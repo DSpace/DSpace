@@ -531,11 +531,9 @@ public class SyndicationFeed {
         if (dso == null) {
             if (baseURL == null) {
                 if (request == null) {
-                    baseURL = ConfigurationManager.getProperty("dspace.url");
+                    baseURL = ConfigurationManager.getProperty("dspace.ui.url");
                 } else {
-                    baseURL = (request.isSecure()) ? "https://" : "http://";
-                    baseURL += ConfigurationManager.getProperty("dspace.hostname");
-                    baseURL += ":" + request.getServerPort();
+                    baseURL = ConfigurationManager.getProperty("dspace.ui.url");
                     baseURL += request.getContextPath();
                 }
             }
