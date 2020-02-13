@@ -90,7 +90,10 @@ public class Utils {
 
     private static final Logger log = Logger.getLogger(Utils.class);
 
-    private static final int EMBEDDED_PAGE_SIZE = 20;
+    /**
+     * The default page size, if unspecified in the request.
+     */
+    private static final int DEFAULT_PAGE_SIZE = 20;
 
     /**
      * The maximum number of embed levels to allow.
@@ -139,7 +142,7 @@ public class Utils {
      * @return the existing instance if it is not null, a default pageable instance otherwise.
      */
     public Pageable getPageable(@Nullable Pageable optionalPageable) {
-        return optionalPageable != null ? optionalPageable : new PageRequest(0, 20);
+        return optionalPageable != null ? optionalPageable : new PageRequest(0, DEFAULT_PAGE_SIZE);
     }
 
     public Link linkToSingleResource(DSpaceResource r, String rel) {
@@ -629,8 +632,8 @@ public class Utils {
             List<RestAddressableModel> list = (List<RestAddressableModel>) linkedObject;
             if (list.size() > 0) {
                 PageImpl<RestAddressableModel> page = new PageImpl(
-                        list.subList(0, list.size() > EMBEDDED_PAGE_SIZE ? EMBEDDED_PAGE_SIZE : list.size()),
-                        new PageRequest(0, EMBEDDED_PAGE_SIZE), list.size());
+                        list.subList(0, list.size() > DEFAULT_PAGE_SIZE ? DEFAULT_PAGE_SIZE : list.size()),
+                        new PageRequest(0, DEFAULT_PAGE_SIZE), list.size());
                 return new EmbeddedPage(link.getHref(),
                         page.map((restObject) -> {
                             restObject.setEmbedLevel(childEmbedLevel);
