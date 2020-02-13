@@ -54,6 +54,7 @@ public class CollectionMatcher {
         return matchEmbeds(
                 "license",
                 "logo",
+                "parentCommunity",
                 "mappedItems[]"
         );
     }
@@ -68,6 +69,7 @@ public class CollectionMatcher {
                 "license",
                 "logo",
                 "mappedItems",
+                "parentCommunity",
                 "self"
         );
     }
