@@ -115,7 +115,6 @@
     <bean class="org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItemServiceImpl"/>
     <bean class="org.dspace.xmlworkflow.XmlWorkflowServiceImpl"/>
     <bean class="org.dspace.xmlworkflow.WorkflowRequirementsServiceImpl"/>
-    <bean class="org.dspace.xmlworkflow.XmlWorkflowFactoryImpl"/>
 
     <!-- Discovery indexable object services -->
     <bean class="org.dspace.discovery.indexobject.ClaimedTaskIndexFactoryImpl" autowire-candidate="true"/>

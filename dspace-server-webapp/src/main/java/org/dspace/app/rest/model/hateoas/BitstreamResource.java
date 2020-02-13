@@ -22,6 +22,5 @@ public class BitstreamResource extends DSpaceResource<BitstreamRest> {
     public BitstreamResource(BitstreamRest bs, Utils utils) {
         super(bs, utils);
         add(utils.linkToSubResource(bs, "content"));
-        add(utils.linkToSubResource(bs, "bundle"));
     }
 }
