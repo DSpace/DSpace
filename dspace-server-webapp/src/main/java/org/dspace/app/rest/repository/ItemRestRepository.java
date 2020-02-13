@@ -128,7 +128,7 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
             while (it.hasNext()) {
                 items.add(it.next());
             }
-            return converter.toRestPage(items, pageable, total, utils.obtainProjection(true));
+            return converter.toRestPage(items, pageable, total, utils.obtainProjection());
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -149,12 +149,19 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
         Context context = obtainContext();
         if (itemRest.getWithdrawn() != item.isWithdrawn()) {
             if (itemRest.getWithdrawn()) {
+                if (item.getTemplateItemOf() != null) {
+                    throw new UnprocessableEntityException("A template item cannot be withdrawn.");
+                }
                 itemService.withdraw(context, item);
             } else {
                 itemService.reinstate(context, item);
             }
         }
+
         if (itemRest.getDiscoverable() != item.isDiscoverable()) {
+            if (itemRest.getDiscoverable() && item.getTemplateItemOf() != null) {
+                throw new UnprocessableEntityException("A template item cannot be discoverable.");
+            }
             item.setDiscoverable(itemRest.getDiscoverable());
             itemService.update(context, item);
         }

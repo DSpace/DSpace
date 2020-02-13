@@ -44,7 +44,7 @@ public class EntityTypeRestRepository extends DSpaceRestRepository<EntityTypeRes
     public Page<EntityTypeRest> findAll(Context context, Pageable pageable) {
         try {
             List<EntityType> entityTypes = entityTypeService.findAll(context);
-            return converter.toRestPage(utils.getPage(entityTypes, pageable), utils.obtainProjection(true));
+            return converter.toRestPage(utils.getPage(entityTypes, pageable), utils.obtainProjection());
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }

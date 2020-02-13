@@ -12,20 +12,24 @@ import org.dspace.app.rest.model.hateoas.HALResource;
 import org.springframework.stereotype.Component;
 
 /**
- * A projection that provides an abbreviated form of any resource that omits all optional embeds.
+ * Catch-all projection that allows embedding of all subresources.
  */
 @Component
-public class ListProjection extends AbstractProjection {
+public class FullProjection extends AbstractProjection {
 
-    public final static String NAME = "list";
+    public final static String NAME = "full";
 
-    @Override
     public String getName() {
         return NAME;
     }
 
     @Override
-    public boolean allowOptionalEmbed(HALResource halResource, LinkRest linkRest) {
-        return false;
+    public boolean allowEmbedding(HALResource halResource, LinkRest linkRest) {
+        return true;
+    }
+
+    @Override
+    public boolean allowLinking(HALResource halResource, LinkRest linkRest) {
+        return true;
     }
 }
