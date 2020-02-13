@@ -34,9 +34,9 @@ public class RootConverterTest {
 
     @Before
     public void setUp() throws Exception {
-        when(configurationService.getProperty("dspace.url")).thenReturn("dspaceurl");
+        when(configurationService.getProperty("dspace.ui.url")).thenReturn("dspaceurl");
         when(configurationService.getProperty("dspace.name")).thenReturn("dspacename");
-        when(configurationService.getProperty("dspace.baseUrl")).thenReturn("rest");
+        when(configurationService.getProperty("dspace.server.url")).thenReturn("rest");
     }
 
     @Test

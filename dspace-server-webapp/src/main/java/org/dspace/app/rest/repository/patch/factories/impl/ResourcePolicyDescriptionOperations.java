@@ -16,7 +16,7 @@ import org.springframework.stereotype.Component;
  * Implementation for ResourcePolicy name patches.
  *
  * Example: <code>
- * curl -X PATCH http://${dspace.url}/api/authz/resourcepolicies/<:id-resourcepolicy> -H "
+ * curl -X PATCH http://${dspace.server.url}/api/authz/resourcepolicies/<:id-resourcepolicy> -H "
  * Content-Type: application/json" -d '[{ "op": "replace", "path": "
  * /description", "value": "my description"]'
  * </code>
@@ -82,7 +82,7 @@ public class ResourcePolicyDescriptionOperations implements ResourcePatchOperati
      *            the resource to update
      * @param operation
      *            the operation to apply
-     * 
+     *
      */
     void checkModelForExistingValue(ResourcePolicyRest resource, Operation operation) {
         if (resource.getDescription() == null) {
@@ -97,7 +97,7 @@ public class ResourcePolicyDescriptionOperations implements ResourcePatchOperati
      *            the resource to update
      * @param operation
      *            the operation to apply
-     * 
+     *
      */
     void checkModelForNotExistingValue(ResourcePolicyRest resource, Operation operation) {
         if (resource.getDescription() != null) {
