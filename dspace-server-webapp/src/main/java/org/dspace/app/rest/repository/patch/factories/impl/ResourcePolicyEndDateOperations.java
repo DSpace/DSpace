@@ -20,7 +20,7 @@ import org.springframework.stereotype.Component;
  * Implementation for ResourcePolicy endDate patches.
  *
  * Example: <code>
- * curl -X PATCH http://${dspace.url}/api/authz/resourcepolicies/<:id-resourcepolicy> -H "
+ * curl -X PATCH http://${dspace.server.url}/api/authz/resourcepolicies/<:id-resourcepolicy> -H "
  * Content-Type: application/json" -d '[{ "op": "replace", "path": "
  * /endDate", "value": "YYYY-MM-DD"]'
  * </code>
@@ -100,7 +100,7 @@ public class ResourcePolicyEndDateOperations implements ResourcePatchOperation<R
      *            the resource to update
      * @param operation
      *            the operation to apply
-     * 
+     *
      */
     void checkModelForExistingValue(ResourcePolicyRest resource, Operation operation) {
         if (resource.getEndDate() == null) {
@@ -115,7 +115,7 @@ public class ResourcePolicyEndDateOperations implements ResourcePatchOperation<R
      *            the resource to update
      * @param operation
      *            the operation to apply
-     * 
+     *
      */
     void checkModelForNotExistingValue(ResourcePolicyRest resource, Operation operation) {
         if (resource.getEndDate() != null) {
@@ -131,7 +131,7 @@ public class ResourcePolicyEndDateOperations implements ResourcePatchOperation<R
      *            the resource to update
      * @param operation
      *            the operation to apply
-     * 
+     *
      */
     void checkModelForConsistentValue(ResourcePolicyRest resource, Operation operation) {
         String dateS = (String) operation.getValue();
