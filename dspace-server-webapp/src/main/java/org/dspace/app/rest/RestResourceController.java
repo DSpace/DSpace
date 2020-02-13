@@ -797,7 +797,11 @@ public class RestResourceController implements InitializingBean {
                             .invoke(linkRepository, request, uuid, page, utils.obtainProjection());
 
                     if (pageResult == null) {
-                        response.setStatus(HttpServletResponse.SC_NO_CONTENT);
+                        // Link repositories may throw an exception or return an empty page,
+                        // but must never return null for a paged subresource.
+                        log.error("Paged subresource link repository " + linkRepository.getClass()
+                                + " incorrectly returned null for request with id " + uuid);
+                        response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                         return null;
                     }
 
