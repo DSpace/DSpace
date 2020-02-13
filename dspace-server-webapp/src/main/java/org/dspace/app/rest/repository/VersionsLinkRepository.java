@@ -1,0 +1,59 @@
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
+ *
+ * http://www.dspace.org/license/
+ */
+package org.dspace.app.rest.repository;
+
+import java.sql.SQLException;
+import java.util.List;
+import javax.annotation.Nullable;
+import javax.servlet.http.HttpServletRequest;
+
+import org.dspace.app.rest.model.VersionHistoryRest;
+import org.dspace.app.rest.model.VersionRest;
+import org.dspace.app.rest.projection.Projection;
+import org.dspace.core.Context;
+import org.dspace.versioning.Version;
+import org.dspace.versioning.VersionHistory;
+import org.dspace.versioning.service.VersionHistoryService;
+import org.dspace.versioning.service.VersioningService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Component;
+
+/**
+ * This is the Repository that takes care of the retrieval of the {@link Version} objects for a given
+ * {@link VersionHistory}
+ */
+@Component(VersionHistoryRest.CATEGORY + "." + VersionHistoryRest.NAME + "." + VersionHistoryRest.VERSIONS)
+public class VersionsLinkRepository extends AbstractDSpaceRestRepository
+    implements LinkRestRepository {
+
+    @Autowired
+    private VersionHistoryService versionHistoryService;
+
+    @Autowired
+    private VersioningService versioningService;
+
+    public Page<VersionRest> getVersions(@Nullable HttpServletRequest request,
+                                               Integer versionHistoryId,
+                                               @Nullable Pageable optionalPageable,
+                                               Projection projection) throws SQLException {
+
+        Context context = obtainContext();
+        VersionHistory versionHistory = versionHistoryService.find(context, versionHistoryId);
+        List<Version> versions = versioningService.getVersionsByHistory(context, versionHistory);
+        Pageable pageable = optionalPageable != null ? optionalPageable : new PageRequest(0, 20);
+        return converter.toRestPage(versions, pageable, versions.size(), projection);
+    }
+
+    @Override
+    public boolean isEmbeddableRelation(Object data, String name) {
+        return false;
+    }
+}
