@@ -53,9 +53,4 @@ public class BitstreamBundleLinkRepository extends AbstractDSpaceRestRepository
             throw new RuntimeException(e);
         }
     }
-
-    @Override
-    public boolean isEmbeddableRelation(Object data, String name) {
-        return false;
-    }
 }

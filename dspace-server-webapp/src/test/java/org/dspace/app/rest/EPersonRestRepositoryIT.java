@@ -183,7 +183,6 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
     @Test
     public void findOneTest() throws Exception {
         context.turnOffAuthorisationSystem();
-        HalMatcher projectionsMatcher = new HalMatcher();
 
         EPerson ePerson = EPersonBuilder.createEPerson(context)
                                         .withNameInMetadata("John", "Doe")
@@ -195,11 +194,11 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                                          .withEmail("janesmith@fake-email.com")
                                          .build();
 
+        // When full projection is requested, response should include expected properties, links, and embeds.
         String authToken = getAuthToken(admin.getEmail(), password);
         getClient(authToken).perform(get("/api/eperson/epersons/" + ePerson2.getID()).param("projection", "full"))
                    .andExpect(status().isOk())
-                   .andExpect(jsonPath("$", projectionsMatcher.matchEpersonEmbeds()))
-                   .andExpect(jsonPath("$", projectionsMatcher.matchEpersonLinks()))
+                   .andExpect(jsonPath("$", EPersonMatcher.matchFullEmbeds()))
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$", is(
                        EPersonMatcher.matchEPersonEntry(ePerson2)
@@ -211,9 +210,10 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                    )))
         ;
 
+        // When no projection is requested, response should include expected properties, links, and no embeds.
         getClient(authToken).perform(get("/api/eperson/epersons/" + ePerson2.getID()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$", projectionsMatcher.matchNoEmbeds()))
+                .andExpect(jsonPath("$", HalMatcher.matchNoEmbeds()))
         ;
 
     }

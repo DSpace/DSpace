@@ -22,7 +22,6 @@ import org.dspace.content.service.BundleService;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -52,7 +51,7 @@ public class BundleBitstreamLinkRepository extends AbstractDSpaceRestRepository
             if (bundle == null) {
                 throw new ResourceNotFoundException("No such bundle: " + bundleId);
             }
-            Pageable pageable = optionalPageable != null ? optionalPageable : new PageRequest(0, 20);
+            Pageable pageable = utils.getPageable(optionalPageable);
             Page<Bitstream> page = utils.getPage(bundle.getBitstreams(), pageable);
             return converter.toRestPage(page, projection);
         } catch (SQLException e) {
