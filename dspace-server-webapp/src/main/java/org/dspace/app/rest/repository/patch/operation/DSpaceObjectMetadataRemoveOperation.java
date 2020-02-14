@@ -31,7 +31,7 @@ import org.springframework.stereotype.Component;
  * > Without index: removes all md values of that schema.identifier.qualifier type
  * > With index: removes only that select md value
  * <code>
- * curl -X PATCH http://${dspace.url}/api/core/items/<:id-item> -H "
+ * curl -X PATCH http://${dspace.server.url}/api/core/items/<:id-item> -H "
  * Content-Type: application/json" -d '[{ "op": "remove",
  * "path": "/metadata/schema.identifier.qualifier(/indexOfSpecificMdToRemove)"}]'
  * </code>

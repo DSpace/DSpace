@@ -30,7 +30,7 @@ import org.springframework.stereotype.Component;
  * - REPLACE metadata (with schema.identifier.qualifier) value of a dso (here: Item)
  *      from existing value to new given value
  * <code>
- * curl -X PATCH http://${dspace.url}/api/core/items/<:id-item> -H "
+ * curl -X PATCH http://${dspace.server.url}/api/core/items/<:id-item> -H "
  * Content-Type: application/json" -d '[{ "op": "replace", "path": "
  * /metadata/schema.identifier.qualifier}", "value": "newMetadataValue"]'
  * </code>
