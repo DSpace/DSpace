@@ -109,7 +109,7 @@ public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, E
             long total = es.countTotal(context);
             List<EPerson> epersons = es.findAll(context, EPerson.EMAIL, pageable.getPageSize(),
                     Math.toIntExact(pageable.getOffset()));
-            return converter.toRestPage(epersons, pageable, total, utils.obtainProjection(true));
+            return converter.toRestPage(epersons, pageable, total, utils.obtainProjection());
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -133,7 +133,7 @@ public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, E
             long total = es.searchResultCount(context, q);
             List<EPerson> epersons = es.search(context, q, Math.toIntExact(pageable.getOffset()),
                     Math.toIntExact(pageable.getOffset() + pageable.getPageSize()));
-            return converter.toRestPage(epersons, pageable, total, utils.obtainProjection(true));
+            return converter.toRestPage(epersons, pageable, total, utils.obtainProjection());
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }

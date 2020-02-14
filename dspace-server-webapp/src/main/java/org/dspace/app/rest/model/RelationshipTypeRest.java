@@ -123,7 +123,7 @@ public class RelationshipTypeRest extends BaseObjectRest<Integer> {
         this.rightMaxCardinality = rightMaxCardinality;
     }
 
-    @LinkRest(linkClass = EntityTypeRest.class)
+    @LinkRest
     @JsonIgnore
     public EntityTypeRest getLeftType() {
         return leftType;
@@ -133,7 +133,7 @@ public class RelationshipTypeRest extends BaseObjectRest<Integer> {
         this.leftType = leftType;
     }
 
-    @LinkRest(linkClass = EntityTypeRest.class)
+    @LinkRest
     @JsonIgnore
     public EntityTypeRest getRightType() {
         return rightType;

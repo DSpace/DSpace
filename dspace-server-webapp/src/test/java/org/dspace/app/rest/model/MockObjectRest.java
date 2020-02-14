@@ -16,20 +16,10 @@ import org.dspace.app.rest.projection.Projection;
 @LinksRest(links = {
         @LinkRest(
                 name = MockObjectRest.O_CHILDREN,
-                linkClass = MockObjectRest.class,
-                method = "getMockObjectChildren",
-                embedOptional = true,
-                linkOptional = true
-        ),
-        @LinkRest(
-                name = MockObjectRest.A_CHILDREN,
-                linkClass = MockObjectRest.class,
-                method = "getMockObjectChildren",
-                linkOptional = true
+                method = "getMockObjectChildren"
         ),
         @LinkRest(
                 name = MockObjectRest.N_CHILDREN,
-                linkClass = MockObjectRest.class,
                 method = "getMockObjectChildren"
         )
 })
@@ -39,25 +29,19 @@ public class MockObjectRest extends BaseObjectRest<Long> {
 
     public static final String NAME = "testobject";
 
-    public static final String O_CHILDREN = "oChildren";
+    public static final String O_CHILDREN = "optionallyEmbeddedChildren";
 
-    public static final String A_CHILDREN = "aChildren";
-
-    public static final String N_CHILDREN = "nChildren";
+    public static final String N_CHILDREN = "neverEmbeddedChildren";
 
     private String value;
 
-    private MockObjectRest restProp1;
+    private MockObjectRest restPropNotNull;
 
-    private MockObjectRest restProp2;
+    private MockObjectRest restPropNull;
 
-    private MockObjectRest restProp3;
+    private MockObjectRest restPropRenamed;
 
-    private MockObjectRest restProp4;
-
-    private MockObjectRest restProp5;
-
-    private MockObjectRest restProp6;
+    private MockObjectRest restPropUnannotated;
 
     public static MockObjectRest create(long id) {
         MockObjectRest mockObjectRest = new MockObjectRest();
@@ -90,56 +74,38 @@ public class MockObjectRest extends BaseObjectRest<Long> {
         this.value = value;
     }
 
-    @LinkRest(linkClass = MockObjectRest.class, linkOptional = true)
-    public MockObjectRest getRestProp1() {
-        return restProp1;
+    @LinkRest
+    public MockObjectRest getRestPropNotNull() {
+        return restPropNotNull;
     }
 
-    public void setRestProp1(MockObjectRest restProp1) {
-        this.restProp1 = restProp1;
+    public void setRestPropNotNull(MockObjectRest restPropNotNull) {
+        this.restPropNotNull = restPropNotNull;
     }
 
-    @LinkRest(linkClass = MockObjectRest.class, embedOptional = true, linkOptional = true)
-    public MockObjectRest getRestProp2() {
-        return restProp2;
+    @LinkRest
+    public MockObjectRest getRestPropNull() {
+        return restPropNull;
     }
 
-    public void setRestProp2(MockObjectRest restProp2) {
-        this.restProp2 = restProp2;
+    public void setRestPropNull(MockObjectRest restPropNull) {
+        this.restPropNull = restPropNull;
     }
 
-    @LinkRest(linkClass = MockObjectRest.class, embedOptional = true, linkOptional = true)
-    public MockObjectRest getRestProp3() {
-        return restProp3;
+    @LinkRest(name = "restPropRenamedWithSuffix")
+    public MockObjectRest getRestPropRenamed() {
+        return restPropRenamed;
     }
 
-    public void setRestProp3(MockObjectRest restProp3) {
-        this.restProp3 = restProp3;
+    public void setRestPropRenamed(MockObjectRest restPropRenamed) {
+        this.restPropRenamed = restPropRenamed;
     }
 
-    @LinkRest(linkClass = MockObjectRest.class, embedOptional = true)
-    public MockObjectRest getRestProp4() {
-        return restProp4;
+    public MockObjectRest getRestPropUnannotated() {
+        return restPropUnannotated;
     }
 
-    public void setRestProp4(MockObjectRest restProp4) {
-        this.restProp4 = restProp4;
-    }
-
-    @LinkRest(linkClass = MockObjectRest.class, name = "restPropFive")
-    public MockObjectRest getRestProp5() {
-        return restProp5;
-    }
-
-    public void setRestProp5(MockObjectRest restProp5) {
-        this.restProp5 = restProp5;
-    }
-
-    public MockObjectRest getRestProp6() {
-        return restProp6;
-    }
-
-    public void setRestProp6(MockObjectRest restProp6) {
-        this.restProp6 = restProp6;
+    public void setRestPropUnannotated(MockObjectRest restPropUnannotated) {
+        this.restPropUnannotated = restPropUnannotated;
     }
 }
