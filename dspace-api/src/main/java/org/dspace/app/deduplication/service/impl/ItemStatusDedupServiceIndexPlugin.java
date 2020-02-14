@@ -15,25 +15,27 @@ import org.apache.solr.common.SolrInputDocument;
 import org.dspace.app.deduplication.service.SolrDedupServiceIndexPlugin;
 import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
-import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.util.ItemUtils;
 
+/**
+ * The class defines a status index strategy used to collect items information
+ * related to firstId and secondId items.
+ * 
+ * Item status (like archived, withdrawn, ...) are added to the document index
+ * in a "itemstatus_i" field.
+ */
 public class ItemStatusDedupServiceIndexPlugin implements SolrDedupServiceIndexPlugin {
 
     private static final Logger log = Logger.getLogger(ItemStatusDedupServiceIndexPlugin.class);
 
     @Override
-    public void additionalIndex(Context context, UUID firstId, UUID secondId, Integer type,
-            SolrInputDocument document) {
+    public void additionalIndex(Context context, UUID firstId, UUID secondId, SolrInputDocument document) {
 
-        if (type == Constants.ITEM) {
-            internal(context, firstId, document);
-            if (firstId != secondId) {
-                internal(context, secondId, document);
-            }
+        internal(context, firstId, document);
+        if (firstId != secondId) {
+            internal(context, secondId, document);
         }
-
     }
 
     private void internal(Context context, UUID itemId, SolrInputDocument document) {

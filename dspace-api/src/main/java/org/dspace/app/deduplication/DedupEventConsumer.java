@@ -18,12 +18,11 @@ import java.util.UUID;
 import org.apache.log4j.Logger;
 import org.dspace.app.deduplication.service.DedupService;
 import org.dspace.app.deduplication.utils.Signature;
-import org.dspace.content.DSpaceObject;
+import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.discovery.IndexEventConsumer;
 import org.dspace.event.Consumer;
 import org.dspace.event.Event;
 import org.dspace.utils.DSpace;
@@ -33,10 +32,10 @@ public class DedupEventConsumer implements Consumer {
     /**
      * log4j logger
      */
-    private static Logger log = Logger.getLogger(IndexEventConsumer.class);
+    private static Logger log = Logger.getLogger(DedupEventConsumer.class);
 
     // collect Items, Collections, Communities that need indexing
-    private Set<DSpaceObject> objectsToUpdate = null;
+    private Set<Item> objectsToUpdate = null;
 
     private Set<UUID> objectsToDelete = null;
 
@@ -66,7 +65,7 @@ public class DedupEventConsumer implements Consumer {
     public void consume(Context ctx, Event event) throws Exception {
 
         if (objectsToUpdate == null) {
-            objectsToUpdate = new HashSet<DSpaceObject>();
+            objectsToUpdate = new HashSet<Item>();
             objectsToDelete = new HashSet<UUID>();
         }
 
@@ -77,9 +76,9 @@ public class DedupEventConsumer implements Consumer {
             return;
         }
 
-        DSpaceObject subject = event.getSubject(ctx);
+        Item subject = (Item)event.getSubject(ctx);
 
-        DSpaceObject object = event.getObject(ctx);
+        Item object = (Item)event.getObject(ctx);
 
         // If event subject is a Bundle and event was Add or Remove,
         // transform the event to be a Modify on the owning Item.
@@ -124,7 +123,7 @@ public class DedupEventConsumer implements Consumer {
         }
     }
 
-    private void fillObjectToUpdate(DSpaceObject subject) {
+    private void fillObjectToUpdate(Item subject) {
         if (!cache.containsKey(subject.getID())) {
             objectsToUpdate.add(subject);
             Map<String, List<String>> newCacheMetadata = new HashMap<String, List<String>>();
@@ -201,18 +200,16 @@ public class DedupEventConsumer implements Consumer {
         if (objectsToUpdate != null && objectsToDelete != null) {
 
             // update the changed Items not deleted because they were on create list
-            for (DSpaceObject iu : objectsToUpdate) {
+            for (Item iu : objectsToUpdate) {
                 /*
                  * we let all types through here and allow the search DSIndexer to make
                  * decisions on indexing and/or removal
                  */
                 if (!objectsToDelete.contains(iu.getID())) {
                     try {
-                        if (iu instanceof /* BrowsableDSpaceObject */DSpaceObject) {
-                            indexer.indexContent(ctx, (/* BrowsableDSpaceObject */DSpaceObject) iu, true);
-                            log.debug("Indexed " + Constants.typeText[iu.getType()] + ", id="
-                                    + String.valueOf(iu.getID()) + ", handle (if exist)=" + iu.getHandle());
-                        }
+                        indexer.indexContent(ctx, iu, true);
+                        log.debug("Indexed " + Constants.typeText[iu.getType()] + ", id=" + String.valueOf(iu.getID())
+                                + ", handle (if exist)=" + iu.getHandle());
                     } catch (Exception e) {
                         log.error("Failed while indexing object: ", e);
                     }
@@ -221,7 +218,7 @@ public class DedupEventConsumer implements Consumer {
 
             for (UUID key : objectsToDelete) {
                 try {
-                    indexer.unIndexContent(ctx, key, Constants.ITEM);
+                    indexer.unIndexContent(ctx, key);
                     if (log.isDebugEnabled()) {
                         log.debug("UN-Indexed ITEM, id=" + key);
                     }

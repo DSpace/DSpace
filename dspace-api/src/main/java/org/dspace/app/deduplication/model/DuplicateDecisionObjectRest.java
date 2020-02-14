@@ -9,13 +9,22 @@ package org.dspace.app.deduplication.model;
 
 import org.dspace.app.deduplication.service.impl.SolrDedupServiceImpl.DeduplicationFlag;
 
+/***
+ * Define a Json object to trace the choices that can be done to resolve a
+ * duplication.
+ * <p>
+ * Use VERIFY as type mark the deduplication to be verified. Use REJECT as type
+ * mark the deduplication to be ignored.
+ *
+ * A DeduplicationFlag store the current status (MATCH, VERIFY or REJECT).
+ */
 public class DuplicateDecisionObjectRest {
 
-    String value;
+    private String value;
 
-    DuplicateDecisionType type;
+    private DuplicateDecisionType type;
 
-    String note;
+    private String note;
 
     public DuplicateDecisionValue getValue() {
         return (value != null) ? DuplicateDecisionValue.fromString(value) : null;

@@ -20,13 +20,12 @@ CREATE TABLE deduplication (
     reader_time TIMESTAMP,
     reader_note VARCHAR2(256),
     reject_time TIMESTAMP,
-    resource_type_id INTEGER,
     submitter_decision VARCHAR2(256),
     workflow_decision VARCHAR2(256),
     admin_decision VARCHAR2(256),
     eperson_id uuid,
     admin_id uuid,
     reader_id uuid,
-    first_item_id VARCHAR2(255),
-    second_item_id VARCHAR2(255)
+    first_item_id uuid,
+    second_item_id uuid
 );

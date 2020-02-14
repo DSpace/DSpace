@@ -12,7 +12,10 @@ import java.util.UUID;
 import org.apache.solr.common.SolrInputDocument;
 import org.dspace.core.Context;
 
+/**
+ * Interface used to define an index strategy used to collect item information
+ * related to itemFirst and itemSecond.
+ */
 public interface SolrDedupServiceIndexPlugin {
-    public void additionalIndex(Context context, UUID dsoFirst, UUID dsoSecond, Integer type,
-            SolrInputDocument document);
+    public void additionalIndex(Context context, UUID itemFirst, UUID itemSecond, SolrInputDocument document);
 }

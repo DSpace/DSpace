@@ -12,6 +12,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.UUID;
 
 import javax.persistence.Query;
 
@@ -29,21 +30,38 @@ public class DeduplicationDAOImpl extends AbstractHibernateDAO<Deduplication> im
     private static final String DEDUPLICATION_SEQUENCE = "deduplication_id_seq";
 
     @Override
-    public List<Deduplication> findByFirstAndSecond(Context context, String firstId, String secondId)
-            throws SQLException {
+    public Deduplication create(Context context, Deduplication d) throws SQLException {
+        Deduplication dedup = super.create(context, d);
+        dedup.setDeduplicationId(getNextDeduplicationId(context));
+
+        return dedup;
+    }
+
+    @Override
+    public List<Deduplication> findByFirstAndSecond(Context context, UUID firstId, UUID secondId) throws SQLException {
         Query query = queryByFirstAndSecond(context, firstId, secondId);
         return list(query);
     }
 
     @Override
-    public Deduplication uniqueByFirstAndSecond(Context context, String firstId, String secondId) throws SQLException {
+    public Deduplication uniqueByFirstAndSecond(Context context, UUID firstId, UUID secondId) throws SQLException {
         Query query = queryByFirstAndSecond(context, firstId, secondId);
         return singleResult(query);
     }
 
-    public List<Deduplication> findAll(Context context) throws SQLException {
+    public List<Deduplication> findAll(Context context, int pageSize, int offset) throws SQLException {
         Query query = createQuery(context, "SELECT d FROM Deduplication d");
+        if (pageSize > 0) {
+            query.setMaxResults(pageSize);
+        }
+        if (offset > 0) {
+            query.setFirstResult(offset);
+        }
         return list(query);
+    }
+
+    public int countRows(Context context) throws SQLException {
+        return count(createQuery(context, "SELECT count(*) FROM Deduplication"));
     }
 
     /**
@@ -53,8 +71,7 @@ public class DeduplicationDAOImpl extends AbstractHibernateDAO<Deduplication> im
      * @return next available id (as a Long)
      * @throws SQLException if database error or sequence doesn't exist
      */
-    @Override
-    public Integer getNextDeduplicationId(Context context) throws SQLException {
+    private Integer getNextDeduplicationId(Context context) throws SQLException {
         // Create a new Hibernate ReturningWork, which will return the
         // result of the next value in the Handle Sequence.
         ReturningWork<Integer> nextValReturningWork = new ReturningWork<Integer>() {
@@ -87,11 +104,7 @@ public class DeduplicationDAOImpl extends AbstractHibernateDAO<Deduplication> im
         return getHibernateSession(context).doReturningWork(nextValReturningWork);
     }
 
-    public int countRows(Context context) throws SQLException {
-        return count(createQuery(context, "SELECT count(*) FROM Deduplication"));
-    }
-
-    private Query queryByFirstAndSecond(Context context, String firstId, String secondId) throws SQLException {
+    private Query queryByFirstAndSecond(Context context, UUID firstId, UUID secondId) throws SQLException {
         Query query = createQuery(context, "SELECT d FROM Deduplication d"
                 + " WHERE d.firstItemId = :firstItemId and d.secondItemId = :secondItemId");
 

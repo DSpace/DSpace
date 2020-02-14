@@ -7,6 +7,13 @@
  */
 package org.dspace.app.deduplication.model;
 
+/***
+ * Define an enumeration to list the choices that can be done to resolve a
+ * duplication.
+ * <p>
+ * Use VERIFY to mark the deduplication to be verified. Use REJECT to mark the
+ * deduplication to be ignored.
+ */
 public enum DuplicateDecisionValue {
 
     REJECT("reject"), VERIFY("verify");

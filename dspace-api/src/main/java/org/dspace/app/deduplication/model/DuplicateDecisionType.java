@@ -7,6 +7,8 @@
  */
 package org.dspace.app.deduplication.model;
 
+import org.apache.commons.lang3.StringUtils;
+
 public enum DuplicateDecisionType {
 
     WORKSPACE("WORKSPACE"), WORKFLOW("WORKFLOW"), ADMIN("ADMIN");
@@ -23,11 +25,11 @@ public enum DuplicateDecisionType {
     }
 
     public static DuplicateDecisionType fromString(String text) {
-        if (text == null) {
+        if (StringUtils.isBlank(text)) {
             return null;
         }
         for (DuplicateDecisionType b : DuplicateDecisionType.values()) {
-            if (b.text.equalsIgnoreCase(text)) {
+            if (StringUtils.equals(text, b.text)) {
                 return b;
             }
         }

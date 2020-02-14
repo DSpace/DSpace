@@ -26,7 +26,7 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 /**
  * Class representing a Deduplication data.
  *
- * @author fcadili
+ * @author fcadili (francecso.cadili at 4science.it)
  * @version $Revision$
  */
 @Entity
@@ -64,9 +64,6 @@ public class Deduplication {
     @Temporal(TemporalType.TIMESTAMP)
     Date rejectTime;
 
-    @Column(name = "resource_type_id")
-    Integer resourceTypeId;
-
     @Column(name = "submitter_decision", length = 256)
     private String submitterDecision;
 
@@ -85,11 +82,11 @@ public class Deduplication {
     @Column(name = "reader_id")
     UUID readerId;
 
-    @Column(name = "first_item_id", length = 256)
-    private String firstItemId;
+    @Column(name = "first_item_id")
+    private UUID firstItemId;
 
-    @Column(name = "second_item_id", length = 256)
-    private String secondItemId;
+    @Column(name = "second_item_id")
+    private UUID secondItemId;
 
     public Integer getDeduplicationId() {
         return deduplicationId;
@@ -99,28 +96,20 @@ public class Deduplication {
         this.deduplicationId = deduplicationId;
     }
 
-    public String getFirstItemId() {
+    public UUID getFirstItemId() {
         return firstItemId;
     }
 
-    public void setFirstItemId(String firstItemId) {
+    public void setFirstItemId(UUID firstItemId) {
         this.firstItemId = firstItemId;
     }
 
-    public String getSecondItemId() {
+    public UUID getSecondItemId() {
         return secondItemId;
     }
 
-    public void setSecondItemId(String secondItemId) {
+    public void setSecondItemId(UUID secondItemId) {
         this.secondItemId = secondItemId;
-    }
-
-    public Integer getResourceTypeId() {
-        return resourceTypeId;
-    }
-
-    public void setResourceTypeId(Integer resourceTypeId) {
-        this.resourceTypeId = resourceTypeId;
     }
 
     public boolean isTofix() {

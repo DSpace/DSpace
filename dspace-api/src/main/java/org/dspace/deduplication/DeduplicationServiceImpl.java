@@ -9,6 +9,7 @@ package org.dspace.deduplication;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.UUID;
 
 import org.apache.logging.log4j.Logger;
 import org.dspace.core.Context;
@@ -31,18 +32,14 @@ public class DeduplicationServiceImpl implements DeduplicationService {
     }
 
     @Override
-    public Deduplication create(Context context) throws SQLException {
-        // Create a table row
-        Deduplication dedup = deduplicationDAO.create(context, new Deduplication());
-
-        dedup.setDeduplicationId(deduplicationDAO.getNextDeduplicationId(context));
-
+    public Deduplication create(Context context, Deduplication d) throws SQLException {
+        Deduplication dedup = deduplicationDAO.create(context, d);
         return dedup;
     }
 
     @Override
-    public List<Deduplication> findAll(Context context) throws SQLException {
-        return deduplicationDAO.findAll(context);
+    public List<Deduplication> findAll(Context context, int pageSize, int offset) throws SQLException {
+        return deduplicationDAO.findAll(context, pageSize, offset);
     }
 
     @Override
@@ -56,13 +53,13 @@ public class DeduplicationServiceImpl implements DeduplicationService {
     }
 
     @Override
-    public List<Deduplication> getDeduplicationByFirstAndSecond(Context context, String firstId, String secondId)
+    public List<Deduplication> getDeduplicationByFirstAndSecond(Context context, UUID firstId, UUID secondId)
             throws SQLException {
         return deduplicationDAO.findByFirstAndSecond(context, firstId, secondId);
     }
 
     @Override
-    public Deduplication uniqueDeduplicationByFirstAndSecond(Context context, String firstId, String secondId)
+    public Deduplication uniqueDeduplicationByFirstAndSecond(Context context, UUID firstId, UUID secondId)
             throws SQLException {
         return deduplicationDAO.uniqueByFirstAndSecond(context, firstId, secondId);
     }

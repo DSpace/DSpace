@@ -9,8 +9,8 @@ package org.dspace.app.rest.model.step;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonProperty.Access;
 
+import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.deduplication.model.DuplicateDecisionValue;
 import org.dspace.app.rest.model.ItemRest;
 import org.dspace.app.rest.model.LinkRest;
@@ -22,22 +22,22 @@ import org.dspace.app.rest.model.LinkRest;
  */
 public class DuplicateMatch implements SectionData {
 
-    @JsonProperty(access = Access.READ_ONLY)
+    @JsonProperty
     private String submitterDecision;
 
-    @JsonProperty(access = Access.READ_ONLY)
+    @JsonProperty
     private String workflowDecision;
 
-    @JsonProperty(access = Access.READ_ONLY)
+    @JsonProperty
     private String adminDecision;
 
-    @JsonProperty(access = Access.READ_ONLY)
+    @JsonProperty
     private String submitterNote;
 
-    @JsonProperty(access = Access.READ_ONLY)
+    @JsonProperty
     private String workflowNote;
 
-    @JsonProperty(access = Access.READ_ONLY)
+    @JsonProperty
     private ItemRest matchObject;
 
     @LinkRest(linkClass = ItemRest.class)
@@ -94,6 +94,12 @@ public class DuplicateMatch implements SectionData {
 
     public void setWorkflowNote(String workflowNote) {
         this.workflowNote = workflowNote;
+    }
+
+    @JsonIgnore
+    public boolean anyDecisionMade() {
+        return StringUtils.isNotBlank(getAdminDecision()) || StringUtils.isNotBlank(getSubmitterDecision())
+                || StringUtils.isNotBlank(getWorkflowDecision());
     }
 
 }

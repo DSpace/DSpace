@@ -17,15 +17,17 @@ import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.client.solrj.response.UpdateResponse;
 import org.dspace.app.deduplication.model.DuplicateDecisionType;
 import org.dspace.app.deduplication.service.impl.SolrDedupServiceImpl.DeduplicationFlag;
-import org.dspace.content.DSpaceObject;
+import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.discovery.SearchServiceException;
 
+/**
+ * Service used to handle indexing related to the dedup solr core.
+ */
 public interface DedupService {
-    public void indexContent(Context ctx, /* BrowsableDSpaceObject<UUID> */DSpaceObject dso, boolean force)
-            throws SearchServiceException;
+    public void indexContent(Context ctx, Item item, boolean force) throws SearchServiceException;
 
-    public void unIndexContent(Context context, /* BrowsableDSpaceObject<UUID> */DSpaceObject dso);
+    public void unIndexContent(Context context, Item item);
 
     public QueryResponse find(String query, String... filters) throws SearchServiceException;
 
@@ -33,24 +35,19 @@ public interface DedupService {
 
     public void cleanIndex(boolean force) throws IOException, SQLException, SearchServiceException;
 
-    public void cleanIndex(boolean force, int type) throws IOException, SQLException, SearchServiceException;
+    public void indexContent(Context context, List<UUID> ids, boolean force);
 
-    public void updateIndex(Context context, boolean force);
-
-    public void indexContent(Context context, List<UUID> ids, boolean force, int type);
-
-    public void updateIndex(Context context, boolean b, Integer type);
+    public void updateIndex(Context context, boolean b);
 
     public void optimize();
 
     public void unIndexContent(Context context, String handleOrUuid) throws IllegalStateException, SQLException;
 
-    public void unIndexContent(Context context, UUID id, Integer type) throws IllegalStateException, SQLException;
+    public void unIndexContent(Context context, UUID id) throws IllegalStateException, SQLException;
 
     public QueryResponse search(SolrQuery solrQuery) throws SearchServiceException;
 
-    public void buildDecision(Context context, String firstId, String secondId, Integer type, DeduplicationFlag flag,
-            String note);
+    public void buildDecision(Context context, UUID firstId, UUID secondId, DeduplicationFlag flag, String note);
 
     public void commit();
 

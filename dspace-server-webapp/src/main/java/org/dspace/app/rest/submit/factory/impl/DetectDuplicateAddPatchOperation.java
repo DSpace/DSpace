@@ -12,19 +12,23 @@ import java.util.UUID;
 import org.dspace.app.deduplication.model.DuplicateDecisionObjectRest;
 import org.dspace.app.deduplication.model.DuplicateDecisionType;
 import org.dspace.app.deduplication.utils.DedupUtils;
-import org.dspace.app.rest.exception.PatchUnprocessableEntityException;
+import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.patch.LateObjectEvaluator;
 import org.dspace.content.InProgressSubmission;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.core.Context;
 import org.dspace.services.model.Request;
 import org.dspace.utils.DSpace;
+import org.dspace.workflow.WorkflowItem;
 
 /**
  * Submission "add" PATCH operation.
- *
- * Path used to add a new value to an <b>existent metadata</b>:
- * "/sections/<:name-of-the-form>/<:metadata>/-"
+ * <p>
+ * With path:<br>
+ * matches/<UUID>/submitterDecision or matches/<UUID>/workflowDecision
+ * <p>
+ * With body:<br>
+ * value: reject or verify and note: null or <description>.
  *
  * @author Giuseppe Digilio (giuseppe.digilio at 4science.it)
  */
@@ -43,32 +47,67 @@ public class DetectDuplicateAddPatchOperation extends AddPatchOperation<Duplicat
 
         DuplicateDecisionObjectRest decisionObject = evaluateSingleObject((LateObjectEvaluator) value);
         UUID currentItemID = source.getItem().getID();
-        UUID duplicateItemID = UUID.fromString(split[1]);
+        UUID duplicateItemID = null;
+        try {
+            duplicateItemID = UUID.fromString(split[1]);
+        } catch (IllegalArgumentException ie) {
+            throw new UnprocessableEntityException(String.format("The patch item id (%s) is not an UUID", split[1]));
+        }
         boolean isInWorkflow = !(source instanceof WorkspaceItem);
         String subPath = split[2];
         Integer resourceType = source.getItem().getType();
 
         switch (subPath) {
             case "submitterDecision":
-                decisionObject.setType(DuplicateDecisionType.WORKSPACE);
+                if (decisionObject.getType() == null) {
+                    decisionObject.setType(DuplicateDecisionType.WORKSPACE);
+
+                    if (!(source instanceof WorkspaceItem)) {
+                        throw new UnprocessableEntityException(
+                                String.format("The specified path %s can be used only with a workspace item", subPath));
+                    }
+                } else if (decisionObject.getType() != DuplicateDecisionType.WORKSPACE) {
+                    throw new UnprocessableEntityException(
+                            String.format("The specified path %s is not WORKSPACE", subPath));
+                }
                 break;
             case "workflowDecision":
-                decisionObject.setType(DuplicateDecisionType.WORKFLOW);
+                if (decisionObject.getType() == null) {
+                    decisionObject.setType(DuplicateDecisionType.WORKFLOW);
+
+                    if (!(source instanceof WorkflowItem)) {
+                        throw new UnprocessableEntityException(
+                                String.format("The specified path %s can be used only with a workflow item", subPath));
+                    }
+                } else if (decisionObject.getType() != DuplicateDecisionType.WORKFLOW) {
+                    throw new UnprocessableEntityException(
+                            String.format("The specified path %s is not WORKFLOW", subPath));
+                }
                 break;
             case "adminDecision":
-                decisionObject.setType(DuplicateDecisionType.ADMIN);
+                if (decisionObject.getType() == null) {
+                    decisionObject.setType(DuplicateDecisionType.ADMIN);
+                } else if (decisionObject.getType() != DuplicateDecisionType.ADMIN) {
+                    throw new UnprocessableEntityException(
+                            String.format("The specified path %s is not ADMIN", subPath));
+                }
                 break;
             default:
-                throw new IllegalArgumentException(String.format("The specified path %s is not valid", subPath));
+                throw new UnprocessableEntityException(String.format("The specified path %s is not valid", subPath));
         }
 
-        if (!dedupUtils.validateDecision(decisionObject)) {
-            throw new IllegalArgumentException(
-                    String.format("The specified decision %s is not valid", decisionObject.getValue()));
+        // generate UnprocessableEntityException if decisionObject is invalid
+        try {
+            if (!dedupUtils.validateDecision(decisionObject)) {
+                throw new UnprocessableEntityException(
+                        String.format("The specified decision %s is not valid", decisionObject.getValue()));
+            }
+        } catch (IllegalArgumentException e) {
+            throw new UnprocessableEntityException(String.format("The specified decision is not valid", e));
         }
 
         if (!dedupUtils.matchExist(context, currentItemID, duplicateItemID, resourceType, null, isInWorkflow)) {
-            throw new PatchUnprocessableEntityException(
+            throw new UnprocessableEntityException(
                     String.format("Cannot find any duplicate match related to Item %s", duplicateItemID));
         }
 

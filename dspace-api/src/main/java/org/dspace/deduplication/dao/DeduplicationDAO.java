@@ -9,6 +9,7 @@ package org.dspace.deduplication.dao;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.UUID;
 
 import org.dspace.core.Context;
 import org.dspace.core.GenericDAO;
@@ -20,17 +21,15 @@ import org.dspace.deduplication.Deduplication;
  * Deduplication object and is autowired by spring This class should only be
  * accessed from a single service and should never be exposed outside of the API
  *
- * @author fcadili
+ * @author fcadili (francecso.cadili at 4science.it)
  */
 public interface DeduplicationDAO extends GenericDAO<Deduplication> {
-    public List<Deduplication> findByFirstAndSecond(Context context, String firstId, String secondId)
-            throws SQLException;
 
-    public Deduplication uniqueByFirstAndSecond(Context context, String firstId, String secondId) throws SQLException;
+    public List<Deduplication> findByFirstAndSecond(Context context, UUID firstId, UUID secondId) throws SQLException;
 
-    public List<Deduplication> findAll(Context context) throws SQLException;
+    public Deduplication uniqueByFirstAndSecond(Context context, UUID firstId, UUID secondId) throws SQLException;
 
-    public Integer getNextDeduplicationId(Context context) throws SQLException;
+    public List<Deduplication> findAll(Context context, int pageSize, int offset) throws SQLException;
 
     public int countRows(Context context) throws SQLException;
 }

@@ -353,7 +353,12 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
                             " Therefore it cannot be used by the Configurable Submission as the <processing-class>!");
                     }
 
-                } catch (Exception e) {
+                }
+                catch (UnprocessableEntityException ue) {
+                    log.error(ue.getMessage(), ue);
+                    throw ue;
+                }
+                catch (Exception e) {
                     log.error(e.getMessage(), e);
                     throw new PatchException("Error processing the patch request", e);
                 }

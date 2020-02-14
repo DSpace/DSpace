@@ -47,6 +47,10 @@ import org.dspace.discovery.SearchServiceException;
 import org.dspace.util.ItemUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
+/**
+ * Utility class used to search for duplicates inside the dedup solr core.
+ *
+ */
 public class DedupUtils {
 
     /** log4j logger */
@@ -149,8 +153,9 @@ public class DedupUtils {
 
         SolrQuery findDuplicateBySignature = new SolrQuery();
         findDuplicateBySignature.setQuery((isInWorkflow == null ? SolrDedupServiceImpl.SUBQUERY_NOT_IN_REJECTED
-                : (isInWorkflow ? SolrDedupServiceImpl.SUBQUERY_NOT_IN_REJECTED_OR_VERIFYWF
-                        : SolrDedupServiceImpl.SUBQUERY_NOT_IN_REJECTED_OR_VERIFY)));
+                : (isInWorkflow
+                        ? SolrDedupServiceImpl./* (test)SUBQUERY_NOT_IN_REJECTED_OR_VERIFYWF */SUBQUERY_WF_MATCH_OR_REJECTED_OR_VERIFY
+                        : SolrDedupServiceImpl/* .SUBQUERY_NOT_IN_REJECTED_OR_VERIFY */.SUBQUERY_WS_MATCH_OR_REJECTED_OR_VERIFY)));
         findDuplicateBySignature.addFilterQuery(SolrDedupServiceImpl.RESOURCE_IDS_FIELD + ":" + targetItemID);
         findDuplicateBySignature.addFilterQuery(SolrDedupServiceImpl.RESOURCE_RESOURCETYPE_FIELD + ":" + resourceType);
         String filter = "";
@@ -159,11 +164,14 @@ public class DedupUtils {
                     + SolrDedupServiceImpl.DeduplicationFlag.MATCH.getDescription();
         } else if (isInWorkflow) {
             filter = SolrDedupServiceImpl.RESOURCE_FLAG_FIELD + ":("
-                    + SolrDedupServiceImpl.DeduplicationFlag.REJECTWS.getDescription() + " OR "
-                    + SolrDedupServiceImpl.DeduplicationFlag.VERIFYWS.getDescription() + ")";
+                    + SolrDedupServiceImpl.DeduplicationFlag.REJECTWF.getDescription() + " OR "
+                    + SolrDedupServiceImpl.DeduplicationFlag.VERIFYWF.getDescription() + /* ")"; */" OR "
+                    + SolrDedupServiceImpl.DeduplicationFlag.MATCH.getDescription() + ")";
         } else {
-            filter = SolrDedupServiceImpl.RESOURCE_FLAG_FIELD + ":"
-                    + SolrDedupServiceImpl.DeduplicationFlag.MATCH.getDescription();
+            filter = SolrDedupServiceImpl.RESOURCE_FLAG_FIELD + ":("
+                    + SolrDedupServiceImpl.DeduplicationFlag.REJECTWS.getDescription() + " OR "
+                    + SolrDedupServiceImpl.DeduplicationFlag.VERIFYWS.getDescription() + " OR "
+                    + SolrDedupServiceImpl.DeduplicationFlag.MATCH.getDescription() + ")";
         }
 
         findDuplicateBySignature.addFilterQuery(filter);
@@ -203,6 +211,12 @@ public class DedupUtils {
                             info.setDecision(DuplicateDecisionType.WORKSPACE, DuplicateDecisionValue.VERIFY);
                         } else if (SolrDedupServiceImpl.DeduplicationFlag.REJECTWS.getDescription().equals(flag)) {
                             info.setDecision(DuplicateDecisionType.WORKSPACE, DuplicateDecisionValue.REJECT);
+                        } else if (SolrDedupServiceImpl.DeduplicationFlag.VERIFYWF.getDescription().equals(flag)) {
+                            info.setNote(DuplicateDecisionType.WORKFLOW,
+                                    (String) solrDocument.getFieldValue("dedup.note"));
+                            info.setDecision(DuplicateDecisionType.WORKFLOW, DuplicateDecisionValue.VERIFY);
+                        } else if (SolrDedupServiceImpl.DeduplicationFlag.REJECTWF.getDescription().equals(flag)) {
+                            info.setDecision(DuplicateDecisionType.WORKFLOW, DuplicateDecisionValue.REJECT);
                         }
                         dupsInfo.add(info);
                         break;
@@ -253,25 +267,21 @@ public class DedupUtils {
         Deduplication row = null;
         try {
 
-            row = deduplicationService.uniqueDeduplicationByFirstAndSecond(context, sortedIds[0].toString(),
-                    sortedIds[1].toString());
+            row = deduplicationService.uniqueDeduplicationByFirstAndSecond(context, sortedIds[0], sortedIds[1]);
             if (row != null) {
                 row.setAdminId(context.getCurrentUser().getID());
                 row.setAdminTime(new Date());
-                row.setResourceTypeId(type);
                 row.setAdminDecision(DeduplicationFlag.REJECTADMIN.getDescription());
             } else {
                 row = new Deduplication();
                 row.setAdminId(context.getCurrentUser().getID());
-                row.setFirstItemId(sortedIds[0].toString());
-                row.setSecondItemId(sortedIds[1].toString());
+                row.setFirstItemId(sortedIds[0]);
+                row.setSecondItemId(sortedIds[1]);
                 row.setAdminTime(new Date());
-                row.setResourceTypeId(type);
                 row.setAdminDecision(DeduplicationFlag.REJECTADMIN.getDescription());
             }
             deduplicationService.update(context, row);
-            dedupService.buildDecision(context, firstId.toString(), secondId.toString(), type,
-                    DeduplicationFlag.REJECTADMIN, null);
+            dedupService.buildDecision(context, firstId, secondId, DeduplicationFlag.REJECTADMIN, null);
             return true;
         } catch (Exception ex) {
             log.error(ex.getMessage(), ex);
@@ -337,8 +347,7 @@ public class DedupUtils {
                 Constants.WRITE)
                 || AuthorizeServiceFactory.getInstance().getAuthorizeService().authorizeActionBoolean(context,
                         secondItem, Constants.WRITE)) {
-            Deduplication row = deduplicationService.uniqueDeduplicationByFirstAndSecond(context, firstId.toString(),
-                    secondId.toString());
+            Deduplication row = deduplicationService.uniqueDeduplicationByFirstAndSecond(context, firstId, secondId);
 
             if (row != null) {
                 String submitterDecision = row.getSubmitterDecision();
@@ -349,9 +358,8 @@ public class DedupUtils {
                 row = new Deduplication();
             }
 
-            row.setFirstItemId(firstId.toString());
-            row.setSecondItemId(secondId.toString());
-            row.setResourceTypeId(type);
+            row.setFirstItemId(firstId);
+            row.setSecondItemId(secondId);
             row.setTofix(toFix);
             row.setFake(false);
             row.setReaderNote(note);
@@ -364,7 +372,7 @@ public class DedupUtils {
             }
 
             deduplicationService.update(context, row);
-            dedupService.buildDecision(context, firstId.toString(), secondId.toString(), type,
+            dedupService.buildDecision(context, firstId, secondId,
                     check ? DeduplicationFlag.VERIFYWF : DeduplicationFlag.VERIFYWS, note);
         } else {
             throw new AuthorizeException("Only authorize users can access to the deduplication");
@@ -393,8 +401,7 @@ public class DedupUtils {
         UUID[] sortedIds = new UUID[] { firstId, secondId };
         Arrays.sort(sortedIds);
         Deduplication row = null;
-        row = deduplicationService.uniqueDeduplicationByFirstAndSecond(context, sortedIds[0].toString(),
-                sortedIds[1].toString());
+        row = deduplicationService.uniqueDeduplicationByFirstAndSecond(context, sortedIds[0], sortedIds[1]);
         if (row == null) {
             row = new Deduplication();
         }
@@ -434,9 +441,8 @@ public class DedupUtils {
                 decisionDesc = null;
             }
 
-            row.setFirstItemId(firstId.toString());
-            row.setSecondItemId(secondId.toString());
-            row.setResourceTypeId(type);
+            row.setFirstItemId(firstId);
+            row.setSecondItemId(secondId);
             row.setTofix(toFix);
             row.setFake(fake);
             row.setEpersonId(epersonId);
@@ -457,13 +463,11 @@ public class DedupUtils {
                 dedupService.removeStoredDecision(firstId, secondId, decisionObject.getType());
             }
 
-            dedupService.buildDecision(context, firstId.toString(), secondId.toString(), type, decisionFlag,
-                    decisionObject.getNote());
+            dedupService.buildDecision(context, firstId, secondId, decisionFlag, decisionObject.getNote());
             dedupService.commit();
         } else {
             throw new AuthorizeException("Only authorize users can access to the deduplication");
         }
-
     }
 
     public boolean validateDecision(DuplicateDecisionObjectRest decisionObject) {
@@ -495,8 +499,7 @@ public class DedupUtils {
         Deduplication row = null;
         try {
 
-            row = deduplicationService.uniqueDeduplicationByFirstAndSecond(context, sortedIds[0].toString(),
-                    sortedIds[1].toString());
+            row = deduplicationService.uniqueDeduplicationByFirstAndSecond(context, sortedIds[0], sortedIds[1]);
 
             Item firstItem = ContentServiceFactory.getInstance().getItemService().find(context, firstId);
             Item secondItem = ContentServiceFactory.getInstance().getItemService().find(context, secondId);
@@ -515,19 +518,18 @@ public class DedupUtils {
                 }
 
                 row.setEpersonId(context.getCurrentUser().getID());
-                row.setFirstItemId(sortedIds[0].toString());
-                row.setSecondItemId(sortedIds[1].toString());
+                row.setFirstItemId(sortedIds[0]);
+                row.setSecondItemId(sortedIds[1]);
                 row.setRejectTime(new Date());
                 row.setNote(note);
                 row.setFake(notDupl);
-                row.setResourceTypeId(type);
                 if (check) {
                     row.setWorkflowDecision(DeduplicationFlag.REJECTWF.getDescription());
                 } else {
                     row.setSubmitterDecision(DeduplicationFlag.REJECTWS.getDescription());
                 }
                 deduplicationService.update(context, row);
-                dedupService.buildDecision(context, firstId.toString(), secondId.toString(), type,
+                dedupService.buildDecision(context, firstId, secondId,
                         check ? DeduplicationFlag.REJECTWF : DeduplicationFlag.REJECTWS, note);
                 return true;
             }

@@ -83,8 +83,16 @@ public class SolrDedupServiceImpl implements DedupService {
 
     public static final String RESOURCE_ID_FIELD = "dedup.id";
 
+    /***
+     * Identify the couple of UUID.
+     */
     public static final String RESOURCE_IDS_FIELD = "dedup.ids";
 
+    /**
+     * Identify the deduplication status
+     * 
+     * @See DeduplicationFlag
+     */
     public static final String RESOURCE_FLAG_FIELD = "dedup.flag";
 
     public static final String RESOURCE_NOTE_FIELD = "dedup.note";
@@ -111,6 +119,13 @@ public class SolrDedupServiceImpl implements DedupService {
     public static final String SUBQUERY_NOT_IN_REJECTED_OR_VERIFY = "-({!join from=" + RESOURCE_ID_FIELD + " to="
             + RESOURCE_ID_FIELD + "}" + RESOURCE_FLAG_FIELD + ":verify*) OR " + "-({!join from=" + RESOURCE_ID_FIELD
             + " to=" + RESOURCE_ID_FIELD + "}" + RESOURCE_FLAG_FIELD + ":reject*)";
+
+    public static final String SUBQUERY_WF_MATCH_OR_REJECTED_OR_VERIFY = "(({!join from=" + RESOURCE_ID_FIELD + " to="
+            + RESOURCE_ID_FIELD + "}" + RESOURCE_FLAG_FIELD + ":verify_wf) OR " + "({!join from=" + RESOURCE_ID_FIELD
+            + " to=" + RESOURCE_ID_FIELD + "}" + RESOURCE_FLAG_FIELD + ":reject_wf) OR dedup.flag:match)";
+    public static final String SUBQUERY_WS_MATCH_OR_REJECTED_OR_VERIFY = "(({!join from=" + RESOURCE_ID_FIELD + " to="
+            + RESOURCE_ID_FIELD + "}" + RESOURCE_FLAG_FIELD + ":verify_ws) OR " + "({!join from=" + RESOURCE_ID_FIELD
+            + " to=" + RESOURCE_ID_FIELD + "}" + RESOURCE_FLAG_FIELD + ":reject_ws) OR dedup.flag:match)";
 
     public static final String SUBQUERY_MATCH_NOT_IN_REJECTED_OR_VERIFY = "(-({!join from=" + RESOURCE_ID_FIELD + " to="
             + RESOURCE_ID_FIELD + "}" + RESOURCE_FLAG_FIELD + ":verify*) OR " + "-({!join from=" + RESOURCE_ID_FIELD
@@ -142,6 +157,13 @@ public class SolrDedupServiceImpl implements DedupService {
     @Autowired(required = true)
     private DeduplicationService deduplicationService;
 
+    /***
+     * Deduplication status
+     * <p>
+     * MATCH, there is a match between dedup.ids items. REJECTWS and REJECTWF, the
+     * match was rejected by the user. REJECTADMIN, the match was rejected by the
+     * administrator. VERIFYWS and VERIFYWF, the match has to be verified.
+     */
     public enum DeduplicationFlag {
 
         FAKE("fake", 0), MATCH("match", 1), REJECTWS("reject_ws", 2), REJECTWF("reject_wf", 3),
@@ -217,7 +239,7 @@ public class SolrDedupServiceImpl implements DedupService {
     }
 
     @Override
-    public void indexContent(Context ctx, DSpaceObject iu, boolean force) throws SearchServiceException {
+    public void indexContent(Context ctx, Item iu, boolean force) throws SearchServiceException {
 
         Map<String, List<String>> tmpMapFilter = new HashMap<String, List<String>>();
         List<String> tmpFilter = new ArrayList<String>();
@@ -242,8 +264,7 @@ public class SolrDedupServiceImpl implements DedupService {
         removeFake(dedupID, iu.getType());
 
         // build the FAKE document
-        build(ctx, iu.getID().toString(), iu.getID().toString(), DeduplicationFlag.FAKE, iu.getType(), tmpMapFilter,
-                searchSignature, null);
+        build(ctx, iu.getID(), iu.getID(), DeduplicationFlag.FAKE, tmpMapFilter, searchSignature, null);
 
         // remove previous potential match
         removeMatch(iu.getID(), iu.getType());
@@ -349,8 +370,7 @@ public class SolrDedupServiceImpl implements DedupService {
                 }
             }
 
-            build(ctx, iu.getID().toString(), matchId.toString(), DeduplicationFlag.MATCH, iu.getType(), tmp,
-                    searchSignature, null);
+            build(ctx, iu.getID(), matchId, DeduplicationFlag.MATCH, tmp, searchSignature, null);
 
         }
     }
@@ -382,14 +402,14 @@ public class SolrDedupServiceImpl implements DedupService {
         }
     }
 
-    public void build(Context ctx, String firstId, String secondId, DeduplicationFlag flag, Integer type,
+    public void build(Context ctx, UUID firstId, UUID secondId, DeduplicationFlag flag,
             Map<String, List<String>> signatures, SearchDeduplication searchSignature, String note) {
         SolrInputDocument doc = new SolrInputDocument();
 
         // build upgraded document
         doc.addField(LAST_INDEXED_FIELD, new Date());
 
-        String[] sortedIds = new String[] { firstId, secondId };
+        UUID[] sortedIds = new UUID[] { firstId, secondId };
         Arrays.sort(sortedIds);
 
         String dedupID = sortedIds[0] + "-" + sortedIds[1];
@@ -400,7 +420,7 @@ public class SolrDedupServiceImpl implements DedupService {
         if (!firstId.equals(secondId)) {
             doc.addField(RESOURCE_IDS_FIELD, sortedIds[1]);
         }
-        doc.addField(RESOURCE_RESOURCETYPE_FIELD, type);
+        doc.addField(RESOURCE_RESOURCETYPE_FIELD, Constants.ITEM);
         doc.addField(RESOURCE_FLAG_FIELD, flag.getDescription());
 
         if (signatures != null) {
@@ -418,8 +438,7 @@ public class SolrDedupServiceImpl implements DedupService {
 
         if (searchSignature != null) {
             for (SolrDedupServiceIndexPlugin solrServiceIndexPlugin : searchSignature.getSolrIndexPlugin()) {
-                solrServiceIndexPlugin.additionalIndex(ctx, UUID.fromString(sortedIds[0]),
-                        UUID.fromString(sortedIds[1]), type, doc);
+                solrServiceIndexPlugin.additionalIndex(ctx, sortedIds[0], sortedIds[1], doc);
             }
 
         }
@@ -450,9 +469,9 @@ public class SolrDedupServiceImpl implements DedupService {
     }
 
     @Override
-    public void unIndexContent(Context context, DSpaceObject dso) {
+    public void unIndexContent(Context context, Item item) {
         try {
-            delete(MessageFormat.format(QUERY_REMOVE, dso.getID(), dso.getType()));
+            delete(MessageFormat.format(QUERY_REMOVE, item.getID(), item.getType()));
 
         } catch (SearchServiceException e) {
             log.error(e.getMessage(), e);
@@ -530,27 +549,18 @@ public class SolrDedupServiceImpl implements DedupService {
                 throw new SearchServiceException(e.getMessage(), e);
             }
         } else {
-            cleanIndex(false, Constants.ITEM);
-        }
-    }
+            Context context = new Context();
+            context.turnOffAuthorisationSystem();
 
-    @Override
-    public void cleanIndex(boolean force, int type) throws IOException, SQLException, SearchServiceException {
-        Context context = new Context();
-        context.turnOffAuthorisationSystem();
-
-        try {
-            if (getSolr() == null) {
-                return;
-            }
-            if (force) {
-                getSolr().deleteByQuery(RESOURCE_RESOURCETYPE_FIELD + ":" + type);
-            } else {
+            try {
+                if (getSolr() == null) {
+                    return;
+                }
                 SolrQuery query = new SolrQuery();
                 // Query for all indexed Items, Collections and Communities,
                 // returning just their handle
                 query.setFields(RESOURCE_IDS_FIELD);
-                query.setQuery(RESOURCE_RESOURCETYPE_FIELD + ":" + type);
+                query.setQuery(RESOURCE_RESOURCETYPE_FIELD + ":" + Constants.ITEM);
                 QueryResponse rsp = getSolr().query(query);
                 SolrDocumentList docs = rsp.getResults();
 
@@ -562,38 +572,30 @@ public class SolrDedupServiceImpl implements DedupService {
                     Collection<Object> ids = doc.getFieldValues(RESOURCE_IDS_FIELD);
 
                     for (Object id : ids) {
-                        DSpaceObject o = ContentServiceFactory.getInstance().getDSpaceObjectService(type).find(context,
-                                UUID.fromString((String) id));
+                        Item i = ContentServiceFactory.getInstance().getItemService()
+                                /* getDSpaceObjectService(type) */.find(context, UUID.fromString((String) id));
 
-                        if (o == null) {
+                        if (i == null) {
                             log.info("Deleting: " + id);
                             /*
                              * Use IndexWriter to delete, its easier to manage write.lock
                              */
-                            unIndexContent(context, (DSpaceObject) o);
+                            unIndexContent(context, i);
                         }
                     }
                 }
+            } catch (Exception e) {
+                log.error("Error cleaning cris deduplication index: " + e.getMessage(), e);
+            } finally {
+                context.abort();
             }
-        } catch (Exception e) {
-            log.error("Error cleaning cris deduplication index: " + e.getMessage(), e);
-        } finally {
-            context.abort();
         }
     }
 
     @Override
-    public void indexContent(Context context, List<UUID> ids, boolean force, int type) {
+    public void indexContent(Context context, List<UUID> ids, boolean force) {
         try {
-            switch (type) {
-                case Constants.ITEM:
-                    startMultiThreadIndex(context, force, ids);
-                    break;
-                default:
-                    // no-action
-                    break;
-            }
-
+            startMultiThreadIndex(context, force, ids);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
         }
@@ -601,24 +603,11 @@ public class SolrDedupServiceImpl implements DedupService {
 
     @Override
     public void updateIndex(Context context, boolean force) {
-        updateIndex(context, force, Constants.ITEM);
-    }
-
-    @Override
-    public void updateIndex(Context context, boolean force, Integer type) {
         try {
-            switch (type) {
-                case Constants.ITEM:
-                    startMultiThreadIndex(context, true, null);
-                    commit();
-                    startMultiThreadIndex(context, false, null);
-                    commit();
-                    break;
-                default:
-                    // no-action
-                    break;
-            }
-
+            startMultiThreadIndex(context, true, null);
+            commit();
+            startMultiThreadIndex(context, false, null);
+            commit();
         } catch (Exception e) {
             log.error(e.getMessage(), e);
         }
@@ -645,14 +634,14 @@ public class SolrDedupServiceImpl implements DedupService {
 
     @Override
     public void unIndexContent(Context context, String handleOrUuid) throws IllegalStateException, SQLException {
-        DSpaceObject dso = null;
+        Item item = null;
         if (StringUtils.isNotEmpty(handleOrUuid)) {
             String handlePrefix = ConfigurationManager.getProperty("handle.prefix");
 
-            dso = HandleServiceFactory.getInstance().getHandleService().resolveToObject(context, handleOrUuid);
+            item = (Item) HandleServiceFactory.getInstance().getHandleService().resolveToObject(context, handleOrUuid);
         }
-        if (dso != null) {
-            unIndexContent(context, dso);
+        if (item != null) {
+            unIndexContent(context, item);
         }
     }
 
@@ -713,8 +702,8 @@ public class SolrDedupServiceImpl implements DedupService {
                                     "item".toUpperCase() + "SearchDeduplication", SearchDeduplication.class);
                             if (onlyFake) {
                                 buildFromDedupReject(context, item, tmpMapFilter, tmpFilter, searchSignature);
-                                build(context, item.getID().toString(), item.getID().toString(), DeduplicationFlag.FAKE,
-                                        Constants.ITEM, tmpMapFilter, searchSignature, null);
+                                build(context, item.getID(), item.getID(), DeduplicationFlag.FAKE, tmpMapFilter,
+                                        searchSignature, null);
                             } else {
                                 buildPotentialMatch(context, item, tmpMapFilter, tmpFilter, searchSignature);
                             }
@@ -739,8 +728,8 @@ public class SolrDedupServiceImpl implements DedupService {
             List<String> tmpFilter, SearchDeduplication searchSignature) {
 
         try {
-            List<Deduplication> tri = deduplicationService.getDeduplicationByFirstAndSecond(ctx, iu.getID().toString(),
-                    iu.getID().toString());
+            List<Deduplication> tri = deduplicationService.getDeduplicationByFirstAndSecond(ctx, iu.getID(),
+                    iu.getID());
 
             for (Deduplication row : tri) {
 
@@ -750,22 +739,18 @@ public class SolrDedupServiceImpl implements DedupService {
                 String readerNote = row.getReaderNote();
                 String adminNote = row.getNote();
 
-                String firstId = row.getFirstItemId();
-                String secondId = row.getSecondItemId();
-                int resourceTypeId = row.getResourceTypeId();
+                UUID firstId = row.getFirstItemId();
+                UUID secondId = row.getSecondItemId();
                 if (StringUtils.isNotBlank(submitterDecision)) {
-                    buildDecision(ctx, firstId, secondId, resourceTypeId, DeduplicationFlag.getEnum(submitterDecision),
-                            readerNote);
+                    buildDecision(ctx, firstId, secondId, DeduplicationFlag.getEnum(submitterDecision), readerNote);
                 }
 
                 if (StringUtils.isNotBlank(workflowDecision)) {
-                    buildDecision(ctx, firstId, secondId, resourceTypeId, DeduplicationFlag.getEnum(workflowDecision),
-                            readerNote);
+                    buildDecision(ctx, firstId, secondId, DeduplicationFlag.getEnum(workflowDecision), readerNote);
                 }
 
                 if (StringUtils.isNotBlank(adminDecision)) {
-                    buildDecision(ctx, firstId, secondId, resourceTypeId, DeduplicationFlag.getEnum(adminDecision),
-                            adminNote);
+                    buildDecision(ctx, firstId, secondId, DeduplicationFlag.getEnum(adminDecision), adminNote);
                 }
             }
         } catch (Exception ex) {
@@ -775,9 +760,8 @@ public class SolrDedupServiceImpl implements DedupService {
     }
 
     @Override
-    public void buildDecision(Context context, String firstId, String secondId, Integer type, DeduplicationFlag flag,
-            String note) {
-        build(context, firstId, secondId, flag, type, null, null, note);
+    public void buildDecision(Context context, UUID firstId, UUID secondId, DeduplicationFlag flag, String note) {
+        build(context, firstId, secondId, flag, null, null, note);
     }
 
     @Override
@@ -792,9 +776,9 @@ public class SolrDedupServiceImpl implements DedupService {
     }
 
     @Override
-    public void unIndexContent(Context context, UUID id, Integer type) throws IllegalStateException, SQLException {
+    public void unIndexContent(Context context, UUID id) throws IllegalStateException, SQLException {
         try {
-            delete(MessageFormat.format(QUERY_REMOVE, id, type));
+            delete(MessageFormat.format(QUERY_REMOVE, id, Constants.ITEM));
 
         } catch (SearchServiceException e) {
             log.error(e.getMessage(), e);

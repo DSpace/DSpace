@@ -25,13 +25,17 @@ import org.apache.commons.cli.PosixParser;
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.dspace.app.deduplication.service.DedupService;
-import org.dspace.content.DSpaceObject;
-import org.dspace.core.Constants;
+import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.discovery.SearchServiceException;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.utils.DSpace;
 
+/**
+ * Curation Task used to populate the deduplication index of solr dedup core.
+ * 
+ * Usage: ./dspace index-deduplication [-chfueto[r <item handle/uuid>]]
+ */
 public class DedupClient {
     private static final Logger log = Logger.getLogger(DedupClient.class);
 
@@ -54,7 +58,7 @@ public class DedupClient {
         Context context = new Context();
         context.turnOffAuthorisationSystem();
 
-        String usage = "org.dspace.app.cris.batch.DedupClient [-chfueto[r <item handle/uuid>]]"
+        String usage = "./dspace index-deduplication [-chfueo[r <item handle/uuid>]]"
                 + " or nothing to update/clean an existing index.";
         Options options = new Options();
         HelpFormatter formatter = new HelpFormatter();
@@ -70,9 +74,6 @@ public class DedupClient {
         options.addOption(OptionBuilder.isRequired(false)
                 .withDescription("if updating existing index, force each handle to be reindexed even if uptodate")
                 .create("f"));
-
-        options.addOption(OptionBuilder.isRequired(false).hasArg(true)
-                .withDescription("update a specific class of objects based on its type").create("t"));
 
         options.addOption(OptionBuilder.isRequired(false).hasArg(true)
                 .withDescription("update an entity from index based on its handle or uuid, use with -f to force clean")
@@ -118,24 +119,14 @@ public class DedupClient {
         } else if (line.hasOption("o")) {
             log.info("Optimizing dedup core.");
             indexer.optimize();
-        } else if (line.hasOption("t")) {
-            log.info("Updating and Cleaning a specific Index");
-            String optionValue = line.getOptionValue("t");
-            indexer.cleanIndex(line.hasOption("f"), Integer.valueOf(optionValue));
-            indexer.updateIndex(context, true, Integer.valueOf(optionValue));
         } else if (line.hasOption("u")) {
             String optionValue = line.getOptionValue("u");
             String[] identifiers = optionValue.split("\\s*,\\s*");
             for (String id : identifiers) {
-                DSpaceObject dso;
-                // if (id.startsWith(ConfigurationManager.getProperty("handle.prefix")) ||
-                // id.startsWith("123456789/")) {
-                dso = (DSpaceObject) HandleServiceFactory.getInstance().getHandleService().resolveToObject(context, id);
-//                } else {
-//
-//                    dso =(DSpaceObject)dspace.getSingletonService(ExternalService.class).getObject(id);
-//                }
-                indexer.indexContent(context, dso, line.hasOption("f"));
+                Item item;
+
+                item = (Item) HandleServiceFactory.getInstance().getHandleService().resolveToObject(context, id);
+                indexer.indexContent(context, item, line.hasOption("f"));
             }
         } else if (line.hasOption('e')) {
             try {
@@ -156,15 +147,7 @@ public class DedupClient {
                 }
 
                 in.close();
-
-                int type = -1;
-                if (line.hasOption('t')) {
-                    type = Integer.parseInt(line.getOptionValue("t"));
-                } else {
-                    // force to item
-                    type = Constants.ITEM;
-                }
-                indexer.indexContent(context, ids, line.hasOption("f"), type);
+                indexer.indexContent(context, ids, line.hasOption("f"));
             } catch (Exception e) {
                 log.error("Error: " + e.getMessage());
             }

@@ -14,6 +14,7 @@ import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.deduplication.model.DuplicateDecisionType;
 import org.dspace.app.deduplication.utils.DedupUtils;
 import org.dspace.app.deduplication.utils.DuplicateItemInfo;
@@ -87,7 +88,10 @@ public class DetectPotentialDuplicateStep extends AbstractProcessingStep impleme
             match.setSubmitterNote(itemInfo.getNote(DuplicateDecisionType.WORKSPACE));
             match.setWorkflowNote(itemInfo.getNote(DuplicateDecisionType.WORKFLOW));
 
-            matches.put((UUID) duplicateItem.getID(), match);
+            // avoid a clash with data with a valid decision
+            if (!matches.containsKey(duplicateItem.getID()) || match.anyDecisionMade()) {
+                matches.put((UUID) duplicateItem.getID(), match);
+            }
         }
 
         return matches;

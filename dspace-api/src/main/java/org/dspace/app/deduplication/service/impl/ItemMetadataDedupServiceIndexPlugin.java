@@ -18,9 +18,15 @@ import org.dspace.app.deduplication.service.SolrDedupServiceIndexPlugin;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.factory.ContentServiceFactory;
-import org.dspace.core.Constants;
 import org.dspace.core.Context;
 
+/**
+ * The class defines a metadata index strategy used to collect metadata
+ * information related to firstId and secondId items.
+ * 
+ * Metadata values are added to the document index in a field as configured in
+ * the bean.
+ */
 public class ItemMetadataDedupServiceIndexPlugin implements SolrDedupServiceIndexPlugin {
 
     private static final Logger log = Logger.getLogger(ItemMetadataDedupServiceIndexPlugin.class);
@@ -30,14 +36,11 @@ public class ItemMetadataDedupServiceIndexPlugin implements SolrDedupServiceInde
     private String field;
 
     @Override
-    public void additionalIndex(Context context, UUID firstId, UUID secondId, Integer type,
-            SolrInputDocument document) {
+    public void additionalIndex(Context context, UUID firstId, UUID secondId, SolrInputDocument document) {
 
-        if (type == Constants.ITEM) {
-            internal(context, firstId, document);
-            if (firstId != secondId) {
-                internal(context, secondId, document);
-            }
+        internal(context, firstId, document);
+        if (firstId != secondId) {
+            internal(context, secondId, document);
         }
 
     }
