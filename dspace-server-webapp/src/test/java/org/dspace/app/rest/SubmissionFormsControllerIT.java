@@ -138,7 +138,7 @@ public class SubmissionFormsControllerIT extends AbstractControllerIntegrationTe
                         // check the first two rows
                         .andExpect(jsonPath("$.rows[0].fields", contains(
                             SubmissionFormFieldMatcher.matchFormClosedRelationshipFieldDefinition("Journal", null,
-                    false,"Select the journal related to this volume.", "isVolumeOfJournal",
+                    false,"Select the journal related to this volume.", "isJournalOfVolume",
                         "creativework.publisher:somepublishername", "periodical", false))))
         ;
     }

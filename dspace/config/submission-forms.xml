@@ -489,7 +489,7 @@
         <form name="journalVolumeStep">
             <row>
                 <relation-field>
-                    <relationship-type>isVolumeOfJournal</relationship-type>
+                    <relationship-type>isJournalOfVolume</relationship-type>
                     <search-configuration>journal</search-configuration>
                     <filter>creativework.publisher:somepublishername</filter>
                     <label>Journal</label>
