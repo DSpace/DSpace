@@ -38,7 +38,7 @@ public class InfoCheck extends Check {
         ).append("\n");
 
         sb.append("Url: ").append(
-            ConfigurationManager.getProperty("dspace.url")
+            ConfigurationManager.getProperty("dspace.ui.url")
         ).append("\n");
         sb.append("\n");
 

@@ -28,7 +28,7 @@ public class EntityTypeHalLinkFactory extends HalLinkFactory<EntityTypeResource,
     @Override
     protected void addLinks(EntityTypeResource halResource, Pageable pageable, LinkedList<Link> list) throws Exception {
         list.add(buildLink("relationshiptypes", getMethodOn().retrieve(
-                halResource.getContent().getId(), null, null)));
+                halResource.getContent().getId(), null, null, null, null)));
     }
 
     @Override

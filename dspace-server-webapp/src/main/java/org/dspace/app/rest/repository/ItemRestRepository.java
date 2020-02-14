@@ -126,7 +126,7 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
             while (it.hasNext()) {
                 items.add(it.next());
             }
-            return converter.toRestPage(items, pageable, total, utils.obtainProjection(true));
+            return converter.toRestPage(items, pageable, total, utils.obtainProjection());
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }

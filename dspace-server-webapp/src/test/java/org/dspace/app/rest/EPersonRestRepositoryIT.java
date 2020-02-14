@@ -32,6 +32,7 @@ import org.dspace.app.rest.builder.CommunityBuilder;
 import org.dspace.app.rest.builder.EPersonBuilder;
 import org.dspace.app.rest.builder.ItemBuilder;
 import org.dspace.app.rest.matcher.EPersonMatcher;
+import org.dspace.app.rest.matcher.HalMatcher;
 import org.dspace.app.rest.model.EPersonRest;
 import org.dspace.app.rest.model.MetadataRest;
 import org.dspace.app.rest.model.MetadataValueRest;
@@ -193,9 +194,11 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                                          .withEmail("janesmith@fake-email.com")
                                          .build();
 
+        // When full projection is requested, response should include expected properties, links, and embeds.
         String authToken = getAuthToken(admin.getEmail(), password);
-        getClient(authToken).perform(get("/api/eperson/epersons/" + ePerson2.getID()))
+        getClient(authToken).perform(get("/api/eperson/epersons/" + ePerson2.getID()).param("projection", "full"))
                    .andExpect(status().isOk())
+                   .andExpect(jsonPath("$", EPersonMatcher.matchFullEmbeds()))
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$", is(
                        EPersonMatcher.matchEPersonEntry(ePerson2)
@@ -204,7 +207,14 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                        is(
                            EPersonMatcher.matchEPersonEntry(ePerson)
                        )
-                   )));
+                   )))
+        ;
+
+        // When no projection is requested, response should include expected properties, links, and no embeds.
+        getClient(authToken).perform(get("/api/eperson/epersons/" + ePerson2.getID()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", HalMatcher.matchNoEmbeds()))
+        ;
 
     }
 

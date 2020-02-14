@@ -51,8 +51,11 @@ import org.dspace.content.Community;
 import org.dspace.content.Item;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.eperson.EPerson;
+import org.dspace.services.ConfigurationService;
 import org.hamcrest.Matchers;
+import org.junit.Before;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MvcResult;
 
@@ -62,6 +65,19 @@ import org.springframework.test.web.servlet.MvcResult;
  *
  */
 public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegrationTest {
+
+    @Autowired
+    private ConfigurationService configurationService;
+
+    @Before
+    @Override
+    public void setUp() throws Exception {
+
+        super.setUp();
+
+        //disable file upload mandatory
+        configurationService.setProperty("webui.submit.upload.required", false);
+    }
 
     @Test
     /**
@@ -241,17 +257,21 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                 .withSubject("ExtraEntry")
                 .build();
 
-        getClient().perform(get("/api/submission/workspaceitems/" + witem.getID() + "/collection"))
+        String token = getAuthToken(admin.getEmail(), password);
+
+        getClient(token).perform(get("/api/submission/workspaceitems/" + witem.getID() + "/collection")
+                .param("projection", "full"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", Matchers
                         .is(CollectionMatcher.matchCollectionEntry(col1.getName(), col1.getID(), col1.getHandle()))
                 ));
 
-        getClient().perform(get("/api/submission/workspaceitems/" + witem.getID() + "/item")).andExpect(status().isOk())
+        getClient(token).perform(get("/api/submission/workspaceitems/" + witem.getID() + "/item"))
+                .andExpect(status().isOk())
                 .andExpect(jsonPath("$", Matchers.is(ItemMatcher.matchItemWithTitleAndDateIssued(witem.getItem(),
                         "Workspace Item 1", "2017-10-17"))));
 
-        getClient().perform(get("/api/submission/workspaceitems/" + witem.getID() + "/submissionDefinition"))
+        getClient(token).perform(get("/api/submission/workspaceitems/" + witem.getID() + "/submissionDefinition"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", Matchers.is(hasJsonPath("$.id", is("traditional")))));
 
@@ -1628,6 +1648,83 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
             .andExpect(jsonPath("$.sections.upload.files[0].metadata['dc.source'][0].value",
                     is("/local/path/simple-article.pdf")))
         ;
+    }
+
+    @Test
+    public void createWorkspaceWithFiles_UploadRequired() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and two collections.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+            .withName("Parent Community")
+            .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+            .withName("Sub Community")
+            .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+
+        String authToken = getAuthToken(admin.getEmail(), password);
+
+        WorkspaceItem witem = WorkspaceItemBuilder.createWorkspaceItem(context, col1)
+            .withTitle("Test WorkspaceItem")
+            .withIssueDate("2017-10-17")
+            .build();
+
+        configurationService.setProperty("webui.submit.upload.required", true);
+
+        InputStream pdf = getClass().getResourceAsStream("simple-article.pdf");
+        final MockMultipartFile pdfFile = new MockMultipartFile("file", "/local/path/simple-article.pdf",
+            "application/pdf", pdf);
+
+        // upload the file in our workspaceitem
+        getClient(authToken).perform(fileUpload("/api/submission/workspaceitems/" + witem.getID())
+            .file(pdfFile))
+            .andExpect(status().isCreated())
+            .andExpect(jsonPath("$.sections.upload.files[0].metadata['dc.title'][0].value",
+                is("simple-article.pdf")))
+            .andExpect(jsonPath("$.sections.upload.files[0].metadata['dc.source'][0].value",
+                is("/local/path/simple-article.pdf")))
+        ;
+
+        //Verify there are no errors since file was uploaded (with upload required set to true)
+        getClient(authToken).perform(get("/api/submission/workspaceitems/" + witem.getID()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.errors").doesNotExist());
+    }
+
+    @Test
+    public void createWorkspaceWithoutFiles_UploadRequired() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and two collections.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+            .withName("Parent Community")
+            .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+            .withName("Sub Community")
+            .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+
+        String authToken = getAuthToken(admin.getEmail(), password);
+
+        WorkspaceItem witem = WorkspaceItemBuilder.createWorkspaceItem(context, col1)
+            .withTitle("Test WorkspaceItem")
+            .withIssueDate("2017-10-17")
+            .build();
+
+        configurationService.setProperty("webui.submit.upload.required", true);
+
+        //Verify there is an error since no file was uploaded (with upload required set to true)
+        getClient(authToken).perform(get("/api/submission/workspaceitems/" + witem.getID()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.errors").isNotEmpty())
+            .andExpect(jsonPath("$.errors[?(@.message=='error.validation.filerequired')]",
+                Matchers.contains(
+                    hasJsonPath("$.paths", Matchers.contains(
+                        hasJsonPath("$", Matchers.is("/sections/upload"))
+                    )))));
     }
 
     @Test

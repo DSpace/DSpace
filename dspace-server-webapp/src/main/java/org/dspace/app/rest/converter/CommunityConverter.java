@@ -7,17 +7,9 @@
  */
 package org.dspace.app.rest.converter;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.dspace.app.rest.model.CollectionRest;
 import org.dspace.app.rest.model.CommunityRest;
-import org.dspace.app.rest.projection.Projection;
-import org.dspace.content.Bitstream;
-import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.discovery.IndexableObject;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -28,40 +20,8 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class CommunityConverter
-    extends DSpaceObjectConverter<org.dspace.content.Community, org.dspace.app.rest.model.CommunityRest>
-    implements IndexableObjectConverter<Community, CommunityRest> {
-
-    @Autowired
-    private ConverterService converter;
-
-    @Override
-    public CommunityRest convert(org.dspace.content.Community obj, Projection projection) {
-        CommunityRest com = super.convert(obj, projection);
-        Bitstream logo = obj.getLogo();
-        if (logo != null) {
-            com.setLogo(converter.toRest(logo, projection));
-        }
-        List<Collection> collections = obj.getCollections();
-        List<CollectionRest> collectionsRest = new ArrayList<>();
-        if (collections != null) {
-            for (Collection col : collections) {
-                collectionsRest.add(converter.toRest(col, projection));
-            }
-        }
-        com.setCollections(collectionsRest);
-
-        List<Community> subCommunities = obj.getSubcommunities();
-        List<CommunityRest> communityRest = new ArrayList<>();
-        if (subCommunities != null) {
-            for (Community scom : subCommunities) {
-                CommunityRest scomrest = this.convert(scom, projection);
-                communityRest.add(scomrest);
-            }
-        }
-        com.setSubCommunities(communityRest);
-
-        return com;
-    }
+    extends DSpaceObjectConverter<Community, CommunityRest>
+        implements IndexableObjectConverter<Community, CommunityRest> {
 
     @Override
     protected CommunityRest newInstance() {
@@ -69,8 +29,8 @@ public class CommunityConverter
     }
 
     @Override
-    public Class<org.dspace.content.Community> getModelClass() {
-        return org.dspace.content.Community.class;
+    public Class<Community> getModelClass() {
+        return Community.class;
     }
 
     @Override
