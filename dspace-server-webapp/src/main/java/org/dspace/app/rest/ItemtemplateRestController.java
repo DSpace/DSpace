@@ -12,21 +12,17 @@ import static org.dspace.app.rest.utils.RegexUtils.REGEX_REQUESTMAPPING_IDENTIFI
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.UUID;
-
 import javax.servlet.http.HttpServletRequest;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
-import org.dspace.app.rest.model.ItemRest;
 import org.dspace.app.rest.model.TemplateItemRest;
-import org.dspace.app.rest.model.hateoas.ItemResource;
 import org.dspace.app.rest.model.hateoas.TemplateItemResource;
 import org.dspace.app.rest.model.wrapper.TemplateItem;
-import org.dspace.app.rest.projection.Projection;
-import org.dspace.app.rest.repository.ItemRestRepository;
 import org.dspace.app.rest.repository.ItemTemplateItemOfLinkRepository;
+import org.dspace.app.rest.repository.TemplateItemRestRepository;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.app.rest.utils.Utils;
 import org.dspace.authorize.AuthorizeException;
@@ -83,7 +79,7 @@ public class ItemtemplateRestController {
      * </pre>
      * @param request
      * @param uuid      A UUID of a template item
-     * @return          The template item corresponding to the UUID above
+     * @return The template item corresponding to the UUID above
      */
     @PreAuthorize("hasPermission(#uuid, 'COLLECTION', 'READ')")
     @RequestMapping(method = RequestMethod.GET)
@@ -120,14 +116,14 @@ public class ItemtemplateRestController {
      * @param request
      * @param uuid          The UUID of the template item to be modified
      * @param jsonNode      The data as shown above
-     * @return              The modified item
+     * @return The modified item
      * @throws SQLException
      * @throws AuthorizeException
      */
     @PreAuthorize("hasPermission(#uuid, 'ITEM', 'WRITE')")
     @RequestMapping(method = RequestMethod.PATCH)
     public ResponseEntity<ResourceSupport> patch(HttpServletRequest request, @PathVariable UUID uuid,
-                                                               @RequestBody(required = true) JsonNode jsonNode)
+                                                 @RequestBody(required = true) JsonNode jsonNode)
         throws SQLException, AuthorizeException {
 
         Context context = ContextUtil.obtainContext(request);
@@ -136,7 +132,7 @@ public class ItemtemplateRestController {
         context.commit();
 
         return ControllerUtils.toResponseEntity(HttpStatus.OK, new HttpHeaders(),
-            converter.toResource(templateItemRest));
+                                                converter.toResource(templateItemRest));
     }
 
     /**
@@ -152,7 +148,7 @@ public class ItemtemplateRestController {
      * </pre>
      * @param request
      * @param uuid
-     * @return          Status code 204 is returned if the deletion was successful
+     * @return Status code 204 is returned if the deletion was successful
      * @throws SQLException
      * @throws AuthorizeException
      * @throws IOException
