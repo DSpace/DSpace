@@ -40,11 +40,15 @@ public abstract class PatchOperation<M> {
     /**
      * Throws PatchBadRequestException for missing operation value.
      *
-     * @param value the value to test
+     * @param value
+     *            the value to test
      */
-    void checkOperationValue(Object value) {
+    public void checkOperationValue(Object value) {
         if (value == null) {
             throw new DSpaceBadRequestException("No value provided for the operation.");
+        }
+        if (value instanceof String && (((String) value).trim().isBlank())) {
+            throw new DSpaceBadRequestException("Value can't be empty or just spaces.");
         }
     }
 

@@ -94,8 +94,8 @@ public class DSpaceObjectMetadataCopyOperation<R extends DSpaceObject> extends P
 
     @Override
     public boolean supports(Object objectToMatch, Operation operation) {
-        return ((operation.getPath().startsWith(metadataPatchUtils.METADATA_PATH)
-                || operation.getPath().equals(metadataPatchUtils.METADATA_PATH))
+        return ((operation.getPath().startsWith(metadataPatchUtils.OPERATION_METADATA_PATH)
+                || operation.getPath().equals(metadataPatchUtils.OPERATION_METADATA_PATH))
                 && operation.getOp().trim().equalsIgnoreCase(OPERATION_COPY)
                 && objectToMatch instanceof DSpaceObject);
     }

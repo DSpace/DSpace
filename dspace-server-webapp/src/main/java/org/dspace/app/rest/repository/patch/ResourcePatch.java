@@ -14,7 +14,6 @@ import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.rest.repository.patch.operation.PatchOperation;
-import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -23,7 +22,7 @@ import org.springframework.stereotype.Component;
  * The base class for resource PATCH operations.
  */
 @Component
-public class ResourcePatch<M extends DSpaceObject> {
+public class ResourcePatch<M extends Object> {
 
     @Autowired
     private List<PatchOperation> patchOperations;
@@ -48,15 +47,15 @@ public class ResourcePatch<M extends DSpaceObject> {
      * Checks with all possible patch operations whether they support this operation
      *      (based on instanceof dso and operation.path)
      * @param context       Context of patch operation
-     * @param dso           the dso resource to patch
+     * @param object        the resource to patch
      * @param operation     the patch operation
      * @throws DSpaceBadRequestException
      */
-    protected void performPatchOperation(Context context, M dso, Operation operation)
+    protected void performPatchOperation(Context context, M object, Operation operation)
             throws DSpaceBadRequestException, SQLException {
         for (PatchOperation patchOperation: patchOperations) {
-            if (patchOperation.supports(dso, operation)) {
-                patchOperation.perform(context, dso, operation);
+            if (patchOperation.supports(object, operation)) {
+                patchOperation.perform(context,object, operation);
                 return;
             }
         }

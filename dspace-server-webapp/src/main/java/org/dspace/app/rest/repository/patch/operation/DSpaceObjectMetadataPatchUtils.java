@@ -37,9 +37,9 @@ public final class DSpaceObjectMetadataPatchUtils {
     private MetadataFieldService metadataFieldService;
 
     /**
-     * Path in json body of patch that uses this operation
+     * Path in json body of patch that uses these metadata operations
      */
-    protected static final String METADATA_PATH = "/metadata";
+    protected static final String OPERATION_METADATA_PATH = "/metadata";
 
     private DSpaceObjectMetadataPatchUtils() {
     }
@@ -84,9 +84,9 @@ public final class DSpaceObjectMetadataPatchUtils {
      * @return The mdField (schema.element.qualifier) patch is being performed on
      */
     protected String extractMdFieldStringFromOperation(Operation operation) {
-        String mdElement = StringUtils.substringBetween(operation.getPath(), METADATA_PATH + "/", "/");
+        String mdElement = StringUtils.substringBetween(operation.getPath(), OPERATION_METADATA_PATH + "/", "/");
         if (mdElement == null) {
-            mdElement = StringUtils.substringAfter(operation.getPath(), METADATA_PATH + "/");
+            mdElement = StringUtils.substringAfter(operation.getPath(), OPERATION_METADATA_PATH + "/");
             if (mdElement == null) {
                 throw new DSpaceBadRequestException("No metadata field string found in path: " + operation.getPath());
             }
