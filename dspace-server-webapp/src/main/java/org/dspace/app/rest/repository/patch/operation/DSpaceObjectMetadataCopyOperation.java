@@ -30,7 +30,7 @@ import org.springframework.stereotype.Component;
  * Usage: (can be done on other dso than Item also):
  * - COPY metadata (with schema.identifier.qualifier) value of a dso (here: Item) from given index to end of list of md
  * <code>
- * curl -X PATCH http://${dspace.url}/api/core/items/<:id-item> -H "
+ * curl -X PATCH http://${dspace.server.url}/api/core/items/<:id-item> -H "
  * Content-Type: application/json" -d '[{ "op": "copy",
  * "from": "/metadata/schema.identifier.qualifier/indexToCopyFrom"
  * "path": "/metadata/schema.identifier.qualifier/-"}]'

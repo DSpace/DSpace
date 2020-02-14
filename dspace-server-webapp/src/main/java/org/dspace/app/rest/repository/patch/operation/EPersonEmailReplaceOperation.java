@@ -17,7 +17,7 @@ import org.springframework.stereotype.Component;
  * Implementation for EPerson password patches.
  *
  * Example: <code>
- * curl -X PATCH http://${dspace.url}/api/epersons/eperson/<:id-eperson> -H "
+ * curl -X PATCH http://${dspace.server.url}/api/epersons/eperson/<:id-eperson> -H "
  * Content-Type: application/json" -d '[{ "op": "replace", "path": "
  * /email", "value": "new@email"]'
  * </code>

@@ -24,7 +24,7 @@ import org.springframework.stereotype.Component;
  * This is the implementation for Item 'withdrawn' patches.
  * <p>
  * Example: <code>
- * curl -X PATCH http://${dspace.url}/api/core/items/<:id-item> -H "
+ * curl -X PATCH http://${dspace.server.url}/api/core/items/<:id-item> -H "
  * Content-Type: application/json" -d '[{ "op": "replace", "path": "
  * /withdrawn", "value": true|false]'
  * </code>

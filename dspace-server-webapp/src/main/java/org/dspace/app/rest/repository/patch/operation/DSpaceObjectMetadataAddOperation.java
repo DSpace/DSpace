@@ -25,7 +25,7 @@ import org.springframework.stereotype.Component;
  * Usage: (can be done on other dso than Item also):
  * - ADD metadata (with schema.identifier.qualifier) value of a dso (here: Item) to end of list of md
  * <code>
- * curl -X PATCH http://${dspace.url}/api/core/items/<:id-item> -H "
+ * curl -X PATCH http://${dspace.server.url}/api/core/items/<:id-item> -H "
  * Content-Type: application/json" -d '[{ "op": "add", "path": "
  * /metadata/schema.identifier.qualifier(/0|-)}", "value": "metadataValue"]'
  * </code>
