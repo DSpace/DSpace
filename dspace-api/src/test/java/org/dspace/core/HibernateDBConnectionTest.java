@@ -123,7 +123,7 @@ public class HibernateDBConnectionTest extends AbstractUnitTest {
 
         // Close the DB connection / Session
         // NOTE: Because of our Hibernate configuration, Hibernate automatically creates a new Session per thread.
-        // So, even though we "close" the connection, Hibernate will reopen a new on immediately. So, all this actually
+        // Even though we "close" the connection, Hibernate will reopen a new one immediately. So, all this actually
         // does is create a *new* Session
         connection.closeDBConnection();
 
