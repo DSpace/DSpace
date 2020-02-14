@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
 /**
@@ -37,15 +38,16 @@ public class VersionHistoryRestRepository extends DSpaceRestRepository<VersionHi
     private ConverterService converterService;
 
     @Override
-    public VersionHistoryRest findOne(Context context, Integer integer) {
+    @PreAuthorize("hasPermission(#id, 'VERSIONHISTORY', 'READ')")
+    public VersionHistoryRest findOne(Context context, Integer id) {
         try {
-            VersionHistory versionHistory = versionHistoryService.find(context, integer);
+            VersionHistory versionHistory = versionHistoryService.find(context, id);
             if (versionHistory == null) {
-                throw new ResourceNotFoundException("Couldn't find version for id: " + integer);
+                throw new ResourceNotFoundException("Couldn't find version for id: " + id);
             }
             return converterService.toRest(versionHistory, utils.obtainProjection());
         } catch (SQLException e) {
-            log.error("Something with wrong getting version with id:" + integer, e);
+            log.error("Something with wrong getting version with id:" + id, e);
             throw new RuntimeException(e.getMessage(), e);
         }
     }

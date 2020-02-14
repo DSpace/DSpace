@@ -7,15 +7,14 @@
  */
 package org.dspace.app.rest;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-
-import java.sql.SQLException;
 
 import org.dspace.app.rest.builder.CollectionBuilder;
 import org.dspace.app.rest.builder.CommunityBuilder;
 import org.dspace.app.rest.builder.ItemBuilder;
+import org.dspace.app.rest.matcher.EPersonMatcher;
 import org.dspace.app.rest.matcher.ItemMatcher;
 import org.dspace.app.rest.matcher.VersionMatcher;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
@@ -62,12 +61,13 @@ public class VersionRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         //2. Three public items that are readable by Anonymous with different subjects
         item = ItemBuilder.createItem(context, col1)
-                                      .withTitle("Public item 1")
-                                      .withIssueDate("2017-10-17")
-                                      .withAuthor("Smith, Donald").withAuthor("Doe, John")
-                                      .withSubject("ExtraEntry")
-                                      .build();
+                          .withTitle("Public item 1")
+                          .withIssueDate("2017-10-17")
+                          .withAuthor("Smith, Donald").withAuthor("Doe, John")
+                          .withSubject("ExtraEntry")
+                          .build();
         version = versioningService.createNewVersion(context, item);
+        context.restoreAuthSystemState();
     }
 
     @Test
@@ -84,7 +84,7 @@ public class VersionRestRepositoryIT extends AbstractControllerIntegrationTest {
     public void findOneUnauthorizedTest() throws Exception {
 
         getClient().perform(get("/api/versioning/versions/" + version.getID()))
-                        .andExpect(status().isUnauthorized());
+                   .andExpect(status().isUnauthorized());
     }
 
     @Test
@@ -94,7 +94,37 @@ public class VersionRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         String token = getAuthToken(eperson.getEmail(), password);
         getClient(token).perform(get("/api/versioning/versions/" + version.getID()))
-                   .andExpect(status().isForbidden());
+                        .andExpect(status().isForbidden());
         configurationService.setProperty("versioning.item.history.view.admin", false);
+    }
+
+    @Test
+    public void versionForItemTest() throws Exception {
+
+        getClient().perform(get("/api/core/items/" + version.getItem().getID() + "/version"))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$", Matchers.is(VersionMatcher.matchEntry(version))));
+
+    }
+
+    @Test
+    public void versionEPersonTest() throws Exception {
+
+        String adminToken = getAuthToken(admin.getEmail(), password);
+
+        getClient(adminToken).perform(get("/api/versioning/versions/" + version.getID() + "/eperson"))
+                             .andExpect(status().isOk())
+                             .andExpect(
+                                 jsonPath("$", Matchers.is(EPersonMatcher.matchEPersonEntry(item.getSubmitter()))));
+    }
+
+    @Test
+    public void versionItemTest() throws Exception {
+
+        String adminToken = getAuthToken(admin.getEmail(), password);
+
+        getClient(adminToken).perform(get("/api/versioning/versions/" + version.getID() + "/item"))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$", Matchers.is(ItemMatcher.matchItemProperties(version.getItem()))));
     }
 }

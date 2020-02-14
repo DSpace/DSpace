@@ -11,14 +11,13 @@ import java.io.Serializable;
 import java.sql.SQLException;
 
 import org.apache.commons.lang3.StringUtils;
-import org.dspace.app.rest.model.VersionRest;
+import org.dspace.app.rest.model.VersionHistoryRest;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.core.Context;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.RequestService;
 import org.dspace.services.model.Request;
-import org.dspace.versioning.Version;
 import org.dspace.versioning.service.VersioningService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,9 +30,9 @@ import org.springframework.stereotype.Component;
  * pass through or not
  */
 @Component
-public class VersionRestPermissionEvaluatorPlugin extends RestObjectPermissionEvaluatorPlugin {
+public class VersionHistoryRestPermissionEvaluatorPlugin extends RestObjectPermissionEvaluatorPlugin {
 
-    private static final Logger log = LoggerFactory.getLogger(VersionRestPermissionEvaluatorPlugin.class);
+    private static final Logger log = LoggerFactory.getLogger(VersionHistoryRestPermissionEvaluatorPlugin.class);
 
     @Autowired
     private RequestService requestService;
@@ -53,7 +52,7 @@ public class VersionRestPermissionEvaluatorPlugin extends RestObjectPermissionEv
                                        DSpaceRestPermission restPermission) {
 
 
-        if (!StringUtils.equalsIgnoreCase(targetType, VersionRest.NAME)) {
+        if (!StringUtils.equalsIgnoreCase(targetType, VersionHistoryRest.NAME)) {
             return false;
         }
 
@@ -61,20 +60,11 @@ public class VersionRestPermissionEvaluatorPlugin extends RestObjectPermissionEv
         Context context = ContextUtil.obtainContext(request.getServletRequest());
 
         try {
-            int versionId = Integer.parseInt(targetId.toString());
             if (configurationService.getBooleanProperty("versioning.item.history.view.admin")
                 && !authorizeService.isAdmin(context)) {
                 return false;
             }
-            Version version = versioningService.getVersion(context, versionId);
-            if (version == null) {
-                return true;
-            }
-            if (authorizeService.authorizeActionBoolean(context, version.getItem(),
-                                                        restPermission.getDspaceApiActionId())) {
-                return true;
-            }
-
+            return true;
         } catch (SQLException e) {
             log.error(e.getMessage(), e);
         }
