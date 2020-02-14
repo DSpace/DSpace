@@ -37,7 +37,6 @@ public class VersionRestRepository extends DSpaceRestRepository<VersionRest, Int
     @Autowired
     private ConverterService converterService;
 
-    //TODO PermissionEvaluator
     @Override
     @PreAuthorize("hasPermission(#id, 'VERSION', 'READ')")
     public VersionRest findOne(Context context, Integer id) {
