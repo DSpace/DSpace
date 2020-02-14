@@ -49,7 +49,7 @@ import org.springframework.orm.hibernate5.SessionFactoryUtils;
  * <P>
  * If an Error occurs, the Session itself is invalidated. No further Transactions can be run on that Session.
  * <P>
- * DSpace follows the "Session-per-request" transactional pattern described here:
+ * DSpace generally follows the "Session-per-request" transactional pattern described here:
  * https://docs.jboss.org/hibernate/orm/5.0/userguide/en-US/html/ch06.html#session-per-request
  *
  *
@@ -199,12 +199,12 @@ public class HibernateDBConnection implements DBConnection<Session> {
     }
 
     /**
-     * Reload an entity into the Hibernate cache. This can be called after a call to commit() to recache an object
+     * Reload an entity into the Hibernate cache. This can be called after a call to commit() to re-cache an object
      * in the Hibernate Session (see commit()). Failing to reload objects into the cache may result in a Hibernate
      * throwing a "LazyInitializationException" if you attempt to use an object that has been disconnected from the
      * Session cache.
      * @param entity The DSpace object to reload
-     * @param <E> The class of the enity. The entity must implement the {@link ReloadableEntity} interface.
+     * @param <E> The class of the entity. The entity must implement the {@link ReloadableEntity} interface.
      * @return the newly cached object.
      * @throws SQLException
      */
@@ -243,10 +243,13 @@ public class HibernateDBConnection implements DBConnection<Session> {
     }
 
     /**
-     * Evict an entity from the hibernate cache. This is necessary when batch processing a large number of items.
+     * Evict an entity from the hibernate cache.
+     * <P>
+     * When an entity is evicted, it frees up the memory used by that entity in the cache. This is often
+     * necessary when batch processing a large number of objects (to avoid out-of-memory exceptions).
      *
      * @param entity The entity to evict
-     * @param <E>    The class of the enity. The entity must implement the {@link ReloadableEntity} interface.
+     * @param <E>    The class of the entity. The entity must implement the {@link ReloadableEntity} interface.
      * @throws SQLException When reloading the entity from the database fails.
      */
     @Override
