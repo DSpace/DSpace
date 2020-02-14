@@ -8,7 +8,6 @@
 package org.dspace.app.rest.repository;
 
 import java.io.IOException;
-
 import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
@@ -24,13 +23,11 @@ import org.dspace.app.rest.exception.RESTAuthorizationException;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.ResourcePolicyRest;
-import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.rest.model.patch.Patch;
 import org.dspace.app.rest.projection.Projection;
-import org.dspace.app.rest.repository.patch.factories.ResourcePolicyOperationFactory;
+import org.dspace.app.rest.repository.patch.ResourcePatch;
 import org.dspace.app.rest.utils.DSpaceObjectUtils;
 import org.dspace.app.rest.utils.Utils;
-import org.dspace.app.util.DCInputsReaderException;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.authorize.service.ResourcePolicyService;
@@ -60,9 +57,6 @@ public class ResourcePolicyRestRepository extends DSpaceRestRepository<ResourceP
     ResourcePolicyService resourcePolicyService;
 
     @Autowired
-    ResourcePolicyOperationFactory resourcePolicyOperationPatchFactory;
-
-    @Autowired
     Utils utils;
 
     @Autowired
@@ -73,6 +67,9 @@ public class ResourcePolicyRestRepository extends DSpaceRestRepository<ResourceP
 
     @Autowired
     DSpaceObjectUtils dspaceObjectUtils;
+
+    @Autowired
+    ResourcePatch<ResourcePolicy> resourcePatch;
 
 
     @Override
@@ -103,7 +100,7 @@ public class ResourcePolicyRestRepository extends DSpaceRestRepository<ResourceP
 
     /**
      * Find the resource policies matching the uuid of the resource object and/or the specified action
-     * 
+     *
      * @param resourceUuid
      *            mandatory, the uuid of the resource object of the policy
      * @param action
@@ -142,7 +139,7 @@ public class ResourcePolicyRestRepository extends DSpaceRestRepository<ResourceP
 
     /**
      * Find the resource policies matching uuid of the eperson and/or the one specified resource object
-     * 
+     *
      * @param epersonUuid
      *            mandatory, the uuid of the eperson that benefit of the policy
      * @param resourceUuid
@@ -186,14 +183,14 @@ public class ResourcePolicyRestRepository extends DSpaceRestRepository<ResourceP
 
     /**
      * Find the resource policies matching uuid of the group and/or the ones specified resource object
-     * 
+     *
      * @param groupUuid
      *            mandatory, the uuid of the group that benefit of the policy
      * @param resourceUuid
      *            optional, limit the returned policies to the ones related to the specified resource
      * @param pageable
      *            contains the pagination information
-     * 
+     *
      * @return It returns the list of explicit matching resource policies, no inherited or broader resource policies
      *         will be included in the list nor policies derived by groups' membership
      */
@@ -321,27 +318,9 @@ public class ResourcePolicyRestRepository extends DSpaceRestRepository<ResourceP
     @Override
     @PreAuthorize("hasPermission(#id, 'resourcepolicy', 'ADMIN')")
     protected void patch(Context context, HttpServletRequest request, String apiCategory, String model, Integer id,
-            Patch patch)
-            throws RepositoryMethodNotImplementedException, SQLException, AuthorizeException, DCInputsReaderException {
-        ResourcePolicyRest rest = findOne(context,id);
-        if (rest == null) {
-            throw new ResourceNotFoundException(
-                    ResourcePolicyRest.CATEGORY + "." + ResourcePolicyRest.NAME + " with id: " + id + " not found");
-        }
-        for (Operation op : patch.getOperations()) {
-            rest = resourcePolicyOperationPatchFactory.getOperationForPath(op.getPath()).perform(rest, op);
-        }
-
-        ResourcePolicy resourcePolicy = null;
-        try {
-            resourcePolicy = resourcePolicyService.find(context, id);
-            resourcePolicy.setStartDate(rest.getStartDate());
-            resourcePolicy.setEndDate(rest.getEndDate());
-            resourcePolicy.setRpDescription(rest.getDescription());
-            resourcePolicy.setRpName(rest.getName());
-            resourcePolicyService.update(context, resourcePolicy);
-        } catch (SQLException e) {
-            throw new RuntimeException("Unable to patch ResourcePolicy with id = " + id, e);
-        }
+            Patch patch) throws RepositoryMethodNotImplementedException, SQLException, AuthorizeException {
+        ResourcePolicy resourcePolicy = resourcePolicyService.find(context, id);
+        resourcePatch.patch(obtainContext(), resourcePolicy, patch.getOperations());
+        resourcePolicyService.update(context, resourcePolicy);
     }
 }

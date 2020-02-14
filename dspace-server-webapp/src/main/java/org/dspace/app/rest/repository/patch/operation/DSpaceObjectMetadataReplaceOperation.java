@@ -214,8 +214,8 @@ public class DSpaceObjectMetadataReplaceOperation<R extends DSpaceObject> extend
 
     @Override
     public boolean supports(Object objectToMatch, Operation operation) {
-        return ((operation.getPath().startsWith(metadataPatchUtils.METADATA_PATH)
-                || operation.getPath().equals(metadataPatchUtils.METADATA_PATH))
+        return ((operation.getPath().startsWith(metadataPatchUtils.OPERATION_METADATA_PATH)
+                || operation.getPath().equals(metadataPatchUtils.OPERATION_METADATA_PATH))
                 && operation.getOp().trim().equalsIgnoreCase(OPERATION_REPLACE)
                 && objectToMatch instanceof DSpaceObject);
     }
