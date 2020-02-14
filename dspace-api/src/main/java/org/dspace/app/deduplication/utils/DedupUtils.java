@@ -154,8 +154,8 @@ public class DedupUtils {
         SolrQuery findDuplicateBySignature = new SolrQuery();
         findDuplicateBySignature.setQuery((isInWorkflow == null ? SolrDedupServiceImpl.SUBQUERY_NOT_IN_REJECTED
                 : (isInWorkflow
-                        ? SolrDedupServiceImpl./* (test)SUBQUERY_NOT_IN_REJECTED_OR_VERIFYWF */SUBQUERY_WF_MATCH_OR_REJECTED_OR_VERIFY
-                        : SolrDedupServiceImpl/* .SUBQUERY_NOT_IN_REJECTED_OR_VERIFY */.SUBQUERY_WS_MATCH_OR_REJECTED_OR_VERIFY)));
+                        ? SolrDedupServiceImpl.SUBQUERY_WF_MATCH_OR_REJECTED_OR_VERIFY
+                        : SolrDedupServiceImpl.SUBQUERY_WS_MATCH_OR_REJECTED_OR_VERIFY)));
         findDuplicateBySignature.addFilterQuery(SolrDedupServiceImpl.RESOURCE_IDS_FIELD + ":" + targetItemID);
         findDuplicateBySignature.addFilterQuery(SolrDedupServiceImpl.RESOURCE_RESOURCETYPE_FIELD + ":" + resourceType);
         String filter = "";
