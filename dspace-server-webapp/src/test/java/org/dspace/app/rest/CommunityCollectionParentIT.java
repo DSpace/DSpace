@@ -7,15 +7,14 @@
  */
 package org.dspace.app.rest;
 
-import java.sql.SQLException;
-import java.util.Map;
-
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.not;
 import static org.junit.Assert.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.sql.SQLException;
+import java.util.Map;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.dspace.app.rest.builder.CollectionBuilder;
@@ -62,17 +61,17 @@ public class CommunityCollectionParentIT extends AbstractControllerIntegrationTe
         //** GIVEN **
         //1. A community-collection structure with one parent community with sub-community and one collection.
         communityA = CommunityBuilder.createCommunity(context)
-                                               .withName("Parent CommunityA")
-                                               .build();
+                                     .withName("Parent CommunityA")
+                                     .build();
         communityB = CommunityBuilder.createCommunity(context)
-                                               .withName("Parent CommunityB")
-                                               .build();
+                                     .withName("Parent CommunityB")
+                                     .build();
         communityAA = CommunityBuilder.createSubCommunity(context, communityA)
-                                                .withName("Sub Community")
-                                                .build();
+                                      .withName("Sub Community")
+                                      .build();
         communityAB = CommunityBuilder.createSubCommunity(context, communityA)
-                                                .withName("Sub Community Two")
-                                                .build();
+                                      .withName("Sub Community Two")
+                                      .build();
         col1 = CollectionBuilder.createCollection(context, communityAA).withName("Collection 1").build();
         col2 = CollectionBuilder.createCollection(context, communityAA).withName("Collection 2").build();
         col3 = CollectionBuilder.createCollection(context, communityAB).withName("Collection 3").build();
@@ -80,25 +79,25 @@ public class CommunityCollectionParentIT extends AbstractControllerIntegrationTe
 
 
         itemX = ItemBuilder.createItem(context, col1)
-                                .withTitle("Public item 1")
-                                .withIssueDate("2017-10-17")
-                                .withAuthor("Smith, Donald").withAuthor("Doe, John")
-                                .withSubject("ExtraEntry")
-                                .build();
+                           .withTitle("Public item 1")
+                           .withIssueDate("2017-10-17")
+                           .withAuthor("Smith, Donald").withAuthor("Doe, John")
+                           .withSubject("ExtraEntry")
+                           .build();
 
         itemY = ItemBuilder.createItem(context, col1)
-                                .withTitle("Public item 1")
-                                .withIssueDate("2017-10-17")
-                                .withAuthor("Smith, Donald").withAuthor("Doe, John")
-                                .withSubject("ExtraEntry")
-                                .build();
+                           .withTitle("Public item 1")
+                           .withIssueDate("2017-10-17")
+                           .withAuthor("Smith, Donald").withAuthor("Doe, John")
+                           .withSubject("ExtraEntry")
+                           .build();
         collectionService.addItem(context, col2, itemY);
         itemZ = ItemBuilder.createItem(context, col2)
-                                .withTitle("Public item 1")
-                                .withIssueDate("2017-10-17")
-                                .withAuthor("Smith, Donald").withAuthor("Doe, John")
-                                .withSubject("ExtraEntry")
-                                .build();
+                           .withTitle("Public item 1")
+                           .withIssueDate("2017-10-17")
+                           .withAuthor("Smith, Donald").withAuthor("Doe, John")
+                           .withSubject("ExtraEntry")
+                           .build();
 
         context.restoreAuthSystemState();
     }
@@ -108,11 +107,12 @@ public class CommunityCollectionParentIT extends AbstractControllerIntegrationTe
 
         ObjectMapper mapper = new ObjectMapper();
         String token = getAuthToken(admin.getEmail(), password);
-        MvcResult mvcResult = getClient(token).perform(get("/api/core/items/" + itemX.getID() + "/owningCollection")).andReturn();
+        MvcResult mvcResult = getClient(token).perform(get("/api/core/items/" + itemX.getID() + "/owningCollection"))
+                                              .andReturn();
 
         String content = mvcResult.getResponse().getContentAsString();
-        Map<String,Object> map = mapper.readValue(content, Map.class);
-        String collectionUuidString =  String.valueOf(map.get("uuid"));
+        Map<String, Object> map = mapper.readValue(content, Map.class);
+        String collectionUuidString = String.valueOf(map.get("uuid"));
         String collectionName = String.valueOf(map.get("name"));
 
         mvcResult = getClient(token).perform(get("/api/core/collections/" + col1.getID())).andReturn();
@@ -131,11 +131,12 @@ public class CommunityCollectionParentIT extends AbstractControllerIntegrationTe
 
         ObjectMapper mapper = new ObjectMapper();
         String token = getAuthToken(admin.getEmail(), password);
-        MvcResult mvcResult = getClient(token).perform(get("/api/core/items/" + itemY.getID() + "/owningCollection")).andReturn();
+        MvcResult mvcResult = getClient(token).perform(get("/api/core/items/" + itemY.getID() + "/owningCollection"))
+                                              .andReturn();
 
         String content = mvcResult.getResponse().getContentAsString();
-        Map<String,Object> map = mapper.readValue(content, Map.class);
-        String collectionUuidString =  String.valueOf(map.get("uuid"));
+        Map<String, Object> map = mapper.readValue(content, Map.class);
+        String collectionUuidString = String.valueOf(map.get("uuid"));
         String collectionName = String.valueOf(map.get("name"));
 
         mvcResult = getClient(token).perform(get("/api/core/collections/" + col1.getID())).andReturn();
@@ -154,11 +155,12 @@ public class CommunityCollectionParentIT extends AbstractControllerIntegrationTe
 
         ObjectMapper mapper = new ObjectMapper();
         String token = getAuthToken(admin.getEmail(), password);
-        MvcResult mvcResult = getClient(token).perform(get("/api/core/items/" + itemZ.getID() + "/owningCollection")).andReturn();
+        MvcResult mvcResult = getClient(token).perform(get("/api/core/items/" + itemZ.getID() + "/owningCollection"))
+                                              .andReturn();
 
         String content = mvcResult.getResponse().getContentAsString();
-        Map<String,Object> map = mapper.readValue(content, Map.class);
-        String collectionUuidString =  String.valueOf(map.get("uuid"));
+        Map<String, Object> map = mapper.readValue(content, Map.class);
+        String collectionUuidString = String.valueOf(map.get("uuid"));
         String collectionName = String.valueOf(map.get("name"));
 
         mvcResult = getClient(token).perform(get("/api/core/collections/" + col2.getID())).andReturn();
@@ -177,11 +179,12 @@ public class CommunityCollectionParentIT extends AbstractControllerIntegrationTe
 
         ObjectMapper mapper = new ObjectMapper();
         String token = getAuthToken(admin.getEmail(), password);
-        MvcResult mvcResult = getClient(token).perform(get("/api/core/collections/" + col1.getID() + "/parentCommunity")).andReturn();
+        MvcResult mvcResult = getClient(token)
+            .perform(get("/api/core/collections/" + col1.getID() + "/parentCommunity")).andReturn();
 
         String content = mvcResult.getResponse().getContentAsString();
-        Map<String,Object> map = mapper.readValue(content, Map.class);
-        String communityUuidString =  String.valueOf(map.get("uuid"));
+        Map<String, Object> map = mapper.readValue(content, Map.class);
+        String communityUuidString = String.valueOf(map.get("uuid"));
         String communityName = String.valueOf(map.get("name"));
 
         mvcResult = getClient(token).perform(get("/api/core/communities/" + communityAA.getID())).andReturn();
@@ -201,11 +204,12 @@ public class CommunityCollectionParentIT extends AbstractControllerIntegrationTe
 
         ObjectMapper mapper = new ObjectMapper();
         String token = getAuthToken(admin.getEmail(), password);
-        MvcResult mvcResult = getClient(token).perform(get("/api/core/collections/" + col2.getID() + "/parentCommunity")).andReturn();
+        MvcResult mvcResult = getClient(token)
+            .perform(get("/api/core/collections/" + col2.getID() + "/parentCommunity")).andReturn();
 
         String content = mvcResult.getResponse().getContentAsString();
-        Map<String,Object> map = mapper.readValue(content, Map.class);
-        String communityUuidString =  String.valueOf(map.get("uuid"));
+        Map<String, Object> map = mapper.readValue(content, Map.class);
+        String communityUuidString = String.valueOf(map.get("uuid"));
         String communityName = String.valueOf(map.get("name"));
 
         mvcResult = getClient(token).perform(get("/api/core/communities/" + communityAA.getID())).andReturn();
@@ -225,11 +229,12 @@ public class CommunityCollectionParentIT extends AbstractControllerIntegrationTe
 
         ObjectMapper mapper = new ObjectMapper();
         String token = getAuthToken(admin.getEmail(), password);
-        MvcResult mvcResult = getClient(token).perform(get("/api/core/collections/" + col3.getID() + "/parentCommunity")).andReturn();
+        MvcResult mvcResult = getClient(token)
+            .perform(get("/api/core/collections/" + col3.getID() + "/parentCommunity")).andReturn();
 
         String content = mvcResult.getResponse().getContentAsString();
-        Map<String,Object> map = mapper.readValue(content, Map.class);
-        String communityUuidString =  String.valueOf(map.get("uuid"));
+        Map<String, Object> map = mapper.readValue(content, Map.class);
+        String communityUuidString = String.valueOf(map.get("uuid"));
         String communityName = String.valueOf(map.get("name"));
 
         mvcResult = getClient(token).perform(get("/api/core/communities/" + communityAB.getID())).andReturn();
@@ -249,11 +254,12 @@ public class CommunityCollectionParentIT extends AbstractControllerIntegrationTe
 
         ObjectMapper mapper = new ObjectMapper();
         String token = getAuthToken(admin.getEmail(), password);
-        MvcResult mvcResult = getClient(token).perform(get("/api/core/communities/" + communityAA.getID() + "/parentCommunity")).andReturn();
+        MvcResult mvcResult = getClient(token)
+            .perform(get("/api/core/communities/" + communityAA.getID() + "/parentCommunity")).andReturn();
 
         String content = mvcResult.getResponse().getContentAsString();
-        Map<String,Object> map = mapper.readValue(content, Map.class);
-        String communityUuidString =  String.valueOf(map.get("uuid"));
+        Map<String, Object> map = mapper.readValue(content, Map.class);
+        String communityUuidString = String.valueOf(map.get("uuid"));
         String communityName = String.valueOf(map.get("name"));
 
         mvcResult = getClient(token).perform(get("/api/core/communities/" + communityA.getID())).andReturn();
@@ -273,11 +279,12 @@ public class CommunityCollectionParentIT extends AbstractControllerIntegrationTe
 
         ObjectMapper mapper = new ObjectMapper();
         String token = getAuthToken(admin.getEmail(), password);
-        MvcResult mvcResult = getClient(token).perform(get("/api/core/communities/" + communityAB.getID() + "/parentCommunity")).andReturn();
+        MvcResult mvcResult = getClient(token)
+            .perform(get("/api/core/communities/" + communityAB.getID() + "/parentCommunity")).andReturn();
 
         String content = mvcResult.getResponse().getContentAsString();
-        Map<String,Object> map = mapper.readValue(content, Map.class);
-        String communityUuidString =  String.valueOf(map.get("uuid"));
+        Map<String, Object> map = mapper.readValue(content, Map.class);
+        String communityUuidString = String.valueOf(map.get("uuid"));
         String communityName = String.valueOf(map.get("name"));
 
         mvcResult = getClient(token).perform(get("/api/core/communities/" + communityA.getID())).andReturn();
@@ -296,7 +303,7 @@ public class CommunityCollectionParentIT extends AbstractControllerIntegrationTe
 
         String token = getAuthToken(admin.getEmail(), password);
         getClient(token).perform(get("/api/core/communities/" + communityA.getID() + "/parentCommunity"))
-                                                        .andExpect(status().isNoContent());
+                        .andExpect(status().isNoContent());
 
 
     }
