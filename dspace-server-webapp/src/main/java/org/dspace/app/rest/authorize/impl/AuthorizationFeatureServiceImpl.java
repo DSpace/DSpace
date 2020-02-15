@@ -73,6 +73,6 @@ public class AuthorizationFeatureServiceImpl implements AuthorizationFeatureServ
 //                foundFeatures.add(f);
 //            }
 //        }
-//        return null;
+//        return foundFeatures;
     }
 }

@@ -29,6 +29,7 @@ import org.dspace.app.util.DCInputsReaderException;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.service.MetadataFieldService;
 import org.dspace.core.Context;
+import org.dspace.discovery.FindableObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

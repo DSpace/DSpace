@@ -21,6 +21,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.sql.SQLException;
@@ -60,6 +61,7 @@ import org.dspace.app.rest.projection.DefaultProjection;
 import org.dspace.app.rest.projection.ListProjection;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.repository.DSpaceRestRepository;
+import org.dspace.app.rest.repository.FindableObjectRepository;
 import org.dspace.app.rest.repository.LinkRestRepository;
 import org.dspace.content.BitstreamFormat;
 import org.dspace.content.DSpaceObject;
@@ -71,8 +73,10 @@ import org.dspace.services.RequestService;
 import org.dspace.util.UUIDUtils;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.annotation.AnnotationUtils;
+import org.springframework.core.convert.ConversionService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -98,6 +102,10 @@ public class Utils {
 
     @Autowired
     RequestService requestService;
+    
+    @Autowired
+    @Qualifier("defaultConversionService")
+    ConversionService conversionService;
 
     @Autowired(required = true)
     private List<DSpaceObjectService<? extends DSpaceObject>> dSpaceObjectServices;
@@ -658,5 +666,9 @@ public class Utils {
             }
         }
         return contentId;
+    }
+
+    public Serializable castToPKClass(FindableObjectRepository repository, String pkStr) {
+        return (Serializable) conversionService.convert(pkStr, repository.getPKClass());
     }
 }

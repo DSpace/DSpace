@@ -14,12 +14,9 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+
 import javax.servlet.http.HttpServletRequest;
 
-import gr.ekt.bte.core.TransformationEngine;
-import gr.ekt.bte.core.TransformationSpec;
-import gr.ekt.bte.exceptions.BadTransformationSpec;
-import gr.ekt.bte.exceptions.MalformedSourceException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.Parameter;
@@ -69,13 +66,19 @@ import org.springframework.data.rest.webmvc.json.patch.PatchException;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
+import gr.ekt.bte.core.TransformationEngine;
+import gr.ekt.bte.core.TransformationSpec;
+import gr.ekt.bte.exceptions.BadTransformationSpec;
+import gr.ekt.bte.exceptions.MalformedSourceException;
+
 /**
  * This is the repository responsible to manage WorkspaceItem Rest object
  *
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 @Component(WorkspaceItemRest.CATEGORY + "." + WorkspaceItemRest.NAME)
-public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceItemRest, Integer> {
+public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceItemRest, Integer> 
+    implements FindableObjectRepository<WorkspaceItem, Integer> {
 
     public static final String OPERATION_PATH_SECTIONS = "sections";
 
@@ -497,5 +500,13 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
         return converter.toRest(workspaceItem, Projection.DEFAULT);
     }
 
+    @Override
+    public WorkspaceItem findDomainObjectByPk(Context context, Integer id) throws SQLException {
+        return wis.find(context, id);
+    }
 
+    @Override
+    public Class<Integer> getPKClass() {
+        return Integer.class;
+    }
 }
