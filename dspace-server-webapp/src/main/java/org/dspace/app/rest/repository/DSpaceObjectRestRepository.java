@@ -30,7 +30,7 @@ import org.springframework.data.rest.webmvc.ResourceNotFoundException;
  * @param <R> the corresponding DSpaceObjectRest.
  */
 public abstract class DSpaceObjectRestRepository<M extends DSpaceObject, R extends DSpaceObjectRest>
-        extends DSpaceRestRepository<R, UUID> {
+        extends DSpaceRestRepository<R, UUID> implements FindableObjectRepository<M, UUID> {
 
     final DSpaceObjectService<M> dsoService;
     final DSpaceObjectPatch<R> dsoPatch;
@@ -81,5 +81,15 @@ public abstract class DSpaceObjectRestRepository<M extends DSpaceObject, R exten
         if (!origDsoRest.getMetadata().equals(dsoRest.getMetadata())) {
             metadataConverter.setMetadata(obtainContext(), dso, dsoRest.getMetadata());
         }
+    }
+    
+    @Override
+    public M findDomainObjectByPk(Context context, UUID uuid) throws SQLException {
+        return dsoService.find(context, uuid);
+    }
+    
+    @Override
+    public Class<UUID> getPKClass() {
+        return UUID.class;
     }
 }

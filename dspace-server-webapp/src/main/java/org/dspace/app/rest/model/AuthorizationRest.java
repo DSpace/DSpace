@@ -18,7 +18,7 @@ import org.dspace.app.rest.RestResourceController;
  *
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
-public class AuthorizationRest extends DSpaceObjectRest {
+public class AuthorizationRest extends BaseObjectRest<String> {
     public static final String NAME = "authorization";
     public static final String CATEGORY = RestAddressableModel.AUTHORIZATION;
 

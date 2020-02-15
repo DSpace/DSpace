@@ -13,10 +13,14 @@ import org.dspace.app.rest.authorize.AuthorizationFeature;
 import org.dspace.app.rest.authorize.AuthorizationFeatureDocumentation;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.services.ConfigurationService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
- * This is a mock feature that always throw an exception during execution and support only SITE
+ * This is a mock feature that always throw an exception during execution and support only SITE. It is possible to
+ * disable the exception turning the feature in an "always false" using the configuration property
+ * "org.dspace.app.rest.authorization.AlwaysThrowExceptionFeature.turnoff = true"
  *
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
@@ -26,9 +30,20 @@ public class AlwaysThrowExceptionFeature implements AuthorizationFeature {
 
     public static final String NAME = "alwaysexception";
 
+    @Autowired
+    private ConfigurationService configurationService;
+    
     @Override
+    /**
+     * This check will throw a runtime exception except if the
+     * org.dspace.app.rest.authorization.AlwaysThrowExceptionFeature.turnoff property is set to true in the
+     * configuration service. In this case it will return false
+     */
     public boolean isAuthorized(Context context, Object object) throws SQLException {
-        throw new  RuntimeException("Sometimes things go wrong and we should not hide it");
+        if (!configurationService.getBooleanProperty("org.dspace.app.rest.authorization.AlwaysThrowExceptionFeature.turnoff", false)) {
+            throw new  RuntimeException("Sometimes things go wrong and we should not hide it");
+        }
+        return false;
     }
 
     @Override
