@@ -11,10 +11,11 @@ import java.io.Serializable;
 import java.sql.SQLException;
 
 import org.dspace.core.Context;
-import org.dspace.discovery.FindableObject;
+import org.dspace.core.ReloadableEntity;
 
 /**
- * This interface must be implemented by all the rest repository that deal with representation of {@link FindableObject}
+ * This interface must be implemented by all the rest repository that deal with resources that can be make
+ * {@link FindableObject}
  * 
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  *
@@ -23,8 +24,10 @@ import org.dspace.discovery.FindableObject;
  * @param <PK>
  *            the primary key type
  */
-public interface FindableObjectRepository<F extends FindableObject<PK>, PK extends Serializable> {
-    F findDomainObjectByPk(Context context, PK id) throws SQLException;
+public interface FindableObjectRepository<T extends ReloadableEntity<PK>,
+    PK extends Serializable> {
+
+    T findDomainObjectByPk(Context context, PK id) throws SQLException;
 
     Class<PK> getPKClass();
 }

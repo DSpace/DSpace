@@ -26,7 +26,7 @@ import org.springframework.stereotype.Component;
  * This operation moves bitstreams within a bundle from one index to another.
  *
  * Example: <code>
- * curl -X PATCH http://${dspace.url}/api/bundles/<:id-bundle> -H "
+ * curl -X PATCH http://${dspace.server.url}/api/bundles/<:id-bundle> -H "
  * Content-Type: application/json" -d '[{ "op": "move", "path": "
  * /_links/bitstreams/1/href", "from": "/_links/bitstreams/0/href"]'
  * </code>

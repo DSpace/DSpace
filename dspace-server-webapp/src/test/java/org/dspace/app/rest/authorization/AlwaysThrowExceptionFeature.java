@@ -9,7 +9,8 @@ package org.dspace.app.rest.authorization;
 
 import java.sql.SQLException;
 
-import org.dspace.core.Constants;
+import org.dspace.app.rest.model.BaseObjectRest;
+import org.dspace.app.rest.model.SiteRest;
 import org.dspace.core.Context;
 import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,7 +38,7 @@ public class AlwaysThrowExceptionFeature implements AuthorizationFeature {
      * org.dspace.app.rest.authorization.AlwaysThrowExceptionFeature.turnoff property is set to true in the
      * configuration service. In this case it will return false
      */
-    public boolean isAuthorized(Context context, Object object) throws SQLException {
+    public boolean isAuthorized(Context context, BaseObjectRest object) throws SQLException {
         if (!configurationService
                 .getBooleanProperty("org.dspace.app.rest.authorization.AlwaysThrowExceptionFeature.turnoff", false)) {
             throw new  RuntimeException("Sometimes things go wrong and we should not hide it");
@@ -46,7 +47,7 @@ public class AlwaysThrowExceptionFeature implements AuthorizationFeature {
     }
 
     @Override
-    public int[] getSupportedTypes() {
-        return new int[]{Constants.SITE};
+    public String[] getSupportedTypes() {
+        return new String[]{SiteRest.CATEGORY + "." + SiteRest.NAME};
     }
 }

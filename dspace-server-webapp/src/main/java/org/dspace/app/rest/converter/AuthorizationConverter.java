@@ -10,7 +10,6 @@ package org.dspace.app.rest.converter;
 import org.dspace.app.rest.authorization.Authorization;
 import org.dspace.app.rest.model.AuthorizationRest;
 import org.dspace.app.rest.projection.Projection;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -23,20 +22,12 @@ import org.springframework.stereotype.Component;
 public class AuthorizationConverter
         implements DSpaceConverter<Authorization, AuthorizationRest> {
 
-    @Autowired
-    private ConverterService converter;
-
     @Override
     public AuthorizationRest convert(Authorization authz, Projection projection) {
         AuthorizationRest featureRest = new AuthorizationRest();
         featureRest.setProjection(projection);
         if (authz != null) {
             featureRest.setId(authz.getID());
-            if (authz.getEperson() != null) {
-                featureRest.setEperson(converter.toRest(authz.getEperson(), projection));
-            }
-            featureRest.setFeature(converter.toRest(authz.getFeature(), projection));
-            featureRest.setObject(converter.toRest(authz.getObject(), projection));
         }
         return featureRest;
     }

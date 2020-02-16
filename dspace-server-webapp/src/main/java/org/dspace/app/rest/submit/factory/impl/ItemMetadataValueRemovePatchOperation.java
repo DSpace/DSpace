@@ -21,7 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * "/sections/<:name-of-the-form>/<:metadata>/<:idx-zero-based>"
  *
  * Example: <code>
- * curl -X PATCH http://${dspace.url}/api/submission/workspaceitems/<:id-workspaceitem> -H "
+ * curl -X PATCH http://${dspace.server.url}/api/submission/workspaceitems/<:id-workspaceitem> -H "
  * Content-Type: application/json" -d '[{ "op": "remove", "path": "
  * /sections/traditionalpageone/dc.title/1"}]'
  * </code>
@@ -30,7 +30,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * "/sections/<:name-of-the-form>/<:metadata>"
  *
  * Example: <code>
- * curl -X PATCH http://${dspace.url}/api/submission/workspaceitems/<:id-workspaceitem> -H "
+ * curl -X PATCH http://${dspace.server.url}/api/submission/workspaceitems/<:id-workspaceitem> -H "
  * Content-Type: application/json" -d '[{ "op": "remove", "path": "
  * /sections/traditionalpageone/dc.title"}]'
  * </code>

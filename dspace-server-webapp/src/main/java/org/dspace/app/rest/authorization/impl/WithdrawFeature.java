@@ -11,11 +11,14 @@ import java.sql.SQLException;
 
 import org.dspace.app.rest.authorization.AuthorizationFeature;
 import org.dspace.app.rest.authorization.AuthorizationFeatureDocumentation;
+import org.dspace.app.rest.model.BaseObjectRest;
+import org.dspace.app.rest.model.ItemRest;
+import org.dspace.app.rest.utils.Utils;
 import org.dspace.app.util.AuthorizeUtil;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Item;
-import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -27,14 +30,18 @@ import org.springframework.stereotype.Component;
 @Component
 @AuthorizationFeatureDocumentation(name = WithdrawFeature.NAME)
 public class WithdrawFeature implements AuthorizationFeature {
+
     public final static String NAME = "withdrawItem";
 
+    @Autowired
+    private Utils utils;
+
     @Override
-    public boolean isAuthorized(Context context, Object object) throws SQLException {
-        if (!(object instanceof Item)) {
+    public boolean isAuthorized(Context context, BaseObjectRest object) throws SQLException {
+        if (!(object instanceof ItemRest)) {
             return false;
         }
-        Item item = (Item) object;
+        Item item = (Item) utils.getDSpaceAPIObjectFromRest(context, object);
         if (!item.isArchived()) {
             return false;
         }
@@ -47,7 +54,7 @@ public class WithdrawFeature implements AuthorizationFeature {
     }
 
     @Override
-    public int[] getSupportedTypes() {
-        return new int[]{Constants.ITEM};
+    public String[] getSupportedTypes() {
+        return new String[] { ItemRest.CATEGORY + "." + ItemRest.NAME };
     }
 }

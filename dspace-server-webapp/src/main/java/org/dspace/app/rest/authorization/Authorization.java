@@ -7,8 +7,8 @@
  */
 package org.dspace.app.rest.authorization;
 
+import org.dspace.app.rest.model.BaseObjectRest;
 import org.dspace.content.Site;
-import org.dspace.discovery.FindableObject;
 import org.dspace.discovery.IndexableObject;
 import org.dspace.eperson.EPerson;
 
@@ -33,12 +33,12 @@ public class Authorization {
     /**
      * the object where the feature can be used. Not null, for repository wide feature use the {@link Site} object
      */
-    private FindableObject object;
+    private BaseObjectRest object;
 
     public Authorization() {
     }
 
-    public Authorization(EPerson eperson, AuthorizationFeature feature, FindableObject object) {
+    public Authorization(EPerson eperson, AuthorizationFeature feature, BaseObjectRest object) {
         super();
         this.eperson = eperson;
         this.feature = feature;
@@ -85,7 +85,7 @@ public class Authorization {
      * @return the object where the feature can be used. Not null, for repository wide feature use the {@link Site}
      *         object
      */
-    public FindableObject getObject() {
+    public BaseObjectRest getObject() {
         return object;
     }
 
@@ -95,7 +95,7 @@ public class Authorization {
      *            the object where the feature can be used. Not null, for repository wide feature use the {@link Site}
      *            object
      */
-    public void setObject(FindableObject object) {
+    public void setObject(BaseObjectRest object) {
         this.object = object;
     }
 
@@ -110,7 +110,7 @@ public class Authorization {
         if (eperson != null) {
             sb.append(eperson.getID().toString()).append("_");
         }
-        sb.append(feature.getName()).append("_").append(object.getType()).append("_").append(object.getID());
+        sb.append(feature.getName()).append("_").append(object.getUniqueType()).append("_").append(object.getId());
         return sb.toString();
     }
 

@@ -9,8 +9,9 @@ package org.dspace.app.rest.authorization;
 
 import java.sql.SQLException;
 
+import org.dspace.app.rest.model.BaseObjectRest;
+import org.dspace.app.rest.model.RestModel;
 import org.dspace.content.Site;
-import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.springframework.core.annotation.AnnotationUtils;
 
@@ -32,7 +33,7 @@ public interface AuthorizationFeature {
      *            feature
      * @return true if the user associated with the context has access to the feature for the specified object
      */
-    boolean isAuthorized(Context context, Object object) throws SQLException;
+    boolean isAuthorized(Context context, BaseObjectRest object) throws SQLException;
 
     /**
      * Return the name of the feature
@@ -63,9 +64,9 @@ public interface AuthorizationFeature {
     }
 
     /**
-     * Return the supported object type according to the {@link Constants} class
+     * Return the supported object type according to the {@link RestModel#getType()}
      * 
      * @return the supported object type, required to be not null
      */
-    int[] getSupportedTypes();
+    String[] getSupportedTypes();
 }

@@ -9,7 +9,10 @@ package org.dspace.app.rest.authorization;
 
 import java.sql.SQLException;
 
-import org.dspace.core.Constants;
+import org.dspace.app.rest.model.BaseObjectRest;
+import org.dspace.app.rest.model.BitstreamRest;
+import org.dspace.app.rest.model.CollectionRest;
+import org.dspace.app.rest.model.SiteRest;
 import org.dspace.core.Context;
 import org.springframework.stereotype.Component;
 
@@ -25,12 +28,16 @@ public class AlwaysFalseFeature implements AuthorizationFeature {
     public static final String NAME = "alwaysfalse";
 
     @Override
-    public boolean isAuthorized(Context context, Object object) throws SQLException {
+    public boolean isAuthorized(Context context, BaseObjectRest object) throws SQLException {
         return false;
     }
 
     @Override
-    public int[] getSupportedTypes() {
-        return new int[]{Constants.SITE, Constants.COLLECTION, Constants.BITSTREAM};
+    public String[] getSupportedTypes() {
+       return new String[]{
+               SiteRest.CATEGORY + "." + SiteRest.NAME,
+               CollectionRest.CATEGORY + "." + CollectionRest.NAME,
+               BitstreamRest.CATEGORY + "." + BitstreamRest.NAME
+       };
     }
 }

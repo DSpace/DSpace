@@ -17,6 +17,10 @@ import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
 
+import gr.ekt.bte.core.TransformationEngine;
+import gr.ekt.bte.core.TransformationSpec;
+import gr.ekt.bte.exceptions.BadTransformationSpec;
+import gr.ekt.bte.exceptions.MalformedSourceException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.Parameter;
@@ -65,11 +69,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.rest.webmvc.json.patch.PatchException;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
-
-import gr.ekt.bte.core.TransformationEngine;
-import gr.ekt.bte.core.TransformationSpec;
-import gr.ekt.bte.exceptions.BadTransformationSpec;
-import gr.ekt.bte.exceptions.MalformedSourceException;
 
 /**
  * This is the repository responsible to manage WorkspaceItem Rest object
@@ -145,7 +144,7 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
             long total = wis.countTotal(context);
             List<WorkspaceItem> witems = wis.findAll(context, pageable.getPageSize(),
                     Math.toIntExact(pageable.getOffset()));
-            return converter.toRestPage(witems, pageable, total, utils.obtainProjection(true));
+            return converter.toRestPage(witems, pageable, total, utils.obtainProjection());
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -161,7 +160,7 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
             long total = wis.countByEPerson(context, ep);
             List<WorkspaceItem> witems = wis.findByEPerson(context, ep, pageable.getPageSize(),
                     Math.toIntExact(pageable.getOffset()));
-            return converter.toRestPage(witems, pageable, total, utils.obtainProjection(true));
+            return converter.toRestPage(witems, pageable, total, utils.obtainProjection());
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }

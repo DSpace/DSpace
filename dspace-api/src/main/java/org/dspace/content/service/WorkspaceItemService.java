@@ -27,7 +27,7 @@ import org.dspace.workflow.WorkflowItem;
  *
  * @author kevinvandevelde at atmire.com
  */
-public interface WorkspaceItemService extends InProgressSubmissionService<WorkspaceItem, Integer> {
+public interface WorkspaceItemService extends InProgressSubmissionService<WorkspaceItem> {
 
     /**
      * Get a workspace item from the database. The item, collection and

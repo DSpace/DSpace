@@ -7,7 +7,6 @@
  */
 package org.dspace.app.rest.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
 import org.dspace.app.rest.RestResourceController;
@@ -18,17 +17,20 @@ import org.dspace.app.rest.RestResourceController;
  *
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
+@LinksRest(links = {
+        @LinkRest(method = "getEperson", name = AuthorizationRest.EPERSON),
+        @LinkRest(method = "getFeature", name = AuthorizationRest.FEATURE),
+        @LinkRest(method = "getObject", name = AuthorizationRest.OBJECT)
+})
 public class AuthorizationRest extends BaseObjectRest<String> {
     public static final String NAME = "authorization";
     public static final String CATEGORY = RestAddressableModel.AUTHORIZATION;
 
+    public static final String EPERSON = "eperson";
+    public static final String FEATURE = "feature";
+    public static final String OBJECT = "object";
+
     private String id;
-
-    private EPersonRest eperson;
-
-    private AuthorizationFeatureRest feature;
-
-    private RestAddressableModel object;
 
     @Override
     @JsonProperty(access = Access.READ_ONLY)
@@ -52,36 +54,6 @@ public class AuthorizationRest extends BaseObjectRest<String> {
 
     public void setId(String id) {
         this.id = id;
-    }
-
-    @LinkRest(linkClass = EPersonRest.class)
-    @JsonIgnore
-    public EPersonRest getEperson() {
-        return eperson;
-    }
-
-    public void setEperson(EPersonRest eperson) {
-        this.eperson = eperson;
-    }
-
-    @LinkRest(linkClass = AuthorizationFeatureRest.class)
-    @JsonIgnore
-    public AuthorizationFeatureRest getFeature() {
-        return feature;
-    }
-
-    public void setFeature(AuthorizationFeatureRest feature) {
-        this.feature = feature;
-    }
-
-    @LinkRest(linkClass = RestAddressableModel.class)
-    @JsonIgnore
-    public RestAddressableModel getObject() {
-        return object;
-    }
-
-    public void setObject(RestAddressableModel object) {
-        this.object = object;
     }
 
 }

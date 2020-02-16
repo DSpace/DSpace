@@ -7,27 +7,20 @@
  */
 package org.dspace.app.rest.authorization;
 
+import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
-import org.dspace.content.factory.ContentServiceFactory;
-import org.dspace.content.service.BitstreamService;
-import org.dspace.content.service.BundleService;
-import org.dspace.content.service.CollectionService;
-import org.dspace.content.service.CommunityService;
-import org.dspace.content.service.ItemService;
-import org.dspace.content.service.SiteService;
-import org.dspace.content.service.WorkspaceItemService;
-import org.dspace.core.Constants;
+import org.dspace.app.rest.model.BaseObjectRest;
+import org.dspace.app.rest.repository.DSpaceRestRepository;
+import org.dspace.app.rest.repository.FindableObjectRepository;
+import org.dspace.app.rest.utils.Utils;
 import org.dspace.core.Context;
-import org.dspace.discovery.FindableObject;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
-import org.dspace.eperson.service.GroupService;
-import org.dspace.workflow.WorkflowItemService;
-import org.dspace.workflow.factory.WorkflowServiceFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -38,6 +31,10 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class AuthorizationRestUtil {
+
+    @Autowired
+    private Utils utils;
+
     /**
      * Extract the feature name from the Authorization business ID. See {@link Authorization#getID()}
      * 
@@ -63,60 +60,18 @@ public class AuthorizationRestUtil {
      * @throws IllegalArgumentException
      *             if the specified id doesn't contain syntactically valid object information
      */
-    public FindableObject getObject(Context context, String id) throws SQLException {
+    public BaseObjectRest getObject(Context context, String id) throws SQLException {
         String[] parts = splitIdParts(id);
         String objIdStr = parts[3];
-        int objTypeId;
+        String[] objType;
         try {
-            objTypeId = Integer.parseInt(parts[2]);
-        } catch (NumberFormatException e) {
+            objType = parts[2].split("\\.");
+            DSpaceRestRepository repository = utils.getResourceRepositoryByCategoryAndModel(objType[0], objType[1]);
+            Serializable pk = utils.castToPKClass((FindableObjectRepository) repository, objIdStr);
+            return (BaseObjectRest) repository.findOne(context, pk);
+        } catch (RuntimeException e) {
             throw new IllegalArgumentException(
-                    "The type " + objIdStr + " is not yet supported, please implement it if needed by a feature");
-        }
-        switch (objTypeId) {
-            case Constants.SITE:
-                SiteService siteService = ContentServiceFactory.getInstance().getSiteService();
-                UUID siteUuid = UUID.fromString(objIdStr);
-                return siteService.find(context, siteUuid);
-            case Constants.COMMUNITY:
-                CommunityService comService = ContentServiceFactory.getInstance().getCommunityService();
-                UUID comUuid = UUID.fromString(objIdStr);
-                return comService.find(context, comUuid);
-            case Constants.COLLECTION:
-                CollectionService colService = ContentServiceFactory.getInstance().getCollectionService();
-                UUID colUuid = UUID.fromString(objIdStr);
-                return colService.find(context, colUuid);
-            case Constants.ITEM:
-                ItemService itemService = ContentServiceFactory.getInstance().getItemService();
-                UUID itemUuid = UUID.fromString(objIdStr);
-                return itemService.find(context, itemUuid);
-            case Constants.BUNDLE:
-                BundleService bndService = ContentServiceFactory.getInstance().getBundleService();
-                UUID bndUuid = UUID.fromString(objIdStr);
-                return bndService.find(context, bndUuid);
-            case Constants.BITSTREAM:
-                BitstreamService bitService = ContentServiceFactory.getInstance().getBitstreamService();
-                UUID bitUuid = UUID.fromString(objIdStr);
-                return bitService.find(context, bitUuid);
-            case Constants.EPERSON:
-                EPersonService epService = EPersonServiceFactory.getInstance().getEPersonService();
-                UUID epUuid = UUID.fromString(objIdStr);
-                return epService.find(context, epUuid);
-            case Constants.GROUP:
-                GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
-                UUID grUuid = UUID.fromString(objIdStr);
-                return groupService.find(context, grUuid);
-            case Constants.WORKSPACEITEM:
-                WorkspaceItemService wsService = ContentServiceFactory.getInstance().getWorkspaceItemService();
-                int wsId = Integer.parseInt(objIdStr);
-                return wsService.find(context, wsId);
-            case Constants.WORKFLOWITEM:
-                WorkflowItemService wfService = WorkflowServiceFactory.getInstance().getWorkflowItemService();
-                int wfId = Integer.parseInt(objIdStr);
-                return wfService.find(context, wfId);
-            default:
-                throw new IllegalArgumentException(
-                        "The type " + objTypeId + " is not yet supported, please implement it if needed by a feature");
+                    "The id " + id + " not resolve to a valid object", e);
         }
     }
 
