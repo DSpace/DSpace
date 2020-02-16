@@ -5,7 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.app.rest.authorize.impl;
+package org.dspace.app.rest.authorization.impl;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -13,8 +13,8 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.dspace.app.rest.authorize.AuthorizationFeature;
-import org.dspace.app.rest.authorize.AuthorizationFeatureService;
+import org.dspace.app.rest.authorization.AuthorizationFeature;
+import org.dspace.app.rest.authorization.AuthorizationFeatureService;
 import org.dspace.core.Context;
 import org.dspace.discovery.FindableObject;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -10,7 +10,7 @@ package org.dspace.app.rest.converter;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.dspace.app.rest.authorize.AuthorizationFeature;
+import org.dspace.app.rest.authorization.AuthorizationFeature;
 import org.dspace.app.rest.model.AuthorizationFeatureRest;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.core.Constants;

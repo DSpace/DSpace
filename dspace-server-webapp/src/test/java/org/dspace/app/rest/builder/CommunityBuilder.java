@@ -19,6 +19,8 @@ import org.dspace.content.Community;
 import org.dspace.content.MetadataSchemaEnum;
 import org.dspace.content.service.DSpaceObjectService;
 import org.dspace.core.Context;
+import org.dspace.eperson.EPerson;
+import org.dspace.eperson.Group;
 
 /**
  * Builder to construct Community objects
@@ -56,6 +58,23 @@ public class CommunityBuilder extends AbstractDSpaceObjectBuilder<Community> {
             return null;
         }
 
+        return this;
+    }
+
+    /**
+     * Create an admin group for the community with the specified members
+     *
+     * @param members epersons to add to the admin group
+     * @return this builder
+     * @throws SQLException
+     * @throws AuthorizeException
+     */
+    public CommunityBuilder withAdminGroup(EPerson... members) throws SQLException, AuthorizeException {
+        Group g = communityService.createAdministrators(context, community);
+        for (EPerson e : members) {
+            groupService.addMember(context, g, e);
+        }
+        groupService.update(context, g);
         return this;
     }
 

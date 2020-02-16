@@ -11,8 +11,8 @@ import java.util.List;
 
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
-import org.dspace.app.rest.authorize.AuthorizationFeature;
-import org.dspace.app.rest.authorize.AuthorizationFeatureService;
+import org.dspace.app.rest.authorization.AuthorizationFeature;
+import org.dspace.app.rest.authorization.AuthorizationFeatureService;
 import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.model.AuthorizationFeatureRest;
 import org.dspace.core.Constants;

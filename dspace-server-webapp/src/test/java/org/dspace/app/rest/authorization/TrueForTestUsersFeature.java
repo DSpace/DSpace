@@ -10,8 +10,6 @@ package org.dspace.app.rest.authorization;
 import java.sql.SQLException;
 
 import org.apache.commons.lang3.StringUtils;
-import org.dspace.app.rest.authorize.AuthorizationFeature;
-import org.dspace.app.rest.authorize.AuthorizationFeatureDocumentation;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.springframework.stereotype.Component;

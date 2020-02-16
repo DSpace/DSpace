@@ -9,8 +9,6 @@ package org.dspace.app.rest.authorization;
 
 import java.sql.SQLException;
 
-import org.dspace.app.rest.authorize.AuthorizationFeature;
-import org.dspace.app.rest.authorize.AuthorizationFeatureDocumentation;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.services.ConfigurationService;
@@ -32,7 +30,7 @@ public class AlwaysThrowExceptionFeature implements AuthorizationFeature {
 
     @Autowired
     private ConfigurationService configurationService;
-    
+
     @Override
     /**
      * This check will throw a runtime exception except if the
@@ -40,7 +38,8 @@ public class AlwaysThrowExceptionFeature implements AuthorizationFeature {
      * configuration service. In this case it will return false
      */
     public boolean isAuthorized(Context context, Object object) throws SQLException {
-        if (!configurationService.getBooleanProperty("org.dspace.app.rest.authorization.AlwaysThrowExceptionFeature.turnoff", false)) {
+        if (!configurationService
+                .getBooleanProperty("org.dspace.app.rest.authorization.AlwaysThrowExceptionFeature.turnoff", false)) {
             throw new  RuntimeException("Sometimes things go wrong and we should not hide it");
         }
         return false;
