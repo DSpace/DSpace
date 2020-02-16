@@ -19,13 +19,15 @@
 
     <context:annotation-config/> <!-- allows us to use spring annotations in beans -->
 
-    <bean class="org.dspace.discovery.MockSolrServiceImpl" id="org.dspace.discovery.SearchService"/>
+    <bean class="org.dspace.discovery.SolrServiceImpl" id="org.dspace.discovery.SearchService"/>
 
     <alias name="org.dspace.discovery.SearchService" alias="org.dspace.discovery.IndexingService"/>
 
     <!-- These beans have been added so that we can mock our AuthoritySearchService in the tests-->
     <bean class="org.dspace.authority.MockAuthoritySolrServiceImpl" id="org.dspace.authority.AuthoritySearchService"/>
     <alias name="org.dspace.authority.AuthoritySearchService" alias="org.dspace.authority.indexer.AuthorityIndexingService"/>
+
+    <bean id="org.dspace.discovery.SolrSearchCore" class="org.dspace.discovery.MockSolrSearchCore" autowire-candidate="true"/>
 
     <!--<bean class="org.dspace.discovery.SolrServiceIndexOutputPlugin" id="solrServiceIndexOutputPlugin"/>-->
 

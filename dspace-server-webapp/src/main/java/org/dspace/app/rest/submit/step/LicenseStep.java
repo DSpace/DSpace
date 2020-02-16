@@ -42,7 +42,7 @@ public class LicenseStep extends org.dspace.submit.step.LicenseStep implements A
             String acceptanceDate = bitstreamService.getMetadata(bitstream, DCTERMS_RIGHTSDATE);
             result.setAcceptanceDate(acceptanceDate);
             result.setUrl(
-                configurationService.getProperty("dspace.url") + "/api/" + BitstreamRest.CATEGORY + "/" + English
+                configurationService.getProperty("dspace.server.url") + "/api/" + BitstreamRest.CATEGORY + "/" + English
                     .plural(BitstreamRest.NAME) + "/" + bitstream.getID() + "/content");
             result.setGranted(true);
         }

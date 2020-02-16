@@ -13,7 +13,6 @@ import java.util.List;
 import org.dspace.app.rest.authorization.AuthorizationFeature;
 import org.dspace.app.rest.model.AuthorizationFeatureRest;
 import org.dspace.app.rest.projection.Projection;
-import org.dspace.core.Constants;
 import org.springframework.stereotype.Component;
 
 /**
@@ -34,8 +33,8 @@ public class AuthorizationFeatureConverter
             featureRest.setId(feature.getName());
             featureRest.setDescription(feature.getDescription());
             List<String> types = new ArrayList<String>();
-            for (int t : feature.getSupportedTypes()) {
-                types.add(Constants.typeText[t]);
+            for (String t : feature.getSupportedTypes()) {
+                types.add(t);
             }
             featureRest.setResourceTypes(types);
         }

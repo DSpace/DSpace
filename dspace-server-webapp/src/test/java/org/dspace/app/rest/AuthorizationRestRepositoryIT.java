@@ -31,7 +31,9 @@ import org.dspace.app.rest.builder.CommunityBuilder;
 import org.dspace.app.rest.builder.EPersonBuilder;
 import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.matcher.AuthorizationMatcher;
+import org.dspace.app.rest.model.BaseObjectRest;
 import org.dspace.app.rest.model.CommunityRest;
+import org.dspace.app.rest.model.EPersonRest;
 import org.dspace.app.rest.model.SiteRest;
 import org.dspace.app.rest.projection.DefaultProjection;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
@@ -41,7 +43,6 @@ import org.dspace.content.Site;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.SiteService;
 import org.dspace.core.Constants;
-import org.dspace.discovery.FindableObject;
 import org.dspace.eperson.EPerson;
 import org.dspace.services.ConfigurationService;
 import org.hamcrest.Matchers;
@@ -121,11 +122,12 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
      */
     public void findOneTest() throws Exception {
         Site site = siteService.findSite(context);
+        SiteRest siteRest = converterService.toRest(site, DefaultProjection.DEFAULT);
 
         // define three authorizations that we know must exists
-        Authorization authAdminSite = new Authorization(admin, trueForAdmins, site);
-        Authorization authNormalUserSite = new Authorization(eperson, trueForLoggedUsers, site);
-        Authorization authAnonymousUserSite = new Authorization(null, alwaysTrue, site);
+        Authorization authAdminSite = new Authorization(admin, trueForAdmins, siteRest);
+        Authorization authNormalUserSite = new Authorization(eperson, trueForLoggedUsers, siteRest);
+        Authorization authAnonymousUserSite = new Authorization(null, alwaysTrue, siteRest);
 
         // access the authorization for the admin user
         String adminToken = getAuthToken(admin.getEmail(), password);
@@ -162,10 +164,11 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
      */
     public void findOneUnauthorizedTest() throws Exception {
         Site site = siteService.findSite(context);
+        SiteRest siteRest = converterService.toRest(site, DefaultProjection.DEFAULT);
 
         // define two authorizations that we know must exists
-        Authorization authAdminSite = new Authorization(admin, alwaysTrue, site);
-        Authorization authNormalUserSite = new Authorization(eperson, alwaysTrue, site);
+        Authorization authAdminSite = new Authorization(admin, alwaysTrue, siteRest);
+        Authorization authNormalUserSite = new Authorization(eperson, alwaysTrue, siteRest);
 
         // try anonymous access to the authorization for the admin user
         getClient().perform(get("/api/authz/authorizations/" + authAdminSite.getID()))
@@ -185,14 +188,15 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
     public void findOneForbiddenTest() throws Exception {
         context.turnOffAuthorisationSystem();
         Site site = siteService.findSite(context);
+        SiteRest siteRest = converterService.toRest(site, DefaultProjection.DEFAULT);
         EPerson testEPerson = EPersonBuilder.createEPerson(context)
                 .withEmail("test-authorization@example.com")
                 .withPassword(password).build();
         context.restoreAuthSystemState();
 
         // define three authorizations that we know must exists
-        Authorization authAdminSite = new Authorization(admin, alwaysTrue, site);
-        Authorization authNormalUserSite = new Authorization(eperson, alwaysTrue, site);
+        Authorization authAdminSite = new Authorization(admin, alwaysTrue, siteRest);
+        Authorization authNormalUserSite = new Authorization(eperson, alwaysTrue, siteRest);
 
         String testToken = getAuthToken(testEPerson.getEmail(), password);
 
@@ -206,7 +210,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
 
         // check access as a test user to a not existing authorization for another
         // eperson (but existing for the test user)
-        Authorization noTestAuthForNormalUserSite  = new Authorization(eperson, trueForTestUsers, site);
+        Authorization noTestAuthForNormalUserSite  = new Authorization(eperson, trueForTestUsers, siteRest);
         getClient(testToken).perform(get("/api/authz/authorizations/" + noTestAuthForNormalUserSite.getID()))
                     .andExpect(status().isForbidden());
     }
@@ -220,15 +224,17 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
     public void findOneNotFoundTest() throws Exception {
         context.turnOffAuthorisationSystem();
         Site site = siteService.findSite(context);
+        SiteRest siteRest = converterService.toRest(site, DefaultProjection.DEFAULT);
+        EPersonRest epersonRest = converterService.toRest(eperson, DefaultProjection.DEFAULT);
         context.restoreAuthSystemState();
 
         String epersonToken = getAuthToken(eperson.getEmail(), password);
         String adminToken = getAuthToken(admin.getEmail(), password);
 
         // define three authorizations that we know will be no granted
-        Authorization authAdminSite = new Authorization(admin, alwaysFalse, site);
-        Authorization authNormalUserSite = new Authorization(eperson, alwaysFalse, site);
-        Authorization authAnonymousUserSite = new Authorization(null, alwaysFalse, site);
+        Authorization authAdminSite = new Authorization(admin, alwaysFalse, siteRest);
+        Authorization authNormalUserSite = new Authorization(eperson, alwaysFalse, siteRest);
+        Authorization authAnonymousUserSite = new Authorization(null, alwaysFalse, siteRest);
 
         getClient(adminToken).perform(get("/api/authz/authorizations/" + authAdminSite.getID()))
                     .andExpect(status().isNotFound());
@@ -247,7 +253,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
 
         // build a couple of IDs that look good but are related to not existing authorizations
         // the trueForAdmins feature is not defined for eperson
-        String authInvalidType = getAuthorizationID(admin, trueForAdmins, eperson);
+        String authInvalidType = getAuthorizationID(admin, trueForAdmins, epersonRest);
         getClient(adminToken).perform(get("/api/authz/authorizations/" + authInvalidType))
                     .andExpect(status().isNotFound());
 
@@ -257,17 +263,17 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
                     .andExpect(status().isNotFound());
 
         // the specified eperson doesn't exist
-        String authNotExistingEPerson = getAuthorizationID(UUID.randomUUID(), alwaysTrue, site);
+        String authNotExistingEPerson = getAuthorizationID(UUID.randomUUID(), alwaysTrue, siteRest);
         getClient(adminToken).perform(get("/api/authz/authorizations/" + authNotExistingEPerson))
                     .andExpect(status().isNotFound());
 
         // the specified feature doesn't exist
-        String authNotExistingFeature = getAuthorizationID(admin, "notexistingfeature", site);
+        String authNotExistingFeature = getAuthorizationID(admin, "notexistingfeature", siteRest);
         getClient(adminToken).perform(get("/api/authz/authorizations/" + authNotExistingFeature))
                     .andExpect(status().isNotFound());
 
         // check access as admin to a not existing authorization for another eperson (but existing for the admin)
-        Authorization noAdminAuthForNormalUserSite  = new Authorization(eperson, trueForAdmins, site);
+        Authorization noAdminAuthForNormalUserSite  = new Authorization(eperson, trueForAdmins, siteRest);
         getClient(adminToken).perform(get("/api/authz/authorizations/" + noAdminAuthForNormalUserSite.getID()))
                     .andExpect(status().isNotFound());
 
@@ -289,7 +295,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
 
         String notValidIDWithUnknownObjectTypePart =
                 getAuthorizationID(eperson.getID().toString(), alwaysTrue.getName(),
-                        String.valueOf(Integer.MAX_VALUE), "1");
+                        "core.unknown", "1");
         getClient(epersonToken).perform(get("/api/authz/authorizations/" + notValidIDWithUnknownObjectTypePart))
                     .andExpect(status().isNotFound());
 
@@ -303,10 +309,10 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
      */
     public void findOneInternalServerErrorTest() throws Exception {
         Site site = siteService.findSite(context);
-
+        SiteRest siteRest = converterService.toRest(site, DefaultProjection.DEFAULT);
         // define two authorizations that we know will throw exceptions
-        Authorization authAdminSite = new Authorization(admin, alwaysException, site);
-        Authorization authNormalUserSite = new Authorization(eperson, alwaysException, site);
+        Authorization authAdminSite = new Authorization(admin, alwaysException, siteRest);
+        Authorization authNormalUserSite = new Authorization(eperson, alwaysException, siteRest);
 
         String adminToken = getAuthToken(admin.getEmail(), password);
         String epersonToken = getAuthToken(eperson.getEmail(), password);
@@ -1111,19 +1117,19 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
     }
 
     // utility methods to build authorization ID without having an authorization object
-    private String getAuthorizationID(EPerson eperson, AuthorizationFeature feature, FindableObject obj) {
+    private String getAuthorizationID(EPerson eperson, AuthorizationFeature feature, BaseObjectRest obj) {
         return getAuthorizationID(eperson != null ? eperson.getID().toString() : null, feature.getName(),
-                String.valueOf(obj.getType()), obj.getID());
+                String.valueOf(obj.getUniqueType()), obj.getId());
     }
 
-    private String getAuthorizationID(UUID epersonUuid, AuthorizationFeature feature, FindableObject obj) {
+    private String getAuthorizationID(UUID epersonUuid, AuthorizationFeature feature, BaseObjectRest obj) {
         return getAuthorizationID(epersonUuid != null ? epersonUuid.toString() : null, feature.getName(),
-                String.valueOf(obj.getType()), obj.getID());
+                String.valueOf(obj.getType()), obj.getId());
     }
 
-    private String getAuthorizationID(EPerson eperson, String featureName, FindableObject obj) {
+    private String getAuthorizationID(EPerson eperson, String featureName, BaseObjectRest obj) {
         return getAuthorizationID(eperson != null ? eperson.getID().toString() : null, featureName,
-                String.valueOf(obj.getType()), obj.getID());
+                String.valueOf(obj.getType()), obj.getId());
     }
 
     private String getAuthorizationID(EPerson eperson, AuthorizationFeature feature, int objType, Serializable objID) {

@@ -19,6 +19,7 @@
 
     <context:annotation-config /> <!-- allows us to use spring annotations in beans -->
 
+    <bean class="org.dspace.discovery.SolrSearchCore" autowire-candidate="true"/>
 
     <bean class="org.dspace.discovery.SolrServiceImpl" id="org.dspace.discovery.SearchService"/>
 

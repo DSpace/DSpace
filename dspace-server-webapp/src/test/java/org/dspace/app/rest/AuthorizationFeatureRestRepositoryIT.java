@@ -19,10 +19,10 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
 import com.jayway.jsonpath.matchers.JsonPathMatchers;
-
+import org.dspace.app.rest.authorization.AlwaysTrueFeature;
 import org.dspace.app.rest.authorization.AuthorizationFeature;
+import org.dspace.app.rest.authorization.AuthorizationFeatureService;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
-import org.dspace.core.Constants;
 import org.hamcrest.Matchers;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +35,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class AuthorizationFeatureRestRepositoryIT extends AbstractControllerIntegrationTest {
     @Autowired
-    private List<AuthorizationFeature> featuresList;
+    private AuthorizationFeatureService authzFeatureService;
 
     @Test
     /**
@@ -44,7 +44,7 @@ public class AuthorizationFeatureRestRepositoryIT extends AbstractControllerInte
      * @throws Exception
      */
     public void findAllTest() throws Exception {
-        int featuresNum = featuresList.size();
+        int featuresNum = authzFeatureService.findAll().size();
         int expReturn = featuresNum > 20 ? 20 : featuresNum;
         String adminToken = getAuthToken(admin.getEmail(), password);
 
@@ -68,7 +68,7 @@ public class AuthorizationFeatureRestRepositoryIT extends AbstractControllerInte
      * @throws Exception
      */
     public void findAllWithPaginationTest() throws Exception {
-        int featuresNum = featuresList.size();
+        int featuresNum = authzFeatureService.findAll().size();
 
         String adminToken = getAuthToken(admin.getEmail(), password);
         List<String> featureIDs = new ArrayList<String>();
@@ -111,7 +111,7 @@ public class AuthorizationFeatureRestRepositoryIT extends AbstractControllerInte
         getClient(adminToken).perform(get("/api/authz/features/withdrawItem")).andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", is("withdrawItem")))
                 .andExpect(jsonPath("$.description", Matchers.any(String.class)))
-                .andExpect(jsonPath("$.resourcetypes", Matchers.contains("ITEM")))
+                .andExpect(jsonPath("$.resourcetypes", Matchers.contains("core.item")))
                 .andExpect(jsonPath("$.type", is("feature")));
 
         getClient().perform(get("/api/authz/features/withdrawItem")).andExpect(status().isUnauthorized());
@@ -138,18 +138,17 @@ public class AuthorizationFeatureRestRepositoryIT extends AbstractControllerInte
      * @throws Exception
      */
     public void findByResourceTypeTest() throws Exception {
+        AuthorizationFeature alwaysTrueFeature = authzFeatureService.find(AlwaysTrueFeature.NAME);
         String adminToken = getAuthToken(admin.getEmail(), password);
-        for (String type : Constants.typeText) {
+        for (String type : alwaysTrueFeature.getSupportedTypes()) {
             getClient(adminToken).perform(get("/api/authz/features/search/resourcetype").param("type", type))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$",
-                            Matchers.anyOf(
-                                    JsonPathMatchers.hasNoJsonPath("$._embedded"),
                                     JsonPathMatchers.hasJsonPath("$._embedded.features",
                                             Matchers.everyItem(
                                                     JsonPathMatchers.hasJsonPath("$.resourcetypes",
                                                             Matchers.hasItem(is(type))))
-                                    ))))
+                                    )))
                     .andExpect(
                             jsonPath("$._links.self.href",
                                     Matchers.containsString("/api/authz/features/search/resourcetype")));
@@ -158,11 +157,11 @@ public class AuthorizationFeatureRestRepositoryIT extends AbstractControllerInte
         getClient(adminToken).perform(get("/api/authz/features/search/resourcetype").param("type", "NOT-EXISTING"))
                 .andExpect(status().isOk()).andExpect(jsonPath("$.page.totalElements", is(0)));
 
-        getClient().perform(get("/api/authz/features/search/resourcetype").param("type", "ITEM"))
+        getClient().perform(get("/api/authz/features/search/resourcetype").param("type", "core.item"))
                 .andExpect(status().isUnauthorized());
 
         String epersonAuthToken = getAuthToken(eperson.getEmail(), password);
-        getClient(epersonAuthToken).perform(get("/api/authz/features/search/resourcetype").param("type", "ITEM"))
+        getClient(epersonAuthToken).perform(get("/api/authz/features/search/resourcetype").param("type", "core.item"))
                 .andExpect(status().isForbidden());
 
     }

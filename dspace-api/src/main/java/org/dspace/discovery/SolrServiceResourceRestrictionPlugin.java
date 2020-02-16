@@ -24,6 +24,7 @@ import org.dspace.content.service.CommunityService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
+import org.dspace.discovery.indexobject.IndexableDSpaceObject;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.service.GroupService;
@@ -56,8 +57,8 @@ public class SolrServiceResourceRestrictionPlugin implements SolrServiceIndexPlu
 
     @Override
     public void additionalIndex(Context context, IndexableObject idxObj, SolrInputDocument document) {
-        if (idxObj instanceof DSpaceObject) {
-            DSpaceObject dso = (DSpaceObject) idxObj;
+        if (idxObj instanceof IndexableDSpaceObject) {
+            DSpaceObject dso = ((IndexableDSpaceObject) idxObj).getIndexedObject();
             try {
                 List<ResourcePolicy> policies = authorizeService.getPoliciesActionFilter(context, dso, Constants.READ);
                 for (ResourcePolicy resourcePolicy : policies) {

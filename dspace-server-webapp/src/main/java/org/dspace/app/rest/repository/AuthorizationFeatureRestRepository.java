@@ -15,7 +15,6 @@ import org.dspace.app.rest.authorization.AuthorizationFeature;
 import org.dspace.app.rest.authorization.AuthorizationFeatureService;
 import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.model.AuthorizationFeatureRest;
-import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -47,7 +46,7 @@ public class AuthorizationFeatureRestRepository extends DSpaceRestRepository<Aut
     @Override
     public Page<AuthorizationFeatureRest> findAll(Context context, Pageable pageable) {
         return converter.toRestPage(utils.getPage(authorizationFeatureService.findAll(),
-                pageable), utils.obtainProjection(true));
+                pageable), utils.obtainProjection());
     }
 
     @PreAuthorize("hasAuthority('ADMIN')")
@@ -55,7 +54,7 @@ public class AuthorizationFeatureRestRepository extends DSpaceRestRepository<Aut
     public AuthorizationFeatureRest findOne(Context context, String id) {
         AuthorizationFeature authzFeature = authorizationFeatureService.find(id);
         if (authzFeature != null) {
-            return converter.toRest(authzFeature, utils.obtainProjection(true));
+            return converter.toRest(authzFeature, utils.obtainProjection());
         }
         return null;
     }
@@ -64,8 +63,7 @@ public class AuthorizationFeatureRestRepository extends DSpaceRestRepository<Aut
     @SearchRestMethod(name = "resourcetype")
     public Page<AuthorizationFeatureRest> findByResourceType(@Parameter(value = "type", required = true) String type,
             Pageable pageable) {
-        int typeID = Constants.getTypeID(type);
-        List<AuthorizationFeature> foundFeatures = authorizationFeatureService.findByResourceType(typeID);
-        return converter.toRestPage(utils.getPage(foundFeatures, pageable), utils.obtainProjection(true));
+        List<AuthorizationFeature> foundFeatures = authorizationFeatureService.findByResourceType(type);
+        return converter.toRestPage(utils.getPage(foundFeatures, pageable), utils.obtainProjection());
     }
 }

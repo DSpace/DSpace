@@ -73,7 +73,7 @@ public class ReinstateFeatureRestIT extends AbstractControllerIntegrationTest {
 
         ItemRest itemRest = converterService.toRest(item, converterService.getProjection(DefaultProjection.NAME));
         String itemUri = utils.linkToSingleResource(itemRest, "self").getHref();
-        Authorization authAdminWithdraw = new Authorization(admin, reinstateFeature, item);
+        Authorization authAdminWithdraw = new Authorization(admin, reinstateFeature, itemRest);
 
         // access the authorization for the admin user
         String adminToken = getAuthToken(admin.getEmail(), password);
@@ -102,7 +102,7 @@ public class ReinstateFeatureRestIT extends AbstractControllerIntegrationTest {
 
         ItemRest itemRest = converterService.toRest(item, converterService.getProjection(DefaultProjection.NAME));
         String itemUri = utils.linkToSingleResource(itemRest, "self").getHref();
-        Authorization authAdminWithdraw = new Authorization(eperson, reinstateFeature, item);
+        Authorization authAdminWithdraw = new Authorization(eperson, reinstateFeature, itemRest);
 
         // access the authorization for the community admin user
         String comAdminToken = getAuthToken(eperson.getEmail(), password);
@@ -161,7 +161,7 @@ public class ReinstateFeatureRestIT extends AbstractControllerIntegrationTest {
 
         ItemRest itemRest = converterService.toRest(item, converterService.getProjection(DefaultProjection.NAME));
         String itemUri = utils.linkToSingleResource(itemRest, "self").getHref();
-        Authorization authAdminWithdraw = new Authorization(eperson, reinstateFeature, item);
+        Authorization authAdminWithdraw = new Authorization(eperson, reinstateFeature, itemRest);
 
         // access the authorization for the admin user
         String colAdminToken = getAuthToken(eperson.getEmail(), password);
@@ -199,8 +199,8 @@ public class ReinstateFeatureRestIT extends AbstractControllerIntegrationTest {
 
         ItemRest itemRest = converterService.toRest(item, converterService.getProjection(DefaultProjection.NAME));
         String itemUri = utils.linkToSingleResource(itemRest, "self").getHref();
-        Authorization authEpersonWithdraw = new Authorization(eperson, reinstateFeature, item);
-        Authorization authAnonymousWithdraw = new Authorization(null, reinstateFeature, item);
+        Authorization authEpersonWithdraw = new Authorization(eperson, reinstateFeature, itemRest);
+        Authorization authAnonymousWithdraw = new Authorization(null, reinstateFeature, itemRest);
 
         // check the authorization for a normal user
         String epersonToken = getAuthToken(eperson.getEmail(), password);
@@ -246,9 +246,9 @@ public class ReinstateFeatureRestIT extends AbstractControllerIntegrationTest {
                 converterService.getProjection(DefaultProjection.NAME));
         String wfItemUri = utils.linkToSingleResource(wfItemRest, "self").getHref();
 
-        Authorization authWithdrawnItem = new Authorization(admin, reinstateFeature, archivedItem);
-        Authorization authWsItem = new Authorization(admin, reinstateFeature, wsItem.getItem());
-        Authorization authWFItem = new Authorization(admin, reinstateFeature, wfItem.getItem());
+        Authorization authWithdrawnItem = new Authorization(admin, reinstateFeature, archivedItemRest);
+        Authorization authWsItem = new Authorization(admin, reinstateFeature, wsItemRest);
+        Authorization authWFItem = new Authorization(admin, reinstateFeature, wfItemRest);
         // nor the admin should be authorized to reinstate the previous items
         String adminToken = getAuthToken(admin.getEmail(), password);
         getClient(adminToken).perform(get("/api/authz/authorizations/" + authWithdrawnItem.getID()))

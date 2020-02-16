@@ -24,10 +24,10 @@ import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.exception.RepositoryNotFoundException;
 import org.dspace.app.rest.model.AuthorizationRest;
+import org.dspace.app.rest.model.BaseObjectRest;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.core.Context;
-import org.dspace.discovery.FindableObject;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.services.ConfigurationService;
@@ -83,7 +83,7 @@ public class AuthorizationRestRepository extends DSpaceRestRepository<Authorizat
             return null;
         }
         try {
-            FindableObject object = null;
+            BaseObjectRest object = null;
             try {
                 object = authorizationRestUtil.getObject(context, id);
             } catch (IllegalArgumentException e) {
@@ -115,7 +115,7 @@ public class AuthorizationRestRepository extends DSpaceRestRepository<Authorizat
                 authz.setEperson(user);
                 authz.setFeature(authorizationFeature);
                 authz.setObject(object);
-                authorizationRest = converter.toRest(authz, utils.obtainProjection(true));
+                authorizationRest = converter.toRest(authz, utils.obtainProjection());
             }
             context.setCurrentUser(currUser);
         } catch (SQLException e) {
@@ -152,7 +152,7 @@ public class AuthorizationRestRepository extends DSpaceRestRepository<Authorizat
             @Parameter(value = "eperson") UUID epersonUuid,
             Pageable pageable) throws AuthorizeException, SQLException {
         Context context = obtainContext();
-        FindableObject obj = getObject(context, uri);
+        BaseObjectRest obj = getObject(context, uri);
         if (obj == null) {
             return null;
         }
@@ -175,7 +175,7 @@ public class AuthorizationRestRepository extends DSpaceRestRepository<Authorizat
             user = null;
         }
         context.setCurrentUser(user);
-        List<AuthorizationFeature> features = authorizationFeatureService.findByResourceType(obj.getType());
+        List<AuthorizationFeature> features = authorizationFeatureService.findByResourceType(obj.getUniqueType());
         List<Authorization> authorizations = new ArrayList<Authorization>();
         for (AuthorizationFeature f : features) {
             if (authorizationFeatureService.isAuthorized(context, f, obj)) {
@@ -183,7 +183,7 @@ public class AuthorizationRestRepository extends DSpaceRestRepository<Authorizat
             }
         }
         context.setCurrentUser(currUser);
-        return converter.toRestPage(utils.getPage(authorizations, pageable), utils.obtainProjection(true));
+        return converter.toRestPage(utils.getPage(authorizations, pageable), utils.obtainProjection());
     }
 
     /**
@@ -213,7 +213,7 @@ public class AuthorizationRestRepository extends DSpaceRestRepository<Authorizat
             @Parameter(value = "feature", required = true) String featureName,
             Pageable pageable) throws AuthorizeException, SQLException {
         Context context = obtainContext();
-        FindableObject obj = getObject(context, uri);
+        BaseObjectRest obj = getObject(context, uri);
         if (obj == null) {
             return null;
         }
@@ -242,13 +242,13 @@ public class AuthorizationRestRepository extends DSpaceRestRepository<Authorizat
             authz.setEperson(user);
             authz.setFeature(feature);
             authz.setObject(obj);
-            authorizationRest = converter.toRest(authz, utils.obtainProjection(true));
+            authorizationRest = converter.toRest(authz, utils.obtainProjection());
         }
         context.setCurrentUser(currUser);
         return authorizationRest;
     }
 
-    private FindableObject getObject(Context context, String uri) throws SQLException {
+    private BaseObjectRest getObject(Context context, String uri) throws SQLException {
         String dspaceUrl = configurationService.getProperty("dspace.baseUrl");
         if (!StringUtils.startsWith(uri, dspaceUrl)) {
             throw new IllegalArgumentException("the supplied uri is not valid:" + uri);
@@ -275,7 +275,7 @@ public class AuthorizationRestRepository extends DSpaceRestRepository<Authorizat
         } catch (Exception e) {
             throw new IllegalArgumentException("the supplied uri is not valid:" + uri, e);
         }
-        FindableObject obj = ((FindableObjectRepository) repository).findDomainObjectByPk(context, pk);
+        BaseObjectRest obj = (BaseObjectRest) repository.findOne(context, pk);
         return obj;
     }
 

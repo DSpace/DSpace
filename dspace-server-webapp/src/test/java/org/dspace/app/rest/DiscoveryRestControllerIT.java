@@ -918,7 +918,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 //These search results have to be shown in the embedded.objects section as these are the items
                 // given in the structure defined above.
                 //Seeing as everything fits onto one page, they have to all be present
-                .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.containsInAnyOrder(
+                .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.hasItems(
                         SearchResultMatcher.match("core", "community", "communities"),
                         SearchResultMatcher.match("core", "community", "communities"),
                         //This has to be like this because collections don't have anything else
@@ -1000,7 +1000,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 )))
                 //All elements have to be present in the embedded.objects section, these are the ones we made in
                 // the structure defined above
-                .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.containsInAnyOrder(
+                .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.hasItems(
                         SearchResultMatcher.match("core", "community", "communities"),
                         SearchResultMatcher.match("core", "community", "communities"),
                         //Match without any parameters because collections don't have anything special to check in the
@@ -1089,7 +1089,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                         PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 7)
                 )))
                 //All the elements created in the structure above have to be present in the embedded.objects section
-                .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.containsInAnyOrder(
+                .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.hasItems(
                         SearchResultMatcher.match("core", "community", "communities"),
                         SearchResultMatcher.match("core", "community", "communities"),
                         //Collections are specified like this because they don't have any special properties
@@ -1251,7 +1251,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 //The scope property has to be set to the value we entered in the parameters
                 .andExpect(jsonPath("$.scope", is("test")))
                 //All the elements created in the structure above have to be present in the embedded.objects section
-                .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.containsInAnyOrder(
+                .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.hasItems(
                         SearchResultMatcher.match("core", "community", "communities"),
                         SearchResultMatcher.match("core", "community", "communities"),
                         //Collections are specified like this because they don't have any special properties
@@ -1319,7 +1319,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
         //An anonymous user browses this endpoint to find the the objects in the system
         //With a dsoType 'item'
         getClient().perform(get("/api/discover/search/objects")
-                .param("dsoType", "item"))
+                .param("dsoType", "Item"))
 
                 //** THEN **
                 //The status has to be 200 OK
@@ -1396,7 +1396,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
         //With a dsoType 'item'
         //And a sort on the dc.title ascending
         getClient().perform(get("/api/discover/search/objects")
-                .param("dsoType", "item")
+                .param("dsoType", "Item")
                 .param("sort", "dc.title,ASC"))
 
                 //** THEN **
@@ -1794,7 +1794,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                         PageMatcher.pageEntry(0, 20)
                 )))
                 //These are the items that aren't set to private
-                .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.containsInAnyOrder(
+                .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.hasItems(
                         SearchResultMatcher.match("core", "community", "communities"),
                         SearchResultMatcher.match("core", "community", "communities"),
                         //Collections are specified like this because they don't have any special properties

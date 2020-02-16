@@ -10,9 +10,9 @@ package org.dspace.app.rest.authorization;
 import java.sql.SQLException;
 import java.util.List;
 
+import org.dspace.app.rest.model.BaseObjectRest;
 import org.dspace.content.Site;
 import org.dspace.core.Context;
-import org.dspace.discovery.FindableObject;
 
 /**
  * This service provides access to the Authorization Features and check if the feature is allowed or not in a specific
@@ -34,7 +34,7 @@ public interface AuthorizationFeatureService {
      *            feature pass the {@link Site} object
      * @return true if the user associated with the context has access to the feature
      */
-    boolean isAuthorized(Context context, AuthorizationFeature feature, FindableObject object) throws SQLException;
+    boolean isAuthorized(Context context, AuthorizationFeature feature, BaseObjectRest object) throws SQLException;
 
     /**
      * Get all the authorization features defined in the syste
@@ -52,5 +52,5 @@ public interface AuthorizationFeatureService {
      */
     public AuthorizationFeature find(String name);
 
-    List<AuthorizationFeature> findByResourceType(int typeID);
+    List<AuthorizationFeature> findByResourceType(String categoryDotModel);
 }

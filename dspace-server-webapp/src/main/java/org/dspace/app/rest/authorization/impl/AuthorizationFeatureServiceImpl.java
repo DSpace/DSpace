@@ -15,8 +15,9 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.authorization.AuthorizationFeature;
 import org.dspace.app.rest.authorization.AuthorizationFeatureService;
+import org.dspace.app.rest.model.BaseObjectRest;
+import org.dspace.app.rest.utils.Utils;
 import org.dspace.core.Context;
-import org.dspace.discovery.FindableObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -32,17 +33,22 @@ public class AuthorizationFeatureServiceImpl implements AuthorizationFeatureServ
     @Autowired
     private List<AuthorizationFeature> features;
 
+    @Autowired
+    private Utils utils;
+
     @Override
-    public boolean isAuthorized(Context context, AuthorizationFeature feature, FindableObject object)
+    public boolean isAuthorized(Context context, AuthorizationFeature feature, BaseObjectRest object)
             throws SQLException {
         if (object == null) {
             // the authorization interface require that the object is not null
             return false;
         }
 
-        if (feature == null || !ArrayUtils.contains(feature.getSupportedTypes(), object.getType())) {
+        if (feature == null
+                || !ArrayUtils.contains(feature.getSupportedTypes(), object.getUniqueType())) {
             return false;
         }
+
         return feature.isAuthorized(context, object);
     }
 
@@ -62,7 +68,7 @@ public class AuthorizationFeatureServiceImpl implements AuthorizationFeatureServ
     }
 
     @Override
-    public List<AuthorizationFeature> findByResourceType(int typeID) {
+    public List<AuthorizationFeature> findByResourceType(String typeID) {
         return features
                 .stream()
                 .filter(f -> ArrayUtils.contains(f.getSupportedTypes(), typeID))

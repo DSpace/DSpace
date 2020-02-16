@@ -11,11 +11,14 @@ import java.sql.SQLException;
 
 import org.dspace.app.rest.authorization.AuthorizationFeature;
 import org.dspace.app.rest.authorization.AuthorizationFeatureDocumentation;
+import org.dspace.app.rest.model.BaseObjectRest;
+import org.dspace.app.rest.model.ItemRest;
+import org.dspace.app.rest.utils.Utils;
 import org.dspace.app.util.AuthorizeUtil;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Item;
-import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -30,13 +33,17 @@ public class CCLicenseFeature implements AuthorizationFeature {
 
     public static final String NAME = "cclicense";
 
+    @Autowired
+    private Utils utils;
+
     @Override
-    public boolean isAuthorized(Context context, Object object) throws SQLException {
-        if (!(object instanceof Item)) {
+    public boolean isAuthorized(Context context, BaseObjectRest object) throws SQLException {
+        if (!(object instanceof ItemRest)) {
             return false;
         }
+        Item item = (Item) utils.getDSpaceAPIObjectFromRest(context, object);
         try {
-            AuthorizeUtil.authorizeManageCCLicense(context, (Item) object);
+            AuthorizeUtil.authorizeManageCCLicense(context, item);
         } catch (AuthorizeException e) {
             return false;
         }
@@ -44,7 +51,7 @@ public class CCLicenseFeature implements AuthorizationFeature {
     }
 
     @Override
-    public int[] getSupportedTypes() {
-        return new int[]{Constants.ITEM};
+    public String[] getSupportedTypes() {
+        return new String[] { ItemRest.CATEGORY + "." + ItemRest.NAME };
     }
 }

@@ -51,11 +51,14 @@ import org.dspace.content.Community;
 import org.dspace.content.Item;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.eperson.EPerson;
+import org.dspace.services.ConfigurationService;
 import org.dspace.xmlworkflow.storedcomponents.ClaimedTask;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 import org.hamcrest.Matchers;
+import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Test suite for the WorkflowItem endpoint
@@ -63,6 +66,20 @@ import org.junit.Test;
  *
  */
 public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationTest {
+
+    @Autowired
+    private ConfigurationService configurationService;
+
+
+    @Before
+    @Override
+    public void setUp() throws Exception {
+
+        super.setUp();
+
+        //disable file upload mandatory
+        configurationService.setProperty("webui.submit.upload.required", false);
+    }
 
     @Test
     /**
@@ -441,7 +458,8 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
 
         String authToken = getAuthToken(admin.getEmail(), password);
 
-        getClient(authToken).perform(get("/api/workflow/workflowitems/" + witem.getID() + "/collection"))
+        getClient(authToken).perform(get("/api/workflow/workflowitems/" + witem.getID() + "/collection")
+                .param("projection", "full"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", Matchers
                         .is(CollectionMatcher.matchCollectionEntry(col1.getName(), col1.getID(), col1.getHandle()))));
@@ -1516,5 +1534,4 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
             .andExpect(jsonPath("$.sections.traditionalpagetwo['dc.subject'][5].value", is("Final Subject")))
         ;
     }
-
 }

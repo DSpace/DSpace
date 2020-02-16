@@ -10,8 +10,10 @@ package org.dspace.app.rest.model;
 import java.util.Date;
 import java.util.UUID;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.dspace.app.rest.RestResourceController;
 
 /**
@@ -22,15 +24,14 @@ import org.dspace.app.rest.RestResourceController;
  */
 public class ResourcePolicyRest extends BaseObjectRest<Integer> {
 
-    public static final String NAME = "resourcePolicy";
+    public static final String NAME = "resourcepolicy";
     public static final String CATEGORY = RestAddressableModel.AUTHORIZATION;
 
     private String name;
 
     @JsonInclude(Include.NON_NULL)
-    private String rpType;
+    private String policyType;
 
-    @JsonInclude(Include.NON_NULL)
     private String description;
 
     @JsonInclude(Include.NON_NULL)
@@ -39,12 +40,19 @@ public class ResourcePolicyRest extends BaseObjectRest<Integer> {
     @JsonInclude(Include.NON_NULL)
     private UUID epersonUUID;
 
+    @JsonIgnore
+    private EPersonRest eperson;
+
+    @JsonIgnore
+    private GroupRest group;
+
+    @JsonIgnore
+    private DSpaceObjectRest resource;
+
     private String action;
 
-    @JsonInclude(Include.NON_NULL)
     private Date startDate;
 
-    @JsonInclude(Include.NON_NULL)
     private Date endDate;
 
     public UUID getGroupUUID() {
@@ -63,8 +71,8 @@ public class ResourcePolicyRest extends BaseObjectRest<Integer> {
         this.endDate = endDate;
     }
 
-
     @Override
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     public String getType() {
         return NAME;
     }
@@ -87,12 +95,12 @@ public class ResourcePolicyRest extends BaseObjectRest<Integer> {
         this.name = name;
     }
 
-    public String getRpType() {
-        return rpType;
+    public String getPolicyType() {
+        return policyType;
     }
 
-    public void setRpType(String rpType) {
-        this.rpType = rpType;
+    public void setPolicyType(String policyType) {
+        this.policyType = policyType;
     }
 
     public String getDescription() {
@@ -109,6 +117,30 @@ public class ResourcePolicyRest extends BaseObjectRest<Integer> {
 
     public void setEpersonUUID(UUID epersonUUID) {
         this.epersonUUID = epersonUUID;
+    }
+
+    public EPersonRest getEperson() {
+        return eperson;
+    }
+
+    public void setEperson(EPersonRest eperson) {
+        this.eperson = eperson;
+    }
+
+    public GroupRest getGroup() {
+        return group;
+    }
+
+    public void setGroup(GroupRest group) {
+        this.group = group;
+    }
+
+    public DSpaceObjectRest getResource() {
+        return resource;
+    }
+
+    public void setResource(DSpaceObjectRest resource) {
+        this.resource = resource;
     }
 
     public String getAction() {

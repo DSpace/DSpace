@@ -73,7 +73,7 @@ public class WithdrawFeatureRestIT extends AbstractControllerIntegrationTest {
 
         ItemRest itemRest = converterService.toRest(item, converterService.getProjection(DefaultProjection.NAME));
         String itemUri = utils.linkToSingleResource(itemRest, "self").getHref();
-        Authorization authAdminWithdraw = new Authorization(admin, withdrawFeature, item);
+        Authorization authAdminWithdraw = new Authorization(admin, withdrawFeature, itemRest);
 
         // access the authorization for the admin user
         String adminToken = getAuthToken(admin.getEmail(), password);
@@ -102,7 +102,7 @@ public class WithdrawFeatureRestIT extends AbstractControllerIntegrationTest {
 
         ItemRest itemRest = converterService.toRest(item, converterService.getProjection(DefaultProjection.NAME));
         String itemUri = utils.linkToSingleResource(itemRest, "self").getHref();
-        Authorization authAdminWithdraw = new Authorization(eperson, withdrawFeature, item);
+        Authorization authAdminWithdraw = new Authorization(eperson, withdrawFeature, itemRest);
 
         // access the authorization for the community admin user
         String comAdminToken = getAuthToken(eperson.getEmail(), password);
@@ -161,7 +161,7 @@ public class WithdrawFeatureRestIT extends AbstractControllerIntegrationTest {
 
         ItemRest itemRest = converterService.toRest(item, converterService.getProjection(DefaultProjection.NAME));
         String itemUri = utils.linkToSingleResource(itemRest, "self").getHref();
-        Authorization authAdminWithdraw = new Authorization(eperson, withdrawFeature, item);
+        Authorization authAdminWithdraw = new Authorization(eperson, withdrawFeature, itemRest);
 
         // access the authorization for the admin user
         String colAdminToken = getAuthToken(eperson.getEmail(), password);
@@ -199,8 +199,8 @@ public class WithdrawFeatureRestIT extends AbstractControllerIntegrationTest {
 
         ItemRest itemRest = converterService.toRest(item, converterService.getProjection(DefaultProjection.NAME));
         String itemUri = utils.linkToSingleResource(itemRest, "self").getHref();
-        Authorization authEpersonWithdraw = new Authorization(eperson, withdrawFeature, item);
-        Authorization authAnonymousWithdraw = new Authorization(null, withdrawFeature, item);
+        Authorization authEpersonWithdraw = new Authorization(eperson, withdrawFeature, itemRest);
+        Authorization authAnonymousWithdraw = new Authorization(null, withdrawFeature, itemRest);
 
         // check the authorization for a normal user
         String epersonToken = getAuthToken(eperson.getEmail(), password);
@@ -247,9 +247,9 @@ public class WithdrawFeatureRestIT extends AbstractControllerIntegrationTest {
                 converterService.getProjection(DefaultProjection.NAME));
         String wfItemUri = utils.linkToSingleResource(wfItemRest, "self").getHref();
 
-        Authorization authWithdrawnItem = new Authorization(admin, withdrawFeature, withdrawnItem);
-        Authorization authWsItem = new Authorization(admin, withdrawFeature, wsItem.getItem());
-        Authorization authWFItem = new Authorization(admin, withdrawFeature, wfItem.getItem());
+        Authorization authWithdrawnItem = new Authorization(admin, withdrawFeature, withdrawnItemRest);
+        Authorization authWsItem = new Authorization(admin, withdrawFeature, wsItemRest);
+        Authorization authWFItem = new Authorization(admin, withdrawFeature, wfItemRest);
         // nor the admin should be authorized to withdraw the previous item
         String adminToken = getAuthToken(admin.getEmail(), password);
         getClient(adminToken).perform(get("/api/authz/authorizations/" + authWithdrawnItem.getID()))

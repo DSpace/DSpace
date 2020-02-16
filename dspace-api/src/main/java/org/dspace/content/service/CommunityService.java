@@ -12,7 +12,6 @@ import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.MissingResourceException;
-import java.util.UUID;
 
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
@@ -28,8 +27,7 @@ import org.dspace.eperson.Group;
  *
  * @author kevinvandevelde at atmire.com
  */
-public interface CommunityService extends DSpaceObjectService<Community>, DSpaceObjectLegacySupportService<Community>,
-        IndexableObjectService<Community, UUID> {
+public interface CommunityService extends DSpaceObjectService<Community>, DSpaceObjectLegacySupportService<Community> {
 
 
     /**

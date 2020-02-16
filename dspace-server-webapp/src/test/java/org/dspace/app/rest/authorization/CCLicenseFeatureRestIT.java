@@ -72,7 +72,7 @@ public class CCLicenseFeatureRestIT extends AbstractControllerIntegrationTest {
 
         ItemRest itemRest = converterService.toRest(item, converterService.getProjection(DefaultProjection.NAME));
         String itemUri = utils.linkToSingleResource(itemRest, "self").getHref();
-        Authorization authAdminCCLicense = new Authorization(admin, ccLicenseFeature, item);
+        Authorization authAdminCCLicense = new Authorization(admin, ccLicenseFeature, itemRest);
 
         // access the authorization for the admin user
         String adminToken = getAuthToken(admin.getEmail(), password);
@@ -101,7 +101,7 @@ public class CCLicenseFeatureRestIT extends AbstractControllerIntegrationTest {
 
         ItemRest itemRest = converterService.toRest(item, converterService.getProjection(DefaultProjection.NAME));
         String itemUri = utils.linkToSingleResource(itemRest, "self").getHref();
-        Authorization authAdminCCLicense = new Authorization(eperson, ccLicenseFeature, item);
+        Authorization authAdminCCLicense = new Authorization(eperson, ccLicenseFeature, itemRest);
 
         // access the authorization for the community admin user
         String comAdminToken = getAuthToken(eperson.getEmail(), password);
@@ -161,7 +161,7 @@ public class CCLicenseFeatureRestIT extends AbstractControllerIntegrationTest {
 
         ItemRest itemRest = converterService.toRest(item, converterService.getProjection(DefaultProjection.NAME));
         String itemUri = utils.linkToSingleResource(itemRest, "self").getHref();
-        Authorization authAdminCCLicense = new Authorization(eperson, ccLicenseFeature, item);
+        Authorization authAdminCCLicense = new Authorization(eperson, ccLicenseFeature, itemRest);
 
         // access the authorization for the admin user
         String colAdminToken = getAuthToken(eperson.getEmail(), password);
@@ -202,7 +202,7 @@ public class CCLicenseFeatureRestIT extends AbstractControllerIntegrationTest {
 
         ItemRest itemRest = converterService.toRest(item, converterService.getProjection(DefaultProjection.NAME));
         String itemUri = utils.linkToSingleResource(itemRest, "self").getHref();
-        Authorization authAdminCCLicense = new Authorization(eperson, ccLicenseFeature, item);
+        Authorization authAdminCCLicense = new Authorization(eperson, ccLicenseFeature, itemRest);
 
         // access the authorization for the admin user
         String itemAdminToken = getAuthToken(eperson.getEmail(), password);
@@ -240,8 +240,8 @@ public class CCLicenseFeatureRestIT extends AbstractControllerIntegrationTest {
 
         ItemRest itemRest = converterService.toRest(item, converterService.getProjection(DefaultProjection.NAME));
         String itemUri = utils.linkToSingleResource(itemRest, "self").getHref();
-        Authorization authEpersonCCLicense = new Authorization(eperson, ccLicenseFeature, item);
-        Authorization authAnonymousCCLicense = new Authorization(null, ccLicenseFeature, item);
+        Authorization authEpersonCCLicense = new Authorization(eperson, ccLicenseFeature, itemRest);
+        Authorization authAnonymousCCLicense = new Authorization(null, ccLicenseFeature, itemRest);
 
         // check the authorization for a normal user
         String epersonToken = getAuthToken(eperson.getEmail(), password);

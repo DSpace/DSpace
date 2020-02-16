@@ -9,7 +9,19 @@ package org.dspace.app.rest.authorization;
 
 import java.sql.SQLException;
 
-import org.dspace.core.Constants;
+import org.dspace.app.rest.model.BaseObjectRest;
+import org.dspace.app.rest.model.BitstreamRest;
+import org.dspace.app.rest.model.BundleRest;
+import org.dspace.app.rest.model.ClaimedTaskRest;
+import org.dspace.app.rest.model.CollectionRest;
+import org.dspace.app.rest.model.CommunityRest;
+import org.dspace.app.rest.model.EPersonRest;
+import org.dspace.app.rest.model.GroupRest;
+import org.dspace.app.rest.model.ItemRest;
+import org.dspace.app.rest.model.PoolTaskRest;
+import org.dspace.app.rest.model.SiteRest;
+import org.dspace.app.rest.model.WorkflowItemRest;
+import org.dspace.app.rest.model.WorkspaceItemRest;
 import org.dspace.core.Context;
 import org.springframework.stereotype.Component;
 
@@ -24,16 +36,25 @@ public class AlwaysTrueFeature implements AuthorizationFeature {
     public final static String NAME = "alwaystrue";
 
     @Override
-    public boolean isAuthorized(Context context, Object object) throws SQLException {
+    public boolean isAuthorized(Context context, BaseObjectRest object) throws SQLException {
         return true;
     }
 
     @Override
-    public int[] getSupportedTypes() {
-        int[] supportedTypes = new int[Constants.typeText.length];
-        for (int i = 0; i < Constants.typeText.length; i++) {
-            supportedTypes[i] = Constants.getTypeID(Constants.typeText[i]);
-        }
-        return supportedTypes;
+    public String[] getSupportedTypes() {
+       return new String[]{
+               SiteRest.CATEGORY + "." + SiteRest.NAME,
+               CommunityRest.CATEGORY + "." + CommunityRest.NAME,
+               CollectionRest.CATEGORY + "." + CollectionRest.NAME,
+               ItemRest.CATEGORY + "." + ItemRest.NAME,
+               BundleRest.CATEGORY + "." + BundleRest.NAME,
+               BitstreamRest.CATEGORY + "." + BitstreamRest.NAME,
+               WorkspaceItemRest.CATEGORY + "." + WorkspaceItemRest.NAME,
+               WorkflowItemRest.CATEGORY + "." + WorkflowItemRest.NAME,
+               EPersonRest.CATEGORY + "." + EPersonRest.NAME,
+               GroupRest.CATEGORY + "." + GroupRest.NAME,
+               PoolTaskRest.CATEGORY + "." + PoolTaskRest.NAME,
+               ClaimedTaskRest.CATEGORY + "." + ClaimedTaskRest.NAME
+               };
     }
 }

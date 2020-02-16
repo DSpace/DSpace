@@ -10,6 +10,7 @@ package org.dspace.discovery;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Iterator;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.apache.commons.cli.CommandLine;
@@ -17,11 +18,16 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
+import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
-import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.discovery.indexobject.IndexableCollection;
+import org.dspace.discovery.indexobject.IndexableCommunity;
+import org.dspace.discovery.indexobject.IndexableItem;
+import org.dspace.discovery.indexobject.factory.IndexFactory;
+import org.dspace.discovery.indexobject.factory.IndexObjectFactoryFactory;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.scripts.DSpaceRunnable;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -79,28 +85,42 @@ public class IndexClient extends DSpaceRunnable {
             } catch (Exception e) {
                 // nothing to do, it should be an handle
             }
-            IndexableObject dso = null;
+            Optional<IndexableObject> indexableObject = Optional.empty();
             if (uuid != null) {
-                dso = ContentServiceFactory.getInstance().getItemService().find(context, uuid);
-                if (dso == null) {
+                final Item item = ContentServiceFactory.getInstance().getItemService().find(context, uuid);
+                if (item != null) {
+                    indexableObject = Optional.of(new IndexableItem(item));
+                } else {
                     // it could be a community
-                    dso = ContentServiceFactory.getInstance().getCommunityService().find(context, uuid);
-                    if (dso == null) {
+                    final Community community = ContentServiceFactory.getInstance().
+                            getCommunityService().find(context, uuid);
+                    if (community != null) {
+                        indexableObject = Optional.of(new IndexableCommunity(community));
+                    } else {
                         // it could be a collection
-                        dso = ContentServiceFactory.getInstance().getCollectionService().find(context, uuid);
+                        final Collection collection = ContentServiceFactory.getInstance().
+                                getCollectionService().find(context, uuid);
+                        if (collection != null) {
+                            indexableObject = Optional.of(new IndexableCollection(collection));
+                        }
                     }
                 }
             } else {
-                dso = (IndexableObject) HandleServiceFactory.getInstance()
-                                                            .getHandleService().resolveToObject(context, param);
+                final DSpaceObject dso = HandleServiceFactory.getInstance()
+                        .getHandleService().resolveToObject(context, param);
+                if (dso != null) {
+                    final IndexFactory indexableObjectService = IndexObjectFactoryFactory.getInstance().
+                            getIndexFactoryByType(String.valueOf(dso.getType()));
+                    indexableObject = indexableObjectService.findIndexableObject(context, dso.getID().toString());
+                }
             }
-            if (dso == null) {
+            if (!indexableObject.isPresent()) {
                 throw new IllegalArgumentException("Cannot resolve " + param + " to a DSpace object");
             }
             handler.logInfo("Indexing " + param + " force " + commandLine.hasOption("f"));
             final long startTimeMillis = System.currentTimeMillis();
-            final long count = indexAll(indexer, ContentServiceFactory.getInstance().getItemService(), context,
-                                        dso);
+            final long count = indexAll(indexer, ContentServiceFactory.getInstance().
+                    getItemService(), context, indexableObject.get());
             final long seconds = (System.currentTimeMillis() - startTimeMillis) / 1000;
             handler.logInfo("Indexed " + count + " object" + (count > 1 ? "s" : "") + " in " + seconds + " seconds");
         } else if (indexClientOptions == IndexClientOptions.UPDATE ||
@@ -163,11 +183,11 @@ public class IndexClient extends DSpaceRunnable {
 
         indexingService.indexContent(context, dso, true, true);
         count++;
-        if (dso.getType() == Constants.COMMUNITY) {
+        if (dso.getIndexedObject() instanceof Community) {
             final Community community = (Community) dso;
             final String communityHandle = community.getHandle();
             for (final Community subcommunity : community.getSubcommunities()) {
-                count += indexAll(indexingService, itemService, context, subcommunity);
+                count += indexAll(indexingService, itemService, context, new IndexableCommunity(subcommunity));
                 //To prevent memory issues, discard an object from the cache after processing
                 context.uncacheEntity(subcommunity);
             }
@@ -176,13 +196,13 @@ public class IndexClient extends DSpaceRunnable {
                                                                                                  communityHandle);
             for (final Collection collection : reloadedCommunity.getCollections()) {
                 count++;
-                indexingService.indexContent(context, collection, true, true);
+                indexingService.indexContent(context, new IndexableCollection(collection), true, true);
                 count += indexItems(indexingService, itemService, context, collection);
                 //To prevent memory issues, discard an object from the cache after processing
                 context.uncacheEntity(collection);
             }
-        } else if (dso.getType() == Constants.COLLECTION) {
-            count += indexItems(indexingService, itemService, context, (Collection) dso);
+        } else if (dso instanceof IndexableCollection) {
+            count += indexItems(indexingService, itemService, context, (Collection) dso.getIndexedObject());
         }
 
         return count;
@@ -209,7 +229,7 @@ public class IndexClient extends DSpaceRunnable {
         final Iterator<Item> itemIterator = itemService.findByCollection(context, collection);
         while (itemIterator.hasNext()) {
             Item item = itemIterator.next();
-            indexingService.indexContent(context, item, true, false);
+            indexingService.indexContent(context, new IndexableItem(item), true, false);
             count++;
             //To prevent memory issues, discard an object from the cache after processing
             context.uncacheEntity(item);
