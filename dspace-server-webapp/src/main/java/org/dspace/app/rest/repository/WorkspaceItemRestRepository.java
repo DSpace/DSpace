@@ -77,7 +77,7 @@ import gr.ekt.bte.exceptions.MalformedSourceException;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 @Component(WorkspaceItemRest.CATEGORY + "." + WorkspaceItemRest.NAME)
-public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceItemRest, Integer> 
+public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceItemRest, Integer>
     implements FindableObjectRepository<WorkspaceItem, Integer> {
 
     public static final String OPERATION_PATH_SECTIONS = "sections";

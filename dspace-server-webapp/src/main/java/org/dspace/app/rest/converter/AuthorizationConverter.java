@@ -7,7 +7,7 @@
  */
 package org.dspace.app.rest.converter;
 
-import org.dspace.app.rest.authorize.Authorization;
+import org.dspace.app.rest.authorization.Authorization;
 import org.dspace.app.rest.model.AuthorizationRest;
 import org.dspace.app.rest.projection.Projection;
 import org.springframework.beans.factory.annotation.Autowired;

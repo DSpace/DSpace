@@ -5,7 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.app.rest.authorize;
+package org.dspace.app.rest.authorization;
 
 import org.dspace.content.Site;
 import org.dspace.discovery.FindableObject;

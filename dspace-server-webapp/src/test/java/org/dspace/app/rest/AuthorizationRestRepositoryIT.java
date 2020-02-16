@@ -16,16 +16,17 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.io.Serializable;
 import java.util.UUID;
 
+import com.jayway.jsonpath.matchers.JsonPathMatchers;
 import org.dspace.app.rest.authorization.AlwaysFalseFeature;
 import org.dspace.app.rest.authorization.AlwaysThrowExceptionFeature;
 import org.dspace.app.rest.authorization.AlwaysTrueFeature;
+import org.dspace.app.rest.authorization.Authorization;
+import org.dspace.app.rest.authorization.AuthorizationFeature;
+import org.dspace.app.rest.authorization.AuthorizationFeatureService;
+import org.dspace.app.rest.authorization.AuthorizationRestUtil;
 import org.dspace.app.rest.authorization.TrueForAdminsFeature;
 import org.dspace.app.rest.authorization.TrueForLoggedUsersFeature;
 import org.dspace.app.rest.authorization.TrueForTestUsersFeature;
-import org.dspace.app.rest.authorize.Authorization;
-import org.dspace.app.rest.authorize.AuthorizationFeature;
-import org.dspace.app.rest.authorize.AuthorizationFeatureService;
-import org.dspace.app.rest.authorize.AuthorizationRestUtil;
 import org.dspace.app.rest.builder.CommunityBuilder;
 import org.dspace.app.rest.builder.EPersonBuilder;
 import org.dspace.app.rest.converter.ConverterService;
@@ -47,10 +48,6 @@ import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.web.servlet.ResultHandler;
-import org.springframework.test.web.servlet.ResultMatcher;
-
-import com.jayway.jsonpath.matchers.JsonPathMatchers;
 
 /**
  * Test suite for the Authorization endpoint
@@ -68,13 +65,13 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
 
     @Autowired
     private ConverterService converterService;
-    
+
     @Autowired
     private ConfigurationService configurationService;
-    
+
     @Autowired
     private Utils utils;
-    
+
     private SiteService siteService;
 
     private AuthorizationFeature alwaysTrue;
@@ -335,7 +332,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
         Site site = siteService.findSite(context);
         SiteRest siteRest = converterService.toRest(site, converterService.getProjection(DefaultProjection.NAME));
         String siteUri = utils.linkToSingleResource(siteRest, "self").getHref();
-        
+
         // disarm the alwaysThrowExceptionFeature
         configurationService.setProperty("org.dspace.app.rest.authorization.AlwaysThrowExceptionFeature.turnoff", true);
         // verify that it works for administrators
@@ -361,11 +358,12 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
                             JsonPathMatchers.hasJsonPath("$.id",
                                     Matchers.anyOf(
                                             Matchers.startsWith(admin.getID().toString()),
-                                            Matchers.endsWith(site.getType() + "_" + site.getID()))))        
+                                            Matchers.endsWith(site.getType() + "_" + site.getID()))))
                                     )
                     )
             )
-            .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/authz/authorizations/search/object")))
+            .andExpect(jsonPath("$._links.self.href",
+                    Matchers.containsString("/api/authz/authorizations/search/object")))
             .andExpect(jsonPath("$.page.size", is(20)))
             .andExpect(jsonPath("$.page.totalElements", greaterThanOrEqualTo(3)));
 
@@ -393,11 +391,12 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
                             JsonPathMatchers.hasJsonPath("$.id",
                                     Matchers.anyOf(
                                             Matchers.startsWith(eperson.getID().toString()),
-                                            Matchers.endsWith(site.getType() + "_" + site.getID()))))        
+                                            Matchers.endsWith(site.getType() + "_" + site.getID()))))
                                     )
                     )
             )
-            .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/authz/authorizations/search/object")))
+            .andExpect(jsonPath("$._links.self.href",
+                    Matchers.containsString("/api/authz/authorizations/search/object")))
             .andExpect(jsonPath("$.page.size", is(20)))
             .andExpect(jsonPath("$.page.totalElements", greaterThanOrEqualTo(2)));
 
@@ -416,7 +415,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
                                                 is(alwaysFalse.getName()),
                                                 is(alwaysException.getName()),
                                                 is(trueForTestUsers.getName()),
-                                                // this guarantee that we are looking to the eperson 
+                                                // this guarantee that we are looking to the eperson
                                                 // authz and not to the admin ones
                                                 is(trueForAdmins.getName())
                                             )
@@ -425,14 +424,15 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
                                     Matchers.hasItem(is("authorization"))),
                             JsonPathMatchers.hasJsonPath("$.id",
                                     Matchers.anyOf(
-                                            // this guarantee that we are looking to the eperson 
+                                            // this guarantee that we are looking to the eperson
                                             // authz and not to the admin ones
                                             Matchers.startsWith(eperson.getID().toString()),
-                                            Matchers.endsWith(site.getType() + "_" + site.getID()))))        
+                                            Matchers.endsWith(site.getType() + "_" + site.getID()))))
                                     )
                     )
             )
-            .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/authz/authorizations/search/object")))
+            .andExpect(jsonPath("$._links.self.href",
+                    Matchers.containsString("/api/authz/authorizations/search/object")))
             .andExpect(jsonPath("$.page.size", is(20)))
             .andExpect(jsonPath("$.page.totalElements", greaterThanOrEqualTo(2)));
 
@@ -457,11 +457,12 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
                             JsonPathMatchers.hasJsonPath("$.id",
                                     Matchers.anyOf(
                                             Matchers.startsWith(eperson.getID().toString()),
-                                            Matchers.endsWith(site.getType() + "_" + site.getID()))))        
+                                            Matchers.endsWith(site.getType() + "_" + site.getID()))))
                                     )
                     )
             )
-            .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/authz/authorizations/search/object")))
+            .andExpect(jsonPath("$._links.self.href",
+                    Matchers.containsString("/api/authz/authorizations/search/object")))
             .andExpect(jsonPath("$.page.size", is(20)))
             .andExpect(jsonPath("$.page.totalElements", greaterThanOrEqualTo(1)));
 
@@ -486,11 +487,12 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
                             JsonPathMatchers.hasJsonPath("$.id",
                                     Matchers.anyOf(
                                             Matchers.startsWith(eperson.getID().toString()),
-                                            Matchers.endsWith(site.getType() + "_" + site.getID()))))        
+                                            Matchers.endsWith(site.getType() + "_" + site.getID()))))
                                     )
                     )
             )
-            .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/authz/authorizations/search/object")))
+            .andExpect(jsonPath("$._links.self.href",
+                    Matchers.containsString("/api/authz/authorizations/search/object")))
             .andExpect(jsonPath("$.page.size", is(20)))
             .andExpect(jsonPath("$.page.totalElements", greaterThanOrEqualTo(1)));
     }
@@ -504,7 +506,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
      */
     public void findByNotExistingObjectTest() throws Exception {
         String wrongSiteUri = "http://localhost/api/core/sites/" + UUID.randomUUID();
-        
+
         // disarm the alwaysThrowExceptionFeature
         configurationService.setProperty("org.dspace.app.rest.authorization.AlwaysThrowExceptionFeature.turnoff", true);
         // verify that it works for administrators, no result
@@ -514,7 +516,8 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
                 .param("eperson", admin.getID().toString()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$", JsonPathMatchers.hasNoJsonPath("$._embedded.authorizations")))
-            .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/authz/authorizations/search/object")))
+            .andExpect(jsonPath("$._links.self.href",
+                    Matchers.containsString("/api/authz/authorizations/search/object")))
             .andExpect(jsonPath("$.page.size", is(20)))
             .andExpect(jsonPath("$.page.totalElements", is(0)));
 
@@ -525,7 +528,8 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
                 .param("eperson", eperson.getID().toString()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$", JsonPathMatchers.hasNoJsonPath("$._embedded.authorizations")))
-            .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/authz/authorizations/search/object")))
+            .andExpect(jsonPath("$._links.self.href",
+                    Matchers.containsString("/api/authz/authorizations/search/object")))
             .andExpect(jsonPath("$.page.size", is(20)))
             .andExpect(jsonPath("$.page.totalElements", is(0)));
 
@@ -535,7 +539,8 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
                 .param("eperson", eperson.getID().toString()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$", JsonPathMatchers.hasNoJsonPath("$._embedded.authorizations")))
-            .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/authz/authorizations/search/object")))
+            .andExpect(jsonPath("$._links.self.href",
+                    Matchers.containsString("/api/authz/authorizations/search/object")))
             .andExpect(jsonPath("$.page.size", is(20)))
             .andExpect(jsonPath("$.page.totalElements", is(0)));
 
@@ -544,7 +549,8 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
                 .param("uri", wrongSiteUri))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$", JsonPathMatchers.hasNoJsonPath("$._embedded.authorizations")))
-            .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/authz/authorizations/search/object")))
+            .andExpect(jsonPath("$._links.self.href",
+                    Matchers.containsString("/api/authz/authorizations/search/object")))
             .andExpect(jsonPath("$.page.size", is(20)))
             .andExpect(jsonPath("$.page.totalElements", is(0)));
 
@@ -553,7 +559,8 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
                 .param("uri", wrongSiteUri))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$", JsonPathMatchers.hasNoJsonPath("$._embedded.authorizations")))
-            .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/authz/authorizations/search/object")))
+            .andExpect(jsonPath("$._links.self.href",
+                    Matchers.containsString("/api/authz/authorizations/search/object")))
             .andExpect(jsonPath("$.page.size", is(20)))
             .andExpect(jsonPath("$.page.totalElements", is(0)));
     }
@@ -571,7 +578,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
                 "http://localhost/api/wrongcategory/wrongmodel/1",
                 "http://localhost/api/core/sites/this-is-not-an-uuid"
         };
-        
+
         // disarm the alwaysThrowExceptionFeature
         configurationService.setProperty("org.dspace.app.rest.authorization.AlwaysThrowExceptionFeature.turnoff", true);
 
@@ -583,31 +590,31 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
                     .param("uri", invalidUri)
                     .param("eperson", admin.getID().toString()))
                 .andExpect(status().isBadRequest());
-    
+
             // verify that it works for normal loggedin users with an invalid or missing uri
             String epersonToken = getAuthToken(eperson.getEmail(), password);
             getClient(epersonToken).perform(get("/api/authz/authorizations/search/object")
                     .param("uri", invalidUri)
                     .param("eperson", eperson.getID().toString()))
                 .andExpect(status().isBadRequest());
-    
+
             // verify that it works for administators inspecting other users with an invalid or missing uri
             getClient(adminToken).perform(get("/api/authz/authorizations/search/object")
                     .param("uri", invalidUri)
                     .param("eperson", eperson.getID().toString()))
                 .andExpect(status().isBadRequest());
-    
+
             // verify that it works for anonymous users with an invalid or missing uri
             getClient().perform(get("/api/authz/authorizations/search/object")
                     .param("uri", invalidUri))
                 .andExpect(status().isBadRequest());
-    
+
             // verify that it works for administrators inspecting anonymous users with an invalid or missing uri
             getClient(adminToken).perform(get("/api/authz/authorizations/search/object")
                     .param("uri", invalidUri))
                 .andExpect(status().isBadRequest());
         }
-        //FIXME add once https://github.com/DSpace/DSpace/pull/2668 is merged        
+        //FIXME add once https://github.com/DSpace/DSpace/pull/2668 is merged
         //        getClient(adminToken).perform(get("/api/authz/authorizations/search/object")
         //                .param("eperson", admin.getID().toString()))
         //            .andExpect(status().isBadRequest());
@@ -633,7 +640,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
         Site site = siteService.findSite(context);
         SiteRest siteRest = converterService.toRest(site, converterService.getProjection(DefaultProjection.NAME));
         String siteUri = utils.linkToSingleResource(siteRest, "self").getHref();
-        
+
         // disarm the alwaysThrowExceptionFeature
         configurationService.setProperty("org.dspace.app.rest.authorization.AlwaysThrowExceptionFeature.turnoff", true);
 
@@ -689,7 +696,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
         Site site = siteService.findSite(context);
         SiteRest siteRest = converterService.toRest(site, converterService.getProjection(DefaultProjection.NAME));
         String siteUri = utils.linkToSingleResource(siteRest, "self").getHref();
-        
+
         // verify that it works for administrators
         String adminToken = getAuthToken(admin.getEmail(), password);
         getClient(adminToken).perform(get("/api/authz/authorizations/search/object")
@@ -735,7 +742,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
         CommunityRest comRest = converterService.toRest(com, converterService.getProjection(DefaultProjection.NAME));
         String comUri = utils.linkToSingleResource(comRest, "self").getHref();
         context.restoreAuthSystemState();
-        
+
         // verify that it works for administrators
         String adminToken = getAuthToken(admin.getEmail(), password);
         getClient(adminToken).perform(get("/api/authz/authorizations/search/objectAndFeature")
@@ -745,7 +752,8 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.type", is("authorization")))
             .andExpect(jsonPath("$._embedded.feature.id", is(alwaysTrue.getName())))
-            .andExpect(jsonPath("$.id",Matchers.is(admin.getID().toString() + "_"+ alwaysTrue.getName() + "_" + com.getType() + "_" + com.getID())));
+                .andExpect(jsonPath("$.id", Matchers.is(admin.getID().toString() + "_" + alwaysTrue.getName() + "_"
+                        + com.getType() + "_" + com.getID())));
 
         // verify that it works for normal loggedin users
         String epersonToken = getAuthToken(eperson.getEmail(), password);
@@ -756,7 +764,8 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.type", is("authorization")))
             .andExpect(jsonPath("$._embedded.feature.id", is(alwaysTrue.getName())))
-            .andExpect(jsonPath("$.id",Matchers.is(eperson.getID().toString() + "_"+ alwaysTrue.getName() + "_" + com.getType() + "_" + com.getID())));
+                .andExpect(jsonPath("$.id", Matchers.is(eperson.getID().toString() + "_" + alwaysTrue.getName() + "_"
+                        + com.getType() + "_" + com.getID())));
 
         // verify that it works for administators inspecting other users
         getClient(adminToken).perform(get("/api/authz/authorizations/search/objectAndFeature")
@@ -766,7 +775,8 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.type", is("authorization")))
             .andExpect(jsonPath("$._embedded.feature.id", is(alwaysTrue.getName())))
-            .andExpect(jsonPath("$.id", Matchers.is(eperson.getID().toString() + "_"+ alwaysTrue.getName() + "_" + com.getType() + "_" + com.getID())));
+                .andExpect(jsonPath("$.id", Matchers.is(eperson.getID().toString() + "_" + alwaysTrue.getName() + "_"
+                        + com.getType() + "_" + com.getID())));
 
         // verify that it works for anonymous users
         getClient().perform(get("/api/authz/authorizations/search/objectAndFeature")
@@ -797,7 +807,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
         Site site = siteService.findSite(context);
         SiteRest siteRest = converterService.toRest(site, converterService.getProjection(DefaultProjection.NAME));
         String siteUri = utils.linkToSingleResource(siteRest, "self").getHref();
-        
+
         // verify that it works for administrators
         String adminToken = getAuthToken(admin.getEmail(), password);
         getClient(adminToken).perform(get("/api/authz/authorizations/search/objectAndFeature")
@@ -846,7 +856,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
         Site site = siteService.findSite(context);
         SiteRest siteRest = converterService.toRest(site, converterService.getProjection(DefaultProjection.NAME));
         String siteUri = utils.linkToSingleResource(siteRest, "self").getHref();
-        
+
         // disarm the alwaysThrowExceptionFeature
         configurationService.setProperty("org.dspace.app.rest.authorization.AlwaysThrowExceptionFeature.turnoff", true);
         // verify that it works for administrators, no result
@@ -856,7 +866,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
                 .param("feature", alwaysTrue.getName())
                 .param("eperson", admin.getID().toString()))
             .andExpect(status().isNoContent());
-        
+
         getClient(adminToken).perform(get("/api/authz/authorizations/search/objectAndFeature")
                 .param("uri", siteUri)
                 .param("feature", "not-existing-feature")
@@ -876,7 +886,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
                 .param("feature", "not-existing-feature")
                 .param("eperson", eperson.getID().toString()))
             .andExpect(status().isNoContent());
-        
+
         // verify that it works for administators inspecting other users
         getClient(adminToken).perform(get("/api/authz/authorizations/search/objectAndFeature")
                 .param("uri", wrongSiteUri)
@@ -889,7 +899,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
                 .param("feature", "not-existing-feature")
                 .param("eperson", eperson.getID().toString()))
             .andExpect(status().isNoContent());
-        
+
         // verify that it works for anonymous users
         getClient().perform(get("/api/authz/authorizations/search/objectAndFeature")
                 .param("uri", wrongSiteUri)
@@ -900,13 +910,13 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
                 .param("uri", siteUri)
                 .param("feature", "not-existing-feature"))
             .andExpect(status().isNoContent());
-        
+
         // verify that it works for administrators inspecting anonymous users
         getClient(adminToken).perform(get("/api/authz/authorizations/search/objectAndFeature")
                 .param("uri", wrongSiteUri)
                 .param("feature", alwaysTrue.getName()))
             .andExpect(status().isNoContent());
-        
+
         getClient(adminToken).perform(get("/api/authz/authorizations/search/objectAndFeature")
                 .param("uri", siteUri)
                 .param("feature", "not-existing-feature"))
@@ -942,7 +952,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
                     .param("feature", alwaysTrue.getName())
                     .param("eperson", admin.getID().toString()))
                 .andExpect(status().isBadRequest());
-    
+
             // verify that it works for normal loggedin users with an invalid or missing uri
             String epersonToken = getAuthToken(eperson.getEmail(), password);
             getClient(epersonToken).perform(get("/api/authz/authorizations/search/object")
@@ -950,28 +960,28 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
                     .param("feature", alwaysTrue.getName())
                     .param("eperson", eperson.getID().toString()))
                 .andExpect(status().isBadRequest());
-    
+
             // verify that it works for administators inspecting other users with an invalid or missing uri
             getClient(adminToken).perform(get("/api/authz/authorizations/search/object")
                     .param("uri", invalidUri)
                     .param("feature", alwaysTrue.getName())
                     .param("eperson", eperson.getID().toString()))
                 .andExpect(status().isBadRequest());
-    
+
             // verify that it works for anonymous users with an invalid or missing uri
             getClient().perform(get("/api/authz/authorizations/search/object")
                     .param("uri", invalidUri)
                     .param("feature", alwaysTrue.getName()))
                 .andExpect(status().isBadRequest());
-    
+
             // verify that it works for administrators inspecting anonymous users with an invalid or missing uri
             getClient(adminToken).perform(get("/api/authz/authorizations/search/object")
                     .param("uri", invalidUri)
                     .param("feature", alwaysTrue.getName()))
                 .andExpect(status().isBadRequest());
         }
-        
-        //FIXME add once https://github.com/DSpace/DSpace/pull/2668 is merged        
+
+        //FIXME add once https://github.com/DSpace/DSpace/pull/2668 is merged
         //        getClient(adminToken).perform(get("/api/authz/authorizations/search/object")
         //                .param("eperson", admin.getID().toString()))
         //            .andExpect(status().isBadRequest());
@@ -1016,7 +1026,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
         Site site = siteService.findSite(context);
         SiteRest siteRest = converterService.toRest(site, converterService.getProjection(DefaultProjection.NAME));
         String siteUri = utils.linkToSingleResource(siteRest, "self").getHref();
-        
+
         // disarm the alwaysThrowExceptionFeature
         configurationService.setProperty("org.dspace.app.rest.authorization.AlwaysThrowExceptionFeature.turnoff", true);
 
@@ -1076,7 +1086,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
         Site site = siteService.findSite(context);
         SiteRest siteRest = converterService.toRest(site, converterService.getProjection(DefaultProjection.NAME));
         String siteUri = utils.linkToSingleResource(siteRest, "self").getHref();
-        
+
         // verify that it works for administrators
         String adminToken = getAuthToken(admin.getEmail(), password);
         getClient(adminToken).perform(get("/api/authz/authorizations/search/objectAndFeature")

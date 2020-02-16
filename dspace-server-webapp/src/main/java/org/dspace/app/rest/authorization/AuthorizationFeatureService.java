@@ -5,7 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.app.rest.authorize;
+package org.dspace.app.rest.authorization;
 
 import java.sql.SQLException;
 import java.util.List;

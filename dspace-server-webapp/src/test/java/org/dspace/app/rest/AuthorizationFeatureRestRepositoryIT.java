@@ -19,7 +19,8 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
 import com.jayway.jsonpath.matchers.JsonPathMatchers;
-import org.dspace.app.rest.authorize.AuthorizationFeature;
+
+import org.dspace.app.rest.authorization.AuthorizationFeature;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.core.Constants;
 import org.hamcrest.Matchers;

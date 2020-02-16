@@ -16,10 +16,10 @@ import java.util.UUID;
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
-import org.dspace.app.rest.authorize.Authorization;
-import org.dspace.app.rest.authorize.AuthorizationFeature;
-import org.dspace.app.rest.authorize.AuthorizationFeatureService;
-import org.dspace.app.rest.authorize.AuthorizationRestUtil;
+import org.dspace.app.rest.authorization.Authorization;
+import org.dspace.app.rest.authorization.AuthorizationFeature;
+import org.dspace.app.rest.authorization.AuthorizationFeatureService;
+import org.dspace.app.rest.authorization.AuthorizationRestUtil;
 import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.exception.RepositoryNotFoundException;
@@ -56,19 +56,19 @@ public class AuthorizationRestRepository extends DSpaceRestRepository<Authorizat
 
     @Autowired
     private AuthorizationRestUtil authorizationRestUtil;
-    
+
     @Autowired
     private AuthorizeService authorizeService;
-    
+
     @Autowired
     private EPersonService epersonService;
 
     @Autowired
     protected ConverterService converter;
-    
+
     @Autowired
     ConfigurationService configurationService;
-    
+
     @Override
     @PreAuthorize("hasPermission(#id, 'authorization', 'READ')")
     public AuthorizationRest findOne(Context context, String id) {
@@ -149,30 +149,29 @@ public class AuthorizationRestRepository extends DSpaceRestRepository<Authorizat
     @PreAuthorize("#epersonUuid==null || hasPermission(#epersonUuid, 'EPERSON', 'READ')")
     @SearchRestMethod(name = "object")
     public Page<AuthorizationRest> findByObject(@Parameter(value = "uri", required = true) String uri,
-            @Parameter(value = "eperson") UUID epersonUuid, 
+            @Parameter(value = "eperson") UUID epersonUuid,
             Pageable pageable) throws AuthorizeException, SQLException {
         Context context = obtainContext();
         FindableObject obj = getObject(context, uri);
         if (obj == null) {
             return null;
         }
-        
+
         EPerson currUser = context.getCurrentUser();
         EPerson user = currUser;
-        
+
         if (epersonUuid != null) {
             if (context.getCurrentUser() == null) {
-                throw new AuthorizeException("attempt to anonymously access the authorization of the eperson " + epersonUuid);
-            }
-            else {
+                throw new AuthorizeException("attempt to anonymously access the authorization of the eperson "
+                        + epersonUuid);
+            } else {
                 if (!authorizeService.isAdmin(context) && !epersonUuid.equals(currUser.getID())) {
                     throw new AuthorizeException("attempt to access the authorization of the eperson " + epersonUuid
                             + " only system administrators can see the authorization of other users");
                 }
                 user = epersonService.find(context, epersonUuid);
             }
-        }
-        else {
+        } else {
             user = null;
         }
         context.setCurrentUser(user);
@@ -186,7 +185,7 @@ public class AuthorizationRestRepository extends DSpaceRestRepository<Authorizat
         context.setCurrentUser(currUser);
         return converter.toRestPage(utils.getPage(authorizations, pageable), utils.obtainProjection(true));
     }
-    
+
     /**
      * It returns the authorization related to the requested feature if granted to the specified eperson or to the
      * anonymous user. Only administrators and the user identified by the epersonUuid parameter can access this method
@@ -211,30 +210,28 @@ public class AuthorizationRestRepository extends DSpaceRestRepository<Authorizat
     @SearchRestMethod(name = "objectAndFeature")
     public AuthorizationRest findByObjectAndFeature(@Parameter(value = "uri", required = true) String uri,
             @Parameter(value = "eperson") UUID epersonUuid,
-            @Parameter(value="feature", required = true) String featureName, 
+            @Parameter(value = "feature", required = true) String featureName,
             Pageable pageable) throws AuthorizeException, SQLException {
         Context context = obtainContext();
         FindableObject obj = getObject(context, uri);
         if (obj == null) {
             return null;
         }
-        
+
         EPerson currUser = context.getCurrentUser();
         EPerson user = currUser;
-        
         if (epersonUuid != null) {
             if (context.getCurrentUser() == null) {
-                throw new AuthorizeException("attempt to anonymously access the authorization of the eperson " + epersonUuid);
-            }
-            else {
+                throw new AuthorizeException("attempt to anonymously access the authorization of the eperson "
+                        + epersonUuid);
+            } else {
                 if (!authorizeService.isAdmin(context) && !epersonUuid.equals(currUser.getID())) {
                     throw new AuthorizeException("attempt to access the authorization of the eperson " + epersonUuid
                             + " only system administrators can see the authorization of other users");
                 }
                 user = epersonService.find(context, epersonUuid);
             }
-        }
-        else {
+        } else {
             user = null;
         }
         context.setCurrentUser(user);
@@ -250,17 +247,18 @@ public class AuthorizationRestRepository extends DSpaceRestRepository<Authorizat
         context.setCurrentUser(currUser);
         return authorizationRest;
     }
-    
+
     private FindableObject getObject(Context context, String uri) throws SQLException {
         String dspaceUrl = configurationService.getProperty("dspace.baseUrl");
         if (!StringUtils.startsWith(uri, dspaceUrl)) {
             throw new IllegalArgumentException("the supplied uri is not valid:" + uri);
         }
-        String[] uriParts = uri.substring(dspaceUrl.length() + (dspaceUrl.endsWith("/")?0:1) + "api/".length()).split("/", 3);
+        String[] uriParts = uri.substring(dspaceUrl.length() + (dspaceUrl.endsWith("/") ? 0 : 1) + "api/".length())
+                .split("/", 3);
         if (uriParts.length != 3) {
             throw new IllegalArgumentException("the supplied uri is not valid:" + uri);
         }
-        
+
         DSpaceRestRepository repository;
         try {
             repository = utils.getResourceRepository(uriParts[0], uriParts[1]);
@@ -270,7 +268,7 @@ public class AuthorizationRestRepository extends DSpaceRestRepository<Authorizat
         } catch (RepositoryNotFoundException e) {
             throw new IllegalArgumentException("the supplied uri is not valid:" + uri, e);
         }
-        
+
         Serializable pk;
         try {
             pk = utils.castToPKClass((FindableObjectRepository) repository, uriParts[2]);

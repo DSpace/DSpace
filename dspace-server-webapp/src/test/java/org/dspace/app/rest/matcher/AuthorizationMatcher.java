@@ -13,7 +13,7 @@ import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.startsWith;
 
-import org.dspace.app.rest.authorize.Authorization;
+import org.dspace.app.rest.authorization.Authorization;
 import org.hamcrest.Matcher;
 
 /**

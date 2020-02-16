@@ -5,12 +5,12 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.app.rest.authorize.impl;
+package org.dspace.app.rest.authorization.impl;
 
 import java.sql.SQLException;
 
-import org.dspace.app.rest.authorize.AuthorizationFeature;
-import org.dspace.app.rest.authorize.AuthorizationFeatureDocumentation;
+import org.dspace.app.rest.authorization.AuthorizationFeature;
+import org.dspace.app.rest.authorization.AuthorizationFeatureDocumentation;
 import org.dspace.app.util.AuthorizeUtil;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Item;
@@ -19,13 +19,16 @@ import org.dspace.core.Context;
 import org.springframework.stereotype.Component;
 
 /**
- * The cclicense feature
+ * The cclicense feature. It can be used by administrators (or community/collection delegate) to manage the Creative
+ * Commons license for an item
  *
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 @Component
-@AuthorizationFeatureDocumentation(name = "cclicense")
+@AuthorizationFeatureDocumentation(name = CCLicenseFeature.NAME)
 public class CCLicenseFeature implements AuthorizationFeature {
+
+    public static final String NAME = "cclicense";
 
     @Override
     public boolean isAuthorized(Context context, Object object) throws SQLException {

@@ -82,12 +82,12 @@ public abstract class DSpaceObjectRestRepository<M extends DSpaceObject, R exten
             metadataConverter.setMetadata(obtainContext(), dso, dsoRest.getMetadata());
         }
     }
-    
+
     @Override
     public M findDomainObjectByPk(Context context, UUID uuid) throws SQLException {
         return dsoService.find(context, uuid);
     }
-    
+
     @Override
     public Class<UUID> getPKClass() {
         return UUID.class;
