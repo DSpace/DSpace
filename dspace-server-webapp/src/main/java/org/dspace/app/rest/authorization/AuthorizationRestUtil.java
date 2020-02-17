@@ -68,7 +68,13 @@ public class AuthorizationRestUtil {
             objType = parts[2].split("\\.");
             DSpaceRestRepository repository = utils.getResourceRepositoryByCategoryAndModel(objType[0], objType[1]);
             Serializable pk = utils.castToPKClass((FindableObjectRepository) repository, objIdStr);
-            return (BaseObjectRest) repository.findOne(context, pk);
+            try {
+                // disable the security as we only need to retrieve the object to further process the authorization
+                context.turnOffAuthorisationSystem();
+                return (BaseObjectRest) repository.findOne(context, pk);
+            } finally {
+                context.restoreAuthSystemState();
+            }
         } catch (RuntimeException e) {
             throw new IllegalArgumentException(
                     "The id " + id + " not resolve to a valid object", e);
