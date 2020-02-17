@@ -26,7 +26,7 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 /**
  * Class representing a Deduplication data.
  *
- * @author fcadili (francecso.cadili at 4science.it)
+ * @author fcadili (francesco.cadili at 4science.it)
  * @version $Revision$
  */
 @Entity

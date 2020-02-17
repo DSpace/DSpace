@@ -21,7 +21,7 @@ import org.dspace.deduplication.Deduplication;
  * Deduplication object and is autowired by spring This class should only be
  * accessed from a single service and should never be exposed outside of the API
  *
- * @author fcadili (francecso.cadili at 4science.it)
+ * @author fcadili (francesco.cadili at 4science.it)
  */
 public interface DeduplicationDAO extends GenericDAO<Deduplication> {
 

@@ -334,13 +334,17 @@ public class SolrDedupServiceImpl implements DedupService {
 
             // build the MATCH identifier
             Collection<Object> matchIds = (Collection<Object>) resultDoc.getFieldValues(RESOURCE_IDS_FIELD);
-            UUID matchId = null;
+            UUID matchId = iu.getID();
 
             internal: for (Object matchIdObj : matchIds) {
-                matchId = UUID.fromString((String) matchIdObj);
+                try {
+                    matchId = UUID.fromString((String) matchIdObj);
 
-                if (!iu.getID().equals(matchId)) {
-                    break internal;
+                    if (!iu.getID().equals(matchId)) {
+                        break internal;
+                    }
+                } catch (IllegalArgumentException ie) {
+                    log.error("Match ids: " + matchId + ". Id " + matchId + " is not an UUID");
                 }
             }
 
@@ -416,9 +420,9 @@ public class SolrDedupServiceImpl implements DedupService {
 
         doc.addField(UNIQUE_ID_FIELD, dedupID + "-" + flag.getDescription());
         doc.addField(RESOURCE_ID_FIELD, dedupID);
-        doc.addField(RESOURCE_IDS_FIELD, sortedIds[0]);
+        doc.addField(RESOURCE_IDS_FIELD, sortedIds[0].toString());
         if (!firstId.equals(secondId)) {
-            doc.addField(RESOURCE_IDS_FIELD, sortedIds[1]);
+            doc.addField(RESOURCE_IDS_FIELD, sortedIds[1].toString());
         }
         doc.addField(RESOURCE_RESOURCETYPE_FIELD, Constants.ITEM);
         doc.addField(RESOURCE_FLAG_FIELD, flag.getDescription());

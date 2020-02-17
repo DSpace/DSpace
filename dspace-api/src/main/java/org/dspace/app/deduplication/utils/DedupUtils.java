@@ -153,8 +153,7 @@ public class DedupUtils {
 
         SolrQuery findDuplicateBySignature = new SolrQuery();
         findDuplicateBySignature.setQuery((isInWorkflow == null ? SolrDedupServiceImpl.SUBQUERY_NOT_IN_REJECTED
-                : (isInWorkflow
-                        ? SolrDedupServiceImpl.SUBQUERY_WF_MATCH_OR_REJECTED_OR_VERIFY
+                : (isInWorkflow ? SolrDedupServiceImpl.SUBQUERY_WF_MATCH_OR_REJECTED_OR_VERIFY
                         : SolrDedupServiceImpl.SUBQUERY_WS_MATCH_OR_REJECTED_OR_VERIFY)));
         findDuplicateBySignature.addFilterQuery(SolrDedupServiceImpl.RESOURCE_IDS_FIELD + ":" + targetItemID);
         findDuplicateBySignature.addFilterQuery(SolrDedupServiceImpl.RESOURCE_RESOURCETYPE_FIELD + ":" + resourceType);
@@ -272,6 +271,8 @@ public class DedupUtils {
                 row.setAdminId(context.getCurrentUser().getID());
                 row.setAdminTime(new Date());
                 row.setAdminDecision(DeduplicationFlag.REJECTADMIN.getDescription());
+
+                deduplicationService.update(context, row);
             } else {
                 row = new Deduplication();
                 row.setAdminId(context.getCurrentUser().getID());
@@ -279,8 +280,9 @@ public class DedupUtils {
                 row.setSecondItemId(sortedIds[1]);
                 row.setAdminTime(new Date());
                 row.setAdminDecision(DeduplicationFlag.REJECTADMIN.getDescription());
+
+                row = deduplicationService.create(context, row);
             }
-            deduplicationService.update(context, row);
             dedupService.buildDecision(context, firstId, secondId, DeduplicationFlag.REJECTADMIN, null);
             return true;
         } catch (Exception ex) {
@@ -355,7 +357,7 @@ public class DedupUtils {
                     row.setSubmitterDecision(submitterDecision);
                 }
             } else {
-                row = new Deduplication();
+                row = deduplicationService.create(context, new Deduplication());
             }
 
             row.setFirstItemId(firstId);
@@ -403,7 +405,7 @@ public class DedupUtils {
         Deduplication row = null;
         row = deduplicationService.uniqueDeduplicationByFirstAndSecond(context, sortedIds[0], sortedIds[1]);
         if (row == null) {
-            row = new Deduplication();
+            row = deduplicationService.create(context, new Deduplication());
         }
 
         return row;
@@ -514,7 +516,7 @@ public class DedupUtils {
                         row.setSubmitterDecision(submitterDecision);
                     }
                 } else {
-                    row = new Deduplication();
+                    row = deduplicationService.create(context, new Deduplication());
                 }
 
                 row.setEpersonId(context.getCurrentUser().getID());

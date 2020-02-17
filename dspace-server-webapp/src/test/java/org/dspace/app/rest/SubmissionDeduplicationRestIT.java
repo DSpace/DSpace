@@ -28,6 +28,7 @@ import org.dspace.app.rest.builder.EPersonBuilder;
 import org.dspace.app.rest.builder.ItemBuilder;
 import org.dspace.app.rest.builder.WorkflowItemBuilder;
 import org.dspace.app.rest.builder.WorkspaceItemBuilder;
+import org.dspace.app.rest.matcher.WorkspaceItemMatcher;
 import org.dspace.app.rest.model.patch.AddOperation;
 import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
@@ -37,6 +38,7 @@ import org.dspace.content.Item;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.eperson.EPerson;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
+import org.hamcrest.Matchers;
 import org.junit.Test;
 
 /**
@@ -1310,5 +1312,73 @@ public class SubmissionDeduplicationRestIT extends AbstractControllerIntegration
                 .perform(patch("/api/workflow/workflowitems/" + witem.getID()).content(patchBody)
                         .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
                 .andExpect(status().isUnprocessableEntity());
+    }
+
+    @Test
+    /**
+     * Test reject deduplication during workspace submission. A patch that modifies
+     * workspace title is performed and then duplicates are checked.
+     *
+     * @throws Exception
+     */
+    public void checkDedupIndexModification() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        // 1. create two users to use as submitters
+        EPerson itemSubmitter = EPersonBuilder.createEPerson(context).withEmail("submitter1@example.com")
+                .withPassword(password).build();
+        EPerson workspaceItemSubmitter = EPersonBuilder.createEPerson(context).withEmail("submitter2@example.com")
+                .withPassword(password).build();
+
+        // 2. A community-collection structure with one parent community with
+        // sub-community and two collections.
+        parentCommunity = CommunityBuilder.createCommunity(context).withName("Parent Community").build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity).withName("Sub Community")
+                .build();
+        Collection colItem = CollectionBuilder.createCollection(context, child1).withName("Collection 1")
+                .withSubmitterGroup(itemSubmitter).build();
+        Collection colWorkspace = CollectionBuilder.createCollection(context, child1).withName("Collection 2")
+                .withSubmitterGroup(workspaceItemSubmitter).build();
+
+        // 3. create an item with title "Sample submission" using the first submitter
+        context.setCurrentUser(itemSubmitter);
+        Item item = ItemBuilder.createItem(context, colItem).withTitle("Sample submission").withIssueDate("2020-01-31")
+                .withAuthor("Cadili, Francesco").withAuthor("Perelli, Matteo").withSubject("Sample").build();
+
+        // 4a. create workflow items with the second submitter
+        context.setCurrentUser(workspaceItemSubmitter);
+        String authToken = getAuthToken(workspaceItemSubmitter.getEmail(), password);
+
+        // Test reject patch operation with a workspace item
+        InputStream pdf = getClass().getResourceAsStream("simple-article.pdf");
+        WorkspaceItem witem = WorkspaceItemBuilder.createWorkspaceItem(context, colWorkspace).withTitle("Test")
+                .withIssueDate("2020-02-01").withSubject("Test")
+                .withFulltext("simple-article.pdf", "/local/path/simple-article.pdf", pdf).build();
+        pdf.close();
+        context.restoreAuthSystemState();
+
+        // try to modify the title
+        List<Operation> addTitle = new ArrayList<Operation>();
+        // create a list of values to use in add operation
+        List<Map<String, String>> values = new ArrayList<Map<String, String>>();
+        Map<String, String> value = new HashMap<String, String>();
+        value.put("value", "Sample submission");
+        values.add(value);
+        addTitle.add(new AddOperation("/sections/traditionalpageone/dc.title", values));
+
+        String patchBody = getPatchContent(addTitle);
+        getClient(authToken)
+                .perform(patch("/api/submission/workspaceitems/" + witem.getID()).content(patchBody)
+                        .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.errors").doesNotExist())
+                .andExpect(jsonPath("$", Matchers.is(WorkspaceItemMatcher
+                        .matchItemWithTitleAndDateIssuedAndSubject(witem, "Sample submission", "2020-02-01", "Test"))));
+
+        // check for duplicates
+        getClient().perform(get("/api/submission/workspaceitems/" + witem.getID())).andExpect(status().isOk())
+                .andExpect(jsonPath("$.sections['detect-duplicate'].matches['" + item.getID() + "'].matchObject.id",
+                        is(item.getID().toString())))
+                .andExpect(jsonPath("$.sections['detect-duplicate'].matches['" + item.getID() + "'].submitterDecision")
+                        .doesNotExist());
     }
 }
