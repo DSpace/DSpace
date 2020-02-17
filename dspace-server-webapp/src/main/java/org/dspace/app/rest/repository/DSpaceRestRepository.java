@@ -407,10 +407,9 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
         try {
             thisRepository.patch(context, request, apiCategory, model, id, patch);
             context.commit();
-
         } catch (AuthorizeException ae) {
             throw new RESTAuthorizationException(ae);
-        } catch (SQLException | DCInputsReaderException e) {
+        } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
         return findById(id).orElse(null);
@@ -428,19 +427,15 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
      * @param patch
      *            the JSON Patch (https://tools.ietf.org/html/rfc6902) operation
      * @return the full new state of the REST object after patching
-     * @throws HttpRequestMethodNotSupportedException
-     * @throws UnprocessableEntityException
-     * @throws DSpaceBadRequestException
      * @throws RepositoryMethodNotImplementedException
      *             returned by the default implementation when the operation is not supported for the entity
      *
      * @throws SQLException
      * @throws AuthorizeException
-     * @throws DCInputsReaderException
      */
     protected void patch(Context context, HttpServletRequest request, String apiCategory, String model, ID id,
                          Patch patch)
-        throws RepositoryMethodNotImplementedException, SQLException, AuthorizeException, DCInputsReaderException {
+        throws RepositoryMethodNotImplementedException, SQLException, AuthorizeException {
         throw new RepositoryMethodNotImplementedException(apiCategory, model);
     }
 
