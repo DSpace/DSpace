@@ -109,8 +109,8 @@ public class ResourcePolicyRestRepository extends DSpaceRestRepository<ResourceP
     @PreAuthorize("hasPermission(#resourceUuid, 'dspaceObject', 'ADMIN')")
     @SearchRestMethod(name = "resource")
     public Page<ResourcePolicyRest> findByResource(@Parameter(value = "uuid", required = true) UUID resourceUuid,
-                                                   @Parameter(value = "action", required = false) String action, Pageable pageable) {
-
+                                                   @Parameter(value = "action", required = false) String action,
+                                                   Pageable pageable) {
         List<ResourcePolicy> resourcePolisies = null;
         int total = 0;
         try {
@@ -145,8 +145,8 @@ public class ResourcePolicyRestRepository extends DSpaceRestRepository<ResourceP
     @PreAuthorize("hasPermission(#epersonUuid, 'EPERSON', 'READ')")
     @SearchRestMethod(name = "eperson")
     public Page<ResourcePolicyRest> findByEPerson(@Parameter(value = "uuid", required = true) UUID epersonUuid,
-                                                  @Parameter(value = "resource", required = false) UUID resourceUuid, Pageable pageable) {
-
+                                                  @Parameter(value = "resource", required = false) UUID resourceUuid,
+                                                  Pageable pageable) {
         List<ResourcePolicy> resourcePolisies = null;
         int total = 0;
         try {
@@ -185,8 +185,8 @@ public class ResourcePolicyRestRepository extends DSpaceRestRepository<ResourceP
     @PreAuthorize("hasPermission(#groupUuid, 'GROUP', 'READ')")
     @SearchRestMethod(name = "group")
     public Page<ResourcePolicyRest> findByGroup(@Parameter(value = "uuid", required = true) UUID groupUuid,
-                                                @Parameter(value = "resource", required = false) UUID resourceUuid, Pageable pageable) {
-
+                                                @Parameter(value = "resource", required = false) UUID resourceUuid,
+                                                Pageable pageable) {
         List<ResourcePolicy> resourcePolisies = null;
         int total = 0;
         try {
