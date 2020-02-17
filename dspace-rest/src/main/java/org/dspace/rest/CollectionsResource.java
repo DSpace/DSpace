@@ -349,7 +349,7 @@ public class CollectionsResource extends Resource
         {
             context = createContext();
             org.dspace.content.Collection dspaceCollection = findCollection(context, collectionId,
-                    org.dspace.core.Constants.WRITE);
+                    org.dspace.core.Constants.ADD);
 
             writeStats(dspaceCollection, UsageEvent.Action.UPDATE, user_ip, user_agent, xforwardedfor,
                     headers, request, context);
