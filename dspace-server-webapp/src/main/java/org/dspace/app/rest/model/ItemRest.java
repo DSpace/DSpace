@@ -31,7 +31,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
         ),
         @LinkRest(
                 name = ItemRest.RELATIONSHIPS,
-                method = "getItemRelationships"
+                method = "getRelationships"
         ),
         @LinkRest(
                 name = ItemRest.VERSION,
