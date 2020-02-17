@@ -319,7 +319,8 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
                 ResoucePolicyMatcher.matchResourcePolicy(resourcePolicyOfEPerson1))))
             .andExpect(jsonPath("$._embedded.resourcepolicies",
                 Matchers.not(is(ResoucePolicyMatcher.matchResourcePolicy(resourcePolicyOfEPerson2)))))
-            .andExpect(jsonPath("$._links.self.href", Matchers.containsString("api/authz/resourcepolicies/search/eperson")))
+            .andExpect(jsonPath("$._links.self.href", Matchers.containsString(
+                "api/authz/resourcepolicies/search/eperson")))
             .andExpect(jsonPath("$.page.totalElements", is(1)));
     }
 
