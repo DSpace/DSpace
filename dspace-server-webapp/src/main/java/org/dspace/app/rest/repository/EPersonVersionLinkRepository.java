@@ -39,9 +39,6 @@ public class EPersonVersionLinkRepository extends AbstractDSpaceRestRepository
     @Autowired
     private ConfigurationService configurationService;
 
-    @Autowired
-    private AuthorizeService authorizeService;
-
 
     public EPersonRest getEPersonForVersion(@Nullable HttpServletRequest request,
                                             Integer versionId,
@@ -52,7 +49,7 @@ public class EPersonVersionLinkRepository extends AbstractDSpaceRestRepository
         Version version = versioningService.getVersion(context, versionId);
         EPerson ePerson = version.getEPerson();
         if (!configurationService.getBooleanProperty("versioning.item.history.include.submitter")) {
-            throw new ResourceNotFoundException("test");
+            throw new ResourceNotFoundException("The EPerson for this Version couldn't be displayed");
         }
         if (ePerson == null) {
             throw new ResourceNotFoundException("The EPerson for version with id: " + versionId + " couldn't be found");
