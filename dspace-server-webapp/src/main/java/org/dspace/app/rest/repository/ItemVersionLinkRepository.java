@@ -46,6 +46,9 @@ public class ItemVersionLinkRepository extends AbstractDSpaceRestRepository
 
         Context context = obtainContext();
         Item item = itemService.find(context, itemUuid);
+        if (item == null) {
+            throw new ResourceNotFoundException("The Item for uuid: " + itemUuid + " couldn't be found");
+        }
         Version version = versioningService.getVersion(context, item);
         if (version == null) {
             throw new ResourceNotFoundException("The Version for item with uuid: " + itemUuid + " could not be found");

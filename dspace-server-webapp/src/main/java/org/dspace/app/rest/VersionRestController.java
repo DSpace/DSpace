@@ -49,6 +49,9 @@ public class VersionRestController {
                                     PagedResourcesAssembler assembler) throws SQLException {
         Context context = ContextUtil.obtainContext(request);
         Version version = versioningService.getVersion(context, id);
+        if (version == null) {
+            throw new ResourceNotFoundException("The version with ID: " + id + " couldn't be found");
+        }
         EPerson ePerson = version.getEPerson();
         if (ePerson == null) {
             throw new ResourceNotFoundException("The EPerson for version with id: " + id + " couldn't be found");

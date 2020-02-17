@@ -24,6 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.stereotype.Component;
 
 /**
@@ -47,6 +48,10 @@ public class VersionsLinkRepository extends AbstractDSpaceRestRepository
 
         Context context = obtainContext();
         VersionHistory versionHistory = versionHistoryService.find(context, versionHistoryId);
+        if (versionHistory == null) {
+            throw new ResourceNotFoundException("The versionHistory with ID: " + versionHistoryId +
+                                                    " couldn't be found");
+        }
         List<Version> versions = versioningService.getVersionsByHistory(context, versionHistory);
         Pageable pageable = optionalPageable != null ? optionalPageable : new PageRequest(0, 20);
         return converter.toRestPage(versions, pageable, versions.size(), projection);

@@ -41,9 +41,6 @@ public class VersionHistoryRestPermissionEvaluatorPlugin extends RestObjectPermi
     private AuthorizeService authorizeService;
 
     @Autowired
-    private VersioningService versioningService;
-
-    @Autowired
     private ConfigurationService configurationService;
 
 

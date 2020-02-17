@@ -41,6 +41,9 @@ public class VersionHistoryLinkRepository extends AbstractDSpaceRestRepository
 
         Context context = obtainContext();
         Version version = versioningService.getVersion(context, versionId);
+        if (version == null) {
+            throw new ResourceNotFoundException("The version with ID: " + versionId + " couldn't be found");
+        }
         VersionHistory versionHistory = version.getVersionHistory();
         if (versionHistory == null) {
             throw new ResourceNotFoundException("The versionhistory for version with id: " + versionId
