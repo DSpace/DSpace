@@ -8,6 +8,7 @@
 package org.dspace.content.dao.impl;
 
 import java.sql.SQLException;
+
 import java.util.List;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -20,6 +21,7 @@ import org.dspace.scripts.Process;
 import org.dspace.scripts.Process_;
 
 /**
+ * 
  * Implementation class for {@link ProcessDAO}
  */
 public class ProcessDAOImpl extends AbstractHibernateDAO<Process> implements ProcessDAO {
