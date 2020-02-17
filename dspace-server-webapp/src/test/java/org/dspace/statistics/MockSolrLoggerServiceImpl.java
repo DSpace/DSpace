@@ -7,20 +7,29 @@
  */
 package org.dspace.statistics;
 
-import java.io.File;
-import java.io.IOException;
-import java.sql.SQLException;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+import java.net.InetAddress;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
-
 import com.maxmind.geoip2.DatabaseReader;
+import com.maxmind.geoip2.model.CityResponse;
+import com.maxmind.geoip2.record.City;
+import com.maxmind.geoip2.record.Continent;
+import com.maxmind.geoip2.record.Country;
+import com.maxmind.geoip2.record.Location;
+import com.maxmind.geoip2.record.MaxMind;
+import com.maxmind.geoip2.record.Postal;
+import com.maxmind.geoip2.record.RepresentedCountry;
+import com.maxmind.geoip2.record.Traits;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.dspace.content.DSpaceObject;
-import org.dspace.eperson.EPerson;
 import org.dspace.solr.MockSolrServer;
-import org.dspace.usage.UsageWorkflowEvent;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Service;
@@ -31,7 +40,7 @@ import org.springframework.stereotype.Service;
  * <p>
  * <strong>NOTE:</strong>  this class overrides one <em>of the same name</em>
  * defined in dspace-api and declared as a bean there.
- * See {@code config/spring/api/Z-mock-services.xml}.  Some kind of classpath
+ * See {@code test/data/dspaceFolder/config/spring/api/solr-services.xml}.  Some kind of classpath
  * magic makes this work.
  */
 @Service
@@ -51,41 +60,33 @@ public class MockSolrLoggerServiceImpl
         // Initialize our service with a Mock Solr statistics core
         mockSolrServer = new MockSolrServer("statistics");
         solr = mockSolrServer.getSolrServer();
+
+        // Mock GeoIP's DatabaseReader
+        DatabaseReader reader = mock(DatabaseReader.class);
+        // Ensure that any tests requesting a city() get a mock/fake CityResponse
+        when(reader.city(any(InetAddress.class))).thenReturn(mockCityResponse());
+        // Save this mock DatabaseReader to be used by SolrLoggerService
+        locationService = reader;
     }
 
-    @Override
-    public void postView(DSpaceObject dspaceObject, HttpServletRequest request,
-                         EPerson currentUser) {
-        // Load our FakeDatabaseReader before each view event is logged
-        loadFakeDatabaseReader();
-        // Call overridden method
-        super.postView(dspaceObject, request, currentUser);
-    }
+    /**
+     * A mock/fake GeoIP CityResponse, which will be used for *all* test statistical requests
+     * @return faked CityResponse
+     */
+    private CityResponse mockCityResponse() {
+        List<String> cityNames = new ArrayList<String>(Collections.singleton("New York"));
+        City city = new City(cityNames, 1, 1, new HashMap());
 
-    @Override
-    public void postView(DSpaceObject dspaceObject,
-                         String ip, String userAgent, String xforwardedfor, EPerson currentUser) {
-        // Load our FakeDatabaseReader before each view event is logged
-        loadFakeDatabaseReader();
-        // Call overridden method
-        super.postView(dspaceObject, ip, userAgent, xforwardedfor, currentUser);
-    }
+        List<String> countryNames = new ArrayList<String>(Collections.singleton("United States"));
+        Country country = new Country(countryNames, 1, 1, "US", new HashMap());
 
-    @Override
-    public void postSearch(DSpaceObject resultObject, HttpServletRequest request, EPerson currentUser,
-                           List<String> queries, int rpp, String sortBy, String order, int page, DSpaceObject scope) {
-        // Load our FakeDatabaseReader before each search event is logged
-        loadFakeDatabaseReader();
-        // Call overridden method
-        super.postSearch(resultObject, request, currentUser, queries, rpp, sortBy, order, page, scope);
-    }
+        Location location = new Location(1, 1, 40.760498D, -73.9933D, 501, 1, "EST");
 
-    @Override
-    public void postWorkflow(UsageWorkflowEvent usageWorkflowEvent) throws SQLException {
-        // Load our FakeDatabaseReader before each workflow event is logged
-        loadFakeDatabaseReader();
-        // Call overridden method
-        super.postWorkflow(usageWorkflowEvent);
+        Postal postal = new Postal("10036", 1);
+
+        return new CityResponse(city, new Continent(), country, location, new MaxMind(), postal,
+                                                 country,  new RepresentedCountry(), new ArrayList<>(0),
+                                                 new Traits());
     }
 
     /** Remove all records. */
@@ -96,23 +97,5 @@ public class MockSolrLoggerServiceImpl
     @Override
     public void destroy() throws Exception {
         mockSolrServer.destroy();
-    }
-
-    /**
-     * Load / activate our FakeDatabaseReader which uses JMockit to replace specific
-     * methods of the DatabaseReader. This MUST be called for each method that uses
-     * DatabaseReader as JMockit fake classes are only in effect for tests in which
-     * they are defined: http://jmockit.github.io/tutorial/Faking.html
-     */
-    private void loadFakeDatabaseReader() {
-        try {
-            new FakeDatabaseReader(); // Activate fake
-            new FakeDatabaseReader.Builder(); // Activate fake
-            File locationDb = File.createTempFile("GeoIP", ".mmdb");
-            locationDb.deleteOnExit();
-            locationService = new DatabaseReader.Builder(locationDb).build();
-        } catch (IOException e) {
-            log.error("Unable to load FakeDatabaseReader", e);
-        }
     }
 }
