@@ -34,6 +34,7 @@ import org.dspace.app.rest.matcher.AuthorizationMatcher;
 import org.dspace.app.rest.model.BaseObjectRest;
 import org.dspace.app.rest.model.CommunityRest;
 import org.dspace.app.rest.model.EPersonRest;
+import org.dspace.app.rest.model.ItemRest;
 import org.dspace.app.rest.model.SiteRest;
 import org.dspace.app.rest.projection.DefaultProjection;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
@@ -42,7 +43,6 @@ import org.dspace.content.Community;
 import org.dspace.content.Site;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.SiteService;
-import org.dspace.core.Constants;
 import org.dspace.eperson.EPerson;
 import org.dspace.services.ConfigurationService;
 import org.hamcrest.Matchers;
@@ -258,7 +258,8 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
                     .andExpect(status().isNotFound());
 
         // the specified item doesn't exist
-        String authNotExistingObject = getAuthorizationID(admin, alwaysTrue, Constants.ITEM, UUID.randomUUID());
+        String authNotExistingObject = getAuthorizationID(admin, alwaysTrue,
+                ItemRest.CATEGORY + "." + ItemRest.NAME, UUID.randomUUID());
         getClient(adminToken).perform(get("/api/authz/authorizations/" + authNotExistingObject))
                     .andExpect(status().isNotFound());
 
@@ -283,7 +284,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
                     .andExpect(status().isNotFound());
 
         String notValidIDWithWrongEpersonPart = getAuthorizationID("1", alwaysTrue.getName(),
-                String.valueOf(site.getType()), site.getID().toString());
+                SiteRest.CATEGORY + "." + SiteRest.NAME, site.getID().toString());
         // use the admin token otherwise it would result in a forbidden (attempt to access authorization of other users)
         getClient(adminToken).perform(get("/api/authz/authorizations/" + notValidIDWithWrongEpersonPart))
                     .andExpect(status().isNotFound());
@@ -364,7 +365,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
                             JsonPathMatchers.hasJsonPath("$.id",
                                     Matchers.anyOf(
                                             Matchers.startsWith(admin.getID().toString()),
-                                            Matchers.endsWith(site.getType() + "_" + site.getID()))))
+                                            Matchers.endsWith(siteRest.getUniqueType() + "_" + siteRest.getId()))))
                                     )
                     )
             )
@@ -397,7 +398,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
                             JsonPathMatchers.hasJsonPath("$.id",
                                     Matchers.anyOf(
                                             Matchers.startsWith(eperson.getID().toString()),
-                                            Matchers.endsWith(site.getType() + "_" + site.getID()))))
+                                            Matchers.endsWith(siteRest.getUniqueType() + "_" + siteRest.getId()))))
                                     )
                     )
             )
@@ -433,7 +434,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
                                             // this guarantee that we are looking to the eperson
                                             // authz and not to the admin ones
                                             Matchers.startsWith(eperson.getID().toString()),
-                                            Matchers.endsWith(site.getType() + "_" + site.getID()))))
+                                            Matchers.endsWith(siteRest.getUniqueType() + "_" + siteRest.getId()))))
                                     )
                     )
             )
@@ -463,7 +464,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
                             JsonPathMatchers.hasJsonPath("$.id",
                                     Matchers.anyOf(
                                             Matchers.startsWith(eperson.getID().toString()),
-                                            Matchers.endsWith(site.getType() + "_" + site.getID()))))
+                                            Matchers.endsWith(siteRest.getUniqueType() + "_" + siteRest.getId()))))
                                     )
                     )
             )
@@ -493,7 +494,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
                             JsonPathMatchers.hasJsonPath("$.id",
                                     Matchers.anyOf(
                                             Matchers.startsWith(eperson.getID().toString()),
-                                            Matchers.endsWith(site.getType() + "_" + site.getID()))))
+                                            Matchers.endsWith(siteRest.getUniqueType() + "_" + siteRest.getId()))))
                                     )
                     )
             )
@@ -753,54 +754,61 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
         String adminToken = getAuthToken(admin.getEmail(), password);
         getClient(adminToken).perform(get("/api/authz/authorizations/search/objectAndFeature")
                 .param("uri", comUri)
+                .param("projection", "full")
                 .param("feature", alwaysTrue.getName())
                 .param("eperson", admin.getID().toString()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.type", is("authorization")))
             .andExpect(jsonPath("$._embedded.feature.id", is(alwaysTrue.getName())))
-                .andExpect(jsonPath("$.id", Matchers.is(admin.getID().toString() + "_" + alwaysTrue.getName() + "_"
-                        + com.getType() + "_" + com.getID())));
+            .andExpect(jsonPath("$.id", Matchers.is(admin.getID().toString() + "_" + alwaysTrue.getName() + "_"
+                    + comRest.getUniqueType() + "_" + comRest.getId())));
 
         // verify that it works for normal loggedin users
         String epersonToken = getAuthToken(eperson.getEmail(), password);
         getClient(epersonToken).perform(get("/api/authz/authorizations/search/objectAndFeature")
                 .param("uri", comUri)
+                .param("projection", "full")
                 .param("feature", alwaysTrue.getName())
                 .param("eperson", eperson.getID().toString()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.type", is("authorization")))
             .andExpect(jsonPath("$._embedded.feature.id", is(alwaysTrue.getName())))
-                .andExpect(jsonPath("$.id", Matchers.is(eperson.getID().toString() + "_" + alwaysTrue.getName() + "_"
-                        + com.getType() + "_" + com.getID())));
+            .andExpect(jsonPath("$.id", Matchers.is(eperson.getID().toString() + "_" + alwaysTrue.getName() + "_"
+                    + comRest.getUniqueType() + "_" + comRest.getId())));
 
         // verify that it works for administators inspecting other users
         getClient(adminToken).perform(get("/api/authz/authorizations/search/objectAndFeature")
                 .param("uri", comUri)
+                .param("projection", "full")
                 .param("feature", alwaysTrue.getName())
                 .param("eperson", eperson.getID().toString()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.type", is("authorization")))
             .andExpect(jsonPath("$._embedded.feature.id", is(alwaysTrue.getName())))
-                .andExpect(jsonPath("$.id", Matchers.is(eperson.getID().toString() + "_" + alwaysTrue.getName() + "_"
-                        + com.getType() + "_" + com.getID())));
+            .andExpect(jsonPath("$.id", Matchers.is(eperson.getID().toString() + "_" + alwaysTrue.getName() + "_"
+                    + comRest.getUniqueType() + "_" + comRest.getId())));
 
         // verify that it works for anonymous users
         getClient().perform(get("/api/authz/authorizations/search/objectAndFeature")
                 .param("uri", comUri)
+                .param("projection", "full")
                 .param("feature", alwaysTrue.getName()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.type", is("authorization")))
             .andExpect(jsonPath("$._embedded.feature.id", is(alwaysTrue.getName())))
-            .andExpect(jsonPath("$.id",Matchers.is(alwaysTrue.getName() + "_" + com.getType() + "_" + com.getID())));
+            .andExpect(jsonPath("$.id",Matchers.is(alwaysTrue.getName() + "_"
+                    + comRest.getUniqueType() + "_" + comRest.getId())));
 
         // verify that it works for administrators inspecting anonymous users
         getClient(adminToken).perform(get("/api/authz/authorizations/search/objectAndFeature")
                 .param("uri", comUri)
+                .param("projection", "full")
                 .param("feature", alwaysTrue.getName()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.type", is("authorization")))
             .andExpect(jsonPath("$._embedded.feature.id", is(alwaysTrue.getName())))
-            .andExpect(jsonPath("$.id",Matchers.is(alwaysTrue.getName() + "_" + com.getType() + "_" + com.getID())));
+            .andExpect(jsonPath("$.id",Matchers.is(alwaysTrue.getName() + "_"
+                    + comRest.getUniqueType() + "_" + comRest.getId())));
     }
 
     @Test
@@ -1119,22 +1127,23 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
     // utility methods to build authorization ID without having an authorization object
     private String getAuthorizationID(EPerson eperson, AuthorizationFeature feature, BaseObjectRest obj) {
         return getAuthorizationID(eperson != null ? eperson.getID().toString() : null, feature.getName(),
-                String.valueOf(obj.getUniqueType()), obj.getId());
+                obj.getUniqueType(), obj.getId());
     }
 
     private String getAuthorizationID(UUID epersonUuid, AuthorizationFeature feature, BaseObjectRest obj) {
         return getAuthorizationID(epersonUuid != null ? epersonUuid.toString() : null, feature.getName(),
-                String.valueOf(obj.getType()), obj.getId());
+                obj.getUniqueType(), obj.getId());
     }
 
     private String getAuthorizationID(EPerson eperson, String featureName, BaseObjectRest obj) {
         return getAuthorizationID(eperson != null ? eperson.getID().toString() : null, featureName,
-                String.valueOf(obj.getType()), obj.getId());
+                obj.getUniqueType(), obj.getId());
     }
 
-    private String getAuthorizationID(EPerson eperson, AuthorizationFeature feature, int objType, Serializable objID) {
+    private String getAuthorizationID(EPerson eperson, AuthorizationFeature feature, String objUniqueType,
+            Serializable objID) {
         return getAuthorizationID(eperson != null ? eperson.getID().toString() : null, feature.getName(),
-                String.valueOf(objType), objID);
+                objUniqueType, objID);
     }
 
     private String getAuthorizationID(String epersonUuid, String featureName, String type, Serializable id) {

@@ -249,34 +249,39 @@ public class AuthorizationRestRepository extends DSpaceRestRepository<Authorizat
     }
 
     private BaseObjectRest getObject(Context context, String uri) throws SQLException {
-        String dspaceUrl = configurationService.getProperty("dspace.baseUrl");
+        String dspaceUrl = configurationService.getProperty("dspace.server.url");
         if (!StringUtils.startsWith(uri, dspaceUrl)) {
-            throw new IllegalArgumentException("the supplied uri is not valid:" + uri);
+            throw new IllegalArgumentException("the supplied uri is not valid: " + uri);
         }
         String[] uriParts = uri.substring(dspaceUrl.length() + (dspaceUrl.endsWith("/") ? 0 : 1) + "api/".length())
                 .split("/", 3);
         if (uriParts.length != 3) {
-            throw new IllegalArgumentException("the supplied uri is not valid:" + uri);
+            throw new IllegalArgumentException("the supplied uri is not valid: " + uri);
         }
 
         DSpaceRestRepository repository;
         try {
             repository = utils.getResourceRepository(uriParts[0], uriParts[1]);
             if (!(repository instanceof FindableObjectRepository)) {
-                throw new IllegalArgumentException("the supplied uri is not valid:" + uri);
+                throw new IllegalArgumentException("the supplied uri is not valid: " + uri);
             }
         } catch (RepositoryNotFoundException e) {
-            throw new IllegalArgumentException("the supplied uri is not valid:" + uri, e);
+            throw new IllegalArgumentException("the supplied uri is not valid: " + uri, e);
         }
 
         Serializable pk;
         try {
             pk = utils.castToPKClass((FindableObjectRepository) repository, uriParts[2]);
         } catch (Exception e) {
-            throw new IllegalArgumentException("the supplied uri is not valid:" + uri, e);
+            throw new IllegalArgumentException("the supplied uri is not valid: " + uri, e);
         }
-        BaseObjectRest obj = (BaseObjectRest) repository.findOne(context, pk);
-        return obj;
+        try {
+            // disable the security as we only need to retrieve the object to further process the authorization
+            context.turnOffAuthorisationSystem();
+            return (BaseObjectRest) repository.findOne(context, pk);
+        } finally {
+            context.restoreAuthSystemState();
+        }
     }
 
 
