@@ -128,7 +128,7 @@ public class InputFormSelfRegisterWrapperAuthority implements ChoiceAuthority {
         // different value
         for (ChoiceAuthority delegate : delegates.values()) {
             String label = delegate.getLabel(field, key, locale);
-            if (StringUtils.isNotBlank(label)) {
+            if (StringUtils.isNotBlank(label) && !label.startsWith("UNKNOWN KEY ")) {
                 return label;
             }
         }
