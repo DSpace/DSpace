@@ -95,13 +95,10 @@ public class DSpaceApiExceptionControllerAdvice extends ResponseEntityExceptionH
     @ExceptionHandler(QueryMethodParameterConversionException.class)
     protected void ParameterConversionException(HttpServletRequest request, HttpServletResponse response, Exception ex)
         throws IOException {
-
-        //422 is not defined in HttpServletResponse.  Its meaning is "Unprocessable Entity".
-        //Using the value from HttpStatus.
-        //Since this is a handled exception case, the stack trace will not be returned.
+        // we want the 400 status for missing parameters, see https://jira.lyrasis.org/browse/DS-4428
         sendErrorResponse(request, response, null,
                           ex.getMessage(),
-                          HttpStatus.UNPROCESSABLE_ENTITY.value());
+                          HttpStatus.BAD_REQUEST.value());
     }
 
     @ExceptionHandler(MissingParameterException.class)
@@ -124,10 +121,8 @@ public class DSpaceApiExceptionControllerAdvice extends ResponseEntityExceptionH
     @Override
     protected ResponseEntity<Object> handleTypeMismatch(TypeMismatchException ex, HttpHeaders headers,
                                                         HttpStatus status, WebRequest request) {
-        // we want the 422 status for type mismatch on parameters as it seems to be the common behavior for REST
-        // application, see
-        // https://stackoverflow.com/questions/3050518/what-http-status-response-code-should-i-use-if-the-request-is-missing-a-required
-        return super.handleTypeMismatch(ex, headers, HttpStatus.UNPROCESSABLE_ENTITY, request);
+        // we want the 400 status for missing parameters, see https://jira.lyrasis.org/browse/DS-4428
+        return super.handleTypeMismatch(ex, headers, HttpStatus.BAD_REQUEST, request);
     }
 
     @ExceptionHandler(Exception.class)
