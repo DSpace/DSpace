@@ -38,7 +38,6 @@ import org.dspace.xmlworkflow.storedcomponents.ClaimedTask;
 import org.dspace.xmlworkflow.storedcomponents.PoolTask;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 import org.hamcrest.Matchers;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.http.MediaType;
 
@@ -2071,7 +2070,8 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
 
     @Test
     /**
-     * Test the run of the default workflow where the reviewer attempts a non-valid option in the first step (review step)
+     * Test the run of the default workflow where the reviewer attempts a non-valid option in the first step
+     * (review step)
      *
      * @throws Exception
      */
