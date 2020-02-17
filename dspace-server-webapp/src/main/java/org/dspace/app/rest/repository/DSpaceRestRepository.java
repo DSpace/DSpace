@@ -392,23 +392,18 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
     /**
      * Apply a partial update to the REST object via JSON Patch
      *
-     * @param request
-     *            the http request
+     * @param request     the http request
      * @param apiCategory
      * @param model
-     * @param id
-     *            the ID of the target REST object
-     * @param patch
-     * the JSON Patch (https://tools.ietf.org/html/rfc6902) operation
+     * @param id          the ID of the target REST object
+     * @param patch       the JSON Patch (https://tools.ietf.org/html/rfc6902) operation
      * @return
-     * @throws HttpRequestMethodNotSupportedException
      * @throws UnprocessableEntityException
      * @throws DSpaceBadRequestException
      */
     public T patch(HttpServletRequest request, String apiCategory, String model, ID id, Patch patch)
-        throws HttpRequestMethodNotSupportedException, UnprocessableEntityException, DSpaceBadRequestException {
+        throws UnprocessableEntityException, DSpaceBadRequestException {
         Context context = obtainContext();
-
         try {
             thisRepository.patch(context, request, apiCategory, model, id, patch);
             context.commit();

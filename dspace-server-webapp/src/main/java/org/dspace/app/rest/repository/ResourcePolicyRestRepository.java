@@ -71,7 +71,6 @@ public class ResourcePolicyRestRepository extends DSpaceRestRepository<ResourceP
     @Autowired
     ResourcePatch<ResourcePolicy> resourcePatch;
 
-
     @Override
     @PreAuthorize("hasPermission(#id, 'resourcepolicy', 'READ')")
     public ResourcePolicyRest findOne(Context context, Integer id) {
