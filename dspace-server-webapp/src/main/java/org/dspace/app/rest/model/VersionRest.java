@@ -17,15 +17,11 @@ import org.dspace.app.rest.RestResourceController;
 @LinksRest(links = {
     @LinkRest(
         name = VersionRest.VERSION_HISTORY,
-        linkClass = VersionHistoryRest.class,
-        method = "getVersionHistory",
-        embedOptional = true
+        method = "getVersionHistory"
     ),
     @LinkRest(
         name = VersionRest.ITEM,
-        linkClass = ItemRest.class,
-        method = "getVersionItem",
-        embedOptional = true
+        method = "getVersionItem"
     )
 })
 public class VersionRest extends BaseObjectRest<Integer> {

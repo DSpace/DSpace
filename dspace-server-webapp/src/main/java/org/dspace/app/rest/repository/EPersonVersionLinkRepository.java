@@ -15,7 +15,6 @@ import org.dspace.app.rest.model.EPersonRest;
 import org.dspace.app.rest.model.VersionRest;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.services.ConfigurationService;

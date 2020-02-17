@@ -47,14 +47,8 @@ public class VersionItemLinkRepository extends AbstractDSpaceRestRepository
         }
         Item item = version.getItem();
         if (item == null) {
-            throw new ResourceNotFoundException("The item connected to the version with id: " + versionId
-                                                    + " couldn't be found");
+            return null;
         }
         return converter.toRest(item, projection);
-    }
-
-    @Override
-    public boolean isEmbeddableRelation(Object data, String name) {
-        return false;
     }
 }

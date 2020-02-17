@@ -46,14 +46,8 @@ public class VersionHistoryLinkRepository extends AbstractDSpaceRestRepository
         }
         VersionHistory versionHistory = version.getVersionHistory();
         if (versionHistory == null) {
-            throw new ResourceNotFoundException("The versionhistory for version with id: " + versionId
-                                                    + " couldn't be found");
+            return null;
         }
         return converter.toRest(versionHistory, projection);
-    }
-
-    @Override
-    public boolean isEmbeddableRelation(Object data, String name) {
-        return false;
     }
 }

@@ -15,9 +15,7 @@ import org.dspace.app.rest.RestResourceController;
 @LinksRest(links = {
     @LinkRest(
         name = VersionHistoryRest.VERSIONS,
-        linkClass = VersionRest.class,
-        method = "getVersions",
-        embedOptional = true
+        method = "getVersions"
     )
 })
 public class VersionHistoryRest extends BaseObjectRest<Integer> {
