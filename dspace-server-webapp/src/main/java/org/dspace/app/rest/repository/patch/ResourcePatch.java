@@ -22,7 +22,7 @@ import org.springframework.stereotype.Component;
  * The base class for resource PATCH operations.
  */
 @Component
-public class ResourcePatch<M extends Object> {
+public class ResourcePatch<M> {
 
     @Autowired
     private List<PatchOperation> patchOperations;
