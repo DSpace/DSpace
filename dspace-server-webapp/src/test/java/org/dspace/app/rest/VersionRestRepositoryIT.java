@@ -119,6 +119,14 @@ public class VersionRestRepositoryIT extends AbstractControllerIntegrationTest {
     }
 
     @Test
+    public void versionEPersonTestWrongId() throws Exception {
+
+        String adminToken = getAuthToken(admin.getEmail(), password);
+
+        getClient(adminToken).perform(get("/api/versioning/versions/" + ((version.getID() + 5) * 57) + "/eperson"))
+                             .andExpect(status().isNotFound());
+    }
+    @Test
     public void versionItemTest() throws Exception {
 
         String adminToken = getAuthToken(admin.getEmail(), password);
@@ -126,5 +134,14 @@ public class VersionRestRepositoryIT extends AbstractControllerIntegrationTest {
         getClient(adminToken).perform(get("/api/versioning/versions/" + version.getID() + "/item"))
                              .andExpect(status().isOk())
                              .andExpect(jsonPath("$", Matchers.is(ItemMatcher.matchItemProperties(version.getItem()))));
+    }
+
+    @Test
+    public void versionItemTestWrongId() throws Exception {
+
+        String adminToken = getAuthToken(admin.getEmail(), password);
+
+        getClient(adminToken).perform(get("/api/versioning/versions/" + ((version.getID() + 5) * 57) + "/item"))
+                             .andExpect(status().isNotFound());
     }
 }
