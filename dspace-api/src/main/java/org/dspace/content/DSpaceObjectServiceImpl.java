@@ -677,11 +677,11 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
                 MetadataValue newMetadata = addMetadata(context, dso, schema, element, qualifier,
                         lang, value, authority, confidence);
 
-                moveSingleMetadataValue(context, dso, schema, element, qualifier, place, newMetadata);
+                moveSingleMetadataValue(context, dso, place, newMetadata);
                 place++;
                 last = false;
             }
-            moveSingleMetadataValue(context, dso, schema, element, qualifier, place, rr);
+            moveSingleMetadataValue(context, dso, place, rr);
             place++;
             idx++;
         }
@@ -721,31 +721,30 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
         boolean last = true;
         for (MetadataValue rr : list) {
             if (idx == to && to < from) {
-                moveSingleMetadataValue(context, dso, schema, element, qualifier, place, moved);
+                moveSingleMetadataValue(context, dso, place, moved);
                 place++;
                 last = false;
             }
             if (idx != from) {
-                moveSingleMetadataValue(context, dso, schema, element, qualifier, place, rr);
+                moveSingleMetadataValue(context, dso, place, rr);
                 place++;
             }
             if (idx == to && to > from) {
-                moveSingleMetadataValue(context, dso, schema, element, qualifier, place, moved);
+                moveSingleMetadataValue(context, dso, place, moved);
                 place++;
                 last = false;
             }
             idx++;
         }
         if (last) {
-            moveSingleMetadataValue(context, dso, schema, element, qualifier, place, moved);
+            moveSingleMetadataValue(context, dso, place, moved);
         }
     }
 
     /**
      * Supports moving metadata by updating the place of the metadata value
      */
-    protected void moveSingleMetadataValue(Context context, T dso, String schema, String element,
-                                           String qualifier, int place, MetadataValue rr) throws SQLException {
+    protected void moveSingleMetadataValue(Context context, T dso, int place, MetadataValue rr) {
         //just move the metadata
         rr.setPlace(place);
     }
