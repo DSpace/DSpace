@@ -309,7 +309,7 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
     @Override
     public WorkflowActionConfig doState(Context c, EPerson user, HttpServletRequest request, int workflowItemId,
                                         Workflow workflow, WorkflowActionConfig currentActionConfig)
-        throws SQLException, AuthorizeException, IOException, MessagingException, WorkflowException {
+        throws SQLException, AuthorizeException, IOException, WorkflowException {
         try {
             XmlWorkflowItem wi = xmlWorkflowItemService.find(c, workflowItemId);
             Step currentStep = currentActionConfig.getStep();

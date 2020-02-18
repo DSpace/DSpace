@@ -42,7 +42,14 @@ import org.dspace.eperson.EPersonServiceImpl;
 import org.dspace.services.ConfigurationService;
 import org.dspace.workflow.WorkflowException;
 import org.dspace.workflow.WorkflowService;
+import org.dspace.xmlworkflow.WorkflowConfigurationException;
+import org.dspace.xmlworkflow.factory.XmlWorkflowFactory;
+import org.dspace.xmlworkflow.state.Step;
+import org.dspace.xmlworkflow.state.Workflow;
+import org.dspace.xmlworkflow.state.actions.WorkflowActionConfig;
+import org.dspace.xmlworkflow.storedcomponents.ClaimedTask;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
+import org.dspace.xmlworkflow.storedcomponents.service.ClaimedTaskService;
 import org.dspace.xmlworkflow.storedcomponents.service.XmlWorkflowItemService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -51,6 +58,8 @@ import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
+
+import static org.dspace.xmlworkflow.state.actions.processingaction.ProcessingAction.SUBMIT_EDIT_METADATA;
 
 /**
  * This is the repository responsible to manage WorkflowItem Rest object
@@ -88,6 +97,15 @@ public class WorkflowItemRestRepository extends DSpaceRestRepository<WorkflowIte
 
     @Autowired
     WorkflowService<XmlWorkflowItem> wfs;
+
+    @Autowired
+    ClaimedTaskService claimedTaskService;
+
+    @Autowired
+    protected XmlWorkflowItemService xmlWorkflowItemService;
+
+    @Autowired
+    protected XmlWorkflowFactory workflowFactory;
 
     private final SubmissionConfigReader submissionConfigReader;
 
@@ -167,10 +185,12 @@ public class WorkflowItemRestRepository extends DSpaceRestRepository<WorkflowIte
 
     @Override
     public WorkflowItemRest upload(HttpServletRequest request, String apiCategory, String model, Integer id,
-                                   MultipartFile file) throws Exception {
-
+                                   MultipartFile file) throws SQLException {
         Context context = obtainContext();
         WorkflowItemRest wsi = findOne(context, id);
+
+        this.checkIfEditMetadataAllowedInCurrentStep(context, id);
+
         XmlWorkflowItem source = wis.find(context, id);
         List<ErrorRest> errors = new ArrayList<ErrorRest>();
         SubmissionConfig submissionConfig =
@@ -219,6 +239,9 @@ public class WorkflowItemRestRepository extends DSpaceRestRepository<WorkflowIte
                       Patch patch) throws SQLException, AuthorizeException {
         List<Operation> operations = patch.getOperations();
         WorkflowItemRest wsi = findOne(context, id);
+
+        this.checkIfEditMetadataAllowedInCurrentStep(context, id);
+
         XmlWorkflowItem source = wis.find(context, id);
         for (Operation op : operations) {
             //the value in the position 0 is a null value
@@ -291,6 +314,32 @@ public class WorkflowItemRestRepository extends DSpaceRestRepository<WorkflowIte
         } catch (AuthorizeException e) {
             throw new RESTAuthorizationException(e);
         } catch (SQLException | IOException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Checks if @link{SUBMIT_EDIT_METADATA} is a valid option in the workflow step this task is currently at.
+     * Patching and uploading is only allowed if this is the case.
+     * @param context   Context
+     * @param id        Id of the task
+     */
+    private void checkIfEditMetadataAllowedInCurrentStep(Context context, Integer id) {
+        try {
+            XmlWorkflowItem xmlWorkflowItem = xmlWorkflowItemService.find(context, id);
+            ClaimedTask claimedTask = claimedTaskService.findByWorkflowIdAndEPerson(context, xmlWorkflowItem,
+                context.getCurrentUser());
+            if (claimedTask == null) {
+                throw new UnprocessableEntityException("Task with id " + id + " has not been claimed yet.");
+            }
+            Workflow workflow = workflowFactory.getWorkflow(claimedTask.getWorkflowItem().getCollection());
+            Step step = workflow.getStep(claimedTask.getStepID());
+            WorkflowActionConfig currentActionConfig = step.getActionConfig(claimedTask.getActionID());
+            if (!currentActionConfig.getProcessingAction().getOptions().contains(SUBMIT_EDIT_METADATA)) {
+                throw new UnprocessableEntityException(SUBMIT_EDIT_METADATA + " is not a valid option on this action (" +
+                    currentActionConfig.getProcessingAction().getClass() + ").");
+            }
+        } catch (SQLException | WorkflowConfigurationException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
     }
