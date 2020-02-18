@@ -217,7 +217,7 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
     //TODO @PreAuthorize("hasPermission(#id, 'WORKSPACEITEM', 'WRITE')")
     @Override
     public WorkspaceItemRest upload(HttpServletRequest request, String apiCategory, String model, Integer id,
-                                    MultipartFile file) throws Exception {
+                                    MultipartFile file) throws SQLException {
 
         Context context = obtainContext();
         WorkspaceItemRest wsi = findOne(context, id);
@@ -344,7 +344,7 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
     @Override
     public Iterable<WorkspaceItemRest> upload(Context context, HttpServletRequest request,
             MultipartFile uploadfile)
-        throws SQLException, FileNotFoundException, IOException, AuthorizeException {
+        throws SQLException, IOException, AuthorizeException {
         File file = Utils.getFile(uploadfile, "upload-loader", "filedataloader");
         List<WorkspaceItemRest> results = new ArrayList<>();
 

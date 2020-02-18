@@ -29,6 +29,7 @@ import org.dspace.app.util.DCInputsReaderException;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.service.MetadataFieldService;
 import org.dspace.core.Context;
+import org.dspace.xmlworkflow.WorkflowConfigurationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -382,10 +383,9 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
      * @param file
      *            the uploaded file
      * @return the new state of the REST object
-     * @throws Exception
      */
     public T upload(HttpServletRequest request, String apiCategory, String model,
-                                                     ID id, MultipartFile file) throws Exception {
+                                                     ID id, MultipartFile file) throws SQLException {
         throw new RuntimeException("No implementation found; Method not allowed!");
     }
 
@@ -401,12 +401,11 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
      * @param patch
      * the JSON Patch (https://tools.ietf.org/html/rfc6902) operation
      * @return
-     * @throws HttpRequestMethodNotSupportedException
      * @throws UnprocessableEntityException
      * @throws DSpaceBadRequestException
      */
     public T patch(HttpServletRequest request, String apiCategory, String model, ID id, Patch patch)
-        throws HttpRequestMethodNotSupportedException, UnprocessableEntityException, DSpaceBadRequestException {
+        throws UnprocessableEntityException, DSpaceBadRequestException {
         Context context = obtainContext();
 
         try {
@@ -415,7 +414,7 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
 
         } catch (AuthorizeException ae) {
             throw new RESTAuthorizationException(ae);
-        } catch (SQLException | DCInputsReaderException e) {
+        } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
         return findById(id).orElse(null);
@@ -445,7 +444,7 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
      */
     protected void patch(Context context, HttpServletRequest request, String apiCategory, String model, ID id,
                          Patch patch)
-        throws RepositoryMethodNotImplementedException, SQLException, AuthorizeException, DCInputsReaderException {
+        throws RepositoryMethodNotImplementedException, SQLException, AuthorizeException {
         throw new RepositoryMethodNotImplementedException(apiCategory, model);
     }
 

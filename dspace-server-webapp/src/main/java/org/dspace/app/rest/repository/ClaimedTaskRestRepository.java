@@ -49,6 +49,8 @@ import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
+import static org.dspace.xmlworkflow.state.actions.processingaction.ProcessingAction.SUBMIT_CANCEL;
+
 /**
  * This is the repository responsible to manage PooledTask Rest object
  *
@@ -138,9 +140,10 @@ public class ClaimedTaskRestRepository extends DSpaceRestRepository<ClaimedTaskR
 
             Step step = workflow.getStep(task.getStepID());
             WorkflowActionConfig currentActionConfig = step.getActionConfig(task.getActionID());
-            String submitButton = Util.getSubmitButton(request, "submit_cancel");
+            String submitButton = Util.getSubmitButton(request, null);
             if (!currentActionConfig.getProcessingAction().getOptions().contains(submitButton)) {
-                throw new UnprocessableEntityException(submitButton + " is not a valid option on this action.");
+                throw new UnprocessableEntityException(submitButton + " is not a valid option on this action (" +
+                    currentActionConfig.getProcessingAction().getClass() + ").");
             }
             workflowService
                 .doState(context, context.getCurrentUser(), request, task.getWorkflowItem().getID(), workflow,
