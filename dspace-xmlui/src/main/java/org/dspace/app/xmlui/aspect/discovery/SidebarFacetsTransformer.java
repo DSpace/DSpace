@@ -424,8 +424,9 @@ public class SidebarFacetsTransformer extends AbstractDSpaceTransformer implemen
                         }
 
                         int gap = 1;
-                        //Attempt to retrieve our gap using the algorithm below
-                        int yearDifference = newestYear - oldestYear;
+                        //Attempt to retrieve our gap using the algorithm below.
+                        // One year is added to the "newestYear" to take into account that EXACTLY 10 years apart in values (eg: 2007-2017 entails 11 years)
+                        int yearDifference = (newestYear+1) - oldestYear;
                         if(yearDifference != 0){
                             while (10 < ((double)yearDifference / gap)){
                                 gap *= 10;
