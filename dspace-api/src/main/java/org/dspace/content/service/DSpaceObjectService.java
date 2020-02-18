@@ -202,8 +202,8 @@ public interface DSpaceObjectService<T extends DSpaceObject> {
      * @param values    the values to add.
      * @throws SQLException if database error
      */
-    public void addMetadata(Context context, T dso, String schema, String element, String qualifier, String lang,
-                            List<String> values) throws SQLException;
+    public List<MetadataValue> addMetadata(Context context, T dso, String schema, String element, String qualifier,
+                            String lang, List<String> values) throws SQLException;
 
     /**
      * Add metadata fields. These are appended to existing values.
@@ -225,8 +225,8 @@ public interface DSpaceObjectService<T extends DSpaceObject> {
      * @param confidences the authority confidence (default 0)
      * @throws SQLException if database error
      */
-    public void addMetadata(Context context, T dso, String schema, String element, String qualifier, String lang,
-                            List<String> values, List<String> authorities, List<Integer> confidences)
+    public List<MetadataValue> addMetadata(Context context, T dso, String schema, String element, String qualifier,
+                            String lang, List<String> values, List<String> authorities, List<Integer> confidences)
         throws SQLException;
 
     /**
@@ -244,9 +244,10 @@ public interface DSpaceObjectService<T extends DSpaceObject> {
      * @param authorities   the external authority key for this value (or null)
      * @param confidences   the authority confidence (default 0)
      * @throws SQLException if database error
+     * @return
      */
-    public void addMetadata(Context context, T dso, MetadataField metadataField, String lang, List<String> values,
-            List<String> authorities, List<Integer> confidences) throws SQLException;
+    public List<MetadataValue> addMetadata(Context context, T dso, MetadataField metadataField, String lang,
+                       List<String> values, List<String> authorities, List<Integer> confidences) throws SQLException;
 
     /**
      * Shortcut for {@link #addMetadata(Context, DSpaceObject, MetadataField, String, List, List, List)} when a single
@@ -261,14 +262,14 @@ public interface DSpaceObjectService<T extends DSpaceObject> {
      * @param confidence
      * @throws SQLException
      */
-    public void addMetadata(Context context, T dso, MetadataField metadataField, String language, String value,
-            String authority, int confidence) throws SQLException;
+    public MetadataValue addMetadata(Context context, T dso, MetadataField metadataField, String language,
+           String value, String authority, int confidence) throws SQLException;
 
-    public void addMetadata(Context context, T dso, MetadataField metadataField, String language, String value)
+    public MetadataValue addMetadata(Context context, T dso, MetadataField metadataField, String language, String value)
         throws SQLException;
 
-    public void addMetadata(Context context, T dso, MetadataField metadataField, String language, List<String> values)
-        throws SQLException;
+    public List<MetadataValue> addMetadata(Context context, T dso, MetadataField metadataField, String language,
+                       List<String> values) throws SQLException;
 
     /**
      * Add a single metadata field. This is appended to existing
@@ -287,8 +288,8 @@ public interface DSpaceObjectService<T extends DSpaceObject> {
      * @param value     the value to add.
      * @throws SQLException if database error
      */
-    public void addMetadata(Context context, T dso, String schema, String element, String qualifier, String lang,
-                            String value) throws SQLException;
+    public MetadataValue addMetadata(Context context, T dso, String schema, String element, String qualifier,
+                             String lang, String value) throws SQLException;
 
     /**
      * Add a single metadata field. This is appended to existing
@@ -309,8 +310,8 @@ public interface DSpaceObjectService<T extends DSpaceObject> {
      * @param confidence the authority confidence (default 0)
      * @throws SQLException if database error
      */
-    public void addMetadata(Context context, T dso, String schema, String element, String qualifier, String lang,
-                            String value, String authority, int confidence) throws SQLException;
+    public MetadataValue addMetadata(Context context, T dso, String schema, String element, String qualifier,
+                           String lang, String value, String authority, int confidence) throws SQLException;
 
     /**
      * Clear metadata values. As with <code>getDC</code> above,
