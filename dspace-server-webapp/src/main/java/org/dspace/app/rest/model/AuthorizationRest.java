@@ -30,8 +30,6 @@ public class AuthorizationRest extends BaseObjectRest<String> {
     public static final String FEATURE = "feature";
     public static final String OBJECT = "object";
 
-    private String id;
-
     @Override
     @JsonProperty(access = Access.READ_ONLY)
     public String getType() {
@@ -46,14 +44,6 @@ public class AuthorizationRest extends BaseObjectRest<String> {
     @Override
     public Class getController() {
         return RestResourceController.class;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
     }
 
 }
