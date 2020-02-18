@@ -33,9 +33,12 @@ import org.dspace.app.util.SubmissionConfigReader;
 import org.dspace.app.util.SubmissionConfigReaderException;
 import org.dspace.app.util.SubmissionStepConfig;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.service.AuthorizeService;
+import org.dspace.content.Item;
 import org.dspace.content.service.BitstreamFormatService;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.ItemService;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.EPersonServiceImpl;
@@ -48,6 +51,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
@@ -88,6 +92,9 @@ public class WorkflowItemRestRepository extends DSpaceRestRepository<WorkflowIte
 
     @Autowired
     WorkflowService<XmlWorkflowItem> wfs;
+
+    @Autowired
+    AuthorizeService authorizeService;
 
     private final SubmissionConfigReader submissionConfigReader;
 
@@ -294,4 +301,24 @@ public class WorkflowItemRestRepository extends DSpaceRestRepository<WorkflowIte
             throw new RuntimeException(e.getMessage(), e);
         }
     }
+
+    @SearchRestMethod(name = "item")
+    public WorkflowItemRest findByItemUuid(@Parameter(value = "uuid", required = true) UUID itemUuid,
+                                           Pageable pageable) {
+        try {
+            Context context = obtainContext();
+            Item item = itemService.find(context, itemUuid);
+            XmlWorkflowItem xmlWorkflowItem = wis.findByItem(context, item);
+            if (xmlWorkflowItem == null) {
+                return null;
+            }
+            if (!authorizeService.authorizeActionBoolean(context, xmlWorkflowItem.getItem(), Constants.READ)) {
+                throw new AccessDeniedException("The current user does not have rights to view the WorkflowItem");
+            }
+            return converter.toRest(xmlWorkflowItem, utils.obtainProjection());
+        } catch (SQLException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+    }
+
 }
