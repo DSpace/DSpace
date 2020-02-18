@@ -2516,7 +2516,8 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
 
     @Test
     /**
-     * Test the run of the default workflow where the reviewer attempts a reject option in the 3rd step (final edit step)
+     * Test the run of the default workflow where the reviewer attempts a reject option in the 3rd step
+     * (final edit step)
      *
      * @throws Exception
      */
@@ -2739,7 +2740,8 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
 
     @Test
     /**
-     * Test the run of the default workflow where the reviewer attempts an edit metadata in the 3rd step (final edit step)
+     * Test the run of the default workflow where the reviewer attempts an edit metadata in the 3rd step
+     * (final edit step)
      *
      * @throws Exception
      */
@@ -3413,7 +3415,8 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
 
         context.restoreAuthSystemState();
 
-        // try to upload to a workspace item while it is in a step that does not have the edit_metadata option (review step)
+        // try to upload to a workspace item while it is in a step that does not have the edit_metadata option
+        // (review step)
         String authToken = getAuthToken(reviewer1.getEmail(), password);
         InputStream bibtex = getClass().getResourceAsStream("bibtex-test.bib");
         final MockMultipartFile bibtexFile = new MockMultipartFile("file", "bibtex-test.bib", "application/x-bibtex",

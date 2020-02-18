@@ -7,6 +7,8 @@
  */
 package org.dspace.app.rest.repository;
 
+import static org.dspace.xmlworkflow.state.actions.processingaction.ProcessingAction.SUBMIT_EDIT_METADATA;
+
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -58,8 +60,6 @@ import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
-
-import static org.dspace.xmlworkflow.state.actions.processingaction.ProcessingAction.SUBMIT_EDIT_METADATA;
 
 /**
  * This is the repository responsible to manage WorkflowItem Rest object
@@ -336,8 +336,8 @@ public class WorkflowItemRestRepository extends DSpaceRestRepository<WorkflowIte
             Step step = workflow.getStep(claimedTask.getStepID());
             WorkflowActionConfig currentActionConfig = step.getActionConfig(claimedTask.getActionID());
             if (!currentActionConfig.getProcessingAction().getOptions().contains(SUBMIT_EDIT_METADATA)) {
-                throw new UnprocessableEntityException(SUBMIT_EDIT_METADATA + " is not a valid option on this action (" +
-                    currentActionConfig.getProcessingAction().getClass() + ").");
+                throw new UnprocessableEntityException(SUBMIT_EDIT_METADATA + " is not a valid option on this " +
+                    "action (" + currentActionConfig.getProcessingAction().getClass() + ").");
             }
         } catch (SQLException | WorkflowConfigurationException e) {
             throw new RuntimeException(e.getMessage(), e);

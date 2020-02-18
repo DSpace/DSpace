@@ -49,8 +49,6 @@ import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
-import static org.dspace.xmlworkflow.state.actions.processingaction.ProcessingAction.SUBMIT_CANCEL;
-
 /**
  * This is the repository responsible to manage PooledTask Rest object
  *
