@@ -23,6 +23,7 @@ import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.ClaimedTaskRest;
 import org.dspace.app.rest.model.PoolTaskRest;
+import org.dspace.app.util.Util;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.service.ItemService;
@@ -137,6 +138,10 @@ public class ClaimedTaskRestRepository extends DSpaceRestRepository<ClaimedTaskR
 
             Step step = workflow.getStep(task.getStepID());
             WorkflowActionConfig currentActionConfig = step.getActionConfig(task.getActionID());
+            String submitButton = Util.getSubmitButton(request, "submit_cancel");
+            if (!currentActionConfig.getProcessingAction().getOptions().contains(submitButton)) {
+                throw new UnprocessableEntityException(submitButton + " is not a valid option on this action.");
+            }
             workflowService
                 .doState(context, context.getCurrentUser(), request, task.getWorkflowItem().getID(), workflow,
                     currentActionConfig);
