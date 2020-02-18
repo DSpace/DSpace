@@ -41,7 +41,11 @@ public abstract class MetadataValueRemovePatchOperation<DSO extends DSpaceObject
         String[] metadata = Utils.tokenize(target);
         List<MetadataValue> mm = getDSpaceObjectService().getMetadata(source, metadata[0], metadata[1], metadata[2],
                                                                       Item.ANY);
-        getDSpaceObjectService().removeMetadataValues(context, source, Arrays.asList(mm.get(index)));
+        if (index != -1) {
+            getDSpaceObjectService().removeMetadataValues(context, source, Arrays.asList(mm.get(index)));
+        } else {
+            getDSpaceObjectService().clearMetadata(context, source, metadata[0], metadata[1], metadata[2], Item.ANY);
+        }
     }
 
     protected abstract DSpaceObjectService<DSO> getDSpaceObjectService();
