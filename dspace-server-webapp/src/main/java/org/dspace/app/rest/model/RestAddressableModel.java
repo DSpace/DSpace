@@ -45,6 +45,7 @@ public abstract class RestAddressableModel implements RestModel {
         this.projection = projection;
     }
 
+    @JsonIgnore
     public String getUniqueType() {
         return getCategory() + "." + getType();
     }
