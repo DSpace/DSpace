@@ -42,7 +42,9 @@ import org.dspace.app.util.SubmissionConfigReader;
 import org.dspace.app.util.SubmissionConfigReaderException;
 import org.dspace.app.util.SubmissionStepConfig;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Collection;
+import org.dspace.content.Item;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.content.service.BitstreamFormatService;
 import org.dspace.content.service.BitstreamService;
@@ -66,6 +68,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.rest.webmvc.json.patch.PatchException;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -110,6 +113,9 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
 
     @Autowired
     CollectionService collectionService;
+
+    @Autowired
+    AuthorizeService authorizeService;
 
     @Autowired
     private UriListHandlerService uriListHandlerService;
@@ -497,5 +503,23 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
         return converter.toRest(workspaceItem, Projection.DEFAULT);
     }
 
+    @SearchRestMethod(name = "item")
+    public WorkspaceItemRest findByItemUuid(@Parameter(value = "uuid", required = true) UUID itemUuid,
+                                            Pageable pageable) {
+        try {
+            Context context = obtainContext();
+            Item item = itemService.find(context, itemUuid);
+            WorkspaceItem workspaceItem = wis.findByItem(context, item);
+            if (workspaceItem == null) {
+                return null;
+            }
+            if (!authorizeService.authorizeActionBoolean(context, workspaceItem.getItem(), Constants.READ)) {
+                throw new AccessDeniedException("The current user does not have rights to view the WorkflowItem");
+            }
+            return converter.toRest(workspaceItem, utils.obtainProjection());
+        } catch (SQLException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+    }
 
 }
