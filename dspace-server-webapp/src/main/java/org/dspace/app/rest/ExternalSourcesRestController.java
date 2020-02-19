@@ -44,7 +44,7 @@ public class ExternalSourcesRestController {
      * This method will retrieve all the ExternalSourceEntries for the ExternalSource for the given externalSourceName
      * param
      *
-     * curl -X GET http://<dspace.restUrl>/api/integration/externalsources/orcidV2/entries
+     * curl -X GET http://<dspace.server.url>/api/integration/externalsources/orcidV2/entries
      *
      * @param externalSourceName The externalSourceName that defines which ExternalDataProvider is used
      * @param query         The query used in the lookup
@@ -74,7 +74,7 @@ public class ExternalSourcesRestController {
      * This method will retrieve one ExternalSourceEntryResource based on the ExternalSource for the given
      * externalSourceName and with the given entryId
      *
-     * curl -X GET http://<dspace.restUrl>/api/integration/externalsources/orcidV2/entries/0000-0000-0000-0000
+     * curl -X GET http://<dspace.server.url>/api/integration/externalsources/orcidV2/entries/0000-0000-0000-0000
      *
      * @param externalSourceName The externalSourceName that defines which ExternalDataProvider is used
      * @param entryId       The entryId used for the lookup

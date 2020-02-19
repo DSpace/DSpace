@@ -7,8 +7,6 @@
  */
 package org.dspace.app.rest.model;
 
-import java.util.List;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.dspace.app.rest.RestResourceController;
@@ -19,16 +17,21 @@ import org.dspace.app.rest.RestResourceController;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
+@LinksRest(links = {
+        @LinkRest(
+                name = GroupRest.GROUPS,
+                method = "getGroups"
+        )
+})
 public class GroupRest extends DSpaceObjectRest {
     public static final String NAME = "group";
-
     public static final String CATEGORY = RestAddressableModel.EPERSON;
+
+    public static final String GROUPS = "groups";
 
     private String name;
 
     private boolean permanent;
-
-    private List<GroupRest> groups;
 
     @Override
     public String getCategory() {
@@ -54,16 +57,6 @@ public class GroupRest extends DSpaceObjectRest {
 
     public void setPermanent(boolean permanent) {
         this.permanent = permanent;
-    }
-
-    @JsonIgnore
-    @LinkRest(linkClass = GroupRest.class)
-    public List<GroupRest> getGroups() {
-        return groups;
-    }
-
-    public void setGroups(List<GroupRest> groups) {
-        this.groups = groups;
     }
 
     @Override

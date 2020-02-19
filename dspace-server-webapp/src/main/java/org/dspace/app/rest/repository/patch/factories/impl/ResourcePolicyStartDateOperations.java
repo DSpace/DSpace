@@ -20,25 +20,25 @@ import org.springframework.stereotype.Component;
  * Implementation for ResourcePolicy startDate patches.
  *
  * Examples:
- * 
+ *
  * <code>
- * curl -X PATCH http://${dspace.url}/api/authz/resourcepolicies/<:id-resourcepolicy> -H "
+ * curl -X PATCH http://${dspace.server.url}/api/authz/resourcepolicies/<:id-resourcepolicy> -H "
  * Content-Type: application/json" -d '[{ "op": "replace", "path": "
  * /startDate", "value": "YYYY-MM-DD"]'
  * </code>
- * 
+ *
  * <code>
- * curl -X PATCH http://${dspace.url}/api/authz/resourcepolicies/<:id-resourcepolicy> -H "
+ * curl -X PATCH http://${dspace.server.url}/api/authz/resourcepolicies/<:id-resourcepolicy> -H "
  * Content-Type: application/json" -d '[{ "op": "add", "path": "
  * /startDate", "value": "YYYY-MM-DD"]'
  * </code>
  *
  * <code>
- * curl -X PATCH http://${dspace.url}/api/authz/resourcepolicies/<:id-resourcepolicy> -H "
+ * curl -X PATCH http://${dspace.server.url}/api/authz/resourcepolicies/<:id-resourcepolicy> -H "
  * Content-Type: application/json" -d '[{ "op": "delete", "path": "
  * /startDate"]'
  * </code>
- * 
+ *
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 @Component
@@ -114,7 +114,7 @@ public class ResourcePolicyStartDateOperations implements ResourcePatchOperation
      *            the resource to update
      * @param operation
      *            the operation to apply
-     * 
+     *
      */
     void checkModelForExistingValue(ResourcePolicyRest resource, Operation operation) {
         if (resource.getStartDate() == null) {
@@ -129,7 +129,7 @@ public class ResourcePolicyStartDateOperations implements ResourcePatchOperation
      *            the resource to update
      * @param operation
      *            the operation to apply
-     * 
+     *
      */
     void checkModelForNotExistingValue(ResourcePolicyRest resource, Operation operation) {
         if (resource.getStartDate() != null) {
@@ -145,7 +145,7 @@ public class ResourcePolicyStartDateOperations implements ResourcePatchOperation
      *            the resource to update
      * @param operation
      *            the operation to apply
-     * 
+     *
      */
     void checkModelForConsistentValue(ResourcePolicyRest resource, Operation operation) {
         String dateS = (String) operation.getValue();

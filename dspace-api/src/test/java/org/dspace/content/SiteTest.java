@@ -141,7 +141,7 @@ public class SiteTest extends AbstractUnitTest {
      */
     @Test
     public void testGetURL() {
-        assertThat("testGetURL 0", s.getURL(), equalTo(ConfigurationManager.getProperty("dspace.url")));
+        assertThat("testGetURL 0", s.getURL(), equalTo(ConfigurationManager.getProperty("dspace.ui.url")));
     }
 
 }

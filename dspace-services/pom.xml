@@ -44,23 +44,33 @@
                     <plugin>
                         <groupId>org.codehaus.gmaven</groupId>
                         <artifactId>groovy-maven-plugin</artifactId>
-                        <version>2.0</version>
                         <executions>
                             <execution>
                                 <id>setproperty</id>
-                                <phase>generate-test-resources
-                                </phase> <!-- XXX I think this should be 'initialize' - MHW -->
+                                <phase>initialize</phase>
                                 <goals>
                                     <goal>execute</goal>
                                 </goals>
                                 <configuration>
                                     <source>
                                         project.properties['agnostic.build.dir'] = project.build.directory.replace(File.separator, '/');
-                                        println("Initializing Maven property 'agnostic.build.dir' to: " + project.properties['agnostic.build.dir']);
+                                        log.info("Initializing Maven property 'agnostic.build.dir' to: {}", project.properties['agnostic.build.dir']);
                                     </source>
                                 </configuration>
                             </execution>
                         </executions>
+                        <!-- TODO: When Groovy 3.0.0 is released, we should upgrade to fix this warning
+                             (which appears in Maven builds) https://issues.apache.org/jira/browse/GROOVY-8339
+                             The below (commented out) dependency should let us upgrade to v3.0.0 once released. -->
+                        <!--<dependencies>
+                            <dependency>
+                                <groupId>org.codehaus.groovy</groupId>
+                                <artifactId>groovy-all</artifactId>
+                                <version>3.0.0</version>
+                                <scope>runtime</scope>
+                                <type>pom</type>
+                            </dependency>
+                        </dependencies>-->
                     </plugin>
 
                     <!-- Run Unit Testing! This plugin just kicks off the tests (when enabled). -->
@@ -69,6 +79,7 @@
                         <configuration>
                             <systemPropertyVariables>
                                 <!-- Specify the dspace.dir to use for test environment -->
+                                <!-- ${agnostic.build.dir} is set dynamically by groovy-maven-plugin above -->
                                 <!-- For "dspace-services" we don't need a full test environment, we just need
                                      a valid "config-definition.xml" which exists in target/test-classes/ -->
                                 <dspace.dir>${agnostic.build.dir}/test-classes/</dspace.dir>
@@ -109,9 +120,9 @@
             <groupId>javax.mail</groupId>
             <artifactId>mail</artifactId>
         </dependency>
-        <dependency> <!-- Keep jmockit before junit -->
-            <groupId>org.jmockit</groupId>
-            <artifactId>jmockit</artifactId>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
             <scope>test</scope>
         </dependency>
         <!-- SPECIAL CASE - need JUNIT at build time and testing time -->
@@ -146,10 +157,14 @@
             <groupId>commons-beanutils</groupId>
             <artifactId>commons-beanutils</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+        </dependency>
         <dependency>
             <groupId>javax.annotation</groupId>
             <artifactId>javax.annotation-api</artifactId>
-            <version>1.3.2</version>
         </dependency>
 
         <dependency>

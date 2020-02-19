@@ -249,7 +249,7 @@ public class Negotiator {
         // if html is requested we have to forward to the repositories webui.
         if ("html".equals(lang)) {
             urlBuilder.append(DSpaceServicesFactory.getInstance()
-                                                   .getConfigurationService().getProperty("dspace.url"));
+                                                   .getConfigurationService().getProperty("dspace.ui.url"));
             if (!handle.equals(DSpaceServicesFactory.getInstance()
                                                     .getConfigurationService().getProperty("handle.prefix") + "/0")) {
                 urlBuilder.append("/handle/");
