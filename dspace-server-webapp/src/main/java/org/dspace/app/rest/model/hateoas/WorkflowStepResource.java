@@ -8,6 +8,7 @@
 package org.dspace.app.rest.model.hateoas;
 
 import org.dspace.app.rest.model.WorkflowStepRest;
+import org.dspace.app.rest.model.hateoas.annotations.RelNameDSpaceResource;
 import org.dspace.app.rest.utils.Utils;
 
 /**
@@ -16,6 +17,7 @@ import org.dspace.app.rest.utils.Utils;
  *
  * @author Maria Verdonck (Atmire) on 10/01/2020
  */
+@RelNameDSpaceResource(WorkflowStepRest.NAME)
 public class WorkflowStepResource extends DSpaceResource<WorkflowStepRest> {
     public WorkflowStepResource(WorkflowStepRest data, Utils utils) {
         super(data, utils);

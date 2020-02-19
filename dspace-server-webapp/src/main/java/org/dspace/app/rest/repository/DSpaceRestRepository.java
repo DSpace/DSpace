@@ -400,11 +400,12 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
      * @param patch
      * the JSON Patch (https://tools.ietf.org/html/rfc6902) operation
      * @return
+     * @throws HttpRequestMethodNotSupportedException
      * @throws UnprocessableEntityException
      * @throws DSpaceBadRequestException
      */
     public T patch(HttpServletRequest request, String apiCategory, String model, ID id, Patch patch)
-        throws UnprocessableEntityException, DSpaceBadRequestException {
+        throws HttpRequestMethodNotSupportedException, UnprocessableEntityException, DSpaceBadRequestException {
         Context context = obtainContext();
 
         try {
@@ -413,7 +414,7 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
 
         } catch (AuthorizeException ae) {
             throw new RESTAuthorizationException(ae);
-        } catch (SQLException e) {
+        } catch (SQLException | DCInputsReaderException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
         return findById(id).orElse(null);
@@ -443,7 +444,7 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
      */
     protected void patch(Context context, HttpServletRequest request, String apiCategory, String model, ID id,
                          Patch patch)
-        throws RepositoryMethodNotImplementedException, SQLException, AuthorizeException {
+        throws RepositoryMethodNotImplementedException, SQLException, AuthorizeException, DCInputsReaderException {
         throw new RepositoryMethodNotImplementedException(apiCategory, model);
     }
 

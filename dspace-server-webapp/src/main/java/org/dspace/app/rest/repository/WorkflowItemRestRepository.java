@@ -188,10 +188,10 @@ public class WorkflowItemRestRepository extends DSpaceRestRepository<WorkflowIte
                                    MultipartFile file) throws SQLException {
         Context context = obtainContext();
         WorkflowItemRest wsi = findOne(context, id);
-
-        this.checkIfEditMetadataAllowedInCurrentStep(context, id);
-
         XmlWorkflowItem source = wis.find(context, id);
+
+        this.checkIfEditMetadataAllowedInCurrentStep(context, source);
+
         List<ErrorRest> errors = new ArrayList<ErrorRest>();
         SubmissionConfig submissionConfig =
             submissionConfigReader.getSubmissionConfigByName(wsi.getSubmissionDefinition().getName());
@@ -239,10 +239,10 @@ public class WorkflowItemRestRepository extends DSpaceRestRepository<WorkflowIte
                       Patch patch) throws SQLException, AuthorizeException {
         List<Operation> operations = patch.getOperations();
         WorkflowItemRest wsi = findOne(context, id);
-
-        this.checkIfEditMetadataAllowedInCurrentStep(context, id);
-
         XmlWorkflowItem source = wis.find(context, id);
+
+        this.checkIfEditMetadataAllowedInCurrentStep(context, source);
+
         for (Operation op : operations) {
             //the value in the position 0 is a null value
             String[] path = op.getPath().substring(1).split("/", 3);
@@ -321,16 +321,16 @@ public class WorkflowItemRestRepository extends DSpaceRestRepository<WorkflowIte
     /**
      * Checks if @link{SUBMIT_EDIT_METADATA} is a valid option in the workflow step this task is currently at.
      * Patching and uploading is only allowed if this is the case.
-     * @param context   Context
-     * @param id        Id of the task
+     * @param context               Context
+     * @param xmlWorkflowItem       WorkflowItem of the task
      */
-    private void checkIfEditMetadataAllowedInCurrentStep(Context context, Integer id) {
+    private void checkIfEditMetadataAllowedInCurrentStep(Context context, XmlWorkflowItem xmlWorkflowItem) {
         try {
-            XmlWorkflowItem xmlWorkflowItem = xmlWorkflowItemService.find(context, id);
             ClaimedTask claimedTask = claimedTaskService.findByWorkflowIdAndEPerson(context, xmlWorkflowItem,
                 context.getCurrentUser());
             if (claimedTask == null) {
-                throw new UnprocessableEntityException("Task with id " + id + " has not been claimed yet.");
+                throw new UnprocessableEntityException("WorkflowItem with id " + xmlWorkflowItem.getID()
+                    + " has not been claimed yet.");
             }
             Workflow workflow = workflowFactory.getWorkflow(claimedTask.getWorkflowItem().getCollection());
             Step step = workflow.getStep(claimedTask.getStepID());
