@@ -258,6 +258,96 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
     }
 
     @Test
+    public void searchMethodsExist() throws Exception {
+        String authToken = getAuthToken(admin.getEmail(), password);
+        getClient(authToken).perform(get("/api/eperson/epersons"))
+                            .andExpect(jsonPath("$._links.search.href", Matchers.notNullValue()));
+
+        getClient(authToken).perform(get("/api/eperson/epersons/search"))
+                            .andExpect(status().isOk())
+                            .andExpect(content().contentType(contentType))
+                            .andExpect(jsonPath("$._links.byMetadata", Matchers.notNullValue()));
+    }
+
+    @Test
+    public void findByMetadata() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        Group group1 = GroupBuilder.createGroup(context)
+                                   .withName("Test group")
+                                   .build();
+
+        Group group2 = GroupBuilder.createGroup(context)
+                                   .withName("Test group 2")
+                                   .build();
+
+        Group group3 = GroupBuilder.createGroup(context)
+                                   .withName("Test group 3")
+                                   .build();
+
+        Group group4 = GroupBuilder.createGroup(context)
+                                   .withName("Test other group")
+                                   .build();
+
+
+        String authToken = getAuthToken(admin.getEmail(), password);
+        getClient(authToken).perform(get("/api/eperson/groups/search/byMetadata")
+                                             .param("query", group1.getName()))
+                            .andExpect(status().isOk())
+                            .andExpect(content().contentType(contentType))
+                            .andExpect(jsonPath("$._embedded.groups", Matchers.containsInAnyOrder(
+                                    GroupMatcher.matchGroupEntry(group1.getID(), group1.getName()),
+                                    GroupMatcher.matchGroupEntry(group2.getID(), group2.getName()),
+                                    GroupMatcher.matchGroupEntry(group3.getID(), group3.getName())
+                            )))
+                            .andExpect(jsonPath("$.page.totalElements", is(3)));
+
+        // it must be case insensitive
+        getClient(authToken).perform(get("/api/eperson/groups/search/byMetadata")
+                                             .param("query", String.valueOf(group1.getID())))
+                            .andExpect(status().isOk())
+                            .andExpect(content().contentType(contentType))
+                            .andExpect(jsonPath("$._embedded.groups", Matchers.contains(
+                                    GroupMatcher.matchGroupEntry(group1.getID(), group1.getName())
+                            )))
+                            .andExpect(jsonPath("$.page.totalElements", is(1)));
+    }
+
+    @Test
+    public void findByMetadataUnauthorized() throws Exception {
+        String authToken = getAuthToken(admin.getEmail(), password);
+        getClient().perform(get("/api/eperson/groups/search/byMetadata")
+                                    .param("query", "Administrator"))
+                   .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    public void findByMetadataForbidden() throws Exception {
+        String authToken = getAuthToken(eperson.getEmail(), password);
+        getClient(authToken).perform(get("/api/eperson/groups/search/byMetadata")
+                                             .param("query", "Administrator"))
+                            .andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void findByMetadataUndefined() throws Exception {
+        String authToken = getAuthToken(admin.getEmail(), password);
+        getClient(authToken).perform(get("/api/eperson/groups/search/byMetadata")
+                                             .param("query", "Non-existing Group"))
+                            .andExpect(status().isOk())
+                            .andExpect(content().contentType(contentType))
+                            .andExpect(jsonPath("$.page.totalElements", is(0)));
+    }
+
+    @Test
+    public void findByMetadataUnprocessable() throws Exception {
+        String authToken = getAuthToken(admin.getEmail(), password);
+        getClient(authToken).perform(get("/api/eperson/groups/search/byMetadata"))
+                            .andExpect(status().isUnprocessableEntity());
+    }
+
+
+    @Test
     public void patchGroupMetadataAuthorized() throws Exception {
         runPatchMetadataTests(admin, 200);
     }
