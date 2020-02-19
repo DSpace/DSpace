@@ -35,7 +35,7 @@ public class WorkflowStepRestRepository extends DSpaceRestRepository<WorkflowSte
     public WorkflowStepRest findOne(Context context, String workflowStepName) {
         Step step = this.xmlWorkflowFactory.getStepByName(workflowStepName);
         if (step != null) {
-            return converter.toRest(step, utils.obtainProjection(true));
+            return converter.toRest(step, utils.obtainProjection());
         } else {
             throw new ResourceNotFoundException("No workflow step with name " + workflowStepName
                 + " is configured");
