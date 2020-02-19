@@ -12,6 +12,7 @@ import java.util.Set;
 import org.dspace.app.rest.model.LinkRest;
 import org.dspace.app.rest.model.RestAddressableModel;
 import org.dspace.app.rest.model.hateoas.HALResource;
+import org.springframework.hateoas.Link;
 
 /**
  * Projection that allows a given set of rels to be embedded.
@@ -32,9 +33,22 @@ public class EmbedRelsProjection extends AbstractProjection {
     }
 
     @Override
-    public boolean allowEmbedding(HALResource<? extends RestAddressableModel> halResource, LinkRest linkRest) {
-        if (halResource.getContent().getEmbedLevel() == 0)
-            return embedRels.contains(linkRest.name());
+    public boolean allowEmbedding(HALResource<? extends RestAddressableModel> halResource, LinkRest linkRest, Link... oldLinks) {
+        if (halResource.getContent().getEmbedLevel() == 0 && embedRels.contains(linkRest.name()))
+            return true;
+        StringBuilder fullName = new StringBuilder();
+        for (Link oldLink : oldLinks) {
+            fullName.append(oldLink.getRel()).append("/");
+        }
+        fullName.append(linkRest.name());
+        if (embedRels.contains(fullName.toString())) {
+            return true;
+        }
+        fullName.append("/");
+        for (String embedRel : embedRels) {
+            if (embedRel.startsWith(fullName.toString()))
+                return true;
+        }
         return false;
     }
 }
