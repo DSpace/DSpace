@@ -7,13 +7,9 @@
  */
 package org.dspace.app.rest.converter;
 
-import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.model.CollectionRest;
-import org.dspace.app.rest.projection.Projection;
-import org.dspace.content.Bitstream;
 import org.dspace.content.Collection;
 import org.dspace.discovery.IndexableObject;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -23,24 +19,8 @@ import org.springframework.stereotype.Component;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 @Component
-public class CollectionConverter
-    extends DSpaceObjectConverter<org.dspace.content.Collection, org.dspace.app.rest.model.CollectionRest>
-    implements IndexableObjectConverter<Collection, CollectionRest> {
-
-    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(CollectionConverter.class);
-
-    @Autowired
-    private ConverterService converter;
-
-    @Override
-    public CollectionRest convert(org.dspace.content.Collection obj, Projection projection) {
-        CollectionRest col = super.convert(obj, projection);
-        Bitstream logo = obj.getLogo();
-        if (logo != null) {
-            col.setLogo(converter.toRest(logo, projection));
-        }
-        return col;
-    }
+public class CollectionConverter extends DSpaceObjectConverter<Collection, CollectionRest>
+        implements IndexableObjectConverter<Collection, CollectionRest> {
 
     @Override
     protected CollectionRest newInstance() {

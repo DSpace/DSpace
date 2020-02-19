@@ -16,7 +16,7 @@ Admins to our DockerHub repo can publish with the following command.
 docker push dspace/dspace-dependencies:dspace-7_x
 ```
 
-## Dockerfile.jdk8-test
+## Dockerfile.test
 
 This Dockerfile builds a DSpace 7 Tomcat image (for testing/development).
 This image deploys two DSpace webapps:
@@ -24,7 +24,7 @@ This image deploys two DSpace webapps:
 2. The legacy (v6) REST API (at `http://localhost:8080//rest`), deployed without requiring HTTPS access.
 
 ```
-docker build -t dspace/dspace:dspace-7_x-jdk8-test -f Dockerfile.jdk8-test .
+docker build -t dspace/dspace:dspace-7_x-test -f Dockerfile.test .
 ```
 
 This image is built *automatically* after each commit is made to the `master` branch.
@@ -33,17 +33,17 @@ A corresponding image exists for DSpace 4-6.
 
 Admins to our DockerHub repo can publish with the following command.
 ```
-docker push dspace/dspace:dspace-7_x-jdk8-test
+docker push dspace/dspace:dspace-7_x-test
 ```
 
-## Dockerfile.jdk8
+## Dockerfile
 
 This Dockerfile builds a DSpace 7 tomcat image.
 This image deploys two DSpace webapps:
 1. The DSpace 7 REST API (at `http://localhost:8080/server`)
 2. The legacy (v6) REST API (at `http://localhost:8080//rest`), deployed *requiring* HTTPS access.
 ```
-docker build -t dspace/dspace:dspace-7_x-jdk8 -f Dockerfile.jdk8 .
+docker build -t dspace/dspace:dspace-7_x -f Dockerfile .
 ```
 
 This image is built *automatically* after each commit is made to the `master` branch.
@@ -52,14 +52,14 @@ A corresponding image exists for DSpace 4-6.
 
 Admins to our DockerHub repo can publish with the following command.
 ```
-docker push dspace/dspace:dspace-7_x-jdk8
+docker push dspace/dspace:dspace-7_x
 ```
 
-## Dockefile.cli.jdk8
+## Dockefile.cli
 
 This Dockerfile builds a DSpace 7 CLI image, which can be used to run commandline tools via Docker.
 ```
-docker build -t dspace/dspace-cli:dspace-7_x -f Dockerfile.cli.jdk8 .
+docker build -t dspace/dspace-cli:dspace-7_x -f Dockerfile.cli .
 ```
 
 This image is built *automatically* after each commit is made to the master branch.
@@ -110,13 +110,13 @@ docker push dspace/dspace-postgres-pgcrypto:loadsql
 
 This is a standalone Solr image containing DSpace Solr cores & schemas required by DSpace 7.
 
-**WARNING:** Rebuilding this image first **requires** rebuilding `dspace-7_x-jdk8` (i.e. `Dockerfile.jdk8` listed above),
+**WARNING:** Rebuilding this image first **requires** rebuilding `dspace-7_x` (i.e. `Dockerfile` listed above),
 as this Solr image copies the latest DSpace-specific Solr schemas & settings from that other image.
 
 ```
-# First, rebuild dspace-7_x-jdk8 to grab the latest Solr configs
+# First, rebuild dspace-7_x to grab the latest Solr configs
 cd [src]
-docker build -t dspace/dspace:dspace-7_x-jdk8 -f Dockerfile.jdk8 .
+docker build -t dspace/dspace:dspace-7_x -f Dockerfile .
 
 # Then, rebuild dspace-solr based on that build of DSpace 7.
 cd dspace/src/main/docker/solr
