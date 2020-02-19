@@ -46,8 +46,11 @@ public abstract class DSpaceAbstractTest {
      * do not run this after each individual test
      */
     public static void _initializeKernel() {
+        // Init the Kernel and start it
+        // NOTE: the "dspace.dir" system property MUST be specified via Maven
+        // For example: by using <systemPropertyVariables> of maven-surefire-plugin or maven-failsafe-plugin
         kernelImpl = DSpaceKernelInit.getKernel(null);
-        kernelImpl.start(); // init the kernel
+        kernelImpl.start();
         kernel = kernelImpl.getManagedBean();
     }
 

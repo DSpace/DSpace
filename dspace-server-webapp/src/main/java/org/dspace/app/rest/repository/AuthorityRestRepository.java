@@ -50,7 +50,7 @@ public class AuthorityRestRepository extends DSpaceRestRepository<AuthorityRest,
     public Page<AuthorityRest> findAll(Context context, Pageable pageable) {
         Set<String> authoritiesName = cas.getChoiceAuthoritiesNames();
         List<AuthorityRest> results = new ArrayList<>();
-        Projection projection = utils.obtainProjection(true);
+        Projection projection = utils.obtainProjection();
         for (String authorityName : authoritiesName) {
             ChoiceAuthority source = cas.getChoiceAuthorityByAuthorityName(authorityName);
             AuthorityRest result = authorityUtils.convertAuthority(source, authorityName, projection);
