@@ -10,6 +10,7 @@ package org.dspace.app.rest.projection;
 import javax.persistence.Entity;
 
 import org.dspace.app.rest.model.LinkRest;
+import org.dspace.app.rest.model.RestAddressableModel;
 import org.dspace.app.rest.model.RestModel;
 import org.dspace.app.rest.model.hateoas.HALResource;
 import org.dspace.app.rest.repository.DSpaceRestRepository;
@@ -117,7 +118,7 @@ public interface Projection {
      * @param linkRest the LinkRest annotation through which the related resource was discovered on the rest object.
      * @return true if allowed, false otherwise.
      */
-    boolean allowEmbedding(HALResource halResource, LinkRest linkRest);
+    boolean allowEmbedding(HALResource<? extends RestAddressableModel> halResource, LinkRest linkRest);
 
     /**
      * Tells whether this projection permits the linking of a particular linkable subresource.
