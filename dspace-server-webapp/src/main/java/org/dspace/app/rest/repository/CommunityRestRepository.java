@@ -151,7 +151,7 @@ public class CommunityRestRepository extends DSpaceObjectRestRepository<Communit
             long total = cs.countTotal(context);
             List<Community> communities = cs.findAll(context, pageable.getPageSize(),
                     Math.toIntExact(pageable.getOffset()));
-            return converter.toRestPage(communities, pageable, total, utils.obtainProjection(true));
+            return converter.toRestPage(communities, pageable, total, utils.obtainProjection());
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -163,7 +163,7 @@ public class CommunityRestRepository extends DSpaceObjectRestRepository<Communit
     public Page<CommunityRest> findAllTop(Pageable pageable) {
         try {
             List<Community> communities = cs.findAllTop(obtainContext());
-            return converter.toRestPage(utils.getPage(communities, pageable), utils.obtainProjection(true));
+            return converter.toRestPage(utils.getPage(communities, pageable), utils.obtainProjection());
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -182,7 +182,7 @@ public class CommunityRestRepository extends DSpaceObjectRestRepository<Communit
                     CommunityRest.CATEGORY + "." + CommunityRest.NAME + " with id: " + parentCommunity + " not found");
             }
             List<Community> subCommunities = community.getSubcommunities();
-            return converter.toRestPage(utils.getPage(subCommunities, pageable), utils.obtainProjection(true));
+            return converter.toRestPage(utils.getPage(subCommunities, pageable), utils.obtainProjection());
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }

@@ -21,7 +21,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
-import org.dspace.app.rest.converter.JsonPatchConverter;
 import org.dspace.app.rest.converter.MetadataConverter;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
@@ -114,6 +113,9 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
         if (item == null) {
             return null;
         }
+        if (item.getTemplateItemOf() != null) {
+            throw new DSpaceBadRequestException("Item with id: " + id + " is a template item.");
+        }
         return converter.toRest(item, utils.obtainProjection());
     }
 
@@ -128,7 +130,7 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
             while (it.hasNext()) {
                 items.add(it.next());
             }
-            return converter.toRestPage(items, pageable, total, utils.obtainProjection(true));
+            return converter.toRestPage(items, pageable, total, utils.obtainProjection());
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -138,23 +140,47 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
     @PreAuthorize("hasPermission(#id, 'ITEM', #patch)")
     protected void patch(Context context, HttpServletRequest request, String apiCategory, String model, UUID id,
                          Patch patch) throws AuthorizeException, SQLException {
-        patchDSpaceObject(apiCategory, model, id, patch);
+
+        Item item = itemService.find(obtainContext(), id);
+        if (item == null) {
+            throw new ResourceNotFoundException(apiCategory + "." + model + " with id: " + id + " not found");
+        }
+        if (item.getTemplateItemOf() != null) {
+            throw new DSpaceBadRequestException("The ID: " + id + " resolved to a template item");
+        }
+        ItemRest itemRest = dsoPatch.patch(findOne(context, id), patch.getOperations());
+        updateDSpaceObject(item, itemRest);
     }
 
     @Override
     protected void updateDSpaceObject(Item item, ItemRest itemRest)
         throws AuthorizeException, SQLException {
         super.updateDSpaceObject(item, itemRest);
-
+        if (item.getTemplateItemOf() != null) {
+            if (itemRest.getWithdrawn() != item.isWithdrawn()) {
+                throw new UnprocessableEntityException("Cannot apply a withdrawn patch to a templateItem");
+            }
+            if (itemRest.getDiscoverable() != item.isDiscoverable()) {
+                throw new UnprocessableEntityException("Cannot apply a discoverable patch to a templateItem");
+            }
+            return;
+        }
         Context context = obtainContext();
         if (itemRest.getWithdrawn() != item.isWithdrawn()) {
             if (itemRest.getWithdrawn()) {
+                if (item.getTemplateItemOf() != null) {
+                    throw new UnprocessableEntityException("A template item cannot be withdrawn.");
+                }
                 itemService.withdraw(context, item);
             } else {
                 itemService.reinstate(context, item);
             }
         }
+
         if (itemRest.getDiscoverable() != item.isDiscoverable()) {
+            if (itemRest.getDiscoverable() && item.getTemplateItemOf() != null) {
+                throw new UnprocessableEntityException("A template item cannot be discoverable.");
+            }
             item.setDiscoverable(itemRest.getDiscoverable());
             itemService.update(context, item);
         }
@@ -365,45 +391,6 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
         context.commit();
 
         return bundle;
-    }
-
-    /**
-     * Modify a template Item which is a template Item
-     * @param item          The Item to be modified
-     * @param jsonNode      The patch to be applied
-     * @return              The Item as it is after applying the patch
-     * @throws SQLException
-     * @throws AuthorizeException
-     */
-    public ItemRest patchTemplateItem(Item item, JsonNode jsonNode)
-        throws SQLException, AuthorizeException {
-
-        ObjectMapper mapper = new ObjectMapper();
-        JsonPatchConverter patchConverter = new JsonPatchConverter(mapper);
-        Patch patch = patchConverter.convert(jsonNode);
-
-        ItemRest patchedItemRest = dsoPatch.patch(converter.toRest(item, Projection.DEFAULT), patch.getOperations());
-        updateDSpaceObject(item, patchedItemRest);
-
-        return converter.toRest(item, Projection.DEFAULT);
-    }
-
-    /**
-     * Remove an Item which is a template for a Collection.
-     *
-     * Note: The caller is responsible for checking that this item is in fact a template item.
-     *
-     * @param context
-     * @param item          The item to be removed
-     * @throws SQLException
-     * @throws IOException
-     * @throws AuthorizeException
-     */
-    public void removeTemplateItem(Context context, Item item) throws SQLException, IOException, AuthorizeException {
-
-        Collection collection = item.getTemplateItemOf();
-        collectionService.removeTemplateItem(context, collection);
-        collectionService.update(context, collection);
     }
 
     @Override

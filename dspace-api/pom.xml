@@ -50,10 +50,33 @@
                 <configuration>
                     <debug>true</debug>
                     <showDeprecation>true</showDeprecation>
-                    <compilerArguments>
-                        <processor>org.hibernate.jpamodelgen.JPAMetaModelEntityProcessor</processor>
-                    </compilerArguments>
-
+                    <annotationProcessorPaths>
+                        <!-- Enable Hibernate's Metamodel Generator to generate metadata model classes
+                             (ending in _ suffix) for more type-safe Criteria queries -->
+                        <path>
+                            <groupId>org.hibernate</groupId>
+                            <artifactId>hibernate-jpamodelgen</artifactId>
+                            <version>${hibernate.version}</version>
+                        </path>
+                        <!-- Enable JAXB -->
+                        <path>
+                            <groupId>javax.xml.bind</groupId>
+                            <artifactId>jaxb-api</artifactId>
+                            <version>${jaxb-api.version}</version>
+                        </path>
+                        <!-- Enable Commons Annotations -->
+                        <path>
+                            <groupId>javax.annotation</groupId>
+                            <artifactId>javax.annotation-api</artifactId>
+                            <version>${javax-annotation.version}</version>
+                        </path>
+                        <!-- Enable http://errorprone.info -->
+                        <path>
+                            <groupId>com.google.errorprone</groupId>
+                            <artifactId>error_prone_core</artifactId>
+                            <version>${errorprone.version}</version>
+                        </path>
+                    </annotationProcessorPaths>
                 </configuration>
             </plugin>
             <plugin>
@@ -93,7 +116,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>build-helper-maven-plugin</artifactId>
-                <version>1.9.1</version>
+                <version>3.0.0</version>
                 <executions>
                     <execution>
                         <phase>validate</phase>
@@ -161,7 +184,6 @@
                          install of DSpace, against which Tests can be run. -->
                     <plugin>
                         <artifactId>maven-dependency-plugin</artifactId>
-                        <version>2.8</version>
                         <configuration>
                             <outputDirectory>${project.build.directory}/testing</outputDirectory>
                             <artifactItems>
@@ -196,7 +218,7 @@
                          (see: http://gmaven.codehaus.org/Executing+Groovy+Code )
                          We are generating a OS-agnostic version (agnostic.build.dir) of
                          the ${project.build.directory} property (full path of target dir).
-                         This is needed by the FileWeaver & Surefire plugins (see below)
+                         This is needed by the Surefire & Failsafe plugins (see below)
                          to initialize the Unit Test environment's dspace.cfg file.
                          Otherwise, the Unit Test Framework will not work on Windows OS.
                          This Groovy code was mostly borrowed from:
@@ -205,19 +227,17 @@
                     <plugin>
                         <groupId>org.codehaus.gmaven</groupId>
                         <artifactId>groovy-maven-plugin</artifactId>
-                        <version>2.0</version>
                         <executions>
                             <execution>
                                 <id>setproperty</id>
-                                <phase>generate-test-resources
-                                </phase> <!-- XXX I think this should be 'initialize' - MHW -->
+                                <phase>initialize</phase>
                                 <goals>
                                     <goal>execute</goal>
                                 </goals>
                                 <configuration>
                                     <source>
                                         project.properties['agnostic.build.dir'] = project.build.directory.replace(File.separator, '/');
-                                        println("Initializing Maven property 'agnostic.build.dir' to: " + project.properties['agnostic.build.dir']);
+                                        log.info("Initializing Maven property 'agnostic.build.dir' to: {}", project.properties['agnostic.build.dir']);
                                     </source>
                                 </configuration>
                             </execution>
@@ -230,6 +250,7 @@
                         <configuration>
                             <systemPropertyVariables>
                                 <!-- Specify the dspace.dir to use for test environment -->
+                                <!-- ${agnostic.build.dir} is set dynamically by groovy-maven-plugin above -->
                                 <!-- This system property is loaded by AbstractDSpaceTest to initialize the test environment -->
                                 <dspace.dir>${agnostic.build.dir}/testing/dspace/</dspace.dir>
                                 <!-- Turn off any DSpace logging -->
@@ -238,51 +259,13 @@
                         </configuration>
                     </plugin>
 
-
-                    <plugin>
-                        <groupId>org.codehaus.mojo</groupId>
-                        <artifactId>xml-maven-plugin</artifactId>
-                        <version>1.0.1</version>
-                        <executions>
-                            <execution>
-                                <id>validate-ALL-xml-and-xsl</id>
-                                <phase>process-test-resources</phase>
-                                <goals>
-                                    <goal>validate</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                        <configuration>
-                            <validationSets>
-                                <!-- validate ALL XML and XSL config files in the testing folder -->
-                                <validationSet>
-                                    <dir>${agnostic.build.dir}/testing</dir>
-                                    <includes>
-                                        <include>**/*.xml</include>
-                                        <include>**/*.xsl</include>
-                                        <include>**/*.xconf</include>
-                                    </includes>
-                                </validationSet>
-                                <!-- validate ALL XML and XSL files throughout the project -->
-                                <validationSet>
-                                    <dir>${root.basedir}</dir>
-                                    <includes>
-                                        <include>**/*.xml</include>
-                                        <include>**/*.xsl</include>
-                                        <include>**/*.xmap</include>
-                                    </includes>
-                                </validationSet>
-                            </validationSets>
-                        </configuration>
-                    </plugin>
-
-
                     <!-- Run Integration Testing! This plugin just kicks off the tests (when enabled). -->
                     <plugin>
                         <artifactId>maven-failsafe-plugin</artifactId>
                         <configuration>
                             <systemPropertyVariables>
                                 <!-- Specify the dspace.dir to use for test environment -->
+                                <!-- ${agnostic.build.dir} is set dynamically by groovy-maven-plugin above -->
                                 <dspace.dir>${agnostic.build.dir}/testing/dspace/</dspace.dir>
                                 <!-- Turn off any DSpace logging -->
                                 <dspace.log.init.disable>true</dspace.log.init.disable>
@@ -456,11 +439,6 @@
             <groupId>org.dspace</groupId>
             <artifactId>dspace-services</artifactId>
         </dependency>
-        <dependency> <!-- Keep jmockit before junit -->
-            <groupId>org.jmockit</groupId>
-            <artifactId>jmockit</artifactId>
-            <scope>test</scope>
-        </dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
@@ -481,7 +459,11 @@
             <artifactId>mockito-core</artifactId>
             <scope>test</scope>
         </dependency>
-
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-test</artifactId>
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>org.rometools</groupId>
             <artifactId>rome-modules</artifactId>
@@ -609,19 +591,44 @@
             <type>jar</type>
         </dependency>
 
+        <!-- JAXB API and implementation (no longer bundled as of Java 11) -->
+        <dependency>
+            <groupId>javax.xml.bind</groupId>
+            <artifactId>jaxb-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.jaxb</groupId>
+            <artifactId>jaxb-runtime</artifactId>
+        </dependency>
+
+        <!-- Apache Axiom -->
         <dependency>
             <groupId>org.apache.ws.commons.axiom</groupId>
             <artifactId>axiom-impl</artifactId>
-            <!-- NOTE: SWORDv2 needs 1.2.14, required by Abdera: https://abdera.apache.org/ -->
-            <version>1.2.14</version>
+            <version>${axiom.version}</version>
+            <exclusions>
+                <!-- Exclude Geronimo as it is NOT necessary when using javax.activation (which we use)
+                     See: https://ws.apache.org/axiom/userguide/ch04.html#d0e732 -->
+                <exclusion>
+                    <groupId>org.apache.geronimo.specs</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
-
         <dependency>
             <groupId>org.apache.ws.commons.axiom</groupId>
             <artifactId>axiom-api</artifactId>
-            <!-- NOTE: SWORDv2 needs 1.2.14, required by Abdera: https://abdera.apache.org/ -->
-            <version>1.2.14</version>
+            <version>${axiom.version}</version>
+            <exclusions>
+                <!-- Exclude Geronimo as it is NOT necessary when using javax.activation (which we use)
+                     See: https://ws.apache.org/axiom/userguide/ch04.html#d0e732 -->
+                <exclusion>
+                    <groupId>org.apache.geronimo.specs</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
+
         <dependency>
             <groupId>org.glassfish.jersey.core</groupId>
             <artifactId>jersey-client</artifactId>
@@ -664,7 +671,7 @@
         <dependency>
             <groupId>org.xmlunit</groupId>
             <artifactId>xmlunit-matchers</artifactId>
-            <version>2.6.2</version>
+            <version>2.6.3</version>
             <scope>test</scope>
         </dependency>
 
@@ -672,6 +679,12 @@
             <groupId>org.hibernate.javax.persistence</groupId>
             <artifactId>hibernate-jpa-2.1-api</artifactId>
             <version>1.0.0.Final</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.bcel</groupId>
+            <artifactId>bcel</artifactId>
+            <version>6.4.0</version>
         </dependency>
 
     </dependencies>

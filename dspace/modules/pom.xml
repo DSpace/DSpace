@@ -51,7 +51,7 @@
             </modules>
         </profile>
         <profile>
-            <id>dspace-server-webapp`</id>
+            <id>dspace-server-webapp</id>
             <activation>
                 <file>
                     <exists>server/pom.xml</exists>
