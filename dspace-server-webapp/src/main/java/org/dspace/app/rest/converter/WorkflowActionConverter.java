@@ -23,6 +23,7 @@ public class WorkflowActionConverter implements DSpaceConverter<WorkflowActionCo
     @Override
     public WorkflowActionRest convert(WorkflowActionConfig modelObject, Projection projection) {
         WorkflowActionRest restModel = new WorkflowActionRest();
+        restModel.setProjection(projection);
         restModel.setId(modelObject.getId());
         restModel.setOptions(modelObject.getOptions());
         return restModel;

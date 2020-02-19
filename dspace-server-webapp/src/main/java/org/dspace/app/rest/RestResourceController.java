@@ -369,7 +369,8 @@ public class RestResourceController implements InitializingBean {
     public ResponseEntity<ResourceSupport> post(HttpServletRequest request,
                                                 @PathVariable String apiCategory,
                                                 @PathVariable String model,
-                                                @RequestParam(required = false) String parent) {
+                                                @RequestParam(required = false) String parent)
+        throws HttpRequestMethodNotSupportedException {
         return postJsonInternal(request, apiCategory, model, parent);
     }
 
@@ -394,7 +395,8 @@ public class RestResourceController implements InitializingBean {
     @RequestMapping(method = RequestMethod.POST, consumes = {"text/uri-list"})
     public ResponseEntity<ResourceSupport> postWithUriListContentType(HttpServletRequest request,
                                                                       @PathVariable String apiCategory,
-                                                                      @PathVariable String model) {
+                                                                      @PathVariable String model)
+        throws HttpRequestMethodNotSupportedException {
         return postUriListInternal(request, apiCategory, model);
     }
 
@@ -410,7 +412,8 @@ public class RestResourceController implements InitializingBean {
      */
     public <ID extends Serializable> ResponseEntity<ResourceSupport> postJsonInternal(HttpServletRequest request,
                                                                                   String apiCategory,
-                                                                                  String model, String parent) {
+                                                                                  String model, String parent)
+        throws HttpRequestMethodNotSupportedException {
         checkModelPluralForm(apiCategory, model);
         DSpaceRestRepository<RestAddressableModel, ID> repository = utils.getResourceRepository(apiCategory, model);
 
@@ -436,10 +439,12 @@ public class RestResourceController implements InitializingBean {
      * @param apiCategory   The apiCategory to be used
      * @param model         The model to be used
      * @return              The relevant ResponseEntity for this request
+     * @throws HttpRequestMethodNotSupportedException   If something goes wrong
      */
     public <ID extends Serializable> ResponseEntity<ResourceSupport> postUriListInternal(HttpServletRequest request,
                                                                                   String apiCategory,
-                                                                                  String model) {
+                                                                                  String model)
+        throws HttpRequestMethodNotSupportedException {
         checkModelPluralForm(apiCategory, model);
         DSpaceRestRepository<RestAddressableModel, ID> repository = utils.getResourceRepository(apiCategory, model);
         RestAddressableModel modelObject = null;
@@ -470,6 +475,7 @@ public class RestResourceController implements InitializingBean {
      * @param model
      * @param id
      * @return
+     * @throws HttpRequestMethodNotSupportedException
      * @throws IOException
      * @throws SQLException
      */
@@ -477,7 +483,7 @@ public class RestResourceController implements InitializingBean {
         "content-type=application/x-www-form-urlencoded")
     public ResponseEntity<ResourceSupport> action(HttpServletRequest request, @PathVariable String apiCategory,
                                                   @PathVariable String model, @PathVariable Integer id)
-        throws SQLException, IOException {
+        throws HttpRequestMethodNotSupportedException, SQLException, IOException {
         checkModelPluralForm(apiCategory, model);
         DSpaceRestRepository<RestAddressableModel, Integer> repository =
             utils.getResourceRepository(apiCategory, model);
@@ -514,6 +520,7 @@ public class RestResourceController implements InitializingBean {
      * @param uploadfile
      *            the file to upload
      * @return the created resource
+     * @throws HttpRequestMethodNotSupportedException
      */
     @RequestMapping(method = RequestMethod.POST, value = REGEX_REQUESTMAPPING_IDENTIFIER_AS_DIGIT, headers =
         "content-type=multipart/form-data")
@@ -522,7 +529,8 @@ public class RestResourceController implements InitializingBean {
                                                                             @PathVariable String model,
                                                                             @PathVariable Integer id,
                                                                             @RequestParam("file") MultipartFile
-                                                                                uploadfile) {
+                                                                                uploadfile)
+        throws HttpRequestMethodNotSupportedException {
         return uploadInternal(request, apiCategory, model, id, uploadfile);
     }
 
@@ -542,6 +550,7 @@ public class RestResourceController implements InitializingBean {
      * @param uploadfile
      *            the file to upload
      * @return the created resource
+     * @throws HttpRequestMethodNotSupportedException
      */
     @RequestMapping(method = RequestMethod.POST, value = REGEX_REQUESTMAPPING_IDENTIFIER_AS_UUID, headers =
         "content-type=multipart/form-data")
@@ -550,7 +559,8 @@ public class RestResourceController implements InitializingBean {
                                                                             @PathVariable String model,
                                                                             @PathVariable UUID uuid,
                                                                             @RequestParam("file") MultipartFile
-                                                                                uploadfile) {
+                                                                                uploadfile)
+        throws HttpRequestMethodNotSupportedException {
         return uploadInternal(request, apiCategory, model, uuid, uploadfile);
     }
 
@@ -632,11 +642,13 @@ public class RestResourceController implements InitializingBean {
      * @param id
      * @param jsonNode
      * @return
+     * @throws HttpRequestMethodNotSupportedException
      */
     @RequestMapping(method = RequestMethod.PATCH, value = REGEX_REQUESTMAPPING_IDENTIFIER_AS_DIGIT)
     public ResponseEntity<ResourceSupport> patch(HttpServletRequest request, @PathVariable String apiCategory,
                                                  @PathVariable String model, @PathVariable Integer id,
-                                                 @RequestBody(required = true) JsonNode jsonNode) {
+                                                 @RequestBody(required = true) JsonNode jsonNode)
+        throws HttpRequestMethodNotSupportedException {
         return patchInternal(request, apiCategory, model, id, jsonNode);
     }
 
@@ -652,12 +664,14 @@ public class RestResourceController implements InitializingBean {
      * @param id
      * @param jsonNode
      * @return
+     * @throws HttpRequestMethodNotSupportedException
      */
     @RequestMapping(method = RequestMethod.PATCH, value = REGEX_REQUESTMAPPING_IDENTIFIER_AS_UUID)
     public ResponseEntity<ResourceSupport> patch(HttpServletRequest request, @PathVariable String apiCategory,
                                                  @PathVariable String model,
                                                  @PathVariable(name = "uuid") UUID id,
-                                                 @RequestBody(required = true) JsonNode jsonNode) {
+                                                 @RequestBody(required = true) JsonNode jsonNode)
+        throws HttpRequestMethodNotSupportedException {
         return patchInternal(request, apiCategory, model, id, jsonNode);
     }
 
@@ -670,11 +684,13 @@ public class RestResourceController implements InitializingBean {
      * @param id
      * @param jsonNode
      * @return
+     * @throws HttpRequestMethodNotSupportedException
      */
     public <ID extends Serializable> ResponseEntity<ResourceSupport> patchInternal(HttpServletRequest request,
                                                                                    String apiCategory,
                                                                                    String model, ID id,
-                                                                                   JsonNode jsonNode) {
+                                                                                   JsonNode jsonNode)
+        throws HttpRequestMethodNotSupportedException {
         checkModelPluralForm(apiCategory, model);
         DSpaceRestRepository<RestAddressableModel, ID> repository = utils.getResourceRepository(apiCategory, model);
         RestAddressableModel modelObject = null;
@@ -953,7 +969,7 @@ public class RestResourceController implements InitializingBean {
                                                                                  PagedResourcesAssembler assembler,
                                                                                  @RequestParam MultiValueMap<String,
                                                                                      Object> parameters)
-        throws IllegalArgumentException {
+        throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
 
         Link link = linkTo(this.getClass(), apiCategory, model).slash("search").slash(searchMethodName).withSelfRel();
         DSpaceRestRepository repository = utils.getResourceRepository(apiCategory, model);
@@ -1148,9 +1164,10 @@ public class RestResourceController implements InitializingBean {
      * @param model         The model to be used
      * @param id            The ID for the resource to be altered by the PUT
      * @return              The relevant DSpaceResource for this request
+     * @throws IOException  If something goes wrong
      */
     private <ID extends Serializable> DSpaceResource<RestAddressableModel> putOneUriListInternal(
-        HttpServletRequest request, String apiCategory, String model, ID id) {
+        HttpServletRequest request, String apiCategory, String model, ID id) throws IOException {
         checkModelPluralForm(apiCategory, model);
         DSpaceRestRepository<RestAddressableModel, ID> repository = utils.getResourceRepository(apiCategory, model);
         RestAddressableModel modelObject = null;

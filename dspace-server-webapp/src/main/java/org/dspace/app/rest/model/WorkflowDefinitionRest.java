@@ -11,7 +11,6 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.dspace.app.rest.RestResourceController;
-import org.dspace.xmlworkflow.state.Step;
 
 /**
  * The rest resource used for workflow definitions
@@ -21,10 +20,7 @@ import org.dspace.xmlworkflow.state.Step;
 @LinksRest(links = {
     @LinkRest(
         name = WorkflowDefinitionRest.COLLECTIONS_MAPPED_TO,
-        linkClass = CollectionRest.class,
-        method = "getCollections",
-        embedOptional = true,
-        linkOptional = true
+        method = "getCollections"
     )
 })
 public class WorkflowDefinitionRest extends BaseObjectRest<String> {
@@ -75,7 +71,7 @@ public class WorkflowDefinitionRest extends BaseObjectRest<String> {
         this.isDefault = isDefault;
     }
 
-    @LinkRest(linkClass = Step.class, embedOptional = true)
+    @LinkRest
     @JsonIgnore
     public List<WorkflowStepRest> getSteps() {
         return steps;
