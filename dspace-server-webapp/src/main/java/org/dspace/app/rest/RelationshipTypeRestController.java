@@ -81,7 +81,7 @@ public class RelationshipTypeRestController {
         List<RelationshipType> list = relationshipTypeService.findByEntityType(context, entityType, -1, -1);
 
         Page<RelationshipTypeRest> relationshipTypeRestPage = converter
-            .toRestPage(list, pageable, list.size(), utils.obtainProjection(true));
+            .toRestPage(list, pageable, list.size(), utils.obtainProjection());
 
         Page<RelationshipTypeResource> relationshipTypeResources = relationshipTypeRestPage
             .map(relationshipTypeRest -> new RelationshipTypeResource(relationshipTypeRest, utils));

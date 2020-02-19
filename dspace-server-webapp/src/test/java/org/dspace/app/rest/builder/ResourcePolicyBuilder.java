@@ -7,7 +7,10 @@
  */
 package org.dspace.app.rest.builder;
 
+import java.io.IOException;
+
 import java.sql.SQLException;
+import java.util.Date;
 
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
@@ -17,6 +20,7 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
 import org.dspace.discovery.SearchServiceException;
 import org.dspace.eperson.EPerson;
+import org.dspace.eperson.Group;
 
 public class ResourcePolicyBuilder extends AbstractBuilder<ResourcePolicy, ResourcePolicyService> {
 
@@ -71,6 +75,22 @@ public class ResourcePolicyBuilder extends AbstractBuilder<ResourcePolicy, Resou
         indexingService.commit();
     }
 
+    public static void delete(Integer id)
+            throws SQLException, IOException, SearchServiceException {
+        try (Context c = new Context()) {
+            c.turnOffAuthorisationSystem();
+            ResourcePolicy rp = resourcePolicyService.find(c, id);
+            if (rp != null) {
+                try {
+                    resourcePolicyService.delete(c, rp);
+                } catch (AuthorizeException e) {
+                    throw new RuntimeException(e.getMessage(), e);
+                }
+            }
+            c.complete();
+        }
+        indexingService.commit();
+    }
 
     public static ResourcePolicyBuilder createResourcePolicy(Context context)
             throws SQLException, AuthorizeException {
@@ -91,13 +111,44 @@ public class ResourcePolicyBuilder extends AbstractBuilder<ResourcePolicy, Resou
         resourcePolicy.setEPerson(ePerson);
         return this;
     }
+
+    public ResourcePolicyBuilder withGroup(Group epersonGroup) throws SQLException {
+        resourcePolicy.setGroup(epersonGroup);
+        return this;
+    }
+
     public ResourcePolicyBuilder withAction(int action) throws SQLException {
         resourcePolicy.setAction(action);
         return this;
     }
+
     public ResourcePolicyBuilder withDspaceObject(DSpaceObject dspaceObject) throws SQLException {
         resourcePolicy.setdSpaceObject(dspaceObject);
         return this;
     }
 
+    public ResourcePolicyBuilder withPolicyType(String policyType) {
+        resourcePolicy.setRpType(policyType);
+        return this;
+    }
+
+    public ResourcePolicyBuilder withStartDate(Date data) throws SQLException {
+        resourcePolicy.setStartDate(data);
+        return this;
+    }
+
+    public ResourcePolicyBuilder withEndDate(Date data) throws SQLException {
+        resourcePolicy.setEndDate(data);
+        return this;
+    }
+
+    public ResourcePolicyBuilder withDescription(String description) throws SQLException {
+        resourcePolicy.setRpDescription(description);
+        return this;
+    }
+
+    public ResourcePolicyBuilder withName(String name) throws SQLException {
+        resourcePolicy.setRpName(name);
+        return this;
+    }
 }

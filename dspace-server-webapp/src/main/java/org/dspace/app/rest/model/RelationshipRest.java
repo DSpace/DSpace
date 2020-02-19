@@ -56,7 +56,7 @@ public class RelationshipRest extends BaseObjectRest<Integer> {
         this.leftId = leftId;
     }
 
-    @LinkRest(linkClass = RelationshipTypeRest.class)
+    @LinkRest
     @JsonIgnore
     public RelationshipTypeRest getRelationshipType() {
         return relationshipType;

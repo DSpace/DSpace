@@ -6,7 +6,7 @@ services:
     container_name: dspace-cli
     build:
       context: .
-      dockerfile: Dockerfile.cli.jdk8
+      dockerfile: Dockerfile.cli
     #environment:
     volumes:
     - ./dspace/src/main/docker-compose/local.cfg:/dspace/config/local.cfg

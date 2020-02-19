@@ -67,6 +67,7 @@ import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.PagedResources;
+import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.ResourceSupport;
 import org.springframework.hateoas.Resources;
 import org.springframework.hateoas.UriTemplate;
@@ -776,7 +777,16 @@ public class RestResourceController implements InitializingBean {
             try {
                 if (Page.class.isAssignableFrom(linkMethod.getReturnType())) {
                     Page<? extends RestModel> pageResult = (Page<? extends RestAddressableModel>) linkMethod
-                            .invoke(linkRepository, request, uuid, page, utils.obtainProjection(true));
+                            .invoke(linkRepository, request, uuid, page, utils.obtainProjection());
+
+                    if (pageResult == null) {
+                        // Link repositories may throw an exception or return an empty page,
+                        // but must never return null for a paged subresource.
+                        log.error("Paged subresource link repository " + linkRepository.getClass()
+                                + " incorrectly returned null for request with id " + uuid);
+                        response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                        return null;
+                    }
 
                     Link link = null;
                     String querystring = request.getQueryString();
@@ -787,19 +797,30 @@ public class RestResourceController implements InitializingBean {
                         link = linkTo(this.getClass(), apiCategory, model).slash(uuid).slash(subpath).withSelfRel();
                     }
 
-                    Page<HALResource> halResources = pageResult.map(object -> converter.toResource(object));
-                    return assembler.toResource(halResources, link);
+                    return new Resource(new EmbeddedPage(link.getHref(),
+                            pageResult.map(converter::toResource), null, subpath));
                 } else {
                     RestModel object = (RestModel) linkMethod.invoke(linkRepository, request, uuid, page,
                             utils.obtainProjection());
-                    Link link = linkTo(this.getClass(), apiCategory, model).slash(uuid).slash(subpath)
-                            .withSelfRel();
-                    HALResource tmpresult = converter.toResource(object);
-                    tmpresult.add(link);
-                    return tmpresult;
+                    if (object == null) {
+                        response.setStatus(HttpServletResponse.SC_NO_CONTENT);
+                        return null;
+                    } else {
+                        Link link = linkTo(this.getClass(), apiCategory, model).slash(uuid).slash(subpath)
+                                .withSelfRel();
+                        HALResource tmpresult = converter.toResource(object);
+                        tmpresult.add(link);
+                        return tmpresult;
+                    }
                 }
-            } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-                throw new RuntimeException(e.getMessage(), e);
+            } catch (InvocationTargetException e) {
+                if (e.getTargetException() instanceof RuntimeException) {
+                    throw (RuntimeException) e.getTargetException();
+                } else {
+                    throw new RuntimeException(e);
+                }
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException(e);
             }
         }
         RestAddressableModel modelObject = repository.findById(uuid).orElse(null);
@@ -1019,12 +1040,12 @@ public class RestResourceController implements InitializingBean {
     /**
      * Execute a PUT request for an entity with id of type UUID;
      *
-     * curl -X PUT http://<dspace.baseUrl>/api/{apiCategory}/{model}/{uuid}
+     * curl -X PUT http://<dspace.server.url>/api/{apiCategory}/{model}/{uuid}
      *
      * Example:
      * <pre>
      * {@code
-     *      curl -X PUT http://<dspace.baseUrl>/api/core/collection/8b632938-77c2-487c-81f0-e804f63e68e6
+     *      curl -X PUT http://<dspace.server.url>/api/core/collection/8b632938-77c2-487c-81f0-e804f63e68e6
      * }
      * </pre>
      *
