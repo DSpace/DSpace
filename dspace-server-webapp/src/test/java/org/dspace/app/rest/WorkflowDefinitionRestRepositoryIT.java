@@ -239,7 +239,7 @@ public class WorkflowDefinitionRestRepositoryIT extends AbstractControllerIntegr
         //When we call this facets endpoint
         getClient(token).perform(get(WORKFLOW_DEFINITIONS_ENDPOINT + "/search/findByCollection?uuid=" + nonValidUUID))
             //We expect a 422 Unprocessable Entity status
-            .andExpect(status().is(422));
+            .andExpect(status().isUnprocessableEntity());
     }
 
     @Test
@@ -388,7 +388,8 @@ public class WorkflowDefinitionRestRepositoryIT extends AbstractControllerIntegr
 
         //When we call this facets endpoint
         getClient(token).perform(get(WORKFLOW_DEFINITIONS_ENDPOINT + "/" + workflowName + "/collections"))
-            .andExpect(status().isInternalServerError());
+            //We expect a 404 Not Found
+            .andExpect(status().isNotFound());
     }
 
     @Test
@@ -399,7 +400,8 @@ public class WorkflowDefinitionRestRepositoryIT extends AbstractControllerIntegr
         //When we call this facets endpoint
         getClient(token).perform(get(WORKFLOW_DEFINITIONS_ENDPOINT + "/" + defaultWorkflow.getID()
             + "/collections"))
-            .andExpect(status().isInternalServerError());
+            //We expect a 403 Forbidden status
+            .andExpect(status().isForbidden());
     }
 
     @Test
@@ -410,7 +412,8 @@ public class WorkflowDefinitionRestRepositoryIT extends AbstractControllerIntegr
         //When we call this facets endpoint
         getClient().perform(get(WORKFLOW_DEFINITIONS_ENDPOINT + "/" + defaultWorkflow.getID()
             + "/collections"))
-            .andExpect(status().isInternalServerError());
+            //We expect a 401 Unauthorized
+            .andExpect(status().isUnauthorized());
     }
 
     @Test
@@ -420,7 +423,8 @@ public class WorkflowDefinitionRestRepositoryIT extends AbstractControllerIntegr
 
         //When we call this facets endpoint
         getClient(token).perform(get(WORKFLOW_DEFINITIONS_ENDPOINT + "/" + defaultWorkflow.getID()
-            + "/steps"))
+            + "/steps")
+            .param("projection", "full"))
             //We expect a 200 OK status
             .andExpect(status().isOk())
             //Number of total workflows is equals to number of non-mapped collections

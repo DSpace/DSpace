@@ -35,7 +35,7 @@ public class WorkflowActionRestRepository extends DSpaceRestRepository<WorkflowA
     public WorkflowActionRest findOne(Context context, String workflowActionName) {
         WorkflowActionConfig actionConfig = this.xmlWorkflowFactory.getActionByName(workflowActionName);
         if (actionConfig != null) {
-            return converter.toRest(actionConfig, utils.obtainProjection(true));
+            return converter.toRest(actionConfig, utils.obtainProjection());
         } else {
             throw new ResourceNotFoundException("No workflow action with name " + workflowActionName
                     + " is configured");

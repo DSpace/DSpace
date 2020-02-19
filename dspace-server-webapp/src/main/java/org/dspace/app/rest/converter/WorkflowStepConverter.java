@@ -30,6 +30,7 @@ public class WorkflowStepConverter implements DSpaceConverter<Step, WorkflowStep
     @Override
     public WorkflowStepRest convert(Step modelObject, Projection projection) {
         WorkflowStepRest restModel = new WorkflowStepRest();
+        restModel.setProjection(projection);
         restModel.setId(modelObject.getId());
         restModel.setWorkflowactions(modelObject.getActions().stream()
             .map(x -> (WorkflowActionRest) converter.toRest(x, projection))
