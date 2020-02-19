@@ -140,8 +140,8 @@ public class PersonAuthorityValue extends AuthorityValue {
     @Override
     public void setValues(SolrDocument document) {
         super.setValues(document);
-        this.firstName = Objects.toString(document.getFieldValue("first_name"));
-        this.lastName = Objects.toString(document.getFieldValue("last_name"));
+        this.firstName = Objects.toString(document.getFieldValue("first_name"), "");
+        this.lastName = Objects.toString(document.getFieldValue("last_name"), "");
         nameVariants = new ArrayList<String>();
         Collection<Object> document_name_variant = document.getFieldValues("name_variant");
         if (document_name_variant != null) {
