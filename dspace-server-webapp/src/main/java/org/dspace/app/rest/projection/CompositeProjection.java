@@ -62,7 +62,8 @@ public class CompositeProjection implements Projection {
     }
 
     @Override
-    public boolean allowEmbedding(HALResource<? extends RestAddressableModel> halResource, LinkRest linkRest, Link... oldLinks) {
+    public boolean allowEmbedding(HALResource<? extends RestAddressableModel> halResource, LinkRest linkRest,
+                                  Link... oldLinks) {
         for (Projection projection : projections) {
             if (projection.allowEmbedding(halResource, linkRest, oldLinks)) {
                 return true;

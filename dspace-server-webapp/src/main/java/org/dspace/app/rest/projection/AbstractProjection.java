@@ -36,7 +36,8 @@ public abstract class AbstractProjection implements Projection {
     }
 
     @Override
-    public boolean allowEmbedding(HALResource<? extends RestAddressableModel> halResource, LinkRest linkRest, Link... oldLinks) {
+    public boolean allowEmbedding(HALResource<? extends RestAddressableModel> halResource, LinkRest linkRest,
+                                  Link... oldLinks) {
         return false;
     }
 
