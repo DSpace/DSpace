@@ -755,19 +755,8 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
 
         List<MetadataValue> list = getMetadata(dso, schema, element, qualifier);
 
-        clearMetadata(context, dso, schema, element, qualifier, Item.ANY);
-
-        int idx = 0;
-        for (MetadataValue rr : list) {
-            if (idx == index) {
-                addMetadata(context, dso, schema, element, qualifier,
-                            lang, value, authority, confidence);
-            } else {
-                addMetadata(context, dso, schema, element, qualifier,
-                            rr.getLanguage(), rr.getValue(), rr.getAuthority(), rr.getConfidence());
-            }
-            idx++;
-        }
+        removeMetadataValues(context, dso, Arrays.asList(list.get(index)));
+        addAndShiftRightMetadata(context, dso, schema, element, qualifier, lang, value, authority, confidence, index);
     }
 
 }
