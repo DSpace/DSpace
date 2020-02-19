@@ -75,7 +75,8 @@ public class WorkflowStepRestRepositoryIT extends AbstractControllerIntegrationT
         String nameStep = "reviewstep";
         Step existentStep = xmlWorkflowFactory.getStepByName(nameStep);
         //When we call this facets endpoint
-        getClient(token).perform(get(WORKFLOW_ACTIONS_ENDPOINT + "/" + nameStep))
+        getClient(token).perform(get(WORKFLOW_ACTIONS_ENDPOINT + "/" + nameStep)
+            .param("projection", "full"))
             //We expect a 200 is ok status
             .andExpect(status().isOk())
             //Matches expected step

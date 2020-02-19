@@ -11,7 +11,6 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.dspace.app.rest.RestResourceController;
-import org.dspace.xmlworkflow.state.actions.WorkflowActionConfig;
 
 /**
  * The rest resource used for workflow steps
@@ -41,7 +40,7 @@ public class WorkflowStepRest extends BaseObjectRest {
         return NAME;
     }
 
-    @LinkRest(linkClass = WorkflowActionConfig.class)
+    @LinkRest
     @JsonIgnore
     public List<WorkflowActionRest> getWorkflowactions() {
         return workflowactions;

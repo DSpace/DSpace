@@ -46,8 +46,7 @@ public class WorkflowDefinitionRestRepository extends DSpaceRestRepository<Workf
     public WorkflowDefinitionRest findOne(Context context, String workflowName) {
         if (xmlWorkflowFactory.workflowByThisNameExists(workflowName)) {
             try {
-                return converter.toRest(xmlWorkflowFactory.getWorkflowByName(workflowName),
-                    utils.obtainProjection(true));
+                return converter.toRest(xmlWorkflowFactory.getWorkflowByName(workflowName), utils.obtainProjection());
             } catch (WorkflowConfigurationException e) {
                 // Should never occur, since xmlWorkflowFactory.getWorkflowByName only throws a
                 //      WorkflowConfigurationException if no workflow by that name is configured (tested earlier)
@@ -62,7 +61,7 @@ public class WorkflowDefinitionRestRepository extends DSpaceRestRepository<Workf
     @PreAuthorize("hasAuthority('AUTHENTICATED')")
     public Page<WorkflowDefinitionRest> findAll(Context context, Pageable pageable) {
         List<Workflow> workflows = xmlWorkflowFactory.getAllConfiguredWorkflows();
-        return converter.toRestPage(utils.getPage(workflows, pageable), utils.obtainProjection(true));
+        return converter.toRestPage(utils.getPage(workflows, pageable), utils.obtainProjection());
     }
 
     /**
