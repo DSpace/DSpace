@@ -278,7 +278,7 @@ public class ContextTest extends AbstractUnitTest {
         when(authorizeServiceSpy.isAdmin(instance)).thenReturn(true);
 
         // Create a new EPerson (to be committed)
-        String createdEmail = "myfakeemail@gmail.com";
+        String createdEmail = "myfakeemail@example.com";
         EPerson newUser = ePersonService.create(instance);
         newUser.setFirstName(instance, "Tim");
         newUser.setLastName(instance, "Smith");
@@ -302,7 +302,7 @@ public class ContextTest extends AbstractUnitTest {
         assertEquals("New user should be created", newUser.getEmail(), createdEmail);
 
         // Change the email and commit again (a Context should support multiple commit() calls)
-        String newEmail = "myrealemail@gmail.com";
+        String newEmail = "myrealemail@example.com";
         newUser.setEmail(newEmail);
         instance.commit();
 
