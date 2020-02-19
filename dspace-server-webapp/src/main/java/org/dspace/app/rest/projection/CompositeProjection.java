@@ -13,6 +13,7 @@ import org.dspace.app.rest.model.LinkRest;
 import org.dspace.app.rest.model.RestAddressableModel;
 import org.dspace.app.rest.model.RestModel;
 import org.dspace.app.rest.model.hateoas.HALResource;
+import org.springframework.hateoas.Link;
 
 /**
  * A projection that combines the behavior of multiple projections.
@@ -61,9 +62,9 @@ public class CompositeProjection implements Projection {
     }
 
     @Override
-    public boolean allowEmbedding(HALResource<? extends RestAddressableModel> halResource, LinkRest linkRest) {
+    public boolean allowEmbedding(HALResource<? extends RestAddressableModel> halResource, LinkRest linkRest, Link... oldLinks) {
         for (Projection projection : projections) {
-            if (projection.allowEmbedding(halResource, linkRest)) {
+            if (projection.allowEmbedding(halResource, linkRest, oldLinks)) {
                 return true;
             }
         }
