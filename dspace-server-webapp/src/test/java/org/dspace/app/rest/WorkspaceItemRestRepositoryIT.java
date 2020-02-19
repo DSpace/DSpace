@@ -427,7 +427,8 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
 
         String authToken = getAuthToken(eperson.getEmail(), password);
 
-        getClient(authToken).perform(get("/api/submission/workspaceitems/" + witem.getID() + "/collection"))
+        getClient(authToken).perform(get("/api/submission/workspaceitems/" + witem.getID() + "/collection")
+                .param("projection", "full"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", Matchers
                         .is(CollectionMatcher.matchCollectionEntry(col1.getName(), col1.getID(), col1.getHandle()))
