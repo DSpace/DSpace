@@ -10,6 +10,7 @@ package org.dspace.app.rest.projection;
 import java.util.List;
 
 import org.dspace.app.rest.model.LinkRest;
+import org.dspace.app.rest.model.RestAddressableModel;
 import org.dspace.app.rest.model.RestModel;
 import org.dspace.app.rest.model.hateoas.HALResource;
 
@@ -60,7 +61,7 @@ public class CompositeProjection implements Projection {
     }
 
     @Override
-    public boolean allowEmbedding(HALResource halResource, LinkRest linkRest) {
+    public boolean allowEmbedding(HALResource<? extends RestAddressableModel> halResource, LinkRest linkRest) {
         for (Projection projection : projections) {
             if (projection.allowEmbedding(halResource, linkRest)) {
                 return true;

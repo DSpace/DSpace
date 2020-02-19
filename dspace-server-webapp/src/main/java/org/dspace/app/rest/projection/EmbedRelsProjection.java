@@ -10,6 +10,7 @@ package org.dspace.app.rest.projection;
 import java.util.Set;
 
 import org.dspace.app.rest.model.LinkRest;
+import org.dspace.app.rest.model.RestAddressableModel;
 import org.dspace.app.rest.model.hateoas.HALResource;
 
 /**
@@ -31,7 +32,9 @@ public class EmbedRelsProjection extends AbstractProjection {
     }
 
     @Override
-    public boolean allowEmbedding(HALResource halResource, LinkRest linkRest) {
-        return embedRels.contains(linkRest.name());
+    public boolean allowEmbedding(HALResource<? extends RestAddressableModel> halResource, LinkRest linkRest) {
+        if (halResource.getContent().getEmbedLevel() == 0)
+            return embedRels.contains(linkRest.name());
+        return false;
     }
 }
