@@ -21,6 +21,10 @@ import org.dspace.app.rest.RestResourceController;
         @LinkRest(
                 name = GroupRest.GROUPS,
                 method = "getGroups"
+        ),
+        @LinkRest(
+                name = GroupRest.EPERSONS,
+                method = "getMembers"
         )
 })
 public class GroupRest extends DSpaceObjectRest {
@@ -28,6 +32,7 @@ public class GroupRest extends DSpaceObjectRest {
     public static final String CATEGORY = RestAddressableModel.EPERSON;
 
     public static final String GROUPS = "groups";
+    public static final String EPERSONS = "epersons";
 
     private String name;
 

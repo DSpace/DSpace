@@ -296,62 +296,11 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
         getClient(authToken).perform(get("/api/eperson/epersons/search"))
         .andExpect(status().isOk())
         .andExpect(content().contentType(contentType))
-        .andExpect(jsonPath("$._links.byEmail", Matchers.notNullValue()))
-        .andExpect(jsonPath("$._links.byName", Matchers.notNullValue()));
+        .andExpect(jsonPath("$._links.byMetadata", Matchers.notNullValue()));
     }
 
     @Test
-    public void findByEmail() throws Exception {
-        context.turnOffAuthorisationSystem();
-
-        EPerson ePerson = EPersonBuilder.createEPerson(context)
-                                        .withNameInMetadata("John", "Doe")
-                                        .withEmail("Johndoe@fake-email.com")
-                                        .build();
-
-        // create a second eperson to put the previous one in a no special position (is not the first as we have default
-        // epersons is not the latest created)
-        EPerson ePerson2 = EPersonBuilder.createEPerson(context)
-                                         .withNameInMetadata("Jane", "Smith")
-                                         .withEmail("janesmith@fake-email.com")
-                                         .build();
-
-        String authToken = getAuthToken(admin.getEmail(), password);
-        getClient(authToken).perform(get("/api/eperson/epersons/search/byEmail")
-                    .param("email", ePerson.getEmail()))
-                    .andExpect(status().isOk())
-                    .andExpect(content().contentType(contentType))
-                    .andExpect(jsonPath("$", is(
-                        EPersonMatcher.matchEPersonEntry(ePerson)
-                    )));
-
-        // it must be case-insensitive
-        getClient(authToken).perform(get("/api/eperson/epersons/search/byEmail")
-                .param("email", ePerson.getEmail().toUpperCase()))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(contentType))
-                .andExpect(jsonPath("$", is(
-                    EPersonMatcher.matchEPersonEntry(ePerson)
-                )));
-    }
-
-    @Test
-    public void findByEmailUndefined() throws Exception {
-        String authToken = getAuthToken(admin.getEmail(), password);
-        getClient(authToken).perform(get("/api/eperson/epersons/search/byEmail")
-                .param("email", "undefined@undefined.com"))
-                .andExpect(status().isNoContent());
-    }
-
-    @Test
-    public void findByEmailUnprocessable() throws Exception {
-        String authToken = getAuthToken(admin.getEmail(), password);
-        getClient(authToken).perform(get("/api/eperson/epersons/search/byEmail"))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    public void findByName() throws Exception {
+    public void findByMetadata() throws Exception {
         context.turnOffAuthorisationSystem();
         EPerson ePerson = EPersonBuilder.createEPerson(context)
                                         .withNameInMetadata("John", "Doe")
@@ -379,8 +328,8 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                 .build();
 
         String authToken = getAuthToken(admin.getEmail(), password);
-        getClient(authToken).perform(get("/api/eperson/epersons/search/byName")
-                    .param("q", ePerson.getLastName()))
+        getClient(authToken).perform(get("/api/eperson/epersons/search/byMetadata")
+                    .param("query", ePerson.getLastName()))
                     .andExpect(status().isOk())
                     .andExpect(content().contentType(contentType))
                     .andExpect(jsonPath("$._embedded.epersons", Matchers.containsInAnyOrder(
@@ -392,8 +341,8 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                     .andExpect(jsonPath("$.page.totalElements", is(4)));
 
         // it must be case insensitive
-        getClient(authToken).perform(get("/api/eperson/epersons/search/byName")
-                .param("q", ePerson.getLastName().toLowerCase()))
+        getClient(authToken).perform(get("/api/eperson/epersons/search/byMetadata")
+                .param("query", ePerson.getLastName().toLowerCase()))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
                 .andExpect(jsonPath("$._embedded.epersons", Matchers.containsInAnyOrder(
@@ -406,20 +355,35 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
     }
 
     @Test
-    public void findByNameUndefined() throws Exception {
+    public void findByMetadataUnauthorized() throws Exception {
+        getClient().perform(get("/api/eperson/epersons/search/byMetadata")
+                                             .param("query", "Doe, John"))
+                            .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    public void findByMetadataForbidden() throws Exception {
+        String authToken = getAuthToken(eperson.getEmail(), password);
+        getClient(authToken).perform(get("/api/eperson/epersons/search/byMetadata")
+                                             .param("query", "Doe, John"))
+                            .andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void findByMetadataUndefined() throws Exception {
         String authToken = getAuthToken(admin.getEmail(), password);
-        getClient(authToken).perform(get("/api/eperson/epersons/search/byName")
-                .param("q", "Doe, John"))
+        getClient(authToken).perform(get("/api/eperson/epersons/search/byMetadata")
+                .param("query", "Doe, John"))
         .andExpect(status().isOk())
         .andExpect(content().contentType(contentType))
         .andExpect(jsonPath("$.page.totalElements", is(0)));
     }
 
     @Test
-    public void findByNameUnprocessable() throws Exception {
+    public void findByMetadataUnprocessable() throws Exception {
         String authToken = getAuthToken(admin.getEmail(), password);
-        getClient(authToken).perform(get("/api/eperson/epersons/search/byName"))
-                .andExpect(status().isBadRequest());
+        getClient(authToken).perform(get("/api/eperson/epersons/search/byMetadata"))
+                .andExpect(status().isUnprocessableEntity());
     }
 
     @Test
