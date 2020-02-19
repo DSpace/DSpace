@@ -121,50 +121,29 @@ public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, E
     }
 
     /**
-     * Find the epersons matching the query q parameter. The search is delegated to the
+     * Find the epersons matching the query parameter. The search is delegated to the
      * {@link EPersonService#search(Context, String, int, int)} method
      *
-     * @param q
+     * @param query
      *            is the *required* query string
      * @param pageable
      *            contains the pagination information
      * @return a Page of EPersonRest instances matching the user query
      */
-    @SearchRestMethod(name = "byName")
-    public Page<EPersonRest> findByName(@Parameter(value = "q", required = true) String q,
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @SearchRestMethod(name = "byMetadata")
+    public Page<EPersonRest> findByMetadata(@Parameter(value = "query", required = true) String query,
             Pageable pageable) {
+
         try {
             Context context = obtainContext();
-            long total = es.searchResultCount(context, q);
-            List<EPerson> epersons = es.search(context, q, Math.toIntExact(pageable.getOffset()),
-                    Math.toIntExact(pageable.getOffset() + pageable.getPageSize()));
+            long total = es.searchResultCount(context, query);
+            List<EPerson> epersons = es.search(context, query, Math.toIntExact(pageable.getOffset()),
+                                               Math.toIntExact(pageable.getOffset() + pageable.getPageSize()));
             return converter.toRestPage(epersons, pageable, total, utils.obtainProjection());
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-    }
-
-    /**
-     * Find the eperson with the provided email address if any. The search is delegated to the
-     * {@link EPersonService#findByEmail(Context, String)} method
-     *
-     * @param email
-     *            is the *required* email address
-     * @return a Page of EPersonRest instances matching the user query
-     */
-    @SearchRestMethod(name = "byEmail")
-    public EPersonRest findByEmail(@Parameter(value = "email", required = true) String email) {
-        EPerson eperson = null;
-        try {
-            Context context = obtainContext();
-            eperson = es.findByEmail(context, email);
-        } catch (SQLException e) {
-            throw new RuntimeException(e.getMessage(), e);
-        }
-        if (eperson == null) {
-            return null;
-        }
-        return converter.toRest(eperson, utils.obtainProjection());
     }
 
     @Override

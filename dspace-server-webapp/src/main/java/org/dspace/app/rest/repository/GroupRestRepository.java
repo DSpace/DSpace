@@ -14,6 +14,8 @@ import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.dspace.app.rest.Parameter;
+import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.converter.MetadataConverter;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
@@ -99,7 +101,7 @@ public class GroupRestRepository extends DSpaceObjectRestRepository<Group, Group
         try {
             long total = gs.countTotal(context);
             List<Group> groups = gs.findAll(context, null, pageable.getPageSize(),
-                    Math.toIntExact(pageable.getOffset()));
+                                            Math.toIntExact(pageable.getOffset()));
             return converter.toRestPage(groups, pageable, total, utils.obtainProjection());
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
@@ -111,6 +113,31 @@ public class GroupRestRepository extends DSpaceObjectRestRepository<Group, Group
     protected void patch(Context context, HttpServletRequest request, String apiCategory, String model, UUID id,
                          Patch patch) throws AuthorizeException, SQLException {
         patchDSpaceObject(apiCategory, model, id, patch);
+    }
+
+
+    /**
+     * Find the groups matching the query parameter. The search is delegated to the
+     * {@link GroupService#search(Context, String, int, int)} method
+     *
+     * @param query    is the *required* query string
+     * @param pageable contains the pagination information
+     * @return a Page of GroupRest instances matching the user query
+     */
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @SearchRestMethod(name = "byMetadata")
+    public Page<GroupRest> findByMetadata(@Parameter(value = "query", required = true) String query,
+                                          Pageable pageable) {
+
+        try {
+            Context context = obtainContext();
+            long total = gs.searchResultCount(context, query);
+            List<Group> groups = gs.search(context, query, Math.toIntExact(pageable.getOffset()),
+                                           Math.toIntExact(pageable.getOffset() + pageable.getPageSize()));
+            return converter.toRestPage(groups, pageable, total, utils.obtainProjection());
+        } catch (SQLException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
     }
 
     @Override
