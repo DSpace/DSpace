@@ -7,7 +7,7 @@
  */
 package org.dspace.core;
 
-import static com.sun.org.apache.bcel.internal.Constants.ACC_PUBLIC;
+import static org.apache.bcel.Const.ACC_PUBLIC;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
@@ -16,7 +16,7 @@ import java.io.IOException;
 import java.util.jar.JarEntry;
 import java.util.jar.JarOutputStream;
 
-import com.sun.org.apache.bcel.internal.generic.ClassGen;
+import org.apache.bcel.generic.ClassGen;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;

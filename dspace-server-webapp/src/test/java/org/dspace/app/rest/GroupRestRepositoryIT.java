@@ -22,6 +22,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.dspace.app.rest.builder.GroupBuilder;
 import org.dspace.app.rest.matcher.GroupMatcher;
+import org.dspace.app.rest.matcher.HalMatcher;
 import org.dspace.app.rest.model.GroupRest;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.app.rest.test.MetadataPatchSuite;
@@ -163,23 +164,32 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         String token = getAuthToken(admin.getEmail(), password);
 
+        // When full projection is requested, response should include expected properties, links, and embeds.
         String generatedGroupId = group.getID().toString();
         String groupIdCall = "/api/eperson/groups/" + generatedGroupId;
-        getClient(token).perform(get(groupIdCall))
-                   //The status has to be 200 OK
+        getClient(token).perform(get(groupIdCall).param("projection", "full"))
+        //The status has to be 200 OK
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$", GroupMatcher.matchFullEmbeds()))
+                .andExpect(jsonPath("$", GroupMatcher.matchLinks(group.getID())))
                    .andExpect(jsonPath("$", Matchers.is(
                        GroupMatcher.matchGroupEntry(group.getID(), group.getName())
                    )))
         ;
+
         getClient(token).perform(get("/api/eperson/groups"))
                    //The status has to be 200 OK
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
+                   .andExpect(jsonPath("$.page.totalElements", is(3)))
+        ;
 
-                   .andExpect(jsonPath("$.page.totalElements", is(3)));
-
+        // When no projection is requested, response should include expected properties, links, and no embeds.
+        getClient(token).perform(get("/api/eperson/groups/"  + generatedGroupId))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$", HalMatcher.matchNoEmbeds()))
+        ;
     }
 
     @Test

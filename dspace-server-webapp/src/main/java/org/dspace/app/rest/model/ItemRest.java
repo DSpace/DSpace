@@ -8,9 +8,7 @@
 package org.dspace.app.rest.model;
 
 import java.util.Date;
-import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
@@ -19,28 +17,42 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 @LinksRest(links = {
-    @LinkRest(
-            name = ItemRest.RELATIONSHIPS,
-            linkClass = RelationshipRest.class,
-            method = "getItemRelationships",
-            embedOptional = true
-    )
+        @LinkRest(
+                name = ItemRest.BUNDLES,
+                method = "getBundles"
+        ),
+        @LinkRest(
+                name = ItemRest.MAPPED_COLLECTIONS,
+                method = "getMappedCollections"
+        ),
+        @LinkRest(
+                name = ItemRest.OWNING_COLLECTION,
+                method = "getOwningCollection"
+        ),
+        @LinkRest(
+                name = ItemRest.RELATIONSHIPS,
+                method = "getRelationships"
+        ),
+        @LinkRest(
+                name = ItemRest.TEMPLATE_ITEM_OF,
+                method = "getTemplateItemOf"
+        )
 })
 public class ItemRest extends DSpaceObjectRest {
     public static final String NAME = "item";
     public static final String PLURAL_NAME = "items";
     public static final String CATEGORY = RestAddressableModel.CORE;
+
+    public static final String BUNDLES = "bundles";
+    public static final String MAPPED_COLLECTIONS = "mappedCollections";
+    public static final String OWNING_COLLECTION = "owningCollection";
     public static final String RELATIONSHIPS = "relationships";
+    public static final String TEMPLATE_ITEM_OF = "templateItemOf";
+
     private boolean inArchive = false;
     private boolean discoverable = false;
     private boolean withdrawn = false;
     private Date lastModified = new Date();
-    @JsonIgnore
-    private CollectionRest owningCollection;
-    @JsonIgnore
-    private CollectionRest templateItemOf;
-
-    List<BundleRest> bundles;
 
     @Override
     public String getCategory() {
@@ -83,31 +95,5 @@ public class ItemRest extends DSpaceObjectRest {
 
     public void setLastModified(Date lastModified) {
         this.lastModified = lastModified;
-    }
-
-    public CollectionRest getOwningCollection() {
-        return owningCollection;
-    }
-
-    public void setOwningCollection(CollectionRest owningCollection) {
-        this.owningCollection = owningCollection;
-    }
-
-    public CollectionRest getTemplateItemOf() {
-        return templateItemOf;
-    }
-
-    public void setTemplateItemOf(CollectionRest templateItemOf) {
-        this.templateItemOf = templateItemOf;
-    }
-
-    @LinkRest(linkClass = BundleRest.class)
-    @JsonIgnore
-    public List<BundleRest> getBundles() {
-        return bundles;
-    }
-
-    public void setBundles(List<BundleRest> bundles) {
-        this.bundles = bundles;
     }
 }
