@@ -34,6 +34,16 @@ public class VersionItemLinkRepository extends AbstractDSpaceRestRepository
     @Autowired
     private VersioningService versioningService;
 
+    /**
+     * This method will return the ItemRest object constructed from the Item object which is found in the Version
+     * that will be found through the versionId parameter
+     * @param request           The current request
+     * @param versionId         The ID for the Version to be used
+     * @param optionalPageable  The pageable if present
+     * @param projection        The current Projection
+     * @return                  The ItemRest object that is relevant for the Version
+     * @throws SQLException     If something goes wrong
+     */
     public ItemRest getVersionItem(@Nullable HttpServletRequest request,
                                    Integer versionId,
                                    @Nullable Pageable optionalPageable,

@@ -28,6 +28,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * This controller handles calls for the Version endpoint with a specific ID
+ */
 @RestController
 @RequestMapping("/api/versioning/versions/{id}")
 public class VersionRestController {
@@ -41,6 +44,18 @@ public class VersionRestController {
     @Autowired
     private Utils utils;
 
+    /**
+     * This method will retrieve a Version object based on the given ID paramater and t'll fetch the EPerson from that
+     * Version object and created a Resource from it and return this EPersonResource
+     * @param id            The ID of the Version to be used
+     * @param response      The current response
+     * @param request       The current request
+     * @param pageable      The pageable if present
+     * @param assembler     The assembler
+     * @return              The EPersonResource object constructed from the EPerson that was attached to the Version
+     *                      object which was found through the given ID
+     * @throws SQLException If something goes wrong
+     */
     @RequestMapping(value = "/eperson", method = RequestMethod.GET)
     public EPersonResource retrieve(@PathVariable Integer id,
                                     HttpServletResponse response,
