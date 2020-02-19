@@ -8,6 +8,7 @@
 package org.dspace.app.rest.model.hateoas;
 
 import org.dspace.app.rest.model.WorkflowDefinitionRest;
+import org.dspace.app.rest.model.hateoas.annotations.RelNameDSpaceResource;
 import org.dspace.app.rest.utils.Utils;
 
 /**
@@ -15,6 +16,7 @@ import org.dspace.app.rest.utils.Utils;
  * adding support for the links and embedded resources
  * @author Maria Verdonck (Atmire) on 11/12/2019
  */
+@RelNameDSpaceResource(WorkflowDefinitionRest.NAME)
 public class WorkflowDefinitionResource extends DSpaceResource<WorkflowDefinitionRest> {
     public WorkflowDefinitionResource(WorkflowDefinitionRest data, Utils utils) {
         super(data, utils);

@@ -8,6 +8,7 @@
 package org.dspace.app.rest.repository;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -343,7 +344,7 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
     @Override
     public Iterable<WorkspaceItemRest> upload(Context context, HttpServletRequest request,
             MultipartFile uploadfile)
-        throws SQLException, IOException, AuthorizeException {
+        throws SQLException, FileNotFoundException, IOException, AuthorizeException {
         File file = Utils.getFile(uploadfile, "upload-loader", "filedataloader");
         List<WorkspaceItemRest> results = new ArrayList<>();
 
