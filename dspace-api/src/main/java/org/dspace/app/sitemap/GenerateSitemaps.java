@@ -152,11 +152,11 @@ public class GenerateSitemaps {
      */
     public static void generateSitemaps(boolean makeHTMLMap,
                                         boolean makeSitemapOrg) throws SQLException, IOException {
-        String sitemapStem = configurationService.getProperty("dspace.url")
+        String sitemapStem = configurationService.getProperty("dspace.ui.url")
             + "/sitemap";
-        String htmlMapStem = configurationService.getProperty("dspace.url")
+        String htmlMapStem = configurationService.getProperty("dspace.ui.url")
             + "/htmlmap";
-        String handleURLStem = configurationService.getProperty("dspace.url")
+        String handleURLStem = configurationService.getProperty("dspace.ui.url")
             + "/handle/";
 
         File outputDir = new File(configurationService.getProperty("sitemap.dir"));
@@ -293,7 +293,7 @@ public class GenerateSitemaps {
                 .getProperty("http.proxy.port"));
         }
 
-        String sitemapURL = configurationService.getProperty("dspace.url")
+        String sitemapURL = configurationService.getProperty("dspace.ui.url")
             + "/sitemap";
 
         URL url = new URL(engineURL + URLEncoder.encode(sitemapURL, "UTF-8"));

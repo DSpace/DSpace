@@ -228,7 +228,7 @@ public class AccountServiceImpl implements AccountService {
      */
     protected void sendEmail(Context context, String email, boolean isRegister, RegistrationData rd)
         throws MessagingException, IOException, SQLException {
-        String base = ConfigurationManager.getProperty("dspace.url");
+        String base = ConfigurationManager.getProperty("dspace.ui.url");
 
         //  Note change from "key=" to "token="
         String specialLink = new StringBuffer().append(base).append(

@@ -60,7 +60,7 @@ public class RootRestResourceControllerIT extends AbstractControllerIntegrationT
                    .andExpect(jsonPath("$._links.items.href", startsWith(BASE_REST_SERVER_URL)))
                    .andExpect(jsonPath("$._links.metadatafields.href", startsWith(BASE_REST_SERVER_URL)))
                    .andExpect(jsonPath("$._links.metadataschemas.href", startsWith(BASE_REST_SERVER_URL)))
-                   .andExpect(jsonPath("$._links.resourcePolicies.href", startsWith(BASE_REST_SERVER_URL)))
+                   .andExpect(jsonPath("$._links.resourcepolicies.href", startsWith(BASE_REST_SERVER_URL)))
                    .andExpect(jsonPath("$._links.sites.href", startsWith(BASE_REST_SERVER_URL)))
                    .andExpect(jsonPath("$._links.submissiondefinitions.href", startsWith(BASE_REST_SERVER_URL)))
                    .andExpect(jsonPath("$._links.submissionforms.href", startsWith(BASE_REST_SERVER_URL)))

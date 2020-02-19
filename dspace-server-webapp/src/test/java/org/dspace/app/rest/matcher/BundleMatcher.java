@@ -8,8 +8,9 @@
 package org.dspace.app.rest.matcher;
 
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
+import static org.dspace.app.rest.matcher.HalMatcher.matchEmbeds;
+import static org.dspace.app.rest.test.AbstractControllerIntegrationTest.REST_SERVER_URL;
 import static org.hamcrest.Matchers.allOf;
-import static org.hamcrest.Matchers.endsWith;
 import static org.hamcrest.Matchers.is;
 
 import java.util.List;
@@ -27,19 +28,10 @@ public class BundleMatcher {
     }
 
 
-    public static Matcher<? super Object> matchBundle(String name,
-                                                      UUID uuid,
-                                                      String handle,
-                                                      int type,
+    public static Matcher<? super Object> matchBundle(String name, UUID uuid, String handle, int type,
                                                       List<Bitstream> bitstreams) {
         return allOf(
-            hasJsonPath("$.uuid", is(uuid.toString())),
-            hasJsonPath("$.name", is(name)),
-            hasJsonPath("$.handle", is(handle)),
-            hasJsonPath("$.type", is(Constants.typeText[type].toLowerCase())),
-            hasJsonPath("$.metadata", Matchers.allOf(
-                MetadataMatcher.matchMetadata("dc.title", name)
-            )),
+            matchProperties(name, uuid, handle, type),
             hasJsonPath("$._embedded.bitstreams._embedded.bitstreams", Matchers.containsInAnyOrder(
                 bitstreams
                     .stream()
@@ -50,12 +42,36 @@ public class BundleMatcher {
         );
     }
 
-    private static Matcher<? super Object> matchLinks(UUID uuid) {
-        return allOf(
-            hasJsonPath("$._links.primaryBitstream.href", endsWith("/api/core/bundles/" + uuid + "/primaryBitstream")),
-            hasJsonPath("$._links.bitstreams.href", endsWith("/api/core/bundles/" + uuid + "/bitstreams")),
-            hasJsonPath("$._links.self.href", endsWith("/api/core/bundles/" + uuid))
+    /**
+     * Gets a matcher for all expected embeds when the full projection is requested.
+     */
+    public static Matcher<? super Object> matchFullEmbeds() {
+        return matchEmbeds(
+                "bitstreams[]",
+                "primaryBitstream"
         );
     }
 
+    /**
+     * Gets a matcher for all expected links.
+     */
+    public static Matcher<? super Object> matchLinks(UUID uuid) {
+        return HalMatcher.matchLinks(REST_SERVER_URL + "core/bundles/" + uuid,
+                "bitstreams",
+                "primaryBitstream",
+                "self"
+        );
+    }
+
+    public static Matcher<? super Object> matchProperties(String name, UUID uuid, String handle, int type) {
+        return allOf(
+            hasJsonPath("$.uuid", is(uuid.toString())),
+            hasJsonPath("$.name", is(name)),
+            hasJsonPath("$.handle", is(handle)),
+            hasJsonPath("$.type", is(Constants.typeText[type].toLowerCase())),
+            hasJsonPath("$.metadata", Matchers.allOf(
+                    MetadataMatcher.matchMetadata("dc.title", name)
+            ))
+        );
+    }
 }

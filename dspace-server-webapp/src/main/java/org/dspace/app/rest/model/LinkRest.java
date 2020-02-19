@@ -13,15 +13,12 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import org.dspace.app.rest.model.hateoas.HALResource;
-import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.repository.LinkRestRepository;
 import org.dspace.app.rest.utils.Utils;
 import org.springframework.stereotype.Component;
 
 /**
- * Class or method-level annotation to control linking/embedding behavior when a {@link RestModel}
- * is wrapped as a {@link HALResource}
+ * Class or method-level annotation to provide information about linked/embedded subresources of a {@link RestModel}.
  *
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
@@ -55,45 +52,4 @@ public @interface LinkRest {
      * @return the method name, or the empty string if unspecified by the annotation.
      */
     String method() default "";
-
-    /**
-     * The class of object returned by invoking the link method. If a list or page is returned, this should
-     * specify the inner type.
-     *
-     * @return the class.
-     */
-    Class linkClass();
-
-    /**
-     * Tells whether embedding the resource indicated by this link is optional.
-     * <p>
-     * If false (the default), it means the resource will always be embedded unless the {@link LinkRestRepository}
-     * forbids it via {@link LinkRestRepository#isEmbeddableRelation(Object, String)}.
-     * </p>
-     * <p>
-     * If true, it means the resource will be embedded normally, unless forbidden by the {@link LinkRestRepository}
-     * or the projection, in use, via {@link Projection#allowOptionalEmbed(HALResource, LinkRest)}.
-     * </p>
-     *
-     * @return whether embedding is optional.
-     */
-    boolean embedOptional() default false;
-
-    /**
-     * Tells whether linking the resource indicated by this link is optional.
-     * <p>
-     * If false (the default), it means the resource will always be linked.
-     * </p>
-     * <p>
-     * If true, it means the resource will only be linked if:
-     * <ul>
-     *     <li> The resource is embedded, or</li>
-     *     <li> The value returned by the link method is not null and linking is not forbidden by the
-     *          projection in use, via {@link Projection#allowOptionalLink(HALResource, LinkRest)}</li>
-     * </ul>
-     * </p>
-     *
-     * @return whether linking is optional.
-     */
-    boolean linkOptional() default false;
 }

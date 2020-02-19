@@ -12,7 +12,6 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.Locale;
 
-import mockit.Expectations;
 import org.dspace.AbstractDSpaceTest;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
@@ -136,10 +135,7 @@ public class I18nUtilTest extends AbstractDSpaceTest {
         final ConfigurationService configService = DSpaceServicesFactory.getInstance().getConfigurationService();
 
         // Override "default.locale" and ensure it is set to US English
-        new Expectations(configService.getClass()) {{
-            configService.getProperty("default.locale");
-            result = "en_US.UTF-8";
-        }};
+        configService.setProperty("default.locale", "en_US.UTF-8");
 
         // Assert our overridden default.locale is set in I18nUtil
         assertEquals("Default locale", new Locale("en", "US", "UTF-8"), I18nUtil.getDefaultLocale());

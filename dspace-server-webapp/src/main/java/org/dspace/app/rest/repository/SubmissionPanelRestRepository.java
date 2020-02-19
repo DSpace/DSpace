@@ -62,7 +62,7 @@ public class SubmissionPanelRestRepository extends DSpaceRestRepository<Submissi
                 stepConfs.add(step);
             }
         }
-        return converter.toRestPage(stepConfs, pageable, total, utils.obtainProjection(true));
+        return converter.toRestPage(stepConfs, pageable, total, utils.obtainProjection());
     }
 
     @Override
