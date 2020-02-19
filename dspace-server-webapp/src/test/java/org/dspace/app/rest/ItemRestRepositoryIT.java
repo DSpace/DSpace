@@ -1744,6 +1744,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                         .andExpect(status().is(404));
     }
 
+    @Test
     public void patchItemMetadataAuthorized() throws Exception {
         runPatchMetadataTests(admin, 200);
     }
