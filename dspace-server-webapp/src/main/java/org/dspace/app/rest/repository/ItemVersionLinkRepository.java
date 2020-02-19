@@ -38,6 +38,16 @@ public class ItemVersionLinkRepository extends AbstractDSpaceRestRepository
     @Autowired
     private ItemService itemService;
 
+    /**
+     * This method will return the VersionRest object from the Item that is associated with the given itemUuid
+     * @param request           The current request
+     * @param itemUuid          The itemUuid used to find the Item for which we'll return the VersionRest object
+     * @param optionalPageable  Pageable if present
+     * @param projection        Current Projection
+     * @return                  The VersionRest object constructed from the Version object for the Item that has the
+     *                          itemUuid param as UUID
+     * @throws SQLException     If something goes wrong
+     */
     public VersionRest getItemVersion(@Nullable HttpServletRequest request,
                                       UUID itemUuid,
                                       @Nullable Pageable optionalPageable,

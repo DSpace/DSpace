@@ -302,6 +302,15 @@ public class WorkflowItemRestRepository extends DSpaceRestRepository<WorkflowIte
         }
     }
 
+    /**
+     * This is a search method that will return the WorkflowItemRest object found through the UUID of an item. It'll
+     * find the Item through the given UUID and try to resolve the WorkflowItem relevant for that item and return it.
+     * It'll return a 401/403 if the current user isn't allowed to view the WorkflowItem.
+     * It'll return a 204 if nothing was found
+     * @param itemUuid  The UUID for the Item to be used
+     * @param pageable  The pageable if present
+     * @return          The resulting WorkflowItemRest object
+     */
     @SearchRestMethod(name = "item")
     public WorkflowItemRest findByItemUuid(@Parameter(value = "uuid", required = true) UUID itemUuid,
                                            Pageable pageable) {

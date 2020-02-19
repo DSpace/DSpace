@@ -39,6 +39,17 @@ public class EPersonVersionLinkRepository extends AbstractDSpaceRestRepository
     private ConfigurationService configurationService;
 
 
+    /**
+     * This method will return the EPersonRest object from the Version retrieved by the given versionId
+     * @param request           The current request
+     * @param versionId         The id for the Version from which we'll retrieve the EPerson
+     * @param optionalPageable  Pageable if present
+     * @param projection        Current Projection
+     * @return                  The EPerson that is attached to the Version object that is associated with the given
+     *                          versionId Integer
+     * @throws SQLException     If something goes wrong
+     * @throws AuthorizeException   If something goes wrong
+     */
     public EPersonRest getEPersonForVersion(@Nullable HttpServletRequest request,
                                             Integer versionId,
                                             @Nullable Pageable optionalPageable,

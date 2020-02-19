@@ -503,6 +503,15 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
         return converter.toRest(workspaceItem, Projection.DEFAULT);
     }
 
+    /**
+     * This is a search method that will return the WorkspaceItemRest object found through the UUID of an item. It'll
+     * find the Item through the given UUID and try to resolve the WorkspaceItem relevant for that item and return it.
+     * It'll return a 401/403 if the current user isn't allowed to view the WorkspaceItem.
+     * It'll return a 204 if nothing was found
+     * @param itemUuid  The UUID for the Item to be used
+     * @param pageable  The pageable if present
+     * @return          The resulting WorkspaceItem object
+     */
     @SearchRestMethod(name = "item")
     public WorkspaceItemRest findByItemUuid(@Parameter(value = "uuid", required = true) UUID itemUuid,
                                             Pageable pageable) {

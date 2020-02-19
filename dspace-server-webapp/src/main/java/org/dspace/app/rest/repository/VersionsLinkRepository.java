@@ -41,6 +41,16 @@ public class VersionsLinkRepository extends AbstractDSpaceRestRepository
     @Autowired
     private VersioningService versioningService;
 
+    /**
+     * This method will return a page of VersionRest objects found through the VersionHistory object that is resolved
+     * from the versionHistoryId parameter
+     * @param request           The current request
+     * @param versionHistoryId  The ID for the VersionHistory to be used
+     * @param optionalPageable  The pageable if present
+     * @param projection        The current Projection
+     * @return                  The page containing relevant VersionRest objects
+     * @throws SQLException     If something goes wrong
+     */
     public Page<VersionRest> getVersions(@Nullable HttpServletRequest request,
                                                Integer versionHistoryId,
                                                @Nullable Pageable optionalPageable,
