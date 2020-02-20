@@ -157,7 +157,7 @@ public class WorkflowItemRestRepository extends DSpaceRestRepository<WorkflowIte
         if (source.getItem().isArchived()) {
             return null;
         }
-        return converter.toRest(source, Projection.DEFAULT);
+        return converter.toRest(source, utils.obtainProjection());
     }
 
     @Override

@@ -181,7 +181,7 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
         } catch (SQLException e) {
             throw new RuntimeException("Unable to create new Collection under parent Community " + id, e);
         }
-        return converter.toRest(collection, Projection.DEFAULT);
+        return converter.toRest(collection, utils.obtainProjection());
     }
 
 
@@ -277,7 +277,7 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
         cs.update(context, collection);
         itemService.update(context, item);
 
-        return converter.toRest(new TemplateItem(item), Projection.DEFAULT);
+        return converter.toRest(new TemplateItem(item), utils.obtainProjection());
     }
 
     /**

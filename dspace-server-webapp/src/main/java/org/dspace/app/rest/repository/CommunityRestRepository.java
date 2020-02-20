@@ -90,7 +90,7 @@ public class CommunityRestRepository extends DSpaceObjectRestRepository<Communit
             throw new RuntimeException(e.getMessage(), e);
         }
 
-        return converter.toRest(community, Projection.DEFAULT);
+        return converter.toRest(community, utils.obtainProjection());
     }
 
     @Override
@@ -127,7 +127,7 @@ public class CommunityRestRepository extends DSpaceObjectRestRepository<Communit
             throw new RuntimeException(e.getMessage(), e);
         }
 
-        return converter.toRest(community, Projection.DEFAULT);
+        return converter.toRest(community, utils.obtainProjection());
     }
 
     @Override
