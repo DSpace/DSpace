@@ -131,18 +131,18 @@ public class ConverterServiceIT extends AbstractControllerIntegrationTest {
     }
 
     /**
-     * When calling {@code toResource} with the default projection, the result should have all
-     * the expected links and embeds with no changes introduced by the projection.
+     * When calling {@code toResource} with the default projection, the result should have the unannotated
+     * linkable property as the only embed, all expected links, and no changes introduced by the projection.
      */
     @Test
     public void toResourceWithDefaultProjection() throws Exception {
         MockObjectRest r0 = MockObjectRest.create(0);
-        MockObjectRest r1 = MockObjectRest.create(1);
-        MockObjectRest r2 = MockObjectRest.create(2);
-        MockObjectRest r6 = MockObjectRest.create(6);
-        r0.setRestProp1(r1);
-        r0.setRestProp2(r2);
-        r0.setRestProp6(r6);
+        MockObjectRest restPropNotNullValue = MockObjectRest.create(1);
+        MockObjectRest restPropRenamedValue = MockObjectRest.create(2);
+        MockObjectRest restPropUnannotatedValue = MockObjectRest.create(3);
+        r0.setRestPropNotNull(restPropNotNullValue);
+        r0.setRestPropRenamed(restPropRenamedValue);
+        r0.setRestPropUnannotated(restPropUnannotatedValue);
         String r0json = new ObjectMapper().writeValueAsString(r0);
 
         MockObjectResource resource = converter.toResource(r0);
@@ -151,39 +151,19 @@ public class ConverterServiceIT extends AbstractControllerIntegrationTest {
         assertThat(new ObjectMapper().writeValueAsString(r0), equalTo(r0json));
 
         assertHasEmbeds(resource, new String[] {
-                "restProp1",    // restProp1 embedded;     value != null, embedOptional == false
-                "restProp2",    // restProp2 embedded;     value != null, embedOptional == true
-                                // restProp3 not embedded; value == null, embedOptional == true
-                                // restProp4 not embedded; value == null, embedOptional == true
-                "restPropFive", // restPropFive embedded;  value == null, embedOptional == false
-                "restProp6",    // restProp6 embedded;     value != null, embedOptional == false
-                "oChildren",    // oChildren embedded;     value != null, embedOptional == true
-                "aChildren"     // aChildren embedded;     value != null, embedOptional == false
-                                // nChildren not embedded; value != null, linkOptional == false, embedOptional == false
-                                //                         (embed disallowed by link repository)
+                "restPropUnannotated" // embedded; unannotated properties can't be omitted by projections
         }, new Class[] {
-                Resource.class,
-                Resource.class,
-                null,
-                Resource.class,
-                EmbeddedPage.class,
-                EmbeddedPage.class
+                Resource.class
         });
 
-        assertEmbeddedPageSize(resource, "oChildren", 2);
-        assertEmbeddedPageSize(resource, "aChildren", 2);
-
         assertHasLinks(resource, new String[] {
-                "self",         // self linked;            (added by DSpaceResourceHalLinkFactory)
-                "restProp1",    // restProp1 linked;       value != null, linkOptional == true,  embedOptional == false
-                "restProp2",    // restProp2 linked;       value != null, linkOptional == true,  embedOptional == true
-                                // restProp3 not linked;   value == null, linkOptional == true,  embedOptional == true
-                "restProp4",    // restProp4 linked;       value == null, linkOptional == false, embedOptional == true
-                "restPropFive", // restPropFive linked;    value == null, linkOptional == false, embedOptional == false
-                "restProp6",    // restProp6 linked;       value != null, linkOptional == false, embedOptional == false
-                "oChildren",    // oChildren linked;       value != null, linkOptional == true,  embedOptional == true
-                "aChildren",    // aChildren linked;       value != null, linkOptional == true,  embedOptional == false
-                "nChildren"     // nChildren linked;       value != null, linkOptional == false, embedOptional == false
+                "self",
+                "restPropNotNull",
+                "restPropNull",
+                "restPropRenamedWithSuffix",
+                "restPropUnannotated",
+                "optionallyEmbeddedChildren",
+                "neverEmbeddedChildren"
         });
     }
 
@@ -194,12 +174,12 @@ public class ConverterServiceIT extends AbstractControllerIntegrationTest {
     @Test
     public void toResourceWithMockProjection() throws Exception {
         MockObjectRest r0 = MockObjectRest.create(0);
-        MockObjectRest r1 = MockObjectRest.create(1);
-        MockObjectRest r2 = MockObjectRest.create(2);
-        MockObjectRest r6 = MockObjectRest.create(6);
-        r0.setRestProp1(r1);
-        r0.setRestProp2(r2);
-        r0.setRestProp6(r6);
+        MockObjectRest restPropNotNullValue = MockObjectRest.create(1);
+        MockObjectRest restPropRenamedValue = MockObjectRest.create(2);
+        MockObjectRest restPropUnannotatedValue = MockObjectRest.create(3);
+        r0.setRestPropNotNull(restPropNotNullValue);
+        r0.setRestPropRenamed(restPropRenamedValue);
+        r0.setRestPropUnannotated(restPropUnannotatedValue);
         String r0json = new ObjectMapper().writeValueAsString(r0);
 
         when(mockLink.getRel()).thenReturn("mockLink");
@@ -211,39 +191,29 @@ public class ConverterServiceIT extends AbstractControllerIntegrationTest {
         assertThat(new ObjectMapper().writeValueAsString(r0), equalTo(r0json));
 
         assertHasEmbeds(resource, new String[] {
-                "restProp1",    // restProp1 embedded;     value != null, embedOptional == false
-                                // restProp2 not embedded; value != null, embedOptional == true
-                                // restProp3 not embedded; value == null, embedOptional == true
-                                // restProp4 not embedded; value == null, embedOptional == true
-                "restPropFive", // restPropFive embedded;  value == null, embedOptional == false
-                "restProp6",    // restProp6 embedded;     value != null, embedOptional == false
-                                // oChildren not embedded; value != null, embedOptional == true
-                "aChildren",    // aChildren embedded;     value != null, embedOptional == false
-                                // nChildren not embedded; value != null, linkOptional == false, embedOptional == false
-                                //                         (embed disallowed by link repository)
-                "resource"      // resource embedded       (added by MockProjection)
+                "restPropNotNull",
+                "restPropNull",
+                "restPropRenamedWithSuffix",
+                "restPropUnannotated",
+                "optionallyEmbeddedChildren",
+                "resource" // added by MockProjection
         }, new Class[] {
                 Resource.class,
                 null,
+                Resource.class,
                 Resource.class,
                 EmbeddedPage.class,
                 Object.class
         });
 
-        assertEmbeddedPageSize(resource, "aChildren", 2);
+        assertEmbeddedPageSize(resource, "optionallyEmbeddedChildren", 2);
 
         assertHasLinks(resource, new String[] {
-                "self",         // self linked;            (added by DSpaceResourceHalLinkFactory)
-                "restProp1",    // restProp1 linked;       value != null, linkOptional == true,  embedOptional == false
-                                // restProp2 not linked;   value != null, linkOptional == true,  embedOptional == true
-                                // restProp3 not linked;   value == null, linkOptional == true,  embedOptional == true
-                "restProp4",    // restProp4 linked;       value == null, linkOptional == false, embedOptional == true
-                "restPropFive", // restPropFive linked;    value == null, linkOptional == false, embedOptional == false
-                "restProp6",    // restProp6 linked;       value != null, linkOptional == false, embedOptional == false
-                                // oChildren not linked;   value != null, linkOptional == true,  embedOptional == true
-                "aChildren",    // aChildren linked;       value != null, linkOptional == true,  embedOptional == false
-                "nChildren",    // nChildren linked;       value != null, linkOptional == false, embedOptional == false
-                "mockLink"      // mockLink linked;        (added by MockProjection)
+                "self", // always linked
+                "restPropUnannotated", // linked; unannotated properties can't be omitted by projections
+                "optionallyEmbeddedChildren", // linked; embedded due to projection, and embed forces link
+                "neverEmbeddedChildren", // linked; embedded due to projection, and embed forces link
+                "mockLink" // added by MockProjection
         });
     }
 

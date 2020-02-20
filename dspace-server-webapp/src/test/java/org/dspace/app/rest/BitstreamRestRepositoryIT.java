@@ -26,6 +26,7 @@ import org.dspace.app.rest.builder.CommunityBuilder;
 import org.dspace.app.rest.builder.ItemBuilder;
 import org.dspace.app.rest.matcher.BitstreamFormatMatcher;
 import org.dspace.app.rest.matcher.BitstreamMatcher;
+import org.dspace.app.rest.matcher.HalMatcher;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.app.rest.test.MetadataPatchSuite;
 import org.dspace.content.Bitstream;
@@ -92,7 +93,8 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
 
         String token = getAuthToken(admin.getEmail(), password);
 
-        getClient(token).perform(get("/api/core/bitstreams/"))
+        getClient(token).perform(get("/api/core/bitstreams/")
+                   .param("projection", "full"))
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$._embedded.bitstreams", Matchers.containsInAnyOrder(
@@ -150,7 +152,8 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
         String token = getAuthToken(admin.getEmail(), password);
 
         getClient(token).perform(get("/api/core/bitstreams/")
-                                .param("size", "1"))
+                   .param("size", "1")
+                   .param("projection", "full"))
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$._embedded.bitstreams", Matchers.contains(
@@ -166,7 +169,8 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
 
         getClient(token).perform(get("/api/core/bitstreams/")
                                 .param("size", "1")
-                                .param("page", "1"))
+                                .param("page", "1")
+                                .param("projection", "full"))
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$._embedded.bitstreams", Matchers.contains(
@@ -248,6 +252,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
         //We turn off the authorization system in order to create the structure as defined below
         context.turnOffAuthorisationSystem();
 
+
         //** GIVEN **
         //1. A community-collection structure with one parent community with sub-community and one collection.
         parentCommunity = CommunityBuilder.createCommunity(context)
@@ -289,11 +294,20 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
                                          .build();
         }
 
-        getClient().perform(get("/api/core/bitstreams/" + bitstream.getID()))
+        // When full projection is requested, response should include expected properties, links, and embeds.
+        getClient().perform(get("/api/core/bitstreams/" + bitstream.getID())
+                   .param("projection", "full"))
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
+                   .andExpect(jsonPath("$", BitstreamMatcher.matchFullEmbeds()))
                    .andExpect(jsonPath("$", BitstreamMatcher.matchBitstreamEntry(bitstream)))
                    .andExpect(jsonPath("$", not(BitstreamMatcher.matchBitstreamEntry(bitstream1))))
+        ;
+
+        // When no projection is requested, response should include expected properties, links, and no embeds.
+        getClient().perform(get("/api/core/bitstreams/" + bitstream.getID()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", HalMatcher.matchNoEmbeds()))
         ;
 
     }

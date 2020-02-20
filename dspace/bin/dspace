@@ -12,20 +12,18 @@
 
 BINDIR=`dirname $0`
 DSPACEDIR=`cd "$BINDIR/.." ; pwd`
-# Add the directory with all oai classes (original and overlay) needed by the 'dspace oai' launcher.xml
-OAICLASSES=$DSPACEDIR/webapps/oai/WEB-INF/classes/
 
 # Get the JARs in $DSPACEDIR/jsp/WEB-INF/lib, separated by ':'
-JARS=`echo $DSPACEDIR/lib/*.jar | sed 's/ /\:/g'`
+JARS="$DSPACEDIR/lib/*"
 
 # Class path for DSpace will be:
 #   Any existing classpath
 #   The JARs (WEB-INF/lib/*.jar)
 #   The WEB-INF/classes directory
 if [ "$CLASSPATH" = "" ]; then
-    FULLPATH=$OAICLASSES:$JARS:$DSPACEDIR/config
+    FULLPATH=$JARS:$DSPACEDIR/config
 else
-    FULLPATH=$CLASSPATH:$OAICLASSES:$JARS:$DSPACEDIR/config
+    FULLPATH=$CLASSPATH:$JARS:$DSPACEDIR/config
 fi
 
 

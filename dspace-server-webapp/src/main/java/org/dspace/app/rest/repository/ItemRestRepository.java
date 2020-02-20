@@ -21,7 +21,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
-import org.dspace.app.rest.converter.JsonPatchConverter;
 import org.dspace.app.rest.converter.MetadataConverter;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
@@ -31,7 +30,6 @@ import org.dspace.app.rest.model.ItemRest;
 import org.dspace.app.rest.model.patch.Patch;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.repository.handler.service.UriListHandlerService;
-import org.dspace.app.rest.repository.patch.ItemPatch;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
@@ -97,9 +95,8 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
     @Autowired
     private UriListHandlerService uriListHandlerService;
 
-
-    public ItemRestRepository(ItemService dsoService, ItemPatch dsoPatch) {
-        super(dsoService, dsoPatch);
+    public ItemRestRepository(ItemService dsoService) {
+        super(dsoService);
     }
 
     @Override
@@ -114,6 +111,9 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
         if (item == null) {
             return null;
         }
+        if (item.getTemplateItemOf() != null) {
+            throw new DSpaceBadRequestException("Item with id: " + id + " is a template item.");
+        }
         return converter.toRest(item, utils.obtainProjection());
     }
 
@@ -123,12 +123,12 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
         try {
             long total = itemService.countTotal(context);
             Iterator<Item> it = itemService.findAll(context, pageable.getPageSize(),
-                    Math.toIntExact(pageable.getOffset()));
+                Math.toIntExact(pageable.getOffset()));
             List<Item> items = new ArrayList<>();
             while (it.hasNext()) {
                 items.add(it.next());
             }
-            return converter.toRestPage(items, pageable, total, utils.obtainProjection(true));
+            return converter.toRestPage(items, pageable, total, utils.obtainProjection());
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -139,25 +139,6 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
     protected void patch(Context context, HttpServletRequest request, String apiCategory, String model, UUID id,
                          Patch patch) throws AuthorizeException, SQLException {
         patchDSpaceObject(apiCategory, model, id, patch);
-    }
-
-    @Override
-    protected void updateDSpaceObject(Item item, ItemRest itemRest)
-        throws AuthorizeException, SQLException {
-        super.updateDSpaceObject(item, itemRest);
-
-        Context context = obtainContext();
-        if (itemRest.getWithdrawn() != item.isWithdrawn()) {
-            if (itemRest.getWithdrawn()) {
-                itemService.withdraw(context, item);
-            } else {
-                itemService.reinstate(context, item);
-            }
-        }
-        if (itemRest.getDiscoverable() != item.isDiscoverable()) {
-            item.setDiscoverable(itemRest.getDiscoverable());
-            itemService.update(context, item);
-        }
     }
 
     @Override
@@ -177,15 +158,15 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
             item = itemService.find(context, id);
             if (item == null) {
                 throw new ResourceNotFoundException(ItemRest.CATEGORY + "." + ItemRest.NAME +
-                                                            " with id: " + id + " not found");
+                    " with id: " + id + " not found");
             }
             if (itemService.isInProgressSubmission(context, item)) {
                 throw new UnprocessableEntityException("The item cannot be deleted. "
-                                                           + "It's part of a in-progress submission.");
+                    + "It's part of a in-progress submission.");
             }
             if (item.getTemplateItemOf() != null) {
                 throw new UnprocessableEntityException("The item cannot be deleted. "
-                                                           + "It's a template for a collection");
+                    + "It's a template for a collection");
             }
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
@@ -202,9 +183,9 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
      * Deletes relationships of an item which need virtual metadata to be copied to actual metadata
      * This ensures a delete call is used which can copy the metadata prior to deleting the item
      *
-     * @param context           The relevant DSpace context
-     * @param copyVirtual       The value(s) of the copyVirtualMetadata parameter
-     * @param item              The item to be deleted
+     * @param context     The relevant DSpace context
+     * @param copyVirtual The value(s) of the copyVirtualMetadata parameter
+     * @param item        The item to be deleted
      */
     private void deleteMultipleRelationshipsCopyVirtualMetadata(Context context, String[] copyVirtual, Item item)
         throws SQLException, AuthorizeException {
@@ -247,7 +228,7 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
 
     private List<Integer> parseVirtualMetadataTypes(String[] copyVirtual) {
         List<Integer> types = new ArrayList<>();
-        for (String typeString: copyVirtual) {
+        for (String typeString : copyVirtual) {
             if (!StringUtils.isNumeric(typeString)) {
                 throw new DSpaceBadRequestException("parameter " + REQUESTPARAMETER_COPYVIRTUALMETADATA
                     + " should only contain a single value '" + COPYVIRTUAL_ALL[0] + "', '" + COPYVIRTUAL_CONFIGURED[0]
@@ -260,8 +241,9 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
 
     /**
      * Deletes the relationship while copying the virtual metadata to the item which is **NOT** deleted
-     * @param itemToDelete              The item to be deleted
-     * @param relationshipToDelete      The relationship to be deleted
+     *
+     * @param itemToDelete         The item to be deleted
+     * @param relationshipToDelete The relationship to be deleted
      */
     private void deleteRelationshipCopyVirtualMetadata(Item itemToDelete, Relationship relationshipToDelete)
         throws SQLException, AuthorizeException {
@@ -299,7 +281,7 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
         Collection collection = collectionService.find(context, owningCollectionUuid);
         if (collection == null) {
             throw new DSpaceBadRequestException("The given owningCollection parameter is invalid: "
-                                                    + owningCollectionUuid);
+                + owningCollectionUuid);
         }
         WorkspaceItem workspaceItem = workspaceItemService.create(context, collection, false);
         Item item = workspaceItem.getItem();
@@ -337,8 +319,8 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
             metadataConverter.setMetadata(context, item, itemRest.getMetadata());
         } else {
             throw new IllegalArgumentException("The UUID in the Json and the UUID in the url do not match: "
-                                                       + uuid + ", "
-                                                       + itemRest.getId());
+                + uuid + ", "
+                + itemRest.getId());
         }
         return converter.toRest(item, Projection.DEFAULT);
     }
@@ -352,7 +334,7 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
      * @return The added bundle
      */
     public Bundle addBundleToItem(Context context, Item item, BundleRest bundleRest)
-            throws SQLException, AuthorizeException {
+        throws SQLException, AuthorizeException {
         if (item.getBundles(bundleRest.getName()).size() > 0) {
             throw new DSpaceBadRequestException("The bundle name already exists in the item");
         }
@@ -365,45 +347,6 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
         context.commit();
 
         return bundle;
-    }
-
-    /**
-     * Modify a template Item which is a template Item
-     * @param item          The Item to be modified
-     * @param jsonNode      The patch to be applied
-     * @return              The Item as it is after applying the patch
-     * @throws SQLException
-     * @throws AuthorizeException
-     */
-    public ItemRest patchTemplateItem(Item item, JsonNode jsonNode)
-        throws SQLException, AuthorizeException {
-
-        ObjectMapper mapper = new ObjectMapper();
-        JsonPatchConverter patchConverter = new JsonPatchConverter(mapper);
-        Patch patch = patchConverter.convert(jsonNode);
-
-        ItemRest patchedItemRest = dsoPatch.patch(converter.toRest(item, Projection.DEFAULT), patch.getOperations());
-        updateDSpaceObject(item, patchedItemRest);
-
-        return converter.toRest(item, Projection.DEFAULT);
-    }
-
-    /**
-     * Remove an Item which is a template for a Collection.
-     *
-     * Note: The caller is responsible for checking that this item is in fact a template item.
-     *
-     * @param context
-     * @param item          The item to be removed
-     * @throws SQLException
-     * @throws IOException
-     * @throws AuthorizeException
-     */
-    public void removeTemplateItem(Context context, Item item) throws SQLException, IOException, AuthorizeException {
-
-        Collection collection = item.getTemplateItemOf();
-        collectionService.removeTemplateItem(context, collection);
-        collectionService.update(context, collection);
     }
 
     @Override
