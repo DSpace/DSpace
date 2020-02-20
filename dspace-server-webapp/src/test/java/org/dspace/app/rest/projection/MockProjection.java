@@ -9,7 +9,11 @@ package org.dspace.app.rest.projection;
 
 import javax.annotation.Nullable;
 
-import org.dspace.app.rest.model.*;
+import org.dspace.app.rest.model.LinkRest;
+import org.dspace.app.rest.model.MockObject;
+import org.dspace.app.rest.model.MockObjectRest;
+import org.dspace.app.rest.model.RestAddressableModel;
+import org.dspace.app.rest.model.RestModel;
 import org.dspace.app.rest.model.hateoas.HALResource;
 import org.springframework.hateoas.Link;
 
