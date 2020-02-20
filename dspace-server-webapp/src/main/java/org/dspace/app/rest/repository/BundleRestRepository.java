@@ -24,7 +24,6 @@ import org.dspace.app.rest.model.BitstreamRest;
 import org.dspace.app.rest.model.BundleRest;
 import org.dspace.app.rest.model.patch.Patch;
 import org.dspace.app.rest.projection.Projection;
-import org.dspace.app.rest.repository.patch.BundlePatch;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Bitstream;
@@ -71,8 +70,8 @@ public class BundleRestRepository extends DSpaceObjectRestRepository<Bundle, Bun
     @Autowired
     private BitstreamFormatService bitstreamFormatService;
 
-    public BundleRestRepository(BundleService dsoService, BundlePatch dsoPatch) {
-        super(dsoService, dsoPatch);
+    public BundleRestRepository(BundleService dsoService) {
+        super(dsoService);
         this.bundleService = dsoService;
     }
 

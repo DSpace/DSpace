@@ -106,7 +106,7 @@ public class BitstreamEntryGenerator extends DSpaceATOMEntry {
         if (this.deposit != null && this.deposit.isNoOp()) {
             // just use the dspace url as the
             // property
-            String cfg = ConfigurationManager.getProperty("dspace.url");
+            String cfg = ConfigurationManager.getProperty("dspace.ui.url");
             entry.setId(cfg);
 
             return;

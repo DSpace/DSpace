@@ -72,7 +72,7 @@ public class HandleServiceImpl implements HandleService {
             return null;
         }
 
-        String url = configurationService.getProperty("dspace.url")
+        String url = configurationService.getProperty("dspace.ui.url")
             + "/handle/" + handle;
 
         if (log.isDebugEnabled()) {
@@ -85,7 +85,7 @@ public class HandleServiceImpl implements HandleService {
     @Override
     public String resolveUrlToHandle(Context context, String url)
         throws SQLException {
-        String dspaceUrl = configurationService.getProperty("dspace.url")
+        String dspaceUrl = configurationService.getProperty("dspace.ui.url")
             + "/handle/";
         String handleResolver = configurationService.getProperty("handle.canonical.prefix");
 

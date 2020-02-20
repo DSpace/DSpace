@@ -25,7 +25,9 @@ import java.util.Base64;
 import javax.servlet.http.Cookie;
 
 import org.dspace.app.rest.builder.GroupBuilder;
+import org.dspace.app.rest.matcher.AuthenticationStatusMatcher;
 import org.dspace.app.rest.matcher.EPersonMatcher;
+import org.dspace.app.rest.matcher.HalMatcher;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.eperson.Group;
 import org.dspace.services.ConfigurationService;
@@ -65,10 +67,11 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
     public void testStatusAuthenticated() throws Exception {
         String token = getAuthToken(eperson.getEmail(), password);
 
-        getClient(token).perform(get("/api/authn/status"))
+        getClient(token).perform(get("/api/authn/status").param("projection", "full"))
 
                         .andExpect(status().isOk())
-
+                        .andExpect(jsonPath("$", AuthenticationStatusMatcher.matchFullEmbeds()))
+                        .andExpect(jsonPath("$", AuthenticationStatusMatcher.matchLinks()))
                         //We expect the content type to be "application/hal+json;charset=UTF-8"
                         .andExpect(content().contentType(contentType))
                         .andExpect(jsonPath("$.okay", is(true)))
@@ -77,7 +80,13 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
 
                         .andExpect(jsonPath("$._links.eperson.href", startsWith(REST_SERVER_URL)))
                         .andExpect(jsonPath("$._embedded.eperson",
-                                EPersonMatcher.matchEPersonWithGroups(eperson.getEmail(), "Anonymous")));
+                                EPersonMatcher.matchEPersonWithGroups(eperson.getEmail(), "Anonymous")))
+        ;
+
+        getClient(token).perform(get("/api/authn/status"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", HalMatcher.matchNoEmbeds()))
+        ;
     }
 
     @Test
@@ -141,7 +150,7 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
 
         assertNotEquals(token1, token2);
 
-        getClient(token1).perform(get("/api/authn/status"))
+        getClient(token1).perform(get("/api/authn/status").param("projection", "full"))
 
                          .andExpect(status().isOk())
 
@@ -155,7 +164,8 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
                          .andExpect(jsonPath("$._embedded.eperson",
                                 EPersonMatcher.matchEPersonOnEmail(eperson.getEmail())));
 
-        getClient(token2).perform(get("/api/authn/status"))
+        getClient(token2).perform(get("/api/authn/status")
+                         .param("projection", "full"))
 
                          .andExpect(status().isOk())
 
@@ -414,7 +424,7 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getHeader(AUTHORIZATION_HEADER);
 
-        getClient(token).perform(get("/api/authn/status"))
+        getClient(token).perform(get("/api/authn/status").param("projection", "full"))
                 .andExpect(status().isOk())
                 //We expect the content type to be "application/hal+json;charset=UTF-8"
                 .andExpect(content().contentType(contentType))
@@ -449,7 +459,7 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getHeader(AUTHORIZATION_HEADER);
 
-        getClient(token).perform(get("/api/authn/status")
+        getClient(token).perform(get("/api/authn/status").param("projection", "full")
                                     .with(ip("123.123.123.123")))
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(status().isOk())
@@ -469,7 +479,7 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getHeader(AUTHORIZATION_HEADER);
 
-        getClient(token).perform(get("/api/authn/status")
+        getClient(token).perform(get("/api/authn/status").param("projection", "full")
                 .with(ip("234.234.234.234")))
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(status().isOk())

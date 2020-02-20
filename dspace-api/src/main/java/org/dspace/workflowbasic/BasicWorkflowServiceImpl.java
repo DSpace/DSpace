@@ -1041,7 +1041,7 @@ public class BasicWorkflowServiceImpl implements BasicWorkflowService {
 
     @Override
     public String getMyDSpaceLink() {
-        return configurationService.getProperty("dspace.url") + "/mydspace";
+        return configurationService.getProperty("dspace.ui.url") + "/mydspace";
     }
 
     protected void notifyOfReject(Context context, BasicWorkflowItem workflowItem, EPerson e,

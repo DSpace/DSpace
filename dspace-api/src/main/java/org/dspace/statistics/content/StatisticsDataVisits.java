@@ -650,7 +650,7 @@ public class StatisticsDataVisits extends StatisticsData {
                     }
 
 
-                    String url = ConfigurationManager.getProperty("dspace.url") + "/bitstream/" + identifier + "/";
+                    String url = ConfigurationManager.getProperty("dspace.ui.url") + "/bitstream/" + identifier + "/";
 
                     // If we can put the pretty name of the bitstream on the end of the URL
                     try {
