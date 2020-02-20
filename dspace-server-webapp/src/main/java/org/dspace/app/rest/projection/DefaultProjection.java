@@ -8,7 +8,9 @@
 package org.dspace.app.rest.projection;
 
 /**
- * The default projection, which has no effect.
+ * The default projection.
+ *
+ * This does no transformation, and allows linking but not embedding of all subresources.
  */
 public class DefaultProjection extends AbstractProjection {
 

@@ -289,8 +289,8 @@ public class BasicWorkflowAuthorizationIT
 
         int i = 0;
         // check item policies
-        for (int action : new int[] {Constants.READ, Constants.WRITE, Constants.ADD, Constants.REMOVE, Constants
-            .DELETE}) {
+        for (int action : new int[] {Constants.READ, Constants.WRITE, Constants.ADD, Constants.REMOVE,
+            Constants.DELETE}) {
             Assert.assertTrue("testReviewerPermissions 1-" + i++,
                               authorizeService.authorizeActionBoolean(context, member, item, action, false));
         }

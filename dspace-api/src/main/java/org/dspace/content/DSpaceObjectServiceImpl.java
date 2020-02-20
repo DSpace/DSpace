@@ -701,9 +701,11 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
 
         List<MetadataValue> list = getMetadata(dso, schema, element, qualifier);
 
-        if (from >= list.size()) {
+        if (from >= list.size() || to >= list.size() || to < 0 || from < 0) {
             throw new IllegalArgumentException(
-                    "The \"from\" location MUST exist for the operation to be successful. Idx:" + from);
+                "The \"from\" and \"to\" locations MUST exist for the operation to be successful." +
+                        "\n To and from indices must be between 0 and " + (list.size() - 1) +
+                        "\n Idx from:" + from + " Idx to: " + to);
         }
 
         int idx = 0;
@@ -757,6 +759,11 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
 
         removeMetadataValues(context, dso, Arrays.asList(list.get(index)));
         addAndShiftRightMetadata(context, dso, schema, element, qualifier, lang, value, authority, confidence, index);
+    }
+
+    @Override
+    public void setMetadataModified(T dso) {
+        dso.setMetadataModified();
     }
 
 }
