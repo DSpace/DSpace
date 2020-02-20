@@ -347,7 +347,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
     public void findByEmailUnprocessable() throws Exception {
         String authToken = getAuthToken(admin.getEmail(), password);
         getClient(authToken).perform(get("/api/eperson/epersons/search/byEmail"))
-                .andExpect(status().isUnprocessableEntity());
+                .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -419,7 +419,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
     public void findByNameUnprocessable() throws Exception {
         String authToken = getAuthToken(admin.getEmail(), password);
         getClient(authToken).perform(get("/api/eperson/epersons/search/byName"))
-                .andExpect(status().isUnprocessableEntity());
+                .andExpect(status().isBadRequest());
     }
 
     @Test
