@@ -9,7 +9,7 @@ package org.dspace.app.rest.submit.factory.impl;
 
 import java.util.List;
 
-import org.dspace.app.rest.model.ResourcePolicyRest;
+import org.dspace.app.rest.model.UploadAccessConditionDTO;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.authorize.service.ResourcePolicyService;
 import org.dspace.content.Bitstream;
@@ -28,7 +28,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  *
  * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  */
-public class ResourcePolicyRemovePatchOperation extends RemovePatchOperation<ResourcePolicyRest> {
+public class ResourcePolicyRemovePatchOperation extends RemovePatchOperation<UploadAccessConditionDTO> {
 
     @Autowired
     ItemService itemService;
@@ -83,12 +83,12 @@ public class ResourcePolicyRemovePatchOperation extends RemovePatchOperation<Res
     }
 
     @Override
-    protected Class<ResourcePolicyRest[]> getArrayClassForEvaluation() {
-        return ResourcePolicyRest[].class;
+    protected Class<UploadAccessConditionDTO[]> getArrayClassForEvaluation() {
+        return UploadAccessConditionDTO[].class;
     }
 
     @Override
-    protected Class<ResourcePolicyRest> getClassForEvaluation() {
-        return ResourcePolicyRest.class;
+    protected Class<UploadAccessConditionDTO> getClassForEvaluation() {
+        return UploadAccessConditionDTO.class;
     }
 }
