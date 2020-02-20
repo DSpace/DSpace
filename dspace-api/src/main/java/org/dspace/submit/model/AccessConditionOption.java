@@ -8,7 +8,7 @@
 package org.dspace.submit.model;
 
 /**
- * This class rappresent an option avaiable in the submission upload section to
+ * This class represents an option available in the submission upload section to
  * set permission on a file. An option is defined by a name such as "open
  * access", "embargo", "restricted access", etc. and some optional attributes to
  * better clarify the constraints and input available to the user. For instance
