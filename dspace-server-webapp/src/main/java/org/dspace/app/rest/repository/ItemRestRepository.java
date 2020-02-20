@@ -28,7 +28,6 @@ import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.BundleRest;
 import org.dspace.app.rest.model.ItemRest;
 import org.dspace.app.rest.model.patch.Patch;
-import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.repository.handler.service.UriListHandlerService;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bundle;
@@ -355,6 +354,6 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
 
         HttpServletRequest req = getRequestService().getCurrentRequest().getHttpServletRequest();
         Item item = uriListHandlerService.handle(context, req, stringList, Item.class);
-        return converter.toRest(item, Projection.DEFAULT);
+        return converter.toRest(item, utils.obtainProjection());
     }
 }

@@ -25,7 +25,6 @@ import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.model.ParameterValueRest;
 import org.dspace.app.rest.model.ProcessRest;
 import org.dspace.app.rest.model.ScriptRest;
-import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.scripts.handler.impl.RestDSpaceRunnableHandler;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
@@ -103,7 +102,7 @@ public class ScriptRestRepository extends DSpaceRestRepository<ScriptRest, Strin
         try {
             runDSpaceScript(scriptToExecute, restDSpaceRunnableHandler, args);
             context.complete();
-            return converter.toRest(restDSpaceRunnableHandler.getProcess(), Projection.DEFAULT);
+            return converter.toRest(restDSpaceRunnableHandler.getProcess(), utils.obtainProjection());
         } catch (SQLException e) {
             log.error("Failed to create a process with user: " + context.getCurrentUser() +
                           " scriptname: " + scriptName + " and parameters " + DSpaceCommandLineParameter
