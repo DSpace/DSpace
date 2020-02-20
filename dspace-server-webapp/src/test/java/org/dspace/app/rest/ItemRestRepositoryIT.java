@@ -1296,81 +1296,97 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
     }
 
     @Test
-    public void embargoAccessGrandToAdminOfCollectionTest() throws Exception {
+    public void embargoAccessGrantAdminsTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
-        EPerson eperson1 = EPersonBuilder.createEPerson(context)
-                .withEmail("eperson1@mail.com")
+        EPerson adminParentCommunity = EPersonBuilder.createEPerson(context)
+                .withEmail("adminCommunity@mail.com")
                 .withPassword("qwerty01")
                 .build();
 
         parentCommunity = CommunityBuilder.createCommunity(context)
                 .withName("Parent Community")
+                .withAdminGroup(adminParentCommunity)
                 .build();
+
         Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
                 .withName("Sub Community")
                 .build();
+
+        EPerson adminCollection1 = EPersonBuilder.createEPerson(context)
+                .withEmail("adminCollection1@mail.com")
+                .withPassword("qwerty02")
+                .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1)
                 .withName("Collection 1")
-                .withAdminGroup(eperson1)
+                .withAdminGroup(adminCollection1)
+                .build();
+
+        EPerson adminCollection2 = EPersonBuilder.createEPerson(context)
+                .withEmail("adminCollection2@mail.com")
+                .withPassword("qwerty03")
+                .build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1)
+                .withName("Collection 2")
+                .withAdminGroup(adminCollection2)
                 .build();
 
         Item embargoedItem = ItemBuilder.createItem(context, col1)
-                .withTitle("embargoed item 1")
-                .withIssueDate("2017-12-18")
+                .withTitle("Public item 1")
+                .withIssueDate("2015-10-21")
                 .withAuthor("Smith, Donald")
-                .withEmbargoPeriod("2 week")
+                .withSubject("ExtraEntry")
+                .withEmbargoPeriod("1 week")
                 .build();
 
         context.restoreAuthSystemState();
-
-        //An anonymous user is not allowed to view embargoed items
-        getClient().perform(get("/api/core/items/" + embargoedItem.getID()))
-                   .andExpect(status().isUnauthorized());
-
-        //Collection's admin user is allowed to access the embargoed item
-        String token1 = getAuthToken(eperson1.getEmail(), "qwerty01");
-        getClient(token1).perform(get("/api/core/items/" + embargoedItem.getID()))
+        // parent community's admin user is allowed access to embargoed item
+        String tokenAdminParentCommunity = getAuthToken(adminParentCommunity.getEmail(), "qwerty01");
+        getClient(tokenAdminParentCommunity).perform(get("/api/core/items/" + embargoedItem.getID()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$", Matchers.is(ItemMatcher.matchItemProperties(embargoedItem))));
+                .andExpect(jsonPath("$", is(ItemMatcher.matchItemProperties(embargoedItem))));
+
+        // collection1's admin user is allowed access to embargoed item
+        String tokenAdminCollection1 = getAuthToken(adminCollection1.getEmail(), "qwerty02");
+        getClient(tokenAdminCollection1).perform(get("/api/core/items/" + embargoedItem.getID()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", is(ItemMatcher.matchItemProperties(embargoedItem))));
+
+        // collection2's admin user is NOT allowed access to embargoed item of collection1
+        String tokenAdminCollection2 = getAuthToken(adminCollection2.getEmail(), "qwerty03");
+        getClient(tokenAdminCollection2).perform(get("/api/core/items/" + embargoedItem.getID()))
+                .andExpect(status().isForbidden());
     }
 
     @Test
-    public void embargoAccessGrandToAdminOfCommunityTest() throws Exception {
+    public void expiredEmbargoTest() throws Exception {
         context.turnOffAuthorisationSystem();
-
-        EPerson eperson1 = EPersonBuilder.createEPerson(context)
-                .withEmail("eperson1@mail.com")
-                .withPassword("qwerty01")
-                .build();
 
         parentCommunity = CommunityBuilder.createCommunity(context)
                 .withName("Parent Community")
                 .build();
-        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
-                .withName("Sub Community")
-                .withAdminGroup(eperson1)
-                .build();
-        Collection col1 = CollectionBuilder.createCollection(context, child1)
+
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
                 .withName("Collection 1")
                 .build();
 
         Item embargoedItem = ItemBuilder.createItem(context, col1)
                 .withTitle("embargoed item 1")
-                .withIssueDate("2017-12-18")
+                .withIssueDate("2017-11-18")
                 .withAuthor("Smith, Donald")
-                .withEmbargoPeriod("8 week")
+                .withEmbargoPeriod("-2 week")
                 .build();
 
         context.restoreAuthSystemState();
 
-        //An anonymous user is not allowed to view embargoed items
-        getClient().perform(get("/api/core/items/" + embargoedItem.getID()))
-                   .andExpect(status().isUnauthorized());
+        // all are allowed access to item with embargoed expired
 
-        //Collection's admin user is allowed to access the embargoed item
-        String token1 = getAuthToken(eperson1.getEmail(), "qwerty01");
-        getClient(token1).perform(get("/api/core/items/" + embargoedItem.getID()))
+        String tokenEperson = getAuthToken(eperson.getEmail(), password);
+        getClient(tokenEperson).perform(get("/api/core/items/" + embargoedItem.getID()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", Matchers.is(ItemMatcher.matchItemProperties(embargoedItem))));
+
+        getClient().perform(get("/api/core/items/" + embargoedItem.getID()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", Matchers.is(ItemMatcher.matchItemProperties(embargoedItem))));
     }
@@ -1504,21 +1520,16 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
     }
 
     @Test
-    public void privateGroupAccessForbiddenTest() throws Exception {
+    public void restrictedGroupAccessForbiddenTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
-        EPerson eperson1 = EPersonBuilder.createEPerson(context)
+        EPerson memberRestrictGroup = EPersonBuilder.createEPerson(context)
                 .withEmail("eperson1@mail.com")
                 .withPassword("qwerty01")
                 .build();
 
-        EPerson eperson2 = EPersonBuilder.createEPerson(context)
-                .withEmail("eperson2@mail.com")
-                .withPassword("qwerty02")
-                .build();
-
-        Group group1 = GroupBuilder.createGroup(context)
-                .addMember(eperson1)
+        Group restrictGroup = GroupBuilder.createGroup(context)
+                .addMember(memberRestrictGroup)
                 .build();
 
         parentCommunity = CommunityBuilder.createCommunity(context)
@@ -1537,50 +1548,60 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                 .withTitle("Public item 1")
                 .withIssueDate("2011-11-13")
                 .withAuthor("Smith, Donald")
-                .withReaderGroup(group1)
+                .withReaderGroup(restrictGroup)
                 .build();
 
         context.restoreAuthSystemState();
-        //members who are not part of the internal group, have no access to the item
-        String tokenEPerson2 = getAuthToken(eperson2.getEmail(), "qwerty02");
-        getClient(tokenEPerson2).perform(get("/api/core/items/" + itemRestrictedByGroup.getID()))
-                .andExpect(status().isForbidden());
 
-        //A member of the internal group is also allowed to access the restricted item
-        String tokenEPerson1 = getAuthToken(eperson1.getEmail(), "qwerty01");
-        getClient(tokenEPerson1).perform(get("/api/core/items/" + itemRestrictedByGroup.getID()))
+        //A member of the restricted group is also allowed access to restricted item
+        String tokenMemberRestrictedGroup = getAuthToken(memberRestrictGroup.getEmail(), "qwerty01");
+        getClient(tokenMemberRestrictedGroup).perform(get("/api/core/items/" + itemRestrictedByGroup.getID()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", is(ItemMatcher.matchItemProperties(itemRestrictedByGroup))));
+
+        //members who are not part of the restricted group, have no access to the item
+        String tokenEPerson = getAuthToken(eperson.getEmail(), password);
+        getClient(tokenEPerson).perform(get("/api/core/items/" + itemRestrictedByGroup.getID()))
+                .andExpect(status().isForbidden());
     }
 
     @Test
-    public void privateGroupAccessGrantToAdminOfCollectionTest() throws Exception {
+    public void restrictedGroupAccessGrantAdminsTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
-        EPerson eperson1 = EPersonBuilder.createEPerson(context)
-                .withEmail("eperson1@mail.com")
+        EPerson adminParentCommunity = EPersonBuilder.createEPerson(context)
+                .withEmail("adminCommunity@mail.com")
                 .withPassword("qwerty01")
                 .build();
 
-        EPerson eperson2 = EPersonBuilder.createEPerson(context)
-                .withEmail("eperson2@mail.com")
-                .withPassword("qwerty02")
-                .build();
-
-        Group group1 = GroupBuilder.createGroup(context)
+        Group restrictedGroup = GroupBuilder.createGroup(context)
                 .build();
 
         parentCommunity = CommunityBuilder.createCommunity(context)
                 .withName("Parent Community")
+                .withAdminGroup(adminParentCommunity)
                 .build();
 
         Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
                 .withName("Sub Community")
                 .build();
 
+        EPerson adminCollection1 = EPersonBuilder.createEPerson(context)
+                .withEmail("adminCollection1@mail.com")
+                .withPassword("qwerty02")
+                .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1)
                 .withName("Collection 1")
-                .withAdminGroup(eperson1)
+                .withAdminGroup(adminCollection1)
+                .build();
+
+        EPerson adminCollection2 = EPersonBuilder.createEPerson(context)
+                .withEmail("adminCollection2@mail.com")
+                .withPassword("qwerty03")
+                .build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1)
+                .withName("Collection 2")
+                .withAdminGroup(adminCollection2)
                 .build();
 
         Item itemRestrictedByGroup = ItemBuilder.createItem(context, col1)
@@ -1588,70 +1609,25 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                 .withIssueDate("2015-10-21")
                 .withAuthor("Smith, Donald")
                 .withSubject("ExtraEntry")
-                .withReaderGroup(group1)
+                .withReaderGroup(restrictedGroup)
                 .build();
 
         context.restoreAuthSystemState();
-
-        //collection's admin has permission
-        String tokenEPerson1 = getAuthToken(eperson1.getEmail(), "qwerty01");
-        getClient(tokenEPerson1).perform(get("/api/core/items/" + itemRestrictedByGroup.getID()))
+        // parent community's admin user is allowed access to restricted item
+        String tokenAdminParentCommunity = getAuthToken(adminParentCommunity.getEmail(), "qwerty01");
+        getClient(tokenAdminParentCommunity).perform(get("/api/core/items/" + itemRestrictedByGroup.getID()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", is(ItemMatcher.matchItemProperties(itemRestrictedByGroup))));
 
-        String tokenEPerson2 = getAuthToken(eperson2.getEmail(), "qwerty02");
-        getClient(tokenEPerson2).perform(get("/api/core/items/" + itemRestrictedByGroup.getID()))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
-    public void privateGroupAccessGrantToAdminOfCommunityTest() throws Exception {
-        context.turnOffAuthorisationSystem();
-
-        EPerson eperson1 = EPersonBuilder.createEPerson(context)
-                .withEmail("eperson1@mail.com")
-                .withPassword("qwerty01")
-                .build();
-
-        EPerson eperson2 = EPersonBuilder.createEPerson(context)
-                .withEmail("eperson2@mail.com")
-                .withPassword("qwerty02")
-                .build();
-
-        Group group1 = GroupBuilder.createGroup(context)
-                .build();
-
-        parentCommunity = CommunityBuilder.createCommunity(context)
-                .withName("Parent Community")
-                .build();
-
-        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
-                .withName("Sub Community")
-                .withAdminGroup(eperson1)
-                .build();
-
-        Collection col1 = CollectionBuilder.createCollection(context, child1)
-                .withName("Collection 1")
-                .build();
-
-        Item itemRestrictedByGroup = ItemBuilder.createItem(context, col1)
-                .withTitle("Public item 1")
-                .withIssueDate("2015-10-21")
-                .withAuthor("Smith, Donald")
-                .withSubject("ExtraEntry")
-                .withReaderGroup(group1)
-                .build();
-
-        context.restoreAuthSystemState();
-
-        //community's admin has permission
-        String tokenEPerson1 = getAuthToken(eperson1.getEmail(), "qwerty01");
-        getClient(tokenEPerson1).perform(get("/api/core/items/" + itemRestrictedByGroup.getID()))
+        // collection1's admin user is allowed access to restricted item
+        String tokenAdminCollection1 = getAuthToken(adminCollection1.getEmail(), "qwerty02");
+        getClient(tokenAdminCollection1).perform(get("/api/core/items/" + itemRestrictedByGroup.getID()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", is(ItemMatcher.matchItemProperties(itemRestrictedByGroup))));
 
-        String tokenEPerson2 = getAuthToken(eperson2.getEmail(), "qwerty02");
-        getClient(tokenEPerson2).perform(get("/api/core/items/" + itemRestrictedByGroup.getID()))
+        // collection2's admin user is NOT allowed access to restricted item of collection1
+        String tokenAdminCollection2 = getAuthToken(adminCollection2.getEmail(), "qwerty03");
+        getClient(tokenAdminCollection2).perform(get("/api/core/items/" + itemRestrictedByGroup.getID()))
                 .andExpect(status().isForbidden());
     }
 
