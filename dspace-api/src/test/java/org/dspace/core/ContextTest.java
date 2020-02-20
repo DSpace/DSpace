@@ -13,21 +13,25 @@ import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.when;
 
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 
-import mockit.NonStrictExpectations;
 import org.dspace.AbstractUnitTest;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.eperson.service.GroupService;
+import org.junit.Before;
 import org.junit.Test;
+import org.springframework.test.util.ReflectionTestUtils;
 
 /**
  * Perform some basic unit tests for Context Class
@@ -37,6 +41,33 @@ import org.junit.Test;
 public class ContextTest extends AbstractUnitTest {
     protected EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
     protected GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
+
+    /**
+     * Spy of AuthorizeService to use for tests
+     * (initialized / setup in @Before method)
+     */
+    private AuthorizeService authorizeServiceSpy;
+
+    /**
+     * This method will be run before every test as per @Before. It will
+     * initialize resources required for the tests.
+     *
+     * Other methods can be annotated with @Before here or in subclasses
+     * but no execution order is guaranteed
+     */
+    @Before
+    @Override
+    public void init() {
+        super.init();
+
+        // Initialize our spy of the autowired (global) authorizeService bean.
+        // This allows us to customize the bean's method return values in tests below
+        authorizeServiceSpy = spy(authorizeService);
+        // "Wire" our spy to be used by the current loaded object services
+        // (To ensure these services use the spy instead of the real service)
+        ReflectionTestUtils.setField(ePersonService, "authorizeService", authorizeServiceSpy);
+        ReflectionTestUtils.setField(groupService, "authorizeService", authorizeServiceSpy);
+    }
 
     /**
      * Test of getDBConnection method, of class Context.
@@ -54,11 +85,8 @@ public class ContextTest extends AbstractUnitTest {
      */
     @Test
     public void testSetCurrentUser() throws SQLException, AuthorizeException {
-        new NonStrictExpectations(authorizeService.getClass()) {{
-            // Allow Admin permissions - needed to create a new EPerson
-            authorizeService.isAdmin((Context) any);
-            result = true;
-        }};
+        // Allow full Admin perms
+        when(authorizeServiceSpy.isAdmin(context)).thenReturn(true);
 
         EPerson oldUser = context.getCurrentUser();
 
@@ -104,7 +132,6 @@ public class ContextTest extends AbstractUnitTest {
      */
     @Test
     public void testSetCurrentLocale() {
-
         //Get previous value
         Locale oldLocale = context.getCurrentLocale();
 
@@ -171,6 +198,9 @@ public class ContextTest extends AbstractUnitTest {
 
         assertThat("testSetExtraLogInfo 0", context.getExtraLogInfo(), notNullValue());
         assertThat("testSetExtraLogInfo 1", context.getExtraLogInfo(), equalTo(newValue));
+
+        //restore old value
+        context.setExtraLogInfo(oldValue);
     }
 
     /**
@@ -230,14 +260,11 @@ public class ContextTest extends AbstractUnitTest {
      */
     @Test
     public void testAbort() throws SQLException, AuthorizeException {
-        new NonStrictExpectations(authorizeService.getClass()) {{
-            // Allow Admin permissions - needed to create a new EPerson
-            authorizeService.isAdmin((Context) any);
-            result = true;
-        }};
-
         // To test abort() we need a new Context object
         Context instance = new Context();
+
+        // Allow full Admin perms (in new context)
+        when(authorizeServiceSpy.isAdmin(instance)).thenReturn(true);
 
         // Create a new EPerson (DO NOT COMMIT IT)
         String createdEmail = "susie@email.com";
@@ -268,16 +295,12 @@ public class ContextTest extends AbstractUnitTest {
      */
     @Test
     public void testClose() throws SQLException, AuthorizeException {
-        new NonStrictExpectations(authorizeService.getClass()) {{
-            // Allow Admin permissions - needed to create a new EPerson
-            authorizeService.isAdmin((Context) any);
-            result = true;
-        }};
-
         String createdEmail = "susie@email.com";
 
         // To test close() we need a new Context object in a try-with-resources block
         try (Context instance = new Context()) {
+            // Allow full Admin perms (in new context)
+            when(authorizeServiceSpy.isAdmin(instance)).thenReturn(true);
 
             // Create a new EPerson (DO NOT COMMIT IT)
             EPerson newUser = ePersonService.create(instance);
@@ -411,14 +434,11 @@ public class ContextTest extends AbstractUnitTest {
      */
     @Test
     public void testGetSpecialGroups() throws SQLException, AuthorizeException {
-        new NonStrictExpectations(authorizeService.getClass()) {{
-            // Allow Admin permissions - needed to create a new Group
-            authorizeService.isAdmin((Context) any);
-            result = true;
-        }};
-
         // To test special groups we need a new Context object
         Context instance = new Context();
+
+        // Allow full Admin perms (in new context)
+        when(authorizeServiceSpy.isAdmin(instance)).thenReturn(true);
 
         // Create a new group & add it as a special group
         Group group = groupService.create(instance);

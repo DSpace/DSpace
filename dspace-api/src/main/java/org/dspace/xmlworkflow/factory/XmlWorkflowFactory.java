@@ -7,14 +7,9 @@
  */
 package org.dspace.xmlworkflow.factory;
 
-import java.io.IOException;
-import java.sql.SQLException;
-
 import org.dspace.content.Collection;
 import org.dspace.xmlworkflow.WorkflowConfigurationException;
-import org.dspace.xmlworkflow.state.Step;
 import org.dspace.xmlworkflow.state.Workflow;
-import org.dspace.xmlworkflow.state.actions.WorkflowActionConfig;
 
 /**
  * The xmlworkflowfactory is responsible for parsing the
@@ -28,11 +23,13 @@ import org.dspace.xmlworkflow.state.actions.WorkflowActionConfig;
  */
 public interface XmlWorkflowFactory {
 
-    public final String LEGACY_WORKFLOW_NAME = "default";
 
-    public Workflow getWorkflow(Collection collection) throws IOException, WorkflowConfigurationException, SQLException;
-
-    public Step createStep(Workflow workflow, String stepID) throws WorkflowConfigurationException, IOException;
-
-    public WorkflowActionConfig createWorkflowActionConfig(String actionID);
+    /**
+     * Retrieve the workflow configuration for a single collection
+     *
+     * @param collection the collection for which we want our workflow
+     * @return the workflow configuration
+     * @throws WorkflowConfigurationException occurs if there is a configuration error in the workflow
+     */
+    public Workflow getWorkflow(Collection collection) throws WorkflowConfigurationException;
 }

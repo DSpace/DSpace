@@ -20,7 +20,6 @@ import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.GroupRest;
 import org.dspace.app.rest.model.patch.Patch;
 import org.dspace.app.rest.projection.Projection;
-import org.dspace.app.rest.repository.patch.DSpaceObjectPatch;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
 import org.dspace.eperson.Group;
@@ -44,7 +43,7 @@ public class GroupRestRepository extends DSpaceObjectRestRepository<Group, Group
 
     @Autowired
     GroupRestRepository(GroupService dsoService) {
-        super(dsoService, new DSpaceObjectPatch<GroupRest>() {});
+        super(dsoService);
         this.gs = dsoService;
     }
 
@@ -100,7 +99,7 @@ public class GroupRestRepository extends DSpaceObjectRestRepository<Group, Group
             long total = gs.countTotal(context);
             List<Group> groups = gs.findAll(context, null, pageable.getPageSize(),
                     Math.toIntExact(pageable.getOffset()));
-            return converter.toRestPage(groups, pageable, total, utils.obtainProjection(true));
+            return converter.toRestPage(groups, pageable, total, utils.obtainProjection());
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
