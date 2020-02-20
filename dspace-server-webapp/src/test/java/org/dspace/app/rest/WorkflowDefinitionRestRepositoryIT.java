@@ -441,7 +441,7 @@ public class WorkflowDefinitionRestRepositoryIT extends AbstractControllerIntegr
             + "/steps"))
             //We expect a 403 Forbidden status
             .andExpect(status().isForbidden());
-}
+    }
 
     @Test
     public void getStepsOfWorkflowByName_DefaultWorkflow_NoToken() throws Exception {
