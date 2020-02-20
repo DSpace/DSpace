@@ -494,7 +494,7 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
 
         HttpServletRequest req = getRequestService().getCurrentRequest().getHttpServletRequest();
         WorkspaceItem workspaceItem = uriListHandlerService.handle(context, req, stringList, WorkspaceItem.class);
-        return converter.toRest(workspaceItem, Projection.DEFAULT);
+        return converter.toRest(workspaceItem, utils.obtainProjection());
     }
 
 

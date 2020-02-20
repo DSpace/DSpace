@@ -127,7 +127,7 @@ public class RelationshipRestRepository extends DSpaceRestRepository<Relationshi
                 relationshipService.updateItem(context, relationship.getLeftItem());
                 relationshipService.updateItem(context, relationship.getRightItem());
                 context.restoreAuthSystemState();
-                return converter.toRest(relationship, Projection.DEFAULT);
+                return converter.toRest(relationship, utils.obtainProjection());
             } else {
                 throw new AccessDeniedException("You do not have write rights on this relationship's items");
             }

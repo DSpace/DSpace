@@ -89,7 +89,7 @@ public class BitstreamFormatRestRepository extends DSpaceRestRepository<Bitstrea
                     + bitstreamFormatRest.getShortDescription(), e);
         }
 
-        return converter.toRest(bitstreamFormat, Projection.DEFAULT);
+        return converter.toRest(bitstreamFormat, utils.obtainProjection());
     }
 
     @Override

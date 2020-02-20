@@ -293,7 +293,7 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
 
         Item itemToReturn = installItemService.installItem(context, workspaceItem);
 
-        return converter.toRest(itemToReturn, Projection.DEFAULT);
+        return converter.toRest(itemToReturn, utils.obtainProjection());
     }
 
     @Override
@@ -322,7 +322,7 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
                 + uuid + ", "
                 + itemRest.getId());
         }
-        return converter.toRest(item, Projection.DEFAULT);
+        return converter.toRest(item, utils.obtainProjection());
     }
 
     /**

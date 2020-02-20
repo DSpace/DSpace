@@ -513,10 +513,25 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
 
         ObjectMapper mapper = new ObjectMapper();
         CollectionRest collectionRest = new CollectionRest();
+        CollectionRest collectionRestNoEmbeds = new CollectionRest();
         // We send a name but the created collection should set this to the title
         collectionRest.setName("Collection");
+        collectionRestNoEmbeds.setName("Collection No Embeds");
+
 
         collectionRest.setMetadata(new MetadataRest()
+                .put("dc.description",
+                        new MetadataValueRest("<p>Some cool HTML code here</p>"))
+                .put("dc.description.abstract",
+                        new MetadataValueRest("Sample top-level community created via the REST API"))
+                .put("dc.description.tableofcontents",
+                        new MetadataValueRest("<p>HTML News</p>"))
+                .put("dc.rights",
+                        new MetadataValueRest("Custom Copyright Text"))
+                .put("dc.title",
+                        new MetadataValueRest("Title Text")));
+
+        collectionRestNoEmbeds.setMetadata(new MetadataRest()
                 .put("dc.description",
                         new MetadataValueRest("<p>Some cool HTML code here</p>"))
                 .put("dc.description.abstract",
@@ -532,9 +547,11 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
         getClient(authToken).perform(post("/api/core/collections")
                                          .content(mapper.writeValueAsBytes(collectionRest))
                                          .param("parent", parentCommunity.getID().toString())
-                                         .contentType(contentType))
+                                         .contentType(contentType)
+                                         .param("projection", "full"))
                             .andExpect(status().isCreated())
                             .andExpect(content().contentType(contentType))
+                            .andExpect(jsonPath("$", CollectionMatcher.matchFullEmbeds()))
                             .andExpect(jsonPath("$", Matchers.allOf(
                                 hasJsonPath("$.id", not(empty())),
                                 hasJsonPath("$.uuid", not(empty())),
@@ -554,6 +571,13 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                                             "Title Text")
                                 )))));
 
+        getClient(authToken).perform(post("/api/core/collections")
+                .content(mapper.writeValueAsBytes(collectionRestNoEmbeds))
+                .param("parent", parentCommunity.getID().toString())
+                .contentType(contentType))
+                .andExpect(status().isCreated())
+                .andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$", HalMatcher.matchNoEmbeds()));
     }
 
     @Test

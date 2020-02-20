@@ -111,7 +111,7 @@ public class MetadataSchemaRestRepository extends DSpaceRestRepository<MetadataS
         }
 
         // return
-        return converter.toRest(metadataSchema, Projection.DEFAULT);
+        return converter.toRest(metadataSchema, utils.obtainProjection());
     }
 
     @Override
