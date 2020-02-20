@@ -24,7 +24,6 @@ import org.dspace.app.rest.model.ErrorRest;
 import org.dspace.app.rest.model.WorkflowItemRest;
 import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.rest.model.patch.Patch;
-import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.submit.AbstractRestProcessingStep;
 import org.dspace.app.rest.submit.SubmissionService;
 import org.dspace.app.rest.submit.UploadableStep;
@@ -204,7 +203,7 @@ public class WorkflowItemRestRepository extends DSpaceRestRepository<WorkflowIte
             }
 
         }
-        wsi = converter.toRest(source, Projection.DEFAULT);
+        wsi = converter.toRest(source, utils.obtainProjection());
 
         if (!errors.isEmpty()) {
             wsi.getErrors().addAll(errors);

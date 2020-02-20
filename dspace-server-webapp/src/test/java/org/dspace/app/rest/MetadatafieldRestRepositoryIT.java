@@ -184,6 +184,7 @@ public class MetadatafieldRestRepositoryIT extends AbstractControllerIntegration
         getClient(authToken)
             .perform(post("/api/core/metadatafields")
                          .param("schemaId", metadataSchema.getID() + "")
+                         .param("projection", "full")
                          .content(new ObjectMapper().writeValueAsBytes(metadataFieldRest))
                          .contentType(contentType))
             .andExpect(status().isCreated())

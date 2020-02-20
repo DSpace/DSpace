@@ -10,6 +10,7 @@ package org.dspace.app.rest.matcher;
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasNoJsonPath;
 
+import static org.dspace.app.rest.matcher.HalMatcher.matchEmbeds;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
@@ -24,9 +25,9 @@ import org.hamcrest.Matcher;
  * @author Mykhaylo Boychuk (4science.it)
  *
  */
-public class ResoucePolicyMatcher {
+public class ResourcePolicyMatcher {
 
-    private ResoucePolicyMatcher() {
+    private ResourcePolicyMatcher() {
     }
 
     public static Matcher<? super Object> matchResourcePolicy(ResourcePolicy resourcePolicy) {
@@ -50,6 +51,17 @@ public class ResoucePolicyMatcher {
                                         is(resourcePolicy.getGroup().getID().toString())) :
                                hasJsonPath("$._embedded.group", nullValue())
                         );
+    }
+
+    /**
+     * Gets a matcher for all expected embeds when the full projection is requested.
+     */
+    public static Matcher<? super Object> matchFullEmbeds() {
+        return matchEmbeds(
+                "eperson",
+                "group",
+                "resource"
+        );
     }
 
 }
