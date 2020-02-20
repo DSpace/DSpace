@@ -41,7 +41,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * Created by: Andrew Wood
  * Date: 26 Jul 2019
  */
-public class CSVMetadataImportReferenceTest extends AbstractEntityIntegrationTest {
+public class CSVMetadataImportReferenceIT extends AbstractEntityIntegrationTest {
 
     //Common collection to utilize for test
     private Collection col1;
