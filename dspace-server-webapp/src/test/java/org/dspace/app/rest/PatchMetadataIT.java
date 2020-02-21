@@ -1,3 +1,10 @@
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
+ *
+ * http://www.dspace.org/license/
+ */
 package org.dspace.app.rest;
 
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -80,6 +87,15 @@ public class PatchMetadataIT extends AbstractEntityIntegrationTest {
         context.restoreAuthSystemState();
     }
 
+    /**
+     * A method to create a workspace publication containing 5 authors: 3 regular authors and 2 related Person items.
+     * The authors are added in a specific order:
+     * - "Whyte, William": Regular author
+     * - "Dahlen, Sarah": Related Person
+     * - "Peterson, Karrie": Regular author
+     * - "Perotti, Enrico": Regular author
+     * - "Linton, Oliver": Related Person
+     */
     private void initPersonPublicationWorkspace() throws Exception {
         // Setup the original order of authors
         authorsOriginalOrder = new ArrayList<>();
@@ -174,6 +190,12 @@ public class PatchMetadataIT extends AbstractEntityIntegrationTest {
         assertThat(publicationAuthorList.get(4).getAuthority(), startsWith("virtual::"));
     }
 
+    /**
+     * This test will move an author (dc.description.author) within a workspace publication's "traditionalpageone"
+     * section from position 1 to 0 using a PATCH request and verify the order of the authors within the section.
+     * Original Order: 0,1,2,3,4
+     * Expected Order: 1,0,2,3,4
+     */
     @Test
     public void moveTraditionalPageOneAuthorOneToZeroTest() throws Exception {
         initPersonPublicationWorkspace();
@@ -188,6 +210,12 @@ public class PatchMetadataIT extends AbstractEntityIntegrationTest {
         moveTraditionalPageOneAuthorTest(1, 0, expectedOrder);
     }
 
+    /**
+     * This test will move an author (dc.description.author) within a workspace publication's "traditionalpageone"
+     * section from position 2 to 0 using a PATCH request and verify the order of the authors within the section.
+     * Original Order: 0,1,2,3,4
+     * Expected Order: 2,0,1,3,4
+     */
     @Test
     public void moveTraditionalPageOneAuthorTwoToZeroTest() throws Exception {
         initPersonPublicationWorkspace();
@@ -202,6 +230,12 @@ public class PatchMetadataIT extends AbstractEntityIntegrationTest {
         moveTraditionalPageOneAuthorTest(2, 0, expectedOrder);
     }
 
+    /**
+     * This test will move an author (dc.description.author) within a workspace publication's "traditionalpageone"
+     * section from position 3 to 0 using a PATCH request and verify the order of the authors within the section.
+     * Original Order: 0,1,2,3,4
+     * Expected Order: 3,0,1,2,4
+     */
     @Test
     public void moveTraditionalPageOneAuthorThreeToZeroTest() throws Exception {
         initPersonPublicationWorkspace();
@@ -216,6 +250,12 @@ public class PatchMetadataIT extends AbstractEntityIntegrationTest {
         moveTraditionalPageOneAuthorTest(3, 0, expectedOrder);
     }
 
+    /**
+     * This test will move an author (dc.description.author) within a workspace publication's "traditionalpageone"
+     * section from position 4 to 0 using a PATCH request and verify the order of the authors within the section.
+     * Original Order: 0,1,2,3,4
+     * Expected Order: 4,0,1,2,3
+     */
     @Test
     public void moveTraditionalPageOneAuthorFourToZeroTest() throws Exception {
         initPersonPublicationWorkspace();
@@ -230,6 +270,12 @@ public class PatchMetadataIT extends AbstractEntityIntegrationTest {
         moveTraditionalPageOneAuthorTest(4, 0, expectedOrder);
     }
 
+    /**
+     * This test will move an author (dc.description.author) within a workspace publication's "traditionalpageone"
+     * section from position 1 to 3 using a PATCH request and verify the order of the authors within the section.
+     * Original Order: 0,1,2,3,4
+     * Expected Order: 0,2,3,1,4
+     */
     @Test
     public void moveTraditionalPageOneAuthorOneToThreeTest() throws Exception {
         initPersonPublicationWorkspace();
@@ -244,6 +290,12 @@ public class PatchMetadataIT extends AbstractEntityIntegrationTest {
         moveTraditionalPageOneAuthorTest(1, 3, expectedOrder);
     }
 
+    /**
+     * This test will move an author (dc.description.author) within a workspace publication's "traditionalpageone"
+     * section from position 1 to 4 using a PATCH request and verify the order of the authors within the section.
+     * Original Order: 0,1,2,3,4
+     * Expected Order: 0,2,3,4,1
+     */
     @Test
     public void moveTraditionalPageOneAuthorOneToFourTest() throws Exception {
         initPersonPublicationWorkspace();
@@ -258,6 +310,14 @@ public class PatchMetadataIT extends AbstractEntityIntegrationTest {
         moveTraditionalPageOneAuthorTest(1, 4, expectedOrder);
     }
 
+    /**
+     * This method moves an author (dc.description.author) within a workspace publication's "traditionalpageone"
+     * section from position "from" to "path" using a PATCH request and verifies the order of the authors within the
+     * section using an ordered list of expected author names.
+     * @param from              The "from" index to use for the Move operation
+     * @param path              The "path" index to use for the Move operation
+     * @param expectedOrder     A list of author names sorted in the expected order
+     */
     private void moveTraditionalPageOneAuthorTest(int from, int path, List<String> expectedOrder) throws Exception {
         List<Operation> ops = new ArrayList<Operation>();
         MoveOperation moveOperation = getTraditionalPageOneMoveAuthorOperation(from, path);
@@ -284,6 +344,12 @@ public class PatchMetadataIT extends AbstractEntityIntegrationTest {
                 )));
     }
 
+    /**
+     * Create a move operation on a workspace item's "traditionalpageone" section for
+     * metadata field "dc.contributor.author".
+     * @param from  The "from" index to use for the Move operation
+     * @param path  The "path" index to use for the Move operation
+     */
     private MoveOperation getTraditionalPageOneMoveAuthorOperation(int from, int path) {
         return new MoveOperation("/sections/traditionalpageone/dc.contributor.author/" + path,
                 "/sections/traditionalpageone/dc.contributor.author/" + from);
