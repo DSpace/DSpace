@@ -22,6 +22,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.stereotype.Component;
 
+/**
+ * LinkRepository for the ParentCommunity object for a Community
+ */
 @Component(CommunityRest.CATEGORY + "." + CommunityRest.NAME + "." + CommunityRest.PARENT_COMMUNITY)
 public class CommunityParentCommunityLinkRepository extends AbstractDSpaceRestRepository
     implements LinkRestRepository {
@@ -29,6 +32,15 @@ public class CommunityParentCommunityLinkRepository extends AbstractDSpaceRestRe
     @Autowired
     private CommunityService communityService;
 
+    /**
+     * This method retrieves the ParentCommunity object for the Community which is defined by the given communityId
+     * It'll transform this Parent Community to a REST object and return this
+     * @param httpServletRequest    The current request
+     * @param communityId           The given Community UUID that will be used to find the communityId
+     * @param optionalPageable      The pageable
+     * @param projection            The current Projection
+     * @return                      The Parent Community REST object
+     */
     public CommunityRest getParentCommunity(@Nullable HttpServletRequest httpServletRequest,
                                             UUID communityId,
                                             @Nullable Pageable optionalPageable,

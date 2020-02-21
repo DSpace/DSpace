@@ -24,6 +24,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.stereotype.Component;
 
+/**
+ * LinkRepository for the ParentCommunity object for a Collection
+ */
 @Component(CollectionRest.CATEGORY + "." + CollectionRest.NAME + "." + CollectionRest.PARENT_COMMUNITY)
 public class CollectionParentCommunityLinkRepository extends AbstractDSpaceRestRepository
     implements LinkRestRepository {
@@ -31,6 +34,15 @@ public class CollectionParentCommunityLinkRepository extends AbstractDSpaceRestR
     @Autowired
     private CollectionService collectionService;
 
+    /**
+     * This method retrieves the ParentCommunity object for the Collection which is defined by the given collectionId
+     * It'll transform this Parent Community to a REST object and return this
+     * @param httpServletRequest    The current request
+     * @param collectionId          The given Collection UUID that will be used to find the Collection
+     * @param optionalPageable      The pageable
+     * @param projection            The current Projection
+     * @return                      The Parent Community REST object
+     */
     public CommunityRest getParentCommunity(@Nullable HttpServletRequest httpServletRequest,
                                             UUID collectionId,
                                             @Nullable Pageable optionalPageable,
@@ -38,10 +50,10 @@ public class CollectionParentCommunityLinkRepository extends AbstractDSpaceRestR
         try {
             Context context = obtainContext();
             Collection collection = collectionService.find(context, collectionId);
-            Community parentCommunity = (Community) collectionService.getParentObject(context, collection);
             if (collection == null) {
                 throw new ResourceNotFoundException("No such collection: " + collectionId);
             }
+            Community parentCommunity = (Community) collectionService.getParentObject(context, collection);
             return converter.toRest(parentCommunity, projection);
         } catch (SQLException e) {
             throw new RuntimeException(e);
