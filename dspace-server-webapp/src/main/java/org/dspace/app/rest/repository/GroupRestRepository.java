@@ -7,6 +7,8 @@
  */
 package org.dspace.app.rest.repository;
 
+import static org.apache.commons.lang3.StringUtils.isBlank;
+
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
@@ -56,9 +58,10 @@ public class GroupRestRepository extends DSpaceObjectRestRepository<Group, Group
     @PreAuthorize("hasAuthority('ADMIN')")
     protected GroupRest createAndReturn(Context context)
             throws AuthorizeException, RepositoryMethodNotImplementedException {
+
         HttpServletRequest req = getRequestService().getCurrentRequest().getHttpServletRequest();
         ObjectMapper mapper = new ObjectMapper();
-        GroupRest groupRest = null;
+        GroupRest groupRest;
 
         try {
             groupRest = mapper.readValue(req.getInputStream(), GroupRest.class);
@@ -66,7 +69,11 @@ public class GroupRestRepository extends DSpaceObjectRestRepository<Group, Group
             throw new UnprocessableEntityException("error parsing the body ..." + excIO.getMessage());
         }
 
-        Group group = null;
+        if (isBlank(groupRest.getName())) {
+            throw new UnprocessableEntityException("cannot create group, no group name is provided");
+        }
+
+        Group group;
         try {
             group = gs.create(context);
             gs.setName(group, groupRest.getName());
