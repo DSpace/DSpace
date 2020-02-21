@@ -212,6 +212,8 @@ public class StructBuilder {
             }
 
             importStructure(context, inputStream, outputStream);
+            // save changes from import
+            context.complete();
         }
         System.exit(0);
     }
@@ -304,8 +306,6 @@ public class StructBuilder {
                     output, e.getMessage());
             System.exit(1);
         }
-
-        context.complete();
     }
 
     /**

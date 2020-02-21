@@ -15,6 +15,11 @@ import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.spy;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -26,16 +31,17 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 
-import mockit.NonStrictExpectations;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.ResourcePolicy;
+import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.test.util.ReflectionTestUtils;
 
 /**
  * Units tests for class Bundle
@@ -56,6 +62,11 @@ public class BundleTest extends AbstractDSpaceObjectTest {
     private Collection collection;
     private Community owningCommunity;
 
+    /**
+     * Spy of AuthorizeService to use for tests
+     * (initialized / setup in @Before method)
+     */
+    private AuthorizeService authorizeServiceSpy;
 
     /**
      * This method will be run before every test as per @Before. It will
@@ -79,6 +90,15 @@ public class BundleTest extends AbstractDSpaceObjectTest {
 
             //we need to commit the changes so we don't block the table for testing
             context.restoreAuthSystemState();
+
+            // Initialize our spy of the autowired (global) authorizeService bean.
+            // This allows us to customize the bean's method return values in tests below
+            authorizeServiceSpy = spy(authorizeService);
+            // "Wire" our spy to be used by the current loaded itemService, bundleService & bitstreamService
+            // (To ensure it uses the spy instead of the real service)
+            ReflectionTestUtils.setField(itemService, "authorizeService", authorizeServiceSpy);
+            ReflectionTestUtils.setField(bundleService, "authorizeService", authorizeServiceSpy);
+            ReflectionTestUtils.setField(bitstreamService, "authorizeService", authorizeServiceSpy);
         } catch (SQLException | AuthorizeException ex) {
             log.error("SQL Error in init", ex);
             fail("SQL Error in init: " + ex.getMessage());
@@ -155,14 +175,9 @@ public class BundleTest extends AbstractDSpaceObjectTest {
      */
     @Test
     public void testCreate() throws SQLException, AuthorizeException {
-        new NonStrictExpectations(authorizeService.getClass()) {
-            {
-                // Allow Bundle ADD perms
-                authorizeService.authorizeAction((Context) any, (Bundle) any,
-                                                 Constants.ADD);
-                result = null;
-            }
-        };
+        // Allow Item ADD permissions
+        doNothing().when(authorizeServiceSpy).authorizeAction(context, item, Constants.ADD);
+
         Bundle created = bundleService.create(context, item, "testCreateBundle");
         //the item created by default has no name nor type set
         assertThat("testCreate 0", created, notNullValue());
@@ -221,16 +236,14 @@ public class BundleTest extends AbstractDSpaceObjectTest {
      */
     @Test
     public void testSetPrimaryBitstreamID() throws SQLException, AuthorizeException, IOException {
-        new NonStrictExpectations(authorizeService.getClass()) {
-            {
-                // Allow Bundle ADD perms
-                authorizeService.authorizeAction((Context) any, (Bundle) any,
-                                                 Constants.ADD);
-                authorizeService.authorizeAction((Context) any, (Bitstream) any,
-                                                 Constants.WRITE);
-                result = null;
-            }
-        };
+        // Allow Item WRITE permissions
+        doNothing().when(authorizeServiceSpy).authorizeAction(context, item, Constants.WRITE);
+        // Allow Bundle ADD permissions
+        doNothing().when(authorizeServiceSpy).authorizeAction(context, b, Constants.ADD);
+        // Allow Bitstream WRITE permissions
+        doNothing().when(authorizeServiceSpy)
+                   .authorizeAction(any(Context.class), any(Bitstream.class), eq(Constants.WRITE));
+
         File f = new File(testProps.get("test.bitstream").toString());
         Bitstream bs = bitstreamService.create(context, new FileInputStream(f));
         bundleService.addBitstream(context, b, bs);
@@ -243,16 +256,14 @@ public class BundleTest extends AbstractDSpaceObjectTest {
      */
     @Test
     public void testUnsetPrimaryBitstreamID() throws IOException, SQLException, AuthorizeException {
-        new NonStrictExpectations(authorizeService.getClass()) {
-            {
-                // Allow Bundle ADD perms
-                authorizeService.authorizeAction((Context) any, (Bundle) any,
-                                                 Constants.ADD);
-                authorizeService.authorizeAction((Context) any, (Bitstream) any,
-                                                 Constants.WRITE);
-                result = null;
-            }
-        };
+        // Allow Item WRITE permissions
+        doNothing().when(authorizeServiceSpy).authorizeAction(context, item, Constants.WRITE);
+        // Allow Bundle ADD permissions
+        doNothing().when(authorizeServiceSpy).authorizeAction(context, b, Constants.ADD);
+        // Allow Bitstream WRITE permissions
+        doNothing().when(authorizeServiceSpy)
+                   .authorizeAction(any(Context.class), any(Bitstream.class), eq(Constants.WRITE));
+
         //set a value different than default
         File f = new File(testProps.get("test.bitstream").toString());
         Bitstream bs = bitstreamService.create(context, new FileInputStream(f));
@@ -279,27 +290,25 @@ public class BundleTest extends AbstractDSpaceObjectTest {
      */
     @Test
     public void testGetBitstreamByName() throws FileNotFoundException, SQLException, IOException, AuthorizeException {
-        new NonStrictExpectations(authorizeService.getClass()) {{
-            // Allow Bundle ADD perms
-            authorizeService.authorizeAction((Context) any, (Bundle) any,
-                                             Constants.ADD);
-            result = null;
-            authorizeService.authorizeAction((Context) any, (Bitstream) any,
-                                             Constants.WRITE);
-            result = null;
-
-        }};
+        // Allow Bundle ADD permissions
+        doNothing().when(authorizeServiceSpy).authorizeAction(context, b, Constants.ADD);
+        // Allow Bitstream WRITE permissions
+        doNothing().when(authorizeServiceSpy)
+                   .authorizeAction(any(Context.class), any(Bitstream.class), eq(Constants.WRITE));
 
         String name = "name";
         //by default there is no bitstream
         assertThat("testGetHandle 0", bundleService.getBitstreamByName(b, name), nullValue());
 
         //let's add a bitstream
+        context.turnOffAuthorisationSystem();
         File f = new File(testProps.get("test.bitstream").toString());
         Bitstream bs = bitstreamService.create(context, new FileInputStream(f));
         bs.setName(context, name);
         bundleService.addBitstream(context, b, bs);
         bundleService.update(context, b);
+        context.restoreAuthSystemState();
+
         assertThat("testGetHandle 1", bundleService.getBitstreamByName(b, name), notNullValue());
         assertThat("testGetHandle 2", bundleService.getBitstreamByName(b, name), equalTo(bs));
         assertThat("testGetHandle 3", bundleService.getBitstreamByName(b, name).getName(), equalTo(name));
@@ -310,27 +319,25 @@ public class BundleTest extends AbstractDSpaceObjectTest {
      */
     @Test
     public void testGetBitstreams() throws FileNotFoundException, SQLException, IOException, AuthorizeException {
-        new NonStrictExpectations(authorizeService.getClass()) {{
-            // Allow Bundle ADD perms
-            authorizeService.authorizeAction((Context) any, (Bundle) any,
-                                             Constants.ADD);
-            result = null;
-            authorizeService.authorizeAction((Context) any, (Bitstream) any,
-                                             Constants.WRITE);
-            result = null;
-
-        }};
+        // Allow Bundle ADD permissions
+        doNothing().when(authorizeServiceSpy).authorizeAction(context, b, Constants.ADD);
+        // Allow Bitstream WRITE permissions
+        doNothing().when(authorizeServiceSpy)
+                   .authorizeAction(any(Context.class), any(Bitstream.class), eq(Constants.WRITE));
 
         //default bundle has no bitstreams
         assertThat("testGetBitstreams 0", b.getBitstreams(), notNullValue());
         assertThat("testGetBitstreams 1", b.getBitstreams().size(), equalTo(0));
 
         //let's add a bitstream
+        context.turnOffAuthorisationSystem();
         String name = "name";
         File f = new File(testProps.get("test.bitstream").toString());
         Bitstream bs = bitstreamService.create(context, new FileInputStream(f));
         bs.setName(context, name);
         bundleService.addBitstream(context, b, bs);
+        context.restoreAuthSystemState();
+
         assertThat("testGetBitstreams 2", b.getBitstreams(), notNullValue());
         assertThat("testGetBitstreams 3", b.getBitstreams().size(), equalTo(1));
         assertThat("testGetBitstreams 4", b.getBitstreams().get(0).getName(), equalTo(name));
@@ -352,16 +359,11 @@ public class BundleTest extends AbstractDSpaceObjectTest {
     @Test(expected = AuthorizeException.class)
     public void testCreateBitstreamNoAuth()
         throws FileNotFoundException, AuthorizeException, SQLException, IOException {
-        new NonStrictExpectations(authorizeService.getClass()) {{
-            // Disallow Bundle ADD perms
-            authorizeService.authorizeAction((Context) any, (Bundle) any,
-                                             Constants.ADD);
-            result = new AuthorizeException();
-
-        }};
+        // Disallow Bundle ADD permissions
+        doThrow(new AuthorizeException()).when(authorizeServiceSpy).authorizeAction(context, b, Constants.ADD);
 
         File f = new File(testProps.get("test.bitstream").toString());
-        Bitstream bs = bitstreamService.create(context, b, new FileInputStream(f));
+        bitstreamService.create(context, b, new FileInputStream(f));
         fail("Exception should be thrown");
     }
 
@@ -370,16 +372,13 @@ public class BundleTest extends AbstractDSpaceObjectTest {
      */
     @Test
     public void testCreateBitstreamAuth() throws FileNotFoundException, AuthorizeException, SQLException, IOException {
-        new NonStrictExpectations(authorizeService.getClass()) {{
-            // Allow Bundle ADD perms
-            authorizeService.authorizeAction((Context) any, (Bundle) any,
-                                             Constants.ADD);
-            result = null;
-            authorizeService.authorizeAction((Context) any, (Bitstream) any,
-                                             Constants.WRITE);
-            result = null;
-
-        }};
+        // Allow Item WRITE permissions
+        doNothing().when(authorizeServiceSpy).authorizeAction(context, item, Constants.WRITE);
+        // Allow Bundle ADD permissions
+        doNothing().when(authorizeServiceSpy).authorizeAction(context, b, Constants.ADD);
+        // Allow Bitstream WRITE permissions
+        doNothing().when(authorizeServiceSpy)
+                   .authorizeAction(any(Context.class), any(Bitstream.class), eq(Constants.WRITE));
 
         String name = "name";
         File f = new File(testProps.get("test.bitstream").toString());
@@ -395,17 +394,12 @@ public class BundleTest extends AbstractDSpaceObjectTest {
      */
     @Test(expected = AuthorizeException.class)
     public void testRegisterBitstreamNoAuth() throws AuthorizeException, IOException, SQLException {
-        new NonStrictExpectations(authorizeService.getClass()) {{
-            // Disallow Bundle ADD perms
-            authorizeService.authorizeAction((Context) any, (Bundle) any,
-                                             Constants.ADD);
-            result = new AuthorizeException();
-
-        }};
+        // Disallow Bundle ADD permissions
+        doThrow(new AuthorizeException()).when(authorizeServiceSpy).authorizeAction(context, b, Constants.ADD);
 
         int assetstore = 0; //default assetstore
         File f = new File(testProps.get("test.bitstream").toString());
-        Bitstream bs = bitstreamService.register(context, b, assetstore, f.getAbsolutePath());
+        bitstreamService.register(context, b, assetstore, f.getAbsolutePath());
         fail("Exception should be thrown");
     }
 
@@ -414,16 +408,13 @@ public class BundleTest extends AbstractDSpaceObjectTest {
      */
     @Test
     public void testRegisterBitstreamAuth() throws AuthorizeException, IOException, SQLException {
-        new NonStrictExpectations(authorizeService.getClass()) {{
-            // Allow Bundle ADD perms
-            authorizeService.authorizeAction((Context) any, (Bundle) any,
-                                             Constants.ADD);
-            result = null;
-
-            authorizeService.authorizeAction((Context) any, (Bitstream) any,
-                                             Constants.WRITE);
-            result = null;
-        }};
+        // Allow Item WRITE permissions
+        doNothing().when(authorizeServiceSpy).authorizeAction(context, item, Constants.WRITE);
+        // Allow Bundle ADD permissions
+        doNothing().when(authorizeServiceSpy).authorizeAction(context, b, Constants.ADD);
+        // Allow Bitstream WRITE permissions
+        doNothing().when(authorizeServiceSpy)
+                   .authorizeAction(any(Context.class), any(Bitstream.class), eq(Constants.WRITE));
 
         int assetstore = 0;  //default assetstore
         String name = "name bitstream";
@@ -440,13 +431,8 @@ public class BundleTest extends AbstractDSpaceObjectTest {
      */
     @Test(expected = AuthorizeException.class)
     public void testAddBitstreamNoAuth() throws SQLException, AuthorizeException, IOException {
-        new NonStrictExpectations(authorizeService.getClass()) {{
-            // Disallow Bundle ADD perms
-            authorizeService.authorizeAction((Context) any, (Bundle) any,
-                                             Constants.ADD);
-            result = new AuthorizeException();
-
-        }};
+        // Disallow Bundle ADD permissions
+        doThrow(new AuthorizeException()).when(authorizeServiceSpy).authorizeAction(context, b, Constants.ADD);
 
         // create a new Bitstream to add to Bundle
         File f = new File(testProps.get("test.bitstream").toString());
@@ -461,16 +447,13 @@ public class BundleTest extends AbstractDSpaceObjectTest {
      */
     @Test
     public void testAddBitstreamAuth() throws SQLException, AuthorizeException, FileNotFoundException, IOException {
-        new NonStrictExpectations(authorizeService.getClass()) {{
-            // Allow Bundle ADD perms
-            authorizeService.authorizeAction((Context) any, (Bundle) any,
-                                             Constants.ADD);
-            result = null;
-            authorizeService.authorizeAction((Context) any, (Bitstream) any,
-                                             Constants.WRITE);
-            result = null;
-
-        }};
+        // Allow Item WRITE permissions
+        doNothing().when(authorizeServiceSpy).authorizeAction(context, item, Constants.WRITE);
+        // Allow Bundle ADD permissions
+        doNothing().when(authorizeServiceSpy).authorizeAction(context, b, Constants.ADD);
+        // Allow Bitstream WRITE permissions
+        doNothing().when(authorizeServiceSpy)
+                   .authorizeAction(any(Context.class), any(Bitstream.class), eq(Constants.WRITE));
 
         File f = new File(testProps.get("test.bitstream").toString());
         Bitstream bs = bitstreamService.create(context, new FileInputStream(f));
@@ -487,17 +470,15 @@ public class BundleTest extends AbstractDSpaceObjectTest {
      */
     @Test(expected = AuthorizeException.class)
     public void testRemoveBitstreamNoAuth() throws SQLException, AuthorizeException, IOException {
-        new NonStrictExpectations(authorizeService.getClass()) {{
-            // Disallow Bundle REMOVE perms
-            authorizeService.authorizeAction((Context) any, (Bundle) any,
-                                             Constants.REMOVE);
-            result = new AuthorizeException();
-
-        }};
+        // Disallow Bundle ADD permissions
+        doThrow(new AuthorizeException()).when(authorizeServiceSpy).authorizeAction(context, b, Constants.REMOVE);
 
         File f = new File(testProps.get("test.bitstream").toString());
+        context.turnOffAuthorisationSystem();
         Bitstream bs = bitstreamService.create(context, new FileInputStream(f));
         bs.setName(context, "name");
+        context.restoreAuthSystemState();
+
         bundleService.removeBitstream(context, b, bs);
         fail("Exception should have been thrown");
     }
@@ -507,28 +488,26 @@ public class BundleTest extends AbstractDSpaceObjectTest {
      */
     @Test
     public void testRemoveBitstreamAuth() throws SQLException, AuthorizeException, IOException {
-        new NonStrictExpectations(authorizeService.getClass()) {{
-            // Allow Bundle ADD perms (to create a new Bitstream and add it)
-            authorizeService.authorizeAction((Context) any, (Bundle) any,
-                                             Constants.ADD);
-            result = null;
-            // Allow Bundle REMOVE perms (to test remove)
-            authorizeService.authorizeAction((Context) any, (Bundle) any,
-                                             Constants.REMOVE);
-            result = null;
-            authorizeService.authorizeAction((Context) any, (Bitstream) any,
-                                             Constants.WRITE);
-            result = null;
-            authorizeService.authorizeAction(context, (Bitstream) any,
-                                             Constants.DELETE);
-            result = null;
-
-        }};
+        // Allow Item WRITE permissions (to create a new bitstream)
+        doNothing().when(authorizeServiceSpy).authorizeAction(context, item, Constants.WRITE);
+        // Allow Bundle ADD permissions (to create a new bitstream)
+        doNothing().when(authorizeServiceSpy).authorizeAction(context, b, Constants.ADD);
+        // Allow Bundle REMOVE permissions
+        doNothing().when(authorizeServiceSpy).authorizeAction(context, b, Constants.REMOVE);
+        // Allow Bitstream WRITE permissions
+        doNothing().when(authorizeServiceSpy)
+                   .authorizeAction(any(Context.class), any(Bitstream.class), eq(Constants.WRITE));
+        // Allow Bitstream DELETE permissions
+        doNothing().when(authorizeServiceSpy)
+                   .authorizeAction(any(Context.class), any(Bitstream.class), eq(Constants.DELETE));
 
         // Create a new Bitstream to test with
+        context.turnOffAuthorisationSystem();
         File f = new File(testProps.get("test.bitstream").toString());
         Bitstream bs = bitstreamService.create(context, new FileInputStream(f));
         bundleService.addBitstream(context, b, bs);
+        context.restoreAuthSystemState();
+
         bundleService.removeBitstream(context, b, bs);
         assertThat("testRemoveBitstreamAuth 0", bundleService.getBitstreamByName(b, bs.getName()), nullValue());
     }
@@ -549,19 +528,10 @@ public class BundleTest extends AbstractDSpaceObjectTest {
      */
     @Test
     public void testDelete() throws SQLException, AuthorizeException, IOException {
-        new NonStrictExpectations(authorizeService.getClass()) {{
-            // Allow Bundle ADD perms (to create a new Bitstream and add it)
-            authorizeService.authorizeAction((Context) any, (Bundle) any,
-                                             Constants.ADD);
-            result = null;
-            // Allow Bundle REMOVE perms (to test remove)
-            authorizeService.authorizeAction((Context) any, (Bundle) any,
-                                             Constants.REMOVE);
-            result = null;
-            authorizeService.authorizeAction((Context) any, (Bundle) any,
-                                             Constants.DELETE);
-            result = null;
-        }};
+        // Allow Item REMOVE permissions
+        doNothing().when(authorizeServiceSpy).authorizeAction(context, item, Constants.REMOVE);
+        // Allow Bundle DELETE permissions
+        doNothing().when(authorizeServiceSpy).authorizeAction(context, b, Constants.DELETE);
 
         UUID id = b.getID();
         itemService.removeBundle(context, item, b);
@@ -676,17 +646,18 @@ public class BundleTest extends AbstractDSpaceObjectTest {
 
     @Test
     public void testSetOrder() throws SQLException, AuthorizeException, FileNotFoundException, IOException {
-        new NonStrictExpectations(authorizeService.getClass()) {{
-            // Allow Bundle ADD perms
-            authorizeService.authorizeAction((Context) any, (Bundle) any,
-                                             Constants.ADD);
-            result = null;
-            authorizeService.authorizeAction((Context) any, (Bitstream) any,
-                                             Constants.WRITE);
-            result = null;
-        }};
+        // Allow Item WRITE permissions
+        doNothing().when(authorizeServiceSpy).authorizeAction(context, item, Constants.WRITE);
+        // Allow Bundle ADD permissions
+        doNothing().when(authorizeServiceSpy).authorizeAction(context, b, Constants.ADD);
+        // Allow Bundle WRITE permissions
+        doNothing().when(authorizeServiceSpy).authorizeAction(context, b, Constants.WRITE);
+        // Allow Bitstream WRITE permissions
+        doNothing().when(authorizeServiceSpy)
+                   .authorizeAction(any(Context.class), any(Bitstream.class), eq(Constants.WRITE));
 
         // Create three Bitstreams to test ordering with. Give them different names
+        context.turnOffAuthorisationSystem();
         File f = new File(testProps.get("test.bitstream").toString());
         Bitstream bs = bitstreamService.create(context, new FileInputStream(f));
         bs.setName(context, "bitstream1");
@@ -697,6 +668,7 @@ public class BundleTest extends AbstractDSpaceObjectTest {
         Bitstream bs3 = bitstreamService.create(context, new FileInputStream(f));
         bs3.setName(context, "bitstream3");
         bundleService.addBitstream(context, b, bs3);
+        context.restoreAuthSystemState();
 
         // Assert Bitstreams are in the order added
         Bitstream[] bitstreams = b.getBitstreams().toArray(new Bitstream[b.getBitstreams().size()]);

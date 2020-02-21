@@ -23,8 +23,9 @@ import org.dspace.content.service.RelationshipService;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.rest.webmvc.ResourceNotFoundException;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
 /**
@@ -40,22 +41,21 @@ public class ItemRelationshipLinkRepository extends AbstractDSpaceRestRepository
     @Autowired
     ItemService itemService;
 
-    //@PreAuthorize("hasPermission(#itemId, 'ITEM', 'READ')")
-    public Page<RelationshipRest> getItemRelationships(@Nullable HttpServletRequest request,
-                                                       UUID itemId,
-                                                       @Nullable Pageable optionalPageable,
-                                                       Projection projection) {
+    @PreAuthorize("hasPermission(#itemId, 'ITEM', 'READ')")
+    public Page<RelationshipRest> getRelationships(@Nullable HttpServletRequest request,
+                                                   UUID itemId,
+                                                   @Nullable Pageable optionalPageable,
+                                                   Projection projection) {
         try {
             Context context = obtainContext();
             Item item = itemService.find(context, itemId);
             if (item == null) {
-                return null;
+                throw new ResourceNotFoundException("No such item: " + itemId);
             }
-            Pageable pageable = optionalPageable != null ? optionalPageable : new PageRequest(0, 20);
-            Integer limit = pageable == null ? null : pageable.getPageSize();
-            Integer offset = pageable == null ? null : Math.toIntExact(pageable.getOffset());
             int total = relationshipService.countByItem(context, item);
-            List<Relationship> relationships = relationshipService.findByItem(context, item, limit, offset);
+            Pageable pageable = utils.getPageable(optionalPageable);
+            List<Relationship> relationships = relationshipService.findByItem(context, item,
+                    pageable.getPageSize(), Math.toIntExact(pageable.getOffset()));
             return converter.toRestPage(relationships, pageable, total, projection);
         } catch (SQLException e) {
             throw new RuntimeException(e);

@@ -11,11 +11,11 @@ package org.dspace.statistics.util;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.security.Principal;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -114,7 +114,7 @@ public class DummyHttpServletRequest implements HttpServletRequest {
      * @param headerValue The value of the header
      */
     public void addHeader(String headerName, String headerValue) {
-        List<String> values = headers.computeIfAbsent(headerName, k -> new LinkedList<>());
+        List<String> values = headers.computeIfAbsent(headerName, k -> new ArrayList<>());
         values.add(headerValue);
     }
     /* (non-Javadoc)
@@ -292,6 +292,7 @@ public class DummyHttpServletRequest implements HttpServletRequest {
      * @see javax.servlet.http.HttpServletRequest#isRequestedSessionIdFromUrl()
      */
     @Override
+    @Deprecated
     public boolean isRequestedSessionIdFromUrl() {
         // TODO Auto-generated method stub
         return false;
@@ -502,6 +503,7 @@ public class DummyHttpServletRequest implements HttpServletRequest {
      * @see javax.servlet.ServletRequest#getRealPath(java.lang.String)
      */
     @Override
+    @Deprecated
     public String getRealPath(String arg0) {
         // TODO Auto-generated method stub
         return null;

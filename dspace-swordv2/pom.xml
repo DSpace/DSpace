@@ -69,6 +69,8 @@
             <type>jar</type>
             <classifier>classes</classifier>
             <exclusions>
+                <!-- Abdera is unmaintained/obsolete. But, 'fom-impl' is a new Abdera compatible library for Axiom.
+                     Therefore, we are using 'fom-impl' instead (see below) -->
                 <exclusion>
                     <groupId>org.apache.abdera</groupId>
                     <artifactId>abdera-client</artifactId>
@@ -77,6 +79,7 @@
                     <groupId>javax.servlet</groupId>
                     <artifactId>servlet-api</artifactId>
                 </exclusion>
+                <!-- Newer version of log4j provided below -->
                 <exclusion>
                     <groupId>log4j</groupId>
                     <artifactId>log4j</artifactId>
@@ -112,6 +115,7 @@
             </exclusions>
         </dependency>
 
+        <!-- Log4j -->
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-api</artifactId>
@@ -120,26 +124,24 @@
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-core</artifactId>
         </dependency>
-	<dependency>
+        <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-web</artifactId>
-	</dependency>
+        </dependency>
+
+        <!-- Replacement for Abdera (required by sword2-server dependency). Abdera is no longer maintained
+             (https://abdera.apache.org/). But Axiom FOM is backwards compatible with Abdera.
+             See https://ws.apache.org/axiom/implementations/fom-impl/index.html -->
         <dependency>
-            <groupId>org.apache.abdera</groupId>
-            <artifactId>abdera-client</artifactId>
-            <version>1.1.3</version>
+            <groupId>org.apache.ws.commons.axiom</groupId>
+            <artifactId>fom-impl</artifactId>
+            <version>${axiom.version}</version>
             <exclusions>
+                <!-- Exclude Geronimo as it is NOT necessary when using javax.activation (which we use)
+                     See: https://ws.apache.org/axiom/userguide/ch04.html#d0e732 -->
                 <exclusion>
-                    <groupId>org.apache.ws.commons.axiom</groupId>
-                    <artifactId>axiom-impl</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.apache.ws.commons.axiom</groupId>
-                    <artifactId>axiom-api</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.codehaus.woodstox</groupId>
-                    <artifactId>wstx-asl</artifactId>
+                    <groupId>org.apache.geronimo.specs</groupId>
+                    <artifactId>*</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>

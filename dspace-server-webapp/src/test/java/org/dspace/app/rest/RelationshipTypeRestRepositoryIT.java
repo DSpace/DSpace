@@ -137,7 +137,7 @@ public class RelationshipTypeRestRepositoryIT extends AbstractEntityIntegrationT
         //When we call this facets endpoint
         List<RelationshipType> relationshipTypes = relationshipTypeService.findAll(context);
 
-        getClient().perform(get("/api/core/relationshiptypes"))
+        getClient().perform(get("/api/core/relationshiptypes").param("projection", "full"))
 
                    //We expect a 200 OK status
                    .andExpect(status().isOk())
@@ -176,7 +176,8 @@ public class RelationshipTypeRestRepositoryIT extends AbstractEntityIntegrationT
         }
 
         if (foundRelationshipType != null) {
-            getClient().perform(get("/api/core/relationshiptypes/" + foundRelationshipType.getID()))
+            getClient().perform(get("/api/core/relationshiptypes/" + foundRelationshipType.getID())
+                       .param("projection", "full"))
                        .andExpect(jsonPath("$._embedded.leftType",
                                            EntityTypeMatcher.matchEntityTypeEntryForLabel("Publication")))
                        .andExpect(
@@ -221,7 +222,8 @@ public class RelationshipTypeRestRepositoryIT extends AbstractEntityIntegrationT
         }
 
         if (foundRelationshipType != null) {
-            getClient().perform(get("/api/core/relationshiptypes/" + foundRelationshipType.getID()))
+            getClient().perform(get("/api/core/relationshiptypes/" + foundRelationshipType.getID())
+                       .param("projection", "full"))
                        .andExpect(jsonPath("$._embedded.leftType",
                                            EntityTypeMatcher.matchEntityTypeEntryForLabel("JournalVolume")))
                        .andExpect(jsonPath("$._embedded.rightType",
