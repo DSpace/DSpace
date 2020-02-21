@@ -463,8 +463,8 @@ public class RelationshipMetadataServiceTest extends AbstractUnitTest {
         WorkspaceItem is = workspaceItemService.create(context, col, false);
         Item secondItem = installItemService.installItem(context, is);
         itemService.addMetadata(context, secondItem, "relationship", "type", null, null, "Publication");
-        Relationship secondRelationship = relationshipService.create(context, secondItem, rightItem,
-                                                                     isAuthorOfPublicationRelationshipType, 0, 0);
+        relationshipService.create(context, secondItem, rightItem,
+                                   isAuthorOfPublicationRelationshipType, 0, 0);
         context.restoreAuthSystemState();
 
         assertThat(relationshipService.findNextRightPlaceByRightItem(context, rightItem), equalTo(2));
@@ -489,8 +489,8 @@ public class RelationshipMetadataServiceTest extends AbstractUnitTest {
         itemService.addMetadata(context, secondAuthor, "relationship", "type", null, null, "Author");
         itemService.addMetadata(context, secondAuthor, "person", "familyName", null, null, "familyName");
         itemService.addMetadata(context, secondAuthor, "person", "givenName", null, null, "firstName");
-        Relationship secondRelationship = relationshipService.create(context, leftItem, secondAuthor,
-                                                                     isAuthorOfPublicationRelationshipType, 0, 0);
+        relationshipService.create(context, leftItem, secondAuthor,
+                                   isAuthorOfPublicationRelationshipType, 0, 0);
         context.restoreAuthSystemState();
 
         assertThat(relationshipService.findNextLeftPlaceByLeftItem(context, leftItem), equalTo(2));

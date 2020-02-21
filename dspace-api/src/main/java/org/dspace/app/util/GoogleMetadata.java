@@ -889,7 +889,7 @@ public class GoogleMetadata {
             Bitstream bitstream = findLinkableFulltext(item);
             if (bitstream != null) {
                 StringBuilder path = new StringBuilder();
-                path.append(ConfigurationManager.getProperty("dspace.url"));
+                path.append(ConfigurationManager.getProperty("dspace.ui.url"));
 
                 if (item.getHandle() != null) {
                     path.append("/bitstream/");

@@ -15,15 +15,14 @@ import java.sql.SQLException;
 import java.util.Properties;
 import java.util.TimeZone;
 
-import mockit.integration.junit4.JMockit;
 import org.apache.logging.log4j.Logger;
-import org.dspace.app.util.MockUtil;
 import org.dspace.servicemanager.DSpaceKernelImpl;
 import org.dspace.servicemanager.DSpaceKernelInit;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.runner.RunWith;
+import org.mockito.junit.MockitoJUnitRunner;
 
 /**
  * DSpace Unit Tests need to initialize the DSpace Kernel / Service Mgr
@@ -39,7 +38,7 @@ import org.junit.runner.RunWith;
  * @see AbstractIntegrationTest
  */
 @Ignore
-@RunWith(JMockit.class)
+@RunWith(MockitoJUnitRunner.class)
 public class AbstractDSpaceTest {
 
     /**
@@ -86,11 +85,9 @@ public class AbstractDSpaceTest {
             kernelImpl = DSpaceKernelInit.getKernel(null);
             if (!kernelImpl.isRunning()) {
                 // NOTE: the "dspace.dir" system property MUST be specified via Maven
+                // For example: by using <systemPropertyVariables> of maven-surefire-plugin or maven-failsafe-plugin
                 kernelImpl.start(getDspaceDir()); // init the kernel
             }
-
-            // Initialize mock Util class (allows Util.getSourceVersion() to work in Unit tests)
-            new MockUtil();
         } catch (IOException ex) {
             log.error("Error initializing tests", ex);
             fail("Error initializing tests: " + ex.getMessage());

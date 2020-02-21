@@ -21,16 +21,11 @@ import org.dspace.app.rest.RestResourceController;
 @LinksRest(links = {
     @LinkRest(
             name = BrowseIndexRest.ITEMS,
-            linkClass = ItemRest.class,
-            method = "listBrowseItems",
-            embedOptional = true
+            method = "listBrowseItems"
     ),
     @LinkRest(
             name = BrowseIndexRest.ENTRIES,
-            linkClass = BrowseEntryRest.class,
-            method = "listBrowseEntries",
-            embedOptional = true,
-            linkOptional = true
+            method = "listBrowseEntries"
     )
 })
 public class BrowseIndexRest extends BaseObjectRest<String> {
