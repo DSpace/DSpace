@@ -8,7 +8,7 @@
 package org.dspace.core;
 
 import static org.apache.bcel.Const.ACC_PUBLIC;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertNotNull;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -136,12 +136,12 @@ public class PathsClassLoaderTest {
             jarFile.getCanonicalPath()};
         PathsClassLoader instance = new PathsClassLoader(parentCL, classpath);
         Class result = instance.findClass(className);
-        assertTrue("Should return a Class from file", result instanceof Class);
+        assertNotNull("Should return a Class from file", result);
 
         classpath[0] = jarFile.getCanonicalPath();
         instance = new PathsClassLoader(parentCL, classpath);
         result = instance.findClass(jarClassName);
-        assertTrue("Should return a Class from JAR", result instanceof Class);
+        assertNotNull("Should return a Class from JAR", result);
     }
 
 }
