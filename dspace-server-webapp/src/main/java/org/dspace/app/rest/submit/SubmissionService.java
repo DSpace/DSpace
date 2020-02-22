@@ -26,6 +26,7 @@ import org.dspace.app.rest.model.CheckSumRest;
 import org.dspace.app.rest.model.MetadataValueRest;
 import org.dspace.app.rest.model.UploadAccessConditionDTO;
 import org.dspace.app.rest.model.WorkspaceItemRest;
+import org.dspace.app.rest.model.step.DataUpload;
 import org.dspace.app.rest.model.step.UploadBitstreamRest;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.utils.ContextUtil;
@@ -80,7 +81,7 @@ public class SubmissionService {
     private ConverterService converter;
 
     /**
-     * Create a workspaceitem using the information in the reqest
+     * Create a workspaceitem using the information in the request
      *
      * @param context
      *            the dspace context
@@ -134,7 +135,17 @@ public class SubmissionService {
         }
     }
 
-
+/**
+ * Build the rest representation of a bitstream as used in the upload section
+ * ({@link DataUpload}. It contains all its metadata and the list of applied
+ * access conditions (@link {@link UploadAccessConditionDTO}
+ * 
+ * @param configurationService the DSpace ConfigurationService
+ * @param source               the bitstream to translate in its rest submission
+ *                             representation
+ * @return
+ * @throws SQLException
+ */
     public UploadBitstreamRest buildUploadBitstream(ConfigurationService configurationService, Bitstream source)
         throws SQLException {
         UploadBitstreamRest data = new UploadBitstreamRest();
@@ -186,7 +197,7 @@ public class SubmissionService {
     }
 
     /**
-     * Create a workflowitem using the information in the reqest
+     * Create a workflowitem using the information in the request
      *
      * @param context
      *            the dspace context
