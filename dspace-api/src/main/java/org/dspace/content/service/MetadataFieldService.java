@@ -71,6 +71,16 @@ public interface MetadataFieldService {
     public MetadataField findByElement(Context context, String metadataSchemaName, String element, String qualifier)
         throws SQLException;
 
+    /**
+     * Separates an mdString in schema, element and qualifier parts, separated by a given separator
+     *      And returns it's matching metadataField if found
+     * @param context       dspace context
+     * @param mdString      String being separated to find corresponding mdField (ex dc.contributor)
+     * @param separator     Separator being used to separate the mdString
+     * @return  Corresponding MetadataField if found
+     */
+    public MetadataField findByString(Context context, String mdString, char separator) throws SQLException;
+
     public List<MetadataField> findFieldsByElementNameUnqualified(Context context, String metadataSchema,
                                                                   String element)
         throws SQLException;
