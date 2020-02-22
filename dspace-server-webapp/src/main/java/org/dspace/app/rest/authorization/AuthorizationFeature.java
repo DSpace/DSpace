@@ -11,7 +11,7 @@ import java.sql.SQLException;
 
 import org.dspace.app.rest.model.BaseObjectRest;
 import org.dspace.app.rest.model.RestModel;
-import org.dspace.content.Site;
+import org.dspace.app.rest.model.SiteRest;
 import org.dspace.core.Context;
 import org.springframework.core.annotation.AnnotationUtils;
 
@@ -29,8 +29,8 @@ public interface AuthorizationFeature {
      * @param context
      *            the DSpace Context
      * @param object
-     *            the object target by the feature (MUST be NOT null). Use the {@link Site} object for repository wide
-     *            feature
+     *            the object target by the feature (MUST be NOT null). Use the {@link SiteRest} object for repository
+     *            wide feature
      * @return true if the user associated with the context has access to the feature for the specified object
      */
     boolean isAuthorized(Context context, BaseObjectRest object) throws SQLException;

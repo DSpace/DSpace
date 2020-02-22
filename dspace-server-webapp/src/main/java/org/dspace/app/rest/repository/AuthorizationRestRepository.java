@@ -99,7 +99,7 @@ public class AuthorizationRestRepository extends DSpaceRestRepository<Authorizat
             if (authorizationFeature == null) {
                 return null;
             }
-
+            // get the user specified identified by the id
             EPerson user;
             try {
                 user = authorizationRestUtil.getEperson(context, id);
@@ -108,6 +108,8 @@ public class AuthorizationRestRepository extends DSpaceRestRepository<Authorizat
                 return null;
             }
             EPerson currUser = context.getCurrentUser();
+            // Temporarily change the Context's current user in order to retrieve
+            // authorizations based on that user
             context.setCurrentUser(user);
 
             if (authorizationFeatureService.isAuthorized(context, authorizationFeature, object)) {
@@ -117,6 +119,7 @@ public class AuthorizationRestRepository extends DSpaceRestRepository<Authorizat
                 authz.setObject(object);
                 authorizationRest = converter.toRest(authz, utils.obtainProjection());
             }
+            // restore the real current user
             context.setCurrentUser(currUser);
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
@@ -158,22 +161,10 @@ public class AuthorizationRestRepository extends DSpaceRestRepository<Authorizat
         }
 
         EPerson currUser = context.getCurrentUser();
-        EPerson user = currUser;
-
-        if (epersonUuid != null) {
-            if (context.getCurrentUser() == null) {
-                throw new AuthorizeException("attempt to anonymously access the authorization of the eperson "
-                        + epersonUuid);
-            } else {
-                if (!authorizeService.isAdmin(context) && !epersonUuid.equals(currUser.getID())) {
-                    throw new AuthorizeException("attempt to access the authorization of the eperson " + epersonUuid
-                            + " only system administrators can see the authorization of other users");
-                }
-                user = epersonService.find(context, epersonUuid);
-            }
-        } else {
-            user = null;
-        }
+        // get the user specified in the requested parameters
+        EPerson user = getUserFromRequestParameter(context, epersonUuid);
+        // Temporarily change the Context's current user in order to retrieve
+        // authorizations based on that user
         context.setCurrentUser(user);
         List<AuthorizationFeature> features = authorizationFeatureService.findByResourceType(obj.getUniqueType());
         List<Authorization> authorizations = new ArrayList<Authorization>();
@@ -182,6 +173,7 @@ public class AuthorizationRestRepository extends DSpaceRestRepository<Authorizat
                 authorizations.add(new Authorization(user, f, obj));
             }
         }
+        // restore the real current user
         context.setCurrentUser(currUser);
         return converter.toRestPage(utils.getPage(authorizations, pageable), utils.obtainProjection());
     }
@@ -219,21 +211,10 @@ public class AuthorizationRestRepository extends DSpaceRestRepository<Authorizat
         }
 
         EPerson currUser = context.getCurrentUser();
-        EPerson user = currUser;
-        if (epersonUuid != null) {
-            if (context.getCurrentUser() == null) {
-                throw new AuthorizeException("attempt to anonymously access the authorization of the eperson "
-                        + epersonUuid);
-            } else {
-                if (!authorizeService.isAdmin(context) && !epersonUuid.equals(currUser.getID())) {
-                    throw new AuthorizeException("attempt to access the authorization of the eperson " + epersonUuid
-                            + " only system administrators can see the authorization of other users");
-                }
-                user = epersonService.find(context, epersonUuid);
-            }
-        } else {
-            user = null;
-        }
+        // get the user specified in the requested parameters
+        EPerson user = getUserFromRequestParameter(context, epersonUuid);
+        // Temporarily change the Context's current user in order to retrieve
+        // authorizations based on that user
         context.setCurrentUser(user);
         AuthorizationFeature feature = authorizationFeatureService.find(featureName);
         AuthorizationRest authorizationRest = null;
@@ -244,6 +225,7 @@ public class AuthorizationRestRepository extends DSpaceRestRepository<Authorizat
             authz.setObject(obj);
             authorizationRest = converter.toRest(authz, utils.obtainProjection());
         }
+        // restore the real current user
         context.setCurrentUser(currUser);
         return authorizationRest;
     }
@@ -284,6 +266,38 @@ public class AuthorizationRestRepository extends DSpaceRestRepository<Authorizat
         }
     }
 
+    /**
+     * Return the user specified in the request parameter if valid
+     * 
+     * @param context
+     * @param epersonUuid
+     * @return
+     * @throws AuthorizeException if the user specified in the request parameter is
+     *                            not valid
+     * @throws SQLException       if a database error occurs
+     */
+    private EPerson getUserFromRequestParameter(Context context, UUID epersonUuid)
+            throws AuthorizeException, SQLException {
+        EPerson currUser = context.getCurrentUser();
+        EPerson user = currUser;
+        if (epersonUuid != null) {
+            if (currUser == null) {
+                throw new AuthorizeException("attempt to anonymously access the authorization of the eperson "
+                        + epersonUuid);
+            } else {
+                // an user is specified in the request parameters
+                if (!authorizeService.isAdmin(context) && !epersonUuid.equals(currUser.getID())) {
+                    throw new AuthorizeException("attempt to access the authorization of the eperson " + epersonUuid
+                            + " only system administrators can see the authorization of other users");
+                }
+                user = epersonService.find(context, epersonUuid);
+            }
+        } else {
+            // the request asks to check the permission for the anonymous user
+            user = null;
+        }
+        return user;
+    }
 
     @Override
     public Class<AuthorizationRest> getDomainClass() {

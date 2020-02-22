@@ -11,7 +11,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 import org.dspace.app.rest.model.BaseObjectRest;
-import org.dspace.content.Site;
+import org.dspace.app.rest.model.SiteRest;
 import org.dspace.core.Context;
 
 /**
@@ -31,13 +31,13 @@ public interface AuthorizationFeatureService {
      *            the Authorization Feature to check
      * @param object
      *            the object target by the feature. Passing a null object always return false. To check repository wide
-     *            feature pass the {@link Site} object
+     *            feature pass the {@link SiteRest} object
      * @return true if the user associated with the context has access to the feature
      */
     boolean isAuthorized(Context context, AuthorizationFeature feature, BaseObjectRest object) throws SQLException;
 
     /**
-     * Get all the authorization features defined in the syste
+     * Get all the authorization features defined in the system
      *
      * @return a list of all the authorization features
      */
@@ -52,5 +52,12 @@ public interface AuthorizationFeatureService {
      */
     public AuthorizationFeature find(String name);
 
+    /**
+     * Return all the feature that apply to the rest resources identified by the
+     * uniqueType string category.model
+     * 
+     * @param categoryDotModel
+     * @return
+     */
     List<AuthorizationFeature> findByResourceType(String categoryDotModel);
 }
