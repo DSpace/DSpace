@@ -19,6 +19,12 @@ import org.dspace.app.rest.model.CheckSumRest;
 import org.dspace.app.rest.model.MetadataValueRest;
 import org.dspace.app.rest.model.UploadAccessConditionDTO;
 
+/**
+ * This Java Bean is used to represent a single bitstream with all its metadata
+ * and access conditions ({@link UploadAccessConditionDTO}) inside an
+ * upload submission section ({@link DataUpload}
+ *
+ */
 public class UploadBitstreamRest extends UploadStatusResponse {
 
     private UUID uuid;

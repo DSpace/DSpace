@@ -28,7 +28,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  *
  * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  */
-public class ResourcePolicyRemovePatchOperation extends RemovePatchOperation<UploadAccessConditionDTO> {
+public class BitstreamResourcePolicyRemovePatchOperation extends RemovePatchOperation<UploadAccessConditionDTO> {
 
     @Autowired
     ItemService itemService;

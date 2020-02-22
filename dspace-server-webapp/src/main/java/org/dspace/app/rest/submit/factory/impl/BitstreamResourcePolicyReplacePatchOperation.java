@@ -36,7 +36,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  *
  * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  */
-public class ResourcePolicyReplacePatchOperation extends ReplacePatchOperation<ResourcePolicyRest> {
+public class BitstreamResourcePolicyReplacePatchOperation extends ReplacePatchOperation<ResourcePolicyRest> {
 
     @Autowired
     BitstreamService bitstreamService;
