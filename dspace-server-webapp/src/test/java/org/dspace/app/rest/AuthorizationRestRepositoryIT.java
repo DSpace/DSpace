@@ -611,17 +611,17 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
         // disarm the alwaysThrowExceptionFeature
         configurationService.setProperty("org.dspace.app.rest.authorization.AlwaysThrowExceptionFeature.turnoff", true);
 
+        String adminToken = getAuthToken(admin.getEmail(), password);
+        String epersonToken = getAuthToken(eperson.getEmail(), password);
         for (String invalidUri : invalidUris) {
             log.debug("findByObjectBadRequestTest - Testing the URI: " + invalidUri);
             // verify that it works for administrators with an invalid or missing uri
-            String adminToken = getAuthToken(admin.getEmail(), password);
             getClient(adminToken).perform(get("/api/authz/authorizations/search/object")
                     .param("uri", invalidUri)
                     .param("eperson", admin.getID().toString()))
                 .andExpect(status().isBadRequest());
 
             // verify that it works for normal loggedin users with an invalid or missing uri
-            String epersonToken = getAuthToken(eperson.getEmail(), password);
             getClient(epersonToken).perform(get("/api/authz/authorizations/search/object")
                     .param("uri", invalidUri)
                     .param("eperson", eperson.getID().toString()))
@@ -643,20 +643,19 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
                     .param("uri", invalidUri))
                 .andExpect(status().isBadRequest());
         }
-        //FIXME add once https://github.com/DSpace/DSpace/pull/2668 is merged
-        //        getClient(adminToken).perform(get("/api/authz/authorizations/search/object")
-        //                .param("eperson", admin.getID().toString()))
-        //            .andExpect(status().isBadRequest());
-        //        getClient(epersonToken).perform(get("/api/authz/authorizations/search/object")
-        //                .param("eperson", eperson.getID().toString()))
-        //            .andExpect(status().isBadRequest());
-        //        getClient(adminToken).perform(get("/api/authz/authorizations/search/object")
-        //                .param("eperson", eperson.getID().toString()))
-        //            .andExpect(status().isBadRequest());
-        //        getClient().perform(get("/api/authz/authorizations/search/object"))
-        //            .andExpect(status().isBadRequest());
-        //        getClient(adminToken).perform(get("/api/authz/authorizations/search/object"))
-        //            .andExpect(status().isBadRequest());
+        getClient(adminToken).perform(get("/api/authz/authorizations/search/object")
+                .param("eperson", admin.getID().toString()))
+            .andExpect(status().isBadRequest());
+        getClient(epersonToken).perform(get("/api/authz/authorizations/search/object")
+                .param("eperson", eperson.getID().toString()))
+            .andExpect(status().isBadRequest());
+        getClient(adminToken).perform(get("/api/authz/authorizations/search/object")
+                .param("eperson", eperson.getID().toString()))
+            .andExpect(status().isBadRequest());
+        getClient().perform(get("/api/authz/authorizations/search/object"))
+            .andExpect(status().isBadRequest());
+        getClient(adminToken).perform(get("/api/authz/authorizations/search/object"))
+            .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -979,10 +978,11 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
         // disarm the alwaysThrowExceptionFeature
         configurationService.setProperty("org.dspace.app.rest.authorization.AlwaysThrowExceptionFeature.turnoff", true);
 
+        String adminToken = getAuthToken(admin.getEmail(), password);
+        String epersonToken = getAuthToken(eperson.getEmail(), password);
         for (String invalidUri : invalidUris) {
-            System.out.println("findByObjectAndFeatureBadRequestTest - Testing the URI: " + invalidUri);
+            log.debug("findByObjectAndFeatureBadRequestTest - Testing the URI: " + invalidUri);
             // verify that it works for administrators with an invalid or missing uri
-            String adminToken = getAuthToken(admin.getEmail(), password);
             getClient(adminToken).perform(get("/api/authz/authorizations/search/objectAndFeature")
                     .param("uri", invalidUri)
                     .param("feature", alwaysTrue.getName())
@@ -990,66 +990,64 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
                 .andExpect(status().isBadRequest());
 
             // verify that it works for normal loggedin users with an invalid or missing uri
-            String epersonToken = getAuthToken(eperson.getEmail(), password);
-            getClient(epersonToken).perform(get("/api/authz/authorizations/search/object")
+            getClient(epersonToken).perform(get("/api/authz/authorizations/search/objectAndFeature")
                     .param("uri", invalidUri)
                     .param("feature", alwaysTrue.getName())
                     .param("eperson", eperson.getID().toString()))
                 .andExpect(status().isBadRequest());
 
             // verify that it works for administators inspecting other users with an invalid or missing uri
-            getClient(adminToken).perform(get("/api/authz/authorizations/search/object")
+            getClient(adminToken).perform(get("/api/authz/authorizations/search/objectAndFeature")
                     .param("uri", invalidUri)
                     .param("feature", alwaysTrue.getName())
                     .param("eperson", eperson.getID().toString()))
                 .andExpect(status().isBadRequest());
 
             // verify that it works for anonymous users with an invalid or missing uri
-            getClient().perform(get("/api/authz/authorizations/search/object")
+            getClient().perform(get("/api/authz/authorizations/search/objectAndFeature")
                     .param("uri", invalidUri)
                     .param("feature", alwaysTrue.getName()))
                 .andExpect(status().isBadRequest());
 
             // verify that it works for administrators inspecting anonymous users with an invalid or missing uri
-            getClient(adminToken).perform(get("/api/authz/authorizations/search/object")
+            getClient(adminToken).perform(get("/api/authz/authorizations/search/objectAndFeature")
                     .param("uri", invalidUri)
                     .param("feature", alwaysTrue.getName()))
                 .andExpect(status().isBadRequest());
         }
 
-        //FIXME add once https://github.com/DSpace/DSpace/pull/2668 is merged
-        //        getClient(adminToken).perform(get("/api/authz/authorizations/search/object")
-        //                .param("eperson", admin.getID().toString()))
-        //            .andExpect(status().isBadRequest());
-        //        getClient(epersonToken).perform(get("/api/authz/authorizations/search/object")
-        //                .param("eperson", eperson.getID().toString()))
-        //            .andExpect(status().isBadRequest());
-        //        getClient(adminToken).perform(get("/api/authz/authorizations/search/object")
-        //                .param("eperson", eperson.getID().toString()))
-        //            .andExpect(status().isBadRequest());
-        //        getClient().perform(get("/api/authz/authorizations/search/object"))
-        //            .andExpect(status().isBadRequest());
-        //        getClient(adminToken).perform(get("/api/authz/authorizations/search/object"))
-        //            .andExpect(status().isBadRequest());
+        getClient(adminToken).perform(get("/api/authz/authorizations/search/objectAndFeature")
+                .param("eperson", admin.getID().toString()))
+            .andExpect(status().isBadRequest());
+        getClient(epersonToken).perform(get("/api/authz/authorizations/search/objectAndFeature")
+                .param("eperson", eperson.getID().toString()))
+            .andExpect(status().isBadRequest());
+        getClient(adminToken).perform(get("/api/authz/authorizations/search/objectAndFeature")
+                .param("eperson", eperson.getID().toString()))
+            .andExpect(status().isBadRequest());
+        getClient().perform(get("/api/authz/authorizations/search/objectAndFeature"))
+            .andExpect(status().isBadRequest());
+        getClient(adminToken).perform(get("/api/authz/authorizations/search/objectAndFeature"))
+            .andExpect(status().isBadRequest());
 
-        //        getClient(adminToken).perform(get("/api/authz/authorizations/search/object")
-        //                .param("uri", siteUri.getID().toString()))
-        //                .param("eperson", admin.getID().toString()))
-        //            .andExpect(status().isBadRequest());
-        //        getClient(epersonToken).perform(get("/api/authz/authorizations/search/object")
-        //                .param("uri", siteUri.getID().toString()))
-        //                .param("eperson", eperson.getID().toString()))
-        //            .andExpect(status().isBadRequest());
-        //        getClient(adminToken).perform(get("/api/authz/authorizations/search/object")
-        //                .param("uri", siteUri.getID().toString()))
-        //                .param("eperson", eperson.getID().toString()))
-        //            .andExpect(status().isBadRequest());
-        //        getClient().perform(get("/api/authz/authorizations/search/object")
-        //                .param("uri", siteUri.getID().toString())))
-        //            .andExpect(status().isBadRequest());
-        //        getClient(adminToken).perform(get("/api/authz/authorizations/search/object")
-        //                .param("uri", siteUri.getID().toString())))
-        //            .andExpect(status().isBadRequest());
+        getClient(adminToken).perform(get("/api/authz/authorizations/search/objectAndFeature")
+                .param("uri", siteUri)
+                .param("eperson", admin.getID().toString()))
+            .andExpect(status().isBadRequest());
+        getClient(epersonToken).perform(get("/api/authz/authorizations/search/objectAndFeature")
+                .param("uri", siteUri)
+                .param("eperson", eperson.getID().toString()))
+            .andExpect(status().isBadRequest());
+        getClient(adminToken).perform(get("/api/authz/authorizations/search/objectAndFeature")
+                .param("uri", siteUri)
+                .param("eperson", eperson.getID().toString()))
+            .andExpect(status().isBadRequest());
+        getClient().perform(get("/api/authz/authorizations/search/objectAndFeature")
+                .param("uri", siteUri))
+            .andExpect(status().isBadRequest());
+        getClient(adminToken).perform(get("/api/authz/authorizations/search/objectAndFeature")
+                .param("uri", siteUri.toString()))
+            .andExpect(status().isBadRequest());
     }
 
     @Test
