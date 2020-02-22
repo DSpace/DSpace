@@ -24,7 +24,6 @@ import org.dspace.app.rest.authorization.AlwaysTrueFeature;
 import org.dspace.app.rest.authorization.Authorization;
 import org.dspace.app.rest.authorization.AuthorizationFeature;
 import org.dspace.app.rest.authorization.AuthorizationFeatureService;
-import org.dspace.app.rest.authorization.AuthorizationRestUtil;
 import org.dspace.app.rest.authorization.TrueForAdminsFeature;
 import org.dspace.app.rest.authorization.TrueForLoggedUsersFeature;
 import org.dspace.app.rest.authorization.TrueForTestUsersFeature;
@@ -64,9 +63,6 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
 
     @Autowired
     private AuthorizationFeatureService authorizationFeatureService;
-
-    @Autowired
-    private AuthorizationRestUtil authorizationRestUtil;
 
     @Autowired
     private ConverterService converterService;
