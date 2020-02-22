@@ -37,6 +37,7 @@ import java.util.Scanner;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.UUID;
+
 import javax.annotation.Nullable;
 import javax.servlet.http.HttpServletRequest;
 
@@ -68,6 +69,7 @@ import org.dspace.content.service.BitstreamFormatService;
 import org.dspace.content.service.DSpaceObjectService;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
+import org.dspace.services.ConfigurationService;
 import org.dspace.services.RequestService;
 import org.dspace.util.UUIDUtils;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
@@ -122,6 +124,9 @@ public class Utils {
 
     @Autowired
     private ConverterService converter;
+
+    @Autowired
+    private ConfigurationService configurationService;
 
     /** Cache to support fast lookups of LinkRest method annotation information. */
     private Map<Method, Optional<LinkRest>> linkAnnotationForMethod = new HashMap<>();
@@ -738,5 +743,54 @@ public class Utils {
                 restObj.getType());
         Serializable pk = castToPKClass((FindableObjectRepository) repository, restObj.getId().toString());
         return ((FindableObjectRepository) repository).findDomainObjectByPk(context, pk);
+    }
+
+    /**
+    * Get the rest object associated with the specified URI
+    * 
+    * @param context the DSpace context
+    * @param uri     the uri of a {@link BaseObjectRest}
+    * @return the {@link BaseObjectRest} identified by the provided uri
+    * @throws SQLException             if a database error occur
+    * @throws IllegalArgumentException if the uri is not valid
+    */
+    public BaseObjectRest getBaseObjectRestFromUri(Context context, String uri) throws SQLException {
+        String dspaceUrl = configurationService.getProperty("dspace.server.url");
+        // first check if the uri could be valid
+        if (!StringUtils.startsWith(uri, dspaceUrl)) {
+            throw new IllegalArgumentException("the supplied uri is not valid: " + uri);
+        }
+        // extract from the uri the category, model and id components
+        // they start after the dspaceUrl/api/{apiCategory}/{apiModel}/{id}
+        String[] uriParts = uri.substring(dspaceUrl.length() + (dspaceUrl.endsWith("/") ? 0 : 1) + "api/".length())
+                .split("/", 3);
+        if (uriParts.length != 3) {
+            throw new IllegalArgumentException("the supplied uri is not valid: " + uri);
+        }
+
+        DSpaceRestRepository repository;
+        try {
+            repository = getResourceRepository(uriParts[0], uriParts[1]);
+            if (!(repository instanceof FindableObjectRepository)) {
+                throw new IllegalArgumentException("the supplied uri is not valid: " + uri);
+            }
+        } catch (RepositoryNotFoundException e) {
+            throw new IllegalArgumentException("the supplied uri is not valid: " + uri, e);
+        }
+
+        Serializable pk;
+        try {
+            // cast the string id in the uriParts to the real pk class
+            pk = castToPKClass((FindableObjectRepository) repository, uriParts[2]);
+        } catch (Exception e) {
+            throw new IllegalArgumentException("the supplied uri is not valid: " + uri, e);
+        }
+        try {
+            // disable the security as we only need to retrieve the object to further process the authorization
+            context.turnOffAuthorisationSystem();
+            return (BaseObjectRest) repository.findOne(context, pk);
+        } finally {
+            context.restoreAuthSystemState();
+        }
     }
 }

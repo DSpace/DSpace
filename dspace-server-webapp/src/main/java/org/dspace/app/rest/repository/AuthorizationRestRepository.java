@@ -7,13 +7,11 @@
  */
 package org.dspace.app.rest.repository;
 
-import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.authorization.Authorization;
@@ -22,7 +20,6 @@ import org.dspace.app.rest.authorization.AuthorizationFeatureService;
 import org.dspace.app.rest.authorization.AuthorizationRestUtil;
 import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
-import org.dspace.app.rest.exception.RepositoryNotFoundException;
 import org.dspace.app.rest.model.AuthorizationRest;
 import org.dspace.app.rest.model.BaseObjectRest;
 import org.dspace.authorize.AuthorizeException;
@@ -30,7 +27,6 @@ import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.service.EPersonService;
-import org.dspace.services.ConfigurationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -65,9 +61,6 @@ public class AuthorizationRestRepository extends DSpaceRestRepository<Authorizat
 
     @Autowired
     protected ConverterService converter;
-
-    @Autowired
-    ConfigurationService configurationService;
 
     @Override
     @PreAuthorize("hasPermission(#id, 'authorization', 'READ')")
@@ -155,7 +148,7 @@ public class AuthorizationRestRepository extends DSpaceRestRepository<Authorizat
             @Parameter(value = "eperson") UUID epersonUuid,
             Pageable pageable) throws AuthorizeException, SQLException {
         Context context = obtainContext();
-        BaseObjectRest obj = getObject(context, uri);
+        BaseObjectRest obj = utils.getBaseObjectRestFromUri(context, uri);
         if (obj == null) {
             return null;
         }
@@ -205,7 +198,7 @@ public class AuthorizationRestRepository extends DSpaceRestRepository<Authorizat
             @Parameter(value = "feature", required = true) String featureName,
             Pageable pageable) throws AuthorizeException, SQLException {
         Context context = obtainContext();
-        BaseObjectRest obj = getObject(context, uri);
+        BaseObjectRest obj = utils.getBaseObjectRestFromUri(context, uri);
         if (obj == null) {
             return null;
         }
@@ -228,42 +221,6 @@ public class AuthorizationRestRepository extends DSpaceRestRepository<Authorizat
         // restore the real current user
         context.setCurrentUser(currUser);
         return authorizationRest;
-    }
-
-    private BaseObjectRest getObject(Context context, String uri) throws SQLException {
-        String dspaceUrl = configurationService.getProperty("dspace.server.url");
-        if (!StringUtils.startsWith(uri, dspaceUrl)) {
-            throw new IllegalArgumentException("the supplied uri is not valid: " + uri);
-        }
-        String[] uriParts = uri.substring(dspaceUrl.length() + (dspaceUrl.endsWith("/") ? 0 : 1) + "api/".length())
-                .split("/", 3);
-        if (uriParts.length != 3) {
-            throw new IllegalArgumentException("the supplied uri is not valid: " + uri);
-        }
-
-        DSpaceRestRepository repository;
-        try {
-            repository = utils.getResourceRepository(uriParts[0], uriParts[1]);
-            if (!(repository instanceof FindableObjectRepository)) {
-                throw new IllegalArgumentException("the supplied uri is not valid: " + uri);
-            }
-        } catch (RepositoryNotFoundException e) {
-            throw new IllegalArgumentException("the supplied uri is not valid: " + uri, e);
-        }
-
-        Serializable pk;
-        try {
-            pk = utils.castToPKClass((FindableObjectRepository) repository, uriParts[2]);
-        } catch (Exception e) {
-            throw new IllegalArgumentException("the supplied uri is not valid: " + uri, e);
-        }
-        try {
-            // disable the security as we only need to retrieve the object to further process the authorization
-            context.turnOffAuthorisationSystem();
-            return (BaseObjectRest) repository.findOne(context, pk);
-        } finally {
-            context.restoreAuthSystemState();
-        }
     }
 
     /**
