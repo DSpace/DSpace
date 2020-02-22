@@ -14,20 +14,30 @@ import org.dspace.core.Context;
 import org.dspace.core.ReloadableEntity;
 
 /**
- * This interface must be implemented by all the rest repository that deal with resources that can be make
- * {@link FindableObject}
+ * This interface must be implemented by all the rest repository that need to
+ * provide access to the DSpace API model objects corresponding to the REST
+ * resources that it manages
  * 
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  *
- * @param <F>
- *            the FindableObject type
- * @param <PK>
- *            the primary key type
+ * @param <F> the ReloadableEntity type
+ * @param <PK> the primary key type
  */
 public interface FindableObjectRepository<T extends ReloadableEntity<PK>,
     PK extends Serializable> {
 
+    /**
+     * 
+     * @param context the DSpace context
+     * @param id      the primary key shared between the rest and dspace api object
+     * @return the dspace api model object related to the specified id
+     * @throws SQLException if a database error occurs
+     */
     T findDomainObjectByPk(Context context, PK id) throws SQLException;
 
+    /**
+     * 
+     * @return the class of the primary key
+     */
     Class<PK> getPKClass();
 }

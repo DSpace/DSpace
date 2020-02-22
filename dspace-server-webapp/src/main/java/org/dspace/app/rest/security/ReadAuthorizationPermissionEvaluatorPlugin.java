@@ -32,9 +32,9 @@ import org.springframework.stereotype.Component;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 @Component
-public class AuthorizationPermissionEvaluatorPlugin extends RestObjectPermissionEvaluatorPlugin {
+public class ReadAuthorizationPermissionEvaluatorPlugin extends RestObjectPermissionEvaluatorPlugin {
 
-    private static final Logger log = LoggerFactory.getLogger(AuthorizationPermissionEvaluatorPlugin.class);
+    private static final Logger log = LoggerFactory.getLogger(ReadAuthorizationPermissionEvaluatorPlugin.class);
 
     @Autowired
     AuthorizeService authorizeService;

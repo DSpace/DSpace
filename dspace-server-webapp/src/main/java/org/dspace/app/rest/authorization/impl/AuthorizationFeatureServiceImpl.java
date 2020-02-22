@@ -68,17 +68,11 @@ public class AuthorizationFeatureServiceImpl implements AuthorizationFeatureServ
     }
 
     @Override
-    public List<AuthorizationFeature> findByResourceType(String typeID) {
+    public List<AuthorizationFeature> findByResourceType(String categoryDotType) {
+        // Loops through all features, returning any that match the given categoryDotType
         return features
                 .stream()
-                .filter(f -> ArrayUtils.contains(f.getSupportedTypes(), typeID))
+                .filter(f -> ArrayUtils.contains(f.getSupportedTypes(), categoryDotType))
                 .collect(Collectors.toList());
-//        List<AuthorizationFeature> foundFeatures = new ArrayList<AuthorizationFeature>();
-//        for (AuthorizationFeature f : features) {
-//            if (ArrayUtils.contains(f.getSupportedTypes(), typeID)) {
-//                foundFeatures.add(f);
-//            }
-//        }
-//        return foundFeatures;
     }
 }

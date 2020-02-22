@@ -17,6 +17,7 @@ import java.io.Serializable;
 import java.util.UUID;
 
 import com.jayway.jsonpath.matchers.JsonPathMatchers;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.authorization.AlwaysFalseFeature;
 import org.dspace.app.rest.authorization.AlwaysThrowExceptionFeature;
 import org.dspace.app.rest.authorization.AlwaysTrueFeature;
@@ -58,6 +59,9 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class AuthorizationRestRepositoryIT extends AbstractControllerIntegrationTest {
 
+    private static final Logger log = org.apache.logging.log4j.LogManager
+            .getLogger(AuthorizationRestRepositoryIT.class);
+
     @Autowired
     private AuthorizationFeatureService authorizationFeatureService;
 
@@ -75,16 +79,34 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
 
     private SiteService siteService;
 
+    /** 
+     * this hold a reference to the test feature {@link AlwaysTrueFeature}
+     */
     private AuthorizationFeature alwaysTrue;
 
+    /** 
+     * this hold a reference to the test feature {@link AlwaysFalseFeature}
+     */
     private AuthorizationFeature alwaysFalse;
 
+    /** 
+     * this hold a reference to the test feature {@link AlwaysThrowExceptionFeature}
+     */
     private AuthorizationFeature alwaysException;
 
+    /** 
+     * this hold a reference to the test feature {@link TrueForAdminsFeature}
+     */
     private AuthorizationFeature trueForAdmins;
 
+    /** 
+     * this hold a reference to the test feature {@link TrueForLoggedUsersFeature}
+     */
     private AuthorizationFeature trueForLoggedUsers;
 
+    /** 
+     * this hold a reference to the test feature {@link TrueForTestFeature}
+     */
     private AuthorizationFeature trueForTestUsers;
 
     @Override
@@ -590,7 +612,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
         configurationService.setProperty("org.dspace.app.rest.authorization.AlwaysThrowExceptionFeature.turnoff", true);
 
         for (String invalidUri : invalidUris) {
-            System.out.println("Testing the URI: " + invalidUri);
+            log.debug("findByObjectBadRequestTest - Testing the URI: " + invalidUri);
             // verify that it works for administrators with an invalid or missing uri
             String adminToken = getAuthToken(admin.getEmail(), password);
             getClient(adminToken).perform(get("/api/authz/authorizations/search/object")
@@ -958,7 +980,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
         configurationService.setProperty("org.dspace.app.rest.authorization.AlwaysThrowExceptionFeature.turnoff", true);
 
         for (String invalidUri : invalidUris) {
-            System.out.println("Testing the URI: " + invalidUri);
+            System.out.println("findByObjectAndFeatureBadRequestTest - Testing the URI: " + invalidUri);
             // verify that it works for administrators with an invalid or missing uri
             String adminToken = getAuthToken(admin.getEmail(), password);
             getClient(adminToken).perform(get("/api/authz/authorizations/search/objectAndFeature")
