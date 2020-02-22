@@ -86,6 +86,7 @@ public class AbstractIntegrationTest extends AbstractUnitTest {
         try {
             FileChannel.open(Paths.get(extraConfPath), StandardOpenOption.WRITE)
                 .truncate(initialLocalCfgSize).close();
+            localCfgChanged = false;
             // sleep for 5.5 seconds to give the time to the configuration to note the change
             Thread.sleep(5500);
         } catch (IOException | InterruptedException e) {
