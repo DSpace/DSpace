@@ -17,11 +17,19 @@ import org.dspace.app.rest.RestResourceController;
  *
  * @author Maria Verdonck (Atmire) on 10/01/2020
  */
+@LinksRest(links = {
+    @LinkRest(
+        name = WorkflowStepRest.ACTIONS,
+        method = "getActions"
+    ),
+})
 public class WorkflowStepRest extends BaseObjectRest {
 
     public static final String CATEGORY = "config";
     public static final String NAME = "workflowstep";
     public static final String NAME_PLURAL = "workflowsteps";
+
+    public static final String ACTIONS = "workflowactions";
 
     private List<WorkflowActionRest> workflowactions;
 
@@ -40,7 +48,6 @@ public class WorkflowStepRest extends BaseObjectRest {
         return NAME;
     }
 
-    @LinkRest
     @JsonIgnore
     public List<WorkflowActionRest> getWorkflowactions() {
         return workflowactions;

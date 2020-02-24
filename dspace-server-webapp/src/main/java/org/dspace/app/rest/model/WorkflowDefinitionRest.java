@@ -21,6 +21,10 @@ import org.dspace.app.rest.RestResourceController;
     @LinkRest(
         name = WorkflowDefinitionRest.COLLECTIONS_MAPPED_TO,
         method = "getCollections"
+    ),
+    @LinkRest(
+        name = WorkflowDefinitionRest.STEPS,
+        method = "getSteps"
     )
 })
 public class WorkflowDefinitionRest extends BaseObjectRest<String> {
@@ -28,7 +32,9 @@ public class WorkflowDefinitionRest extends BaseObjectRest<String> {
     public static final String CATEGORY = "config";
     public static final String NAME = "workflowdefinition";
     public static final String NAME_PLURAL = "workflowdefinitions";
+
     public static final String COLLECTIONS_MAPPED_TO = "collections";
+    public static final String STEPS = "steps";
 
     private String name;
     private boolean isDefault;
@@ -71,7 +77,6 @@ public class WorkflowDefinitionRest extends BaseObjectRest<String> {
         this.isDefault = isDefault;
     }
 
-    @LinkRest
     @JsonIgnore
     public List<WorkflowStepRest> getSteps() {
         return steps;
