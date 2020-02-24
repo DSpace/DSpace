@@ -385,10 +385,10 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
     }
 
     @Test
-    public void findByMetadataUnprocessable() throws Exception {
+    public void findByMetadataMissingParameter() throws Exception {
         String authToken = getAuthToken(admin.getEmail(), password);
         getClient(authToken).perform(get("/api/eperson/groups/search/byMetadata"))
-                            .andExpect(status().isUnprocessableEntity());
+                            .andExpect(status().isBadRequest());
     }
 
 
@@ -1041,7 +1041,7 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
             context.commit();
 
             parentGroup = context.reloadEntity(parentGroup);
-            childGroup= context.reloadEntity(childGroup);
+            childGroup = context.reloadEntity(childGroup);
 
             String authToken = getAuthToken(admin.getEmail(), password);
             getClient(authToken).perform(
@@ -1049,7 +1049,7 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
             ).andExpect(status().isNoContent());
 
             parentGroup = context.reloadEntity(parentGroup);
-            childGroup= context.reloadEntity(childGroup);
+            childGroup = context.reloadEntity(childGroup);
 
             assertFalse(
                     groupService.isMember(parentGroup, childGroup)
@@ -1089,7 +1089,7 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
             context.commit();
 
             parentGroup = context.reloadEntity(parentGroup);
-            childGroup= context.reloadEntity(childGroup);
+            childGroup = context.reloadEntity(childGroup);
 
             String authToken = getAuthToken(eperson.getEmail(), password);
             getClient(authToken).perform(
@@ -1097,7 +1097,7 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
             ).andExpect(status().isNoContent());
 
             parentGroup = context.reloadEntity(parentGroup);
-            childGroup= context.reloadEntity(childGroup);
+            childGroup = context.reloadEntity(childGroup);
 
             assertFalse(
                     groupService.isMember(parentGroup, childGroup)
@@ -1244,7 +1244,7 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
             String authToken = getAuthToken(admin.getEmail(), password);
 
             getClient(authToken).perform(
-                    delete("/api/eperson/groups/" + parentGroup.getID() + "/subgroups/123456789")
+                    delete("/api/eperson/groups/" + parentGroup.getID() + "/subgroups/" + UUID.randomUUID())
             ).andExpect(status().isUnprocessableEntity());
 
         } finally {
@@ -1277,7 +1277,7 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
             context.commit();
 
             parentGroup = context.reloadEntity(parentGroup);
-            member= context.reloadEntity(member);
+            member = context.reloadEntity(member);
 
             String authToken = getAuthToken(admin.getEmail(), password);
             getClient(authToken).perform(
@@ -1285,7 +1285,7 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
             ).andExpect(status().isNoContent());
 
             parentGroup = context.reloadEntity(parentGroup);
-            member= context.reloadEntity(member);
+            member = context.reloadEntity(member);
 
             assertFalse(
                     groupService.isMember(context, member, parentGroup)
@@ -1328,7 +1328,7 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
             context.commit();
 
             parentGroup = context.reloadEntity(parentGroup);
-            member= context.reloadEntity(member);
+            member = context.reloadEntity(member);
 
             String authToken = getAuthToken(eperson.getEmail(), password);
             getClient(authToken).perform(
@@ -1336,7 +1336,7 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
             ).andExpect(status().isNoContent());
 
             parentGroup = context.reloadEntity(parentGroup);
-            member= context.reloadEntity(member);
+            member = context.reloadEntity(member);
 
             assertFalse(
                     groupService.isMember(context, member, parentGroup)
@@ -1487,7 +1487,7 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
             String authToken = getAuthToken(admin.getEmail(), password);
 
             getClient(authToken).perform(
-                    delete("/api/eperson/groups/" + parentGroup.getID() + "/epersons/123456789")
+                    delete("/api/eperson/groups/" + parentGroup.getID() + "/epersons/" + UUID.randomUUID())
             ).andExpect(status().isUnprocessableEntity());
 
         } finally {

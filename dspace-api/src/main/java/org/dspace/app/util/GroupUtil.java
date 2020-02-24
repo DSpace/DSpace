@@ -22,6 +22,9 @@ import org.dspace.eperson.Group;
  */
 public class GroupUtil {
 
+    private GroupUtil() {
+    }
+
     /**
      * The collection prefix, all groups which are specific to
      * a collection start with this.
@@ -35,7 +38,9 @@ public class GroupUtil {
      * <p>
      * Note: the order of these suffixes are important, see getCollectionRole()
      */
-    private static final String[] COLLECTION_SUFFIXES = {"_SUBMIT", "_ADMIN", "_WFSTEP_1", "_WORKFLOW_STEP_1", "_WFSTEP_2", "_WORKFLOW_STEP_2", "_WFSTEP_3", "_WORKFLOW_STEP_3", "_DEFAULT_ITEM_READ"};
+    private static final String[] COLLECTION_SUFFIXES =
+        {"_SUBMIT", "_ADMIN", "_WFSTEP_1", "_WORKFLOW_STEP_1", "_WFSTEP_2", "_WORKFLOW_STEP_2", "_WFSTEP_3",
+            "_WORKFLOW_STEP_3", "_DEFAULT_ITEM_READ"};
 
     /**
      * The community prefix: all groups which are specific to
@@ -52,8 +57,10 @@ public class GroupUtil {
      */
     private static final String[] COMMUNITY_SUFFIXES = {"_ADMIN"};
 
-    protected static final CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
-    protected static final CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
+    protected static final CollectionService collectionService = ContentServiceFactory.getInstance()
+                                                                                      .getCollectionService();
+    protected static final CommunityService communityService = ContentServiceFactory.getInstance()
+                                                                                    .getCommunityService();
 
     /**
      * Get the collection a given group is related to, or null if it is not related to a collection.

@@ -186,7 +186,8 @@ public class GroupRestController {
      */
     @PreAuthorize("hasAuthority('AUTHENTICATED')")
     @RequestMapping( method = DELETE, path = "/{parentUUID}/subgroups/{childUUID}")
-    public void removeChildGroup(@PathVariable UUID parentUUID, @PathVariable UUID childUUID, HttpServletResponse response, HttpServletRequest request)
+    public void removeChildGroup(@PathVariable UUID parentUUID, @PathVariable UUID childUUID,
+                     HttpServletResponse response, HttpServletRequest request)
             throws IOException, SQLException, AuthorizeException {
 
         Context context = obtainContext(request);
@@ -217,7 +218,8 @@ public class GroupRestController {
      */
     @PreAuthorize("hasAuthority('AUTHENTICATED')")
     @RequestMapping( method = DELETE, path = "/{parentUUID}/epersons/{memberUUID}")
-    public void removeMember(@PathVariable UUID parentUUID, @PathVariable UUID memberUUID, HttpServletResponse response, HttpServletRequest request)
+    public void removeMember(@PathVariable UUID parentUUID, @PathVariable UUID memberUUID,
+                             HttpServletResponse response, HttpServletRequest request)
             throws IOException, SQLException, AuthorizeException {
 
         Context context = obtainContext(request);
