@@ -33,8 +33,8 @@ import org.dspace.content.NonUniqueMetadataException;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.MetadataFieldService;
 import org.dspace.content.service.MetadataSchemaService;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
+import org.dspace.core.Utils;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.factory.EPersonServiceFactory;
@@ -493,23 +493,9 @@ public class ShibAuthentication implements AuthenticationMethod {
         boolean lazySession = configurationService.getBooleanProperty("authentication-shibboleth.lazysession", false);
 
         if ( lazySession ) {
-            String shibURL = configurationService.getProperty("authentication-shibboleth.lazysession.loginurl");
-            boolean forceHTTPS =
-                configurationService.getBooleanProperty("authentication-shibboleth.lazysession.secure",true);
+            String shibURL = getShibURL(request);
 
-            // Shibboleth authentication initiator
-            if (shibURL == null || shibURL.length() == 0) {
-                shibURL = "/Shibboleth.sso/Login";
-            }
-            shibURL = shibURL.trim();
-
-            // Determine the return URL, where shib will send the user after authenticating. We need it to go back
-            // to DSpace's shibboleth-login url so the we will extract the user's information and locally
-            // authenticate them.
-            String host = request.getServerName();
-            int port = request.getServerPort();
-            String contextPath = request.getContextPath();
-
+            // Determine the client redirect URL, where to redirect after authenticating.
             String redirectUrl = null;
             if (request.getHeader("Referer") != null && StringUtils.isNotBlank(request.getHeader("Referer"))) {
                 redirectUrl = request.getHeader("Referer");
@@ -518,7 +504,10 @@ public class ShibAuthentication implements AuthenticationMethod {
                 redirectUrl = request.getHeader("X-Requested-With");
             }
 
-            String returnURL = ConfigurationManager.getProperty("dspace.baseUrl") + "/api/authn/shibboleth"
+            // Determine the server return URL, where shib will send the user after authenticating.
+            // We need it to go back to DSpace's shibboleth-login url so we will extract the user's information
+            // and locally authenticate them.
+            String returnURL = configurationService.getProperty("dspace.server.url") + "/api/authn/shibboleth"
                     + ((redirectUrl != null) ? "?redirectUrl=" + redirectUrl : "");
 
             try {
@@ -1257,6 +1246,28 @@ public class ShibAuthentication implements AuthenticationMethod {
         return valueList;
     }
 
+    private String getShibURL(HttpServletRequest request) {
+        String shibURL = configurationService.getProperty("authentication-shibboleth.lazysession.loginurl");
+        boolean forceHTTPS =
+                configurationService.getBooleanProperty("authentication-shibboleth.lazysession.secure",true);
+
+        // Shibboleth authentication initiator
+        if (shibURL == null || shibURL.length() == 0) {
+            shibURL = "/Shibboleth.sso/Login";
+        }
+        shibURL = shibURL.trim();
+
+        // Shibboleth url must be absolute
+        if (shibURL.startsWith("/")) {
+            String serverUrl = Utils.getBaseUrl(configurationService.getProperty("dspace.server.url"));
+            shibURL = serverUrl + shibURL;
+            if ((request.isSecure() || forceHTTPS) && shibURL.startsWith("http://")) {
+                shibURL = shibURL.replace("http://", "https://");
+            }
+        }
+        return shibURL;
+
+    }
 
 }
 

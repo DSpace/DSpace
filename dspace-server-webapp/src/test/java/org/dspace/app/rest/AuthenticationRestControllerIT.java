@@ -394,6 +394,56 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
     }
 
     @Test
+    public void testShibbolethLoginURLWithDefaultLazyURL() throws Exception {
+        context.turnOffAuthorisationSystem();
+        //Enable Shibboleth login
+        configurationService.setProperty("plugin.sequence.org.dspace.authenticate.AuthenticationMethod", SHIB_ONLY);
+
+        //Create a reviewers group
+        Group reviewersGroup = GroupBuilder.createGroup(context)
+                .withName("Reviewers")
+                .build();
+
+        //Faculty members are assigned to the Reviewers group
+        configurationService.setProperty("authentication-shibboleth.role.faculty", "Reviewers");
+        context.restoreAuthSystemState();
+
+        getClient().perform(post("/api/authn/login").header("Referer", "http://my.uni.edu"))
+                .andExpect(status().isUnauthorized())
+                .andExpect(header().string("WWW-Authenticate",
+                        "shibboleth realm=\"DSpace REST API\", " +
+                                "location=\"https://localhost/Shibboleth.sso/Login?" +
+                                "target=http%3A%2F%2Flocalhost%2Fapi%2Fauthn%2Fshibboleth%3F" +
+                                "redirectUrl%3Dhttp%3A%2F%2Fmy.uni.edu\""));
+    }
+
+    @Test
+    public void testShibbolethLoginURLWithConfiguredLazyURL() throws Exception {
+        context.turnOffAuthorisationSystem();
+        //Enable Shibboleth login
+        configurationService.setProperty("plugin.sequence.org.dspace.authenticate.AuthenticationMethod", SHIB_ONLY);
+        configurationService.setProperty("authentication-shibboleth.lazysession.loginurl",
+                "http://shibboleth.org/Shibboleth.sso/Login");
+
+        //Create a reviewers group
+        Group reviewersGroup = GroupBuilder.createGroup(context)
+                .withName("Reviewers")
+                .build();
+
+        //Faculty members are assigned to the Reviewers group
+        configurationService.setProperty("authentication-shibboleth.role.faculty", "Reviewers");
+        context.restoreAuthSystemState();
+
+        getClient().perform(post("/api/authn/login").header("Referer", "http://my.uni.edu"))
+                .andExpect(status().isUnauthorized())
+                .andExpect(header().string("WWW-Authenticate",
+                        "shibboleth realm=\"DSpace REST API\", " +
+                                "location=\"http://shibboleth.org/Shibboleth.sso/Login?" +
+                                "target=http%3A%2F%2Flocalhost%2Fapi%2Fauthn%2Fshibboleth%3F" +
+                                "redirectUrl%3Dhttp%3A%2F%2Fmy.uni.edu\""));
+    }
+
+    @Test
     public void testShibbolethLoginRequestAttribute() throws Exception {
         context.turnOffAuthorisationSystem();
         //Enable Shibboleth login
@@ -412,7 +462,7 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
                 .andExpect(status().isUnauthorized())
                 .andExpect(header().string("WWW-Authenticate",
                         "shibboleth realm=\"DSpace REST API\", " +
-                                "location=\"/Shibboleth.sso/Login?" +
+                                "location=\"https://localhost/Shibboleth.sso/Login?" +
                                 "target=http%3A%2F%2Flocalhost%2Fapi%2Fauthn%2Fshibboleth%3F" +
                                 "redirectUrl%3Dhttp%3A%2F%2Fmy.uni.edu\""));
 
@@ -448,7 +498,7 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
                 .andExpect(status().isUnauthorized())
                 .andExpect(header().string("WWW-Authenticate",
                         "ip realm=\"DSpace REST API\", shibboleth realm=\"DSpace REST API\", " +
-                                "location=\"/Shibboleth.sso/Login?" +
+                                "location=\"https://localhost/Shibboleth.sso/Login?" +
                                 "target=http%3A%2F%2Flocalhost%2Fapi%2Fauthn%2Fshibboleth%3F" +
                                 "redirectUrl%3Dhttp%3A%2F%2Fmy.uni.edu\""));
 
@@ -506,7 +556,7 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
                 .andExpect(status().isOk())
                 .andExpect(header().string("WWW-Authenticate",
                         "shibboleth realm=\"DSpace REST API\", " +
-                                "location=\"/Shibboleth.sso/Login?" +
+                                "location=\"https://localhost/Shibboleth.sso/Login?" +
                                 "target=http%3A%2F%2Flocalhost%2Fapi%2Fauthn%2Fshibboleth%3F" +
                                 "redirectUrl%3Dhttp%3A%2F%2Fmy.uni.edu\"" +
                                 ", password realm=\"DSpace REST API\""));
@@ -616,7 +666,7 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
             .andExpect(status().isOk())
             .andExpect(header().string("WWW-Authenticate",
                     "shibboleth realm=\"DSpace REST API\", " +
-                            "location=\"/Shibboleth.sso/Login?" +
+                            "location=\"https://localhost/Shibboleth.sso/Login?" +
                             "target=http%3A%2F%2Flocalhost%2Fapi%2Fauthn%2Fshibboleth%3F" +
                             "redirectUrl%3Dhttp%3A%2F%2Fmy.uni.edu\""));
 
