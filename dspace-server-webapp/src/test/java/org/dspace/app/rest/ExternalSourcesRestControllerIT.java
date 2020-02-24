@@ -114,6 +114,6 @@ public class ExternalSourcesRestControllerIT extends AbstractControllerIntegrati
     @Test
     public void findOneExternalSourceEntriesNoQuery() throws Exception {
         getClient().perform(get("/api/integration/externalsources/mock/entries"))
-                   .andExpect(status().isUnprocessableEntity());
+                   .andExpect(status().isBadRequest());
     }
 }
