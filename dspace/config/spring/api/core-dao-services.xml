@@ -63,6 +63,11 @@
     <bean class="org.dspace.xmlworkflow.storedcomponents.dao.impl.WorkflowItemRoleDAOImpl"/>
     <bean class="org.dspace.xmlworkflow.storedcomponents.dao.impl.XmlWorkflowItemDAOImpl"/>
 
-
+    <bean class="org.dspace.batch.dao.impl.ImpBitstreamDAOImpl"/>
+    <bean class="org.dspace.batch.dao.impl.ImpMetadatavalueDAOImpl"/>
+    <bean class="org.dspace.batch.dao.impl.ImpRecordDAOImpl"/>
+    <bean class="org.dspace.batch.dao.impl.ImpRecordToItemDAOImpl"/>
+	<bean class="org.dspace.batch.dao.impl.ImpBitstreamMetadatavalueDAOImpl"/>
+	<bean class="org.dspace.batch.dao.impl.ImpWorkflowNStateDAOImpl"/>
 
 </beans>

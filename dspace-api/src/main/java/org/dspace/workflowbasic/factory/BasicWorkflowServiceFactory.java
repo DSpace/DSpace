@@ -29,6 +29,6 @@ public abstract class BasicWorkflowServiceFactory extends WorkflowServiceFactory
 
     public static BasicWorkflowServiceFactory getInstance() {
         return DSpaceServicesFactory.getInstance().getServiceManager()
-                                    .getServiceByName("workflowServiceFactory", BasicWorkflowServiceFactory.class);
+                                    .getServiceByName("basicWorkflowServiceFactory", BasicWorkflowServiceFactory.class);
     }
 }
