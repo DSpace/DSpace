@@ -45,15 +45,19 @@ public class HarvestedItemDAOImpl extends AbstractHibernateDAO<HarvestedItem> im
         Criteria criteria = createCriteria(context, HarvestedItem.class);
         criteria.add(Restrictions.eq("oaiId", itemOaiID));
         HarvestedItem harvestedItem = singleResult(criteria);
+        boolean alreadyHarvestedToCollection = false;
         if (harvestedItem != null && harvestedItem.getItem() != null) {
             List<Collection> collections = harvestedItem.getItem().getCollections();
             if (collections != null && !collections.isEmpty()) {
-                Collection collectionOfHarvested = collections.get(0);
-                if (!collectionOfHarvested.equals(collection)) {
-                    harvestedItem = null;
+                for (Collection collectionOfHarvestedItem : collections) {
+                    if (collectionOfHarvestedItem.equals(collection)) {
+                        alreadyHarvestedToCollection = true;
+                        break;
+                    }
+
                 }
             }
         }
-        return harvestedItem;
+        return alreadyHarvestedToCollection ? harvestedItem : null;
     }
 }
