@@ -271,7 +271,7 @@ public class BasicWorkflowAuthorizationIT
             Item item = wsi.getItem();
             Bundle bundle = bundleService.create(context, item, "ORIGINAL");
             File f = new File(AbstractDSpaceTest.testProps.get("test.bitstream").toString());
-            Bitstream bs = bitstreamService.create(context, bundle, new FileInputStream(f));
+            bitstreamService.create(context, bundle, new FileInputStream(f));
             bundleService.update(context, bundle);
             itemService.update(context, item);
             workspaceItemService.update(context, wsi);
@@ -323,7 +323,7 @@ public class BasicWorkflowAuthorizationIT
             Item item = wsi.getItem();
             Bundle bundle = bundleService.create(context, item, "ORIGINAL");
             File f = new File(AbstractDSpaceTest.testProps.get("test.bitstream").toString());
-            Bitstream bs = bitstreamService.create(context, bundle, new FileInputStream(f));
+            bitstreamService.create(context, bundle, new FileInputStream(f));
             bundleService.update(context, bundle);
             itemService.update(context, item);
             workspaceItemService.update(context, wsi);
@@ -365,7 +365,7 @@ public class BasicWorkflowAuthorizationIT
             item.setSubmitter(submitter);
             Bundle bundle = bundleService.create(context, item, "ORIGINAL");
             File f = new File(AbstractDSpaceTest.testProps.get("test.bitstream").toString());
-            Bitstream bs = bitstreamService.create(context, bundle, new FileInputStream(f));
+            bitstreamService.create(context, bundle, new FileInputStream(f));
             bundleService.update(context, bundle);
             itemService.update(context, item);
             workspaceItemService.update(context, wsi);
