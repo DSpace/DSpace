@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.HttpStatus;
 import org.dspace.app.rest.builder.CollectionBuilder;
 import org.dspace.app.rest.builder.CommunityBuilder;
 import org.dspace.app.rest.matcher.WorkflowDefinitionMatcher;
@@ -238,8 +239,9 @@ public class WorkflowDefinitionRestRepositoryIT extends AbstractControllerIntegr
 
         //When we call this facets endpoint
         getClient(token).perform(get(WORKFLOW_DEFINITIONS_ENDPOINT + "/search/findByCollection?uuid=" + nonValidUUID))
-            //We expect a 422 Unprocessable Entity status
-            .andExpect(status().isUnprocessableEntity());
+            //We expect a 400 Illegal Argument Exception cannot convert UUID
+            .andExpect(status().is(HttpStatus.SC_BAD_REQUEST))
+            .andExpect(status().reason(containsString("Failed to convert " + nonValidUUID)));
     }
 
     @Test

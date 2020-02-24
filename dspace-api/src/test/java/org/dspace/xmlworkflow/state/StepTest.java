@@ -7,8 +7,9 @@
  */
 package org.dspace.xmlworkflow.state;
 
-import static junit.framework.TestCase.assertEquals;
-import static junit.framework.TestCase.assertNull;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 
@@ -35,70 +36,70 @@ public class StepTest extends AbstractUnitTest {
     @Test
     public void defaultWorkflow_ReviewStep() throws WorkflowConfigurationException {
         Step step = defaultWorkflow.getStep("reviewstep");
-        assertEquals(step.getUserSelectionMethod().getId(), "claimaction");
-        assertEquals(step.getRole().getName(), "Reviewer");
+        assertEquals("claimaction", step.getUserSelectionMethod().getId());
+        assertEquals("Reviewer", step.getRole().getName());
         List<WorkflowActionConfig> actions = step.getActions();
-        assert (this.containsActionNamed(actions, "reviewaction"));
-        assertEquals(step.getNextStep(0).getId(), "editstep");
+        assertTrue(this.containsActionNamed(actions, "reviewaction"));
+        assertEquals("editstep", step.getNextStep(0).getId());
     }
 
     @Test
     public void defaultWorkflow_EditStep() throws WorkflowConfigurationException {
         Step step = defaultWorkflow.getStep("editstep");
-        assertEquals(step.getUserSelectionMethod().getId(), "claimaction");
-        assertEquals(step.getRole().getName(), "Editor");
+        assertEquals("claimaction", step.getUserSelectionMethod().getId());
+        assertEquals("Editor", step.getRole().getName());
         List<WorkflowActionConfig> actions = step.getActions();
-        assert (this.containsActionNamed(actions, "editaction"));
-        assertEquals(step.getNextStep(0).getId(), "finaleditstep");
+        assertTrue(this.containsActionNamed(actions, "editaction"));
+        assertEquals("finaleditstep", step.getNextStep(0).getId());
     }
 
     @Test
     public void defaultWorkflow_FinalEditStep() throws WorkflowConfigurationException {
         Step step = defaultWorkflow.getStep("finaleditstep");
-        assertEquals(step.getUserSelectionMethod().getId(), "claimaction");
-        assertEquals(step.getRole().getName(), "Final Editor");
+        assertEquals("claimaction", step.getUserSelectionMethod().getId());
+        assertEquals("Final Editor", step.getRole().getName());
         List<WorkflowActionConfig> actions = step.getActions();
-        assert (this.containsActionNamed(actions, "finaleditaction"));
+        assertTrue(this.containsActionNamed(actions, "finaleditaction"));
         assertNull(step.getNextStep(0));
     }
 
     @Test
     public void selectSingleReviewer_SelectReviewerStep() throws WorkflowConfigurationException {
         Step step = selectSingleReviewer.getStep("selectReviewerStep");
-        assertEquals(step.getUserSelectionMethod().getId(), "claimaction");
-        assertEquals(step.getRole().getName(), "ReviewManagers");
+        assertEquals("claimaction", step.getUserSelectionMethod().getId());
+        assertEquals("ReviewManagers", step.getRole().getName());
         List<WorkflowActionConfig> actions = step.getActions();
-        assert (this.containsActionNamed(actions, "selectrevieweraction"));
-        assertEquals(step.getNextStep(0).getId(), "singleUserReviewStep");
+        assertTrue(this.containsActionNamed(actions, "selectrevieweraction"));
+        assertEquals("singleUserReviewStep", step.getNextStep(0).getId());
     }
 
     @Test
     public void selectSingleReviewer_SingleUserReviewStep() throws WorkflowConfigurationException {
         Step step = selectSingleReviewer.getStep("singleUserReviewStep");
-        assertEquals(step.getUserSelectionMethod().getId(), "autoassignAction");
-        assert (step.getRole().getName().equals("Reviewer"));
+        assertEquals("autoassignAction", step.getUserSelectionMethod().getId());
+        assertEquals("Reviewer", step.getRole().getName());
         List<WorkflowActionConfig> actions = step.getActions();
-        assert (this.containsActionNamed(actions, "singleuserreviewaction"));
-        assertEquals(step.getNextStep(1).getId(), "selectReviewerStep");
+        assertTrue(this.containsActionNamed(actions, "singleuserreviewaction"));
+        assertEquals("selectReviewerStep", step.getNextStep(1).getId());
     }
 
     @Test
     public void scoreReview_ScoreReviewStep() throws WorkflowConfigurationException {
         Step step = scoreReview.getStep("scoreReviewStep");
-        assertEquals(step.getUserSelectionMethod().getId(), "claimaction");
-        assertEquals(step.getRole().getName(), "ScoreReviewers");
+        assertEquals("claimaction", step.getUserSelectionMethod().getId());
+        assertEquals("ScoreReviewers", step.getRole().getName());
         List<WorkflowActionConfig> actions = step.getActions();
-        assert (this.containsActionNamed(actions, "scorereviewaction"));
-        assertEquals(step.getNextStep(0).getId(), "evaluationStep");
-        assertEquals(step.getRequiredUsers(), 2);
+        assertTrue(this.containsActionNamed(actions, "scorereviewaction"));
+        assertEquals("evaluationStep", step.getNextStep(0).getId());
+        assertEquals(2, step.getRequiredUsers());
     }
 
     @Test
     public void scoreReview_EvaluationStep() throws WorkflowConfigurationException {
         Step step = scoreReview.getStep("evaluationStep");
-        assertEquals(step.getUserSelectionMethod().getId(), "noUserSelectionAction");
+        assertEquals("noUserSelectionAction", step.getUserSelectionMethod().getId());
         List<WorkflowActionConfig> actions = step.getActions();
-        assert (this.containsActionNamed(actions, "evaluationaction"));
+        assertTrue(this.containsActionNamed(actions, "evaluationaction"));
         assertNull(step.getNextStep(0));
     }
 

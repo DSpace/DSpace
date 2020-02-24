@@ -195,7 +195,7 @@ public class CommunityTest extends AbstractDSpaceObjectTest {
 
         // test creating community with no parent (as a non-admin)
         // this should throw an exception
-        Community created = communityService.create(null, context);
+        communityService.create(null, context);
         fail("Exception expected");
     }
 
@@ -230,7 +230,7 @@ public class CommunityTest extends AbstractDSpaceObjectTest {
 
         // test creating community with a specified handle which IS already in use
         // This should throw an exception
-        Community created = communityService.create(null, context, inUseHandle);
+        communityService.create(null, context, inUseHandle);
         fail("Exception expected");
     }
 
@@ -378,7 +378,7 @@ public class CommunityTest extends AbstractDSpaceObjectTest {
         doThrow(new AuthorizeException()).when(authorizeServiceSpy).authorizeAction(context, c, Constants.WRITE);
 
         File f = new File(testProps.get("test.bitstream").toString());
-        Bitstream logo = communityService.setLogo(context, c, new FileInputStream(f));
+        communityService.setLogo(context, c, new FileInputStream(f));
         fail("Exception expected");
     }
 
@@ -425,7 +425,7 @@ public class CommunityTest extends AbstractDSpaceObjectTest {
      */
     @Test(expected = AuthorizeException.class)
     public void testCreateAdministratorsNoAuth() throws Exception {
-        Group result = communityService.createAdministrators(context, c);
+        communityService.createAdministrators(context, c);
         fail("Exception should have been thrown");
     }
 
@@ -617,7 +617,7 @@ public class CommunityTest extends AbstractDSpaceObjectTest {
         // Disallow current Community ADD perms
         doThrow(new AuthorizeException()).when(authorizeServiceSpy).authorizeAction(context, c, Constants.ADD);
 
-        Collection result = collectionService.create(context, c);
+        collectionService.create(context, c);
         fail("Exception expected");
     }
 
@@ -672,7 +672,7 @@ public class CommunityTest extends AbstractDSpaceObjectTest {
         // Disallow current Community ADD perms
         doThrow(new AuthorizeException()).when(authorizeServiceSpy).authorizeAction(context, c, Constants.ADD);
 
-        Community result = communityService.createSubcommunity(context, c);
+        communityService.createSubcommunity(context, c);
         fail("Exception expected");
     }
 
@@ -872,8 +872,9 @@ public class CommunityTest extends AbstractDSpaceObjectTest {
         Collection grandchildCol = collectionService.create(context, grandchild);
         // Create two separate items
         WorkspaceItem wsItem = workspaceItemService.create(context, childCol, false);
-        wsItem = workspaceItemService.create(context, childCol, false);
         Item item = installItemService.installItem(context, wsItem);
+        wsItem = workspaceItemService.create(context, grandchildCol, false);
+        Item item2 = installItemService.installItem(context, wsItem);
 
         // Done creating the objects. Turn auth system back on
         context.restoreAuthSystemState();
@@ -885,6 +886,7 @@ public class CommunityTest extends AbstractDSpaceObjectTest {
         UUID childColId = childCol.getID();
         UUID grandchildColId = grandchildCol.getID();
         UUID itemId = item.getID();
+        UUID item2Id = item2.getID();
 
         // Delete the parent of this entire hierarchy
         communityService.delete(context, parent);
@@ -902,6 +904,8 @@ public class CommunityTest extends AbstractDSpaceObjectTest {
                    collectionService.find(context, grandchildColId), nullValue());
         assertThat("Item not deleted",
                    itemService.find(context, itemId), nullValue());
+        assertThat("Item not deleted",
+                   itemService.find(context, item2Id), nullValue());
     }
 
     /**
@@ -1030,7 +1034,7 @@ public class CommunityTest extends AbstractDSpaceObjectTest {
             assertThat("testGetParentObject 1", communityService.getParentObject(context, son), notNullValue());
             assertThat("testGetParentObject 2", (Community) communityService.getParentObject(context, son), equalTo(c));
         } catch (AuthorizeException ex) {
-            fail("Authorize exception catched");
+            throw new AssertionError("AuthorizeException occurred", ex);
         }
     }
 

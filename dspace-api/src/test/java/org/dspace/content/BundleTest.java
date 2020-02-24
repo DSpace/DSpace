@@ -363,7 +363,7 @@ public class BundleTest extends AbstractDSpaceObjectTest {
         doThrow(new AuthorizeException()).when(authorizeServiceSpy).authorizeAction(context, b, Constants.ADD);
 
         File f = new File(testProps.get("test.bitstream").toString());
-        Bitstream bs = bitstreamService.create(context, b, new FileInputStream(f));
+        bitstreamService.create(context, b, new FileInputStream(f));
         fail("Exception should be thrown");
     }
 
@@ -399,7 +399,7 @@ public class BundleTest extends AbstractDSpaceObjectTest {
 
         int assetstore = 0; //default assetstore
         File f = new File(testProps.get("test.bitstream").toString());
-        Bitstream bs = bitstreamService.register(context, b, assetstore, f.getAbsolutePath());
+        bitstreamService.register(context, b, assetstore, f.getAbsolutePath());
         fail("Exception should be thrown");
     }
 
