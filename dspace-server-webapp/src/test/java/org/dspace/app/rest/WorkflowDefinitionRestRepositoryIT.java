@@ -238,8 +238,9 @@ public class WorkflowDefinitionRestRepositoryIT extends AbstractControllerIntegr
 
         //When we call this facets endpoint
         getClient(token).perform(get(WORKFLOW_DEFINITIONS_ENDPOINT + "/search/findByCollection?uuid=" + nonValidUUID))
-            //We expect a 422 Unprocessable Entity status
-            .andExpect(status().isUnprocessableEntity());
+            //We expect a 400 Illegal Argument Exception cannot convert UUID
+            .andExpect(status().is(400))
+            .andExpect(status().reason(containsString("Failed to convert " + nonValidUUID)));
     }
 
     @Test
