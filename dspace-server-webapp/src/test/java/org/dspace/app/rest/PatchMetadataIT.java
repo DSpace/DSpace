@@ -26,9 +26,11 @@ import org.dspace.app.rest.builder.CommunityBuilder;
 import org.dspace.app.rest.builder.ItemBuilder;
 import org.dspace.app.rest.builder.WorkspaceItemBuilder;
 import org.dspace.app.rest.matcher.MetadataMatcher;
+import org.dspace.app.rest.model.MetadataValueRest;
 import org.dspace.app.rest.model.patch.AddOperation;
 import org.dspace.app.rest.model.patch.MoveOperation;
 import org.dspace.app.rest.model.patch.Operation;
+import org.dspace.app.rest.model.patch.RemoveOperation;
 import org.dspace.app.rest.test.AbstractEntityIntegrationTest;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
@@ -322,7 +324,8 @@ public class PatchMetadataIT extends AbstractEntityIntegrationTest {
      * Original Order: 0,1,2,3,4
      * Expected Order: +,0,1,2,3,4 (with + being the new author)
      */
-    public void addAuthorOnTraditionalPageOnePlaceZero() throws Exception {
+    @Test
+    public void addAuthorOnTraditionalPageOnePlaceZeroTest() throws Exception {
         initPersonPublicationWorkspace();
 
         List<String> expectedOrder = new ArrayList<>();
@@ -344,7 +347,8 @@ public class PatchMetadataIT extends AbstractEntityIntegrationTest {
      * Original Order: 0,1,2,3,4
      * Expected Order: 0,+,1,2,3,4 (with + being the new author)
      */
-    public void addAuthorOnTraditionalPageOnePlaceOne() throws Exception {
+    @Test
+    public void addAuthorOnTraditionalPageOnePlaceOneTest() throws Exception {
         initPersonPublicationWorkspace();
 
         List<String> expectedOrder = new ArrayList<>();
@@ -366,7 +370,8 @@ public class PatchMetadataIT extends AbstractEntityIntegrationTest {
      * Original Order: 0,1,2,3,4
      * Expected Order: 0,1,+,2,3,4 (with + being the new author)
      */
-    public void addAuthorOnTraditionalPageOnePlaceTwo() throws Exception {
+    @Test
+    public void addAuthorOnTraditionalPageOnePlaceTwoTest() throws Exception {
         initPersonPublicationWorkspace();
 
         List<String> expectedOrder = new ArrayList<>();
@@ -388,7 +393,8 @@ public class PatchMetadataIT extends AbstractEntityIntegrationTest {
      * Original Order: 0,1,2,3,4
      * Expected Order: 0,1,2,+,3,4 (with + being the new author)
      */
-    public void addAuthorOnTraditionalPageOnePlaceThree() throws Exception {
+    @Test
+    public void addAuthorOnTraditionalPageOnePlaceThreeTest() throws Exception {
         initPersonPublicationWorkspace();
 
         List<String> expectedOrder = new ArrayList<>();
@@ -410,7 +416,8 @@ public class PatchMetadataIT extends AbstractEntityIntegrationTest {
      * Original Order: 0,1,2,3,4
      * Expected Order: 0,1,2,3,+,4 (with + being the new author)
      */
-    public void addAuthorOnTraditionalPageOnePlaceFour() throws Exception {
+    @Test
+    public void addAuthorOnTraditionalPageOnePlaceFourTest() throws Exception {
         initPersonPublicationWorkspace();
 
         List<String> expectedOrder = new ArrayList<>();
@@ -432,7 +439,8 @@ public class PatchMetadataIT extends AbstractEntityIntegrationTest {
      * Original Order: 0,1,2,3,4
      * Expected Order: +,0,1,2,3,4 (with + being the new author)
      */
-    public void addAuthorOnTraditionalPageOneLastPlace() throws Exception {
+    @Test
+    public void addAuthorOnTraditionalPageOneLastPlaceTest() throws Exception {
         initPersonPublicationWorkspace();
 
         List<String> expectedOrder = new ArrayList<>();
@@ -444,6 +452,137 @@ public class PatchMetadataIT extends AbstractEntityIntegrationTest {
         expectedOrder.add(addedAuthor);
 
         addTraditionalPageOneAuthorTest("-", expectedOrder);
+
+    }
+
+    /**
+     * This test will remove the author (dc.description.author) from a workspace publication's "traditionalpageone"
+     * section at position 0 using a PATCH request and verify the order of the remaining authors within the section.
+     * Original Order: 0,1,2,3,4
+     * Expected Order: 1,2,3,4
+     */
+    @Test
+    public void removeAuthorOnTraditionalPageFromPlaceZeroTest() throws Exception {
+        initPersonPublicationWorkspace();
+
+        List<String> expectedOrder = new ArrayList<>();
+        expectedOrder.add(authorsOriginalOrder.get(1));
+        expectedOrder.add(authorsOriginalOrder.get(2));
+        expectedOrder.add(authorsOriginalOrder.get(3));
+        expectedOrder.add(authorsOriginalOrder.get(4));
+
+        removeTraditionalPageOneAuthorTest(0, expectedOrder);
+    }
+    /**
+     * This test will remove the author (dc.description.author) from a workspace publication's "traditionalpageone"
+     * section at position 1 using a PATCH request and verify the order of the remaining authors within the section.
+     * Original Order: 0,1,2,3,4
+     * Expected Order: 0,2,3,4
+     */
+    @Test
+    public void removeAuthorOnTraditionalPageFromPlaceOneTest() throws Exception {
+        initPersonPublicationWorkspace();
+
+        List<String> expectedOrder = new ArrayList<>();
+        expectedOrder.add(authorsOriginalOrder.get(0));
+        expectedOrder.add(authorsOriginalOrder.get(1));
+        expectedOrder.add(authorsOriginalOrder.get(2));
+        expectedOrder.add(authorsOriginalOrder.get(3));
+        expectedOrder.add(authorsOriginalOrder.get(4));
+
+        // The author at the first place is linked through a relationship and cannot be deleted through a PATCH request
+        removeTraditionalPageOneAuthorTest(1, expectedOrder);
+    }
+    /**
+     * This test will remove the author (dc.description.author) from a workspace publication's "traditionalpageone"
+     * section at position 2 using a PATCH request and verify the order of the remaining authors within the section.
+     * Original Order: 0,1,2,3,4
+     * Expected Order: 0,1,3,4
+     */
+    @Test
+    public void removeAuthorOnTraditionalPageFromPlaceTwoTest() throws Exception {
+        initPersonPublicationWorkspace();
+
+        List<String> expectedOrder = new ArrayList<>();
+        expectedOrder.add(authorsOriginalOrder.get(0));
+        expectedOrder.add(authorsOriginalOrder.get(1));
+        expectedOrder.add(authorsOriginalOrder.get(3));
+        expectedOrder.add(authorsOriginalOrder.get(4));
+
+        removeTraditionalPageOneAuthorTest(2, expectedOrder);
+    }
+    /**
+     * This test will remove the author (dc.description.author) from a workspace publication's "traditionalpageone"
+     * section at position 3 using a PATCH request and verify the order of the remaining authors within the section.
+     * Original Order: 0,1,2,3,4
+     * Expected Order: 0,1,2,4
+     */
+    @Test
+    public void removeAuthorOnTraditionalPageFromPlaceThreeTest() throws Exception {
+        initPersonPublicationWorkspace();
+
+        List<String> expectedOrder = new ArrayList<>();
+        expectedOrder.add(authorsOriginalOrder.get(0));
+        expectedOrder.add(authorsOriginalOrder.get(1));
+        expectedOrder.add(authorsOriginalOrder.get(2));
+        expectedOrder.add(authorsOriginalOrder.get(4));
+
+        removeTraditionalPageOneAuthorTest(3, expectedOrder);
+    }
+    /**
+     * This test will remove the author (dc.description.author) from a workspace publication's "traditionalpageone"
+     * section at position 4 using a PATCH request and verify the order of the remaining authors within the section.
+     * Original Order: 0,1,2,3,4
+     * Expected Order: 0,1,2,3
+     */
+    @Test
+    public void removeAuthorOnTraditionalPageFromPlaceFourTest() throws Exception {
+        initPersonPublicationWorkspace();
+
+        List<String> expectedOrder = new ArrayList<>();
+        expectedOrder.add(authorsOriginalOrder.get(0));
+        expectedOrder.add(authorsOriginalOrder.get(1));
+        expectedOrder.add(authorsOriginalOrder.get(2));
+        expectedOrder.add(authorsOriginalOrder.get(3));
+        expectedOrder.add(authorsOriginalOrder.get(4));
+
+        // The author at the fourth place is linked through a relationship and cannot be deleted through a PATCH request
+        removeTraditionalPageOneAuthorTest(4, expectedOrder);
+    }
+
+    /**
+     * This test will remove all authors (dc.description.author) from a workspace publication's "traditionalpageone"
+     * section using a PATCH request and verify that there are no remaining authors within the section.
+     */
+    @Test
+    public void removeAllAuthorsOnTraditionalPageTest() throws  Exception {
+        initPersonPublicationWorkspace();
+
+        List<Operation> ops = new ArrayList<Operation>();
+        RemoveOperation removeOperation = new RemoveOperation("/sections/traditionalpageone/dc.contributor.author");
+        ops.add(removeOperation);
+        String patchBody = getPatchContent(ops);
+
+        String token = getAuthToken(admin.getEmail(), password);
+
+        getClient(token).perform(patch("/api/submission/workspaceitems/" + publicationItem.getID())
+                                         .content(patchBody)
+                                         .contentType(javax.ws.rs.core.MediaType.APPLICATION_JSON_PATCH_JSON))
+                        .andExpect(status().isOk());
+
+        String authorField = "dc.contributor.author";
+        getClient().perform(get("/api/submission/workspaceitems/" + publicationItem.getID()))
+                   .andExpect(status().isOk())
+                   .andExpect(content().contentType(contentType))
+                   .andExpect(jsonPath("$.sections.traditionalpageone",
+                   // The author at the first and fourth place are linked through a relationship
+                   // and cannot be deleted through a PATCH request
+                       Matchers.allOf(
+                           Matchers.is(MetadataMatcher.matchMetadata(authorField, authorsOriginalOrder.get(1), 0)),
+                           Matchers.is(MetadataMatcher.matchMetadata(authorField, authorsOriginalOrder.get(4), 1))
+                   )));
+
+
 
     }
 
@@ -490,8 +629,10 @@ public class PatchMetadataIT extends AbstractEntityIntegrationTest {
      */
     private void addTraditionalPageOneAuthorTest(String path, List<String> expectedOrder) throws Exception {
         List<Operation> ops = new ArrayList<Operation>();
+        MetadataValueRest value = new MetadataValueRest();
+        value.setValue(addedAuthor);
         AddOperation addOperation = new AddOperation("/sections/traditionalpageone/dc.contributor.author/" + path,
-                                                     addedAuthor);
+                                                     value);
         ops.add(addOperation);
         String patchBody = getPatchContent(ops);
 
@@ -513,6 +654,39 @@ public class PatchMetadataIT extends AbstractEntityIntegrationTest {
                            Matchers.is(MetadataMatcher.matchMetadata(authorField, expectedOrder.get(3), 3)),
                            Matchers.is(MetadataMatcher.matchMetadata(authorField, expectedOrder.get(4), 4)),
                            Matchers.is(MetadataMatcher.matchMetadata(authorField, expectedOrder.get(5), 5))
+                   )));
+    }
+
+    /**
+     * This method removes an author (dc.description.author) within a workspace publication's "traditionalpageone"
+     * section from the position "path" using a PATCH request and verifies the order of the remaining authors
+     * within the section using an ordered list of expected author names.
+     * @param path              The "path" index to use for the Remove operation
+     * @param expectedOrder     A list of author names sorted in the expected order
+     */
+    private void removeTraditionalPageOneAuthorTest(int path, List<String> expectedOrder) throws Exception {
+        List<Operation> ops = new ArrayList<Operation>();
+        RemoveOperation removeOperation = new RemoveOperation("/sections/traditionalpageone/dc.contributor.author/"
+                                                                      + path);
+        ops.add(removeOperation);
+        String patchBody = getPatchContent(ops);
+
+        String token = getAuthToken(admin.getEmail(), password);
+
+        getClient(token).perform(patch("/api/submission/workspaceitems/" + publicationItem.getID())
+                                         .content(patchBody)
+                                         .contentType(javax.ws.rs.core.MediaType.APPLICATION_JSON_PATCH_JSON))
+                        .andExpect(status().isOk());
+
+        String authorField = "dc.contributor.author";
+        getClient().perform(get("/api/submission/workspaceitems/" + publicationItem.getID()))
+                   .andExpect(status().isOk())
+                   .andExpect(content().contentType(contentType))
+                   .andExpect(jsonPath("$.sections.traditionalpageone", Matchers.allOf(
+                           Matchers.is(MetadataMatcher.matchMetadata(authorField, expectedOrder.get(0), 0)),
+                           Matchers.is(MetadataMatcher.matchMetadata(authorField, expectedOrder.get(1), 1)),
+                           Matchers.is(MetadataMatcher.matchMetadata(authorField, expectedOrder.get(2), 2)),
+                           Matchers.is(MetadataMatcher.matchMetadata(authorField, expectedOrder.get(3), 3))
                    )));
     }
 
