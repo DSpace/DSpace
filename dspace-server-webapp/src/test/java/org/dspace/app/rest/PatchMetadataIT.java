@@ -26,6 +26,7 @@ import org.dspace.app.rest.builder.CommunityBuilder;
 import org.dspace.app.rest.builder.ItemBuilder;
 import org.dspace.app.rest.builder.WorkspaceItemBuilder;
 import org.dspace.app.rest.matcher.MetadataMatcher;
+import org.dspace.app.rest.model.patch.AddOperation;
 import org.dspace.app.rest.model.patch.MoveOperation;
 import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.rest.test.AbstractEntityIntegrationTest;
@@ -71,6 +72,8 @@ public class PatchMetadataIT extends AbstractEntityIntegrationTest {
 
     private List<String> authorsOriginalOrder;
 
+    private String addedAuthor;
+
     @Before
     @Override
     public void setUp() throws Exception {
@@ -106,6 +109,8 @@ public class PatchMetadataIT extends AbstractEntityIntegrationTest {
         authorsOriginalOrder.add("Perotti, Enrico");
         // 5th one will be virtual metadata
         authorsOriginalOrder.add("Linton, Oliver");
+
+        addedAuthor = "Semple, Robert";
 
         context.turnOffAuthorisationSystem();
 
@@ -311,6 +316,138 @@ public class PatchMetadataIT extends AbstractEntityIntegrationTest {
     }
 
     /**
+     * This test will add an author (dc.description.author) within a workspace publication's "traditionalpageone"
+     * section at position 0 using a PATCH request and verify the place of the new author and the order of the
+     * authors within the section.
+     * Original Order: 0,1,2,3,4
+     * Expected Order: +,0,1,2,3,4 (with + being the new author)
+     */
+    public void addAuthorOnTraditionalPageOnePlaceZero() throws Exception {
+        initPersonPublicationWorkspace();
+
+        List<String> expectedOrder = new ArrayList<>();
+        expectedOrder.add(addedAuthor);
+        expectedOrder.add(authorsOriginalOrder.get(0));
+        expectedOrder.add(authorsOriginalOrder.get(1));
+        expectedOrder.add(authorsOriginalOrder.get(2));
+        expectedOrder.add(authorsOriginalOrder.get(3));
+        expectedOrder.add(authorsOriginalOrder.get(4));
+
+        addTraditionalPageOneAuthorTest("0", expectedOrder);
+
+    }
+
+    /**
+     * This test will add an author (dc.description.author) within a workspace publication's "traditionalpageone"
+     * section at position 1 using a PATCH request and verify the place of the new author and the order of the
+     * authors within the section.
+     * Original Order: 0,1,2,3,4
+     * Expected Order: 0,+,1,2,3,4 (with + being the new author)
+     */
+    public void addAuthorOnTraditionalPageOnePlaceOne() throws Exception {
+        initPersonPublicationWorkspace();
+
+        List<String> expectedOrder = new ArrayList<>();
+        expectedOrder.add(authorsOriginalOrder.get(0));
+        expectedOrder.add(addedAuthor);
+        expectedOrder.add(authorsOriginalOrder.get(1));
+        expectedOrder.add(authorsOriginalOrder.get(2));
+        expectedOrder.add(authorsOriginalOrder.get(3));
+        expectedOrder.add(authorsOriginalOrder.get(4));
+
+        addTraditionalPageOneAuthorTest("1", expectedOrder);
+
+    }
+
+    /**
+     * This test will add an author (dc.description.author) within a workspace publication's "traditionalpageone"
+     * section at position 2 using a PATCH request and verify the place of the new author and the order of the
+     * authors within the section.
+     * Original Order: 0,1,2,3,4
+     * Expected Order: 0,1,+,2,3,4 (with + being the new author)
+     */
+    public void addAuthorOnTraditionalPageOnePlaceTwo() throws Exception {
+        initPersonPublicationWorkspace();
+
+        List<String> expectedOrder = new ArrayList<>();
+        expectedOrder.add(authorsOriginalOrder.get(0));
+        expectedOrder.add(authorsOriginalOrder.get(1));
+        expectedOrder.add(addedAuthor);
+        expectedOrder.add(authorsOriginalOrder.get(2));
+        expectedOrder.add(authorsOriginalOrder.get(3));
+        expectedOrder.add(authorsOriginalOrder.get(4));
+
+        addTraditionalPageOneAuthorTest("2", expectedOrder);
+
+    }
+
+    /**
+     * This test will add an author (dc.description.author) within a workspace publication's "traditionalpageone"
+     * section at position 3 using a PATCH request and verify the place of the new author and the order of the
+     * authors within the section.
+     * Original Order: 0,1,2,3,4
+     * Expected Order: 0,1,2,+,3,4 (with + being the new author)
+     */
+    public void addAuthorOnTraditionalPageOnePlaceThree() throws Exception {
+        initPersonPublicationWorkspace();
+
+        List<String> expectedOrder = new ArrayList<>();
+        expectedOrder.add(authorsOriginalOrder.get(0));
+        expectedOrder.add(authorsOriginalOrder.get(1));
+        expectedOrder.add(authorsOriginalOrder.get(2));
+        expectedOrder.add(addedAuthor);
+        expectedOrder.add(authorsOriginalOrder.get(3));
+        expectedOrder.add(authorsOriginalOrder.get(4));
+
+        addTraditionalPageOneAuthorTest("3", expectedOrder);
+
+    }
+
+    /**
+     * This test will add an author (dc.description.author) within a workspace publication's "traditionalpageone"
+     * section at position 4 using a PATCH request and verify the place of the new author and the order of the
+     * authors within the section.
+     * Original Order: 0,1,2,3,4
+     * Expected Order: 0,1,2,3,+,4 (with + being the new author)
+     */
+    public void addAuthorOnTraditionalPageOnePlaceFour() throws Exception {
+        initPersonPublicationWorkspace();
+
+        List<String> expectedOrder = new ArrayList<>();
+        expectedOrder.add(authorsOriginalOrder.get(0));
+        expectedOrder.add(authorsOriginalOrder.get(1));
+        expectedOrder.add(authorsOriginalOrder.get(2));
+        expectedOrder.add(authorsOriginalOrder.get(3));
+        expectedOrder.add(addedAuthor);
+        expectedOrder.add(authorsOriginalOrder.get(4));
+
+        addTraditionalPageOneAuthorTest("4", expectedOrder);
+
+    }
+
+    /**
+     * This test will add an author (dc.description.author) within a workspace publication's "traditionalpageone"
+     * section at position 0 using a PATCH request and verify the place of the new author and the order of the
+     * authors within the section.
+     * Original Order: 0,1,2,3,4
+     * Expected Order: +,0,1,2,3,4 (with + being the new author)
+     */
+    public void addAuthorOnTraditionalPageOneLastPlace() throws Exception {
+        initPersonPublicationWorkspace();
+
+        List<String> expectedOrder = new ArrayList<>();
+        expectedOrder.add(authorsOriginalOrder.get(0));
+        expectedOrder.add(authorsOriginalOrder.get(1));
+        expectedOrder.add(authorsOriginalOrder.get(2));
+        expectedOrder.add(authorsOriginalOrder.get(3));
+        expectedOrder.add(authorsOriginalOrder.get(4));
+        expectedOrder.add(addedAuthor);
+
+        addTraditionalPageOneAuthorTest("-", expectedOrder);
+
+    }
+
+    /**
      * This method moves an author (dc.description.author) within a workspace publication's "traditionalpageone"
      * section from position "from" to "path" using a PATCH request and verifies the order of the authors within the
      * section using an ordered list of expected author names.
@@ -342,6 +479,41 @@ public class PatchMetadataIT extends AbstractEntityIntegrationTest {
                         Matchers.is(MetadataMatcher.matchMetadata(authorField, expectedOrder.get(3), 3)),
                         Matchers.is(MetadataMatcher.matchMetadata(authorField, expectedOrder.get(4), 4))
                 )));
+    }
+
+    /**
+     * This method adds an author (dc.description.author) within a workspace publication's "traditionalpageone"
+     * section to the position "path" using a PATCH request and verifies the place of the new author and the
+     * order of the previous authors within the section using an ordered list of expected author names.
+     * @param path              The "path" index to use for the Add operation
+     * @param expectedOrder     A list of author names sorted in the expected order
+     */
+    private void addTraditionalPageOneAuthorTest(String path, List<String> expectedOrder) throws Exception {
+        List<Operation> ops = new ArrayList<Operation>();
+        AddOperation addOperation = new AddOperation("/sections/traditionalpageone/dc.contributor.author/" + path,
+                                                     addedAuthor);
+        ops.add(addOperation);
+        String patchBody = getPatchContent(ops);
+
+        String token = getAuthToken(admin.getEmail(), password);
+
+        getClient(token).perform(patch("/api/submission/workspaceitems/" + publicationItem.getID())
+                                         .content(patchBody)
+                                         .contentType(javax.ws.rs.core.MediaType.APPLICATION_JSON_PATCH_JSON))
+                        .andExpect(status().isOk());
+
+        String authorField = "dc.contributor.author";
+        getClient().perform(get("/api/submission/workspaceitems/" + publicationItem.getID()))
+                   .andExpect(status().isOk())
+                   .andExpect(content().contentType(contentType))
+                   .andExpect(jsonPath("$.sections.traditionalpageone", Matchers.allOf(
+                           Matchers.is(MetadataMatcher.matchMetadata(authorField, expectedOrder.get(0), 0)),
+                           Matchers.is(MetadataMatcher.matchMetadata(authorField, expectedOrder.get(1), 1)),
+                           Matchers.is(MetadataMatcher.matchMetadata(authorField, expectedOrder.get(2), 2)),
+                           Matchers.is(MetadataMatcher.matchMetadata(authorField, expectedOrder.get(3), 3)),
+                           Matchers.is(MetadataMatcher.matchMetadata(authorField, expectedOrder.get(4), 4)),
+                           Matchers.is(MetadataMatcher.matchMetadata(authorField, expectedOrder.get(5), 5))
+                   )));
     }
 
     /**
