@@ -7,9 +7,9 @@
  */
 package org.dspace.app.rest;
 
+import java.util.List;
 import javax.annotation.Nullable;
 import javax.servlet.http.HttpServletRequest;
-import java.util.List;
 
 import org.dspace.app.rest.model.WorkflowActionRest;
 import org.dspace.app.rest.model.WorkflowStepRest;
