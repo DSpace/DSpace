@@ -34,15 +34,7 @@ public class CollectionParentCommunityLinkRepository extends AbstractDSpaceRestR
     @Autowired
     private CollectionService collectionService;
 
-    /**
-     * This method retrieves the ParentCommunity object for the Collection which is defined by the given collectionId
-     * It'll transform this Parent Community to a REST object and return this
-     * @param httpServletRequest    The current request
-     * @param collectionId          The given Collection UUID that will be used to find the Collection
-     * @param optionalPageable      The pageable
-     * @param projection            The current Projection
-     * @return                      The Parent Community REST object
-     */
+
     public CommunityRest getParentCommunity(@Nullable HttpServletRequest httpServletRequest,
                                             UUID collectionId,
                                             @Nullable Pageable optionalPageable,
