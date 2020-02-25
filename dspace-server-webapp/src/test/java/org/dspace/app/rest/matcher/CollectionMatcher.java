@@ -31,8 +31,7 @@ public class CollectionMatcher {
     public static Matcher<? super Object> matchCollectionEntry(String name, UUID uuid, String handle, Bitstream logo) {
         return allOf(
                 matchProperties(name, uuid, handle),
-                matchLinks(uuid),
-                matchLogo(logo)
+                matchLinks(uuid)
         );
     }
 
