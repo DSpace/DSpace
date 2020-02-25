@@ -201,7 +201,7 @@ public class PatchMetadataIT extends AbstractEntityIntegrationTest {
     }
 
     /**
-     * This test will move an author (dc.description.author) within a workspace publication's "traditionalpageone"
+     * This test will move an author (dc.contributor.author) within a workspace publication's "traditionalpageone"
      * section from position 1 to 0 using a PATCH request and verify the order of the authors within the section.
      * Original Order: 0,1,2,3,4
      * Expected Order: 1,0,2,3,4
@@ -221,7 +221,7 @@ public class PatchMetadataIT extends AbstractEntityIntegrationTest {
     }
 
     /**
-     * This test will move an author (dc.description.author) within a workspace publication's "traditionalpageone"
+     * This test will move an author (dc.contributor.author) within a workspace publication's "traditionalpageone"
      * section from position 2 to 0 using a PATCH request and verify the order of the authors within the section.
      * Original Order: 0,1,2,3,4
      * Expected Order: 2,0,1,3,4
@@ -241,7 +241,7 @@ public class PatchMetadataIT extends AbstractEntityIntegrationTest {
     }
 
     /**
-     * This test will move an author (dc.description.author) within a workspace publication's "traditionalpageone"
+     * This test will move an author (dc.contributor.author) within a workspace publication's "traditionalpageone"
      * section from position 3 to 0 using a PATCH request and verify the order of the authors within the section.
      * Original Order: 0,1,2,3,4
      * Expected Order: 3,0,1,2,4
@@ -261,7 +261,7 @@ public class PatchMetadataIT extends AbstractEntityIntegrationTest {
     }
 
     /**
-     * This test will move an author (dc.description.author) within a workspace publication's "traditionalpageone"
+     * This test will move an author (dc.contributor.author) within a workspace publication's "traditionalpageone"
      * section from position 4 to 0 using a PATCH request and verify the order of the authors within the section.
      * Original Order: 0,1,2,3,4
      * Expected Order: 4,0,1,2,3
@@ -281,7 +281,7 @@ public class PatchMetadataIT extends AbstractEntityIntegrationTest {
     }
 
     /**
-     * This test will move an author (dc.description.author) within a workspace publication's "traditionalpageone"
+     * This test will move an author (dc.contributor.author) within a workspace publication's "traditionalpageone"
      * section from position 1 to 3 using a PATCH request and verify the order of the authors within the section.
      * Original Order: 0,1,2,3,4
      * Expected Order: 0,2,3,1,4
@@ -301,7 +301,7 @@ public class PatchMetadataIT extends AbstractEntityIntegrationTest {
     }
 
     /**
-     * This test will move an author (dc.description.author) within a workspace publication's "traditionalpageone"
+     * This test will move an author (dc.contributor.author) within a workspace publication's "traditionalpageone"
      * section from position 1 to 4 using a PATCH request and verify the order of the authors within the section.
      * Original Order: 0,1,2,3,4
      * Expected Order: 0,2,3,4,1
@@ -321,7 +321,7 @@ public class PatchMetadataIT extends AbstractEntityIntegrationTest {
     }
 
     /**
-     * This test will replace an author (dc.description.author) within a workspace publication's "traditionalpageone"
+     * This test will replace an author (dc.contributor.author) within a workspace publication's "traditionalpageone"
      * section at position 0 using a PATCH request and verify the order and value of the authors within the section.
      * @throws Exception
      */
@@ -340,7 +340,7 @@ public class PatchMetadataIT extends AbstractEntityIntegrationTest {
     }
 
     /**
-     * This test will replace an author (dc.description.author) within a workspace publication's "traditionalpageone"
+     * This test will replace an author (dc.contributor.author) within a workspace publication's "traditionalpageone"
      * section at position 2 using a PATCH request and verify the order and value of the authors within the section.
      * @throws Exception
      */
@@ -359,7 +359,7 @@ public class PatchMetadataIT extends AbstractEntityIntegrationTest {
     }
 
     /**
-     * This test will replace an author (dc.description.author) within a workspace publication's "traditionalpageone"
+     * This test will replace an author (dc.contributor.author) within a workspace publication's "traditionalpageone"
      * section at position 3 using a PATCH request and verify the order and value of the authors within the section.
      * @throws Exception
      */
@@ -379,7 +379,7 @@ public class PatchMetadataIT extends AbstractEntityIntegrationTest {
 
 
     /**
-     * This test will add an author (dc.description.author) within a workspace publication's "traditionalpageone"
+     * This test will add an author (dc.contributor.author) within a workspace publication's "traditionalpageone"
      * section at position 0 using a PATCH request and verify the place of the new author and the order of the
      * authors within the section.
      * Original Order: 0,1,2,3,4
@@ -402,7 +402,7 @@ public class PatchMetadataIT extends AbstractEntityIntegrationTest {
     }
 
     /**
-     * This test will add an author (dc.description.author) within a workspace publication's "traditionalpageone"
+     * This test will add an author (dc.contributor.author) within a workspace publication's "traditionalpageone"
      * section at position 1 using a PATCH request and verify the place of the new author and the order of the
      * authors within the section.
      * Original Order: 0,1,2,3,4
@@ -425,7 +425,7 @@ public class PatchMetadataIT extends AbstractEntityIntegrationTest {
     }
 
     /**
-     * This test will add an author (dc.description.author) within a workspace publication's "traditionalpageone"
+     * This test will add an author (dc.contributor.author) within a workspace publication's "traditionalpageone"
      * section at position 2 using a PATCH request and verify the place of the new author and the order of the
      * authors within the section.
      * Original Order: 0,1,2,3,4
@@ -448,7 +448,7 @@ public class PatchMetadataIT extends AbstractEntityIntegrationTest {
     }
 
     /**
-     * This test will add an author (dc.description.author) within a workspace publication's "traditionalpageone"
+     * This test will add an author (dc.contributor.author) within a workspace publication's "traditionalpageone"
      * section at position 3 using a PATCH request and verify the place of the new author and the order of the
      * authors within the section.
      * Original Order: 0,1,2,3,4
@@ -471,7 +471,7 @@ public class PatchMetadataIT extends AbstractEntityIntegrationTest {
     }
 
     /**
-     * This test will add an author (dc.description.author) within a workspace publication's "traditionalpageone"
+     * This test will add an author (dc.contributor.author) within a workspace publication's "traditionalpageone"
      * section at position 4 using a PATCH request and verify the place of the new author and the order of the
      * authors within the section.
      * Original Order: 0,1,2,3,4
@@ -494,7 +494,7 @@ public class PatchMetadataIT extends AbstractEntityIntegrationTest {
     }
 
     /**
-     * This test will add an author (dc.description.author) within a workspace publication's "traditionalpageone"
+     * This test will add an author (dc.contributor.author) within a workspace publication's "traditionalpageone"
      * section at position 0 using a PATCH request and verify the place of the new author and the order of the
      * authors within the section.
      * Original Order: 0,1,2,3,4
@@ -517,7 +517,7 @@ public class PatchMetadataIT extends AbstractEntityIntegrationTest {
     }
 
     /**
-     * This test will remove the author (dc.description.author) from a workspace publication's "traditionalpageone"
+     * This test will remove the author (dc.contributor.author) from a workspace publication's "traditionalpageone"
      * section at position 0 using a PATCH request and verify the order of the remaining authors within the section.
      * Original Order: 0,1,2,3,4
      * Expected Order: 1,2,3,4
@@ -535,10 +535,10 @@ public class PatchMetadataIT extends AbstractEntityIntegrationTest {
         removeTraditionalPageOneAuthorTest(0, expectedOrder);
     }
     /**
-     * This test will remove the author (dc.description.author) from a workspace publication's "traditionalpageone"
+     * This test will remove the author (dc.contributor.author) from a workspace publication's "traditionalpageone"
      * section at position 1 using a PATCH request and verify the order of the remaining authors within the section.
      * Original Order: 0,1,2,3,4
-     * Expected Order: 0,2,3,4
+     * Expected Order: 0,1,2,3,4
      */
     @Test
     public void removeAuthorOnTraditionalPageFromPlaceOneTest() throws Exception {
@@ -555,7 +555,7 @@ public class PatchMetadataIT extends AbstractEntityIntegrationTest {
         removeTraditionalPageOneAuthorTest(1, expectedOrder);
     }
     /**
-     * This test will remove the author (dc.description.author) from a workspace publication's "traditionalpageone"
+     * This test will remove the author (dc.contributor.author) from a workspace publication's "traditionalpageone"
      * section at position 2 using a PATCH request and verify the order of the remaining authors within the section.
      * Original Order: 0,1,2,3,4
      * Expected Order: 0,1,3,4
@@ -573,7 +573,7 @@ public class PatchMetadataIT extends AbstractEntityIntegrationTest {
         removeTraditionalPageOneAuthorTest(2, expectedOrder);
     }
     /**
-     * This test will remove the author (dc.description.author) from a workspace publication's "traditionalpageone"
+     * This test will remove the author (dc.contributor.author) from a workspace publication's "traditionalpageone"
      * section at position 3 using a PATCH request and verify the order of the remaining authors within the section.
      * Original Order: 0,1,2,3,4
      * Expected Order: 0,1,2,4
@@ -591,10 +591,10 @@ public class PatchMetadataIT extends AbstractEntityIntegrationTest {
         removeTraditionalPageOneAuthorTest(3, expectedOrder);
     }
     /**
-     * This test will remove the author (dc.description.author) from a workspace publication's "traditionalpageone"
+     * This test will remove the author (dc.contributor.author) from a workspace publication's "traditionalpageone"
      * section at position 4 using a PATCH request and verify the order of the remaining authors within the section.
      * Original Order: 0,1,2,3,4
-     * Expected Order: 0,1,2,3
+     * Expected Order: 0,1,2,3,4
      */
     @Test
     public void removeAuthorOnTraditionalPageFromPlaceFourTest() throws Exception {
@@ -612,8 +612,9 @@ public class PatchMetadataIT extends AbstractEntityIntegrationTest {
     }
 
     /**
-     * This test will remove all authors (dc.description.author) from a workspace publication's "traditionalpageone"
-     * section using a PATCH request and verify that there are no remaining authors within the section.
+     * This test will remove all authors (dc.contributor.author) that are not linked through a relationship  from a
+     * workspace publication's "traditionalpageone" section using a PATCH request and verify that the only remaining
+     * authors are those coming from a relationship.
      */
     @Test
     public void removeAllAuthorsOnTraditionalPageTest() throws  Exception {
@@ -648,7 +649,7 @@ public class PatchMetadataIT extends AbstractEntityIntegrationTest {
     }
 
     /**
-     * This method moves an author (dc.description.author) within a workspace publication's "traditionalpageone"
+     * This method moves an author (dc.contributor.author) within a workspace publication's "traditionalpageone"
      * section from position "from" to "path" using a PATCH request and verifies the order of the authors within the
      * section using an ordered list of expected author names.
      * @param from              The "from" index to use for the Move operation
@@ -682,7 +683,7 @@ public class PatchMetadataIT extends AbstractEntityIntegrationTest {
     }
 
     /**
-     * This method replaces an author (dc.description.author) within a workspace publication's "traditionalpageone"
+     * This method replaces an author (dc.contributor.author) within a workspace publication's "traditionalpageone"
      * section at position "path" using a PATCH request and verifies the order of the authors within the
      * section using an ordered list of expected author names.
      * @param path              The "path" index to use for the Replace operation
@@ -719,7 +720,7 @@ public class PatchMetadataIT extends AbstractEntityIntegrationTest {
     }
 
     /**
-     * This method adds an author (dc.description.author) within a workspace publication's "traditionalpageone"
+     * This method adds an author (dc.contributor.author) within a workspace publication's "traditionalpageone"
      * section to the position "path" using a PATCH request and verifies the place of the new author and the
      * order of the previous authors within the section using an ordered list of expected author names.
      * @param path              The "path" index to use for the Add operation
@@ -756,7 +757,7 @@ public class PatchMetadataIT extends AbstractEntityIntegrationTest {
     }
 
     /**
-     * This method removes an author (dc.description.author) within a workspace publication's "traditionalpageone"
+     * This method removes an author (dc.contributor.author) within a workspace publication's "traditionalpageone"
      * section from the position "path" using a PATCH request and verifies the order of the remaining authors
      * within the section using an ordered list of expected author names.
      * @param path              The "path" index to use for the Remove operation
