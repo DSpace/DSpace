@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.dspace.content.Collection;
+import org.dspace.content.Community;
 import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
 
@@ -108,4 +109,10 @@ public class CommunityMatcher {
         );
     }
 
+    public static Matcher<? super Object> matchCommuity(Community community) {
+        return allOf(hasJsonPath("$.uuid", is(community.getID().toString())),
+                hasJsonPath("$.name", is(community.getName())),
+                hasJsonPath("$.type", is("community")),
+                hasJsonPath("$.handle", is(community.getHandle())));
+    }
 }
