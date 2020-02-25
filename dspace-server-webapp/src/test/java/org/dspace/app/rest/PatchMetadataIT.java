@@ -31,6 +31,7 @@ import org.dspace.app.rest.model.patch.AddOperation;
 import org.dspace.app.rest.model.patch.MoveOperation;
 import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.rest.model.patch.RemoveOperation;
+import org.dspace.app.rest.model.patch.ReplaceOperation;
 import org.dspace.app.rest.test.AbstractEntityIntegrationTest;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
@@ -75,6 +76,7 @@ public class PatchMetadataIT extends AbstractEntityIntegrationTest {
     private List<String> authorsOriginalOrder;
 
     private String addedAuthor;
+    private String replacedAuthor;
 
     @Before
     @Override
@@ -113,6 +115,7 @@ public class PatchMetadataIT extends AbstractEntityIntegrationTest {
         authorsOriginalOrder.add("Linton, Oliver");
 
         addedAuthor = "Semple, Robert";
+        replacedAuthor = "New Value";
 
         context.turnOffAuthorisationSystem();
 
@@ -316,6 +319,64 @@ public class PatchMetadataIT extends AbstractEntityIntegrationTest {
 
         moveTraditionalPageOneAuthorTest(1, 4, expectedOrder);
     }
+
+    /**
+     * This test will replace an author (dc.description.author) within a workspace publication's "traditionalpageone"
+     * section at position 0 using a PATCH request and verify the order and value of the authors within the section.
+     * @throws Exception
+     */
+    @Test
+    public void replaceTraditionalPageOneAuthorZeroTest() throws Exception {
+        initPersonPublicationWorkspace();
+
+        List<String> expectedOrder = new ArrayList<>();
+        expectedOrder.add(replacedAuthor);
+        expectedOrder.add(authorsOriginalOrder.get(1));
+        expectedOrder.add(authorsOriginalOrder.get(2));
+        expectedOrder.add(authorsOriginalOrder.get(3));
+        expectedOrder.add(authorsOriginalOrder.get(4));
+
+        replaceTraditionalPageOneAuthorTest(0, expectedOrder);
+    }
+
+    /**
+     * This test will replace an author (dc.description.author) within a workspace publication's "traditionalpageone"
+     * section at position 2 using a PATCH request and verify the order and value of the authors within the section.
+     * @throws Exception
+     */
+    @Test
+    public void replaceTraditionalPageOneAuthorTwoTest() throws Exception {
+        initPersonPublicationWorkspace();
+
+        List<String> expectedOrder = new ArrayList<>();
+        expectedOrder.add(authorsOriginalOrder.get(0));
+        expectedOrder.add(authorsOriginalOrder.get(1));
+        expectedOrder.add(replacedAuthor);
+        expectedOrder.add(authorsOriginalOrder.get(3));
+        expectedOrder.add(authorsOriginalOrder.get(4));
+
+        replaceTraditionalPageOneAuthorTest(2, expectedOrder);
+    }
+
+    /**
+     * This test will replace an author (dc.description.author) within a workspace publication's "traditionalpageone"
+     * section at position 3 using a PATCH request and verify the order and value of the authors within the section.
+     * @throws Exception
+     */
+    @Test
+    public void replaceTraditionalPageOneAuthorThreeTest() throws Exception {
+        initPersonPublicationWorkspace();
+
+        List<String> expectedOrder = new ArrayList<>();
+        expectedOrder.add(authorsOriginalOrder.get(0));
+        expectedOrder.add(authorsOriginalOrder.get(1));
+        expectedOrder.add(authorsOriginalOrder.get(2));
+        expectedOrder.add(replacedAuthor);
+        expectedOrder.add(authorsOriginalOrder.get(4));
+
+        replaceTraditionalPageOneAuthorTest(3, expectedOrder);
+    }
+
 
     /**
      * This test will add an author (dc.description.author) within a workspace publication's "traditionalpageone"
@@ -618,6 +679,43 @@ public class PatchMetadataIT extends AbstractEntityIntegrationTest {
                         Matchers.is(MetadataMatcher.matchMetadata(authorField, expectedOrder.get(3), 3)),
                         Matchers.is(MetadataMatcher.matchMetadata(authorField, expectedOrder.get(4), 4))
                 )));
+    }
+
+    /**
+     * This method replaces an author (dc.description.author) within a workspace publication's "traditionalpageone"
+     * section at position "path" using a PATCH request and verifies the order of the authors within the
+     * section using an ordered list of expected author names.
+     * @param path              The "path" index to use for the Replace operation
+     * @param expectedOrder     A list of author names sorted in the expected order
+     */
+    private void replaceTraditionalPageOneAuthorTest(int path, List<String> expectedOrder) throws Exception {
+        List<Operation> ops = new ArrayList<Operation>();
+        MetadataValueRest value = new MetadataValueRest();
+        value.setValue(replacedAuthor);
+
+        ReplaceOperation replaceOperation = new ReplaceOperation("/sections/traditionalpageone/dc.contributor.author/"
+                                                                         + path, value);
+        ops.add(replaceOperation);
+        String patchBody = getPatchContent(ops);
+
+        String token = getAuthToken(admin.getEmail(), password);
+
+        getClient(token).perform(patch("/api/submission/workspaceitems/" + publicationItem.getID())
+                                         .content(patchBody)
+                                         .contentType(javax.ws.rs.core.MediaType.APPLICATION_JSON_PATCH_JSON))
+                        .andExpect(status().isOk());
+
+        String authorField = "dc.contributor.author";
+        getClient().perform(get("/api/submission/workspaceitems/" + publicationItem.getID()))
+                   .andExpect(status().isOk())
+                   .andExpect(content().contentType(contentType))
+                   .andExpect(jsonPath("$.sections.traditionalpageone", Matchers.allOf(
+                           Matchers.is(MetadataMatcher.matchMetadata(authorField, expectedOrder.get(0), 0)),
+                           Matchers.is(MetadataMatcher.matchMetadata(authorField, expectedOrder.get(1), 1)),
+                           Matchers.is(MetadataMatcher.matchMetadata(authorField, expectedOrder.get(2), 2)),
+                           Matchers.is(MetadataMatcher.matchMetadata(authorField, expectedOrder.get(3), 3)),
+                           Matchers.is(MetadataMatcher.matchMetadata(authorField, expectedOrder.get(4), 4))
+                   )));
     }
 
     /**
