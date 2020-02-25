@@ -28,7 +28,7 @@ import org.springframework.util.Assert;
  * must return an error.
  *
  * Example: <code>
- * curl -X PATCH http://${dspace.url}/api/submission/workspaceitems/<:id-workspaceitem> -H "
+ * curl -X PATCH http://${dspace.server.url}/api/submission/workspaceitems/<:id-workspaceitem> -H "
  * Content-Type: application/json" -d '[{ "op": "replace", "path": "
  * /sections/traditionalpageone/dc.title/0", "value": {"value": "Add new
  * title", "language": "en"}}]'
@@ -37,7 +37,7 @@ import org.springframework.util.Assert;
  * It is also possible to change only a single attribute of the {@link MetadataValueRest} (except the "place").
  *
  * Example: <code>
- * curl -X PATCH http://${dspace.url}/api/submission/workspaceitems/<:id-workspaceitem> -H "
+ * curl -X PATCH http://${dspace.server.url}/api/submission/workspaceitems/<:id-workspaceitem> -H "
  * Content-Type: application/json" -d '[{ "op": "replace", "path": "
  * /sections/traditionalpageone/dc.title/0/language", "value": "it"}]'
  * </code>
