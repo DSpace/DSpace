@@ -10,8 +10,6 @@ package org.dspace.servicemanager.spring;
 import org.dspace.servicemanager.ServiceManagerSystem;
 import org.dspace.servicemanager.config.DSpaceConfigurationService;
 import org.dspace.services.ConfigurationService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
@@ -25,19 +23,17 @@ import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
  */
 public final class DSpaceBeanFactoryPostProcessor implements BeanFactoryPostProcessor {
 
-    private static Logger log = LoggerFactory.getLogger(DSpaceBeanFactoryPostProcessor.class);
-
+    private ServiceManagerSystem serviceManager;
     private DSpaceConfigurationService configurationService;
-    private ServiceManagerSystem parent;
     private boolean testMode = false;
 
-    public DSpaceBeanFactoryPostProcessor(ServiceManagerSystem parent,
-                                          DSpaceConfigurationService configurationService, boolean testMode) {
-        if (parent == null || configurationService == null) {
-            throw new IllegalArgumentException("parent and configuration service cannot be null");
+    public DSpaceBeanFactoryPostProcessor(ServiceManagerSystem serviceManager,
+            DSpaceConfigurationService configurationService, boolean testMode) {
+        if (configurationService == null) {
+            throw new IllegalArgumentException("Configuration service cannot be null");
         }
+        this.serviceManager = serviceManager;
         this.configurationService = configurationService;
-        this.parent = parent;
         this.testMode = testMode;
     }
 
@@ -45,11 +41,11 @@ public final class DSpaceBeanFactoryPostProcessor implements BeanFactoryPostProc
      * @see org.springframework.beans.factory.config.BeanFactoryPostProcessor#postProcessBeanFactory(org
      * .springframework.beans.factory.config.ConfigurableListableBeanFactory)
      */
-
+    @Override
     public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
         // force config service to be registered first
         beanFactory.registerSingleton(ConfigurationService.class.getName(), configurationService);
-        beanFactory.registerSingleton(ServiceManagerSystem.class.getName(), parent);
+        beanFactory.registerSingleton(ServiceManagerSystem.class.getName(), serviceManager);
     }
 
 }

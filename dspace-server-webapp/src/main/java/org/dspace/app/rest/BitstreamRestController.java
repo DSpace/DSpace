@@ -127,9 +127,12 @@ public class BitstreamRestController {
                     .withLength(bitstreamTuple.getRight())
                     .withChecksum(bit.getChecksum())
                     .withMimetype(mimetype)
-                    .withLastModified(lastModified)
                     .with(request)
                     .with(response);
+
+            if (lastModified != null) {
+                sender.withLastModified(lastModified);
+            }
 
             //Determine if we need to send the file as a download or if the browser can open it inline
             long dispositionThreshold = configurationService.getLongProperty("webui.content_disposition_threshold");

@@ -27,6 +27,7 @@ import org.dspace.checker.service.SimpleReporterService;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.Email;
+import org.dspace.core.Utils;
 
 /**
  * <p>
@@ -62,7 +63,7 @@ public class DailyReportEmailer {
     public void sendReport(File attachment, int numberOfBitstreams)
         throws IOException, javax.mail.MessagingException {
         if (numberOfBitstreams > 0) {
-            String hostname = ConfigurationManager.getProperty("dspace.hostname");
+            String hostname = Utils.getHostName(ConfigurationManager.getProperty("dspace.ui.url"));
             Email email = new Email();
             email.setSubject(
                 "Checksum checker Report - " + numberOfBitstreams + " Bitstreams found with POSSIBLE issues on " +

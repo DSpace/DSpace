@@ -264,8 +264,8 @@ public class IPMatcherTest {
         assertFalse(ipMatcher.match("192.1.2.2"));
     }
 
-
-    private ArrayList<String> getAllIp4Except(ArrayList<String> exceptions) {
+    // Commented out as this is currently not used in tests
+    /*private ArrayList<String> getAllIp4Except(ArrayList<String> exceptions) {
         int d1 = 0;
         int d2 = 0;
         int d3 = 0;
@@ -284,7 +284,7 @@ public class IPMatcherTest {
             }
         }
         return ips;
-    }
+    }*/
 
     private void verifyAllIp4Except(ArrayList<String> exceptions, boolean asserted, IPMatcher ipMatcher)
         throws IPMatcherException {

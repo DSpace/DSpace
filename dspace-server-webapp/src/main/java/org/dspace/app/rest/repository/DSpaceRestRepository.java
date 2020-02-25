@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
@@ -24,7 +25,6 @@ import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.RestAddressableModel;
 import org.dspace.app.rest.model.patch.Patch;
-import org.dspace.app.util.DCInputsReaderException;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.service.MetadataFieldService;
 import org.dspace.core.Context;
@@ -33,7 +33,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.repository.PagingAndSortingRepository;
-import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
@@ -94,7 +93,7 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
     /**
      * Method to implement to support bulk update of a REST objects via a PUT request
      */
-    public <S extends T> Iterable<S> save(Iterable<S> entities) {
+    public <S extends T> Iterable<S> saveAll(Iterable<S> entities) {
         // TODO Auto-generated method stub
         return null;
     }
@@ -105,9 +104,14 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
      *
      * @return the REST object identified by its ID
      */
-    public T findOne(ID id) {
+    public Optional<T> findById(ID id) {
         Context context = obtainContext();
-        return thisRepository.findOne(context, id);
+        final T object = thisRepository.findOne(context, id);
+        if (object == null) {
+            return Optional.empty();
+        } else {
+            return Optional.of(object);
+        }
     }
 
     /**
@@ -126,8 +130,8 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
      * Return true if an object exist for the specified ID. The default implementation is inefficient as it retrieves
      * the actual object to state that it exists. This could lead to retrieve and inizialize lot of linked objects
      */
-    public boolean exists(ID id) {
-        return findOne(id) != null;
+    public boolean existsById(ID id) {
+        return findById(id).isPresent();
     }
 
     @Override
@@ -143,7 +147,7 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
      * This method could be implemented to support bulk retrieval of specific object by their IDs. Unfortunately, this
      * method doesn't allow pagination and it could be misused to retrieve thousand objects at once
      */
-    public Iterable<T> findAll(Iterable<ID> ids) {
+    public Iterable<T> findAllById(Iterable<ID> ids) {
         throw new RuntimeException("findAll MUST be paginated");
     }
 
@@ -161,7 +165,7 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
     /**
      * Delete the object identified by its ID
      */
-    public void delete(ID id) {
+    public void deleteById(ID id) {
         Context context = obtainContext();
         try {
             thisRepository.delete(context, id);
@@ -200,7 +204,7 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
     /**
      * Method to implement to support bulk delete of multiple entity instances
      */
-    public void delete(Iterable<? extends T> entities) {
+    public void deleteAll(Iterable<? extends T> entities) {
         // TODO Auto-generated method stub
 
     }
@@ -386,33 +390,27 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
     /**
      * Apply a partial update to the REST object via JSON Patch
      *
-     * @param request
-     *            the http request
+     * @param request     the http request
      * @param apiCategory
      * @param model
-     * @param id
-     *            the ID of the target REST object
-     * @param patch
-     * the JSON Patch (https://tools.ietf.org/html/rfc6902) operation
+     * @param id          the ID of the target REST object
+     * @param patch       the JSON Patch (https://tools.ietf.org/html/rfc6902) operation
      * @return
-     * @throws HttpRequestMethodNotSupportedException
      * @throws UnprocessableEntityException
      * @throws DSpaceBadRequestException
      */
     public T patch(HttpServletRequest request, String apiCategory, String model, ID id, Patch patch)
-        throws HttpRequestMethodNotSupportedException, UnprocessableEntityException, DSpaceBadRequestException {
+        throws UnprocessableEntityException, DSpaceBadRequestException {
         Context context = obtainContext();
-
         try {
             thisRepository.patch(context, request, apiCategory, model, id, patch);
             context.commit();
-
         } catch (AuthorizeException ae) {
             throw new RESTAuthorizationException(ae);
-        } catch (SQLException | DCInputsReaderException e) {
+        } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-        return findOne(id);
+        return findById(id).orElse(null);
     }
 
     /**
@@ -427,19 +425,15 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
      * @param patch
      *            the JSON Patch (https://tools.ietf.org/html/rfc6902) operation
      * @return the full new state of the REST object after patching
-     * @throws HttpRequestMethodNotSupportedException
-     * @throws UnprocessableEntityException
-     * @throws DSpaceBadRequestException
      * @throws RepositoryMethodNotImplementedException
      *             returned by the default implementation when the operation is not supported for the entity
      *
      * @throws SQLException
      * @throws AuthorizeException
-     * @throws DCInputsReaderException
      */
     protected void patch(Context context, HttpServletRequest request, String apiCategory, String model, ID id,
                          Patch patch)
-        throws RepositoryMethodNotImplementedException, SQLException, AuthorizeException, DCInputsReaderException {
+        throws RepositoryMethodNotImplementedException, SQLException, AuthorizeException {
         throw new RepositoryMethodNotImplementedException(apiCategory, model);
     }
 
@@ -518,7 +512,7 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
             throw new RuntimeException("Unable to perform PUT request as the " +
                                            "current user does not have sufficient rights", e);
         }
-        return findOne(uuid);
+        return findById(uuid).orElse(null);
     }
 
     /**
@@ -540,7 +534,7 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
         } catch (SQLException | AuthorizeException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-        return findOne(id);
+        return findById(id).orElse(null);
     }
 
     /**

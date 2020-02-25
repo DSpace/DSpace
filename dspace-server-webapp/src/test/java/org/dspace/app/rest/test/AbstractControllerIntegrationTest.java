@@ -28,7 +28,7 @@ import org.junit.Assert;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.web.support.ErrorPageFilter;
+import org.springframework.boot.web.servlet.support.ErrorPageFilter;
 import org.springframework.data.rest.webmvc.RestMediaTypes;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.MediaType;

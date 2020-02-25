@@ -8,7 +8,7 @@
 package org.dspace.app.rest.security.jwt;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.any;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -26,7 +26,7 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 /**
  * @author Frederic Van Reet (frederic dot vanreet at atmire dot com)
@@ -56,7 +56,6 @@ public class EPersonClaimProviderTest {
     public void setUp() throws Exception {
         context = Mockito.mock(Context.class);
         Mockito.doCallRealMethod().when(context).setCurrentUser(any(EPerson.class));
-        Mockito.doCallRealMethod().when(context).getCurrentUser();
         when(ePerson.getID()).thenReturn(UUID.fromString("c3bae216-a481-496b-a524-7df5aabdb609"));
         jwtClaimsSet = new JWTClaimsSet.Builder()
             .claim(EPersonClaimProvider.EPERSON_ID, "c3bae216-a481-496b-a524-7df5aabdb609")

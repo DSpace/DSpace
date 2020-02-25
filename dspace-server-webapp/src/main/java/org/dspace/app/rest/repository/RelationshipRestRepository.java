@@ -85,8 +85,8 @@ public class RelationshipRestRepository extends DSpaceRestRepository<Relationshi
         try {
             long total = relationshipService.countTotal(context);
             List<Relationship> relationships = relationshipService.findAll(context,
-                    pageable.getPageSize(), pageable.getOffset());
-            return converter.toRestPage(relationships, pageable, total, utils.obtainProjection(true));
+                    pageable.getPageSize(), Math.toIntExact(pageable.getOffset()));
+            return converter.toRestPage(relationships, pageable, total, utils.obtainProjection());
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -357,16 +357,16 @@ public class RelationshipRestRepository extends DSpaceRestRepository<Relationshi
                 }
                 total += relationshipService.countByItemAndRelationshipType(context, item, relationshipType);
                 relationships.addAll(relationshipService.findByItemAndRelationshipType(context, item, relationshipType,
-                        isLeft, pageable.getPageSize(), pageable.getOffset()));
+                        isLeft, pageable.getPageSize(), Math.toIntExact(pageable.getOffset())));
             }
         } else {
             for (RelationshipType relationshipType : relationshipTypeList) {
                 total += relationshipService.countByRelationshipType(context, relationshipType);
                 relationships.addAll(relationshipService.findByRelationshipType(context, relationshipType,
-                        pageable.getPageSize(), pageable.getOffset()));
+                        pageable.getPageSize(), Math.toIntExact(pageable.getOffset())));
             }
         }
 
-        return converter.toRestPage(relationships, pageable, total, utils.obtainProjection(true));
+        return converter.toRestPage(relationships, pageable, total, utils.obtainProjection());
     }
 }

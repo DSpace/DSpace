@@ -140,8 +140,9 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
     public Page<WorkspaceItemRest> findAll(Context context, Pageable pageable) {
         try {
             long total = wis.countTotal(context);
-            List<WorkspaceItem> witems = wis.findAll(context, pageable.getPageSize(), pageable.getOffset());
-            return converter.toRestPage(witems, pageable, total, utils.obtainProjection(true));
+            List<WorkspaceItem> witems = wis.findAll(context, pageable.getPageSize(),
+                    Math.toIntExact(pageable.getOffset()));
+            return converter.toRestPage(witems, pageable, total, utils.obtainProjection());
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -155,8 +156,9 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
             Context context = obtainContext();
             EPerson ep = epersonService.find(context, submitterID);
             long total = wis.countByEPerson(context, ep);
-            List<WorkspaceItem> witems = wis.findByEPerson(context, ep, pageable.getPageSize(), pageable.getOffset());
-            return converter.toRestPage(witems, pageable, total, utils.obtainProjection(true));
+            List<WorkspaceItem> witems = wis.findByEPerson(context, ep, pageable.getPageSize(),
+                    Math.toIntExact(pageable.getOffset()));
+            return converter.toRestPage(witems, pageable, total, utils.obtainProjection());
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -165,7 +167,7 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
     @Override
     protected WorkspaceItemRest createAndReturn(Context context) throws SQLException, AuthorizeException {
         WorkspaceItem source = submissionService.createWorkspaceItem(context, getRequestService().getCurrentRequest());
-        return converter.toRest(source, Projection.DEFAULT);
+        return converter.toRest(source, converter.getProjection("full"));
     }
 
     @Override
@@ -218,7 +220,7 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
                                     MultipartFile file) throws Exception {
 
         Context context = obtainContext();
-        WorkspaceItemRest wsi = findOne(id);
+        WorkspaceItemRest wsi = findOne(context, id);
         WorkspaceItem source = wis.find(context, id);
         List<ErrorRest> errors = new ArrayList<ErrorRest>();
         SubmissionConfig submissionConfig =
@@ -267,7 +269,7 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
     public void patch(Context context, HttpServletRequest request, String apiCategory, String model, Integer id,
                       Patch patch) throws SQLException, AuthorizeException {
         List<Operation> operations = patch.getOperations();
-        WorkspaceItemRest wsi = findOne(id);
+        WorkspaceItemRest wsi = findOne(context, id);
         WorkspaceItem source = wis.find(context, id);
         for (Operation op : operations) {
             //the value in the position 0 is a null value

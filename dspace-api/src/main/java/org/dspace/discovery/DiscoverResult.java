@@ -243,7 +243,7 @@ public class DiscoverResult {
         String dsoString = SearchDocument.getIndexableObjectStringRepresentation(idxObj);
         List<SearchDocument> result = searchDocuments.get(dsoString);
         if (result == null) {
-            return new ArrayList<SearchDocument>();
+            return new ArrayList<>();
         } else {
             return result;
         }

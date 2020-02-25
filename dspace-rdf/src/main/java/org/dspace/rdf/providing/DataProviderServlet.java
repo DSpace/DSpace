@@ -61,7 +61,7 @@ public class DataProviderServlet extends HttpServlet {
         log.debug("lang = " + lang + ", cType = " + cType + " and pathInfo: " + pathInfo);
         if (StringUtils.isEmpty(pathInfo) || StringUtils.countMatches(pathInfo, "/") < 2) {
             String dspaceURI =
-                DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("dspace.url");
+                DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("dspace.ui.url");
             this.serveNamedGraph(dspaceURI, lang, cType, response);
             return;
         }

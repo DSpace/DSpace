@@ -7,8 +7,6 @@
  */
 package org.dspace.app.rest.converter;
 
-import java.io.Serializable;
-import java.sql.SQLException;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -38,11 +36,9 @@ import org.springframework.beans.factory.annotation.Autowired;
  *            the DSpace API inprogressSubmission object
  * @param <R>
  *            the DSpace REST inprogressSubmission representation
- * @param <ID>
- *            the Serializable class used as primary key
  */
-public abstract class AInprogressItemConverter<T extends InProgressSubmission<ID>,
-                            R extends AInprogressSubmissionRest<ID>, ID extends Serializable>
+public abstract class AInprogressItemConverter<T extends InProgressSubmission,
+                            R extends AInprogressSubmissionRest>
         implements IndexableObjectConverter<T, R> {
 
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(AInprogressItemConverter.class);
@@ -66,11 +62,7 @@ public abstract class AInprogressItemConverter<T extends InProgressSubmission<ID
         Collection collection = obj.getCollection();
         Item item = obj.getItem();
         EPerson submitter = null;
-        try {
-            submitter = obj.getSubmitter();
-        } catch (SQLException e) {
-            throw new RuntimeException(e.getMessage(), e);
-        }
+        submitter = obj.getSubmitter();
 
         witem.setId(obj.getID());
         witem.setCollection(collection != null ? converter.toRest(collection, projection) : null);
