@@ -8,6 +8,7 @@
 package org.dspace.app.rest.matcher;
 
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
+
 import static org.dspace.app.rest.matcher.HalMatcher.matchEmbeds;
 import static org.dspace.app.rest.test.AbstractControllerIntegrationTest.REST_SERVER_URL;
 import static org.hamcrest.Matchers.allOf;
@@ -16,6 +17,7 @@ import static org.hamcrest.Matchers.is;
 import java.util.UUID;
 
 import org.dspace.content.Bitstream;
+import org.dspace.content.Collection;
 import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
 
@@ -81,5 +83,12 @@ public class CollectionMatcher {
                 hasJsonPath("$._embedded.logo",
                         BitstreamMatcher.matchBitstreamEntry(logo.getID(), logo.getSizeBytes()))
             );
+    }
+
+    public static Matcher<? super Object> matchCollection(Collection collection) {
+        return allOf(hasJsonPath("$.uuid", is(collection.getID().toString())),
+                hasJsonPath("$.name", is(collection.getName())),
+                hasJsonPath("$.type", is("collection")),
+                hasJsonPath("$.handle", is(collection.getHandle())));
     }
 }
