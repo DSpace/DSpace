@@ -32,6 +32,7 @@ import java.util.stream.StreamSupport;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.dspace.app.rest.builder.CollectionBuilder;
 import org.dspace.app.rest.builder.CommunityBuilder;
+import org.dspace.app.rest.builder.EPersonBuilder;
 import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.matcher.CommunityMatcher;
 import org.dspace.app.rest.matcher.HalMatcher;
@@ -44,6 +45,7 @@ import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.app.rest.test.MetadataPatchSuite;
 import org.dspace.authorize.service.AuthorizeService;
+import org.dspace.authorize.service.ResourcePolicyService;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.service.CommunityService;
@@ -70,6 +72,9 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
 
     @Autowired
     AuthorizeService authorizeService;
+
+    @Autowired
+    ResourcePolicyService resoucePolicyService;
 
     @Test
     public void createTest() throws Exception {
@@ -528,6 +533,107 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
                 .andExpect(jsonPath("$", CommunityMatcher.matchLinks(parentCommunity.getID())))
                 .andExpect(jsonPath("$", CommunityMatcher.matchProperties(
                         parentCommunity.getName(), parentCommunity.getID(), parentCommunity.getHandle())));
+    }
+
+    @Test
+    public void findOneUnAuthenticatedTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                .withName("Parent Community")
+                .build();
+        Community privateCommunity = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                .withName("Sub Community")
+                .build();
+
+        resoucePolicyService.removePolicies(context, privateCommunity, Constants.READ);
+
+        context.restoreAuthSystemState();
+
+        getClient().perform(get("/api/core/communities/" + parentCommunity.getID().toString()))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$", Matchers.is(CommunityMatcher.matchCommuity(parentCommunity))));
+
+        getClient().perform(get("/api/core/communities/" + privateCommunity.getID().toString()))
+                   .andExpect(status().isUnauthorized());
+
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        getClient(tokenAdmin).perform(get("/api/core/communities/" + privateCommunity.getID().toString()))
+                 .andExpect(status().isOk())
+                 .andExpect(jsonPath("$", Matchers.is(CommunityMatcher.matchCommuity(privateCommunity))));
+    }
+
+    @Test
+    public void findOneForbiddenTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                .withName("Parent Community")
+                .build();
+        Community privateCommunity = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                .withName("Sub Community")
+                .build();
+
+        resoucePolicyService.removePolicies(context, privateCommunity, Constants.READ);
+
+        context.restoreAuthSystemState();
+
+        String tokenEperson = getAuthToken(eperson.getEmail(), password);
+        getClient(tokenEperson).perform(get("/api/core/communities/" + privateCommunity.getID().toString()))
+                   .andExpect(status().isForbidden());
+
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        getClient(tokenAdmin).perform(get("/api/core/communities/" + privateCommunity.getID().toString()))
+                 .andExpect(status().isOk())
+                 .andExpect(jsonPath("$", Matchers.is(CommunityMatcher.matchCommuity(privateCommunity))));
+    }
+
+    @Test
+    public void findOneGrantAccessAdminsTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                .withName("Parent Community")
+                .withAdminGroup(eperson)
+                .build();
+
+        EPerson privateCommunityAdmin = EPersonBuilder.createEPerson(context)
+                .withEmail("comunityAdmin@mail.com")
+                .withPassword("qwerty01")
+                .build();
+        Community privateCommunity = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                .withName("Sub Community")
+                .withAdminGroup(privateCommunityAdmin)
+                .build();
+
+        EPerson privateCommunityAdmin2 = EPersonBuilder.createEPerson(context)
+                .withEmail("comunityAdmin2@mail.com")
+                .withPassword("qwerty02")
+                .build();
+        Community privateCommunity2 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                .withName("Sub Community 2")
+                .withAdminGroup(privateCommunityAdmin2)
+                .build();
+
+        resoucePolicyService.removePolicies(context, privateCommunity, Constants.READ);
+
+        context.restoreAuthSystemState();
+
+        String tokenParentComunityAdmin = getAuthToken(eperson.getEmail(), password);
+        getClient(tokenParentComunityAdmin).perform(get("/api/core/communities/" + privateCommunity.getID().toString()))
+                 .andExpect(status().isOk())
+                 .andExpect(jsonPath("$", Matchers.is(CommunityMatcher.matchCommuity(privateCommunity))));
+
+        String tokenCommunityAdmin = getAuthToken(privateCommunityAdmin.getEmail(), "qwerty01");
+        getClient(tokenCommunityAdmin).perform(get("/api/core/communities/" + privateCommunity.getID().toString()))
+                 .andExpect(status().isOk())
+                 .andExpect(jsonPath("$", Matchers.is(CommunityMatcher.matchCommuity(privateCommunity))));
+
+        String tokenComunityAdmin2 = getAuthToken(privateCommunityAdmin2.getEmail(), "qwerty02");
+        getClient(tokenComunityAdmin2).perform(get("/api/core/communities/"
+                                                   + privateCommunity.getID().toString()))
+                 .andExpect(status().isForbidden());
     }
 
     @Test
