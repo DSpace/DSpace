@@ -878,6 +878,188 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
     }
 
     @Test
+    public void findAllSubCommunitiesUnAuthenticatedTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                          .withName("Parent Community")
+                          .withLogo("ThisIsSomeDummyText")
+                          .build();
+
+        Community communityChild1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                .withName("Sub Community")
+                .build();
+
+        Community communityChild2 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                .withName("Sub Community2")
+                .build();
+
+        resoucePolicyService.removePolicies(context, communityChild2, Constants.READ);
+        context.restoreAuthSystemState();
+
+        // anonymous can NOT see the private community
+        getClient().perform(get("/api/core/communities/search/subCommunities")
+                .param("parent", parentCommunity.getID().toString()))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$._embedded.communities", Matchers.contains(
+                        CommunityMatcher.matchCommuity(communityChild1))))
+                .andExpect(jsonPath("$.page.totalElements", is(1)));
+
+        // admin can see all communities
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        getClient(tokenAdmin).perform(get("/api/core/communities/search/subCommunities")
+                .param("parent", parentCommunity.getID().toString()))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$._embedded.communities", Matchers.containsInAnyOrder(
+                        CommunityMatcher.matchCommuity(communityChild1),
+                        CommunityMatcher.matchCommuity(communityChild2))))
+                .andExpect(jsonPath("$.page.totalElements", is(2)));
+    }
+
+    @Test
+    public void findAllSubCommunitiesForbiddenTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                          .withName("Parent Community")
+                          .withLogo("ThisIsSomeDummyText")
+                          .build();
+
+        Community communityChild1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                .withName("Sub Community")
+                .build();
+
+        Community communityChild2 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                .withName("Sub Community2")
+                .build();
+
+        resoucePolicyService.removePolicies(context, communityChild2, Constants.READ);
+        context.restoreAuthSystemState();
+
+        String tokenEperson = getAuthToken(eperson.getEmail(), password);
+        getClient(tokenEperson).perform(get("/api/core/communities/search/subCommunities")
+                .param("parent", parentCommunity.getID().toString()))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$._embedded.communities", Matchers.contains(
+                        CommunityMatcher.matchCommuity(communityChild1))))
+                .andExpect(jsonPath("$.page.totalElements", is(1)));
+    }
+
+    @Test
+    public void findAllSubCommunitiesWithParentCommunityPrivateTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                          .withName("Parent Community")
+                          .withLogo("ThisIsSomeDummyText")
+                          .build();
+
+        Community communityChild1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                .withName("Sub Community")
+                .build();
+
+        Community communityChild2 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                .withName("Sub Community2")
+                .build();
+
+        resoucePolicyService.removePolicies(context, parentCommunity, Constants.READ);
+        context.restoreAuthSystemState();
+
+        getClient().perform(get("/api/core/communities/search/subCommunities")
+                .param("parent", parentCommunity.getID().toString()))
+                .andExpect(status().isUnauthorized());
+
+        String tokenEperson = getAuthToken(eperson.getEmail(), password);
+        getClient(tokenEperson).perform(get("/api/core/communities/search/subCommunities")
+                .param("parent", parentCommunity.getID().toString()))
+                .andExpect(status().isForbidden());
+
+        // admin can see all communities
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        getClient(tokenAdmin).perform(get("/api/core/communities/search/subCommunities")
+                .param("parent", parentCommunity.getID().toString()))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$._embedded.communities", Matchers.containsInAnyOrder(
+                        CommunityMatcher.matchCommuity(communityChild1),
+                        CommunityMatcher.matchCommuity(communityChild2))))
+                .andExpect(jsonPath("$.page.totalElements", is(2)));
+    }
+
+    @Test
+    public void findAllSubCommunitiesGrantAccessAdminsTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        EPerson parentComAdmin = EPersonBuilder.createEPerson(context)
+                .withEmail("eperson1@mail.com")
+                .withPassword("qwerty01")
+                .build();
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                          .withName("Parent Community")
+                          .withLogo("ThisIsSomeDummyText")
+                          .withAdminGroup(parentComAdmin)
+                          .build();
+
+        EPerson child1Admin = EPersonBuilder.createEPerson(context)
+                .withEmail("eperson2@mail.com")
+                .withPassword("qwerty02")
+                .build();
+        Community communityChild1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                .withName("Sub Community")
+                .withAdminGroup(child1Admin)
+                .build();
+
+        EPerson child2Admin = EPersonBuilder.createEPerson(context)
+                .withEmail("eperson3@mail.com")
+                .withPassword("qwerty03")
+                .build();
+        Community communityChild2 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                .withName("Sub Community2")
+                .withAdminGroup(child2Admin)
+                .build();
+
+        Community ommunityChild1Child1 = CommunityBuilder.createSubCommunity(context, communityChild1)
+                .withName("Sub1 Community 1")
+                .build();
+
+        Community сommunity2Child1 = CommunityBuilder.createSubCommunity(context, communityChild2)
+                .withName("Sub2 Community 1")
+                .build();
+
+        resoucePolicyService.removePolicies(context, parentCommunity, Constants.READ);
+        resoucePolicyService.removePolicies(context, communityChild1, Constants.READ);
+        resoucePolicyService.removePolicies(context, communityChild2, Constants.READ);
+
+        context.restoreAuthSystemState();
+
+        String tokenParentAdmin = getAuthToken(parentComAdmin.getEmail(), "qwerty01");
+        getClient(tokenParentAdmin).perform(get("/api/core/communities/search/subCommunities")
+                .param("parent", parentCommunity.getID().toString()))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$._embedded.communities", Matchers.containsInAnyOrder(
+                        CommunityMatcher.matchCommuity(communityChild1),
+                        CommunityMatcher.matchCommuity(communityChild2))))
+                .andExpect(jsonPath("$.page.totalElements", is(2)));
+
+        String tokenChild1Admin = getAuthToken(child1Admin.getEmail(), "qwerty02");
+        getClient(tokenChild1Admin).perform(get("/api/core/communities/search/subCommunities")
+                .param("parent", parentCommunity.getID().toString()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$._embedded.communities", Matchers.contains(
+                        CommunityMatcher.matchCommuity(communityChild1))))
+                .andExpect(jsonPath("$.page.totalElements", is(1)));
+
+        String tokenChild2Admin = getAuthToken(child2Admin.getEmail(), "qwerty03");
+        getClient(tokenChild2Admin).perform(get("/api/core/communities/search/subCommunities")
+                .param("parent", communityChild1.getID().toString()))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
     public void findAllSubCommunitiesWithoutUUID() throws Exception {
         getClient().perform(get("/api/core/communities/search/subCommunities"))
                  .andExpect(status().isUnprocessableEntity());
