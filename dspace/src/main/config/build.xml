@@ -349,8 +349,6 @@ Common usage:
                      autoconfiguring itself (e.g. see DS-3104). -->
                 <include name="log4j*.properties"/>
                 <include name="log4j2*.xml"/>
-                <!-- Filter OAI-PMH description so it can include hostname and handle prefix -->
-                <include name="crosswalks/oai/description.xml"/>
                 <!-- Filter sample Tomcat context.xml -->
                 <include name="default.context.xml"/>
                 <!-- Filter RDF configs as these are TTL files -->
@@ -849,9 +847,9 @@ Common usage:
 
    ${dspace.dir}/bin/dspace create-administrator
 
- You should then be able to access your DSpace's 'home page':
+ You should then be able to access your DSpace's REST API:
 
-   ${dspace.url}
+   ${dspace.server.url}
 
 ====================================================================
         </echo>

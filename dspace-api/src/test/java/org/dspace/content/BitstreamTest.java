@@ -15,6 +15,11 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.spy;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -23,9 +28,9 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
 
-import mockit.NonStrictExpectations;
 import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamFormatService;
 import org.dspace.core.Constants;
@@ -33,6 +38,7 @@ import org.dspace.core.Context;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.test.util.ReflectionTestUtils;
 
 /**
  * Unit Tests for class Bitstream
@@ -55,6 +61,12 @@ public class BitstreamTest extends AbstractDSpaceObjectTest {
     private Bitstream bs;
 
     /**
+     * Spy of AuthorizeService to use for tests
+     * (initialized / setup in @Before method)
+     */
+    private AuthorizeService authorizeServiceSpy;
+
+    /**
      * This method will be run before every test as per @Before. It will
      * initialize resources required for the tests.
      *
@@ -67,10 +79,18 @@ public class BitstreamTest extends AbstractDSpaceObjectTest {
         super.init();
         try {
             //we have to create a new bitstream in the database
+            context.turnOffAuthorisationSystem();
             File f = new File(testProps.get("test.bitstream").toString());
             this.bs = bitstreamService.create(context, new FileInputStream(f));
             this.dspaceObject = bs;
-            //we need to commit the changes so we don't block the table for testing
+            context.restoreAuthSystemState();
+
+            // Initialize our spy of the autowired (global) authorizeService bean.
+            // This allows us to customize the bean's method return values in tests below
+            authorizeServiceSpy = spy(authorizeService);
+            // "Wire" our spy to be used by the current loaded bitstreamService
+            // (To ensure it uses the spy instead of the real service)
+            ReflectionTestUtils.setField(bitstreamService, "authorizeService", authorizeServiceSpy);
         } catch (IOException ex) {
             log.error("IO Error in init", ex);
             fail("SQL Error in init: " + ex.getMessage());
@@ -146,11 +166,10 @@ public class BitstreamTest extends AbstractDSpaceObjectTest {
      */
     @Test
     public void testRegister() throws IOException, SQLException, AuthorizeException {
-        new NonStrictExpectations(authorizeService.getClass()) {{
-            authorizeService.authorizeAction((Context) any, (Bitstream) any,
-                                             Constants.WRITE);
-            result = null;
-        }};
+        // Allow general Bitstream WRITE permissions
+        doNothing().when(authorizeServiceSpy).authorizeAction(any(Context.class), any(Bitstream.class),
+                                                              eq(Constants.WRITE));
+
         int assetstore = 0;
         File f = new File(testProps.get("test.bitstream").toString());
         Bitstream registered = bitstreamService.register(context, assetstore, f.getName());
@@ -366,13 +385,9 @@ public class BitstreamTest extends AbstractDSpaceObjectTest {
      */
     @Test(expected = AuthorizeException.class)
     public void testUpdateNotAdmin() throws SQLException, AuthorizeException {
-        new NonStrictExpectations(authorizeService.getClass()) {{
-            // Disallow Bitstream WRITE perms
-            authorizeService.authorizeAction((Context) any, (Bitstream) any,
-                                             Constants.WRITE);
-            result = new AuthorizeException();
+        // Disallow Bitstream WRITE permissions
+        doThrow(new AuthorizeException()).when(authorizeServiceSpy).authorizeAction(context, bs, Constants.WRITE);
 
-        }};
         //TODO: we need to verify the update, how?
         bitstreamService.update(context, bs);
     }
@@ -382,13 +397,8 @@ public class BitstreamTest extends AbstractDSpaceObjectTest {
      */
     @Test
     public void testUpdateAdmin() throws SQLException, AuthorizeException {
-        new NonStrictExpectations(authorizeService.getClass()) {{
-            // Allow Bitstream WRITE perms
-            authorizeService.authorizeAction((Context) any, (Bitstream) any,
-                                             Constants.WRITE);
-            result = null;
-
-        }};
+        // Allow Bitstream WRITE permissions
+        doNothing().when(authorizeServiceSpy).authorizeAction(context, bs, Constants.WRITE);
 
         //TODO: we need to verify the update, how?
         bitstreamService.update(context, bs);
@@ -399,21 +409,18 @@ public class BitstreamTest extends AbstractDSpaceObjectTest {
      */
     @Test
     public void testDeleteAndExpunge() throws IOException, SQLException, AuthorizeException {
-        new NonStrictExpectations(authorizeService.getClass()) {{
-            // Allow Bitstream WRITE perms
-            authorizeService.authorizeAction((Context) any, (Bitstream) any,
-                                             Constants.WRITE);
-            result = null;
-            authorizeService.authorizeAction((Context) any, (Bitstream) any,
-                                             Constants.DELETE);
-            result = null;
-
-        }};
         // Create a new bitstream, which we can delete. As ordering of these
         // tests is unpredictable we don't want to delete the global bitstream
+        context.ignoreAuthorization();
         File f = new File(testProps.get("test.bitstream").toString());
         Bitstream delBS = bitstreamService.create(context, new FileInputStream(f));
         UUID bitstreamId = delBS.getID();
+        context.restoreAuthSystemState();
+
+        // Allow Bitstream WRITE permissions
+        doNothing().when(authorizeServiceSpy).authorizeAction(context, delBS, Constants.WRITE);
+        // Allow Bitstream DELETE permissions
+        doNothing().when(authorizeServiceSpy).authorizeAction(context, delBS, Constants.DELETE);
 
         // Test that delete will flag the bitstream as deleted
         assertFalse("testIsDeleted 0", delBS.isDeleted());
@@ -431,12 +438,8 @@ public class BitstreamTest extends AbstractDSpaceObjectTest {
     @Test
     public void testRetrieveCanRead() throws IOException, SQLException,
         AuthorizeException {
-        new NonStrictExpectations(authorizeService.getClass()) {{
-            // Allow Bitstream READ perms
-            authorizeService.authorizeAction((Context) any, (Bitstream) any,
-                                             Constants.READ);
-            result = null;
-        }};
+        // Allow Bitstream READ permissions
+        doNothing().when(authorizeServiceSpy).authorizeAction(context, bs, Constants.READ);
 
         assertThat("testRetrieveCanRead 0", bitstreamService.retrieve(context, bs), notNullValue());
     }
@@ -447,12 +450,8 @@ public class BitstreamTest extends AbstractDSpaceObjectTest {
     @Test(expected = AuthorizeException.class)
     public void testRetrieveNoRead() throws IOException, SQLException,
         AuthorizeException {
-        new NonStrictExpectations(authorizeService.getClass()) {{
-            // Disallow Bitstream READ perms
-            authorizeService.authorizeAction((Context) any, (Bitstream) any,
-                                             Constants.READ);
-            result = new AuthorizeException();
-        }};
+        // Disallow Bitstream READ permissions
+        doThrow(new AuthorizeException()).when(authorizeServiceSpy).authorizeAction(context, bs, Constants.READ);
 
         assertThat("testRetrieveNoRead 0", bitstreamService.retrieve(context, bs), notNullValue());
     }

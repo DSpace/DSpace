@@ -7,7 +7,8 @@
  */
 package org.dspace.xmlworkflow.state;
 
-import static junit.framework.TestCase.assertEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 
@@ -31,30 +32,30 @@ public class WorkflowTest extends AbstractUnitTest {
 
     @Test
     public void defaultWorkflow() {
-        assertEquals(defaultWorkflow.getFirstStep().getId(), "reviewstep");
+        assertEquals("reviewstep", defaultWorkflow.getFirstStep().getId());
         List<Step> steps = defaultWorkflow.getSteps();
-        assertEquals(steps.size(), 3);
-        assert (this.containsStepNamed(steps, "reviewstep"));
-        assert (this.containsStepNamed(steps, "editstep"));
-        assert (this.containsStepNamed(steps, "finaleditstep"));
+        assertEquals(3, steps.size());
+        assertTrue(this.containsStepNamed(steps, "reviewstep"));
+        assertTrue(this.containsStepNamed(steps, "editstep"));
+        assertTrue(this.containsStepNamed(steps, "finaleditstep"));
     }
 
     @Test
     public void selectSingleReviewer() {
-        assertEquals(selectSingleReviewer.getFirstStep().getId(), "selectReviewerStep");
+        assertEquals("selectReviewerStep", selectSingleReviewer.getFirstStep().getId());
         List<Step> steps = selectSingleReviewer.getSteps();
-        assertEquals(steps.size(), 2);
-        assert (this.containsStepNamed(steps, "selectReviewerStep"));
-        assert (this.containsStepNamed(steps, "singleUserReviewStep"));
+        assertEquals(2, steps.size());
+        assertTrue(this.containsStepNamed(steps, "selectReviewerStep"));
+        assertTrue(this.containsStepNamed(steps, "singleUserReviewStep"));
     }
 
     @Test
     public void scoreReview() {
-        assertEquals(scoreReview.getFirstStep().getId(), "scoreReviewStep");
+        assertEquals("scoreReviewStep", scoreReview.getFirstStep().getId());
         List<Step> steps = scoreReview.getSteps();
-        assertEquals(steps.size(), 2);
-        assert (this.containsStepNamed(steps, "scoreReviewStep"));
-        assert (this.containsStepNamed(steps, "evaluationStep"));
+        assertEquals(2, steps.size());
+        assertTrue(this.containsStepNamed(steps, "scoreReviewStep"));
+        assertTrue(this.containsStepNamed(steps, "evaluationStep"));
     }
 
     private boolean containsStepNamed(List<Step> steps, String stepName) {

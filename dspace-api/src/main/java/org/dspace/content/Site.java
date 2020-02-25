@@ -56,7 +56,7 @@ public class Site extends DSpaceObject {
     }
 
     public String getURL() {
-        return ConfigurationManager.getProperty("dspace.url");
+        return ConfigurationManager.getProperty("dspace.ui.url");
     }
 
     private SiteService getSiteService() {

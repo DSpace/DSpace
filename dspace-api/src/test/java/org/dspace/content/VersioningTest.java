@@ -25,7 +25,6 @@ import org.dspace.content.service.CommunityService;
 import org.dspace.content.service.InstallItemService;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.WorkspaceItemService;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
 import org.dspace.versioning.Version;
@@ -49,7 +48,6 @@ public class VersioningTest extends AbstractUnitTest {
 
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(VersioningTest.class);
 
-    private String originalHandle;
     private Item originalItem;
     private Item versionedItem;
     private String summary = "Unit test version";
@@ -65,7 +63,7 @@ public class VersioningTest extends AbstractUnitTest {
 
     //A regex that can be used to see if a handle contains the format of handle created by the org.dspace.identifier
     // .VersionedHandleIdentifierProvider*
-    protected String versionedHandleRegex = ConfigurationManager.getProperty("handle.prefix") + "\\/[0-9]*\\.[0-9]";
+    //protected String versionedHandleRegex = ConfigurationManager.getProperty("handle.prefix") + "\\/[0-9]*\\.[0-9]";
 
     /**
      * This method will be run before every test as per @Before. It will
@@ -86,7 +84,6 @@ public class VersioningTest extends AbstractUnitTest {
             WorkspaceItem is = workspaceItemService.create(context, col, false);
 
             originalItem = installItemService.installItem(context, is);
-            originalHandle = originalItem.getHandle();
 
             Version version = versionService.createNewVersion(context, originalItem, summary);
             WorkspaceItem wsi = workspaceItemService.findByItem(context, version.getItem());

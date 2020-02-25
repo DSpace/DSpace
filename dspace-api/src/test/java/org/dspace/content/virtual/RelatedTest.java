@@ -13,7 +13,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 
@@ -29,7 +28,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 public class RelatedTest {
@@ -150,8 +149,8 @@ public class RelatedTest {
         assertEquals("TestGetValues 1", virtualMetadataConfiguration.getValues(context, item),
                 related.getValues(context, item));
         related.setPlace(2);
-        // No match should return empty LinkedList
-        assertEquals("TestGetValues 2", new LinkedList<>(), related.getValues(context, item));
+        // No match should return empty List
+        assertEquals("TestGetValues 2", new ArrayList<>(), related.getValues(context, item));
     }
 
 
