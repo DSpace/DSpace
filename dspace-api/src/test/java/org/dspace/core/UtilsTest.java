@@ -23,6 +23,27 @@ import org.junit.Test;
 public class UtilsTest extends AbstractUnitTest {
 
     /**
+     * Test of getBaseUrl method, of class Utils
+     */
+    @Test
+    public void testGetBaseUrl() {
+        assertEquals("Test remove /server", "http://dspace.org",
+                     Utils.getBaseUrl("http://dspace.org/server"));
+
+        assertEquals("Test remove /server/api/core/items", "https://dspace.org",
+                     Utils.getBaseUrl("https://dspace.org/server/api/core/items"));
+
+        assertEquals("Test remove trailing slash", "https://dspace.org",
+                     Utils.getBaseUrl("https://dspace.org/"));
+
+        assertEquals("Test keep url", "https://demo.dspace.org",
+                     Utils.getBaseUrl("https://demo.dspace.org"));
+
+        // This uses a bunch of reserved URI characters
+        assertNull("Test invalid URI returns null", Utils.getBaseUrl("&+,?/@="));
+    }
+
+    /**
      * Test of getHostName method, of class Utils
      */
     @Test

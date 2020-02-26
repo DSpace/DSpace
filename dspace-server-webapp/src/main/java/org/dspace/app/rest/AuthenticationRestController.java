@@ -92,6 +92,8 @@ public class AuthenticationRestController implements InitializingBean {
         }
 
         AuthenticationStatusRest authenticationStatusRest = new AuthenticationStatusRest(ePersonRest);
+        // Whether authentication status is false add WWW-Authenticate so client can retrieve the available
+        // authentication methods
         if (!authenticationStatusRest.isAuthenticated()) {
             String authenticateHeaderValue = restAuthenticationService
                     .getWwwAuthenticateHeaderValue(request, response);
