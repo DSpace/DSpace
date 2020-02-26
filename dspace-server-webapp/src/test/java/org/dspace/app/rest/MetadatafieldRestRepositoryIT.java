@@ -165,7 +165,7 @@ public class MetadatafieldRestRepositoryIT extends AbstractControllerIntegration
     public void findByNullSchema() throws Exception {
 
         getClient().perform(get("/api/core/metadatafields/search/bySchema"))
-                   .andExpect(status().isUnprocessableEntity());
+                   .andExpect(status().isBadRequest());
     }
 
     @Test

@@ -60,7 +60,7 @@ public class BitstreamFormatRestRepository extends DSpaceRestRepository<Bitstrea
     public Page<BitstreamFormatRest> findAll(Context context, Pageable pageable) {
         try {
             List<BitstreamFormat> bit = bitstreamFormatService.findAll(context);
-            return converter.toRestPage(utils.getPage(bit, pageable), utils.obtainProjection(true));
+            return converter.toRestPage(utils.getPage(bit, pageable), utils.obtainProjection());
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }

@@ -222,7 +222,8 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
 
         context.restoreAuthSystemState();
 
-        getClient().perform(get("/api/core/relationships"))
+        getClient().perform(get("/api/core/relationships")
+                   .param("projection", "full"))
 
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$.page",
@@ -234,7 +235,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                    )))
         ;
 
-        getClient().perform(get("/api/core/relationships").param("size", "2"))
+        getClient().perform(get("/api/core/relationships").param("size", "2").param("projection", "full"))
 
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$.page",
@@ -245,7 +246,8 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                    )))
         ;
 
-        getClient().perform(get("/api/core/relationships").param("size", "2").param("page", "1"))
+        getClient().perform(get("/api/core/relationships").param("size", "2").param("page", "1")
+                   .param("projection", "full"))
 
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$.page",
@@ -2188,7 +2190,8 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         // This is what we're checking for
         getClient().perform(get("/api/core/relationships/search/byLabel")
                                 .param("label", "isOrgUnitOfPerson")
-                                .param("dso", author1.getID().toString()))
+                                .param("dso", author1.getID().toString())
+                                .param("projection", "full"))
 
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$.page",
@@ -2209,7 +2212,8 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         // Which is what we're checking for, both the first relationship and the one with a different author
         // should be returned
         getClient().perform(get("/api/core/relationships/search/byLabel")
-                                .param("label", "isOrgUnitOfPerson"))
+                                .param("label", "isOrgUnitOfPerson")
+                                .param("projection", "full"))
 
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$.page",
@@ -2299,7 +2303,8 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
 
         context.restoreAuthSystemState();
 
-        getClient().perform(get("/api/core/relationships"))
+        getClient().perform(get("/api/core/relationships")
+                   .param("projection", "full"))
 
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$.page",
@@ -2336,7 +2341,8 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
 
         context.restoreAuthSystemState();
 
-        getClient().perform(get("/api/core/relationships"))
+        getClient().perform(get("/api/core/relationships")
+                   .param("projection", "full"))
 
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$.page",
@@ -2389,7 +2395,8 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
 
         context.restoreAuthSystemState();
 
-        getClient().perform(get("/api/core/relationships"))
+        getClient().perform(get("/api/core/relationships")
+                   .param("projection", "full"))
 
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$.page",
@@ -2431,7 +2438,8 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
 
         context.restoreAuthSystemState();
 
-        getClient().perform(get("/api/core/relationships"))
+        getClient().perform(get("/api/core/relationships")
+                   .param("projection", "full"))
 
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$.page",

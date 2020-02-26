@@ -4,10 +4,10 @@ networks:
 services:
   dspace:
     container_name: dspace
-    image: "${DOCKER_OWNER:-dspace}/dspace:${DSPACE_VER:-dspace-7_x-jdk8-test}"
+    image: "${DOCKER_OWNER:-dspace}/dspace:${DSPACE_VER:-dspace-7_x-test}"
     build:
       context: .
-      dockerfile: Dockerfile.jdk8-test
+      dockerfile: Dockerfile.test
     depends_on:
     - dspacedb
     networks:

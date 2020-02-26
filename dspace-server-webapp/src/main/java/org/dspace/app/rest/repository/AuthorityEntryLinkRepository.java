@@ -11,6 +11,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import javax.annotation.Nullable;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
@@ -52,12 +53,12 @@ public class AuthorityEntryLinkRepository extends AbstractDSpaceRestRepository
     private AuthorityUtils authorityUtils;
 
     @PreAuthorize("hasAuthority('AUTHENTICATED')")
-    public Page<AuthorityEntryRest> query(HttpServletRequest request, String name,
-                                          Pageable pageable, Projection projection) {
+    public Page<AuthorityEntryRest> query(@Nullable HttpServletRequest request, String name,
+                                          @Nullable Pageable optionalPageable, Projection projection) {
         Context context = obtainContext();
-        String query = request.getParameter("query");
-        String metadata = request.getParameter("metadata");
-        String uuidCollectìon = request.getParameter("uuid");
+        String query = request == null ? null : request.getParameter("query");
+        String metadata = request == null ? null : request.getParameter("metadata");
+        String uuidCollectìon = request == null ? null : request.getParameter("uuid");
         Collection collection = null;
         if (StringUtils.isNotBlank(uuidCollectìon)) {
             try {
@@ -67,6 +68,7 @@ public class AuthorityEntryLinkRepository extends AbstractDSpaceRestRepository
             }
         }
         List<AuthorityEntryRest> results = new ArrayList<>();
+        Pageable pageable = utils.getPageable(optionalPageable);
         if (StringUtils.isNotBlank(metadata)) {
             String[] tokens = org.dspace.core.Utils.tokenize(metadata);
             String fieldKey = org.dspace.core.Utils.standardize(tokens[0], tokens[1], tokens[2], "_");
