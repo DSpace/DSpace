@@ -109,7 +109,7 @@ public class CommunityMatcher {
         );
     }
 
-    public static Matcher<? super Object> matchCommuity(Community community) {
+    public static Matcher<? super Object> matchCommunity(Community community) {
         return allOf(hasJsonPath("$.uuid", is(community.getID().toString())),
                 hasJsonPath("$.name", is(community.getName())),
                 hasJsonPath("$.type", is("community")),

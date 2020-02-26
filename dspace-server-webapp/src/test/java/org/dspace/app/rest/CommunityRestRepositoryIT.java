@@ -33,7 +33,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.dspace.app.rest.builder.CollectionBuilder;
 import org.dspace.app.rest.builder.CommunityBuilder;
 import org.dspace.app.rest.builder.EPersonBuilder;
-import org.dspace.app.rest.builder.ResourcePolicyBuilder;
 import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.matcher.CollectionMatcher;
 import org.dspace.app.rest.matcher.CommunityMatcher;
@@ -46,7 +45,6 @@ import org.dspace.app.rest.model.MetadataValueRest;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.app.rest.test.MetadataPatchSuite;
-import org.dspace.authorize.ResourcePolicy;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.authorize.service.ResourcePolicyService;
 import org.dspace.content.Collection;
@@ -542,40 +540,24 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
     public void findOneUnAuthenticatedTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
-        parentCommunity = CommunityBuilder.createCommunity(context)
-                .withName("Parent Community")
-                .build();
         Community privateCommunity = CommunityBuilder.createSubCommunity(context, parentCommunity)
-                .withName("Sub Community")
+                .withName("Private Community")
                 .build();
 
         resoucePolicyService.removePolicies(context, privateCommunity, Constants.READ);
 
         context.restoreAuthSystemState();
 
-        getClient().perform(get("/api/core/communities/" + parentCommunity.getID().toString()))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(contentType))
-                .andExpect(jsonPath("$", Matchers.is(CommunityMatcher.matchCommuity(parentCommunity))));
-
         getClient().perform(get("/api/core/communities/" + privateCommunity.getID().toString()))
                    .andExpect(status().isUnauthorized());
-
-        String tokenAdmin = getAuthToken(admin.getEmail(), password);
-        getClient(tokenAdmin).perform(get("/api/core/communities/" + privateCommunity.getID().toString()))
-                 .andExpect(status().isOk())
-                 .andExpect(jsonPath("$", Matchers.is(CommunityMatcher.matchCommuity(privateCommunity))));
     }
 
     @Test
     public void findOneForbiddenTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
-        parentCommunity = CommunityBuilder.createCommunity(context)
-                .withName("Parent Community")
-                .build();
         Community privateCommunity = CommunityBuilder.createSubCommunity(context, parentCommunity)
-                .withName("Sub Community")
+                .withName("Private Community")
                 .build();
 
         resoucePolicyService.removePolicies(context, privateCommunity, Constants.READ);
@@ -585,11 +567,6 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
         String tokenEperson = getAuthToken(eperson.getEmail(), password);
         getClient(tokenEperson).perform(get("/api/core/communities/" + privateCommunity.getID().toString()))
                    .andExpect(status().isForbidden());
-
-        String tokenAdmin = getAuthToken(admin.getEmail(), password);
-        getClient(tokenAdmin).perform(get("/api/core/communities/" + privateCommunity.getID().toString()))
-                 .andExpect(status().isOk())
-                 .andExpect(jsonPath("$", Matchers.is(CommunityMatcher.matchCommuity(privateCommunity))));
     }
 
     @Test
@@ -626,12 +603,12 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
         String tokenParentComunityAdmin = getAuthToken(eperson.getEmail(), password);
         getClient(tokenParentComunityAdmin).perform(get("/api/core/communities/" + privateCommunity.getID().toString()))
                  .andExpect(status().isOk())
-                 .andExpect(jsonPath("$", Matchers.is(CommunityMatcher.matchCommuity(privateCommunity))));
+                 .andExpect(jsonPath("$", Matchers.is(CommunityMatcher.matchCommunity(privateCommunity))));
 
         String tokenCommunityAdmin = getAuthToken(privateCommunityAdmin.getEmail(), "qwerty01");
         getClient(tokenCommunityAdmin).perform(get("/api/core/communities/" + privateCommunity.getID().toString()))
                  .andExpect(status().isOk())
-                 .andExpect(jsonPath("$", Matchers.is(CommunityMatcher.matchCommuity(privateCommunity))));
+                 .andExpect(jsonPath("$", Matchers.is(CommunityMatcher.matchCommunity(privateCommunity))));
 
         String tokenComunityAdmin2 = getAuthToken(privateCommunityAdmin2.getEmail(), "qwerty02");
         getClient(tokenComunityAdmin2).perform(get("/api/core/communities/"
@@ -913,7 +890,7 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
                 .andExpect(jsonPath("$._embedded.subcommunities", Matchers.contains(
-                        CommunityMatcher.matchCommuity(communityChild1))))
+                        CommunityMatcher.matchCommunity(communityChild1))))
                 .andExpect(jsonPath("$.page.totalElements", is(1)));
 
         // admin can see all communities
@@ -923,8 +900,8 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
                 .andExpect(jsonPath("$._embedded.subcommunities", Matchers.containsInAnyOrder(
-                        CommunityMatcher.matchCommuity(communityChild1),
-                        CommunityMatcher.matchCommuity(communityChild2))))
+                        CommunityMatcher.matchCommunity(communityChild1),
+                        CommunityMatcher.matchCommunity(communityChild2))))
                 .andExpect(jsonPath("$.page.totalElements", is(2)));
     }
 
@@ -958,7 +935,7 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
                 .andExpect(jsonPath("$._embedded.subcommunities", Matchers.contains(
-                        CommunityMatcher.matchCommuity(communityChild1))))
+                        CommunityMatcher.matchCommunity(communityChild1))))
                 .andExpect(jsonPath("$.page.totalElements", is(1)));
 
         getClient(tokenEperson).perform(get("/api/core/communities/"
@@ -1010,12 +987,6 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
         resoucePolicyService.removePolicies(context, communityChild1, Constants.READ);
         resoucePolicyService.removePolicies(context, communityChild2, Constants.READ);
 
-        ResourcePolicy resourcePolicyOfchild1Admin = ResourcePolicyBuilder.createResourcePolicy(context)
-                .withDspaceObject(parentCommunity)
-                .withAction(Constants.READ)
-                .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
-                .withUser(child1Admin).build();
-
         context.restoreAuthSystemState();
 
         String tokenParentAdmin = getAuthToken(parentComAdmin.getEmail(), "qwerty01");
@@ -1024,17 +995,14 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
                 .andExpect(jsonPath("$._embedded.subcommunities", Matchers.containsInAnyOrder(
-                        CommunityMatcher.matchCommuity(communityChild1),
-                        CommunityMatcher.matchCommuity(communityChild2))))
+                        CommunityMatcher.matchCommunity(communityChild1),
+                        CommunityMatcher.matchCommunity(communityChild2))))
                 .andExpect(jsonPath("$.page.totalElements", is(2)));
 
         String tokenChild1Admin = getAuthToken(child1Admin.getEmail(), "qwerty02");
         getClient(tokenChild1Admin).perform(get("/api/core/communities/"
                 + parentCommunity.getID().toString() + "/subcommunities"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$._embedded.subcommunities", Matchers.contains(
-                        CommunityMatcher.matchCommuity(communityChild1))))
-                .andExpect(jsonPath("$.page.totalElements", is(1)));
+                .andExpect(status().isForbidden());
 
         String tokenChild2Admin = getAuthToken(child2Admin.getEmail(), "qwerty03");
         getClient(tokenChild2Admin).perform(get("/api/core/communities/"
