@@ -212,7 +212,7 @@ public class MetadataSuggestionsRestRepository extends DSpaceRestRepository<Meta
 
         List<MetadataItemSuggestions> list = metadataSuggestionProviderService
             .getMetadataItemSuggestions(metadataSuggestionProvider, inProgressSubmission, query, bitstream,
-                                        useMetadata, pageable.getOffset(), pageable.getPageSize());
+                                        useMetadata, Math.toIntExact(pageable.getOffset()), pageable.getPageSize());
         int total = metadataSuggestionProviderService.getTotalMetadataItemSuggestions(metadataSuggestionProvider,
                                                                                       inProgressSubmission, query,
                                                                                       bitstream, useMetadata);
