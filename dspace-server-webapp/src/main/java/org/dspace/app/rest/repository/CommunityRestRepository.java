@@ -26,7 +26,6 @@ import org.dspace.app.rest.model.BitstreamRest;
 import org.dspace.app.rest.model.CommunityRest;
 import org.dspace.app.rest.model.patch.Patch;
 import org.dspace.app.rest.projection.Projection;
-import org.dspace.app.rest.repository.patch.DSpaceObjectPatch;
 import org.dspace.app.rest.utils.CommunityRestEqualityUtils;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
@@ -54,16 +53,17 @@ public class CommunityRestRepository extends DSpaceObjectRestRepository<Communit
     private static final Logger log = org.apache.logging.log4j.LogManager
             .getLogger(CommunityRestRepository.class);
 
-    private final CommunityService cs;
-
     @Autowired
     BitstreamService bitstreamService;
 
     @Autowired
     CommunityRestEqualityUtils communityRestEqualityUtils;
 
+    @Autowired
+    private CommunityService cs;
+
     public CommunityRestRepository(CommunityService dsoService) {
-        super(dsoService, new DSpaceObjectPatch<CommunityRest>() {});
+        super(dsoService);
         this.cs = dsoService;
     }
 

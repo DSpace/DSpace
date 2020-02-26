@@ -18,7 +18,7 @@ import org.springframework.stereotype.Service;
  * <p>
  * <strong>NOTE:</strong>  this class overrides one <em>of the same name</em>
  * defined in dspace-api and declared as a bean there.
- * See {@code config/spring/api/Z-mock-services.xml}.  Some kind of classpath
+ * See {@code test/data/dspaceFolder/config/spring/api/solr-services.xml}.  Some kind of classpath
  * magic makes this work.
  */
 @Service

@@ -648,8 +648,7 @@ public class RestResourceController implements InitializingBean {
     @RequestMapping(method = RequestMethod.PATCH, value = REGEX_REQUESTMAPPING_IDENTIFIER_AS_DIGIT)
     public ResponseEntity<ResourceSupport> patch(HttpServletRequest request, @PathVariable String apiCategory,
                                                  @PathVariable String model, @PathVariable Integer id,
-                                                 @RequestBody(required = true) JsonNode jsonNode)
-        throws HttpRequestMethodNotSupportedException {
+                                                 @RequestBody(required = true) JsonNode jsonNode) {
         return patchInternal(request, apiCategory, model, id, jsonNode);
     }
 
@@ -671,8 +670,7 @@ public class RestResourceController implements InitializingBean {
     public ResponseEntity<ResourceSupport> patch(HttpServletRequest request, @PathVariable String apiCategory,
                                                  @PathVariable String model,
                                                  @PathVariable(name = "uuid") UUID id,
-                                                 @RequestBody(required = true) JsonNode jsonNode)
-        throws HttpRequestMethodNotSupportedException {
+                                                 @RequestBody(required = true) JsonNode jsonNode) {
         return patchInternal(request, apiCategory, model, id, jsonNode);
     }
 
@@ -690,8 +688,7 @@ public class RestResourceController implements InitializingBean {
     public <ID extends Serializable> ResponseEntity<ResourceSupport> patchInternal(HttpServletRequest request,
                                                                                    String apiCategory,
                                                                                    String model, ID id,
-                                                                                   JsonNode jsonNode)
-        throws HttpRequestMethodNotSupportedException {
+                                                                                   JsonNode jsonNode) {
         checkModelPluralForm(apiCategory, model);
         DSpaceRestRepository<RestAddressableModel, ID> repository = utils.getResourceRepository(apiCategory, model);
         RestAddressableModel modelObject = null;
@@ -1058,12 +1055,12 @@ public class RestResourceController implements InitializingBean {
     /**
      * Execute a PUT request for an entity with id of type UUID;
      *
-     * curl -X PUT http://<dspace.baseUrl>/api/{apiCategory}/{model}/{uuid}
+     * curl -X PUT http://<dspace.server.url>/api/{apiCategory}/{model}/{uuid}
      *
      * Example:
      * <pre>
      * {@code
-     *      curl -X PUT http://<dspace.baseUrl>/api/core/collection/8b632938-77c2-487c-81f0-e804f63e68e6
+     *      curl -X PUT http://<dspace.server.url>/api/core/collection/8b632938-77c2-487c-81f0-e804f63e68e6
      * }
      * </pre>
      *

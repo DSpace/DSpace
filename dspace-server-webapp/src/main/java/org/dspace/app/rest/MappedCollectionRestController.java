@@ -60,14 +60,14 @@ public class MappedCollectionRestController {
      * This method will add an Item to a Collection. The Collection object is encapsulated in the request due to the
      * text/uri-list consumer and the Item UUID comes from the path in the URL
      *
-     * curl -X POST http://<dspace.baseUrl>/api/core/item/{uuid}/mappedCollections
+     * curl -X POST http://<dspace.server.url>/api/core/item/{uuid}/mappedCollections
      *  -H "Content-Type:text/uri-list"
      *  --data $'https://{url}/rest/api/core/collections/{uuid}'
      *
      * Example:
      * <pre>
      * {@code
-     * curl -X POST http://<dspace.baseUrl>/api/core/item/{uuid}/mappedCollections
+     * curl -X POST http://<dspace.server.url>/api/core/item/{uuid}/mappedCollections
      *  -H "Content-Type:text/uri-list"
      *  --data $'https://{url}/rest/api/core/collections/506a7e54-8d7c-4d5b-8636-d5f6411483de'
      * }
@@ -116,12 +116,12 @@ public class MappedCollectionRestController {
      * This method will delete a Collection to Item relation. It will remove an Item with UUID given in the request
      * URL from the Collection with UUID given in the request URL.
      *
-     * curl -X DELETE http://<dspace.baseUrl>/api/core/item/{uuid}/mappedCollections/{collectionUuid}
+     * curl -X DELETE http://<dspace.server.url>/api/core/item/{uuid}/mappedCollections/{collectionUuid}
      *
      * Example:
      * <pre>
      * {@code
-     * curl -X DELETE http://<dspace.baseUrl>/api/core/item/{uuid}/mappedCollections/{collectionUuid}
+     * curl -X DELETE http://<dspace.server.url>/api/core/item/{uuid}/mappedCollections/{collectionUuid}
      * }
      * </pre>
      *

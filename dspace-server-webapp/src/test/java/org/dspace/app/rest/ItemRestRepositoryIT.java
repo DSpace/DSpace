@@ -1200,9 +1200,9 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         getClient(token).perform(delete("/api/core/items/" + templateItem.getID()))
                     .andExpect(status().is(422));
 
-        //Check templateItem is available after failed deletion
+        //Check templateItem is not deleted
         getClient(token).perform(get("/api/core/items/" + templateItem.getID()))
-                   .andExpect(status().isOk());
+                   .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -1744,6 +1744,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                         .andExpect(status().is(404));
     }
 
+    @Test
     public void patchItemMetadataAuthorized() throws Exception {
         runPatchMetadataTests(admin, 200);
     }
