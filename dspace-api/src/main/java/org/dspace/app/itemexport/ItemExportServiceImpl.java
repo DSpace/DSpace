@@ -929,7 +929,7 @@ public class ItemExportServiceImpl implements ItemExportService {
             Locale supportedLocale = I18nUtil.getEPersonLocale(eperson);
             Email email = Email.getEmail(I18nUtil.getEmailFilename(supportedLocale, "export_success"));
             email.addRecipient(eperson.getEmail());
-            email.addArgument(ConfigurationManager.getProperty("dspace.url") + "/exportdownload/" + fileName);
+            email.addArgument(ConfigurationManager.getProperty("dspace.ui.url") + "/exportdownload/" + fileName);
             email.addArgument(ConfigurationManager.getProperty("org.dspace.app.itemexport.life.span.hours"));
 
             email.send();
@@ -947,7 +947,7 @@ public class ItemExportServiceImpl implements ItemExportService {
             Email email = Email.getEmail(I18nUtil.getEmailFilename(supportedLocale, "export_error"));
             email.addRecipient(eperson.getEmail());
             email.addArgument(error);
-            email.addArgument(ConfigurationManager.getProperty("dspace.url") + "/feedback");
+            email.addArgument(ConfigurationManager.getProperty("dspace.ui.url") + "/feedback");
 
             email.send();
         } catch (Exception e) {

@@ -10,7 +10,6 @@ package org.dspace.app.rest.repository;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 
@@ -22,7 +21,6 @@ import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.EPersonRest;
 import org.dspace.app.rest.model.patch.Patch;
 import org.dspace.app.rest.projection.Projection;
-import org.dspace.app.rest.repository.patch.EPersonPatch;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.core.Context;
@@ -49,12 +47,9 @@ public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, E
 
     private final EPersonService es;
 
-    @Autowired
-    EPersonPatch epersonPatch;
 
-    public EPersonRestRepository(EPersonService dsoService,
-                                 EPersonPatch dsoPatch) {
-        super(dsoService, dsoPatch);
+    public EPersonRestRepository(EPersonService dsoService) {
+        super(dsoService);
         this.es = dsoService;
     }
 
@@ -114,7 +109,7 @@ public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, E
             long total = es.countTotal(context);
             List<EPerson> epersons = es.findAll(context, EPerson.EMAIL, pageable.getPageSize(),
                     Math.toIntExact(pageable.getOffset()));
-            return converter.toRestPage(epersons, pageable, total, utils.obtainProjection(true));
+            return converter.toRestPage(epersons, pageable, total, utils.obtainProjection());
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -138,7 +133,7 @@ public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, E
             long total = es.searchResultCount(context, q);
             List<EPerson> epersons = es.search(context, q, Math.toIntExact(pageable.getOffset()),
                     Math.toIntExact(pageable.getOffset() + pageable.getPageSize()));
-            return converter.toRestPage(epersons, pageable, total, utils.obtainProjection(true));
+            return converter.toRestPage(epersons, pageable, total, utils.obtainProjection());
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -150,7 +145,7 @@ public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, E
      *
      * @param email
      *            is the *required* email address
-     * @return a Page of EPersonRest instances matching the user query
+     * @return the EPersonRest instance, if any, matching the user query
      */
     @SearchRestMethod(name = "byEmail")
     public EPersonRest findByEmail(@Parameter(value = "email", required = true) String email) {
@@ -172,31 +167,6 @@ public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, E
     protected void patch(Context context, HttpServletRequest request, String apiCategory, String model, UUID uuid,
                          Patch patch) throws AuthorizeException, SQLException {
         patchDSpaceObject(apiCategory, model, uuid, patch);
-    }
-
-    @Override
-    protected void updateDSpaceObject(EPerson ePerson, EPersonRest ePersonRest)
-            throws AuthorizeException, SQLException {
-        super.updateDSpaceObject(ePerson, ePersonRest);
-
-        Context context = obtainContext();
-        if (ePersonRest.getPassword() != null) {
-            es.setPassword(ePerson, ePersonRest.getPassword());
-        }
-        if (ePersonRest.isRequireCertificate() != ePerson.getRequireCertificate()) {
-            ePerson.setRequireCertificate(ePersonRest.isRequireCertificate());
-        }
-        if (ePersonRest.isCanLogIn() != ePerson.canLogIn()) {
-            ePerson.setCanLogIn(ePersonRest.isCanLogIn());
-        }
-        if (!Objects.equals(ePersonRest.getEmail(), ePerson.getEmail())) {
-            ePerson.setEmail(ePersonRest.getEmail());
-        }
-        if (!Objects.equals(ePersonRest.getNetid(), ePerson.getNetid())) {
-            ePerson.setNetid(ePersonRest.getNetid());
-        }
-
-        es.update(context, ePerson);
     }
 
     @Override

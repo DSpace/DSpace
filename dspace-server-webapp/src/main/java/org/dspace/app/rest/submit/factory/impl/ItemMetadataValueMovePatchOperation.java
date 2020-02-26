@@ -21,7 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * instance to put the 3rd author as 1st author you need to run:
  *
  * <code>
- * curl -X PATCH http://${dspace.url}/api/submission/workspaceitems/<:id-workspaceitem> -H "
+ * curl -X PATCH http://${dspace.server.url}/api/submission/workspaceitems/<:id-workspaceitem> -H "
  * Content-Type: application/json" -d '[{ "op": "move", "from": "
  * /sections/traditionalpageone/dc.contributor.author/2", "path": "
  * /sections/traditionalpageone/dc.contributor.author/0"}]'

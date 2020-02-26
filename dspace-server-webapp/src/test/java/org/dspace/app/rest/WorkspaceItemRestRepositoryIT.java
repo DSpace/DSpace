@@ -259,17 +259,21 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                 .withSubject("ExtraEntry")
                 .build();
 
-        getClient().perform(get("/api/submission/workspaceitems/" + witem.getID() + "/collection"))
+        String token = getAuthToken(admin.getEmail(), password);
+
+        getClient(token).perform(get("/api/submission/workspaceitems/" + witem.getID() + "/collection")
+                .param("projection", "full"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", Matchers
                         .is(CollectionMatcher.matchCollectionEntry(col1.getName(), col1.getID(), col1.getHandle()))
                 ));
 
-        getClient().perform(get("/api/submission/workspaceitems/" + witem.getID() + "/item")).andExpect(status().isOk())
+        getClient(token).perform(get("/api/submission/workspaceitems/" + witem.getID() + "/item"))
+                .andExpect(status().isOk())
                 .andExpect(jsonPath("$", Matchers.is(ItemMatcher.matchItemWithTitleAndDateIssued(witem.getItem(),
                         "Workspace Item 1", "2017-10-17"))));
 
-        getClient().perform(get("/api/submission/workspaceitems/" + witem.getID() + "/submissionDefinition"))
+        getClient(token).perform(get("/api/submission/workspaceitems/" + witem.getID() + "/submissionDefinition"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", Matchers.is(hasJsonPath("$.id", is("traditional")))));
 

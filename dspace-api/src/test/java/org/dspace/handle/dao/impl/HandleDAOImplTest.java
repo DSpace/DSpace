@@ -128,12 +128,8 @@ public class HandleDAOImplTest extends AbstractUnitTest {
             owningCommunity = context.reloadEntity(owningCommunity);
             ContentServiceFactory.getInstance().getCommunityService().delete(context, owningCommunity);
             owningCommunity = null;
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } catch (AuthorizeException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            throw new AssertionError("Error occurred in destroy()", e);
         }
         item1 = null;
         item2 = null;

@@ -129,7 +129,7 @@ public class AuthorityEntrySearchRestController {
             }
 
             Page<? extends RestModel> pageResult = (Page<? extends RestAddressableModel>) linkMethod
-                    .invoke(linkRepository, id, pageable, utils.obtainProjection(true));
+                    .invoke(linkRepository, id, pageable, utils.obtainProjection());
 
             Page<HALResource> halResources = pageResult.map(restObject -> converter.toResource(restObject));
 
@@ -177,7 +177,7 @@ public class AuthorityEntrySearchRestController {
             }
 
             Page<? extends RestModel> pageResult = (Page<? extends RestAddressableModel>) linkMethod
-                    .invoke(linkRepository, request, id, pageable, utils.obtainProjection(true));
+                    .invoke(linkRepository, request, id, pageable, utils.obtainProjection());
 
             Page<HALResource> halResources = pageResult.map(restObject -> converter.toResource(restObject));
 

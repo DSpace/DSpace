@@ -16,6 +16,7 @@ import java.util.UUID;
 
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.response.QueryResponse;
+import org.dspace.app.rest.matcher.AuthorityEntryMatcher;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.authority.PersonAuthorityValue;
 import org.dspace.authority.factory.AuthorityServiceFactory;
@@ -155,9 +156,12 @@ public class AuthorityRestRepositoryIT extends AbstractControllerIntegrationTest
     @Test
     public void retrieveSrscValueTest() throws Exception {
         String token = getAuthToken(admin.getEmail(), password);
+
+        // When full projection is requested, response should include expected properties, links, and embeds.
         getClient(token).perform(
-                get("/api/integration/authorities/srsc/entryValues/SCB1922"))
+                get("/api/integration/authorities/srsc/entryValues/SCB1922").param("projection", "full"))
                 .andExpect(status().isOk())
+                .andExpect(jsonPath("$", AuthorityEntryMatcher.matchFullEmbeds()))
                 .andExpect(jsonPath("$.page.totalElements", Matchers.is(1)));
     }
 
@@ -173,9 +177,11 @@ public class AuthorityRestRepositoryIT extends AbstractControllerIntegrationTest
     public void retrieveCommonTypesValueTest() throws Exception {
         String token = getAuthToken(admin.getEmail(), password);
         getClient(token).perform(
-                get("/api/integration/authorities/common_types/entryValues/Book"))
+                get("/api/integration/authorities/common_types/entryValues/Book").param("projection", "full"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.page.totalElements", Matchers.is(1)));
+                .andExpect(jsonPath("$.page.totalElements", Matchers.is(1)))
+        ;
+
     }
 
     @Test
