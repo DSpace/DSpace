@@ -123,7 +123,7 @@ public class Utils {
         int total = fullContents.size();
         List<T> pageContent = null;
         if (pageable == null) {
-            pageable = new PageRequest(0, EMBEDDED_PAGE_SIZE);
+            pageable = new PageRequest(0, DEFAULT_PAGE_SIZE);
         }
         if (pageable.getOffset() > total) {
             throw new PaginationException(total);
