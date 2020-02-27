@@ -75,8 +75,10 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
     public void createTest() throws Exception {
         ObjectMapper mapper = new ObjectMapper();
         CommunityRest comm = new CommunityRest();
+        CommunityRest commNoembeds = new CommunityRest();
         // We send a name but the created community should set this to the title
         comm.setName("Test Top-Level Community");
+        commNoembeds.setName("Test Top-Level Community Full");
 
         MetadataRest metadataRest = new MetadataRest();
 
@@ -101,17 +103,22 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
         metadataRest.put("dc.title", title);
 
         comm.setMetadata(metadataRest);
+        commNoembeds.setMetadata(metadataRest);
+
 
         String authToken = getAuthToken(admin.getEmail(), password);
 
         // Capture the UUID of the created Community (see andDo() below)
         AtomicReference<UUID> idRef = new AtomicReference<UUID>();
+        AtomicReference<UUID> idRefNoEmbeds = new AtomicReference<UUID>();
         try {
             getClient(authToken).perform(post("/api/core/communities")
                                         .content(mapper.writeValueAsBytes(comm))
-                                        .contentType(contentType))
+                                        .contentType(contentType)
+                                .param("projection", "full"))
                                 .andExpect(status().isCreated())
                                 .andExpect(content().contentType(contentType))
+                                .andExpect(jsonPath("$", CommunityMatcher.matchFullEmbeds()))
                                 .andExpect(jsonPath("$", Matchers.allOf(
                                     hasJsonPath("$.id", not(empty())),
                                     hasJsonPath("$.uuid", not(empty())),
@@ -135,9 +142,19 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
                                 // capture "id" returned in JSON response
                                 .andDo(result -> idRef
                                     .set(UUID.fromString(read(result.getResponse().getContentAsString(), "$.id"))));
+
+            getClient(authToken).perform(post("/api/core/communities")
+                    .content(mapper.writeValueAsBytes(commNoembeds))
+                    .contentType(contentType))
+                    .andExpect(status().isCreated())
+                    .andExpect(content().contentType(contentType))
+                    .andExpect(jsonPath("$", HalMatcher.matchNoEmbeds()))
+                    .andDo(result -> idRefNoEmbeds
+                            .set(UUID.fromString(read(result.getResponse().getContentAsString(), "$.id"))));
         } finally {
             // Delete the created community (cleanup after ourselves!)
             CommunityBuilder.deleteCommunity(idRef.get());
+            CommunityBuilder.deleteCommunity(idRefNoEmbeds.get());
         }
     }
 

@@ -25,7 +25,6 @@ import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.BitstreamRest;
 import org.dspace.app.rest.model.CommunityRest;
 import org.dspace.app.rest.model.patch.Patch;
-import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.utils.CommunityRestEqualityUtils;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
@@ -90,7 +89,7 @@ public class CommunityRestRepository extends DSpaceObjectRestRepository<Communit
             throw new RuntimeException(e.getMessage(), e);
         }
 
-        return converter.toRest(community, Projection.DEFAULT);
+        return converter.toRest(community, utils.obtainProjection());
     }
 
     @Override
@@ -127,7 +126,7 @@ public class CommunityRestRepository extends DSpaceObjectRestRepository<Communit
             throw new RuntimeException(e.getMessage(), e);
         }
 
-        return converter.toRest(community, Projection.DEFAULT);
+        return converter.toRest(community, utils.obtainProjection());
     }
 
     @Override
@@ -215,14 +214,14 @@ public class CommunityRestRepository extends DSpaceObjectRestRepository<Communit
         if (community == null) {
             throw new ResourceNotFoundException(apiCategory + "." + model + " with id: " + id + " not found");
         }
-        CommunityRest originalCommunityRest = converter.toRest(community, Projection.DEFAULT);
+        CommunityRest originalCommunityRest = converter.toRest(community, utils.obtainProjection());
         if (communityRestEqualityUtils.isCommunityRestEqualWithoutMetadata(originalCommunityRest, communityRest)) {
             metadataConverter.setMetadata(context, community, communityRest.getMetadata());
         } else {
             throw new UnprocessableEntityException("The given JSON and the original Community differ more " +
                                                        "than just the metadata");
         }
-        return converter.toRest(community, Projection.DEFAULT);
+        return converter.toRest(community, utils.obtainProjection());
     }
     @Override
     @PreAuthorize("hasPermission(#id, 'COMMUNITY', 'DELETE')")
@@ -267,6 +266,6 @@ public class CommunityRestRepository extends DSpaceObjectRestRepository<Communit
         Bitstream bitstream = cs.setLogo(context, community, uploadfile.getInputStream());
         cs.update(context, community);
         bitstreamService.update(context, bitstream);
-        return converter.toRest(context.reloadEntity(bitstream), Projection.DEFAULT);
+        return converter.toRest(context.reloadEntity(bitstream), utils.obtainProjection());
     }
 }
