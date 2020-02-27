@@ -56,6 +56,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
         // we should check how to get it from Spring
         ObjectMapper mapper = new ObjectMapper();
         EPersonRest data = new EPersonRest();
+        EPersonRest dataFull = new EPersonRest();
         MetadataRest metadataRest = new MetadataRest();
         data.setEmail("createtest@fake-email.com");
         data.setCanLogIn(true);
@@ -66,13 +67,18 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
         firstname.setValue("John");
         metadataRest.put("eperson.firstname", firstname);
         data.setMetadata(metadataRest);
+        dataFull.setEmail("createtestFull@fake-email.com");
+        dataFull.setCanLogIn(true);
+        dataFull.setMetadata(metadataRest);
 
         String authToken = getAuthToken(admin.getEmail(), password);
         getClient(authToken).perform(post("/api/eperson/epersons")
                                         .content(mapper.writeValueAsBytes(data))
-                                        .contentType(contentType))
+                                        .contentType(contentType)
+                            .param("projection", "full"))
                             .andExpect(status().isCreated())
                             .andExpect(content().contentType(contentType))
+                            .andExpect(jsonPath("$", EPersonMatcher.matchFullEmbeds()))
                             .andExpect(jsonPath("$", Matchers.allOf(
                                hasJsonPath("$.uuid", not(empty())),
                                // is it what you expect? EPerson.getName() returns the email...
@@ -86,6 +92,13 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                                        matchMetadata("eperson.firstname", "John"),
                                        matchMetadata("eperson.lastname", "Doe")
                                )))));
+
+        getClient(authToken).perform(post("/api/eperson/epersons")
+                .content(mapper.writeValueAsBytes(dataFull))
+                .contentType(contentType))
+                .andExpect(status().isCreated())
+                .andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$", HalMatcher.matchNoEmbeds()));
         // TODO cleanup the context!!!
     }
 

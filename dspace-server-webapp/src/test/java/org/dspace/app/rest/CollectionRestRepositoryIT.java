@@ -532,9 +532,11 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
         getClient(authToken).perform(post("/api/core/collections")
                                          .content(mapper.writeValueAsBytes(collectionRest))
                                          .param("parent", parentCommunity.getID().toString())
-                                         .contentType(contentType))
+                                         .contentType(contentType)
+                                         .param("projection", "full"))
                             .andExpect(status().isCreated())
                             .andExpect(content().contentType(contentType))
+                            .andExpect(jsonPath("$", CollectionMatcher.matchFullEmbeds()))
                             .andExpect(jsonPath("$", Matchers.allOf(
                                 hasJsonPath("$.id", not(empty())),
                                 hasJsonPath("$.uuid", not(empty())),
@@ -554,6 +556,13 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                                             "Title Text")
                                 )))));
 
+        getClient(authToken).perform(post("/api/core/collections")
+                .content(mapper.writeValueAsBytes(collectionRest))
+                .param("parent", parentCommunity.getID().toString())
+                .contentType(contentType))
+                .andExpect(status().isCreated())
+                .andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$", HalMatcher.matchNoEmbeds()));
     }
 
     @Test
