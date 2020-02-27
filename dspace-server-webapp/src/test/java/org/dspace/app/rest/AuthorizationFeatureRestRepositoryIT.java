@@ -48,14 +48,15 @@ public class AuthorizationFeatureRestRepositoryIT extends AbstractControllerInte
         int expReturn = featuresNum > 20 ? 20 : featuresNum;
         String adminToken = getAuthToken(admin.getEmail(), password);
 
+        // verify that only the admin can access the endpoint (see subsequent call in the method)
         getClient(adminToken).perform(get("/api/authz/features")).andExpect(status().isOk())
                 .andExpect(jsonPath("$._embedded.features", Matchers.hasSize(is(expReturn))))
                 .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/authz/features")))
                 .andExpect(jsonPath("$.page.size", is(20)))
                 .andExpect(jsonPath("$.page.totalElements", is(featuresNum)));
-
+        // verify that anonymous user cannot access
         getClient().perform(get("/api/authz/features")).andExpect(status().isUnauthorized());
-
+        // verify that normal user cannot access
         String epersonAuthToken = getAuthToken(eperson.getEmail(), password);
         getClient(epersonAuthToken).perform(get("/api/authz/features")).andExpect(status().isForbidden());
 
@@ -63,7 +64,8 @@ public class AuthorizationFeatureRestRepositoryIT extends AbstractControllerInte
 
     @Test
     /**
-     * The feature endpoint must provide proper pagination
+     * The feature endpoint must provide proper pagination. Unauthorized and
+     * forbidden scenarios are managed in the findAllTest
      *
      * @throws Exception
      */
@@ -107,15 +109,15 @@ public class AuthorizationFeatureRestRepositoryIT extends AbstractControllerInte
      */
     public void findOneTest() throws Exception {
         String adminToken = getAuthToken(admin.getEmail(), password);
-
+        // verify that only the admin can access the endpoint (see subsequent call in the method)
         getClient(adminToken).perform(get("/api/authz/features/withdrawItem")).andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", is("withdrawItem")))
                 .andExpect(jsonPath("$.description", Matchers.any(String.class)))
                 .andExpect(jsonPath("$.resourcetypes", Matchers.contains("core.item")))
                 .andExpect(jsonPath("$.type", is("feature")));
-
+        // verify that anonymous user cannot access
         getClient().perform(get("/api/authz/features/withdrawItem")).andExpect(status().isUnauthorized());
-
+        // verify that normal user cannot access
         String epersonAuthToken = getAuthToken(eperson.getEmail(), password);
         getClient(epersonAuthToken).perform(get("/api/authz/features/withdrawItem")).andExpect(status().isForbidden());
     }
@@ -123,11 +125,12 @@ public class AuthorizationFeatureRestRepositoryIT extends AbstractControllerInte
     @Test
     public void findOneNotFoundTest() throws Exception {
         String adminToken = getAuthToken(admin.getEmail(), password);
-
+        // verify that only the admin can access the endpoint and get the not found response code
+        // (see subsequent calls in the method for unauthorized and forbidden attempts)
         getClient(adminToken).perform(get("/api/authz/features/not-existing-feature")).andExpect(status().isNotFound());
-
+        // verify that anonymous user cannot access, without information disclosure
         getClient().perform(get("/api/authz/features/not-existing-feature")).andExpect(status().isUnauthorized());
-
+        // verify that normal user cannot access, without information disclosure
         getClient(adminToken).perform(get("/api/authz/features/1")).andExpect(status().isNotFound());
     }
 
@@ -141,6 +144,7 @@ public class AuthorizationFeatureRestRepositoryIT extends AbstractControllerInte
         AuthorizationFeature alwaysTrueFeature = authzFeatureService.find(AlwaysTrueFeature.NAME);
         String adminToken = getAuthToken(admin.getEmail(), password);
         for (String type : alwaysTrueFeature.getSupportedTypes()) {
+            // verify that only the admin can access the endpoint (see subsequent call in the method)
             getClient(adminToken).perform(get("/api/authz/features/search/resourcetype").param("type", type))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$",
@@ -153,13 +157,13 @@ public class AuthorizationFeatureRestRepositoryIT extends AbstractControllerInte
                             jsonPath("$._links.self.href",
                                     Matchers.containsString("/api/authz/features/search/resourcetype")));
         }
-
+        // verify that the right response code is returned also for not existing types
         getClient(adminToken).perform(get("/api/authz/features/search/resourcetype").param("type", "NOT-EXISTING"))
                 .andExpect(status().isOk()).andExpect(jsonPath("$.page.totalElements", is(0)));
-
+        // verify that anonymous user cannot access, without information disclosure
         getClient().perform(get("/api/authz/features/search/resourcetype").param("type", "core.item"))
                 .andExpect(status().isUnauthorized());
-
+        // verify that normal user cannot access, without information disclosure
         String epersonAuthToken = getAuthToken(eperson.getEmail(), password);
         getClient(epersonAuthToken).perform(get("/api/authz/features/search/resourcetype").param("type", "core.item"))
                 .andExpect(status().isForbidden());
