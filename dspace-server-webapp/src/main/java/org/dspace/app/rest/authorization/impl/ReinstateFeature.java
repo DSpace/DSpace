@@ -28,7 +28,9 @@ import org.springframework.stereotype.Component;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 @Component
-@AuthorizationFeatureDocumentation(name = ReinstateFeature.NAME)
+@AuthorizationFeatureDocumentation(name = ReinstateFeature.NAME,
+        description = "It can be used by administrators (or community/collection delegate) to reinstate an item that "
+                + "was previously withdrawn")
 public class ReinstateFeature implements AuthorizationFeature {
 
     public static final String NAME = "reinstateItem";

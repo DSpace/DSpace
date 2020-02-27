@@ -28,7 +28,9 @@ import org.springframework.stereotype.Component;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 @Component
-@AuthorizationFeatureDocumentation(name = CCLicenseFeature.NAME)
+@AuthorizationFeatureDocumentation(name = CCLicenseFeature.NAME,
+        description = "It can be used by administrators (or community/collection delegate) to manage the Creative " +
+             "Commons license for an item")
 public class CCLicenseFeature implements AuthorizationFeature {
 
     public static final String NAME = "cclicense";
