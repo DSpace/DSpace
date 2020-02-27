@@ -34,6 +34,12 @@ import org.junit.Ignore;
 public class AbstractIntegrationTest extends AbstractUnitTest {
 
     /**
+     * this is the amount of time that guarantee us that changes to the configuration files are picked up.
+     * The actual refresh rate is defined in <code>dspace/config/config-definition.xml</code>
+     */
+    private static final int CONFIG_RELOAD_TIME = 5500;
+
+    /**
      * holds the size of the local.cfg file, see {@link #cleanExtraConfigurations()}
      **/
     private long initialLocalCfgSize;
@@ -87,8 +93,8 @@ public class AbstractIntegrationTest extends AbstractUnitTest {
             FileChannel.open(Paths.get(extraConfPath), StandardOpenOption.WRITE)
                 .truncate(initialLocalCfgSize).close();
             localCfgChanged = false;
-            // sleep for 5.5 seconds to give the time to the configuration to note the change
-            Thread.sleep(5500);
+            // sleep to give the time to the configuration to note the change
+            Thread.sleep(CONFIG_RELOAD_TIME);
         } catch (IOException | InterruptedException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -118,8 +124,8 @@ public class AbstractIntegrationTest extends AbstractUnitTest {
             output.flush();
             output.close();
             localCfgChanged = true;
-            // sleep for 5.5 seconds to give the time to the configuration to note the change
-            Thread.sleep(5500);
+            // sleep to give the time to the configuration to note the change
+            Thread.sleep(CONFIG_RELOAD_TIME);
         } catch (IOException | InterruptedException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
