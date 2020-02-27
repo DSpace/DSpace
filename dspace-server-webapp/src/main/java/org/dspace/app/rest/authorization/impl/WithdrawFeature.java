@@ -28,7 +28,9 @@ import org.springframework.stereotype.Component;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 @Component
-@AuthorizationFeatureDocumentation(name = WithdrawFeature.NAME)
+@AuthorizationFeatureDocumentation(name = WithdrawFeature.NAME,
+        description = "It can be used by administrators (or community/collection delegate) to logically delete an "
+                + "item retiring it from the archive")
 public class WithdrawFeature implements AuthorizationFeature {
 
     public final static String NAME = "withdrawItem";
