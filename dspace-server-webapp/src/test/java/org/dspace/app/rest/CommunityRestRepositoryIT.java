@@ -307,10 +307,11 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$._embedded.communities", Matchers.containsInAnyOrder(
-                       CommunityMatcher.matchCommunityEntry(parentCommunity.getName(), parentCommunity.getID(),
-                                                            parentCommunity.getHandle()),
+                       CommunityMatcher.matchCommunityEntryFullProjection(parentCommunity.getName(),
+                                                                          parentCommunity.getID(),
+                                                                          parentCommunity.getHandle()),
                        CommunityMatcher
-                           .matchCommunityEntry(child1.getName(), child1.getID(), child1.getHandle())
+                           .matchCommunityEntryFullProjection(child1.getName(), child1.getID(), child1.getHandle())
                    )))
                    .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/core/communities")))
                    .andExpect(jsonPath("$.page.size", is(20)))
@@ -334,13 +335,15 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
                                            .build();
 
 
-        getClient().perform(get("/api/core/communities").param("size", "2").param("projection", "full"))
+        getClient().perform(get("/api/core/communities").param("size", "2").param("projection",
+                                                                                  "full"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
                 .andExpect(jsonPath("$._embedded.communities", Matchers.containsInAnyOrder(
                         CommunityMatcher.matchCommunityEntryMultipleTitles(titles, parentCommunity.getID(),
                                 parentCommunity.getHandle()),
-                        CommunityMatcher.matchCommunityEntry(child1.getID(), child1.getHandle())
+                        CommunityMatcher.matchCommunityEntryFullProjection(child1.getName(), child1.getID(),
+                                                                           child1.getHandle())
                 )))
                 .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/core/communities")))
                 .andExpect(jsonPath("$.page.totalElements", is(2)))
@@ -357,50 +360,60 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
                                           .withTitle(titles.get(2))
                                           .withTitle(titles.get(3))
                                           .build();
-        Community childCommunity = CommunityBuilder.createSubCommunity(context, parentCommunity).build();
+        Community childCommunity = CommunityBuilder.createSubCommunity(context, parentCommunity).withName("test")
+                                                   .build();
         Community secondParentCommunity = CommunityBuilder.createCommunity(context).withName("testing").build();
         Community thirdParentCommunity = CommunityBuilder.createCommunity(context).withName("testingTitleTwo").build();
 
         context.restoreAuthSystemState();
 
-        getClient().perform(get("/api/core/communities").param("size", "2").param("projection", "full"))
+        getClient().perform(get("/api/core/communities").param("size", "2").param("projection",
+                                                                                  "full"))
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$._embedded.communities", Matchers.containsInAnyOrder(
                        CommunityMatcher.matchCommunityEntryMultipleTitles(titles, parentCommunity.getID(),
                                                                           parentCommunity.getHandle()),
-                       CommunityMatcher.matchCommunityEntry(childCommunity.getID(), childCommunity.getHandle())
+                       CommunityMatcher.matchCommunityEntryFullProjection(childCommunity.getName(),
+                                                                          childCommunity.getID(),
+                                                                          childCommunity.getHandle())
                        )))
-                   .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/core/communities")))
-                   .andExpect(jsonPath("$.page", PageMatcher.pageEntryWithTotalPagesAndElements(0, 2, 2, 4)));
+                   .andExpect(jsonPath("$._links.self.href",
+                                       Matchers.containsString("/api/core/communities")))
+                   .andExpect(jsonPath("$.page", PageMatcher.pageEntryWithTotalPagesAndElements(0, 2,
+                                                                                                2, 4)));
 
         getClient().perform(get("/api/core/communities").param("size", "2").param("page", "1")
                    .param("projection", "full"))
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$._embedded.communities", Matchers.containsInAnyOrder(
-                       CommunityMatcher.matchCommunityEntry(secondParentCommunity.getID(),
-                                                            secondParentCommunity.getHandle()),
-                       CommunityMatcher.matchCommunityEntry(thirdParentCommunity.getID(),
-                                                            thirdParentCommunity.getHandle())
+                       CommunityMatcher.matchCommunityEntryFullProjection(secondParentCommunity.getName(),
+                                                                          secondParentCommunity.getID(),
+                                                                          secondParentCommunity.getHandle()),
+                       CommunityMatcher.matchCommunityEntryFullProjection(thirdParentCommunity.getName(),
+                                                                          thirdParentCommunity.getID(),
+                                                                          thirdParentCommunity.getHandle())
                    )))
                    .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/core/communities")))
-                   .andExpect(jsonPath("$.page", PageMatcher.pageEntryWithTotalPagesAndElements(1, 2, 2, 4)));
+                   .andExpect(jsonPath("$.page", PageMatcher.pageEntryWithTotalPagesAndElements(1, 2,
+                                                                                                2, 4)));
     }
 
 
     @Test
     public void findAllNoNameCommunityIsReturned() throws Exception {
         context.turnOffAuthorisationSystem();
-        parentCommunity = CommunityBuilder.createCommunity(context).build();
+        parentCommunity = CommunityBuilder.createCommunity(context).withName("test").build();
 
         getClient().perform(get("/api/core/communities")
                 .param("projection", "full"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
                 .andExpect(jsonPath("$._embedded.communities", Matchers.contains(
-                        CommunityMatcher.matchCommunityEntry(parentCommunity.getID(),
-                                parentCommunity.getHandle())
+                        CommunityMatcher.matchCommunityEntryFullProjection(parentCommunity.getName(),
+                                                                           parentCommunity.getID(),
+                                                                           parentCommunity.getHandle())
                 )))
                 .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/core/communities")))
                 .andExpect(jsonPath("$.page.totalElements", is(1)));
@@ -462,12 +475,14 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$._embedded.communities", Matchers.contains(
-                       CommunityMatcher.matchCommunityEntry(parentCommunity.getName(), parentCommunity.getID(),
-                                                            parentCommunity.getHandle())
+                       CommunityMatcher.matchCommunityEntryFullProjection(parentCommunity.getName(),
+                                                                          parentCommunity.getID(),
+                                                                          parentCommunity.getHandle())
                    )))
                    .andExpect(jsonPath("$._embedded.communities", Matchers.not(
                        Matchers.contains(
-                           CommunityMatcher.matchCommunityEntry(child1.getName(), child1.getID(), child1.getHandle())
+                           CommunityMatcher.matchCommunityEntryFullProjection(child1.getName(), child1.getID(),
+                                                                              child1.getHandle())
                        )
                    )))
                    .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/core/communities")))
@@ -480,12 +495,14 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$._embedded.communities", Matchers.contains(
-                       CommunityMatcher.matchCommunityEntry(child1.getName(), child1.getID(), child1.getHandle())
+                       CommunityMatcher.matchCommunityEntryFullProjection(child1.getName(), child1.getID(),
+                                                                          child1.getHandle())
                    )))
                    .andExpect(jsonPath("$._embedded.communities", Matchers.not(
                        Matchers.contains(
-                           CommunityMatcher.matchCommunityEntry(parentCommunity.getName(), parentCommunity.getID(),
-                                                                parentCommunity.getHandle())
+                           CommunityMatcher.matchCommunityEntryFullProjection(parentCommunity.getName(),
+                                                                              parentCommunity.getID(),
+                                                                              parentCommunity.getHandle())
                        )
                    )))
                    .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/core/communities")))
@@ -553,12 +570,14 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$", Matchers.is(
-                       CommunityMatcher.matchCommunityEntry(parentCommunity.getName(), parentCommunity.getID(),
-                                                            parentCommunity.getHandle())
+                       CommunityMatcher.matchCommunityEntryFullProjection(parentCommunity.getName(),
+                                                                          parentCommunity.getID(),
+                                                                          parentCommunity.getHandle())
                    )))
                    .andExpect(jsonPath("$", Matchers.not(
                        Matchers.is(
-                           CommunityMatcher.matchCommunityEntry(child1.getName(), child1.getID(), child1.getHandle())
+                           CommunityMatcher.matchCommunityEntryFullProjection(child1.getName(), child1.getID(),
+                                                                              child1.getHandle())
                        )
                    )))
                    .andExpect(jsonPath("$._links.self.href", Matchers
@@ -633,14 +652,18 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$._embedded.communities", Matchers.containsInAnyOrder(
-                       CommunityMatcher.matchCommunityEntry(parentCommunity.getName(), parentCommunity.getID(),
-                                                            parentCommunity.getHandle()),
-                       CommunityMatcher.matchCommunityEntry(parentCommunity2.getName(), parentCommunity2.getID(),
-                                                            parentCommunity2.getHandle())
+                       CommunityMatcher.matchCommunityEntryFullProjection(parentCommunity.getName(),
+                                                                          parentCommunity.getID(),
+                                                                          parentCommunity.getHandle()),
+                       CommunityMatcher.matchCommunityEntryFullProjection(parentCommunity2.getName(),
+                                                                          parentCommunity2.getID(),
+                                                                          parentCommunity2.getHandle())
                    )))
                    .andExpect(jsonPath("$._embedded.communities", Matchers.not(Matchers.containsInAnyOrder(
-                       CommunityMatcher.matchCommunityEntry(child1.getName(), child1.getID(), child1.getHandle()),
-                       CommunityMatcher.matchCommunityEntry(child12.getName(), child12.getID(), child12.getHandle())
+                       CommunityMatcher.matchCommunityEntryFullProjection(child1.getName(), child1.getID(),
+                                                                          child1.getHandle()),
+                       CommunityMatcher.matchCommunityEntryFullProjection(child12.getName(), child12.getID(),
+                                                                          child12.getHandle())
                    ))))
                    .andExpect(
                        jsonPath("$._links.self.href", Matchers.containsString("/api/core/communities/search/top")))
@@ -697,25 +720,25 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
                 .andExpect(content().contentType(contentType))
                 //Checking that these communities are present
                 .andExpect(jsonPath("$._embedded.communities", Matchers.containsInAnyOrder(
-                        CommunityMatcher.matchCommunityEntry(parentCommunityChild1.getName(),
+                        CommunityMatcher.matchCommunityEntryFullProjection(parentCommunityChild1.getName(),
                                                              parentCommunityChild1.getID(),
                                                              parentCommunityChild1.getHandle()),
-                        CommunityMatcher.matchCommunityEntry(parentCommunityChild2.getName(),
+                        CommunityMatcher.matchCommunityEntryFullProjection(parentCommunityChild2.getName(),
                                                              parentCommunityChild2.getID(),
                                                              parentCommunityChild2.getHandle())
                 )))
                 //Checking that these communities are not present
                 .andExpect(jsonPath("$._embedded.communities", Matchers.not(Matchers.anyOf(
-                        CommunityMatcher.matchCommunityEntry(parentCommunity.getName(),
+                        CommunityMatcher.matchCommunityEntryFullProjection(parentCommunity.getName(),
                                                              parentCommunity.getID(),
                                                              parentCommunity.getHandle()),
-                        CommunityMatcher.matchCommunityEntry(parentCommunity2.getName(),
+                        CommunityMatcher.matchCommunityEntryFullProjection(parentCommunity2.getName(),
                                                              parentCommunity2.getID(),
                                                              parentCommunity2.getHandle()),
-                        CommunityMatcher.matchCommunityEntry(parentCommunity2Child1.getName(),
+                        CommunityMatcher.matchCommunityEntryFullProjection(parentCommunity2Child1.getName(),
                                                              parentCommunity2Child1.getID(),
                                                              parentCommunity2Child1.getHandle()),
-                        CommunityMatcher.matchCommunityEntry(parentCommunityChild2Child1.getName(),
+                        CommunityMatcher.matchCommunityEntryFullProjection(parentCommunityChild2Child1.getName(),
                                                              parentCommunityChild2Child1.getID(),
                                                              parentCommunityChild2Child1.getHandle())
                 ))))
@@ -732,25 +755,25 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
                 .andExpect(content().contentType(contentType))
                 //Checking that these communities are present
                 .andExpect(jsonPath("$._embedded.communities", Matchers.contains(
-                        CommunityMatcher.matchCommunityEntry(parentCommunityChild2Child1.getName(),
+                        CommunityMatcher.matchCommunityEntryFullProjection(parentCommunityChild2Child1.getName(),
                                                              parentCommunityChild2Child1.getID(),
                                                              parentCommunityChild2Child1.getHandle())
                 )))
                 //Checking that these communities are not present
                 .andExpect(jsonPath("$._embedded.communities", Matchers.not(Matchers.anyOf(
-                        CommunityMatcher.matchCommunityEntry(parentCommunity.getName(),
+                        CommunityMatcher.matchCommunityEntryFullProjection(parentCommunity.getName(),
                                                              parentCommunity.getID(),
                                                              parentCommunity.getHandle()),
-                        CommunityMatcher.matchCommunityEntry(parentCommunity2.getName(),
+                        CommunityMatcher.matchCommunityEntryFullProjection(parentCommunity2.getName(),
                                                              parentCommunity2.getID(),
                                                              parentCommunity2.getHandle()),
-                        CommunityMatcher.matchCommunityEntry(parentCommunity2Child1.getName(),
+                        CommunityMatcher.matchCommunityEntryFullProjection(parentCommunity2Child1.getName(),
                                                              parentCommunity2Child1.getID(),
                                                              parentCommunity2Child1.getHandle()),
-                        CommunityMatcher.matchCommunityEntry(parentCommunityChild2Child1.getName(),
+                        CommunityMatcher.matchCommunityEntryFullProjection(parentCommunityChild2Child1.getName(),
                                                              parentCommunityChild2Child1.getID(),
                                                              parentCommunityChild2Child1.getHandle()),
-                        CommunityMatcher.matchCommunityEntry(parentCommunityChild1.getName(),
+                        CommunityMatcher.matchCommunityEntryFullProjection(parentCommunityChild1.getName(),
                                                              parentCommunityChild1.getID(),
                                                              parentCommunityChild1.getHandle())
                 ))))
@@ -824,12 +847,14 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$", Matchers.is(
-                       CommunityMatcher.matchCommunityEntry(parentCommunity.getName(), parentCommunity.getID(),
-                                                            parentCommunity.getHandle())
+                       CommunityMatcher.matchCommunityEntryFullProjection(parentCommunity.getName(),
+                                                                          parentCommunity.getID(),
+                                                                          parentCommunity.getHandle())
                    )))
                    .andExpect(jsonPath("$", Matchers.not(
                        Matchers.is(
-                           CommunityMatcher.matchCommunityEntry(child1.getName(), child1.getID(), child1.getHandle())
+                           CommunityMatcher.matchCommunityEntryFullProjection(child1.getName(), child1.getID(),
+                                                                              child1.getHandle())
                        )
                    )))
                    .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/core/communities")))
@@ -857,7 +882,7 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$", Matchers.is(
-                       CommunityMatcher.matchCommunityEntry("Electronic theses and dissertations",
+                       CommunityMatcher.matchCommunityEntryFullProjection("Electronic theses and dissertations",
                                                             parentCommunity.getID(),
                                                             parentCommunity.getHandle())
                    )))
@@ -912,11 +937,12 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
                         .andExpect(status().isOk())
                         .andExpect(content().contentType(contentType))
                         .andExpect(jsonPath("$", Matchers.is(
-                            CommunityMatcher.matchCommunityEntry(parentCommunity.getName(), parentCommunity.getID(),
-                                                                 parentCommunity.getHandle())
+                            CommunityMatcher.matchCommunityEntryFullProjection(parentCommunity.getName(),
+                                                                               parentCommunity.getID(),
+                                                                               parentCommunity.getHandle())
                         )))
                         .andExpect(jsonPath("$._links.self.href",
-                                            Matchers.containsString("/api/core/communities")))        ;
+                                            Matchers.containsString("/api/core/communities")));
         getClient(token).perform(delete("/api/core/communities/" + parentCommunity.getID().toString()))
                         .andExpect(status().isNoContent())
         ;
@@ -974,11 +1000,12 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
                         .andExpect(status().isOk())
                         .andExpect(content().contentType(contentType))
                         .andExpect(jsonPath("$", Matchers.is(
-                            CommunityMatcher.matchCommunityEntry(parentCommunity.getName(), parentCommunity.getID(),
-                                                                 parentCommunity.getHandle())
+                            CommunityMatcher.matchCommunityEntryFullProjection(parentCommunity.getName(),
+                                                                               parentCommunity.getID(),
+                                                                               parentCommunity.getHandle())
                         )))
                         .andExpect(jsonPath("$._links.self.href",
-                                            Matchers.containsString("/api/core/communities")))        ;
+                                            Matchers.containsString("/api/core/communities")));
         getClient().perform(delete("/api/core/communities/" + parentCommunity.getID().toString()))
                         .andExpect(status().isUnauthorized())
         ;
@@ -1007,11 +1034,12 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
                         .andExpect(status().isOk())
                         .andExpect(content().contentType(contentType))
                         .andExpect(jsonPath("$", Matchers.is(
-                            CommunityMatcher.matchCommunityEntry(parentCommunity.getName(), parentCommunity.getID(),
-                                                                 parentCommunity.getHandle())
+                            CommunityMatcher.matchCommunityEntryFullProjection(parentCommunity.getName(),
+                                                                               parentCommunity.getID(),
+                                                                               parentCommunity.getHandle())
                         )))
                         .andExpect(jsonPath("$._links.self.href",
-                                            Matchers.containsString("/api/core/communities")))        ;
+                                            Matchers.containsString("/api/core/communities")));
         getClient(token).perform(delete("/api/core/communities/" + parentCommunity.getID().toString()))
                         .andExpect(status().isNoContent())
         ;
@@ -1041,12 +1069,14 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$", Matchers.is(
-                       CommunityMatcher.matchCommunityEntry(parentCommunity.getName(), parentCommunity.getID(),
-                                                            parentCommunity.getHandle())
+                       CommunityMatcher.matchCommunityEntryFullProjection(parentCommunity.getName(),
+                                                                          parentCommunity.getID(),
+                                                                          parentCommunity.getHandle())
                    )))
                    .andExpect(jsonPath("$", Matchers.not(
                        Matchers.is(
-                           CommunityMatcher.matchCommunityEntry(child1.getName(), child1.getID(), child1.getHandle())
+                           CommunityMatcher.matchCommunityEntryFullProjection(child1.getName(), child1.getID(),
+                                                                              child1.getHandle())
                        )
                    )))
                    .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/core/communities")))
@@ -1077,7 +1107,7 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$", Matchers.is(
-                       CommunityMatcher.matchCommunityEntry("Electronic theses and dissertations",
+                       CommunityMatcher.matchCommunityEntryFullProjection("Electronic theses and dissertations",
                                                             parentCommunity.getID(),
                                                             parentCommunity.getHandle())
                    )))
