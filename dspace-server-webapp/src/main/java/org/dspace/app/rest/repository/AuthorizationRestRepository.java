@@ -92,7 +92,7 @@ public class AuthorizationRestRepository extends DSpaceRestRepository<Authorizat
             if (authorizationFeature == null) {
                 return null;
             }
-            // get the user specified identified by the id
+            // get the user specified identified by the id, can be null for anonymous
             EPerson user;
             try {
                 user = authorizationRestUtil.getEperson(context, id);
@@ -154,7 +154,7 @@ public class AuthorizationRestRepository extends DSpaceRestRepository<Authorizat
         }
 
         EPerson currUser = context.getCurrentUser();
-        // get the user specified in the requested parameters
+        // get the user specified in the requested parameters, can be null for anonymous
         EPerson user = getUserFromRequestParameter(context, epersonUuid);
         // Temporarily change the Context's current user in order to retrieve
         // authorizations based on that user
@@ -204,7 +204,7 @@ public class AuthorizationRestRepository extends DSpaceRestRepository<Authorizat
         }
 
         EPerson currUser = context.getCurrentUser();
-        // get the user specified in the requested parameters
+        // get the user specified in the requested parameters, can be null for anonymous
         EPerson user = getUserFromRequestParameter(context, epersonUuid);
         // Temporarily change the Context's current user in order to retrieve
         // authorizations based on that user
