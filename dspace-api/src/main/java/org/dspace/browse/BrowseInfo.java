@@ -462,6 +462,15 @@ public class BrowseInfo {
     }
 
     /**
+     * Sets the results of the browse. This is currently only used for combining browse indices 0-9.
+     *
+     * @param results Result list.
+     */
+    public void setResults(List results) {
+        this.results = results;
+    }
+
+    /**
      * Return the results of the Browse as an array of String array.
      * The first element (i.e. index 0) is the value, the second is the authority key
      *
@@ -514,6 +523,15 @@ public class BrowseInfo {
      */
     public int getTotal() {
         return total;
+    }
+
+    /**
+     * Sets the browse total. This is currently only used for combining browse indices 0-9.
+     *
+     * @param total The total number of items in the index.
+     */
+    public void setTotal(int total) {
+        this.total = total;
     }
 
     /**
