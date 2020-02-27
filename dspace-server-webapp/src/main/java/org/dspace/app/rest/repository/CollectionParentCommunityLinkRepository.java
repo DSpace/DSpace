@@ -22,6 +22,7 @@ import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
 /**
@@ -43,6 +44,7 @@ public class CollectionParentCommunityLinkRepository extends AbstractDSpaceRestR
      * @param projection            The current Projection
      * @return                      The Parent Community REST object
      */
+    @PreAuthorize("hasPermission(#collectionId, 'COLLECTION', 'READ')")
     public CommunityRest getParentCommunity(@Nullable HttpServletRequest httpServletRequest,
                                             UUID collectionId,
                                             @Nullable Pageable optionalPageable,

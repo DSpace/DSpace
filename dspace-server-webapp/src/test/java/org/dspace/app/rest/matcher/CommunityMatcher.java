@@ -57,6 +57,15 @@ public class CommunityMatcher {
         );
     }
 
+    public static Matcher<? super Object> matchCommunityEntryFullProjection(String name, UUID uuid, String handle) {
+        return allOf(
+            matchProperties(name, uuid, handle),
+            hasJsonPath("$._embedded.collections", Matchers.not(Matchers.empty())),
+            hasJsonPath("$._embedded.logo", Matchers.not(Matchers.empty())),
+            matchLinks(uuid)
+        );
+    }
+
     public static Matcher<? super Object> matchProperties(String name, UUID uuid, String handle) {
         return allOf(
             hasJsonPath("$.uuid", is(uuid.toString())),

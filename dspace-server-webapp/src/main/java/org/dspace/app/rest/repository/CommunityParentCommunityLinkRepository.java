@@ -20,6 +20,7 @@ import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
 /**
@@ -41,6 +42,7 @@ public class CommunityParentCommunityLinkRepository extends AbstractDSpaceRestRe
      * @param projection            The current Projection
      * @return                      The Parent Community REST object
      */
+    @PreAuthorize("hasPermission(#communityId, 'COMMUNITY', 'READ')")
     public CommunityRest getParentCommunity(@Nullable HttpServletRequest httpServletRequest,
                                             UUID communityId,
                                             @Nullable Pageable optionalPageable,
@@ -48,10 +50,10 @@ public class CommunityParentCommunityLinkRepository extends AbstractDSpaceRestRe
         try {
             Context context = obtainContext();
             Community community = communityService.find(context, communityId);
-            Community parentCommunity = (Community) communityService.getParentObject(context, community);
             if (community == null) {
                 throw new ResourceNotFoundException("No such community: " + community);
             }
+            Community parentCommunity = (Community) communityService.getParentObject(context, community);
             if (parentCommunity == null) {
                 return null;
             }

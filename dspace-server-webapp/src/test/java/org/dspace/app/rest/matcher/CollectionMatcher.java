@@ -35,6 +35,21 @@ public class CollectionMatcher {
         );
     }
 
+    public static Matcher<? super Object> matchCollectionEntryFullProjection(String name, UUID uuid, String handle) {
+        return matchCollectionEntryFullProjection(name, uuid, handle, null);
+
+    }
+
+    public static Matcher<? super Object> matchCollectionEntryFullProjection(String name, UUID uuid, String handle,
+                                                                             Bitstream logo) {
+        return allOf(
+            matchProperties(name, uuid, handle),
+            matchLinks(uuid),
+            matchLogo(logo),
+            matchFullEmbeds()
+        );
+    }
+
     public static Matcher<? super Object> matchProperties(String name, UUID uuid, String handle) {
         return allOf(
                 hasJsonPath("$.uuid", is(uuid.toString())),
