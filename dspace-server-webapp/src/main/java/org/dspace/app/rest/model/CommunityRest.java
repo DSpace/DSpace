@@ -26,6 +26,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
         @LinkRest(
                 name = CommunityRest.SUBCOMMUNITIES,
                 method = "getSubcommunities"
+        ),
+        @LinkRest(
+                name = CommunityRest.PARENT_COMMUNITY,
+                method = "getParentCommunity"
         )
 })
 public class CommunityRest extends DSpaceObjectRest {
@@ -36,6 +40,8 @@ public class CommunityRest extends DSpaceObjectRest {
     public static final String COLLECTIONS = "collections";
     public static final String LOGO = "logo";
     public static final String SUBCOMMUNITIES = "subcommunities";
+    public static final String PARENT_COMMUNITY = "parentCommunity";
+
 
     @Override
     public String getCategory() {
