@@ -8,6 +8,7 @@
 package org.dspace.app.rest.repository;
 
 import java.sql.SQLException;
+
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
@@ -16,11 +17,16 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.dspace.app.rest.model.CommunityRest;
 import org.dspace.app.rest.projection.Projection;
-import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Community;
 import org.dspace.content.service.CommunityService;
-import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.discovery.DiscoverQuery;
+import org.dspace.discovery.DiscoverResult;
+import org.dspace.discovery.IndexableObject;
+import org.dspace.discovery.SearchService;
+import org.dspace.discovery.SearchServiceException;
+import org.dspace.discovery.indexobject.IndexableCommunity;
+import org.dspace.discovery.indexobject.factory.IndexObjectFactoryFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -39,7 +45,7 @@ public class CommunitySubcommunityLinkRepository extends AbstractDSpaceRestRepos
     CommunityService communityService;
 
     @Autowired
-    AuthorizeService authorizeService;
+    SearchService searchService;
 
     @PreAuthorize("hasPermission(#communityId, 'COMMUNITY', 'READ')")
     public Page<CommunityRest> getSubcommunities(@Nullable HttpServletRequest request,
@@ -52,16 +58,24 @@ public class CommunitySubcommunityLinkRepository extends AbstractDSpaceRestRepos
             if (community == null) {
                 throw new ResourceNotFoundException("No such community: " + communityId);
             }
-            List<Community> allSubcommunities = community.getSubcommunities();
+            Pageable pageable = utils.getPageable(optionalPageable);
             List<Community> publicSubcommunities = new LinkedList<Community>();
-            for (Community subCommunity : allSubcommunities ) {
-                if (authorizeService.authorizeActionBoolean(context, subCommunity, Constants.READ)) {
-                    publicSubcommunities.add(subCommunity);
-                }
+            IndexObjectFactoryFactory indexObjectFactory = IndexObjectFactoryFactory.getInstance();
+            IndexableObject scopeObject = indexObjectFactory.getIndexableObjects(context, community).get(0);
+            DiscoverQuery discoverQuery = new DiscoverQuery();
+            discoverQuery.setQuery("*:*");
+            discoverQuery.setDSpaceObjectFilter(IndexableCommunity.TYPE);
+            discoverQuery.setStart(Math.toIntExact(pageable.getOffset()));
+            discoverQuery.setMaxResults(pageable.getPageSize());
+            DiscoverResult resp = searchService.search(context, scopeObject, discoverQuery);
+            long tot = resp.getTotalSearchResults();
+            for (IndexableObject solrCommunities : resp.getIndexableObjects()) {
+                Community c = ((IndexableCommunity) solrCommunities).getIndexedObject();
+                publicSubcommunities.add(c);
             }
-            return converter.toRestPage(utils.getPage(publicSubcommunities, optionalPageable), projection);
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
+            return converter.toRestPage(publicSubcommunities, pageable, tot, utils.obtainProjection());
+        } catch (SQLException | SearchServiceException e) {
+            throw new RuntimeException(e.getMessage(), e);
         }
     }
 }
