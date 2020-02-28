@@ -74,6 +74,12 @@ public class CommunityBuilder extends AbstractDSpaceObjectBuilder<Community> {
         return this;
     }
 
+    public CommunityBuilder addParentCommunity(final Context context, final Community parent)
+        throws SQLException, AuthorizeException {
+        communityService.addSubcommunity(context, parent, community);
+        return this;
+    }
+
     @Override
     public Community build() {
         try {
