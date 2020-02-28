@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.dspace.app.rest.model.UploadAccessConditionDTO;
+import org.dspace.app.rest.model.UploadBitstreamAccessConditionDTO;
 import org.dspace.app.rest.model.patch.LateObjectEvaluator;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.authorize.service.AuthorizeService;
@@ -36,7 +36,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  *
  * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  */
-public class BitstreamResourcePolicyAddPatchOperation extends AddPatchOperation<UploadAccessConditionDTO> {
+public class BitstreamResourcePolicyAddPatchOperation extends AddPatchOperation<UploadBitstreamAccessConditionDTO> {
 
     @Autowired
     BitstreamService bitstreamService;
@@ -67,7 +67,8 @@ public class BitstreamResourcePolicyAddPatchOperation extends AddPatchOperation<
             for (Bitstream b : bb.getBitstreams()) {
                 if (idx == Integer.parseInt(split[1])) {
 
-                    List<UploadAccessConditionDTO> newAccessConditions = new ArrayList<UploadAccessConditionDTO>();
+                    List<UploadBitstreamAccessConditionDTO> newAccessConditions =
+                                                            new ArrayList<UploadBitstreamAccessConditionDTO>();
                     if (split.length == 3) {
                         authorizeService.removePoliciesActionFilter(context, b, Constants.READ);
                         newAccessConditions = evaluateArrayObject((LateObjectEvaluator) value);
@@ -76,19 +77,17 @@ public class BitstreamResourcePolicyAddPatchOperation extends AddPatchOperation<
                         newAccessConditions.add(evaluateSingleObject((LateObjectEvaluator) value));
                     }
 
-                    for (UploadAccessConditionDTO newAccessCondition : newAccessConditions) {
+                    for (UploadBitstreamAccessConditionDTO newAccessCondition : newAccessConditions) {
                         String name = newAccessCondition.getName();
                         String description = newAccessCondition.getDescription();
 
                         //TODO manage error on select group and eperson
                         Group group = null;
                         if (newAccessCondition.getGroupUUID() != null) {
-                           // UUID uuidGroup = UUID.fromString(newAccessCondition.getGroup().getUuid());
                             group = groupService.find(context, newAccessCondition.getGroupUUID());
                         }
                         EPerson eperson = null;
                         if (newAccessCondition.getEpersonUUID() != null) {
-                           // UUID uuidEPerson = UUID.fromString(newAccessCondition.getEperson().getUuid());
                             eperson = epersonService.find(context, newAccessCondition.getEpersonUUID());
                         }
 
@@ -106,12 +105,12 @@ public class BitstreamResourcePolicyAddPatchOperation extends AddPatchOperation<
     }
 
     @Override
-    protected Class<UploadAccessConditionDTO[]> getArrayClassForEvaluation() {
-        return UploadAccessConditionDTO[].class;
+    protected Class<UploadBitstreamAccessConditionDTO[]> getArrayClassForEvaluation() {
+        return UploadBitstreamAccessConditionDTO[].class;
     }
 
     @Override
-    protected Class<UploadAccessConditionDTO> getClassForEvaluation() {
-        return UploadAccessConditionDTO.class;
+    protected Class<UploadBitstreamAccessConditionDTO> getClassForEvaluation() {
+        return UploadBitstreamAccessConditionDTO.class;
     }
 }
