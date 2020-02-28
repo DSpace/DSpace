@@ -39,12 +39,11 @@
          compiling of the corresponding source module.
     -->
     <profiles>
+        <!-- As this old REST API module is deprecated, it only builds if you activate it via -Pdspace-rest -->
         <profile>
             <id>dspace-rest</id>
             <activation>
-                <file>
-                    <exists>rest/pom.xml</exists>
-                </file>
+                <activeByDefault>false</activeByDefault>
             </activation>
             <modules>
                 <module>rest</module>

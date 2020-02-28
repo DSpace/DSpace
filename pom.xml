@@ -790,7 +790,7 @@
         </profile>
 
         <!--
-           Builds XOAI Gateway WAR for DSpace
+           Builds XOAI Gateway extension for DSpace
         -->
         <profile>
             <id>dspace-oai</id>
@@ -805,7 +805,7 @@
         </profile>
 
         <!--
-             Builds RDF API and Data Provider WAR for DSpace
+             Builds RDF API and Data Provider extension for DSpace
         -->
         <profile>
             <id>dspace-rdf</id>
@@ -819,13 +819,12 @@
             </modules>
         </profile>
 
-       <!-- REST Jersey -->
+       <!-- REST Jersey (Deprecated REST API from DSpace 6.x or below) -->
+       <!-- As this module is deprecated, it only builds if you activate it via -Pdspace-rest -->
        <profile>
            <id>dspace-rest</id>
            <activation>
-               <file>
-                   <exists>dspace-rest/pom.xml</exists>
-               </file>
+               <activeByDefault>false</activeByDefault>
            </activation>
            <modules>
                <module>dspace-rest</module>
@@ -834,7 +833,7 @@
 
 
         <!--
-           Builds SWORD WAR for DSpace
+           Builds SWORD extension for DSpace
         -->
         <profile>
             <id>dspace-sword</id>
@@ -850,7 +849,7 @@
 
 
         <!--
-           Builds SWORDv2 WAR for DSpace
+           Builds SWORDv2 extension for DSpace
         -->
         <profile>
             <id>dspace-swordv2</id>
@@ -864,6 +863,9 @@
             </modules>
         </profile>
 
+        <!--
+           Builds Server API webapp for DSpace
+        -->
 		<profile>
             <id>dspace-server-webapp</id>
             <activation>
