@@ -32,6 +32,7 @@ import org.springframework.core.type.filter.AssignableTypeFilter;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.hateoas.Link;
 import org.springframework.hateoas.Resource;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
@@ -155,9 +156,12 @@ public class ConverterService {
      * @throws ClassCastException if the resource type is not compatible with the inferred return type.
      */
     public <T extends HALResource> T toResource(RestModel restObject) {
+        return toResource(restObject, new Link[] {});
+    }
+    public <T extends HALResource> T toResource(RestModel restObject, Link... oldLinks) {
         T halResource = getResource(restObject);
         if (restObject instanceof RestAddressableModel) {
-            utils.embedOrLinkClassLevelRels(halResource);
+            utils.embedOrLinkClassLevelRels(halResource, oldLinks);
             halLinkService.addLinks(halResource);
             Projection projection = ((RestAddressableModel) restObject).getProjection();
             return projection.transformResource(halResource);

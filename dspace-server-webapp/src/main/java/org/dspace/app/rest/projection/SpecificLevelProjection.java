@@ -12,20 +12,27 @@ import org.dspace.app.rest.model.RestAddressableModel;
 import org.dspace.app.rest.model.hateoas.HALResource;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.springframework.hateoas.Link;
-import org.springframework.stereotype.Component;
 
 /**
  * Catch-all projection that allows embedding of all subresources.
  */
-@Component
-public class FullProjection extends AbstractProjection {
+public class SpecificLevelProjection extends AbstractProjection {
 
-    public final static String NAME = "full";
-    private final int maxEmbed = DSpaceServicesFactory.getInstance().getConfigurationService()
+    public final static String NAME = "level.";
+
+    private int maxEmbed = DSpaceServicesFactory.getInstance().getConfigurationService()
             .getIntProperty("projections.full.max", 2);
 
+    public int getMaxEmbed() {
+        return maxEmbed;
+    }
+
+    public void setMaxEmbed(int maxEmbed) {
+        this.maxEmbed = maxEmbed;
+    }
+
     public String getName() {
-        return NAME;
+        return NAME + getMaxEmbed();
     }
 
     @Override
