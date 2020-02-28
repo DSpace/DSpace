@@ -501,6 +501,110 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
     }
 
     @Test
+    public void findAllUnAuthenticatedTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                .withName("Parent Community")
+                .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                .withName("Sub Community")
+                .build();
+        Community child2 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                .withName("Sub Community 2")
+                .build();
+
+        resoucePolicyService.removePolicies(context, parentCommunity, Constants.READ);
+        resoucePolicyService.removePolicies(context, child1, Constants.READ);
+        context.restoreAuthSystemState();
+
+        // anonymous can see only public communities
+        getClient().perform(get("/api/core/communities"))
+                   .andExpect(status().isOk())
+                   .andExpect(content().contentType(contentType))
+                   .andExpect(jsonPath("$._embedded.communities", Matchers.contains(
+                            CommunityMatcher.matchCommunity(child2))))
+                   .andExpect(jsonPath("$.page.totalElements", is(1)));
+    }
+
+    @Test
+    public void findAllForbiddenTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                   .withName("Parent Community")
+                   .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                   .withName("Sub Community")
+                   .build();
+        Community child2 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                   .withName("Sub Community 2")
+                   .build();
+
+        resoucePolicyService.removePolicies(context, parentCommunity, Constants.READ);
+        resoucePolicyService.removePolicies(context, child1, Constants.READ);
+        context.restoreAuthSystemState();
+
+        String tokenEperson = getAuthToken(eperson.getEmail(), password);
+        getClient(tokenEperson).perform(get("/api/core/communities"))
+                   .andExpect(status().isOk())
+                   .andExpect(content().contentType(contentType))
+                   .andExpect(jsonPath("$._embedded.communities", Matchers.contains(
+                            CommunityMatcher.matchCommunity(child2))))
+                   .andExpect(jsonPath("$.page.totalElements", is(1)));
+    }
+
+    @Test
+    public void findAllGrantAccessAdminsTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        EPerson parentAdmin = EPersonBuilder.createEPerson(context)
+                .withEmail("eperson1@mail.com")
+                .withPassword("qwerty01")
+                .build();
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                   .withName("Parent Community")
+                   .withAdminGroup(parentAdmin)
+                   .build();
+
+        EPerson child1Admin = EPersonBuilder.createEPerson(context)
+                .withEmail("eperson2@mail.com")
+                .withPassword("qwerty02")
+                .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                   .withName("Sub Community 1")
+                   .withAdminGroup(child1Admin)
+                   .build();
+
+        Community child2 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                .withName("Sub Community 2")
+                .build();
+
+        resoucePolicyService.removePolicies(context, parentCommunity, Constants.READ);
+        resoucePolicyService.removePolicies(context, child1, Constants.READ);
+        context.restoreAuthSystemState();
+
+        String tokenParentAdmin = getAuthToken(parentAdmin.getEmail(), "qwerty01");
+        getClient(tokenParentAdmin).perform(get("/api/core/communities"))
+                   .andExpect(status().isOk())
+                   .andExpect(content().contentType(contentType))
+                   .andExpect(jsonPath("$._embedded.communities", Matchers.containsInAnyOrder(
+                           CommunityMatcher.matchCommunity(parentCommunity),
+                           CommunityMatcher.matchCommunity(child1),
+                           CommunityMatcher.matchCommunity(child2))))
+                   .andExpect(jsonPath("$.page.totalElements", is(3)));
+
+        String tokenChild1Admin = getAuthToken(child1Admin.getEmail(), "qwerty02");
+        getClient(tokenChild1Admin).perform(get("/api/core/communities"))
+                   .andExpect(status().isOk())
+                   .andExpect(content().contentType(contentType))
+                   .andExpect(jsonPath("$._embedded.communities", Matchers.containsInAnyOrder(
+                           CommunityMatcher.matchCommunity(child1),
+                           CommunityMatcher.matchCommunity(child2))))
+                   .andExpect(jsonPath("$.page.totalElements", is(2)));
+    }
+
+    @Test
     public void findOneTest() throws Exception {
         //We turn off the authorization system in order to create the structure as defined below
         context.turnOffAuthorisationSystem();
@@ -665,7 +769,7 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
         getClient().perform(get("/api/core/communities/" + child1.getID().toString() + "/logo"))
                    .andExpect(status().isNoContent());
 
-        //Main community has no collections, therefore contentType is not set
+        //Main community has no collections
         getClient().perform(get("/api/core/communities/" + parentCommunity.getID().toString() + "/collections"))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$.page.totalElements", is(0)));
