@@ -22,7 +22,6 @@ import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.RelationshipRest;
-import org.dspace.app.rest.projection.Projection;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.DSpaceObject;
@@ -127,7 +126,7 @@ public class RelationshipRestRepository extends DSpaceRestRepository<Relationshi
                 relationshipService.updateItem(context, relationship.getLeftItem());
                 relationshipService.updateItem(context, relationship.getRightItem());
                 context.restoreAuthSystemState();
-                return converter.toRest(relationship, Projection.DEFAULT);
+                return converter.toRest(relationship, utils.obtainProjection());
             } else {
                 throw new AccessDeniedException("You do not have write rights on this relationship's items");
             }
@@ -192,7 +191,7 @@ public class RelationshipRestRepository extends DSpaceRestRepository<Relationshi
                     throw new AccessDeniedException("You do not have write rights on this relationship's items");
                 }
 
-                return converter.toRest(relationship, Projection.DEFAULT);
+                return converter.toRest(relationship, utils.obtainProjection());
             } else {
                 throw new AccessDeniedException("You do not have write rights on this relationship's items");
             }
@@ -256,7 +255,7 @@ public class RelationshipRestRepository extends DSpaceRestRepository<Relationshi
             context.commit();
             context.reloadEntity(relationship);
 
-            return converter.toRest(relationship, Projection.DEFAULT);
+            return converter.toRest(relationship, utils.obtainProjection());
         } catch (AuthorizeException e) {
             throw new AccessDeniedException("You do not have write rights on this relationship's metadata");
         }
