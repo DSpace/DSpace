@@ -17,10 +17,11 @@ import javax.ws.rs.BadRequestException;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.CollectionRest;
-import org.dspace.app.rest.model.ItemRest;
-import org.dspace.app.rest.model.hateoas.ItemResource;
+import org.dspace.app.rest.model.TemplateItemRest;
+import org.dspace.app.rest.model.hateoas.TemplateItemResource;
 import org.dspace.app.rest.repository.CollectionRestRepository;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.app.rest.utils.Utils;
@@ -32,6 +33,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.webmvc.ControllerUtils;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.hateoas.ResourceSupport;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -58,6 +60,9 @@ public class CollectionItemtemplateController {
 
     @Autowired
     private CollectionService collectionService;
+
+    @Autowired
+    private ConverterService converter;
 
     /**
      * This method will create an Item and add it as a template to a Collection.
@@ -107,19 +112,20 @@ public class CollectionItemtemplateController {
         Context context = ContextUtil.obtainContext(request);
         Collection collection = getCollection(context, uuid);
 
-        ItemRest inputItemRest;
+        TemplateItemRest inputTemplateItemRest;
         try {
             ObjectMapper mapper = new ObjectMapper();
-            inputItemRest = mapper.readValue(itemBody.toString(), ItemRest.class);
+            inputTemplateItemRest = mapper.readValue(itemBody.toString(), TemplateItemRest.class);
         } catch (IOException e1) {
             throw new UnprocessableEntityException("Error parsing request body", e1);
         }
 
-        ItemRest templateItem = collectionRestRepository.createTemplateItem(context, collection, inputItemRest);
+        TemplateItemRest templateItem =
+            collectionRestRepository.createTemplateItem(context, collection, inputTemplateItemRest);
         context.commit();
 
-        return ControllerUtils.toResponseEntity(HttpStatus.CREATED, null,
-                new ItemResource(templateItem, utils));
+        return ControllerUtils.toResponseEntity(HttpStatus.CREATED, new HttpHeaders(),
+                converter.toResource(templateItem));
     }
 
     /**
@@ -139,14 +145,14 @@ public class CollectionItemtemplateController {
      */
     @PreAuthorize("hasPermission(#uuid, 'COLLECTION', 'READ')")
     @RequestMapping(method = RequestMethod.GET)
-    public ItemResource getTemplateItem(HttpServletRequest request, @PathVariable UUID uuid)
+    public TemplateItemResource getTemplateItem(HttpServletRequest request, @PathVariable UUID uuid)
             throws SQLException {
 
         Context context = ContextUtil.obtainContext(request);
         Collection collection = getCollection(context, uuid);
-        ItemRest templateItem = collectionRestRepository.getTemplateItem(collection);
+        TemplateItemRest templateItem = collectionRestRepository.getTemplateItem(collection);
 
-        return new ItemResource(templateItem, utils);
+        return converter.toResource(templateItem);
     }
 
     private Collection getCollection(Context context, UUID uuid) throws SQLException {

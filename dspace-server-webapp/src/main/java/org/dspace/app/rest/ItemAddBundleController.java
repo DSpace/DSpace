@@ -22,7 +22,6 @@ import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.BundleRest;
 import org.dspace.app.rest.model.ItemRest;
 import org.dspace.app.rest.model.hateoas.BundleResource;
-import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.repository.ItemRestRepository;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.app.rest.utils.Utils;
@@ -35,6 +34,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.webmvc.ControllerUtils;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.hateoas.ResourceSupport;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -107,8 +107,8 @@ public class ItemAddBundleController {
         }
 
         Bundle bundle = itemRestRepository.addBundleToItem(context, item, bundleRest);
-        BundleResource bundleResource = converter.toResource(converter.toRest(bundle, Projection.DEFAULT));
-        return ControllerUtils.toResponseEntity(HttpStatus.CREATED, null, bundleResource);
+        BundleResource bundleResource = converter.toResource(converter.toRest(bundle, utils.obtainProjection()));
+        return ControllerUtils.toResponseEntity(HttpStatus.CREATED, new HttpHeaders(), bundleResource);
     }
 
 }

@@ -7,7 +7,6 @@
  */
 package org.dspace.content.service;
 
-import java.io.Serializable;
 import java.sql.SQLException;
 
 import org.dspace.app.util.DCInputsReaderException;
@@ -25,8 +24,7 @@ import org.dspace.core.Context;
  * @param <T> class type
  * @author kevinvandevelde at atmire.com
  */
-public interface InProgressSubmissionService<T extends InProgressSubmission<ID>, ID extends Serializable>
-    extends IndexableObjectService<T, ID> {
+public interface InProgressSubmissionService<T extends InProgressSubmission> {
 
     /**
      * Deletes submission wrapper, doesn't delete item contents

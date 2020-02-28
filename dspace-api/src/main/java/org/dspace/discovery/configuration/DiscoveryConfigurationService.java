@@ -13,8 +13,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
-import org.dspace.content.DSpaceObject;
 import org.dspace.discovery.IndexableObject;
+import org.dspace.discovery.indexobject.IndexableDSpaceObject;
 import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
@@ -45,8 +45,8 @@ public class DiscoveryConfigurationService {
         String name;
         if (dso == null) {
             name = "site";
-        } else if (dso instanceof DSpaceObject) {
-            name = ((DSpaceObject) dso).getHandle();
+        } else if (dso instanceof IndexableDSpaceObject) {
+            name = ((IndexableDSpaceObject) dso).getIndexedObject().getHandle();
         } else {
             name = dso.getUniqueIndexID();
         }

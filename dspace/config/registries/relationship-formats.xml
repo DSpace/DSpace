@@ -121,4 +121,29 @@
         <element>isPublicationOfJournalIssue</element>
         <scope_note></scope_note>
     </dc-type>
+
+    <!--
+      OpenAIRE4 Guidelines
+      required relationships -->  
+    <dc-type>
+        <schema>relation</schema>
+        <element>isContributorOfPublication</element>
+        <scope_note></scope_note>
+    </dc-type>
+    <dc-type>
+        <schema>relation</schema>
+        <element>isPublicationOfContributor</element>
+        <scope_note></scope_note>
+    </dc-type>
+    <dc-type>
+        <schema>relation</schema>
+        <element>isFundingAgencyOfProject</element>
+        <scope_note></scope_note>
+    </dc-type>
+    <dc-type>
+        <schema>relation</schema>
+        <element>isProjectOfFundingAgency</element>
+        <scope_note></scope_note>
+    </dc-type>
+
 </dspace-dc-types>

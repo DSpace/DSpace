@@ -13,4 +13,4 @@ services:
     image: dspace/dspace-postgres-pgcrypto:loadsql
     environment:
       # Double underbars in env names will be replaced with periods for apache commons
-      - LOADSQL=https://www.dropbox.com/s/xh3ack0vg0922p2/configurable-entities-2019-05-08.sql?dl=1
+      - LOADSQL=https://www.dropbox.com/s/4ap1y6deseoc8ws/dspace7-entities-2019-11-28.sql?dl=1

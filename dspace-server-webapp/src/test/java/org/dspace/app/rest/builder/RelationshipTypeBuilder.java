@@ -37,12 +37,15 @@ public class RelationshipTypeBuilder extends AbstractBuilder<RelationshipType, R
 
     @Override
     public void cleanup() throws Exception {
-        context.turnOffAuthorisationSystem();
-        List<Relationship> byRelationshipType = relationshipService.findByRelationshipType(context, relationshipType);
-        for (Relationship relationship : byRelationshipType) {
-            relationshipService.delete(context, relationship);
+        try (Context c = new Context()) {
+            c.turnOffAuthorisationSystem();
+            List<Relationship> byRelationshipType = relationshipService
+                .findByRelationshipType(c, relationshipType);
+            for (Relationship relationship : byRelationshipType) {
+                relationshipService.delete(c, relationship);
+            }
+            c.complete();
         }
-        context.restoreAuthSystemState();
 
         delete(relationshipType);
     }
@@ -104,6 +107,15 @@ public class RelationshipTypeBuilder extends AbstractBuilder<RelationshipType, R
             e.printStackTrace();
         }
 
+        return this;
+    }
+
+    public RelationshipTypeBuilder withCopyToLeft(boolean copyToLeft) throws SQLException {
+        relationshipType.setCopyToLeft(copyToLeft);
+        return this;
+    }
+    public RelationshipTypeBuilder withCopyToRight(boolean copyToRight) throws SQLException {
+        relationshipType.setCopyToRight(copyToRight);
         return this;
     }
 }

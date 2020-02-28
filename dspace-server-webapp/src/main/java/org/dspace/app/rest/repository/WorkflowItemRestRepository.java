@@ -24,7 +24,6 @@ import org.dspace.app.rest.model.ErrorRest;
 import org.dspace.app.rest.model.WorkflowItemRest;
 import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.rest.model.patch.Patch;
-import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.submit.AbstractRestProcessingStep;
 import org.dspace.app.rest.submit.SubmissionService;
 import org.dspace.app.rest.submit.UploadableStep;
@@ -116,7 +115,7 @@ public class WorkflowItemRestRepository extends DSpaceRestRepository<WorkflowIte
         try {
             long total = wis.countAll(context);
             List<XmlWorkflowItem> witems = wis.findAll(context, pageable.getPageNumber(), pageable.getPageSize());
-            return converter.toRestPage(witems, pageable, total, utils.obtainProjection(true));
+            return converter.toRestPage(witems, pageable, total, utils.obtainProjection());
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -131,7 +130,7 @@ public class WorkflowItemRestRepository extends DSpaceRestRepository<WorkflowIte
             long total = wis.countBySubmitter(context, ep);
             List<XmlWorkflowItem> witems = wis.findBySubmitter(context, ep, pageable.getPageNumber(),
                     pageable.getPageSize());
-            return converter.toRestPage(witems, pageable, total, utils.obtainProjection(true));
+            return converter.toRestPage(witems, pageable, total, utils.obtainProjection());
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -157,7 +156,7 @@ public class WorkflowItemRestRepository extends DSpaceRestRepository<WorkflowIte
         if (source.getItem().isArchived()) {
             return null;
         }
-        return converter.toRest(source, Projection.DEFAULT);
+        return converter.toRest(source, utils.obtainProjection());
     }
 
     @Override
@@ -170,7 +169,7 @@ public class WorkflowItemRestRepository extends DSpaceRestRepository<WorkflowIte
                                    MultipartFile file) throws Exception {
 
         Context context = obtainContext();
-        WorkflowItemRest wsi = findOne(id);
+        WorkflowItemRest wsi = findOne(context, id);
         XmlWorkflowItem source = wis.find(context, id);
         List<ErrorRest> errors = new ArrayList<ErrorRest>();
         SubmissionConfig submissionConfig =
@@ -204,7 +203,7 @@ public class WorkflowItemRestRepository extends DSpaceRestRepository<WorkflowIte
             }
 
         }
-        wsi = converter.toRest(source, Projection.DEFAULT);
+        wsi = converter.toRest(source, utils.obtainProjection());
 
         if (!errors.isEmpty()) {
             wsi.getErrors().addAll(errors);
@@ -218,7 +217,7 @@ public class WorkflowItemRestRepository extends DSpaceRestRepository<WorkflowIte
     public void patch(Context context, HttpServletRequest request, String apiCategory, String model, Integer id,
                       Patch patch) throws SQLException, AuthorizeException {
         List<Operation> operations = patch.getOperations();
-        WorkflowItemRest wsi = findOne(id);
+        WorkflowItemRest wsi = findOne(context, id);
         XmlWorkflowItem source = wis.find(context, id);
         for (Operation op : operations) {
             //the value in the position 0 is a null value

@@ -9,6 +9,7 @@ package org.dspace.app.rest.matcher;
 
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasNoJsonPath;
+import static org.dspace.app.rest.matcher.HalMatcher.matchEmbeds;
 import static org.dspace.app.rest.test.AbstractControllerIntegrationTest.REST_SERVER_URL;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.is;
@@ -126,5 +127,17 @@ public class WorkspaceItemMatcher {
                     hasJsonPath("$._links.submitter.href", startsWith(REST_SERVER_URL)),
                     hasJsonPath("$._links.submissionDefinition.href", startsWith(REST_SERVER_URL)));
         }
+    }
+
+    /**
+     * Gets a matcher for all expected embeds when the full projection is requested.
+     */
+    public static Matcher<? super Object> matchFullEmbeds() {
+        return matchEmbeds(
+                "collection",
+                "item",
+                "submitter",
+                "submissionDefinition"
+        );
     }
 }

@@ -25,9 +25,10 @@ public interface UriListHandler<T> {
      * can handle this input or not
      * @param uriList   The list of UriList Strings to be checked if they're supported
      * @param method    The request method to be checked if it's supported
+     * @param clazz     The class to be returned by the handle method
      * @return          A boolean indicating whether the implementing UriListHandler can handle this input
      */
-    boolean supports(List<String> uriList, String method);
+    boolean supports(List<String> uriList, String method, Class clazz);
 
     /**
      * This method will take all the required input and validate them to see if there are any issues before
@@ -35,10 +36,9 @@ public interface UriListHandler<T> {
      * @param context   The relevant DSpace context
      * @param request   The current request
      * @param uriList   The list of UriList Strings
-     * @param clazz     The class to be returned by the handle method
      * @return          A boolean indicating whether all this input is valid for the implementing UriListHandler
      */
-    boolean validate(Context context, HttpServletRequest request, List<String> uriList, Class clazz)
+    boolean validate(Context context, HttpServletRequest request, List<String> uriList)
         throws AuthorizeException;
 
     /**

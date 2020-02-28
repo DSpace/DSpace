@@ -32,6 +32,15 @@ import org.dspace.workflow.WorkflowItem;
  * @author Ben Bosman (ben at atmire dot com)
  */
 public class SearchUtils {
+
+    public static final String AUTHORITY_SEPARATOR = "###";
+    public static final String LAST_INDEXED_FIELD = "SolrIndexer.lastIndexed";
+    public static final String RESOURCE_UNIQUE_ID = "search.uniqueid";
+    public static final String RESOURCE_TYPE_FIELD = "search.resourcetype";
+    public static final String RESOURCE_ID_FIELD = "search.resourceid";
+    public static final String NAMED_RESOURCE_TYPE = "namedresourcetype";
+    public static final String FILTER_SEPARATOR = "\n|||\n";
+
     /**
      * Cached search service
      **/
@@ -161,5 +170,4 @@ public class SearchUtils {
         DiscoveryConfiguration configurationExtra = getDiscoveryConfigurationByName(confName);
         result.add(configurationExtra);
     }
-
 }

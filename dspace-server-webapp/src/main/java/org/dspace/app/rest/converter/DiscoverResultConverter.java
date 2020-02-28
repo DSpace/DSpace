@@ -91,10 +91,11 @@ public class DiscoverResultConverter {
         }
     }
 
-    private RestAddressableModel convertDSpaceObject(final IndexableObject dspaceObject, final Projection projection) {
-        for (IndexableObjectConverter<IndexableObject, RestAddressableModel> converter : converters) {
-            if (converter.supportsModel(dspaceObject)) {
-                return converter.convert(dspaceObject, projection);
+    private RestAddressableModel convertDSpaceObject(final IndexableObject indexableObject,
+                                                     final Projection projection) {
+        for (IndexableObjectConverter<Object, RestAddressableModel> converter : converters) {
+            if (converter.supportsModel(indexableObject)) {
+                return converter.convert(indexableObject.getIndexedObject(), projection);
             }
         }
         return null;

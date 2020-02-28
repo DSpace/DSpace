@@ -51,7 +51,7 @@ public class EntityServiceImpl implements EntityService {
     @Override
     public EntityType getType(Context context, Entity entity) throws SQLException {
         Item item = entity.getItem();
-        List<MetadataValue> list = itemService.getMetadata(item, "relationship", "type", null, Item.ANY);
+        List<MetadataValue> list = itemService.getMetadata(item, "relationship", "type", null, Item.ANY, false);
         if (!list.isEmpty()) {
             return entityTypeService.findByEntityType(context, list.get(0).getValue());
         } else {

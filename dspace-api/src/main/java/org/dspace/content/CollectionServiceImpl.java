@@ -48,6 +48,7 @@ import org.dspace.harvest.HarvestedCollection;
 import org.dspace.harvest.service.HarvestedCollectionService;
 import org.dspace.workflow.factory.WorkflowServiceFactory;
 import org.dspace.xmlworkflow.WorkflowConfigurationException;
+import org.dspace.xmlworkflow.XmlWorkflowFactoryImpl;
 import org.dspace.xmlworkflow.factory.XmlWorkflowFactory;
 import org.dspace.xmlworkflow.state.Workflow;
 import org.dspace.xmlworkflow.storedcomponents.CollectionRole;
@@ -278,15 +279,6 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
     }
 
     @Override
-    /**
-     * This method is an alias of the find method needed to avoid ambiguity between the IndexableObjectService interface
-     * and the DSpaceObjectService interface
-     */
-    public Collection findIndexableObject(Context context, UUID id) throws SQLException {
-        return collectionDAO.findByID(context, Collection.class, id);
-    }
-
-    @Override
     public void setMetadata(Context context, Collection collection, String field, String value)
         throws MissingResourceException, SQLException {
         if ((field.trim()).equals("name") && (value == null || value.trim().equals(""))) {
@@ -375,15 +367,15 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
 
     @Override
     public void setWorkflowGroup(Context context, Collection collection, int step, Group group)
-        throws SQLException, AuthorizeException {
+        throws SQLException {
         Workflow workflow = null;
         try {
             workflow = workflowFactory.getWorkflow(collection);
-        } catch (IOException | WorkflowConfigurationException e) {
+        } catch (WorkflowConfigurationException e) {
             log.error(LogManager.getHeader(context, "setWorkflowGroup",
                     "collection_id=" + collection.getID() + " " + e.getMessage()), e);
         }
-        if (!StringUtils.equals(XmlWorkflowFactory.LEGACY_WORKFLOW_NAME, workflow.getID())) {
+        if (!StringUtils.equals(XmlWorkflowFactoryImpl.LEGACY_WORKFLOW_NAME, workflow.getID())) {
             throw new IllegalArgumentException(
                     "setWorkflowGroup can be used only on collection with the default basic dspace workflow. "
                     + "Instead, the collection: "
@@ -792,15 +784,6 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
     @Override
     public int getSupportsTypeConstant() {
         return Constants.COLLECTION;
-    }
-
-    @Override
-    /**
-     * This method is an alias of the getSupportsTypeConstant method needed to avoid ambiguity between the
-     * IndexableObjectService interface and the DSpaceObjectService interface
-     */
-    public int getSupportsIndexableObjectTypeConstant() {
-        return getSupportsTypeConstant();
     }
 
     @Override

@@ -86,6 +86,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
     private Item author3;
 
     private Item orgUnit1;
+    private Item orgUnit2;
     private Item project1;
 
     private Item publication1;
@@ -157,6 +158,13 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                               .withRelationshipType("OrgUnit")
                               .build();
 
+        orgUnit2 = ItemBuilder.createItem(context, col3)
+                .withTitle("OrgUnit2")
+                .withAuthor("Testy, TEst")
+                .withIssueDate("2015-01-01")
+                .withRelationshipType("OrgUnit")
+                .build();
+
         project1 = ItemBuilder.createItem(context, col3)
                               .withTitle("Project1")
                               .withAuthor("Testy, TEst")
@@ -214,7 +222,8 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
 
         context.restoreAuthSystemState();
 
-        getClient().perform(get("/api/core/relationships"))
+        getClient().perform(get("/api/core/relationships")
+                   .param("projection", "full"))
 
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$.page",
@@ -226,7 +235,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                    )))
         ;
 
-        getClient().perform(get("/api/core/relationships").param("size", "2"))
+        getClient().perform(get("/api/core/relationships").param("size", "2").param("projection", "full"))
 
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$.page",
@@ -237,7 +246,8 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                    )))
         ;
 
-        getClient().perform(get("/api/core/relationships").param("size", "2").param("page", "1"))
+        getClient().perform(get("/api/core/relationships").param("size", "2").param("page", "1")
+                   .param("projection", "full"))
 
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$.page",
@@ -504,6 +514,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                                                            .param("relationshipType",
                                                                   isAuthorOfPublicationRelationshipType.getID()
                                                                                                        .toString())
+                                                           .param("projection", "full")
                                                            .contentType(MediaType.parseMediaType
                                                                (org.springframework.data.rest.webmvc.RestMediaTypes
                                                                     .TEXT_URI_LIST_VALUE))
@@ -513,6 +524,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                                                                    "https://localhost:8080/server/api/core/items/" + author1
                                                                    .getID()))
                                               .andExpect(status().isCreated())
+                                              .andExpect(jsonPath("$", RelationshipMatcher.matchFullEmbeds()))
                                               .andReturn();
 
         ObjectMapper mapper = new ObjectMapper();
@@ -2161,6 +2173,9 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         Relationship relationship1 = RelationshipBuilder
             .createRelationshipBuilder(context, author1, orgUnit1, isOrgUnitOfPersonRelationshipType).build();
 
+        Relationship relationshipOrgunitExtra = RelationshipBuilder
+                .createRelationshipBuilder(context, author1, orgUnit2, isOrgUnitOfPersonRelationshipType).build();
+
         // We're creating a Relationship of type isOrgUnitOfPerson between a different author and the same orgunit
         Relationship relationshipAuthorExtra = RelationshipBuilder
             .createRelationshipBuilder(context, author2, orgUnit1, isOrgUnitOfPersonRelationshipType).build();
@@ -2182,14 +2197,21 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         // This is what we're checking for
         getClient().perform(get("/api/core/relationships/search/byLabel")
                                 .param("label", "isOrgUnitOfPerson")
-                                .param("dso", author1.getID().toString()))
+                                .param("dso", author1.getID().toString())
+                                .param("projection", "full"))
 
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$.page",
-                                       is(PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 1))))
+                                       is(PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 2))))
                    .andExpect(jsonPath("$._embedded.relationships", hasItem(
                        RelationshipMatcher.matchRelationship(relationship1)
-                   )))
+                   ))) //check ordering
+                   .andExpect(jsonPath("$._embedded.relationships[0]._links.rightItem.href",
+                       containsString(orgUnit1.getID().toString())
+                   ))
+                   .andExpect(jsonPath("$._embedded.relationships[1]._links.rightItem.href",
+                       containsString(orgUnit2.getID().toString())
+                   ))
         ;
 
         // Perform a GET request to the searchByLabel endpoint, asking for Relationships of type isOrgUnitOfPerson
@@ -2197,14 +2219,16 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         // Which is what we're checking for, both the first relationship and the one with a different author
         // should be returned
         getClient().perform(get("/api/core/relationships/search/byLabel")
-                                .param("label", "isOrgUnitOfPerson"))
+                                .param("label", "isOrgUnitOfPerson")
+                                .param("projection", "full"))
 
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$.page",
-                                       is(PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 2))))
+                                       is(PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 3))))
                    .andExpect(jsonPath("$._embedded.relationships", containsInAnyOrder(
                        RelationshipMatcher.matchRelationship(relationship1),
-                       RelationshipMatcher.matchRelationship(relationshipAuthorExtra)
+                       RelationshipMatcher.matchRelationship(relationshipAuthorExtra),
+                       RelationshipMatcher.matchRelationship(relationshipOrgunitExtra)
                    )))
         ;
     }
@@ -2286,7 +2310,8 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
 
         context.restoreAuthSystemState();
 
-        getClient().perform(get("/api/core/relationships"))
+        getClient().perform(get("/api/core/relationships")
+                   .param("projection", "full"))
 
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$.page",
@@ -2323,7 +2348,8 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
 
         context.restoreAuthSystemState();
 
-        getClient().perform(get("/api/core/relationships"))
+        getClient().perform(get("/api/core/relationships")
+                   .param("projection", "full"))
 
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$.page",
@@ -2376,7 +2402,8 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
 
         context.restoreAuthSystemState();
 
-        getClient().perform(get("/api/core/relationships"))
+        getClient().perform(get("/api/core/relationships")
+                   .param("projection", "full"))
 
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$.page",
@@ -2418,7 +2445,8 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
 
         context.restoreAuthSystemState();
 
-        getClient().perform(get("/api/core/relationships"))
+        getClient().perform(get("/api/core/relationships")
+                   .param("projection", "full"))
 
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$.page",

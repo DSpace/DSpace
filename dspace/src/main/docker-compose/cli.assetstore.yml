@@ -11,7 +11,7 @@ version: "3.7"
 services:
   dspace-cli:
     environment:
-      - LOADASSETS=https://www.dropbox.com/s/zv7lj8j2lp3egjs/assetstore.tar.gz?dl=1
+      - LOADASSETS=https://www.dropbox.com/s/v3ahfcuatklbmi0/assetstore-2019-11-28.tar.gz?dl=1
     entrypoint:
       - /bin/bash
       - '-c'

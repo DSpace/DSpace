@@ -14,11 +14,11 @@ import org.dspace.app.rest.converter.MetadataConverter;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.DSpaceObjectRest;
 import org.dspace.app.rest.model.patch.Patch;
-import org.dspace.app.rest.projection.Projection;
-import org.dspace.app.rest.repository.patch.DSpaceObjectPatch;
+import org.dspace.app.rest.repository.patch.ResourcePatch;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.service.DSpaceObjectService;
+import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 
@@ -32,15 +32,14 @@ public abstract class DSpaceObjectRestRepository<M extends DSpaceObject, R exten
         extends DSpaceRestRepository<R, UUID> {
 
     final DSpaceObjectService<M> dsoService;
-    final DSpaceObjectPatch<R> dsoPatch;
 
+    @Autowired
+    ResourcePatch<M> resourcePatch;
     @Autowired
     MetadataConverter metadataConverter;
 
-    DSpaceObjectRestRepository(DSpaceObjectService<M> dsoService,
-                               DSpaceObjectPatch<R> dsoPatch) {
+    DSpaceObjectRestRepository(DSpaceObjectService<M> dsoService) {
         this.dsoService = dsoService;
-        this.dsoPatch = dsoPatch;
     }
 
     /**
@@ -57,27 +56,12 @@ public abstract class DSpaceObjectRestRepository<M extends DSpaceObject, R exten
      */
     protected void patchDSpaceObject(String apiCategory, String model, UUID id, Patch patch)
             throws AuthorizeException, ResourceNotFoundException, SQLException, UnprocessableEntityException {
-        M dso = dsoService.find(obtainContext(), id);
+        Context context = obtainContext();
+        M dso = dsoService.find(context, id);
         if (dso == null) {
             throw new ResourceNotFoundException(apiCategory + "." + model + " with id: " + id + " not found");
         }
-        R dsoRest = dsoPatch.patch(findOne(id), patch.getOperations());
-        updateDSpaceObject(dso, dsoRest);
-    }
-
-    /**
-     * Applies the changes in the given rest DSpace object to the model DSpace object.
-     * The default implementation updates metadata if needed. Subclasses should extend
-     * to support updates of additional properties.
-     *
-     * @param dso the dso to apply changes to.
-     * @param dsoRest the rest representation of the new desired state.
-     */
-    protected void updateDSpaceObject(M dso, R dsoRest)
-            throws AuthorizeException, SQLException {
-        R origDsoRest = converter.toRest(dso, Projection.DEFAULT);
-        if (!origDsoRest.getMetadata().equals(dsoRest.getMetadata())) {
-            metadataConverter.setMetadata(obtainContext(), dso, dsoRest.getMetadata());
-        }
+        resourcePatch.patch(obtainContext(), dso, patch.getOperations());
+        dsoService.update(obtainContext(), dso);
     }
 }

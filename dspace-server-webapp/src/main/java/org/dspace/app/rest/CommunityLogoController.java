@@ -28,6 +28,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.webmvc.ControllerUtils;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.hateoas.ResourceSupport;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -65,7 +66,7 @@ public class CommunityLogoController {
     /**
      * This method will add a logo to the community.
      *
-     * curl -X POST http://<dspace.restUrl>/api/core/communities/1c11f3f1-ba1f-4f36-908a-3f1ea9a557eb/logo' \
+     * curl -X POST http://<dspace.server.url>/api/core/communities/1c11f3f1-ba1f-4f36-908a-3f1ea9a557eb/logo' \
      *  -XPOST -H 'Content-Type: multipart/form-data' \
      *  -H 'Authorization: Bearer eyJhbGciOiJI...' \
      *  -F "file=@Downloads/test.png"
@@ -73,7 +74,7 @@ public class CommunityLogoController {
      * Example:
      * <pre>
      * {@code
-     * curl -X POST http://<dspace.restUrl>/api/core/communities/1c11f3f1-ba1f-4f36-908a-3f1ea9a557eb/logo' \
+     * curl -X POST http://<dspace.server.url>/api/core/communities/1c11f3f1-ba1f-4f36-908a-3f1ea9a557eb/logo' \
      *  -XPOST -H 'Content-Type: multipart/form-data' \
      *  -H 'Authorization: Bearer eyJhbGciOiJI...' \
      *  -F "file=@Downloads/test.png"
@@ -108,7 +109,7 @@ public class CommunityLogoController {
 
         BitstreamResource bitstreamResource = new BitstreamResource(bitstream, utils);
         context.complete();
-        return ControllerUtils.toResponseEntity(HttpStatus.CREATED, null, bitstreamResource);
+        return ControllerUtils.toResponseEntity(HttpStatus.CREATED, new HttpHeaders(), bitstreamResource);
     }
 
 }

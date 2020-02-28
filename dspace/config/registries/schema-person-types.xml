@@ -88,6 +88,11 @@
     <!-- 2.2.2.1. Attribute nameType (R) -->
     <!-- and 3.2.6. Subproperty nameIdentifier (R) -->
     <!-- specific type required by OpenAIRE4 Guidelines -->  
+    <dc-type>
+        <schema>person</schema>
+        <element>identifier</element>
+        <scope_note>Generic Identifier</scope_note>
+    </dc-type>
 
     <dc-type>
         <schema>person</schema>

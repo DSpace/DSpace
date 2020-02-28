@@ -8,12 +8,11 @@
 package org.dspace.content;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.any;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 import org.dspace.authorize.service.AuthorizeService;
@@ -28,7 +27,7 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 public class RelationshipServiceImplTest {
@@ -137,7 +136,7 @@ public class RelationshipServiceImplTest {
     @Test
     public void testFindByItemAndRelationshipType() throws Exception {
         // Declare objects utilized in unit test
-        List<Relationship> relList = new LinkedList<>();
+        List<Relationship> relList = new ArrayList<>();
         Item item = mock(Item.class);
         RelationshipType testRel = new RelationshipType();
 
@@ -152,7 +151,7 @@ public class RelationshipServiceImplTest {
     @Test
     public void testFindByRelationshipType() throws Exception {
         // Declare objects utilized in unit test
-        List<Relationship> relList = new LinkedList<>();
+        List<Relationship> relList = new ArrayList<>();
         RelationshipType testRel = new RelationshipType();
 
         // The Relationship(s) reported should match our our relList
@@ -205,8 +204,6 @@ public class RelationshipServiceImplTest {
                 .isUseForPlaceTrueForRelationshipType(relationship.getRelationshipType(), true)).thenReturn(true);
         when(authorizeService
                 .authorizeActionBoolean(context, relationship.getLeftItem(), Constants.WRITE)).thenReturn(true);
-        when(authorizeService
-                .authorizeActionBoolean(context, relationship.getRightItem(), Constants.WRITE)).thenReturn(true);
         when(relationshipService.findByItem(context,leftItem)).thenReturn(leftTypelist);
         when(relationshipService.findByItem(context,rightItem)).thenReturn(rightTypelist);
         when(leftEntityType.getLabel()).thenReturn("Entitylabel");
@@ -231,12 +228,8 @@ public class RelationshipServiceImplTest {
 
     @Test
     public void testDelete() throws Exception {
-        // Mock admin state
-        when(authorizeService.isAdmin(context)).thenReturn(true);
 
         // Declare objects utilized in unit test
-        MetadataValue metVal = mock(MetadataValue.class);
-        List<MetadataValue> metsList = new ArrayList<>();
         List<Relationship> leftTypelist = new ArrayList<>();
         List<Relationship> rightTypelist = new ArrayList<>();
         Item leftItem = mock(Item.class);
@@ -250,7 +243,6 @@ public class RelationshipServiceImplTest {
         testRel.setRightwardType("Entitylabel");
         testRel.setLeftMinCardinality(0);
         testRel.setRightMinCardinality(0);
-        metsList.add(metVal);
         relationship = getRelationship(leftItem, rightItem, testRel, 0,0);
         leftTypelist.add(relationship);
         rightTypelist.add(relationship);
@@ -260,21 +252,12 @@ public class RelationshipServiceImplTest {
                 .thenReturn(true);
         when(authorizeService.authorizeActionBoolean(context, relationship.getLeftItem(), Constants.WRITE))
                 .thenReturn(true);
-        when(authorizeService.authorizeActionBoolean(context, relationship.getRightItem(), Constants.WRITE))
-                .thenReturn(true);
         when(relationshipService.findByItem(context,leftItem)).thenReturn(leftTypelist);
         when(relationshipService.findByItem(context,rightItem)).thenReturn(rightTypelist);
-        when(leftEntityType.getLabel()).thenReturn("Entitylabel");
-        when(rightEntityType.getLabel()).thenReturn("Entitylabel");
-        when(metVal.getValue()).thenReturn("Entitylabel");
-        when(metsList.get(0).getValue()).thenReturn("Entitylabel");
         when(relationshipService.findByItemAndRelationshipType(context, leftItem, testRel, true))
                 .thenReturn(leftTypelist);
         when(relationshipService.findByItemAndRelationshipType(context, rightItem, testRel, false))
                 .thenReturn(rightTypelist);
-        when(itemService.getMetadata(leftItem, "relationship", "type", null, Item.ANY)).thenReturn(metsList);
-        when(itemService.getMetadata(rightItem, "relationship", "type", null, Item.ANY)).thenReturn(metsList);
-        when(relationshipDAO.create(any(), any())).thenReturn(relationship);
         when(relationshipService.find(context,0)).thenReturn(relationship);
 
         // Invoke delete()
@@ -288,7 +271,6 @@ public class RelationshipServiceImplTest {
     public void testUpdate() throws Exception {
         // Mock admin state
         context.turnOffAuthorisationSystem();
-        when(authorizeService.isAdmin(context)).thenReturn(true);
 
         // Declare objects utilized in unit test
         MetadataValue metVal = mock(MetadataValue.class);
@@ -311,8 +293,6 @@ public class RelationshipServiceImplTest {
         when(itemService.getMetadata(leftItem, "relationship", "type", null, Item.ANY)).thenReturn(metsList);
         when(itemService.getMetadata(rightItem, "relationship", "type", null, Item.ANY)).thenReturn(metsList);
         when(authorizeService.authorizeActionBoolean(context, relationship.getLeftItem(),
-                Constants.WRITE)).thenReturn(true);
-        when(authorizeService.authorizeActionBoolean(context, relationship.getRightItem(),
                 Constants.WRITE)).thenReturn(true);
 
         // Invoke update()

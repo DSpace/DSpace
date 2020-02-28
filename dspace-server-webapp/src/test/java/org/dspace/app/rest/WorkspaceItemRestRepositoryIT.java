@@ -9,6 +9,8 @@ package org.dspace.app.rest;
 
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static org.hamcrest.Matchers.is;
+import static org.springframework.data.rest.webmvc.RestMediaTypes.TEXT_URI_LIST_VALUE;
+import static org.springframework.http.MediaType.parseMediaType;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.fileUpload;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -26,6 +28,7 @@ import java.util.UUID;
 
 import javax.ws.rs.core.MediaType;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.CharEncoding;
 import org.dspace.app.rest.builder.BitstreamBuilder;
@@ -35,6 +38,7 @@ import org.dspace.app.rest.builder.EPersonBuilder;
 import org.dspace.app.rest.builder.WorkspaceItemBuilder;
 import org.dspace.app.rest.matcher.CollectionMatcher;
 import org.dspace.app.rest.matcher.ItemMatcher;
+import org.dspace.app.rest.matcher.MetadataMatcher;
 import org.dspace.app.rest.matcher.WorkspaceItemMatcher;
 import org.dspace.app.rest.model.patch.AddOperation;
 import org.dspace.app.rest.model.patch.Operation;
@@ -47,9 +51,13 @@ import org.dspace.content.Community;
 import org.dspace.content.Item;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.eperson.EPerson;
+import org.dspace.services.ConfigurationService;
 import org.hamcrest.Matchers;
+import org.junit.Before;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.test.web.servlet.MvcResult;
 
 /**
  * Test suite for the WorkspaceItem endpoint
@@ -57,6 +65,19 @@ import org.springframework.mock.web.MockMultipartFile;
  *
  */
 public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegrationTest {
+
+    @Autowired
+    private ConfigurationService configurationService;
+
+    @Before
+    @Override
+    public void setUp() throws Exception {
+
+        super.setUp();
+
+        //disable file upload mandatory
+        configurationService.setProperty("webui.submit.upload.required", false);
+    }
 
     @Test
     /**
@@ -236,17 +257,20 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                 .withSubject("ExtraEntry")
                 .build();
 
-        getClient().perform(get("/api/submission/workspaceitems/" + witem.getID() + "/collection"))
+        String token = getAuthToken(admin.getEmail(), password);
+
+        getClient(token).perform(get("/api/submission/workspaceitems/" + witem.getID() + "/collection"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", Matchers
                         .is(CollectionMatcher.matchCollectionEntry(col1.getName(), col1.getID(), col1.getHandle()))
                 ));
 
-        getClient().perform(get("/api/submission/workspaceitems/" + witem.getID() + "/item")).andExpect(status().isOk())
+        getClient(token).perform(get("/api/submission/workspaceitems/" + witem.getID() + "/item"))
+                .andExpect(status().isOk())
                 .andExpect(jsonPath("$", Matchers.is(ItemMatcher.matchItemWithTitleAndDateIssued(witem.getItem(),
                         "Workspace Item 1", "2017-10-17"))));
 
-        getClient().perform(get("/api/submission/workspaceitems/" + witem.getID() + "/submissionDefinition"))
+        getClient(token).perform(get("/api/submission/workspaceitems/" + witem.getID() + "/submissionDefinition"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", Matchers.is(hasJsonPath("$.id", is("traditional")))));
 
@@ -443,26 +467,27 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
         String authToken = getAuthToken(admin.getEmail(), password);
 
-        // create a workspaceitem explicitly in the col1
+        // create a workspaceitem explicitly in the colAA1
         getClient(authToken).perform(post("/api/submission/workspaceitems")
-                    .param("collection", col1.getID().toString())
+                    .param("owningCollection", col1.getID().toString())
                     .contentType(org.springframework.http.MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$._embedded.collection.id", is(col1.getID().toString())));
 
-        // create a workspaceitem explicitly in the col2
+        // create a workspaceitem explicitly in the colAA2
         getClient(authToken).perform(post("/api/submission/workspaceitems")
-                    .param("collection", col2.getID().toString())
+                    .param("owningCollection", col2.getID().toString())
                     .contentType(org.springframework.http.MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$._embedded.collection.id", is(col2.getID().toString())));
 
         // create a workspaceitem without an explicit collection, this will go in the first valid collection for the
         // user: the col1
-        getClient(authToken).perform(post("/api/submission/workspaceitems")
-        .contentType(org.springframework.http.MediaType.APPLICATION_JSON))
+        getClient(authToken).perform(post("/api/submission/workspaceitems").param("projection", "full")
+                .contentType(org.springframework.http.MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$._embedded.collection.id", is(col1.getID().toString())));
+                .andExpect(jsonPath("$._embedded.collection.id", is(col1.getID().toString())))
+                .andExpect(jsonPath("$", WorkspaceItemMatcher.matchFullEmbeds()));
 
         // TODO cleanup the context!!!
     }
@@ -493,7 +518,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         final MockMultipartFile bibtexFile = new MockMultipartFile("file", "bibtex-test.bib", "application/x-bibtex",
                 bibtex);
 
-        // bulk create workspaceitems in the default collection (col1)
+        // bulk create workspaceitems in the default collection (colAA1)
         getClient(authToken).perform(fileUpload("/api/submission/workspaceitems")
                     .file(bibtexFile))
                 // bulk create should return 200, 201 (created) is better for single resource
@@ -514,7 +539,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                         jsonPath("$._embedded.workspaceitems[*]._embedded.upload").doesNotExist())
         ;
 
-        // bulk create workspaceitems explicitly in the col2
+        // bulk create workspaceitems explicitly in the colAA2
         getClient(authToken).perform(fileUpload("/api/submission/workspaceitems")
                     .file(bibtexFile)
                     .param("collection", col2.getID().toString()))
@@ -629,7 +654,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                                 )))))
         ;
 
-        // create an empty workspaceitem explicitly in the col1, check validation on creation
+        // create an empty workspaceitem explicitly in the colAA1, check validation on creation
         getClient(authToken).perform(post("/api/submission/workspaceitems")
                     .param("collection", col1.getID().toString())
                     .contentType(org.springframework.http.MediaType.APPLICATION_JSON))
@@ -1625,4 +1650,278 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         ;
     }
 
+    @Test
+    public void createWorkspaceWithFiles_UploadRequired() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and two collections.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+            .withName("Parent Community")
+            .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+            .withName("Sub Community")
+            .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+
+        String authToken = getAuthToken(admin.getEmail(), password);
+
+        WorkspaceItem witem = WorkspaceItemBuilder.createWorkspaceItem(context, col1)
+            .withTitle("Test WorkspaceItem")
+            .withIssueDate("2017-10-17")
+            .build();
+
+        configurationService.setProperty("webui.submit.upload.required", true);
+
+        InputStream pdf = getClass().getResourceAsStream("simple-article.pdf");
+        final MockMultipartFile pdfFile = new MockMultipartFile("file", "/local/path/simple-article.pdf",
+            "application/pdf", pdf);
+
+        // upload the file in our workspaceitem
+        getClient(authToken).perform(fileUpload("/api/submission/workspaceitems/" + witem.getID())
+            .file(pdfFile))
+            .andExpect(status().isCreated())
+            .andExpect(jsonPath("$.sections.upload.files[0].metadata['dc.title'][0].value",
+                is("simple-article.pdf")))
+            .andExpect(jsonPath("$.sections.upload.files[0].metadata['dc.source'][0].value",
+                is("/local/path/simple-article.pdf")))
+        ;
+
+        //Verify there are no errors since file was uploaded (with upload required set to true)
+        getClient(authToken).perform(get("/api/submission/workspaceitems/" + witem.getID()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.errors").doesNotExist());
+    }
+
+    @Test
+    public void createWorkspaceWithoutFiles_UploadRequired() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and two collections.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+            .withName("Parent Community")
+            .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+            .withName("Sub Community")
+            .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+
+        String authToken = getAuthToken(admin.getEmail(), password);
+
+        WorkspaceItem witem = WorkspaceItemBuilder.createWorkspaceItem(context, col1)
+            .withTitle("Test WorkspaceItem")
+            .withIssueDate("2017-10-17")
+            .build();
+
+        configurationService.setProperty("webui.submit.upload.required", true);
+
+        //Verify there is an error since no file was uploaded (with upload required set to true)
+        getClient(authToken).perform(get("/api/submission/workspaceitems/" + witem.getID()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.errors").isNotEmpty())
+            .andExpect(jsonPath("$.errors[?(@.message=='error.validation.filerequired')]",
+                Matchers.contains(
+                    hasJsonPath("$.paths", Matchers.contains(
+                        hasJsonPath("$", Matchers.is("/sections/upload"))
+                    )))));
+    }
+
+    @Test
+    public void createWorkspaceItemFromExternalSources() throws Exception {
+        //We turn off the authorization system in order to create the structure as defined below
+        context.turnOffAuthorisationSystem();
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and two collections.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+
+        context.restoreAuthSystemState();
+
+        ObjectMapper mapper = new ObjectMapper();
+        String token = getAuthToken(admin.getEmail(), password);
+        MvcResult mvcResult = getClient(token).perform(post("/api/submission/workspaceitems?owningCollection="
+                                                                + col1.getID().toString())
+                                                           .contentType(parseMediaType(TEXT_URI_LIST_VALUE))
+                                                           .content("https://localhost:8080/server/api/integration/" +
+                                                                        "externalsources/mock/entryValues/one"))
+                                            .andExpect(status().isCreated()).andReturn();
+
+        String content = mvcResult.getResponse().getContentAsString();
+        Map<String,Object> map = mapper.readValue(content, Map.class);
+        Integer workspaceItemId = (Integer) map.get("id");
+        String itemUuidString = String.valueOf(((Map) ((Map) map.get("_embedded")).get("item")).get("uuid"));
+
+        getClient(token).perform(get("/api/submission/workspaceitems/" + workspaceItemId))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$", Matchers.allOf(
+                            hasJsonPath("$.id", is(workspaceItemId)),
+                            hasJsonPath("$.type", is("workspaceitem")),
+                            hasJsonPath("$._embedded.item", Matchers.allOf(
+                                hasJsonPath("$.id", is(itemUuidString)),
+                                hasJsonPath("$.uuid", is(itemUuidString)),
+                                hasJsonPath("$.type", is("item")),
+                                hasJsonPath("$.metadata", Matchers.allOf(
+                                    MetadataMatcher.matchMetadata("dc.contributor.author", "Donald, Smith")
+                                )))))
+                        ));
+    }
+
+    @Test
+    public void createWorkspaceItemFromExternalSourcesNoOwningCollectionUuidBadRequest() throws Exception {
+        String token = getAuthToken(admin.getEmail(), password);
+        getClient(token).perform(post("/api/submission/workspaceitems")
+                                     .contentType(parseMediaType(
+                                         TEXT_URI_LIST_VALUE))
+                                     .content("https://localhost:8080/server/api/integration/externalsources/" +
+                                                "mock/entryValues/one"))
+                        .andExpect(status().isBadRequest()).andReturn();
+    }
+
+    @Test
+    public void createWorkspaceItemFromExternalSourcesRandomOwningCollectionUuidBadRequest() throws Exception {
+        String token = getAuthToken(admin.getEmail(), password);
+        getClient(token).perform(post("/api/submission/workspaceitems?owningCollection=" + UUID.randomUUID())
+                                     .contentType(parseMediaType(
+                                         TEXT_URI_LIST_VALUE))
+                                     .content("https://localhost:8080/server/api/integration/externalsources/" +
+                                                  "mock/entryValues/one"))
+                        .andExpect(status().isBadRequest()).andReturn();
+    }
+
+    @Test
+    public void createWorkspaceItemFromExternalSourcesWrongUriList() throws Exception {
+        //We turn off the authorization system in order to create the structure as defined below
+        context.turnOffAuthorisationSystem();
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and two collections.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+
+        context.restoreAuthSystemState();
+
+        ObjectMapper mapper = new ObjectMapper();
+        String token = getAuthToken(admin.getEmail(), password);
+        getClient(token).perform(post("/api/submission/workspaceitems?owningCollection="
+                                          + col1.getID().toString())
+                                     .contentType(parseMediaType(
+                                         TEXT_URI_LIST_VALUE))
+                                     .content("https://localhost:8080/server/mock/mock/mock/" +
+                                                  "mock/entryValues/one")).andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void createWorkspaceItemFromExternalSourcesWrongSourceBadRequest() throws Exception {
+        //We turn off the authorization system in order to create the structure as defined below
+        context.turnOffAuthorisationSystem();
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and two collections.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+
+        context.restoreAuthSystemState();
+
+        String token = getAuthToken(admin.getEmail(), password);
+        getClient(token).perform(post("/api/submission/workspaceitems?owningCollection="
+                                          + col1.getID().toString())
+                                     .contentType(parseMediaType(
+                                         TEXT_URI_LIST_VALUE))
+                                     .content("https://localhost:8080/server/api/integration/externalsources/" +
+                                                  "mockWrongSource/entryValues/one"))
+                        .andExpect(status().isBadRequest());
+
+    }
+
+    @Test
+    public void createWorkspaceItemFromExternalSourcesWrongIdResourceNotFound() throws Exception {
+        //We turn off the authorization system in order to create the structure as defined below
+        context.turnOffAuthorisationSystem();
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and two collections.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+
+        context.restoreAuthSystemState();
+
+        String token = getAuthToken(admin.getEmail(), password);
+        getClient(token).perform(post("/api/submission/workspaceitems?owningCollection="
+                                          + col1.getID().toString())
+                                     .contentType(parseMediaType(
+                                         TEXT_URI_LIST_VALUE))
+                                     .content("https://localhost:8080/server/api/integration/externalsources/" +
+                                                  "mock/entryValues/azeazezaezeaz"))
+                        .andExpect(status().is(404));
+
+    }
+
+    @Test
+    public void createWorkspaceItemFromExternalSourcesForbidden() throws Exception {
+        //We turn off the authorization system in order to create the structure as defined below
+        context.turnOffAuthorisationSystem();
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and two collections.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+
+        context.restoreAuthSystemState();
+
+        String token = getAuthToken(eperson.getEmail(), password);
+        getClient(token).perform(post("/api/submission/workspaceitems?owningCollection="
+                                          + col1.getID().toString())
+                                     .contentType(parseMediaType(
+                                         TEXT_URI_LIST_VALUE))
+                                     .content("https://localhost:8080/server/api/integration/externalsources/" +
+                                                  "mock/entryValues/one"))
+                        .andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void createWorkspaceItemFromExternalSourcesUnauthorized() throws Exception {
+        //We turn off the authorization system in order to create the structure as defined below
+        context.turnOffAuthorisationSystem();
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and two collections.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+
+        context.restoreAuthSystemState();
+
+        getClient().perform(post("/api/submission/workspaceitems?owningCollection="
+                                     + col1.getID().toString())
+                                .contentType(parseMediaType(
+                                    TEXT_URI_LIST_VALUE))
+                                .content("https://localhost:8080/server/api/integration/externalsources/" +
+                                             "mock/entryValues/one"))
+                   .andExpect(status().isUnauthorized());
+    }
 }

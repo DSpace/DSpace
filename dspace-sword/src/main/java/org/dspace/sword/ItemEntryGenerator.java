@@ -162,7 +162,7 @@ public class ItemEntryGenerator extends DSpaceATOMEntry {
 
         // if we get this far, then we just use the dspace url as the
         // property
-        String cfg = ConfigurationManager.getProperty("dspace.url");
+        String cfg = ConfigurationManager.getProperty("dspace.ui.url");
         entry.setId(cfg);
 
         // FIXME: later on we will maybe have a workflow page supplied
@@ -246,7 +246,7 @@ public class ItemEntryGenerator extends DSpaceATOMEntry {
             return;
         }
 
-        String base = ConfigurationManager.getProperty("dspace.url");
+        String base = ConfigurationManager.getProperty("dspace.ui.url");
 
         // if there's no base URL, we are stuck
         if (base == null) {

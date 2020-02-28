@@ -31,6 +31,8 @@ public class RelationshipTypeConverter implements DSpaceConverter<RelationshipTy
         relationshipTypeRest.setId(obj.getID());
         relationshipTypeRest.setLeftwardType(obj.getLeftwardType());
         relationshipTypeRest.setRightwardType(obj.getRightwardType());
+        relationshipTypeRest.setCopyToLeft(obj.isCopyToLeft());
+        relationshipTypeRest.setCopyToRight(obj.isCopyToRight());
         relationshipTypeRest.setLeftMinCardinality(obj.getLeftMinCardinality());
         relationshipTypeRest.setLeftMaxCardinality(obj.getLeftMaxCardinality());
         relationshipTypeRest.setRightMinCardinality(obj.getRightMinCardinality());

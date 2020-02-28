@@ -35,6 +35,7 @@ import org.dspace.app.rest.builder.EPersonBuilder;
 import org.dspace.app.rest.builder.GroupBuilder;
 import org.dspace.app.rest.builder.ItemBuilder;
 import org.dspace.app.rest.builder.WorkspaceItemBuilder;
+import org.dspace.app.rest.matcher.HalMatcher;
 import org.dspace.app.rest.matcher.ItemMatcher;
 import org.dspace.app.rest.matcher.MetadataMatcher;
 import org.dspace.app.rest.model.ItemRest;
@@ -51,6 +52,7 @@ import org.dspace.content.Item;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
+import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
 import org.junit.Test;
 import org.springframework.test.web.servlet.MvcResult;
@@ -234,21 +236,21 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                                       .withSubject("ExtraEntry")
                                       .build();
 
+        Matcher<? super Object> publicItem1Matcher = ItemMatcher.matchItemWithTitleAndDateIssued(publicItem1,
+                        "Public item 1", "2017-10-17");
+
+        // When full projection is requested, response should include expected properties, links, and embeds.
+        getClient().perform(get("/api/core/items/" + publicItem1.getID())
+                .param("projection", "full"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", ItemMatcher.matchFullEmbeds()))
+                .andExpect(jsonPath("$", publicItem1Matcher));
+
+        // When no projection is requested, response should include expected properties, links, and no embeds.
         getClient().perform(get("/api/core/items/" + publicItem1.getID()))
-                   .andExpect(status().isOk())
-                   .andExpect(jsonPath("$", Matchers.is(
-                       ItemMatcher.matchItemWithTitleAndDateIssued(publicItem1,
-                               "Public item 1", "2017-10-17")
-                   )))
-                   .andExpect(jsonPath("$", Matchers.not(
-                       Matchers.is(
-                           ItemMatcher.matchItemWithTitleAndDateIssued(publicItem2,
-                                   "Public item 2", "2016-02-13")
-                       )
-                   )))
-                   .andExpect(jsonPath("$._links.self.href",
-                           Matchers.containsString("/api/core/items")))
-        ;
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", HalMatcher.matchNoEmbeds()))
+                .andExpect(jsonPath("$", publicItem1Matcher));
     }
 
     @Test
@@ -329,10 +331,6 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$._links.self.href",
                            Matchers.containsString("/api/core/collections")))
-        ;
-
-        getClient().perform(get("/api/core/items/" + publicItem1.getID() + "/templateItemOf"))
-                   .andExpect(status().isNoContent());
         ;
     }
 
@@ -1202,9 +1200,9 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         getClient(token).perform(delete("/api/core/items/" + templateItem.getID()))
                     .andExpect(status().is(422));
 
-        //Check templateItem is available after failed deletion
+        //Check templateItem is not deleted
         getClient(token).perform(get("/api/core/items/" + templateItem.getID()))
-                   .andExpect(status().isOk());
+                   .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -1443,6 +1441,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         ObjectMapper mapper = new ObjectMapper();
         ItemRest itemRest = new ItemRest();
+        ItemRest itemRestFull = new ItemRest();
         itemRest.setName("Practices of research data curation in institutional repositories:" +
                              " A qualitative view from repository staff");
         itemRest.setInArchive(true);
@@ -1456,11 +1455,25 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                 .put("dc.rights", new MetadataValueRest("Custom Copyright Text"))
                 .put("dc.title", new MetadataValueRest("Title Text")));
 
+        itemRestFull.setName("Practices of research data curation in institutional repositories:" +
+                " A qualitative view from repository staff");
+        itemRestFull.setInArchive(true);
+        itemRestFull.setDiscoverable(true);
+        itemRestFull.setWithdrawn(false);
+
+        itemRestFull.setMetadata(new MetadataRest()
+                .put("dc.description", new MetadataValueRest("<p>Some cool HTML code here</p>"))
+                .put("dc.description.abstract", new MetadataValueRest("Sample item created via the REST API"))
+                .put("dc.description.tableofcontents", new MetadataValueRest("<p>HTML News</p>"))
+                .put("dc.rights", new MetadataValueRest("Custom Copyright Text"))
+                .put("dc.title", new MetadataValueRest("Title Text")));
+
         String token = getAuthToken(admin.getEmail(), password);
         MvcResult mvcResult = getClient(token).perform(post("/api/core/items?owningCollection=" +
                                                                 col1.getID().toString())
                                    .content(mapper.writeValueAsBytes(itemRest)).contentType(contentType))
                                               .andExpect(status().isCreated())
+                                              .andExpect(jsonPath("$", HalMatcher.matchNoEmbeds()))
                                               .andReturn();
 
         String content = mvcResult.getResponse().getContentAsString();
@@ -1489,6 +1502,13 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                                 MetadataMatcher.matchMetadata("dc.title",
                                     "Title Text")
                             )))));
+
+        MvcResult mvcResultFull = getClient(token).perform(post("/api/core/items?owningCollection=" +
+                col1.getID().toString()).param("projection", "full")
+                .content(mapper.writeValueAsBytes(itemRestFull)).contentType(contentType))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$", ItemMatcher.matchFullEmbeds()))
+                .andReturn();
     }
 
     @Test
@@ -1746,6 +1766,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                         .andExpect(status().is(404));
     }
 
+    @Test
     public void patchItemMetadataAuthorized() throws Exception {
         runPatchMetadataTests(admin, 200);
     }

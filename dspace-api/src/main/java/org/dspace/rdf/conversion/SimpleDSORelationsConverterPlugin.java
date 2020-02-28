@@ -473,7 +473,7 @@ public class SimpleDSORelationsConverterPlugin
             // we currently ignore those
             return null;
         }
-        String dspaceURL = configurationService.getProperty("dspace.url");
+        String dspaceURL = configurationService.getProperty("dspace.ui.url");
         String link = "";
         try {
             // this currently (DSpace 4.1) works with xmlui and jspui.

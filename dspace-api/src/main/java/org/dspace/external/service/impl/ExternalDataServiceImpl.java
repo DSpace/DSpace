@@ -18,7 +18,6 @@ import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.content.dto.MetadataValueDTO;
-import org.dspace.content.service.InstallItemService;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.Context;
@@ -43,9 +42,6 @@ public class ExternalDataServiceImpl implements ExternalDataService {
 
     @Autowired
     private WorkspaceItemService workspaceItemService;
-
-    @Autowired
-    private InstallItemService installItemService;
 
     @Autowired
     private AuthorizeService authorizeService;
@@ -95,8 +91,9 @@ public class ExternalDataServiceImpl implements ExternalDataService {
 
 
     @Override
-    public Item createItemFromExternalDataObject(Context context, ExternalDataObject externalDataObject,
-                                                 Collection collection)
+    public WorkspaceItem createWorkspaceItemFromExternalDataObject(Context context,
+                                                                    ExternalDataObject externalDataObject,
+                                                                    Collection collection)
         throws AuthorizeException, SQLException {
         if (!authorizeService.isAdmin(context)) {
             throw new AuthorizeException("You have to be an admin to create an Item from an ExternalDataObject");
@@ -113,6 +110,6 @@ public class ExternalDataServiceImpl implements ExternalDataService {
         log.info(LogManager.getHeader(context, "create_item_from_externalDataObject", "Created item" +
             "with id: " + item.getID() + " from source: " + externalDataObject.getSource() + " with identifier: " +
             externalDataObject.getId()));
-        return installItemService.installItem(context, workspaceItem);
+        return workspaceItem;
     }
 }

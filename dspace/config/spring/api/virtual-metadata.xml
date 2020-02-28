@@ -262,4 +262,3 @@
     </bean>
     <bean class="org.dspace.content.virtual.UUIDValue" id="volumeJournal_uuid"/>
 </beans>
-

@@ -104,7 +104,7 @@ public class BrowseEntryLinkRepository extends AbstractDSpaceRestRepository
         // bs.setJumpToValueLang(valueFocusLang);
         bs.setStartsWith(startsWith);
         if (pageable != null) {
-            bs.setOffset(pageable.getOffset());
+            bs.setOffset(Math.toIntExact(pageable.getOffset()));
             bs.setResultsPerPage(pageable.getPageSize());
         }
         // bs.setEtAl(etAl);

@@ -40,8 +40,7 @@ import org.springframework.stereotype.Component;
  * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  */
 @Component(SubmissionUploadRest.CATEGORY + "." + SubmissionUploadRest.NAME)
-public class SubmissionUploadRestRepository extends DSpaceRestRepository<SubmissionUploadRest, String>
-    implements LinkRestRepository {
+public class SubmissionUploadRestRepository extends DSpaceRestRepository<SubmissionUploadRest, String> {
 
     private static final Logger log = org.apache.logging.log4j.LogManager
             .getLogger(SubmissionUploadRestRepository.class);
@@ -79,8 +78,9 @@ public class SubmissionUploadRestRepository extends DSpaceRestRepository<Submiss
     @Override
     public Page<SubmissionUploadRest> findAll(Context context, Pageable pageable) {
         List<SubmissionConfig> subConfs = new ArrayList<SubmissionConfig>();
-        subConfs = submissionConfigReader.getAllSubmissionConfigs(pageable.getPageSize(), pageable.getOffset());
-        Projection projection = utils.obtainProjection(true);
+        subConfs = submissionConfigReader.getAllSubmissionConfigs(pageable.getPageSize(),
+                Math.toIntExact(pageable.getOffset()));
+        Projection projection = utils.obtainProjection();
         List<SubmissionUploadRest> results = new ArrayList<>();
         for (SubmissionConfig config : subConfs) {
             for (int i = 0; i < config.getNumberOfSteps(); i++) {
@@ -134,7 +134,7 @@ public class SubmissionUploadRestRepository extends DSpaceRestRepository<Submiss
             optionRest.setName(option.getName());
             result.getAccessConditionOptions().add(optionRest);
         }
-        result.setMetadata(submissionFormRestRepository.findOne(config.getMetadata()));
+        result.setMetadata(submissionFormRestRepository.findOne(context, config.getMetadata()));
         result.setMaxSize(config.getMaxSize());
         result.setRequired(config.isRequired());
         result.setName(config.getName());
