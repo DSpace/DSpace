@@ -109,7 +109,7 @@ public class CommunityCollectionItemParentIT extends AbstractControllerIntegrati
     }
 
     @Test
-    public void itemXOwningCollectionTest() throws Exception {
+    public void itemAA1OwningCollectionTest() throws Exception {
 
         String token = getAuthToken(admin.getEmail(), password);
         getClient(token).perform(get("/api/core/items/" + itemAA1.getID() + "/owningCollection"))
@@ -123,7 +123,7 @@ public class CommunityCollectionItemParentIT extends AbstractControllerIntegrati
     }
 
     @Test
-    public void itemYOwningCollectionTest() throws Exception {
+    public void itemAA1MappedInAA2OwningCollectionTest() throws Exception {
 
         String token = getAuthToken(admin.getEmail(), password);
         getClient(token).perform(get("/api/core/items/" + itemAA1MappedInAA2.getID() + "/owningCollection"))
@@ -136,7 +136,7 @@ public class CommunityCollectionItemParentIT extends AbstractControllerIntegrati
     }
 
     @Test
-    public void itemZOwningCollectionTest() throws Exception {
+    public void itemAA2OwningCollectionTest() throws Exception {
 
         String token = getAuthToken(admin.getEmail(), password);
         getClient(token).perform(get("/api/core/items/" + itemAA2.getID() + "/owningCollection"))
@@ -150,7 +150,7 @@ public class CommunityCollectionItemParentIT extends AbstractControllerIntegrati
     }
 
     @Test
-    public void col1ParentCommunityTest() throws Exception {
+    public void colAA1ParentCommunityTest() throws Exception {
 
         String token = getAuthToken(admin.getEmail(), password);
         getClient(token).perform(get("/api/core/collections/" + colAA1.getID() + "/parentCommunity"))

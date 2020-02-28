@@ -259,8 +259,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
 
         String token = getAuthToken(admin.getEmail(), password);
 
-        getClient(token).perform(get("/api/submission/workspaceitems/" + witem.getID() + "/collection")
-                .param("projection", "full"))
+        getClient(token).perform(get("/api/submission/workspaceitems/" + witem.getID() + "/collection"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", Matchers
                         .is(CollectionMatcher.matchCollectionEntry(col1.getName(), col1.getID(), col1.getHandle()))
