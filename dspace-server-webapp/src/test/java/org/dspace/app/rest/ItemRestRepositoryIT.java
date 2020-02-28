@@ -1313,6 +1313,15 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                 .withName("Sub Community")
                 .build();
 
+        EPerson adminChild2 = EPersonBuilder.createEPerson(context)
+                .withEmail("adminChild2@mail.com")
+                .withPassword("qwerty05")
+                .build();
+        Community child2 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                .withName("Sub Community 2")
+                .withAdminGroup(adminChild2)
+                .build();
+
         EPerson adminCollection1 = EPersonBuilder.createEPerson(context)
                 .withEmail("adminCollection1@mail.com")
                 .withPassword("qwerty02")
@@ -1355,6 +1364,17 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         // collection2's admin user is NOT allowed access to embargoed item of collection1
         String tokenAdminCollection2 = getAuthToken(adminCollection2.getEmail(), "qwerty03");
         getClient(tokenAdminCollection2).perform(get("/api/core/items/" + embargoedItem.getID()))
+                .andExpect(status().isForbidden());
+
+        // full admin user is allowed access to embargoed item
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        getClient(tokenAdmin).perform(get("/api/core/items/" + embargoedItem.getID()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", is(ItemMatcher.matchItemProperties(embargoedItem))));
+
+        // child2's admin user is NOT allowed access to embargoed item of collection1
+        String tokenAdminChild2 = getAuthToken(adminChild2.getEmail(), "qwerty05");
+        getClient(tokenAdminChild2).perform(get("/api/core/items/" + embargoedItem.getID()))
                 .andExpect(status().isForbidden());
     }
 
@@ -1563,6 +1583,9 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         String tokenEPerson = getAuthToken(eperson.getEmail(), password);
         getClient(tokenEPerson).perform(get("/api/core/items/" + itemRestrictedByGroup.getID()))
                 .andExpect(status().isForbidden());
+
+        getClient().perform(get("/api/core/items/" + itemRestrictedByGroup.getID()))
+                .andExpect(status().isUnauthorized());
     }
 
     @Test
@@ -1584,6 +1607,14 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
                 .withName("Sub Community")
+                .build();
+
+        EPerson adminChild2 = EPersonBuilder.createEPerson(context)
+                .withEmail("adminChild2@mail.com")
+                .withPassword("qwerty05")
+                .build();
+        Community child2 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                .withName("Sub Community 2")
                 .build();
 
         EPerson adminCollection1 = EPersonBuilder.createEPerson(context)
@@ -1627,6 +1658,11 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         // collection2's admin user is NOT allowed access to restricted item of collection1
         String tokenAdminCollection2 = getAuthToken(adminCollection2.getEmail(), "qwerty03");
+        getClient(tokenAdminCollection2).perform(get("/api/core/items/" + itemRestrictedByGroup.getID()))
+                .andExpect(status().isForbidden());
+
+        // child2's admin user is NOT allowed access to restricted item of collection1
+        String tokenAdminChild2 = getAuthToken(adminChild2.getEmail(), "qwerty05");
         getClient(tokenAdminCollection2).perform(get("/api/core/items/" + itemRestrictedByGroup.getID()))
                 .andExpect(status().isForbidden());
     }
