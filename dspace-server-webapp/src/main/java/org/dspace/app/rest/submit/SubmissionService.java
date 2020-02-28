@@ -24,7 +24,7 @@ import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.BitstreamRest;
 import org.dspace.app.rest.model.CheckSumRest;
 import org.dspace.app.rest.model.MetadataValueRest;
-import org.dspace.app.rest.model.UploadAccessConditionDTO;
+import org.dspace.app.rest.model.UploadBitstreamAccessConditionDTO;
 import org.dspace.app.rest.model.WorkspaceItemRest;
 import org.dspace.app.rest.model.step.DataUpload;
 import org.dspace.app.rest.model.step.UploadBitstreamRest;
@@ -138,7 +138,7 @@ public class SubmissionService {
 /**
  * Build the rest representation of a bitstream as used in the upload section
  * ({@link DataUpload}. It contains all its metadata and the list of applied
- * access conditions (@link {@link UploadAccessConditionDTO}
+ * access conditions (@link {@link UploadBitstreamAccessConditionDTO}
  * 
  * @param configurationService the DSpace ConfigurationService
  * @param source               the bitstream to translate in its rest submission
@@ -180,7 +180,7 @@ public class SubmissionService {
 
         for (ResourcePolicy rp : source.getResourcePolicies()) {
             if (ResourcePolicy.TYPE_CUSTOM.equals(rp.getRpType())) {
-                UploadAccessConditionDTO uploadAccessCondition = createAccessConditionFromResourcePolicy(rp);
+                UploadBitstreamAccessConditionDTO uploadAccessCondition = createAccessConditionFromResourcePolicy(rp);
                 data.getAccessConditions().add(uploadAccessCondition);
             }
         }
@@ -247,8 +247,8 @@ public class SubmissionService {
         return wi;
     }
 
-    private UploadAccessConditionDTO createAccessConditionFromResourcePolicy(ResourcePolicy rp) {
-        UploadAccessConditionDTO accessCondition = new UploadAccessConditionDTO();
+    private UploadBitstreamAccessConditionDTO createAccessConditionFromResourcePolicy(ResourcePolicy rp) {
+        UploadBitstreamAccessConditionDTO accessCondition = new UploadBitstreamAccessConditionDTO();
 
         accessCondition.setId(rp.getID());
         accessCondition.setName(rp.getRpName());
