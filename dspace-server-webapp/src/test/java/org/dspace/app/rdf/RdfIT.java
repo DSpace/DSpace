@@ -139,8 +139,8 @@ public class RdfIT extends AbstractWebClientIntegrationTest {
         ResponseEntity<String> response = getResponseAsString(REDIRECTION_PATH + "/" + communityHandle);
         // Expect a 303 (See Other) response code, redirecting us to the HTTP URI of the Community
         assertThat(response.getStatusCode(), equalTo(HttpStatus.SEE_OTHER));
-        // Expect location of redirection to be [dspace.url]/handle/[community_handle]
+        // Expect location of redirection to be [dspace.ui.url]/handle/[community_handle]
         assertThat(response.getHeaders().getLocation(), equalTo(
-            URI.create(configurationService.getProperty("dspace.url") + "/handle/" + communityHandle + "/")));
+            URI.create(configurationService.getProperty("dspace.ui.url") + "/handle/" + communityHandle + "/")));
     }
 }

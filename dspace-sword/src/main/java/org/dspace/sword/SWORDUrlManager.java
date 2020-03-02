@@ -304,11 +304,11 @@ public class SWORDUrlManager {
             "sword-server", "servicedocument.url");
         if (depositUrl == null || "".equals(depositUrl)) {
             String dspaceUrl = ConfigurationManager.getProperty(
-                "dspace.baseUrl");
+                "dspace.server.url");
             if (dspaceUrl == null || "".equals(dspaceUrl)) {
                 throw new DSpaceSWORDException(
                     "Unable to construct service document urls, due to missing/invalid " +
-                        "config in sword.servicedocument.url and/or dspace.baseUrl");
+                        "config in sword.servicedocument.url and/or dspace.server.url");
             }
 
             try {
@@ -317,7 +317,7 @@ public class SWORDUrlManager {
                                      url.getPort(), "/sword/servicedocument").toString();
             } catch (MalformedURLException e) {
                 throw new DSpaceSWORDException(
-                    "Unable to construct service document urls, due to invalid dspace.baseUrl " +
+                    "Unable to construct service document urls, due to invalid dspace.server.url " +
                         e.getMessage(), e);
             }
 
@@ -334,9 +334,9 @@ public class SWORDUrlManager {
      * If the configuration sword.deposit.url is set, this will be returned,
      * but if not, it will construct the url as follows:
      *
-     * [dspace.baseUrl]/sword/deposit
+     * [dspace.server.url]/sword/deposit
      *
-     * where dspace.baseUrl is also in the configuration file.
+     * where dspace.server.url is also in the configuration file.
      *
      * @return the base URL for SWORD deposit
      * @throws DSpaceSWORDException can be thrown by the internals of the DSpace SWORD implementation
@@ -347,11 +347,11 @@ public class SWORDUrlManager {
             "sword-server", "deposit.url");
         if (depositUrl == null || "".equals(depositUrl)) {
             String dspaceUrl = ConfigurationManager.getProperty(
-                "dspace.baseUrl");
+                "dspace.server.url");
             if (dspaceUrl == null || "".equals(dspaceUrl)) {
                 throw new DSpaceSWORDException(
                     "Unable to construct deposit urls, due to missing/invalid config in " +
-                        "sword.deposit.url and/or dspace.baseUrl");
+                        "sword.deposit.url and/or dspace.server.url");
             }
 
             try {
@@ -360,7 +360,7 @@ public class SWORDUrlManager {
                                      url.getPort(), "/sword/deposit").toString();
             } catch (MalformedURLException e) {
                 throw new DSpaceSWORDException(
-                    "Unable to construct deposit urls, due to invalid dspace.baseUrl " +
+                    "Unable to construct deposit urls, due to invalid dspace.server.url " +
                         e.getMessage(), e);
             }
 
@@ -421,7 +421,7 @@ public class SWORDUrlManager {
             }
 
             String handle = item.getHandle();
-            String bsLink = ConfigurationManager.getProperty("dspace.url");
+            String bsLink = ConfigurationManager.getProperty("dspace.ui.url");
 
             if (handle != null && !"".equals(handle)) {
                 bsLink = bsLink + "/bitstream/" + handle + "/" +
@@ -439,7 +439,7 @@ public class SWORDUrlManager {
     /**
      * Get the base media link URL.  It can be configured using
      * {@code sword-server.media-link.url}.  If not configured, it will be
-     * calculated using {@code dspace.baseUrl} and the constant path
+     * calculated using {@code dspace.server.url} and the constant path
      * {@code /sword/media-link}.
      *
      * @return that URL.
@@ -451,11 +451,11 @@ public class SWORDUrlManager {
             "sword-server", "media-link.url");
         if (StringUtils.isBlank(mlUrl)) {
             String dspaceUrl = ConfigurationManager.getProperty(
-                "dspace.baseUrl");
+                "dspace.server.url");
             if (dspaceUrl == null || "".equals(dspaceUrl)) {
                 throw new DSpaceSWORDException(
                     "Unable to construct media-link urls, due to missing/invalid config in " +
-                        "media-link.url and/or dspace.baseUrl");
+                        "media-link.url and/or dspace.server.url");
             }
 
             try {
@@ -464,7 +464,7 @@ public class SWORDUrlManager {
                                 "/sword/media-link").toString();
             } catch (MalformedURLException e) {
                 throw new DSpaceSWORDException(
-                    "Unable to construct media-link urls, due to invalid dspace.baseUrl " +
+                    "Unable to construct media-link urls, due to invalid dspace.server.url " +
                         e.getMessage(), e);
             }
 

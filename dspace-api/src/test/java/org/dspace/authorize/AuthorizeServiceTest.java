@@ -90,8 +90,7 @@ public class AuthorizeServiceTest extends AbstractUnitTest {
     @Test
     public void testauthorizeMethodRespectSpecialGroups() {
 
-        EPerson eperson1;
-        EPerson eperson2;
+        EPerson eperson;
         Group group1;
 
         Community dso;
@@ -99,7 +98,7 @@ public class AuthorizeServiceTest extends AbstractUnitTest {
             context.turnOffAuthorisationSystem();
 
             // create an eperson and a group
-            eperson1 = ePersonService.create(context);
+            eperson = ePersonService.create(context);
             group1 = groupService.create(context);
             // A group has to have a name, otherwise there are queries that break
             groupService.setName(group1, "My test group 2");
@@ -111,19 +110,19 @@ public class AuthorizeServiceTest extends AbstractUnitTest {
             // special group to the user. Then test if the action on the DSO
             // is allowed for the user
             authorizeService.addPolicy(context, dso, Constants.ADD, group1);
-            context.setCurrentUser(eperson1);
+            context.setCurrentUser(eperson);
             context.setSpecialGroup(group1.getID());
             context.commit();
         } catch (SQLException | AuthorizeException ex) {
-            throw new RuntimeException(ex);
+            throw new AssertionError(ex);
         } finally {
             context.restoreAuthSystemState();
         }
 
         try {
-            Assert.assertTrue(authorizeService.authorizeActionBoolean(context, eperson1, dso, Constants.ADD, true));
+            Assert.assertTrue(authorizeService.authorizeActionBoolean(context, eperson, dso, Constants.ADD, true));
         } catch (SQLException ex) {
-            throw new RuntimeException(ex);
+            throw new AssertionError(ex);
         }
     }
 }

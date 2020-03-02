@@ -583,7 +583,7 @@ public class EZIDIdentifierProvider
             log.warn("{} #{} has no handle -- location not set.",
                      contentServiceFactory.getDSpaceObjectService(dso).getTypeText(dso), dso.getID());
         } else {
-            String url = configurationService.getProperty("dspace.url")
+            String url = configurationService.getProperty("dspace.ui.url")
                 + "/handle/" + item.getHandle();
             log.info("Supplying location:  {}", url);
             mapped.put("_target", url);
