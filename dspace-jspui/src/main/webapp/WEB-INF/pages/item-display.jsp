@@ -144,7 +144,7 @@
             <td><fmt:message key="org.dspace.app.webui.jsptag.ItemTag.appears"/></td>
             <td>
                 <c:forEach items="${owningCollections}" var="collection">
-                    <a href="${collection.handle}">${collection.name}</a> <br/>
+                    <a href="/handle/${collection.handle}">${collection.name}</a> <br/>
                 </c:forEach>
             </td>
         </tr>
