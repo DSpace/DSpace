@@ -25,7 +25,6 @@ import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.RestAddressableModel;
 import org.dspace.app.rest.model.patch.Patch;
-import org.dspace.app.util.DCInputsReaderException;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.service.MetadataFieldService;
 import org.dspace.core.Context;
@@ -34,7 +33,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.repository.PagingAndSortingRepository;
-import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
@@ -392,30 +390,24 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
     /**
      * Apply a partial update to the REST object via JSON Patch
      *
-     * @param request
-     *            the http request
+     * @param request     the http request
      * @param apiCategory
      * @param model
-     * @param id
-     *            the ID of the target REST object
-     * @param patch
-     * the JSON Patch (https://tools.ietf.org/html/rfc6902) operation
+     * @param id          the ID of the target REST object
+     * @param patch       the JSON Patch (https://tools.ietf.org/html/rfc6902) operation
      * @return
-     * @throws HttpRequestMethodNotSupportedException
      * @throws UnprocessableEntityException
      * @throws DSpaceBadRequestException
      */
     public T patch(HttpServletRequest request, String apiCategory, String model, ID id, Patch patch)
-        throws HttpRequestMethodNotSupportedException, UnprocessableEntityException, DSpaceBadRequestException {
+        throws UnprocessableEntityException, DSpaceBadRequestException {
         Context context = obtainContext();
-
         try {
             thisRepository.patch(context, request, apiCategory, model, id, patch);
             context.commit();
-
         } catch (AuthorizeException ae) {
             throw new RESTAuthorizationException(ae);
-        } catch (SQLException | DCInputsReaderException e) {
+        } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
         return findById(id).orElse(null);
@@ -433,19 +425,15 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
      * @param patch
      *            the JSON Patch (https://tools.ietf.org/html/rfc6902) operation
      * @return the full new state of the REST object after patching
-     * @throws HttpRequestMethodNotSupportedException
-     * @throws UnprocessableEntityException
-     * @throws DSpaceBadRequestException
      * @throws RepositoryMethodNotImplementedException
      *             returned by the default implementation when the operation is not supported for the entity
      *
      * @throws SQLException
      * @throws AuthorizeException
-     * @throws DCInputsReaderException
      */
     protected void patch(Context context, HttpServletRequest request, String apiCategory, String model, ID id,
                          Patch patch)
-        throws RepositoryMethodNotImplementedException, SQLException, AuthorizeException, DCInputsReaderException {
+        throws RepositoryMethodNotImplementedException, SQLException, AuthorizeException {
         throw new RepositoryMethodNotImplementedException(apiCategory, model);
     }
 

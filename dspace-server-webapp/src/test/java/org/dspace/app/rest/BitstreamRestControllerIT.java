@@ -74,7 +74,6 @@ import org.dspace.disseminate.CitationDocumentServiceImpl;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.services.ConfigurationService;
-import org.dspace.statistics.FakeDatabaseReader;
 import org.dspace.statistics.ObjectCount;
 import org.dspace.statistics.SolrLoggerServiceImpl;
 import org.dspace.statistics.factory.StatisticsServiceFactory;
@@ -119,13 +118,6 @@ public class BitstreamRestControllerIT extends AbstractControllerIntegrationTest
         // To ensure these tests start "fresh", clear out any existing statistics data.
         // NOTE: this is committed immediately in removeIndex()
         StatisticsServiceFactory.getInstance().getSolrLoggerService().removeIndex("*:*");
-    }
-
-    @BeforeClass
-    public static void mockGeoIP()
-            throws IOException {
-        // Set up a mock GeoIP implementation so we don't need to d/l a database.
-        new FakeDatabaseReader.Builder(); // Activate fake
     }
 
     @Before

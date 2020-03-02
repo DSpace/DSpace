@@ -44,17 +44,23 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         // hold the id of the created workflow item
         AtomicReference<UUID> idRef = new AtomicReference<UUID>();
+        AtomicReference<UUID> idRefNoEmbeds = new AtomicReference<UUID>();
         try {
             ObjectMapper mapper = new ObjectMapper();
             GroupRest groupRest = new GroupRest();
+            GroupRest groupRestNoEmbeds = new GroupRest();
             String groupName = "testGroup1";
+            String groupNameNoEmbeds = "testGroup2";
 
             groupRest.setName(groupName);
+            groupRestNoEmbeds.setName(groupNameNoEmbeds);
 
             String authToken = getAuthToken(admin.getEmail(), password);
             getClient(authToken).perform(post("/api/eperson/groups")
-                    .content(mapper.writeValueAsBytes(groupRest)).contentType(contentType))
+                    .content(mapper.writeValueAsBytes(groupRest)).contentType(contentType)
+                    .param("projection", "full"))
                     .andExpect(status().isCreated())
+                    .andExpect(jsonPath("$", GroupMatcher.matchFullEmbeds()))
                     .andDo(result -> idRef
                             .set(UUID.fromString(read(result.getResponse().getContentAsString(), "$.id"))));
 
@@ -66,9 +72,17 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
                                GroupMatcher.matchGroupWithName(groupName),
                                GroupMatcher.matchGroupWithName("Administrator"),
                                GroupMatcher.matchGroupWithName("Anonymous"))));
+
+            getClient(authToken).perform(post("/api/eperson/groups")
+                    .content(mapper.writeValueAsBytes(groupRestNoEmbeds)).contentType(contentType))
+                    .andExpect(status().isCreated())
+                    .andExpect(jsonPath("$", HalMatcher.matchNoEmbeds()))
+                    .andDo(result -> idRefNoEmbeds
+                            .set(UUID.fromString(read(result.getResponse().getContentAsString(), "$.id"))));
         } finally {
             // remove the created group if any
             GroupBuilder.deleteGroup(idRef.get());
+            GroupBuilder.deleteGroup(idRefNoEmbeds.get());
         }
     }
 

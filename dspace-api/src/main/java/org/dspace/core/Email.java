@@ -497,7 +497,7 @@ public class Email {
         String to = config.getProperty("mail.admin");
         String subject = "DSpace test email";
         String server = config.getProperty("mail.server");
-        String url = config.getProperty("dspace.url");
+        String url = config.getProperty("dspace.ui.url");
         Email message;
         try {
             if (args.length <= 0) {
