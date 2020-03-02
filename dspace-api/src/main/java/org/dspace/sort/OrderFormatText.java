@@ -8,8 +8,8 @@
 package org.dspace.sort;
 
 import org.dspace.text.filter.DecomposeDiactritics;
-import org.dspace.text.filter.StripDiacritics;
 import org.dspace.text.filter.LowerCaseAndTrim;
+import org.dspace.text.filter.StripDiacritics;
 import org.dspace.text.filter.TextFilter;
 
 /**
