@@ -7,7 +7,6 @@
  */
 package org.dspace.app.rest.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
@@ -16,31 +15,33 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 @LinksRest(links = {
-    @LinkRest(
-            name = CollectionRest.LICENSE,
-            linkClass = LicenseRest.class,
-            method = "getLicenseCollection",
-            embedOptional = true,
-            linkOptional = true
-    )
+        @LinkRest(
+                name = CollectionRest.LICENSE,
+                method = "getLicense"
+        ),
+        @LinkRest(
+                name = CollectionRest.LOGO,
+                method = "getLogo"
+        ),
+        @LinkRest(
+                name = CollectionRest.MAPPED_ITEMS,
+                method = "getMappedItems"
+        ),
+        @LinkRest(
+                name = CollectionRest.PARENT_COMMUNITY,
+                method = "getParentCommunity"
+        )
 })
 public class CollectionRest extends DSpaceObjectRest {
     public static final String NAME = "collection";
     public static final String PLURAL_NAME = "collections";
     public static final String CATEGORY = RestAddressableModel.CORE;
-    public static final String LICENSE = "license";
+
     public static final String HARVEST = "harvester";
-    public static final String DEFAULT_ACCESS_CONDITIONS = "defaultAccessConditions";
-    @JsonIgnore
-    private BitstreamRest logo;
-
-    public BitstreamRest getLogo() {
-        return logo;
-    }
-
-    public void setLogo(BitstreamRest logo) {
-        this.logo = logo;
-    }
+    public static final String LICENSE = "license";
+    public static final String LOGO = "logo";
+    public static final String MAPPED_ITEMS = "mappedItems";
+    public static final String PARENT_COMMUNITY = "parentCommunity";
 
     @Override
     public String getCategory() {
@@ -52,5 +53,4 @@ public class CollectionRest extends DSpaceObjectRest {
     public String getType() {
         return NAME;
     }
-
 }

@@ -766,6 +766,7 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
             // submit the workspaceitem to start the workflow
             getClient(authToken)
                     .perform(post(BASE_REST_SERVER_URL + "/api/workflow/workflowitems")
+                            .param("projection", "full")
                             .content("/api/submission/workspaceitems/" + wsitem.getID())
                             .contentType(textUriContentType))
                     .andExpect(status().isCreated())

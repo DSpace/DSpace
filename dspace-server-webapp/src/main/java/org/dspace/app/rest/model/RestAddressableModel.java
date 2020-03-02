@@ -17,6 +17,8 @@ import org.dspace.app.rest.projection.Projection;
  */
 public abstract class RestAddressableModel implements RestModel {
 
+    private int embedLevel = 0;
+
     private Projection projection = Projection.DEFAULT;
 
     @JsonIgnore
@@ -24,6 +26,15 @@ public abstract class RestAddressableModel implements RestModel {
 
     @JsonIgnore
     public abstract Class getController();
+
+    @JsonIgnore
+    public int getEmbedLevel() {
+        return embedLevel;
+    }
+
+    public void setEmbedLevel(int embedLevel) {
+        this.embedLevel = embedLevel;
+    }
 
     @JsonIgnore
     public Projection getProjection() {

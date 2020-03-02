@@ -62,8 +62,8 @@ public class MappedCollectionRestRepositoryIT extends AbstractControllerIntegrat
                 .build();
         context.restoreAuthSystemState();
 
-//        collectionService.addItem(context, col2, publicItem1);
-//        collectionService.update(context, col2);
+//        collectionService.addItem(context, colAA2, publicItem1);
+//        collectionService.update(context, colAA2);
 //        itemService.update(context, publicItem1);
 
         getClient().perform(get("/api/core/items/" + publicItem1.getID() + "/mappedCollections"))
@@ -607,8 +607,8 @@ public class MappedCollectionRestRepositoryIT extends AbstractControllerIntegrat
                 .build();
         context.restoreAuthSystemState();
 
-//        collectionService.addItem(context, col2, publicItem1);
-//        collectionService.update(context, col2);
+//        collectionService.addItem(context, colAA2, publicItem1);
+//        collectionService.update(context, colAA2);
 //        itemService.update(context, publicItem1);
 
         context.restoreAuthSystemState();
@@ -647,8 +647,8 @@ public class MappedCollectionRestRepositoryIT extends AbstractControllerIntegrat
                 .build();
         context.restoreAuthSystemState();
 
-//        collectionService.addItem(context, col2, publicItem1);
-//        collectionService.update(context, col2);
+//        collectionService.addItem(context, colAA2, publicItem1);
+//        collectionService.update(context, colAA2);
 //        itemService.update(context, publicItem1);
 
         getClient().perform(
@@ -684,8 +684,8 @@ public class MappedCollectionRestRepositoryIT extends AbstractControllerIntegrat
                 .build();
         context.restoreAuthSystemState();
 
-//        collectionService.addItem(context, col2, publicItem1);
-//        collectionService.update(context, col2);
+//        collectionService.addItem(context, colAA2, publicItem1);
+//        collectionService.update(context, colAA2);
 //        itemService.update(context, publicItem1);
 
 
