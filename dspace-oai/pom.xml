@@ -15,7 +15,7 @@
     <properties>
         <!-- This is the path to the root [dspace-src] directory. -->
         <root.basedir>${basedir}/..</root.basedir>
-        <xoai.version>3.2.11</xoai.version>
+        <xoai.version>3.3.0</xoai.version>
         <jtwig.version>5.87.0.RELEASE</jtwig.version>
     </properties>
 
@@ -89,7 +89,7 @@
                 <exclusion>
                     <groupId>org.apache.commons</groupId>
                     <artifactId>commons-lang3</artifactId>
-	        </exclusion>
+                </exclusion>
                 <exclusion>
                     <groupId>log4j</groupId>
                     <artifactId>log4j</artifactId>
@@ -102,6 +102,11 @@
                 <exclusion>
                     <groupId>org.codehaus.woodstox</groupId>
                     <artifactId>wstx-asl</artifactId>
+                </exclusion>
+                <!-- Later version provided by Hibernate -->
+                <exclusion>
+                    <groupId>org.dom4j</groupId>
+                    <artifactId>dom4j</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>

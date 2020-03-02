@@ -79,6 +79,8 @@ public class SubmissionService {
     private RequestService requestService;
     @Autowired
     private ConverterService converter;
+    @Autowired
+    private org.dspace.app.rest.utils.Utils utils;
 
     /**
      * Create a workspaceitem using the information in the request
@@ -174,9 +176,9 @@ public class SubmissionService {
             }
 
         }
-
+        Projection projection = utils.obtainProjection();
         HttpServletRequest request = requestService.getCurrentRequest().getHttpServletRequest();
-        data.setFormat(converter.toRest(source.getFormat(ContextUtil.obtainContext(request)), Projection.DEFAULT));
+        data.setFormat(converter.toRest(source.getFormat(ContextUtil.obtainContext(request)), projection));
 
         for (ResourcePolicy rp : source.getResourcePolicies()) {
             if (ResourcePolicy.TYPE_CUSTOM.equals(rp.getRpType())) {
@@ -231,7 +233,7 @@ public class SubmissionService {
         if (wsi == null) {
             throw new UnprocessableEntityException("Workspace item is not found");
         }
-        WorkspaceItemRest wsiRest = converter.toRest(wsi, Projection.DEFAULT);
+        WorkspaceItemRest wsiRest = converter.toRest(wsi, utils.obtainProjection());
         if (!wsiRest.getErrors().isEmpty()) {
             throw new UnprocessableEntityException(
                     "Start workflow failed due to validation error on workspaceitem");
