@@ -28,7 +28,7 @@ public class SolrServiceCommunityCollectionItemFilterPlugin implements SolrServi
                 DSpaceObject parent = ContentServiceFactory.getInstance()
                                       .getDSpaceObjectService(dso).getParentObject(context, dso);
                 if (parent != null) {
-                    document.addField("location.parent:", parent.getID().toString());
+                    document.addField("location.parent", parent.getID().toString());
                 }
             }
         } catch (SQLException e) {

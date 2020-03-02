@@ -1168,12 +1168,12 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
                 .build();
 
         Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
-                .withName("Sub Community")
+                .withName("Sub Community 1")
                 .build();
 
 
         Community child2 = CommunityBuilder.createSubCommunity(context, parentCommunity)
-                .withName("Sub Community")
+                .withName("Sub Community 2")
                 .build();
 
         Collection child1Col1 = CollectionBuilder.createCollection(context, child1)
