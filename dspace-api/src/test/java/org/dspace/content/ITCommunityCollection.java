@@ -19,7 +19,6 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.UUID;
 
-import org.apache.logging.log4j.Logger;
 import org.dspace.AbstractIntegrationTest;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.factory.ContentServiceFactory;
@@ -48,11 +47,6 @@ import org.junit.Test;
  * @author tdonohue
  */
 public class ITCommunityCollection extends AbstractIntegrationTest {
-    /**
-     * log4j category
-     */
-    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(ITCommunityCollection.class);
-
     protected CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
     protected CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
     protected ItemService itemService = ContentServiceFactory.getInstance().getItemService();
@@ -107,8 +101,8 @@ public class ITCommunityCollection extends AbstractIntegrationTest {
         //verify it works as expected
         assertThat("testCreateTree 0", parent.getParentCommunities().size(), is(0));
         assertThat("testCreateTree 1", child1.getParentCommunities().get(0), equalTo(parent));
-        assertThat("testCreateTree 2", (Community) collectionService.getParentObject(context, col1), equalTo(child1));
-        assertThat("testCreateTree 3", (Community) collectionService.getParentObject(context, col2), equalTo(child1));
+        assertThat("testCreateTree 2", collectionService.getParentObject(context, col1), equalTo(child1));
+        assertThat("testCreateTree 3", collectionService.getParentObject(context, col2), equalTo(child1));
 
         context.turnOffAuthorisationSystem();
         communityService.delete(context, parent);
@@ -133,8 +127,8 @@ public class ITCommunityCollection extends AbstractIntegrationTest {
         context.restoreAuthSystemState();
 
         //verify it works as expected
-        assertThat("testCreateItems 0", (Collection) itemService.getParentObject(context, item1), equalTo(col1));
-        assertThat("testCreateItems 1", (Collection) itemService.getParentObject(context, item2), equalTo(col2));
+        assertThat("testCreateItems 0", itemService.getParentObject(context, item1), equalTo(col1));
+        assertThat("testCreateItems 1", itemService.getParentObject(context, item2), equalTo(col2));
 
         context.turnOffAuthorisationSystem();
         communityService.delete(context, parent);
@@ -158,8 +152,8 @@ public class ITCommunityCollection extends AbstractIntegrationTest {
 
         // Add same number of items to each collection
         for (int count = 0; count < items_per_collection; count++) {
-            Item item1 = installItemService.installItem(context, workspaceItemService.create(context, col1, false));
-            Item item2 = installItemService.installItem(context, workspaceItemService.create(context, col2, false));
+            installItemService.installItem(context, workspaceItemService.create(context, col1, false));
+            installItemService.installItem(context, workspaceItemService.create(context, col2, false));
         }
 
         // Finally, let's throw in a small wrench and add a mapped item
@@ -229,7 +223,6 @@ public class ITCommunityCollection extends AbstractIntegrationTest {
         context.setCurrentUser(commAdmin);
 
         // Test deletion of single Bitstream as a Community Admin (delete just flags as deleted)
-        UUID bitstreamId = bitstream.getID();
         bitstreamService.delete(context, bitstream);
         assertTrue("Community Admin unable to flag Bitstream as deleted",
                    bitstream.isDeleted());
@@ -312,7 +305,6 @@ public class ITCommunityCollection extends AbstractIntegrationTest {
         context.setCurrentUser(collAdmin);
 
         // Test deletion of single Bitstream as a Collection Admin (delete just flags as deleted)
-        UUID bitstreamId = bitstream2.getID();
         bitstreamService.delete(context, bitstream2);
         assertTrue("Collection Admin unable to flag Bitstream as deleted",
                    bitstream2.isDeleted());
@@ -327,7 +319,6 @@ public class ITCommunityCollection extends AbstractIntegrationTest {
         // Test deletion of single Item as a Collection Admin
         UUID itemId = item.getID();
         bundleId = bundle.getID();
-        bitstreamId = bitstream.getID();
         itemService.delete(context, item);
         assertThat("Collection Admin unable to delete sub-Item",
                    itemService.find(context, itemId), nullValue());
