@@ -161,7 +161,7 @@ public class WorkflowUtils extends Util {
 
                 email.addRecipient(recipient);
                 email.addArgument(ConfigurationManager
-                                      .getProperty("dspace.url"));
+                                      .getProperty("dspace.ui.url"));
                 email.addArgument(new Date());
                 email.addArgument(request.getSession().getId());
                 email.addArgument(logInfo);

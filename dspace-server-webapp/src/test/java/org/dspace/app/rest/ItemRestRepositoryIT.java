@@ -1201,9 +1201,9 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         getClient(token).perform(delete("/api/core/items/" + templateItem.getID()))
                     .andExpect(status().is(422));
 
-        //Check templateItem is available after failed deletion
+        //Check templateItem is not deleted
         getClient(token).perform(get("/api/core/items/" + templateItem.getID()))
-                   .andExpect(status().isOk());
+                   .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -1313,6 +1313,15 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                 .withName("Sub Community")
                 .build();
 
+        EPerson adminChild2 = EPersonBuilder.createEPerson(context)
+                .withEmail("adminChild2@mail.com")
+                .withPassword("qwerty05")
+                .build();
+        Community child2 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                .withName("Sub Community 2")
+                .withAdminGroup(adminChild2)
+                .build();
+
         EPerson adminCollection1 = EPersonBuilder.createEPerson(context)
                 .withEmail("adminCollection1@mail.com")
                 .withPassword("qwerty02")
@@ -1355,6 +1364,17 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         // collection2's admin user is NOT allowed access to embargoed item of collection1
         String tokenAdminCollection2 = getAuthToken(adminCollection2.getEmail(), "qwerty03");
         getClient(tokenAdminCollection2).perform(get("/api/core/items/" + embargoedItem.getID()))
+                .andExpect(status().isForbidden());
+
+        // full admin user is allowed access to embargoed item
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        getClient(tokenAdmin).perform(get("/api/core/items/" + embargoedItem.getID()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", is(ItemMatcher.matchItemProperties(embargoedItem))));
+
+        // child2's admin user is NOT allowed access to embargoed item of collection1
+        String tokenAdminChild2 = getAuthToken(adminChild2.getEmail(), "qwerty05");
+        getClient(tokenAdminChild2).perform(get("/api/core/items/" + embargoedItem.getID()))
                 .andExpect(status().isForbidden());
     }
 
@@ -1563,6 +1583,9 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         String tokenEPerson = getAuthToken(eperson.getEmail(), password);
         getClient(tokenEPerson).perform(get("/api/core/items/" + itemRestrictedByGroup.getID()))
                 .andExpect(status().isForbidden());
+
+        getClient().perform(get("/api/core/items/" + itemRestrictedByGroup.getID()))
+                .andExpect(status().isUnauthorized());
     }
 
     @Test
@@ -1584,6 +1607,14 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
                 .withName("Sub Community")
+                .build();
+
+        EPerson adminChild2 = EPersonBuilder.createEPerson(context)
+                .withEmail("adminChild2@mail.com")
+                .withPassword("qwerty05")
+                .build();
+        Community child2 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                .withName("Sub Community 2")
                 .build();
 
         EPerson adminCollection1 = EPersonBuilder.createEPerson(context)
@@ -1629,6 +1660,11 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         String tokenAdminCollection2 = getAuthToken(adminCollection2.getEmail(), "qwerty03");
         getClient(tokenAdminCollection2).perform(get("/api/core/items/" + itemRestrictedByGroup.getID()))
                 .andExpect(status().isForbidden());
+
+        // child2's admin user is NOT allowed access to restricted item of collection1
+        String tokenAdminChild2 = getAuthToken(adminChild2.getEmail(), "qwerty05");
+        getClient(tokenAdminCollection2).perform(get("/api/core/items/" + itemRestrictedByGroup.getID()))
+                .andExpect(status().isForbidden());
     }
 
     @Test
@@ -1650,6 +1686,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         ObjectMapper mapper = new ObjectMapper();
         ItemRest itemRest = new ItemRest();
+        ItemRest itemRestFull = new ItemRest();
         itemRest.setName("Practices of research data curation in institutional repositories:" +
                              " A qualitative view from repository staff");
         itemRest.setInArchive(true);
@@ -1663,11 +1700,25 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                 .put("dc.rights", new MetadataValueRest("Custom Copyright Text"))
                 .put("dc.title", new MetadataValueRest("Title Text")));
 
+        itemRestFull.setName("Practices of research data curation in institutional repositories:" +
+                " A qualitative view from repository staff");
+        itemRestFull.setInArchive(true);
+        itemRestFull.setDiscoverable(true);
+        itemRestFull.setWithdrawn(false);
+
+        itemRestFull.setMetadata(new MetadataRest()
+                .put("dc.description", new MetadataValueRest("<p>Some cool HTML code here</p>"))
+                .put("dc.description.abstract", new MetadataValueRest("Sample item created via the REST API"))
+                .put("dc.description.tableofcontents", new MetadataValueRest("<p>HTML News</p>"))
+                .put("dc.rights", new MetadataValueRest("Custom Copyright Text"))
+                .put("dc.title", new MetadataValueRest("Title Text")));
+
         String token = getAuthToken(admin.getEmail(), password);
         MvcResult mvcResult = getClient(token).perform(post("/api/core/items?owningCollection=" +
                                                                 col1.getID().toString())
                                    .content(mapper.writeValueAsBytes(itemRest)).contentType(contentType))
                                               .andExpect(status().isCreated())
+                                              .andExpect(jsonPath("$", HalMatcher.matchNoEmbeds()))
                                               .andReturn();
 
         String content = mvcResult.getResponse().getContentAsString();
@@ -1696,6 +1747,13 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                                 MetadataMatcher.matchMetadata("dc.title",
                                     "Title Text")
                             )))));
+
+        MvcResult mvcResultFull = getClient(token).perform(post("/api/core/items?owningCollection=" +
+                col1.getID().toString()).param("projection", "full")
+                .content(mapper.writeValueAsBytes(itemRestFull)).contentType(contentType))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$", ItemMatcher.matchFullEmbeds()))
+                .andReturn();
     }
 
     @Test
@@ -1953,6 +2011,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                         .andExpect(status().is(404));
     }
 
+    @Test
     public void patchItemMetadataAuthorized() throws Exception {
         runPatchMetadataTests(admin, 200);
     }

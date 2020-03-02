@@ -34,12 +34,6 @@ import org.dspace.core.Context;
  */
 public class AuthorizeUtil {
 
-    private static final AuthorizeService authorizeService =
-        AuthorizeServiceFactory.getInstance().getAuthorizeService();
-    private static final ItemService itemService = ContentServiceFactory.getInstance().getItemService();
-    private static final CollectionService collectionService =
-        ContentServiceFactory.getInstance().getCollectionService();
-
     /**
      * Default constructor
      */
@@ -95,8 +89,9 @@ public class AuthorizeUtil {
      */
     public static void authorizeManageItemPolicy(Context context, Item item)
         throws AuthorizeException, SQLException {
+        AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
         if (AuthorizeConfiguration.canItemAdminManagePolicies()) {
-            authorizeService.authorizeAction(context, item, Constants.ADMIN);
+            AuthorizeServiceFactory.getInstance().getAuthorizeService().authorizeAction(context, item, Constants.ADMIN);
         } else if (AuthorizeConfiguration.canCollectionAdminManageItemPolicies()) {
             authorizeService.authorizeAction(context, item
                 .getOwningCollection(), Constants.ADMIN);
@@ -124,6 +119,7 @@ public class AuthorizeUtil {
      */
     public static void authorizeManageCollectionPolicy(Context context,
                                                        Collection collection) throws AuthorizeException, SQLException {
+        AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
         if (AuthorizeConfiguration.canCollectionAdminManagePolicies()) {
             authorizeService.authorizeAction(context, collection,
                                              Constants.ADMIN);
@@ -151,6 +147,7 @@ public class AuthorizeUtil {
      */
     public static void authorizeManageCommunityPolicy(Context context,
                                                       Community community) throws AuthorizeException, SQLException {
+        AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
         if (AuthorizeConfiguration.canCommunityAdminManagePolicies()) {
             authorizeService.authorizeAction(context, community,
                                              Constants.ADMIN);
@@ -171,6 +168,7 @@ public class AuthorizeUtil {
      */
     public static void requireAdminRole(Context context)
         throws AuthorizeException, SQLException {
+        AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
         if (!authorizeService.isAdmin(context)) {
             throw new AuthorizeException(
                 "Only system admin are allowed to perform this action");
@@ -191,6 +189,8 @@ public class AuthorizeUtil {
      */
     public static void authorizeManageCCLicense(Context context, Item item)
         throws AuthorizeException, SQLException {
+        AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
+        ItemService itemService = ContentServiceFactory.getInstance().getItemService();
         try {
             authorizeService.authorizeAction(context, item, Constants.ADD);
             authorizeService.authorizeAction(context, item, Constants.REMOVE);
@@ -224,6 +224,8 @@ public class AuthorizeUtil {
      */
     public static void authorizeManageTemplateItem(Context context,
                                                    Collection collection) throws AuthorizeException, SQLException {
+        AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
+        CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
         boolean isAuthorized = collectionService.canEditBoolean(context, collection, false);
 
         if (!isAuthorized
@@ -258,6 +260,7 @@ public class AuthorizeUtil {
      */
     public static void authorizeManageSubmittersGroup(Context context,
                                                       Collection collection) throws AuthorizeException, SQLException {
+        AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
         if (AuthorizeConfiguration.canCollectionAdminManageSubmitters()) {
             authorizeService.authorizeAction(context, collection,
                                              Constants.ADMIN);
@@ -285,6 +288,7 @@ public class AuthorizeUtil {
      */
     public static void authorizeManageWorkflowsGroup(Context context,
                                                      Collection collection) throws AuthorizeException, SQLException {
+        AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
         if (AuthorizeConfiguration.canCollectionAdminManageWorkflows()) {
             authorizeService.authorizeAction(context, collection,
                                              Constants.ADMIN);
@@ -313,6 +317,7 @@ public class AuthorizeUtil {
      */
     public static void authorizeManageAdminGroup(Context context,
                                                  Collection collection) throws AuthorizeException, SQLException {
+        AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
         if (AuthorizeConfiguration.canCollectionAdminManageAdminGroup()) {
             authorizeService.authorizeAction(context, collection,
                                              Constants.ADMIN);
@@ -341,6 +346,7 @@ public class AuthorizeUtil {
      */
     public static void authorizeRemoveAdminGroup(Context context,
                                                  Collection collection) throws AuthorizeException, SQLException {
+        AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
         List<Community> parentCommunities = collection.getCommunities();
         if (AuthorizeConfiguration
             .canCommunityAdminManageCollectionAdminGroup()
@@ -368,6 +374,7 @@ public class AuthorizeUtil {
      */
     public static void authorizeManageAdminGroup(Context context,
                                                  Community community) throws AuthorizeException, SQLException {
+        AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
         if (AuthorizeConfiguration.canCommunityAdminManageAdminGroup()) {
             authorizeService.authorizeAction(context, community,
                                              Constants.ADMIN);
@@ -392,6 +399,7 @@ public class AuthorizeUtil {
      */
     public static void authorizeRemoveAdminGroup(Context context,
                                                  Community community) throws SQLException, AuthorizeException {
+        AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
         List<Community> parentCommunities = community.getParentCommunities();
         Community parentCommunity = null;
         if (0 < parentCommunities.size()) {
@@ -458,6 +466,7 @@ public class AuthorizeUtil {
     public static void authorizeWithdrawItem(Context context, Item item)
         throws SQLException, AuthorizeException {
         boolean authorized = false;
+        AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
         if (AuthorizeConfiguration.canCollectionAdminPerformItemWithdrawn()) {
             authorized = authorizeService.authorizeActionBoolean(context, item
                 .getOwningCollection(), Constants.ADMIN);
@@ -492,6 +501,7 @@ public class AuthorizeUtil {
      */
     public static void authorizeReinstateItem(Context context, Item item)
         throws SQLException, AuthorizeException {
+        AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
         List<Collection> colls = item.getCollections();
 
         for (Collection coll : colls) {

@@ -13,7 +13,6 @@ import java.util.Optional;
 import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.model.ExternalSourceEntryRest;
 import org.dspace.app.rest.model.ExternalSourceRest;
-import org.dspace.app.rest.projection.Projection;
 import org.dspace.core.Context;
 import org.dspace.external.model.ExternalDataObject;
 import org.dspace.external.provider.ExternalDataProvider;
@@ -52,7 +51,7 @@ public class ExternalSourceRestRepository extends DSpaceRestRepository<ExternalS
                                                                                                     entryId);
         ExternalDataObject dataObject = externalDataObject.orElseThrow(() -> new ResourceNotFoundException(
             "Couldn't find an ExternalSource for source: " + externalSourceName + " and ID: " + entryId));
-        return converter.toRest(dataObject, Projection.DEFAULT);
+        return converter.toRest(dataObject, utils.obtainProjection());
     }
 
     /**
@@ -84,7 +83,7 @@ public class ExternalSourceRestRepository extends DSpaceRestRepository<ExternalS
             throw new ResourceNotFoundException("ExternalDataProvider for: " +
                                                     externalSourceName + " couldn't be found");
         }
-        return converter.toRest(externalDataProvider, Projection.DEFAULT);
+        return converter.toRest(externalDataProvider, utils.obtainProjection());
     }
 
     @Override
