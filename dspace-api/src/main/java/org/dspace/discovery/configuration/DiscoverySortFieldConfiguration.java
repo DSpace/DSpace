@@ -7,6 +7,7 @@
  */
 package org.dspace.discovery.configuration;
 
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.springframework.beans.factory.annotation.Required;
 
 /**
@@ -46,4 +47,11 @@ public class DiscoverySortFieldConfiguration {
         return false;
     }
 
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder(3, 19)
+            .append(this.getMetadataField())
+            .append(this.getType())
+            .toHashCode();
+    }
 }

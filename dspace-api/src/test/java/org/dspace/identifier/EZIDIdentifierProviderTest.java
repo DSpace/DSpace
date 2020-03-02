@@ -449,7 +449,7 @@ public class EZIDIdentifierProviderTest
             // Evaluate
             String target = (String) metadata.get("_target");
             assertEquals("Generates correct _target metadatum",
-                         config.getProperty("dspace.url") + "/handle/" + handle,
+                         config.getProperty("dspace.ui.url") + "/handle/" + handle,
                          target);
             assertTrue("Has title", metadata.containsKey("datacite.title"));
             assertTrue("Has publication year", metadata.containsKey("datacite.publicationyear"));

@@ -62,12 +62,11 @@ public class MappedCollectionRestRepositoryIT extends AbstractControllerIntegrat
                 .build();
         context.restoreAuthSystemState();
 
-//        collectionService.addItem(context, col2, publicItem1);
-//        collectionService.update(context, col2);
+//        collectionService.addItem(context, colAA2, publicItem1);
+//        collectionService.update(context, colAA2);
 //        itemService.update(context, publicItem1);
 
-        getClient().perform(get("/api/core/items/" + publicItem1.getID() + "/mappedCollections")
-                   .param("projection", "full"))
+        getClient().perform(get("/api/core/items/" + publicItem1.getID() + "/mappedCollections"))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$._embedded.mappedCollections", Matchers.not(Matchers.contains(
                        CollectionMatcher.matchCollectionEntry("Collection 1", col1.getID(), col1.getHandle()),
@@ -76,14 +75,12 @@ public class MappedCollectionRestRepositoryIT extends AbstractControllerIntegrat
                    .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/core/items")))
         ;
 
-        getClient().perform(get("/api/core/collections/" + col1.getID() + "/mappedItems")
-                .param("projection", "full"))
+        getClient().perform(get("/api/core/collections/" + col1.getID() + "/mappedItems"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$._embedded.mappedItems", Matchers.not(Matchers.contains(
                         ItemMatcher.matchItemProperties(publicItem1))
                 )));
-        getClient().perform(get("/api/core/collections/" + col2.getID() + "/mappedItems")
-                .param("projection", "full"))
+        getClient().perform(get("/api/core/collections/" + col2.getID() + "/mappedItems"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$._embedded.mappedItems", Matchers.not(Matchers.contains(
                         ItemMatcher.matchItemProperties(publicItem1))
@@ -124,8 +121,7 @@ public class MappedCollectionRestRepositoryIT extends AbstractControllerIntegrat
                         )
         );
 
-        getClient().perform(get("/api/core/items/" + publicItem1.getID() + "/mappedCollections")
-                .param("projection", "full"))
+        getClient().perform(get("/api/core/items/" + publicItem1.getID() + "/mappedCollections"))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$._embedded.mappedCollections", Matchers.containsInAnyOrder(
                        CollectionMatcher.matchCollectionEntry("Collection 2", col2.getID(), col2.getHandle())
@@ -133,15 +129,13 @@ public class MappedCollectionRestRepositoryIT extends AbstractControllerIntegrat
                    .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/core/items")))
         ;
 
-        getClient().perform(get("/api/core/collections/" + col1.getID() + "/mappedItems")
-                .param("projection", "full"))
+        getClient().perform(get("/api/core/collections/" + col1.getID() + "/mappedItems"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$._embedded.mappedItems", Matchers.not(Matchers.contains(
                         ItemMatcher.matchItemProperties(publicItem1))
                 )))
                 .andExpect(jsonPath("$._embedded.mappedItems", Matchers.hasSize(0)));
-        getClient().perform(get("/api/core/collections/" + col2.getID() + "/mappedItems")
-                .param("projection", "full"))
+        getClient().perform(get("/api/core/collections/" + col2.getID() + "/mappedItems"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$._embedded.mappedItems", Matchers.contains(
                         ItemMatcher.matchItemProperties(publicItem1))
@@ -184,8 +178,7 @@ public class MappedCollectionRestRepositoryIT extends AbstractControllerIntegrat
                     )
             );
 
-        getClient().perform(get("/api/core/items/" + publicItem1.getID() + "/mappedCollections")
-                   .param("projection", "full"))
+        getClient().perform(get("/api/core/items/" + publicItem1.getID() + "/mappedCollections"))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$._embedded.mappedCollections", Matchers.containsInAnyOrder(
                        CollectionMatcher.matchCollectionEntry("Collection 2", col2.getID(), col2.getHandle()),
@@ -251,8 +244,7 @@ public class MappedCollectionRestRepositoryIT extends AbstractControllerIntegrat
                     )
             );
 
-        getClient().perform(get("/api/core/items/" + publicItem1.getID() + "/mappedCollections")
-                   .param("projection", "full"))
+        getClient().perform(get("/api/core/items/" + publicItem1.getID() + "/mappedCollections"))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$._embedded.mappedCollections", Matchers.containsInAnyOrder(
                        CollectionMatcher.matchCollectionEntry("Collection 2", col2.getID(), col2.getHandle()),
@@ -307,8 +299,7 @@ public class MappedCollectionRestRepositoryIT extends AbstractControllerIntegrat
                     )
             );
 
-        getClient().perform(get("/api/core/items/" + publicItem1.getID() + "/mappedCollections")
-                   .param("projection", "full"))
+        getClient().perform(get("/api/core/items/" + publicItem1.getID() + "/mappedCollections"))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$._embedded.mappedCollections", Matchers.not(Matchers.contains(
                        CollectionMatcher.matchCollectionEntry("Collection 1", col1.getID(), col1.getHandle())
@@ -359,16 +350,14 @@ public class MappedCollectionRestRepositoryIT extends AbstractControllerIntegrat
                     )
             );
 
-        getClient().perform(get("/api/core/items/" + publicItem1.getID() + "/mappedCollections")
-                   .param("projection", "full"))
+        getClient().perform(get("/api/core/items/" + publicItem1.getID() + "/mappedCollections"))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$._embedded.mappedCollections", Matchers.not(Matchers.contains(
                        CollectionMatcher.matchCollectionEntry("Collection 1", col1.getID(), col1.getHandle()))
                    )))
                    .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/core/items")))
         ;
-        getClient().perform(get("/api/core/collections/" + col1.getID() + "/mappedItems")
-                .param("projection", "full"))
+        getClient().perform(get("/api/core/collections/" + col1.getID() + "/mappedItems"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$._embedded.mappedItems", Matchers.not(Matchers.contains(
                         ItemMatcher.matchItemProperties(publicItem1))
@@ -378,30 +367,26 @@ public class MappedCollectionRestRepositoryIT extends AbstractControllerIntegrat
         getClient(adminToken)
             .perform(delete("/api/core/items/" + publicItem1.getID() + "/mappedCollections/" + col2.getID()));
 
-        getClient().perform(get("/api/core/items/" + publicItem1.getID() + "/mappedCollections")
-                   .param("projection", "full"))
+        getClient().perform(get("/api/core/items/" + publicItem1.getID() + "/mappedCollections"))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$._embedded.mappedCollections", Matchers.not(Matchers.containsInAnyOrder(
                        CollectionMatcher.matchCollectionEntry("Collection 2", col2.getID(), col2.getHandle()),
                        CollectionMatcher.matchCollectionEntry("Collection 1", col1.getID(), col1.getHandle())
                    ))))
                    .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/core/items")));
-        getClient().perform(get("/api/core/collections/" + col1.getID() + "/mappedItems")
-                .param("projection", "full"))
+        getClient().perform(get("/api/core/collections/" + col1.getID() + "/mappedItems"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$._embedded.mappedItems", Matchers.not(Matchers.contains(
                         ItemMatcher.matchItemProperties(publicItem1))
                 )))
                 .andExpect(jsonPath("$._embedded.mappedItems", Matchers.hasSize(0)));
-        getClient().perform(get("/api/core/collections/" + col2.getID() + "/mappedItems")
-                .param("projection", "full"))
+        getClient().perform(get("/api/core/collections/" + col2.getID() + "/mappedItems"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$._embedded.mappedItems", Matchers.not(Matchers.contains(
                         ItemMatcher.matchItemProperties(publicItem1))
                 )))
                 .andExpect(jsonPath("$._embedded.mappedItems", Matchers.hasSize(0)));
-        getClient().perform(get("/api/core/collections/" + col3.getID() + "/mappedItems")
-                .param("projection", "full"))
+        getClient().perform(get("/api/core/collections/" + col3.getID() + "/mappedItems"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$._embedded.mappedItems", Matchers.contains(
                         ItemMatcher.matchItemProperties(publicItem1))
@@ -411,8 +396,7 @@ public class MappedCollectionRestRepositoryIT extends AbstractControllerIntegrat
         getClient(adminToken)
             .perform(delete("/api/core/items/" + publicItem1.getID() + "/mappedCollections/" + col1.getID()));
 
-        getClient().perform(get("/api/core/items/" + publicItem1.getID() + "/mappedCollections")
-                   .param("projection", "full"))
+        getClient().perform(get("/api/core/items/" + publicItem1.getID() + "/mappedCollections"))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$._embedded.mappedCollections", Matchers.not(Matchers.containsInAnyOrder(
                        CollectionMatcher.matchCollectionEntry("Collection 2", col2.getID(), col2.getHandle()),
@@ -420,22 +404,19 @@ public class MappedCollectionRestRepositoryIT extends AbstractControllerIntegrat
                    ))))
                    .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/core/items")))
         ;
-        getClient().perform(get("/api/core/collections/" + col1.getID() + "/mappedItems")
-                .param("projection", "full"))
+        getClient().perform(get("/api/core/collections/" + col1.getID() + "/mappedItems"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$._embedded.mappedItems", Matchers.not(Matchers.contains(
                         ItemMatcher.matchItemProperties(publicItem1))
                 )))
                 .andExpect(jsonPath("$._embedded.mappedItems", Matchers.hasSize(0)));
-        getClient().perform(get("/api/core/collections/" + col2.getID() + "/mappedItems")
-                .param("projection", "full"))
+        getClient().perform(get("/api/core/collections/" + col2.getID() + "/mappedItems"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$._embedded.mappedItems", Matchers.not(Matchers.contains(
                         ItemMatcher.matchItemProperties(publicItem1))
                 )))
                 .andExpect(jsonPath("$._embedded.mappedItems", Matchers.hasSize(0)));;
-        getClient().perform(get("/api/core/collections/" + col3.getID() + "/mappedItems")
-                .param("projection", "full"))
+        getClient().perform(get("/api/core/collections/" + col3.getID() + "/mappedItems"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$._embedded.mappedItems", Matchers.contains(
                         ItemMatcher.matchItemProperties(publicItem1))
@@ -626,14 +607,13 @@ public class MappedCollectionRestRepositoryIT extends AbstractControllerIntegrat
                 .build();
         context.restoreAuthSystemState();
 
-//        collectionService.addItem(context, col2, publicItem1);
-//        collectionService.update(context, col2);
+//        collectionService.addItem(context, colAA2, publicItem1);
+//        collectionService.update(context, colAA2);
 //        itemService.update(context, publicItem1);
 
         context.restoreAuthSystemState();
         context.setCurrentUser(null);
-        getClient().perform(get("/api/core/items/" + publicItem1.getID() + "/mappedCollections")
-                   .param("projection", "full"))
+        getClient().perform(get("/api/core/items/" + publicItem1.getID() + "/mappedCollections"))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$._embedded.mappedCollections", Matchers.not(Matchers.contains(
                        CollectionMatcher.matchCollectionEntry("Collection 1", col1.getID(), col1.getHandle()),
@@ -667,8 +647,8 @@ public class MappedCollectionRestRepositoryIT extends AbstractControllerIntegrat
                 .build();
         context.restoreAuthSystemState();
 
-//        collectionService.addItem(context, col2, publicItem1);
-//        collectionService.update(context, col2);
+//        collectionService.addItem(context, colAA2, publicItem1);
+//        collectionService.update(context, colAA2);
 //        itemService.update(context, publicItem1);
 
         getClient().perform(
@@ -704,8 +684,8 @@ public class MappedCollectionRestRepositoryIT extends AbstractControllerIntegrat
                 .build();
         context.restoreAuthSystemState();
 
-//        collectionService.addItem(context, col2, publicItem1);
-//        collectionService.update(context, col2);
+//        collectionService.addItem(context, colAA2, publicItem1);
+//        collectionService.update(context, colAA2);
 //        itemService.update(context, publicItem1);
 
 

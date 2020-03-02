@@ -89,7 +89,7 @@ public class OpenSearchServiceImpl implements OpenSearchService {
      * Get base search service URL (websvc.opensearch.svccontext)
      */
     protected String getBaseSearchServiceURL() {
-        return configurationService.getProperty("dspace.url") + "/" +
+        return configurationService.getProperty("dspace.server.url") + "/" +
             configurationService.getProperty("websvc.opensearch.svccontext");
     }
 
@@ -97,7 +97,7 @@ public class OpenSearchServiceImpl implements OpenSearchService {
      * Get base search UI URL (websvc.opensearch.uicontext)
      */
     protected String getBaseSearchUIURL() {
-        return configurationService.getProperty("dspace.url") + "/" +
+        return configurationService.getProperty("dspace.server.url") + "/" +
             configurationService.getProperty("websvc.opensearch.uicontext");
     }
 
