@@ -29,6 +29,7 @@ import org.dspace.app.rest.builder.BitstreamFormatBuilder;
 import org.dspace.app.rest.builder.EPersonBuilder;
 import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.matcher.BitstreamFormatMatcher;
+import org.dspace.app.rest.matcher.HalMatcher;
 import org.dspace.app.rest.model.BitstreamFormatRest;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
@@ -134,6 +135,7 @@ public class BitstreamFormatRestRepositoryIT extends AbstractControllerIntegrati
     public void createAdminAccess() throws Exception {
         ObjectMapper mapper = new ObjectMapper();
         BitstreamFormatRest bitstreamFormatRest = this.createRandomMockBitstreamRest(false);
+
         //Create bitstream format
         String token = getAuthToken(admin.getEmail(), password);
 
@@ -142,10 +144,10 @@ public class BitstreamFormatRestRepositoryIT extends AbstractControllerIntegrati
         try {
 
             MvcResult mvcResult = getClient(token).perform(post("/api/core/bitstreamformats/")
-                                                                   .content(mapper.writeValueAsBytes(
-                                                                           bitstreamFormatRest))
+                                                  .content(mapper.writeValueAsBytes(bitstreamFormatRest))
                                                                    .contentType(contentType))
                                                   .andExpect(status().isCreated())
+                                                  .andExpect(jsonPath("$", HalMatcher.matchNoEmbeds()))
                                                   .andReturn();
 
             String content = mvcResult.getResponse().getContentAsString();
