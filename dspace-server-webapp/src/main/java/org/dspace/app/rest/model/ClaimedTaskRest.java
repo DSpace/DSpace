@@ -22,7 +22,8 @@ public class ClaimedTaskRest extends BaseObjectRest<Integer> {
 
     private String step;
 
-    private String action;
+    @JsonIgnore
+    private WorkflowActionRest action;
 
     @JsonIgnore
     private EPersonRest owner;
@@ -61,11 +62,11 @@ public class ClaimedTaskRest extends BaseObjectRest<Integer> {
      * @see ClaimedTaskRest#getAction()
      * @return the action
      */
-    public String getAction() {
+    public WorkflowActionRest getAction() {
         return action;
     }
 
-    public void setAction(String action) {
+    public void setAction(WorkflowActionRest action) {
         this.action = action;
     }
 

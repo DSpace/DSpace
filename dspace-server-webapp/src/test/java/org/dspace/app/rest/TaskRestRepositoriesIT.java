@@ -27,6 +27,7 @@ import org.dspace.app.rest.builder.WorkflowItemBuilder;
 import org.dspace.app.rest.matcher.ClaimedTaskMatcher;
 import org.dspace.app.rest.matcher.EPersonMatcher;
 import org.dspace.app.rest.matcher.PoolTaskMatcher;
+import org.dspace.app.rest.matcher.WorkflowActionMatcher;
 import org.dspace.app.rest.matcher.WorkflowItemMatcher;
 import org.dspace.app.rest.matcher.WorkspaceItemMatcher;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
@@ -34,11 +35,14 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
 import org.dspace.eperson.EPerson;
+import org.dspace.xmlworkflow.factory.XmlWorkflowFactory;
+import org.dspace.xmlworkflow.state.actions.WorkflowActionConfig;
 import org.dspace.xmlworkflow.storedcomponents.ClaimedTask;
 import org.dspace.xmlworkflow.storedcomponents.PoolTask;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 import org.hamcrest.Matchers;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 
 /**
@@ -48,6 +52,10 @@ import org.springframework.http.MediaType;
  *
  */
 public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
+
+    @Autowired
+    private XmlWorkflowFactory xmlWorkflowFactory;
+
 
     @Test
     /**
@@ -1821,6 +1829,8 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED))
             .andExpect(status().isNoContent());
 
+        WorkflowActionConfig workflowAction = xmlWorkflowFactory.getActionByName("reviewaction");
+
         // get the id of the claimed task
         getClient(reviewer1Token).perform(get("/api/workflow/claimedtasks/search/findByUser")
                 .param("uuid", reviewer1.getID().toString()))
@@ -1831,7 +1841,9 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
                             hasJsonPath("$.type", Matchers.is("claimedtask")),
                             hasJsonPath("$._embedded.workflowitem",
                                      Matchers.is(WorkflowItemMatcher.matchItemWithTitleAndDateIssuedAndSubject(
-                                             witem, "Test item full workflow", "2019-03-06", "ExtraEntry")))
+                                             witem, "Test item full workflow", "2019-03-06", "ExtraEntry"))),
+                            hasJsonPath("$._embedded.action",
+                                        WorkflowActionMatcher.matchWorkflowActionEntry(workflowAction))
                     ))))
             .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/workflow/claimedtasks")))
             .andExpect(jsonPath("$.page.size", is(20)))
@@ -1872,6 +1884,8 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED))
             .andExpect(status().isNoContent());
 
+        workflowAction = xmlWorkflowFactory.getActionByName("editaction");
+
         // get the id of the claimed task
         getClient(reviewer2Token).perform(get("/api/workflow/claimedtasks/search/findByUser")
                 .param("uuid", reviewer2.getID().toString()))
@@ -1882,7 +1896,9 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
                             hasJsonPath("$.type", Matchers.is("claimedtask")),
                             hasJsonPath("$._embedded.workflowitem",
                                      Matchers.is(WorkflowItemMatcher.matchItemWithTitleAndDateIssuedAndSubject(
-                                             witem, "Test item full workflow", "2019-03-06", "ExtraEntry")))
+                                             witem, "Test item full workflow", "2019-03-06", "ExtraEntry"))),
+                            hasJsonPath("$._embedded.action",
+                                        WorkflowActionMatcher.matchWorkflowActionEntry(workflowAction))
                     ))))
             .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/workflow/claimedtasks")))
             .andExpect(jsonPath("$.page.size", is(20)))
@@ -1911,7 +1927,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
                             hasJsonPath("$._embedded.workflowitem",
                                     Matchers.is(WorkflowItemMatcher.matchItemWithTitleAndDateIssuedAndSubject(
                                             witem, "Test item full workflow", "2019-03-06", "ExtraEntry")))
-                            ))))
+                    ))))
             .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/workflow/pooltasks")))
             .andExpect(jsonPath("$.page.size", is(20)))
             .andExpect(jsonPath("$.page.totalElements", is(1)))
@@ -1923,6 +1939,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED))
             .andExpect(status().isNoContent());
 
+        workflowAction = xmlWorkflowFactory.getActionByName("finaleditaction");
         // get the id of the claimed task
         getClient(reviewer3Token).perform(get("/api/workflow/claimedtasks/search/findByUser")
                 .param("uuid", reviewer3.getID().toString()))
@@ -1933,7 +1950,9 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
                             hasJsonPath("$.type", Matchers.is("claimedtask")),
                             hasJsonPath("$._embedded.workflowitem",
                                      Matchers.is(WorkflowItemMatcher.matchItemWithTitleAndDateIssuedAndSubject(
-                                             witem, "Test item full workflow", "2019-03-06", "ExtraEntry")))
+                                             witem, "Test item full workflow", "2019-03-06", "ExtraEntry"))),
+                            hasJsonPath("$._embedded.action",
+                                        WorkflowActionMatcher.matchWorkflowActionEntry(workflowAction))
                     ))))
             .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/workflow/claimedtasks")))
             .andExpect(jsonPath("$.page.size", is(20)))
