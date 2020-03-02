@@ -356,7 +356,9 @@ public abstract class AbstractBrowserServlet extends DSpaceServlet
                 		}
                 		request.setAttribute("tagCloudConfig", tagCloudConfiguration);
                 	}
-                	
+
+                    request.setAttribute("starts_with", scope.getStartsWith());
+
                     showSinglePage(context, request, response);
                 }
                 else
