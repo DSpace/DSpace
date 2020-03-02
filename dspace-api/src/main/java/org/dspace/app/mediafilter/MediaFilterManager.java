@@ -573,6 +573,8 @@ public class MediaFilterManager
                 	System.out.println("\tChecksum: " + checksum);
                 	System.out.println("\tAsset Store: " + assetstore);
                 	System.out.println(e);
+                    System.err.println("Error filtering bitstream \"" + myBitstream.getName() + "\"");
+                    System.err.println("Item Handle:" + handle);
                     e.printStackTrace();
                 }
     		}
