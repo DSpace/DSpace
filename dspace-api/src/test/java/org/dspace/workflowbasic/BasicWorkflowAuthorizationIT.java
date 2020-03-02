@@ -271,7 +271,7 @@ public class BasicWorkflowAuthorizationIT
             Item item = wsi.getItem();
             Bundle bundle = bundleService.create(context, item, "ORIGINAL");
             File f = new File(AbstractDSpaceTest.testProps.get("test.bitstream").toString());
-            Bitstream bs = bitstreamService.create(context, bundle, new FileInputStream(f));
+            bitstreamService.create(context, bundle, new FileInputStream(f));
             bundleService.update(context, bundle);
             itemService.update(context, item);
             workspaceItemService.update(context, wsi);
@@ -289,8 +289,8 @@ public class BasicWorkflowAuthorizationIT
 
         int i = 0;
         // check item policies
-        for (int action : new int[] {Constants.READ, Constants.WRITE, Constants.ADD, Constants.REMOVE, Constants
-            .DELETE}) {
+        for (int action : new int[] {Constants.READ, Constants.WRITE, Constants.ADD, Constants.REMOVE,
+            Constants.DELETE}) {
             Assert.assertTrue("testReviewerPermissions 1-" + i++,
                               authorizeService.authorizeActionBoolean(context, member, item, action, false));
         }
@@ -323,7 +323,7 @@ public class BasicWorkflowAuthorizationIT
             Item item = wsi.getItem();
             Bundle bundle = bundleService.create(context, item, "ORIGINAL");
             File f = new File(AbstractDSpaceTest.testProps.get("test.bitstream").toString());
-            Bitstream bs = bitstreamService.create(context, bundle, new FileInputStream(f));
+            bitstreamService.create(context, bundle, new FileInputStream(f));
             bundleService.update(context, bundle);
             itemService.update(context, item);
             workspaceItemService.update(context, wsi);
@@ -365,7 +365,7 @@ public class BasicWorkflowAuthorizationIT
             item.setSubmitter(submitter);
             Bundle bundle = bundleService.create(context, item, "ORIGINAL");
             File f = new File(AbstractDSpaceTest.testProps.get("test.bitstream").toString());
-            Bitstream bs = bitstreamService.create(context, bundle, new FileInputStream(f));
+            bitstreamService.create(context, bundle, new FileInputStream(f));
             bundleService.update(context, bundle);
             itemService.update(context, item);
             workspaceItemService.update(context, wsi);

@@ -262,8 +262,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
 
         String token = getAuthToken(admin.getEmail(), password);
 
-        getClient(token).perform(get("/api/submission/workspaceitems/" + witem.getID() + "/collection")
-                .param("projection", "full"))
+        getClient(token).perform(get("/api/submission/workspaceitems/" + witem.getID() + "/collection"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", Matchers
                         .is(CollectionMatcher.matchCollectionEntry(col1.getName(), col1.getID(), col1.getHandle()))
@@ -471,14 +470,14 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
         String authToken = getAuthToken(admin.getEmail(), password);
 
-        // create a workspaceitem explicitly in the col1
+        // create a workspaceitem explicitly in the colAA1
         getClient(authToken).perform(post("/api/submission/workspaceitems")
                     .param("owningCollection", col1.getID().toString())
                     .contentType(org.springframework.http.MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$._embedded.collection.id", is(col1.getID().toString())));
 
-        // create a workspaceitem explicitly in the col2
+        // create a workspaceitem explicitly in the colAA2
         getClient(authToken).perform(post("/api/submission/workspaceitems")
                     .param("owningCollection", col2.getID().toString())
                     .contentType(org.springframework.http.MediaType.APPLICATION_JSON))
@@ -487,10 +486,11 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
 
         // create a workspaceitem without an explicit collection, this will go in the first valid collection for the
         // user: the col1
-        getClient(authToken).perform(post("/api/submission/workspaceitems")
-        .contentType(org.springframework.http.MediaType.APPLICATION_JSON))
+        getClient(authToken).perform(post("/api/submission/workspaceitems").param("projection", "full")
+                .contentType(org.springframework.http.MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$._embedded.collection.id", is(col1.getID().toString())));
+                .andExpect(jsonPath("$._embedded.collection.id", is(col1.getID().toString())))
+                .andExpect(jsonPath("$", WorkspaceItemMatcher.matchFullEmbeds()));
 
         // TODO cleanup the context!!!
     }
@@ -521,7 +521,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         final MockMultipartFile bibtexFile = new MockMultipartFile("file", "bibtex-test.bib", "application/x-bibtex",
                 bibtex);
 
-        // bulk create workspaceitems in the default collection (col1)
+        // bulk create workspaceitems in the default collection (colAA1)
         getClient(authToken).perform(fileUpload("/api/submission/workspaceitems")
                     .file(bibtexFile))
                 // bulk create should return 200, 201 (created) is better for single resource
@@ -542,7 +542,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                         jsonPath("$._embedded.workspaceitems[*]._embedded.upload").doesNotExist())
         ;
 
-        // bulk create workspaceitems explicitly in the col2
+        // bulk create workspaceitems explicitly in the colAA2
         getClient(authToken).perform(fileUpload("/api/submission/workspaceitems")
                     .file(bibtexFile)
                     .param("collection", col2.getID().toString()))
@@ -657,7 +657,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                                 )))))
         ;
 
-        // create an empty workspaceitem explicitly in the col1, check validation on creation
+        // create an empty workspaceitem explicitly in the colAA1, check validation on creation
         getClient(authToken).perform(post("/api/submission/workspaceitems")
                     .param("collection", col1.getID().toString())
                     .contentType(org.springframework.http.MediaType.APPLICATION_JSON))

@@ -11,7 +11,7 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.dspace.AbstractUnitTest;
@@ -121,7 +121,7 @@ public class DSpaceCommandLineParameterTest extends AbstractUnitTest {
         String value3 = null;
         DSpaceCommandLineParameter dSpaceCommandLineParameter3 = new DSpaceCommandLineParameter(key3, value3);
 
-        List<DSpaceCommandLineParameter> dSpaceCommandLineParameterList = new LinkedList<>();
+        List<DSpaceCommandLineParameter> dSpaceCommandLineParameterList = new ArrayList<>();
         dSpaceCommandLineParameterList.add(dSpaceCommandLineParameter);
         dSpaceCommandLineParameterList.add(dSpaceCommandLineParameter1);
         dSpaceCommandLineParameterList.add(dSpaceCommandLineParameter2);

@@ -66,7 +66,7 @@ public class CommunityLogoController {
     /**
      * This method will add a logo to the community.
      *
-     * curl -X POST http://<dspace.restUrl>/api/core/communities/1c11f3f1-ba1f-4f36-908a-3f1ea9a557eb/logo' \
+     * curl -X POST http://<dspace.server.url>/api/core/communities/1c11f3f1-ba1f-4f36-908a-3f1ea9a557eb/logo' \
      *  -XPOST -H 'Content-Type: multipart/form-data' \
      *  -H 'Authorization: Bearer eyJhbGciOiJI...' \
      *  -F "file=@Downloads/test.png"
@@ -74,7 +74,7 @@ public class CommunityLogoController {
      * Example:
      * <pre>
      * {@code
-     * curl -X POST http://<dspace.restUrl>/api/core/communities/1c11f3f1-ba1f-4f36-908a-3f1ea9a557eb/logo' \
+     * curl -X POST http://<dspace.server.url>/api/core/communities/1c11f3f1-ba1f-4f36-908a-3f1ea9a557eb/logo' \
      *  -XPOST -H 'Content-Type: multipart/form-data' \
      *  -H 'Authorization: Bearer eyJhbGciOiJI...' \
      *  -F "file=@Downloads/test.png"
