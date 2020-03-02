@@ -374,23 +374,24 @@ public class BitstreamRestControllerIT extends AbstractControllerIntegrationTest
                                           .withAuthor("Smith, Donald")
                                           .build();
 
-            Bitstream bitstream = BitstreamBuilder
+            bitstream = BitstreamBuilder
                 .createBitstream(context, publicItem1, is)
                 .withName("Test Embargoed Bitstream")
                 .withDescription("This bitstream is embargoed")
                 .withMimeType("text/plain")
                 .withEmbargoPeriod("3 months")
                 .build();
-
+        }
             context.restoreAuthSystemState();
 
             String authToken = getAuthToken(eperson.getEmail(), password);
             getClient(authToken).perform(get("/api/core/bitstreams/" + bitstream.getID() + "/content"))
                        .andExpect(status().isForbidden());
 
-            // An forbidden request should not log statistics
+            getClient().perform(get("/api/core/bitstreams/" + bitstream.getID() + "/content"))
+                       .andExpect(status().isUnauthorized());
+
             checkNumberOfStatsRecords(bitstream, 0);
-       }
     }
 
     @Test
@@ -422,7 +423,7 @@ public class BitstreamRestControllerIT extends AbstractControllerIntegrationTest
                 .withMimeType("text/plain")
                 .withEmbargoPeriod("-3 months")
                 .build();
-
+        }
             context.restoreAuthSystemState();
 
             // all  are allowed access to item with embargoed expired
@@ -435,7 +436,6 @@ public class BitstreamRestControllerIT extends AbstractControllerIntegrationTest
                        .andExpect(status().isOk());
 
             checkNumberOfStatsRecords(bitstream, 2);
-       }
     }
 
     @Test
@@ -455,6 +455,15 @@ public class BitstreamRestControllerIT extends AbstractControllerIntegrationTest
         Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
                    .withName("Sub Community")
                    .build();
+
+        EPerson adminChild2 = EPersonBuilder.createEPerson(context)
+                .withEmail("adminChil2@mail.com")
+                .withPassword("qwerty05")
+                .build();
+        Community child2 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                .withName("Sub Community 2")
+                .withAdminGroup(adminChild2)
+                .build();
 
         EPerson adminCollection1 = EPersonBuilder.createEPerson(context)
                 .withEmail("adminCollection1@mail.com")
@@ -509,6 +518,11 @@ public class BitstreamRestControllerIT extends AbstractControllerIntegrationTest
 
         // admin of second collection is NOT allowed access to embargoed item  of first collection
         String tokenAdminCollection2 = getAuthToken(adminCollection2.getEmail(), "qwerty01");
+        getClient(tokenAdminCollection2).perform(get("/api/core/bitstreams/" + bitstream.getID() + "/content"))
+                   .andExpect(status().isForbidden());
+
+        // admin of child2 community is NOT allowed access to embargoed item  of first collection
+        String tokenAdminChild2 = getAuthToken(adminChild2.getEmail(), "qwerty05");
         getClient(tokenAdminCollection2).perform(get("/api/core/bitstreams/" + bitstream.getID() + "/content"))
                    .andExpect(status().isForbidden());
 
@@ -592,15 +606,15 @@ public class BitstreamRestControllerIT extends AbstractControllerIntegrationTest
                     .withIssueDate("2013-01-17")
                     .withAuthor("Doe, John")
                     .build();
-            Bitstream bitstream = BitstreamBuilder
+            bitstream = BitstreamBuilder
                 .createBitstream(context, item, is)
                 .withName("Test Embargoed Bitstream")
                 .withDescription("This bitstream is embargoed")
                 .withMimeType("text/plain")
                 .withReaderGroup(restrictedGroup)
                 .build();
-
-
+        }
+            context.restoreAuthSystemState();
             // download the bitstream
             // eperson that belong to restricted group is allowed access to the item
             String authToken = getAuthToken(eperson.getEmail(), password);
@@ -618,7 +632,6 @@ public class BitstreamRestControllerIT extends AbstractControllerIntegrationTest
                                 .andExpect(status().isUnauthorized());
 
             checkNumberOfStatsRecords(bitstream, 1);
-        }
     }
 
     @Test
@@ -633,6 +646,15 @@ public class BitstreamRestControllerIT extends AbstractControllerIntegrationTest
         parentCommunity = CommunityBuilder.createCommunity(context)
                 .withName("Parent Community")
                 .withAdminGroup(adminParentCommunity)
+                .build();
+
+        EPerson adminChild1 = EPersonBuilder.createEPerson(context)
+                .withEmail("adminChild1@mail.com")
+                .withPassword("qwerty05")
+                .build();
+        Community child1 = CommunityBuilder.createCommunity(context)
+                .withName("Sub Community")
+                .withAdminGroup(adminChild1)
                 .build();
 
         EPerson adminCol1 = EPersonBuilder.createEPerson(context)
@@ -666,15 +688,15 @@ public class BitstreamRestControllerIT extends AbstractControllerIntegrationTest
                     .withIssueDate("2018-10-17")
                     .withAuthor("Doe, John")
                     .build();
-            Bitstream bitstream = BitstreamBuilder
+            bitstream = BitstreamBuilder
                 .createBitstream(context, item, is)
                 .withName("Test Embargoed Bitstream")
                 .withDescription("This bitstream is embargoed")
                 .withMimeType("text/plain")
                 .withReaderGroup(restrictedGroup)
                 .build();
-
-
+        }
+            context.restoreAuthSystemState();
             // download the bitstream
             // parent community's admin user is allowed access to the item belong restricted group
             String tokenAdminParentCommuity = getAuthToken(adminParentCommunity.getEmail(), "qwerty00");
@@ -693,8 +715,12 @@ public class BitstreamRestControllerIT extends AbstractControllerIntegrationTest
             getClient(tokenAdminCol2).perform(get("/api/core/bitstreams/" + bitstream.getID() + "/content"))
                                 .andExpect(status().isForbidden());
 
+            // child1's admin user is NOT allowed access to the item belong collection1
+            String tokenAdminChild1 = getAuthToken(adminChild1.getEmail(), "qwerty05");
+            getClient(tokenAdminCol2).perform(get("/api/core/bitstreams/" + bitstream.getID() + "/content"))
+                                .andExpect(status().isForbidden());
+
             checkNumberOfStatsRecords(bitstream, 2);
-        }
     }
 
     // Verify number of hits/views of Bitstream is as expected
