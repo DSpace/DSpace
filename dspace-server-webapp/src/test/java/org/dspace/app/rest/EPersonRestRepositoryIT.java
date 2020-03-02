@@ -32,6 +32,7 @@ import org.dspace.app.rest.builder.CommunityBuilder;
 import org.dspace.app.rest.builder.EPersonBuilder;
 import org.dspace.app.rest.builder.ItemBuilder;
 import org.dspace.app.rest.matcher.EPersonMatcher;
+import org.dspace.app.rest.matcher.HalMatcher;
 import org.dspace.app.rest.model.EPersonRest;
 import org.dspace.app.rest.model.MetadataRest;
 import org.dspace.app.rest.model.MetadataValueRest;
@@ -55,6 +56,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
         // we should check how to get it from Spring
         ObjectMapper mapper = new ObjectMapper();
         EPersonRest data = new EPersonRest();
+        EPersonRest dataFull = new EPersonRest();
         MetadataRest metadataRest = new MetadataRest();
         data.setEmail("createtest@fake-email.com");
         data.setCanLogIn(true);
@@ -65,13 +67,18 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
         firstname.setValue("John");
         metadataRest.put("eperson.firstname", firstname);
         data.setMetadata(metadataRest);
+        dataFull.setEmail("createtestFull@fake-email.com");
+        dataFull.setCanLogIn(true);
+        dataFull.setMetadata(metadataRest);
 
         String authToken = getAuthToken(admin.getEmail(), password);
         getClient(authToken).perform(post("/api/eperson/epersons")
                                         .content(mapper.writeValueAsBytes(data))
-                                        .contentType(contentType))
+                                        .contentType(contentType)
+                            .param("projection", "full"))
                             .andExpect(status().isCreated())
                             .andExpect(content().contentType(contentType))
+                            .andExpect(jsonPath("$", EPersonMatcher.matchFullEmbeds()))
                             .andExpect(jsonPath("$", Matchers.allOf(
                                hasJsonPath("$.uuid", not(empty())),
                                // is it what you expect? EPerson.getName() returns the email...
@@ -85,6 +92,13 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                                        matchMetadata("eperson.firstname", "John"),
                                        matchMetadata("eperson.lastname", "Doe")
                                )))));
+
+        getClient(authToken).perform(post("/api/eperson/epersons")
+                .content(mapper.writeValueAsBytes(dataFull))
+                .contentType(contentType))
+                .andExpect(status().isCreated())
+                .andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$", HalMatcher.matchNoEmbeds()));
         // TODO cleanup the context!!!
     }
 
@@ -193,9 +207,11 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                                          .withEmail("janesmith@fake-email.com")
                                          .build();
 
+        // When full projection is requested, response should include expected properties, links, and embeds.
         String authToken = getAuthToken(admin.getEmail(), password);
-        getClient(authToken).perform(get("/api/eperson/epersons/" + ePerson2.getID()))
+        getClient(authToken).perform(get("/api/eperson/epersons/" + ePerson2.getID()).param("projection", "full"))
                    .andExpect(status().isOk())
+                   .andExpect(jsonPath("$", EPersonMatcher.matchFullEmbeds()))
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$", is(
                        EPersonMatcher.matchEPersonEntry(ePerson2)
@@ -204,7 +220,14 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                        is(
                            EPersonMatcher.matchEPersonEntry(ePerson)
                        )
-                   )));
+                   )))
+        ;
+
+        // When no projection is requested, response should include expected properties, links, and no embeds.
+        getClient(authToken).perform(get("/api/eperson/epersons/" + ePerson2.getID()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", HalMatcher.matchNoEmbeds()))
+        ;
 
     }
 
@@ -337,7 +360,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
     public void findByEmailUnprocessable() throws Exception {
         String authToken = getAuthToken(admin.getEmail(), password);
         getClient(authToken).perform(get("/api/eperson/epersons/search/byEmail"))
-                .andExpect(status().isUnprocessableEntity());
+                .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -409,7 +432,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
     public void findByNameUnprocessable() throws Exception {
         String authToken = getAuthToken(admin.getEmail(), password);
         getClient(authToken).perform(get("/api/eperson/epersons/search/byName"))
-                .andExpect(status().isUnprocessableEntity());
+                .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -976,6 +999,32 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
         getClient(token).perform(get("/api/"))
                         .andExpect(status().isOk());
 
+    }
+
+    @Test
+    public void patchPasswordReplaceOnNonExistentValue() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        EPerson ePerson = EPersonBuilder.createEPerson(context)
+                .withNameInMetadata("John", "Doe")
+                .withEmail("Johndoe@fake-email.com")
+                .build();
+
+        String newPassword = "newpassword";
+
+        List<Operation> ops = new ArrayList<Operation>();
+        ReplaceOperation replaceOperation = new ReplaceOperation("/password", newPassword);
+        ops.add(replaceOperation);
+        String patchBody = getPatchContent(ops);
+
+        String token = getAuthToken(admin.getEmail(), password);
+
+        // replace of password should fail
+        getClient(token).perform(patch("/api/eperson/epersons/" + ePerson.getID())
+                .content(patchBody)
+                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                .andExpect(status().isBadRequest());
     }
 
     @Test

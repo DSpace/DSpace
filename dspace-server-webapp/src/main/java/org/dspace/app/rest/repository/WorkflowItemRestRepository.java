@@ -24,7 +24,6 @@ import org.dspace.app.rest.model.ErrorRest;
 import org.dspace.app.rest.model.WorkflowItemRest;
 import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.rest.model.patch.Patch;
-import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.submit.AbstractRestProcessingStep;
 import org.dspace.app.rest.submit.SubmissionService;
 import org.dspace.app.rest.submit.UploadableStep;
@@ -116,7 +115,7 @@ public class WorkflowItemRestRepository extends DSpaceRestRepository<WorkflowIte
         try {
             long total = wis.countAll(context);
             List<XmlWorkflowItem> witems = wis.findAll(context, pageable.getPageNumber(), pageable.getPageSize());
-            return converter.toRestPage(witems, pageable, total, utils.obtainProjection(true));
+            return converter.toRestPage(witems, pageable, total, utils.obtainProjection());
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -131,7 +130,7 @@ public class WorkflowItemRestRepository extends DSpaceRestRepository<WorkflowIte
             long total = wis.countBySubmitter(context, ep);
             List<XmlWorkflowItem> witems = wis.findBySubmitter(context, ep, pageable.getPageNumber(),
                     pageable.getPageSize());
-            return converter.toRestPage(witems, pageable, total, utils.obtainProjection(true));
+            return converter.toRestPage(witems, pageable, total, utils.obtainProjection());
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -157,7 +156,7 @@ public class WorkflowItemRestRepository extends DSpaceRestRepository<WorkflowIte
         if (source.getItem().isArchived()) {
             return null;
         }
-        return converter.toRest(source, Projection.DEFAULT);
+        return converter.toRest(source, utils.obtainProjection());
     }
 
     @Override
@@ -204,7 +203,7 @@ public class WorkflowItemRestRepository extends DSpaceRestRepository<WorkflowIte
             }
 
         }
-        wsi = converter.toRest(source, Projection.DEFAULT);
+        wsi = converter.toRest(source, utils.obtainProjection());
 
         if (!errors.isEmpty()) {
             wsi.getErrors().addAll(errors);

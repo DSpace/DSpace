@@ -8,12 +8,14 @@
 package org.dspace.app.rest.matcher;
 
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
+import static org.dspace.app.rest.matcher.HalMatcher.matchEmbeds;
 import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadata;
 import static org.dspace.app.rest.test.AbstractControllerIntegrationTest.REST_SERVER_URL;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
-import static org.hamcrest.Matchers.startsWith;
+
+import java.util.UUID;
 
 import org.dspace.content.Item;
 import org.hamcrest.Matcher;
@@ -39,16 +41,34 @@ public class ItemMatcher {
                     matchMetadata("dc.date.issued", dateIssued))),
 
             //Check links
-            matchItemLinks(item)
+            matchLinks(item.getID())
         );
     }
 
-    public static Matcher<? super Object> matchItemLinks(Item item) {
-        return allOf(
-            hasJsonPath("$._links.self.href", startsWith(REST_SERVER_URL)),
-            hasJsonPath("$._links.bundles.href", startsWith(REST_SERVER_URL)),
-            hasJsonPath("$._links.owningCollection.href", startsWith(REST_SERVER_URL)),
-            hasJsonPath("$._links.templateItemOf.href", startsWith(REST_SERVER_URL))
+    /**
+     * Gets a matcher for all expected embeds when the full projection is requested.
+     */
+    public static Matcher<? super Object> matchFullEmbeds() {
+        return matchEmbeds(
+                "bundles[]",
+                "mappedCollections[]",
+                "owningCollection",
+                "relationships[]",
+                "templateItemOf"
+        );
+    }
+
+    /**
+     * Gets a matcher for all expected links.
+     */
+    public static Matcher<? super Object> matchLinks(UUID uuid) {
+        return HalMatcher.matchLinks(REST_SERVER_URL + "core/items/" + uuid,
+                "bundles",
+                "mappedCollections",
+                "owningCollection",
+                "relationships",
+                "self",
+                "templateItemOf"
         );
     }
 

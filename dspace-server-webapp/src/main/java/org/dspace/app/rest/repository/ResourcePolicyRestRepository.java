@@ -8,7 +8,6 @@
 package org.dspace.app.rest.repository;
 
 import java.io.IOException;
-
 import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
@@ -24,13 +23,10 @@ import org.dspace.app.rest.exception.RESTAuthorizationException;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.ResourcePolicyRest;
-import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.rest.model.patch.Patch;
-import org.dspace.app.rest.projection.Projection;
-import org.dspace.app.rest.repository.patch.factories.ResourcePolicyOperationFactory;
+import org.dspace.app.rest.repository.patch.ResourcePatch;
 import org.dspace.app.rest.utils.DSpaceObjectUtils;
 import org.dspace.app.rest.utils.Utils;
-import org.dspace.app.util.DCInputsReaderException;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.authorize.service.ResourcePolicyService;
@@ -60,9 +56,6 @@ public class ResourcePolicyRestRepository extends DSpaceRestRepository<ResourceP
     ResourcePolicyService resourcePolicyService;
 
     @Autowired
-    ResourcePolicyOperationFactory resourcePolicyOperationPatchFactory;
-
-    @Autowired
     Utils utils;
 
     @Autowired
@@ -74,6 +67,8 @@ public class ResourcePolicyRestRepository extends DSpaceRestRepository<ResourceP
     @Autowired
     DSpaceObjectUtils dspaceObjectUtils;
 
+    @Autowired
+    ResourcePatch<ResourcePolicy> resourcePatch;
 
     @Override
     @PreAuthorize("hasPermission(#id, 'resourcepolicy', 'READ')")
@@ -103,21 +98,18 @@ public class ResourcePolicyRestRepository extends DSpaceRestRepository<ResourceP
 
     /**
      * Find the resource policies matching the uuid of the resource object and/or the specified action
-     * 
-     * @param resourceUuid
-     *            mandatory, the uuid of the resource object of the policy
-     * @param action
-     *            optional, limit the returned policies to the specified action
-     * @param pageable
-     *            contains the pagination information
+     *
+     * @param resourceUuid mandatory, the uuid of the resource object of the policy
+     * @param action       optional, limit the returned policies to the specified action
+     * @param pageable     contains the pagination information
      * @return a Page of ResourcePolicyRest instances matching the uuid of the resource object and/or the specified
-     *         action
+     * action
      */
     @PreAuthorize("hasPermission(#resourceUuid, 'dspaceObject', 'ADMIN')")
     @SearchRestMethod(name = "resource")
     public Page<ResourcePolicyRest> findByResource(@Parameter(value = "uuid", required = true) UUID resourceUuid,
-                                      @Parameter(value = "action", required = false) String action, Pageable pageable) {
-
+                                                   @Parameter(value = "action", required = false) String action,
+                                                   Pageable pageable) {
         List<ResourcePolicy> resourcePolisies = null;
         int total = 0;
         try {
@@ -125,39 +117,35 @@ public class ResourcePolicyRestRepository extends DSpaceRestRepository<ResourceP
             if (action != null) {
                 int actionId = Constants.getActionID(action);
                 resourcePolisies = resourcePolicyService.findByResouceUuidAndActionId(context, resourceUuid, actionId,
-                        Math.toIntExact(pageable.getOffset()),
-                        Math.toIntExact(pageable.getOffset() + pageable.getPageSize()));
+                    Math.toIntExact(pageable.getOffset()),
+                    Math.toIntExact(pageable.getOffset() + pageable.getPageSize()));
                 total = resourcePolicyService.countByResouceUuidAndActionId(context, resourceUuid, actionId);
             } else {
                 resourcePolisies = resourcePolicyService.findByResouceUuid(context, resourceUuid,
-                        Math.toIntExact(pageable.getOffset()),
-                        Math.toIntExact(pageable.getOffset() + pageable.getPageSize()));
+                    Math.toIntExact(pageable.getOffset()),
+                    Math.toIntExact(pageable.getOffset() + pageable.getPageSize()));
                 total = resourcePolicyService.countByResourceUuid(context, resourceUuid);
             }
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-        return converter.toRestPage(resourcePolisies, pageable, total, utils.obtainProjection(true));
+        return converter.toRestPage(resourcePolisies, pageable, total, utils.obtainProjection());
     }
 
     /**
      * Find the resource policies matching uuid of the eperson and/or the one specified resource object
-     * 
-     * @param epersonUuid
-     *            mandatory, the uuid of the eperson that benefit of the policy
-     * @param resourceUuid
-     *            optional, limit the returned policies to the ones related to the specified resource
-     * @param pageable
-     *            contains the pagination information
      *
+     * @param epersonUuid  mandatory, the uuid of the eperson that benefit of the policy
+     * @param resourceUuid optional, limit the returned policies to the ones related to the specified resource
+     * @param pageable     contains the pagination information
      * @return It returns the list of explicit matching resource policies, no inherited or broader resource policies
-     *         will be included in the list nor policies derived by groups' membership
+     * will be included in the list nor policies derived by groups' membership
      */
     @PreAuthorize("hasPermission(#epersonUuid, 'EPERSON', 'READ')")
     @SearchRestMethod(name = "eperson")
     public Page<ResourcePolicyRest> findByEPerson(@Parameter(value = "uuid", required = true) UUID epersonUuid,
-                                @Parameter(value = "resource", required = false) UUID resourceUuid, Pageable pageable) {
-
+                                                  @Parameter(value = "resource", required = false) UUID resourceUuid,
+                                                  Pageable pageable) {
         List<ResourcePolicy> resourcePolisies = null;
         int total = 0;
         try {
@@ -168,40 +156,36 @@ public class ResourcePolicyRestRepository extends DSpaceRestRepository<ResourceP
             }
             if (resourceUuid != null) {
                 resourcePolisies = resourcePolicyService.findByEPersonAndResourceUuid(context, eperson, resourceUuid,
-                        Math.toIntExact(pageable.getOffset()),
-                        Math.toIntExact(pageable.getOffset() + pageable.getPageSize()));
+                    Math.toIntExact(pageable.getOffset()),
+                    Math.toIntExact(pageable.getOffset() + pageable.getPageSize()));
                 total = resourcePolicyService.countResourcePoliciesByEPersonAndResourceUuid(context,
-                        eperson, resourceUuid);
+                    eperson, resourceUuid);
             } else {
                 resourcePolisies = resourcePolicyService.findByEPerson(context, eperson,
-                        Math.toIntExact(pageable.getOffset()),
-                        Math.toIntExact(pageable.getOffset() + pageable.getPageSize()));
+                    Math.toIntExact(pageable.getOffset()),
+                    Math.toIntExact(pageable.getOffset() + pageable.getPageSize()));
                 total = resourcePolicyService.countByEPerson(context, eperson);
             }
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-        return converter.toRestPage(resourcePolisies, pageable, total, utils.obtainProjection(true));
+        return converter.toRestPage(resourcePolisies, pageable, total, utils.obtainProjection());
     }
 
     /**
      * Find the resource policies matching uuid of the group and/or the ones specified resource object
-     * 
-     * @param groupUuid
-     *            mandatory, the uuid of the group that benefit of the policy
-     * @param resourceUuid
-     *            optional, limit the returned policies to the ones related to the specified resource
-     * @param pageable
-     *            contains the pagination information
-     * 
+     *
+     * @param groupUuid    mandatory, the uuid of the group that benefit of the policy
+     * @param resourceUuid optional, limit the returned policies to the ones related to the specified resource
+     * @param pageable     contains the pagination information
      * @return It returns the list of explicit matching resource policies, no inherited or broader resource policies
-     *         will be included in the list nor policies derived by groups' membership
+     * will be included in the list nor policies derived by groups' membership
      */
     @PreAuthorize("hasPermission(#groupUuid, 'GROUP', 'READ')")
     @SearchRestMethod(name = "group")
     public Page<ResourcePolicyRest> findByGroup(@Parameter(value = "uuid", required = true) UUID groupUuid,
-                                @Parameter(value = "resource", required = false) UUID resourceUuid, Pageable pageable) {
-
+                                                @Parameter(value = "resource", required = false) UUID resourceUuid,
+                                                Pageable pageable) {
         List<ResourcePolicy> resourcePolisies = null;
         int total = 0;
         try {
@@ -215,20 +199,20 @@ public class ResourcePolicyRestRepository extends DSpaceRestRepository<ResourceP
             }
             if (resourceUuid != null) {
                 resourcePolisies = resourcePolicyService.findByGroupAndResourceUuid(context, group, resourceUuid,
-                        Math.toIntExact(pageable.getOffset()),
-                        Math.toIntExact(pageable.getOffset() + pageable.getPageSize()));
+                    Math.toIntExact(pageable.getOffset()),
+                    Math.toIntExact(pageable.getOffset() + pageable.getPageSize()));
                 total = resourcePolicyService.countByGroupAndResourceUuid(context, group, resourceUuid);
             } else {
                 resourcePolisies = resourcePolicyService.findByGroup(context, group,
-                        Math.toIntExact(pageable.getOffset()),
-                        Math.toIntExact(pageable.getOffset() + pageable.getPageSize()));
+                    Math.toIntExact(pageable.getOffset()),
+                    Math.toIntExact(pageable.getOffset() + pageable.getPageSize()));
                 total = resourcePolicyService.countResourcePolicyByGroup(context, group);
             }
 
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-        return converter.toRestPage(resourcePolisies, pageable, total, utils.obtainProjection(true));
+        return converter.toRestPage(resourcePolisies, pageable, total, utils.obtainProjection());
     }
 
     @Override
@@ -285,7 +269,7 @@ public class ResourcePolicyRestRepository extends DSpaceRestRepository<ResourceP
             } catch (SQLException excSQL) {
                 throw new RuntimeException(excSQL.getMessage(), excSQL);
             }
-            return converter.toRest(resourcePolicy, Projection.DEFAULT);
+            return converter.toRest(resourcePolicy, utils.obtainProjection());
         } else {
             try {
                 UUID groupUuid = UUID.fromString(groupUuidStr);
@@ -298,7 +282,7 @@ public class ResourcePolicyRestRepository extends DSpaceRestRepository<ResourceP
             } catch (SQLException excSQL) {
                 throw new RuntimeException(excSQL.getMessage(), excSQL);
             }
-            return converter.toRest(resourcePolicy, Projection.DEFAULT);
+            return converter.toRest(resourcePolicy, utils.obtainProjection());
         }
     }
 
@@ -310,7 +294,7 @@ public class ResourcePolicyRestRepository extends DSpaceRestRepository<ResourceP
             resourcePolicy = resourcePolicyService.find(context, id);
             if (resourcePolicy == null) {
                 throw new ResourceNotFoundException(
-                        ResourcePolicyRest.CATEGORY + "." + ResourcePolicyRest.NAME + " with id: " + id + " not found");
+                    ResourcePolicyRest.CATEGORY + "." + ResourcePolicyRest.NAME + " with id: " + id + " not found");
             }
             resourcePolicyService.delete(context, resourcePolicy);
         } catch (SQLException e) {
@@ -321,27 +305,13 @@ public class ResourcePolicyRestRepository extends DSpaceRestRepository<ResourceP
     @Override
     @PreAuthorize("hasPermission(#id, 'resourcepolicy', 'ADMIN')")
     protected void patch(Context context, HttpServletRequest request, String apiCategory, String model, Integer id,
-            Patch patch)
-            throws RepositoryMethodNotImplementedException, SQLException, AuthorizeException, DCInputsReaderException {
-        ResourcePolicyRest rest = findOne(context,id);
-        if (rest == null) {
+                         Patch patch) throws RepositoryMethodNotImplementedException, SQLException, AuthorizeException {
+        ResourcePolicy resourcePolicy = resourcePolicyService.find(context, id);
+        if (resourcePolicy == null) {
             throw new ResourceNotFoundException(
-                    ResourcePolicyRest.CATEGORY + "." + ResourcePolicyRest.NAME + " with id: " + id + " not found");
+                ResourcePolicyRest.CATEGORY + "." + ResourcePolicyRest.NAME + " with id: " + id + " not found");
         }
-        for (Operation op : patch.getOperations()) {
-            rest = resourcePolicyOperationPatchFactory.getOperationForPath(op.getPath()).perform(rest, op);
-        }
-
-        ResourcePolicy resourcePolicy = null;
-        try {
-            resourcePolicy = resourcePolicyService.find(context, id);
-            resourcePolicy.setStartDate(rest.getStartDate());
-            resourcePolicy.setEndDate(rest.getEndDate());
-            resourcePolicy.setRpDescription(rest.getDescription());
-            resourcePolicy.setRpName(rest.getName());
-            resourcePolicyService.update(context, resourcePolicy);
-        } catch (SQLException e) {
-            throw new RuntimeException("Unable to patch ResourcePolicy with id = " + id, e);
-        }
+        resourcePatch.patch(obtainContext(), resourcePolicy, patch.getOperations());
+        resourcePolicyService.update(context, resourcePolicy);
     }
 }

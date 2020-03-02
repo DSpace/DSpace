@@ -24,8 +24,9 @@ import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.BitstreamRest;
 import org.dspace.app.rest.model.CheckSumRest;
 import org.dspace.app.rest.model.MetadataValueRest;
-import org.dspace.app.rest.model.UploadAccessConditionDTO;
+import org.dspace.app.rest.model.UploadBitstreamAccessConditionDTO;
 import org.dspace.app.rest.model.WorkspaceItemRest;
+import org.dspace.app.rest.model.step.DataUpload;
 import org.dspace.app.rest.model.step.UploadBitstreamRest;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.utils.ContextUtil;
@@ -78,10 +79,12 @@ public class SubmissionService {
     private RequestService requestService;
     @Autowired
     private ConverterService converter;
+    @Autowired
+    private org.dspace.app.rest.utils.Utils utils;
 
     /**
-     * Create a workspaceitem using the information in the reqest
-     * 
+     * Create a workspaceitem using the information in the request
+     *
      * @param context
      *            the dspace context
      * @param request
@@ -134,7 +137,17 @@ public class SubmissionService {
         }
     }
 
-
+/**
+ * Build the rest representation of a bitstream as used in the upload section
+ * ({@link DataUpload}. It contains all its metadata and the list of applied
+ * access conditions (@link {@link UploadBitstreamAccessConditionDTO}
+ * 
+ * @param configurationService the DSpace ConfigurationService
+ * @param source               the bitstream to translate in its rest submission
+ *                             representation
+ * @return
+ * @throws SQLException
+ */
     public UploadBitstreamRest buildUploadBitstream(ConfigurationService configurationService, Bitstream source)
         throws SQLException {
         UploadBitstreamRest data = new UploadBitstreamRest();
@@ -163,13 +176,13 @@ public class SubmissionService {
             }
 
         }
-
+        Projection projection = utils.obtainProjection();
         HttpServletRequest request = requestService.getCurrentRequest().getHttpServletRequest();
-        data.setFormat(converter.toRest(source.getFormat(ContextUtil.obtainContext(request)), Projection.DEFAULT));
+        data.setFormat(converter.toRest(source.getFormat(ContextUtil.obtainContext(request)), projection));
 
         for (ResourcePolicy rp : source.getResourcePolicies()) {
             if (ResourcePolicy.TYPE_CUSTOM.equals(rp.getRpType())) {
-                UploadAccessConditionDTO uploadAccessCondition = createAccessConditionFromResourcePolicy(rp);
+                UploadBitstreamAccessConditionDTO uploadAccessCondition = createAccessConditionFromResourcePolicy(rp);
                 data.getAccessConditions().add(uploadAccessCondition);
             }
         }
@@ -180,14 +193,14 @@ public class SubmissionService {
         checksum.setValue(source.getChecksum());
         data.setCheckSum(checksum);
         data.setSizeBytes(source.getSizeBytes());
-        data.setUrl(configurationService.getProperty("dspace.url") + "/api/" + BitstreamRest.CATEGORY + "/" + English
-            .plural(BitstreamRest.NAME) + "/" + source.getID() + "/content");
+        data.setUrl(configurationService.getProperty("dspace.server.url") + "/api/" + BitstreamRest.CATEGORY + "/" +
+                        English.plural(BitstreamRest.NAME) + "/" + source.getID() + "/content");
         return data;
     }
 
     /**
-     * Create a workflowitem using the information in the reqest
-     * 
+     * Create a workflowitem using the information in the request
+     *
      * @param context
      *            the dspace context
      * @param requestUriListString
@@ -220,7 +233,7 @@ public class SubmissionService {
         if (wsi == null) {
             throw new UnprocessableEntityException("Workspace item is not found");
         }
-        WorkspaceItemRest wsiRest = converter.toRest(wsi, Projection.DEFAULT);
+        WorkspaceItemRest wsiRest = converter.toRest(wsi, utils.obtainProjection());
         if (!wsiRest.getErrors().isEmpty()) {
             throw new UnprocessableEntityException(
                     "Start workflow failed due to validation error on workspaceitem");
@@ -236,8 +249,8 @@ public class SubmissionService {
         return wi;
     }
 
-    private UploadAccessConditionDTO createAccessConditionFromResourcePolicy(ResourcePolicy rp) {
-        UploadAccessConditionDTO accessCondition = new UploadAccessConditionDTO();
+    private UploadBitstreamAccessConditionDTO createAccessConditionFromResourcePolicy(ResourcePolicy rp) {
+        UploadBitstreamAccessConditionDTO accessCondition = new UploadBitstreamAccessConditionDTO();
 
         accessCondition.setId(rp.getID());
         accessCondition.setName(rp.getRpName());

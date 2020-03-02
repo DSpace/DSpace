@@ -87,15 +87,11 @@ public class MockProjection implements Projection {
         return halResource;
     }
 
-    /** Disallows all optional embeds. */
-    @Override
-    public boolean allowOptionalEmbed(HALResource halResource, LinkRest linkRest) {
-        return false;
+    public boolean allowEmbedding(HALResource halResource, LinkRest linkRest) {
+        return true;
     }
 
-    /** Disallows all optional links. */
-    @Override
-    public boolean allowOptionalLink(HALResource halResource, LinkRest linkRest) {
+    public boolean allowLinking(HALResource halResource, LinkRest linkRest) {
         return false;
     }
 }

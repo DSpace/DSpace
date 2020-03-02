@@ -21,7 +21,6 @@ import org.dspace.app.rest.model.BitstreamRest;
 import org.dspace.app.rest.model.BundleRest;
 import org.dspace.app.rest.model.patch.Patch;
 import org.dspace.app.rest.projection.Projection;
-import org.dspace.app.rest.repository.patch.DSpaceObjectPatch;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Bitstream;
@@ -67,7 +66,7 @@ public class BitstreamRestRepository extends DSpaceObjectRestRepository<Bitstrea
 
     @Autowired
     public BitstreamRestRepository(BitstreamService dsoService) {
-        super(dsoService, new DSpaceObjectPatch<BitstreamRest>() { });
+        super(dsoService);
         this.bs = dsoService;
     }
 
@@ -108,7 +107,7 @@ public class BitstreamRestRepository extends DSpaceObjectRestRepository<Bitstrea
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-        Projection projection = utils.obtainProjection(true);
+        Projection projection = utils.obtainProjection();
         Page<BitstreamRest> page = new PageImpl<>(bit, pageable, total)
                 .map((bitstream) -> converter.toRest(bitstream, projection));
         return page;
