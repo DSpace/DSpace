@@ -13,12 +13,17 @@ import org.dspace.external.provider.metadata.service.impl.MetadataSuggestionDiff
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+/**
+ * This class will act as a converter between the {@link MetadataSuggestionDifference} object and the
+ * {@link MetadataDifferenceRest} object
+ */
 @Component
 public class MetadataSuggestionDifferenceRestConverter
     implements DSpaceConverter<MetadataSuggestionDifference, MetadataDifferenceRest> {
     @Autowired
     private MetadataChangeConverter metadataChangeConverter;
 
+    @Override
     public MetadataDifferenceRest convert(MetadataSuggestionDifference modelObject, Projection projection) {
         MetadataDifferenceRest metadataDifferenceRest = new MetadataDifferenceRest();
         if (modelObject.getCurrentValues() != null) {
@@ -28,6 +33,7 @@ public class MetadataSuggestionDifferenceRestConverter
         return metadataDifferenceRest;
     }
 
+    @Override
     public Class<MetadataSuggestionDifference> getModelClass() {
         return MetadataSuggestionDifference.class;
     }

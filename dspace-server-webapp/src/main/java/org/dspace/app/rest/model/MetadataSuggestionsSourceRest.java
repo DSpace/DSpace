@@ -62,6 +62,7 @@ public class MetadataSuggestionsSourceRest extends BaseObjectRest<String> {
      * Generic getter for the id
      * @return the id value of this MetadataSuggestionsSourceRest
      */
+    @Override
     public String getId() {
         return id;
     }
@@ -70,6 +71,7 @@ public class MetadataSuggestionsSourceRest extends BaseObjectRest<String> {
      * Generic setter for the id
      * @param id   The id to be set on this MetadataSuggestionsSourceRest
      */
+    @Override
     public void setId(String id) {
         this.id = id;
     }

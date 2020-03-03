@@ -12,12 +12,19 @@ import java.util.Map;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.dspace.app.rest.MetadataSuggestionsRestController;
 
+/**
+ * This is the REST object to represent the MetadataSuggestionsDifferences through the use of a Map containing the
+ * String MetadataFieldKey and the MetadataDifferenceRest object as value
+ */
 public class MetadataSuggestionsDifferencesRest extends BaseObjectRest<String> {
 
     public static final String NAME = "metadataSuggestionDifference";
     public static final String CATEGORY = RestAddressableModel.INTEGRATION;
 
 
+    /**
+     * The map that holds the metadata field String representation as key and the MetadataDifferenceRest object as value
+     */
     private Map<String, MetadataDifferenceRest> differences;
 
     @JsonIgnore
@@ -28,14 +35,17 @@ public class MetadataSuggestionsDifferencesRest extends BaseObjectRest<String> {
     @JsonIgnore
     private Integer workflowItemId;
 
+    @Override
     public String getCategory() {
         return CATEGORY;
     }
 
+    @Override
     public Class getController() {
         return MetadataSuggestionsRestController.class;
     }
 
+    @Override
     @JsonIgnore
     public String getType() {
         return NAME;

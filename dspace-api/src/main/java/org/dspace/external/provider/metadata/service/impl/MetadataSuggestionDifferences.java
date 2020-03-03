@@ -61,6 +61,11 @@ public class MetadataSuggestionDifferences {
         this.differences = differences;
     }
 
+    /**
+     * This method retrieves the specific MetadataSuggestionDifference from the map of MetadataSuggestionDifferences
+     * @param metadataKey   the key that'll be used to fetch the MetadataSuggestionDifference
+     * @return              The MetadataSuggestionDifference object that's associated with the given key
+     */
     public MetadataSuggestionDifference getDifference(String metadataKey) {
         return differences.get(metadataKey);
     }

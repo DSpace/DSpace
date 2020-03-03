@@ -5,7 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.mock;
+package org.dspace.content.dto;
 
 /**
  * A generalised configuration for metadatafields.
@@ -13,7 +13,7 @@ package org.dspace.mock;
  *
  * @author Roeland Dillen (roeland at atmire dot com)
  */
-public class MockMetadataField {
+public class MetadataFieldDTO {
     private String schema;
     private String element;
     private String qualifier;
@@ -35,7 +35,7 @@ public class MockMetadataField {
             return false;
         }
 
-        MockMetadataField that = (MockMetadataField) o;
+        MetadataFieldDTO that = (MetadataFieldDTO) o;
 
         if (!element.equals(that.element)) {
             return false;
@@ -84,7 +84,7 @@ public class MockMetadataField {
     /**
      * An empty initialization of MetadataFieldConfig
      */
-    public MockMetadataField() {
+    public MetadataFieldDTO() {
     }
 
     /**
@@ -94,7 +94,7 @@ public class MockMetadataField {
      * @param element   The element to set to this object
      * @param qualifier The qualifier to set to this object
      */
-    public MockMetadataField(String schema, String element, String qualifier) {
+    public MetadataFieldDTO(String schema, String element, String qualifier) {
         this.schema = schema;
         this.element = element;
         this.qualifier = qualifier;
@@ -106,7 +106,7 @@ public class MockMetadataField {
      *
      * @param full A string representing the schema.element.qualifier triplet
      */
-    public MockMetadataField(String full) {
+    public MetadataFieldDTO(String full) {
         String elements[] = full.split("\\.");
         if (elements.length == 2) {
             this.schema = elements[0];
@@ -126,7 +126,7 @@ public class MockMetadataField {
      * @param schema  The schema to set to this object
      * @param element The element to set to this object
      */
-    public MockMetadataField(String schema, String element) {
+    public MetadataFieldDTO(String schema, String element) {
         this.schema = schema;
         this.element = element;
         this.qualifier = null;

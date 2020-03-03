@@ -31,10 +31,12 @@ public class MetadataChangeHalLinkFactory extends
 
     }
 
+    @Override
     protected Class<MetadataSuggestionsRestController> getControllerClass() {
         return MetadataSuggestionsRestController.class;
     }
 
+    @Override
     protected Class<MetadataChangeResource> getResourceClass() {
         return MetadataChangeResource.class;
     }

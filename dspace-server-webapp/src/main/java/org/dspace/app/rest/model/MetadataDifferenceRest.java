@@ -14,6 +14,9 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.dspace.app.rest.MetadataSuggestionsRestController;
 
+/**
+ * This is the REST object to represent a MetadataDifference
+ */
 public class MetadataDifferenceRest extends BaseObjectRest<String> {
 
     public static final String NAME = "metadataDifferenceRest";

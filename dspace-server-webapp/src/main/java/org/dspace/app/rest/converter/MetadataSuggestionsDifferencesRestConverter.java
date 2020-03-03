@@ -21,6 +21,10 @@ import org.dspace.workflow.WorkflowItem;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+/**
+ * This class will act as a converter between the {@link MetadataSuggestionDifferences} object and the
+ * {@link MetadataSuggestionsDifferencesRest} object
+ */
 @Component
 public class MetadataSuggestionsDifferencesRestConverter
     implements DSpaceConverter<MetadataSuggestionDifferences, MetadataSuggestionsDifferencesRest> {
@@ -28,6 +32,7 @@ public class MetadataSuggestionsDifferencesRestConverter
     @Autowired
     private ConverterService converterService;
 
+    @Override
     public MetadataSuggestionsDifferencesRest convert(MetadataSuggestionDifferences modelObject,
                                                       Projection projection) {
         MetadataSuggestionsDifferencesRest metadataSuggestionsDifferencesRest =
@@ -48,6 +53,7 @@ public class MetadataSuggestionsDifferencesRestConverter
         return metadataSuggestionsDifferencesRest;
     }
 
+    @Override
     public Class<MetadataSuggestionDifferences> getModelClass() {
         return MetadataSuggestionDifferences.class;
     }

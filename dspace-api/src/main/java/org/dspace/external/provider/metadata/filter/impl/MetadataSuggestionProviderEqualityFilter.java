@@ -60,6 +60,7 @@ public class MetadataSuggestionProviderEqualityFilter implements MetadataSuggest
         this.value = value;
     }
 
+    @Override
     public boolean supports(InProgressSubmission inProgressSubmission) {
         List<MetadataValue> metadata = itemService
             .getMetadataByMetadataString(inProgressSubmission.getItem(), metadataFieldString);

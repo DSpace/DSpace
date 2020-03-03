@@ -15,9 +15,9 @@ import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMText;
 import org.apache.axiom.om.xpath.AXIOMXPath;
+import org.dspace.content.dto.MetadataFieldDTO;
 import org.dspace.content.dto.MetadataValueDTO;
 import org.dspace.external.provider.impl.pubmed.metadatamapping.utils.MetadatumContributorUtils;
-import org.dspace.mock.MockMetadataField;
 import org.jaxen.JaxenException;
 import org.springframework.beans.factory.annotation.Required;
 
@@ -27,7 +27,7 @@ import org.springframework.beans.factory.annotation.Required;
  * @author Roeland Dillen (roeland at atmire dot com)
  */
 public class SimpleXpathMetadatumContributor implements MetadataContributor<OMElement> {
-    private MockMetadataField field;
+    private MetadataFieldDTO field;
 
     /**
      * Initialize SimpleXpathMetadatumContributor with a query, prefixToNamespaceMapping and MetadataFieldConfig
@@ -36,7 +36,7 @@ public class SimpleXpathMetadatumContributor implements MetadataContributor<OMEl
      * @param field
      * <a href="https://github.com/DSpace/DSpace/tree/master/dspace-api/src/main/java/org/dspace/importer/external#metadata-mapping-">MetadataFieldConfig</a>
      */
-    public SimpleXpathMetadatumContributor(String query, MockMetadataField field) {
+    public SimpleXpathMetadatumContributor(String query, MetadataFieldDTO field) {
         this.query = query;
         this.field = field;
     }
@@ -55,7 +55,7 @@ public class SimpleXpathMetadatumContributor implements MetadataContributor<OMEl
      *
      * @return MetadataFieldConfig
      */
-    public MockMetadataField getField() {
+    public MetadataFieldDTO getField() {
         return field;
     }
 
@@ -65,7 +65,7 @@ public class SimpleXpathMetadatumContributor implements MetadataContributor<OMEl
      * @param field MetadataFieldConfig used while retrieving MetadatumDTO
      */
     @Required
-    public void setField(MockMetadataField field) {
+    public void setField(MetadataFieldDTO field) {
         this.field = field;
     }
 

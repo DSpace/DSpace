@@ -103,33 +103,33 @@
         <property name="query" value="descendant::Language"/>
     </bean>
 
-    <bean id="dc.title" class="org.dspace.mock.MockMetadataField">
+    <bean id="dc.title" class="org.dspace.content.dto.MetadataFieldDTO">
         <constructor-arg value="dc.title"/>
     </bean>
 
-    <bean id="dc.description.abstract" class="org.dspace.mock.MockMetadataField">
+    <bean id="dc.description.abstract" class="org.dspace.content.dto.MetadataFieldDTO">
         <constructor-arg value="dc.description.abstract"/>
     </bean>
 
 
-    <bean id="dc.contributor.author" class="org.dspace.mock.MockMetadataField">
+    <bean id="dc.contributor.author" class="org.dspace.content.dto.MetadataFieldDTO">
         <constructor-arg value="dc.contributor.author"/>
     </bean>
 
-    <bean id="dc.date.issued" class="org.dspace.mock.MockMetadataField">
+    <bean id="dc.date.issued" class="org.dspace.content.dto.MetadataFieldDTO">
         <constructor-arg value="dc.date.issued"/>
     </bean>
 
-    <bean id="dc.language.iso" class="org.dspace.mock.MockMetadataField">
+    <bean id="dc.language.iso" class="org.dspace.content.dto.MetadataFieldDTO">
         <constructor-arg value="dc.language.iso"/>
     </bean>
 
 
-    <bean id="dc.subject" class="org.dspace.mock.MockMetadataField">
+    <bean id="dc.subject" class="org.dspace.content.dto.MetadataFieldDTO">
         <constructor-arg value="dc.subject"/>
     </bean>
 
-    <bean id="dc.identifier.pubmed" class="org.dspace.mock.MockMetadataField">
+    <bean id="dc.identifier.pubmed" class="org.dspace.content.dto.MetadataFieldDTO">
         <constructor-arg value="dc.identifier.pubmed"/>
     </bean>
     

@@ -33,14 +33,17 @@ public class MetadataSuggestionEntryRest extends BaseObjectRest<String> {
     @JsonIgnore
     private Integer workflowItemId;
 
+    @Override
     public String getCategory() {
         return CATEGORY;
     }
 
+    @Override
     public Class getController() {
         return MetadataSuggestionsRestController.class;
     }
 
+    @Override
     public String getType() {
         return NAME;
     }
@@ -49,6 +52,7 @@ public class MetadataSuggestionEntryRest extends BaseObjectRest<String> {
      * Generic getter for the id
      * @return the id value of this MetadataSuggestionEntryRest
      */
+    @Override
     public String getId() {
         return id;
     }
@@ -57,6 +61,7 @@ public class MetadataSuggestionEntryRest extends BaseObjectRest<String> {
      * Generic setter for the id
      * @param id   The id to be set on this MetadataSuggestionEntryRest
      */
+    @Override
     public void setId(String id) {
         this.id = id;
     }

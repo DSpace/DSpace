@@ -42,6 +42,7 @@ public class MetadataSuggestionProviderEmptyValueFilter implements MetadataSugge
         this.metadataFieldString = metadataFieldString;
     }
 
+    @Override
     public boolean supports(InProgressSubmission inProgressSubmission) {
         List<MetadataValue> metadata = itemService
             .getMetadataByMetadataString(inProgressSubmission.getItem(), metadataFieldString);

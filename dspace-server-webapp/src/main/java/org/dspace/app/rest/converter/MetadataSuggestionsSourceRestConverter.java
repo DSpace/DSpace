@@ -20,6 +20,7 @@ import org.springframework.stereotype.Component;
 public class MetadataSuggestionsSourceRestConverter implements
     DSpaceConverter<MetadataSuggestionProvider, MetadataSuggestionsSourceRest> {
 
+    @Override
     public MetadataSuggestionsSourceRest convert(MetadataSuggestionProvider obj, Projection projection) {
         MetadataSuggestionsSourceRest metadataSuggestionsSourceRest = new MetadataSuggestionsSourceRest();
         metadataSuggestionsSourceRest.setId(obj.getId());
@@ -27,8 +28,10 @@ public class MetadataSuggestionsSourceRestConverter implements
         metadataSuggestionsSourceRest.setFileBased(obj.isFileBased());
         metadataSuggestionsSourceRest.setMetadataBased(obj.isMetadataBased());
         metadataSuggestionsSourceRest.setQueryBased(obj.isQueryBased());
-        return metadataSuggestionsSourceRest;    }
+        return metadataSuggestionsSourceRest;
+    }
 
+    @Override
     public Class<MetadataSuggestionProvider> getModelClass() {
         return MetadataSuggestionProvider.class;
     }

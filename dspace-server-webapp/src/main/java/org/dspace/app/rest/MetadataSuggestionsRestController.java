@@ -219,6 +219,17 @@ public class MetadataSuggestionsRestController {
     }
 
 
+    /**
+     * This endpoint will return a {@link MetadataChangeResource} object based on the given path values
+     * @param suggestionName    The SuggestionName to be used to calculate the MetadataChangeResource
+     * @param entryId           The entryId for the given SuggestionName
+     * @param workspaceItemId   The workspaceItemId to use
+     * @param workflowItemId    The workflowItemId to use
+     * @param response          The relevant response
+     * @param request           The relevant request
+     * @return                  The resulting MetadataChangeResource
+     * @throws SQLException     If something goes wrong
+     */
     @RequestMapping(method = RequestMethod.GET, value = "/entryValues/{entryId}/changes")
     public MetadataChangeResource getMetadataSuggestionEntryChanges(
         @PathVariable("suggestionName") String suggestionName, @PathVariable("entryId") String entryId,
@@ -229,6 +240,17 @@ public class MetadataSuggestionsRestController {
         throw new RepositoryMethodNotImplementedException("", "Method not yet implemented");
     }
 
+    /**
+     * This method will return a {@link MetadataSuggestionsDifferencesResource} based on the given path values
+     * @param suggestionName    The SuggestionName to be used
+     * @param entryId           The entryId for the given SuggestionName
+     * @param workspaceitem     The workspaceItemId to use
+     * @param workflowitem      The workflowItemId to use
+     * @param response          The relevant response
+     * @param request           The relevant request
+     * @return                  The resulting MetadataSuggestionsDifferencesResource
+     * @throws SQLException     If something goes wrong
+     */
     @RequestMapping(method = RequestMethod.GET, value = "/entryValueDifferences/{entryId}")
     public MetadataSuggestionsDifferencesResource getMetadataSuggestionEntryDifferences(
         @PathVariable("suggestionName") String suggestionName, @PathVariable("entryId") String entryId,

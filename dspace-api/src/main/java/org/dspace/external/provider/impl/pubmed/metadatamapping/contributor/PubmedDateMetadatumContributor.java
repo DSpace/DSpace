@@ -17,10 +17,10 @@ import java.util.List;
 
 import org.apache.logging.log4j.Logger;
 import org.dspace.content.DCDate;
+import org.dspace.content.dto.MetadataFieldDTO;
 import org.dspace.content.dto.MetadataValueDTO;
 import org.dspace.external.provider.impl.metadatamapping.contributors.MetadataContributor;
 import org.dspace.external.provider.impl.pubmed.metadatamapping.utils.MetadatumContributorUtils;
-import org.dspace.mock.MockMetadataField;
 import org.springframework.beans.factory.annotation.Required;
 
 /**
@@ -46,7 +46,7 @@ public class PubmedDateMetadatumContributor<T> implements MetadataContributor<T>
         this.dateFormatsToAttempt = dateFormatsToAttempt;
     }
 
-    private MockMetadataField field;
+    private MetadataFieldDTO field;
     private MetadataContributor day;
     private MetadataContributor month;
     private MetadataContributor year;
@@ -58,12 +58,12 @@ public class PubmedDateMetadatumContributor<T> implements MetadataContributor<T>
     }
 
     /**
-     * @param field {@link MockMetadataField} used in mapping
+     * @param field {@link MetadataFieldDTO} used in mapping
      * @param day   a MetadataContributor, representing a day
      * @param month a {@link MetadataContributor}, representing a month
      * @param year  a {@link MetadataContributor}, representing a year
      */
-    public PubmedDateMetadatumContributor(MockMetadataField field, MetadataContributor day, MetadataContributor month,
+    public PubmedDateMetadatumContributor(MetadataFieldDTO field, MetadataContributor day, MetadataContributor month,
                                           MetadataContributor year) {
         this.field = field;
         this.day = day;
@@ -137,7 +137,7 @@ public class PubmedDateMetadatumContributor<T> implements MetadataContributor<T>
      *
      * @return MetadataFieldConfig
      */
-    public MockMetadataField getField() {
+    public MetadataFieldDTO getField() {
         return field;
     }
 
@@ -146,7 +146,7 @@ public class PubmedDateMetadatumContributor<T> implements MetadataContributor<T>
      *
      * @param field MetadataFieldConfig used while retrieving MetadatumDTO
      */
-    public void setField(MockMetadataField field) {
+    public void setField(MetadataFieldDTO field) {
         this.field = field;
     }
 

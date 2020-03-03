@@ -28,6 +28,7 @@ public class MetadataSuggestionEntryConverter implements
     @Autowired
     private ConverterService converter;
 
+    @Override
     public MetadataSuggestionEntryRest convert(MetadataItemSuggestions obj, Projection projection) {
         MetadataSuggestionEntryRest metadataSuggestionEntryRest = new MetadataSuggestionEntryRest();
         metadataSuggestionEntryRest.setDisplay(obj.getExternalDataObject().getDisplayValue());
@@ -46,6 +47,7 @@ public class MetadataSuggestionEntryConverter implements
         return metadataSuggestionEntryRest;
     }
 
+    @Override
     public Class<MetadataItemSuggestions> getModelClass() {
         return MetadataItemSuggestions.class;
     }

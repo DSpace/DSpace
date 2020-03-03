@@ -162,6 +162,13 @@ public class MetadataSuggestionsRestRepository extends DSpaceRestRepository<Meta
         return metadataSuggestionsSourceRestPage;
     }
 
+    /**
+     * This method will retrieve the InProgressSubmission for a given workspaceItemId or workflowItemid
+     * @param workspaceItemId   The workspaceItemId to use
+     * @param workflowItemId    The workflowItemId to use
+     * @param context           The relevant DSpace context
+     * @return                  The InProgressSubmission associated with the given ID
+     */
     public InProgressSubmission resolveInProgressSubmission(Integer workspaceItemId, Integer workflowItemId,
                                                             Context context) {
         InProgressSubmission inProgressSubmission = null;

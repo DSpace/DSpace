@@ -56,6 +56,10 @@ public class MetadataSuggestionDifference {
         this.metadataChanges = metadataChanges;
     }
 
+    /**
+     * This method adds a MetadataChange object to the list of MetadataChanges for this MetadataSuggestionDifference
+     * @param metadataChange    The MetadataChange object to be added
+     */
     public void addMetadataChange(MetadataChange metadataChange) {
         metadataChanges.add(metadataChange);
     }

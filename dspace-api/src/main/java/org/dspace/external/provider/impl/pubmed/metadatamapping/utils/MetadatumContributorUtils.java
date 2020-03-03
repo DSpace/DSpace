@@ -7,8 +7,8 @@
  */
 package org.dspace.external.provider.impl.pubmed.metadatamapping.utils;
 
+import org.dspace.content.dto.MetadataFieldDTO;
 import org.dspace.content.dto.MetadataValueDTO;
-import org.dspace.mock.MockMetadataField;
 
 /**
  * This class will contain utility methods for MetadatumContributors
@@ -23,7 +23,7 @@ public final class MetadatumContributorUtils {
      * @param value The value to map to a MetadatumDTO
      * @return A metadatumDTO created from the field and value
      */
-    public static MetadataValueDTO toMockMetadataValue(MockMetadataField field, String value) {
+    public static MetadataValueDTO toMockMetadataValue(MetadataFieldDTO field, String value) {
         MetadataValueDTO mockMetadataValue = new MetadataValueDTO();
 
         if (field == null) {

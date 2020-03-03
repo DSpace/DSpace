@@ -16,9 +16,15 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.Link;
 import org.springframework.stereotype.Component;
 
+/**
+ * This class will act as a {@link HalLinkFactory} for the {@link MetadataSuggestionsDifferencesResource} and it'll
+ * add links onto this resource as defined in the addLinks method
+ */
 @Component
 public class MetadataSuggestionDifferencesHalLinkFactory
     extends HalLinkFactory<MetadataSuggestionsDifferencesResource, MetadataSuggestionsRestController> {
+
+    @Override
     protected void addLinks(MetadataSuggestionsDifferencesResource halResource, Pageable pageable,
                             LinkedList<Link> list) throws Exception {
 
@@ -30,10 +36,12 @@ public class MetadataSuggestionDifferencesHalLinkFactory
 
     }
 
+    @Override
     protected Class<MetadataSuggestionsRestController> getControllerClass() {
         return MetadataSuggestionsRestController.class;
     }
 
+    @Override
     protected Class<MetadataSuggestionsDifferencesResource> getResourceClass() {
         return MetadataSuggestionsDifferencesResource.class;
     }

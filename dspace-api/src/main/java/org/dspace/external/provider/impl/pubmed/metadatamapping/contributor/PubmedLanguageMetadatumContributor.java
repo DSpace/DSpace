@@ -15,10 +15,10 @@ import java.util.List;
 import java.util.Locale;
 
 import org.apache.logging.log4j.Logger;
+import org.dspace.content.dto.MetadataFieldDTO;
 import org.dspace.content.dto.MetadataValueDTO;
 import org.dspace.external.provider.impl.metadatamapping.contributors.MetadataContributor;
 import org.dspace.external.provider.impl.pubmed.metadatamapping.utils.MetadatumContributorUtils;
-import org.dspace.mock.MockMetadataField;
 
 /**
  * Pubmed specific implementation of {@link MetadataContributor}
@@ -31,7 +31,7 @@ public class PubmedLanguageMetadatumContributor<T> implements MetadataContributo
 
     private HashMap<String, String> iso3toIso2;
 
-    private MockMetadataField field;
+    private MetadataFieldDTO field;
     private MetadataContributor language;
 
     /**
@@ -48,13 +48,13 @@ public class PubmedLanguageMetadatumContributor<T> implements MetadataContributo
 
     /**
      * Initialize the PubmedLanguageMetadatumContributor class using a
-     * {@link MockMetadataField} and a language
+     * {@link MetadataFieldDTO} and a language
      * -{@link MetadataContributor}
      *
-     * @param field    {@link MockMetadataField} used in mapping
+     * @param field    {@link MetadataFieldDTO} used in mapping
      * @param language the language.
      */
-    public PubmedLanguageMetadatumContributor(MockMetadataField field, MetadataContributor language) {
+    public PubmedLanguageMetadatumContributor(MetadataFieldDTO field, MetadataContributor language) {
         this();
         this.field = field;
         this.language = language;
@@ -106,7 +106,7 @@ public class PubmedLanguageMetadatumContributor<T> implements MetadataContributo
      *
      * @return MetadataFieldConfig
      */
-    public MockMetadataField getField() {
+    public MetadataFieldDTO getField() {
         return field;
     }
 
@@ -115,7 +115,7 @@ public class PubmedLanguageMetadatumContributor<T> implements MetadataContributo
      *
      * @param field MetadataFieldConfig used while retrieving MetadatumDTO
      */
-    public void setField(MockMetadataField field) {
+    public void setField(MetadataFieldDTO field) {
         this.field = field;
     }
 }

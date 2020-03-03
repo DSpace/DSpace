@@ -11,9 +11,9 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.dspace.content.dto.MetadataFieldDTO;
 import org.dspace.content.dto.MetadataValueDTO;
 import org.dspace.external.provider.impl.pubmed.metadatamapping.utils.MetadatumContributorUtils;
-import org.dspace.mock.MockMetadataField;
 
 /**
  * Wrapper class used to accommodate for the possibility of correlations between multiple MetadatumContributor objects
@@ -22,7 +22,7 @@ import org.dspace.mock.MockMetadataField;
  */
 public class CombinedMetadatumContributor<T> implements MetadataContributor<T> {
 
-    private MockMetadataField field;
+    private MetadataFieldDTO field;
 
     private LinkedList<MetadataContributor> metadatumContributors;
 
@@ -35,12 +35,12 @@ public class CombinedMetadatumContributor<T> implements MetadataContributor<T> {
     }
 
     /**
-     * @param field                 {@link MockMetadataField} used in
+     * @param field                 {@link MetadataFieldDTO} used in
      *                              mapping
      * @param metadatumContributors A list of MetadataContributor
      * @param separator             A separator used to differentiate between different values
      */
-    public CombinedMetadatumContributor(MockMetadataField field, List<MetadataContributor> metadatumContributors,
+    public CombinedMetadatumContributor(MetadataFieldDTO field, List<MetadataContributor> metadatumContributors,
                                         String separator) {
         this.field = field;
         this.metadatumContributors = (LinkedList<MetadataContributor>) metadatumContributors;
@@ -90,7 +90,7 @@ public class CombinedMetadatumContributor<T> implements MetadataContributor<T> {
      *
      * @return MetadataFieldConfig
      */
-    public MockMetadataField getField() {
+    public MetadataFieldDTO getField() {
         return field;
     }
 
@@ -99,7 +99,7 @@ public class CombinedMetadatumContributor<T> implements MetadataContributor<T> {
      *
      * @param field MetadataFieldConfig used while retrieving MetadatumDTO
      */
-    public void setField(MockMetadataField field) {
+    public void setField(MetadataFieldDTO field) {
         this.field = field;
     }
 
