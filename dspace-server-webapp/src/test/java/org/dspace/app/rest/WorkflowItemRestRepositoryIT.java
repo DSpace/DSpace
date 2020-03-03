@@ -1590,7 +1590,7 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
 
         String token = getAuthToken(admin.getEmail(), password);
         getClient(token).perform(get("/api/workflow/workflowitems/search/item"))
-                        .andExpect(status().isUnprocessableEntity());
+                        .andExpect(status().isBadRequest());
     }
 
     @Test
