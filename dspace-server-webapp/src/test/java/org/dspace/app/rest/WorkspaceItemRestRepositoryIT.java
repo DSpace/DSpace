@@ -1981,7 +1981,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                                                   .build();
         String token = getAuthToken(admin.getEmail(), password);
         getClient(token).perform(get("/api/submission/workspaceitems/search/item"))
-                   .andExpect(status().isUnprocessableEntity());
+                   .andExpect(status().isBadRequest());
     }
 
     @Test
