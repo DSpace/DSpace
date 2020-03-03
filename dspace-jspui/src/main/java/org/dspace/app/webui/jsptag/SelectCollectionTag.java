@@ -88,7 +88,7 @@ public class SelectCollectionTag extends TagSupport
                 {
                     sb.append(" selected=\"selected\"");
                 }
-                sb.append(">").append(CollectionDropDown.collectionPath(context, coll)).append("</option>\n");
+                sb.append(">").append(coll.getName()).append("</option>\n");
             }
 
             sb.append("</select>\n");
