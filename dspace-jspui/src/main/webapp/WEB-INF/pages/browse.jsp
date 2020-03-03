@@ -19,8 +19,8 @@
                 <c:if test="${isExtended}">
                         <%--<input type="hidden" name = "publications" id = "publications" value="${exportPublications}">--%>
                     <input type="hidden" name = "author" id = "author" value="${searchQuery}">
-                    <button type="submit" class="btn btn-default btn-sm">
-                        <span class="glyphicon glyphicon-import"></span>
+                    <button type="submit" class="btn btn-default btn-sm" title="<fmt:message key="browse.publications.export"/>">
+                        <span class="glyphicon glyphicon-save"></span>
                     </button>
                 </c:if>
             </form>
