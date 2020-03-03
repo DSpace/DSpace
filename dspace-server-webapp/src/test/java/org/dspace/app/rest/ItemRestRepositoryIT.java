@@ -2187,11 +2187,16 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                                        CollectionMatcher.matchCollectionEntry(col1.getName(),
                                                                               col1.getID(),
                                                                               col1.getHandle())))
+                   // .doesNotExist() makes sure that this section is not embedded, it's not there at all
                    .andExpect(jsonPath("$._embedded.bundles").doesNotExist())
+                   // .doesNotExist() makes sure that this section is not embedded, it's not there at all
                    .andExpect(jsonPath("$._embedded.relationships").doesNotExist())
+                   // .doesNotExist() makes sure that this section is not embedded, it's not there at all
                    .andExpect(jsonPath("$._embedded.owningCollection._embedded.defaultAccessConditions")
                                   .doesNotExist())
+                   // .nullValue() makes sure that it could be embedded, it's just null in this case
                    .andExpect(jsonPath("$._embedded.owningCollection._embedded.logo", Matchers.nullValue()))
+                   // .empty() makes sure that the embed is there, but that there's no actual data
                    .andExpect(jsonPath("$._embedded.owningCollection._embedded.mappedItems._embedded.mappedItems",
                                        Matchers.empty()))
         ;
@@ -2270,10 +2275,12 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                    .andExpect(jsonPath("$._embedded.owningCollection",
                                        CollectionMatcher.matchCollectionEntry(col1.getName(), col1.getID(),
                                                                               col1.getHandle())))
+                   // .doesNotExist() makes sure that this section is not embedded, it's not there at all
                    .andExpect(jsonPath("$._embedded.bundles").doesNotExist())
                    .andExpect(jsonPath("$._embedded.relationships").doesNotExist())
                    .andExpect(jsonPath("$._embedded.owningCollection._embedded.defaultAccessConditions")
                                   .doesNotExist())
+                   // .notNullValue() makes sure that it's there and that it does actually contain a value, but not null
                    .andExpect(jsonPath("$._embedded.owningCollection._embedded.logo", Matchers.notNullValue()))
                    .andExpect(jsonPath("$._embedded.owningCollection._embedded.logo._embedded").doesNotExist())
                    .andExpect(jsonPath("$._embedded.owningCollection._embedded.mappedItems._embedded.mappedItems",

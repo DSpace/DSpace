@@ -968,14 +968,18 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                    .andExpect(jsonPath("$", CollectionMatcher.matchCollectionEntry(col1.getName(),
                                                                                    col1.getID(),
                                                                                    col1.getHandle())))
+                   // .exists() makes sure that the embed is there, but it could be empty
                    .andExpect(jsonPath("$._embedded.mappedItems").exists())
+                   // .isEmpty() makes sure that the embed is there, but that there's no actual data
                    .andExpect(jsonPath("$._embedded.mappedItems._embedded.mappedItems").isEmpty())
                    .andExpect(jsonPath("$._embedded.parentCommunity",
                                        CommunityMatcher.matchCommunityEntry(child1.getName(),
                                                                             child1.getID(),
                                                                             child1.getHandle())))
+                   // .doesNotExist() makes sure that this section is not embedded, it's not there at all
                    .andExpect(jsonPath("$._embedded.parentCommunity._embedded.subcommunities").doesNotExist())
                    .andExpect(jsonPath("$._embedded.logo", Matchers.not(Matchers.empty())))
+                   // .doesNotExist() makes sure that this section is not embedded, it's not there at all
                    .andExpect(jsonPath("$._embedded.logo._embedded.format").doesNotExist());
 
         getClient().perform(get("/api/core/collections/" + col1.getID() + "?projection=level.3"))
@@ -983,12 +987,15 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                    .andExpect(jsonPath("$", CollectionMatcher.matchCollectionEntry(col1.getName(),
                                                                                    col1.getID(),
                                                                                    col1.getHandle())))
+                   // .exists() makes sure that the embed is there, but it could be empty
                    .andExpect(jsonPath("$._embedded.mappedItems").exists())
+                   // .isEmpty() makes sure that the embed is there, but that there's no actual data
                    .andExpect(jsonPath("$._embedded.mappedItems._embedded.mappedItems").isEmpty())
                    .andExpect(jsonPath("$._embedded.parentCommunity",
                                        CommunityMatcher.matchCommunityEntry(child1.getName(),
                                                                             child1.getID(),
                                                                             child1.getHandle())))
+                   // .exists() makes sure that the embed is there, but it could be empty
                    .andExpect(jsonPath("$._embedded.parentCommunity._embedded.subcommunities").exists())
                    .andExpect(jsonPath("$._embedded.parentCommunity._embedded.subcommunities._embedded.subcommunities",
                                        Matchers.contains(CommunityMatcher.matchCommunityEntry(child1child.getID(),
@@ -1000,10 +1007,12 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                                                                                                 col2.getID(),
                                                                                                 col2.getHandle())
                    )))
+                   // .doesNotExist() makes sure that this section is not embedded, it's not there at all
                    .andExpect(jsonPath("$._embedded.parentCommunity._embedded.subcommunities" +
                                            "._embedded.subcommunities[0]._embedded.collections._embedded" +
                                            ".collections[0]._embedded.logo").doesNotExist())
                    .andExpect(jsonPath("$._embedded.logo", Matchers.not(Matchers.empty())))
+                   // .exists() makes sure that the embed is there, but it could be empty
                    .andExpect(jsonPath("$._embedded.logo._embedded.format").exists());
     }
 }
