@@ -10,7 +10,9 @@ package org.dspace.app.rest.projection;
 import org.dspace.app.rest.model.LinkRest;
 import org.dspace.app.rest.model.RestAddressableModel;
 import org.dspace.app.rest.model.hateoas.HALResource;
+import org.dspace.services.RequestService;
 import org.dspace.services.factory.DSpaceServicesFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.Link;
 
 /**
@@ -18,7 +20,10 @@ import org.springframework.hateoas.Link;
  */
 public class SpecificLevelProjection extends AbstractProjection {
 
-    public final static String NAME = "level.";
+    @Autowired
+    private RequestService requestService;
+
+    public final static String NAME = "level";
 
     private int maxEmbed = DSpaceServicesFactory.getInstance().getConfigurationService()
             .getIntProperty("projections.full.max", 2);
@@ -32,13 +37,18 @@ public class SpecificLevelProjection extends AbstractProjection {
     }
 
     public String getName() {
-        return NAME + getMaxEmbed();
+        return NAME;
     }
 
     @Override
     public boolean allowEmbedding(HALResource<? extends RestAddressableModel> halResource, LinkRest linkRest,
                                   Link... oldLinks) {
-        return halResource.getContent().getEmbedLevel() < maxEmbed;
+        Integer embedLevelDepth = Integer.parseInt(requestService.getCurrentRequest().getHttpServletRequest()
+                                               .getParameter("embedLevelDepth"));
+        if (embedLevelDepth > maxEmbed) {
+            throw new IllegalArgumentException("The embedLevelDepth may not exceed the configured max: " + maxEmbed);
+        }
+        return halResource.getContent().getEmbedLevel() < Math.min(embedLevelDepth, maxEmbed);
     }
 
     @Override

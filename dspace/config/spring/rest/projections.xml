@@ -4,19 +4,6 @@
            http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
 
     <bean class="org.dspace.app.rest.projection.SpecificLevelProjection">
-        <property name="maxEmbed" value="1" />
-    </bean>
-    <bean class="org.dspace.app.rest.projection.SpecificLevelProjection">
-        <property name="maxEmbed" value="2" />
-    </bean>
-    <bean class="org.dspace.app.rest.projection.SpecificLevelProjection">
-        <property name="maxEmbed" value="3" />
-    </bean>
-    <bean class="org.dspace.app.rest.projection.SpecificLevelProjection">
-        <property name="maxEmbed" value="4" />
-    </bean>
-    <bean class="org.dspace.app.rest.projection.SpecificLevelProjection">
         <property name="maxEmbed" value="5" />
     </bean>
-
 </beans>
