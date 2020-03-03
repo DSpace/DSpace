@@ -8,6 +8,7 @@
 package org.dspace.app.rest.matcher;
 
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
+import static org.dspace.app.rest.matcher.HalMatcher.matchEmbeds;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
@@ -46,6 +47,15 @@ public class RelationshipMatcher {
             hasJsonPath("$.rightPlace", is(rightPlace)),
             hasJsonPath("$._embedded.relationshipType",
                         RelationshipTypeMatcher.matchRelationshipTypeEntry(relationshipType))
+        );
+    }
+
+    /**
+     * Gets a matcher for all expected embeds when the full projection is requested.
+     */
+    public static Matcher<? super Object> matchFullEmbeds() {
+        return matchEmbeds(
+                "relationshipType"
         );
     }
 }

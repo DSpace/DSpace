@@ -38,7 +38,7 @@ import org.dspace.app.rest.builder.EPersonBuilder;
 import org.dspace.app.rest.builder.GroupBuilder;
 import org.dspace.app.rest.builder.ItemBuilder;
 import org.dspace.app.rest.builder.ResourcePolicyBuilder;
-import org.dspace.app.rest.matcher.ResoucePolicyMatcher;
+import org.dspace.app.rest.matcher.ResourcePolicyMatcher;
 import org.dspace.app.rest.model.ResourcePolicyRest;
 import org.dspace.app.rest.model.patch.AddOperation;
 import org.dspace.app.rest.model.patch.Operation;
@@ -122,7 +122,7 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
         getClient(authToken).perform(get("/api/authz/resourcepolicies/" + resourcePolicy.getID()))
             .andExpect(status().isOk()).andExpect(content().contentType(contentType))
             .andExpect(jsonPath("$", is(
-                ResoucePolicyMatcher.matchResourcePolicy(resourcePolicy)
+                    ResourcePolicyMatcher.matchResourcePolicy(resourcePolicy)
             )))
             .andExpect(jsonPath("$._links.self.href", Matchers
                 .containsString("/api/authz/resourcepolicies/" + resourcePolicy.getID())));
@@ -236,8 +236,7 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
         String authToken = getAuthToken(admin.getEmail(), password);
         getClient(authToken).perform(get("/api/authz/resourcepolicies/" + resourcePolicy.getID()))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$", is(
-                ResoucePolicyMatcher.matchResourcePolicy(resourcePolicy))));
+            .andExpect(jsonPath("$", is(ResourcePolicyMatcher.matchResourcePolicy(resourcePolicy))));
     }
 
     @Test
@@ -272,7 +271,7 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
         String authToken = getAuthToken(eperson1.getEmail(), "qwerty01");
         getClient(authToken).perform(get("/api/authz/resourcepolicies/" + resourcePolicy.getID()))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$", is(ResoucePolicyMatcher.matchResourcePolicy(resourcePolicy))));
+            .andExpect(jsonPath("$", is(ResourcePolicyMatcher.matchResourcePolicy(resourcePolicy))));
 
         String authTokenEperson2 = getAuthToken(eperson2.getEmail(), "qwerty02");
         getClient(authTokenEperson2).perform(get("/api/authz/resourcepolicies/" + resourcePolicy.getID()))
@@ -315,9 +314,9 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
             .andExpect(status().isOk())
             .andExpect(content().contentType(contentType))
             .andExpect(jsonPath("$._embedded.resourcepolicies", Matchers.contains(
-                ResoucePolicyMatcher.matchResourcePolicy(resourcePolicyOfEPerson1))))
+                    ResourcePolicyMatcher.matchResourcePolicy(resourcePolicyOfEPerson1))))
             .andExpect(jsonPath("$._embedded.resourcepolicies",
-                Matchers.not(is(ResoucePolicyMatcher.matchResourcePolicy(resourcePolicyOfEPerson2)))))
+                Matchers.not(is(ResourcePolicyMatcher.matchResourcePolicy(resourcePolicyOfEPerson2)))))
             .andExpect(jsonPath("$._links.self.href", Matchers.containsString(
                 "api/authz/resourcepolicies/search/eperson")))
             .andExpect(jsonPath("$.page.totalElements", is(1)));
@@ -360,11 +359,11 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
                 .param("resource", community.getID().toString()))
             .andExpect(status().isOk()).andExpect(content().contentType(contentType))
             .andExpect(jsonPath("$._embedded.resourcepolicies", Matchers.containsInAnyOrder(
-                ResoucePolicyMatcher.matchResourcePolicy(resourcePolicyOfCommunity),
-                ResoucePolicyMatcher.matchResourcePolicy(secondResourcePolicyOfCommunity)
+                    ResourcePolicyMatcher.matchResourcePolicy(resourcePolicyOfCommunity),
+                    ResourcePolicyMatcher.matchResourcePolicy(secondResourcePolicyOfCommunity)
             )))
             .andExpect(jsonPath("$._embedded.resourcepolicies",
-                Matchers.not(is(ResoucePolicyMatcher.matchResourcePolicy(resourcePolicyOfCollection)))))
+                Matchers.not(is(ResourcePolicyMatcher.matchResourcePolicy(resourcePolicyOfCollection)))))
             .andExpect(jsonPath("$._links.self.href",
                 Matchers.containsString("api/authz/resourcepolicies/search/eperson")))
             .andExpect(jsonPath("$.page.totalElements", is(2)));
@@ -497,11 +496,11 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
             .andExpect(status().isOk())
             .andExpect(content().contentType(contentType))
             .andExpect(jsonPath("$._embedded.resourcepolicies", Matchers.containsInAnyOrder(
-                ResoucePolicyMatcher.matchResourcePolicy(firstResourcePolicyOfEPerson1),
-                ResoucePolicyMatcher.matchResourcePolicy(resourcePolicyAnonymous)
+                    ResourcePolicyMatcher.matchResourcePolicy(firstResourcePolicyOfEPerson1),
+                    ResourcePolicyMatcher.matchResourcePolicy(resourcePolicyAnonymous)
             )))
             .andExpect(jsonPath("$._embedded.resourcepolicies",
-                Matchers.not(is(ResoucePolicyMatcher.matchResourcePolicy(firstResourcePolicyOfEPerson2)))))
+                Matchers.not(is(ResourcePolicyMatcher.matchResourcePolicy(firstResourcePolicyOfEPerson2)))))
             .andExpect(jsonPath("$._links.self.href",
                 Matchers.containsString("api/authz/resourcepolicies/search/resource")))
             .andExpect(jsonPath("$.page.totalElements", is(2)));
@@ -549,10 +548,10 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
             .andExpect(status().isOk())
             .andExpect(content().contentType(contentType))
             .andExpect(jsonPath("$._embedded.resourcepolicies", Matchers.contains(
-                ResoucePolicyMatcher.matchResourcePolicy(firstResourcePolicyOfEPerson2)
+                 ResourcePolicyMatcher.matchResourcePolicy(firstResourcePolicyOfEPerson2)
             )))
             .andExpect(jsonPath("$._embedded.resourcepolicies",
-                Matchers.not(is(ResoucePolicyMatcher.matchResourcePolicy(secondResourcePolicyOfEPerson2)))))
+                Matchers.not(is(ResourcePolicyMatcher.matchResourcePolicy(secondResourcePolicyOfEPerson2)))))
             .andExpect(jsonPath("$._links.self.href",
                 Matchers.containsString("api/authz/resourcepolicies/search/resource")))
             .andExpect(jsonPath("$.page.totalElements", is(1)));
@@ -764,11 +763,11 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
             .andExpect(status().isOk()).andExpect(content().contentType(contentType))
             .andExpect(jsonPath("$._embedded.resourcepolicies",
                 Matchers.containsInAnyOrder(
-                    ResoucePolicyMatcher.matchResourcePolicy(firstResourcePolicyOfGroup1),
-                    ResoucePolicyMatcher.matchResourcePolicy(secondResourcePolicyOfGroup1),
-                    ResoucePolicyMatcher.matchResourcePolicy(collectionResourcePolicyOfGroup1))))
+                     ResourcePolicyMatcher.matchResourcePolicy(firstResourcePolicyOfGroup1),
+                     ResourcePolicyMatcher.matchResourcePolicy(secondResourcePolicyOfGroup1),
+                     ResourcePolicyMatcher.matchResourcePolicy(collectionResourcePolicyOfGroup1))))
             .andExpect(jsonPath("$._embedded.resourcepolicies",
-                Matchers.not(is(ResoucePolicyMatcher.matchResourcePolicy(firstResourcePolicyOfGroup2)))))
+                Matchers.not(is(ResourcePolicyMatcher.matchResourcePolicy(firstResourcePolicyOfGroup2)))))
             .andExpect(jsonPath("$._links.self.href",
                 Matchers.containsString("api/authz/resourcepolicies/search/group")))
             .andExpect(jsonPath("$.page.totalElements", is(3)));
@@ -780,7 +779,7 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
             .andExpect(status().isOk()).andExpect(content().contentType(contentType))
             .andExpect(jsonPath("$._embedded.resourcepolicies",
                 Matchers.contains(
-                    ResoucePolicyMatcher.matchResourcePolicy(firstResourcePolicyOfGroup2))))
+                        ResourcePolicyMatcher.matchResourcePolicy(firstResourcePolicyOfGroup2))))
             .andExpect(jsonPath("$._links.self.href",
                 Matchers.containsString("api/authz/resourcepolicies/search/group")))
             .andExpect(jsonPath("$.page.totalElements", is(1)));
@@ -819,9 +818,9 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
             .param("resource", community.getID().toString()))
             .andExpect(status().isOk()).andExpect(content().contentType(contentType))
             .andExpect(jsonPath("$._embedded.resourcepolicies",
-                Matchers.contains(ResoucePolicyMatcher.matchResourcePolicy(firstResourcePolicyOfGroup1))))
+                Matchers.contains(ResourcePolicyMatcher.matchResourcePolicy(firstResourcePolicyOfGroup1))))
             .andExpect(jsonPath("$._embedded.resourcepolicies",
-                Matchers.not(is(ResoucePolicyMatcher.matchResourcePolicy(secondResourcePolicyOfGroup1)))))
+                Matchers.not(is(ResourcePolicyMatcher.matchResourcePolicy(secondResourcePolicyOfGroup1)))))
             .andExpect(jsonPath("$._links.self.href",
                 Matchers.containsString("api/authz/resourcepolicies/search/group")))
             .andExpect(jsonPath("$.page.totalElements", is(1)));
@@ -971,9 +970,11 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
                     .content(mapper.writeValueAsBytes(resourcePolicyRest))
                     .param("resource", community.getID().toString())
                     .param("eperson", eperson1.getID().toString())
+                    .param("projections", "full")
                     .contentType(contentType))
                 .andExpect(status().isCreated())
                 .andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$", ResourcePolicyMatcher.matchFullEmbeds()))
                 .andExpect(jsonPath("$", Matchers.allOf(
                     hasJsonPath("$.name", is(resourcePolicyRest.getName())),
                     hasJsonPath("$.description", is(resourcePolicyRest.getDescription())),
@@ -1156,7 +1157,7 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
         String token = getAuthToken(admin.getEmail(), password);
         getClient(token).perform(get("/api/authz/resourcepolicies/" + resourcePolicy.getID()))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$", is(ResoucePolicyMatcher.matchResourcePolicy(resourcePolicy))))
+            .andExpect(jsonPath("$", is(ResourcePolicyMatcher.matchResourcePolicy(resourcePolicy))))
             .andExpect(jsonPath("$._links.self.href", Matchers
                 .containsString("/api/authz/resourcepolicies/" + resourcePolicy.getID())));
     }

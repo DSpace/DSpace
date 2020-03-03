@@ -458,8 +458,7 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
 
         String authToken = getAuthToken(admin.getEmail(), password);
 
-        getClient(authToken).perform(get("/api/workflow/workflowitems/" + witem.getID() + "/collection")
-                .param("projection", "full"))
+        getClient(authToken).perform(get("/api/workflow/workflowitems/" + witem.getID() + "/collection"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", Matchers
                         .is(CollectionMatcher.matchCollectionEntry(col1.getName(), col1.getID(), col1.getHandle()))));
@@ -767,6 +766,7 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
             // submit the workspaceitem to start the workflow
             getClient(authToken)
                     .perform(post(BASE_REST_SERVER_URL + "/api/workflow/workflowitems")
+                            .param("projection", "full")
                             .content("/api/submission/workspaceitems/" + wsitem.getID())
                             .contentType(textUriContentType))
                     .andExpect(status().isCreated())

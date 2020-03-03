@@ -26,6 +26,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
         @LinkRest(
                 name = CollectionRest.MAPPED_ITEMS,
                 method = "getMappedItems"
+        ),
+        @LinkRest(
+                name = CollectionRest.PARENT_COMMUNITY,
+                method = "getParentCommunity"
         )
 })
 public class CollectionRest extends DSpaceObjectRest {
@@ -37,6 +41,7 @@ public class CollectionRest extends DSpaceObjectRest {
     public static final String LICENSE = "license";
     public static final String LOGO = "logo";
     public static final String MAPPED_ITEMS = "mappedItems";
+    public static final String PARENT_COMMUNITY = "parentCommunity";
 
     @Override
     public String getCategory() {
