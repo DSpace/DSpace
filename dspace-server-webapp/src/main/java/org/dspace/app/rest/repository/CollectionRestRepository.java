@@ -27,8 +27,6 @@ import org.dspace.app.rest.model.CommunityRest;
 import org.dspace.app.rest.model.TemplateItemRest;
 import org.dspace.app.rest.model.patch.Patch;
 import org.dspace.app.rest.model.wrapper.TemplateItem;
-import org.dspace.app.rest.projection.Projection;
-import org.dspace.app.rest.repository.patch.DSpaceObjectPatch;
 import org.dspace.app.rest.utils.CollectionRestEqualityUtils;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
@@ -74,8 +72,7 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
     private ItemService itemService;
 
     public CollectionRestRepository(CollectionService dsoService) {
-        super(dsoService, new DSpaceObjectPatch<CollectionRest>() {
-        });
+        super(dsoService);
     }
 
     @Override
@@ -98,7 +95,7 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
         try {
             long total = cs.countTotal(context);
             List<Collection> collections = cs.findAll(context, pageable.getPageSize(),
-                    Math.toIntExact(pageable.getOffset()));
+                Math.toIntExact(pageable.getOffset()));
             return converter.toRestPage(collections, pageable, total, utils.obtainProjection());
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
@@ -157,7 +154,7 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
 
         if (id == null) {
             throw new DSpaceBadRequestException("Parent Community UUID is null. " +
-                                                    "Cannot create a Collection without providing a parent Community");
+                "Cannot create a Collection without providing a parent Community");
         }
 
         HttpServletRequest req = getRequestService().getCurrentRequest().getHttpServletRequest();
@@ -175,7 +172,7 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
             Community parent = communityService.find(context, id);
             if (parent == null) {
                 throw new UnprocessableEntityException("Parent community for id: "
-                                                           + id + " not found");
+                    + id + " not found");
             }
             collection = cs.create(context, parent);
             cs.update(context, collection);
@@ -183,7 +180,7 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
         } catch (SQLException e) {
             throw new RuntimeException("Unable to create new Collection under parent Community " + id, e);
         }
-        return converter.toRest(collection, Projection.DEFAULT);
+        return converter.toRest(collection, utils.obtainProjection());
     }
 
 
@@ -202,15 +199,15 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
         if (collection == null) {
             throw new ResourceNotFoundException(apiCategory + "." + model + " with id: " + id + " not found");
         }
-        CollectionRest originalCollectionRest = converter.toRest(collection, Projection.DEFAULT);
+        CollectionRest originalCollectionRest = converter.toRest(collection, utils.obtainProjection());
         if (collectionRestEqualityUtils.isCollectionRestEqualWithoutMetadata(originalCollectionRest, collectionRest)) {
             metadataConverter.setMetadata(context, collection, collectionRest.getMetadata());
         } else {
             throw new IllegalArgumentException("The UUID in the Json and the UUID in the url do not match: "
-                                                   + id + ", "
-                                                   + collectionRest.getId());
+                + id + ", "
+                + collectionRest.getId());
         }
-        return converter.toRest(collection, Projection.DEFAULT);
+        return converter.toRest(collection, utils.obtainProjection());
     }
 
     @Override
@@ -233,9 +230,10 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
     /**
      * Method to install a logo on a Collection which doesn't have a logo
      * Called by request mappings in CollectionLogoController
+     *
      * @param context
-     * @param collection    The collection on which to install the logo
-     * @param uploadfile    The new logo
+     * @param collection The collection on which to install the logo
+     * @param uploadfile The new logo
      * @return The created bitstream containing the new logo
      * @throws IOException
      * @throws AuthorizeException
@@ -251,7 +249,7 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
         Bitstream bitstream = cs.setLogo(context, collection, uploadfile.getInputStream());
         cs.update(context, collection);
         bitstreamService.update(context, bitstream);
-        return converter.toRest(context.reloadEntity(bitstream), Projection.DEFAULT);
+        return converter.toRest(context.reloadEntity(bitstream), utils.obtainProjection());
     }
 
     /**
@@ -268,7 +266,7 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
         throws SQLException, AuthorizeException {
         if (collection.getTemplateItem() != null) {
             throw new UnprocessableEntityException("Collection with ID " + collection.getID()
-                                                       + " already contains a template item");
+                + " already contains a template item");
         }
         cs.createTemplateItem(context, collection);
         Item item = collection.getTemplateItem();
@@ -278,13 +276,13 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
         cs.update(context, collection);
         itemService.update(context, item);
 
-        return converter.toRest(new TemplateItem(item), Projection.DEFAULT);
+        return converter.toRest(new TemplateItem(item), utils.obtainProjection());
     }
 
     /**
      * This method looks up the template Item associated with a Collection
      *
-     * @param collection    The Collection for which to find the template
+     * @param collection The Collection for which to find the template
      * @return The template Item from the Collection
      * @throws SQLException
      */
@@ -297,7 +295,7 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
         }
 
         try {
-            return converter.toRest(new TemplateItem(item), Projection.DEFAULT);
+            return converter.toRest(new TemplateItem(item), utils.obtainProjection());
         } catch (IllegalArgumentException e) {
             throw new UnprocessableEntityException("The item with id " + item.getID() + " is not a template item");
         }

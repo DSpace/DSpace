@@ -1441,6 +1441,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         ObjectMapper mapper = new ObjectMapper();
         ItemRest itemRest = new ItemRest();
+        ItemRest itemRestFull = new ItemRest();
         itemRest.setName("Practices of research data curation in institutional repositories:" +
                              " A qualitative view from repository staff");
         itemRest.setInArchive(true);
@@ -1454,11 +1455,25 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                 .put("dc.rights", new MetadataValueRest("Custom Copyright Text"))
                 .put("dc.title", new MetadataValueRest("Title Text")));
 
+        itemRestFull.setName("Practices of research data curation in institutional repositories:" +
+                " A qualitative view from repository staff");
+        itemRestFull.setInArchive(true);
+        itemRestFull.setDiscoverable(true);
+        itemRestFull.setWithdrawn(false);
+
+        itemRestFull.setMetadata(new MetadataRest()
+                .put("dc.description", new MetadataValueRest("<p>Some cool HTML code here</p>"))
+                .put("dc.description.abstract", new MetadataValueRest("Sample item created via the REST API"))
+                .put("dc.description.tableofcontents", new MetadataValueRest("<p>HTML News</p>"))
+                .put("dc.rights", new MetadataValueRest("Custom Copyright Text"))
+                .put("dc.title", new MetadataValueRest("Title Text")));
+
         String token = getAuthToken(admin.getEmail(), password);
         MvcResult mvcResult = getClient(token).perform(post("/api/core/items?owningCollection=" +
                                                                 col1.getID().toString())
                                    .content(mapper.writeValueAsBytes(itemRest)).contentType(contentType))
                                               .andExpect(status().isCreated())
+                                              .andExpect(jsonPath("$", HalMatcher.matchNoEmbeds()))
                                               .andReturn();
 
         String content = mvcResult.getResponse().getContentAsString();
@@ -1487,6 +1502,13 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                                 MetadataMatcher.matchMetadata("dc.title",
                                     "Title Text")
                             )))));
+
+        MvcResult mvcResultFull = getClient(token).perform(post("/api/core/items?owningCollection=" +
+                col1.getID().toString()).param("projection", "full")
+                .content(mapper.writeValueAsBytes(itemRestFull)).contentType(contentType))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$", ItemMatcher.matchFullEmbeds()))
+                .andReturn();
     }
 
     @Test
@@ -1744,6 +1766,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                         .andExpect(status().is(404));
     }
 
+    @Test
     public void patchItemMetadataAuthorized() throws Exception {
         runPatchMetadataTests(admin, 200);
     }
