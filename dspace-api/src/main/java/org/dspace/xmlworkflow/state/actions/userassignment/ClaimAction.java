@@ -10,6 +10,7 @@ package org.dspace.xmlworkflow.state.actions.userassignment;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
 import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
 
@@ -65,6 +66,11 @@ public class ClaimAction extends UserSelectionAction {
         XmlWorkflowServiceFactory.getInstance().getWorkflowRequirementsService().addClaimedUser(c, wfi, step,
                 c.getCurrentUser());
         return new ActionResult(ActionResult.TYPE.TYPE_OUTCOME, ActionResult.OUTCOME_COMPLETE);
+    }
+
+    @Override
+    public List<String> getOptions() {
+        return new ArrayList<>();
     }
 
     @Override

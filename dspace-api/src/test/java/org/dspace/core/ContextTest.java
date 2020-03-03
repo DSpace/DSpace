@@ -10,12 +10,15 @@ package org.dspace.core;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Locale;
@@ -84,7 +87,7 @@ public class ContextTest extends AbstractUnitTest {
      * Test of setCurrentUser method, of class Context.
      */
     @Test
-    public void testSetCurrentUser() throws SQLException, AuthorizeException {
+    public void testSetCurrentUser() throws SQLException, AuthorizeException, IOException {
         // Allow full Admin perms
         when(authorizeServiceSpy.isAdmin(context)).thenReturn(true);
 
@@ -105,6 +108,9 @@ public class ContextTest extends AbstractUnitTest {
 
         // Restore the previous current user
         context.setCurrentUser(oldUser);
+
+        // Cleanup our new user
+        ePersonService.delete(context, newUser);
     }
 
     /**
@@ -256,6 +262,60 @@ public class ContextTest extends AbstractUnitTest {
     }
 
     /**
+     * Test of commit method, of class Context.
+     */
+    @Test
+    public void testCommit() throws SQLException, AuthorizeException, IOException {
+        // To test commit() we need a new Context object
+        Context instance = new Context();
+
+        // By default, we should have a new DB connection, so let's make sure it is there
+        assertThat("HibernateDBConnection should exist", instance.getDBConnection(), notNullValue());
+        assertTrue("Context should be valid", instance.isValid());
+        assertTrue("Transaction should be open", instance.isTransactionAlive());
+
+        // Allow full Admin perms (in new context)
+        when(authorizeServiceSpy.isAdmin(instance)).thenReturn(true);
+
+        // Create a new EPerson (to be committed)
+        String createdEmail = "myfakeemail@example.com";
+        EPerson newUser = ePersonService.create(instance);
+        newUser.setFirstName(instance, "Tim");
+        newUser.setLastName(instance, "Smith");
+        newUser.setEmail(createdEmail);
+        newUser.setCanLogIn(true);
+        newUser.setLanguage(instance, I18nUtil.getDefaultLocale().getLanguage());
+
+        // Now, call commit()
+        instance.commit();
+
+        // We expect our DB connection to still exist
+        assertThat("HibernateDBConnection should still be open", instance.getDBConnection(), notNullValue());
+        // We expect the Context to be valid
+        assertTrue("Context should still be valid", instance.isValid());
+        // However, the transaction should now be closed
+        assertFalse("DB transaction should be closed", instance.isTransactionAlive());
+
+        // ReloadEntity and verify changes saved
+        // NOTE: reloadEntity() is required, see commit() method Javadocs
+        newUser = instance.reloadEntity(newUser);
+        assertEquals("New user should be created", newUser.getEmail(), createdEmail);
+
+        // Change the email and commit again (a Context should support multiple commit() calls)
+        String newEmail = "myrealemail@example.com";
+        newUser.setEmail(newEmail);
+        instance.commit();
+
+        // Reload entity and new value should be there.
+        newUser = instance.reloadEntity(newUser);
+        assertEquals("New email address should be saved", newUser.getEmail(), newEmail);
+
+        // Cleanup our new object & context
+        ePersonService.delete(instance, newUser);
+        cleanupContext(instance);
+    }
+
+    /**
      * Test of abort method, of class Context.
      */
     @Test
@@ -269,11 +329,11 @@ public class ContextTest extends AbstractUnitTest {
         // Create a new EPerson (DO NOT COMMIT IT)
         String createdEmail = "susie@email.com";
         EPerson newUser = ePersonService.create(instance);
-        newUser.setFirstName(context, "Susan");
-        newUser.setLastName(context, "Doe");
+        newUser.setFirstName(instance, "Susan");
+        newUser.setLastName(instance, "Doe");
         newUser.setEmail(createdEmail);
         newUser.setCanLogIn(true);
-        newUser.setLanguage(context, I18nUtil.getDefaultLocale().getLanguage());
+        newUser.setLanguage(instance, I18nUtil.getDefaultLocale().getLanguage());
 
         // Abort our context
         instance.abort();
@@ -304,12 +364,11 @@ public class ContextTest extends AbstractUnitTest {
 
             // Create a new EPerson (DO NOT COMMIT IT)
             EPerson newUser = ePersonService.create(instance);
-            newUser.setFirstName(context, "Susan");
-            newUser.setLastName(context, "Doe");
+            newUser.setFirstName(instance, "Susan");
+            newUser.setLastName(instance, "Doe");
             newUser.setEmail(createdEmail);
             newUser.setCanLogIn(true);
-            newUser.setLanguage(context, I18nUtil.getDefaultLocale().getLanguage());
-
+            newUser.setLanguage(instance, I18nUtil.getDefaultLocale().getLanguage());
         }
 
         // Open a new context, let's make sure that EPerson isn't there
@@ -433,7 +492,7 @@ public class ContextTest extends AbstractUnitTest {
      * Test of getSpecialGroups method, of class Context.
      */
     @Test
-    public void testGetSpecialGroups() throws SQLException, AuthorizeException {
+    public void testGetSpecialGroups() throws SQLException, AuthorizeException, IOException {
         // To test special groups we need a new Context object
         Context instance = new Context();
 
@@ -456,7 +515,8 @@ public class ContextTest extends AbstractUnitTest {
         assertThat("testGetSpecialGroup 1", specialGroups.get(0), equalTo(group));
         assertThat("testGetSpecialGroup 1", specialGroups.get(1), equalTo(adminGroup));
 
-        // Cleanup our context
+        // Cleanup our context & group
+        groupService.delete(instance, group);
         cleanupContext(instance);
     }
 
