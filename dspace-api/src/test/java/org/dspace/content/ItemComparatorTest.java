@@ -132,8 +132,8 @@ public class ItemComparatorTest extends AbstractUnitTest {
      */
     @Test
     public void testCompare() throws SQLException {
-        int result = 0;
-        ItemComparator ic = null;
+        int result;
+        ItemComparator ic;
 
         //one of the tiems has no value
         ic = new ItemComparator("test", "one", Item.ANY, true);
@@ -246,7 +246,7 @@ public class ItemComparatorTest extends AbstractUnitTest {
     @SuppressWarnings( {"ObjectEqualsNull", "IncompatibleEquals"})
     public void testEquals() {
         ItemComparator ic = new ItemComparator("test", "one", Item.ANY, true);
-        ItemComparator target = null;
+        ItemComparator target;
 
         assertFalse("testEquals 0", ic.equals(null));
         assertFalse("testEquals 1", ic.equals("test one"));

@@ -102,7 +102,7 @@ public class Utils {
     /**
      * The maximum number of embed levels to allow.
      */
-    private static final int EMBED_MAX_LEVELS = 2;
+    private static final int EMBED_MAX_LEVELS = 10;
 
     @Autowired
     ApplicationContext applicationContext;
@@ -516,13 +516,14 @@ public class Utils {
      * Adds embeds or links for all class-level LinkRel annotations for which embeds or links are allowed.
      *
      * @param halResource the resource.
+     * @param oldLinks    previously traversed links
      */
-    public void embedOrLinkClassLevelRels(HALResource<RestAddressableModel> halResource) {
+    public void embedOrLinkClassLevelRels(HALResource<RestAddressableModel> halResource, Link... oldLinks) {
         Projection projection = halResource.getContent().getProjection();
         getLinkRests(halResource.getContent().getClass()).stream().forEach((linkRest) -> {
             Link link = linkToSubResource(halResource.getContent(), linkRest.name());
-            if (projection.allowEmbedding(halResource, linkRest)) {
-                embedRelFromRepository(halResource, linkRest.name(), link, linkRest);
+            if (projection.allowEmbedding(halResource, linkRest, oldLinks)) {
+                embedRelFromRepository(halResource, linkRest.name(), link, linkRest, oldLinks);
                 halResource.add(link); // unconditionally link if embedding was allowed
             } else if (projection.allowLinking(halResource, linkRest)) {
                 halResource.add(link);
@@ -561,6 +562,32 @@ public class Utils {
      */
     void embedRelFromRepository(HALResource<? extends RestAddressableModel> resource,
                                         String rel, Link link, LinkRest linkRest) {
+        embedRelFromRepository(resource, rel, link, linkRest, new Link[] {});
+    }
+
+    /**
+     * Embeds a rel whose value comes from a {@link LinkRestRepository}, if the maximum embed level has not
+     * been exceeded yet.
+     * <p>
+     * The embed will be skipped if 1) the link repository reports that it is not embeddable or 2) the returned
+     * value is null and the LinkRest annotation has embedOptional = true.
+     * </p><p>
+     * Implementation note: The caller is responsible for ensuring that the projection allows the embed
+     * before calling this method.
+     * </p>
+     *
+     * @param resource the resource from which the embed will be made.
+     * @param rel the name of the rel.
+     * @param link the link.
+     * @param linkRest the LinkRest annotation (must have method defined).
+     * @param oldLinks    The previously traversed links
+     * @throws RepositoryNotFoundException if the link repository could not be found.
+     * @throws IllegalArgumentException if the method specified by the LinkRest could not be found in the
+     * link repository.
+     * @throws RuntimeException if any other problem occurs when trying to invoke the method.
+     */
+    void embedRelFromRepository(HALResource<? extends RestAddressableModel> resource,
+                                        String rel, Link link, LinkRest linkRest, Link... oldLinks) {
         if (resource.getContent().getEmbedLevel() == EMBED_MAX_LEVELS) {
             return;
         }
@@ -572,7 +599,7 @@ public class Utils {
             Object contentId = getContentIdForLinkMethod(resource.getContent(), method);
             try {
                 Object linkedObject = method.invoke(linkRepository, null, contentId, null, projection);
-                resource.embedResource(rel, wrapForEmbedding(resource, linkedObject, link));
+                resource.embedResource(rel, wrapForEmbedding(resource, linkedObject, link, oldLinks));
             } catch (InvocationTargetException e) {
                 if (e.getTargetException() instanceof RuntimeException) {
                     throw (RuntimeException) e.getTargetException();
@@ -677,17 +704,37 @@ public class Utils {
      */
     private Object wrapForEmbedding(HALResource<? extends RestAddressableModel> resource,
                                     Object linkedObject, Link link) {
+        return wrapForEmbedding(resource, linkedObject, link, new Link[] {});
+    }
+
+    /**
+     * Wraps the given linked object (retrieved from a link repository or link method on the rest item)
+     * in an object that is appropriate for embedding, if needed. Does not perform the actual embed; the
+     * caller is responsible for that.
+     *
+     * @param resource the resource from which the embed will be made.
+     * @param linkedObject the linked object.
+     * @param link the link, which is used if the linked object is a list or page, to determine the self link
+     *             and embed property name to use for the subresource.
+     * @param oldLinks    The previously traversed links
+     * @return the wrapped object, which will have an "embed level" one greater than the given parent resource.
+     */
+    private Object wrapForEmbedding(HALResource<? extends RestAddressableModel> resource,
+                                    Object linkedObject, Link link, Link... oldLinks) {
         int childEmbedLevel = resource.getContent().getEmbedLevel() + 1;
+        //Add the latest link to the list
+        Link[] newList = Arrays.copyOf(oldLinks, oldLinks.length + 1);
+        newList[oldLinks.length] = link;
         if (linkedObject instanceof RestAddressableModel) {
             RestAddressableModel restObject = (RestAddressableModel) linkedObject;
             restObject.setEmbedLevel(childEmbedLevel);
-            return converter.toResource(restObject);
+            return converter.toResource(restObject, newList);
         } else if (linkedObject instanceof Page) {
             // The first page has already been constructed by a link repository and we only need to wrap it
             Page<RestAddressableModel> page = (Page<RestAddressableModel>) linkedObject;
             return new EmbeddedPage(link.getHref(), page.map((restObject) -> {
                 restObject.setEmbedLevel(childEmbedLevel);
-                return converter.toResource(restObject);
+                return converter.toResource(restObject, newList);
             }), null, link.getRel());
         } else if (linkedObject instanceof List) {
             // The full list has been retrieved and we need to provide the first page for embedding
@@ -699,7 +746,7 @@ public class Utils {
                 return new EmbeddedPage(link.getHref(),
                         page.map((restObject) -> {
                             restObject.setEmbedLevel(childEmbedLevel);
-                            return converter.toResource(restObject);
+                            return converter.toResource(restObject, newList);
                         }),
                         list, link.getRel());
             } else {

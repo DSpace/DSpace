@@ -16,7 +16,6 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 
-import org.apache.logging.log4j.Logger;
 import org.dspace.AbstractIntegrationTest;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.factory.ContentServiceFactory;
@@ -37,11 +36,6 @@ import org.junit.Test;
  * @author pvillega
  */
 public class ITMetadata extends AbstractIntegrationTest {
-    /**
-     * log4j category
-     */
-    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(ITMetadata.class);
-
 
     protected CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
     protected CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();

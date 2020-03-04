@@ -31,49 +31,48 @@ public class RoleTest extends AbstractUnitTest {
     @Test
     public void defaultWorkflow_RoleReviewer() {
         Role role = defaultWorkflow.getRoles().get("Reviewer");
-        assertEquals(role.getDescription(),
-                "The people responsible for this step are able to edit the metadata of incoming submissions, " +
-                        "and then accept or reject them.");
-        assertEquals(role.getName(), "Reviewer");
-        assertEquals(role.getScope(), Role.Scope.COLLECTION);
+        assertEquals("The people responsible for this step are able to edit the metadata of incoming submissions, " +
+                        "and then accept or reject them.", role.getDescription());
+        assertEquals("Reviewer", role.getName());
+        assertEquals(Role.Scope.COLLECTION, role.getScope());
     }
 
     @Test
     public void defaultWorkflow_RoleEditor() {
         Role role = defaultWorkflow.getRoles().get("Editor");
-        assertEquals(role.getDescription(), "The people responsible for this step are able to edit the " +
-                "metadata of incoming submissions, and then accept or reject them.");
-        assertEquals(role.getName(), "Editor");
-        assertEquals(role.getScope(), Role.Scope.COLLECTION);
+        assertEquals("The people responsible for this step are able to edit the " +
+                "metadata of incoming submissions, and then accept or reject them.", role.getDescription());
+        assertEquals("Editor", role.getName());
+        assertEquals(Role.Scope.COLLECTION, role.getScope());
     }
 
     @Test
     public void defaultWorkflow_RoleFinalEditor() {
         Role role = defaultWorkflow.getRoles().get("Final Editor");
-        assertEquals(role.getDescription(), "The people responsible for this step are able to edit the " +
-                "metadata of incoming submissions, but will not be able to reject them.");
-        assertEquals(role.getName(), "Final Editor");
-        assertEquals(role.getScope(), Role.Scope.COLLECTION);
+        assertEquals("The people responsible for this step are able to edit the " +
+                "metadata of incoming submissions, but will not be able to reject them.", role.getDescription());
+        assertEquals("Final Editor", role.getName());
+        assertEquals(Role.Scope.COLLECTION, role.getScope());
     }
 
     @Test
     public void selectSingleReviewer_RoleReviewManagers() {
         Role role = selectSingleReviewer.getRoles().get("ReviewManagers");
-        assertEquals(role.getName(), "ReviewManagers");
-        assertEquals(role.getScope(), Role.Scope.REPOSITORY);
+        assertEquals("ReviewManagers", role.getName());
+        assertEquals(Role.Scope.REPOSITORY, role.getScope());
     }
 
     @Test
     public void selectSingleReviewer_RoleReviewer() {
         Role role = selectSingleReviewer.getRoles().get("Reviewer");
-        assertEquals(role.getName(), "Reviewer");
-        assertEquals(role.getScope(), Role.Scope.ITEM);
+        assertEquals("Reviewer", role.getName());
+        assertEquals(Role.Scope.ITEM, role.getScope());
     }
 
     @Test
     public void scoreReview_RoleScoreReviewers() {
         Role role = scoreReview.getRoles().get("ScoreReviewers");
-        assertEquals(role.getName(), "ScoreReviewers");
-        assertEquals(role.getScope(), Role.Scope.COLLECTION);
+        assertEquals("ScoreReviewers", role.getName());
+        assertEquals(Role.Scope.COLLECTION, role.getScope());
     }
 }

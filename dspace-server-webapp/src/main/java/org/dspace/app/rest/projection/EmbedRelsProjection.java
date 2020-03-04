@@ -10,7 +10,9 @@ package org.dspace.app.rest.projection;
 import java.util.Set;
 
 import org.dspace.app.rest.model.LinkRest;
+import org.dspace.app.rest.model.RestAddressableModel;
 import org.dspace.app.rest.model.hateoas.HALResource;
+import org.springframework.hateoas.Link;
 
 /**
  * Projection that allows a given set of rels to be embedded.
@@ -31,7 +33,31 @@ public class EmbedRelsProjection extends AbstractProjection {
     }
 
     @Override
-    public boolean allowEmbedding(HALResource halResource, LinkRest linkRest) {
-        return embedRels.contains(linkRest.name());
+    public boolean allowEmbedding(HALResource<? extends RestAddressableModel> halResource, LinkRest linkRest,
+                                  Link... oldLinks) {
+        // If level 0, and the name is present, the link can be embedded (e.g. the logo on a collection page)
+        if (halResource.getContent().getEmbedLevel() == 0 && embedRels.contains(linkRest.name())) {
+            return true;
+        }
+
+        StringBuilder fullName = new StringBuilder();
+        for (Link oldLink : oldLinks) {
+            fullName.append(oldLink.getRel()).append("/");
+        }
+        fullName.append(linkRest.name());
+        // If the full name matches, the link can be embedded (e.g. mappedItems/owningCollection on a collection page)
+        if (embedRels.contains(fullName.toString())) {
+            return true;
+        }
+
+        fullName.append("/");
+        // If the full name starts with the allowed embed, but the embed goes deeper, the link can be embedded
+        // (e.g. making sure mappedItems/owningCollection also embeds mappedItems on a collection page)
+        for (String embedRel : embedRels) {
+            if (embedRel.startsWith(fullName.toString())) {
+                return true;
+            }
+        }
+        return false;
     }
 }

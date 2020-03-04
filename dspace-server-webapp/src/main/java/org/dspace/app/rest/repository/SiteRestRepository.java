@@ -15,7 +15,6 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.dspace.app.rest.model.SiteRest;
 import org.dspace.app.rest.model.patch.Patch;
-import org.dspace.app.rest.repository.patch.DSpaceObjectPatch;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Site;
 import org.dspace.content.service.SiteService;
@@ -39,7 +38,7 @@ public class SiteRestRepository extends DSpaceObjectRestRepository<Site, SiteRes
 
     @Autowired
     public SiteRestRepository(SiteService dsoService) {
-        super(dsoService, new DSpaceObjectPatch<SiteRest>() {});
+        super(dsoService);
         this.sitesv = dsoService;
     }
 
