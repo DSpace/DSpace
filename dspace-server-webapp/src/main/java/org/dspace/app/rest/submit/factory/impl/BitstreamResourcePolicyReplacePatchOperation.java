@@ -9,6 +9,7 @@ package org.dspace.app.rest.submit.factory.impl;
 
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 import org.dspace.app.rest.model.ResourcePolicyRest;
 import org.dspace.app.rest.model.patch.LateObjectEvaluator;
@@ -35,7 +36,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  *
  * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  */
-public class ResourcePolicyReplacePatchOperation extends ReplacePatchOperation<ResourcePolicyRest> {
+public class BitstreamResourcePolicyReplacePatchOperation extends ReplacePatchOperation<ResourcePolicyRest> {
 
     @Autowired
     BitstreamService bitstreamService;
@@ -89,12 +90,14 @@ public class ResourcePolicyReplacePatchOperation extends ReplacePatchOperation<R
 
                         //TODO manage error on select group and eperson
                         Group group = null;
-                        if (newAccessCondition.getGroupUUID() != null) {
-                            group = groupService.find(context, newAccessCondition.getGroupUUID());
+                        if (newAccessCondition.getGroup().getUuid() != null) {
+                            UUID uuidGroup = UUID.fromString(newAccessCondition.getGroup().getUuid());
+                            group = groupService.find(context, uuidGroup);
                         }
                         EPerson eperson = null;
-                        if (newAccessCondition.getEpersonUUID() != null) {
-                            eperson = epersonService.find(context, newAccessCondition.getEpersonUUID());
+                        if (newAccessCondition.getEperson().getUuid() != null) {
+                            UUID uuidEPerson = UUID.fromString(newAccessCondition.getEperson().getUuid());
+                            eperson = epersonService.find(context, uuidEPerson);
                         }
 
                         Date startDate = newAccessCondition.getStartDate();
