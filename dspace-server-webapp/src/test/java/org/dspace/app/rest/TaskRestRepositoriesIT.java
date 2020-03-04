@@ -29,6 +29,7 @@ import org.dspace.app.rest.matcher.EPersonMatcher;
 import org.dspace.app.rest.matcher.PoolTaskMatcher;
 import org.dspace.app.rest.matcher.WorkflowActionMatcher;
 import org.dspace.app.rest.matcher.WorkflowItemMatcher;
+import org.dspace.app.rest.matcher.WorkflowStepMatcher;
 import org.dspace.app.rest.matcher.WorkspaceItemMatcher;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.content.Collection;
@@ -36,6 +37,7 @@ import org.dspace.content.Community;
 import org.dspace.content.Item;
 import org.dspace.eperson.EPerson;
 import org.dspace.xmlworkflow.factory.XmlWorkflowFactory;
+import org.dspace.xmlworkflow.state.Step;
 import org.dspace.xmlworkflow.state.actions.WorkflowActionConfig;
 import org.dspace.xmlworkflow.storedcomponents.ClaimedTask;
 import org.dspace.xmlworkflow.storedcomponents.PoolTask;
@@ -1807,13 +1809,15 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
 
         AtomicReference<Integer> idRef = new AtomicReference<Integer>();
 
+        Step step = xmlWorkflowFactory.getStepByName("reviewstep");
         // step 1
         getClient(reviewer1Token).perform(get("/api/workflow/pooltasks/search/findByUser")
-                .param("uuid", reviewer1.getID().toString()))
+                .param("uuid", reviewer1.getID().toString()).param("projection", "full"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.pooltasks", Matchers.contains(
                     Matchers.allOf(
                             Matchers.is(PoolTaskMatcher.matchPoolTask(null, "reviewstep")),
+                            hasJsonPath("$._embedded.step", WorkflowStepMatcher.matchWorkflowStepEntry(step)),
                             hasJsonPath("$._embedded.workflowitem",
                                     Matchers.is(WorkflowItemMatcher.matchItemWithTitleAndDateIssuedAndSubject(
                                             witem, "Test item full workflow", "2019-03-06", "ExtraEntry")))
@@ -1833,12 +1837,13 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
 
         // get the id of the claimed task
         getClient(reviewer1Token).perform(get("/api/workflow/claimedtasks/search/findByUser")
-                .param("uuid", reviewer1.getID().toString()))
+                .param("uuid", reviewer1.getID().toString()).param("projection", "full"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.claimedtasks", Matchers.contains(
                     Matchers.allOf(
                             hasJsonPath("$._links.self.href", Matchers.containsString("/api/workflow/claimedtasks/")),
                             hasJsonPath("$.type", Matchers.is("claimedtask")),
+                            hasJsonPath("$._embedded.step", WorkflowStepMatcher.matchWorkflowStepEntry(step)),
                             hasJsonPath("$._embedded.workflowitem",
                                      Matchers.is(WorkflowItemMatcher.matchItemWithTitleAndDateIssuedAndSubject(
                                              witem, "Test item full workflow", "2019-03-06", "ExtraEntry"))),
@@ -1862,13 +1867,16 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.inArchive", is(false)));
 
+        step = xmlWorkflowFactory.getStepByName("editstep");
+
         // step 2
         getClient(reviewer2Token).perform(get("/api/workflow/pooltasks/search/findByUser")
-                .param("uuid", reviewer2.getID().toString()))
+                .param("uuid", reviewer2.getID().toString()).param("projection", "full"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.pooltasks", Matchers.contains(
                     Matchers.allOf(
                             Matchers.is(PoolTaskMatcher.matchPoolTask(null, "editstep")),
+                            hasJsonPath("$._embedded.step", WorkflowStepMatcher.matchWorkflowStepEntry(step)),
                             hasJsonPath("$._embedded.workflowitem",
                                     Matchers.is(WorkflowItemMatcher.matchItemWithTitleAndDateIssuedAndSubject(
                                             witem, "Test item full workflow", "2019-03-06", "ExtraEntry")))
@@ -1888,12 +1896,13 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
 
         // get the id of the claimed task
         getClient(reviewer2Token).perform(get("/api/workflow/claimedtasks/search/findByUser")
-                .param("uuid", reviewer2.getID().toString()))
+                .param("uuid", reviewer2.getID().toString()).param("projection", "full"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.claimedtasks", Matchers.contains(
                     Matchers.allOf(
                             hasJsonPath("$._links.self.href", Matchers.containsString("/api/workflow/claimedtasks/")),
                             hasJsonPath("$.type", Matchers.is("claimedtask")),
+                            hasJsonPath("$._embedded.step", WorkflowStepMatcher.matchWorkflowStepEntry(step)),
                             hasJsonPath("$._embedded.workflowitem",
                                      Matchers.is(WorkflowItemMatcher.matchItemWithTitleAndDateIssuedAndSubject(
                                              witem, "Test item full workflow", "2019-03-06", "ExtraEntry"))),
@@ -1917,13 +1926,16 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.inArchive", is(false)));
 
+        step = xmlWorkflowFactory.getStepByName("finaleditstep");
+
         // step 3
         getClient(reviewer3Token).perform(get("/api/workflow/pooltasks/search/findByUser")
-                .param("uuid", reviewer3.getID().toString()))
+                .param("uuid", reviewer3.getID().toString()).param("projection", "full"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.pooltasks", Matchers.contains(
                     Matchers.allOf(
                             Matchers.is(PoolTaskMatcher.matchPoolTask(null, "finaleditstep")),
+                            hasJsonPath("$._embedded.step", WorkflowStepMatcher.matchWorkflowStepEntry(step)),
                             hasJsonPath("$._embedded.workflowitem",
                                     Matchers.is(WorkflowItemMatcher.matchItemWithTitleAndDateIssuedAndSubject(
                                             witem, "Test item full workflow", "2019-03-06", "ExtraEntry")))
@@ -1942,12 +1954,13 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
         workflowAction = xmlWorkflowFactory.getActionByName("finaleditaction");
         // get the id of the claimed task
         getClient(reviewer3Token).perform(get("/api/workflow/claimedtasks/search/findByUser")
-                .param("uuid", reviewer3.getID().toString()))
+                .param("uuid", reviewer3.getID().toString()).param("projection", "full"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.claimedtasks", Matchers.contains(
                     Matchers.allOf(
                             hasJsonPath("$._links.self.href", Matchers.containsString("/api/workflow/claimedtasks/")),
                             hasJsonPath("$.type", Matchers.is("claimedtask")),
+                            hasJsonPath("$._embedded.step", WorkflowStepMatcher.matchWorkflowStepEntry(step)),
                             hasJsonPath("$._embedded.workflowitem",
                                      Matchers.is(WorkflowItemMatcher.matchItemWithTitleAndDateIssuedAndSubject(
                                              witem, "Test item full workflow", "2019-03-06", "ExtraEntry"))),
