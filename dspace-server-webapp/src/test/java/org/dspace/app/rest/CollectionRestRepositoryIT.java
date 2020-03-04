@@ -963,7 +963,9 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                                            .build();
         Collection col2 = CollectionBuilder.createCollection(context, child1child).withName("Collection 2").build();
 
-        getClient().perform(get("/api/core/collections/" + col1.getID() + "?projection=level.1"))
+        getClient().perform(get("/api/core/collections/" + col1.getID())
+                            .param("projection", "level")
+                            .param("embedLevelDepth", "1"))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$", CollectionMatcher.matchCollectionEntry(col1.getName(),
                                                                                    col1.getID(),
@@ -982,7 +984,9 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                    // .doesNotExist() makes sure that this section is not embedded, it's not there at all
                    .andExpect(jsonPath("$._embedded.logo._embedded.format").doesNotExist());
 
-        getClient().perform(get("/api/core/collections/" + col1.getID() + "?projection=level.3"))
+        getClient().perform(get("/api/core/collections/" + col1.getID())
+                            .param("projection", "level")
+                            .param("embedLevelDepth", "3"))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$", CollectionMatcher.matchCollectionEntry(col1.getName(),
                                                                                    col1.getID(),
@@ -1014,5 +1018,55 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                    .andExpect(jsonPath("$._embedded.logo", Matchers.not(Matchers.empty())))
                    // .exists() makes sure that the embed is there, but it could be empty
                    .andExpect(jsonPath("$._embedded.logo._embedded.format").exists());
+    }
+
+    @Test
+    public void projectonLevelEmbedLevelDepthHigherThanEmbedMaxBadRequestTest() throws Exception {
+        //We turn off the authorization system in order to create the structure as defined below
+        context.turnOffAuthorisationSystem();
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and one collection.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Community child1child = CommunityBuilder.createSubCommunity(context, child1)
+                                                .withName("Sub Community Two")
+                                                .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1)
+                                           .withName("Collection 1")
+                                           .withLogo("TestingContentForLogo")
+                                           .build();
+
+        getClient().perform(get("/api/core/collections/" + col1.getID())
+                                .param("projection", "level")
+                                .param("embedLevelDepth", "100"))
+                   .andExpect(status().isBadRequest());
+    }
+    @Test
+    public void projectonLevelEmbedLevelDepthNotPresentBadRequestTest() throws Exception {
+        //We turn off the authorization system in order to create the structure as defined below
+        context.turnOffAuthorisationSystem();
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and one collection.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Community child1child = CommunityBuilder.createSubCommunity(context, child1)
+                                                .withName("Sub Community Two")
+                                                .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1)
+                                           .withName("Collection 1")
+                                           .withLogo("TestingContentForLogo")
+                                           .build();
+
+        getClient().perform(get("/api/core/collections/" + col1.getID())
+                                .param("projection", "level"))
+                   .andExpect(status().isBadRequest());
     }
 }
