@@ -40,7 +40,6 @@ public class ClaimedTaskConverter
         taskRest.setId(obj.getID());
         taskRest.setWorkflowitem(converter.toRest(witem, projection));
         taskRest.setAction(converter.toRest(xmlWorkflowFactory.getActionByName(obj.getActionID()), projection));
-        taskRest.setStep(obj.getStepID());
         taskRest.setOwner(converter.toRest(obj.getOwner(), projection));
         return taskRest;
     }

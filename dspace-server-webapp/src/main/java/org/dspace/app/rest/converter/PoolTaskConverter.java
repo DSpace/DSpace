@@ -43,7 +43,6 @@ public class PoolTaskConverter
             taskRest.setGroup(converter.toRest(obj.getGroup(), projection));
         }
         taskRest.setAction(obj.getActionID());
-        taskRest.setStep(obj.getStepID());
         return taskRest;
     }
 
