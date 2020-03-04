@@ -8,16 +8,14 @@
 package org.dspace.content;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.any;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 
-import org.dspace.content.dao.RelationshipTypeDAO;
 import org.dspace.content.service.EntityTypeService;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.RelationshipService;
@@ -27,7 +25,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 public class EntityServiceImplTest  {
@@ -60,10 +58,8 @@ public class EntityServiceImplTest  {
     public void testfindByItemId() throws Exception {
         // Declare objects utilized in unit test
         Item item = mock(Item.class);
-        List<Relationship> relationshipList = new ArrayList<>();
         Relationship relationship = mock(Relationship.class);
         relationship.setId(9);
-        relationshipList.add(relationship);
 
         // Mock the state of objects utilized in findByItemId() to meet the success criteria of an invocation
         when(itemService.find(any(), any())).thenReturn(item);
@@ -79,10 +75,6 @@ public class EntityServiceImplTest  {
         // Declare objects utilized in unit test
         Entity entity = mock(Entity.class);
         EntityTypeService entityTypeService = mock(EntityTypeService.class);
-        Item item = mock(Item.class);
-        List<MetadataValue> list = new ArrayList<>();
-        MetadataValue metadataValue = mock(MetadataValue.class);
-        list.add(metadataValue);
         EntityType entityType = entityTypeService.findByEntityType(context, "testType");
 
         // The returned EntityType should equal our defined entityType case
@@ -151,11 +143,7 @@ public class EntityServiceImplTest  {
     @Test
     public void testGetAllRelationshipTypes() throws Exception {
         // Declare objects utilized for this test
-        List<MetadataValue> list = new ArrayList<>();
-        MetadataValue metadataValue = mock(MetadataValue.class);
-        list.add(metadataValue);
         Item item = mock(Item.class);
-        RelationshipTypeDAO relationshipTypeDAO = mock(RelationshipTypeDAO.class);
         Entity entity = mock(Entity.class);
         RelationshipType relationshipType = mock(RelationshipType.class);
         relationshipType.setLeftType(leftType);
@@ -185,7 +173,7 @@ public class EntityServiceImplTest  {
         RelationshipType relationshipType = mock(RelationshipType.class);
 
         // Currently this unit test will only test one case with one relationshipType
-        List<RelationshipType> relationshipTypeList = new LinkedList<>();
+        List<RelationshipType> relationshipTypeList = new ArrayList<>();
         relationshipTypeList.add(relationshipType);
         List<MetadataValue> metsList = new ArrayList<>();
         MetadataValue metadataValue = mock(MetadataValue.class);
@@ -213,7 +201,7 @@ public class EntityServiceImplTest  {
         RelationshipType relationshipType = mock(RelationshipType.class);
 
         // Currently this unit test will only test one case with one relationshipType
-        List<RelationshipType> relationshipTypeList = new LinkedList<>();
+        List<RelationshipType> relationshipTypeList = new ArrayList<>();
         relationshipTypeList.add(relationshipType);
         List<MetadataValue> metsList = new ArrayList<>();
         MetadataValue metadataValue = mock(MetadataValue.class);
@@ -236,7 +224,7 @@ public class EntityServiceImplTest  {
     @Test
     public void testGetRelationshipTypesByTypeName() throws Exception {
         // Declare objects utilized in unit test
-        List<RelationshipType> list = new LinkedList<>();
+        List<RelationshipType> list = new ArrayList<>();
         RelationshipType relationshipType = mock(RelationshipType.class);
         list.add(relationshipType);
 

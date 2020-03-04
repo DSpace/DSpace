@@ -10,25 +10,19 @@ package org.dspace.statistics.util;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import mockit.Mock;
-import mockit.MockUp;
 import org.dspace.AbstractDSpaceTest;
 import org.dspace.core.factory.CoreServiceFactory;
 import org.dspace.service.ClientInfoService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
-import org.dspace.statistics.SolrLoggerServiceImpl;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.runners.MockitoJUnitRunner;
 
 /**
  * @author mwood
  * @author frederic at atmire.com
  */
-@RunWith(MockitoJUnitRunner.class)
 public class SpiderDetectorServiceImplTest extends AbstractDSpaceTest {
     private static final String NOT_A_BOT_ADDRESS = "192.168.0.1";
 
@@ -338,30 +332,5 @@ public class SpiderDetectorServiceImplTest extends AbstractDSpaceTest {
     public void cleanup() throws Exception {
         spiderDetectorService = null;
         configurationService.setProperty("usage-statistics.bots.case-insensitive", false);
-        ;
     }
-
-
-    /**
-     * Dummy SolrLogger for testing.
-     *
-     * @author mwood
-     */
-    static public class MockSolrLogger
-        extends MockUp<SolrLoggerServiceImpl> {
-        @Mock
-        public void $init() {
-        }
-
-        @Mock
-        public void $clinit() {
-        }
-
-        @Mock
-        public boolean isUseProxies() {
-            return false;
-        }
-
-    }
-
 }

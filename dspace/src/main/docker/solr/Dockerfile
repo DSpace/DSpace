@@ -7,7 +7,7 @@
 #
 
 # Define a 'dspace' alias for our latest v7 image
-FROM dspace/dspace:dspace-7_x-jdk8 as dspace
+FROM dspace/dspace:dspace-7_x as dspace
 
 # Pin to Solr v7
 # Note: The WORKDIR changes to /var/solr in v8 and directory layout is different
