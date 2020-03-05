@@ -9,6 +9,7 @@ package org.dspace.app.rest;
 
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadata;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
@@ -30,8 +31,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.dspace.app.rest.builder.CollectionBuilder;
 import org.dspace.app.rest.builder.CommunityBuilder;
 import org.dspace.app.rest.builder.EPersonBuilder;
+import org.dspace.app.rest.builder.GroupBuilder;
 import org.dspace.app.rest.builder.ItemBuilder;
 import org.dspace.app.rest.matcher.EPersonMatcher;
+import org.dspace.app.rest.matcher.GroupMatcher;
 import org.dspace.app.rest.matcher.HalMatcher;
 import org.dspace.app.rest.model.EPersonRest;
 import org.dspace.app.rest.model.MetadataRest;
@@ -43,6 +46,7 @@ import org.dspace.app.rest.test.MetadataPatchSuite;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.eperson.EPerson;
+import org.dspace.eperson.Group;
 import org.hamcrest.Matchers;
 import org.junit.Test;
 
@@ -1295,6 +1299,56 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
         String token = getAuthToken(asUser.getEmail(), password);
 
         new MetadataPatchSuite().runWith(getClient(token), "/api/eperson/epersons/" + ePerson.getID(), expectedStatus);
+    }
+
+    /**
+     * Test that epersons/<:uuid>/groups endpoint returns the direct groups of the epersons
+     * @throws Exception
+     */
+    @Test
+    public void getDirectEpersonGroups() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        EPerson ePerson = EPersonBuilder.createEPerson(context)
+                                        .withNameInMetadata("John", "Doe")
+                                        .withEmail("Johndoe@fake-email.com")
+                                        .withPassword(password)
+                                        .build();
+
+        Group parentGroup1 = GroupBuilder.createGroup(context)
+                                        .withName("Test Parent Group 1")
+                                        .build();
+
+        Group childGroup1 = GroupBuilder.createGroup(context)
+                                       .withName("Test Child Group 1")
+                                       .withParent(parentGroup1)
+                                       .addMember(ePerson)
+                                       .build();
+
+        Group parentGroup2 = GroupBuilder.createGroup(context)
+                                         .withName("Test Parent Group 2")
+                                         .build();
+
+        Group childGroup2 = GroupBuilder.createGroup(context)
+                                        .withName("Test Child Group 2")
+                                        .withParent(parentGroup2)
+                                        .addMember(ePerson)
+                                        .build();
+
+
+        String authToken = getAuthToken(admin.getEmail(), password);
+        getClient(authToken).perform(get("/api/eperson/epersons/" + ePerson.getID() + "/groups"))
+                            .andExpect(status().isOk())
+                            .andExpect(content().contentType(contentType))
+                            .andExpect(jsonPath("$._embedded.groups", containsInAnyOrder(
+                                    GroupMatcher.matchGroupWithName(childGroup1.getName()),
+                                    GroupMatcher.matchGroupWithName(childGroup2.getName()))))
+                            .andExpect(jsonPath("$._embedded.groups", Matchers.not(
+                                    containsInAnyOrder(
+                                            GroupMatcher.matchGroupWithName(parentGroup1.getName()),
+                                            GroupMatcher.matchGroupWithName(parentGroup2.getName()))))
+                            );
+
     }
 
 }
