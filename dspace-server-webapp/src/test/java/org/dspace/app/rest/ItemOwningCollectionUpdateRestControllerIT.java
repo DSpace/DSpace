@@ -277,8 +277,9 @@ public class ItemOwningCollectionUpdateRestControllerIT extends AbstractControll
                         "https://localhost:8080/spring-rest/api/core/collections/" + col2.getID()
                 ))
 
-                        //We expect a 401 Unauthorized status when performed by anonymous
-                        .andExpect(status().isForbidden());
+                          // we expect a 200 here as the user has ADMIN permission on the source collection and
+                         //  ADD permission on the target one. This is the normal behavior also in DSpace 6
+                        .andExpect(status().isOk());
 
 
     }

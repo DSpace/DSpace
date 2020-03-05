@@ -57,6 +57,7 @@ import org.apache.solr.client.solrj.SolrServerException;
 import org.dspace.app.rest.builder.BitstreamBuilder;
 import org.dspace.app.rest.builder.CollectionBuilder;
 import org.dspace.app.rest.builder.CommunityBuilder;
+import org.dspace.app.rest.builder.EPersonBuilder;
 import org.dspace.app.rest.builder.GroupBuilder;
 import org.dspace.app.rest.builder.ItemBuilder;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
@@ -70,6 +71,7 @@ import org.dspace.content.service.BitstreamFormatService;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.core.Constants;
 import org.dspace.disseminate.CitationDocumentServiceImpl;
+import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.services.ConfigurationService;
 import org.dspace.statistics.ObjectCount;
@@ -342,6 +344,184 @@ public class BitstreamRestControllerIT extends AbstractControllerIntegrationTest
     }
 
     @Test
+    public void embargoedBitstreamForbiddenTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                .withName("Parent Community")
+                .build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                .withName("Collection 1")
+                .build();
+
+        // a public item with an embargoed bitstream
+        String bitstreamContent = "Embargoed!";
+
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+
+            Item publicItem1 = ItemBuilder.createItem(context, col1)
+                                          .withTitle("Public item 1")
+                                          .withIssueDate("2017-10-17")
+                                          .withAuthor("Smith, Donald")
+                                          .build();
+
+            bitstream = BitstreamBuilder
+                .createBitstream(context, publicItem1, is)
+                .withName("Test Embargoed Bitstream")
+                .withDescription("This bitstream is embargoed")
+                .withMimeType("text/plain")
+                .withEmbargoPeriod("3 months")
+                .build();
+        }
+            context.restoreAuthSystemState();
+
+            String authToken = getAuthToken(eperson.getEmail(), password);
+            getClient(authToken).perform(get("/api/core/bitstreams/" + bitstream.getID() + "/content"))
+                       .andExpect(status().isForbidden());
+
+            getClient().perform(get("/api/core/bitstreams/" + bitstream.getID() + "/content"))
+                       .andExpect(status().isUnauthorized());
+
+            checkNumberOfStatsRecords(bitstream, 0);
+    }
+
+    @Test
+    public void expiredEmbargoedBitstreamTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                .withName("Parent Community")
+                .build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                .withName("Collection 1")
+                .build();
+
+        String bitstreamContent = "Embargoed!";
+
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+
+            Item publicItem1 = ItemBuilder.createItem(context, col1)
+                    .withTitle("Public item 1")
+                    .withIssueDate("2015-10-17")
+                    .withAuthor("Smith, Donald")
+                    .build();
+
+            Bitstream bitstream = BitstreamBuilder
+                .createBitstream(context, publicItem1, is)
+                .withName("Test Embargoed Bitstream")
+                .withDescription("This bitstream is embargoed")
+                .withMimeType("text/plain")
+                .withEmbargoPeriod("-3 months")
+                .build();
+        }
+            context.restoreAuthSystemState();
+
+            // all  are allowed access to item with embargoed expired
+
+            String authToken = getAuthToken(eperson.getEmail(), password);
+            getClient(authToken).perform(get("/api/core/bitstreams/" + bitstream.getID() + "/content"))
+                       .andExpect(status().isOk());
+
+            getClient().perform(get("/api/core/bitstreams/" + bitstream.getID() + "/content"))
+                       .andExpect(status().isOk());
+
+            checkNumberOfStatsRecords(bitstream, 2);
+    }
+
+    @Test
+    public void embargoedBitstreamAccessGrantByAdminsTest() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        EPerson adminParentCommunity = EPersonBuilder.createEPerson(context)
+                .withEmail("adminCommunity@mail.com")
+                .withPassword("qwerty02")
+                .build();
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                   .withName("Parent Community")
+                   .withAdminGroup(adminParentCommunity)
+                   .build();
+
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                   .withName("Sub Community")
+                   .build();
+
+        EPerson adminChild2 = EPersonBuilder.createEPerson(context)
+                .withEmail("adminChil2@mail.com")
+                .withPassword("qwerty05")
+                .build();
+        Community child2 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                .withName("Sub Community 2")
+                .withAdminGroup(adminChild2)
+                .build();
+
+        EPerson adminCollection1 = EPersonBuilder.createEPerson(context)
+                .withEmail("adminCollection1@mail.com")
+                .withPassword("qwerty03")
+                .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1)
+                   .withName("Collection 1")
+                   .withAdminGroup(adminCollection1)
+                   .build();
+
+        EPerson adminCollection2 = EPersonBuilder.createEPerson(context)
+                .withEmail("adminCol2@mail.com")
+                .withPassword("qwerty01")
+                .build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1)
+                   .withName("Collection 2")
+                   .withAdminGroup(adminCollection2)
+                   .build();
+
+
+        String bitstreamContent = "Embargoed!";
+        Bitstream bitstream = null;
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+
+            Item item = ItemBuilder.createItem(context, col1)
+                    .withTitle("Test")
+                    .withIssueDate("2018-10-18")
+                    .withAuthor("Smith, Donald")
+                    .withSubject("ExtraEntry")
+                    .build();
+
+            bitstream = BitstreamBuilder.createBitstream(context, item, is)
+                    .withName("Bitstream")
+                    .withDescription("Description")
+                    .withMimeType("text/plain")
+                    .withEmbargoPeriod("2 week")
+                    .build();
+        }
+        context.restoreAuthSystemState();
+
+        // parent community's admin user is allowed access to embargoed item
+        String tokenAdminParentCommunity = getAuthToken(adminParentCommunity.getEmail(), "qwerty02");
+        getClient(tokenAdminParentCommunity).perform(get("/api/core/bitstreams/" + bitstream.getID() + "/content"))
+                   .andExpect(status().isOk());
+
+        // collection1's admin user is allowed access to embargoed item
+        String tokenAdminCollection1 = getAuthToken(adminCollection1.getEmail(), "qwerty03");
+        getClient(tokenAdminCollection1).perform(get("/api/core/bitstreams/" + bitstream.getID() + "/content"))
+                   .andExpect(status().isOk());
+
+        checkNumberOfStatsRecords(bitstream, 2);
+
+        // admin of second collection is NOT allowed access to embargoed item  of first collection
+        String tokenAdminCollection2 = getAuthToken(adminCollection2.getEmail(), "qwerty01");
+        getClient(tokenAdminCollection2).perform(get("/api/core/bitstreams/" + bitstream.getID() + "/content"))
+                   .andExpect(status().isForbidden());
+
+        // admin of child2 community is NOT allowed access to embargoed item  of first collection
+        String tokenAdminChild2 = getAuthToken(adminChild2.getEmail(), "qwerty05");
+        getClient(tokenAdminCollection2).perform(get("/api/core/bitstreams/" + bitstream.getID() + "/content"))
+                   .andExpect(status().isForbidden());
+
+        checkNumberOfStatsRecords(bitstream, 2);
+    }
+
+    @Test
     public void testPrivateBitstream() throws Exception {
         context.turnOffAuthorisationSystem();
 
@@ -386,6 +566,153 @@ public class BitstreamRestControllerIT extends AbstractControllerIntegrationTest
             checkNumberOfStatsRecords(bitstream, 0);
 
         }
+    }
+
+    @Test
+    public void restrictedGroupBitstreamForbiddenTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        EPerson eperson2 = EPersonBuilder.createEPerson(context)
+                .withEmail("eperson2@mail.com")
+                .withPassword("qwerty02")
+                .build();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                .withName("Parent Community")
+                .build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                .withName("Collection 1")
+                .build();
+
+        Group restrictedGroup = GroupBuilder.createGroup(context)
+                .withName("Restricted Group")
+                .addMember(eperson)
+                .build();
+
+        String bitstreamContent = "Private!";
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+
+            Item item = ItemBuilder.createItem(context, col1)
+                    .withTitle("item 1")
+                    .withIssueDate("2013-01-17")
+                    .withAuthor("Doe, John")
+                    .build();
+            bitstream = BitstreamBuilder
+                .createBitstream(context, item, is)
+                .withName("Test Embargoed Bitstream")
+                .withDescription("This bitstream is embargoed")
+                .withMimeType("text/plain")
+                .withReaderGroup(restrictedGroup)
+                .build();
+        }
+            context.restoreAuthSystemState();
+            // download the bitstream
+            // eperson that belong to restricted group is allowed access to the item
+            String authToken = getAuthToken(eperson.getEmail(), password);
+            getClient(authToken).perform(get("/api/core/bitstreams/" + bitstream.getID() + "/content"))
+                                .andExpect(status().isOk());
+
+            checkNumberOfStatsRecords(bitstream, 1);
+
+            String tokenEPerson2 = getAuthToken(eperson2.getEmail(), "qwerty02");
+            getClient(tokenEPerson2).perform(get("/api/core/bitstreams/" + bitstream.getID() + "/content"))
+                                .andExpect(status().isForbidden());
+
+            // Anonymous users CANNOT access/download Bitstreams that are restricted
+            getClient().perform(get("/api/core/bitstreams/" + bitstream.getID() + "/content"))
+                                .andExpect(status().isUnauthorized());
+
+            checkNumberOfStatsRecords(bitstream, 1);
+    }
+
+    @Test
+    public void restrictedGroupBitstreamAccessGrantByAdminsTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        EPerson adminParentCommunity = EPersonBuilder.createEPerson(context)
+                .withEmail("adminCommunity@mail.com")
+                .withPassword("qwerty00")
+                .build();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                .withName("Parent Community")
+                .withAdminGroup(adminParentCommunity)
+                .build();
+
+        EPerson adminChild1 = EPersonBuilder.createEPerson(context)
+                .withEmail("adminChild1@mail.com")
+                .withPassword("qwerty05")
+                .build();
+        Community child1 = CommunityBuilder.createCommunity(context)
+                .withName("Sub Community")
+                .withAdminGroup(adminChild1)
+                .build();
+
+        EPerson adminCol1 = EPersonBuilder.createEPerson(context)
+                .withEmail("admin1@mail.com")
+                .withPassword("qwerty01")
+                .build();
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                .withName("Collection 1")
+                .withAdminGroup(adminCol1)
+                .build();
+
+        EPerson adminCol2 = EPersonBuilder.createEPerson(context)
+                .withEmail("admin2@mail.com")
+                .withPassword("qwerty02")
+                .build();
+        Collection col2 = CollectionBuilder.createCollection(context, parentCommunity)
+                .withName("Collection 2")
+                .withAdminGroup(adminCol2)
+                .build();
+
+        Group restrictedGroup = GroupBuilder.createGroup(context)
+                .withName("Restricted Group")
+                .addMember(eperson)
+                .build();
+
+        String bitstreamContent = "Private!";
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+
+            Item item = ItemBuilder.createItem(context, col1)
+                    .withTitle("item")
+                    .withIssueDate("2018-10-17")
+                    .withAuthor("Doe, John")
+                    .build();
+            bitstream = BitstreamBuilder
+                .createBitstream(context, item, is)
+                .withName("Test Embargoed Bitstream")
+                .withDescription("This bitstream is embargoed")
+                .withMimeType("text/plain")
+                .withReaderGroup(restrictedGroup)
+                .build();
+        }
+            context.restoreAuthSystemState();
+            // download the bitstream
+            // parent community's admin user is allowed access to the item belong restricted group
+            String tokenAdminParentCommuity = getAuthToken(adminParentCommunity.getEmail(), "qwerty00");
+            getClient(tokenAdminParentCommuity).perform(get("/api/core/bitstreams/" + bitstream.getID() + "/content"))
+                                .andExpect(status().isOk());
+
+            // collection1's admin user is allowed access to the item belong restricted group
+            String tokenAdminCol1 = getAuthToken(adminCol1.getEmail(), "qwerty01");
+            getClient(tokenAdminCol1).perform(get("/api/core/bitstreams/" + bitstream.getID() + "/content"))
+                                .andExpect(status().isOk());
+
+            checkNumberOfStatsRecords(bitstream, 2);
+
+            // collection2's admin user is NOT allowed access to the item belong collection1
+            String tokenAdminCol2 = getAuthToken(adminCol2.getEmail(), "qwerty02");
+            getClient(tokenAdminCol2).perform(get("/api/core/bitstreams/" + bitstream.getID() + "/content"))
+                                .andExpect(status().isForbidden());
+
+            // child1's admin user is NOT allowed access to the item belong collection1
+            String tokenAdminChild1 = getAuthToken(adminChild1.getEmail(), "qwerty05");
+            getClient(tokenAdminCol2).perform(get("/api/core/bitstreams/" + bitstream.getID() + "/content"))
+                                .andExpect(status().isForbidden());
+
+            checkNumberOfStatsRecords(bitstream, 2);
     }
 
     // Verify number of hits/views of Bitstream is as expected
