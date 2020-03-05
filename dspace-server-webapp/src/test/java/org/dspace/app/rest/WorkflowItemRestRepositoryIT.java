@@ -663,15 +663,15 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
                    .andExpect(status().is(200));
 
         // a workspaceitem should exist now in the submitter workspace
-        getClient(tokenSubmitter).perform(get("/api/submission/workspaceitems"))
-                   .andExpect(status().isOk())
-                   .andExpect(jsonPath("$._embedded.workspaceitems", Matchers.containsInAnyOrder(
-                        WorkspaceItemMatcher.matchItemWithTitleAndDateIssued(null, "Workflow Item 1",
-                                "2017-10-17"))))
-                   .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/submission/workspaceitems")))
-                   .andExpect(jsonPath("$.page.size", is(20)))
-                   .andExpect(jsonPath("$.page.totalElements", is(1)));
-
+        getClient(tokenSubmitter).perform(get("/api/submission/workspaceitems/search/findBySubmitter")
+                .param("uuid", submitter.getID().toString()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$._embedded.workspaceitems", Matchers.containsInAnyOrder(
+                  WorkspaceItemMatcher.matchItemWithTitleAndDateIssued(null, "Workflow Item 1",
+                      "2017-10-17"))))
+                .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/submission/workspaceitems")))
+                .andExpect(jsonPath("$.page.size", is(20)))
+                .andExpect(jsonPath("$.page.totalElements", is(1)));
     }
 
     @Test
