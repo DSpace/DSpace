@@ -1,9 +1,9 @@
 package org.ssu.entity;
 
-import java.util.List;
+import java.util.UUID;
 
 public class Item {
-    private Integer itemId;
+    private UUID itemId;
     private String name;
     private Long viewCount;
     private Long downloadCount;
@@ -17,7 +17,7 @@ public class Item {
         link = builder.link;
     }
 
-    public Integer getItemId() {
+    public UUID getItemId() {
         return itemId;
     }
 
@@ -39,7 +39,7 @@ public class Item {
 
 
     public static final class Builder {
-        private Integer itemId;
+        private UUID itemId;
         private String name;
         private Long viewCount;
         private Long downloadCount;
@@ -56,7 +56,7 @@ public class Item {
             this.link = copy.getLink();
         }
 
-        public Builder withItemId(Integer itemId) {
+        public Builder withItemId(UUID itemId) {
             this.itemId = itemId;
             return this;
         }

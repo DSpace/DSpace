@@ -174,8 +174,8 @@ public class ItemService {
                 .withHandle(item.getHandle())
                 .withAuthors(extractAuthorListForItem.apply(item))
                 .withType(getItemTypeLocalized(item, locale))
-                .withViews(essuirStatistics.getViewsForItem(item.getLegacyId()))
-                .withDownloads(essuirStatistics.getDownloadsForItem(item.getLegacyId()))
+                .withViews(essuirStatistics.getViewsForItem(item.getID()))
+                .withDownloads(essuirStatistics.getDownloadsForItem(item.getID()))
                 .withDateAvailable(getDateAvailableForItem(item))
                 .withSubmitter(item.getSubmitter())
                 .build();

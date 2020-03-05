@@ -32,4 +32,32 @@
             insert into dspaceobject (select uuid from speciality)
         </sql>
     </changeSet>
+
+    <changeSet author="Igor Marchenko" id="8">
+        <addColumn tableName="statistics">
+            <column name="uuid" type="UUID"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet author="Igor Marchenko" id="9">
+        <sql>
+            UPDATE statistics st SET uuid = (SELECT uuid FROM item it WHERE it.item_id = st.item_id);
+        </sql>
+    </changeSet>
+
+    <changeSet author="Igor Marchenko" id="10">
+        <dropColumn columnName="item_id" tableName="statistics"/>
+    </changeSet>
+
+    <changeSet author="Igor Marchenko" id="11">
+        <addPrimaryKey columnNames="uuid, sequence_id, country_code"
+                       constraintName="pk_statistics_uuid"
+                       tableName="statistics"/>
+    </changeSet>
+
+    <changeSet author="Igor Marchenko" id="12">
+        <sql>
+            DELETE FROM statistics WHERE uuid IS NULL;
+        </sql>
+    </changeSet>
 </databaseChangeLog>

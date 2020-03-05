@@ -211,7 +211,7 @@ public class HandleController {
         Function<Bitstream, String> getLinkForBitstream = (bitstream) -> {
             try {
                 Item item = dspaceItemService.find(dspaceContext, itemId);
-                essuirStatistics.updateItemDownloads(request, item.getLegacyId());
+                essuirStatistics.updateItemDownloads(request, item.getID());
                 return String.format("%s/bitstream/%s/%s/%s", request.getContextPath(), item.getHandle(), bitstream.getSequenceID(), UIUtil.encodeBitstreamName(bitstream.getName(), Constants.DEFAULT_ENCODING));
             } catch (UnsupportedEncodingException | SQLException e) {
                 e.printStackTrace();
@@ -253,8 +253,8 @@ public class HandleController {
         outputXmlWritter.output(outputTags, headMetadata );
         request.setAttribute("dspace.layout.head", headMetadata.toString());
 
-        essuirStatistics.updateItemViews(request, item.getLegacyId());
-        List<CountryStatisticsResponse> itemViewsByCountry = essuirStatistics.getItemViewsByCountry(item.getLegacyId())
+        essuirStatistics.updateItemViews(request, item.getID());
+        List<CountryStatisticsResponse> itemViewsByCountry = essuirStatistics.getItemViewsByCountry(item.getID())
                 .entrySet()
                 .stream()
                 .map(country -> new CountryStatisticsResponse.Builder()
@@ -266,7 +266,7 @@ public class HandleController {
                 .sorted(Comparator.comparing(CountryStatisticsResponse::getCountryName))
                 .collect(Collectors.toList());
 
-        List<CountryStatisticsResponse> itemDownloadsByCountry = essuirStatistics.getItemDownloadsByCountry(item.getLegacyId())
+        List<CountryStatisticsResponse> itemDownloadsByCountry = essuirStatistics.getItemDownloadsByCountry(item.getID())
                 .entrySet()
                 .stream()
                 .map(country -> new CountryStatisticsResponse.Builder()
