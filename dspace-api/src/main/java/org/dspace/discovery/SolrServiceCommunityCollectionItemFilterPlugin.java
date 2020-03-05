@@ -23,12 +23,14 @@ public class SolrServiceCommunityCollectionItemFilterPlugin implements SolrServi
     @Override
     public void additionalIndex(Context context, IndexableObject idxObj, SolrInputDocument document) {
         try {
-            DSpaceObject dso = ((IndexableDSpaceObject) idxObj).getIndexedObject();
-            if (dso instanceof Community || dso instanceof Collection || dso instanceof Item) {
-                DSpaceObject parent = ContentServiceFactory.getInstance()
-                                      .getDSpaceObjectService(dso).getParentObject(context, dso);
-                if (parent != null) {
-                    document.addField("location.parent", parent.getID().toString());
+            if (idxObj instanceof IndexableDSpaceObject) {
+                DSpaceObject dso = ((IndexableDSpaceObject) idxObj).getIndexedObject();
+                if (dso instanceof Community || dso instanceof Collection || dso instanceof Item) {
+                    DSpaceObject parent = ContentServiceFactory.getInstance().getDSpaceObjectService(dso)
+                                                               .getParentObject(context, dso);
+                    if (parent != null) {
+                        document.addField("location.parent", parent.getID().toString());
+                    }
                 }
             }
         } catch (SQLException e) {
