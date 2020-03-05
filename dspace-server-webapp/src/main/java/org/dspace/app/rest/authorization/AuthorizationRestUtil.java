@@ -14,7 +14,7 @@ import java.util.UUID;
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.model.BaseObjectRest;
 import org.dspace.app.rest.repository.DSpaceRestRepository;
-import org.dspace.app.rest.repository.FindableObjectRepository;
+import org.dspace.app.rest.repository.ReloadableEntityObjectRepository;
 import org.dspace.app.rest.utils.Utils;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
@@ -67,7 +67,7 @@ public class AuthorizationRestUtil {
         try {
             objType = parts[2].split("\\.");
             DSpaceRestRepository repository = utils.getResourceRepositoryByCategoryAndModel(objType[0], objType[1]);
-            Serializable pk = utils.castToPKClass((FindableObjectRepository) repository, objIdStr);
+            Serializable pk = utils.castToPKClass((ReloadableEntityObjectRepository) repository, objIdStr);
             try {
                 // disable the security as we only need to retrieve the object to further process the authorization
                 context.turnOffAuthorisationSystem();
