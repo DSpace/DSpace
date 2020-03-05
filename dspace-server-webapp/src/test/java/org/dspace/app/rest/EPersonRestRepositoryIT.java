@@ -348,10 +348,10 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
     }
 
     @Test
-    public void findByEmailUnprocessable() throws Exception {
+    public void findByEmailMissingParameter() throws Exception {
         String authToken = getAuthToken(admin.getEmail(), password);
         getClient(authToken).perform(get("/api/eperson/epersons/search/byEmail"))
-                            .andExpect(status().isUnprocessableEntity());
+                            .andExpect(status().isBadRequest());
     }
 
     @Test
