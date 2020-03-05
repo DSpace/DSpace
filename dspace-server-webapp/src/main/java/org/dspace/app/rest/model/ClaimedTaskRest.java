@@ -9,18 +9,23 @@ package org.dspace.app.rest.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.dspace.app.rest.RestResourceController;
-import org.dspace.xmlworkflow.storedcomponents.ClaimedTask;
 
 /**
  * The ClaimedTask REST Resource
  *
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
+@LinksRest(links = {
+    @LinkRest(
+        name = ClaimedTaskRest.STEP,
+        method = "getStep"
+    )
+})
 public class ClaimedTaskRest extends BaseObjectRest<Integer> {
     public static final String NAME = "claimedtask";
     public static final String CATEGORY = RestAddressableModel.WORKFLOW;
 
-    private String step;
+    public static final String STEP = "step";
 
     @JsonIgnore
     private WorkflowActionRest action;
@@ -44,18 +49,6 @@ public class ClaimedTaskRest extends BaseObjectRest<Integer> {
     @Override
     public Class getController() {
         return RestResourceController.class;
-    }
-
-    /**
-     * @see ClaimedTask#getStepID()
-     * @return the step
-     */
-    public String getStep() {
-        return step;
-    }
-
-    public void setStep(String step) {
-        this.step = step;
     }
 
     /**
@@ -83,7 +76,7 @@ public class ClaimedTaskRest extends BaseObjectRest<Integer> {
     }
 
     /**
-     * 
+     *
      * @return the WorkflowItemRest that belong to this claimed task
      */
     public WorkflowItemRest getWorkflowitem() {
