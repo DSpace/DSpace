@@ -77,7 +77,7 @@ import org.springframework.web.multipart.MultipartFile;
  */
 @Component(WorkspaceItemRest.CATEGORY + "." + WorkspaceItemRest.NAME)
 public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceItemRest, Integer>
-    implements FindableObjectRepository<WorkspaceItem, Integer> {
+    implements ReloadableEntityObjectRepository<WorkspaceItem, Integer> {
 
     public static final String OPERATION_PATH_SECTIONS = "sections";
 

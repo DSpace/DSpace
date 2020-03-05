@@ -29,7 +29,7 @@ import org.springframework.data.rest.webmvc.ResourceNotFoundException;
  * @param <R> the corresponding DSpaceObjectRest.
  */
 public abstract class DSpaceObjectRestRepository<M extends DSpaceObject, R extends DSpaceObjectRest>
-        extends DSpaceRestRepository<R, UUID> implements FindableObjectRepository<M, UUID> {
+        extends DSpaceRestRepository<R, UUID> implements ReloadableEntityObjectRepository<M, UUID> {
 
     final DSpaceObjectService<M> dsoService;
 

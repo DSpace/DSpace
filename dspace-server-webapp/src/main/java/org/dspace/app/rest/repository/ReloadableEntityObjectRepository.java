@@ -23,7 +23,7 @@ import org.dspace.core.ReloadableEntity;
  * @param <F> the ReloadableEntity type
  * @param <PK> the primary key type
  */
-public interface FindableObjectRepository<T extends ReloadableEntity<PK>,
+public interface ReloadableEntityObjectRepository<T extends ReloadableEntity<PK>,
     PK extends Serializable> {
 
     /**
