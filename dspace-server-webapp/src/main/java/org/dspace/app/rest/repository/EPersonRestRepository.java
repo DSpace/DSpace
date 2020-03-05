@@ -116,6 +116,29 @@ public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, E
     }
 
     /**
+     * Find the eperson with the provided email address if any. The search is delegated to the
+     * {@link EPersonService#findByEmail(Context, String)} method
+     *
+     * @param email
+     *            is the *required* email address
+     * @return a Page of EPersonRest instances matching the user query
+     */
+    @SearchRestMethod(name = "byEmail")
+    public EPersonRest findByEmail(@Parameter(value = "email", required = true) String email) {
+        EPerson eperson = null;
+        try {
+            Context context = obtainContext();
+            eperson = es.findByEmail(context, email);
+        } catch (SQLException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+        if (eperson == null) {
+            return null;
+        }
+        return converter.toRest(eperson, utils.obtainProjection());
+    }
+
+    /**
      * Find the epersons matching the query parameter. The search is delegated to the
      * {@link EPersonService#search(Context, String, int, int)} method
      *
