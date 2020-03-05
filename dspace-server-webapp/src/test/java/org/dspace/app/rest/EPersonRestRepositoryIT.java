@@ -32,6 +32,7 @@ import org.dspace.app.rest.builder.CommunityBuilder;
 import org.dspace.app.rest.builder.EPersonBuilder;
 import org.dspace.app.rest.builder.ItemBuilder;
 import org.dspace.app.rest.matcher.EPersonMatcher;
+import org.dspace.app.rest.matcher.GroupMatcher;
 import org.dspace.app.rest.matcher.HalMatcher;
 import org.dspace.app.rest.model.EPersonRest;
 import org.dspace.app.rest.model.MetadataRest;
@@ -43,6 +44,8 @@ import org.dspace.app.rest.test.MetadataPatchSuite;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.eperson.EPerson;
+import org.dspace.eperson.Group;
+import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.hamcrest.Matchers;
 import org.junit.Test;
 
@@ -229,6 +232,28 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                 .andExpect(jsonPath("$", HalMatcher.matchNoEmbeds()))
         ;
 
+    }
+
+    @Test
+    public void findOneForbiddenTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        EPerson ePerson1 = EPersonBuilder.createEPerson(context)
+        		.withNameInMetadata("Mik", "Reck")
+                .withEmail("MikReck@email.com")
+                .withPassword("qwerty01")
+                .build();
+
+        EPerson ePerson2 = EPersonBuilder.createEPerson(context)
+                .withNameInMetadata("Bob", "Smith")
+                .withEmail("bobsmith@fake-email.com")
+                .build();
+
+        context.restoreAuthSystemState();
+
+        String tokenEperson1 = getAuthToken(ePerson1.getEmail(), "qwerty01");
+        getClient(tokenEperson1).perform(get("/api/eperson/epersons/" + ePerson2.getID()))
+                .andExpect(status().isForbidden());
     }
 
     @Test
@@ -1321,4 +1346,28 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
         new MetadataPatchSuite().runWith(getClient(token), "/api/eperson/epersons/" + ePerson.getID(), expectedStatus);
     }
 
+    @Test
+    public void newlyCreatedAccountHasNoGroups() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        EPerson ePerson1 = EPersonBuilder.createEPerson(context)
+        		.withNameInMetadata("Mik", "Reck")
+                .withEmail("MikReck@email.com")
+                .withPassword("qwerty01")
+                .build();
+
+        // newly created account become membership of Anonymous group
+        Group groupAnonymous = EPersonServiceFactory.getInstance().getGroupService().findByName(context, Group.ANONYMOUS);
+
+        context.restoreAuthSystemState();
+        String tokenEperson1 = getAuthToken(ePerson1.getEmail(), "qwerty01");
+        getClient(tokenEperson1).perform(get("/api/eperson/epersons/" + ePerson1.getID()).param("projection", "full"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$", Matchers.allOf(
+                		hasJsonPath("$._embedded.groups._embedded.groups.length()", is(1)),
+                            hasJsonPath("$._embedded.groups._embedded.groups[0].id", is(groupAnonymous.getID().toString())),
+                            hasJsonPath("$._embedded.groups._embedded.groups[0].name", is(groupAnonymous.getName()))
+                )));
+    }
 }
