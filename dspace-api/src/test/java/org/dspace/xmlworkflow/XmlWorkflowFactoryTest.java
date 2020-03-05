@@ -83,7 +83,7 @@ public class XmlWorkflowFactoryTest extends AbstractUnitTest {
 
     @Test
     public void workflowMapping_MappedCollection() throws WorkflowConfigurationException {
-        Collection collection = this.findOrCreateCollectionWithHandle("123456789/4");
+        Collection collection = this.findOrCreateCollectionWithHandle("123456789/1000000");
         Workflow workflow = xmlWorkflowFactory.getWorkflow(collection);
         assertEquals(workflow.getID(), "selectSingleReviewer");
     }

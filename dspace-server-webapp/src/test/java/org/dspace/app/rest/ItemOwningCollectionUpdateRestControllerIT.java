@@ -279,8 +279,8 @@ public class ItemOwningCollectionUpdateRestControllerIT extends AbstractControll
                         "https://localhost:8080/spring-rest/api/core/collections/" + col2.getID()
                 ))
 
-                        //We expect a 401 Unauthorized status when performed by anonymous
-                        .andExpect(status().isForbidden());
+                        // we expect 200 Ok as the user have the right permissions
+                        .andExpect(status().isOk());
 
 
     }
