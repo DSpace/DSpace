@@ -296,7 +296,58 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
         getClient(authToken).perform(get("/api/eperson/epersons/search"))
         .andExpect(status().isOk())
         .andExpect(content().contentType(contentType))
+        .andExpect(jsonPath("$._links.byEmail", Matchers.notNullValue()))
         .andExpect(jsonPath("$._links.byMetadata", Matchers.notNullValue()));
+    }
+
+    @Test
+    public void findByEmail() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        EPerson ePerson = EPersonBuilder.createEPerson(context)
+                                        .withNameInMetadata("John", "Doe")
+                                        .withEmail("Johndoe@fake-email.com")
+                                        .build();
+
+        // create a second eperson to put the previous one in a no special position (is not the first as we have default
+        // epersons is not the latest created)
+        EPerson ePerson2 = EPersonBuilder.createEPerson(context)
+                                         .withNameInMetadata("Jane", "Smith")
+                                         .withEmail("janesmith@fake-email.com")
+                                         .build();
+
+        String authToken = getAuthToken(admin.getEmail(), password);
+        getClient(authToken).perform(get("/api/eperson/epersons/search/byEmail")
+                                             .param("email", ePerson.getEmail()))
+                            .andExpect(status().isOk())
+                            .andExpect(content().contentType(contentType))
+                            .andExpect(jsonPath("$", is(
+                                    EPersonMatcher.matchEPersonEntry(ePerson)
+                            )));
+
+        // it must be case-insensitive
+        getClient(authToken).perform(get("/api/eperson/epersons/search/byEmail")
+                                             .param("email", ePerson.getEmail().toUpperCase()))
+                            .andExpect(status().isOk())
+                            .andExpect(content().contentType(contentType))
+                            .andExpect(jsonPath("$", is(
+                                    EPersonMatcher.matchEPersonEntry(ePerson)
+                            )));
+    }
+
+    @Test
+    public void findByEmailUndefined() throws Exception {
+        String authToken = getAuthToken(admin.getEmail(), password);
+        getClient(authToken).perform(get("/api/eperson/epersons/search/byEmail")
+                                             .param("email", "undefined@undefined.com"))
+                            .andExpect(status().isNoContent());
+    }
+
+    @Test
+    public void findByEmailUnprocessable() throws Exception {
+        String authToken = getAuthToken(admin.getEmail(), password);
+        getClient(authToken).perform(get("/api/eperson/epersons/search/byEmail"))
+                            .andExpect(status().isUnprocessableEntity());
     }
 
     @Test
