@@ -24,9 +24,11 @@ import org.dspace.app.xmlui.utils.*;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.*;
+import org.dspace.app.xmlui.wing.element.List;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.browse.*;
 import org.dspace.content.*;
+import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.content.authority.factory.ContentAuthorityServiceFactory;
 import org.dspace.content.authority.service.ChoiceAuthorityService;
@@ -41,10 +43,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.Serializable;
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Implements all the browse functionality (browse by title, subject, authors,
@@ -1099,6 +1098,9 @@ class BrowseParams
         paramMap.put(BrowseParams.RESULTS_PER_PAGE, Integer
                 .toString(this.scope.getResultsPerPage()));
         paramMap.put(BrowseParams.ETAL, Integer.toString(this.etAl));
+        if (this.scope.hasStartsWith()) {
+            paramMap.put(BrowseParams.STARTS_WITH, this.scope.getStartsWith());
+        }
 
         return paramMap;
     }
