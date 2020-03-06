@@ -200,6 +200,62 @@ it, please enter the types and the actual numbers or codes.</hint>
          <required></required>
        </field>
      </page>
+     
+     <page number="3">
+     	  <field>
+         <dc-schema>project</dc-schema>
+         <dc-element>funder</dc-element>
+         <dc-qualifier>name</dc-qualifier>
+         <repeatable>false</repeatable>
+         <label>Funder Name</label>
+         <input-type>onebox</input-type>
+         <hint>Name of the funding provider.</hint>
+         <required></required>
+       </field>
+
+     	  <field>
+         <dc-schema>oaire</dc-schema>
+         <dc-element>awardNumber</dc-element>
+         <repeatable>false</repeatable>
+         <label>Funder Grant</label>
+         <input-type>onebox</input-type>
+         <hint>Project grantId or awardNumber.</hint>
+         <required></required>
+       </field>
+
+       <field>
+         <dc-schema>project</dc-schema>
+         <dc-element>funder</dc-element>
+         <dc-qualifier>identifier</dc-qualifier>
+         <repeatable>false</repeatable>
+         <label>Funder Identifier</label>
+         <input-type>onebox</input-type>
+         <hint>Unique identifier of the funding entity.</hint>
+         <required></required>
+       </field>
+
+       <field>
+         <dc-schema>dc</dc-schema>
+         <dc-element>relation</dc-element>
+         <dc-qualifier></dc-qualifier>
+         <repeatable>false</repeatable>
+         <label>Award Title</label>
+         <input-type>onebox</input-type>
+         <hint>Title of the project, award or grant.</hint>
+         <required></required>
+       </field>
+
+       <field>
+         <dc-schema>oaire</dc-schema>
+         <dc-element>awardURI</dc-element>
+         <repeatable>false</repeatable>
+         <label>Award URI.</label>
+         <input-type>onebox</input-type>
+         <hint>URI of the project landing page provided by the funder for more information about the award.</hint>
+         <required></required>
+       </field>
+	</page>
+	
    </form>
 
    <form name="one">
