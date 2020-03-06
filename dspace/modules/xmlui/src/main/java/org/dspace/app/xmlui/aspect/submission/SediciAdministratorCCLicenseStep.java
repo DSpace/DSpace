@@ -185,7 +185,8 @@ public class SediciAdministratorCCLicenseStep extends AbstractSubmissionStep
         if (carga.length>0){
 	    	select.setOptionSelected(carga[0].value);
         } else {
-        	select.setOptionSelected("");
+        	//Si no tiene licencia, selecciono por default by-nc-sa
+        	select.setOptionSelected("http://creativecommons.org/licenses/by-nc-sa/4.0/");
         }
 
 		div.addSimpleHTMLFragment(true, "&#160;");

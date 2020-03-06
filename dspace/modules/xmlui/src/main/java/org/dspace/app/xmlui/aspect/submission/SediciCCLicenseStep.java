@@ -74,8 +74,8 @@ public class SediciCCLicenseStep extends AbstractSubmissionStep
 	    String ccUri=ConfigurationManager.getProperty("cc.license.uri");
 	    Metadatum[] carga=item.getMetadataByMetadataString(ccUri);
 	    String dato;
-	    String commercial="y";
-	    String derivatives="y";
+	    String commercial="nc";
+	    String derivatives="sa";
 	    if (carga.length>0){
 	    	dato=carga[0].value;
 	    	int inicio=dato.indexOf("/by")+1;
@@ -156,7 +156,7 @@ public class SediciCCLicenseStep extends AbstractSubmissionStep
 			    	select.setOptionSelected(substring);
 		        }
 	        } else {
-	        	select.setOptionSelected("");
+	        	select.setOptionSelected("by-" + commercial + "-" + derivatives);
 	        }
 	    } else {		    
 		    //cargo las opciones de CC
