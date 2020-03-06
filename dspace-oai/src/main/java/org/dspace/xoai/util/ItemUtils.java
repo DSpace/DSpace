@@ -7,29 +7,35 @@
  */
 package org.dspace.xoai.util;
 
-import com.lyncode.xoai.dataprovider.xml.xoai.Element;
-import com.lyncode.xoai.dataprovider.xml.xoai.Metadata;
-import com.lyncode.xoai.util.Base64Utils;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.sql.SQLException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.dspace.app.util.MetadataExposure;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.AuthorizeManager;
+import org.dspace.authorize.ResourcePolicy;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
-import org.dspace.content.Metadatum;
 import org.dspace.content.Item;
+import org.dspace.content.Metadatum;
 import org.dspace.content.authority.Choices;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.Utils;
+import org.dspace.xoai.app.PermissionElementAdditional;
 import org.dspace.xoai.data.DSpaceItem;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.sql.SQLException;
-import java.util.List;
+import com.lyncode.xoai.dataprovider.xml.xoai.Element;
+import com.lyncode.xoai.dataprovider.xml.xoai.Metadata;
+import com.lyncode.xoai.util.Base64Utils;
 
 /**
  * 
@@ -38,10 +44,13 @@ import java.util.List;
 @SuppressWarnings("deprecation")
 public class ItemUtils
 {
+    
     private static Logger log = LogManager
             .getLogger(ItemUtils.class);
 
-    private static Element getElement(List<Element> list, String name)
+    private static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+    
+    public static Element getElement(List<Element> list, String name)
     {
         for (Element e : list)
             if (name.equals(e.getName()))
@@ -49,14 +58,14 @@ public class ItemUtils
 
         return null;
     }
-    private static Element create(String name)
+    public static Element create(String name)
     {
         Element e = new Element();
         e.setName(name);
         return e;
     }
 
-    private static Element.Field createValue(
+    public static Element.Field createValue(
             String name, String value)
     {
         Element.Field e = new Element.Field();
@@ -216,7 +225,8 @@ public class ItemUtils
                     String oname = bit.getSource();
                     String name = bit.getName();
                     String description = bit.getDescription();
-
+                    String drm = ItemUtils.getDRM(AuthorizeManager.getPoliciesActionFilter(context, bit,  Constants.READ));
+                        
                     if (name != null)
                         bitstream.getField().add(
                                 createValue("name", name));
@@ -239,6 +249,8 @@ public class ItemUtils
                     bitstream.getField().add(
                             createValue("sid", bit.getSequenceID()
                                     + ""));
+                    bitstream.getField()
+                            .add(createValue("drm", drm));
                 }
             }
         }
@@ -317,4 +329,46 @@ public class ItemUtils
         
         return metadata;
     }
-}
+    
+	public static String getDRM(List<ResourcePolicy> rps) {
+		Date now = new Date();
+		Date embargoEndDate = null;
+		boolean openAccess = false;
+		boolean groupRestricted = false;
+		boolean withEmbargo = false;
+
+		if (rps != null) {
+			for (ResourcePolicy rp : rps) {
+				if (rp.getGroupID() == 0) {
+					if (rp.isDateValid()) {
+						openAccess = true;
+					} else if (rp.getStartDate() != null && rp.getStartDate().after(now)) {
+						withEmbargo = true;
+						embargoEndDate = rp.getStartDate();
+					}
+				} else if (rp.getGroupID() != 1) {
+					if (rp.isDateValid()) {
+						groupRestricted = true;
+					} else if (rp.getStartDate() == null || rp.getStartDate().after(now)) {
+						withEmbargo = true;
+						embargoEndDate = rp.getStartDate();
+					}
+				}
+			}
+		}
+		String values = "metadata only access";
+		// if there are fulltext build the values
+		if (openAccess) {
+			// open access
+			values = "open access";
+		} else if (withEmbargo) {
+			// all embargoed
+			values = "embargoed access" + "|||" + sdf.format(embargoEndDate);
+		} else if (groupRestricted) {
+			// all restricted
+			values = "restricted access";
+		}
+		return values;
+	}
+
+ }
