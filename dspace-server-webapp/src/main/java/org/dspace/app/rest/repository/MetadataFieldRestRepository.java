@@ -24,7 +24,6 @@ import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.MetadataFieldRest;
-import org.dspace.app.rest.projection.Projection;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataSchema;
@@ -147,7 +146,7 @@ public class MetadataFieldRestRepository extends DSpaceRestRepository<MetadataFi
         }
 
         // return
-        return converter.toRest(metadataField, Projection.DEFAULT);
+        return converter.toRest(metadataField, utils.obtainProjection());
     }
 
     @Override
@@ -203,6 +202,6 @@ public class MetadataFieldRestRepository extends DSpaceRestRepository<MetadataFi
             throw new RuntimeException(e);
         }
 
-        return converter.toRest(metadataField, Projection.DEFAULT);
+        return converter.toRest(metadataField, utils.obtainProjection());
     }
 }

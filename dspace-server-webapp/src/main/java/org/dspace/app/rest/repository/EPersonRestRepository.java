@@ -20,7 +20,6 @@ import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.EPersonRest;
 import org.dspace.app.rest.model.patch.Patch;
-import org.dspace.app.rest.projection.Projection;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.core.Context;
@@ -84,7 +83,7 @@ public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, E
             throw new RuntimeException(e.getMessage(), e);
         }
 
-        return converter.toRest(eperson, Projection.DEFAULT);
+        return converter.toRest(eperson, utils.obtainProjection());
     }
 
     @Override

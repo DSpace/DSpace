@@ -23,7 +23,8 @@ USER dspace
 ADD --chown=dspace . /app/
 COPY dspace/src/main/docker/local.cfg /app/local.cfg
 
-# Build DSpace.  Copy the dspace-install directory to /install.  Clean up the build to keep the docker image small
+# Build DSpace (note: this build doesn't include the optional, deprecated "dspace-rest" webapp)
+# Copy the dspace-install directory to /install.  Clean up the build to keep the docker image small
 RUN mvn package && \
   mv /app/dspace/target/${TARGET_DIR}/* /install && \
   mvn clean
@@ -54,12 +55,9 @@ EXPOSE 8080 8009
 ENV JAVA_OPTS=-Xmx2000m
 
 # Run the "server" webapp off the /server path (e.g. http://localhost:8080/server/)
-# and the v6.x (deprecated) REST API off the "/rest" path
-RUN ln -s $DSPACE_INSTALL/webapps/server   /usr/local/tomcat/webapps/server   && \
-    ln -s $DSPACE_INSTALL/webapps/rest          /usr/local/tomcat/webapps/rest
+RUN ln -s $DSPACE_INSTALL/webapps/server   /usr/local/tomcat/webapps/server
 # If you wish to run "server" webapp off the ROOT path, then comment out the above RUN, and uncomment the below RUN.
 # You also MUST update the URL in dspace/src/main/docker/local.cfg
 # Please note that server webapp should only run on one path at a time.
 #RUN mv /usr/local/tomcat/webapps/ROOT /usr/local/tomcat/webapps/ROOT.bk && \
-#    ln -s $DSPACE_INSTALL/webapps/server   /usr/local/tomcat/webapps/ROOT && \
-#    ln -s $DSPACE_INSTALL/webapps/rest          /usr/local/tomcat/webapps/rest
+#    ln -s $DSPACE_INSTALL/webapps/server   /usr/local/tomcat/webapps/ROOT
