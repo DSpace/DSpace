@@ -55,7 +55,7 @@
                 <entry key="workspace" value-ref="workspaceConfiguration" />
                 <entry key="workflow" value-ref="workflowConfiguration" />
                 <entry key="undiscoverable" value-ref="unDiscoverableItems" />
-                <entry key="discoverableAndUndiscoveableItems" value-ref="discoverableAndUniscoverableItems" />
+                <entry key="discoverableAndUndiscoverableItems" value-ref="discoverableAndUndiscoverableItems" />
                 <entry key="publication" value-ref="publication"/>
                 <entry key="person" value-ref="person"/>
                 <entry key="organization" value-ref="organization"/>
@@ -394,7 +394,7 @@
     </bean>
 
     <!--The configuration settings for discovery of withdrawn and indiscoverable items (admin only)-->
-    <bean id="discoverableAndUniscoverableItems" class="org.dspace.discovery.configuration.DiscoveryConfiguration" scope="prototype">
+    <bean id="discoverableAndUndiscoverableItems" class="org.dspace.discovery.configuration.DiscoveryConfiguration" scope="prototype">
         <!--Which sidebar facets are to be displayed-->
         <property name="sidebarFacets">
             <list>
@@ -1461,9 +1461,9 @@
 
     <bean id="searchFilterDiscoverable" class="org.dspace.discovery.configuration.DiscoverySearchFilterFacet">
         <property name="indexFieldName" value="discoverable"/>
+        <property name="type" value="standard"/>
         <property name="metadataFields">
             <list>
-                <value>dc.title</value>
             </list>
         </property>
         <property name="isOpenByDefault" value="true"/>
@@ -1472,9 +1472,9 @@
 
     <bean id="searchFilterWithdrawn" class="org.dspace.discovery.configuration.DiscoverySearchFilterFacet">
         <property name="indexFieldName" value="withdrawn"/>
+        <property name="type" value="standard"/>
         <property name="metadataFields">
             <list>
-                <value>dc.title</value>
             </list>
         </property>
         <property name="isOpenByDefault" value="true"/>
