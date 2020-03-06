@@ -156,6 +156,12 @@
 			<xsl:when test="$subtype='Conjunto de datos'">
 				conjunto de datos
 			</xsl:when>
+            <xsl:when test="$subtype='Proyecto de extension'">
+                proyecto de investigación
+            </xsl:when>
+            <xsl:when test="$subtype='Proyecto de investigacion'">
+                proyecto de investigación
+            </xsl:when>
 			<!-- No se exportan
 			<xsl:when test="$subtype='Documento institucional'">
 				otros

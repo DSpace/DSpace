@@ -522,7 +522,8 @@
 					<string>Boletin</string>
 					<string>Conjunto de datos</string>
 					<string>Convenio</string>
-					<string>Proyecto</string>
+					<string>Proyecto de extension</string>
+					<string>Proyecto de investigacion</string>
 					<string>Informe</string>
                 </list>
             </Configuration>
@@ -602,6 +603,8 @@
 		    		<string>Objeto de conferencia</string>
 			    	<string>Resumen</string>
     				<string>Conjunto de datos</string>
+    				<string>Proyecto de extension</string>
+    				<string>Proyecto de investigacion</string>
     			</list>
 			</Configuration>
 		</CustomCondition>
