@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  This document was based on the OpenAIRE4 Guidelines for Literature Repositories
+  https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/v4.0.0/index.html
+  -->
+  
+<dspace-dc-types>
+    <dspace-header>
+        <title>Project fields definition for OpenAIRE 4</title>
+    </dspace-header>
+
+    <dc-schema>
+        <name>project</name>
+        <namespace>http://dspace.org/project</namespace>
+    </dc-schema>
+    	
+    <dc-type>
+        <schema>project</schema>
+        <element>funder</element>
+        <qualifier>identifier</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+	
+    <dc-type>
+        <schema>project</schema>
+        <element>funder</element>
+        <qualifier>name</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+        
+</dspace-dc-types>

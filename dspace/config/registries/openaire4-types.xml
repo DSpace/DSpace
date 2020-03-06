@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  This document was based on the OpenAIRE4 Guidelines for Literature Repositories
+  https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/v4.0.0/index.html
+  -->
+  
+<dspace-dc-types>
+    <dspace-header>
+        <title>OpenAIRE4 fields definition</title>
+    </dspace-header>
+
+    <dc-schema>
+        <name>oaire</name>
+        <namespace>http://namespace.openaire.eu/schema/oaire/</namespace>
+    </dc-schema>
+	
+    <dc-type>
+        <schema>oaire</schema>
+        <element>awardNumber</element>
+        <scope_note>Project grantId or awardNumber</scope_note>
+    </dc-type>
+	
+    <dc-type>
+        <schema>oaire</schema>
+        <element>awardURI</element>
+        <scope_note>URI of the project landing page provided by the funder for more information about the award (grant).</scope_note>
+    </dc-type>
+
+</dspace-dc-types>

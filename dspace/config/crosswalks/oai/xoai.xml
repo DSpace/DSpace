@@ -80,8 +80,26 @@
                 This contexts complies with OpenAIRE rules.
             </Description>
         </Context>
-    </Contexts>
 
+        <!--
+            OpenAIRE Guidelines 4.0:
+
+            - https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/v4.0.0/
+
+		-->
+        <Context baseurl="openaire4" name="OpenAIRE v4 Context">
+            <!-- Date format, field prefixes, etc are ensured by the transformer -->
+            <Transformer ref="openaire4Transformer"/>
+            <!-- OpenAIRE filter -->
+			<!-- This Context includes bibliographic metadata describing open access and non open access items -->            
+            <Set ref="openaire4Set"/>
+            <!-- Metadata Formats -->
+            <Format ref="oaiopenaire"/>
+            <Description>
+				This contexts complies with OpenAIRE Guidelines for Literature Repositories v4.0.
+            </Description>
+        </Context>
+    </Contexts>
 
     <Formats>
         <Format id="oaidc">
@@ -165,6 +183,15 @@
             <Namespace>http://irdb.nii.ac.jp/oai</Namespace>
             <SchemaLocation>http://irdb.nii.ac.jp/oai/junii2-3-1.xsd</SchemaLocation>
         </Format>
+        <!-- Metadata format based on the OpenAIRE 4.0 guidelines
+             https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/v4.0.0/use_of_oai_pmh.html 
+        -->        
+        <Format id="oaiopenaire">
+            <Prefix>oai_openaire</Prefix>
+            <XSLT>metadataFormats/oai_openaire.xsl</XSLT>
+            <Namespace>http://namespace.openaire.eu/schema/oaire/</Namespace>
+            <SchemaLocation>https://www.openaire.eu/schema/repo-lit/4.0/openaire.xsd</SchemaLocation>
+        </Format>
     </Formats>
 
     <Transformers>
@@ -173,6 +200,9 @@
         </Transformer>
         <Transformer id="openaireTransformer">
             <XSLT>transformers/openaire.xsl</XSLT>
+        </Transformer>
+        <Transformer id="openaire4Transformer">
+            <XSLT>transformers/openaire4.xsl</XSLT>
         </Transformer>
     </Transformers>
 
@@ -414,5 +444,10 @@
             <Name>EC_fundedresources set</Name>
             <!-- Just an alias -->
         </Set>
+        <Set id="openaire4Set">
+            <Spec>openaire</Spec>
+            <Name>OpenAIRE set</Name>
+            <!-- Just an alias -->
+        </Set>        
     </Sets>
 </Configuration>
