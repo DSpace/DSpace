@@ -8,6 +8,7 @@
 package org.dspace.app.rest;
 
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
+
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -1295,6 +1296,122 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
     }
 
     @Test
+    public void embargoAccessGrantAdminsTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        EPerson adminParentCommunity = EPersonBuilder.createEPerson(context)
+                .withEmail("adminCommunity@mail.com")
+                .withPassword("qwerty01")
+                .build();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                .withName("Parent Community")
+                .withAdminGroup(adminParentCommunity)
+                .build();
+
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                .withName("Sub Community")
+                .build();
+
+        EPerson adminChild2 = EPersonBuilder.createEPerson(context)
+                .withEmail("adminChild2@mail.com")
+                .withPassword("qwerty05")
+                .build();
+        Community child2 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                .withName("Sub Community 2")
+                .withAdminGroup(adminChild2)
+                .build();
+
+        EPerson adminCollection1 = EPersonBuilder.createEPerson(context)
+                .withEmail("adminCollection1@mail.com")
+                .withPassword("qwerty02")
+                .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1)
+                .withName("Collection 1")
+                .withAdminGroup(adminCollection1)
+                .build();
+
+        EPerson adminCollection2 = EPersonBuilder.createEPerson(context)
+                .withEmail("adminCollection2@mail.com")
+                .withPassword("qwerty03")
+                .build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1)
+                .withName("Collection 2")
+                .withAdminGroup(adminCollection2)
+                .build();
+
+        Item embargoedItem = ItemBuilder.createItem(context, col1)
+                .withTitle("Public item 1")
+                .withIssueDate("2015-10-21")
+                .withAuthor("Smith, Donald")
+                .withSubject("ExtraEntry")
+                .withEmbargoPeriod("1 week")
+                .build();
+
+        context.restoreAuthSystemState();
+        // parent community's admin user is allowed access to embargoed item
+        String tokenAdminParentCommunity = getAuthToken(adminParentCommunity.getEmail(), "qwerty01");
+        getClient(tokenAdminParentCommunity).perform(get("/api/core/items/" + embargoedItem.getID()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", is(ItemMatcher.matchItemProperties(embargoedItem))));
+
+        // collection1's admin user is allowed access to embargoed item
+        String tokenAdminCollection1 = getAuthToken(adminCollection1.getEmail(), "qwerty02");
+        getClient(tokenAdminCollection1).perform(get("/api/core/items/" + embargoedItem.getID()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", is(ItemMatcher.matchItemProperties(embargoedItem))));
+
+        // collection2's admin user is NOT allowed access to embargoed item of collection1
+        String tokenAdminCollection2 = getAuthToken(adminCollection2.getEmail(), "qwerty03");
+        getClient(tokenAdminCollection2).perform(get("/api/core/items/" + embargoedItem.getID()))
+                .andExpect(status().isForbidden());
+
+        // full admin user is allowed access to embargoed item
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        getClient(tokenAdmin).perform(get("/api/core/items/" + embargoedItem.getID()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", is(ItemMatcher.matchItemProperties(embargoedItem))));
+
+        // child2's admin user is NOT allowed access to embargoed item of collection1
+        String tokenAdminChild2 = getAuthToken(adminChild2.getEmail(), "qwerty05");
+        getClient(tokenAdminChild2).perform(get("/api/core/items/" + embargoedItem.getID()))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void expiredEmbargoTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                .withName("Parent Community")
+                .build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                .withName("Collection 1")
+                .build();
+
+        Item embargoedItem = ItemBuilder.createItem(context, col1)
+                .withTitle("embargoed item 1")
+                .withIssueDate("2017-11-18")
+                .withAuthor("Smith, Donald")
+                .withEmbargoPeriod("-2 week")
+                .build();
+
+        context.restoreAuthSystemState();
+
+        // all are allowed access to item with embargoed expired
+
+        String tokenEperson = getAuthToken(eperson.getEmail(), password);
+        getClient(tokenEperson).perform(get("/api/core/items/" + embargoedItem.getID()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", Matchers.is(ItemMatcher.matchItemProperties(embargoedItem))));
+
+        getClient().perform(get("/api/core/items/" + embargoedItem.getID()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", Matchers.is(ItemMatcher.matchItemProperties(embargoedItem))));
+    }
+
+    @Test
     public void undiscoverableAccessTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
@@ -1423,6 +1540,134 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
     }
 
     @Test
+    public void restrictedGroupAccessForbiddenTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        EPerson memberRestrictGroup = EPersonBuilder.createEPerson(context)
+                .withEmail("eperson1@mail.com")
+                .withPassword("qwerty01")
+                .build();
+
+        Group restrictGroup = GroupBuilder.createGroup(context)
+                .addMember(memberRestrictGroup)
+                .build();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                .withName("Parent Community")
+                .build();
+
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                .withName("Sub Community")
+                .build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, child1)
+                .withName("Collection 1")
+                .build();
+
+        Item itemRestrictedByGroup = ItemBuilder.createItem(context, col1)
+                .withTitle("Public item 1")
+                .withIssueDate("2011-11-13")
+                .withAuthor("Smith, Donald")
+                .withReaderGroup(restrictGroup)
+                .build();
+
+        context.restoreAuthSystemState();
+
+        //A member of the restricted group is also allowed access to restricted item
+        String tokenMemberRestrictedGroup = getAuthToken(memberRestrictGroup.getEmail(), "qwerty01");
+        getClient(tokenMemberRestrictedGroup).perform(get("/api/core/items/" + itemRestrictedByGroup.getID()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", is(ItemMatcher.matchItemProperties(itemRestrictedByGroup))));
+
+        //members who are not part of the restricted group, have no access to the item
+        String tokenEPerson = getAuthToken(eperson.getEmail(), password);
+        getClient(tokenEPerson).perform(get("/api/core/items/" + itemRestrictedByGroup.getID()))
+                .andExpect(status().isForbidden());
+
+        getClient().perform(get("/api/core/items/" + itemRestrictedByGroup.getID()))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    public void restrictedGroupAccessGrantAdminsTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        EPerson adminParentCommunity = EPersonBuilder.createEPerson(context)
+                .withEmail("adminCommunity@mail.com")
+                .withPassword("qwerty01")
+                .build();
+
+        Group restrictedGroup = GroupBuilder.createGroup(context)
+                .build();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                .withName("Parent Community")
+                .withAdminGroup(adminParentCommunity)
+                .build();
+
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                .withName("Sub Community")
+                .build();
+
+        EPerson adminChild2 = EPersonBuilder.createEPerson(context)
+                .withEmail("adminChild2@mail.com")
+                .withPassword("qwerty05")
+                .build();
+        Community child2 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                .withName("Sub Community 2")
+                .build();
+
+        EPerson adminCollection1 = EPersonBuilder.createEPerson(context)
+                .withEmail("adminCollection1@mail.com")
+                .withPassword("qwerty02")
+                .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1)
+                .withName("Collection 1")
+                .withAdminGroup(adminCollection1)
+                .build();
+
+        EPerson adminCollection2 = EPersonBuilder.createEPerson(context)
+                .withEmail("adminCollection2@mail.com")
+                .withPassword("qwerty03")
+                .build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1)
+                .withName("Collection 2")
+                .withAdminGroup(adminCollection2)
+                .build();
+
+        Item itemRestrictedByGroup = ItemBuilder.createItem(context, col1)
+                .withTitle("Public item 1")
+                .withIssueDate("2015-10-21")
+                .withAuthor("Smith, Donald")
+                .withSubject("ExtraEntry")
+                .withReaderGroup(restrictedGroup)
+                .build();
+
+        context.restoreAuthSystemState();
+        // parent community's admin user is allowed access to restricted item
+        String tokenAdminParentCommunity = getAuthToken(adminParentCommunity.getEmail(), "qwerty01");
+        getClient(tokenAdminParentCommunity).perform(get("/api/core/items/" + itemRestrictedByGroup.getID()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", is(ItemMatcher.matchItemProperties(itemRestrictedByGroup))));
+
+        // collection1's admin user is allowed access to restricted item
+        String tokenAdminCollection1 = getAuthToken(adminCollection1.getEmail(), "qwerty02");
+        getClient(tokenAdminCollection1).perform(get("/api/core/items/" + itemRestrictedByGroup.getID()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", is(ItemMatcher.matchItemProperties(itemRestrictedByGroup))));
+
+        // collection2's admin user is NOT allowed access to restricted item of collection1
+        String tokenAdminCollection2 = getAuthToken(adminCollection2.getEmail(), "qwerty03");
+        getClient(tokenAdminCollection2).perform(get("/api/core/items/" + itemRestrictedByGroup.getID()))
+                .andExpect(status().isForbidden());
+
+        // child2's admin user is NOT allowed access to restricted item of collection1
+        String tokenAdminChild2 = getAuthToken(adminChild2.getEmail(), "qwerty05");
+        getClient(tokenAdminCollection2).perform(get("/api/core/items/" + itemRestrictedByGroup.getID()))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
     public void testCreateItem() throws Exception {
 
         context.turnOffAuthorisationSystem();
@@ -1441,6 +1686,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         ObjectMapper mapper = new ObjectMapper();
         ItemRest itemRest = new ItemRest();
+        ItemRest itemRestFull = new ItemRest();
         itemRest.setName("Practices of research data curation in institutional repositories:" +
                              " A qualitative view from repository staff");
         itemRest.setInArchive(true);
@@ -1454,11 +1700,25 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                 .put("dc.rights", new MetadataValueRest("Custom Copyright Text"))
                 .put("dc.title", new MetadataValueRest("Title Text")));
 
+        itemRestFull.setName("Practices of research data curation in institutional repositories:" +
+                " A qualitative view from repository staff");
+        itemRestFull.setInArchive(true);
+        itemRestFull.setDiscoverable(true);
+        itemRestFull.setWithdrawn(false);
+
+        itemRestFull.setMetadata(new MetadataRest()
+                .put("dc.description", new MetadataValueRest("<p>Some cool HTML code here</p>"))
+                .put("dc.description.abstract", new MetadataValueRest("Sample item created via the REST API"))
+                .put("dc.description.tableofcontents", new MetadataValueRest("<p>HTML News</p>"))
+                .put("dc.rights", new MetadataValueRest("Custom Copyright Text"))
+                .put("dc.title", new MetadataValueRest("Title Text")));
+
         String token = getAuthToken(admin.getEmail(), password);
         MvcResult mvcResult = getClient(token).perform(post("/api/core/items?owningCollection=" +
                                                                 col1.getID().toString())
                                    .content(mapper.writeValueAsBytes(itemRest)).contentType(contentType))
                                               .andExpect(status().isCreated())
+                                              .andExpect(jsonPath("$", HalMatcher.matchNoEmbeds()))
                                               .andReturn();
 
         String content = mvcResult.getResponse().getContentAsString();
@@ -1487,6 +1747,13 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                                 MetadataMatcher.matchMetadata("dc.title",
                                     "Title Text")
                             )))));
+
+        MvcResult mvcResultFull = getClient(token).perform(post("/api/core/items?owningCollection=" +
+                col1.getID().toString()).param("projection", "full")
+                .content(mapper.writeValueAsBytes(itemRestFull)).contentType(contentType))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$", ItemMatcher.matchFullEmbeds()))
+                .andReturn();
     }
 
     @Test

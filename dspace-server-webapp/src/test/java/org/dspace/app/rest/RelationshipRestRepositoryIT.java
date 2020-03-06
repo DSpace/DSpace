@@ -514,6 +514,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                                                            .param("relationshipType",
                                                                   isAuthorOfPublicationRelationshipType.getID()
                                                                                                        .toString())
+                                                           .param("projection", "full")
                                                            .contentType(MediaType.parseMediaType
                                                                (org.springframework.data.rest.webmvc.RestMediaTypes
                                                                     .TEXT_URI_LIST_VALUE))
@@ -523,6 +524,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                                                                    "https://localhost:8080/server/api/core/items/" + author1
                                                                    .getID()))
                                               .andExpect(status().isCreated())
+                                              .andExpect(jsonPath("$", RelationshipMatcher.matchFullEmbeds()))
                                               .andReturn();
 
         ObjectMapper mapper = new ObjectMapper();

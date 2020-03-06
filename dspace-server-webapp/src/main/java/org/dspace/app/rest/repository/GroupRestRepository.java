@@ -23,7 +23,6 @@ import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.GroupRest;
 import org.dspace.app.rest.model.patch.Patch;
-import org.dspace.app.rest.projection.Projection;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
 import org.dspace.eperson.Group;
@@ -83,7 +82,7 @@ public class GroupRestRepository extends DSpaceObjectRestRepository<Group, Group
             throw new RuntimeException(excSQL.getMessage(), excSQL);
         }
 
-        return converter.toRest(group, Projection.DEFAULT);
+        return converter.toRest(group, utils.obtainProjection());
     }
 
     @Override
