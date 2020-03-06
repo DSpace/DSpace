@@ -277,6 +277,178 @@ it, please enter the types and the actual numbers or codes.</hint>
      </row>
    </form>
 
+   <!-- Form patent [START] -->
+   <form name="patent">
+     <row>
+       <field>
+         <dc-schema>dc</dc-schema>
+         <dc-element>title</dc-element>
+         <label>Title</label>
+         <input-type>onebox</input-type>
+         <repeatable>false</repeatable>
+         <required>You must specify a title for the patent</required>
+         <hint>The title of the patent</hint>
+       </field>
+     </row>
+     <row>
+       <field>
+         <dc-schema>dcterms</dc-schema>
+         <dc-element>dateAccepted</dc-element>
+         <label>Approval Date</label>
+         <input-type>date</input-type>
+         <repeatable>false</repeatable>
+         <required />
+         <hint>The Approval date.
+You can leave out the day and/or month if they aren't applicable.</hint>
+       </field>
+     </row>
+     <row>
+       <field>
+         <dc-schema>dc</dc-schema>
+         <dc-element>date</dc-element>
+         <dc-qualifier>issued</dc-qualifier>
+         <label>Registration Date</label>
+         <input-type>date</input-type>
+         <repeatable>false</repeatable>
+         <required />
+         <hint>The registration date of the patent.
+You can leave out the day and/or month if they aren't applicable.</hint>
+       </field>
+     </row>
+     <row>
+       <field>
+         <dc-schema>dc</dc-schema>
+         <dc-element>contributor</dc-element>
+         <dc-qualifier>author</dc-qualifier>
+         <label>Inventor(s)</label>
+         <input-type>group</input-type>
+         <repeatable>true</repeatable>
+         <required />
+         <hint>The inventor: The actual devisor of an invention that is the subject of a patent.</hint>
+       </field>
+     </row>
+     <row>
+       <field>
+         <dc-schema>dcterms</dc-schema>
+         <dc-element>rightsHolder</dc-element>
+         <label>Holder</label>
+         <input-type>onebox</input-type>
+         <repeatable>true</repeatable>
+         <required />
+         <hint>The holders of this patent</hint>
+       </field>
+     </row>
+     <row>
+       <field>
+         <dc-schema>dc</dc-schema>
+         <dc-element>publisher</dc-element>
+         <label>Issuer</label>
+         <input-type>onebox</input-type>
+         <repeatable>true</repeatable>
+         <required />
+         <hint>The issuer of the patent: the patent office</hint>
+       </field>
+     </row>
+     <row>
+       <field>
+         <dc-schema>dc</dc-schema>
+         <dc-element>identifier</dc-element>
+         <dc-qualifier>patentno</dc-qualifier>
+         <label>Patent Number</label>
+         <input-type>onebox</input-type>
+         <repeatable>false</repeatable>
+         <required />
+         <hint>The patent number.</hint>
+       </field>
+     </row>
+     <row>
+       <field>
+         <dc-schema>dc</dc-schema>
+         <dc-element>type</dc-element>
+         <label>Type</label>
+         <input-type value-pairs-name="patent_types">dropdown</input-type>
+         <repeatable>false</repeatable>
+         <required>You must select a patent type</required>
+         <hint>Select the type of content of the patent.</hint>
+       </field>
+     </row>
+   </form>
+   <form name="patent_indexing">
+     <row>
+       <field>
+         <dc-schema>dc</dc-schema>
+         <dc-element>language</dc-element>
+         <dc-qualifier>iso</dc-qualifier>
+         <label>Language</label>
+         <input-type value-pairs-name="common_iso_languages">dropdown</input-type>
+         <repeatable>false</repeatable>
+         <required />
+         <hint>Select the country and its language.</hint>
+       </field>
+     </row>
+     <row>
+       <field>
+         <dc-schema>dc</dc-schema>
+         <dc-element>subject</dc-element>
+         <label>Subject Keyword(s)</label>
+         <input-type>onebox</input-type>
+         <repeatable>true</repeatable>
+         <required />
+         <hint>Enter appropriate subject keywords or phrases.</hint>
+       </field>
+     </row>
+     <row>
+       <field>
+         <dc-schema>dc</dc-schema>
+         <dc-element>description</dc-element>
+         <dc-qualifier>abstract</dc-qualifier>
+         <label>Abstract</label>
+         <input-type>textarea</input-type>
+         <repeatable>false</repeatable>
+         <required />
+         <hint>Enter the description of the patent.</hint>
+       </field>
+     </row>
+   </form>
+   <form name="patent_references">
+     <row>
+       <field>
+         <dc-schema>dc</dc-schema>
+         <dc-element>relation</dc-element>
+         <label>Originates From</label>
+         <input-type>onebox</input-type>
+         <repeatable>true</repeatable>
+         <required />
+         <hint>Enter the name of project, if any, that has produced this patent.</hint>
+       </field>
+     </row>
+     <row>
+       <field>
+         <dc-schema>dc</dc-schema>
+         <dc-element>relation</dc-element>
+         <dc-qualifier>patent</dc-qualifier>
+         <label>Predecessor</label>
+         <input-type>onebox</input-type>
+         <repeatable>true</repeatable>
+         <required />
+         <hint>Patents that precede (i.e., have priority over) this patent</hint>
+       </field>
+     </row>
+     <row>
+       <field>
+         <dc-schema>dc</dc-schema>
+         <dc-element>relation</dc-element>
+         <dc-qualifier>references</dc-qualifier>
+         <label>References</label>
+         <input-type>onebox</input-type>
+         <repeatable>true</repeatable>
+         <required />
+         <hint>Result outputs that are referenced by this patent</hint>
+       </field>
+     </row>
+   </form>
+   <!-- Form patent [END] -->
+
  </form-definitions>
 
 
@@ -473,6 +645,25 @@ it, please enter the types and the actual numbers or codes.</hint>
        <stored-value>other</stored-value>
      </pair>
    </value-pairs>
+   <!-- patent value pairs -->
+   <value-pairs value-pairs-name="patent_types" dc-term="patent_types">
+      <pair>
+        <displayed-value>Use by owner</displayed-value>
+        <stored-value>Use by owner</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Licensing</displayed-value>
+        <stored-value>Licensing</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Sale</displayed-value>
+        <stored-value>Sale</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Other</displayed-value>
+        <stored-value>Other</stored-value>
+      </pair>
+    </value-pairs>
 
  </form-value-pairs>
 

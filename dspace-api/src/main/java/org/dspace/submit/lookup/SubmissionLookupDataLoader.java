@@ -43,6 +43,10 @@ public interface SubmissionLookupDataLoader extends DataLoader {
 
     public final static String ORCID = "orciid";
 
+    public final static String EPOPUBLICATIONNUMBER = "publicationnumber";
+
+    public final static String EPOAPPLICANTNUMBER = "applicantnumber";
+
     List<String> getSupportedIdentifiers();
 
     boolean isSearchProvider();

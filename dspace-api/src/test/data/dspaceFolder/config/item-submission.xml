@@ -18,6 +18,7 @@
     <!-- for handle "default". -->
     <submission-map>
         <name-map collection-handle="default" submission-name="traditional"/>
+        <name-map collection-handle="123456789/2001" submission-name="patent"/>
     </submission-map>
 
 
@@ -72,12 +73,12 @@
             <type>license</type>
             <scope visibilityOutside="read-only">submission</scope>
         </step>
-		<step id="extraction">
-			<heading></heading>
-			<processing-class>org.dspace.app.rest.submit.step.ExtractMetadataStep</processing-class>
-			<type>utils</type>
-			<scope visibility="hidden" visibilityOutside="hidden">submission</scope>
-		</step>
+        <step id="extraction">
+            <heading></heading>
+            <processing-class>org.dspace.app.rest.submit.step.ExtractMetadataStep</processing-class>
+            <type>utils</type>
+            <scope visibility="hidden" visibilityOutside="hidden">submission</scope>
+        </step>
         <!-- Step Upload Item with Embargo Features to enable this step, please
             make sure to comment-out the previous step "UploadStep" <step id="upload-with-embargo">
             <heading>submit.progressbar.upload</heading> <processing-class>org.dspace.submit.step.UploadWithEmbargoStep</processing-class>
@@ -106,6 +107,24 @@
             <scope visibility="read-only">submission</scope> </step> <step mandatory="false">
             <heading>fake.workflow.readonly</heading> <processing-class>org.dspace.submit.step.SampleStep</processing-class>
             <type>sample</type> <scope visibility="read-only">workflow</scope> </step> -->
+
+        <!-- patent steps [START] -->
+        <step id="patent" mandatory="true">
+            <heading>submit.progressbar.describe.patent</heading>
+            <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
+            <type>submission-form</type>
+        </step>
+        <step id="patent_indexing" mandatory="true">
+            <heading>submit.progressbar.describe.patent_indexing</heading>
+            <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
+            <type>submission-form</type>
+        </step>
+        <step id="patent_references" mandatory="true">
+            <heading>submit.progressbar.describe.patent_references</heading>
+            <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
+            <type>submission-form</type>
+        </step>
+        <!-- publication steps [END]   -->
 
         <!-- This is the Sample Step which utilizes the JSPSampleStep class -->
         <step id="sample">
@@ -153,6 +172,16 @@
             <step id="license"/>
             <!-- <step id="creative-commons"/> -->
             <!-- <step id="verify"/> -->
+        </submission-process>
+
+        <!-- patent, used by some collection like 123456789/1001 -->
+        <submission-process name="patent">
+            <step id="collection" />
+            <step id="patent" />
+            <step id="patent_indexing" />
+            <step id="patent_references" />
+            <step id="upload" />
+            <step id="license" />
         </submission-process>
 
     </submission-definitions>
