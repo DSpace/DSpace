@@ -572,115 +572,110 @@
     }
 
     void doTextArea(javax.servlet.jsp.JspWriter out, Item item,
-      String fieldName, String schema, String element, String qualifier, boolean repeatable, boolean required, boolean readonly,
-      int fieldCountIncr, String label, PageContext pageContext, String vocabulary, boolean closedVocabulary, Collection collection,
-      boolean language, List<String> valueLanguageList)
-      throws java.io.IOException
+                    String fieldName, String schema, String element, String qualifier, boolean repeatable,
+                    boolean required, boolean readonly, int fieldCountIncr, String label, PageContext pageContext,
+                    String vocabulary, boolean closedVocabulary, Collection collection, int cols) throws java.io.IOException
     {
-      String authorityType = getAuthorityType(pageContext, fieldName, collection);
-      List<MetadataValue> defaults = ContentServiceFactory.getInstance().getItemService().getMetadata(item, schema, element, qualifier, Item.ANY);
-      int fieldCount = defaults.size() + fieldCountIncr;
-      StringBuffer sb = new StringBuffer();
-      String val, auth;
-      int conf = unknownConfidence;
+        String authorityType = getAuthorityType(pageContext, fieldName, collection);
+        List<MetadataValue> defaults = ContentServiceFactory.getInstance().getItemService().getMetadata(item, schema, element, qualifier, Item.ANY);
+        int fieldCount = defaults.size() + fieldCountIncr;
+        StringBuffer sb = new StringBuffer();
+        String val, auth;
+        int conf = unknownConfidence;
 
-      if (fieldCount == 0)
-         fieldCount = 1;
+        if (fieldCount == 0)
+            fieldCount = 1;
 
-      sb.append("<div class=\"row\"><label class=\"col-md-2"+ (required?" label-required":"") +"\">")
-      	.append(label)
-      	.append("</label><div class=\"col-md-10\">");
-      
-      for (int i = 0; i < fieldCount; i++)
-      { 
-         String lang = null;
-         
-         if (i < defaults.size())
-         {
-             val = defaults.get(i).getValue();
-             lang = defaults.get(i).getLanguage();
-             auth = defaults.get(i).getAuthority();
-             conf = defaults.get(i).getConfidence();
-         }
-         else
-         {
-           val = "";
-            auth = "";
-         }
-         sb.append("<div class=\"row col-md-12\">\n");
-         String fieldNameIdx = fieldName + ((repeatable)?"_" + (i+1):"");
+        boolean repeating = repeatable;
+        int rowCount = 4;
+        boolean descriptionAbstract = false;
+        String[] lang = {"uk", "ru", "en"};
 
-         if (language) 
-         {
-             sb.append("<div class=\"col-md-8\">");
-         }
-         else 
-         {
-             sb.append("<div class=\"col-md-10\">");
-         }
+        if (fieldName.indexOf("abstract") > 0) {
+            repeating = true;
+            fieldCount = 3;
+            rowCount = 10;
+            descriptionAbstract = true;
+        }
 
-         if (authorityType != null)
-         {
-        	 sb.append("<div class=\"col-md-10\">");
-         }
-         sb.append("<textarea class=\"form-control\" name=\"").append(fieldNameIdx)
-           .append("\" rows=\"4\" cols=\"45\" id=\"")
-           .append(fieldNameIdx).append("_id\" ")
-           .append((hasVocabulary(vocabulary)&&closedVocabulary)||readonly?" readonly=\"readonly\" ":"")
-           .append(">")
-           .append(val)
-           .append("</textarea>")
-           .append(doControlledVocabulary(fieldNameIdx, pageContext, vocabulary, readonly))
-           .append("</div>");
-           
-         if (language) 
-         {
-             if (null == lang)
-             {
-                 lang = ConfigurationManager.getProperty("default.language");
-             }
-             sb.append("<div class=\"col-md-2\">");
-             sb = doLanguageTag(sb, fieldNameIdx, valueLanguageList, lang);
-             sb.append("</div>");
-         }
-            
-         if (authorityType != null)
-         {
-        	 sb.append("</div><div class=\"col-md-2\">");
-	         sb.append(doAuthority(pageContext, fieldName, i, fieldCount, fieldName,
-                            auth, conf, false, repeatable,
-                            defaults, null, collection));
-	         sb.append("</div>");
-         }
-         
-         if (repeatable && !readonly && i < fieldCount - 1)
-         {
-            // put a remove button next to filled in values
-            sb.append("<button class=\"btn btn-danger col-md-2\" name=\"submit_")
-              .append(fieldName)
-              .append("_remove_")
-              .append(i)
-              .append("\" value=\"")
-              .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.remove"))
-              .append("\"><span class=\"glyphicon glyphicon-trash\"></span>&nbsp;&nbsp;"+LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.remove")+"</button>");
-         }
-         else if (repeatable && !readonly && i == fieldCount - 1)
-         {
-            // put a 'more' button next to the last space
-            sb.append("<button class=\"btn btn-default col-md-2\" name=\"submit_")
-              .append(fieldName)
-              .append("_add\" value=\"")
-              .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.add"))
-              .append("\"><span class=\"glyphicon glyphicon-plus\"></span>&nbsp;&nbsp;"+LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.add")+"</button>");
-         }
+        sb.append("<div class=\"row\"><label class=\"col-md-2"+ (required?" label-required":"") +"\">")
+                .append(label)
+                .append("</label><div class=\"col-md-10\">");
 
-         // put a blank if nothing else
-         sb.append("</div>");
-      }
-      sb.append("</div></div><br/>");
-      
-      out.write(sb.toString());
+        for (int i = 0; i < fieldCount; i++)
+        {
+            if (i < defaults.size())
+            {
+                val = defaults.get(i).getValue();
+                auth = defaults.get(i).getAuthority();
+                conf = defaults.get(i).getConfidence();
+            }
+            else
+            {
+                val = "";
+                auth = "";
+            }
+            sb.append("<div class=\"row col-md-12\">\n");
+            String fieldNameIdx = fieldName + ((repeating && i != fieldCount-1)?"_" + (i+1):"");
+
+            if (descriptionAbstract) {
+                sb.append("<div class=\"row col-md-10\"><label>" + LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.locale_" + lang[i]) + "</label></div>");
+            }
+
+            sb.append("<div class=\"col-md-10\">");
+            if (authorityType != null)
+            {
+                sb.append("<div class=\"col-md-10\">");
+            }
+            sb.append("<textarea class=\"form-control\" name=\"").append(fieldNameIdx)
+                    .append("\" rows=\"" + rowCount + "\" cols=\"" + cols + "\" id=\"")
+                    .append(fieldNameIdx).append("_id\" ")
+                    .append((hasVocabulary(vocabulary)&&closedVocabulary)||readonly?" disabled=\"disabled\" ":"")
+                    .append(">")
+                    .append(val)
+                    .append("</textarea>")
+                    .append(doControlledVocabulary(fieldNameIdx, pageContext, vocabulary, readonly));
+            if (authorityType != null)
+            {
+                sb.append("</div><div class=\"col-md-2\">");
+                sb.append(doAuthority(pageContext, fieldName, i, fieldCount, fieldName,
+                        auth, conf, false, repeating,
+                        defaults, null, collection));
+                sb.append("</div>");
+            }
+
+            sb.append("</div>");
+
+
+            if (repeatable && !readonly && i < defaults.size())
+            {
+                // put a remove button next to filled in values
+                sb.append("<button class=\"btn btn-danger col-md-2\" name=\"submit_")
+                        .append(fieldName)
+                        .append("_remove_")
+                        .append(i)
+                        .append("\" value=\"")
+                        .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.remove"))
+                        .append("\"><span class=\"glyphicon glyphicon-trash\"></span>&nbsp;&nbsp;" + LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.remove") + "</button>");
+            }
+            else if (repeatable && !readonly && i == fieldCount - 1)
+            {
+                // put a 'more' button next to the last space
+                sb.append("<button class=\"btn btn-default col-md-2\" name=\"submit_")
+                        .append(fieldName)
+                        .append("_add\" value=\"")
+                        .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.add"))
+                        .append("\"><span class=\"glyphicon glyphicon-plus\"></span>&nbsp;&nbsp;" + LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.add") + "</button>");
+            }
+
+            // put a blank if nothing else
+            sb.append("</div>");
+        }
+        sb.append("</div></div><br/>");
+
+        out.write(sb.toString());
     }
+
 
     void doOneBox(javax.servlet.jsp.JspWriter out, Item item,
       String fieldName, String schema, String element, String qualifier, boolean repeatable, boolean required, boolean readonly,
@@ -1709,8 +1704,9 @@
        String inputType = inputs[z].getInputType();
        String label = inputs[z].getLabel();
        boolean closedVocabulary = inputs[z].isClosedVocabulary();
-       
-       if (inputType.equals("name"))
+        if (fieldName.indexOf("identifier_citation") > 0) {
+            doTextArea(out, item, fieldName, dcSchema, dcElement, dcQualifier, repeatable, required, readonly, fieldCountIncr, label, pageContext, vocabulary, closedVocabulary, collection, 45);
+        } else if (inputType.equals("name"))
        {
            doPersonalName(out, item, fieldName, dcSchema, dcElement, dcQualifier,
                                           repeatable, required, readonly, fieldCountIncr, label, pageContext, collection);
@@ -1739,7 +1735,7 @@
        {
                    doTextArea(out, item, fieldName, dcSchema, dcElement, dcQualifier,
                                   repeatable, required, readonly, fieldCountIncr, label, pageContext, vocabulary,
-                                  closedVocabulary, collection, language, inputs[z].getValueLanguageList());
+                                  closedVocabulary, collection, 65);
        }
        else if (inputType.equals("dropdown"))
        {

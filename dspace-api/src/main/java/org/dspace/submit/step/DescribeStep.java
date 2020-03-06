@@ -283,8 +283,7 @@ public class DescribeStep extends AbstractProcessingStep
                     || (inputType.equals("textarea"))
                     || inputType.equals("threelocbox"))
             {
-                readText(context, request, item, schema, element, qualifier, inputs[j]
-                        .getRepeatable(), LANGUAGE_QUALIFIER, inputs[j].getLanguage());
+                readText(context, request, item, schema, element, qualifier, true, LANGUAGE_QUALIFIER, inputs[j].getLanguage());
             }
             else
             {
