@@ -65,7 +65,9 @@ public class SendFeedbackAction extends AbstractAction
             // arrives at the installation; e.g. presence or absence of "www"
             int lastDot = host.lastIndexOf('.');
             if (host.substring(0, lastDot).contains("."))
+            {
                 basicHost = host.substring(host.substring(0, lastDot).lastIndexOf('.'));
+            }
         }
 
         if ((fromPage == null) || ((!fromPage.contains(basicHost)) && (!isValidReferral(fromPage))))
