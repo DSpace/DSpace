@@ -22,7 +22,7 @@ public class FullProjection extends AbstractProjection {
 
     public final static String NAME = "full";
     private final int maxEmbed = DSpaceServicesFactory.getInstance().getConfigurationService()
-            .getIntProperty("projections.full.max", 2);
+            .getIntProperty("rest.projections.full.max", 2);
 
     public String getName() {
         return NAME;

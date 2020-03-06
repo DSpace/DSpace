@@ -158,6 +158,24 @@ public class ConverterService {
     public <T extends HALResource> T toResource(RestModel restObject) {
         return toResource(restObject, new Link[] {});
     }
+
+    /**
+     * Converts the given rest object to a {@link HALResource} object.
+     * <p>
+     * If the rest object is a {@link RestAddressableModel}, the projection returned by
+     * {@link RestAddressableModel#getProjection()} will be used to determine which optional
+     * embeds and links will be added, and {@link Projection#transformResource(HALResource)}
+     * will be automatically called before returning the final, fully converted resource.
+     * </p><p>
+     * In all cases, the {@link HalLinkService} will be used immediately after the resource is constructed,
+     * to ensure all {@link HalLinkFactory}s have had a chance to add links as needed.
+     * </p>
+     *
+     * @param restObject the input rest object.
+     * @param oldLinks  The old links fo the Resource Object
+     * @param <T> the return type, a subclass of {@link HALResource}.
+     * @return the fully converted resource, with all automatic links and embeds applied.
+     */
     public <T extends HALResource> T toResource(RestModel restObject, Link... oldLinks) {
         T halResource = getResource(restObject);
         if (restObject instanceof RestAddressableModel) {
