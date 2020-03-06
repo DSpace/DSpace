@@ -16,6 +16,8 @@ import org.springframework.hateoas.Link;
 
 /**
  * Projection that allows a given set of rels to be embedded.
+ * A Rel refers to a Link Relation, this is an Embedded Object of the HalResource and the HalResource contains
+ * a link to this
  */
 public class EmbedRelsProjection extends AbstractProjection {
 

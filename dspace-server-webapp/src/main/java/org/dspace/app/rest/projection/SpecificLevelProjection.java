@@ -31,7 +31,7 @@ public class SpecificLevelProjection extends AbstractProjection {
     public final static String NAME = "level";
 
     private int maxEmbed = DSpaceServicesFactory.getInstance().getConfigurationService()
-            .getIntProperty("projections.full.max", 2);
+            .getIntProperty("rest.projections.full.max", 2);
 
     public int getMaxEmbed() {
         return maxEmbed;
