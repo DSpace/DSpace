@@ -8,14 +8,14 @@
 package org.dspace.app.rest.authorization;
 
 import org.dspace.app.rest.model.BaseObjectRest;
+import org.dspace.app.rest.model.RestAddressableModel;
 import org.dspace.content.Site;
-import org.dspace.discovery.IndexableObject;
 import org.dspace.eperson.EPerson;
 
 /**
  * An authorization is the right for a specific {@link EPerson}, eventually null to indicate unauthenticated users, to
  * use a specific {@link AuthorizationFeature} on a defined object. The target object must implement the
- * {@link IndexableObject} interface so to have an unique ID and type
+ * {@link RestAddressableModel} interface so to be directly addressable
  *
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */

@@ -17,7 +17,6 @@ import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
-import org.dspace.eperson.service.EPersonService;
 import org.dspace.services.RequestService;
 import org.dspace.services.model.Request;
 import org.slf4j.Logger;
@@ -43,9 +42,6 @@ public class ReadAuthorizationPermissionEvaluatorPlugin extends RestObjectPermis
     private RequestService requestService;
 
     @Autowired
-    private EPersonService ePersonService;
-
-    @Autowired
     private AuthorizationRestUtil authorizationRestUtil;
 
     @Override
@@ -67,9 +63,7 @@ public class ReadAuthorizationPermissionEvaluatorPlugin extends RestObjectPermis
                 return true;
             }
             EPerson ePerson = authorizationRestUtil.getEperson(context, targetId.toString());
-            EPerson currUser = null;
-
-            currUser = ePersonService.findByEmail(context, (String) authentication.getPrincipal());
+            EPerson currUser = context.getCurrentUser();
 
             if (ePerson == null) {
                 // everyone can check authorization for the anonymous user

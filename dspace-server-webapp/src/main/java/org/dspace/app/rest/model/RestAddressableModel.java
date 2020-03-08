@@ -46,6 +46,13 @@ public abstract class RestAddressableModel implements RestModel {
     }
 
     @JsonIgnore
+    /**
+     * 
+     * @return an unique string useful to unambiguously identify the type of rest
+     *         object. It is in the form of category.model where model is in its
+     *         singular form. Examples include core.item, core.community,
+     *         submission.workspaceitem, etc.
+     */
     public String getUniqueType() {
         return getCategory() + "." + getType();
     }

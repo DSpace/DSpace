@@ -10,7 +10,7 @@ package org.dspace.app.rest.authorization;
 import java.sql.SQLException;
 
 import org.dspace.app.rest.model.BaseObjectRest;
-import org.dspace.app.rest.model.RestModel;
+import org.dspace.app.rest.model.RestAddressableModel;
 import org.dspace.app.rest.model.SiteRest;
 import org.dspace.core.Context;
 import org.springframework.core.annotation.AnnotationUtils;
@@ -64,7 +64,7 @@ public interface AuthorizationFeature {
     }
 
     /**
-     * Return the supported object type according to the {@link RestModel#getType()}
+     * Return the supported object type according to the {@link RestAddressableModel#getUniqueType()}
      * 
      * @return the supported object type, required to be not null
      */
