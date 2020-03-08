@@ -164,6 +164,10 @@ public class AuthorizationFeatureServiceIT extends AbstractIntegrationTestWithDa
         // login our admin
         context.setCurrentUser(admin);
         assertThat(authzFeatureService.isAuthorized(context, trueForAdmins, siteRest), equalTo(true));
+        // finally check that a null object will always result in false to be returned
+        assertThat(authzFeatureService.isAuthorized(context, alwaysTrue, null), equalTo(false));
+        // without call at all the authorizationFeature to prevent NPE
+        assertThat(authzFeatureService.isAuthorized(context, alwaysThrowEx, null), equalTo(false));
     }
 
 }
