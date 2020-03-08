@@ -26,6 +26,7 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
+import org.dspace.eperson.Group;
 import org.dspace.eperson.service.EPersonService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -101,9 +102,18 @@ public class AuthorizationRestRepository extends DSpaceRestRepository<Authorizat
                 return null;
             }
             EPerson currUser = context.getCurrentUser();
-            // Temporarily change the Context's current user in order to retrieve
-            // authorizations based on that user
-            context.setCurrentUser(user);
+            List<UUID> specialGroupsUUID = null;
+            if (currUser != user) {
+                // Temporarily change the Context's current user in order to retrieve
+                // authorizations based on that user
+                List<Group> specialGroups = context.getSpecialGroups();
+                specialGroupsUUID = new ArrayList<UUID>(specialGroups.size());
+                for (Group s : specialGroups) {
+                    specialGroupsUUID.add(s.getID());
+                }
+                context.setCurrentUser(user);
+                context.emptySpecialGroups();
+            }
 
             if (authorizationFeatureService.isAuthorized(context, authorizationFeature, object)) {
                 Authorization authz = new Authorization();
@@ -112,8 +122,13 @@ public class AuthorizationRestRepository extends DSpaceRestRepository<Authorizat
                 authz.setObject(object);
                 authorizationRest = converter.toRest(authz, utils.obtainProjection());
             }
-            // restore the real current user
-            context.setCurrentUser(currUser);
+            if (currUser != user) {
+                // restore the real current user
+                context.setCurrentUser(currUser);
+                for (UUID suuid : specialGroupsUUID) {
+                    context.setSpecialGroup(suuid);
+                }
+            }
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -149,11 +164,21 @@ public class AuthorizationRestRepository extends DSpaceRestRepository<Authorizat
         }
 
         EPerson currUser = context.getCurrentUser();
+        List<UUID> specialGroupsUUID = null;
         // get the user specified in the requested parameters, can be null for anonymous
         EPerson user = getUserFromRequestParameter(context, epersonUuid);
-        // Temporarily change the Context's current user in order to retrieve
-        // authorizations based on that user
-        context.setCurrentUser(user);
+        if (currUser != user) {
+            // Temporarily change the Context's current user in order to retrieve
+            // authorizations based on that user
+            List<Group> specialGroups = context.getSpecialGroups();
+            specialGroupsUUID = new ArrayList<UUID>(specialGroups.size());
+            for (Group s : specialGroups) {
+                specialGroupsUUID.add(s.getID());
+            }
+            context.setCurrentUser(user);
+            context.emptySpecialGroups();
+        }
+
         List<AuthorizationFeature> features = authorizationFeatureService.findByResourceType(obj.getUniqueType());
         List<Authorization> authorizations = new ArrayList<Authorization>();
         for (AuthorizationFeature f : features) {
@@ -161,8 +186,14 @@ public class AuthorizationRestRepository extends DSpaceRestRepository<Authorizat
                 authorizations.add(new Authorization(user, f, obj));
             }
         }
-        // restore the real current user
-        context.setCurrentUser(currUser);
+
+        if (currUser != user) {
+            // restore the real current user
+            context.setCurrentUser(currUser);
+            for (UUID suuid : specialGroupsUUID) {
+                context.setSpecialGroup(suuid);
+            }
+        }
         return converter.toRestPage(utils.getPage(authorizations, pageable), utils.obtainProjection());
     }
 
@@ -198,9 +229,18 @@ public class AuthorizationRestRepository extends DSpaceRestRepository<Authorizat
         EPerson currUser = context.getCurrentUser();
         // get the user specified in the requested parameters, can be null for anonymous
         EPerson user = getUserFromRequestParameter(context, epersonUuid);
-        // Temporarily change the Context's current user in order to retrieve
-        // authorizations based on that user
-        context.setCurrentUser(user);
+        List<UUID> specialGroupsUUID = null;
+        if (currUser != user) {
+            // Temporarily change the Context's current user in order to retrieve
+            // authorizations based on that user
+            List<Group> specialGroups = context.getSpecialGroups();
+            specialGroupsUUID = new ArrayList<UUID>(specialGroups.size());
+            for (Group s : specialGroups) {
+                specialGroupsUUID.add(s.getID());
+            }
+            context.setCurrentUser(user);
+            context.emptySpecialGroups();
+        }
         AuthorizationFeature feature = authorizationFeatureService.find(featureName);
         AuthorizationRest authorizationRest = null;
         if (authorizationFeatureService.isAuthorized(context, feature, obj)) {
@@ -210,8 +250,13 @@ public class AuthorizationRestRepository extends DSpaceRestRepository<Authorizat
             authz.setObject(obj);
             authorizationRest = converter.toRest(authz, utils.obtainProjection());
         }
-        // restore the real current user
-        context.setCurrentUser(currUser);
+        if (currUser != user) {
+            // restore the real current user
+            context.setCurrentUser(currUser);
+            for (UUID suuid : specialGroupsUUID) {
+                context.setSpecialGroup(suuid);
+            }
+        }
         return authorizationRest;
     }
 

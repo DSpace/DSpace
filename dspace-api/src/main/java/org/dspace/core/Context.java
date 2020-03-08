@@ -629,6 +629,17 @@ public class Context implements AutoCloseable {
     }
 
     /**
+     * This method will remove any special group that was assigned to the context.
+     * This should be used in very specific scenario such as login-as feature where
+     * we don't want to pass special group related to the current request /
+     * authentication method. Normally an authentication method only need to add it
+     * own additional group without touching what is already set in the context
+     */
+    public void emptySpecialGroups() {
+        specialGroups.clear();
+    }
+
+    /**
      *  Close the context, aborting any open transactions (if any).
      * @throws Throwable
      */
