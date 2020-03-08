@@ -125,16 +125,11 @@ public class AuthorizationRestRepository extends DSpaceRestRepository<Authorizat
     /**
      * It returns the list of matching available authorizations granted to the specified eperson or to the anonymous
      * user. Only administrators and the user identified by the epersonUuid parameter can access this method
-     *
      * 
-     * @param context
-     *            the DSpace Context
      * @param uri
      *            the uri of the object to check the authorization against
      * @param epersonUuid
      *            the eperson uuid to use in the authorization evaluation
-     * @param featureName
-     *            limit the authorization check to only the feature identified via its name
      * @param pageable
      *            the pagination options
      * @return the list of matching authorization available for the requested user and object, filtered by feature if
@@ -175,9 +170,6 @@ public class AuthorizationRestRepository extends DSpaceRestRepository<Authorizat
      * It returns the authorization related to the requested feature if granted to the specified eperson or to the
      * anonymous user. Only administrators and the user identified by the epersonUuid parameter can access this method
      *
-     * 
-     * @param context
-     *            the DSpace Context
      * @param uri
      *            the uri of the object to check the authorization against
      * @param epersonUuid

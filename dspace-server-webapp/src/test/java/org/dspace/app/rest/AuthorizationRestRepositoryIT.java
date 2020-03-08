@@ -363,6 +363,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
         // verify that it works for administrators
         String adminToken = getAuthToken(admin.getEmail(), password);
         getClient(adminToken).perform(get("/api/authz/authorizations/search/object")
+                .param("projection", "full")
                 .param("uri", siteUri)
                 .param("eperson", admin.getID().toString()))
             .andExpect(status().isOk())
@@ -395,6 +396,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
         // verify that it works for normal loggedin users
         String epersonToken = getAuthToken(eperson.getEmail(), password);
         getClient(epersonToken).perform(get("/api/authz/authorizations/search/object")
+                .param("projection", "full")
                 .param("uri", siteUri)
                 .param("eperson", eperson.getID().toString()))
             .andExpect(status().isOk())
@@ -427,6 +429,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
 
         // verify that it works for administators inspecting other users
         getClient(adminToken).perform(get("/api/authz/authorizations/search/object")
+                .param("projection", "full")
                 .param("uri", siteUri)
                 .param("eperson", eperson.getID().toString()))
             .andExpect(status().isOk())
@@ -463,6 +466,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
 
         // verify that it works for anonymous users
         getClient().perform(get("/api/authz/authorizations/search/object")
+                .param("projection", "full")
                 .param("uri", siteUri))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.authorizations", Matchers.hasSize(greaterThanOrEqualTo(1))))
@@ -493,6 +497,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
 
         // verify that it works for administrators inspecting anonymous users
         getClient(adminToken).perform(get("/api/authz/authorizations/search/object")
+                .param("projection", "full")
                 .param("uri", siteUri))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.authorizations", Matchers.hasSize(greaterThanOrEqualTo(1))))
