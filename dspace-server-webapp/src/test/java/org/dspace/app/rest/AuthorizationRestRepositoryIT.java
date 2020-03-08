@@ -27,8 +27,10 @@ import org.dspace.app.rest.authorization.AuthorizationFeatureService;
 import org.dspace.app.rest.authorization.TrueForAdminsFeature;
 import org.dspace.app.rest.authorization.TrueForLoggedUsersFeature;
 import org.dspace.app.rest.authorization.TrueForTestUsersFeature;
+import org.dspace.app.rest.authorization.TrueForUsersInGroupTestFeature;
 import org.dspace.app.rest.builder.CommunityBuilder;
 import org.dspace.app.rest.builder.EPersonBuilder;
+import org.dspace.app.rest.builder.GroupBuilder;
 import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.matcher.AuthorizationMatcher;
 import org.dspace.app.rest.model.BaseObjectRest;
@@ -44,6 +46,7 @@ import org.dspace.content.Site;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.SiteService;
 import org.dspace.eperson.EPerson;
+import org.dspace.eperson.Group;
 import org.dspace.services.ConfigurationService;
 import org.hamcrest.Matchers;
 import org.junit.Before;
@@ -105,6 +108,11 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
      */
     private AuthorizationFeature trueForTestUsers;
 
+    /** 
+     * this hold a reference to the test feature {@link TrueForUsersInGroupTestFeature}
+     */
+    private AuthorizationFeature trueForUsersInGroupTest;
+
     @Override
     @Before
     public void setUp() throws Exception {
@@ -116,6 +124,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
         trueForAdmins = authorizationFeatureService.find(TrueForAdminsFeature.NAME);
         trueForLoggedUsers = authorizationFeatureService.find(TrueForLoggedUsersFeature.NAME);
         trueForTestUsers = authorizationFeatureService.find(TrueForTestUsersFeature.NAME);
+        trueForUsersInGroupTest = authorizationFeatureService.find(TrueForUsersInGroupTestFeature.NAME);
     }
 
     @Test
@@ -1143,6 +1152,126 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
                 .param("uri", siteUri)
                 .param("feature", alwaysException.getName()))
             .andExpect(status().isInternalServerError());
+    }
+
+    @Test
+    /**
+     * This test will check that special group are correctly used to verify
+     * authorization for the current loggedin user but not inherited from the
+     * Administrators login when they look to authorization of third users
+     * 
+     * @throws Exception
+     */
+    public void verifySpecialGroupMembershipTest() throws Exception {
+        Site site = siteService.findSite(context);
+        SiteRest siteRest = converterService.toRest(site, converterService.getProjection(DefaultProjection.NAME));
+        String siteUri = utils.linkToSingleResource(siteRest, "self").getHref();
+        context.turnOffAuthorisationSystem();
+        // create two normal users and put one in the test group directly
+        EPerson memberOfTestGroup = EPersonBuilder.createEPerson(context).withEmail("memberGroupTest@example.com")
+                .withPassword(password).build();
+        EPerson normalUser = EPersonBuilder.createEPerson(context).withEmail("normal@example.com")
+                .withPassword(password).build();
+        Group testGroup = GroupBuilder.createGroup(context).withName(TrueForUsersInGroupTestFeature.GROUP_NAME)
+                .addMember(memberOfTestGroup).build();
+        context.restoreAuthSystemState();
+
+        Authorization authAdminSite = new Authorization(admin, trueForUsersInGroupTest, siteRest);
+        Authorization authMemberSite = new Authorization(memberOfTestGroup, trueForUsersInGroupTest, siteRest);
+        Authorization authNormalUserSite = new Authorization(normalUser, trueForUsersInGroupTest, siteRest);
+
+        String adminToken = getAuthToken(admin.getEmail(), password);
+        String normalUserToken = getAuthToken(normalUser.getEmail(), password);
+        String memberToken = getAuthToken(memberOfTestGroup.getEmail(), password);
+
+        // proof that our admin doesn't have the special trueForUsersInGroupTest feature
+        // check both via direct access than via a search method
+        getClient(adminToken).perform(get("/api/authz/authorizations/" + authAdminSite.getID()))
+            .andExpect(status().isNotFound());
+        getClient(adminToken).perform(get("/api/authz/authorizations/search/objectAndFeature")
+                .param("uri", siteUri)
+                .param("feature", trueForUsersInGroupTest.getName())
+                .param("eperson", admin.getID().toString()))
+            .andExpect(status().isNoContent());
+        // nor the normal user both directly than if checked by the admin
+        getClient(adminToken).perform(get("/api/authz/authorizations/" + authNormalUserSite.getID()))
+            .andExpect(status().isNotFound());
+        getClient(adminToken).perform(get("/api/authz/authorizations/search/objectAndFeature")
+                .param("uri", siteUri)
+                .param("feature", trueForUsersInGroupTest.getName())
+                .param("eperson", normalUser.getID().toString()))
+            .andExpect(status().isNoContent());
+        getClient(normalUserToken).perform(get("/api/authz/authorizations/" + authNormalUserSite.getID()))
+            .andExpect(status().isNotFound());
+        getClient(normalUserToken).perform(get("/api/authz/authorizations/search/objectAndFeature")
+                .param("uri", siteUri)
+                .param("feature", trueForUsersInGroupTest.getName())
+                .param("eperson", normalUser.getID().toString()))
+            .andExpect(status().isNoContent());
+
+        // instead the member user has
+        getClient(adminToken).perform(get("/api/authz/authorizations/" + authMemberSite.getID()))
+            .andExpect(status().isOk());
+        getClient(adminToken).perform(get("/api/authz/authorizations/search/objectAndFeature")
+                .param("uri", siteUri)
+                .param("feature", trueForUsersInGroupTest.getName())
+                .param("eperson", memberOfTestGroup.getID().toString()))
+            .andExpect(status().isOk());
+        // so it can also check itself the permission
+        getClient(memberToken).perform(get("/api/authz/authorizations/" + authMemberSite.getID()))
+            .andExpect(status().isOk());
+        getClient(memberToken).perform(get("/api/authz/authorizations/search/objectAndFeature")
+                .param("uri", siteUri)
+                .param("feature", trueForUsersInGroupTest.getName())
+                .param("eperson", memberOfTestGroup.getID().toString()))
+            .andExpect(status().isOk());
+
+        // now configure the password login to grant special membership to our test group and login again our users
+        configurationService.setProperty("authentication-password.login.specialgroup",
+                TrueForUsersInGroupTestFeature.GROUP_NAME);
+        adminToken = getAuthToken(admin.getEmail(), password);
+        normalUserToken = getAuthToken(normalUser.getEmail(), password);
+        memberToken = getAuthToken(memberOfTestGroup.getEmail(), password);
+
+        // our admin now should have the authorization
+        getClient(adminToken).perform(get("/api/authz/authorizations/" + authAdminSite.getID()))
+            .andExpect(status().isOk());
+        getClient(adminToken).perform(get("/api/authz/authorizations/search/objectAndFeature")
+                .param("uri", siteUri)
+                .param("feature", trueForUsersInGroupTest.getName())
+                .param("eperson", admin.getID().toString()))
+            .andExpect(status().isOk());
+        // our normal user when checked via the admin should still not have the authorization
+        getClient(adminToken).perform(get("/api/authz/authorizations/" + authNormalUserSite.getID()))
+            .andExpect(status().isNotFound());
+        getClient(adminToken).perform(get("/api/authz/authorizations/search/objectAndFeature")
+                .param("uri", siteUri)
+                .param("feature", trueForUsersInGroupTest.getName())
+                .param("eperson", normalUser.getID().toString()))
+            .andExpect(status().isNoContent());
+        // but he should have the authorization if loggedin directly
+        getClient(normalUserToken).perform(get("/api/authz/authorizations/" + authNormalUserSite.getID()))
+            .andExpect(status().isOk());
+        getClient(normalUserToken).perform(get("/api/authz/authorizations/search/objectAndFeature")
+                .param("uri", siteUri)
+                .param("feature", trueForUsersInGroupTest.getName())
+                .param("eperson", normalUser.getID().toString()))
+            .andExpect(status().isOk());
+        // for our direct member user we don't expect differences
+        getClient(adminToken).perform(get("/api/authz/authorizations/" + authMemberSite.getID()))
+            .andExpect(status().isOk());
+        getClient(adminToken).perform(get("/api/authz/authorizations/search/objectAndFeature")
+                .param("uri", siteUri)
+                .param("feature", trueForUsersInGroupTest.getName())
+                .param("eperson", memberOfTestGroup.getID().toString()))
+            .andExpect(status().isOk());
+        getClient(memberToken).perform(get("/api/authz/authorizations/" + authMemberSite.getID()))
+            .andExpect(status().isOk());
+        getClient(memberToken).perform(get("/api/authz/authorizations/search/objectAndFeature")
+                .param("uri", siteUri)
+                .param("feature", trueForUsersInGroupTest.getName())
+                .param("eperson", memberOfTestGroup.getID().toString()))
+            .andExpect(status().isOk());
     }
 
     // utility methods to build authorization ID without having an authorization object
