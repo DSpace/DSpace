@@ -393,7 +393,7 @@
         <property name="spellCheckEnabled" value="true"/>
     </bean>
 
-    <!--The configuration settings for discovery of withdrawn and indiscoverable items (admin only)-->
+    <!--The configuration settings for discovery of withdrawn and undiscoverable items (admin only) and regular items-->
     <bean id="discoverableAndUndiscoverableItems" class="org.dspace.discovery.configuration.DiscoveryConfiguration" scope="prototype">
         <!--Which sidebar facets are to be displayed-->
         <property name="sidebarFacets">

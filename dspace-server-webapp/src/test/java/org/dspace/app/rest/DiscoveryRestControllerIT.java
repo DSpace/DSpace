@@ -3790,7 +3790,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.type", is("discover")))
                 .andExpect(jsonPath("$._embedded.searchResult.page", is(
-                        PageMatcher.pageEntry(0, 20)
+                        PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 1)
                 )))
                 .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.contains(
                         SearchResultMatcher.matchOnItemName("item", "items", "Public Test Item")
@@ -3871,7 +3871,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.type", is("discover")))
                 .andExpect(jsonPath("$._embedded.searchResult.page", is(
-                        PageMatcher.pageEntry(0, 20)
+                        PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 3)
                 )))
                 .andExpect(jsonPath("$._embedded.searchResult._embedded.objects",
                         Matchers.containsInAnyOrder(
