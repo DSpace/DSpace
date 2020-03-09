@@ -8,7 +8,10 @@
 package org.dspace.app.rest.projection;
 
 import org.dspace.app.rest.model.LinkRest;
+import org.dspace.app.rest.model.RestAddressableModel;
 import org.dspace.app.rest.model.hateoas.HALResource;
+import org.dspace.services.factory.DSpaceServicesFactory;
+import org.springframework.hateoas.Link;
 import org.springframework.stereotype.Component;
 
 /**
@@ -18,14 +21,17 @@ import org.springframework.stereotype.Component;
 public class FullProjection extends AbstractProjection {
 
     public final static String NAME = "full";
+    private final int maxEmbed = DSpaceServicesFactory.getInstance().getConfigurationService()
+            .getIntProperty("rest.projections.full.max", 2);
 
     public String getName() {
         return NAME;
     }
 
     @Override
-    public boolean allowEmbedding(HALResource halResource, LinkRest linkRest) {
-        return true;
+    public boolean allowEmbedding(HALResource<? extends RestAddressableModel> halResource, LinkRest linkRest,
+                                  Link... oldLinks) {
+        return halResource.getContent().getEmbedLevel() < maxEmbed;
     }
 
     @Override
