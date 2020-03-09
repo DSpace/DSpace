@@ -193,6 +193,17 @@
 					<visibility-on-group>Bibliotecarios</visibility-on-group>
 					<type-bind>Conjunto de datos</type-bind>
 				</field>
+				
+				<field>
+					<dc-schema>sedici</dc-schema>
+					<dc-element>subtype</dc-element>
+					<label>Especifique el tipo de Proyecto (*)</label>
+					<input-type value-pairs-name="common_subtypes_proyecto">dropdown</input-type>
+					<hint>Seleccione el tipo de proyecto que desea cargar</hint>
+					<required-on-group>Bibliotecarios</required-on-group>
+					<visibility-on-group>Bibliotecarios</visibility-on-group>
+					<type-bind>Proyecto</type-bind>
+				</field>
 
 				<!-- /////////////////// FIN DE LOS TYPES Y SUBTYPES /////////////////// -->
 
@@ -650,7 +661,7 @@
 					<label>Evaluación</label>
 					<input-type value-pairs-name="common_evaluations">dropdown</input-type>
 					<hint>Tipo de evaluación a la que el recurso fue sometido</hint>
-					<type-bind>Articulo,Objeto de conferencia,Publicacion seriada</type-bind>
+					<type-bind>Articulo,Objeto de conferencia,Publicacion seriada,Proyecto</type-bind>
 					<visibility-on-group>Bibliotecarios</visibility-on-group>
 				</field>
 
@@ -1042,6 +1053,10 @@
 				<displayed-value>Conjunto de datos</displayed-value>
 				<stored-value>Conjunto de datos</stored-value>
 			</pair>
+			<pair>
+				<displayed-value>Proyecto</displayed-value>
+				<stored-value>Proyecto</stored-value>
+			</pair>
 		</value-pairs>
 		
 		<value-pairs value-pairs-name="common_subtypes_articulo" dc-term="type">
@@ -1208,10 +1223,6 @@
 				<stored-value>Convenio</stored-value>
 			</pair>
 			<pair>
-				<displayed-value>Proyecto</displayed-value>
-				<stored-value>Proyecto</stored-value>
-			</pair>
-			<pair>
 				<displayed-value>Informe</displayed-value>
 				<stored-value>Informe</stored-value>
 			</pair>
@@ -1291,6 +1302,17 @@
 				<stored-value>Placa fotografica</stored-value>
 			</pair>
 		</value-pairs>
+		
+        <value-pairs value-pairs-name="common_subtypes_proyecto" dc-term="type">
+            <pair>
+                <displayed-value>Proyecto de extensión</displayed-value>
+                <stored-value>Proyecto de extension</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Proyecto de investigación</displayed-value>
+                <stored-value>Proyecto de investigacion</stored-value>
+            </pair>
+        </value-pairs>
 
 
 		<!-- default language order: (from dspace 1.2.1) "en_US", "en", "es", "de", 

@@ -26,6 +26,7 @@
   <xsl:variable name="objeto_de_aprendizaje">Objeto de aprendizaje</xsl:variable>
   <xsl:variable name="publicacion_seriada">Publicacion seriada</xsl:variable>
   <xsl:variable name="conjunto_de_datos">Conjunto de datos</xsl:variable>
+  <xsl:variable name="proyecto">Proyecto</xsl:variable>
   
   	<xsl:variable name="global-theme-path">
 		<xsl:value-of 
