@@ -16,6 +16,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
@@ -24,6 +25,8 @@ import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.BitstreamRest;
 import org.dspace.app.rest.model.CommunityRest;
+import org.dspace.app.rest.model.GroupRest;
+import org.dspace.app.rest.model.MetadataRest;
 import org.dspace.app.rest.model.patch.Patch;
 import org.dspace.app.rest.utils.CommunityRestEqualityUtils;
 import org.dspace.authorize.AuthorizeException;
@@ -32,6 +35,8 @@ import org.dspace.content.Community;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.CommunityService;
 import org.dspace.core.Context;
+import org.dspace.eperson.Group;
+import org.dspace.eperson.service.GroupService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -57,6 +62,9 @@ public class CommunityRestRepository extends DSpaceObjectRestRepository<Communit
 
     @Autowired
     CommunityRestEqualityUtils communityRestEqualityUtils;
+
+    @Autowired
+    private GroupService groupService;
 
     @Autowired
     private CommunityService cs;
@@ -267,5 +275,32 @@ public class CommunityRestRepository extends DSpaceObjectRestRepository<Communit
         cs.update(context, community);
         bitstreamService.update(context, bitstream);
         return converter.toRest(context.reloadEntity(bitstream), utils.obtainProjection());
+    }
+
+    public GroupRest createAdminGroup(Context context, HttpServletRequest request, Community community)
+        throws SQLException, AuthorizeException {
+
+        Group group = cs.createAdministrators(context, community);
+        ObjectMapper mapper = new ObjectMapper();
+        GroupRest groupRest = new GroupRest();
+        try {
+            ServletInputStream input = request.getInputStream();
+            groupRest = mapper.readValue(input, GroupRest.class);
+            if (groupRest.isPermanent() || StringUtils.isNotBlank(groupRest.getName())) {
+                throw new UnprocessableEntityException("The given GroupRest object has to be non-permanent and can't" +
+                                                           " contain a name");
+            }
+            metadataConverter.setMetadata(context, group, groupRest.getMetadata());
+        } catch (IOException e1) {
+            throw new UnprocessableEntityException("Error parsing request body.", e1);
+        }
+        return converter.toRest(group, utils.obtainProjection());
+    }
+
+    public void deleteAdminGroup(Context context, Community community)
+        throws SQLException, AuthorizeException, IOException {
+        Group adminGroup = community.getAdministrators();
+        cs.removeAdministrators(context, community);
+        groupService.delete(context, adminGroup);
     }
 }
