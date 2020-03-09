@@ -434,7 +434,9 @@ public class OAIHarvester {
 		// If we got to this point, it means the harvest was completely successful
 		Date finishTime = new Date();
 		long timeTaken = finishTime.getTime() - startTime.getTime();
+		// this is a bit wonky to set both fields to the same value, but there is some inconsistencies in use of them.
 		harvestRow.setHarvestStartTime(startTime);
+		harvestRow.setLastHarvested(startTime);
 		harvestRow.setHarvestMessage("Harvest from " + oaiSource + " successful");
 		harvestRow.setHarvestStatus(HarvestedCollection.STATUS_READY);
 		log.info("Harvest from " + oaiSource + " successful. The process took " + timeTaken + " milliseconds. Harvested " + currentRecord + " items.");
