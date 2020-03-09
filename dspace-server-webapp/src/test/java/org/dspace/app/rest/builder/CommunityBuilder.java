@@ -135,6 +135,11 @@ public class CommunityBuilder extends AbstractDSpaceObjectBuilder<Community> {
             Community community = communityService.find(c, uuid);
             if (community != null) {
                 try {
+                    if (community.getAdministrators() != null) {
+                        Group adminGroup = community.getAdministrators();
+                        communityService.removeAdministrators(c, community);
+                        groupService.delete(c, adminGroup);
+                    }
                     communityService.delete(c, community);
                 } catch (AuthorizeException e) {
                     // cannot occur, just wrap it to make the compiler happy
