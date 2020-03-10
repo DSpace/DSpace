@@ -21,7 +21,6 @@ import org.dspace.content.service.CommunityService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.eperson.Group;
-import org.dspace.eperson.service.GroupService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
@@ -38,9 +37,6 @@ public class CommunityAdminGroupLinkRepository extends AbstractDSpaceRestReposit
     @Autowired
     private AuthorizeService authorizeService;
 
-    @Autowired
-    private GroupService groupService;
-
     @PreAuthorize("hasPermission(#communityId, 'COMMUNITY', 'READ')")
     public GroupRest getAdminGroup(@Nullable HttpServletRequest request,
                                    UUID communityId,
@@ -55,7 +51,8 @@ public class CommunityAdminGroupLinkRepository extends AbstractDSpaceRestReposit
 
             Group administrators = community.getAdministrators();
 
-            if (!authorizeService.isAdmin(context) && !authorizeService.isCommunityAdmin(context)) {
+            if (!authorizeService.isAdmin(context) && !authorizeService.authorizeActionBoolean(context, community,
+                                                                                               Constants.ADMIN, true)) {
                 throw new AccessDeniedException("The current user was not allowed to retrieve the AdminGroup for" +
                                                     " community: " + communityId);
             }
