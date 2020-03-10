@@ -66,6 +66,19 @@ public class BitstreamMatcher {
         );
     }
 
+    public static Matcher<? super Object> matchBitstreamEntryWithoutEmbed(UUID uuid, long size) {
+        return allOf(
+            //Check ID and size
+            hasJsonPath("$.uuid", is(uuid.toString())),
+            hasJsonPath("$.sizeBytes", is((int) size)),
+            //Make sure we have a checksum
+            hasJsonPath("$.checkSum", matchChecksum()),
+            //Make sure we have a valid format
+            //Check links
+            matchLinks(uuid)
+        );
+    }
+
     private static Matcher<? super Object> matchChecksum() {
         return allOf(
             hasJsonPath("$.checkSumAlgorithm", not(empty())),
