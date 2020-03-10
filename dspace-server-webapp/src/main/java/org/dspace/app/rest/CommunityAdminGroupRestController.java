@@ -25,6 +25,7 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Community;
 import org.dspace.content.service.CommunityService;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.webmvc.ControllerUtils;
@@ -69,7 +70,8 @@ public class CommunityAdminGroupRestController {
         if (community == null) {
             throw new ResourceNotFoundException("No such community: " + uuid);
         }
-        if (!authorizeService.isAdmin(context) && !authorizeService.isCommunityAdmin(context)) {
+        if (!authorizeService.isAdmin(context) && !authorizeService.authorizeActionBoolean(context, community,
+                                                                                           Constants.ADMIN, true)) {
             throw new AccessDeniedException("The current user was not allowed to retrieve the AdminGroup for" +
                                                 " community: " + uuid);
         }
@@ -95,7 +97,8 @@ public class CommunityAdminGroupRestController {
             throw new ResourceNotFoundException("No such community: " + uuid);
         }
 
-        if (!authorizeService.isAdmin(context) && !authorizeService.isCommunityAdmin(context)) {
+        if (!authorizeService.isAdmin(context) && !authorizeService.authorizeActionBoolean(context, community,
+                                                                                           Constants.ADMIN, true)) {
             throw new AccessDeniedException("The current user was not allowed to retrieve the AdminGroup for" +
                                                 " community: " + uuid);
         }

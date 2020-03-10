@@ -24,10 +24,13 @@ import org.dspace.app.rest.model.GroupRest;
 import org.dspace.app.rest.model.MetadataRest;
 import org.dspace.app.rest.model.MetadataValueRest;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
+import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.service.CommunityService;
+import org.dspace.core.Constants;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.service.GroupService;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -39,6 +42,9 @@ public class CommunityAdminGroupRestControllerIT extends AbstractControllerInteg
 
     @Autowired
     private GroupService groupService;
+
+    @Autowired
+    private AuthorizeService authorizeService;
 
     @Before
     public void setup() {
@@ -56,6 +62,19 @@ public class CommunityAdminGroupRestControllerIT extends AbstractControllerInteg
                         .andExpect(
                             jsonPath("$", GroupMatcher.matchGroupEntry(adminGroup.getID(), adminGroup.getName())));
     }
+
+    @Test
+    public void getCommunityAdminGroupTestCommunityAdmin() throws Exception {
+        Group adminGroup = communityService.createAdministrators(context, parentCommunity);
+        authorizeService.addPolicy(context, parentCommunity, Constants.ADMIN, eperson);
+
+        String token = getAuthToken(eperson.getEmail(), password);
+        getClient(token).perform(get("/api/core/communities/" + parentCommunity.getID() + "/adminGroup"))
+                        .andExpect(status().isOk())
+                        .andExpect(
+                            jsonPath("$", GroupMatcher.matchGroupEntry(adminGroup.getID(), adminGroup.getName())));
+    }
+
 
     @Test
     public void getCommunityAdminGroupUnAuthorizedTest() throws Exception {
@@ -104,6 +123,37 @@ public class CommunityAdminGroupRestControllerIT extends AbstractControllerInteg
         AtomicReference<UUID> idRef = new AtomicReference<>();
 
         String token = getAuthToken(admin.getEmail(), password);
+        getClient(token).perform(post("/api/core/communities/" + parentCommunity.getID() + "/adminGroup")
+                                     .content(mapper.writeValueAsBytes(groupRest))
+                                     .contentType(contentType))
+                        .andExpect(status().isCreated())
+                        .andDo(result -> idRef
+                            .set(UUID.fromString(read(result.getResponse().getContentAsString(), "$.id")))
+                        );
+        Group adminGroup = groupService.find(context, idRef.get());
+        getClient(token).perform(get("/api/eperson/groups/" + adminGroup.getID()))
+                        .andExpect(status().isOk())
+                        .andExpect(
+                            jsonPath("$", GroupMatcher.matchGroupEntry(adminGroup.getID(), adminGroup.getName())));
+
+    }
+
+    @Test
+    public void postCommunityAdminGroupCreateAdminGroupSuccessCommunityAdmin() throws Exception {
+
+        ObjectMapper mapper = new ObjectMapper();
+        GroupRest groupRest = new GroupRest();
+        MetadataRest metadataRest = new MetadataRest();
+        metadataRest.put("dc.description", new MetadataValueRest("testingDescription"));
+        metadataRest.put("dc.subject", new MetadataValueRest("testSubject"));
+
+        groupRest.setMetadata(metadataRest);
+
+        authorizeService.addPolicy(context, parentCommunity, Constants.ADMIN, eperson);
+
+        AtomicReference<UUID> idRef = new AtomicReference<>();
+
+        String token = getAuthToken(eperson.getEmail(), password);
         getClient(token).perform(post("/api/core/communities/" + parentCommunity.getID() + "/adminGroup")
                                      .content(mapper.writeValueAsBytes(groupRest))
                                      .contentType(contentType))
@@ -223,6 +273,22 @@ public class CommunityAdminGroupRestControllerIT extends AbstractControllerInteg
     public void deleteCommunityAdminGroupTest() throws Exception {
         Group adminGroup = communityService.createAdministrators(context, parentCommunity);
         String token = getAuthToken(admin.getEmail(), password);
+        getClient(token).perform(delete("/api/core/communities/" + parentCommunity.getID() + "/adminGroup"))
+                        .andExpect(status().isNoContent());
+
+        getClient(token).perform(get("/api/core/communities/" + parentCommunity.getID() + "/adminGroup"))
+                        .andExpect(status().isNoContent());
+    }
+
+
+    // This is currently not supported in DSpace API
+    @Ignore
+    @Test
+    public void deleteCommunityAdminGroupTestCommunityAdmin() throws Exception {
+        Group adminGroup = communityService.createAdministrators(context, parentCommunity);
+        authorizeService.addPolicy(context, parentCommunity, Constants.ADMIN, eperson);
+
+        String token = getAuthToken(eperson.getEmail(), password);
         getClient(token).perform(delete("/api/core/communities/" + parentCommunity.getID() + "/adminGroup"))
                         .andExpect(status().isNoContent());
 
