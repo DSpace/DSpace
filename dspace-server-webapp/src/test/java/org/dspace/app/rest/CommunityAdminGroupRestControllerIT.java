@@ -222,7 +222,6 @@ public class CommunityAdminGroupRestControllerIT extends AbstractControllerInteg
     @Test
     public void deleteCommunityAdminGroupTest() throws Exception {
         Group adminGroup = communityService.createAdministrators(context, parentCommunity);
-        
         String token = getAuthToken(admin.getEmail(), password);
         getClient(token).perform(delete("/api/core/communities/" + parentCommunity.getID() + "/adminGroup"))
                         .andExpect(status().isNoContent());

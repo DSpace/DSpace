@@ -98,4 +98,8 @@ public class CollectionMatcher {
                         BitstreamMatcher.matchBitstreamEntry(logo.getID(), logo.getSizeBytes()))
             );
     }
+
+    public static String getFullEmbedsParameter() {
+        return "license,logo,parentCommunity,mappedItems";
+    }
 }
