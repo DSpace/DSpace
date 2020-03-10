@@ -24,7 +24,6 @@ import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.ResourcePolicyRest;
 import org.dspace.app.rest.model.patch.Patch;
-import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.repository.patch.ResourcePatch;
 import org.dspace.app.rest.utils.DSpaceObjectUtils;
 import org.dspace.app.rest.utils.Utils;
@@ -270,7 +269,7 @@ public class ResourcePolicyRestRepository extends DSpaceRestRepository<ResourceP
             } catch (SQLException excSQL) {
                 throw new RuntimeException(excSQL.getMessage(), excSQL);
             }
-            return converter.toRest(resourcePolicy, Projection.DEFAULT);
+            return converter.toRest(resourcePolicy, utils.obtainProjection());
         } else {
             try {
                 UUID groupUuid = UUID.fromString(groupUuidStr);
@@ -283,7 +282,7 @@ public class ResourcePolicyRestRepository extends DSpaceRestRepository<ResourceP
             } catch (SQLException excSQL) {
                 throw new RuntimeException(excSQL.getMessage(), excSQL);
             }
-            return converter.toRest(resourcePolicy, Projection.DEFAULT);
+            return converter.toRest(resourcePolicy, utils.obtainProjection());
         }
     }
 

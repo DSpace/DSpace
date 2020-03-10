@@ -25,8 +25,9 @@ USER dspace
 ADD --chown=dspace . /app/
 COPY dspace/src/main/docker/local.cfg /app/local.cfg
 
-# Build DSpace.  Copy the dspace-install directory to /install.  Clean up the build to keep the docker image small
-RUN mvn package && \
+# Build DSpace (including the optional, deprecated "dspace-rest" webapp)
+# Copy the dspace-install directory to /install.  Clean up the build to keep the docker image small
+RUN mvn package -Pdspace-rest && \
   mv /app/dspace/target/${TARGET_DIR}/* /install && \
   mvn clean
 

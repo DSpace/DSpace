@@ -85,7 +85,7 @@ public class AuthorizeServicePermissionEvaluatorPlugin extends RestObjectPermiss
                 }
 
                 return authorizeService.authorizeActionBoolean(context, ePerson, dSpaceObject,
-                        restPermission.getDspaceApiActionId(), false);
+                        restPermission.getDspaceApiActionId(), true);
             }
 
         } catch (SQLException e) {

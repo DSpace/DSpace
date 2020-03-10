@@ -8,6 +8,7 @@
 package org.dspace.app.rest;
 
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
+
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -35,6 +36,8 @@ import org.dspace.app.rest.builder.EPersonBuilder;
 import org.dspace.app.rest.builder.GroupBuilder;
 import org.dspace.app.rest.builder.ItemBuilder;
 import org.dspace.app.rest.builder.WorkspaceItemBuilder;
+import org.dspace.app.rest.matcher.BitstreamMatcher;
+import org.dspace.app.rest.matcher.CollectionMatcher;
 import org.dspace.app.rest.matcher.HalMatcher;
 import org.dspace.app.rest.matcher.ItemMatcher;
 import org.dspace.app.rest.matcher.MetadataMatcher;
@@ -50,14 +53,19 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
 import org.dspace.content.WorkspaceItem;
+import org.dspace.content.service.CollectionService;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.MvcResult;
 
 public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
+
+    @Autowired
+    private CollectionService collectionService;
 
     @Test
     public void findAllTest() throws Exception {
@@ -250,6 +258,16 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         getClient().perform(get("/api/core/items/" + publicItem1.getID()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", HalMatcher.matchNoEmbeds()))
+                .andExpect(jsonPath("$", publicItem1Matcher));
+
+        // When exact embeds are requested, response should include expected properties, links, and exact embeds.
+        getClient().perform(get("/api/core/items/" + publicItem1.getID())
+                .param("embed", "bundles,owningCollection"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", HalMatcher.matchEmbeds(
+                        "bundles[]",
+                        "owningCollection"
+                )))
                 .andExpect(jsonPath("$", publicItem1Matcher));
     }
 
@@ -1295,6 +1313,122 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
     }
 
     @Test
+    public void embargoAccessGrantAdminsTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        EPerson adminParentCommunity = EPersonBuilder.createEPerson(context)
+                .withEmail("adminCommunity@mail.com")
+                .withPassword("qwerty01")
+                .build();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                .withName("Parent Community")
+                .withAdminGroup(adminParentCommunity)
+                .build();
+
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                .withName("Sub Community")
+                .build();
+
+        EPerson adminChild2 = EPersonBuilder.createEPerson(context)
+                .withEmail("adminChild2@mail.com")
+                .withPassword("qwerty05")
+                .build();
+        Community child2 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                .withName("Sub Community 2")
+                .withAdminGroup(adminChild2)
+                .build();
+
+        EPerson adminCollection1 = EPersonBuilder.createEPerson(context)
+                .withEmail("adminCollection1@mail.com")
+                .withPassword("qwerty02")
+                .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1)
+                .withName("Collection 1")
+                .withAdminGroup(adminCollection1)
+                .build();
+
+        EPerson adminCollection2 = EPersonBuilder.createEPerson(context)
+                .withEmail("adminCollection2@mail.com")
+                .withPassword("qwerty03")
+                .build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1)
+                .withName("Collection 2")
+                .withAdminGroup(adminCollection2)
+                .build();
+
+        Item embargoedItem = ItemBuilder.createItem(context, col1)
+                .withTitle("Public item 1")
+                .withIssueDate("2015-10-21")
+                .withAuthor("Smith, Donald")
+                .withSubject("ExtraEntry")
+                .withEmbargoPeriod("1 week")
+                .build();
+
+        context.restoreAuthSystemState();
+        // parent community's admin user is allowed access to embargoed item
+        String tokenAdminParentCommunity = getAuthToken(adminParentCommunity.getEmail(), "qwerty01");
+        getClient(tokenAdminParentCommunity).perform(get("/api/core/items/" + embargoedItem.getID()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", is(ItemMatcher.matchItemProperties(embargoedItem))));
+
+        // collection1's admin user is allowed access to embargoed item
+        String tokenAdminCollection1 = getAuthToken(adminCollection1.getEmail(), "qwerty02");
+        getClient(tokenAdminCollection1).perform(get("/api/core/items/" + embargoedItem.getID()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", is(ItemMatcher.matchItemProperties(embargoedItem))));
+
+        // collection2's admin user is NOT allowed access to embargoed item of collection1
+        String tokenAdminCollection2 = getAuthToken(adminCollection2.getEmail(), "qwerty03");
+        getClient(tokenAdminCollection2).perform(get("/api/core/items/" + embargoedItem.getID()))
+                .andExpect(status().isForbidden());
+
+        // full admin user is allowed access to embargoed item
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        getClient(tokenAdmin).perform(get("/api/core/items/" + embargoedItem.getID()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", is(ItemMatcher.matchItemProperties(embargoedItem))));
+
+        // child2's admin user is NOT allowed access to embargoed item of collection1
+        String tokenAdminChild2 = getAuthToken(adminChild2.getEmail(), "qwerty05");
+        getClient(tokenAdminChild2).perform(get("/api/core/items/" + embargoedItem.getID()))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void expiredEmbargoTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                .withName("Parent Community")
+                .build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                .withName("Collection 1")
+                .build();
+
+        Item embargoedItem = ItemBuilder.createItem(context, col1)
+                .withTitle("embargoed item 1")
+                .withIssueDate("2017-11-18")
+                .withAuthor("Smith, Donald")
+                .withEmbargoPeriod("-2 week")
+                .build();
+
+        context.restoreAuthSystemState();
+
+        // all are allowed access to item with embargoed expired
+
+        String tokenEperson = getAuthToken(eperson.getEmail(), password);
+        getClient(tokenEperson).perform(get("/api/core/items/" + embargoedItem.getID()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", Matchers.is(ItemMatcher.matchItemProperties(embargoedItem))));
+
+        getClient().perform(get("/api/core/items/" + embargoedItem.getID()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", Matchers.is(ItemMatcher.matchItemProperties(embargoedItem))));
+    }
+
+    @Test
     public void undiscoverableAccessTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
@@ -1423,6 +1557,134 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
     }
 
     @Test
+    public void restrictedGroupAccessForbiddenTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        EPerson memberRestrictGroup = EPersonBuilder.createEPerson(context)
+                .withEmail("eperson1@mail.com")
+                .withPassword("qwerty01")
+                .build();
+
+        Group restrictGroup = GroupBuilder.createGroup(context)
+                .addMember(memberRestrictGroup)
+                .build();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                .withName("Parent Community")
+                .build();
+
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                .withName("Sub Community")
+                .build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, child1)
+                .withName("Collection 1")
+                .build();
+
+        Item itemRestrictedByGroup = ItemBuilder.createItem(context, col1)
+                .withTitle("Public item 1")
+                .withIssueDate("2011-11-13")
+                .withAuthor("Smith, Donald")
+                .withReaderGroup(restrictGroup)
+                .build();
+
+        context.restoreAuthSystemState();
+
+        //A member of the restricted group is also allowed access to restricted item
+        String tokenMemberRestrictedGroup = getAuthToken(memberRestrictGroup.getEmail(), "qwerty01");
+        getClient(tokenMemberRestrictedGroup).perform(get("/api/core/items/" + itemRestrictedByGroup.getID()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", is(ItemMatcher.matchItemProperties(itemRestrictedByGroup))));
+
+        //members who are not part of the restricted group, have no access to the item
+        String tokenEPerson = getAuthToken(eperson.getEmail(), password);
+        getClient(tokenEPerson).perform(get("/api/core/items/" + itemRestrictedByGroup.getID()))
+                .andExpect(status().isForbidden());
+
+        getClient().perform(get("/api/core/items/" + itemRestrictedByGroup.getID()))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    public void restrictedGroupAccessGrantAdminsTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        EPerson adminParentCommunity = EPersonBuilder.createEPerson(context)
+                .withEmail("adminCommunity@mail.com")
+                .withPassword("qwerty01")
+                .build();
+
+        Group restrictedGroup = GroupBuilder.createGroup(context)
+                .build();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                .withName("Parent Community")
+                .withAdminGroup(adminParentCommunity)
+                .build();
+
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                .withName("Sub Community")
+                .build();
+
+        EPerson adminChild2 = EPersonBuilder.createEPerson(context)
+                .withEmail("adminChild2@mail.com")
+                .withPassword("qwerty05")
+                .build();
+        Community child2 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                .withName("Sub Community 2")
+                .build();
+
+        EPerson adminCollection1 = EPersonBuilder.createEPerson(context)
+                .withEmail("adminCollection1@mail.com")
+                .withPassword("qwerty02")
+                .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1)
+                .withName("Collection 1")
+                .withAdminGroup(adminCollection1)
+                .build();
+
+        EPerson adminCollection2 = EPersonBuilder.createEPerson(context)
+                .withEmail("adminCollection2@mail.com")
+                .withPassword("qwerty03")
+                .build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1)
+                .withName("Collection 2")
+                .withAdminGroup(adminCollection2)
+                .build();
+
+        Item itemRestrictedByGroup = ItemBuilder.createItem(context, col1)
+                .withTitle("Public item 1")
+                .withIssueDate("2015-10-21")
+                .withAuthor("Smith, Donald")
+                .withSubject("ExtraEntry")
+                .withReaderGroup(restrictedGroup)
+                .build();
+
+        context.restoreAuthSystemState();
+        // parent community's admin user is allowed access to restricted item
+        String tokenAdminParentCommunity = getAuthToken(adminParentCommunity.getEmail(), "qwerty01");
+        getClient(tokenAdminParentCommunity).perform(get("/api/core/items/" + itemRestrictedByGroup.getID()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", is(ItemMatcher.matchItemProperties(itemRestrictedByGroup))));
+
+        // collection1's admin user is allowed access to restricted item
+        String tokenAdminCollection1 = getAuthToken(adminCollection1.getEmail(), "qwerty02");
+        getClient(tokenAdminCollection1).perform(get("/api/core/items/" + itemRestrictedByGroup.getID()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", is(ItemMatcher.matchItemProperties(itemRestrictedByGroup))));
+
+        // collection2's admin user is NOT allowed access to restricted item of collection1
+        String tokenAdminCollection2 = getAuthToken(adminCollection2.getEmail(), "qwerty03");
+        getClient(tokenAdminCollection2).perform(get("/api/core/items/" + itemRestrictedByGroup.getID()))
+                .andExpect(status().isForbidden());
+
+        // child2's admin user is NOT allowed access to restricted item of collection1
+        String tokenAdminChild2 = getAuthToken(adminChild2.getEmail(), "qwerty05");
+        getClient(tokenAdminCollection2).perform(get("/api/core/items/" + itemRestrictedByGroup.getID()))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
     public void testCreateItem() throws Exception {
 
         context.turnOffAuthorisationSystem();
@@ -1441,6 +1703,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         ObjectMapper mapper = new ObjectMapper();
         ItemRest itemRest = new ItemRest();
+        ItemRest itemRestFull = new ItemRest();
         itemRest.setName("Practices of research data curation in institutional repositories:" +
                              " A qualitative view from repository staff");
         itemRest.setInArchive(true);
@@ -1454,11 +1717,25 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                 .put("dc.rights", new MetadataValueRest("Custom Copyright Text"))
                 .put("dc.title", new MetadataValueRest("Title Text")));
 
+        itemRestFull.setName("Practices of research data curation in institutional repositories:" +
+                " A qualitative view from repository staff");
+        itemRestFull.setInArchive(true);
+        itemRestFull.setDiscoverable(true);
+        itemRestFull.setWithdrawn(false);
+
+        itemRestFull.setMetadata(new MetadataRest()
+                .put("dc.description", new MetadataValueRest("<p>Some cool HTML code here</p>"))
+                .put("dc.description.abstract", new MetadataValueRest("Sample item created via the REST API"))
+                .put("dc.description.tableofcontents", new MetadataValueRest("<p>HTML News</p>"))
+                .put("dc.rights", new MetadataValueRest("Custom Copyright Text"))
+                .put("dc.title", new MetadataValueRest("Title Text")));
+
         String token = getAuthToken(admin.getEmail(), password);
         MvcResult mvcResult = getClient(token).perform(post("/api/core/items?owningCollection=" +
                                                                 col1.getID().toString())
                                    .content(mapper.writeValueAsBytes(itemRest)).contentType(contentType))
                                               .andExpect(status().isCreated())
+                                              .andExpect(jsonPath("$", HalMatcher.matchNoEmbeds()))
                                               .andReturn();
 
         String content = mvcResult.getResponse().getContentAsString();
@@ -1487,6 +1764,13 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                                 MetadataMatcher.matchMetadata("dc.title",
                                     "Title Text")
                             )))));
+
+        MvcResult mvcResultFull = getClient(token).perform(post("/api/core/items?owningCollection=" +
+                col1.getID().toString()).param("projection", "full")
+                .content(mapper.writeValueAsBytes(itemRestFull)).contentType(contentType))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$", ItemMatcher.matchFullEmbeds()))
+                .andReturn();
     }
 
     @Test
@@ -2087,5 +2371,179 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                                          org.springframework.data.rest.webmvc.RestMediaTypes.TEXT_URI_LIST_VALUE))
                                      .content("https://localhost:8080/server/api/integration/externalsources/" +
                                                   "mock/entryValues/one")).andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    public void specificEmbedTestMultipleLevelOfLinks() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and two collections.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
+
+        //2. Three public items that are readable by Anonymous with different subjects
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
+                                      .withTitle("Public item 1")
+                                      .withIssueDate("2017-10-17")
+                                      .withAuthor("Smith, Donald").withAuthor("Doe, John")
+                                      .withSubject("ExtraEntry")
+                                      .build();
+
+        Item publicItem2 = ItemBuilder.createItem(context, col2)
+                                      .withTitle("Public item 2")
+                                      .withIssueDate("2016-02-13")
+                                      .withAuthor("Smith, Maria").withAuthor("Doe, Jane")
+                                      .withSubject("TestingForMore").withSubject("ExtraEntry")
+                                      .build();
+
+        Item publicItem3 = ItemBuilder.createItem(context, col2)
+                                      .withTitle("Public item 3")
+                                      .withIssueDate("2016-02-13")
+                                      .withAuthor("Smith, Maria").withAuthor("Doe, Jane")
+                                      .withSubject("AnotherTest").withSubject("TestingForMore")
+                                      .withSubject("ExtraEntry")
+                                      .build();
+
+
+        //Add a bitstream to an item
+        String bitstreamContent = "ThisIsSomeDummyText";
+        Bitstream bitstream1 = null;
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+            bitstream1 = BitstreamBuilder.
+                                             createBitstream(context, publicItem1, is)
+                                         .withName("Bitstream1")
+                                         .withMimeType("text/plain")
+                                         .build();
+        }
+        context.restoreAuthSystemState();
+        getClient().perform(get("/api/core/items/" + publicItem1.getID() +
+                                    "?embed=owningCollection/mappedItems/bundles/" +
+                                    "bitstreams&embed=owningCollection/logo"))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$", ItemMatcher.matchItemProperties(publicItem1)))
+                   .andExpect(jsonPath("$._embedded.owningCollection",
+                                       CollectionMatcher.matchCollectionEntry(col1.getName(),
+                                                                              col1.getID(),
+                                                                              col1.getHandle())))
+                   // .doesNotExist() makes sure that this section is not embedded, it's not there at all
+                   .andExpect(jsonPath("$._embedded.bundles").doesNotExist())
+                   // .doesNotExist() makes sure that this section is not embedded, it's not there at all
+                   .andExpect(jsonPath("$._embedded.relationships").doesNotExist())
+                   // .doesNotExist() makes sure that this section is not embedded, it's not there at all
+                   .andExpect(jsonPath("$._embedded.owningCollection._embedded.defaultAccessConditions")
+                                  .doesNotExist())
+                   // .nullValue() makes sure that it could be embedded, it's just null in this case
+                   .andExpect(jsonPath("$._embedded.owningCollection._embedded.logo", Matchers.nullValue()))
+                   // .empty() makes sure that the embed is there, but that there's no actual data
+                   .andExpect(jsonPath("$._embedded.owningCollection._embedded.mappedItems._embedded.mappedItems",
+                                       Matchers.empty()))
+        ;
+    }
+
+    @Test
+    public void specificEmbedTestMultipleLevelOfLinksWithData() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and two collections.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1")
+                                           .withLogo("TestingContentForLogo").build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
+
+        //2. Three public items that are readable by Anonymous with different subjects
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
+                                      .withTitle("Public item 1")
+                                      .withIssueDate("2017-10-17")
+                                      .withAuthor("Smith, Donald").withAuthor("Doe, John")
+                                      .withSubject("ExtraEntry")
+                                      .build();
+
+        Item publicItem2 = ItemBuilder.createItem(context, col2)
+                                      .withTitle("Public item 2")
+                                      .withIssueDate("2016-02-13")
+                                      .withAuthor("Smith, Maria").withAuthor("Doe, Jane")
+                                      .withSubject("TestingForMore").withSubject("ExtraEntry")
+                                      .build();
+
+        Item publicItem3 = ItemBuilder.createItem(context, col2)
+                                      .withTitle("Public item 3")
+                                      .withIssueDate("2016-02-13")
+                                      .withAuthor("Smith, Maria").withAuthor("Doe, Jane")
+                                      .withSubject("AnotherTest").withSubject("TestingForMore")
+                                      .withSubject("ExtraEntry")
+                                      .build();
+
+
+        collectionService.addItem(context, col1, publicItem2);
+
+        //Add a bitstream to an item
+        String bitstreamContent = "ThisIsSomeDummyText";
+        Bitstream bitstream1 = null;
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+            bitstream1 = BitstreamBuilder.
+                                             createBitstream(context, publicItem1, is)
+                                         .withName("Bitstream1")
+                                         .withMimeType("text/plain")
+                                         .build();
+        }
+
+        String bitstreamContent2 = "ThisIsSomeDummyText";
+        Bitstream bitstream2 = null;
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent2, CharEncoding.UTF_8)) {
+            bitstream2 = BitstreamBuilder.
+                                             createBitstream(context, publicItem2, is)
+                                         .withName("Bitstream2")
+                                         .withMimeType("text/plain")
+                                         .build();
+        }
+
+
+        context.restoreAuthSystemState();
+        getClient().perform(get("/api/core/items/" + publicItem1.getID() +
+                                    "?embed=owningCollection/mappedItems/bundles/" +
+                                    "bitstreams&embed=owningCollection/logo"))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$", ItemMatcher.matchItemProperties(publicItem1)))
+                   .andExpect(jsonPath("$._embedded.owningCollection",
+                                       CollectionMatcher.matchCollectionEntry(col1.getName(), col1.getID(),
+                                                                              col1.getHandle())))
+                   // .doesNotExist() makes sure that this section is not embedded, it's not there at all
+                   .andExpect(jsonPath("$._embedded.bundles").doesNotExist())
+                   .andExpect(jsonPath("$._embedded.relationships").doesNotExist())
+                   .andExpect(jsonPath("$._embedded.owningCollection._embedded.defaultAccessConditions")
+                                  .doesNotExist())
+                   // .notNullValue() makes sure that it's there and that it does actually contain a value, but not null
+                   .andExpect(jsonPath("$._embedded.owningCollection._embedded.logo", Matchers.notNullValue()))
+                   .andExpect(jsonPath("$._embedded.owningCollection._embedded.logo._embedded").doesNotExist())
+                   .andExpect(jsonPath("$._embedded.owningCollection._embedded.mappedItems._embedded.mappedItems",
+                                       Matchers.contains(ItemMatcher.matchItemProperties(publicItem2))))
+                   .andExpect(jsonPath("$._embedded.owningCollection._embedded.mappedItems._embedded" +
+                                           ".mappedItems[0]._embedded.bundles._embedded.bundles[0]._embedded" +
+                                           ".bitstreams._embedded.bitstreams", Matchers.contains(
+                       BitstreamMatcher.matchBitstreamEntryWithoutEmbed(bitstream2.getID(), bitstream2.getSizeBytes())
+                   )))
+                   .andExpect(jsonPath("$._embedded.owningCollection._embedded.mappedItems." +
+                                           "_embedded.mappedItems[0]_embedded.relationships").doesNotExist())
+                   .andExpect(jsonPath("$._embedded.owningCollection._embedded.mappedItems" +
+                                           "._embedded.mappedItems[0]._embedded.bundles._embedded.bundles[0]." +
+                                           "_embedded.primaryBitstream").doesNotExist())
+                   .andExpect(jsonPath("$._embedded.owningCollection._embedded.mappedItems." +
+                                           "_embedded.mappedItems[0]._embedded.bundles._embedded.bundles[0]." +
+                                           "_embedded.bitstreams._embedded.bitstreams[0]._embedded.format")
+                                  .doesNotExist())
+        ;
     }
 }
