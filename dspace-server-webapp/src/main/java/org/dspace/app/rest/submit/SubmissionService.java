@@ -8,6 +8,7 @@
 package org.dspace.app.rest.submit;
 
 import java.io.IOException;
+
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,8 +24,9 @@ import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.BitstreamRest;
 import org.dspace.app.rest.model.CheckSumRest;
 import org.dspace.app.rest.model.MetadataValueRest;
-import org.dspace.app.rest.model.ResourcePolicyRest;
+import org.dspace.app.rest.model.UploadBitstreamAccessConditionDTO;
 import org.dspace.app.rest.model.WorkspaceItemRest;
+import org.dspace.app.rest.model.step.DataUpload;
 import org.dspace.app.rest.model.step.UploadBitstreamRest;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.utils.ContextUtil;
@@ -77,9 +79,11 @@ public class SubmissionService {
     private RequestService requestService;
     @Autowired
     private ConverterService converter;
+    @Autowired
+    private org.dspace.app.rest.utils.Utils utils;
 
     /**
-     * Create a workspaceitem using the information in the reqest
+     * Create a workspaceitem using the information in the request
      *
      * @param context
      *            the dspace context
@@ -133,7 +137,17 @@ public class SubmissionService {
         }
     }
 
-
+/**
+ * Build the rest representation of a bitstream as used in the upload section
+ * ({@link DataUpload}. It contains all its metadata and the list of applied
+ * access conditions (@link {@link UploadBitstreamAccessConditionDTO}
+ * 
+ * @param configurationService the DSpace ConfigurationService
+ * @param source               the bitstream to translate in its rest submission
+ *                             representation
+ * @return
+ * @throws SQLException
+ */
     public UploadBitstreamRest buildUploadBitstream(ConfigurationService configurationService, Bitstream source)
         throws SQLException {
         UploadBitstreamRest data = new UploadBitstreamRest();
@@ -162,14 +176,14 @@ public class SubmissionService {
             }
 
         }
-
+        Projection projection = utils.obtainProjection();
         HttpServletRequest request = requestService.getCurrentRequest().getHttpServletRequest();
-        data.setFormat(converter.toRest(source.getFormat(ContextUtil.obtainContext(request)), Projection.DEFAULT));
+        data.setFormat(converter.toRest(source.getFormat(ContextUtil.obtainContext(request)), projection));
 
         for (ResourcePolicy rp : source.getResourcePolicies()) {
             if (ResourcePolicy.TYPE_CUSTOM.equals(rp.getRpType())) {
-                ResourcePolicyRest resourcePolicyRest = converter.toRest(rp, Projection.DEFAULT);
-                data.getAccessConditions().add(resourcePolicyRest);
+                UploadBitstreamAccessConditionDTO uploadAccessCondition = createAccessConditionFromResourcePolicy(rp);
+                data.getAccessConditions().add(uploadAccessCondition);
             }
         }
 
@@ -185,7 +199,7 @@ public class SubmissionService {
     }
 
     /**
-     * Create a workflowitem using the information in the reqest
+     * Create a workflowitem using the information in the request
      *
      * @param context
      *            the dspace context
@@ -219,7 +233,7 @@ public class SubmissionService {
         if (wsi == null) {
             throw new UnprocessableEntityException("Workspace item is not found");
         }
-        WorkspaceItemRest wsiRest = converter.toRest(wsi, Projection.DEFAULT);
+        WorkspaceItemRest wsiRest = converter.toRest(wsi, utils.obtainProjection());
         if (!wsiRest.getErrors().isEmpty()) {
             throw new UnprocessableEntityException(
                     "Start workflow failed due to validation error on workspaceitem");
@@ -233,6 +247,23 @@ public class SubmissionService {
         }
 
         return wi;
+    }
+
+    private UploadBitstreamAccessConditionDTO createAccessConditionFromResourcePolicy(ResourcePolicy rp) {
+        UploadBitstreamAccessConditionDTO accessCondition = new UploadBitstreamAccessConditionDTO();
+
+        accessCondition.setId(rp.getID());
+        accessCondition.setName(rp.getRpName());
+        accessCondition.setDescription(rp.getRpDescription());
+        accessCondition.setStartDate(rp.getStartDate());
+        accessCondition.setEndDate(rp.getEndDate());
+        if (rp.getGroup() != null) {
+            accessCondition.setGroupUUID(rp.getGroup().getID());
+        }
+        if (rp.getEPerson() != null) {
+            accessCondition.setEpersonUUID(rp.getEPerson().getID());
+        }
+        return accessCondition;
     }
 
     public void saveWorkflowItem(Context context, XmlWorkflowItem source) throws SQLException, AuthorizeException {

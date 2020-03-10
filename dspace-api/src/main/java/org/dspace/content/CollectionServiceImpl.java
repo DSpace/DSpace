@@ -367,7 +367,7 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
 
     @Override
     public void setWorkflowGroup(Context context, Collection collection, int step, Group group)
-        throws SQLException, AuthorizeException {
+        throws SQLException {
         Workflow workflow = null;
         try {
             workflow = workflowFactory.getWorkflow(collection);

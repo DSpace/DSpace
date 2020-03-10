@@ -8,6 +8,8 @@
 package org.dspace.xmlworkflow.state.actions.userassignment;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import org.dspace.core.Context;
@@ -35,6 +37,11 @@ public class InheritUsersAction extends UserSelectionAction {
     @Override
     public ActionResult execute(Context c, XmlWorkflowItem wfi, Step step, HttpServletRequest request) {
         return new ActionResult(ActionResult.TYPE.TYPE_OUTCOME, ActionResult.OUTCOME_COMPLETE);
+    }
+
+    @Override
+    public List<String> getOptions() {
+        return new ArrayList<>();
     }
 
     @Override
