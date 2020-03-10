@@ -14,29 +14,32 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.spy;
 
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
 
-import mockit.NonStrictExpectations;
 import org.apache.logging.log4j.Logger;
 import org.dspace.AbstractUnitTest;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.Constants;
-import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.test.util.ReflectionTestUtils;
 
 /**
  * Unit Tests for class WorkspaceItem
@@ -64,6 +67,12 @@ public class WorkspaceItemTest extends AbstractUnitTest {
     protected WorkspaceItemService workspaceItemService = ContentServiceFactory.getInstance().getWorkspaceItemService();
 
     /**
+     * Spy of AuthorizeService to use for tests
+     * (initialized / setup in @Before method)
+     */
+    private AuthorizeService authorizeServiceSpy;
+
+    /**
      * This method will be run before every test as per @Before. It will
      * initialize resources required for the tests.
      *
@@ -75,13 +84,22 @@ public class WorkspaceItemTest extends AbstractUnitTest {
     public void init() {
         super.init();
         try {
-            //we have to create a new community in the database
+            //we have to create a new community/collection/workspaceitem in the database
             context.turnOffAuthorisationSystem();
             this.owningCommunity = communityService.create(null, context);
             this.collection = collectionService.create(context, owningCommunity);
             this.wi = workspaceItemService.create(context, collection, true);
             //we need to commit the changes so we don't block the table for testing
             context.restoreAuthSystemState();
+
+            // Initialize our spy of the autowired (global) authorizeService bean.
+            // This allows us to customize the bean's method return values in tests below
+            authorizeServiceSpy = spy(authorizeService);
+            // "Wire" our spy to be used by the current loaded object services
+            // (To ensure these services use the spy instead of the real service)
+            ReflectionTestUtils.setField(workspaceItemService, "authorizeService", authorizeServiceSpy);
+            ReflectionTestUtils.setField(collectionService, "authorizeService", authorizeServiceSpy);
+            ReflectionTestUtils.setField(communityService, "authorizeService", authorizeServiceSpy);
         } catch (AuthorizeException ex) {
             log.error("Authorization Error in init", ex);
             fail("Authorization Error in init: " + ex.getMessage());
@@ -139,15 +157,11 @@ public class WorkspaceItemTest extends AbstractUnitTest {
      */
     @Test
     public void testCreateAuth() throws Exception {
-        new NonStrictExpectations(authorizeService.getClass()) {{
-            // Allow Collection ADD perms
-            authorizeService.authorizeAction((Context) any, (Collection) any,
-                                             Constants.ADD);
-            result = null;
-        }};
+        // Allow Collection ADD perms
+        doNothing().when(authorizeServiceSpy).authorizeAction(context, collection, Constants.ADD);
 
-        boolean template = false;
-        WorkspaceItem created = null;
+        boolean template;
+        WorkspaceItem created;
 
         template = false;
         created = workspaceItemService.create(context, collection, template);
@@ -167,18 +181,7 @@ public class WorkspaceItemTest extends AbstractUnitTest {
      */
     @Test(expected = AuthorizeException.class)
     public void testCreateNoAuth() throws Exception {
-        new NonStrictExpectations(authorizeService.getClass()) {{
-            // Disallow Collection ADD perms
-            authorizeService.authorizeAction((Context) any, (Collection) any,
-                                             Constants.ADD);
-            result = new AuthorizeException();
-        }};
-
-        boolean template = false;
-        WorkspaceItem created = null;
-
-        template = false;
-        created = workspaceItemService.create(context, collection, template);
+        workspaceItemService.create(context, collection, false);
         fail("Exception expected");
     }
 
@@ -281,18 +284,13 @@ public class WorkspaceItemTest extends AbstractUnitTest {
     @Test
     public void testUpdateAuth() throws Exception {
         // no need to mockup the authorization as we are the same user that have
-        // created the wi
+        // created the workspaceitem (who has full perms by default)
         boolean pBefore = wi.isPublishedBefore();
         wi.setPublishedBefore(!pBefore);
         workspaceItemService.update(context, wi);
-        context.commit();
-        // force to read the data from the database
-        context.uncacheEntity(wi);
-        // read all our test attributes objects from the fresh session
-        // to avoid duplicate object in session issue
+
+        // Reload our WorkspaceItem
         wi = workspaceItemService.find(context, wi.getID());
-        collection = wi.getCollection();
-        owningCommunity = collection.getCommunities().get(0);
         assertTrue("testUpdate", pBefore != wi.isPublishedBefore());
     }
 
@@ -301,18 +299,29 @@ public class WorkspaceItemTest extends AbstractUnitTest {
      */
     @Test(expected = AuthorizeException.class)
     public void testUpdateNoAuth() throws Exception {
-        new NonStrictExpectations(authorizeService.getClass()) {{
-            // Remove Item WRITE perms
-            authorizeService.authorizeActionBoolean((Context) any, (Item) any,
-                                                    Constants.WRITE);
-            result = false;
-            authorizeService.authorizeAction((Context) any, (Item) any,
-                                             Constants.WRITE);
-            result = new AuthorizeException();
-        }};
-        boolean pBefore = wi.isPublishedBefore();
-        wi.setPublishedBefore(!pBefore);
-        workspaceItemService.update(context, wi);
+        // Create a new Eperson to be the current user
+        context.turnOffAuthorisationSystem();
+        EPerson eperson = ePersonService.create(context);
+        eperson.setEmail("jane@smith.org");
+        eperson.setFirstName(context, "Jane");
+        eperson.setLastName(context, "Smith");
+        ePersonService.update(context, eperson);
+
+        // Update our session to be logged in as new users
+        EPerson currentUser = context.getCurrentUser();
+        context.setCurrentUser(eperson);
+        context.restoreAuthSystemState();
+
+        // Try and update the workspace item. A different EPerson should have no rights
+        try {
+            boolean pBefore = wi.isPublishedBefore();
+            wi.setPublishedBefore(!pBefore);
+            workspaceItemService.update(context, wi);
+        } finally {
+            // Restore the current user
+            context.setCurrentUser(currentUser);
+        }
+
         fail("Exception expected");
     }
 
@@ -351,12 +360,8 @@ public class WorkspaceItemTest extends AbstractUnitTest {
      */
     @Test
     public void testDeleteWrapperAuth() throws Exception {
-        new NonStrictExpectations(authorizeService.getClass()) {{
-            // Allow Item WRITE perms
-            authorizeService.authorizeAction((Context) any, (Item) any,
-                                             Constants.WRITE);
-            result = null;
-        }};
+        // Allow Item WRITE perms
+        doNothing().when(authorizeServiceSpy).authorizeAction(context, wi.getItem(), Constants.WRITE);
 
         UUID itemid = wi.getItem().getID();
         int id = wi.getID();
@@ -372,13 +377,9 @@ public class WorkspaceItemTest extends AbstractUnitTest {
      */
     @Test(expected = AuthorizeException.class)
     public void testDeleteWrapperNoAuth() throws Exception {
-        new NonStrictExpectations(authorizeService.getClass()) {{
-            // Disallow Item WRITE perms
-            authorizeService.authorizeAction((Context) any, (Item) any,
-                                             Constants.WRITE);
-            result = new AuthorizeException();
-        }};
-
+        // Disallow Item WRITE perms
+        doThrow(new AuthorizeException()).when(authorizeServiceSpy)
+                                         .authorizeAction(context, wi.getItem(), Constants.WRITE);
         workspaceItemService.deleteWrapper(context, wi);
         fail("Exception expected");
     }

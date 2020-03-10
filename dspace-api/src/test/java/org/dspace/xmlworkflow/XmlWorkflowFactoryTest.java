@@ -25,6 +25,7 @@ import org.dspace.utils.DSpace;
 import org.dspace.xmlworkflow.factory.XmlWorkflowFactory;
 import org.dspace.xmlworkflow.state.Workflow;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -42,6 +43,8 @@ public class XmlWorkflowFactoryTest extends AbstractUnitTest {
             = new DSpace().getServiceManager().getServiceByName("xmlWorkflowFactory",
             XmlWorkflowFactoryImpl.class);
     private Community owningCommunity;
+    private Collection mappedCollection;
+    private Collection nonMappedCollection;
 
     /**
      * log4j category
@@ -63,6 +66,9 @@ public class XmlWorkflowFactoryTest extends AbstractUnitTest {
             //we have to create a new community in the database
             context.turnOffAuthorisationSystem();
             this.owningCommunity = communityService.create(null, context);
+            this.mappedCollection =
+                    this.collectionService.create(context, owningCommunity, "123456789/workflow-test-1");
+            this.nonMappedCollection = this.collectionService.create(context, owningCommunity, "123456789/999");
             //we need to commit the changes so we don't block the table for testing
             context.restoreAuthSystemState();
         } catch (SQLException e) {
@@ -74,38 +80,46 @@ public class XmlWorkflowFactoryTest extends AbstractUnitTest {
         }
     }
 
+    /**
+     * This method will be run after every test as per @After. It will
+     * clean resources initialized by the @Before methods.
+     *
+     * Other methods can be annotated with @After here or in subclasses
+     * but no execution order is guaranteed
+     */
+    @After
+    @Override
+    public void destroy() {
+        context.turnOffAuthorisationSystem();
+
+        try {
+            this.collectionService.delete(context, this.nonMappedCollection);
+            this.collectionService.delete(context, this.mappedCollection);
+            this.communityService.delete(context, this.owningCommunity);
+        } catch (Exception e) {
+            log.error("Error in destroy", e);
+        }
+
+        context.restoreAuthSystemState();
+        this.owningCommunity = null;
+        this.nonMappedCollection = null;
+        this.mappedCollection = null;
+        try {
+            super.destroy();
+        } catch (Exception e) {
+            log.error("Error in destroy", e);
+        }
+    }
+
     @Test
     public void workflowMapping_NonMappedCollection() throws WorkflowConfigurationException {
-        Collection collection = this.findOrCreateCollectionWithHandle("123456789/6");
-        Workflow workflow = xmlWorkflowFactory.getWorkflow(collection);
+        Workflow workflow = xmlWorkflowFactory.getWorkflow(this.nonMappedCollection);
         assertEquals(workflow.getID(), "defaultWorkflow");
     }
 
     @Test
     public void workflowMapping_MappedCollection() throws WorkflowConfigurationException {
-        Collection collection = this.findOrCreateCollectionWithHandle("123456789/1000000");
-        Workflow workflow = xmlWorkflowFactory.getWorkflow(collection);
+        Workflow workflow = xmlWorkflowFactory.getWorkflow(this.mappedCollection);
         assertEquals(workflow.getID(), "selectSingleReviewer");
-    }
-
-    private Collection findOrCreateCollectionWithHandle(String handle) {
-        try {
-            context.turnOffAuthorisationSystem();
-            for (Collection collection : this.collectionService.findAll(context)) {
-                if (collection.getHandle().equalsIgnoreCase(handle)) {
-                    return collection;
-                }
-            }
-            Collection collection = this.collectionService.create(context, owningCommunity, handle);
-            context.restoreAuthSystemState();
-            return collection;
-        } catch (SQLException e) {
-            log.error("SQL Error in findOrCreateCollectionWithHandle", e);
-            fail("SQL Error in findOrCreateCollectionWithHandle: " + e.getMessage());
-        } catch (AuthorizeException e) {
-            log.error("Authorization Error in findOrCreateCollectionWithHandle", e);
-            fail("Authorization Error in findOrCreateCollectionWithHandle: " + e.getMessage());
-        }
-        return null;
     }
 }

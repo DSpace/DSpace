@@ -14,6 +14,7 @@ import static org.mockito.Mockito.when;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.google.common.base.Splitter;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.service.ItemService;
@@ -22,7 +23,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 public class CollectedTest {
@@ -85,18 +86,15 @@ public class CollectedTest {
         metadataValueList.add(metadataValue);
         String s = "dc.title";
         list.add(s);
-        String[] splittedString = s.split("\\.");
+        List<String> splittedString = Splitter.on('.').splitToList(s);
         collected.setFields(list);
         valueList.add("TestValue");
 
         // Mock the state of objects utilized in getValues() to meet the success criteria of an invocation
-        when(itemService.getMetadata(item, splittedString.length > 0 ? splittedString[0] :
-                        null,
-                splittedString.length > 1 ? splittedString[1] :
-                        null,
-                splittedString.length > 2 ? splittedString[2] :
-                        null,
-                Item.ANY, false)).thenReturn(metadataValueList);
+        when(itemService.getMetadata(item, splittedString.size() > 0 ? splittedString.get(0) : null,
+                                     splittedString.size() > 1 ? splittedString.get(1) : null,
+                                     splittedString.size() > 2 ? splittedString.get(2) : null,
+                                     Item.ANY, false)).thenReturn(metadataValueList);
         when(metadataValue.getValue()).thenReturn("TestValue");
 
         // The reported value(s) should match our valueList
