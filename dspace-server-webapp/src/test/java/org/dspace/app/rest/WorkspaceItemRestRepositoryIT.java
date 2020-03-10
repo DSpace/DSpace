@@ -8,6 +8,7 @@
 package org.dspace.app.rest;
 
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.data.rest.webmvc.RestMediaTypes.TEXT_URI_LIST_VALUE;
 import static org.springframework.http.MediaType.parseMediaType;
@@ -36,6 +37,7 @@ import org.dspace.app.rest.builder.BitstreamBuilder;
 import org.dspace.app.rest.builder.CollectionBuilder;
 import org.dspace.app.rest.builder.CommunityBuilder;
 import org.dspace.app.rest.builder.EPersonBuilder;
+import org.dspace.app.rest.builder.GroupBuilder;
 import org.dspace.app.rest.builder.WorkspaceItemBuilder;
 import org.dspace.app.rest.matcher.CollectionMatcher;
 import org.dspace.app.rest.matcher.ItemMatcher;
@@ -52,6 +54,8 @@ import org.dspace.content.Community;
 import org.dspace.content.Item;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.eperson.EPerson;
+import org.dspace.eperson.Group;
+import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.hamcrest.Matchers;
@@ -71,14 +75,34 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
     @Autowired
     private ConfigurationService configurationService;
 
+    private Group embargoedGroups;
+    private Group embargoedGroup1;
+    private Group embargoedGroup2;
+    private Group anonymousGroup;
+
     @Before
     @Override
     public void setUp() throws Exception {
-
         super.setUp();
+        context.turnOffAuthorisationSystem();
 
-        //disable file upload mandatory
-        configurationService.setProperty("webui.submit.upload.required", false);
+        embargoedGroups = GroupBuilder.createGroup(context)
+                .withName("Embargoed Groups")
+                .build();
+
+        embargoedGroup1 = GroupBuilder.createGroup(context)
+                .withName("Embargoed Group 1")
+                .withParent(embargoedGroups)
+                .build();
+
+        embargoedGroup2 = GroupBuilder.createGroup(context)
+                .withName("Embargoed Group 2")
+                .withParent(embargoedGroups)
+                .build();
+
+        anonymousGroup = EPersonServiceFactory.getInstance().getGroupService().findByName(context, Group.ANONYMOUS);
+
+        context.restoreAuthSystemState();
     }
 
     @Test
@@ -261,8 +285,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
 
         String token = getAuthToken(admin.getEmail(), password);
 
-        getClient(token).perform(get("/api/submission/workspaceitems/" + witem.getID() + "/collection")
-                .param("projection", "full"))
+        getClient(token).perform(get("/api/submission/workspaceitems/" + witem.getID() + "/collection"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", Matchers
                         .is(CollectionMatcher.matchCollectionEntry(col1.getName(), col1.getID(), col1.getHandle()))
@@ -470,14 +493,14 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
         String authToken = getAuthToken(admin.getEmail(), password);
 
-        // create a workspaceitem explicitly in the col1
+        // create a workspaceitem explicitly in the colAA1
         getClient(authToken).perform(post("/api/submission/workspaceitems")
                     .param("owningCollection", col1.getID().toString())
                     .contentType(org.springframework.http.MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$._embedded.collection.id", is(col1.getID().toString())));
 
-        // create a workspaceitem explicitly in the col2
+        // create a workspaceitem explicitly in the colAA2
         getClient(authToken).perform(post("/api/submission/workspaceitems")
                     .param("owningCollection", col2.getID().toString())
                     .contentType(org.springframework.http.MediaType.APPLICATION_JSON))
@@ -486,10 +509,11 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
 
         // create a workspaceitem without an explicit collection, this will go in the first valid collection for the
         // user: the col1
-        getClient(authToken).perform(post("/api/submission/workspaceitems")
-        .contentType(org.springframework.http.MediaType.APPLICATION_JSON))
+        getClient(authToken).perform(post("/api/submission/workspaceitems").param("projection", "full")
+                .contentType(org.springframework.http.MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$._embedded.collection.id", is(col1.getID().toString())));
+                .andExpect(jsonPath("$._embedded.collection.id", is(col1.getID().toString())))
+                .andExpect(jsonPath("$", WorkspaceItemMatcher.matchFullEmbeds()));
 
         // TODO cleanup the context!!!
     }
@@ -520,7 +544,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         final MockMultipartFile bibtexFile = new MockMultipartFile("file", "bibtex-test.bib", "application/x-bibtex",
                 bibtex);
 
-        // bulk create workspaceitems in the default collection (col1)
+        // bulk create workspaceitems in the default collection (colAA1)
         getClient(authToken).perform(fileUpload("/api/submission/workspaceitems")
                     .file(bibtexFile))
                 // bulk create should return 200, 201 (created) is better for single resource
@@ -541,7 +565,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                         jsonPath("$._embedded.workspaceitems[*]._embedded.upload").doesNotExist())
         ;
 
-        // bulk create workspaceitems explicitly in the col2
+        // bulk create workspaceitems explicitly in the colAA2
         getClient(authToken).perform(fileUpload("/api/submission/workspaceitems")
                     .file(bibtexFile)
                     .param("collection", col2.getID().toString()))
@@ -647,6 +671,9 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                 .withIssueDate("2017-10-17")
                 .build();
 
+        //disable file upload mandatory
+        configurationService.setProperty("webui.submit.upload.required", false);
+
         getClient(authToken).perform(get("/api/submission/workspaceitems/" + workspaceItem1.getID()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.errors").doesNotExist())
@@ -665,7 +692,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                                 )))))
         ;
 
-        // create an empty workspaceitem explicitly in the col1, check validation on creation
+        // create an empty workspaceitem explicitly in the colAA1, check validation on creation
         getClient(authToken).perform(post("/api/submission/workspaceitems")
                     .param("collection", col1.getID().toString())
                     .contentType(org.springframework.http.MediaType.APPLICATION_JSON))
@@ -1023,6 +1050,9 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                 .withSubject("ExtraEntry")
                 .build();
 
+        //disable file upload mandatory
+        configurationService.setProperty("webui.submit.upload.required", false);
+
         // a simple patch to update an existent metadata
         List<Operation> updateTitle = new ArrayList<Operation>();
         Map<String, String> value = new HashMap<String, String>();
@@ -1128,6 +1158,9 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                     Matchers.is(WorkspaceItemMatcher.matchItemWithTitleAndDateIssuedAndSubject(witem,
                             null, "2017-10-17", "ExtraEntry"))))
         ;
+
+        //disable file upload mandatory
+        configurationService.setProperty("webui.submit.upload.required", false);
 
         // try to remove a metadata in a specific position
         List<Operation> removeMidSubject = new ArrayList<Operation>();
@@ -1312,6 +1345,8 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                 .withSubject("ExtraEntry")
                 .build();
 
+        //disable file upload mandatory
+        configurationService.setProperty("webui.submit.upload.required", false);
 
         // try to add the title
         List<Operation> addTitle = new ArrayList<Operation>();
@@ -1368,6 +1403,9 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                 .withTitle("Test WorkspaceItem")
                 .withIssueDate("2017-10-17")
                 .build();
+
+        //disable file upload mandatory
+        configurationService.setProperty("webui.submit.upload.required", false);
 
         // try to add multiple subjects at once
         List<Operation> addSubjects = new ArrayList<Operation>();
@@ -1590,6 +1628,9 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
             .andExpect(jsonPath("$.sections.license.url").isEmpty())
         ;
 
+        //disable file upload mandatory
+        configurationService.setProperty("webui.submit.upload.required", false);
+
         // try to grant the license with an add operation
         List<Operation> addGrant = new ArrayList<Operation>();
         addGrant.add(new AddOperation("/sections/license/granted", true));
@@ -1738,6 +1779,9 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                 .withIssueDate("2017-10-17")
                 .grantLicense()
                 .build();
+
+        //disable file upload mandatory
+        configurationService.setProperty("webui.submit.upload.required", false);
 
         // check that our workspaceitems come with a license (all are build in the same way, just check the first)
         getClient().perform(get("/api/submission/workspaceitems/" + witem.getID()))
@@ -1982,6 +2026,147 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
     }
 
     @Test
+    public void patchUploadAddAccessConditionTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                .withName("Parent Community")
+                .build();
+
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                .withName("Sub Community")
+                .build();
+
+        Collection collection1 = CollectionBuilder.createCollection(context, child1)
+                .withName("Collection 1")
+                .build();
+
+        InputStream pdf = getClass().getResourceAsStream("simple-article.pdf");
+
+        WorkspaceItem witem = WorkspaceItemBuilder.createWorkspaceItem(context, collection1)
+                .withTitle("Test WorkspaceItem")
+                .withIssueDate("2019-10-01")
+                .withFulltext("simple-article.pdf", "/local/path/simple-article.pdf", pdf)
+                .build();
+
+        context.restoreAuthSystemState();
+
+        // create a list of values to use in add accessCondition
+        List<Operation> addAccessCondition = new ArrayList<Operation>();
+        Map<String, String> value = new HashMap<String, String>();
+        value.put("name", "embargoedWithGroupSelect");
+        value.put("groupUUID", embargoedGroup1.getID().toString());
+        value.put("endDate", "2030-10-02");
+        addAccessCondition.add(new AddOperation("/sections/upload/files/0/accessConditions/-", value));
+
+        String patchBody = getPatchContent(addAccessCondition);
+        String authToken = getAuthToken(admin.getEmail(), password);
+
+        getClient(authToken).perform(patch("/api/submission/workspaceitems/" + witem.getID())
+                .content(patchBody)
+                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                            .andExpect(status().isOk())
+                            .andExpect(jsonPath("$",Matchers.allOf(
+                                    hasJsonPath("$.sections.upload.files[0].accessConditions[0].name",
+                                             is("embargoedWithGroupSelect")),
+                                    hasJsonPath("$.sections.upload.files[0].accessConditions[0].groupUUID",
+                                             is(embargoedGroup1.getID().toString()))
+                                    )));
+
+        // verify that the patch changes have been persisted
+        getClient(authToken).perform(get("/api/submission/workspaceitems/" + witem.getID()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$",Matchers.allOf(
+                    hasJsonPath("$.sections.upload.files[0].accessConditions[0].name",
+                             is("embargoedWithGroupSelect")),
+                    hasJsonPath("$.sections.upload.files[0].accessConditions[0].groupUUID",
+                             is(embargoedGroup1.getID().toString()))
+                    )));
+    }
+
+    @Test
+    public void patchUploadRemoveAccessConditionTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                .withName("Parent Community")
+                .build();
+
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                .withName("Sub Community")
+                .build();
+
+        Collection collection1 = CollectionBuilder.createCollection(context, child1)
+                .withName("Collection 1")
+                .build();
+
+        InputStream pdf = getClass().getResourceAsStream("simple-article.pdf");
+
+        WorkspaceItem witem = WorkspaceItemBuilder.createWorkspaceItem(context, collection1)
+                .withTitle("Test WorkspaceItem")
+                .withIssueDate("2019-10-01")
+                .withFulltext("simple-article.pdf", "/local/path/simple-article.pdf", pdf)
+                .build();
+
+        context.restoreAuthSystemState();
+
+        // create a list of values to use in add operation
+        List<Operation> addAccessCondition = new ArrayList<Operation>();
+        Map<String, String> value = new HashMap<String, String>();
+        value.put("name", "embargoedWithGroupSelect");
+        value.put("groupUUID", embargoedGroup1.getID().toString());
+        value.put("endDate", "2020-01-01");
+        addAccessCondition.add(new AddOperation("/sections/upload/files/0/accessConditions/-", value));
+
+        String patchBody = getPatchContent(addAccessCondition);
+        String authToken = getAuthToken(admin.getEmail(), password);
+
+        getClient(authToken).perform(patch("/api/submission/workspaceitems/" + witem.getID())
+                .content(patchBody)
+                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$",Matchers.allOf(
+                        hasJsonPath("$.sections.upload.files[0].accessConditions[0].name",
+                                 is("embargoedWithGroupSelect")),
+                        hasJsonPath("$.sections.upload.files[0].accessConditions[0].endDate",
+                                is("2020-01-01")),
+                        hasJsonPath("$.sections.upload.files[0].accessConditions[0].groupUUID",
+                                 is(embargoedGroup1.getID().toString()))
+                        )));
+
+        // verify that the patch changes have been persisted
+        getClient(authToken).perform(get("/api/submission/workspaceitems/" + witem.getID()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$",Matchers.allOf(
+                    hasJsonPath("$.sections.upload.files[0].accessConditions[0].name",
+                             is("embargoedWithGroupSelect")),
+                    hasJsonPath("$.sections.upload.files[0].accessConditions[0].endDate",
+                            is("2020-01-01")),
+                    hasJsonPath("$.sections.upload.files[0].accessConditions[0].groupUUID",
+                             is(embargoedGroup1.getID().toString()))
+                    )));
+
+        // create a list of values to use in remove operation
+        List<Operation> removeAccessCondition = new ArrayList<Operation>();
+        removeAccessCondition.add(new RemoveOperation("/sections/upload/files/0/accessConditions"));
+
+        String patchReplaceBody = getPatchContent(removeAccessCondition);
+        getClient(authToken).perform(patch("/api/submission/workspaceitems/" + witem.getID())
+                .content(patchReplaceBody)
+                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$",Matchers.allOf(
+                            hasJsonPath("$.sections.upload.files[0].accessConditions",hasSize(0)))));
+
+        // verify that the patch changes have been persisted
+        getClient(authToken).perform(get("/api/submission/workspaceitems/" + witem.getID()))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$",Matchers.allOf(
+                hasJsonPath("$.sections.upload.files[0].accessConditions", hasSize(0))
+                )));
+    }
+
+    @Test
     /**
      * Test the upload of files in the upload over section
      *
@@ -2052,8 +2237,6 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
             .withIssueDate("2017-10-17")
             .build();
 
-        configurationService.setProperty("webui.submit.upload.required", true);
-
         InputStream pdf = getClass().getResourceAsStream("simple-article.pdf");
         final MockMultipartFile pdfFile = new MockMultipartFile("file", "/local/path/simple-article.pdf",
             "application/pdf", pdf);
@@ -2094,8 +2277,6 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
             .withTitle("Test WorkspaceItem")
             .withIssueDate("2017-10-17")
             .build();
-
-        configurationService.setProperty("webui.submit.upload.required", true);
 
         //Verify there is an error since no file was uploaded (with upload required set to true)
         getClient(authToken).perform(get("/api/submission/workspaceitems/" + witem.getID()))

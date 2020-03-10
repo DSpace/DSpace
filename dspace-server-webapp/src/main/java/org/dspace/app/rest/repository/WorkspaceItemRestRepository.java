@@ -33,7 +33,6 @@ import org.dspace.app.rest.model.ErrorRest;
 import org.dspace.app.rest.model.WorkspaceItemRest;
 import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.rest.model.patch.Patch;
-import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.repository.handler.service.UriListHandlerService;
 import org.dspace.app.rest.submit.AbstractRestProcessingStep;
 import org.dspace.app.rest.submit.SubmissionService;
@@ -201,7 +200,7 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
             source = submissionService.createWorkspaceItem(context, getRequestService().getCurrentRequest());
         }
 
-        return converter.toRest(source, converter.getProjection("full"));
+        return converter.toRest(source, utils.obtainProjection());
     }
 
     @Override
@@ -288,7 +287,7 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
             }
 
         }
-        wsi = converter.toRest(source, Projection.DEFAULT);
+        wsi = converter.toRest(source, utils.obtainProjection());
 
         if (!errors.isEmpty()) {
             wsi.getErrors().addAll(errors);
@@ -507,7 +506,7 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
                             }
                         }
                     }
-                    WorkspaceItemRest wsi = converter.toRest(wi, Projection.DEFAULT);
+                    WorkspaceItemRest wsi = converter.toRest(wi, utils.obtainProjection());
                     if (result.size() == 1) {
                         if (!errors.isEmpty()) {
                             wsi.getErrors().addAll(errors);
@@ -528,7 +527,7 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
 
         HttpServletRequest req = getRequestService().getCurrentRequest().getHttpServletRequest();
         WorkspaceItem workspaceItem = uriListHandlerService.handle(context, req, stringList, WorkspaceItem.class);
-        return converter.toRest(workspaceItem, Projection.DEFAULT);
+        return converter.toRest(workspaceItem, utils.obtainProjection());
     }
 
 

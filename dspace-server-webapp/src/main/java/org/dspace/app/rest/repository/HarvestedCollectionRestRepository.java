@@ -21,7 +21,6 @@ import org.dspace.app.rest.converter.HarvestedCollectionConverter;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.HarvestTypeEnum;
 import org.dspace.app.rest.model.HarvestedCollectionRest;
-import org.dspace.app.rest.projection.Projection;
 import org.dspace.content.Collection;
 import org.dspace.core.Context;
 import org.dspace.harvest.HarvestedCollection;
@@ -91,7 +90,7 @@ public class HarvestedCollectionRestRepository extends AbstractDSpaceRestReposit
                 List<Map<String,String>> configs = OAIHarvester.getAvailableMetadataFormats();
 
                 return harvestedCollectionConverter.fromModel(harvestedCollection, collection, configs,
-                        Projection.DEFAULT);
+                        utils.obtainProjection());
             } else {
                 throw new UnprocessableEntityException(
                     "Incorrect harvest settings in request. The following errors were found: " + errors.toString()

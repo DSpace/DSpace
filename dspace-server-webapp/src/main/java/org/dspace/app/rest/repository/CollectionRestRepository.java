@@ -27,7 +27,6 @@ import org.dspace.app.rest.model.CommunityRest;
 import org.dspace.app.rest.model.TemplateItemRest;
 import org.dspace.app.rest.model.patch.Patch;
 import org.dspace.app.rest.model.wrapper.TemplateItem;
-import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.utils.CollectionRestEqualityUtils;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
@@ -181,7 +180,7 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
         } catch (SQLException e) {
             throw new RuntimeException("Unable to create new Collection under parent Community " + id, e);
         }
-        return converter.toRest(collection, Projection.DEFAULT);
+        return converter.toRest(collection, utils.obtainProjection());
     }
 
 
@@ -200,7 +199,7 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
         if (collection == null) {
             throw new ResourceNotFoundException(apiCategory + "." + model + " with id: " + id + " not found");
         }
-        CollectionRest originalCollectionRest = converter.toRest(collection, Projection.DEFAULT);
+        CollectionRest originalCollectionRest = converter.toRest(collection, utils.obtainProjection());
         if (collectionRestEqualityUtils.isCollectionRestEqualWithoutMetadata(originalCollectionRest, collectionRest)) {
             metadataConverter.setMetadata(context, collection, collectionRest.getMetadata());
         } else {
@@ -208,7 +207,7 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
                 + id + ", "
                 + collectionRest.getId());
         }
-        return converter.toRest(collection, Projection.DEFAULT);
+        return converter.toRest(collection, utils.obtainProjection());
     }
 
     @Override
@@ -250,7 +249,7 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
         Bitstream bitstream = cs.setLogo(context, collection, uploadfile.getInputStream());
         cs.update(context, collection);
         bitstreamService.update(context, bitstream);
-        return converter.toRest(context.reloadEntity(bitstream), Projection.DEFAULT);
+        return converter.toRest(context.reloadEntity(bitstream), utils.obtainProjection());
     }
 
     /**
@@ -277,7 +276,7 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
         cs.update(context, collection);
         itemService.update(context, item);
 
-        return converter.toRest(new TemplateItem(item), Projection.DEFAULT);
+        return converter.toRest(new TemplateItem(item), utils.obtainProjection());
     }
 
     /**
@@ -296,7 +295,7 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
         }
 
         try {
-            return converter.toRest(new TemplateItem(item), Projection.DEFAULT);
+            return converter.toRest(new TemplateItem(item), utils.obtainProjection());
         } catch (IllegalArgumentException e) {
             throw new UnprocessableEntityException("The item with id " + item.getID() + " is not a template item");
         }
