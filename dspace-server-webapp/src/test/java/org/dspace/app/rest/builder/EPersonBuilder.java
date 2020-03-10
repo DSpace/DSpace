@@ -119,7 +119,7 @@ public class EPersonBuilder extends AbstractDSpaceObjectBuilder<EPerson> {
                     ePersonService.delete(c, ePerson);
                 } catch (AuthorizeException e) {
                     // cannot occur, just wrap it to make the compiler happy
-                    throw new RuntimeException(e.getMessage(), e);
+                    throw new RuntimeException(e);
                 }
             }
             c.complete();
