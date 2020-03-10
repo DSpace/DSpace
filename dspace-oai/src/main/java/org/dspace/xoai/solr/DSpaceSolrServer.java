@@ -30,12 +30,12 @@ public class DSpaceSolrServer {
 
     public static SolrClient getServer() throws SolrServerException {
         if (_server == null) {
+            String serverUrl = ConfigurationManager.getProperty("oai.solr.url");
             try {
-                _server = new HttpSolrClient.Builder(
-                    ConfigurationManager.getProperty("oai", "solr.url")).build();
-                log.debug("Solr Server Initialized");
+                _server = new HttpSolrClient.Builder(serverUrl).build();
+                log.debug("OAI Solr Server Initialized");
             } catch (Exception e) {
-                log.error(e.getMessage(), e);
+                log.error("Could not initialize OAI Solr Server at " + serverUrl , e);
             }
         }
         return _server;

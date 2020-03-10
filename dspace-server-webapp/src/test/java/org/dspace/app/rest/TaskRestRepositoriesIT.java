@@ -1439,7 +1439,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
                                            .withName("Sub Community")
                                            .build();
 
-        // the reviewer2 is a reviewer in a different step for the col1 and with the same role than reviewer1 for
+        // the reviewer2 is a reviewer in a different step for the colAA1 and with the same role than reviewer1 for
         // another collection
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1")
                 .withWorkflowGroup(1, reviewer1)
@@ -1613,7 +1613,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
                                            .withName("Sub Community")
                                            .build();
 
-        // the reviewer2 is a reviewer in a different step for the col1 and with the same role than reviewer1 for
+        // the reviewer2 is a reviewer in a different step for the colAA1 and with the same role than reviewer1 for
         // another collection
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1")
                 .withWorkflowGroup(1, reviewer1)
