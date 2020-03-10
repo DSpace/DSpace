@@ -11,11 +11,17 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import gr.ekt.bte.core.Record;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpException;
 import org.apache.http.HttpResponse;
@@ -34,10 +40,6 @@ import org.dspace.app.util.XMLUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
-
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class EPOService {
     private static Logger log = Logger.getLogger(EPOService.class);
@@ -70,17 +72,18 @@ public class EPOService {
 
                 start = end + 1;
                 end = end + SIZE;
-                if (ids.size() > 0)
+                if (ids.size() > 0) {
                     epoDocIds.addAll(ids);
+                }
 
-                if (ids.size() < SIZE)
+                if (ids.size() < SIZE) {
                     break;
+                }
             }
 
-            
             for (EPODocumentId epoDocId : epoDocIds) {
                 List<Record> recordfounds = searchDocument(bearer, epoDocId);
-                
+
                 if (recordfounds.size() > 1) {
                     log.warn("More record are returned with epocID " + epoDocId.toString());
                 }
@@ -151,8 +154,9 @@ public class EPOService {
             HttpClient client = HttpClientBuilder.create().build();
             HttpGet method = new HttpGet(endPointPublisherDataSearchService);
             method.setHeader("Authorization", "Bearer " + bearer);
-            if (start >= 1 && end > start)
+            if (start >= 1 && end > start) {
                 method.setHeader("X-OPS-Range", start + "-" + end);
+            }
 
             URI uri = new URIBuilder(method.getURI()).addParameter("q", query).build();
             ((HttpRequestBase) method).setURI(uri);
@@ -167,7 +171,7 @@ public class EPOService {
             DocumentBuilder builder = factory.newDocumentBuilder();
             Document inDoc = builder.parse(httpResponse.getEntity().getContent());
             inDoc.getDocumentElement().normalize();
-            
+
             Element xmlRoot = inDoc.getDocumentElement();
             Element biblio = XMLUtils.getSingleElement(xmlRoot, "ops:biblio-search");
             String totalRes = biblio.getAttribute("total-result-count");
@@ -218,11 +222,11 @@ public class EPOService {
             DocumentBuilder builder = factory.newDocumentBuilder();
             Document inDoc = builder.parse(httpResponse.getEntity().getContent());
             inDoc.getDocumentElement().normalize();
-            
+
             Element xmlRoot = inDoc.getDocumentElement();
             Element exchangeDocs = XMLUtils.getSingleElement(xmlRoot, "exchange-documents");
             Element exchangeDoc = XMLUtils.getSingleElement(exchangeDocs, "exchange-document");
-            
+
             results.add(EPOUtils.convertBibliographicData(exchangeDoc, formats));
         } catch (ParserConfigurationException e) {
             log.error(e.getMessage(), e);

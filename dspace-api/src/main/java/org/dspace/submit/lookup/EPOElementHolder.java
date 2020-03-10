@@ -78,8 +78,9 @@ public class EPOElementHolder {
             String filterSelector) {
         this.formats = formats;
         for (Element element : elements) {
-            if (StringUtils.isEmpty(filterValue) || filterValue.equals(element.getAttribute(filterSelector)))
+            if (StringUtils.isEmpty(filterValue) || filterValue.equals(element.getAttribute(filterSelector))) {
                 add(new ElementHolder(element, dataFormatSelector));
+            }
         }
     }
 
@@ -95,8 +96,9 @@ public class EPOElementHolder {
      */
     public Element get() {
         for (String key : formats) {
-            if (holder.containsKey(key))
+            if (holder.containsKey(key)) {
                 return holder.get(key).getElement();
+            }
         }
 
         return null;

@@ -7,11 +7,11 @@
  */
 package org.dspace.submit.lookup;
 
+import java.util.List;
+
 import gr.ekt.bte.core.MutableRecord;
 import gr.ekt.bte.core.Record;
 import gr.ekt.bte.core.StringValue;
-
-import java.util.List;
 
 import org.dspace.app.util.XMLUtils;
 import org.dspace.submit.util.SubmissionLookupPublication;
@@ -38,7 +38,7 @@ public final class EPOUtils {
         List<Element> documentIds = XMLUtils.getElementList(pubblicationRef, "document-id");
         EPOElementHolder holder = new EPOElementHolder(formats, documentIds, "document-id-type");
         Element documentId = holder.get();
-        
+
         EPODocumentId epoDocumentId = new EPODocumentId(documentId);
         return epoDocumentId;
     }

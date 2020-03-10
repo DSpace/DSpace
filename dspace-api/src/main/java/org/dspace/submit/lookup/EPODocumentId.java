@@ -15,7 +15,7 @@ import org.w3c.dom.Element;
  * 
  * Format supported "docdb" and "epodoc".
  * 
- * {@code 
+ * {@code
  * <document-id document-id-type="docdb">
  *  <country>AT</country>
  *  <doc-number>232441</doc-number>

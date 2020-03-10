@@ -321,7 +321,7 @@ You can leave out the day and/or month if they aren't applicable.</hint>
          <dc-element>contributor</dc-element>
          <dc-qualifier>author</dc-qualifier>
          <label>Inventor(s)</label>
-         <input-type>group</input-type>
+         <input-type>name</input-type>
          <repeatable>true</repeatable>
          <required />
          <hint>The inventor: The actual devisor of an invention that is the subject of a patent.</hint>

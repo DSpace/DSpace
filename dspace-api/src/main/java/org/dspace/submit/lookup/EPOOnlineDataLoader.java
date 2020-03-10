@@ -91,7 +91,7 @@ public class EPOOnlineDataLoader extends NetworkSubmissionLookupDataLoader {
 
         if (query.length() > 0) {
             List<Record> records = epoService.search(query, getConsumerKey(), getConsumerSecretKey());
-            
+
             for (Record record : records) {
                 results.add(convertFields(record));
             }
