@@ -23,6 +23,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.stereotype.Component;
 
+/**
+ * Link repository for the Steps subresources for an individual ClaimedTask
+ */
 @Component(ClaimedTaskRest.CATEGORY + "." + ClaimedTaskRest.NAME + "." + ClaimedTaskRest.STEP)
 public class ClaimedTaskStepLinkRepository extends AbstractDSpaceRestRepository implements LinkRestRepository {
 
@@ -32,6 +35,15 @@ public class ClaimedTaskStepLinkRepository extends AbstractDSpaceRestRepository 
     @Autowired
     private XmlWorkflowFactory xmlWorkflowFactory;
 
+    /**
+     * This method will retrieve the {@link WorkflowStepRest} object for the {@link ClaimedTask} with the given id
+     * @param request           The current request
+     * @param claimedTaskId     The id for the ClaimedTask to be used
+     * @param optionalPageable  The pageable if relevant
+     * @param projection        The Projection
+     * @return                  The {@link WorkflowStepRest} object related to the {@link ClaimedTask} specified by
+     *                          the given ID
+     */
     public WorkflowStepRest getStep(@Nullable HttpServletRequest request,
                                     Integer claimedTaskId,
                                     @Nullable Pageable optionalPageable,
