@@ -8,6 +8,8 @@
 package org.dspace.app.util;
 
 import java.sql.SQLException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
@@ -26,21 +28,14 @@ public class GroupUtil {
     }
 
     /**
-     * The collection prefix, all groups which are specific to
-     * a collection start with this.
+     * UUID regex used in the collection regex
      */
-    private static final String COLLECTION_PREFIX = "COLLECTION_";
-
+    private static final String UUID_REGEX = "[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0" +
+            "-9a-fA-F]{12}";
     /**
-     * These are the possible collection suffixes, all groups which are
-     * specific to a collection will end with one of these. The collection
-     * id should be in between the prefix and the suffix.
-     * <p>
-     * Note: the order of these suffixes are important, see getCollectionRole()
+     * Collection regex used to extract the ID
      */
-    private static final String[] COLLECTION_SUFFIXES =
-        {"_SUBMIT", "_ADMIN", "_WFSTEP_1", "_WORKFLOW_STEP_1", "_WFSTEP_2", "_WORKFLOW_STEP_2", "_WFSTEP_3",
-            "_WORKFLOW_STEP_3", "_DEFAULT_ITEM_READ"};
+    private static final String COLLECTION_REGEX = "COLLECTION_(" + UUID_REGEX + ")_.*?";
 
     /**
      * The community prefix: all groups which are specific to
@@ -69,21 +64,17 @@ public class GroupUtil {
 
         String groupName = group.getName();
 
-        if (groupName == null || !groupName.startsWith(COLLECTION_PREFIX)) {
+        if (groupName == null) {
             return null;
         }
 
-        for (String suffix : COLLECTION_SUFFIXES) {
-            if (groupName.endsWith(suffix)) {
-                String idString = groupName.substring(COLLECTION_PREFIX.length());
-                idString = idString.substring(0, idString.length() - suffix.length());
+        Matcher groupNameMatcher = Pattern.compile(COLLECTION_REGEX).matcher(groupName);
 
-                Collection collection = collectionService.findByIdOrLegacyId(context, idString);
-                if (collection != null) {
-                    return collection;
-                } else {
-                    return null;
-                }
+        if (groupNameMatcher.find()) {
+            String uuid = groupNameMatcher.group();
+            Collection collection = collectionService.findByIdOrLegacyId(context, uuid);
+            if (collection != null) {
+                return collection;
             }
         }
 
