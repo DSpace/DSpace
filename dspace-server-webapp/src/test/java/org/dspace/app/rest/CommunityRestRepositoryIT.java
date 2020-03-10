@@ -115,7 +115,7 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
             getClient(authToken).perform(post("/api/core/communities")
                                         .content(mapper.writeValueAsBytes(comm))
                                         .contentType(contentType)
-                                .param("projection", "full"))
+                                   .param("embed", CommunityMatcher.getFullEmbedsParameters()))
                                 .andExpect(status().isCreated())
                                 .andExpect(content().contentType(contentType))
                                 .andExpect(jsonPath("$", CommunityMatcher.matchFullEmbeds()))
@@ -320,7 +320,7 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
         context.restoreAuthSystemState();
 
         getClient().perform(get("/api/core/communities")
-                   .param("projection", "full"))
+                      .param("embed", CommunityMatcher.getFullEmbedsParameters()))
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$._embedded.communities", Matchers.containsInAnyOrder(
@@ -352,8 +352,8 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
                                            .build();
 
 
-        getClient().perform(get("/api/core/communities").param("size", "2").param("projection",
-                                                                                  "full"))
+        getClient().perform(get("/api/core/communities").param("size", "2")
+                                                        .param("embed", CommunityMatcher.getFullEmbedsParameters()))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
                 .andExpect(jsonPath("$._embedded.communities", Matchers.containsInAnyOrder(
@@ -384,8 +384,8 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
 
         context.restoreAuthSystemState();
 
-        getClient().perform(get("/api/core/communities").param("size", "2").param("projection",
-                                                                                  "full"))
+        getClient().perform(get("/api/core/communities").param("size", "2")
+                                                        .param("embed", CommunityMatcher.getFullEmbedsParameters()))
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$._embedded.communities", Matchers.containsInAnyOrder(
@@ -401,7 +401,7 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
                                                                                                 2, 4)));
 
         getClient().perform(get("/api/core/communities").param("size", "2").param("page", "1")
-                   .param("projection", "full"))
+                      .param("embed", CommunityMatcher.getFullEmbedsParameters()))
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$._embedded.communities", Matchers.containsInAnyOrder(
@@ -424,7 +424,7 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
         parentCommunity = CommunityBuilder.createCommunity(context).withName("test").build();
 
         getClient().perform(get("/api/core/communities")
-                .param("projection", "full"))
+                      .param("embed", CommunityMatcher.getFullEmbedsParameters()))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
                 .andExpect(jsonPath("$._embedded.communities", Matchers.contains(
@@ -488,7 +488,7 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
 
         getClient().perform(get("/api/core/communities")
                                 .param("size", "1")
-                                .param("projection", "full"))
+                      .param("embed", CommunityMatcher.getFullEmbedsParameters()))
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$._embedded.communities", Matchers.contains(
@@ -508,7 +508,7 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
         getClient().perform(get("/api/core/communities")
                                 .param("size", "1")
                                 .param("page", "1")
-                   .param("projection", "full"))
+                      .param("embed", CommunityMatcher.getFullEmbedsParameters()))
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$._embedded.communities", Matchers.contains(
@@ -547,7 +547,7 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
 
         // When full projection is requested, response should include expected properties, links, and embeds.
         getClient().perform(get("/api/core/communities/" + parentCommunity.getID().toString())
-                .param("projection", "full"))
+                      .param("embed", CommunityMatcher.getFullEmbedsParameters()))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
                 .andExpect(jsonPath("$", CommunityMatcher.matchFullEmbeds()))
@@ -583,7 +583,7 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
         context.restoreAuthSystemState();
 
         getClient().perform(get("/api/core/communities/" + parentCommunity.getID().toString())
-                   .param("projection", "full"))
+                      .param("embed", CommunityMatcher.getFullEmbedsParameters()))
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$", Matchers.is(
@@ -665,7 +665,7 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
         context.restoreAuthSystemState();
 
         getClient().perform(get("/api/core/communities/search/top")
-                   .param("projection", "full"))
+                      .param("embed", CommunityMatcher.getFullEmbedsParameters()))
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$._embedded.communities", Matchers.containsInAnyOrder(
@@ -732,7 +732,7 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
 
         getClient().perform(get("/api/core/communities/search/subCommunities")
                 .param("parent", parentCommunity.getID().toString())
-                .param("projection", "full"))
+                      .param("embed", CommunityMatcher.getFullEmbedsParameters()))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
                 //Checking that these communities are present
@@ -767,7 +767,7 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
 
         getClient().perform(get("/api/core/communities/search/subCommunities")
                 .param("parent", parentCommunityChild2.getID().toString())
-                .param("projection", "full"))
+                      .param("embed", CommunityMatcher.getFullEmbedsParameters()))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
                 //Checking that these communities are present
@@ -860,7 +860,7 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
 
         getClient().perform(get("/api/core/communities/" + parentCommunity.getID().toString())
-                   .param("projection", "full"))
+                      .param("embed", CommunityMatcher.getFullEmbedsParameters()))
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$", Matchers.is(
@@ -895,7 +895,7 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
         ;
 
         getClient().perform(get("/api/core/communities/" + parentCommunity.getID().toString())
-                   .param("projection", "full"))
+                      .param("embed", CommunityMatcher.getFullEmbedsParameters()))
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$", Matchers.is(
@@ -950,7 +950,7 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
         context.restoreAuthSystemState();
 
         getClient(token).perform(get("/api/core/communities/" + parentCommunity.getID().toString())
-                        .param("projection", "full"))
+                           .param("embed", CommunityMatcher.getFullEmbedsParameters()))
                         .andExpect(status().isOk())
                         .andExpect(content().contentType(contentType))
                         .andExpect(jsonPath("$", Matchers.is(
@@ -1013,7 +1013,7 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
         context.restoreAuthSystemState();
 
         getClient().perform(get("/api/core/communities/" + parentCommunity.getID().toString())
-                        .param("projection", "full"))
+                           .param("embed", CommunityMatcher.getFullEmbedsParameters()))
                         .andExpect(status().isOk())
                         .andExpect(content().contentType(contentType))
                         .andExpect(jsonPath("$", Matchers.is(
@@ -1047,7 +1047,7 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
         context.restoreAuthSystemState();
 
         getClient(token).perform(get("/api/core/communities/" + parentCommunity.getID().toString())
-                        .param("projection", "full"))
+                           .param("embed", CommunityMatcher.getFullEmbedsParameters()))
                         .andExpect(status().isOk())
                         .andExpect(content().contentType(contentType))
                         .andExpect(jsonPath("$", Matchers.is(
@@ -1082,7 +1082,7 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
                                            .build();
 
         getClient().perform(get("/api/core/communities/" + parentCommunity.getID().toString())
-                   .param("projection", "full"))
+                      .param("embed", CommunityMatcher.getFullEmbedsParameters()))
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$", Matchers.is(
@@ -1120,7 +1120,7 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
         ;
 
         getClient().perform(get("/api/core/communities/" + parentCommunity.getID().toString())
-                   .param("projection", "full"))
+                      .param("embed", CommunityMatcher.getFullEmbedsParameters()))
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$", Matchers.is(

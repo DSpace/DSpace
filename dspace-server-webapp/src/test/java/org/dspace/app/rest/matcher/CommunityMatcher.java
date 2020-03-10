@@ -99,7 +99,8 @@ public class CommunityMatcher {
                 "logo",
                 "self",
                 "parentCommunity",
-                "subcommunities"
+                "subcommunities",
+                 "adminGroup"
         );
     }
 
@@ -113,6 +114,10 @@ public class CommunityMatcher {
             hasJsonPath("$._embedded.logo", Matchers.not(Matchers.empty())),
             matchLinks(uuid)
         );
+    }
+
+    public static String getFullEmbedsParameters() {
+        return "collections,logo,parentCommunity,subcommunities";
     }
 
 }
