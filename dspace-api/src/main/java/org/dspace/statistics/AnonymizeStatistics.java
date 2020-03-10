@@ -101,7 +101,7 @@ public class AnonymizeStatistics {
         options.addOption(
                 builder(SLEEP_OPTION)
                         .longOpt("sleep")
-                        .desc("Sleep a certain time between each solr request")
+                        .desc("Sleep a certain time given in milliseconds between each solr request")
                         .hasArg(true)
                         .build()
         );
@@ -131,7 +131,7 @@ public class AnonymizeStatistics {
 
         if (commandLine.hasOption(HELP_OPTION)) {
             printHelp(options);
-            System.exit(0);
+            System.exit(-1);
         }
 
         if (commandLine.hasOption(SLEEP_OPTION)) {

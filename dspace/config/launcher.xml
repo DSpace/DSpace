@@ -384,7 +384,7 @@
         <name>anonymize-statistics</name>
         <description>Anonymize the ip values of the solr statistics</description>
         <step>
-            <class>com.atmire.dspace.statistics.AnonymizeStatistics</class>
+            <class>org.dspace.statistics.AnonymizeStatistics</class>
         </step>
     </command>
 </commands>
