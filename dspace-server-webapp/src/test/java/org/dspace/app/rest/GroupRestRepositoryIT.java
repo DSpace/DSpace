@@ -8,6 +8,7 @@
 package org.dspace.app.rest;
 
 import static com.jayway.jsonpath.JsonPath.read;
+
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -26,10 +27,13 @@ import org.dspace.app.rest.matcher.HalMatcher;
 import org.dspace.app.rest.model.GroupRest;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.app.rest.test.MetadataPatchSuite;
+import org.dspace.authorize.service.ResourcePolicyService;
+import org.dspace.core.Constants;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.hamcrest.Matchers;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 
 /**
@@ -37,6 +41,9 @@ import org.junit.Test;
  */
 
 public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
+
+    @Autowired
+    ResourcePolicyService resourcePolicyService;
 
     @Test
     public void createTest()
@@ -146,6 +153,13 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
     }
 
     @Test
+    public void findAllForbiddenTest() throws Exception {
+    	String tokenEperson = getAuthToken(eperson.getEmail(), password);
+        getClient(tokenEperson).perform(get("/api/eperson/groups"))
+                   .andExpect(status().isForbidden());
+    }
+
+    @Test
     public void findAllPaginationTest() throws Exception {
 
         getClient().perform(get("/api/eperson/groups"))
@@ -252,6 +266,22 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
                         )))
                         .andExpect(jsonPath("$._links.self.href",
                                         Matchers.containsString("/api/eperson/groups/" + group2.getID())));
+    }
+
+    @Test
+    public void findOneForbiddenTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        Group privateGroup = GroupBuilder.createGroup(context)
+        		.withName("Private Group")
+                .build();
+
+        resourcePolicyService.removePolicies(context, privateGroup, Constants.READ);
+        context.restoreAuthSystemState();
+
+        String tokenEperson = getAuthToken(eperson.getEmail(), password);
+        getClient(tokenEperson).perform(get("/api/eperson/groups/" + privateGroup.getID()))
+                .andExpect(status().isForbidden());
     }
 
     @Test
