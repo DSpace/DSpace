@@ -1305,7 +1305,6 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                 .content(patchBody)
                 .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
                             .andExpect(status().isOk())
-                            .andExpect(jsonPath("$.errors").doesNotExist())
                             .andExpect(jsonPath("$.sections.traditionalpagetwo['dc.subject']").doesNotExist())
                             .andExpect(jsonPath("$.sections.traditionalpagetwo['dc.description.abstract']")
                                     .doesNotExist())
@@ -1314,7 +1313,6 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         // verify that the patch changes have been persisted
         getClient().perform(get("/api/submission/workspaceitems/" + witem.getID()))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.errors").doesNotExist())
             .andExpect(jsonPath("$.sections.traditionalpagetwo['dc.subject']").doesNotExist())
             .andExpect(jsonPath("$.sections.traditionalpagetwo['dc.description.abstract']").doesNotExist())
         ;
