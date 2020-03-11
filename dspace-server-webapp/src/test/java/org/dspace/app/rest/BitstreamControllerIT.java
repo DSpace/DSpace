@@ -104,7 +104,8 @@ public class BitstreamControllerIT extends AbstractControllerIntegrationTest {
 
         String token = getAuthToken(admin.getEmail(), password);
 
-        getClient(token).perform(get("/api/core/bitstreams/" + bitstream.getID() + "/bundle"))
+        getClient(token).perform(get("/api/core/bitstreams/" + bitstream.getID() + "/bundle")
+                        .param("projection", "full"))
                         .andExpect(status().isOk())
                         .andExpect(content().contentType(contentType))
                         .andExpect(jsonPath("$", Matchers.is(
@@ -167,7 +168,8 @@ public class BitstreamControllerIT extends AbstractControllerIntegrationTest {
 
         String token = getAuthToken(admin.getEmail(), password);
 
-        getClient().perform(get("/api/core/bitstreams/" + bitstream.getID() + "/bundle"))
+        getClient().perform(get("/api/core/bitstreams/" + bitstream.getID() + "/bundle")
+                   .param("projection", "full"))
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$", Matchers.is(
@@ -334,7 +336,8 @@ public class BitstreamControllerIT extends AbstractControllerIntegrationTest {
         String name = targetBundle.getName();
         String handle = targetBundle.getHandle();
         List<Bitstream> bitstreams = targetBundle.getBitstreams();
-        getClient(token).perform(get("/api/core/bitstreams/" + bitstream.getID() + "/bundle"))
+        getClient(token).perform(get("/api/core/bitstreams/" + bitstream.getID() + "/bundle")
+                        .param("projection", "full"))
                         .andExpect(status().isOk())
                         .andExpect(content().contentType(contentType))
                         .andExpect(jsonPath("$", Matchers.is(
@@ -454,7 +457,8 @@ public class BitstreamControllerIT extends AbstractControllerIntegrationTest {
         String handle = targetBundle.getHandle();
         List<Bitstream> bitstreams = targetBundle.getBitstreams();
 
-        getClient(token).perform(get("/api/core/bitstreams/" + bitstream.getID() + "/bundle"))
+        getClient(token).perform(get("/api/core/bitstreams/" + bitstream.getID() + "/bundle")
+                        .param("projection", "full"))
                         .andExpect(status().isOk())
                         .andExpect(content().contentType(contentType))
                         .andExpect(jsonPath("$", Matchers.is(
@@ -566,7 +570,8 @@ public class BitstreamControllerIT extends AbstractControllerIntegrationTest {
         List<Bitstream> bitstreams = targetBundle.getBitstreams();
 
 
-        getClient(token).perform(get("/api/core/bitstreams/" + bitstream.getID() + "/bundle"))
+        getClient(token).perform(get("/api/core/bitstreams/" + bitstream.getID() + "/bundle")
+                        .param("projection", "full"))
                         .andExpect(status().isOk())
                         .andExpect(content().contentType(contentType))
                         .andExpect(jsonPath("$", Matchers.is(
@@ -666,7 +671,8 @@ public class BitstreamControllerIT extends AbstractControllerIntegrationTest {
                                  ))
                 .andExpect(status().isForbidden());
 
-        getClient(token).perform(get("/api/core/bitstreams/" + bitstream.getID() + "/bundle"))
+        getClient(token).perform(get("/api/core/bitstreams/" + bitstream.getID() + "/bundle")
+                        .param("projection", "full"))
                         .andExpect(status().isOk())
                         .andExpect(content().contentType(contentType))
                         .andExpect(jsonPath("$", Matchers.is(
@@ -768,8 +774,9 @@ public class BitstreamControllerIT extends AbstractControllerIntegrationTest {
                 .andExpect(status().isForbidden());
 
 
-        getClient(token).perform(get("/api/core/bitstreams/" + bitstream.getID() + "/bundle"))
-                        .andExpect(status().isOk())
+        getClient(token).perform(get("/api/core/bitstreams/" + bitstream.getID() + "/bundle")
+                .param("projection", "full"))
+                .andExpect(status().isOk())
                         .andExpect(content().contentType(contentType))
                         .andExpect(jsonPath("$", Matchers.is(
                                 BundleMatcher.matchBundle(bundle1.getName(),
@@ -869,7 +876,8 @@ public class BitstreamControllerIT extends AbstractControllerIntegrationTest {
                                  ))
                 .andExpect(status().isForbidden());
 
-        getClient(token).perform(get("/api/core/bitstreams/" + bitstream.getID() + "/bundle"))
+        getClient(token).perform(get("/api/core/bitstreams/" + bitstream.getID() + "/bundle")
+                        .param("projection", "full"))
                         .andExpect(status().isOk())
                         .andExpect(content().contentType(contentType))
                         .andExpect(jsonPath("$", Matchers.is(
@@ -963,14 +971,15 @@ public class BitstreamControllerIT extends AbstractControllerIntegrationTest {
         String token = getAuthToken(putBundlePerson.getEmail(), "test");
 
         getClient(token)
-                .perform(put("/api/core/bitstreams/" + bitstream.getID() + "/bundle")
-                                 .contentType(parseMediaType(TEXT_URI_LIST_VALUE))
+                .perform(put("/api/core/bitstreams/" + bitstream.getID() + "/bundle").param("projection", "full")
+                .contentType(parseMediaType(TEXT_URI_LIST_VALUE))
                                  .content(
                                          "https://localhost:8080/spring-rest/api/core/bundles/" + targetBundle.getID()
                                  ))
                 .andExpect(status().isForbidden());
 
-        getClient(token).perform(get("/api/core/bitstreams/" + bitstream.getID() + "/bundle"))
+        getClient(token).perform(get("/api/core/bitstreams/" + bitstream.getID() + "/bundle")
+                        .param("projection", "full"))
                         .andExpect(status().isOk())
                         .andExpect(content().contentType(contentType))
                         .andExpect(jsonPath("$", Matchers.is(
@@ -1072,7 +1081,8 @@ public class BitstreamControllerIT extends AbstractControllerIntegrationTest {
                 .andExpect(status().isForbidden());
 
 
-        getClient(token).perform(get("/api/core/bitstreams/" + bitstream.getID() + "/bundle"))
+        getClient(token).perform(get("/api/core/bitstreams/" + bitstream.getID() + "/bundle")
+                        .param("projection", "full"))
                         .andExpect(status().isOk())
                         .andExpect(content().contentType(contentType))
                         .andExpect(jsonPath("$", Matchers.is(
@@ -1173,7 +1183,8 @@ public class BitstreamControllerIT extends AbstractControllerIntegrationTest {
                                  ))
                 .andExpect(status().isForbidden());
 
-        getClient(token).perform(get("/api/core/bitstreams/" + bitstream.getID() + "/bundle"))
+        getClient(token).perform(get("/api/core/bitstreams/" + bitstream.getID() + "/bundle")
+                        .param("projection", "full"))
                         .andExpect(status().isOk())
                         .andExpect(content().contentType(contentType))
                         .andExpect(jsonPath("$", Matchers.is(
@@ -1267,14 +1278,15 @@ public class BitstreamControllerIT extends AbstractControllerIntegrationTest {
         String token = getAuthToken(putBundlePerson.getEmail(), "test");
 
         getClient(token)
-                .perform(put("/api/core/bitstreams/" + bitstream.getID() + "/bundle")
+                .perform(put("/api/core/bitstreams/" + bitstream.getID() + "/bundle").param("projection", "full")
                                  .contentType(parseMediaType(TEXT_URI_LIST_VALUE))
                                  .content(
                                          "https://localhost:8080/spring-rest/api/core/bundles/" + targetBundle.getID()
                                  ))
                 .andExpect(status().isForbidden());
 
-        getClient(token).perform(get("/api/core/bitstreams/" + bitstream.getID() + "/bundle"))
+        getClient(token).perform(get("/api/core/bitstreams/" + bitstream.getID() + "/bundle")
+                        .param("projection", "full"))
                         .andExpect(status().isOk())
                         .andExpect(content().contentType(contentType))
                         .andExpect(jsonPath("$", Matchers.is(

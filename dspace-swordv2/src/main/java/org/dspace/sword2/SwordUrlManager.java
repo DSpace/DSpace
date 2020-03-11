@@ -95,11 +95,11 @@ public class SwordUrlManager {
         String sUrl = ConfigurationManager.getProperty("swordv2-server", "url");
         if (sUrl == null || "".equals(sUrl)) {
             String dspaceUrl = ConfigurationManager
-                .getProperty("dspace.baseUrl");
+                .getProperty("dspace.server.url");
             if (dspaceUrl == null || "".equals(dspaceUrl)) {
                 throw new DSpaceSwordException(
                     "Unable to construct service document urls, due to missing/invalid " +
-                        "config in sword2.url and/or dspace.baseUrl");
+                        "config in sword2.url and/or dspace.server.url");
             }
 
             try {
@@ -108,7 +108,7 @@ public class SwordUrlManager {
                                "/swordv2").toString();
             } catch (MalformedURLException e) {
                 throw new DSpaceSwordException(
-                    "Unable to construct service document urls, due to invalid dspace.baseUrl " +
+                    "Unable to construct service document urls, due to invalid dspace.server.url " +
                         e.getMessage(), e);
             }
         }
@@ -303,11 +303,11 @@ public class SwordUrlManager {
             .getProperty("swordv2-server", "servicedocument.url");
         if (sdUrl == null || "".equals(sdUrl)) {
             String dspaceUrl = ConfigurationManager
-                .getProperty("dspace.baseUrl");
+                .getProperty("dspace.server.url");
             if (dspaceUrl == null || "".equals(dspaceUrl)) {
                 throw new DSpaceSwordException(
                     "Unable to construct service document urls, due to missing/invalid " +
-                        "config in swordv2-server.cfg servicedocument.url and/or dspace.baseUrl");
+                        "config in swordv2-server.cfg servicedocument.url and/or dspace.server.url");
             }
 
             try {
@@ -316,7 +316,7 @@ public class SwordUrlManager {
                                 "/swordv2/servicedocument").toString();
             } catch (MalformedURLException e) {
                 throw new DSpaceSwordException(
-                    "Unable to construct service document urls, due to invalid dspace.baseUrl " +
+                    "Unable to construct service document urls, due to invalid dspace.server.url " +
                         e.getMessage(), e);
             }
         }
@@ -332,9 +332,9 @@ public class SwordUrlManager {
      * If the configuration sword.deposit.url is set, this will be returned,
      * but if not, it will construct the url as follows:
      *
-     * [dspace.baseUrl]/sword/deposit
+     * [dspace.server.url]/sword/deposit
      *
-     * where dspace.baseUrl is also in the configuration file.
+     * where dspace.server.url is also in the configuration file.
      *
      * @return the base URL for SWORD deposit
      * @throws DSpaceSwordException can be thrown by the internals of the DSpace SWORD implementation
@@ -345,11 +345,11 @@ public class SwordUrlManager {
             .getProperty("swordv2-server", "collection.url");
         if (depositUrl == null || "".equals(depositUrl)) {
             String dspaceUrl = ConfigurationManager
-                .getProperty("dspace.baseUrl");
+                .getProperty("dspace.server.url");
             if (dspaceUrl == null || "".equals(dspaceUrl)) {
                 throw new DSpaceSwordException(
                     "Unable to construct deposit urls, due to missing/invalid config in " +
-                        "swordv2-server.cfg deposit.url and/or dspace.baseUrl");
+                        "swordv2-server.cfg deposit.url and/or dspace.server.url");
             }
 
             try {
@@ -358,7 +358,7 @@ public class SwordUrlManager {
                                      url.getPort(), "/swordv2/collection").toString();
             } catch (MalformedURLException e) {
                 throw new DSpaceSwordException(
-                    "Unable to construct deposit urls, due to invalid dspace.baseUrl " +
+                    "Unable to construct deposit urls, due to invalid dspace.server.url " +
                         e.getMessage(), e);
             }
 
@@ -407,7 +407,7 @@ public class SwordUrlManager {
             }
 
             String handle = item.getHandle();
-            String bsLink = ConfigurationManager.getProperty("dspace.url");
+            String bsLink = ConfigurationManager.getProperty("dspace.ui.url");
 
             if (handle != null && !"".equals(handle)) {
                 bsLink = bsLink + "/bitstream/" + handle + "/" +

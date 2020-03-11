@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 /**
  * This class serves as a representation of a command line parameter by holding a String name and a String value
@@ -95,6 +96,7 @@ public class DSpaceCommandLineParameter {
      * @param other The other object
      * @return      A boolean indicating equality
      */
+    @Override
     public boolean equals(Object other) {
         if (other == null) {
             return false;
@@ -104,5 +106,13 @@ public class DSpaceCommandLineParameter {
         }
         return StringUtils.equals(this.getName(), ((DSpaceCommandLineParameter) other).getName()) && StringUtils
             .equals(this.getValue(), ((DSpaceCommandLineParameter) other).getValue());
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder(5, 17)
+            .append(this.getName())
+            .append(this.getValue())
+            .toHashCode();
     }
 }

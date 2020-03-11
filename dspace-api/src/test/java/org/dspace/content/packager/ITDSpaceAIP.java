@@ -22,9 +22,9 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
-import mockit.NonStrictExpectations;
+import com.google.common.base.Splitter;
 import org.apache.logging.log4j.Logger;
-import org.dspace.AbstractUnitTest;
+import org.dspace.AbstractIntegrationTest;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
@@ -75,7 +75,7 @@ import org.junit.rules.TemporaryFolder;
  *
  * @author Tim Donohue
  */
-public class ITDSpaceAIP extends AbstractUnitTest {
+public class ITDSpaceAIP extends AbstractIntegrationTest {
     /**
      * log4j category
      */
@@ -295,10 +295,7 @@ public class ITDSpaceAIP extends AbstractUnitTest {
         // Override default value of configured temp directory to point at our
         // JUnit TemporaryFolder. This ensures Crosswalk classes like RoleCrosswalk
         // store their temp files in a place where JUnit can clean them up automatically.
-        new NonStrictExpectations(configService.getClass()) {{
-            configService.getProperty("upload.temp.dir");
-            result = uploadTempFolder.getRoot().getAbsolutePath();
-        }};
+        configService.setProperty("upload.temp.dir", uploadTempFolder.getRoot().getAbsolutePath());
 
         try {
             context = new Context();
@@ -322,13 +319,6 @@ public class ITDSpaceAIP extends AbstractUnitTest {
      */
     @Test
     public void testRestoreCommunityHierarchy() throws Exception {
-        new NonStrictExpectations(authorizeService.getClass()) {{
-            // Allow Full Admin permissions. Since we are working with an object
-            // hierarchy you really need full admin rights
-            authorizeService.isAdmin((Context) any);
-            result = true;
-        }};
-
         log.info("testRestoreCommunityHierarchy() - BEGIN");
 
         // Locate the top level community (from our test data)
@@ -378,13 +368,6 @@ public class ITDSpaceAIP extends AbstractUnitTest {
      */
     @Test
     public void testRestoreRestrictedCommunity() throws Exception {
-        new NonStrictExpectations(authorizeService.getClass()) {{
-            // Allow Full Admin permissions. Since we are working with an object
-            // hierarchy  (Items/Bundles/Bitstreams) you need full admin rights
-            authorizeService.isAdmin((Context) any);
-            result = true;
-        }};
-
         log.info("testRestoreRestrictedCommunity() - BEGIN");
 
         // Locate the top-level Community (as a parent)
@@ -457,13 +440,6 @@ public class ITDSpaceAIP extends AbstractUnitTest {
      */
     @Test
     public void testReplaceCommunityHierarchy() throws Exception {
-        new NonStrictExpectations(authorizeService.getClass()) {{
-            // Allow Full Admin permissions. Since we are working with an object
-            // hierarchy you really need full admin rights
-            authorizeService.isAdmin((Context) any);
-            result = true;
-        }};
-
         log.info("testReplaceCommunityHierarchy() - BEGIN");
 
         // Locate the top level community (from our test data)
@@ -535,13 +511,6 @@ public class ITDSpaceAIP extends AbstractUnitTest {
      */
     @Test
     public void testReplaceCommunityOnly() throws Exception {
-        new NonStrictExpectations(authorizeService.getClass()) {{
-            // Allow Community WRITE perms
-            authorizeService.authorizeAction((Context) any, (Community) any,
-                                             Constants.WRITE, true);
-            result = null;
-        }};
-
         log.info("testReplaceCommunityOnly() - BEGIN");
 
         // Locate the top level community (from our test data)
@@ -575,13 +544,6 @@ public class ITDSpaceAIP extends AbstractUnitTest {
      */
     @Test
     public void testRestoreCollectionHierarchy() throws Exception {
-        new NonStrictExpectations(authorizeService.getClass()) {{
-            // Allow Full Admin permissions. Since we are working with an object
-            // hierarchy you really need full admin rights
-            authorizeService.isAdmin((Context) any);
-            result = true;
-        }};
-
         log.info("testRestoreCollectionHierarchy() - BEGIN");
 
         // Locate the collection (from our test data)
@@ -620,13 +582,6 @@ public class ITDSpaceAIP extends AbstractUnitTest {
      */
     @Test
     public void testRestoreRestrictedCollection() throws Exception {
-        new NonStrictExpectations(authorizeService.getClass()) {{
-            // Allow Full Admin permissions. Since we are working with an object
-            // hierarchy  (Items/Bundles/Bitstreams) you need full admin rights
-            authorizeService.isAdmin((Context) any);
-            result = true;
-        }};
-
         log.info("testRestoreRestrictedCollection() - BEGIN");
 
         // Locate the top-level Community (as a parent)
@@ -699,13 +654,6 @@ public class ITDSpaceAIP extends AbstractUnitTest {
      */
     @Test
     public void testReplaceCollectionHierarchy() throws Exception {
-        new NonStrictExpectations(authorizeService.getClass()) {{
-            // Allow Full Admin permissions. Since we are working with an object
-            // hierarchy you really need full admin rights
-            authorizeService.isAdmin((Context) any);
-            result = true;
-        }};
-
         log.info("testReplaceCollectionHierarchy() - BEGIN");
 
         // Locate the collection (from our test data)
@@ -759,13 +707,6 @@ public class ITDSpaceAIP extends AbstractUnitTest {
      */
     @Test
     public void testReplaceCollectionOnly() throws Exception {
-        new NonStrictExpectations(authorizeService.getClass()) {{
-            // Allow Collection WRITE perms
-            authorizeService.authorizeAction((Context) any, (Collection) any,
-                                             Constants.WRITE, true);
-            result = null;
-        }};
-
         log.info("testReplaceCollectionOnly() - BEGIN");
 
         // Locate the collection (from our test data)
@@ -801,13 +742,6 @@ public class ITDSpaceAIP extends AbstractUnitTest {
      */
     @Test
     public void testRestoreItem() throws Exception {
-        new NonStrictExpectations(authorizeService.getClass()) {{
-            // Allow Full Admin permissions. Since we are working with an object
-            // hierarchy  (Items/Bundles/Bitstreams) you need full admin rights
-            authorizeService.isAdmin((Context) any);
-            result = true;
-        }};
-
         log.info("testRestoreItem() - BEGIN");
 
         // Locate the item (from our test data)
@@ -870,13 +804,6 @@ public class ITDSpaceAIP extends AbstractUnitTest {
      */
     @Test
     public void testRestoreRestrictedItem() throws Exception {
-        new NonStrictExpectations(authorizeService.getClass()) {{
-            // Allow Full Admin permissions. Since we are working with an object
-            // hierarchy  (Items/Bundles/Bitstreams) you need full admin rights
-            authorizeService.isAdmin((Context) any);
-            result = true;
-        }};
-
         log.info("testRestoreRestrictedItem() - BEGIN");
 
         // Locate the test Collection (as a parent)
@@ -948,13 +875,6 @@ public class ITDSpaceAIP extends AbstractUnitTest {
      */
     @Test
     public void testRestoreItemNoPolicies() throws Exception {
-        new NonStrictExpectations(authorizeService.getClass()) {{
-            // Allow Full Admin permissions. Since we are working with an object
-            // hierarchy  (Items/Bundles/Bitstreams) you need full admin rights
-            authorizeService.isAdmin((Context) any);
-            result = true;
-        }};
-
         log.info("testRestoreItemNoPolicies() - BEGIN");
 
         // Locate the test Collection (as a parent)
@@ -1009,13 +929,6 @@ public class ITDSpaceAIP extends AbstractUnitTest {
      */
     @Test
     public void testReplaceItem() throws Exception {
-        new NonStrictExpectations(authorizeService.getClass()) {{
-            // Allow Full Admin permissions. Since we are working with an object
-            // hierarchy (Items/Bundles/Bitstreams) you need full admin rights
-            authorizeService.isAdmin((Context) any);
-            result = true;
-        }};
-
         log.info("testReplaceItem() - BEGIN");
 
         // Locate the item (from our test data)
@@ -1049,17 +962,6 @@ public class ITDSpaceAIP extends AbstractUnitTest {
      */
     @Test
     public void testRestoreMappedItem() throws Exception {
-        new NonStrictExpectations(authorizeService.getClass()) {{
-            // Allow Full Admin permissions. Since we are working with an object
-            // hierarchy  (Items/Bundles/Bitstreams) you need full admin rights
-            authorizeService.isAdmin((Context) any);
-            result = true;
-            authorizeService.authorizeAction(context, (Collection) any, Constants.REMOVE);
-            result = null;
-            authorizeService.authorizeAction(context, (Collection) any, Constants.ADD);
-            result = null;
-        }};
-
         log.info("testRestoreMappedItem() - BEGIN");
 
         // Get a reference to our test mapped Item
@@ -1105,7 +1007,7 @@ public class ITDSpaceAIP extends AbstractUnitTest {
      * to avoid having to rewrite this code into several tests.
      *
      * @param dso       DSpaceObject to create AIP(s) for
-     * @param pkParams  any special PackageParameters to pass (if any)
+     * @param pkgParams  any special PackageParameters to pass (if any)
      * @param recursive whether to recursively create AIPs or just a single AIP
      * @return exported root AIP file
      */
@@ -1145,7 +1047,7 @@ public class ITDSpaceAIP extends AbstractUnitTest {
      *
      * @param parent    The DSpaceObject which will be the parent object of the newly restored object(s)
      * @param aipFile   AIP file to start restoration from
-     * @param pkParams  any special PackageParameters to pass (if any)
+     * @param pkgParams  any special PackageParameters to pass (if any)
      * @param recursive whether to recursively restore AIPs or just a single AIP
      */
     private void restoreFromAIP(DSpaceObject parent, File aipFile, PackageParameters pkgParams, boolean recursive)
@@ -1183,7 +1085,7 @@ public class ITDSpaceAIP extends AbstractUnitTest {
      *
      * @param dso       The DSpaceObject to be replaced from AIP
      * @param aipFile   AIP file to start replacement from
-     * @param pkParams  any special PackageParameters to pass (if any)
+     * @param pkgParams  any special PackageParameters to pass (if any)
      * @param recursive whether to recursively restore AIPs or just a single AIP
      */
     private void replaceFromAIP(DSpaceObject dso, File aipFile, PackageParameters pkgParams, boolean recursive)
@@ -1293,9 +1195,9 @@ public class ITDSpaceAIP extends AbstractUnitTest {
 
             // Get the typeText & name of this object from the values
             String info = infoMap.get(key);
-            String[] values = info.split(valueseparator);
-            String typeText = values[0];
-            String name = values[1];
+            List<String> values = Splitter.on(valueseparator).splitToList(info);
+            String typeText = values.get(0);
+            String name = values.get(1);
 
             // Also assert type and name are correct
             assertEquals("assertObjectsExist object " + key + " type",
