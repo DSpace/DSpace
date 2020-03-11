@@ -60,10 +60,10 @@ import org.springframework.test.web.servlet.MvcResult;
 
 public class BundleRestRepositoryIT extends AbstractControllerIntegrationTest {
 
-	@Autowired
-	ResourcePolicyService resourcePolicyService;
+    @Autowired
+    ResourcePolicyService resourcePolicyService;
 
-	private Collection collection;
+    private Collection collection;
     private Item item;
     private Bundle bundle1;
     private Bundle bundle2;
