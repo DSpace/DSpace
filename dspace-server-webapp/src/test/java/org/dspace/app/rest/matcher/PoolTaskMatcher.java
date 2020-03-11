@@ -36,7 +36,6 @@ public class PoolTaskMatcher {
      */
     public static Matcher matchPoolTask(PoolTask pTask, String step) {
         return allOf(
-                hasJsonPath("$.step", is(step)),
                 // Check workflowitem properties
                 matchProperties(pTask),
                 // Check links
