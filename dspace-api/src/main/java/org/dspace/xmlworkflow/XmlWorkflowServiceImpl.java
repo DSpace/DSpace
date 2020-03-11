@@ -1049,7 +1049,7 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
             email.addArgument(coll.getName());
             email.addArgument(rejector);
             email.addArgument(reason);
-            email.addArgument(ConfigurationManager.getProperty("dspace.url") + "/mydspace");
+            email.addArgument(ConfigurationManager.getProperty("dspace.ui.url") + "/mydspace");
 
             email.send();
         } catch (Exception ex) {
@@ -1063,7 +1063,7 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
 
     @Override
     public String getMyDSpaceLink() {
-        return ConfigurationManager.getProperty("dspace.url") + "/mydspace";
+        return ConfigurationManager.getProperty("dspace.ui.url") + "/mydspace";
     }
 
     protected void revokeReviewerPolicies(Context context, Item item) throws SQLException, AuthorizeException {

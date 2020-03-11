@@ -19,7 +19,6 @@ import java.util.Locale;
 import java.util.TimeZone;
 
 import org.apache.commons.lang3.time.DateUtils;
-import org.apache.logging.log4j.Logger;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -28,11 +27,6 @@ import org.junit.Test;
  * @author pvillega
  */
 public class DCDateTest {
-    /**
-     * log4j category
-     */
-    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(DCDateTest.class);
-
     /**
      * Object to use in the tests
      */

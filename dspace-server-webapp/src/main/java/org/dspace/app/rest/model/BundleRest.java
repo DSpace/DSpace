@@ -7,25 +7,31 @@
  */
 package org.dspace.app.rest.model;
 
-import java.util.List;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.dspace.content.Bitstream;
 
 /**
  * The Bundle REST Resource
  *
  * @author Jelle Pelgrims (jelle.pelgrims at atmire.com)
  */
-
+@LinksRest(links = {
+        @LinkRest(
+                name = BundleRest.BITSTREAMS,
+                method = "getBitstreams"
+        ),
+        @LinkRest(
+                name = BundleRest.PRIMARY_BITSTREAM,
+                method = "getPrimaryBitstream"
+        )
+})
 public class BundleRest extends DSpaceObjectRest {
     public static final String NAME = "bundle";
     public static final String PLURAL_NAME = "bundles";
     public static final String CATEGORY = RestAddressableModel.CORE;
 
-    private BitstreamRest primaryBitstream;
-    private List<BitstreamRest> bitstreams;
+    public static final String BITSTREAMS = "bitstreams";
+    public static final String PRIMARY_BITSTREAM = "primaryBitstream";
 
     @Override
     @JsonIgnore
@@ -41,25 +47,4 @@ public class BundleRest extends DSpaceObjectRest {
     public String getType() {
         return NAME;
     }
-
-    @JsonIgnore
-    @LinkRest(linkClass = Bitstream.class)
-    public BitstreamRest getPrimaryBitstream() {
-        return primaryBitstream;
-    }
-
-    public void setPrimaryBitstream(BitstreamRest primaryBitstream) {
-        this.primaryBitstream = primaryBitstream;
-    }
-
-    @LinkRest(linkClass = Bitstream.class)
-    @JsonIgnore
-    public List<BitstreamRest> getBitstreams() {
-        return bitstreams;
-    }
-
-    public void setBitstreams(List<BitstreamRest> bitstreams) {
-        this.bitstreams = bitstreams;
-    }
-
 }

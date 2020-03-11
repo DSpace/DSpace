@@ -16,6 +16,12 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.when;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -23,16 +29,17 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
 
-import mockit.NonStrictExpectations;
 import org.apache.logging.log4j.Logger;
-import org.dspace.app.util.AuthorizeUtil;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.factory.AuthorizeServiceFactory;
+import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.eperson.Group;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.test.util.ReflectionTestUtils;
 
 /**
  * Unit Tests for class Community
@@ -50,6 +57,12 @@ public class CommunityTest extends AbstractDSpaceObjectTest {
      * Community instance for the tests
      */
     private Community c;
+
+    /**
+     * Spy of AuthorizeService to use for tests
+     * (initialized / setup in @Before method)
+     */
+    private AuthorizeService authorizeServiceSpy;
 
     /**
      * This method will be run before every test as per @Before. It will
@@ -70,6 +83,18 @@ public class CommunityTest extends AbstractDSpaceObjectTest {
             this.dspaceObject = c;
             //we need to commit the changes so we don't block the table for testing
             context.restoreAuthSystemState();
+
+            // Initialize our spy of the autowired (global) authorizeService bean.
+            // This allows us to customize the bean's method return values in tests below
+            authorizeServiceSpy = spy(authorizeService);
+            // "Wire" our spy to be used by the current loaded object services
+            // (To ensure both these services use the spy instead of the real service)
+            ReflectionTestUtils.setField(communityService, "authorizeService", authorizeServiceSpy);
+            ReflectionTestUtils.setField(collectionService, "authorizeService", authorizeServiceSpy);
+            ReflectionTestUtils.setField(itemService, "authorizeService", authorizeServiceSpy);
+            // Also wire into current AuthorizeServiceFactory, as that is used for some checks (e.g. AuthorizeUtil)
+            ReflectionTestUtils.setField(AuthorizeServiceFactory.getInstance(), "authorizeService",
+                                         authorizeServiceSpy);
         } catch (AuthorizeException ex) {
             log.error("Authorization Error in init", ex);
             fail("Authorization Error in init: " + ex.getMessage());
@@ -89,6 +114,15 @@ public class CommunityTest extends AbstractDSpaceObjectTest {
     @After
     @Override
     public void destroy() {
+        context.turnOffAuthorisationSystem();
+        // Delete community created in init()
+        try {
+            communityService.delete(context, c);
+        } catch (Exception e) {
+            // ignore
+        }
+        context.restoreAuthSystemState();
+
         c = null;
         super.destroy();
     }
@@ -111,20 +145,11 @@ public class CommunityTest extends AbstractDSpaceObjectTest {
      */
     @Test
     public void testCreateAuth() throws Exception {
-        //Default to Community-Admin Rights (but not full Admin rights)
-        new NonStrictExpectations(authorizeService.getClass()) {{
-            // Allow parent Community ADD perms (needed for addSubCommunity functionality)
-            authorizeService.authorizeAction((Context) any, (Community) any,
-                                             Constants.ADD);
-            result = null;
-            // Allow current Community ADD perms (needed to just create community)
-            authorizeService.authorizeActionBoolean((Context) any, (Community) any,
-                                                    Constants.ADD);
-            result = true;
-            // Disallow full Admin perms
-            authorizeService.isAdmin((Context) any);
-            result = false;
-        }};
+        // Below settings default to Community-Admin Rights (but not full Admin rights)
+        // Allow parent Community ADD perms (needed to just create community)
+        when(authorizeServiceSpy.authorizeActionBoolean(context, c, Constants.ADD)).thenReturn(true);
+        // Disallow full Admin perms
+        when(authorizeServiceSpy.isAdmin(context)).thenReturn(false);
 
         // test that a Community Admin can create a Community with parent (Sub-Community)
         Community sub = communityService.create(c, context);
@@ -141,16 +166,9 @@ public class CommunityTest extends AbstractDSpaceObjectTest {
      */
     @Test
     public void testCreateAuth2() throws Exception {
-        //Default to Admin Rights, but NOT Community Admin Rights
-        new NonStrictExpectations(authorizeService.getClass()) {{
-            // Disallow Community ADD perms
-            authorizeService.authorizeActionBoolean((Context) any, (Community) any,
-                                                    Constants.ADD);
-            result = false;
-            // Allow full Admin perms
-            authorizeService.isAdmin((Context) any);
-            result = true;
-        }};
+        // Below settings default to Full Admin Rights (but not Community Admin rights)
+        // Allow full Admin perms
+        when(authorizeServiceSpy.isAdmin(context)).thenReturn(true);
 
         //Test that a full Admin can create a Community without a parent (Top-Level Community)
         Community created = communityService.create(null, context);
@@ -172,42 +190,12 @@ public class CommunityTest extends AbstractDSpaceObjectTest {
      */
     @Test(expected = AuthorizeException.class)
     public void testCreateNoAuth() throws Exception {
-        //Default to NO Admin Rights, and NO Community Admin Rights
-        new NonStrictExpectations(authorizeService.getClass()) {{
-            // Disallow Community ADD perms
-            authorizeService.authorizeActionBoolean((Context) any, (Community) any,
-                                                    Constants.ADD);
-            result = false;
-            // Disallow full Admin perms
-            authorizeService.isAdmin((Context) any);
-            result = false;
-        }};
+        // Disallow full Admin perms
+        when(authorizeServiceSpy.isAdmin(context)).thenReturn(false);
 
-        // test creating community with no parent (as a non-admin & non-Community Admin)
+        // test creating community with no parent (as a non-admin)
         // this should throw an exception
-        Community created = communityService.create(null, context);
-        fail("Exception expected");
-    }
-
-    /**
-     * Test of create method, of class Community.
-     */
-    @Test(expected = AuthorizeException.class)
-    public void testCreateNoAuth2() throws Exception {
-        //Default to Community-Admin Rights (but not full Admin rights)
-        new NonStrictExpectations(authorizeService.getClass()) {{
-            // Allow Community ADD perms
-            authorizeService.authorizeActionBoolean((Context) any, (Community) any,
-                                                    Constants.ADD);
-            result = true;
-            // Disallow full Admin perms
-            authorizeService.isAdmin((Context) any);
-            result = false;
-        }};
-
-        // test creating community with no parent (as a non-admin, but with Community Admin rights)
-        // this should throw an exception, as only admins can create Top Level communities
-        Community created = communityService.create(null, context);
+        communityService.create(null, context);
         fail("Exception expected");
     }
 
@@ -216,16 +204,8 @@ public class CommunityTest extends AbstractDSpaceObjectTest {
      */
     @Test
     public void testCreateWithValidHandle() throws Exception {
-        //Default to Admin Rights, but NOT Community Admin Rights
-        new NonStrictExpectations(authorizeService.getClass()) {{
-            // Disallow Community ADD perms
-            authorizeService.authorizeActionBoolean((Context) any, (Community) any,
-                                                    Constants.ADD);
-            result = false;
-            // Allow full Admin perms
-            authorizeService.isAdmin((Context) any);
-            result = true;
-        }};
+        // Allow full Admin perms
+        when(authorizeServiceSpy.isAdmin(context)).thenReturn(true);
 
         // test creating community with a specified handle which is NOT already in use
         // (this handle should not already be used by system, as it doesn't start with "1234567689" prefix)
@@ -242,23 +222,15 @@ public class CommunityTest extends AbstractDSpaceObjectTest {
      */
     @Test(expected = IllegalStateException.class)
     public void testCreateWithInvalidHandle() throws Exception {
-        //Default to Admin Rights, but NOT Community Admin Rights
-        new NonStrictExpectations(authorizeService.getClass()) {{
-            // Disallow Community ADD perms
-            authorizeService.authorizeActionBoolean((Context) any, (Community) any,
-                                                    Constants.ADD);
-            result = false;
-            // Allow full Admin perms
-            authorizeService.isAdmin((Context) any);
-            result = true;
-        }};
+        // Allow full Admin perms
+        when(authorizeServiceSpy.isAdmin(context)).thenReturn(true);
 
         //get handle of our default created community
         String inUseHandle = c.getHandle();
 
         // test creating community with a specified handle which IS already in use
         // This should throw an exception
-        Community created = communityService.create(null, context, inUseHandle);
+        communityService.create(null, context, inUseHandle);
         fail("Exception expected");
     }
 
@@ -386,21 +358,8 @@ public class CommunityTest extends AbstractDSpaceObjectTest {
      */
     @Test
     public void testSetLogoAuth() throws Exception {
-        // Test inheritance of permissions
-        new NonStrictExpectations(authorizeService.getClass()) {{
-            // Allow parent Community ADD perms
-            authorizeService.authorizeActionBoolean((Context) any, (Community) any,
-                                                    Constants.ADD);
-            result = true;
-            // Allow parent Community WRITE perms
-            authorizeService.authorizeActionBoolean((Context) any, (Community) any,
-                                                    Constants.WRITE);
-            result = true;
-            // Allow current Community WRITE perms
-            authorizeService.authorizeAction((Context) any, (Community) any,
-                                             Constants.WRITE);
-            result = null;
-        }};
+        // Allow current Community WRITE perms
+        doNothing().when(authorizeServiceSpy).authorizeAction(context, c, Constants.WRITE);
 
         File f = new File(testProps.get("test.bitstream").toString());
         Bitstream logo = communityService.setLogo(context, c, new FileInputStream(f));
@@ -413,114 +372,14 @@ public class CommunityTest extends AbstractDSpaceObjectTest {
     /**
      * Test of setLogo method, of class Community.
      */
-    @Test
-    public void testSetLogoAuth2() throws Exception {
-        // Test inheritance of permissions
-        new NonStrictExpectations(authorizeService.getClass()) {{
-            // Disallow parent Community ADD perms
-            authorizeService.authorizeActionBoolean((Context) any, (Community) any,
-                                                    Constants.ADD);
-            result = false;
-            // Allow parent Community WRITE perms
-            authorizeService.authorizeActionBoolean((Context) any, (Community) any,
-                                                    Constants.WRITE);
-            result = true;
-            // Allow current Community WRITE perms
-            authorizeService.authorizeAction((Context) any, (Community) any,
-                                             Constants.WRITE);
-            result = null;
-        }};
-
-        File f = new File(testProps.get("test.bitstream").toString());
-        Bitstream logo = communityService.setLogo(context, c, new FileInputStream(f));
-        assertThat("testSetLogoAuth2 0", c.getLogo(), equalTo(logo));
-
-        c.setLogo(null);
-        assertThat("testSetLogoAuth2 1", c.getLogo(), nullValue());
-    }
-
-    /**
-     * Test of setLogo method, of class Community.
-     */
-    @Test
-    public void testSetLogoAuth3() throws Exception {
-        // Test inheritance of permissions
-        new NonStrictExpectations(authorizeService.getClass()) {{
-            // Allow parent Community ADD perms
-            authorizeService.authorizeActionBoolean((Context) any, (Community) any,
-                                                    Constants.ADD);
-            result = true;
-            // Disallow parent Community WRITE perms
-            authorizeService.authorizeActionBoolean((Context) any, (Community) any,
-                                                    Constants.WRITE);
-            result = false;
-            // Allow current Community WRITE perms
-            authorizeService.authorizeAction((Context) any, (Community) any,
-                                             Constants.WRITE);
-            result = null;
-        }};
-
-        File f = new File(testProps.get("test.bitstream").toString());
-        Bitstream logo = communityService.setLogo(context, c, new FileInputStream(f));
-        assertThat("testSetLogoAuth3 0", c.getLogo(), equalTo(logo));
-
-        c.setLogo(null);
-        assertThat("testSetLogoAuth3 1", c.getLogo(), nullValue());
-    }
-
-    /**
-     * Test of setLogo method, of class Community.
-     */
-    @Test
-    public void testSetLogoAuth4() throws Exception {
-        // Test inheritance of permissions
-        new NonStrictExpectations(authorizeService.getClass()) {{
-            // Disallow parent Community ADD perms
-            authorizeService.authorizeActionBoolean((Context) any, (Community) any,
-                                                    Constants.ADD);
-            result = false;
-            // Disallow parent Community WRITE perms
-            authorizeService.authorizeActionBoolean((Context) any, (Community) any,
-                                                    Constants.WRITE);
-            result = false;
-            // Allow current Community WRITE perms
-            authorizeService.authorizeAction((Context) any, (Community) any,
-                                             Constants.WRITE);
-            result = null;
-        }};
-
-        File f = new File(testProps.get("test.bitstream").toString());
-        Bitstream logo = communityService.setLogo(context, c, new FileInputStream(f));
-        assertThat("testSetLogoAuth4 0", c.getLogo(), equalTo(logo));
-
-        c.setLogo(null);
-        assertThat("testSetLogoAuth4 1", c.getLogo(), nullValue());
-    }
-
-    /**
-     * Test of setLogo method, of class Community.
-     */
     @Test(expected = AuthorizeException.class)
     public void testSetLogoNoAuth() throws Exception {
-        // Test inheritance of permissions
-        new NonStrictExpectations(authorizeService.getClass()) {{
-            // Disallow parent Community ADD perms
-            authorizeService.authorizeActionBoolean((Context) any, (Community) any,
-                                                    Constants.ADD);
-            result = false;
-            // Disallow parent Community WRITE perms
-            authorizeService.authorizeActionBoolean((Context) any, (Community) any,
-                                                    Constants.WRITE);
-            result = false;
-            // Disallow current Community WRITE perms
-            authorizeService.authorizeAction((Context) any, (Community) any,
-                                             Constants.WRITE);
-            result = new AuthorizeException();
-        }};
+        // Disallow current Community WRITE perms
+        doThrow(new AuthorizeException()).when(authorizeServiceSpy).authorizeAction(context, c, Constants.WRITE);
 
         File f = new File(testProps.get("test.bitstream").toString());
-        Bitstream logo = communityService.setLogo(context, c, new FileInputStream(f));
-        fail("EXception expected");
+        communityService.setLogo(context, c, new FileInputStream(f));
+        fail("Exception expected");
     }
 
     /**
@@ -528,16 +387,8 @@ public class CommunityTest extends AbstractDSpaceObjectTest {
      */
     @Test(expected = AuthorizeException.class)
     public void testUpdateNoAuth() throws Exception {
-        new NonStrictExpectations(authorizeService.getClass()) {{
-            // Disallow current Community ADD perms
-            authorizeService.authorizeAction((Context) any, (Community) any,
-                                             Constants.ADD);
-            result = new AuthorizeException();
-            // Disallow current Community WRITE perms
-            authorizeService.authorizeAction((Context) any, (Community) any,
-                                             Constants.WRITE);
-            result = new AuthorizeException();
-        }};
+        // Disallow current Community WRITE perms
+        doThrow(new AuthorizeException()).when(authorizeServiceSpy).authorizeAction(context, c, Constants.WRITE);
 
         //TODO: we need to verify the update, how?
         communityService.update(context, c);
@@ -549,16 +400,8 @@ public class CommunityTest extends AbstractDSpaceObjectTest {
      */
     @Test
     public void testUpdateAuth() throws Exception {
-        new NonStrictExpectations(authorizeService.getClass()) {{
-            // Allow current Community ADD perms
-            authorizeService.authorizeAction((Context) any, (Community) any,
-                                             Constants.ADD);
-            result = null;
-            // Allow current Community WRITE perms
-            authorizeService.authorizeAction((Context) any, (Community) any,
-                                             Constants.WRITE);
-            result = null;
-        }};
+        // Allow current Community WRITE perms
+        doNothing().when(authorizeServiceSpy).authorizeAction(context, c, Constants.WRITE);
 
         //TODO: we need to verify the update, how?
         communityService.update(context, c);
@@ -569,11 +412,8 @@ public class CommunityTest extends AbstractDSpaceObjectTest {
      */
     @Test
     public void testCreateAdministratorsAuth() throws Exception {
-        new NonStrictExpectations(AuthorizeUtil.class) {{
-            // Allow manage AdminGroup perms
-            AuthorizeUtil.authorizeManageAdminGroup((Context) any, (Community) any);
-            result = null;
-        }};
+        // Allow Community ADMIN perms
+        doNothing().when(authorizeServiceSpy).authorizeAction(context, c, Constants.ADMIN);
 
         Group result = communityService.createAdministrators(context, c);
         assertThat("testCreateAdministratorsAuth 0", c.getAdministrators(), notNullValue());
@@ -585,14 +425,7 @@ public class CommunityTest extends AbstractDSpaceObjectTest {
      */
     @Test(expected = AuthorizeException.class)
     public void testCreateAdministratorsNoAuth() throws Exception {
-        new NonStrictExpectations(AuthorizeUtil.class) {{
-            // Disallow manage AdminGroup perms
-            AuthorizeUtil.authorizeManageAdminGroup((Context) any, (Community) any);
-            result = new AuthorizeException();
-
-        }};
-
-        Group result = communityService.createAdministrators(context, c);
+        communityService.createAdministrators(context, c);
         fail("Exception should have been thrown");
     }
 
@@ -602,17 +435,14 @@ public class CommunityTest extends AbstractDSpaceObjectTest {
      */
     @Test
     public void testRemoveAdministratorsAuth() throws Exception {
-        new NonStrictExpectations(AuthorizeUtil.class) {{
-            // Allow manage AdminGroup perms (needed to possibly create group first)
-            AuthorizeUtil.authorizeManageAdminGroup((Context) any, (Community) any);
-            result = null;
-            // Allow remove AdminGroup perms
-            AuthorizeUtil.authorizeRemoveAdminGroup((Context) any, (Community) any);
-            result = null;
-        }};
+        // Allow Full ADMIN perms (Community Admins cannot delete their Admin Group)
+        when(authorizeServiceSpy.isAdmin(context)).thenReturn(true);
 
         // Ensure admin group is created first
+        context.turnOffAuthorisationSystem();
         Group result = communityService.createAdministrators(context, c);
+        context.restoreAuthSystemState();
+
         assertThat("testRemoveAdministratorsAuth 0", c.getAdministrators(), notNullValue());
         assertThat("testRemoveAdministratorsAuth 1", c.getAdministrators(), equalTo(result));
         communityService.removeAdministrators(context, c);
@@ -624,17 +454,14 @@ public class CommunityTest extends AbstractDSpaceObjectTest {
      */
     @Test(expected = AuthorizeException.class)
     public void testRemoveAdministratorsNoAuth() throws Exception {
-        new NonStrictExpectations(AuthorizeUtil.class) {{
-            // Allow manage AdminGroup perms (needed to possibly create group first)
-            AuthorizeUtil.authorizeManageAdminGroup((Context) any, (Community) any);
-            result = null;
-            // Disallow remove AdminGroup perms
-            AuthorizeUtil.authorizeRemoveAdminGroup((Context) any, (Community) any);
-            result = new AuthorizeException();
-        }};
+        // Allow Community ADMIN perms (Community Admins cannot delete their Admin Group)
+        doNothing().when(authorizeServiceSpy).authorizeAction(context, c, Constants.ADMIN);
 
         // Ensure admin group is created first
+        context.turnOffAuthorisationSystem();
         Group result = communityService.createAdministrators(context, c);
+        context.restoreAuthSystemState();
+
         assertThat("testRemoveAdministratorsAuth 0", c.getAdministrators(), notNullValue());
         assertThat("testRemoveAdministratorsAuth 1", c.getAdministrators(), equalTo(result));
         communityService.removeAdministrators(context, c);
@@ -655,17 +482,6 @@ public class CommunityTest extends AbstractDSpaceObjectTest {
      */
     @Test
     public void testGetCollections() throws Exception {
-        new NonStrictExpectations(authorizeService.getClass()) {{
-            // Allow current Community ADD perms
-            authorizeService.authorizeAction((Context) any, (Community) any,
-                                             Constants.ADD);
-            result = null;
-            // Allow current Community WRITE perms
-            authorizeService.authorizeAction((Context) any, (Community) any,
-                                             Constants.WRITE);
-            result = null;
-        }};
-
         //empty by default
         assertThat("testGetCollections 0", c.getCollections(), notNullValue());
         assertTrue("testGetCollections 1", c.getCollections().size() == 0);
@@ -697,17 +513,6 @@ public class CommunityTest extends AbstractDSpaceObjectTest {
      */
     @Test
     public void testGetSubcommunities() throws Exception {
-        new NonStrictExpectations(authorizeService.getClass()) {{
-            // Allow current Community ADD perms
-            authorizeService.authorizeAction((Context) any, (Community) any,
-                                             Constants.ADD);
-            result = null;
-            // Allow *parent* Community ADD perms
-            authorizeService.authorizeActionBoolean((Context) any, (Community) any,
-                                                    Constants.ADD);
-            result = true;
-        }};
-
         //empty by default
         assertThat("testGetSubcommunities 0", c.getSubcommunities(), notNullValue());
         assertTrue("testGetSubcommunities 1", c.getSubcommunities().size() == 0);
@@ -739,22 +544,13 @@ public class CommunityTest extends AbstractDSpaceObjectTest {
      */
     @Test
     public void testGetParentCommunity() throws Exception {
-        new NonStrictExpectations(authorizeService.getClass()) {{
-            // Allow current Community ADD perms
-            authorizeService.authorizeAction((Context) any, (Community) any,
-                                             Constants.ADD);
-            result = null;
-            // Allow *parent* Community ADD perms
-            authorizeService.authorizeActionBoolean((Context) any, (Community) any,
-                                                    Constants.ADD);
-            result = true;
-        }};
-
         //null by default
         assertThat("testGetParentCommunity 0", c.getParentCommunities().size(), equalTo(0));
 
-        //community with  parent
+        //community with parent
+        context.turnOffAuthorisationSystem();
         Community son = communityService.create(c, context);
+        context.restoreAuthSystemState();
         assertThat("testGetParentCommunity 1", son.getParentCommunities().size(), not(0));
         assertThat("testGetParentCommunity 2", son.getParentCommunities().get(0), equalTo(c));
     }
@@ -764,23 +560,14 @@ public class CommunityTest extends AbstractDSpaceObjectTest {
      */
     @Test
     public void testGetAllParents() throws Exception {
-        new NonStrictExpectations(authorizeService.getClass()) {{
-            // Allow current Community ADD perms
-            authorizeService.authorizeAction((Context) any, (Community) any,
-                                             Constants.ADD);
-            result = null;
-            // Allow *parent* Community ADD perms
-            authorizeService.authorizeActionBoolean((Context) any, (Community) any,
-                                                    Constants.ADD);
-            result = true;
-        }};
-
         //empty by default
         assertThat("testGetAllParents 0", communityService.getAllParents(context, c), notNullValue());
         assertTrue("testGetAllParents 1", communityService.getAllParents(context, c).size() == 0);
 
-        //community with  parent
+        //community with parent
+        context.turnOffAuthorisationSystem();
         Community son = communityService.create(c, context);
+        context.restoreAuthSystemState();
         assertThat("testGetAllParents 2", communityService.getAllParents(context, son), notNullValue());
         assertTrue("testGetAllParents 3", communityService.getAllParents(context, son).size() == 1);
         assertThat("testGetAllParents 4", communityService.getAllParents(context, son).get(0), equalTo(c));
@@ -791,25 +578,16 @@ public class CommunityTest extends AbstractDSpaceObjectTest {
      */
     @Test
     public void testGetAllCollections() throws Exception {
-        new NonStrictExpectations(authorizeService.getClass()) {{
-            // Allow current Community ADD perms
-            authorizeService.authorizeAction((Context) any, (Community) any,
-                                             Constants.ADD);
-            result = null;
-            // Allow *parent* Community ADD perms
-            authorizeService.authorizeActionBoolean((Context) any, (Community) any,
-                                                    Constants.ADD);
-            result = true;
-        }};
-
         //empty by default
         assertThat("testGetAllCollections 0", communityService.getAllCollections(context, c), notNullValue());
         assertTrue("testGetAllCollections 1", communityService.getAllCollections(context, c).size() == 0);
 
         //community has a collection and a subcommunity, subcommunity has a collection
+        context.turnOffAuthorisationSystem();
         Collection collOfC = collectionService.create(context, c);
         Community sub = communityService.create(c, context);
         Collection collOfSub = collectionService.create(context, sub);
+        context.restoreAuthSystemState();
         assertThat("testGetAllCollections 2", communityService.getAllCollections(context, c), notNullValue());
         assertTrue("testGetAllCollections 3", communityService.getAllCollections(context, c).size() == 2);
         assertThat("testGetAllCollections 4", communityService.getAllCollections(context, c).get(0),
@@ -822,13 +600,8 @@ public class CommunityTest extends AbstractDSpaceObjectTest {
      */
     @Test
     public void testCreateCollectionAuth() throws Exception {
-        // Need current Community ADD permissions in order to create a Collection
-        new NonStrictExpectations(authorizeService.getClass()) {{
-            // Allow current Community ADD perms
-            authorizeService.authorizeAction((Context) any, (Community) any,
-                                             Constants.ADD);
-            result = null;
-        }};
+        // Allow current Community ADD perms
+        doNothing().when(authorizeServiceSpy).authorizeAction(context, c, Constants.ADD);
 
         Collection result = collectionService.create(context, c);
         assertThat("testCreateCollectionAuth 0", result, notNullValue());
@@ -841,14 +614,10 @@ public class CommunityTest extends AbstractDSpaceObjectTest {
      */
     @Test(expected = AuthorizeException.class)
     public void testCreateCollectionNoAuth() throws Exception {
-        new NonStrictExpectations(authorizeService.getClass()) {{
-            // Disallow current Community ADD perms
-            authorizeService.authorizeAction((Context) any, (Community) any,
-                                             Constants.ADD);
-            result = new AuthorizeException();
-        }};
+        // Disallow current Community ADD perms
+        doThrow(new AuthorizeException()).when(authorizeServiceSpy).authorizeAction(context, c, Constants.ADD);
 
-        Collection result = collectionService.create(context, c);
+        collectionService.create(context, c);
         fail("Exception expected");
     }
 
@@ -857,12 +626,8 @@ public class CommunityTest extends AbstractDSpaceObjectTest {
      */
     @Test
     public void testAddCollectionAuth() throws Exception {
-        new NonStrictExpectations(authorizeService.getClass()) {{
-            // Allow current Community ADD perms
-            authorizeService.authorizeAction((Context) any, (Community) any,
-                                             Constants.ADD);
-            result = null;
-        }};
+        // Allow current Community ADD perms
+        doNothing().when(authorizeServiceSpy).authorizeAction(context, c, Constants.ADD);
 
         Collection col = collectionService.create(context, c);
         c.addCollection(col);
@@ -875,12 +640,8 @@ public class CommunityTest extends AbstractDSpaceObjectTest {
      */
     @Test(expected = AuthorizeException.class)
     public void testAddCollectionNoAuth() throws Exception {
-        new NonStrictExpectations(authorizeService.getClass()) {{
-            // Disallow current Community ADD perms
-            authorizeService.authorizeAction((Context) any, (Community) any,
-                                             Constants.ADD);
-            result = new AuthorizeException();
-        }};
+        // Disallow current Community ADD perms
+        doThrow(new AuthorizeException()).when(authorizeServiceSpy).authorizeAction(context, c, Constants.ADD);
 
         Collection col = collectionService.create(context, c);
         c.addCollection(col);
@@ -892,16 +653,10 @@ public class CommunityTest extends AbstractDSpaceObjectTest {
      */
     @Test
     public void testCreateSubcommunityAuth() throws Exception {
-        new NonStrictExpectations(authorizeService.getClass()) {{
-            // Allow current Community ADD perms
-            authorizeService.authorizeAction((Context) any, (Community) any,
-                                             Constants.ADD);
-            result = null;
-            // Allow *parent* Community ADD perms
-            authorizeService.authorizeActionBoolean((Context) any, (Community) any,
-                                                    Constants.ADD);
-            result = true;
-        }};
+        // Allow current Community ADD perms
+        doNothing().when(authorizeServiceSpy).authorizeAction(context, c, Constants.ADD);
+        // Allow parent Community ADD perms
+        when(authorizeServiceSpy.authorizeActionBoolean(context, c, Constants.ADD)).thenReturn(true);
 
         Community result = communityService.createSubcommunity(context, c);
         assertThat("testCreateSubcommunityAuth 0", c.getSubcommunities(), notNullValue());
@@ -914,18 +669,10 @@ public class CommunityTest extends AbstractDSpaceObjectTest {
      */
     @Test(expected = AuthorizeException.class)
     public void testCreateSubcommunityNoAuth() throws Exception {
-        new NonStrictExpectations(authorizeService.getClass()) {{
-            // Disallow current Community ADD perms
-            authorizeService.authorizeAction((Context) any, (Community) any,
-                                             Constants.ADD);
-            result = new AuthorizeException();
-            // Allow *parent* Community ADD perms
-            authorizeService.authorizeActionBoolean((Context) any, (Community) any,
-                                                    Constants.ADD);
-            result = true;
-        }};
+        // Disallow current Community ADD perms
+        doThrow(new AuthorizeException()).when(authorizeServiceSpy).authorizeAction(context, c, Constants.ADD);
 
-        Community result = communityService.createSubcommunity(context, c);
+        communityService.createSubcommunity(context, c);
         fail("Exception expected");
     }
 
@@ -934,16 +681,8 @@ public class CommunityTest extends AbstractDSpaceObjectTest {
      */
     @Test
     public void testAddSubcommunityAuth() throws Exception {
-        new NonStrictExpectations(authorizeService.getClass()) {{
-            // Allow current Community ADD perms
-            authorizeService.authorizeAction((Context) any, (Community) any,
-                                             Constants.ADD);
-            result = null;
-            // Allow *parent* Community ADD perms
-            authorizeService.authorizeActionBoolean((Context) any, (Community) any,
-                                                    Constants.ADD);
-            result = true;
-        }};
+        // Allow current Community ADD perms
+        doNothing().when(authorizeServiceSpy).authorizeAction(context, c, Constants.ADD);
 
         // Turn off authorization temporarily to create a new top-level community
         context.turnOffAuthorisationSystem();
@@ -961,18 +700,11 @@ public class CommunityTest extends AbstractDSpaceObjectTest {
      */
     @Test(expected = AuthorizeException.class)
     public void testAddSubcommunityNoAuth() throws Exception {
-        new NonStrictExpectations(authorizeService.getClass()) {{
-            // Disallow current Community ADD perms
-            authorizeService.authorizeAction((Context) any, (Community) any,
-                                             Constants.ADD);
-            result = new AuthorizeException();
-            // Allow *parent* Community ADD perms
-            authorizeService.authorizeActionBoolean((Context) any, (Community) any,
-                                                    Constants.ADD);
-            result = true;
-        }};
-
+        // Turn off authorization temporarily to create a new top-level community
+        context.turnOffAuthorisationSystem();
         Community result = communityService.create(null, context);
+        context.restoreAuthSystemState();
+
         communityService.addSubcommunity(context, c, result);
         fail("Exception expected");
     }
@@ -982,30 +714,23 @@ public class CommunityTest extends AbstractDSpaceObjectTest {
      */
     @Test
     public void testRemoveCollectionAuth() throws Exception {
-        new NonStrictExpectations(authorizeService.getClass(), AuthorizeUtil.class) {{
-            // Allow current Community ADD perms (to add Collection)
-            authorizeService.authorizeAction((Context) any, (Community) any,
-                                             Constants.ADD);
-            result = null;
-            // Allow current Community REMOVE perms
-            authorizeService.authorizeAction((Context) any, (Community) any,
-                                             Constants.REMOVE);
-            result = null;
-            // Allow Collection ManageTemplateItem perms (needed to delete Collection)
-            AuthorizeUtil.authorizeManageTemplateItem((Context) any, (Collection) any);
-            result = null;
-            // Allow Collection WRITE perms (needed to delete Collection)
-            authorizeService.authorizeAction((Context) any, (Collection) any,
-                                             Constants.WRITE, true);
-            result = null;
-        }};
-
+        // Turn off authorization temporarily to create a new Collection
+        context.turnOffAuthorisationSystem();
         Collection col = collectionService.create(context, c);
+        context.restoreAuthSystemState();
         assertThat("testRemoveCollectionAuth 0", c.getCollections(), notNullValue());
         assertTrue("testRemoveCollectionAuth 1", c.getCollections().size() == 1);
         assertThat("testRemoveCollectionAuth 2", c.getCollections().get(0), equalTo(col));
 
-        c.removeCollection(col);
+        // Allow current Community REMOVE perms (to remove Collection from Community & delete)
+        doNothing().when(authorizeServiceSpy).authorizeAction(context, c, Constants.REMOVE);
+        // Allow collection WRITE perms (needed to remove Logo before Collection can be deleted)
+        doNothing().when(authorizeServiceSpy).authorizeAction(context, col, Constants.WRITE,true);
+        // Allow current Community ADMIN perms (to remove Collection from Community & delete)
+        doNothing().when(authorizeServiceSpy).authorizeAction(context, col, Constants.ADMIN);
+
+        // Note that this will *also* delete the collection (hence the extra permissions provided above)
+        communityService.removeCollection(context, c, col);
         assertThat("testRemoveCollectionAuth 3", c.getCollections(), notNullValue());
         assertTrue("testRemoveCollectionAuth 4", c.getCollections().size() == 0);
     }
@@ -1015,18 +740,13 @@ public class CommunityTest extends AbstractDSpaceObjectTest {
      */
     @Test(expected = AuthorizeException.class)
     public void testRemoveCollectionNoAuth() throws Exception {
-        new NonStrictExpectations(authorizeService.getClass()) {{
-            // Allow current Community ADD perms
-            authorizeService.authorizeAction((Context) any, (Community) any,
-                                             Constants.ADD);
-            result = null;
-            // Disallow current Community REMOVE perms
-            authorizeService.authorizeAction((Context) any, (Community) any,
-                                             Constants.REMOVE);
-            result = new AuthorizeException();
-        }};
+        // Disallow current Community REMOVE perms
+        doThrow(new AuthorizeException()).when(authorizeServiceSpy).authorizeAction(context, c, Constants.REMOVE);
 
+        // Turn off authorization temporarily to create a new Collection
+        context.turnOffAuthorisationSystem();
         Collection col = collectionService.create(context, c);
+        context.restoreAuthSystemState();
         assertThat("testRemoveCollectionNoAuth 0", c.getCollections(), notNullValue());
         assertTrue("testRemoveCollectionNoAuth 1", c.getCollections().size() == 1);
         assertThat("testRemoveCollectionNoAuth 2", c.getCollections().get(0), equalTo(col));
@@ -1040,20 +760,15 @@ public class CommunityTest extends AbstractDSpaceObjectTest {
      */
     @Test
     public void testRemoveSubcommunityAuth() throws Exception {
-        new NonStrictExpectations(authorizeService.getClass()) {{
-            // Allow Community ADD perms (in order to add a new subcommunity to parent)
-            authorizeService.authorizeAction((Context) any, (Community) any,
-                                             Constants.ADD, true);
-            result = null;
-            // Allow Community REMOVE perms (needed to unmap/remove subcommunity)
-            authorizeService.authorizeAction((Context) any, (Community) any,
-                                             Constants.REMOVE, true);
-            result = null;
-            // Allow Community DELETE perms (needed to actually delete subcommunity)
-            authorizeService.authorizeAction((Context) any, (Community) any,
-                                             Constants.DELETE, true);
-            result = null;
-        }};
+        // Allow current Community ADD perms  (in order to add a new subcommunity to parent)
+        doNothing().when(authorizeServiceSpy)
+                   .authorizeAction(any(Context.class), any(Community.class), eq(Constants.ADD), eq(true));
+        // Allow current Community REMOVE perms (needed to unmap/remove subcommunity)
+        doNothing().when(authorizeServiceSpy)
+                   .authorizeAction(any(Context.class), any(Community.class), eq(Constants.REMOVE), eq(true));
+        // Allow current Community REMOVE perms (needed to actually delete subcommunity)
+        doNothing().when(authorizeServiceSpy)
+                   .authorizeAction(any(Context.class), any(Community.class), eq(Constants.DELETE), eq(true));
 
         // Turn off authorization temporarily to create a new top-level community
         context.turnOffAuthorisationSystem();
@@ -1075,24 +790,12 @@ public class CommunityTest extends AbstractDSpaceObjectTest {
      */
     @Test
     public void testDeleteAuth() throws Exception {
-        new NonStrictExpectations(authorizeService.getClass()) {{
-            // Allow current Community ADD perms (to create content to be deleted)
-            authorizeService.authorizeAction((Context) any, (Community) any,
-                                             Constants.ADD);
-            result = null;
-            // Allow current Community WRITE perms (to create content to be deleted)
-            authorizeService.authorizeAction((Context) any, (Community) any,
-                                             Constants.WRITE);
-            result = null;
-            // Allow current Community DELETE perms (needed to delete community)
-            authorizeService.authorizeAction((Context) any, (Community) any,
-                                             Constants.DELETE);
-            result = null;
-            // Disallow *parent* Community REMOVE perms
-            authorizeService.authorizeActionBoolean((Context) any, (Community) any,
-                                                    Constants.REMOVE);
-            result = false;
-        }};
+        // Allow current Community WRITE perms (to create content to be deleted)
+        doNothing().when(authorizeServiceSpy)
+                   .authorizeAction(any(Context.class), any(Community.class), eq(Constants.WRITE));
+        // Allow current Community DELETE perms (needed to delete community)
+        doNothing().when(authorizeServiceSpy)
+                   .authorizeAction(any(Context.class), any(Community.class), eq(Constants.DELETE));
 
         // Turn off authorization temporarily to create a new top-level community
         context.turnOffAuthorisationSystem();
@@ -1111,24 +814,12 @@ public class CommunityTest extends AbstractDSpaceObjectTest {
      */
     @Test
     public void testDeleteAuth2() throws Exception {
-        new NonStrictExpectations(authorizeService.getClass()) {{
-            // Allow current Community ADD perms (to create content to be deleted)
-            authorizeService.authorizeAction((Context) any, (Community) any,
-                                             Constants.ADD);
-            result = null;
-            // Allow current Community WRITE perms (to create content to be deleted)
-            authorizeService.authorizeAction((Context) any, (Community) any,
-                                             Constants.WRITE);
-            result = null;
-            // Allow current Community DELETE perms (needed to delete community)
-            authorizeService.authorizeAction((Context) any, (Community) any,
-                                             Constants.DELETE);
-            result = null;
-            // Allow *parent* Community REMOVE perms
-            authorizeService.authorizeActionBoolean((Context) any, (Community) any,
-                                                    Constants.REMOVE, true);
-            result = true;
-        }};
+        // Allow current Community WRITE perms
+        doNothing().when(authorizeServiceSpy)
+                   .authorizeAction(any(Context.class), any(Community.class), eq(Constants.WRITE));
+        // Allow current Community DELETE perms (needed to delete community)
+        doNothing().when(authorizeServiceSpy)
+                   .authorizeAction(any(Context.class), any(Community.class), eq(Constants.DELETE));
 
         // Turn off authorization temporarily to create a new top-level community
         context.turnOffAuthorisationSystem();
@@ -1147,28 +838,27 @@ public class CommunityTest extends AbstractDSpaceObjectTest {
      */
     @Test
     public void testDeleteHierachyAuth() throws Exception {
-        System.out.println("testDeleteHierarchyAuth");
-        new NonStrictExpectations(authorizeService.getClass(), AuthorizeUtil.class) {{
-            // Allow current Community DELETE perms (needed to delete a community)
-            authorizeService.authorizeAction((Context) any, (Community) any,
-                                             Constants.DELETE, true);
-            result = null;
-            // Allow current Community REMOVE perms (needed to remove a sub-community from a community)
-            authorizeService.authorizeAction((Context) any, (Community) any,
-                                             Constants.REMOVE, true);
-            result = null;
-            // Allow Collection ManageTemplateItem perms (needed to delete a collection)
-            AuthorizeUtil.authorizeManageTemplateItem((Context) any, (Collection) any);
-            result = null;
-            // Allow current Collection DELETE perms (needed to delete a Collection)
-            authorizeService.authorizeAction((Context) any, (Collection) any,
-                                             Constants.DELETE, true);
-            result = null;
-            // Allow current Item WRITE perms (needed to remove identifiers from an Item prior to deletion)
-            authorizeService.authorizeAction((Context) any, (Item) any,
-                                             Constants.WRITE, true);
-            result = null;
-        }};
+        // Allow current Community DELETE perms (needed to delete a community)
+        doNothing().when(authorizeServiceSpy)
+                   .authorizeAction(any(Context.class), any(Community.class), eq(Constants.DELETE), eq(true));
+        // Allow current Community REMOVE perms (needed to remove a sub-community from a community)
+        doNothing().when(authorizeServiceSpy)
+                   .authorizeAction(any(Context.class), any(Community.class), eq(Constants.REMOVE), eq(true));
+        // Allow current Collection DELETE perms (needed to delete a Collection)
+        doNothing().when(authorizeServiceSpy)
+                   .authorizeAction(any(Context.class), any(Collection.class), eq(Constants.DELETE), eq(true));
+        // Allow current Collection ADMIN perms (needed to delete a Collection)
+        doNothing().when(authorizeServiceSpy)
+                   .authorizeAction(any(Context.class), any(Collection.class), eq(Constants.ADMIN));
+        // Allow current Item WRITE perms (needed to remove identifiers from an Item prior to deletion)
+        doNothing().when(authorizeServiceSpy)
+                   .authorizeAction(any(Context.class), any(Item.class), eq(Constants.WRITE), eq(true));
+        // Allow current Item DELETE perms (needed to delete Item)
+        doNothing().when(authorizeServiceSpy)
+                   .authorizeAction(any(Context.class), any(Item.class), eq(Constants.DELETE), eq(true));
+        // Allow current Item REMOVE perms (needed to delete Item)
+        doNothing().when(authorizeServiceSpy)
+                   .authorizeAction(any(Context.class), any(Item.class), eq(Constants.REMOVE), eq(true));
 
         // Create a dummy Community hierarchy to test delete with
         // Turn off authorization temporarily to create some test objects.
@@ -1183,8 +873,8 @@ public class CommunityTest extends AbstractDSpaceObjectTest {
         // Create two separate items
         WorkspaceItem wsItem = workspaceItemService.create(context, childCol, false);
         Item item = installItemService.installItem(context, wsItem);
-        wsItem = workspaceItemService.create(context, childCol, false);
-        item = installItemService.installItem(context, wsItem);
+        wsItem = workspaceItemService.create(context, grandchildCol, false);
+        Item item2 = installItemService.installItem(context, wsItem);
 
         // Done creating the objects. Turn auth system back on
         context.restoreAuthSystemState();
@@ -1196,6 +886,7 @@ public class CommunityTest extends AbstractDSpaceObjectTest {
         UUID childColId = childCol.getID();
         UUID grandchildColId = grandchildCol.getID();
         UUID itemId = item.getID();
+        UUID item2Id = item2.getID();
 
         // Delete the parent of this entire hierarchy
         communityService.delete(context, parent);
@@ -1213,6 +904,8 @@ public class CommunityTest extends AbstractDSpaceObjectTest {
                    collectionService.find(context, grandchildColId), nullValue());
         assertThat("Item not deleted",
                    itemService.find(context, itemId), nullValue());
+        assertThat("Item not deleted",
+                   itemService.find(context, item2Id), nullValue());
     }
 
     /**
@@ -1220,16 +913,10 @@ public class CommunityTest extends AbstractDSpaceObjectTest {
      */
     @Test(expected = AuthorizeException.class)
     public void testDeleteNoAuth() throws Exception {
-        new NonStrictExpectations(authorizeService.getClass()) {{
-            // Disallow current Community DELETE perms
-            authorizeService.authorizeAction((Context) any, (Community) any,
-                                             Constants.DELETE);
-            result = new AuthorizeException();
-            // Disallow *parent* Community REMOVE perms
-            authorizeService.authorizeActionBoolean((Context) any, (Community) any,
-                                                    Constants.REMOVE);
-            result = false;
-        }};
+        // Disallow current Community DELETE perms
+        doThrow(new AuthorizeException()).when(authorizeServiceSpy)
+                                         .authorizeAction(any(Context.class), any(Community.class),
+                                                          eq(Constants.DELETE));
 
         communityService.delete(context, c);
         fail("Exception expected");
@@ -1241,11 +928,8 @@ public class CommunityTest extends AbstractDSpaceObjectTest {
     @Test
     @SuppressWarnings("ObjectEqualsNull")
     public void testEquals() throws SQLException, AuthorizeException {
-        new NonStrictExpectations(authorizeService.getClass()) {{
-            // Allow full Admin perms (just to create top-level community)
-            authorizeService.isAdmin((Context) any);
-            result = true;
-        }};
+        // Allow full Admin perms (just to create top-level community)
+        when(authorizeServiceSpy.isAdmin(context)).thenReturn(true);
 
         assertFalse("testEquals 0", c.equals(null));
         assertFalse("testEquals 1", c.equals(communityService.create(null, context)));
@@ -1266,21 +950,9 @@ public class CommunityTest extends AbstractDSpaceObjectTest {
      */
     @Test
     public void testCanEditBooleanAuth() throws Exception {
-        // Test inheritance of permissions
-        new NonStrictExpectations(authorizeService.getClass()) {{
-            // Allow parent Community ADD perms
-            authorizeService.authorizeActionBoolean((Context) any, (Community) any,
-                                                    Constants.ADD);
-            result = true;
-            // Allow parent Community WRITE perms
-            authorizeService.authorizeActionBoolean((Context) any, (Community) any,
-                                                    Constants.WRITE);
-            result = true;
-            // Allow current Community WRITE perms
-            authorizeService.authorizeAction((Context) any, (Community) any,
-                                             Constants.WRITE);
-            result = null;
-        }};
+        // Allow current Community WRITE perms
+        doNothing().when(authorizeServiceSpy)
+                   .authorizeAction(context, c, Constants.WRITE);
 
         assertTrue("testCanEditBooleanAuth 0", communityService.canEditBoolean(context, c));
     }
@@ -1289,94 +961,9 @@ public class CommunityTest extends AbstractDSpaceObjectTest {
      * Test of canEditBoolean method, of class Community.
      */
     @Test
-    public void testCanEditBooleanAuth2() throws Exception {
-        // Test inheritance of permissions
-        new NonStrictExpectations(authorizeService.getClass()) {{
-            // Disallow parent Community ADD perms
-            authorizeService.authorizeActionBoolean((Context) any, (Community) any,
-                                                    Constants.ADD);
-            result = false;
-            // Allow parent Community WRITE perms
-            authorizeService.authorizeActionBoolean((Context) any, (Community) any,
-                                                    Constants.WRITE);
-            result = true;
-            // Allow current Community WRITE perms
-            authorizeService.authorizeAction((Context) any, (Community) any,
-                                             Constants.WRITE);
-            result = null;
-        }};
-
-        assertTrue("testCanEditBooleanAuth2 0", communityService.canEditBoolean(context, c));
-    }
-
-    /**
-     * Test of canEditBoolean method, of class Community.
-     */
-    @Test
-    public void testCanEditBooleanAuth3() throws Exception {
-        // Test inheritance of permissions
-        new NonStrictExpectations(authorizeService.getClass()) {{
-            // Allow parent Community ADD perms
-            authorizeService.authorizeActionBoolean((Context) any, (Community) any,
-                                                    Constants.ADD);
-            result = true;
-            // Disallow parent Community WRITE perms
-            authorizeService.authorizeActionBoolean((Context) any, (Community) any,
-                                                    Constants.WRITE);
-            result = false;
-            // Allow current Community WRITE perms
-            authorizeService.authorizeAction((Context) any, (Community) any,
-                                             Constants.WRITE);
-            result = null;
-        }};
-
-        assertTrue("testCanEditBooleanAuth3 0", communityService.canEditBoolean(context, c));
-    }
-
-    /**
-     * Test of canEditBoolean method, of class Community.
-     */
-    @Test
-    public void testCanEditBooleanAuth4() throws Exception {
-        // Test inheritance of permissions
-        new NonStrictExpectations(authorizeService.getClass()) {{
-            // Disallow parent Community ADD perms
-            authorizeService.authorizeActionBoolean((Context) any, (Community) any,
-                                                    Constants.ADD);
-            result = false;
-            // Disallow parent Community WRITE perms
-            authorizeService.authorizeActionBoolean((Context) any, (Community) any,
-                                                    Constants.WRITE);
-            result = false;
-            // Allow current Community WRITE perms
-            authorizeService.authorizeAction((Context) any, (Community) any,
-                                             Constants.WRITE);
-            result = null;
-        }};
-
-        assertTrue("testCanEditBooleanAuth4 0", communityService.canEditBoolean(context, c));
-    }
-
-    /**
-     * Test of canEditBoolean method, of class Community.
-     */
-    @Test
     public void testCanEditBooleanNoAuth() throws Exception {
-        // Test inheritance of permissions
-        new NonStrictExpectations(authorizeService.getClass()) {{
-            // Disallow parent Community ADD perms
-            authorizeService.authorizeActionBoolean((Context) any, (Community) any,
-                                                    Constants.ADD);
-            result = false;
-            // Disallow parent Community WRITE perms
-            authorizeService.authorizeActionBoolean((Context) any, (Community) any,
-                                                    Constants.WRITE);
-            result = false;
-            // Disallow current Community WRITE perms
-            authorizeService.authorizeAction((Context) any, (Community) any,
-                                             Constants.WRITE);
-            result = new AuthorizeException();
-        }};
+        // Disallow current Community WRITE perms
+        doThrow(new AuthorizeException()).when(authorizeServiceSpy).authorizeAction(context, c, Constants.WRITE);
 
         assertFalse("testCanEditBooleanNoAuth 0", communityService.canEditBoolean(context, c));
     }
@@ -1386,93 +973,8 @@ public class CommunityTest extends AbstractDSpaceObjectTest {
      */
     @Test
     public void testCanEditAuth() throws Exception {
-        // Test inheritance of permissions
-        new NonStrictExpectations(authorizeService.getClass()) {{
-            // Allow parent Community ADD perms
-            authorizeService.authorizeActionBoolean((Context) any, (Community) any,
-                                                    Constants.ADD);
-            result = true;
-            // Allow parent Community WRITE perms
-            authorizeService.authorizeActionBoolean((Context) any, (Community) any,
-                                                    Constants.WRITE);
-            result = true;
-            // Allow current Community WRITE perms
-            authorizeService.authorizeAction((Context) any, (Community) any,
-                                             Constants.WRITE);
-            result = null;
-        }};
-
-        communityService.canEdit(context, c);
-    }
-
-    /**
-     * Test of canEdit method, of class Community.
-     */
-    @Test
-    public void testCanEditAuth1() throws Exception {
-        // Test inheritance of permissions
-        new NonStrictExpectations(authorizeService.getClass()) {{
-            // Disallow parent Community ADD perms
-            authorizeService.authorizeActionBoolean((Context) any, (Community) any,
-                                                    Constants.ADD);
-            result = false;
-            // Allow parent Community WRITE perms
-            authorizeService.authorizeActionBoolean((Context) any, (Community) any,
-                                                    Constants.WRITE);
-            result = true;
-            // Allow current Community WRITE perms
-            authorizeService.authorizeAction((Context) any, (Community) any,
-                                             Constants.WRITE);
-            result = null;
-        }};
-
-        communityService.canEdit(context, c);
-    }
-
-    /**
-     * Test of canEdit method, of class Community.
-     */
-    @Test
-    public void testCanEditAuth2() throws Exception {
-        // Test inheritance of permissions
-        new NonStrictExpectations(authorizeService.getClass()) {{
-            // Allow parent Community ADD perms
-            authorizeService.authorizeActionBoolean((Context) any, (Community) any,
-                                                    Constants.ADD);
-            result = true;
-            // Disallow parent Community WRITE perms
-            authorizeService.authorizeActionBoolean((Context) any, (Community) any,
-                                                    Constants.WRITE);
-            result = false;
-            // Allow current Community WRITE perms
-            authorizeService.authorizeAction((Context) any, (Community) any,
-                                             Constants.WRITE);
-            result = null;
-        }};
-
-        communityService.canEdit(context, c);
-    }
-
-    /**
-     * Test of canEdit method, of class Community.
-     */
-    @Test
-    public void testCanEditAuth3() throws Exception {
-        // Test inheritance of permissions
-        new NonStrictExpectations(authorizeService.getClass()) {{
-            // Disallow parent Community ADD perms
-            authorizeService.authorizeActionBoolean((Context) any, (Community) any,
-                                                    Constants.ADD);
-            result = false;
-            // Disallow parent Community WRITE perms
-            authorizeService.authorizeActionBoolean((Context) any, (Community) any,
-                                                    Constants.WRITE);
-            result = false;
-            // Allow current Community WRITE perms
-            authorizeService.authorizeAction((Context) any, (Community) any,
-                                             Constants.WRITE);
-            result = null;
-        }};
+        // Allow current Community WRITE perms
+        doNothing().when(authorizeServiceSpy).authorizeAction(context, c, Constants.WRITE);
 
         communityService.canEdit(context, c);
     }
@@ -1482,21 +984,8 @@ public class CommunityTest extends AbstractDSpaceObjectTest {
      */
     @Test(expected = AuthorizeException.class)
     public void testCanEditNoAuth() throws Exception {
-        // Test inheritance of permissions
-        new NonStrictExpectations(authorizeService.getClass()) {{
-            // Disallow parent Community ADD perms
-            authorizeService.authorizeActionBoolean((Context) any, (Community) any,
-                                                    Constants.ADD);
-            result = false;
-            // Disallow parent Community WRITE perms
-            authorizeService.authorizeActionBoolean((Context) any, (Community) any,
-                                                    Constants.WRITE);
-            result = false;
-            // Disallow current Community WRITE perms
-            authorizeService.authorizeAction((Context) any, (Community) any,
-                                             Constants.WRITE);
-            result = new AuthorizeException();
-        }};
+        // Disallow current Community WRITE perms
+        doThrow(new AuthorizeException()).when(authorizeServiceSpy).authorizeAction(context, c,Constants.WRITE);
 
         communityService.canEdit(context, c);
         fail("Exception expected");
@@ -1545,7 +1034,7 @@ public class CommunityTest extends AbstractDSpaceObjectTest {
             assertThat("testGetParentObject 1", communityService.getParentObject(context, son), notNullValue());
             assertThat("testGetParentObject 2", (Community) communityService.getParentObject(context, son), equalTo(c));
         } catch (AuthorizeException ex) {
-            fail("Authorize exception catched");
+            throw new AssertionError("AuthorizeException occurred", ex);
         }
     }
 

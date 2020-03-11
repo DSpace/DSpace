@@ -10,9 +10,12 @@ package org.dspace.app.rest.projection;
 import javax.persistence.Entity;
 
 import org.dspace.app.rest.model.LinkRest;
+import org.dspace.app.rest.model.RestAddressableModel;
 import org.dspace.app.rest.model.RestModel;
 import org.dspace.app.rest.model.hateoas.HALResource;
 import org.dspace.app.rest.repository.DSpaceRestRepository;
+import org.dspace.app.rest.utils.Utils;
+import org.springframework.hateoas.Link;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -43,19 +46,16 @@ import org.springframework.web.bind.annotation.RestController;
  *        via {@link #transformModel(Object)}.</li>
  *   <li> After it is converted to a {@link RestModel}, the projection may modify it
  *        via {@link #transformRest(RestModel)}.</li>
- *   <li> During conversion to a {@link HALResource}, the projection may opt out of certain annotation-discovered
- *        HAL embeds and links via {@link #allowOptionalEmbed(HALResource, LinkRest)}
- *        and {@link #allowOptionalLink(HALResource, LinkRest)}.</li>
+ *   <li> During conversion to a {@link HALResource}, the projection may opt in to certain annotation-discovered
+ *        HAL embeds and links via {@link #allowEmbedding(HALResource, LinkRest, Link...)}
+ *        and {@link #allowLinking(HALResource, LinkRest)}</li>
  *   <li> After conversion to a {@link HALResource}, the projection may modify it
  *        via {@link #transformResource(HALResource)}.</li>
  * </ul>
  *
  * <h2>How a projection is chosen</h2>
  *
- * When a REST request is made, the use of a projection may be explicit, as when it is provided as an argument
- * to the request, e.g. {@code /items/{uuid}?projection={projectionName}}. It may also be implicit, as when the
- * {@link ListProjection} is used automatically, in order to provide an abbreviated representation when serving
- * a collection of resources.
+ * See {@link Utils#obtainProjection()}.
  */
 public interface Projection {
 
@@ -108,28 +108,32 @@ public interface Projection {
     <T extends HALResource> T transformResource(T halResource);
 
     /**
-     * Tells whether this projection permits the embedding of a particular optionally-embeddable related resource.
+     * Tells whether this projection permits the embedding of a particular embeddable subresource.
      *
-     * Optionally-embeddable related resources, discovered through {@link LinkRest} annotations, are normally
-     * automatically embedded. This method gives the projection an opportunity to opt out of some or all such embeds,
-     * by returning {@code false}.
+     * This gives the projection an opportunity to opt in to to certain embeds, by returning {@code true}.
+     *
+     * Note: If this method returns {@code true} for a given subresource,
+     * it will be automatically linked regardless of what {@link #allowLinking(HALResource, LinkRest)} returns.
      *
      * @param halResource the resource from which the embed may or may not be made.
      * @param linkRest the LinkRest annotation through which the related resource was discovered on the rest object.
+     * @param oldLinks    The previously traversed links
      * @return true if allowed, false otherwise.
      */
-    boolean allowOptionalEmbed(HALResource halResource, LinkRest linkRest);
+    boolean allowEmbedding(HALResource<? extends RestAddressableModel> halResource, LinkRest linkRest,
+                           Link... oldLinks);
 
     /**
-     * Tells whether this projection permits the linking of a particular optionally-linkable related resource.
+     * Tells whether this projection permits the linking of a particular linkable subresource.
      *
-     * Optionally-linkable related resources, discovered through {@link LinkRest} annotations, are normally
-     * automatically linked. This method gives the projection an opportunity to opt out of some or all such links,
-     * by returning {@code false}.
+     * This gives the projection an opportunity to opt in to to certain links, by returning {@code true}.
      *
-     * @param halResource the resource from which the embed may or may not be made.
+     * Note: If {@link #allowEmbedding(HALResource, LinkRest, Link...)} returns {@code true} for a given subresource,
+     * it will be automatically linked regardless of what this method returns.
+     *
+     * @param halResource the resource from which the link may or may not be made.
      * @param linkRest the LinkRest annotation through which the related resource was discovered on the rest object.
      * @return true if allowed, false otherwise.
      */
-    boolean allowOptionalLink(HALResource halResource, LinkRest linkRest);
+    boolean allowLinking(HALResource halResource, LinkRest linkRest);
 }

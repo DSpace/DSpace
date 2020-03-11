@@ -24,6 +24,7 @@ import java.util.Map;
 import org.dspace.app.rest.builder.CollectionBuilder;
 import org.dspace.app.rest.builder.CommunityBuilder;
 import org.dspace.app.rest.builder.EPersonBuilder;
+import org.dspace.app.rest.matcher.HarvesterMetadataMatcher;
 import org.dspace.app.rest.matcher.MetadataConfigsMatcher;
 import org.dspace.app.rest.model.HarvestTypeEnum;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
@@ -113,7 +114,8 @@ public class CollectionHarvestSettingsControllerIT extends AbstractControllerInt
         List<Map<String,String>> configs = OAIHarvester.getAvailableMetadataFormats();
 
         // Add harvest settings to collection
-        JSONObject json = createHarvestSettingsJson("METADATA_ONLY", "https://dspace.org/oai/request", "col_1721.1_114174", "dc");
+        JSONObject json = createHarvestSettingsJson("METADATA_ONLY", "https://dspace.org/oai/request",
+                "col_1721.1_114174", "dc");
 
         getClient(token).perform(
             put("/api/core/collections/" + collection.getID() + "/harvester")
@@ -125,6 +127,8 @@ public class CollectionHarvestSettingsControllerIT extends AbstractControllerInt
         getClient(token).perform(
             get("/api/core/collections/" + collection.getID() + "/harvester"))
                 .andExpect(status().isOk())
+                .andExpect(jsonPath("$", HarvesterMetadataMatcher.matchFullEmbeds()))
+                .andExpect(jsonPath("$", HarvesterMetadataMatcher.matchLinks()))
                 .andExpect(jsonPath("$.harvest_type", is("METADATA_ONLY")))
                 .andExpect(jsonPath("$.oai_source", is("https://dspace.org/oai/request")))
                 .andExpect(jsonPath("$.oai_set_id", is("col_1721.1_114174")))
@@ -139,7 +143,8 @@ public class CollectionHarvestSettingsControllerIT extends AbstractControllerInt
                     MetadataConfigsMatcher.matchMetadataConfigs(configs)
                 )))
                 .andExpect(jsonPath("$._embedded.harvestermetadata._links.self.href",
-                    endsWith("/api/config/harvestermetadata")));
+                    endsWith("/api/config/harvestermetadata")))
+        ;
     }
 
     @Test
@@ -156,7 +161,8 @@ public class CollectionHarvestSettingsControllerIT extends AbstractControllerInt
     public void GetAndPutCollectionHarvestSettingsIfUserHasWriteRights() throws Exception {
         context.setCurrentUser(ePersonWithWriteRights);
         String token = getAuthToken(ePersonWithWriteRights.getEmail(), password);
-        JSONObject json = createHarvestSettingsJson("METADATA_ONLY", "https://dspace.org/oai/request", "col_1721.1_114174", "dc");
+        JSONObject json = createHarvestSettingsJson("METADATA_ONLY", "https://dspace.org/oai/request",
+                "col_1721.1_114174", "dc");
 
         getClient(token).perform(
             put("/api/core/collections/" + collection.getID() + "/harvester")
@@ -172,7 +178,8 @@ public class CollectionHarvestSettingsControllerIT extends AbstractControllerInt
 
     @Test
     public void getAndPutCollectionHarvestSettingsAnonymousUserException() throws Exception {
-        JSONObject json = createHarvestSettingsJson("METADATA_ONLY", "https://dspace.org/oai/request", "col_1721.1_114174", "dc");
+        JSONObject json = createHarvestSettingsJson("METADATA_ONLY", "https://dspace.org/oai/request",
+                "col_1721.1_114174", "dc");
 
         getClient().perform(
             put("/api/core/collections/" + collection.getID() + "/harvester")
@@ -185,7 +192,8 @@ public class CollectionHarvestSettingsControllerIT extends AbstractControllerInt
     public void GetAndPutCollectionHarvestSettingsIfUserHasNoWriteRightsException() throws Exception {
         context.setCurrentUser(eperson);
         String token = getAuthToken(eperson.getEmail(), password);
-        JSONObject json = createHarvestSettingsJson("METADATA_ONLY", "https://dspace.org/oai/request", "col_1721.1_114174", "dc");
+        JSONObject json = createHarvestSettingsJson("METADATA_ONLY", "https://dspace.org/oai/request",
+                "col_1721.1_114174", "dc");
 
         getClient(token).perform(
             put("/api/core/collections/" + collection.getID() + "/harvester")
@@ -224,7 +232,8 @@ public class CollectionHarvestSettingsControllerIT extends AbstractControllerInt
     public void PutWorksWithStandardSettings() throws Exception {
         String token = getAuthToken(admin.getEmail(), password);
 
-        JSONObject json = createHarvestSettingsJson("METADATA_ONLY", "https://dspace.org/oai/request", "col_1721.1_114174", "dc");
+        JSONObject json = createHarvestSettingsJson("METADATA_ONLY", "https://dspace.org/oai/request",
+                "col_1721.1_114174", "dc");
 
         getClient(token).perform(
             put("/api/core/collections/" + collection.getID() + "/harvester")
@@ -245,7 +254,8 @@ public class CollectionHarvestSettingsControllerIT extends AbstractControllerInt
     public void PutUnProcessableEntityIfIncorrectSettings() throws Exception {
         String token = getAuthToken(admin.getEmail(), password);
 
-        JSONObject json = createHarvestSettingsJson("METADATA_ONLY", "https://mydspace.edu/oai/request", "col_1721.1_114174", "bc");
+        JSONObject json = createHarvestSettingsJson("METADATA_ONLY", "https://mydspace.edu/oai/request",
+                "col_1721.1_114174", "bc");
 
         getClient(token).perform(
             put("/api/core/collections/" + collection.getID() + "/harvester")
@@ -301,7 +311,8 @@ public class CollectionHarvestSettingsControllerIT extends AbstractControllerInt
     public void PutUnprocessableEntityIfHarvestTypeIncorrect() throws Exception {
         String token = getAuthToken(admin.getEmail(), password);
 
-        JSONObject json = createHarvestSettingsJson("INCORRECT_HARVEST_TYPE", "https://mydspace.edu/oai/request", "col_1721.1_114174", "dc");
+        JSONObject json = createHarvestSettingsJson("INCORRECT_HARVEST_TYPE", "https://mydspace.edu/oai/request",
+                "col_1721.1_114174", "dc");
 
         getClient(token).perform(
             put("/api/core/collections/" + collection.getID() + "/harvester")

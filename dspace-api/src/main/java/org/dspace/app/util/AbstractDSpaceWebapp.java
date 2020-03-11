@@ -50,16 +50,16 @@ abstract public class AbstractDSpaceWebapp
     /**
      * Construct a particular kind of DSpace application.
      *
-     * @param kind what kind of application is this?  (XMLUI, JSPUI, etc.)
+     * @param kind what kind of application is this?
      */
     public AbstractDSpaceWebapp(String kind) {
         this.kind = kind;
 
         started = new Date();
 
-        url = ConfigurationManager.getProperty("dspace.url");
+        url = ConfigurationManager.getProperty("dspace.ui.url");
         if (null == url) {
-            throw new IllegalStateException("dspace.url is undefined");
+            throw new IllegalStateException("dspace.ui.url is undefined");
         }
     }
 

@@ -8,8 +8,8 @@
 package org.dspace.external.provider.impl;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -28,10 +28,12 @@ public class MockDataProvider implements ExternalDataProvider {
      * Generic getter for the sourceIdentifier
      * @return the sourceIdentifier value of this MockDataProvider
      */
+    @Override
     public String getSourceIdentifier() {
         return sourceIdentifier;
     }
 
+    @Override
     public Optional<ExternalDataObject> getExternalDataObject(String id) {
         ExternalDataObject externalDataObject = mockLookupMap.get(id);
         if (externalDataObject == null) {
@@ -41,8 +43,9 @@ public class MockDataProvider implements ExternalDataProvider {
         }
     }
 
+    @Override
     public List<ExternalDataObject> searchExternalDataObjects(String query, int start, int limit) {
-        List<ExternalDataObject> listToReturn = new LinkedList<>();
+        List<ExternalDataObject> listToReturn = new ArrayList<>();
         for (Map.Entry<String, ExternalDataObject> entry : mockLookupMap.entrySet()) {
             if (StringUtils.containsIgnoreCase(entry.getKey(), query)) {
                 listToReturn.add(entry.getValue());
@@ -72,7 +75,7 @@ public class MockDataProvider implements ExternalDataProvider {
 
     public void init() throws IOException {
         mockLookupMap = new HashMap<>();
-        List<String> externalDataObjectsToMake = new LinkedList<>();
+        List<String> externalDataObjectsToMake = new ArrayList<>();
         externalDataObjectsToMake.add("one");
         externalDataObjectsToMake.add("two");
         externalDataObjectsToMake.add("three");
@@ -83,7 +86,7 @@ public class MockDataProvider implements ExternalDataProvider {
             externalDataObject.setId(id);
             externalDataObject.setValue(id);
             externalDataObject.setDisplayValue(id);
-            List<MetadataValueDTO> list = new LinkedList<>();
+            List<MetadataValueDTO> list = new ArrayList<>();
             list.add(new MetadataValueDTO("dc", "contributor", "author", null, "Donald, Smith"));
             externalDataObject.setMetadata(list);
 
