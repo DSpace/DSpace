@@ -32,6 +32,7 @@ import org.springframework.core.type.filter.AssignableTypeFilter;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.hateoas.Link;
 import org.springframework.hateoas.Resource;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
@@ -155,9 +156,30 @@ public class ConverterService {
      * @throws ClassCastException if the resource type is not compatible with the inferred return type.
      */
     public <T extends HALResource> T toResource(RestModel restObject) {
+        return toResource(restObject, new Link[] {});
+    }
+
+    /**
+     * Converts the given rest object to a {@link HALResource} object.
+     * <p>
+     * If the rest object is a {@link RestAddressableModel}, the projection returned by
+     * {@link RestAddressableModel#getProjection()} will be used to determine which optional
+     * embeds and links will be added, and {@link Projection#transformResource(HALResource)}
+     * will be automatically called before returning the final, fully converted resource.
+     * </p><p>
+     * In all cases, the {@link HalLinkService} will be used immediately after the resource is constructed,
+     * to ensure all {@link HalLinkFactory}s have had a chance to add links as needed.
+     * </p>
+     *
+     * @param restObject the input rest object.
+     * @param oldLinks  The old links fo the Resource Object
+     * @param <T> the return type, a subclass of {@link HALResource}.
+     * @return the fully converted resource, with all automatic links and embeds applied.
+     */
+    public <T extends HALResource> T toResource(RestModel restObject, Link... oldLinks) {
         T halResource = getResource(restObject);
         if (restObject instanceof RestAddressableModel) {
-            utils.embedOrLinkClassLevelRels(halResource);
+            utils.embedOrLinkClassLevelRels(halResource, oldLinks);
             halLinkService.addLinks(halResource);
             Projection projection = ((RestAddressableModel) restObject).getProjection();
             return projection.transformResource(halResource);
