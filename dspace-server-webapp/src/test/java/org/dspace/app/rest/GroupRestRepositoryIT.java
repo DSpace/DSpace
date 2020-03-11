@@ -154,7 +154,7 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     @Test
     public void findAllForbiddenTest() throws Exception {
-    	String tokenEperson = getAuthToken(eperson.getEmail(), password);
+        String tokenEperson = getAuthToken(eperson.getEmail(), password);
         getClient(tokenEperson).perform(get("/api/eperson/groups"))
                    .andExpect(status().isForbidden());
     }
@@ -273,7 +273,7 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
         context.turnOffAuthorisationSystem();
 
         Group privateGroup = GroupBuilder.createGroup(context)
-        		.withName("Private Group")
+                .withName("Private Group")
                 .build();
 
         resourcePolicyService.removePolicies(context, privateGroup, Constants.READ);

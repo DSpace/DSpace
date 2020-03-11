@@ -32,7 +32,6 @@ import org.dspace.app.rest.builder.CommunityBuilder;
 import org.dspace.app.rest.builder.EPersonBuilder;
 import org.dspace.app.rest.builder.ItemBuilder;
 import org.dspace.app.rest.matcher.EPersonMatcher;
-import org.dspace.app.rest.matcher.GroupMatcher;
 import org.dspace.app.rest.matcher.HalMatcher;
 import org.dspace.app.rest.model.EPersonRest;
 import org.dspace.app.rest.model.MetadataRest;
@@ -239,7 +238,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
         context.turnOffAuthorisationSystem();
 
         EPerson ePerson1 = EPersonBuilder.createEPerson(context)
-        		.withNameInMetadata("Mik", "Reck")
+                .withNameInMetadata("Mik", "Reck")
                 .withEmail("MikReck@email.com")
                 .withPassword("qwerty01")
                 .build();
@@ -1351,13 +1350,14 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
         context.turnOffAuthorisationSystem();
 
         EPerson ePerson1 = EPersonBuilder.createEPerson(context)
-        		.withNameInMetadata("Mik", "Reck")
+                .withNameInMetadata("Mik", "Reck")
                 .withEmail("MikReck@email.com")
                 .withPassword("qwerty01")
                 .build();
 
         // newly created account become membership of Anonymous group
-        Group groupAnonymous = EPersonServiceFactory.getInstance().getGroupService().findByName(context, Group.ANONYMOUS);
+        Group groupAnonymous = EPersonServiceFactory.getInstance().getGroupService()
+                                                    .findByName(context, Group.ANONYMOUS);
 
         context.restoreAuthSystemState();
         String tokenEperson1 = getAuthToken(ePerson1.getEmail(), "qwerty01");
@@ -1365,9 +1365,9 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
                 .andExpect(jsonPath("$", Matchers.allOf(
-                		hasJsonPath("$._embedded.groups._embedded.groups.length()", is(1)),
-                            hasJsonPath("$._embedded.groups._embedded.groups[0].id", is(groupAnonymous.getID().toString())),
-                            hasJsonPath("$._embedded.groups._embedded.groups[0].name", is(groupAnonymous.getName()))
+                        hasJsonPath("$._embedded.groups._embedded.groups.length()", is(1)),
+                        hasJsonPath("$._embedded.groups._embedded.groups[0].id", is(groupAnonymous.getID().toString())),
+                        hasJsonPath("$._embedded.groups._embedded.groups[0].name", is(groupAnonymous.getName()))
                 )));
     }
 }

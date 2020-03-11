@@ -43,10 +43,10 @@ import org.springframework.test.web.servlet.MvcResult;
 
 public class ItemTemplateRestControllerIT extends AbstractControllerIntegrationTest {
 
-	@Autowired
-	 ResourcePolicyService  resourcePolicyService;
+    @Autowired
+    ResourcePolicyService  resourcePolicyService;
 
-	private ObjectMapper mapper;
+    private ObjectMapper mapper;
     private String adminAuthToken;
     private Collection childCollection;
     private TemplateItemRest testTemplateItem;
