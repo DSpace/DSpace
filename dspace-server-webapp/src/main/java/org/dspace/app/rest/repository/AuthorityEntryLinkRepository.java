@@ -69,12 +69,12 @@ public class AuthorityEntryLinkRepository extends AbstractDSpaceRestRepository
         }
         List<AuthorityEntryRest> results = new ArrayList<>();
         Pageable pageable = utils.getPageable(optionalPageable);
+        Choices choices = null;
         if (StringUtils.isNotBlank(metadata)) {
             String[] tokens = org.dspace.core.Utils.tokenize(metadata);
             String fieldKey = org.dspace.core.Utils.standardize(tokens[0], tokens[1], tokens[2], "_");
-            Choices choices = cas.getMatches(name, fieldKey, query, collection, Math.toIntExact(pageable.getOffset()),
-                    pageable.getPageSize(),
-                                             context.getCurrentLocale().toString());
+            choices = cas.getMatches(name, fieldKey, query, collection, Math.toIntExact(pageable.getOffset()),
+                    pageable.getPageSize(), context.getCurrentLocale().toString());
             for (Choice value : choices.values) {
                 results.add(authorityUtils.convertEntry(value, name, projection));
             }
@@ -82,7 +82,11 @@ public class AuthorityEntryLinkRepository extends AbstractDSpaceRestRepository
 
         Page<AuthorityEntryRest> resources;
         try {
-            resources = utils.getPage(results, pageable);
+            if (choices.total > results.size()) {
+                resources = new PageImpl<AuthorityEntryRest>(results, pageable, choices.total);
+            } else {
+                resources = utils.getPage(results, pageable);
+            }
         } catch (PaginationException pe) {
             resources = new PageImpl<AuthorityEntryRest>(new ArrayList<AuthorityEntryRest>(), pageable, pe.getTotal());
         }
