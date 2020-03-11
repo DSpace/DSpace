@@ -9,7 +9,6 @@ package org.dspace.app.rest.matcher;
 
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasNoJsonPath;
-
 import static org.dspace.app.rest.matcher.HalMatcher.matchEmbeds;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.is;
@@ -21,7 +20,7 @@ import org.hamcrest.Matcher;
 
 /**
  * Provide convenient org.hamcrest.Matcher to verify a ResourcePolicyRest json response
- * 
+ *
  * @author Mykhaylo Boychuk (4science.it)
  *
  */

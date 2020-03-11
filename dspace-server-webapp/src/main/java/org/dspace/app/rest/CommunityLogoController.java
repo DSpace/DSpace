@@ -10,7 +10,6 @@ package org.dspace.app.rest;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.UUID;
-
 import javax.servlet.http.HttpServletRequest;
 
 import org.dspace.app.rest.exception.UnprocessableEntityException;
