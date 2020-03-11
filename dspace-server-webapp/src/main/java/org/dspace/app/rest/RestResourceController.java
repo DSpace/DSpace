@@ -798,14 +798,14 @@ public class RestResourceController implements InitializingBean {
                         Page<? extends RestModel> pageResult = (Page<? extends RestAddressableModel>) linkMethod
                                 .invoke(linkRepository, request, uuid, page, utils.obtainProjection());
 
-                    if (pageResult == null) {
-                        // Link repositories may throw an exception or return an empty page,
-                        // but must never return null for a paged subresource.
-                        log.error("Paged subresource link repository " + linkRepository.getClass()
-                                + " incorrectly returned null for request with id " + uuid);
-                        response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                        return null;
-                    }
+                        if (pageResult == null) {
+                            // Link repositories may throw an exception or return an empty page,
+                            // but must never return null for a paged subresource.
+                            log.error("Paged subresource link repository " + linkRepository.getClass()
+                                    + " incorrectly returned null for request with id " + uuid);
+                            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                            return null;
+                        }
 
                         Link link = null;
                         String querystring = request.getQueryString();
