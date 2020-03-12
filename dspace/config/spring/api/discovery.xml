@@ -55,7 +55,7 @@
                 <entry key="workspace" value-ref="workspaceConfiguration" />
                 <entry key="workflow" value-ref="workflowConfiguration" />
                 <entry key="undiscoverable" value-ref="unDiscoverableItems" />
-                <entry key="discoverableAndUndiscoverableItems" value-ref="discoverableAndUndiscoverableItems" />
+                <entry key="administrativeView" value-ref="administrativeView" />
                 <entry key="publication" value-ref="publication"/>
                 <entry key="person" value-ref="person"/>
                 <entry key="organization" value-ref="organization"/>
@@ -394,7 +394,7 @@
     </bean>
 
     <!--The configuration settings for discovery of withdrawn and undiscoverable items (admin only) and regular items-->
-    <bean id="discoverableAndUndiscoverableItems" class="org.dspace.discovery.configuration.DiscoveryConfiguration" scope="prototype">
+    <bean id="administrativeView" class="org.dspace.discovery.configuration.DiscoveryConfiguration" scope="prototype">
         <!--Which sidebar facets are to be displayed-->
         <property name="sidebarFacets">
             <list>

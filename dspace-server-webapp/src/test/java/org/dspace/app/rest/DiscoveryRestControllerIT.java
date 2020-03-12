@@ -3720,7 +3720,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
     }
 
     @Test
-    public void discoverSearchObjectsTestForDiscoverableAndUniscoverableItemsAnonymous() throws Exception {
+    public void discoverSearchObjectsTestForAdministrativeViewAnonymous() throws Exception {
 
         //We turn off the authorization system in order to create the structure as defined below
         context.turnOffAuthorisationSystem();
@@ -3782,7 +3782,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
         // With a query stating 'Test'
 
         getClient().perform(get("/api/discover/search/objects")
-                .param("configuration", "discoverableAndUndiscoverableItems")
+                .param("configuration", "administrativeView")
                 .param("query", "Test"))
 
                 //** THEN **
@@ -3799,7 +3799,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
     }
 
     @Test
-    public void discoverSearchObjectsTestForDiscoverableAndUniscoverableItemsEPerson() throws Exception {
+    public void discoverSearchObjectsTestForAdministrativeViewEPerson() throws Exception {
 
         //We turn off the authorization system in order to create the structure as defined below
         context.turnOffAuthorisationSystem();
@@ -3863,7 +3863,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
         String authToken = getAuthToken(eperson.getEmail(), password);
 
         getClient(authToken).perform(get("/api/discover/search/objects")
-                .param("configuration", "discoverableAndUndiscoverableItems")
+                .param("configuration", "administrativeView")
                 .param("query", "Test"))
 
                 //** THEN **
@@ -3880,7 +3880,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
     }
 
     @Test
-    public void discoverSearchObjectsTestForDiscoverableAndUniscoverableItemsAdmin() throws Exception {
+    public void discoverSearchObjectsTestForAdministrativeViewAdmin() throws Exception {
 
         //We turn off the authorization system in order to create the structure as defined below
         context.turnOffAuthorisationSystem();
@@ -3944,7 +3944,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
         String adminToken = getAuthToken(admin.getEmail(), password);
 
         getClient(adminToken).perform(get("/api/discover/search/objects")
-                .param("configuration", "discoverableAndUndiscoverableItems")
+                .param("configuration", "administrativeView")
                 .param("query", "Test"))
 
                 //** THEN **
@@ -3993,7 +3993,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
     }
 
     @Test
-    public void discoverSearchObjectsTestForDiscoverableAndUniscoverableItemsWithFilters() throws Exception {
+    public void discoverSearchObjectsTestForAdministrativeViewWithFilters() throws Exception {
 
         context.turnOffAuthorisationSystem();
 
@@ -4046,7 +4046,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
 
         getClient(adminToken)
                 .perform(get("/api/discover/search/objects")
-                        .param("configuration", "discoverableAndUndiscoverableItems")
+                        .param("configuration", "administrativeView")
                         .param("query", "Test")
                         .param("f.withdrawn", "true")
                 )
@@ -4065,7 +4065,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
 
         getClient(adminToken)
                 .perform(get("/api/discover/search/objects")
-                        .param("configuration", "discoverableAndUndiscoverableItems")
+                        .param("configuration", "administrativeView")
                         .param("query", "Test")
                         .param("f.withdrawn", "false")
                 )
@@ -4085,7 +4085,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
 
         getClient(adminToken)
                 .perform(get("/api/discover/search/objects")
-                        .param("configuration", "discoverableAndUndiscoverableItems")
+                        .param("configuration", "administrativeView")
                         .param("query", "Test")
                         .param("f.discoverable", "true")
                 )
@@ -4105,7 +4105,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
 
         getClient(adminToken)
                 .perform(get("/api/discover/search/objects")
-                        .param("configuration", "discoverableAndUndiscoverableItems")
+                        .param("configuration", "administrativeView")
                         .param("query", "Test")
                         .param("f.discoverable", "false")
                 )
