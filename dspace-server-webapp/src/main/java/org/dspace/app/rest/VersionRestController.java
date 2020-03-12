@@ -15,14 +15,17 @@ import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.model.hateoas.EPersonResource;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.app.rest.utils.Utils;
+import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.versioning.Version;
 import org.dspace.versioning.service.VersioningService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.data.web.PagedResourcesAssembler;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -40,6 +43,9 @@ public class VersionRestController {
 
     @Autowired
     private ConverterService converterService;
+
+    @Autowired
+    private AuthorizeService authorizeService;
 
     @Autowired
     private Utils utils;
@@ -63,6 +69,11 @@ public class VersionRestController {
                                     Pageable pageable,
                                     PagedResourcesAssembler assembler) throws SQLException {
         Context context = ContextUtil.obtainContext(request);
+        if (!authorizeService.isAdmin(context) && !DSpaceServicesFactory.getInstance().getConfigurationService()
+                                 .getBooleanProperty("versioning.item.history.include.submitter")) {
+            throw new AccessDeniedException("The current user does not have access to call the submitter" +
+                                                " of this version");
+        }
         Version version = versioningService.getVersion(context, id);
         if (version == null) {
             throw new ResourceNotFoundException("The version with ID: " + id + " couldn't be found");
