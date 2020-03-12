@@ -47,10 +47,7 @@ public class GroupUtil {
 
     /**
      * These are the possible community suffixes. All groups which are
-     * specific to a collection will end with one of these. The collection
-     * id should be between the prefix and the suffix.
-     * <p>
-     * Note: the order of these suffixes are important, see getCollectionRole()
+     * specific to a community will end with one of these.
      */
     private static final String[] COMMUNITY_SUFFIXES = {"_ADMIN"};
 
