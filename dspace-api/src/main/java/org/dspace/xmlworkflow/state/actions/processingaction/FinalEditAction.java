@@ -48,7 +48,7 @@ public class FinalEditAction extends ProcessingAction {
 
     public ActionResult processMainPage(Context c, XmlWorkflowItem wfi, HttpServletRequest request)
             throws SQLException, AuthorizeException {
-        if (super.isInOptions(request)) {
+        if (super.isOptionInParam(request)) {
             switch (Util.getSubmitButton(request, SUBMIT_CANCEL)) {
                 case SUBMIT_APPROVE:
                     //Delete the tasks

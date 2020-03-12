@@ -136,7 +136,8 @@ public class WorkflowItemRestRepository extends DSpaceRestRepository<WorkflowIte
             List<XmlWorkflowItem> witems = wis.findAll(context, pageable.getPageNumber(), pageable.getPageSize());
             return converter.toRestPage(witems, pageable, total, utils.obtainProjection());
         } catch (SQLException e) {
-            throw new RuntimeException(e.getMessage(), e);
+            throw new RuntimeException("SQLException in " + this.getClass() + "#findAll trying to retrieve all " +
+                "workflowitems from db.", e);
         }
     }
 
@@ -151,7 +152,8 @@ public class WorkflowItemRestRepository extends DSpaceRestRepository<WorkflowIte
                     pageable.getPageSize());
             return converter.toRestPage(witems, pageable, total, utils.obtainProjection());
         } catch (SQLException e) {
-            throw new RuntimeException(e.getMessage(), e);
+            throw new RuntimeException("SQLException in " + this.getClass() + "#findBySubmitter trying to retrieve " +
+                "eperson or their workflowitems from db.", e);
         }
     }
 
@@ -169,7 +171,8 @@ public class WorkflowItemRestRepository extends DSpaceRestRepository<WorkflowIte
             throw new UnprocessableEntityException(
                     "Invalid workflow action: " + e.getMessage(), e);
         } catch (SQLException e) {
-            throw new RuntimeException(e.getMessage(), e);
+            throw new RuntimeException("SQLException in " + this.getClass() + "#findBySubmitter trying to create " +
+                "a workflow and adding it to db.", e);
         }
         //if the item go directly in published status we have to manage a status code 204 with no content
         if (source.getItem().isArchived()) {
@@ -313,8 +316,12 @@ public class WorkflowItemRestRepository extends DSpaceRestRepository<WorkflowIte
             wfs.abort(context, witem, context.getCurrentUser());
         } catch (AuthorizeException e) {
             throw new RESTAuthorizationException(e);
-        } catch (SQLException | IOException e) {
-            throw new RuntimeException(e.getMessage(), e);
+        } catch (SQLException e) {
+            throw new RuntimeException("SQLException in " + this.getClass() + "#delete trying to retrieve or delete a" +
+                " workflowitem from db.", e);
+        } catch (IOException e) {
+            throw new RuntimeException("IOException in " + this.getClass() + "#delete trying to delete a workflowitem" +
+                " from db (abort).", e);
         }
     }
 
@@ -339,8 +346,12 @@ public class WorkflowItemRestRepository extends DSpaceRestRepository<WorkflowIte
                 throw new UnprocessableEntityException(SUBMIT_EDIT_METADATA + " is not a valid option on this " +
                     "action (" + currentActionConfig.getProcessingAction().getClass() + ").");
             }
-        } catch (SQLException | WorkflowConfigurationException e) {
-            throw new RuntimeException(e.getMessage(), e);
+        } catch (SQLException e) {
+            throw new RuntimeException("SQLException in " + this.getClass()
+                + "#checkIfEditMetadataAllowedInCurrentStep trying to retrieve workflowitem from db by eperson.", e);
+        } catch (WorkflowConfigurationException e) {
+            throw new RuntimeException("WorkflowConfigurationException in " + this.getClass()
+                + "#checkIfEditMetadataAllowedInCurrentStep trying to retrieve workflow configuration from config", e);
         }
     }
 }

@@ -48,7 +48,7 @@ public class ReviewAction extends ProcessingAction {
     @Override
     public ActionResult execute(Context c, XmlWorkflowItem wfi, Step step, HttpServletRequest request)
         throws SQLException, AuthorizeException, IOException {
-        if (super.isInOptions(request)) {
+        if (super.isOptionInParam(request)) {
             switch (Util.getSubmitButton(request, SUBMIT_CANCEL)) {
                 case SUBMIT_APPROVE:
                     return processAccept(c, wfi);

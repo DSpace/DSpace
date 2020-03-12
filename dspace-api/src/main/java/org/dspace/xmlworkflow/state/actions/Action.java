@@ -55,7 +55,7 @@ public abstract class Action {
      * @param request   Action request
      * @return  true if one of the options is a parameter of the request; false if none was found
      */
-    protected boolean isInOptions(HttpServletRequest request) {
+    protected boolean isOptionInParam(HttpServletRequest request) {
         for (String option: this.getOptions()) {
             if (request.getParameter(option) != null) {
                 return true;
