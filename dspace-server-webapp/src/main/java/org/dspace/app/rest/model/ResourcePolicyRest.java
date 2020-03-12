@@ -8,7 +8,6 @@
 package org.dspace.app.rest.model;
 
 import java.util.Date;
-import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -34,12 +33,6 @@ public class ResourcePolicyRest extends BaseObjectRest<Integer> {
 
     private String description;
 
-    @JsonInclude(Include.NON_NULL)
-    private UUID groupUUID;
-
-    @JsonInclude(Include.NON_NULL)
-    private UUID epersonUUID;
-
     @JsonIgnore
     private EPersonRest eperson;
 
@@ -54,14 +47,6 @@ public class ResourcePolicyRest extends BaseObjectRest<Integer> {
     private Date startDate;
 
     private Date endDate;
-
-    public UUID getGroupUUID() {
-        return groupUUID;
-    }
-
-    public void setGroupUUID(UUID groupUuid) {
-        this.groupUUID = groupUuid;
-    }
 
     public Date getEndDate() {
         return endDate;
@@ -109,14 +94,6 @@ public class ResourcePolicyRest extends BaseObjectRest<Integer> {
 
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    public UUID getEpersonUUID() {
-        return epersonUUID;
-    }
-
-    public void setEpersonUUID(UUID epersonUUID) {
-        this.epersonUUID = epersonUUID;
     }
 
     public EPersonRest getEperson() {

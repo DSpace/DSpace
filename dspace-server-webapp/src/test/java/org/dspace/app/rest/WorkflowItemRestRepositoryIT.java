@@ -40,6 +40,7 @@ import org.dspace.app.rest.builder.WorkspaceItemBuilder;
 import org.dspace.app.rest.matcher.CollectionMatcher;
 import org.dspace.app.rest.matcher.ItemMatcher;
 import org.dspace.app.rest.matcher.WorkflowItemMatcher;
+import org.dspace.app.rest.matcher.WorkflowStepMatcher;
 import org.dspace.app.rest.matcher.WorkspaceItemMatcher;
 import org.dspace.app.rest.model.patch.AddOperation;
 import org.dspace.app.rest.model.patch.Operation;
@@ -53,6 +54,8 @@ import org.dspace.content.Item;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.eperson.EPerson;
 import org.dspace.services.ConfigurationService;
+import org.dspace.xmlworkflow.factory.XmlWorkflowFactory;
+import org.dspace.xmlworkflow.state.Step;
 import org.dspace.xmlworkflow.storedcomponents.ClaimedTask;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 import org.hamcrest.Matchers;
@@ -71,6 +74,8 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
     @Autowired
     private ConfigurationService configurationService;
 
+    @Autowired
+    private XmlWorkflowFactory xmlWorkflowFactory;
 
     @Before
     @Override
@@ -85,7 +90,7 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
     @Test
     /**
      * All the workflowitems should be returned regardless of the collection where they were created
-     * 
+     *
      * @throws Exception
      */
     public void findAllTest() throws Exception {
@@ -140,7 +145,7 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
     @Test
     /**
      * The workflowitem endpoint must provide proper pagination
-     * 
+     *
      * @throws Exception
      */
     public void findAllWithPaginationTest() throws Exception {
@@ -208,7 +213,7 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
     @Test
     /**
      * The findAll should be available only to admins regardless to having or less a role in the workflow
-     * 
+     *
      * @throws Exception
      */
     public void findAllForbiddenTest() throws Exception {
@@ -259,7 +264,7 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
     @Test
     /**
      * The workflowitem resource endpoint must expose the proper structure
-     * 
+     *
      * @throws Exception
      */
     public void findOneTest() throws Exception {
@@ -297,7 +302,7 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
     @Test
     /**
      * The workflowitem resource endpoint should be visible only to member of the corresponding workflow step
-     * 
+     *
      * @throws Exception
      */
     public void findOneForbiddenTest() throws Exception {
@@ -430,7 +435,7 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
     @Test
     /**
      * The workflowitem resource endpoint must expose the proper structure
-     * 
+     *
      * @throws Exception
      */
     public void findOneRelsTest() throws Exception {
@@ -478,7 +483,7 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
     @Test
     /**
      * Check the response code for unexistent workflowitem
-     * 
+     *
      * @throws Exception
      */
     public void findOneWrongIDTest() throws Exception {
@@ -495,7 +500,7 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
     /**
      * Create three workflowitem with two different submitter and verify that the findBySubmitter return the proper
      * list of workflowitem for each submitter also paginating
-     * 
+     *
      * @throws Exception
      */
     public void findBySubmitterTest() throws Exception {
@@ -602,7 +607,7 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
     /**
      * A delete request over a workflowitem should result in abort the workflow sending the item back to the submitter
      * workspace
-     * 
+     *
      * @throws Exception
      */
     public void deleteOneTest() throws Exception {
@@ -1681,5 +1686,85 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
         getClient().perform(get("/api/workflow/workflowitems/search/item")
                                 .param("uuid", String.valueOf(witem.getItem().getID())))
                    .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    public void stepEmbedTest() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        // 1. A community-collection structure with one parent community with sub-community and three collections
+        // (different workflow steps and reviewers).
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        EPerson reviewer1 = EPersonBuilder.createEPerson(context).withEmail("reviewer1@example.com")
+                                          .withPassword(password).build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1")
+                                           .withWorkflowGroup(1, reviewer1).build();
+
+        EPerson reviewer2 = EPersonBuilder.createEPerson(context).withEmail("reviewer2@example.com")
+                                          .withPassword(password).build();
+
+        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2")
+                                           .withWorkflowGroup(2, reviewer2).build();
+
+        EPerson reviewer3 = EPersonBuilder.createEPerson(context).withEmail("reviewer3@example.com")
+                                          .withPassword(password).build();
+
+        Collection col3 = CollectionBuilder.createCollection(context, child1).withName("Collection 3")
+                                           .withWorkflowGroup(3, reviewer3).build();
+
+        //2. three workflow items in the three collections (this will lead to pool task)
+        XmlWorkflowItem witem1 = WorkflowItemBuilder.createWorkflowItem(context, col1)
+                                                    .withTitle("Workflow Item 1")
+                                                    .withIssueDate("2016-02-13")
+                                                    .build();
+
+        XmlWorkflowItem witem2 = WorkflowItemBuilder.createWorkflowItem(context, col2)
+                                                    .withTitle("Workflow Item 2")
+                                                    .withIssueDate("2016-02-13")
+                                                    .build();
+
+        XmlWorkflowItem witem3 = WorkflowItemBuilder.createWorkflowItem(context, col3)
+                                                    .withTitle("Workflow Item 3")
+                                                    .withIssueDate("2016-02-13")
+                                                    .build();
+
+        Step step = xmlWorkflowFactory.getStepByName("reviewstep");
+        String token = getAuthToken(admin.getEmail(), password);
+
+        getClient(token).perform(get("/api/workflow/workflowitems/" + witem1.getID())
+                                .param("projection", "full"))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$",
+                                       WorkflowItemMatcher.matchItemWithTitleAndDateIssued(witem1,
+                                                                   "Workflow Item 1", "2016-02-13")))
+                   .andExpect(jsonPath("$._embedded.step", WorkflowStepMatcher.matchWorkflowStepEntry(step)));
+
+        step = xmlWorkflowFactory.getStepByName("editstep");
+
+        getClient(token).perform(get("/api/workflow/workflowitems/" + witem2.getID())
+                                     .param("projection", "full"))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$",
+                                            WorkflowItemMatcher.matchItemWithTitleAndDateIssued(witem2,
+                                                                 "Workflow Item 2", "2016-02-13")))
+                        .andExpect(jsonPath("$._embedded.step", WorkflowStepMatcher.matchWorkflowStepEntry(step)));
+
+        step = xmlWorkflowFactory.getStepByName("finaleditstep");
+
+        getClient(token).perform(get("/api/workflow/workflowitems/" + witem3.getID())
+                                     .param("projection", "full"))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$",
+                                            WorkflowItemMatcher.matchItemWithTitleAndDateIssued(witem3,
+                                                                 "Workflow Item 3", "2016-02-13")))
+                        .andExpect(jsonPath("$._embedded.step", WorkflowStepMatcher.matchWorkflowStepEntry(step)));
     }
 }
