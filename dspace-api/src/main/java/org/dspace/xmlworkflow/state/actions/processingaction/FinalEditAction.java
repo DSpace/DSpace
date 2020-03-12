@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
+import org.dspace.app.util.Util;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DCDate;
 import org.dspace.content.MetadataSchemaEnum;
@@ -42,20 +43,23 @@ public class FinalEditAction extends ProcessingAction {
     @Override
     public ActionResult execute(Context c, XmlWorkflowItem wfi, Step step, HttpServletRequest request)
             throws SQLException, AuthorizeException {
-        return processMainPage(c, wfi, step, request);
+        return processMainPage(c, wfi, request);
     }
 
-    public ActionResult processMainPage(Context c, XmlWorkflowItem wfi, Step step, HttpServletRequest request)
+    public ActionResult processMainPage(Context c, XmlWorkflowItem wfi, HttpServletRequest request)
             throws SQLException, AuthorizeException {
-        if (request.getParameter(SUBMIT_APPROVE) != null) {
-            //Delete the tasks
-            addApprovedProvenance(c, wfi);
-
-            return new ActionResult(ActionResult.TYPE.TYPE_OUTCOME, ActionResult.OUTCOME_COMPLETE);
-        } else {
-            //We pressed the leave button so return to our submissions page
-            return new ActionResult(ActionResult.TYPE.TYPE_SUBMISSION_PAGE);
+        if (super.isOptionInParam(request)) {
+            switch (Util.getSubmitButton(request, SUBMIT_CANCEL)) {
+                case SUBMIT_APPROVE:
+                    //Delete the tasks
+                    addApprovedProvenance(c, wfi);
+                    return new ActionResult(ActionResult.TYPE.TYPE_OUTCOME, ActionResult.OUTCOME_COMPLETE);
+                default:
+                    //We pressed the leave button so return to our submissions page
+                    return new ActionResult(ActionResult.TYPE.TYPE_SUBMISSION_PAGE);
+            }
         }
+        return new ActionResult(ActionResult.TYPE.TYPE_CANCEL);
     }
 
     @Override
