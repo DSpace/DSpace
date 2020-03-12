@@ -42,7 +42,7 @@ public class EPOClassification {
         mainGroup = XMLUtils.getElementValue(classification, "main-group");
         subGroup = XMLUtils.getElementValue(classification, "subgroup");
     }
-    
+
     /***
      * {@link https://en.wikipedia.org/wiki/International_Patent_Classification}
      * 

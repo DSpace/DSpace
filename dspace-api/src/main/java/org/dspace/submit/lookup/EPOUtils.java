@@ -15,7 +15,6 @@ import gr.ekt.bte.core.StringValue;
 
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.util.XMLUtils;
-import org.dspace.submit.lookup.EPOElementHolder;
 import org.dspace.submit.util.SubmissionLookupPublication;
 import org.w3c.dom.Element;
 
