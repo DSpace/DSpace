@@ -14,11 +14,13 @@ import org.dspace.content.Bitstream;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
+import org.dspace.services.ConfigurationService;
 import org.dspace.services.model.Event;
 import org.dspace.statistics.export.processor.BitstreamEventProcessor;
 import org.dspace.statistics.export.processor.ItemEventProcessor;
 import org.dspace.usage.AbstractUsageEventListener;
 import org.dspace.usage.UsageEvent;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Class to receive usage events and send corresponding data to IRUS
@@ -27,39 +29,45 @@ public class ExportUsageEventListener extends AbstractUsageEventListener {
     /*  Log4j logger*/
     private static Logger log = Logger.getLogger(ExportUsageEventListener.class);
 
+    @Autowired
+    ConfigurationService configurationService;
+
     /**
      * Receives an event and processes to create a URL to send to IRUS when certain conditions are met
+     *
      * @param event includes all the information related to the event that occurred
      */
     public void receiveEvent(Event event) {
-        if (event instanceof UsageEvent) {
-            UsageEvent ue = (UsageEvent) event;
-            Context context = ue.getContext();
+        if (configurationService.getBooleanProperty("stats.tracker.enabled", false)) {
+            if (event instanceof UsageEvent) {
+                UsageEvent ue = (UsageEvent) event;
+                Context context = ue.getContext();
 
-            try {
-                //Check for item investigation
-                if (ue.getObject() instanceof Item) {
-                    ItemEventProcessor itemEventProcessor = new ItemEventProcessor(context, ue.getRequest(),
-                                                                                   (Item) ue.getObject());
-                    itemEventProcessor.processEvent();
-                } else if (ue.getObject() instanceof Bitstream) {
-
-                    BitstreamEventProcessor bitstreamEventProcessor =
-                            new BitstreamEventProcessor(context, ue.getRequest(), (Bitstream) ue.getObject());
-                    bitstreamEventProcessor.processEvent();
-                }
-            } catch (Exception e) {
-                UUID id;
-                id = ue.getObject().getID();
-
-                int type;
                 try {
-                    type = ue.getObject().getType();
-                } catch (Exception e1) {
-                    type = -1;
+                    //Check for item investigation
+                    if (ue.getObject() instanceof Item) {
+                        ItemEventProcessor itemEventProcessor = new ItemEventProcessor(context, ue.getRequest(),
+                                                                                       (Item) ue.getObject());
+                        itemEventProcessor.processEvent();
+                    } else if (ue.getObject() instanceof Bitstream) {
+
+                        BitstreamEventProcessor bitstreamEventProcessor =
+                                new BitstreamEventProcessor(context, ue.getRequest(), (Bitstream) ue.getObject());
+                        bitstreamEventProcessor.processEvent();
+                    }
+                } catch (Exception e) {
+                    UUID id;
+                    id = ue.getObject().getID();
+
+                    int type;
+                    try {
+                        type = ue.getObject().getType();
+                    } catch (Exception e1) {
+                        type = -1;
+                    }
+                    log.error(LogManager.getHeader(ue.getContext(), "Error while processing export of use event",
+                                                   "Id: " + id + " type: " + type), e);
                 }
-                log.error(LogManager.getHeader(ue.getContext(), "Error while processing export of use event",
-                                               "Id: " + id + " type: " + type), e);
             }
         }
     }
