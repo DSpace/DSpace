@@ -2622,6 +2622,7 @@
 <message key="xmlui.dri2xhtml.METS-1.0.item-true-fulltext">Fulltext document</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-false-fulltext">Non fulltext document</message>
 <message key="xmlui.dri2xhtml.METS-1.0.other-attributes">Other attributes of the document</message>
+<message key="xmlui.dri2xhtml.METS-1.0.proyecto-info">Project information</message>
 <message key="xmlui.dri2xhtml.METS-1.0.tesis-info">Thesis information</message>
 <message key="xmlui.dri2xhtml.METS-1.0.general-info">General information</message>
 

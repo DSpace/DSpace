@@ -334,6 +334,24 @@
                         </div>
                 </xsl:if>
 
+        <!-- Solo para el tipo Proyecto -->
+        <xsl:if test="dim:field[@element='type'] = $proyecto" >
+            <h2><i18n:text>xmlui.dri2xhtml.METS-1.0.proyecto-info</i18n:text></h2>
+            <!-- contributor.director row -->
+            <xsl:call-template name="render-author-metadata-field">
+                <xsl:with-param name="general-element" select="'contributor'"/>
+                <xsl:with-param name="general-qualifier" select="'director'"/>
+                <xsl:with-param name="metadata-fields" select="dim:field[@element='contributor' and @qualifier='director']"/>
+            </xsl:call-template>
+
+            <!-- contributor.codirector row -->
+            <xsl:call-template name="render-author-metadata-field">
+                <xsl:with-param name="general-element" select="'contributor'"/>
+                <xsl:with-param name="general-qualifier" select="'codirector'"/>
+                <xsl:with-param name="metadata-fields" select="dim:field[@element='contributor' and @qualifier='codirector'] "/>
+            </xsl:call-template>
+        </xsl:if>
+
 		<!-- Solo para el tipo tesis -->
 		<xsl:if test="dim:field[@element='type'] = $tesis">
 			<h2><i18n:text>xmlui.dri2xhtml.METS-1.0.tesis-info</i18n:text></h2>

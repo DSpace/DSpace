@@ -2208,6 +2208,7 @@
 	<message key="xmlui.dri2xhtml.METS-1.0.item-title-subtitle">Subtítulo</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-true-fulltext">Documento texto completo</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.other-attributes">Outros atributos do documento</message>
+	<message key="xmlui.dri2xhtml.METS-1.0.proyecto-info">Informações do projeto</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.tesis-info">Informação da tese</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-audience">Contexto de Uso</message>
 

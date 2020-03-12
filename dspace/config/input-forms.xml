@@ -640,7 +640,6 @@
 					<type-bind>Libro</type-bind>
 				</field>
 
-
 				<!-- Dossier -->
 				<field>
 					<dc-schema>sedici</dc-schema>
@@ -713,6 +712,18 @@
 					<type-bind>Tesis</type-bind>
 				</field>
 
+                <!-- Director de Proyecto-->
+                <field>
+                    <dc-schema>sedici</dc-schema>
+                    <dc-element>contributor</dc-element>
+                    <dc-qualifier>director</dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Director del Proyecto</label>
+                    <input-type>onebox</input-type>
+                    <hint>Nombre del director del Proyecto</hint>
+                    <type-bind>Proyecto</type-bind>
+                </field>
+
 				<!-- CoDirecotor de tesis -->
 				<field>
 					<dc-schema>sedici</dc-schema>
@@ -725,6 +736,19 @@
 					<type-bind>Tesis</type-bind>
 					<visibility-on-group>Bibliotecarios</visibility-on-group>
 				</field>
+
+                <!-- CoDirecotor de Proyecto -->
+                <field>
+                    <dc-schema>sedici</dc-schema>
+                    <dc-element>contributor</dc-element>
+                    <dc-qualifier>codirector</dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Co-Director del Proyecto</label>
+                    <input-type>onebox</input-type>
+                    <hint>Nombre de los co-directores del Proyecto</hint>
+                    <type-bind>Proyecto</type-bind>
+                    <visibility-on-group>Bibliotecarios</visibility-on-group>
+                </field>
 
 				<!-- Jurado de tesis -->
 				<field>
