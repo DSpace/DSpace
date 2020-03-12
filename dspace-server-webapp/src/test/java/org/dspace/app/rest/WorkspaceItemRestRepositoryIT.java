@@ -789,6 +789,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         String patchBody = getPatchContent(updateTitle);
         UUID idItem = witem.getItem().getID();
 
+        // Verify submitter cannot modify metadata via item PATCH. They must use submission forms.
         String tokenEperson = getAuthToken(eperson.getEmail(), password);
         getClient(tokenEperson).perform(patch("/api/core/items/" + idItem)
             .content(patchBody)
@@ -832,6 +833,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         String patchBody = getPatchContent(addIssueDate);
         UUID idItem = witem.getItem().getID();
 
+        // Verify submitter cannot modify metadata via item PATCH. They must use submission forms.
         String tokenEperson = getAuthToken(eperson.getEmail(), password);
         getClient(tokenEperson).perform(patch("/api/core/items/" + idItem)
             .content(patchBody)
@@ -875,6 +877,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         String patchBody = getPatchContent(removeTitle);
         UUID idItem = witem.getItem().getID();
 
+        // Verify submitter cannot modify metadata via item PATCH. They must use submission forms.
         String tokenEperson = getAuthToken(eperson.getEmail(), password);
         getClient(tokenEperson).perform(patch("/api/core/items/" + idItem)
             .content(patchBody)
