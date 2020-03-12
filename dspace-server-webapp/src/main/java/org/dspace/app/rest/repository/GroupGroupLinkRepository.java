@@ -27,7 +27,7 @@ import org.springframework.stereotype.Component;
 /**
  * Link repository for "groups" subresource of an individual group.
  */
-@Component(GroupRest.CATEGORY + "." + GroupRest.NAME + "." + GroupRest.GROUPS)
+@Component(GroupRest.CATEGORY + "." + GroupRest.NAME + "." + GroupRest.SUBGROUPS)
 public class GroupGroupLinkRepository extends AbstractDSpaceRestRepository
         implements LinkRestRepository {
 
