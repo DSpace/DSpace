@@ -22,7 +22,7 @@ import org.dspace.core.ConfigurationManager;
 
 public class DSpaceResourceResolver implements ResourceResolver {
     private static final TransformerFactory transformerFactory = TransformerFactory
-        .newInstance();
+            .newInstance("net.sf.saxon.TransformerFactoryImpl", null);
 
     private final String basePath = ConfigurationManager.getProperty("oai",
                                                                      "config.dir");

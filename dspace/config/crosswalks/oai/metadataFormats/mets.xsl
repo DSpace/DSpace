@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!-- http://www.loc.gov/standards/mets/mets.xsd -->
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-	xmlns:doc="http://www.lyncode.com/xoai" 
-    xmlns:date="http://exslt.org/dates-and-times" 
-    extension-element-prefixes="date" version="1.0">
+				xmlns:doc="http://www.lyncode.com/xoai" version="2.0">
     
 	<xsl:output omit-xml-declaration="yes" method="xml" indent="yes" />
 
@@ -20,7 +18,7 @@
 			</xsl:attribute>
 			<metsHdr>
 				<xsl:attribute name="CREATEDATE">
-					<xsl:value-of select="concat(date:format-date(date:date(), 'yyyy-MM-dd'), 'T' , date:format-date(date:time(), 'HH:mm:ss'), 'Z')"/>
+					<xsl:value-of select="concat(format-date(current-date(), 'yyyy-MM-dd'), 'T' , format-time(current-time(), 'HH:mm:ss'), 'Z')"/>
 				</xsl:attribute>
 				<agent ROLE="CUSTODIAN" TYPE="ORGANIZATION">
 					<name><xsl:value-of select="doc:metadata/doc:element[@name='repository']/doc:field[@name='name']/text()" /></name>
