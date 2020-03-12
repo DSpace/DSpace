@@ -216,7 +216,7 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
     //TODO @PreAuthorize("hasPermission(#id, 'WORKSPACEITEM', 'WRITE')")
     @Override
     public WorkspaceItemRest upload(HttpServletRequest request, String apiCategory, String model, Integer id,
-                                    MultipartFile file) throws Exception {
+                                    MultipartFile file) throws SQLException {
 
         Context context = obtainContext();
         WorkspaceItemRest wsi = findOne(context, id);
