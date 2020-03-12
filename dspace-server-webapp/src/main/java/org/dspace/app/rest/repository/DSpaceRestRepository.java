@@ -380,7 +380,6 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
      * @param file
      *            the uploaded file
      * @return the new state of the REST object
-     * @throws Exception
      */
     public T upload(HttpServletRequest request, String apiCategory, String model,
                                                      ID id, MultipartFile file)

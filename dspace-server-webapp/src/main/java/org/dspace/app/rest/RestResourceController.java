@@ -581,7 +581,6 @@ public class RestResourceController implements InitializingBean {
                                                                                      MultipartFile uploadfile) {
         checkModelPluralForm(apiCategory, model);
         DSpaceRestRepository<RestAddressableModel, ID> repository = utils.getResourceRepository(apiCategory, model);
-
         RestAddressableModel modelObject = null;
         try {
             modelObject = repository.upload(request, apiCategory, model, id, uploadfile);
@@ -912,7 +911,6 @@ public class RestResourceController implements InitializingBean {
                                                                                       Pageable page,
                                                                                       PagedResourcesAssembler assembler,
                                                                                       HttpServletResponse response) {
-
         DSpaceRestRepository<T, ?> repository = utils.getResourceRepository(apiCategory, model);
         Link link = linkTo(methodOn(this.getClass(), apiCategory, model).findAll(apiCategory, model,
                                                                                  page, assembler, response))
