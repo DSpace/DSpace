@@ -393,7 +393,7 @@ function DSpaceChoicesLoad(form)
             defaultSelected = selectedByChoices;
           else if (selectedByValue >= 0)
             defaultSelected = selectedByValue;
-          else if (select.options.length == 1)
+          else if (select.options.length >= 1)
             defaultSelected = 0;
 
           // load default-selected value
