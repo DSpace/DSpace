@@ -563,7 +563,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                 .build();
         Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
                 .withName("Collection 1")
-                .withSubmitterGroup(submitter1)
+                .withSubmitterGroup(submitter1, submitter2)
                 .build();
 
         context.setCurrentUser(submitter1);
@@ -584,15 +584,42 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                     .withMimeType("text/plain").build();
         }
 
+        context.setCurrentUser(submitter2);
+        WorkspaceItem witem2 = WorkspaceItemBuilder.createWorkspaceItem(context, col1)
+                .withTitle("Workspace Item 2")
+                .withIssueDate("2020-02-02")
+                .build();
+
+        Item item2 = witem2.getItem();
+
+        String bitstreamContent2 = "ThisIsSomeDummyText2";
+        Bitstream bitstream2 = null;
+        try (InputStream is2 = IOUtils.toInputStream(bitstreamContent2, CharEncoding.UTF_8)) {
+            bitstream2 = BitstreamBuilder
+                    .createBitstream(context, item2, is2)
+                    .withName("Bitstream 2")
+                    .withMimeType("text/plain").build();
+        }
         context.restoreAuthSystemState();
 
+        // submitter2 attempt to delete the workspaceitem of submitter1
         String tokenSubmitter2 = getAuthToken(submitter2.getEmail(), "qwerty02");
         getClient(tokenSubmitter2).perform(delete("/api/submission/workspaceitems/" + witem.getID()))
                                   .andExpect(status().isForbidden());
 
-        String authToken = getAuthToken(admin.getEmail(), password);
-        getClient(authToken).perform(get("/api/submission/workspaceitems/" + witem.getID()))
-                                  .andExpect(status().isOk());
+        // check that workspaceitem was not deleted
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        getClient(tokenAdmin).perform(get("/api/submission/workspaceitems/" + witem.getID()))
+                            .andExpect(status().isOk());
+
+        // newly created account attempt to delete the workspaceitem of submitter1
+        String tokenEPerson = getAuthToken(eperson.getEmail(), password);
+        getClient(tokenSubmitter2).perform(delete("/api/submission/workspaceitems/" + witem.getID()))
+                                  .andExpect(status().isForbidden());
+
+        // check that workspaceitem was not deleted
+        getClient(tokenAdmin).perform(get("/api/submission/workspaceitems/" + witem.getID()))
+                            .andExpect(status().isOk());
     }
 
     @Test
@@ -697,6 +724,18 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                                     "2016-02-13"))))
             .andExpect(jsonPath("$.page.size", is(20)))
             .andExpect(jsonPath("$.page.totalElements", is(1)));
+
+        // also the admin should be able to retrieve the submission of an another user
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        getClient(tokenAdmin).perform(get("/api/submission/workspaceitems/search/findBySubmitter")
+                             .param("uuid", submitter1.getID().toString()))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$._embedded.workspaceitems", Matchers.containsInAnyOrder(
+                                        WorkspaceItemMatcher.matchItemWithTitleAndDateIssued
+                                                  (workspaceItem1, "Workspace Item 1", "2017-10-17"),
+                                        WorkspaceItemMatcher.matchItemWithTitleAndDateIssued
+                                                  (workspaceItem2, "Workspace Item 2", "2016-02-13"))))
+                             .andExpect(jsonPath("$.page.totalElements", is(2)));
     }
 
     @Test

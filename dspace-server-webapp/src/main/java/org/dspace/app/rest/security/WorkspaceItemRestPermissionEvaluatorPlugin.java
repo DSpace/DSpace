@@ -18,7 +18,6 @@ import org.dspace.content.WorkspaceItem;
 import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
-import org.dspace.eperson.service.EPersonService;
 import org.dspace.services.RequestService;
 import org.dspace.services.model.Request;
 import org.slf4j.Logger;
@@ -39,9 +38,6 @@ public class WorkspaceItemRestPermissionEvaluatorPlugin extends RestObjectPermis
 
     @Autowired
     private RequestService requestService;
-
-    @Autowired
-    private EPersonService ePersonService;
 
     @Autowired
     WorkspaceItemService wis;
@@ -66,7 +62,7 @@ public class WorkspaceItemRestPermissionEvaluatorPlugin extends RestObjectPermis
         EPerson ePerson = null;
         WorkspaceItem witem = null;
         try {
-            ePerson = ePersonService.findByEmail(context, (String) authentication.getPrincipal());
+            ePerson = context.getCurrentUser();
             Integer dsoId = Integer.parseInt(targetId.toString());
 
             // anonymous user
