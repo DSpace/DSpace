@@ -90,7 +90,7 @@ public class EPOElementHolder {
 
     /***
      * Retrieve the data in a ordered way using the internal formats.
-     * 
+     *
      * @param keys
      * @return
      */
@@ -99,6 +99,21 @@ public class EPOElementHolder {
             if (holder.containsKey(key)) {
                 return holder.get(key).getElement();
             }
+        }
+
+        return null;
+    }
+
+    /***
+     * Retrieve the data in a ordered way using the internal formats.
+     * 
+     * @param keys
+     * @param format
+     * @return
+     */
+    public Element get(String format) {
+        if (holder.containsKey(format)) {
+            return holder.get(format).getElement();
         }
 
         return null;

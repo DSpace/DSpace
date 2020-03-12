@@ -227,7 +227,7 @@ public class EPOService {
             Element exchangeDocs = XMLUtils.getSingleElement(xmlRoot, "exchange-documents");
             Element exchangeDoc = XMLUtils.getSingleElement(exchangeDocs, "exchange-document");
 
-            results.add(EPOUtils.convertBibliographicData(exchangeDoc, formats));
+            results.add(EPOUtils.convertBibliographicData(exchangeDoc, formats, EPODocumentId.ORIGIN));
         } catch (ParserConfigurationException e) {
             log.error(e.getMessage(), e);
         } catch (SAXException e) {

@@ -13,7 +13,9 @@ import gr.ekt.bte.core.MutableRecord;
 import gr.ekt.bte.core.Record;
 import gr.ekt.bte.core.StringValue;
 
+import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.util.XMLUtils;
+import org.dspace.submit.lookup.EPOElementHolder;
 import org.dspace.submit.util.SubmissionLookupPublication;
 import org.w3c.dom.Element;
 
@@ -34,13 +36,35 @@ public final class EPOUtils {
 
     private static EPODocumentId getDocumentNumber(Element biblographicData, String section, String[] formats) {
 
+        return getDocumentNumber(biblographicData, section, formats, null);
+    }
+
+    private static EPODocumentId getDocumentNumber(Element biblographicData, String section, String[] formats,
+            String format) {
+
         Element pubblicationRef = XMLUtils.getSingleElement(biblographicData, section);
         List<Element> documentIds = XMLUtils.getElementList(pubblicationRef, "document-id");
         EPOElementHolder holder = new EPOElementHolder(formats, documentIds, "document-id-type");
-        Element documentId = holder.get();
+        Element documentId = (format == null) ? holder.get() : holder.get(format);
 
-        EPODocumentId epoDocumentId = new EPODocumentId(documentId);
-        return epoDocumentId;
+        if (documentId != null) {
+            EPODocumentId epoDocumentId = new EPODocumentId(documentId);
+            return epoDocumentId;
+        } else {
+            return null;
+        }
+    }
+
+    private static EPOClassification getClassification(Element classificationData, String section, int sequence) {
+
+        List<Element> classifications = XMLUtils.getElementList(classificationData, section);
+        for (Element classification : classifications) {
+            if (String.valueOf(sequence).equals(classification.getAttribute("sequence"))) {
+                return new EPOClassification(classification);
+            }
+        }
+
+        return null;
     }
 
     private static Element getApplicantOrInventor(Element parties, String sectionName, String elementName, int sequence,
@@ -53,16 +77,33 @@ public final class EPOUtils {
         return holder.get();
     }
 
-    public static Record convertBibliographicData(Element exchangeDoc, String[] formats) {
+    public static Record convertBibliographicData(Element exchangeDoc, String[] formats, String originFormat) {
         MutableRecord record = new SubmissionLookupPublication("");
         Element biblographicData = XMLUtils.getSingleElement(exchangeDoc, "bibliographic-data");
 
         EPODocumentId epoDocumentId = getDocumentNumber(biblographicData, "publication-reference", formats);
-        record.addValue("publicationnumber", new StringValue(epoDocumentId.getId()));
-        record.addValue("dateissued", new StringValue(epoDocumentId.getDate()));
+        if (epoDocumentId != null) {
+            record.addValue("publicationnumber", new StringValue(epoDocumentId.getId()));
+            if (StringUtils.isNotBlank(epoDocumentId.getDate())) {
+                record.addValue("dateissued", new StringValue(epoDocumentId.getDate()));
+            }
+        }
+
+        EPODocumentId epoOriginDocumentId = getDocumentNumber(biblographicData, "application-reference", formats,
+                originFormat);
+        if (epoOriginDocumentId != null && StringUtils.isNotBlank(epoOriginDocumentId.getDate())) {
+            record.addValue("datefilled", new StringValue(epoOriginDocumentId.getDate()));
+        } else {
+            epoOriginDocumentId = null;
+        }
 
         epoDocumentId = getDocumentNumber(biblographicData, "application-reference", formats);
-        record.addValue("applicationnumber", new StringValue(epoDocumentId.getId()));
+        if (epoDocumentId != null) {
+            record.addValue("applicationnumber", new StringValue(epoDocumentId.getId()));
+            if (epoOriginDocumentId == null && StringUtils.isNotBlank(epoDocumentId.getDate())) {
+                record.addValue("datefilled", new StringValue(epoDocumentId.getDate()));
+            }
+        }
 
         int iseq = 1;
         Element applicant = null;
@@ -89,11 +130,27 @@ public final class EPOUtils {
             iinv++;
         } while (inventor != null);
 
-        String inventionTitle = XMLUtils.getElementValue(biblographicData, "invention-title");
-        record.addValue("inventiontitle", new StringValue(inventionTitle));
+        int iclass = 1;
+        EPOClassification classification = null;
+        Element patentClassification = XMLUtils.getSingleElement(biblographicData, "patent-classifications");
+        do {
+            classification = getClassification(patentClassification, "patent-classification", iclass);
+            if (classification != null) {
+                record.addValue("ipc", new StringValue(classification.toString()));
+            }
 
-        String summary = XMLUtils.getElementValue(exchangeDoc, "abstract");
-        record.addValue("abstract", new StringValue(summary));
+            iclass++;
+        } while (classification != null);
+
+        List<Element> inventionTitles = XMLUtils.getElementList(biblographicData, "invention-title");
+        for (Element inventionTitle : inventionTitles) {
+            record.addValue("inventiontitle", new StringValue(inventionTitle.getTextContent()));
+        }
+
+        List<Element> summaries = XMLUtils.getElementList(exchangeDoc, "abstract");
+        for (Element summary : summaries) {
+            record.addValue("abstract", new StringValue(summary.getTextContent()));
+        }
 
         return record;
     }
