@@ -1432,7 +1432,8 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         // This test checks that there's no relationship on the second author
         getClient(adminToken).perform(get("/api/core/items/" +
                                               author2.getID() + "/relationships"))
-                             .andExpect(status().isNoContent());
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("page.totalElements", is(0)));
 
         // Creates another Relationship for the Publication
         mvcResult = getClient(adminToken).perform(post("/api/core/relationships")

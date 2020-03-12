@@ -111,7 +111,8 @@ public class AuthorityRestRepositoryIT extends AbstractControllerIntegrationTest
                 .param("metadata", "dc.subject")
                 .param("query", "Research2")
                 .param("size", "1000"))
-                        .andExpect(status().isNoContent());
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.page.totalElements", Matchers.is(0)));
     }
 
     @Test
@@ -150,7 +151,8 @@ public class AuthorityRestRepositoryIT extends AbstractControllerIntegrationTest
                         .param("metadata", "dc.contributor.author")
                         .param("query", "Smith")
                         .param("size", "1000"))
-                .andExpect(status().isNoContent());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.page.totalElements", Matchers.is(0)));
     }
 
     @Test
