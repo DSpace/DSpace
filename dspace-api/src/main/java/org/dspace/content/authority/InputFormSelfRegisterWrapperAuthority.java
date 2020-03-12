@@ -59,10 +59,10 @@ public class InputFormSelfRegisterWrapperAuthority implements ChoiceAuthority {
     public Choices getMatches(String authorityName, String field, String query, Collection collection,
             int start, int limit, String locale) {
         String formName;
+        Choices choices = null;
         try {
             init();
             if (collection == null) {
-                Set<Choice> choices = new HashSet<Choice>();
                 // workaround search in all authority configured
                 for (ChoiceAuthority ca : delegates.values()) {
                     // if authority name is present skip authority that doesn't match
@@ -72,14 +72,12 @@ public class InputFormSelfRegisterWrapperAuthority implements ChoiceAuthority {
                     }
                     Choices tmp = ca.getMatches(field, query, null, start, limit, locale);
                     if (tmp.total > 0) {
-                        Set<Choice> mySet = new HashSet<Choice>(Arrays.asList(tmp.values));
-                        choices.addAll(mySet);
+                        choices = tmp;
+                        break;
                     }
                 }
-                if (!choices.isEmpty()) {
-                    Choice[] results = new Choice[choices.size()];
-                    choices.toArray(results);
-                    return new Choices(results, 0, choices.size(), Choices.CF_AMBIGUOUS, false);
+                if (choices != null) {
+                    return choices;
                 }
             } else {
                 formName = dci.getInputFormNameByCollectionAndField(collection, field);
