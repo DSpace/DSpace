@@ -16,6 +16,7 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.dspace.core.ReloadableEntity;
 
 /**
@@ -81,7 +82,8 @@ public class EntityType implements ReloadableEntity<Integer> {
     }
 
     /**
-     * @param obj
+     * Determines whether two entity types are equal based on the id and the label
+     * @param obj   object to be compared
      * @return
      */
     public boolean equals(Object obj) {
@@ -98,5 +100,14 @@ public class EntityType implements ReloadableEntity<Integer> {
             return false;
         }
         return true;
+    }
+
+    /**
+     * Returns a hash code value for the object.
+     * @return  hash code value
+     */
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder().append(getID()).toHashCode();
     }
 }

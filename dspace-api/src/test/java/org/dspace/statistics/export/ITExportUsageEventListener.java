@@ -10,7 +10,7 @@ package org.dspace.statistics.export;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.CALLS_REAL_METHODS;
+import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -45,6 +45,7 @@ import org.dspace.core.Context;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.eperson.service.GroupService;
+import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.statistics.export.factory.OpenURLTrackerLoggerServiceFactory;
 import org.dspace.statistics.export.service.FailedOpenURLTrackerService;
@@ -52,17 +53,21 @@ import org.dspace.usage.UsageEvent;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mock;
+import org.junit.runner.RunWith;
+import org.mockito.Spy;
+import org.mockito.junit.MockitoJUnitRunner;
 
 /**
  * Test class for the ExportUsageEventListener
  */
+@RunWith(MockitoJUnitRunner.class)
 public class ITExportUsageEventListener extends AbstractIntegrationTest {
 
     private static Logger log = Logger.getLogger(ITExportUsageEventListener.class);
 
 
     protected CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
+    protected ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
     protected CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
     protected ItemService itemService = ContentServiceFactory.getInstance().getItemService();
     protected InstallItemService installItemService = ContentServiceFactory.getInstance().getInstallItemService();
@@ -79,8 +84,8 @@ public class ITExportUsageEventListener extends AbstractIntegrationTest {
                                                                  .getServiceByName("testProcessedUrls",
                                                                                    ArrayList.class);
 
-    @Mock
-    ExportUsageEventListener exportUsageEventListener = mock(ExportUsageEventListener.class, CALLS_REAL_METHODS);
+    @Spy
+    ExportUsageEventListener exportUsageEventListener;
 
     private Item item;
     private Bitstream bitstream;
@@ -97,6 +102,8 @@ public class ITExportUsageEventListener extends AbstractIntegrationTest {
         super.init();
         context.turnOffAuthorisationSystem();
         try {
+            exportUsageEventListener.configurationService = configurationService;
+
             entityType = entityTypeService.create(context, "Publication");
             community = communityService.create(null, context);
             collection = collectionService.create(context, community);
@@ -145,7 +152,11 @@ public class ITExportUsageEventListener extends AbstractIntegrationTest {
         } catch (Exception e) {
             log.error(e.getMessage(), e);
         } finally {
-            context.restoreAuthSystemState();
+            try {
+                context.complete();
+            } catch (SQLException e) {
+                log.error(e);
+            }
         }
         super.destroy();
     }
@@ -164,6 +175,7 @@ public class ITExportUsageEventListener extends AbstractIntegrationTest {
         when(usageEvent.getRequest()).thenReturn(request);
         when(usageEvent.getContext()).thenReturn(new Context());
 
+        doCallRealMethod().when(exportUsageEventListener).receiveEvent(usageEvent);
         exportUsageEventListener.receiveEvent(usageEvent);
 
 
@@ -173,7 +185,7 @@ public class ITExportUsageEventListener extends AbstractIntegrationTest {
         String regex = "https://irus.jisc.ac.uk/counter/test/\\?url_ver=Z39.88-2004&req_id=" +
                 URLEncoder.encode(request.getRemoteAddr(), "UTF-8") + "&req_dat=&rft" +
                 ".artnum=oai%3Alocalhost%3A" + URLEncoder.encode(item.getHandle(), "UTF-8") + "&rfr_dat=&rfr_id" +
-                "=localhost&url_tim=" + ".*" + "?&svc_dat=http%3A%2F%2Flocalhost%3A3000%2Fhandle%2F" + URLEncoder
+                "=localhost&url_tim=" + ".*" + "?&svc_dat=http%3A%2F%2Flocalhost%2Fhandle%2F" + URLEncoder
                 .encode(item.getHandle(), "UTF-8") + "&rft_dat=Investigation";
 
         boolean isMatch = matchesString(String.valueOf(testProcessedUrls.get(0)), regex);
@@ -199,14 +211,16 @@ public class ITExportUsageEventListener extends AbstractIntegrationTest {
         when(usageEvent.getRequest()).thenReturn(request);
         when(usageEvent.getContext()).thenReturn(new Context());
 
+        doCallRealMethod().when(exportUsageEventListener).receiveEvent(usageEvent);
         exportUsageEventListener.receiveEvent(usageEvent);
+
 
         List<OpenURLTracker> all = failedOpenURLTrackerService.findAll(context);
 
         String regex = "https://irus.jisc.ac.uk/counter/test/\\?url_ver=Z39.88-2004&req_id=" +
                 URLEncoder.encode(request.getRemoteAddr(), "UTF-8") + "&req_dat=&rft" +
                 ".artnum=oai%3Alocalhost%3A" + URLEncoder.encode(item.getHandle(), "UTF-8") + "&rfr_dat=&rfr_id" +
-                "=localhost&url_tim=" + ".*" + "?&svc_dat=http%3A%2F%2Flocalhost%3A3000%2Fhandle%2F" + URLEncoder
+                "=localhost&url_tim=" + ".*" + "?&svc_dat=http%3A%2F%2Flocalhost%2Fhandle%2F" + URLEncoder
                 .encode(item.getHandle(), "UTF-8") + "&rft_dat=Investigation";
 
         boolean isMatch = matchesString(all.get(0).getUrl(), regex);
@@ -225,8 +239,6 @@ public class ITExportUsageEventListener extends AbstractIntegrationTest {
         context.turnOffAuthorisationSystem();
 
         HttpServletRequest request = mock(HttpServletRequest.class);
-        when(request.getRemoteAddr()).thenReturn("client-ip-fail");
-        when(request.getHeader(anyString())).thenReturn(null);
 
         UsageEvent usageEvent = mock(UsageEvent.class);
         when(usageEvent.getObject()).thenReturn(item);
@@ -239,6 +251,7 @@ public class ITExportUsageEventListener extends AbstractIntegrationTest {
 
         context.restoreAuthSystemState();
 
+        doCallRealMethod().when(exportUsageEventListener).receiveEvent(usageEvent);
         exportUsageEventListener.receiveEvent(usageEvent);
 
         List<OpenURLTracker> all = failedOpenURLTrackerService.findAll(context);
@@ -262,12 +275,13 @@ public class ITExportUsageEventListener extends AbstractIntegrationTest {
         when(usageEvent.getRequest()).thenReturn(request);
         when(usageEvent.getContext()).thenReturn(new Context());
 
+        doCallRealMethod().when(exportUsageEventListener).receiveEvent(usageEvent);
         exportUsageEventListener.receiveEvent(usageEvent);
 
         String regex = "https://irus.jisc.ac.uk/counter/test/\\?url_ver=Z39.88-2004&req_id=" +
                 URLEncoder.encode(request.getRemoteAddr(), "UTF-8") + "&req_dat=&rft" +
                 ".artnum=oai%3Alocalhost%3A" + URLEncoder.encode(item.getHandle(), "UTF-8") + "&rfr_dat=&rfr_id" +
-                "=localhost&url_tim=" + ".*" + "?&svc_dat=http%3A%2F%2Flocalhost%3A3000%2Fbitstream%2Fhandle%2F" +
+                "=localhost&url_tim=" + ".*" + "?&svc_dat=http%3A%2F%2Flocalhost%2Fbitstream%2Fhandle%2F" +
                 URLEncoder.encode(item.getHandle(), "UTF-8") + "%2F%3Fsequence%3D\\d+" + "&rft_dat=Request";
 
         boolean isMatch = matchesString(String.valueOf(testProcessedUrls.get(0)), regex);
@@ -294,6 +308,7 @@ public class ITExportUsageEventListener extends AbstractIntegrationTest {
         when(usageEvent.getRequest()).thenReturn(request);
         when(usageEvent.getContext()).thenReturn(new Context());
 
+        doCallRealMethod().when(exportUsageEventListener).receiveEvent(usageEvent);
         exportUsageEventListener.receiveEvent(usageEvent);
 
         List<OpenURLTracker> all = failedOpenURLTrackerService.findAll(context);
@@ -301,7 +316,7 @@ public class ITExportUsageEventListener extends AbstractIntegrationTest {
         String regex = "https://irus.jisc.ac.uk/counter/test/\\?url_ver=Z39.88-2004&req_id=" +
                 URLEncoder.encode(request.getRemoteAddr(), "UTF-8") + "&req_dat=&rft" +
                 ".artnum=oai%3Alocalhost%3A" + URLEncoder.encode(item.getHandle(), "UTF-8") + "&rfr_dat=&rfr_id" +
-                "=localhost&url_tim=" + ".*" + "?&svc_dat=http%3A%2F%2Flocalhost%3A3000%2Fbitstream%2Fhandle%2F" +
+                "=localhost&url_tim=" + ".*" + "?&svc_dat=http%3A%2F%2Flocalhost%2Fbitstream%2Fhandle%2F" +
                 URLEncoder.encode(item.getHandle(), "UTF-8") + "%2F%3Fsequence%3D\\d+" + "&rft_dat=Request";
 
 
@@ -334,6 +349,7 @@ public class ITExportUsageEventListener extends AbstractIntegrationTest {
 
         context.restoreAuthSystemState();
 
+        doCallRealMethod().when(exportUsageEventListener).receiveEvent(usageEvent);
         exportUsageEventListener.receiveEvent(usageEvent);
 
         List<OpenURLTracker> all = failedOpenURLTrackerService.findAll(context);
@@ -351,14 +367,12 @@ public class ITExportUsageEventListener extends AbstractIntegrationTest {
     public void testReceiveEventOnNonRelevantObject() throws SQLException {
 
         HttpServletRequest request = mock(HttpServletRequest.class);
-        when(request.getRemoteAddr()).thenReturn("client-ip-fail");
-        when(request.getHeader(anyString())).thenReturn(null);
 
         UsageEvent usageEvent = mock(UsageEvent.class);
         when(usageEvent.getObject()).thenReturn(community);
-        when(usageEvent.getRequest()).thenReturn(request);
         when(usageEvent.getContext()).thenReturn(new Context());
 
+        doCallRealMethod().when(exportUsageEventListener).receiveEvent(usageEvent);
         exportUsageEventListener.receiveEvent(usageEvent);
 
         List<OpenURLTracker> all = failedOpenURLTrackerService.findAll(context);

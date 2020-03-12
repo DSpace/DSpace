@@ -10,6 +10,7 @@ package org.dspace.statistics.export;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,13 +25,10 @@ import org.dspace.statistics.export.factory.OpenURLTrackerLoggerServiceFactory;
 import org.dspace.statistics.export.service.FailedOpenURLTrackerService;
 import org.junit.After;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.runners.MockitoJUnitRunner;
 
 /**
  * Class to test the RetryFailedOpenUrlTracker
  */
-@RunWith(MockitoJUnitRunner.class)
 public class ITRetryFailedOpenUrlTracker extends AbstractIntegrationTest {
 
     private static Logger log = Logger.getLogger(ITRetryFailedOpenUrlTracker.class);
@@ -40,7 +38,8 @@ public class ITRetryFailedOpenUrlTracker extends AbstractIntegrationTest {
             OpenURLTrackerLoggerServiceFactory.getInstance().getOpenUrlTrackerLoggerService();
 
     protected ArrayList testProcessedUrls = DSpaceServicesFactory.getInstance().getServiceManager()
-                                                       .getServiceByName("testProcessedUrls", ArrayList.class);
+                                                                 .getServiceByName("testProcessedUrls",
+                                                                                   ArrayList.class);
 
     private ScriptService scriptService = ScriptServiceFactory.getInstance().getScriptService();
 
@@ -65,13 +64,18 @@ public class ITRetryFailedOpenUrlTracker extends AbstractIntegrationTest {
         } catch (Exception e) {
             log.error(e.getMessage(), e);
         } finally {
-            context.restoreAuthSystemState();
+            try {
+                context.complete();
+            } catch (SQLException e) {
+                log.error(e);
+            }
         }
         super.destroy();
     }
 
     /**
      * Test the mode of the script that allows the user to add a failed url to the database
+     *
      * @throws Exception
      */
     @Test
@@ -94,6 +98,7 @@ public class ITRetryFailedOpenUrlTracker extends AbstractIntegrationTest {
 
     /**
      * Test to check that all logged failed urls are reprocessed succesfully and removed from the db
+     *
      * @throws Exception
      */
     @Test
@@ -126,6 +131,7 @@ public class ITRetryFailedOpenUrlTracker extends AbstractIntegrationTest {
 
     /**
      * Test to check that the successful retries are removed, but the failed retries remain in the db
+     *
      * @throws Exception
      */
     @Test
