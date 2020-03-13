@@ -9,6 +9,8 @@ package org.dspace.app.rest;
 
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 
+import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadata;
+import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.data.rest.webmvc.RestMediaTypes.TEXT_URI_LIST_VALUE;
@@ -31,6 +33,7 @@ import java.util.UUID;
 import javax.ws.rs.core.MediaType;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.CharEncoding;
 import org.dspace.app.rest.builder.BitstreamBuilder;
@@ -1157,6 +1160,95 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                                (witem, "Workspace Item 1", "2019-01-01", "ExtraEntry"))));
     }
 
+    public void patchReplaceMetadataOnItemStillInSubmissionTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                .withName("Parent Community")
+                .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                .withName("Sub Community")
+                .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1)
+                .withName("Collection 1")
+                .build();
+
+        context.setCurrentUser(eperson);
+        WorkspaceItem witem = WorkspaceItemBuilder.createWorkspaceItem(context, col1)
+                .withTitle("Workspace Item 1")
+                .withIssueDate("2017-10-17")
+                .withSubject("ExtraEntry")
+                .build();
+
+        context.restoreAuthSystemState();
+
+        List<Operation> updateTitle = new ArrayList<Operation>();
+        Map<String, String> value = new HashMap<String, String>();
+        value.put("value", "New Title");
+        updateTitle.add(new ReplaceOperation("/metadata/dc.title/0", value));
+
+        String patchBody = getPatchContent(updateTitle);
+        UUID idItem = witem.getItem().getID();
+
+        // Verify submitter cannot modify metadata via item PATCH. They must use submission forms.
+        String tokenEperson = getAuthToken(eperson.getEmail(), password);
+        getClient(tokenEperson).perform(patch("/api/core/items/" + idItem)
+            .content(patchBody)
+            .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+            .andExpect(status().isForbidden());
+
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        getClient(tokenAdmin).perform(get("/api/core/items/" + idItem))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$", Matchers.is(ItemMatcher.matchItemWithTitleAndDateIssued
+                  (witem.getItem(), "Workspace Item 1", "2017-10-17"))));
+    }
+
+    @Test
+    public void patchAddMetadataOnItemStillInSubmissionTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                .withName("Parent Community")
+                .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                .withName("Sub Community")
+                .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1)
+                .withName("Collection 1")
+                .build();
+
+        context.setCurrentUser(eperson);
+        WorkspaceItem witem = WorkspaceItemBuilder.createWorkspaceItem(context, col1)
+                .withTitle("Workspace")
+                .withSubject("ExtraEntry")
+                .build();
+
+        context.restoreAuthSystemState();
+
+        List<Operation> addIssueDate = new ArrayList<Operation>();
+        Map<String, String> value = new HashMap<String, String>();
+        value.put("value", "2017-10-17");
+        addIssueDate.add(new ReplaceOperation("/metadata/dc.date.issued/0", value));
+
+        String patchBody = getPatchContent(addIssueDate);
+        UUID idItem = witem.getItem().getID();
+
+        // Verify submitter cannot modify metadata via item PATCH. They must use submission forms.
+        String tokenEperson = getAuthToken(eperson.getEmail(), password);
+        getClient(tokenEperson).perform(patch("/api/core/items/" + idItem)
+            .content(patchBody)
+            .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+            .andExpect(status().isForbidden());
+
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        getClient(tokenAdmin).perform(get("/api/core/items/" + idItem))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$", hasJsonPath("$.metadata", allOf(
+              matchMetadata("dc.title", "Workspace")))))
+        .andExpect(jsonPath("$.metadata.['dc.date.issued']").doesNotExist());
+    }
+
     @Test
     public void patchUpdateMetadataUnAuthenticatedTest() throws Exception {
         context.turnOffAuthorisationSystem();
@@ -1202,6 +1294,50 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
             .andExpect(jsonPath("$",
                     Matchers.is(WorkspaceItemMatcher.matchItemWithTitleAndDateIssuedAndSubject
                                (witem, "Workspace Item 1", "2019-01-01", "ExtraEntry"))));
+    }
+
+    @Test
+    public void patchRemoveMetadataOnItemStillInSubmissionTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                .withName("Parent Community")
+                .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                .withName("Sub Community")
+                .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1)
+                .withName("Collection 1")
+                .build();
+
+        context.setCurrentUser(eperson);
+        WorkspaceItem witem = WorkspaceItemBuilder.createWorkspaceItem(context, col1)
+                .withTitle("Workspace title")
+                .withIssueDate("2017-10-17")
+                .withSubject("ExtraEntry")
+                .build();
+
+        context.restoreAuthSystemState();
+
+        List<Operation> removeTitle = new ArrayList<Operation>();
+        removeTitle.add(new RemoveOperation("/metadata/dc.title/0"));
+
+        String patchBody = getPatchContent(removeTitle);
+        UUID idItem = witem.getItem().getID();
+
+        // Verify submitter cannot modify metadata via item PATCH. They must use submission forms.
+        String tokenEperson = getAuthToken(eperson.getEmail(), password);
+        getClient(tokenEperson).perform(patch("/api/core/items/" + idItem)
+            .content(patchBody)
+            .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+            .andExpect(status().isForbidden());
+
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        getClient(tokenAdmin).perform(get("/api/core/items/" + idItem))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$", hasJsonPath("$.metadata", allOf(
+              matchMetadata("dc.title", "Workspace title"),
+              matchMetadata("dc.date.issued", "2017-10-17")))));
     }
 
     @Test
