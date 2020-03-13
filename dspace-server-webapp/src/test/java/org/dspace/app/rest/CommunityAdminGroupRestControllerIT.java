@@ -139,6 +139,29 @@ public class CommunityAdminGroupRestControllerIT extends AbstractControllerInteg
     }
 
     @Test
+    public void postCommunityAdminGroupCreateAdminGroupDcTitleUnprocessable() throws Exception {
+
+        ObjectMapper mapper = new ObjectMapper();
+        GroupRest groupRest = new GroupRest();
+        MetadataRest metadataRest = new MetadataRest();
+        metadataRest.put("dc.description", new MetadataValueRest("testingDescription"));
+        metadataRest.put("dc.subject", new MetadataValueRest("testSubject"));
+        metadataRest.put("dc.title", new MetadataValueRest("testTitle"));
+
+        groupRest.setMetadata(metadataRest);
+
+        AtomicReference<UUID> idRef = new AtomicReference<>();
+
+        String token = getAuthToken(admin.getEmail(), password);
+        getClient(token).perform(post("/api/core/communities/" + parentCommunity.getID() + "/adminGroup")
+                                     .content(mapper.writeValueAsBytes(groupRest))
+                                     .contentType(contentType))
+                        .andExpect(status().isUnprocessableEntity());
+
+    }
+
+
+    @Test
     public void postCommunityAdminGroupCreateAdminGroupSuccessCommunityAdmin() throws Exception {
 
         ObjectMapper mapper = new ObjectMapper();

@@ -10,6 +10,7 @@ package org.dspace.app.rest.repository;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.SortedMap;
 import java.util.UUID;
 import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
@@ -26,6 +27,8 @@ import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.BitstreamRest;
 import org.dspace.app.rest.model.CommunityRest;
 import org.dspace.app.rest.model.GroupRest;
+import org.dspace.app.rest.model.MetadataRest;
+import org.dspace.app.rest.model.MetadataValueRest;
 import org.dspace.app.rest.model.patch.Patch;
 import org.dspace.app.rest.utils.CommunityRestEqualityUtils;
 import org.dspace.authorize.AuthorizeException;
@@ -276,6 +279,15 @@ public class CommunityRestRepository extends DSpaceObjectRestRepository<Communit
         return converter.toRest(context.reloadEntity(bitstream), utils.obtainProjection());
     }
 
+    /**
+     * This method will create an AdminGroup for the given Community with the given Information through JSON
+     * @param context   The current context
+     * @param request   The current request
+     * @param community The community for which we'll create an admingroup
+     * @return          The created AdminGroup's REST object
+     * @throws SQLException If something goes wrong
+     * @throws AuthorizeException   If something goes wrong
+     */
     public GroupRest createAdminGroup(Context context, HttpServletRequest request, Community community)
         throws SQLException, AuthorizeException {
 
@@ -289,13 +301,31 @@ public class CommunityRestRepository extends DSpaceObjectRestRepository<Communit
                 throw new UnprocessableEntityException("The given GroupRest object has to be non-permanent and can't" +
                                                            " contain a name");
             }
-            metadataConverter.setMetadata(context, group, groupRest.getMetadata());
+            MetadataRest metadata = groupRest.getMetadata();
+            SortedMap<String, List<MetadataValueRest>> map = metadata.getMap();
+            if (map != null) {
+                List<MetadataValueRest> dcTitleMetadata = map.get("dc.title");
+                if (dcTitleMetadata != null) {
+                    if (!dcTitleMetadata.isEmpty()) {
+                        throw new UnprocessableEntityException("The given GroupRest can't contain a dc.title mdv");
+                    }
+                }
+            }
+            metadataConverter.setMetadata(context, group, metadata);
         } catch (IOException e1) {
             throw new UnprocessableEntityException("Error parsing request body.", e1);
         }
         return converter.toRest(group, utils.obtainProjection());
     }
 
+    /**
+     * This method will delete the AdminGroup for the given Community
+     * @param context       The current context
+     * @param community     The community for which we'll delete the admingroup
+     * @throws SQLException If something goes wrong
+     * @throws AuthorizeException   If something goes wrong
+     * @throws IOException  If something goes wrong
+     */
     public void deleteAdminGroup(Context context, Community community)
         throws SQLException, AuthorizeException, IOException {
         Group adminGroup = community.getAdministrators();
