@@ -11,11 +11,18 @@ import static com.jayway.jsonpath.JsonPath.read;
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.fileUpload;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.dspace.app.rest.builder.ClaimedTaskBuilder;
@@ -27,32 +34,45 @@ import org.dspace.app.rest.builder.WorkflowItemBuilder;
 import org.dspace.app.rest.matcher.ClaimedTaskMatcher;
 import org.dspace.app.rest.matcher.EPersonMatcher;
 import org.dspace.app.rest.matcher.PoolTaskMatcher;
+import org.dspace.app.rest.matcher.WorkflowActionMatcher;
 import org.dspace.app.rest.matcher.WorkflowItemMatcher;
+import org.dspace.app.rest.matcher.WorkflowStepMatcher;
 import org.dspace.app.rest.matcher.WorkspaceItemMatcher;
+import org.dspace.app.rest.model.patch.Operation;
+import org.dspace.app.rest.model.patch.ReplaceOperation;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
 import org.dspace.eperson.EPerson;
+import org.dspace.xmlworkflow.factory.XmlWorkflowFactory;
+import org.dspace.xmlworkflow.state.Step;
+import org.dspace.xmlworkflow.state.actions.WorkflowActionConfig;
 import org.dspace.xmlworkflow.storedcomponents.ClaimedTask;
 import org.dspace.xmlworkflow.storedcomponents.PoolTask;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 import org.hamcrest.Matchers;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 
 /**
  * Test suite for the pooltasks and claimedtasks endpoints
- * 
- * @author Andrea Bollini (andrea.bollini at 4science.it)
  *
+ * @author Andrea Bollini (andrea.bollini at 4science.it)
+ * @author Maria Verdonck (Atmire) on 10/02/2020
  */
 public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
+
+    @Autowired
+    private XmlWorkflowFactory xmlWorkflowFactory;
+
 
     @Test
     /**
      * Retrieve a specific pooltask
-     * 
+     *
      * @throws Exception
      */
     public void findOnePoolTest() throws Exception {
@@ -117,7 +137,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
     @Test
     /**
      * Verify that only authenticated user can retrieve a specific pooltask
-     * 
+     *
      * @throws Exception
      */
     public void findOnePoolUnauthorizedTest() throws Exception {
@@ -159,7 +179,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
     @Test
     /**
      * Verify that an other reviewer cannot access a pooltask of a colleague
-     * 
+     *
      * @throws Exception
      */
     public void findOnePoolForbiddenTest() throws Exception {
@@ -227,7 +247,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
     /**
      * Create three workflowitem in three different collections with different, partially overlapping reviewers, and
      * verify that each reviewer get the proper list of tasks
-     * 
+     *
      * @throws Exception
      */
     public void findByUserTest() throws Exception {
@@ -462,7 +482,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
     /**
      * A delete request over a pooltask should result in a 405 Method not supported exception and no changes applied
      * workspace
-     * 
+     *
      * @throws Exception
      */
     public void deletePoolTaskTest() throws Exception {
@@ -1439,7 +1459,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
                                            .withName("Sub Community")
                                            .build();
 
-        // the reviewer2 is a reviewer in a different step for the col1 and with the same role than reviewer1 for
+        // the reviewer2 is a reviewer in a different step for the colAA1 and with the same role than reviewer1 for
         // another collection
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1")
                 .withWorkflowGroup(1, reviewer1)
@@ -1613,7 +1633,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
                                            .withName("Sub Community")
                                            .build();
 
-        // the reviewer2 is a reviewer in a different step for the col1 and with the same role than reviewer1 for
+        // the reviewer2 is a reviewer in a different step for the colAA1 and with the same role than reviewer1 for
         // another collection
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1")
                 .withWorkflowGroup(1, reviewer1)
@@ -1799,13 +1819,15 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
 
         AtomicReference<Integer> idRef = new AtomicReference<Integer>();
 
+        Step step = xmlWorkflowFactory.getStepByName("reviewstep");
         // step 1
         getClient(reviewer1Token).perform(get("/api/workflow/pooltasks/search/findByUser")
-                .param("uuid", reviewer1.getID().toString()))
+                .param("uuid", reviewer1.getID().toString()).param("projection", "full"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.pooltasks", Matchers.contains(
                     Matchers.allOf(
                             Matchers.is(PoolTaskMatcher.matchPoolTask(null, "reviewstep")),
+                            hasJsonPath("$._embedded.step", WorkflowStepMatcher.matchWorkflowStepEntry(step)),
                             hasJsonPath("$._embedded.workflowitem",
                                     Matchers.is(WorkflowItemMatcher.matchItemWithTitleAndDateIssuedAndSubject(
                                             witem, "Test item full workflow", "2019-03-06", "ExtraEntry")))
@@ -1821,17 +1843,22 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED))
             .andExpect(status().isNoContent());
 
+        WorkflowActionConfig workflowAction = xmlWorkflowFactory.getActionByName("reviewaction");
+
         // get the id of the claimed task
         getClient(reviewer1Token).perform(get("/api/workflow/claimedtasks/search/findByUser")
-                .param("uuid", reviewer1.getID().toString()))
+                .param("uuid", reviewer1.getID().toString()).param("projection", "full"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.claimedtasks", Matchers.contains(
                     Matchers.allOf(
                             hasJsonPath("$._links.self.href", Matchers.containsString("/api/workflow/claimedtasks/")),
                             hasJsonPath("$.type", Matchers.is("claimedtask")),
+                            hasJsonPath("$._embedded.step", WorkflowStepMatcher.matchWorkflowStepEntry(step)),
                             hasJsonPath("$._embedded.workflowitem",
                                      Matchers.is(WorkflowItemMatcher.matchItemWithTitleAndDateIssuedAndSubject(
-                                             witem, "Test item full workflow", "2019-03-06", "ExtraEntry")))
+                                             witem, "Test item full workflow", "2019-03-06", "ExtraEntry"))),
+                            hasJsonPath("$._embedded.action",
+                                        WorkflowActionMatcher.matchWorkflowActionEntry(workflowAction))
                     ))))
             .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/workflow/claimedtasks")))
             .andExpect(jsonPath("$.page.size", is(20)))
@@ -1850,13 +1877,16 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.inArchive", is(false)));
 
+        step = xmlWorkflowFactory.getStepByName("editstep");
+
         // step 2
         getClient(reviewer2Token).perform(get("/api/workflow/pooltasks/search/findByUser")
-                .param("uuid", reviewer2.getID().toString()))
+                .param("uuid", reviewer2.getID().toString()).param("projection", "full"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.pooltasks", Matchers.contains(
                     Matchers.allOf(
                             Matchers.is(PoolTaskMatcher.matchPoolTask(null, "editstep")),
+                            hasJsonPath("$._embedded.step", WorkflowStepMatcher.matchWorkflowStepEntry(step)),
                             hasJsonPath("$._embedded.workflowitem",
                                     Matchers.is(WorkflowItemMatcher.matchItemWithTitleAndDateIssuedAndSubject(
                                             witem, "Test item full workflow", "2019-03-06", "ExtraEntry")))
@@ -1872,17 +1902,22 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED))
             .andExpect(status().isNoContent());
 
+        workflowAction = xmlWorkflowFactory.getActionByName("editaction");
+
         // get the id of the claimed task
         getClient(reviewer2Token).perform(get("/api/workflow/claimedtasks/search/findByUser")
-                .param("uuid", reviewer2.getID().toString()))
+                .param("uuid", reviewer2.getID().toString()).param("projection", "full"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.claimedtasks", Matchers.contains(
                     Matchers.allOf(
                             hasJsonPath("$._links.self.href", Matchers.containsString("/api/workflow/claimedtasks/")),
                             hasJsonPath("$.type", Matchers.is("claimedtask")),
+                            hasJsonPath("$._embedded.step", WorkflowStepMatcher.matchWorkflowStepEntry(step)),
                             hasJsonPath("$._embedded.workflowitem",
                                      Matchers.is(WorkflowItemMatcher.matchItemWithTitleAndDateIssuedAndSubject(
-                                             witem, "Test item full workflow", "2019-03-06", "ExtraEntry")))
+                                             witem, "Test item full workflow", "2019-03-06", "ExtraEntry"))),
+                            hasJsonPath("$._embedded.action",
+                                        WorkflowActionMatcher.matchWorkflowActionEntry(workflowAction))
                     ))))
             .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/workflow/claimedtasks")))
             .andExpect(jsonPath("$.page.size", is(20)))
@@ -1901,17 +1936,20 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.inArchive", is(false)));
 
+        step = xmlWorkflowFactory.getStepByName("finaleditstep");
+
         // step 3
         getClient(reviewer3Token).perform(get("/api/workflow/pooltasks/search/findByUser")
-                .param("uuid", reviewer3.getID().toString()))
+                .param("uuid", reviewer3.getID().toString()).param("projection", "full"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.pooltasks", Matchers.contains(
                     Matchers.allOf(
                             Matchers.is(PoolTaskMatcher.matchPoolTask(null, "finaleditstep")),
+                            hasJsonPath("$._embedded.step", WorkflowStepMatcher.matchWorkflowStepEntry(step)),
                             hasJsonPath("$._embedded.workflowitem",
                                     Matchers.is(WorkflowItemMatcher.matchItemWithTitleAndDateIssuedAndSubject(
                                             witem, "Test item full workflow", "2019-03-06", "ExtraEntry")))
-                            ))))
+                    ))))
             .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/workflow/pooltasks")))
             .andExpect(jsonPath("$.page.size", is(20)))
             .andExpect(jsonPath("$.page.totalElements", is(1)))
@@ -1923,17 +1961,21 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED))
             .andExpect(status().isNoContent());
 
+        workflowAction = xmlWorkflowFactory.getActionByName("finaleditaction");
         // get the id of the claimed task
         getClient(reviewer3Token).perform(get("/api/workflow/claimedtasks/search/findByUser")
-                .param("uuid", reviewer3.getID().toString()))
+                .param("uuid", reviewer3.getID().toString()).param("projection", "full"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.claimedtasks", Matchers.contains(
                     Matchers.allOf(
                             hasJsonPath("$._links.self.href", Matchers.containsString("/api/workflow/claimedtasks/")),
                             hasJsonPath("$.type", Matchers.is("claimedtask")),
+                            hasJsonPath("$._embedded.step", WorkflowStepMatcher.matchWorkflowStepEntry(step)),
                             hasJsonPath("$._embedded.workflowitem",
                                      Matchers.is(WorkflowItemMatcher.matchItemWithTitleAndDateIssuedAndSubject(
-                                             witem, "Test item full workflow", "2019-03-06", "ExtraEntry")))
+                                             witem, "Test item full workflow", "2019-03-06", "ExtraEntry"))),
+                            hasJsonPath("$._embedded.action",
+                                        WorkflowActionMatcher.matchWorkflowActionEntry(workflowAction))
                     ))))
             .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/workflow/claimedtasks")))
             .andExpect(jsonPath("$.page.size", is(20)))
@@ -1951,6 +1993,1105 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
         getClient().perform(get("/api/core/items/" + item.getID()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.inArchive", is(true)));
+    }
+
+    @Test
+    /**
+     * Test the run of the default workflow where the wfi gets rejected in the first step (review step)
+     *
+     * @throws Exception
+     */
+    public void defaultWorkflowTest_UntilReviewStep_Reject() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+        //** GIVEN **
+        //1. A reviewer
+        EPerson reviewer1 = EPersonBuilder.createEPerson(context)
+            .withEmail("reviewer1@example.com")
+            .withPassword(password)
+            .build();
+
+        //2. A community-collection structure with one parent community with sub-community and one collection.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+            .withName("Parent Community")
+            .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+            .withName("Sub Community")
+            .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1")
+            .withWorkflowGroup(1, reviewer1)
+            .build();
+
+        //3. create a normal user to use as submitter
+        EPerson submitter = EPersonBuilder.createEPerson(context)
+            .withEmail("submitter@example.com")
+            .withPassword(password)
+            .build();
+
+        context.setCurrentUser(submitter);
+
+        //3. create a workflowitem (so a pool task in step1)
+        XmlWorkflowItem witem = WorkflowItemBuilder.createWorkflowItem(context, col1)
+            .withTitle("Test item full workflow")
+            .withIssueDate("2019-03-06")
+            .withSubject("ExtraEntry")
+            .build();
+
+        Item item = witem.getItem();
+
+        context.restoreAuthSystemState();
+
+        String reviewer1Token = getAuthToken(reviewer1.getEmail(), password);
+        String adminToken = getAuthToken(admin.getEmail(), password);
+
+        AtomicReference<Integer> idRef = new AtomicReference<Integer>();
+
+        // step 1
+        getClient(reviewer1Token).perform(get("/api/workflow/pooltasks/search/findByUser")
+            .param("uuid", reviewer1.getID().toString()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$._embedded.pooltasks", Matchers.contains(
+                Matchers.allOf(
+                    Matchers.is(PoolTaskMatcher.matchPoolTask(null, "reviewstep")),
+                    hasJsonPath("$._embedded.workflowitem",
+                        Matchers.is(WorkflowItemMatcher.matchItemWithTitleAndDateIssuedAndSubject(
+                            witem, "Test item full workflow", "2019-03-06", "ExtraEntry")))
+                ))))
+            .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/workflow/pooltasks")))
+            .andExpect(jsonPath("$.page.size", is(20)))
+            .andExpect(jsonPath("$.page.totalElements", is(1)))
+            .andDo((result -> idRef
+                .set(read(result.getResponse().getContentAsString(), "$._embedded.pooltasks[0].id"))));
+
+        // claim the task
+        getClient(reviewer1Token).perform(post("/api/workflow/pooltasks/" + idRef.get())
+            .contentType(MediaType.APPLICATION_FORM_URLENCODED))
+            .andExpect(status().isNoContent());
+
+        // get the id of the claimed task
+        getClient(reviewer1Token).perform(get("/api/workflow/claimedtasks/search/findByUser")
+            .param("uuid", reviewer1.getID().toString()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$._embedded.claimedtasks", Matchers.contains(
+                Matchers.allOf(
+                    hasJsonPath("$._links.self.href", Matchers.containsString("/api/workflow/claimedtasks/")),
+                    hasJsonPath("$.type", Matchers.is("claimedtask")),
+                    hasJsonPath("$._embedded.workflowitem",
+                        Matchers.is(WorkflowItemMatcher.matchItemWithTitleAndDateIssuedAndSubject(
+                            witem, "Test item full workflow", "2019-03-06", "ExtraEntry")))
+                ))))
+            .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/workflow/claimedtasks")))
+            .andExpect(jsonPath("$.page.size", is(20)))
+            .andExpect(jsonPath("$.page.totalElements", is(1)))
+            .andDo((result -> idRef
+                .set(read(result.getResponse().getContentAsString(), "$._embedded.claimedtasks[0].id"))));
+
+        // reject the claimedTask with reason, default wf step 1 - review step
+        getClient(reviewer1Token).perform(post("/api/workflow/claimedtasks/" + idRef.get())
+            .param("submit_reject", "true")
+            .param("reason", "I need to test the reject in review step")
+            .contentType(MediaType.APPLICATION_FORM_URLENCODED))
+            .andExpect(status().isNoContent());
+
+        // verify that the task has been processed and is not anymore available
+        getClient(reviewer1Token).perform(get("/api/workflow/claimedtasks/" + idRef.get()))
+            .andExpect(status().isNotFound());
+
+        // verify that the task is send back to the user and not to the pool
+        getClient(reviewer1Token).perform(get("/api/workflow/pooltasks/search/findByUser")
+            .param("uuid", reviewer1.getID().toString()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.page.totalElements", is(0)));
+
+        // verify that the underline item is still unpublished
+        getClient(adminToken).perform(get("/api/core/items/" + item.getID()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.inArchive", is(false)));
+    }
+
+    @Test
+    /**
+     * Test the run of the default workflow where the reviewer attempts a non-valid option in the first step
+     * (review step)
+     *
+     * @throws Exception
+     */
+    public void defaultWorkflowTest_UntilReviewStep_NonValidOption_EditMetadata() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+        //** GIVEN **
+        //1. A reviewer
+        EPerson reviewer1 = EPersonBuilder.createEPerson(context)
+            .withEmail("reviewer1@example.com")
+            .withPassword(password)
+            .build();
+
+        //2. A community-collection structure with one parent community with sub-community and one collection.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+            .withName("Parent Community")
+            .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+            .withName("Sub Community")
+            .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1")
+            .withWorkflowGroup(1, reviewer1)
+            .build();
+
+        //3. create a normal user to use as submitter
+        EPerson submitter = EPersonBuilder.createEPerson(context)
+            .withEmail("submitter@example.com")
+            .withPassword(password)
+            .build();
+
+        context.setCurrentUser(submitter);
+
+        //3. create a workflowitem (so a pool task in step1)
+        XmlWorkflowItem witem = WorkflowItemBuilder.createWorkflowItem(context, col1)
+            .withTitle("Test item full workflow")
+            .withIssueDate("2019-03-06")
+            .withSubject("ExtraEntry")
+            .build();
+
+        context.restoreAuthSystemState();
+
+        String reviewer1Token = getAuthToken(reviewer1.getEmail(), password);
+
+        AtomicReference<Integer> idRef = new AtomicReference<Integer>();
+
+        // step 1
+        getClient(reviewer1Token).perform(get("/api/workflow/pooltasks/search/findByUser")
+            .param("uuid", reviewer1.getID().toString()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$._embedded.pooltasks", Matchers.contains(
+                Matchers.allOf(
+                    Matchers.is(PoolTaskMatcher.matchPoolTask(null, "reviewstep")),
+                    hasJsonPath("$._embedded.workflowitem",
+                        Matchers.is(WorkflowItemMatcher.matchItemWithTitleAndDateIssuedAndSubject(
+                            witem, "Test item full workflow", "2019-03-06", "ExtraEntry")))
+                ))))
+            .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/workflow/pooltasks")))
+            .andExpect(jsonPath("$.page.size", is(20)))
+            .andExpect(jsonPath("$.page.totalElements", is(1)))
+            .andDo((result -> idRef
+                .set(read(result.getResponse().getContentAsString(), "$._embedded.pooltasks[0].id"))));
+
+        // claim the task
+        getClient(reviewer1Token).perform(post("/api/workflow/pooltasks/" + idRef.get())
+            .contentType(MediaType.APPLICATION_FORM_URLENCODED))
+            .andExpect(status().isNoContent());
+
+        // get the id of the claimed task
+        getClient(reviewer1Token).perform(get("/api/workflow/claimedtasks/search/findByUser")
+            .param("uuid", reviewer1.getID().toString()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$._embedded.claimedtasks", Matchers.contains(
+                Matchers.allOf(
+                    hasJsonPath("$._links.self.href", Matchers.containsString("/api/workflow/claimedtasks/")),
+                    hasJsonPath("$.type", Matchers.is("claimedtask")),
+                    hasJsonPath("$._embedded.workflowitem",
+                        Matchers.is(WorkflowItemMatcher.matchItemWithTitleAndDateIssuedAndSubject(
+                            witem, "Test item full workflow", "2019-03-06", "ExtraEntry")))
+                ))))
+            .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/workflow/claimedtasks")))
+            .andExpect(jsonPath("$.page.size", is(20)))
+            .andExpect(jsonPath("$.page.totalElements", is(1)))
+            .andDo((result -> idRef
+                .set(read(result.getResponse().getContentAsString(), "$._embedded.claimedtasks[0].id"))));
+
+        // try non valid option (submit_edit_metadata), in default wf step 1 (review step)
+        getClient(reviewer1Token).perform(post("/api/workflow/claimedtasks/" + idRef.get())
+            .param("submit_edit_metadata", "true")
+            .param("reason", "I need to test the submit_edit_metadata")
+            .contentType(MediaType.APPLICATION_FORM_URLENCODED))
+            .andExpect(status().isUnprocessableEntity());
+
+        // verify that the task has not been processed and is still available
+        getClient(reviewer1Token).perform(get("/api/workflow/claimedtasks/" + idRef.get()))
+            .andExpect(status().isOk());
+    }
+
+    @Test
+    /**
+     * Test the run of the default workflow where the wfi gets rejected in the 2nd step (edit step)
+     *
+     * @throws Exception
+     */
+    public void defaultWorkflowTest_UntilEditStep_Reject() throws Exception {
+        context.turnOffAuthorisationSystem();
+        //** GIVEN **
+        //1. reviewer of 2nd step
+        EPerson reviewer2 = EPersonBuilder.createEPerson(context)
+            .withEmail("reviewer2@example.com")
+            .withPassword(password)
+            .build();
+
+        //2. A community-collection structure with one parent community with sub-community and one collection.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+            .withName("Parent Community")
+            .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+            .withName("Sub Community")
+            .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1")
+            .withWorkflowGroup(2, reviewer2)
+            .build();
+
+        //3. create a normal user to use as submitter
+        EPerson submitter = EPersonBuilder.createEPerson(context)
+            .withEmail("submitter@example.com")
+            .withPassword(password)
+            .build();
+
+        context.setCurrentUser(submitter);
+
+        //3. create a workflowitem (so a pool task in step1)
+        XmlWorkflowItem witem = WorkflowItemBuilder.createWorkflowItem(context, col1)
+            .withTitle("Test item full workflow")
+            .withIssueDate("2019-03-06")
+            .withSubject("ExtraEntry")
+            .build();
+
+        Item item = witem.getItem();
+
+        context.restoreAuthSystemState();
+
+        String reviewer2Token = getAuthToken(reviewer2.getEmail(), password);
+        String adminToken = getAuthToken(admin.getEmail(), password);
+
+        AtomicReference<Integer> idRef = new AtomicReference<Integer>();
+
+        // step 2
+        getClient(reviewer2Token).perform(get("/api/workflow/pooltasks/search/findByUser")
+            .param("uuid", reviewer2.getID().toString()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$._embedded.pooltasks", Matchers.contains(
+                Matchers.allOf(
+                    Matchers.is(PoolTaskMatcher.matchPoolTask(null, "editstep")),
+                    hasJsonPath("$._embedded.workflowitem",
+                        Matchers.is(WorkflowItemMatcher.matchItemWithTitleAndDateIssuedAndSubject(
+                            witem, "Test item full workflow", "2019-03-06", "ExtraEntry")))
+                ))))
+            .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/workflow/pooltasks")))
+            .andExpect(jsonPath("$.page.size", is(20)))
+            .andExpect(jsonPath("$.page.totalElements", is(1)))
+            .andDo((result -> idRef
+                .set(read(result.getResponse().getContentAsString(), "$._embedded.pooltasks[0].id"))));
+
+        // claim the task
+        getClient(reviewer2Token).perform(post("/api/workflow/pooltasks/" + idRef.get())
+            .contentType(MediaType.APPLICATION_FORM_URLENCODED))
+            .andExpect(status().isNoContent());
+
+        // get the id of the claimed task
+        getClient(reviewer2Token).perform(get("/api/workflow/claimedtasks/search/findByUser")
+            .param("uuid", reviewer2.getID().toString()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$._embedded.claimedtasks", Matchers.contains(
+                Matchers.allOf(
+                    hasJsonPath("$._links.self.href", Matchers.containsString("/api/workflow/claimedtasks/")),
+                    hasJsonPath("$.type", Matchers.is("claimedtask")),
+                    hasJsonPath("$._embedded.workflowitem",
+                        Matchers.is(WorkflowItemMatcher.matchItemWithTitleAndDateIssuedAndSubject(
+                            witem, "Test item full workflow", "2019-03-06", "ExtraEntry")))
+                ))))
+            .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/workflow/claimedtasks")))
+            .andExpect(jsonPath("$.page.size", is(20)))
+            .andExpect(jsonPath("$.page.totalElements", is(1)))
+            .andDo((result -> idRef
+                .set(read(result.getResponse().getContentAsString(), "$._embedded.claimedtasks[0].id"))));
+
+        // reject the claimedTask, default wf step 2 (edit step)
+        getClient(reviewer2Token).perform(post("/api/workflow/claimedtasks/" + idRef.get())
+            .param("submit_reject", "true")
+            .param("reason", "I need to test the submit_reject in edit step")
+            .contentType(MediaType.APPLICATION_FORM_URLENCODED))
+            .andExpect(status().isNoContent());
+
+        // verify that the task has been processed and is not anymore available
+        getClient(reviewer2Token).perform(get("/api/workflow/claimedtasks/" + idRef.get()))
+            .andExpect(status().isNotFound());
+
+        // verify that the task is send back to the user and not to the pool
+        getClient(reviewer2Token).perform(get("/api/workflow/pooltasks/search/findByUser")
+            .param("uuid", reviewer2.getID().toString()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.page.totalElements", is(0)));
+
+        // verify that the underline item is still unpublished
+        getClient(adminToken).perform(get("/api/core/items/" + item.getID()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.inArchive", is(false)));
+    }
+
+    @Test
+    /**
+     * Test the run of the default workflow where the reviewer attempts a non-valid option in the 2d step (edit step)
+     *
+     * @throws Exception
+     */
+    public void defaultWorkflowTest_UntilEditStep_NonValidOption() throws Exception {
+        context.turnOffAuthorisationSystem();
+        //** GIVEN **
+        //1. reviewer of 2nd step
+        EPerson reviewer2 = EPersonBuilder.createEPerson(context)
+            .withEmail("reviewer2@example.com")
+            .withPassword(password)
+            .build();
+
+        //2. A community-collection structure with one parent community with sub-community and one collection.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+            .withName("Parent Community")
+            .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+            .withName("Sub Community")
+            .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1")
+            .withWorkflowGroup(2, reviewer2)
+            .build();
+
+        //3. create a normal user to use as submitter
+        EPerson submitter = EPersonBuilder.createEPerson(context)
+            .withEmail("submitter@example.com")
+            .withPassword(password)
+            .build();
+
+        context.setCurrentUser(submitter);
+
+        //3. create a workflowitem (so a pool task in step1)
+        XmlWorkflowItem witem = WorkflowItemBuilder.createWorkflowItem(context, col1)
+            .withTitle("Test item full workflow")
+            .withIssueDate("2019-03-06")
+            .withSubject("ExtraEntry")
+            .build();
+
+        Item item = witem.getItem();
+
+        context.restoreAuthSystemState();
+
+        String reviewer2Token = getAuthToken(reviewer2.getEmail(), password);
+        String adminToken = getAuthToken(admin.getEmail(), password);
+
+        AtomicReference<Integer> idRef = new AtomicReference<Integer>();
+
+        // step 2
+        getClient(reviewer2Token).perform(get("/api/workflow/pooltasks/search/findByUser")
+            .param("uuid", reviewer2.getID().toString()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$._embedded.pooltasks", Matchers.contains(
+                Matchers.allOf(
+                    Matchers.is(PoolTaskMatcher.matchPoolTask(null, "editstep")),
+                    hasJsonPath("$._embedded.workflowitem",
+                        Matchers.is(WorkflowItemMatcher.matchItemWithTitleAndDateIssuedAndSubject(
+                            witem, "Test item full workflow", "2019-03-06", "ExtraEntry")))
+                ))))
+            .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/workflow/pooltasks")))
+            .andExpect(jsonPath("$.page.size", is(20)))
+            .andExpect(jsonPath("$.page.totalElements", is(1)))
+            .andDo((result -> idRef
+                .set(read(result.getResponse().getContentAsString(), "$._embedded.pooltasks[0].id"))));
+
+        // claim the task
+        getClient(reviewer2Token).perform(post("/api/workflow/pooltasks/" + idRef.get())
+            .contentType(MediaType.APPLICATION_FORM_URLENCODED))
+            .andExpect(status().isNoContent());
+
+        // get the id of the claimed task
+        getClient(reviewer2Token).perform(get("/api/workflow/claimedtasks/search/findByUser")
+            .param("uuid", reviewer2.getID().toString()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$._embedded.claimedtasks", Matchers.contains(
+                Matchers.allOf(
+                    hasJsonPath("$._links.self.href", Matchers.containsString("/api/workflow/claimedtasks/")),
+                    hasJsonPath("$.type", Matchers.is("claimedtask")),
+                    hasJsonPath("$._embedded.workflowitem",
+                        Matchers.is(WorkflowItemMatcher.matchItemWithTitleAndDateIssuedAndSubject(
+                            witem, "Test item full workflow", "2019-03-06", "ExtraEntry")))
+                ))))
+            .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/workflow/claimedtasks")))
+            .andExpect(jsonPath("$.page.size", is(20)))
+            .andExpect(jsonPath("$.page.totalElements", is(1)))
+            .andDo((result -> idRef
+                .set(read(result.getResponse().getContentAsString(), "$._embedded.claimedtasks[0].id"))));
+
+        // try non valid option (submit_edit_metadata), default wf step 2 (edit step)
+        getClient(reviewer2Token).perform(post("/api/workflow/claimedtasks/" + idRef.get())
+            .param("submit_non_valid_option", "true")
+            .param("reason", "I need to test an unvalid option")
+            .contentType(MediaType.APPLICATION_FORM_URLENCODED))
+            .andExpect(status().isUnprocessableEntity());
+
+        // verify that the task has not been processed and is still available
+        getClient(reviewer2Token).perform(get("/api/workflow/claimedtasks/" + idRef.get()))
+            .andExpect(status().isOk());
+
+        // verify that the underline item is still unpublished
+        getClient(adminToken).perform(get("/api/core/items/" + item.getID()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.inArchive", is(false)));
+    }
+
+    @Test
+    /**
+     * Test the run of the default workflow where the reviewer attempts a reject option in the 3rd step
+     * (final edit step)
+     *
+     * @throws Exception
+     */
+    public void defaultWorkflowTest_UntilFinalEditStep_Reject() throws Exception {
+        context.turnOffAuthorisationSystem();
+        //** GIVEN **
+        //1. reviewer of 3rd step
+        EPerson reviewer3 = EPersonBuilder.createEPerson(context)
+            .withEmail("reviewer3@example.com")
+            .withPassword(password)
+            .build();
+
+        //2. A community-collection structure with one parent community with sub-community and one collection.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+            .withName("Parent Community")
+            .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+            .withName("Sub Community")
+            .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1")
+            .withWorkflowGroup(3, reviewer3)
+            .build();
+
+        //3. create a normal user to use as submitter
+        EPerson submitter = EPersonBuilder.createEPerson(context)
+            .withEmail("submitter@example.com")
+            .withPassword(password)
+            .build();
+
+        context.setCurrentUser(submitter);
+
+        //3. create a workflowitem (so a pool task in step1)
+        XmlWorkflowItem witem = WorkflowItemBuilder.createWorkflowItem(context, col1)
+            .withTitle("Test item full workflow")
+            .withIssueDate("2019-03-06")
+            .withSubject("ExtraEntry")
+            .build();
+
+        Item item = witem.getItem();
+
+        context.restoreAuthSystemState();
+
+        String reviewer3Token = getAuthToken(reviewer3.getEmail(), password);
+        String adminToken = getAuthToken(admin.getEmail(), password);
+
+        AtomicReference<Integer> idRef = new AtomicReference<Integer>();
+
+        // step 3
+        getClient(reviewer3Token).perform(get("/api/workflow/pooltasks/search/findByUser")
+            .param("uuid", reviewer3.getID().toString()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$._embedded.pooltasks", Matchers.contains(
+                Matchers.allOf(
+                    Matchers.is(PoolTaskMatcher.matchPoolTask(null, "finaleditstep")),
+                    hasJsonPath("$._embedded.workflowitem",
+                        Matchers.is(WorkflowItemMatcher.matchItemWithTitleAndDateIssuedAndSubject(
+                            witem, "Test item full workflow", "2019-03-06", "ExtraEntry")))
+                ))))
+            .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/workflow/pooltasks")))
+            .andExpect(jsonPath("$.page.size", is(20)))
+            .andExpect(jsonPath("$.page.totalElements", is(1)))
+            .andDo((result -> idRef
+                .set(read(result.getResponse().getContentAsString(), "$._embedded.pooltasks[0].id"))));
+
+        // claim the task
+        getClient(reviewer3Token).perform(post("/api/workflow/pooltasks/" + idRef.get())
+            .contentType(MediaType.APPLICATION_FORM_URLENCODED))
+            .andExpect(status().isNoContent());
+
+        // get the id of the claimed task
+        getClient(reviewer3Token).perform(get("/api/workflow/claimedtasks/search/findByUser")
+            .param("uuid", reviewer3.getID().toString()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$._embedded.claimedtasks", Matchers.contains(
+                Matchers.allOf(
+                    hasJsonPath("$._links.self.href", Matchers.containsString("/api/workflow/claimedtasks/")),
+                    hasJsonPath("$.type", Matchers.is("claimedtask")),
+                    hasJsonPath("$._embedded.workflowitem",
+                        Matchers.is(WorkflowItemMatcher.matchItemWithTitleAndDateIssuedAndSubject(
+                            witem, "Test item full workflow", "2019-03-06", "ExtraEntry")))
+                ))))
+            .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/workflow/claimedtasks")))
+            .andExpect(jsonPath("$.page.size", is(20)))
+            .andExpect(jsonPath("$.page.totalElements", is(1)))
+            .andDo((result -> idRef
+                .set(read(result.getResponse().getContentAsString(), "$._embedded.claimedtasks[0].id"))));
+
+        // reject the claimedTask, default wf step 3 (final edit step)
+        getClient(reviewer3Token).perform(post("/api/workflow/claimedtasks/" + idRef.get())
+            .param("submit_reject", "true")
+            .param("reason", "I need to test reject in fina edit step")
+            .contentType(MediaType.APPLICATION_FORM_URLENCODED))
+            .andExpect(status().isUnprocessableEntity());
+
+        // verify that the task has not been processed and is still available
+        getClient(reviewer3Token).perform(get("/api/workflow/claimedtasks/" + idRef.get()))
+            .andExpect(status().isOk());
+
+        // verify that the underline item is still unpublished
+        getClient(adminToken).perform(get("/api/core/items/" + item.getID()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.inArchive", is(false)));
+    }
+
+    @Test
+    /**
+     * Test the run of the default workflow where the reviewer attempts an edit metadata in the 3rd step
+     * (final edit step)
+     *
+     * @throws Exception
+     */
+    public void defaultWorkflowTest_UntilFinalEditStep_EditMetadata() throws Exception {
+        context.turnOffAuthorisationSystem();
+        //** GIVEN **
+        //1. reviewer of 3rd step
+        EPerson reviewer3 = EPersonBuilder.createEPerson(context)
+            .withEmail("reviewer3@example.com")
+            .withPassword(password)
+            .build();
+
+        //2. A community-collection structure with one parent community with sub-community and one collection.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+            .withName("Parent Community")
+            .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+            .withName("Sub Community")
+            .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1")
+            .withWorkflowGroup(3, reviewer3)
+            .build();
+
+        //3. create a normal user to use as submitter
+        EPerson submitter = EPersonBuilder.createEPerson(context)
+            .withEmail("submitter@example.com")
+            .withPassword(password)
+            .build();
+
+        context.setCurrentUser(submitter);
+
+        //3. create a workflowitem (so a pool task in step1)
+        XmlWorkflowItem witem = WorkflowItemBuilder.createWorkflowItem(context, col1)
+            .withTitle("Test item full workflow")
+            .withIssueDate("2019-03-06")
+            .withSubject("ExtraEntry")
+            .build();
+
+        Item item = witem.getItem();
+
+        context.restoreAuthSystemState();
+
+        String reviewer3Token = getAuthToken(reviewer3.getEmail(), password);
+        String adminToken = getAuthToken(admin.getEmail(), password);
+
+        AtomicReference<Integer> idRef = new AtomicReference<Integer>();
+
+        // step 3
+        getClient(reviewer3Token).perform(get("/api/workflow/pooltasks/search/findByUser")
+            .param("uuid", reviewer3.getID().toString()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$._embedded.pooltasks", Matchers.contains(
+                Matchers.allOf(
+                    Matchers.is(PoolTaskMatcher.matchPoolTask(null, "finaleditstep")),
+                    hasJsonPath("$._embedded.workflowitem",
+                        Matchers.is(WorkflowItemMatcher.matchItemWithTitleAndDateIssuedAndSubject(
+                            witem, "Test item full workflow", "2019-03-06", "ExtraEntry")))
+                ))))
+            .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/workflow/pooltasks")))
+            .andExpect(jsonPath("$.page.size", is(20)))
+            .andExpect(jsonPath("$.page.totalElements", is(1)))
+            .andDo((result -> idRef
+                .set(read(result.getResponse().getContentAsString(), "$._embedded.pooltasks[0].id"))));
+
+        // claim the task
+        getClient(reviewer3Token).perform(post("/api/workflow/pooltasks/" + idRef.get())
+            .contentType(MediaType.APPLICATION_FORM_URLENCODED))
+            .andExpect(status().isNoContent());
+
+        // get the id of the claimed task
+        getClient(reviewer3Token).perform(get("/api/workflow/claimedtasks/search/findByUser")
+            .param("uuid", reviewer3.getID().toString()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$._embedded.claimedtasks", Matchers.contains(
+                Matchers.allOf(
+                    hasJsonPath("$._links.self.href", Matchers.containsString("/api/workflow/claimedtasks/")),
+                    hasJsonPath("$.type", Matchers.is("claimedtask")),
+                    hasJsonPath("$._embedded.workflowitem",
+                        Matchers.is(WorkflowItemMatcher.matchItemWithTitleAndDateIssuedAndSubject(
+                            witem, "Test item full workflow", "2019-03-06", "ExtraEntry")))
+                ))))
+            .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/workflow/claimedtasks")))
+            .andExpect(jsonPath("$.page.size", is(20)))
+            .andExpect(jsonPath("$.page.totalElements", is(1)))
+            .andDo((result -> idRef
+                .set(read(result.getResponse().getContentAsString(), "$._embedded.claimedtasks[0].id"))));
+
+        // edit metadata of the claimedTask, default wf step 3 (final edit step)
+        getClient(reviewer3Token).perform(post("/api/workflow/claimedtasks/" + idRef.get())
+            .param("submit_edit_metadata", "true")
+            .contentType(MediaType.APPLICATION_FORM_URLENCODED))
+            .andExpect(status().isNoContent());
+    }
+
+    @Test
+    /**
+     * Test the run of the default workflow where the reviewer attempts a non-valid option in the 3rd step
+     * (final edit step)
+     *
+     * @throws Exception
+     */
+    public void defaultWorkflowTest_UntilFinalEditStep_NonValidOption() throws Exception {
+        context.turnOffAuthorisationSystem();
+        //** GIVEN **
+        //1. reviewer of 3rd step
+        EPerson reviewer3 = EPersonBuilder.createEPerson(context)
+            .withEmail("reviewer3@example.com")
+            .withPassword(password)
+            .build();
+
+        //2. A community-collection structure with one parent community with sub-community and one collection.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+            .withName("Parent Community")
+            .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+            .withName("Sub Community")
+            .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1")
+            .withWorkflowGroup(3, reviewer3)
+            .build();
+
+        //3. create a normal user to use as submitter
+        EPerson submitter = EPersonBuilder.createEPerson(context)
+            .withEmail("submitter@example.com")
+            .withPassword(password)
+            .build();
+
+        context.setCurrentUser(submitter);
+
+        //3. create a workflowitem (so a pool task in step1)
+        XmlWorkflowItem witem = WorkflowItemBuilder.createWorkflowItem(context, col1)
+            .withTitle("Test item full workflow")
+            .withIssueDate("2019-03-06")
+            .withSubject("ExtraEntry")
+            .build();
+
+        Item item = witem.getItem();
+
+        context.restoreAuthSystemState();
+
+        String reviewer3Token = getAuthToken(reviewer3.getEmail(), password);
+        String adminToken = getAuthToken(admin.getEmail(), password);
+
+        AtomicReference<Integer> idRef = new AtomicReference<Integer>();
+
+        // step 3
+        getClient(reviewer3Token).perform(get("/api/workflow/pooltasks/search/findByUser")
+            .param("uuid", reviewer3.getID().toString()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$._embedded.pooltasks", Matchers.contains(
+                Matchers.allOf(
+                    Matchers.is(PoolTaskMatcher.matchPoolTask(null, "finaleditstep")),
+                    hasJsonPath("$._embedded.workflowitem",
+                        Matchers.is(WorkflowItemMatcher.matchItemWithTitleAndDateIssuedAndSubject(
+                            witem, "Test item full workflow", "2019-03-06", "ExtraEntry")))
+                ))))
+            .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/workflow/pooltasks")))
+            .andExpect(jsonPath("$.page.size", is(20)))
+            .andExpect(jsonPath("$.page.totalElements", is(1)))
+            .andDo((result -> idRef
+                .set(read(result.getResponse().getContentAsString(), "$._embedded.pooltasks[0].id"))));
+
+        // claim the task
+        getClient(reviewer3Token).perform(post("/api/workflow/pooltasks/" + idRef.get())
+            .contentType(MediaType.APPLICATION_FORM_URLENCODED))
+            .andExpect(status().isNoContent());
+
+        // get the id of the claimed task
+        getClient(reviewer3Token).perform(get("/api/workflow/claimedtasks/search/findByUser")
+            .param("uuid", reviewer3.getID().toString()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$._embedded.claimedtasks", Matchers.contains(
+                Matchers.allOf(
+                    hasJsonPath("$._links.self.href", Matchers.containsString("/api/workflow/claimedtasks/")),
+                    hasJsonPath("$.type", Matchers.is("claimedtask")),
+                    hasJsonPath("$._embedded.workflowitem",
+                        Matchers.is(WorkflowItemMatcher.matchItemWithTitleAndDateIssuedAndSubject(
+                            witem, "Test item full workflow", "2019-03-06", "ExtraEntry")))
+                ))))
+            .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/workflow/claimedtasks")))
+            .andExpect(jsonPath("$.page.size", is(20)))
+            .andExpect(jsonPath("$.page.totalElements", is(1)))
+            .andDo((result -> idRef
+                .set(read(result.getResponse().getContentAsString(), "$._embedded.claimedtasks[0].id"))));
+
+        // non valid option in the default wf step 3 (final edit step)
+        getClient(reviewer3Token).perform(post("/api/workflow/claimedtasks/" + idRef.get())
+            .param("submit_non_valid_option", "true")
+            .contentType(MediaType.APPLICATION_FORM_URLENCODED))
+            .andExpect(status().isUnprocessableEntity());
+
+        // verify that the task has not been processed and is still available
+        getClient(reviewer3Token).perform(get("/api/workflow/claimedtasks/" + idRef.get()))
+            .andExpect(status().isOk());
+
+        // verify that the underline item is still unpublished
+        getClient(adminToken).perform(get("/api/core/items/" + item.getID()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.inArchive", is(false)));
+    }
+
+    @Test
+    /**
+     * Test to try an upload on unclaimed task in step where edit_metadata is allowed
+     *
+     * @throws Exception
+     */
+    public void unclaimedTaskTest_Upload_EditMetadataOptionAllowed() throws Exception {
+        context.turnOffAuthorisationSystem();
+        //** GIVEN **
+        //1. a reviewer
+        EPerson reviewer1 = EPersonBuilder.createEPerson(context)
+            .withEmail("reviewer1@example.com")
+            .withPassword(password)
+            .build();
+
+        //2. A community-collection structure with one parent community with sub-community and one collection.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+            .withName("Parent Community")
+            .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+            .withName("Sub Community")
+            .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1")
+            .withWorkflowGroup(1, reviewer1)
+            .build();
+
+        //3. create a normal user to use as submitter
+        EPerson submitter = EPersonBuilder.createEPerson(context)
+            .withEmail("submitter@example.com")
+            .withPassword(password)
+            .build();
+
+        context.setCurrentUser(submitter);
+
+        //4. a pool task
+        PoolTask poolTask = PoolTaskBuilder.createPoolTask(context, col1, reviewer1)
+            .withTitle("Workflow Item 1")
+            .withIssueDate("2017-10-17")
+            .withAuthor("Smith, Donald").withAuthor("Doe, John")
+            .withSubject("ExtraEntry")
+            .build();
+        XmlWorkflowItem witem = poolTask.getWorkflowItem();
+        poolTask.setStepID("editstep");
+        poolTask.setActionID("editaction");
+
+        context.restoreAuthSystemState();
+        String reviewer1Token = getAuthToken(reviewer1.getEmail(), password);
+
+        // try to upload file on workspace item while it is unclaimed
+        InputStream bibtex = getClass().getResourceAsStream("bibtex-test.bib");
+        final MockMultipartFile bibtexFile = new MockMultipartFile("file", "bibtex-test.bib", "application/x-bibtex",
+            bibtex);
+        getClient(reviewer1Token).perform(fileUpload("/api/workflow/workflowitems/" + witem.getID())
+            .file(bibtexFile))
+            .andExpect(status().isUnprocessableEntity());
+
+        bibtex.close();
+    }
+
+    @Test
+    /**
+     * Test to try a patch on unclaimed task in step where edit_metadata is allowed
+     *
+     * @throws Exception
+     */
+    public void unclaimedTaskTest_Patch_EditMetadataOptionAllowed() throws Exception {
+        context.turnOffAuthorisationSystem();
+        //** GIVEN **
+        //1. reviewer for second step
+        EPerson reviewer2 = EPersonBuilder.createEPerson(context)
+            .withEmail("reviewer2@example.com")
+            .withPassword(password)
+            .build();
+
+        //2. A community-collection structure with one parent community with sub-community and one collection.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+            .withName("Parent Community")
+            .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+            .withName("Sub Community")
+            .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1")
+            .withWorkflowGroup(2, reviewer2)
+            .build();
+
+        //3. create a normal user to use as submitter
+        EPerson submitter = EPersonBuilder.createEPerson(context)
+            .withEmail("submitter@example.com")
+            .withPassword(password)
+            .build();
+
+        context.setCurrentUser(submitter);
+
+        //3. create a workflowitem (so a pool task in step1)
+        XmlWorkflowItem witem = WorkflowItemBuilder.createWorkflowItem(context, col1)
+            .withTitle("Test item full workflow")
+            .withIssueDate("2019-03-06")
+            .withSubject("ExtraEntry")
+            .build();
+
+        context.restoreAuthSystemState();
+
+        String reviewer2Token = getAuthToken(reviewer2.getEmail(), password);
+
+        AtomicReference<Integer> idRef = new AtomicReference<Integer>();
+
+        // step 2
+        getClient(reviewer2Token).perform(get("/api/workflow/pooltasks/search/findByUser")
+            .param("uuid", reviewer2.getID().toString()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$._embedded.pooltasks", Matchers.contains(
+                Matchers.allOf(
+                    Matchers.is(PoolTaskMatcher.matchPoolTask(null, "editstep")),
+                    hasJsonPath("$._embedded.workflowitem",
+                        Matchers.is(WorkflowItemMatcher.matchItemWithTitleAndDateIssuedAndSubject(
+                            witem, "Test item full workflow", "2019-03-06", "ExtraEntry")))
+                ))))
+            .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/workflow/pooltasks")))
+            .andExpect(jsonPath("$.page.size", is(20)))
+            .andExpect(jsonPath("$.page.totalElements", is(1)))
+            .andDo((result -> idRef
+                .set(read(result.getResponse().getContentAsString(), "$._embedded.pooltasks[0].id"))));
+
+        // try to patch a workspace item while it is unclaimed
+        String authToken = getAuthToken(eperson.getEmail(), password);
+
+        // a simple patch to update an existent metadata
+        List<Operation> updateTitle = new ArrayList<Operation>();
+        Map<String, String> value = new HashMap<String, String>();
+        value.put("value", "New Title");
+        updateTitle.add(new ReplaceOperation("/sections/traditionalpageone/dc.title/0", value));
+
+        String patchBody = getPatchContent(updateTitle);
+
+        getClient(authToken).perform(patch("/api/workflow/workflowitems/" + witem.getID())
+            .content(patchBody)
+            .contentType(javax.ws.rs.core.MediaType.APPLICATION_JSON_PATCH_JSON))
+            .andExpect(status().isUnprocessableEntity());
+    }
+
+    @Test
+    /**
+     * Test to try an upload on a claimed task in step where edit_metadata is Not allowed (review step)
+     *
+     * @throws Exception
+     */
+    public void uploadTest_ClaimedTask_EditMetadataOptionNotAllowed() throws Exception {
+        context.turnOffAuthorisationSystem();
+        //** GIVEN **
+        //1. two reviewers
+        EPerson reviewer1 = EPersonBuilder.createEPerson(context)
+            .withEmail("reviewer1@example.com")
+            .withPassword(password)
+            .build();
+
+        //2. A community-collection structure with one parent community with sub-community and one collection.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+            .withName("Parent Community")
+            .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+            .withName("Sub Community")
+            .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1")
+            .withWorkflowGroup(1, reviewer1)
+            .build();
+
+        //3. create a normal user to use as submitter
+        EPerson submitter = EPersonBuilder.createEPerson(context)
+            .withEmail("submitter@example.com")
+            .withPassword(password)
+            .build();
+
+        context.setCurrentUser(submitter);
+
+        //4. a claimed task with workflow item in review step
+        ClaimedTask claimedTask = ClaimedTaskBuilder.createClaimedTask(context, col1, reviewer1)
+            .withTitle("Workflow Item 1")
+            .withIssueDate("2017-10-17")
+            .withAuthor("Smith, Donald").withAuthor("Doe, John")
+            .withSubject("ExtraEntry")
+            .build();
+        claimedTask.setStepID("reviewstep");
+        claimedTask.setActionID("reviewaction");
+        XmlWorkflowItem witem = claimedTask.getWorkflowItem();
+
+        context.restoreAuthSystemState();
+
+        // try to upload to a workspace item while it is in a step that does not have the edit_metadata option
+        // (review step)
+        String authToken = getAuthToken(reviewer1.getEmail(), password);
+        InputStream bibtex = getClass().getResourceAsStream("bibtex-test.bib");
+        final MockMultipartFile bibtexFile = new MockMultipartFile("file", "bibtex-test.bib", "application/x-bibtex",
+            bibtex);
+        getClient(authToken).perform(fileUpload("/api/workflow/workflowitems/" + witem.getID())
+            .file(bibtexFile))
+            .andExpect(status().isUnprocessableEntity());
+
+        bibtex.close();
+    }
+
+    @Test
+    /**
+     * Test to try a patch on a claimed task that is in a step that does not allow edit_metadata (review step)
+     *
+     * @throws Exception
+     */
+    public void patchTest_ClaimedTask_EditMetadataOptionNotAllowed() throws Exception {
+        context.turnOffAuthorisationSystem();
+        //** GIVEN **
+        //1. two reviewers
+        EPerson reviewer1 = EPersonBuilder.createEPerson(context)
+            .withEmail("reviewer1@example.com")
+            .withPassword(password)
+            .build();
+
+        EPerson reviewer2 = EPersonBuilder.createEPerson(context)
+            .withEmail("reviewer2@example.com")
+            .withPassword(password)
+            .build();
+
+        //2. A community-collection structure with one parent community with sub-community and one collection.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+            .withName("Parent Community")
+            .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+            .withName("Sub Community")
+            .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1")
+            .withWorkflowGroup(1, reviewer1)
+            .withWorkflowGroup(2, reviewer2)
+            .build();
+
+        //3. create a normal user to use as submitter
+        EPerson submitter = EPersonBuilder.createEPerson(context)
+            .withEmail("submitter@example.com")
+            .withPassword(password)
+            .build();
+
+        context.setCurrentUser(submitter);
+
+        //3. create a workflowitem (so a pool task in step1)
+        XmlWorkflowItem witem = WorkflowItemBuilder.createWorkflowItem(context, col1)
+            .withTitle("Test item full workflow")
+            .withIssueDate("2019-03-06")
+            .withSubject("ExtraEntry")
+            .build();
+
+        context.restoreAuthSystemState();
+
+        String reviewer1Token = getAuthToken(reviewer1.getEmail(), password);
+
+        AtomicReference<Integer> idRef = new AtomicReference<Integer>();
+
+        // step 1
+        getClient(reviewer1Token).perform(get("/api/workflow/pooltasks/search/findByUser")
+            .param("uuid", reviewer1.getID().toString()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$._embedded.pooltasks", Matchers.contains(
+                Matchers.allOf(
+                    Matchers.is(PoolTaskMatcher.matchPoolTask(null, "reviewstep")),
+                    hasJsonPath("$._embedded.workflowitem",
+                        Matchers.is(WorkflowItemMatcher.matchItemWithTitleAndDateIssuedAndSubject(
+                            witem, "Test item full workflow", "2019-03-06", "ExtraEntry")))
+                ))))
+            .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/workflow/pooltasks")))
+            .andExpect(jsonPath("$.page.size", is(20)))
+            .andExpect(jsonPath("$.page.totalElements", is(1)))
+            .andDo((result -> idRef
+                .set(read(result.getResponse().getContentAsString(), "$._embedded.pooltasks[0].id"))));
+
+        // claim the task
+        getClient(reviewer1Token).perform(post("/api/workflow/pooltasks/" + idRef.get())
+            .contentType(MediaType.APPLICATION_FORM_URLENCODED))
+            .andExpect(status().isNoContent());
+
+        // try to patch a workspace item while it is in a step that does not have the edit_metadata option (review step)
+        String authToken = getAuthToken(eperson.getEmail(), password);
+
+        // a simple patch to update an existent metadata
+        List<Operation> updateTitle = new ArrayList<Operation>();
+        Map<String, String> value = new HashMap<String, String>();
+        value.put("value", "New Title");
+        updateTitle.add(new ReplaceOperation("/sections/traditionalpageone/dc.title/0", value));
+
+        String patchBody = getPatchContent(updateTitle);
+
+        getClient(authToken).perform(patch("/api/workflow/workflowitems/" + witem.getID())
+            .content(patchBody)
+            .contentType(javax.ws.rs.core.MediaType.APPLICATION_JSON_PATCH_JSON))
+            .andExpect(status().isUnprocessableEntity());
+    }
+
+    @Test
+    /**
+     * Test to upload on claimed task in step where edit_metadata is allowed
+     *
+     * @throws Exception
+     */
+    public void claimedTaskTest_Upload_EditMetadataOptionAllowed() throws Exception {
+        context.turnOffAuthorisationSystem();
+        //** GIVEN **
+        //1. a reviewer
+        EPerson reviewer1 = EPersonBuilder.createEPerson(context)
+            .withEmail("reviewer1@example.com")
+            .withPassword(password)
+            .build();
+
+        //2. A community-collection structure with one parent community with sub-community and one collection.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+            .withName("Parent Community")
+            .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+            .withName("Sub Community")
+            .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1")
+            .withWorkflowGroup(1, reviewer1)
+            .build();
+
+        //3. create a normal user to use as submitter
+        EPerson submitter = EPersonBuilder.createEPerson(context)
+            .withEmail("submitter@example.com")
+            .withPassword(password)
+            .build();
+
+        context.setCurrentUser(submitter);
+
+        //4. a claimed task with workflow item in review step
+        ClaimedTask claimedTask = ClaimedTaskBuilder.createClaimedTask(context, col1, reviewer1)
+            .withTitle("Workflow Item 1")
+            .withIssueDate("2017-10-17")
+            .withAuthor("Smith, Donald").withAuthor("Doe, John")
+            .withSubject("ExtraEntry")
+            .build();
+        claimedTask.setStepID("editstep");
+        claimedTask.setActionID("editaction");
+        XmlWorkflowItem witem = claimedTask.getWorkflowItem();
+
+        context.restoreAuthSystemState();
+        String reviewer1Token = getAuthToken(reviewer1.getEmail(), password);
+
+        // upload a file on workspace item that is claimed and in the edit step
+        InputStream bibtex = getClass().getResourceAsStream("bibtex-test.bib");
+        final MockMultipartFile bibtexFile = new MockMultipartFile("file", "bibtex-test.bib", "application/x-bibtex",
+            bibtex);
+        getClient(reviewer1Token).perform(fileUpload("/api/workflow/workflowitems/" + witem.getID())
+            .file(bibtexFile))
+            .andExpect(status().isCreated());
+
+        bibtex.close();
     }
 
 }

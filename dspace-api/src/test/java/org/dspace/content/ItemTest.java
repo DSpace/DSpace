@@ -41,7 +41,6 @@ import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamFormatService;
-import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.MetadataFieldService;
 import org.dspace.content.service.MetadataSchemaService;
 import org.dspace.core.Constants;
@@ -75,8 +74,6 @@ public class ItemTest extends AbstractDSpaceObjectTest {
     private BitstreamFormatService bitstreamFormatService = ContentServiceFactory.getInstance()
                                                                                  .getBitstreamFormatService();
     private MetadataFieldService metadataFieldService = ContentServiceFactory.getInstance().getMetadataFieldService();
-
-    private CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
 
     private Collection collection;
     private Community owningCommunity;
@@ -839,7 +836,7 @@ public class ItemTest extends AbstractDSpaceObjectTest {
     @Test(expected = AuthorizeException.class)
     public void testCreateBundleNoAuth() throws Exception {
         String name = "bundle";
-        Bundle created = bundleService.create(context, it, name);
+        bundleService.create(context, it, name);
         fail("Exception expected");
     }
 
@@ -941,7 +938,7 @@ public class ItemTest extends AbstractDSpaceObjectTest {
     public void testCreateSingleBitstream_InputStream_StringNoAuth() throws Exception {
         String name = "new bundle";
         File f = new File(testProps.get("test.bitstream").toString());
-        Bitstream result = itemService.createSingleBitstream(context, new FileInputStream(f), it, name);
+        itemService.createSingleBitstream(context, new FileInputStream(f), it, name);
         fail("Exception expected");
     }
 
@@ -972,7 +969,7 @@ public class ItemTest extends AbstractDSpaceObjectTest {
     @Test(expected = AuthorizeException.class)
     public void testCreateSingleBitstream_InputStreamNoAuth() throws Exception {
         File f = new File(testProps.get("test.bitstream").toString());
-        Bitstream result = itemService.createSingleBitstream(context, new FileInputStream(f), it);
+        itemService.createSingleBitstream(context, new FileInputStream(f), it);
         fail("Expected exception");
     }
 
@@ -1624,7 +1621,7 @@ public class ItemTest extends AbstractDSpaceObjectTest {
             assertThat("testGetParentObject 1", itemService.getParentObject(context, it), notNullValue());
             assertThat("testGetParentObject 2", (Collection) itemService.getParentObject(context, it), equalTo(parent));
         } catch (AuthorizeException ex) {
-            fail("Authorize exception catched");
+            throw new AssertionError("Authorize Exception occurred", ex);
         }
     }
 

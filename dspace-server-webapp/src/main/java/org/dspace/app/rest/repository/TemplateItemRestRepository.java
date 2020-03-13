@@ -17,7 +17,6 @@ import org.dspace.app.rest.converter.JsonPatchConverter;
 import org.dspace.app.rest.model.TemplateItemRest;
 import org.dspace.app.rest.model.patch.Patch;
 import org.dspace.app.rest.model.wrapper.TemplateItem;
-import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.repository.patch.ResourcePatch;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
@@ -62,7 +61,7 @@ public class TemplateItemRestRepository extends DSpaceRestRepository<TemplateIte
         }
 
         try {
-            return converter.toRest(new TemplateItem(item), Projection.DEFAULT);
+            return converter.toRest(new TemplateItem(item), utils.obtainProjection());
         } catch (IllegalArgumentException e) {
             throw new ResourceNotFoundException("The item with id " + item.getID() + " is not a template item");
         }
