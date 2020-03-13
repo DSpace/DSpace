@@ -127,9 +127,7 @@
 	            <entry key="scopus" value-ref="scopusOnlineDataLoader"/>
 	            <entry key="scival" value-ref="scivalOnlineDataLoader"/>
 	            <entry key="wos" value-ref="wosOnlineDataLoader"/>
-				<!--
 				<entry key="epo" value-ref="epoOnlineDataLoader" />
-				-->
 			</map>
 	    </property>
 	</bean>
