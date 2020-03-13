@@ -212,7 +212,6 @@ public class ConverterServiceIT extends AbstractControllerIntegrationTest {
                 "self", // always linked
                 "restPropUnannotated", // linked; unannotated properties can't be omitted by projections
                 "optionallyEmbeddedChildren", // linked; embedded due to projection, and embed forces link
-                "neverEmbeddedChildren", // linked; embedded due to projection, and embed forces link
                 "mockLink" // added by MockProjection
         });
     }

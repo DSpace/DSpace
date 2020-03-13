@@ -25,6 +25,7 @@ public class VersionConverter implements DSpaceConverter<Version, VersionRest> {
         versionRest.setId(modelObject.getID());
         versionRest.setSummary(modelObject.getSummary());
         versionRest.setVersion(modelObject.getVersionNumber());
+        versionRest.setProjection(projection);
         return versionRest;
     }
 

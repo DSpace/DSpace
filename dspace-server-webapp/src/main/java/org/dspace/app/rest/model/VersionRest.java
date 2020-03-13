@@ -22,6 +22,10 @@ import org.dspace.app.rest.RestResourceController;
     @LinkRest(
         name = VersionRest.ITEM,
         method = "getVersionItem"
+    ),
+    @LinkRest(
+        name = VersionRest.EPERSON,
+        method = "getEPersonForVersion"
     )
 })
 public class VersionRest extends BaseObjectRest<Integer> {

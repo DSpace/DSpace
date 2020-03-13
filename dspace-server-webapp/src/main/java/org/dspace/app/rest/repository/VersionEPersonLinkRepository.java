@@ -11,13 +11,18 @@ import java.sql.SQLException;
 import javax.annotation.Nullable;
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.model.EPersonRest;
 import org.dspace.app.rest.model.VersionRest;
 import org.dspace.app.rest.projection.Projection;
+import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.factory.AuthorizeServiceFactory;
+import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.versioning.Version;
 import org.dspace.versioning.service.VersioningService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,14 +34,19 @@ import org.springframework.stereotype.Component;
  * This is the Repository that will take care of retrieving the EPerson for a given Version
  */
 @Component(VersionRest.CATEGORY + "." + VersionRest.NAME + "." + VersionRest.EPERSON)
-public class EPersonVersionLinkRepository extends AbstractDSpaceRestRepository
+public class VersionEPersonLinkRepository extends AbstractDSpaceRestRepository
     implements LinkRestRepository {
+
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(VersionEPersonLinkRepository.class);
 
     @Autowired
     private VersioningService versioningService;
 
     @Autowired
     private ConfigurationService configurationService;
+
+    @Autowired
+    private AuthorizeService authorizeService;
 
 
     /**
@@ -57,8 +67,12 @@ public class EPersonVersionLinkRepository extends AbstractDSpaceRestRepository
 
         Context context = obtainContext();
         Version version = versioningService.getVersion(context, versionId);
+        if (version == null) {
+            throw new ResourceNotFoundException("The Version with id: " + versionId + " couldn't be found");
+        }
         EPerson ePerson = version.getEPerson();
-        if (!configurationService.getBooleanProperty("versioning.item.history.include.submitter")) {
+        if (!authorizeService.isAdmin(context) &&
+            !configurationService.getBooleanProperty("versioning.item.history.include.submitter")) {
             throw new ResourceNotFoundException("The EPerson for this Version couldn't be displayed");
         }
         if (ePerson == null) {
@@ -67,10 +81,25 @@ public class EPersonVersionLinkRepository extends AbstractDSpaceRestRepository
         return converter.toRest(ePerson, projection);
     }
 
-    @Override
     public boolean isEmbeddableRelation(Object data, String name) {
         return false;
     }
 
+    @Override
+    public boolean isLinkableRelation(Object data, String name) {
+        return isAdmin() || DSpaceServicesFactory.getInstance().getConfigurationService()
+                                                 .getBooleanProperty("versioning.item.history.include.submitter");
+    }
 
+    private boolean isAdmin() {
+        try {
+            return AuthorizeServiceFactory.getInstance().getAuthorizeService().isAdmin(
+                ContextUtil.obtainContext(
+                    DSpaceServicesFactory.getInstance().getRequestService().getCurrentRequest()
+                                         .getHttpServletRequest()));
+        } catch (SQLException e) {
+            log.error(e.getMessage(), e);
+        }
+        return false;
+    }
 }

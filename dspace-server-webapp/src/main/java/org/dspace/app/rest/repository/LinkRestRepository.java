@@ -16,4 +16,7 @@ public interface LinkRestRepository {
     default boolean isEmbeddableRelation(Object data, String name) {
         return true;
     }
+    default boolean isLinkableRelation(Object data, String name) {
+        return true;
+    }
 }
