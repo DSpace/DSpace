@@ -15,9 +15,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
-import java.util.Arrays;
 import java.util.Iterator;
-import java.util.List;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Source;
 import javax.xml.transform.TransformerException;
@@ -47,7 +45,6 @@ import org.xmlunit.diff.ComparisonFormatter;
 import org.xmlunit.diff.DefaultComparisonFormatter;
 import org.xmlunit.diff.Diff;
 import org.xmlunit.diff.Difference;
-import org.xmlunit.util.Predicate;
 
 /**
  * Tests of {@link StructBuilder}.
@@ -314,9 +311,9 @@ public class StructBuilderIT
     }
 
     /**
-     * Reject uninteresting nodes.
+     * Reject uninteresting nodes. (currently commented out of tests above)
      */
-    private static class MyNodeFilter implements Predicate<Node> {
+    /*private static class MyNodeFilter implements Predicate<Node> {
         private static final List<String> dontCare = Arrays.asList(
             "description",
             "intro",
@@ -330,5 +327,5 @@ public class StructBuilderIT
             String type = node.getLocalName();
             return ! dontCare.contains(type);
         }
-    }
+    }*/
 }

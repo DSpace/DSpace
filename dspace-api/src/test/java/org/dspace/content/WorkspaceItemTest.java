@@ -160,8 +160,8 @@ public class WorkspaceItemTest extends AbstractUnitTest {
         // Allow Collection ADD perms
         doNothing().when(authorizeServiceSpy).authorizeAction(context, collection, Constants.ADD);
 
-        boolean template = false;
-        WorkspaceItem created = null;
+        boolean template;
+        WorkspaceItem created;
 
         template = false;
         created = workspaceItemService.create(context, collection, template);

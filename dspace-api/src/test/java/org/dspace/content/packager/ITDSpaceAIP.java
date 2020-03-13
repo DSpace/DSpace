@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
+import com.google.common.base.Splitter;
 import org.apache.logging.log4j.Logger;
 import org.dspace.AbstractIntegrationTest;
 import org.dspace.authorize.AuthorizeException;
@@ -1194,9 +1195,9 @@ public class ITDSpaceAIP extends AbstractIntegrationTest {
 
             // Get the typeText & name of this object from the values
             String info = infoMap.get(key);
-            String[] values = info.split(valueseparator);
-            String typeText = values[0];
-            String name = values[1];
+            List<String> values = Splitter.on(valueseparator).splitToList(info);
+            String typeText = values.get(0);
+            String name = values.get(1);
 
             // Also assert type and name are correct
             assertEquals("assertObjectsExist object " + key + " type",

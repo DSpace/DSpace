@@ -35,7 +35,7 @@
 
 
     <servlet>
-        <servlet-name>DSpace REST API</servlet-name>
+        <servlet-name>DSpace REST API (Deprecated)</servlet-name>
         <servlet-class>
             org.glassfish.jersey.servlet.ServletContainer
         </servlet-class>
@@ -47,7 +47,7 @@
     </servlet>
 
     <servlet-mapping>
-        <servlet-name>DSpace REST API</servlet-name>
+        <servlet-name>DSpace REST API (Deprecated)</servlet-name>
         <url-pattern>/*</url-pattern>
     </servlet-mapping>
 
@@ -59,7 +59,7 @@
     <!-- Security settings and mapping -->
     <security-constraint>
         <web-resource-collection>
-            <web-resource-name>DSpace REST API</web-resource-name>
+            <web-resource-name>DSpace REST API (Deprecated)</web-resource-name>
             <url-pattern>/*</url-pattern>
         </web-resource-collection>
         <user-data-constraint>
