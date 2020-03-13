@@ -526,13 +526,27 @@ public class Utils {
         Projection projection = halResource.getContent().getProjection();
         getLinkRests(halResource.getContent().getClass()).stream().forEach((linkRest) -> {
             Link link = linkToSubResource(halResource.getContent(), linkRest.name());
-            if (projection.allowEmbedding(halResource, linkRest, oldLinks)) {
+            if (projection.allowEmbedding(halResource, linkRest, oldLinks) &&
+                allowEmbeddingFromLinkRepository(halResource, linkRest.name())) {
                 embedRelFromRepository(halResource, linkRest.name(), link, linkRest, oldLinks);
                 halResource.add(link); // unconditionally link if embedding was allowed
-            } else if (projection.allowLinking(halResource, linkRest)) {
+            } else if (allowLinkingFromLinkRepository(halResource, linkRest.name()) &&
+                projection.allowLinking(halResource, linkRest)) {
                 halResource.add(link);
             }
         });
+    }
+
+    private boolean allowEmbeddingFromLinkRepository(HALResource<? extends RestAddressableModel> resource, String rel) {
+        return getLinkResourceRepository(resource.getContent().getCategory(),
+                              resource.getContent().getType(), rel).isEmbeddableRelation(resource.getContent(), rel);
+    }
+
+    private boolean allowLinkingFromLinkRepository(HALResource<? extends RestAddressableModel> resource, String rel) {
+
+        return getLinkResourceRepository(resource.getContent().getCategory(),
+                                  resource.getContent().getType(), rel).isLinkableRelation(resource.getContent(), rel);
+
     }
 
     private List<LinkRest> getLinkRests(Class<? extends RestAddressableModel> restClass) {

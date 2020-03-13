@@ -199,23 +199,23 @@ public class VersionRestRepositoryIT extends AbstractControllerIntegrationTest {
     }
 
     @Test
-    public void versionEPersonTestConfigurationPropertyFalseAndNormalUserAccessDenied() throws Exception {
+    public void versionEPersonTestConfigurationPropertyFalseAndNormalUserNotFound() throws Exception {
 
         configurationService.setProperty("versioning.item.history.include.submitter", false);
         String token = getAuthToken(eperson.getEmail(), password);
 
         getClient(token).perform(get("/api/versioning/versions/" + version.getID() + "/eperson"))
-                             .andExpect(status().isForbidden());
+                             .andExpect(status().isNotFound());
         configurationService.setProperty("versioning.item.history.include.submitter", true);
     }
 
     @Test
-    public void versionEPersonTestConfigurationPropertyFalseAndAnonAccessDenied() throws Exception {
+    public void versionEPersonTestConfigurationPropertyFalseAndAnonNotFound() throws Exception {
 
         configurationService.setProperty("versioning.item.history.include.submitter", false);
 
         getClient().perform(get("/api/versioning/versions/" + version.getID() + "/eperson"))
-                        .andExpect(status().isUnauthorized());
+                        .andExpect(status().isNotFound());
         configurationService.setProperty("versioning.item.history.include.submitter", true);
     }
 
