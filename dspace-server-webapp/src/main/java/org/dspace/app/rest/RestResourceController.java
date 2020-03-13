@@ -585,7 +585,8 @@ public class RestResourceController implements InitializingBean {
         try {
             modelObject = repository.upload(request, apiCategory, model, id, uploadfile);
         } catch (SQLException | IOException e) {
-            throw new RuntimeException(e.getMessage(), e);
+            throw new RuntimeException("Error " + e.getMessage() +
+                                       " uploading file to " + model + " with ID= " + id, e);
         } catch ( AuthorizeException ae) {
             throw new RESTAuthorizationException(ae);
         }
