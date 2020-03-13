@@ -7,14 +7,6 @@
  */
 package org.dspace.app.rest.repository;
 
-import static org.apache.commons.lang3.StringUtils.isBlank;
-
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.List;
-import java.util.UUID;
-import javax.servlet.http.HttpServletRequest;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
@@ -30,8 +22,17 @@ import org.dspace.eperson.service.GroupService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
+
+import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.List;
+import java.util.UUID;
+
+import static org.apache.commons.lang3.StringUtils.isBlank;
 
 /**
  * This is the repository responsible to manage Group Rest object
@@ -149,4 +150,23 @@ public class GroupRestRepository extends DSpaceObjectRestRepository<Group, Group
     public Class<GroupRest> getDomainClass() {
         return GroupRest.class;
     }
+
+    @Override
+    @PreAuthorize("hasAuthority('ADMIN')")
+    protected void delete(Context context, UUID uuid) throws AuthorizeException {
+        Group group = null;
+        try {
+            group = gs.find(context, uuid);
+            if (group == null) {
+                throw new ResourceNotFoundException(
+                        GroupRest.CATEGORY + "." + GroupRest.NAME
+                                + " with id: " + uuid + " not found"
+                );
+            }
+            gs.delete(context, group);
+        } catch (SQLException | IOException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+    }
+
 }
