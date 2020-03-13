@@ -537,11 +537,23 @@ public class Utils {
         });
     }
 
+    /**
+     * Calls on the LinkRepository to ask whether it's allowed to embed said relation
+     * @param resource  The current HalResource
+     * @param rel       The relation to be asked if it can be embedded
+     * @return          A boolean indicating the result
+     */
     private boolean allowEmbeddingFromLinkRepository(HALResource<? extends RestAddressableModel> resource, String rel) {
         return getLinkResourceRepository(resource.getContent().getCategory(),
                               resource.getContent().getType(), rel).isEmbeddableRelation(resource.getContent(), rel);
     }
 
+    /**
+     * Calls on the LinkRepository to ask whether it's allowed to link to said relation
+     * @param resource  The current HalResource
+     * @param rel       The relation to be asked if it can be linked to
+     * @return          A boolean indicating the result
+     */
     private boolean allowLinkingFromLinkRepository(HALResource<? extends RestAddressableModel> resource, String rel) {
 
         return getLinkResourceRepository(resource.getContent().getCategory(),
