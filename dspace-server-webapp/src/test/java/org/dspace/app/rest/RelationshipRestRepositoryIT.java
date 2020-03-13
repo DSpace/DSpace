@@ -1487,7 +1487,8 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         // This test checks that there's no relationship on the first author
         getClient(adminToken).perform(get("/api/core/items/" +
                                               author1.getID() + "/relationships"))
-                             .andExpect(status().isNoContent());
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("page.totalElements", is(0)));
 
         // This test checks that there are one relationship on the second author
         getClient(adminToken).perform(get("/api/core/items/" +
@@ -1503,17 +1504,20 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         // This test checks that there's no relationship on the publication
         getClient(adminToken).perform(get("/api/core/items/" +
                                               publication1.getID() + "/relationships"))
-                             .andExpect(status().isNoContent());
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("page.totalElements", is(0)));
 
         // This test checks that there's no relationship on the first author
         getClient(adminToken).perform(get("/api/core/items/" +
                                               author1.getID() + "/relationships"))
-                             .andExpect(status().isNoContent());
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("page.totalElements", is(0)));
 
         // This test checks that there are no relationship on the second author
         getClient(adminToken).perform(get("/api/core/items/" +
                                               author2.getID() + "/relationships"))
-                             .andExpect(status().isNoContent());
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("page.totalElements", is(0)));
     }
 
     /**
