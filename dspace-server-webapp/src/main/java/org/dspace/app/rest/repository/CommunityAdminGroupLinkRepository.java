@@ -28,6 +28,10 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
+/**
+ * Link repository for "admingroup" subresource of an individual community.
+ *
+ */
 @Component(CommunityRest.CATEGORY + "." + CommunityRest.NAME + "." + CommunityRest.ADMIN_GROUP)
 public class CommunityAdminGroupLinkRepository extends AbstractDSpaceRestRepository implements LinkRestRepository {
 
@@ -37,6 +41,14 @@ public class CommunityAdminGroupLinkRepository extends AbstractDSpaceRestReposit
     @Autowired
     private AuthorizeService authorizeService;
 
+    /**
+     * This method is responsible for retrieving the AdminGroup of a Community
+     * @param request           The current request
+     * @param communityId       The id of the community that we'll retrieve the admingroup for
+     * @param optionalPageable  The pageable if applicable
+     * @param projection        The current Projection
+     * @return                  The admingroup of the given community
+     */
     @PreAuthorize("hasPermission(#communityId, 'COMMUNITY', 'READ')")
     public GroupRest getAdminGroup(@Nullable HttpServletRequest request,
                                    UUID communityId,
