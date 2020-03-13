@@ -421,6 +421,32 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
     }
 
     @Test
+    public void testShibbolethLoginURLWithServerlURLConteiningPort() throws Exception {
+        context.turnOffAuthorisationSystem();
+        //Enable Shibboleth login
+        configurationService.setProperty("plugin.sequence.org.dspace.authenticate.AuthenticationMethod", SHIB_ONLY);
+        configurationService.setProperty("dspace.server.url", "http://localhost:8080/server");
+        configurationService.setProperty("authentication-shibboleth.lazysession.secure", false);
+
+        //Create a reviewers group
+        Group reviewersGroup = GroupBuilder.createGroup(context)
+                .withName("Reviewers")
+                .build();
+
+        //Faculty members are assigned to the Reviewers group
+        configurationService.setProperty("authentication-shibboleth.role.faculty", "Reviewers");
+        context.restoreAuthSystemState();
+
+        getClient().perform(post("/api/authn/login").header("Referer", "http://my.uni.edu"))
+                .andExpect(status().isUnauthorized())
+                .andExpect(header().string("WWW-Authenticate",
+                        "shibboleth realm=\"DSpace REST API\", " +
+                                "location=\"http://localhost:8080/Shibboleth.sso/Login?" +
+                                "target=http%3A%2F%2Flocalhost%3A8080%2Fserver%2Fapi%2Fauthn%2Fshibboleth%3F" +
+                                "redirectUrl%3Dhttp%3A%2F%2Fmy.uni.edu\""));
+    }
+
+    @Test
     public void testShibbolethLoginURLWithConfiguredLazyURL() throws Exception {
         context.turnOffAuthorisationSystem();
         //Enable Shibboleth login
@@ -442,6 +468,32 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
                 .andExpect(header().string("WWW-Authenticate",
                         "shibboleth realm=\"DSpace REST API\", " +
                                 "location=\"http://shibboleth.org/Shibboleth.sso/Login?" +
+                                "target=http%3A%2F%2Flocalhost%2Fapi%2Fauthn%2Fshibboleth%3F" +
+                                "redirectUrl%3Dhttp%3A%2F%2Fmy.uni.edu\""));
+    }
+
+    @Test
+    public void testShibbolethLoginURLWithConfiguredLazyURLWithPort() throws Exception {
+        context.turnOffAuthorisationSystem();
+        //Enable Shibboleth login
+        configurationService.setProperty("plugin.sequence.org.dspace.authenticate.AuthenticationMethod", SHIB_ONLY);
+        configurationService.setProperty("authentication-shibboleth.lazysession.loginurl",
+                "http://shibboleth.org:8080/Shibboleth.sso/Login");
+
+        //Create a reviewers group
+        Group reviewersGroup = GroupBuilder.createGroup(context)
+                .withName("Reviewers")
+                .build();
+
+        //Faculty members are assigned to the Reviewers group
+        configurationService.setProperty("authentication-shibboleth.role.faculty", "Reviewers");
+        context.restoreAuthSystemState();
+
+        getClient().perform(post("/api/authn/login").header("Referer", "http://my.uni.edu"))
+                .andExpect(status().isUnauthorized())
+                .andExpect(header().string("WWW-Authenticate",
+                        "shibboleth realm=\"DSpace REST API\", " +
+                                "location=\"http://shibboleth.org:8080/Shibboleth.sso/Login?" +
                                 "target=http%3A%2F%2Flocalhost%2Fapi%2Fauthn%2Fshibboleth%3F" +
                                 "redirectUrl%3Dhttp%3A%2F%2Fmy.uni.edu\""));
     }
