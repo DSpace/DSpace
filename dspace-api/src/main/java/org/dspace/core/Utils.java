@@ -425,6 +425,9 @@ public final class Utils {
         try {
             URL url = new URL(urlString);
             String baseUrl = url.getProtocol() + "://" + url.getHost();
+            if (url.getPort() != -1) {
+                baseUrl += (":" + url.getPort());
+            }
             return baseUrl;
         } catch (MalformedURLException e) {
             return null;

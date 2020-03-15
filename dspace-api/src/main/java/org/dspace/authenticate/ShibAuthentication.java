@@ -1247,15 +1247,10 @@ public class ShibAuthentication implements AuthenticationMethod {
     }
 
     private String getShibURL(HttpServletRequest request) {
-        String shibURL = configurationService.getProperty("authentication-shibboleth.lazysession.loginurl");
+        String shibURL = configurationService.getProperty("authentication-shibboleth.lazysession.loginurl",
+                "/Shibboleth.sso/Login");
         boolean forceHTTPS =
-                configurationService.getBooleanProperty("authentication-shibboleth.lazysession.secure",true);
-
-        // Shibboleth authentication initiator
-        if (shibURL == null || shibURL.length() == 0) {
-            shibURL = "/Shibboleth.sso/Login";
-        }
-        shibURL = shibURL.trim();
+                configurationService.getBooleanProperty("authentication-shibboleth.lazysession.secure", true);
 
         // Shibboleth url must be absolute
         if (shibURL.startsWith("/")) {

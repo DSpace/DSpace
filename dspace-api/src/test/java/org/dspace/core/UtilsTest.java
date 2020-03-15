@@ -39,6 +39,12 @@ public class UtilsTest extends AbstractUnitTest {
         assertEquals("Test keep url", "https://demo.dspace.org",
                      Utils.getBaseUrl("https://demo.dspace.org"));
 
+        assertEquals("Test keep url", "http://localhost:8080",
+                     Utils.getBaseUrl("http://localhost:8080"));
+
+        assertEquals("Test keep url", "http://localhost:8080",
+                     Utils.getBaseUrl("http://localhost:8080/server"));
+
         // This uses a bunch of reserved URI characters
         assertNull("Test invalid URI returns null", Utils.getBaseUrl("&+,?/@="));
     }
