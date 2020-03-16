@@ -9,7 +9,6 @@ public class YearStatistics {
     private Integer totalYearDownloads;
     private List<Integer> yearViews;
     private List<Integer> yearDownloads;
-    private Integer currentMonth;
 
     private YearStatistics(Builder builder) {
         year = builder.year;
@@ -17,7 +16,6 @@ public class YearStatistics {
         totalYearDownloads = builder.totalYearDownloads;
         yearViews = builder.yearViews;
         yearDownloads = builder.yearDownloads;
-        currentMonth = builder.currentMonth;
     }
 
     public Integer getYear() {
@@ -40,18 +38,12 @@ public class YearStatistics {
         return yearDownloads;
     }
 
-    public Integer getCurrentMonth() {
-        return currentMonth;
-    }
-
-
     public static final class Builder {
         private Integer year;
         private Integer totalYearViews;
         private Integer totalYearDownloads;
         private List<Integer> yearViews;
         private List<Integer> yearDownloads;
-        private Integer currentMonth;
 
         public Builder() {
         }
@@ -62,7 +54,6 @@ public class YearStatistics {
             this.totalYearDownloads = copy.getTotalYearDownloads();
             this.yearViews = copy.getYearViews();
             this.yearDownloads = copy.getYearDownloads();
-            this.currentMonth = copy.getCurrentMonth();
         }
 
         public Builder withYear(Integer year) {
@@ -91,11 +82,6 @@ public class YearStatistics {
             this.yearDownloads = yearDownloads;
             while(this.yearDownloads.size() < 12)
                 this.yearDownloads.add(0);
-            return this;
-        }
-
-        public Builder withCurrentMonth(Integer currentMonth) {
-            this.currentMonth = currentMonth;
             return this;
         }
 

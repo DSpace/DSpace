@@ -35,6 +35,7 @@ import java.util.stream.Collectors;
 @Service
 public class EssuirStatistics {
     private static final org.ssu.entity.jooq.Item ITEM = org.ssu.entity.jooq.Item.TABLE;
+    private static final org.ssu.entity.jooq.GeneralStatistics GENERAL_STATISTICS = org.ssu.entity.jooq.GeneralStatistics.TABLE;
     private static final org.ssu.entity.jooq.Statistics STATISTICS = org.ssu.entity.jooq.Statistics.TABLE;
     private static final org.ssu.entity.jooq.Metadatavalue METADATAVALUE = org.ssu.entity.jooq.Metadatavalue.TABLE;
     private org.dspace.content.service.ItemService dspaceItemService = ContentServiceFactory.getInstance().getItemService();
@@ -200,6 +201,16 @@ public class EssuirStatistics {
                 .orElse(0);
     }
 
+    public void incrementGlobalItemViews(UUID itemId) {
+        dsl.insertInto(GENERAL_STATISTICS)
+                .set(GENERAL_STATISTICS.year, LocalDate.now().getYear())
+                .set(GENERAL_STATISTICS.month, LocalDate.now().getMonthValue() - 1)
+                .set(GENERAL_STATISTICS.downloadsCount, 0)
+                .set(GENERAL_STATISTICS.viewCount, 1)
+                .onDuplicateKeyUpdate()
+                .set(GENERAL_STATISTICS.viewCount, GENERAL_STATISTICS.viewCount.plus(1))
+                .execute();
+    }
     public void updateItemViews(HttpServletRequest request, UUID itemId) {
         String countryCode = geoIpService.getCountryCode(request);
 
@@ -210,6 +221,17 @@ public class EssuirStatistics {
                 .set(STATISTICS.viewCount, 1)
                 .onDuplicateKeyUpdate()
                 .set(STATISTICS.viewCount, STATISTICS.viewCount.plus(1))
+                .execute();
+    }
+
+    public void incrementGlobalItemDownloads(UUID itemId) {
+        dsl.insertInto(GENERAL_STATISTICS)
+                .set(GENERAL_STATISTICS.year, LocalDate.now().getYear())
+                .set(GENERAL_STATISTICS.month, LocalDate.now().getMonthValue() - 1)
+                .set(GENERAL_STATISTICS.downloadsCount, 1)
+                .set(GENERAL_STATISTICS.viewCount, 0)
+                .onDuplicateKeyUpdate()
+                .set(GENERAL_STATISTICS.downloadsCount, GENERAL_STATISTICS.downloadsCount.plus(1))
                 .execute();
     }
 

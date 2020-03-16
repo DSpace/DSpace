@@ -935,11 +935,6 @@
 
     <servlet-mapping>
         <servlet-name>essuir-servlet</servlet-name>
-        <url-pattern>/current</url-pattern>
-    </servlet-mapping>
-
-    <servlet-mapping>
-        <servlet-name>essuir-servlet</servlet-name>
         <url-pattern>/update-statistics</url-pattern>
     </servlet-mapping>
 

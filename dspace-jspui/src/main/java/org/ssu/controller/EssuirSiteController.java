@@ -42,7 +42,6 @@ import org.ssu.service.CommunityService;
 import org.ssu.service.GeneralStatisticsService;
 import org.ssu.service.localization.TypeLocalization;
 import org.ssu.service.statistics.EssuirStatistics;
-import org.ssu.service.statistics.ScheduledTasks;
 
 import javax.annotation.Resource;
 import javax.mail.MessagingException;
@@ -69,9 +68,6 @@ public class EssuirSiteController {
 
     @Resource
     private GeneralStatisticsService generalStatisticsService;
-
-    @Resource
-    private ScheduledTasks scheduledTasks;
 
     @RequestMapping("/")
     public ModelAndView homePage(ModelAndView model, HttpServletRequest request) throws SQLException, ItemCountException {
@@ -196,24 +192,16 @@ public class EssuirSiteController {
         return model;
     }
 
-    @RequestMapping(value = "/current", method = RequestMethod.GET)
-    @ResponseBody
-    public String getTotalStatistics(HttpServletRequest request) throws JsonProcessingException, SQLException {
-        Context dspaceContext = UIUtil.obtainContext(request);
-        return new ObjectMapper()
-                .writeValueAsString(generalStatisticsService.collectGeneralStatistics(dspaceContext));
-    }
-
     @RequestMapping(value = "/general-statistics", method = RequestMethod.GET)
-    public String getGeneralStatistics(ModelMap model) {
+    public String getGeneralStatistics(ModelMap model, HttpServletRequest request) throws SQLException {
+        Context context = UIUtil.obtainContext(request);
+        StatisticsData statisticsData = essuirStatistics.getTotalStatistic(context);
+        model.addAttribute("totalItemCount", statisticsData.getTotalCount());
+        model.addAttribute("totalDownloads", statisticsData.getTotalDownloads());
+        model.addAttribute("totalViews", statisticsData.getTotalViews());
         model.addAttribute("listYearStatistics", generalStatisticsService.getListYearsStatistics());
+        context.complete();
         return "pub_stat";
-    }
-
-
-    @RequestMapping(value = "/update-statistics", method = RequestMethod.GET)
-    public void update() {
-        scheduledTasks.finalizeMonthStatistics();
     }
 
     @RequestMapping("community-list")

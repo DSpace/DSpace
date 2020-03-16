@@ -9,7 +9,6 @@
 %>
 
 <dspace:layout locbar="nolink" titlekey="jsp.layout.navbar-admin.statistics">
-    <script type="text/javascript" src="<%= request.getContextPath() %>/static/ajaxStatistics.js"> </script>
 
     <h2><%= LocaleSupport.getLocalizedMessage(pageContext, "jsp.general-statistics.stat-sumdu") %></h2>
 
@@ -17,15 +16,15 @@
 
     <table width="95%%" align="center" class="table">
         <tr class="oddRowOddCol">
-            <td id="TotalCount">-</td>
+            <td id="TotalCount">${totalItemCount}</td>
             <td><%= LocaleSupport.getLocalizedMessage(pageContext, "jsp.general-statistics.total-resources") %></td>
         </tr>
         <tr class="evenRowOddCol">
-            <td id="TotalViews">-</td>
+            <td id="TotalViews">${totalViews}</td>
             <td><%= LocaleSupport.getLocalizedMessage(pageContext, "jsp.general-statistics.total-views") %></td>
         </tr>
         <tr class="oddRowOddCol">
-            <td id="TotalDownloads">-</td>
+            <td id="TotalDownloads">${totalDownloads}</td>
             <td><%= LocaleSupport.getLocalizedMessage(pageContext, "jsp.general-statistics.total-downloads") %></td>
         </tr>
     </table>
@@ -43,42 +42,16 @@
 
             <tr class="evenRowOddCol" align="center">
                 <c:forEach var="cntViews" items="${yearStatistics.yearViews}" varStatus="status" begin="0" end="11">
-                    <c:choose>
-                        <c:when test="${cnt.index == 0 && yearStatistics.currentMonth == status.index}">
-                            <td id="CurrentMonthStatisticsViews">-</td>
-                        </c:when>
-                        <c:otherwise>
-                            <td><c:out value="${cntViews}"/></td>
-                        </c:otherwise>
-                    </c:choose>
+                    <td><c:out value="${cntViews}"/></td>
                 </c:forEach>
-                <c:if test="${cnt.index == 0}">
-                    <td><span id="CurrentYearStatisticsViews"></span> - <%= LocaleSupport.getLocalizedMessage(pageContext, "jsp.general-statistics.views") %></td>
-                </c:if>
-                <c:if test="${cnt.index != 0}">
-                    <td><c:out value="${yearStatistics.totalYearViews}"/> - <%= LocaleSupport.getLocalizedMessage(pageContext, "jsp.general-statistics.views") %></td>
-                </c:if>
-
+                <td><c:out value="${yearStatistics.totalYearViews}"/> - <%= LocaleSupport.getLocalizedMessage(pageContext, "jsp.general-statistics.views") %></td>
             </tr>
 
             <tr class="oddRowOddCol" align="center">
                 <c:forEach var="cntDownloads" items="${yearStatistics.yearDownloads}" varStatus="status" begin="0" end="11">
-                    <c:choose>
-                        <c:when test="${cnt.index == 0 && yearStatistics.currentMonth == status.index}">
-                            <td id="CurrentMonthStatisticsDownloads">-</td>
-                        </c:when>
-                        <c:otherwise>
-                            <td><c:out value="${cntDownloads}"/></td>
-                        </c:otherwise>
-                    </c:choose>
+                    <td><c:out value="${cntDownloads}"/></td>
                 </c:forEach>
-                <c:if test="${cnt.index == 0}">
-                    <td ><span id="CurrentYearStatisticsDownloads"></span > - <%= LocaleSupport.getLocalizedMessage(pageContext, "jsp.general-statistics.downloads") %></td>
-                </c:if>
-                <c:if test="${cnt.index != 0}">
-                    <td><c:out value="${yearStatistics.totalYearDownloads}"/> - <%= LocaleSupport.getLocalizedMessage(pageContext, "jsp.general-statistics.downloads") %></td>
-                </c:if>
-
+                <td><c:out value="${yearStatistics.totalYearDownloads}"/> - <%= LocaleSupport.getLocalizedMessage(pageContext, "jsp.general-statistics.downloads") %></td>
             </tr>
 
         </table>
