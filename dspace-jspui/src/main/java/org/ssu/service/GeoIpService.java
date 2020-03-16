@@ -16,7 +16,7 @@ import java.net.InetAddress;
 @Service
 public class GeoIpService {
     private static Logger log = Logger.getLogger(GeoIpService.class);
-
+    private static final String UNKNOWN_COUNTRY_CODE = "--";
     private static final DatabaseReader geoipLookup;;
 
     private static final boolean useProxies;
@@ -51,13 +51,13 @@ public class GeoIpService {
 
     public static String getCountryCode(HttpServletRequest request) {
         if (geoipLookup == null)
-            return null;
+            return UNKNOWN_COUNTRY_CODE;
 
         boolean isSpiderBot = SpiderDetector.isSpider(request);
 
         try {
             if(isSpiderBot) {
-                return null;
+                return UNKNOWN_COUNTRY_CODE;
             }
 
             String ip = request.getRemoteAddr();
@@ -85,7 +85,7 @@ public class GeoIpService {
             double longitude = cityResponse.getLocation().getLongitude();
             double latitude = cityResponse.getLocation().getLatitude();
 
-            if (!("--".equals(countryCode)
+            if (!(UNKNOWN_COUNTRY_CODE.equals(countryCode)
                     && latitude == -180 && longitude == -180)) {
                 return countryCode;
             }
@@ -94,6 +94,6 @@ public class GeoIpService {
             log.error(e.getMessage(), e);
         }
 
-        return "--";
+        return UNKNOWN_COUNTRY_CODE;
     }
 }
