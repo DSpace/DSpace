@@ -44,7 +44,14 @@ import com.lyncode.xoai.util.Base64Utils;
 @SuppressWarnings("deprecation")
 public class ItemUtils
 {
-    
+    public static final String RESTRICTED_ACCESS = "restricted access";
+
+    public static final String EMBARGOED_ACCESS = "embargoed access";
+
+    public static final String OPEN_ACCESS = "open access";
+
+    public static final String METADATA_ONLY_ACCESS = "metadata only access";
+
     private static Logger log = LogManager
             .getLogger(ItemUtils.class);
 
@@ -225,7 +232,7 @@ public class ItemUtils
                     String oname = bit.getSource();
                     String name = bit.getName();
                     String description = bit.getDescription();
-                    String drm = ItemUtils.getDRM(AuthorizeManager.getPoliciesActionFilter(context, bit,  Constants.READ));
+                    String drm = ItemUtils.getAccessRightsValue(AuthorizeManager.getPoliciesActionFilter(context, bit,  Constants.READ));
                         
                     if (name != null)
                         bitstream.getField().add(
@@ -330,7 +337,16 @@ public class ItemUtils
         return metadata;
     }
     
-	public static String getDRM(List<ResourcePolicy> rps) {
+	/**
+	 * Method to return a default value text to identify access rights:
+	 * 'open access','embargoed access','restricted access','metadata only access'
+	 *
+	 * NOTE: embargoed access contains also embargo end date in the form "embargoed access|||yyyy-MM-dd"
+	 *
+	 * @param rps
+	 * @return
+	 */
+	public static String getAccessRightsValue(List<ResourcePolicy> rps) {
 		Date now = new Date();
 		Date embargoEndDate = null;
 		boolean openAccess = false;
@@ -356,19 +372,19 @@ public class ItemUtils
 				}
 			}
 		}
-		String values = "metadata only access";
+		String value = METADATA_ONLY_ACCESS;
 		// if there are fulltext build the values
 		if (openAccess) {
 			// open access
-			values = "open access";
+			value = OPEN_ACCESS;
 		} else if (withEmbargo) {
 			// all embargoed
-			values = "embargoed access" + "|||" + sdf.format(embargoEndDate);
+			value = EMBARGOED_ACCESS + "|||" + sdf.format(embargoEndDate);
 		} else if (groupRestricted) {
 			// all restricted
-			values = "restricted access";
+			value = RESTRICTED_ACCESS;
 		}
-		return values;
+		return value;
 	}
 
  }
