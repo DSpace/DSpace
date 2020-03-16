@@ -10,12 +10,19 @@ package org.dspace.app.rest.repository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
+import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.converter.MetadataConverter;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
+import org.dspace.app.rest.model.DSpaceObjectRest;
 import org.dspace.app.rest.model.GroupRest;
 import org.dspace.app.rest.model.patch.Patch;
+import org.dspace.app.rest.utils.Utils;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.content.Collection;
+import org.dspace.content.Community;
+import org.dspace.content.service.CollectionService;
+import org.dspace.content.service.CommunityService;
 import org.dspace.core.Context;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.service.GroupService;
@@ -44,6 +51,18 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 public class GroupRestRepository extends DSpaceObjectRestRepository<Group, GroupRest> {
     @Autowired
     GroupService gs;
+
+    @Autowired
+    CollectionService collectionService;
+
+    @Autowired
+    CommunityService communityService;
+
+    @Autowired
+    protected Utils utils;
+
+    @Autowired
+    protected ConverterService converter;
 
     @Autowired
     GroupRestRepository(GroupService dsoService) {
@@ -168,5 +187,38 @@ public class GroupRestRepository extends DSpaceObjectRestRepository<Group, Group
             throw new RuntimeException(e.getMessage(), e);
         }
     }
+
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public DSpaceObjectRest object(UUID uuid) {
+        Context context = obtainContext();
+        try {
+            Group group = gs.find(context, uuid);
+            if (group == null) {
+                throw new ResourceNotFoundException(
+                        GroupRest.CATEGORY + "." + GroupRest.NAME
+                                + " with id: " + uuid + " not found"
+                );
+            } else {
+                final Collection collection = collectionService.findByGroup(context, group);
+                if (collection != null) {
+                    return converter.toRest(collection, utils.obtainProjection());
+                } else {
+                    final Community community = communityService.findByAdminGroup(context, group);
+                    if (community != null) {
+                        return converter.toRest(community, utils.obtainProjection());
+                    } else {
+                        throw new ResourceNotFoundException(
+                                GroupRest.CATEGORY + "." + GroupRest.NAME
+                                        + " with id: " + uuid
+                                        + " has no associated collection or community"
+                        );
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+    }
+
 
 }
