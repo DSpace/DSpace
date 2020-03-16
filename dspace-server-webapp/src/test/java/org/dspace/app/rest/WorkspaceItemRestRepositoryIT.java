@@ -615,9 +615,9 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         getClient(tokenAdmin).perform(get("/api/submission/workspaceitems/" + witem.getID()))
                             .andExpect(status().isOk());
 
-        // newly created account attempt to delete the workspaceitem of submitter1
+        // a normal user, without any special submission rights, attempt to delete the workspaceitem of submitter1
         String tokenEPerson = getAuthToken(eperson.getEmail(), password);
-        getClient(tokenSubmitter2).perform(delete("/api/submission/workspaceitems/" + witem.getID()))
+        getClient(tokenEPerson).perform(delete("/api/submission/workspaceitems/" + witem.getID()))
                                   .andExpect(status().isForbidden());
 
         // check that workspaceitem was not deleted
