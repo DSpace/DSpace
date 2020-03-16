@@ -26,6 +26,7 @@ import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.dspace.app.rest.builder.CollectionBuilder;
 import org.dspace.app.rest.builder.CommunityBuilder;
 import org.dspace.app.rest.builder.EPersonBuilder;
 import org.dspace.app.rest.builder.GroupBuilder;
@@ -36,8 +37,10 @@ import org.dspace.app.rest.model.MetadataRest;
 import org.dspace.app.rest.model.MetadataValueRest;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.app.rest.test.MetadataPatchSuite;
+import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
@@ -1514,7 +1517,6 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
     public void deleteGroupTest() throws Exception {
 
         GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
-        EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
 
         Group parentGroup = null;
 
@@ -1552,7 +1554,6 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
     public void deleteGroupUnauthorizedTest() throws Exception {
 
         GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
-        EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
 
         Group parentGroup = null;
 
@@ -1590,7 +1591,6 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
     public void deleteGroupForbiddenTest() throws Exception {
 
         GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
-        EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
 
         Group parentGroup = null;
 
@@ -1628,24 +1628,116 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
     @Test
     public void deleteGroupNotFoundTest() throws Exception {
 
-        GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
-        EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
+        context.turnOffAuthorisationSystem();
+        context.commit();
 
-        Group parentGroup = null;
+        String authToken = getAuthToken(admin.getEmail(), password);
+
+        getClient(authToken).perform(
+                delete("/api/eperson/groups/" + UUID.randomUUID())
+        ).andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void getGroupObjectCommunityTest() throws Exception {
+        CommunityService communityService
+                = ContentServiceFactory.getInstance().getCommunityService();
+        Community community = null;
+        Group adminGroup = null;
 
         try {
             context.turnOffAuthorisationSystem();
+            community = communityService.create(null, context);
+            adminGroup = communityService.createAdministrators(context, community);
             context.commit();
+            adminGroup = context.reloadEntity(adminGroup);
 
             String authToken = getAuthToken(admin.getEmail(), password);
-
             getClient(authToken).perform(
-                    delete("/api/eperson/groups/" + UUID.randomUUID())
-            ).andExpect(status().isNotFound());
-
+                    get("/api/eperson/groups/" + adminGroup.getID() + "/object")
+            ).andExpect(status().isOk());
         } finally {
-            if (parentGroup != null) {
-                GroupBuilder.deleteGroup(parentGroup.getID());
+            if (community != null) {
+                CommunityBuilder.deleteCommunity(community.getID());
+            }
+            if (adminGroup != null) {
+                GroupBuilder.deleteGroup(adminGroup.getID());
+            }
+        }
+    }
+
+    @Test
+    public void getGroupObjectCollectionTest() throws Exception {
+        CommunityService communityService
+                = ContentServiceFactory.getInstance().getCommunityService();
+        CollectionService collectionService
+                = ContentServiceFactory.getInstance().getCollectionService();
+        Community community = null;
+        Collection collection = null;
+        Group adminGroup = null;
+
+        try {
+            context.turnOffAuthorisationSystem();
+            community = communityService.create(null, context);
+            collection = collectionService.create(context, community);
+            adminGroup = collectionService.createAdministrators(context, collection);
+            context.commit();
+            adminGroup = context.reloadEntity(adminGroup);
+
+            String authToken = getAuthToken(admin.getEmail(), password);
+            getClient(authToken).perform(
+                    get("/api/eperson/groups/" + adminGroup.getID() + "/object")
+            ).andExpect(status().isOk());
+        } finally {
+            if (collection != null) {
+                CollectionBuilder.deleteCollection(collection.getID());
+            }
+            if (community != null) {
+                CommunityBuilder.deleteCommunity(community.getID());
+            }
+            if (adminGroup != null) {
+                GroupBuilder.deleteGroup(adminGroup.getID());
+            }
+        }
+    }
+
+    @Test
+    public void getGroupObjectNotFoundTest() throws Exception {
+        GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
+        Group adminGroup = null;
+        try {
+            context.turnOffAuthorisationSystem();
+            adminGroup = groupService.create(context);
+            context.commit();
+            adminGroup = context.reloadEntity(adminGroup);
+
+            String authToken = getAuthToken(admin.getEmail(), password);
+            getClient(authToken).perform(
+                    get("/api/eperson/groups/" + adminGroup.getID() + "/object")
+            ).andExpect(status().isNotFound());
+        } finally {
+            if (adminGroup != null) {
+                GroupBuilder.deleteGroup(adminGroup.getID());
+            }
+        }
+    }
+
+    @Test
+    public void getGroupObjectUnauthorizedTest() throws Exception {
+        GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
+        Group adminGroup = null;
+        try {
+            context.turnOffAuthorisationSystem();
+            adminGroup = groupService.create(context);
+            context.commit();
+            adminGroup = context.reloadEntity(adminGroup);
+
+            getClient().perform(
+                    get("/api/eperson/groups/" + adminGroup.getID() + "/object")
+            ).andExpect(status().isUnauthorized());
+        } finally {
+            if (adminGroup != null) {
+                GroupBuilder.deleteGroup(adminGroup.getID());
             }
         }
     }

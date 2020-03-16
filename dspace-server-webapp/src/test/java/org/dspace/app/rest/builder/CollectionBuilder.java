@@ -10,6 +10,7 @@ package org.dspace.app.rest.builder;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
+import java.util.UUID;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.CharEncoding;
@@ -177,6 +178,28 @@ public class CollectionBuilder extends AbstractDSpaceObjectBuilder<Collection> {
         }
 
         indexingService.commit();
+    }
+
+    /**
+     * Delete the Test Collection referred to by the given UUID
+     *
+     * @param uuid UUID of Test Collection to delete
+     * @throws SQLException
+     * @throws IOException
+     */
+    public static void deleteCollection(UUID uuid) throws SQLException, IOException {
+        try (Context c = new Context()) {
+            c.turnOffAuthorisationSystem();
+            Collection collection = collectionService.find(c, uuid);
+            if (collection != null) {
+                try {
+                    collectionService.delete(c, collection);
+                } catch (AuthorizeException e) {
+                    throw new RuntimeException(e.getMessage(), e);
+                }
+            }
+            c.complete();
+        }
     }
 
     @Override
