@@ -8,6 +8,9 @@
 package org.dspace.app.rest;
 
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
+import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadata;
+import static org.hamcrest.Matchers.allOf;
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.data.rest.webmvc.RestMediaTypes.TEXT_URI_LIST_VALUE;
 import static org.springframework.http.MediaType.parseMediaType;
@@ -29,12 +32,14 @@ import java.util.UUID;
 import javax.ws.rs.core.MediaType;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.CharEncoding;
 import org.dspace.app.rest.builder.BitstreamBuilder;
 import org.dspace.app.rest.builder.CollectionBuilder;
 import org.dspace.app.rest.builder.CommunityBuilder;
 import org.dspace.app.rest.builder.EPersonBuilder;
+import org.dspace.app.rest.builder.GroupBuilder;
 import org.dspace.app.rest.builder.WorkspaceItemBuilder;
 import org.dspace.app.rest.matcher.CollectionMatcher;
 import org.dspace.app.rest.matcher.ItemMatcher;
@@ -51,6 +56,8 @@ import org.dspace.content.Community;
 import org.dspace.content.Item;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.eperson.EPerson;
+import org.dspace.eperson.Group;
+import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.services.ConfigurationService;
 import org.hamcrest.Matchers;
 import org.junit.Before;
@@ -69,14 +76,34 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
     @Autowired
     private ConfigurationService configurationService;
 
+    private Group embargoedGroups;
+    private Group embargoedGroup1;
+    private Group embargoedGroup2;
+    private Group anonymousGroup;
+
     @Before
     @Override
     public void setUp() throws Exception {
-
         super.setUp();
+        context.turnOffAuthorisationSystem();
 
-        //disable file upload mandatory
-        configurationService.setProperty("webui.submit.upload.required", false);
+        embargoedGroups = GroupBuilder.createGroup(context)
+                .withName("Embargoed Groups")
+                .build();
+
+        embargoedGroup1 = GroupBuilder.createGroup(context)
+                .withName("Embargoed Group 1")
+                .withParent(embargoedGroups)
+                .build();
+
+        embargoedGroup2 = GroupBuilder.createGroup(context)
+                .withName("Embargoed Group 2")
+                .withParent(embargoedGroups)
+                .build();
+
+        anonymousGroup = EPersonServiceFactory.getInstance().getGroupService().findByName(context, Group.ANONYMOUS);
+
+        context.restoreAuthSystemState();
     }
 
     @Test
@@ -636,6 +663,9 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                 .withIssueDate("2017-10-17")
                 .build();
 
+        //disable file upload mandatory
+        configurationService.setProperty("webui.submit.upload.required", false);
+
         getClient(authToken).perform(get("/api/submission/workspaceitems/" + workspaceItem1.getID()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.errors").doesNotExist())
@@ -696,6 +726,9 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                 .withSubject("ExtraEntry")
                 .build();
 
+        //disable file upload mandatory
+        configurationService.setProperty("webui.submit.upload.required", false);
+
         // a simple patch to update an existent metadata
         List<Operation> updateTitle = new ArrayList<Operation>();
         Map<String, String> value = new HashMap<String, String>();
@@ -723,6 +756,140 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                     Matchers.is(WorkspaceItemMatcher.matchItemWithTitleAndDateIssuedAndSubject(witem,
                             "New Title", "2017-10-17", "ExtraEntry"))))
         ;
+    }
+
+    @Test
+    public void patchReplaceMetadataOnItemStillInSubmissionTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                .withName("Parent Community")
+                .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                .withName("Sub Community")
+                .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1)
+                .withName("Collection 1")
+                .build();
+
+        context.setCurrentUser(eperson);
+        WorkspaceItem witem = WorkspaceItemBuilder.createWorkspaceItem(context, col1)
+                .withTitle("Workspace Item 1")
+                .withIssueDate("2017-10-17")
+                .withSubject("ExtraEntry")
+                .build();
+
+        context.restoreAuthSystemState();
+
+        List<Operation> updateTitle = new ArrayList<Operation>();
+        Map<String, String> value = new HashMap<String, String>();
+        value.put("value", "New Title");
+        updateTitle.add(new ReplaceOperation("/metadata/dc.title/0", value));
+
+        String patchBody = getPatchContent(updateTitle);
+        UUID idItem = witem.getItem().getID();
+
+        // Verify submitter cannot modify metadata via item PATCH. They must use submission forms.
+        String tokenEperson = getAuthToken(eperson.getEmail(), password);
+        getClient(tokenEperson).perform(patch("/api/core/items/" + idItem)
+            .content(patchBody)
+            .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+            .andExpect(status().isForbidden());
+
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        getClient(tokenAdmin).perform(get("/api/core/items/" + idItem))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$", Matchers.is(ItemMatcher.matchItemWithTitleAndDateIssued
+                  (witem.getItem(), "Workspace Item 1", "2017-10-17"))));
+    }
+
+    @Test
+    public void patchAddMetadataOnItemStillInSubmissionTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                .withName("Parent Community")
+                .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                .withName("Sub Community")
+                .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1)
+                .withName("Collection 1")
+                .build();
+
+        context.setCurrentUser(eperson);
+        WorkspaceItem witem = WorkspaceItemBuilder.createWorkspaceItem(context, col1)
+                .withTitle("Workspace")
+                .withSubject("ExtraEntry")
+                .build();
+
+        context.restoreAuthSystemState();
+
+        List<Operation> addIssueDate = new ArrayList<Operation>();
+        Map<String, String> value = new HashMap<String, String>();
+        value.put("value", "2017-10-17");
+        addIssueDate.add(new ReplaceOperation("/metadata/dc.date.issued/0", value));
+
+        String patchBody = getPatchContent(addIssueDate);
+        UUID idItem = witem.getItem().getID();
+
+        // Verify submitter cannot modify metadata via item PATCH. They must use submission forms.
+        String tokenEperson = getAuthToken(eperson.getEmail(), password);
+        getClient(tokenEperson).perform(patch("/api/core/items/" + idItem)
+            .content(patchBody)
+            .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+            .andExpect(status().isForbidden());
+
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        getClient(tokenAdmin).perform(get("/api/core/items/" + idItem))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$", hasJsonPath("$.metadata", allOf(
+              matchMetadata("dc.title", "Workspace")))))
+        .andExpect(jsonPath("$.metadata.['dc.date.issued']").doesNotExist());
+    }
+
+    @Test
+    public void patchRemoveMetadataOnItemStillInSubmissionTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                .withName("Parent Community")
+                .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                .withName("Sub Community")
+                .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1)
+                .withName("Collection 1")
+                .build();
+
+        context.setCurrentUser(eperson);
+        WorkspaceItem witem = WorkspaceItemBuilder.createWorkspaceItem(context, col1)
+                .withTitle("Workspace title")
+                .withIssueDate("2017-10-17")
+                .withSubject("ExtraEntry")
+                .build();
+
+        context.restoreAuthSystemState();
+
+        List<Operation> removeTitle = new ArrayList<Operation>();
+        removeTitle.add(new RemoveOperation("/metadata/dc.title/0"));
+
+        String patchBody = getPatchContent(removeTitle);
+        UUID idItem = witem.getItem().getID();
+
+        // Verify submitter cannot modify metadata via item PATCH. They must use submission forms.
+        String tokenEperson = getAuthToken(eperson.getEmail(), password);
+        getClient(tokenEperson).perform(patch("/api/core/items/" + idItem)
+            .content(patchBody)
+            .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+            .andExpect(status().isForbidden());
+
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        getClient(tokenAdmin).perform(get("/api/core/items/" + idItem))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$", hasJsonPath("$.metadata", allOf(
+              matchMetadata("dc.title", "Workspace title"),
+              matchMetadata("dc.date.issued", "2017-10-17")))));
     }
 
     @Test
@@ -801,6 +968,9 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                     Matchers.is(WorkspaceItemMatcher.matchItemWithTitleAndDateIssuedAndSubject(witem,
                             null, "2017-10-17", "ExtraEntry"))))
         ;
+
+        //disable file upload mandatory
+        configurationService.setProperty("webui.submit.upload.required", false);
 
         // try to remove a metadata in a specific position
         List<Operation> removeMidSubject = new ArrayList<Operation>();
@@ -931,6 +1101,8 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                 .withSubject("ExtraEntry")
                 .build();
 
+        //disable file upload mandatory
+        configurationService.setProperty("webui.submit.upload.required", false);
 
         // try to add the title
         List<Operation> addTitle = new ArrayList<Operation>();
@@ -987,6 +1159,9 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                 .withTitle("Test WorkspaceItem")
                 .withIssueDate("2017-10-17")
                 .build();
+
+        //disable file upload mandatory
+        configurationService.setProperty("webui.submit.upload.required", false);
 
         // try to add multiple subjects at once
         List<Operation> addSubjects = new ArrayList<Operation>();
@@ -1209,6 +1384,9 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
             .andExpect(jsonPath("$.sections.license.url").isEmpty())
         ;
 
+        //disable file upload mandatory
+        configurationService.setProperty("webui.submit.upload.required", false);
+
         // try to grant the license with an add operation
         List<Operation> addGrant = new ArrayList<Operation>();
         addGrant.add(new AddOperation("/sections/license/granted", true));
@@ -1357,6 +1535,9 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                 .withIssueDate("2017-10-17")
                 .grantLicense()
                 .build();
+
+        //disable file upload mandatory
+        configurationService.setProperty("webui.submit.upload.required", false);
 
         // check that our workspaceitems come with a license (all are build in the same way, just check the first)
         getClient().perform(get("/api/submission/workspaceitems/" + witem.getID()))
@@ -1601,6 +1782,147 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
     }
 
     @Test
+    public void patchUploadAddAccessConditionTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                .withName("Parent Community")
+                .build();
+
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                .withName("Sub Community")
+                .build();
+
+        Collection collection1 = CollectionBuilder.createCollection(context, child1)
+                .withName("Collection 1")
+                .build();
+
+        InputStream pdf = getClass().getResourceAsStream("simple-article.pdf");
+
+        WorkspaceItem witem = WorkspaceItemBuilder.createWorkspaceItem(context, collection1)
+                .withTitle("Test WorkspaceItem")
+                .withIssueDate("2019-10-01")
+                .withFulltext("simple-article.pdf", "/local/path/simple-article.pdf", pdf)
+                .build();
+
+        context.restoreAuthSystemState();
+
+        // create a list of values to use in add accessCondition
+        List<Operation> addAccessCondition = new ArrayList<Operation>();
+        Map<String, String> value = new HashMap<String, String>();
+        value.put("name", "embargoedWithGroupSelect");
+        value.put("groupUUID", embargoedGroup1.getID().toString());
+        value.put("endDate", "2030-10-02");
+        addAccessCondition.add(new AddOperation("/sections/upload/files/0/accessConditions/-", value));
+
+        String patchBody = getPatchContent(addAccessCondition);
+        String authToken = getAuthToken(admin.getEmail(), password);
+
+        getClient(authToken).perform(patch("/api/submission/workspaceitems/" + witem.getID())
+                .content(patchBody)
+                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                            .andExpect(status().isOk())
+                            .andExpect(jsonPath("$",Matchers.allOf(
+                                    hasJsonPath("$.sections.upload.files[0].accessConditions[0].name",
+                                             is("embargoedWithGroupSelect")),
+                                    hasJsonPath("$.sections.upload.files[0].accessConditions[0].groupUUID",
+                                             is(embargoedGroup1.getID().toString()))
+                                    )));
+
+        // verify that the patch changes have been persisted
+        getClient(authToken).perform(get("/api/submission/workspaceitems/" + witem.getID()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$",Matchers.allOf(
+                    hasJsonPath("$.sections.upload.files[0].accessConditions[0].name",
+                             is("embargoedWithGroupSelect")),
+                    hasJsonPath("$.sections.upload.files[0].accessConditions[0].groupUUID",
+                             is(embargoedGroup1.getID().toString()))
+                    )));
+    }
+
+    @Test
+    public void patchUploadRemoveAccessConditionTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                .withName("Parent Community")
+                .build();
+
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                .withName("Sub Community")
+                .build();
+
+        Collection collection1 = CollectionBuilder.createCollection(context, child1)
+                .withName("Collection 1")
+                .build();
+
+        InputStream pdf = getClass().getResourceAsStream("simple-article.pdf");
+
+        WorkspaceItem witem = WorkspaceItemBuilder.createWorkspaceItem(context, collection1)
+                .withTitle("Test WorkspaceItem")
+                .withIssueDate("2019-10-01")
+                .withFulltext("simple-article.pdf", "/local/path/simple-article.pdf", pdf)
+                .build();
+
+        context.restoreAuthSystemState();
+
+        // create a list of values to use in add operation
+        List<Operation> addAccessCondition = new ArrayList<Operation>();
+        Map<String, String> value = new HashMap<String, String>();
+        value.put("name", "embargoedWithGroupSelect");
+        value.put("groupUUID", embargoedGroup1.getID().toString());
+        value.put("endDate", "2020-01-01");
+        addAccessCondition.add(new AddOperation("/sections/upload/files/0/accessConditions/-", value));
+
+        String patchBody = getPatchContent(addAccessCondition);
+        String authToken = getAuthToken(admin.getEmail(), password);
+
+        getClient(authToken).perform(patch("/api/submission/workspaceitems/" + witem.getID())
+                .content(patchBody)
+                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$",Matchers.allOf(
+                        hasJsonPath("$.sections.upload.files[0].accessConditions[0].name",
+                                 is("embargoedWithGroupSelect")),
+                        hasJsonPath("$.sections.upload.files[0].accessConditions[0].endDate",
+                                is("2020-01-01")),
+                        hasJsonPath("$.sections.upload.files[0].accessConditions[0].groupUUID",
+                                 is(embargoedGroup1.getID().toString()))
+                        )));
+
+        // verify that the patch changes have been persisted
+        getClient(authToken).perform(get("/api/submission/workspaceitems/" + witem.getID()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$",Matchers.allOf(
+                    hasJsonPath("$.sections.upload.files[0].accessConditions[0].name",
+                             is("embargoedWithGroupSelect")),
+                    hasJsonPath("$.sections.upload.files[0].accessConditions[0].endDate",
+                            is("2020-01-01")),
+                    hasJsonPath("$.sections.upload.files[0].accessConditions[0].groupUUID",
+                             is(embargoedGroup1.getID().toString()))
+                    )));
+
+        // create a list of values to use in remove operation
+        List<Operation> removeAccessCondition = new ArrayList<Operation>();
+        removeAccessCondition.add(new RemoveOperation("/sections/upload/files/0/accessConditions"));
+
+        String patchReplaceBody = getPatchContent(removeAccessCondition);
+        getClient(authToken).perform(patch("/api/submission/workspaceitems/" + witem.getID())
+                .content(patchReplaceBody)
+                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$",Matchers.allOf(
+                            hasJsonPath("$.sections.upload.files[0].accessConditions",hasSize(0)))));
+
+        // verify that the patch changes have been persisted
+        getClient(authToken).perform(get("/api/submission/workspaceitems/" + witem.getID()))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$",Matchers.allOf(
+                hasJsonPath("$.sections.upload.files[0].accessConditions", hasSize(0))
+                )));
+    }
+
+    @Test
     /**
      * Test the upload of files in the upload over section
      *
@@ -1671,8 +1993,6 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
             .withIssueDate("2017-10-17")
             .build();
 
-        configurationService.setProperty("webui.submit.upload.required", true);
-
         InputStream pdf = getClass().getResourceAsStream("simple-article.pdf");
         final MockMultipartFile pdfFile = new MockMultipartFile("file", "/local/path/simple-article.pdf",
             "application/pdf", pdf);
@@ -1713,8 +2033,6 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
             .withTitle("Test WorkspaceItem")
             .withIssueDate("2017-10-17")
             .build();
-
-        configurationService.setProperty("webui.submit.upload.required", true);
 
         //Verify there is an error since no file was uploaded (with upload required set to true)
         getClient(authToken).perform(get("/api/submission/workspaceitems/" + witem.getID()))
