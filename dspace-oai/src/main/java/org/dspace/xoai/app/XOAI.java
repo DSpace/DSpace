@@ -288,7 +288,7 @@ public class XOAI {
         XmlOutputContext xmlContext = XmlOutputContext.emptyContext(out, Second);
         Metadata metadata = retrieveMetadata(context, item);
         
-        //Do any additional metadata element, depends on the plugins
+        //Do any additional content on "item.compile" field, depends on the plugins
         List<XOAIItemCompilePlugin> xOAIItemCompilePlugins = new DSpace().getServiceManager().getServicesByType(XOAIItemCompilePlugin.class);
         for (XOAIItemCompilePlugin xOAIItemCompilePlugin : xOAIItemCompilePlugins)
         {

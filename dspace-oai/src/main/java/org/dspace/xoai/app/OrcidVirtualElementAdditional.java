@@ -25,6 +25,11 @@ import org.dspace.xoai.util.ItemUtils;
 import com.lyncode.xoai.dataprovider.xml.xoai.Element;
 import com.lyncode.xoai.dataprovider.xml.xoai.Metadata;
 
+/**
+ * Utility class to build xml element to support additional element on author
+ *
+ */
+@Deprecated
 public class OrcidVirtualElementAdditional implements XOAIItemCompilePlugin {
 
 	private static final Logger log = Logger.getLogger(OrcidVirtualElementAdditional.class);
