@@ -24,6 +24,7 @@
 <%@ page import="org.dspace.services.factory.DSpaceServicesFactory" %>
 <%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
 <%@ page import="org.dspace.app.webui.servlet.MyDSpaceServlet" %>
+<%@ page import="org.dspace.core.Context" %>
 
 <%
     int discovery_panel_cols = 12;
@@ -144,3 +145,8 @@
     </dspace:sidebar>
 </c:if>
 </dspace:layout>
+<%
+    // Obtain DSpace context
+    Context context = UIUtil.obtainContext(request);
+    context.complete();
+%>

@@ -1,4 +1,6 @@
 <%@ page import="org.dspace.app.webui.servlet.MyDSpaceServlet" %>
+<%@ page import="org.dspace.core.Context" %>
+<%@ page import="org.dspace.app.webui.util.UIUtil" %>
 <%@ taglib prefix="dspace" uri="http://www.dspace.org/dspace-tags.tld" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jstl/fmt" %>
@@ -222,3 +224,9 @@
     </div>
     <p class="submitFormHelp alert alert-info"><fmt:message key="jsp.display-item.copyright"/></p>
 </dspace:layout>
+
+<%
+    // Obtain DSpace context
+    Context context = UIUtil.obtainContext(request);
+    context.complete();
+%>

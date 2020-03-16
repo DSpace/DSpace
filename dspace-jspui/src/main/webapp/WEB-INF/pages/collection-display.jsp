@@ -14,6 +14,7 @@
 <%@ page import="org.dspace.app.webui.servlet.MyDSpaceServlet" %>
 <%@ page import="org.dspace.app.webui.servlet.admin.EditCommunitiesServlet" %>
 <%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
+<%@ page import="org.dspace.core.Context" %>
 
 <%
     int discovery_panel_cols = 12;
@@ -97,3 +98,8 @@
         <%@ include file="/discovery/static-sidebar-facet.jsp" %>
     </dspace:sidebar>
 </dspace:layout>
+<%
+    // Obtain DSpace context
+    Context context = UIUtil.obtainContext(request);
+    context.complete();
+%>

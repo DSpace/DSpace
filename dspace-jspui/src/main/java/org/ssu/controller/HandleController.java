@@ -95,22 +95,23 @@ public class HandleController {
                 request.setAttribute("dspace.collection", item.getOwningCollection());
                 parentCommunity = item.getOwningCollection().getCommunities().get(0);
                 includeCurrentCommunityInResult = true;
-                result = displayItem(request, model, item, locale);
+                result = displayItem(request, model, item, locale, dspaceContext);
             }
             if (dSpaceObject.getType() == Constants.COMMUNITY) {
                 Community community = (Community) dSpaceObject;
                 parentCommunity = community;
                 includeCurrentCommunityInResult = false;
-                result = displayCommunity(request, response, model, community, locale);
+                result = displayCommunity(request, response, model, community, locale, dspaceContext);
             }
             if (dSpaceObject.getType() == Constants.COLLECTION) {
                 parentCommunity = ((Collection)dSpaceObject).getCommunities().get(0);
                 includeCurrentCommunityInResult = true;
-                result = displayCollection(request, response, model, (Collection)dSpaceObject, locale);
+                result = displayCollection(request, response, model, (Collection)dSpaceObject, locale, dspaceContext);
             }
             if(parentCommunity != null) {
                 request.setAttribute("dspace.community", parentCommunity);
                 request.setAttribute("dspace.communities", getCommunityParents(dspaceContext, parentCommunity, includeCurrentCommunityInResult));
+                request.setAttribute("dspace.context", dspaceContext);
                 return result;
             }
         }
@@ -124,10 +125,9 @@ public class HandleController {
     }
 
 
-    private ModelAndView displayCollection(HttpServletRequest request, HttpServletResponse response, ModelAndView model, Collection collection, Locale locale) throws SQLException, ServletException, IOException, AuthorizeException, BrowseException, SortException, ItemCountException, PluginException {
+    private ModelAndView displayCollection(HttpServletRequest request, HttpServletResponse response, ModelAndView model, Collection collection, Locale locale, Context dspaceContext) throws SQLException, ServletException, IOException, AuthorizeException, BrowseException, SortException, ItemCountException, PluginException {
 
         request.setAttribute("dspace.collection", collection);
-        Context dspaceContext = UIUtil.obtainContext(request);
         ItemCounter ic = new ItemCounter(dspaceContext);
         BrowseInfo browseInfo = new BrowseContext().getBrowseInfo(dspaceContext, request, response);
         List<ItemResponse> items = communityService.getItems(dspaceContext, browseInfo);
@@ -154,10 +154,8 @@ public class HandleController {
         model.setViewName("collection-display");
         return model;
     }
-    private ModelAndView displayCommunity(HttpServletRequest request, HttpServletResponse response, ModelAndView model, Community community, Locale locale) throws SQLException, ItemCountException, PluginException, AuthorizeException, BrowseException {
-        Context dspaceContext = UIUtil.obtainContext(request);
+    private ModelAndView displayCommunity(HttpServletRequest request, HttpServletResponse response, ModelAndView model, Community community, Locale locale, Context dspaceContext) throws SQLException, ItemCountException, PluginException, AuthorizeException, BrowseException {
         ItemCounter ic = new ItemCounter(dspaceContext);
-
         Function<DSpaceObject, CountedCommunityResponse> extractDataForCountedItem = (collection) -> {
             try {
                 return new CountedCommunityResponse.Builder()
@@ -220,12 +218,11 @@ public class HandleController {
         };
 
         Bitstream bitstream = ContentServiceFactory.getInstance().getBitstreamService().find(dspaceContext, bitstreamId);
+        dspaceContext.complete();
         return new ModelAndView("redirect:" + getLinkForBitstream.apply(bitstream));
     }
 
-    private ModelAndView displayItem(HttpServletRequest request, ModelAndView model, Item item, Locale locale) throws SQLException, IOException, CrosswalkException, AuthorizeException {
-        Context dspaceContext = UIUtil.obtainContext(request);
-
+    private ModelAndView displayItem(HttpServletRequest request, ModelAndView model, Item item, Locale locale, Context dspaceContext) throws SQLException, IOException, CrosswalkException, AuthorizeException {
         List<Element> metaTags = xHTMLHeadCrosswalk.disseminateList(dspaceContext, item);
 
         boolean googleEnabled = ConfigurationManager.getBooleanProperty("google-metadata.enable", false);
