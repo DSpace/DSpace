@@ -29,6 +29,8 @@
         <start-class>org.dspace.app.rest.Application</start-class>
         <!-- Library for managing JSON Web Tokens (JWT): https://bitbucket.org/connect2id/nimbus-jose-jwt/wiki/Home -->
         <nimbus-jose-jwt.version>7.9</nimbus-jose-jwt.version>
+        <!-- Spring Data REST HAL Browser (May require updating when updating spring-boot.version in parent POM) -->
+        <spring-hal-browser.version>3.2.5.RELEASE</spring-hal-browser.version>
     </properties>
 
     <profiles>
@@ -241,11 +243,7 @@
         <dependency>
             <groupId>org.springframework.data</groupId>
             <artifactId>spring-data-rest-hal-browser</artifactId>
-            <version>3.1.10.RELEASE</version>
-            <!-- if you get a java.util.zip.ZipException: invalid LOC
-                 header (bad signature) during the tomcat startup
-                 force the use of the previous version as the jar file
-                 looks corrupted in the maven repository -->
+            <version>${spring-hal-browser.version}</version>
         </dependency>
 
         <!-- Add in Spring Security for AuthN and AuthZ -->
