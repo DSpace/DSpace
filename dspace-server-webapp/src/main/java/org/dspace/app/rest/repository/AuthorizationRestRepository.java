@@ -111,8 +111,7 @@ public class AuthorizationRestRepository extends DSpaceRestRepository<Authorizat
                 for (Group s : specialGroups) {
                     specialGroupsUUID.add(s.getID());
                 }
-                context.setCurrentUser(user);
-                context.emptySpecialGroups();
+                context.switchContextUser(user);
             }
 
             if (authorizationFeatureService.isAuthorized(context, authorizationFeature, object)) {
@@ -124,10 +123,7 @@ public class AuthorizationRestRepository extends DSpaceRestRepository<Authorizat
             }
             if (currUser != user) {
                 // restore the real current user
-                context.setCurrentUser(currUser);
-                for (UUID suuid : specialGroupsUUID) {
-                    context.setSpecialGroup(suuid);
-                }
+                context.restoreContextUser();
             }
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
@@ -175,8 +171,7 @@ public class AuthorizationRestRepository extends DSpaceRestRepository<Authorizat
             for (Group s : specialGroups) {
                 specialGroupsUUID.add(s.getID());
             }
-            context.setCurrentUser(user);
-            context.emptySpecialGroups();
+            context.switchContextUser(user);
         }
 
         List<AuthorizationFeature> features = authorizationFeatureService.findByResourceType(obj.getUniqueType());
@@ -189,10 +184,7 @@ public class AuthorizationRestRepository extends DSpaceRestRepository<Authorizat
 
         if (currUser != user) {
             // restore the real current user
-            context.setCurrentUser(currUser);
-            for (UUID suuid : specialGroupsUUID) {
-                context.setSpecialGroup(suuid);
-            }
+            context.restoreContextUser();
         }
         return converter.toRestPage(utils.getPage(authorizations, pageable), utils.obtainProjection());
     }
@@ -238,8 +230,7 @@ public class AuthorizationRestRepository extends DSpaceRestRepository<Authorizat
             for (Group s : specialGroups) {
                 specialGroupsUUID.add(s.getID());
             }
-            context.setCurrentUser(user);
-            context.emptySpecialGroups();
+            context.switchContextUser(user);
         }
         AuthorizationFeature feature = authorizationFeatureService.find(featureName);
         AuthorizationRest authorizationRest = null;
@@ -252,10 +243,7 @@ public class AuthorizationRestRepository extends DSpaceRestRepository<Authorizat
         }
         if (currUser != user) {
             // restore the real current user
-            context.setCurrentUser(currUser);
-            for (UUID suuid : specialGroupsUUID) {
-                context.setSpecialGroup(suuid);
-            }
+            context.restoreContextUser();
         }
         return authorizationRest;
     }
