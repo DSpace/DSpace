@@ -683,6 +683,11 @@ public class XOAI {
         }
     }
 
+	/**
+	 * Do any additional content on "item.compile" field, depends on the plugins
+	 * 
+	 * @return
+	 */
 	public List<XOAIItemCompilePlugin> getxOAIItemCompilePlugins() {
 		if(xOAIItemCompilePlugins==null) {
 			xOAIItemCompilePlugins = DSpaceServicesFactory.getInstance().getServiceManager().getServicesByType(XOAIItemCompilePlugin.class);

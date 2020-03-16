@@ -25,6 +25,10 @@ import org.dspace.xoai.util.ItemUtils;
 import com.lyncode.xoai.dataprovider.xml.xoai.Element;
 import com.lyncode.xoai.dataprovider.xml.xoai.Metadata;
 
+/**
+ * Utility class to build xml element to support Creative Commons information
+ *
+ */
 public class CCElementAdditional implements XOAIItemCompilePlugin {
 
 	private static Logger log = LogManager.getLogger(CCElementAdditional.class);

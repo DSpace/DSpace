@@ -25,6 +25,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.lyncode.xoai.dataprovider.xml.xoai.Element;
 import com.lyncode.xoai.dataprovider.xml.xoai.Metadata;
 
+/**
+ * Utility class to build xml element to support Item access rights information at Bitstream level
+ *
+ */
 public class PermissionElementAdditional implements XOAIItemCompilePlugin {
 
 	private static Logger log = LogManager.getLogger(PermissionElementAdditional.class);
@@ -58,9 +62,18 @@ public class PermissionElementAdditional implements XOAIItemCompilePlugin {
 		return metadata;
 	}
 
+	/**
+	 *
+	 * Build access rights of the Item on Bitstream level
+	 *
+	 * @param context
+	 * @param item
+	 * @return
+	 * @throws SQLException
+	 */
 	private String buildPermission(Context context, Item item) throws SQLException {
 
-		String values = "metadata only access";
+		String value = ItemUtils.METADATA_ONLY_ACCESS;
 		List<Bundle> bnds = null;
 		try {
 			bnds = itemService.getBundles(item, Constants.DEFAULT_BUNDLE_NAME);
@@ -79,11 +92,11 @@ public class PermissionElementAdditional implements XOAIItemCompilePlugin {
 			}
 
 			if (bitstream == null) {
-				return "metadata only access";
+				return value;
 			}
-			values = ItemUtils.getDRM(authorizeService.getPoliciesActionFilter(context, bitstream, Constants.READ));
+			value = ItemUtils.getAccessRightsValue(authorizeService.getPoliciesActionFilter(context, bitstream, Constants.READ));
 		}
-		return values;
+		return value;
 	}
 
 	public ItemService getItemService() {
