@@ -382,7 +382,8 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
      * @return the new state of the REST object
      */
     public T upload(HttpServletRequest request, String apiCategory, String model,
-                                                     ID id, MultipartFile file) throws SQLException {
+                                                     ID id, MultipartFile file)
+             throws SQLException, FileNotFoundException, IOException, AuthorizeException {
         throw new RuntimeException("No implementation found; Method not allowed!");
     }
 
