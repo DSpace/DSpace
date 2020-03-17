@@ -888,31 +888,30 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
         //** GIVEN **
         //1. A community-collection structure with one parent community with sub-community and one collection.
         parentCommunity = CommunityBuilder.createCommunity(context)
-                                          .withName("Parent Community")
-                                          .withLogo("ThisIsSomeDummyText")
-                                          .build();
+                          .withName("Parent Community")
+                          .withLogo("ThisIsSomeDummyText")
+                          .build();
 
         Community parentCommunity2 = CommunityBuilder.createCommunity(context)
-                                                     .withName("Parent Community 2")
-                                                     .withLogo("SomeTest")
-                                                     .build();
+                                     .withName("Parent Community 2")
+                                     .withLogo("SomeTest")
+                                     .build();
 
         Community parentCommunityChild1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
-                .withName("Sub Community")
-                .build();
+                                          .withName("Sub Community")
+                                          .build();
 
         Community parentCommunityChild2 = CommunityBuilder.createSubCommunity(context, parentCommunity)
-                .withName("Sub Community2")
-                .build();
+                                          .withName("Sub Community2")
+                                          .build();
 
         Community parentCommunityChild2Child1 = CommunityBuilder.createSubCommunity(context, parentCommunityChild2)
-                .withName("Sub Sub Community")
-                .build();
-
+                                                .withName("Sub Sub Community")
+                                                .build();
 
         Community parentCommunity2Child1 = CommunityBuilder.createSubCommunity(context, parentCommunity2)
-                .withName("Sub2 Community")
-                .build();
+                                           .withName("Sub2 Community")
+                                           .build();
 
         Collection col1 = CollectionBuilder.createCollection(context, parentCommunityChild1)
                                            .withName("Collection 1")
@@ -920,85 +919,54 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
 
         context.restoreAuthSystemState();
 
-        getClient().perform(get("/api/core/communities/search/subCommunities")
-                .param("parent", parentCommunity.getID().toString())
-                .param("projection", "full"))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(contentType))
-                //Checking that these communities are present
-                .andExpect(jsonPath("$._embedded.communities", Matchers.containsInAnyOrder(
-                        CommunityMatcher.matchCommunityEntryFullProjection(parentCommunityChild1.getName(),
-                                                             parentCommunityChild1.getID(),
-                                                             parentCommunityChild1.getHandle()),
-                        CommunityMatcher.matchCommunityEntryFullProjection(parentCommunityChild2.getName(),
-                                                             parentCommunityChild2.getID(),
-                                                             parentCommunityChild2.getHandle())
-                )))
-                //Checking that these communities are not present
-                .andExpect(jsonPath("$._embedded.communities", Matchers.not(Matchers.anyOf(
-                        CommunityMatcher.matchCommunityEntryFullProjection(parentCommunity.getName(),
-                                                             parentCommunity.getID(),
-                                                             parentCommunity.getHandle()),
-                        CommunityMatcher.matchCommunityEntryFullProjection(parentCommunity2.getName(),
-                                                             parentCommunity2.getID(),
-                                                             parentCommunity2.getHandle()),
-                        CommunityMatcher.matchCommunityEntryFullProjection(parentCommunity2Child1.getName(),
-                                                             parentCommunity2Child1.getID(),
-                                                             parentCommunity2Child1.getHandle()),
-                        CommunityMatcher.matchCommunityEntryFullProjection(parentCommunityChild2Child1.getName(),
-                                                             parentCommunityChild2Child1.getID(),
-                                                             parentCommunityChild2Child1.getHandle())
-                ))))
-                .andExpect(jsonPath("$._links.self.href",
-                                    Matchers.containsString("/api/core/communities/search/subCommunities")))
-                .andExpect(jsonPath("$.page.size", is(20)))
-                .andExpect(jsonPath("$.page.totalElements", is(2)))
-        ;
+        getClient().perform(get("/api/core/communities/" + parentCommunity.getID().toString() + "/subcommunities"))
+                   .andExpect(status().isOk())
+                   .andExpect(content().contentType(contentType))
+                   //Checking that these communities are present
+                   .andExpect(jsonPath("$._embedded.subcommunities", Matchers.containsInAnyOrder(
+                        CommunityMatcher.matchCommunity(parentCommunityChild1),
+                        CommunityMatcher.matchCommunity(parentCommunityChild2)
+                   )))
+                   //Checking that these communities are not present
+                   .andExpect(jsonPath("$._embedded.subcommunities", Matchers.not(Matchers.anyOf(
+                        CommunityMatcher.matchCommunity(parentCommunity),
+                        CommunityMatcher.matchCommunity(parentCommunity2),
+                        CommunityMatcher.matchCommunity(parentCommunity2Child1),
+                        CommunityMatcher.matchCommunity(parentCommunityChild2Child1)
+                   ))))
+                   .andExpect(jsonPath("$._links.self.href",
+                              Matchers.containsString("/api/core/communities/" + parentCommunity.getID().toString())))
+                   .andExpect(jsonPath("$.page.size", is(20)))
+                   .andExpect(jsonPath("$.page.totalElements", is(2)));
 
-        getClient().perform(get("/api/core/communities/search/subCommunities")
-                .param("parent", parentCommunityChild2.getID().toString())
-                .param("projection", "full"))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(contentType))
-                //Checking that these communities are present
-                .andExpect(jsonPath("$._embedded.communities", Matchers.contains(
-                        CommunityMatcher.matchCommunityEntryFullProjection(parentCommunityChild2Child1.getName(),
-                                                             parentCommunityChild2Child1.getID(),
-                                                             parentCommunityChild2Child1.getHandle())
-                )))
-                //Checking that these communities are not present
-                .andExpect(jsonPath("$._embedded.communities", Matchers.not(Matchers.anyOf(
-                        CommunityMatcher.matchCommunityEntryFullProjection(parentCommunity.getName(),
-                                                             parentCommunity.getID(),
-                                                             parentCommunity.getHandle()),
-                        CommunityMatcher.matchCommunityEntryFullProjection(parentCommunity2.getName(),
-                                                             parentCommunity2.getID(),
-                                                             parentCommunity2.getHandle()),
-                        CommunityMatcher.matchCommunityEntryFullProjection(parentCommunity2Child1.getName(),
-                                                             parentCommunity2Child1.getID(),
-                                                             parentCommunity2Child1.getHandle()),
-                        CommunityMatcher.matchCommunityEntryFullProjection(parentCommunityChild2Child1.getName(),
-                                                             parentCommunityChild2Child1.getID(),
-                                                             parentCommunityChild2Child1.getHandle()),
-                        CommunityMatcher.matchCommunityEntryFullProjection(parentCommunityChild1.getName(),
-                                                             parentCommunityChild1.getID(),
-                                                             parentCommunityChild1.getHandle())
-                ))))
-                .andExpect(jsonPath("$._links.self.href",
-                                    Matchers.containsString("/api/core/communities/search/subCommunities")))
-                .andExpect(jsonPath("$.page.size", is(20)))
-                .andExpect(jsonPath("$.page.totalElements", is(1)))
-        ;
+       getClient().perform(get("/api/core/communities/" + parentCommunityChild2.getID().toString() + "/subcommunities"))
+                  .andExpect(status().isOk())
+                  .andExpect(content().contentType(contentType))
+                  //Checking that these communities are present
+                  .andExpect(jsonPath("$._embedded.subcommunities", Matchers.contains(
+                            CommunityMatcher.matchCommunity(parentCommunityChild2Child1)
+                  )))
+                  //Checking that these communities are not present
+                  .andExpect(jsonPath("$._embedded.subcommunities", Matchers.not(Matchers.anyOf(
+                            CommunityMatcher.matchCommunity(parentCommunity),
+                            CommunityMatcher.matchCommunity(parentCommunity2),
+                            CommunityMatcher.matchCommunity(parentCommunity2Child1),
+                            CommunityMatcher.matchCommunity(parentCommunityChild2Child1),
+                            CommunityMatcher.matchCommunity(parentCommunityChild1)
+                  ))))
+                  .andExpect(jsonPath("$._links.self.href",
+                          Matchers.containsString("/api/core/communities/" + parentCommunityChild2.getID().toString())))
+                  .andExpect(jsonPath("$.page.size", is(20)))
+                  .andExpect(jsonPath("$.page.totalElements", is(1)));
 
-        getClient().perform(get("/api/core/communities/search/subCommunities")
-                .param("parent", parentCommunityChild2Child1.getID().toString()))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(contentType))
-                .andExpect(jsonPath("$._links.self.href",
-                                    Matchers.containsString("/api/core/communities/search/subCommunities")))
-                .andExpect(jsonPath("$.page.size", is(20)))
-                .andExpect(jsonPath("$.page.totalElements", is(0)))
-        ;
+        getClient().perform(get("/api/core/communities/"
+                                + parentCommunityChild2Child1.getID().toString() + "/subcommunities"))
+                   .andExpect(status().isOk())
+                   .andExpect(content().contentType(contentType))
+                   .andExpect(jsonPath("$._links.self.href",
+                    Matchers.containsString("/api/core/communities/" + parentCommunityChild2Child1.getID().toString())))
+                   .andExpect(jsonPath("$.page.size", is(20)))
+                   .andExpect(jsonPath("$.page.totalElements", is(0)));
     }
 
     @Test
@@ -1321,16 +1289,9 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
     }
 
     @Test
-    public void findAllSubCommunitiesWithoutUUID() throws Exception {
-        getClient().perform(get("/api/core/communities/search/subCommunities"))
-                 .andExpect(status().isBadRequest());
-    }
-
-    @Test
     public void findAllSubCommunitiesWithUnexistentUUID() throws Exception {
-        getClient().perform(get("/api/core/communities/search/subCommunities")
-                 .param("parent", UUID.randomUUID().toString()))
-                 .andExpect(status().isNotFound());
+        getClient().perform(get("/api/core/communities/" + UUID.randomUUID().toString() + "/subcommunities"))
+                   .andExpect(status().isNotFound());
     }
 
     @Test
