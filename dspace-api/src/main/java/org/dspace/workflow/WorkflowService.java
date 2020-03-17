@@ -17,6 +17,7 @@ import org.dspace.content.WorkspaceItem;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
+import org.dspace.xmlworkflow.Role;
 import org.dspace.xmlworkflow.WorkflowConfigurationException;
 
 /**
@@ -93,6 +94,20 @@ public interface WorkflowService<T extends WorkflowItem> {
 
     public Group getWorkflowRoleGroup(Context context, Collection collection, String roleName, Group roleGroup)
         throws SQLException, IOException, WorkflowConfigurationException, AuthorizeException, WorkflowException;
+
+    /**
+     * This method will create the workflowRoleGroup for a collection and the given rolename
+     * @param context       The relevant DSpace context
+     * @param collection    The collection
+     * @param roleName      The rolename
+     * @return              The created Group
+     * @throws AuthorizeException If something goes wrong
+     * @throws SQLException If something goes wrong
+     * @throws IOException If something goes wrong
+     * @throws WorkflowConfigurationException If something goes wrong
+     */
+    public Group createWorkflowRoleGroup(Context context, Collection collection, String roleName)
+        throws AuthorizeException, SQLException, IOException, WorkflowConfigurationException;
 
     public List<String> getFlywayMigrationLocations();
 }
