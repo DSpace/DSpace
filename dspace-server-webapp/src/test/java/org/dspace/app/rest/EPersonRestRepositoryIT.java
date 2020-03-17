@@ -47,7 +47,6 @@ import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
-import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.hamcrest.Matchers;
 import org.junit.Test;
 
@@ -1527,19 +1526,16 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                 .withPassword("qwerty01")
                 .build();
 
-        // newly created account become membership of Anonymous group
-        Group groupAnonymous = EPersonServiceFactory.getInstance().getGroupService()
-                                                    .findByName(context, Group.ANONYMOUS);
-
         context.restoreAuthSystemState();
+
         String tokenEperson1 = getAuthToken(ePerson1.getEmail(), "qwerty01");
-        getClient(tokenEperson1).perform(get("/api/eperson/epersons/" + ePerson1.getID()).param("projection", "full"))
+        getClient(tokenEperson1).perform(get("/api/eperson/epersons/" + ePerson1.getID())
+                .param("projection", "full"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
                 .andExpect(jsonPath("$", Matchers.allOf(
-                        hasJsonPath("$._embedded.groups._embedded.groups.length()", is(1)),
-                        hasJsonPath("$._embedded.groups._embedded.groups[0].id", is(groupAnonymous.getID().toString())),
-                        hasJsonPath("$._embedded.groups._embedded.groups[0].name", is(groupAnonymous.getName()))
+                        hasJsonPath("$._embedded.groups._embedded.groups.length()", is(0)),
+                        hasJsonPath("$._embedded.groups.page.totalElements", is(0))
                 )));
     }
 
