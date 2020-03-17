@@ -9,7 +9,8 @@ package org.dspace.app.rest.model.hateoas;
 
 import org.dspace.app.rest.model.hateoas.annotations.RelNameDSpaceResource;
 import org.springframework.core.annotation.AnnotationUtils;
-import org.springframework.hateoas.core.EvoInflectorRelProvider;
+import org.springframework.hateoas.LinkRelation;
+import org.springframework.hateoas.server.core.EvoInflectorLinkRelationProvider;
 
 /**
  * A DSpace Relation Provider that use the RelNameDSpaceResource to use the
@@ -17,13 +18,13 @@ import org.springframework.hateoas.core.EvoInflectorRelProvider;
  *
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
-public class DSpaceRelProvider extends EvoInflectorRelProvider {
+public class DSpaceRelProvider extends EvoInflectorLinkRelationProvider {
 
     @Override
-    public String getItemResourceRelFor(Class<?> type) {
+    public LinkRelation getItemResourceRelFor(Class<?> type) {
         RelNameDSpaceResource nameAnnotation = AnnotationUtils.findAnnotation(type, RelNameDSpaceResource.class);
         if (nameAnnotation != null) {
-            return nameAnnotation.value();
+            return LinkRelation.of(nameAnnotation.value());
         }
         return super.getItemResourceRelFor(type);
     }
