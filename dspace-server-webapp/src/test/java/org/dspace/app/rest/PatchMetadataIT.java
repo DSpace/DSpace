@@ -633,7 +633,7 @@ public class PatchMetadataIT extends AbstractEntityIntegrationTest {
                         .andExpect(status().isOk());
 
         String authorField = "dc.contributor.author";
-        getClient().perform(get("/api/submission/workspaceitems/" + publicationItem.getID()))
+        getClient(token).perform(get("/api/submission/workspaceitems/" + publicationItem.getID()))
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$.sections.traditionalpageone",
