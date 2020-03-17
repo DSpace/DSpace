@@ -26,7 +26,7 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.annotation.Order;
-import org.springframework.hateoas.RelProvider;
+import org.springframework.hateoas.server.LinkRelationProvider;
 import org.springframework.lang.NonNull;
 import org.springframework.web.context.request.RequestContextListener;
 import org.springframework.web.cors.CorsConfiguration;
@@ -118,7 +118,7 @@ public class Application extends SpringBootServletInitializer {
     }
 
     @Bean
-    protected RelProvider dspaceRelProvider() {
+    protected LinkRelationProvider dspaceRelProvider() {
         return new DSpaceRelProvider();
     }
 

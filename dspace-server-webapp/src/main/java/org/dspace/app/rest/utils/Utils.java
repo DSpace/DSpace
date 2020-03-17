@@ -9,7 +9,7 @@ package org.dspace.app.rest.utils;
 
 import static java.lang.Integer.parseInt;
 import static java.util.stream.Collectors.toList;
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
@@ -159,7 +159,7 @@ public class Utils {
      * @return the existing instance if it is not null, a default pageable instance otherwise.
      */
     public Pageable getPageable(@Nullable Pageable optionalPageable) {
-        return optionalPageable != null ? optionalPageable : new PageRequest(0, DEFAULT_PAGE_SIZE);
+        return optionalPageable != null ? optionalPageable : PageRequest.of(0, DEFAULT_PAGE_SIZE);
     }
 
     public Link linkToSingleResource(DSpaceResource r, String rel) {
@@ -278,7 +278,7 @@ public class Utils {
 
     /**
      * Create a temporary file from a multipart file upload
-     * 
+     *
      * @param multipartFile
      *            the multipartFile representing the uploaded file. Please note that it is a complex object including
      *            additional information other than the binary like the orginal file name and the mimetype
@@ -312,7 +312,7 @@ public class Utils {
     /**
      * Return the filename part from a multipartFile upload that could eventually contains the fullpath on the client
 
-     * 
+     *
      * @param multipartFile
      *            the file uploaded
      * @return the filename part of the file on the client filesystem
@@ -771,23 +771,23 @@ public class Utils {
             return new EmbeddedPage(link.getHref(), page.map((restObject) -> {
                 restObject.setEmbedLevel(childEmbedLevel);
                 return converter.toResource(restObject, newList);
-            }), null, link.getRel());
+            }), null, link.getRel().value());
         } else if (linkedObject instanceof List) {
             // The full list has been retrieved and we need to provide the first page for embedding
             List<RestAddressableModel> list = (List<RestAddressableModel>) linkedObject;
             if (list.size() > 0) {
                 PageImpl<RestAddressableModel> page = new PageImpl(
                         list.subList(0, list.size() > DEFAULT_PAGE_SIZE ? DEFAULT_PAGE_SIZE : list.size()),
-                        new PageRequest(0, DEFAULT_PAGE_SIZE), list.size());
+                        PageRequest.of(0, DEFAULT_PAGE_SIZE), list.size());
                 return new EmbeddedPage(link.getHref(),
                         page.map((restObject) -> {
                             restObject.setEmbedLevel(childEmbedLevel);
                             return converter.toResource(restObject, newList);
                         }),
-                        list, link.getRel());
+                        list, link.getRel().value());
             } else {
                 PageImpl<RestAddressableModel> page = new PageImpl(list);
-                return new EmbeddedPage(link.getHref(), page, list, link.getRel());
+                return new EmbeddedPage(link.getHref(), page, list, link.getRel().value());
             }
         } else {
             return linkedObject;

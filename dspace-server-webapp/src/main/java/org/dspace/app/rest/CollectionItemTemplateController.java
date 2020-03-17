@@ -20,7 +20,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.CollectionRest;
+import org.dspace.app.rest.model.RestModel;
 import org.dspace.app.rest.model.TemplateItemRest;
+import org.dspace.app.rest.model.hateoas.HALResource;
 import org.dspace.app.rest.model.hateoas.TemplateItemResource;
 import org.dspace.app.rest.repository.CollectionRestRepository;
 import org.dspace.app.rest.utils.ContextUtil;
@@ -32,7 +34,8 @@ import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.webmvc.ControllerUtils;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
-import org.springframework.hateoas.ResourceSupport;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.RepresentationModel;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -50,7 +53,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/" + CollectionRest.CATEGORY + "/" + CollectionRest.PLURAL_NAME
     + REGEX_REQUESTMAPPING_IDENTIFIER_AS_UUID + "/itemtemplate")
-public class CollectionItemtemplateController {
+public class CollectionItemTemplateController {
 
     @Autowired
     private Utils utils;
@@ -100,9 +103,9 @@ public class CollectionItemtemplateController {
      */
     @PreAuthorize("hasPermission(#uuid, 'COLLECTION', 'WRITE')")
     @RequestMapping(method = RequestMethod.POST)
-    public ResponseEntity<ResourceSupport> createTemplateItem(HttpServletRequest request,
-                                                              @PathVariable UUID uuid,
-                                                              @RequestBody(required = false) JsonNode itemBody)
+    public ResponseEntity<RepresentationModel<?>> createTemplateItem(HttpServletRequest request,
+                                                          @PathVariable UUID uuid,
+                                                          @RequestBody(required = false) JsonNode itemBody)
             throws SQLException, AuthorizeException {
 
         if (itemBody == null) {
@@ -125,7 +128,7 @@ public class CollectionItemtemplateController {
         context.commit();
 
         return ControllerUtils.toResponseEntity(HttpStatus.CREATED, new HttpHeaders(),
-                converter.toResource(templateItem));
+                                                (RepresentationModel<?>) converter.toResource(templateItem));
     }
 
     /**
