@@ -196,7 +196,7 @@ public class CollectionTest extends AbstractDSpaceObjectTest {
 
         // test creating collection with a specified handle which IS already in use
         // This should throw an exception
-        Collection created = collectionService.create(context, owningCommunity, inUseHandle);
+        collectionService.create(context, owningCommunity, inUseHandle);
         fail("Exception expected");
     }
 
@@ -291,7 +291,6 @@ public class CollectionTest extends AbstractDSpaceObjectTest {
         String itext = "introductory text";
         String copy = "copyright declaration";
         String sidebar = "side bar text";
-        String tempItem = "3";
         String provDesc = "provenance description";
         String license = "license text";
 
@@ -370,7 +369,7 @@ public class CollectionTest extends AbstractDSpaceObjectTest {
     @Test(expected = AuthorizeException.class)
     public void testSetLogoNoAuth() throws Exception {
         File f = new File(testProps.get("test.bitstream").toString());
-        Bitstream logo = collectionService.setLogo(context, collection, new FileInputStream(f));
+        collectionService.setLogo(context, collection, new FileInputStream(f));
         fail("Exception expected");
     }
 
@@ -393,7 +392,7 @@ public class CollectionTest extends AbstractDSpaceObjectTest {
     @Test(expected = AuthorizeException.class)
     public void testCreateWorkflowGroupNoAuth() throws Exception {
         int step = 1;
-        Group result = collectionService.createWorkflowGroup(context, collection, step);
+        collectionService.createWorkflowGroup(context, collection, step);
         fail("Exception expected");
     }
 
@@ -461,7 +460,7 @@ public class CollectionTest extends AbstractDSpaceObjectTest {
      */
     @Test(expected = AuthorizeException.class)
     public void testCreateSubmittersNoAuth() throws Exception {
-        Group result = collectionService.createSubmitters(context, collection);
+        collectionService.createSubmitters(context, collection);
         fail("Exception expected");
     }
 
@@ -511,7 +510,7 @@ public class CollectionTest extends AbstractDSpaceObjectTest {
      */
     @Test(expected = AuthorizeException.class)
     public void testCreateAdministratorsNoAuth() throws Exception {
-        Group result = collectionService.createAdministrators(context, collection);
+        collectionService.createAdministrators(context, collection);
         fail("Exception expected");
     }
 

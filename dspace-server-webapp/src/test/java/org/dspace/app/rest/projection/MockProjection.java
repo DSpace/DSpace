@@ -12,6 +12,7 @@ import javax.annotation.Nullable;
 import org.dspace.app.rest.model.LinkRest;
 import org.dspace.app.rest.model.MockObject;
 import org.dspace.app.rest.model.MockObjectRest;
+import org.dspace.app.rest.model.RestAddressableModel;
 import org.dspace.app.rest.model.RestModel;
 import org.dspace.app.rest.model.hateoas.HALResource;
 import org.springframework.hateoas.Link;
@@ -87,8 +88,9 @@ public class MockProjection implements Projection {
         return halResource;
     }
 
-    public boolean allowEmbedding(HALResource halResource, LinkRest linkRest) {
-        return true;
+    public boolean allowEmbedding(HALResource<? extends RestAddressableModel> halResource, LinkRest linkRest,
+                                  Link... oldLinks) {
+        return halResource.getContent().getEmbedLevel() < 2;
     }
 
     public boolean allowLinking(HALResource halResource, LinkRest linkRest) {

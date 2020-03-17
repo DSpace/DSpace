@@ -28,7 +28,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
 /**
- * Link repository for "groups" subresource of an individual eperson.
+ * Link repository for the direct "groups" subresource of an individual eperson.
  */
 @Component(EPersonRest.CATEGORY + "." + EPersonRest.NAME + "." + EPersonRest.GROUPS)
 public class EPersonGroupLinkRepository extends AbstractDSpaceRestRepository
@@ -51,7 +51,7 @@ public class EPersonGroupLinkRepository extends AbstractDSpaceRestRepository
             if (eperson == null) {
                 throw new ResourceNotFoundException("No such eperson: " + epersonId);
             }
-            Page<Group> groups = utils.getPage(groupService.allMemberGroups(context, eperson), optionalPageable);
+            Page<Group> groups = utils.getPage(eperson.getGroups(), optionalPageable);
             return converter.toRestPage(groups, projection);
         } catch (SQLException e) {
             throw new RuntimeException(e);
