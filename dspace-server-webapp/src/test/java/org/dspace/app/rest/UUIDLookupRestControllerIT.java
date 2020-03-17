@@ -281,13 +281,13 @@ public class UUIDLookupRestControllerIT extends AbstractControllerIntegrationTes
 
     @Test
     /**
-     * Test that a request with an uuid parameter that is not an actual UUID return a 422 Unprocessable Entity status
+     * Test that a request with an uuid parameter that is not an actual UUID return a 400 Bad Request status
      *
      * @throws Exception
      */
     public void testInvalidUUID() throws Exception {
         getClient().perform(get("/api/dso/find?uuid={uuid}","invalidUUID"))
-                        .andExpect(status().isUnprocessableEntity());
+                        .andExpect(status().isBadRequest());
     }
 
     @Test

@@ -8,12 +8,11 @@
 package org.dspace.content;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.any;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 import org.dspace.authorize.service.AuthorizeService;
@@ -137,7 +136,7 @@ public class RelationshipServiceImplTest {
     @Test
     public void testFindByItemAndRelationshipType() throws Exception {
         // Declare objects utilized in unit test
-        List<Relationship> relList = new LinkedList<>();
+        List<Relationship> relList = new ArrayList<>();
         Item item = mock(Item.class);
         RelationshipType testRel = new RelationshipType();
 
@@ -152,7 +151,7 @@ public class RelationshipServiceImplTest {
     @Test
     public void testFindByRelationshipType() throws Exception {
         // Declare objects utilized in unit test
-        List<Relationship> relList = new LinkedList<>();
+        List<Relationship> relList = new ArrayList<>();
         RelationshipType testRel = new RelationshipType();
 
         // The Relationship(s) reported should match our our relList
@@ -231,8 +230,6 @@ public class RelationshipServiceImplTest {
     public void testDelete() throws Exception {
 
         // Declare objects utilized in unit test
-        MetadataValue metVal = mock(MetadataValue.class);
-        List<MetadataValue> metsList = new ArrayList<>();
         List<Relationship> leftTypelist = new ArrayList<>();
         List<Relationship> rightTypelist = new ArrayList<>();
         Item leftItem = mock(Item.class);
@@ -246,7 +243,6 @@ public class RelationshipServiceImplTest {
         testRel.setRightwardType("Entitylabel");
         testRel.setLeftMinCardinality(0);
         testRel.setRightMinCardinality(0);
-        metsList.add(metVal);
         relationship = getRelationship(leftItem, rightItem, testRel, 0,0);
         leftTypelist.add(relationship);
         rightTypelist.add(relationship);

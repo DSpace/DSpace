@@ -20,7 +20,6 @@ import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.EPersonRest;
 import org.dspace.app.rest.model.patch.Patch;
-import org.dspace.app.rest.projection.Projection;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.core.Context;
@@ -84,7 +83,7 @@ public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, E
             throw new RuntimeException(e.getMessage(), e);
         }
 
-        return converter.toRest(eperson, Projection.DEFAULT);
+        return converter.toRest(eperson, utils.obtainProjection());
     }
 
     @Override
@@ -116,30 +115,6 @@ public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, E
     }
 
     /**
-     * Find the epersons matching the query q parameter. The search is delegated to the
-     * {@link EPersonService#search(Context, String, int, int)} method
-     *
-     * @param q
-     *            is the *required* query string
-     * @param pageable
-     *            contains the pagination information
-     * @return a Page of EPersonRest instances matching the user query
-     */
-    @SearchRestMethod(name = "byName")
-    public Page<EPersonRest> findByName(@Parameter(value = "q", required = true) String q,
-            Pageable pageable) {
-        try {
-            Context context = obtainContext();
-            long total = es.searchResultCount(context, q);
-            List<EPerson> epersons = es.search(context, q, Math.toIntExact(pageable.getOffset()),
-                    Math.toIntExact(pageable.getOffset() + pageable.getPageSize()));
-            return converter.toRestPage(epersons, pageable, total, utils.obtainProjection());
-        } catch (SQLException e) {
-            throw new RuntimeException(e.getMessage(), e);
-        }
-    }
-
-    /**
      * Find the eperson with the provided email address if any. The search is delegated to the
      * {@link EPersonService#findByEmail(Context, String)} method
      *
@@ -160,6 +135,32 @@ public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, E
             return null;
         }
         return converter.toRest(eperson, utils.obtainProjection());
+    }
+
+    /**
+     * Find the epersons matching the query parameter. The search is delegated to the
+     * {@link EPersonService#search(Context, String, int, int)} method
+     *
+     * @param query
+     *            is the *required* query string
+     * @param pageable
+     *            contains the pagination information
+     * @return a Page of EPersonRest instances matching the user query
+     */
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @SearchRestMethod(name = "byMetadata")
+    public Page<EPersonRest> findByMetadata(@Parameter(value = "query", required = true) String query,
+            Pageable pageable) {
+
+        try {
+            Context context = obtainContext();
+            long total = es.searchResultCount(context, query);
+            List<EPerson> epersons = es.search(context, query, Math.toIntExact(pageable.getOffset()),
+                                               Math.toIntExact(pageable.getOffset() + pageable.getPageSize()));
+            return converter.toRestPage(epersons, pageable, total, utils.obtainProjection());
+        } catch (SQLException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
     }
 
     @Override
