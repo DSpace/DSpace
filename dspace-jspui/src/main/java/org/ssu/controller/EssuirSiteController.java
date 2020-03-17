@@ -98,7 +98,7 @@ public class EssuirSiteController {
         model.addObject("sideNews", sideNews);
         model.addObject("submissions", submissionStatisticsByType);
         model.addObject("communities", communityResponse);
-
+        request.setAttribute("dspace.context", dspaceContext);
         model.setViewName("home");
         return model;
     }
@@ -154,6 +154,7 @@ public class EssuirSiteController {
                 .collect(Collectors.toList());
         model.addObject("recentItems", recentItems);
         model.setViewName("recent-items");
+        context.complete();
         return model;
     }
 
@@ -213,10 +214,9 @@ public class EssuirSiteController {
         model.addObject("innerCommunities", communityResponse.getCommMap());
         model.addObject("isAdmin", communityResponse.getIsAdmin());
         model.addObject("itemCounter", new ItemCounter(dspaceContext));
-
+        request.setAttribute("dspace.context", dspaceContext);
         model.setViewName("community-list");
         return model;
-
     }
 
 

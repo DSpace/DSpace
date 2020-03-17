@@ -87,6 +87,7 @@ public class HandleController {
         DSpaceObject dSpaceObject = handleService.resolveToObject(dspaceContext, "123456789/" + itemId);
         Locale locale = dspaceContext.getCurrentLocale();
         ModelAndView result = new ModelAndView();
+        request.setAttribute("dspace.context", dspaceContext);
         if(authorizeService.authorizeActionBoolean(dspaceContext, dSpaceObject, Constants.READ)) {
             Community parentCommunity = null;
             boolean includeCurrentCommunityInResult = false;
@@ -111,7 +112,6 @@ public class HandleController {
             if(parentCommunity != null) {
                 request.setAttribute("dspace.community", parentCommunity);
                 request.setAttribute("dspace.communities", getCommunityParents(dspaceContext, parentCommunity, includeCurrentCommunityInResult));
-                request.setAttribute("dspace.context", dspaceContext);
                 return result;
             }
         }

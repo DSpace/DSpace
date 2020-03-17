@@ -184,7 +184,7 @@ public class SearchController {
         model.addObject("queryEncoded", URLEncoder.encode(Optional.ofNullable(query).orElse(""), "UTF-8"));
         model.addObject("searchScope", scope != null ? scope.getHandle() : "");
         model.addObject("scopes", getScopes(scope, dspaceContext));
-
+        request.setAttribute("dspace.context", dspaceContext);
         model.setViewName("search");
         return model;
     }

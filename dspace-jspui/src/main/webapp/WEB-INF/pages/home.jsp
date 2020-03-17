@@ -25,6 +25,7 @@
 <%@ page import="javax.servlet.jsp.jstl.core.*" %>
 <%@ page import="org.dspace.app.webui.util.UIUtil" %>
 <%@ page import="org.dspace.core.ConfigurationManager" %>
+<%@ page import="org.dspace.core.Context" %>
 
 <%
     Locale sessionLocale = UIUtil.getSessionLocale(request);
@@ -87,3 +88,9 @@
 		</table>
 	</div>
 </dspace:layout>
+
+<%
+	// Obtain DSpace context
+	Context context = UIUtil.obtainContext(request);
+	context.complete();
+%>

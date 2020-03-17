@@ -7,7 +7,6 @@ import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.browse.BrowseException;
 import org.dspace.browse.BrowseInfo;
 import org.dspace.content.DSpaceObject;
-import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.handle.factory.HandleServiceFactory;
@@ -40,7 +39,6 @@ public class BrowseController {
     private BrowseRequestProcessor browseRequestProcessor;
     private HandleService handleService = HandleServiceFactory.getInstance().getHandleService();
     private AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
-    private org.dspace.content.service.ItemService dspaceItemService = ContentServiceFactory.getInstance().getItemService();
 
     @RequestMapping(value = "/123456789/{itemId}/browse")
     public ModelAndView browseInCommunity(ModelAndView model, HttpServletRequest request, HttpServletResponse response, @PathVariable("itemId") String itemId) throws ServletException, AuthorizeException, IOException, SQLException, BrowseException, SortException {
@@ -54,15 +52,13 @@ public class BrowseController {
                 request.setAttribute("dspace.community", dSpaceObject);
             }
         }
-        return getBrowseItems(model, request, response);
+        return getBrowseItems(model, request, response, dspaceContext);
     }
 
     @RequestMapping("/browse")
-    public ModelAndView getBrowseItems(ModelAndView model, HttpServletRequest request, HttpServletResponse response) throws SQLException, SortException, ServletException, IOException, AuthorizeException {
+    public ModelAndView getBrowseItems(ModelAndView model, HttpServletRequest request, HttpServletResponse response, Context dspaceContext) throws SQLException, SortException, ServletException, IOException, AuthorizeException {
         String type = request.getParameter("type");
         String value = request.getParameter("value");
-
-        Context dspaceContext = UIUtil.obtainContext(request);
 
         BrowseInfo browseInfo = new BrowseContext().getBrowseInfo(dspaceContext, request, response);
         Boolean isExtendedTable = false;
@@ -76,7 +72,7 @@ public class BrowseController {
         }
 
         browseRequestProcessor.fillModelWithData(model, items, browseInfo, request, isExtendedTable);
-
+        dspaceContext.complete();
         return model;
     }
 

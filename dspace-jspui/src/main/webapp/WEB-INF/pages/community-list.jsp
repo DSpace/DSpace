@@ -1,5 +1,7 @@
 <%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
 <%@ page import="org.dspace.app.webui.servlet.admin.EditCommunitiesServlet" %>
+<%@ page import="org.dspace.core.Context" %>
+<%@ page import="org.dspace.app.webui.util.UIUtil" %>
 <%@ page contentType="text/html;charset=UTF-8" %>
 
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
@@ -10,10 +12,6 @@
 <%@ taglib prefix="C" uri="http://java.sun.com/jsp/jstl/core" %>
 
 <%@taglib prefix="essuir" tagdir="/WEB-INF/tags/essuir"%>
-
-<%
-    org.dspace.core.Context context = org.dspace.app.webui.util.UIUtil.obtainContext(request);
-%>
 
 <dspace:layout locbar="commLink" titlekey="jsp.community-list.title" feedData="NONE">
     <c:if test="${isAdmin}">
@@ -53,3 +51,8 @@
         </ul>
     </div>
 </dspace:layout>
+<%
+    // Obtain DSpace context
+    Context context = UIUtil.obtainContext(request);
+    context.complete();
+%>

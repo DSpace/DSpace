@@ -10,6 +10,7 @@
 <%@ page import="org.apache.commons.lang.StringUtils" %>
 <%@page import="org.dspace.core.Utils"%>
 <%@ page import="com.coverity.security.Escape" %>
+<%@ page import="org.dspace.core.Context" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
@@ -316,3 +317,9 @@
     </dspace:sidebar>
 
 </dspace:layout>
+
+<%
+    // Obtain DSpace context
+    Context context = UIUtil.obtainContext(request);
+    context.complete();
+%>
