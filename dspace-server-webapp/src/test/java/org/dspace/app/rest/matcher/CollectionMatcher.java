@@ -84,7 +84,9 @@ public class CollectionMatcher {
                 "logo",
                 "mappedItems",
                 "parentCommunity",
-                "self"
+                "self",
+                "adminGroup"
+
         );
     }
 
