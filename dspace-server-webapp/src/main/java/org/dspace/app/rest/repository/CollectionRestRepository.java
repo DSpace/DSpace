@@ -115,6 +115,8 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
                 return converter.toRestPage(collections, pageable, total, utils.obtainProjection());
             } else {
                 List<Collection> collections = new LinkedList<Collection>();
+                // search for all the collections and let the SOLR security plugins to limit
+                // what is returned to what the user can see
                 DiscoverQuery discoverQuery = new DiscoverQuery();
                 discoverQuery.setDSpaceObjectFilter(IndexableCollection.TYPE);
                 discoverQuery.setStart(Math.toIntExact(pageable.getOffset()));

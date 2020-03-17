@@ -60,6 +60,8 @@ public class CommunityCollectionLinkRepository extends AbstractDSpaceRestReposit
             if (community == null) {
                 throw new ResourceNotFoundException("No such community: " + communityId);
             }
+            // search for all the collections direct children of our community
+            // and let the SOLR security plugins to limit what is returned to what the user can see
             Pageable pageable = utils.getPageable(optionalPageable);
             List<Collection> collections = new LinkedList<Collection>();
             IndexObjectFactoryFactory indexObjectFactory = IndexObjectFactoryFactory.getInstance();

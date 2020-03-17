@@ -17,8 +17,12 @@ import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.core.Context;
 import org.dspace.discovery.indexobject.IndexableDSpaceObject;
-
-public class SolrServiceCommunityCollectionItemFilterPlugin implements SolrServiceIndexPlugin {
+/**
+ * Indexes the UUID of the parent object for any Community, Collection and Item
+ * 
+ * @author Mykhaylo Boychuk (mykhaylo.boychuk at 4science.it)
+ */
+public class SolrServiceParentObjectIndexingPlugin implements SolrServiceIndexPlugin {
 
     @Override
     public void additionalIndex(Context context, IndexableObject idxObj, SolrInputDocument document) {

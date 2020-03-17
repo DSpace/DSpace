@@ -65,6 +65,7 @@ public class CommunitySubcommunityLinkRepository extends AbstractDSpaceRestRepos
             DiscoverQuery discoverQuery = new DiscoverQuery();
             discoverQuery.setQuery("*:*");
             discoverQuery.setDSpaceObjectFilter(IndexableCommunity.TYPE);
+            discoverQuery.addFilterQueries("location.parent:" + communityId);
             discoverQuery.setStart(Math.toIntExact(pageable.getOffset()));
             discoverQuery.setMaxResults(pageable.getPageSize());
             DiscoverResult resp = searchService.search(context, scopeObject, discoverQuery);
