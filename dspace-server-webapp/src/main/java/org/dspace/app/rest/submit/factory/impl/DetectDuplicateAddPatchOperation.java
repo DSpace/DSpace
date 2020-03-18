@@ -103,7 +103,7 @@ public class DetectDuplicateAddPatchOperation extends AddPatchOperation<Duplicat
                         String.format("The specified decision %s is not valid", decisionObject.getValue()));
             }
         } catch (IllegalArgumentException e) {
-            throw new UnprocessableEntityException(String.format("The specified decision is not valid", e));
+            throw new UnprocessableEntityException(String.format("The specified decision %s is not valid", subPath));
         }
 
         if (!dedupUtils.matchExist(context, currentItemID, duplicateItemID, resourceType, null, isInWorkflow)) {
