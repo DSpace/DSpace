@@ -33,7 +33,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.view.RedirectView;
 import org.ssu.entity.GoogleMetadataTagGenerator;
 import org.ssu.entity.response.BitstreamResponse;
@@ -41,14 +40,12 @@ import org.ssu.entity.response.CountedCommunityResponse;
 import org.ssu.entity.response.CountryStatisticsResponse;
 import org.ssu.entity.response.ItemResponse;
 import org.ssu.service.*;
-import org.ssu.service.localization.AuthorsCache;
 import org.ssu.service.statistics.EssuirStatistics;
 
 import javax.annotation.Resource;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
@@ -207,7 +204,7 @@ public class HandleController {
     }
 
     @RequestMapping("/item-download/{itemId}/{bitstreamId}")
-    public RedirectView downloadBitstream(HttpServletRequest request, RedirectAttributes attributes, @PathVariable("itemId") UUID itemId, @PathVariable("bitstreamId") UUID bitstreamId) throws SQLException {
+    public RedirectView downloadBitstream(HttpServletRequest request, @PathVariable("itemId") UUID itemId, @PathVariable("bitstreamId") UUID bitstreamId) throws SQLException {
         Context dspaceContext = UIUtil.obtainContext(request);
         Function<Bitstream, String> getLinkForBitstream = (bitstream) -> {
             try {
@@ -222,8 +219,9 @@ public class HandleController {
         };
 
         Bitstream bitstream = ContentServiceFactory.getInstance().getBitstreamService().find(dspaceContext, bitstreamId);
-        attributes.addFlashAttribute("dspace.context", dspaceContext);
-        return new RedirectView(getLinkForBitstream.apply(bitstream));
+        RedirectView redirectView = new RedirectView(getLinkForBitstream.apply(bitstream));
+        dspaceContext.complete();
+        return redirectView;
     }
 
     private ModelAndView displayItem(HttpServletRequest request, ModelAndView model, Item item, Locale locale, Context dspaceContext) throws SQLException, IOException, CrosswalkException, AuthorizeException {
