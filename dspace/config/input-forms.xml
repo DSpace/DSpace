@@ -836,7 +836,20 @@
 					<type-bind>Libro,Objeto de aprendizaje</type-bind>
 					<visibility-on-group>Bibliotecarios</visibility-on-group>
 				</field>
-				
+
+				<!-- Traductor de un artículo -->
+				<field>
+					<dc-schema>sedici</dc-schema>
+					<dc-element>contributor</dc-element>
+					<dc-qualifier>translator</dc-qualifier>
+					<repeatable>true</repeatable>
+					<label>Traductor del artículo</label>
+					<input-type>onebox</input-type>
+					<hint>Traductores del artículo</hint>
+					<type-bind>Articulo</type-bind>
+					<visibility-on-group>Bibliotecarios</visibility-on-group>
+				</field>
+
 				<!-- Editor de publicación - Solo publicacion periódica -->
 <!-- TO-DO : deshabilitado temporalmente. Habilitar una vez solucionado el ticket #3329 e incluido el commit en rama master de sedici/DSpace-SEDICI-svn	 -->
 <!-- 				<field> -->
