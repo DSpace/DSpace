@@ -19,5 +19,6 @@ import org.dspace.core.Context;
  */
 public interface SolrServiceSearchPlugin {
 
-    public void additionalSearchParameters(Context context, DiscoverQuery discoveryQuery, SolrQuery solrQuery);
+    public void additionalSearchParameters(Context context, DiscoverQuery discoveryQuery, SolrQuery solrQuery)
+            throws SearchServiceException;
 }
