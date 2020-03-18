@@ -19,7 +19,7 @@
     <properties>
         <!-- This is the path to the root [dspace-src] directory. -->
         <root.basedir>${basedir}/..</root.basedir>
-        <spring-security.version>5.2.4.RELEASE</spring-security.version>
+        <spring-security.version>5.2.2.RELEASE</spring-security.version>
     </properties>
     <build>
         <plugins>
@@ -104,7 +104,7 @@
             <version>${jackson.version}</version>
         </dependency>
 
-        <!-- Spring 3 dependencies -->
+        <!-- Spring dependencies -->
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-core</artifactId>
@@ -123,9 +123,10 @@
         <!-- Jersey + Spring -->
         <dependency>
             <groupId>org.glassfish.jersey.ext</groupId>
-            <artifactId>jersey-spring4</artifactId>
+            <artifactId>jersey-spring5</artifactId>
             <version>${jersey.version}</version>
             <exclusions>
+                <!-- We provide our own version of Spring framework dependencies -->
                 <exclusion>
                     <groupId>org.springframework</groupId>
                     <artifactId>spring</artifactId>
@@ -149,6 +150,11 @@
                 <exclusion>
                     <groupId>org.springframework</groupId>
                     <artifactId>spring-aop</artifactId>
+                </exclusion>
+                <!-- Newer version provided by jersey-server above -->
+                <exclusion>
+                    <groupId>jakarta.annotation</groupId>
+                    <artifactId>jakarta.annotation-api</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
