@@ -18,6 +18,7 @@ import org.apache.logging.log4j.Logger;
 import org.dspace.app.util.DCInputsReader;
 import org.dspace.app.util.DCInputsReaderException;
 import org.dspace.content.Collection;
+import org.dspace.core.SelfNamedPlugin;
 
 /**
  * This authority is registered automatically by the ChoiceAuthorityService for
@@ -51,23 +52,32 @@ public class InputFormSelfRegisterWrapperAuthority implements ChoiceAuthority {
 
     @Override
     public Choices getMatches(String field, String query, Collection collection, int start, int limit, String locale) {
+        return getMatches(null, field, query, collection, start, limit, locale);
+    }
+
+    @Override
+    public Choices getMatches(String authorityName, String field, String query, Collection collection,
+            int start, int limit, String locale) {
         String formName;
+        Choices choices = null;
         try {
             init();
             if (collection == null) {
-                Set<Choice> choices = new HashSet<Choice>();
-                //workaround search in all authority configured
+                // workaround search in all authority configured
                 for (ChoiceAuthority ca : delegates.values()) {
+                    // if authority name is present skip authority that doesn't match
+                    if (StringUtils.isNotBlank(authorityName) &&
+                            !(((SelfNamedPlugin) ca).getPluginInstanceName().equals(authorityName))) {
+                        continue;
+                    }
                     Choices tmp = ca.getMatches(field, query, null, start, limit, locale);
                     if (tmp.total > 0) {
-                        Set<Choice> mySet = new HashSet<Choice>(Arrays.asList(tmp.values));
-                        choices.addAll(mySet);
+                        choices = tmp;
+                        break;
                     }
                 }
-                if (!choices.isEmpty()) {
-                    Choice[] results = new Choice[choices.size()];
-                    choices.toArray(results);
-                    return new Choices(results, 0, choices.size(), Choices.CF_AMBIGUOUS, false);
+                if (choices != null) {
+                    return choices;
                 }
             } else {
                 formName = dci.getInputFormNameByCollectionAndField(collection, field);
@@ -116,7 +126,7 @@ public class InputFormSelfRegisterWrapperAuthority implements ChoiceAuthority {
         // different value
         for (ChoiceAuthority delegate : delegates.values()) {
             String label = delegate.getLabel(field, key, locale);
-            if (StringUtils.isNotBlank(label)) {
+            if (StringUtils.isNotBlank(label) && !label.startsWith("UNKNOWN KEY ")) {
                 return label;
             }
         }

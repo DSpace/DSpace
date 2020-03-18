@@ -15,6 +15,11 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.when;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -28,15 +33,14 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 
-import mockit.NonStrictExpectations;
 import org.apache.commons.lang3.time.DateUtils;
 import org.apache.logging.log4j.Logger;
-import org.dspace.app.util.AuthorizeUtil;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.ResourcePolicy;
+import org.dspace.authorize.factory.AuthorizeServiceFactory;
+import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamFormatService;
-import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.MetadataFieldService;
 import org.dspace.content.service.MetadataSchemaService;
 import org.dspace.core.Constants;
@@ -46,6 +50,7 @@ import org.dspace.eperson.Group;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.test.util.ReflectionTestUtils;
 
 /**
  * Unit Tests for class Item
@@ -70,10 +75,14 @@ public class ItemTest extends AbstractDSpaceObjectTest {
                                                                                  .getBitstreamFormatService();
     private MetadataFieldService metadataFieldService = ContentServiceFactory.getInstance().getMetadataFieldService();
 
-    private CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
-
     private Collection collection;
     private Community owningCommunity;
+
+    /**
+     * Spy of AuthorizeService to use for tests
+     * (initialized / setup in @Before method)
+     */
+    private AuthorizeService authorizeServiceSpy;
 
 
     /**
@@ -92,14 +101,24 @@ public class ItemTest extends AbstractDSpaceObjectTest {
             context.turnOffAuthorisationSystem();
             this.owningCommunity = communityService.create(null, context);
             this.collection = collectionService.create(context, owningCommunity);
-            WorkspaceItem workspaceItem = workspaceItemService.create(context, collection, false);
+            WorkspaceItem workspaceItem = workspaceItemService.create(context, collection, true);
             this.it = installItemService.installItem(context, workspaceItem);
-
-            it.setSubmitter(context.getCurrentUser());
-            itemService.update(context, it);
             this.dspaceObject = it;
-            //we need to commit the changes so we don't block the table for testing
             context.restoreAuthSystemState();
+
+            // Initialize our spy of the autowired (global) authorizeService bean.
+            // This allows us to customize the bean's method return values in tests below
+            authorizeServiceSpy = spy(authorizeService);
+            // "Wire" our spy to be used by the current loaded object services
+            // (To ensure these services use the spy instead of the real service)
+            ReflectionTestUtils.setField(collectionService, "authorizeService", authorizeServiceSpy);
+            ReflectionTestUtils.setField(itemService, "authorizeService", authorizeServiceSpy);
+            ReflectionTestUtils.setField(workspaceItemService, "authorizeService", authorizeServiceSpy);
+            ReflectionTestUtils.setField(bundleService, "authorizeService", authorizeServiceSpy);
+            ReflectionTestUtils.setField(bitstreamService, "authorizeService", authorizeServiceSpy);
+            // Also wire into current AuthorizeServiceFactory, as that is used for some checks (e.g. AuthorizeUtil)
+            ReflectionTestUtils.setField(AuthorizeServiceFactory.getInstance(), "authorizeService",
+                                         authorizeServiceSpy);
         } catch (AuthorizeException ex) {
             log.error("Authorization Error in init", ex);
             fail("Authorization Error in init: " + ex.getMessage());
@@ -169,15 +188,9 @@ public class ItemTest extends AbstractDSpaceObjectTest {
      */
     @Test
     public void testCreate() throws Exception {
-        new NonStrictExpectations(authorizeService.getClass()) {{
-            // Allow Item ADD perms (needed to create an Item)
-            authorizeService.authorizeAction((Context) any, (Collection) any,
-                                             Constants.ADD);
-            result = null;
-            authorizeService.authorizeAction((Context) any, (Collection) any,
-                                             Constants.WRITE);
-            result = null;
-        }};
+        // Allow Collection WRITE perms
+        doNothing().when(authorizeServiceSpy).authorizeAction(context, collection, Constants.ADD);
+
         Item created = createItem();
         assertThat("testCreate 0", created, notNullValue());
         assertThat("testCreate 1", created.getName(), nullValue());
@@ -239,7 +252,7 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         Iterator<Item> all = itemService.findInArchiveOrWithdrawnDiscoverableModifiedSince(context,
                 DateUtils.addDays(it.getLastModified(),1));
         assertThat("Returned list should not be null", all, notNullValue());
-         boolean added = false;
+        boolean added = false;
         while (all.hasNext()) {
             Item tmp = all.next();
             if (tmp.equals(it)) {
@@ -252,7 +265,7 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         all = itemService.findInArchiveOrWithdrawnDiscoverableModifiedSince(context,
                 DateUtils.addDays(it.getLastModified(),-1));
         assertThat("Returned list should not be null", all, notNullValue());
-         added = false;
+        added = false;
         while (all.hasNext()) {
             Item tmp = all.next();
             if (tmp.equals(it)) {
@@ -268,7 +281,7 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         all = itemService.findInArchiveOrWithdrawnDiscoverableModifiedSince(context,
                 DateUtils.addDays(it.getLastModified(),-1));
         assertThat("Returned list should not be null", all, notNullValue());
-         added = false;
+        added = false;
         while (all.hasNext()) {
             Item tmp = all.next();
             if (tmp.equals(it)) {
@@ -282,7 +295,7 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         all = itemService.findInArchiveOrWithdrawnDiscoverableModifiedSince(context,
                 DateUtils.addDays(it.getLastModified(),-1));
         assertThat("Returned list should not be null", all, notNullValue());
-         added = false;
+        added = false;
         while (all.hasNext()) {
             Item tmp = all.next();
             if (tmp.equals(it)) {
@@ -291,7 +304,8 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         }
         // Test 7: We should not find our item in this list
         assertFalse("List should not contain non-discoverable items", added);
-     }
+    }
+
      /**
      * Test of findInArchiveOrWithdrawnNonDiscoverableModifiedSince method, of class Item.
      */
@@ -305,7 +319,7 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         Iterator<Item> all = itemService.findInArchiveOrWithdrawnNonDiscoverableModifiedSince(context,
                 DateUtils.addDays(it.getLastModified(),1));
         assertThat("Returned list should not be null", all, notNullValue());
-         boolean added = false;
+        boolean added = false;
         while (all.hasNext()) {
             Item tmp = all.next();
             if (tmp.equals(it)) {
@@ -318,7 +332,7 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         all = itemService.findInArchiveOrWithdrawnNonDiscoverableModifiedSince(context,
                 DateUtils.addDays(it.getLastModified(),-1));
         assertThat("Returned list should not be null", all, notNullValue());
-         added = false;
+        added = false;
         while (all.hasNext()) {
             Item tmp = all.next();
             if (tmp.equals(it)) {
@@ -333,7 +347,7 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         all = itemService.findInArchiveOrWithdrawnNonDiscoverableModifiedSince(context,
                 DateUtils.addDays(it.getLastModified(),-1));
         assertThat("Returned list should not be null", all, notNullValue());
-         added = false;
+        added = false;
         while (all.hasNext()) {
             Item tmp = all.next();
             if (tmp.equals(it)) {
@@ -787,13 +801,8 @@ public class ItemTest extends AbstractDSpaceObjectTest {
      */
     @Test
     public void testCreateBundleAuth() throws Exception {
-        new NonStrictExpectations(authorizeService.getClass()) {{
-            // Allow Item ADD perms
-            authorizeService.authorizeAction((Context) any, (Item) any,
-                                             Constants.ADD);
-            result = null;
-
-        }};
+        // Allow Item ADD perms
+        doNothing().when(authorizeServiceSpy).authorizeAction(context, it, Constants.ADD);
 
         String name = "bundle";
         Bundle created = bundleService.create(context, it, name);
@@ -808,16 +817,7 @@ public class ItemTest extends AbstractDSpaceObjectTest {
      */
     @Test(expected = SQLException.class)
     public void testCreateBundleNoName() throws Exception {
-        new NonStrictExpectations(authorizeService.getClass()) {{
-            // Allow Item ADD perms
-            authorizeService.authorizeAction((Context) any, (Item) any,
-                                             Constants.ADD);
-            result = null;
-
-        }};
-
-        String name = "";
-        Bundle created = bundleService.create(context, it, name);
+        bundleService.create(context, it, "");
         fail("Exception expected");
     }
 
@@ -825,36 +825,18 @@ public class ItemTest extends AbstractDSpaceObjectTest {
      * Test of createBundle method, of class Item.
      */
     @Test(expected = SQLException.class)
-    public void testCreateBundleNoName2() throws Exception {
-        new NonStrictExpectations(authorizeService.getClass()) {{
-            // Allow Item ADD perms
-            authorizeService.authorizeAction((Context) any, (Item) any,
-                                             Constants.ADD);
-            result = null;
-
-        }};
-
-        String name = null;
-        Bundle created = bundleService.create(context, it, name);
+    public void testCreateBundleNullName() throws Exception {
+        bundleService.create(context, it, null);
         fail("Exception expected");
     }
-
 
     /**
      * Test of createBundle method, of class Item.
      */
     @Test(expected = AuthorizeException.class)
     public void testCreateBundleNoAuth() throws Exception {
-        new NonStrictExpectations(authorizeService.getClass()) {{
-            // Disallow Item ADD perms
-            authorizeService.authorizeAction((Context) any, (Item) any,
-                                             Constants.ADD);
-            result = new AuthorizeException();
-
-        }};
-
         String name = "bundle";
-        Bundle created = bundleService.create(context, it, name);
+        bundleService.create(context, it, name);
         fail("Exception expected");
     }
 
@@ -863,17 +845,13 @@ public class ItemTest extends AbstractDSpaceObjectTest {
      */
     @Test
     public void testAddBundleAuth() throws Exception {
-        new NonStrictExpectations(authorizeService.getClass()) {{
-            // Allow Item ADD perms
-            authorizeService.authorizeAction((Context) any, (Item) any,
-                                             Constants.ADD);
-            result = null;
-
-        }};
+        // Allow Item ADD perms
+        doNothing().when(authorizeServiceSpy).authorizeAction(context, it, Constants.ADD);
 
         String name = "bundle";
         Bundle created = bundleService.create(context, it, name);
         created.setName(context, name);
+        itemService.addBundle(context, it, created);
 
         assertThat("testAddBundleAuth 0", itemService.getBundles(it, name), notNullValue());
         assertTrue("testAddBundleAuth 1", itemService.getBundles(it, name).size() == 1);
@@ -885,19 +863,10 @@ public class ItemTest extends AbstractDSpaceObjectTest {
      */
     @Test(expected = AuthorizeException.class)
     public void testAddBundleNoAuth() throws Exception {
-        new NonStrictExpectations(authorizeService.getClass()) {{
-            // Disallow Item ADD perms
-            authorizeService.authorizeAction((Context) any, (Item) any,
-                                             Constants.ADD);
-            result = new AuthorizeException();
-
-        }};
-
         String name = "bundle";
         Bundle created = bundleService.create(context, it, name);
         created.setName(context, name);
-
-        it.addBundle(created);
+        itemService.addBundle(context, it, created);
         fail("Exception expected");
     }
 
@@ -906,23 +875,18 @@ public class ItemTest extends AbstractDSpaceObjectTest {
      */
     @Test
     public void testRemoveBundleAuth() throws Exception {
-        new NonStrictExpectations(authorizeService.getClass()) {{
-            // Allow Item ADD and REMOVE perms
-            authorizeService.authorizeAction((Context) any, (Item) any,
-                                             Constants.ADD);
-            result = null;
-            authorizeService.authorizeAction((Context) any, (Item) any,
-                                             Constants.REMOVE);
-            result = null;
-            authorizeService.authorizeAction((Context) any, (Item) any,
-                                             Constants.DELETE);
-            result = null;
-        }};
-
+        // First create a bundle for test
+        context.turnOffAuthorisationSystem();
         String name = "bundle";
         Bundle created = bundleService.create(context, it, name);
         created.setName(context, name);
         itemService.addBundle(context, it, created);
+        context.restoreAuthSystemState();
+
+        // Allow Item REMOVE perms
+        doNothing().when(authorizeServiceSpy).authorizeAction(context, it, Constants.REMOVE);
+        // Allow Bundle DELETE
+        doNothing().when(authorizeServiceSpy).authorizeAction(context, created, Constants.DELETE);
 
         itemService.removeBundle(context, it, created);
         assertThat("testRemoveBundleAuth 0", itemService.getBundles(it, name), notNullValue());
@@ -934,21 +898,13 @@ public class ItemTest extends AbstractDSpaceObjectTest {
      */
     @Test(expected = AuthorizeException.class)
     public void testRemoveBundleNoAuth() throws Exception {
-        new NonStrictExpectations(authorizeService.getClass()) {{
-            // Allow Item ADD perms
-            authorizeService.authorizeAction((Context) any, (Item) any,
-                                             Constants.ADD);
-            result = null;
-            // Disallow Item REMOVE perms
-            authorizeService.authorizeAction((Context) any, (Item) any,
-                                             Constants.REMOVE);
-            result = new AuthorizeException();
-        }};
-
+        // First create a bundle for test
+        context.turnOffAuthorisationSystem();
         String name = "bundle";
         Bundle created = bundleService.create(context, it, name);
         created.setName(context, name);
-        it.addBundle(created);
+        itemService.addBundle(context, it, created);
+        context.restoreAuthSystemState();
 
         itemService.removeBundle(context, it, created);
         fail("Exception expected");
@@ -959,15 +915,15 @@ public class ItemTest extends AbstractDSpaceObjectTest {
      */
     @Test
     public void testCreateSingleBitstream_InputStream_StringAuth() throws Exception {
-        new NonStrictExpectations(authorizeService.getClass()) {{
-            // Allow Item ADD perms
-            authorizeService.authorizeAction((Context) any, (Item) any,
-                                             Constants.ADD);
-            result = null;
-            authorizeService.authorizeAction((Context) any, (Item) any,
-                                             Constants.WRITE, true);
-            result = null;
-        }};
+        // Allow Item ADD perms
+        doNothing().when(authorizeServiceSpy).authorizeAction(context, it, Constants.ADD);
+        // Allow Item WRITE perms
+        doNothing().when(authorizeServiceSpy).authorizeAction(context, it, Constants.WRITE, true);
+        // Allow Bundle ADD perms
+        doNothing().when(authorizeServiceSpy).authorizeAction(any(Context.class), any(Bundle.class), eq(Constants.ADD));
+        // Allow Bitstream WRITE perms
+        doNothing().when(authorizeServiceSpy)
+                   .authorizeAction(any(Context.class), any(Bitstream.class), eq(Constants.WRITE));
 
         String name = "new bundle";
         File f = new File(testProps.get("test.bitstream").toString());
@@ -980,17 +936,9 @@ public class ItemTest extends AbstractDSpaceObjectTest {
      */
     @Test(expected = AuthorizeException.class)
     public void testCreateSingleBitstream_InputStream_StringNoAuth() throws Exception {
-        new NonStrictExpectations(authorizeService.getClass()) {{
-            // Disallow Item ADD perms
-            authorizeService.authorizeAction((Context) any, (Item) any,
-                                             Constants.ADD);
-            result = new AuthorizeException();
-
-        }};
-
         String name = "new bundle";
         File f = new File(testProps.get("test.bitstream").toString());
-        Bitstream result = itemService.createSingleBitstream(context, new FileInputStream(f), it, name);
+        itemService.createSingleBitstream(context, new FileInputStream(f), it, name);
         fail("Exception expected");
     }
 
@@ -999,16 +947,16 @@ public class ItemTest extends AbstractDSpaceObjectTest {
      */
     @Test
     public void testCreateSingleBitstream_InputStreamAuth() throws Exception {
-        new NonStrictExpectations(authorizeService.getClass()) {{
-            // Allow Item ADD perms
-            authorizeService.authorizeAction((Context) any, (Item) any,
-                                             Constants.ADD);
-            result = null;
-            authorizeService.authorizeAction((Context) any, (Item) any,
-                                             Constants.WRITE, true);
-            result = null;
+        // Allow Item ADD perms
+        doNothing().when(authorizeServiceSpy).authorizeAction(context, it, Constants.ADD);
+        // Allow Item WRITE perms
+        doNothing().when(authorizeServiceSpy).authorizeAction(context, it, Constants.WRITE, true);
+        // Allow Bundle ADD perms
+        doNothing().when(authorizeServiceSpy).authorizeAction(any(Context.class), any(Bundle.class), eq(Constants.ADD));
+        // Allow Bitstream WRITE perms
+        doNothing().when(authorizeServiceSpy)
+                   .authorizeAction(any(Context.class), any(Bitstream.class), eq(Constants.WRITE));
 
-        }};
 
         File f = new File(testProps.get("test.bitstream").toString());
         Bitstream result = itemService.createSingleBitstream(context, new FileInputStream(f), it);
@@ -1020,16 +968,8 @@ public class ItemTest extends AbstractDSpaceObjectTest {
      */
     @Test(expected = AuthorizeException.class)
     public void testCreateSingleBitstream_InputStreamNoAuth() throws Exception {
-        new NonStrictExpectations(authorizeService.getClass()) {{
-            // Disallow Item ADD perms
-            authorizeService.authorizeAction((Context) any, (Item) any,
-                                             Constants.ADD);
-            result = new AuthorizeException();
-
-        }};
-
         File f = new File(testProps.get("test.bitstream").toString());
-        Bitstream result = itemService.createSingleBitstream(context, new FileInputStream(f), it);
+        itemService.createSingleBitstream(context, new FileInputStream(f), it);
         fail("Expected exception");
     }
 
@@ -1047,23 +987,17 @@ public class ItemTest extends AbstractDSpaceObjectTest {
      */
     @Test
     public void testRemoveDSpaceLicenseAuth() throws Exception {
-        new NonStrictExpectations(authorizeService.getClass()) {{
-            // Allow Item ADD and REMOVE perms
-            authorizeService.authorizeAction((Context) any, (Item) any,
-                                             Constants.ADD);
-            result = null;
-            authorizeService.authorizeAction((Context) any, (Item) any,
-                                             Constants.REMOVE);
-            result = null;
-            authorizeService.authorizeAction((Context) any, (Item) any,
-                                             Constants.DELETE);
-            result = null;
-        }};
-
+        // First create a bundle for test
+        context.turnOffAuthorisationSystem();
         String name = "LICENSE";
         Bundle created = bundleService.create(context, it, name);
         created.setName(context, name);
-//        it.addBundle(created);
+        context.restoreAuthSystemState();
+
+        // Allow Item REMOVE perms
+        doNothing().when(authorizeServiceSpy).authorizeAction(context, it, Constants.REMOVE);
+        // Allow Bundle DELETE perms
+        doNothing().when(authorizeServiceSpy).authorizeAction(context, created, Constants.DELETE);
 
         itemService.removeDSpaceLicense(context, it);
         assertThat("testRemoveDSpaceLicenseAuth 0", itemService.getBundles(it, name), notNullValue());
@@ -1075,20 +1009,12 @@ public class ItemTest extends AbstractDSpaceObjectTest {
      */
     @Test(expected = AuthorizeException.class)
     public void testRemoveDSpaceLicenseNoAuth() throws Exception {
-        new NonStrictExpectations(authorizeService.getClass()) {{
-            // Allow Item ADD perms
-            authorizeService.authorizeAction((Context) any, (Item) any,
-                                             Constants.ADD);
-            result = null;
-            // Disallow Item REMOVE perms
-            authorizeService.authorizeAction((Context) any, (Item) any,
-                                             Constants.REMOVE);
-            result = new AuthorizeException();
-        }};
-
+        // First create a bundle for test
+        context.turnOffAuthorisationSystem();
         String name = "LICENSE";
         Bundle created = bundleService.create(context, it, name);
         created.setName(context, name);
+        context.restoreAuthSystemState();
 
         itemService.removeDSpaceLicense(context, it);
         fail("Exception expected");
@@ -1099,23 +1025,8 @@ public class ItemTest extends AbstractDSpaceObjectTest {
      */
     @Test
     public void testRemoveLicensesAuth() throws Exception {
-        new NonStrictExpectations(authorizeService.getClass()) {{
-            // Allow Item ADD and REMOVE perms
-            authorizeService.authorizeAction((Context) any, (Item) any,
-                                             Constants.ADD);
-            result = null;
-            authorizeService.authorizeAction((Context) any, (Item) any,
-                                             Constants.REMOVE);
-            result = null;
-            authorizeService.authorizeAction((Context) any, (Item) any,
-                                             Constants.WRITE);
-            result = null;
-            authorizeService.authorizeAction(context, (Bitstream) any,
-                                             Constants.DELETE);
-            result = null;
-
-        }};
-
+        // First create test content
+        context.turnOffAuthorisationSystem();
         String name = "LICENSE";
         Bundle created = bundleService.create(context, it, name);
         created.setName(context, name);
@@ -1125,7 +1036,18 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         Bitstream result = itemService.createSingleBitstream(context, new FileInputStream(f), it, bsname);
         bitstreamService.setFormat(context, result, bitstreamFormatService.findByShortDescription(context, bsname));
         bundleService.addBitstream(context, created, result);
+        context.restoreAuthSystemState();
 
+        // Allow Item REMOVE perms
+        doNothing().when(authorizeServiceSpy).authorizeAction(context, it, Constants.REMOVE);
+        // Allow Item WRITE perms
+        doNothing().when(authorizeServiceSpy).authorizeAction(context, it, Constants.WRITE);
+        // Allow Bundle REMOVE perms
+        doNothing().when(authorizeServiceSpy).authorizeAction(context, created, Constants.REMOVE);
+        // Allow Bundle DELETE perms
+        doNothing().when(authorizeServiceSpy).authorizeAction(context, created, Constants.DELETE);
+        // Allow Bitstream DELETE perms
+        doNothing().when(authorizeServiceSpy).authorizeAction(context, result, Constants.DELETE);
 
         itemService.removeLicenses(context, it);
         assertThat("testRemoveLicensesAuth 0", itemService.getBundles(it, name), notNullValue());
@@ -1137,17 +1059,8 @@ public class ItemTest extends AbstractDSpaceObjectTest {
      */
     @Test(expected = AuthorizeException.class)
     public void testRemoveLicensesNoAuth() throws Exception {
-        new NonStrictExpectations(authorizeService.getClass()) {
-            {
-                authorizeService.authorizeAction((Context) any, (Item) any,
-                                                 Constants.ADD);
-                result = null;
-                authorizeService.authorizeAction((Context) any, (Item) any,
-                                                 Constants.REMOVE);
-                result = new AuthorizeException();
-            }
-        };
-
+        // First create test content
+        context.turnOffAuthorisationSystem();
         String name = "LICENSE";
         Bundle created = bundleService.create(context, it, name);
         created.setName(context, name);
@@ -1157,6 +1070,7 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         Bitstream result = itemService.createSingleBitstream(context, new FileInputStream(f), it, bsname);
         bitstreamService.setFormat(context, result, bitstreamFormatService.findByShortDescription(context, bsname));
         bundleService.addBitstream(context, created, result);
+        context.restoreAuthSystemState();
 
         itemService.removeLicenses(context, it);
         fail("Exception expected");
@@ -1167,15 +1081,9 @@ public class ItemTest extends AbstractDSpaceObjectTest {
      */
     @Test
     public void testUpdateAuth() throws Exception {
-        new NonStrictExpectations(authorizeService.getClass()) {{
-            // Allow Item WRITE perms
-            authorizeService.authorizeAction((Context) any, (Item) any,
-                                             Constants.WRITE);
-            result = null;
+        // Allow Item WRITE perms
+        doNothing().when(authorizeServiceSpy).authorizeAction(context, it, Constants.WRITE);
 
-        }};
-
-        //TOOD: how to test?
         itemService.update(context, it);
     }
 
@@ -1184,32 +1092,14 @@ public class ItemTest extends AbstractDSpaceObjectTest {
      */
     @Test
     public void testUpdateAuth2() throws Exception {
-        // Test permission inheritence
-        new NonStrictExpectations(authorizeService.getClass()) {{
-            // Disallow Item WRITE perms
-            authorizeService.authorizeAction((Context) any, (Item) any,
-                                             Constants.WRITE);
-            result = new AuthorizeException();
-            // Allow parent Community WRITE and ADD perms
-            authorizeService.authorizeActionBoolean((Context) any, (Community) any,
-                                                    Constants.WRITE, true);
-            result = true;
-            authorizeService.authorizeActionBoolean((Context) any, (Community) any,
-                                                    Constants.ADD, true);
-            result = true;
-            // Disallow parent Collection WRITE perms
-            authorizeService.authorizeAction((Context) any, (Collection) any,
-                                             Constants.WRITE, true);
-            result = new AuthorizeException();
-
-        }};
-
         context.turnOffAuthorisationSystem();
         Collection c = createCollection();
         it.setOwningCollection(c);
         context.restoreAuthSystemState();
 
-        //TOOD: how to test?
+        // Allow parent Collection WRITE perms (to test inheritance)
+        doNothing().when(authorizeServiceSpy).authorizeAction(context, c, Constants.WRITE, false);
+
         itemService.update(context, it);
     }
 
@@ -1218,31 +1108,11 @@ public class ItemTest extends AbstractDSpaceObjectTest {
      */
     @Test(expected = AuthorizeException.class)
     public void testUpdateNoAuth() throws Exception {
-        // Test permission inheritence
-        new NonStrictExpectations(authorizeService.getClass()) {{
-            // Disallow Item WRITE perms
-            authorizeService.authorizeAction((Context) any, (Item) any,
-                                             Constants.WRITE);
-            result = new AuthorizeException();
-            // Disallow parent Community WRITE or ADD perms
-            authorizeService.authorizeActionBoolean((Context) any, (Community) any,
-                                                    Constants.WRITE, anyBoolean);
-            result = false;
-            authorizeService.authorizeActionBoolean((Context) any, (Community) any,
-                                                    Constants.ADD, anyBoolean);
-            result = false;
-            // Disallow parent Collection WRITE perms
-            authorizeService.authorizeAction((Context) any, (Collection) any,
-                                             Constants.WRITE, anyBoolean);
-            result = new AuthorizeException();
-        }};
-
         context.turnOffAuthorisationSystem();
         Collection c = createCollection();
         it.setOwningCollection(c);
         context.restoreAuthSystemState();
 
-        //TOOD: how to test?
         itemService.update(context, it);
     }
 
@@ -1251,18 +1121,10 @@ public class ItemTest extends AbstractDSpaceObjectTest {
      */
     @Test
     public void testWithdrawAuth() throws Exception {
-        new NonStrictExpectations(AuthorizeUtil.class) {{
-            // Allow Item withdraw permissions
-            AuthorizeUtil.authorizeWithdrawItem((Context) any, (Item) any);
-            result = null;
-        }};
-
-        new NonStrictExpectations(authorizeService.getClass()) {{
-            authorizeService.authorizeAction((Context) any, (Item) any,
-                                             Constants.WRITE);
-            result = null;
-
-        }};
+        // Allow Item WRITE perms
+        doNothing().when(authorizeServiceSpy).authorizeAction(context, it, Constants.WRITE);
+        // Allow Collection ADMIN perms
+        when(authorizeServiceSpy.authorizeActionBoolean(context, collection, Constants.ADMIN)).thenReturn(true);
 
         itemService.withdraw(context, it);
         assertTrue("testWithdrawAuth 0", it.isWithdrawn());
@@ -1273,13 +1135,6 @@ public class ItemTest extends AbstractDSpaceObjectTest {
      */
     @Test(expected = AuthorizeException.class)
     public void testWithdrawNoAuth() throws Exception {
-        new NonStrictExpectations(AuthorizeUtil.class) {{
-            // Disallow Item withdraw permissions
-            AuthorizeUtil.authorizeWithdrawItem((Context) any, (Item) any);
-            result = new AuthorizeException();
-
-        }};
-
         itemService.withdraw(context, it);
         fail("Exception expected");
     }
@@ -1289,21 +1144,16 @@ public class ItemTest extends AbstractDSpaceObjectTest {
      */
     @Test
     public void testReinstateAuth() throws Exception {
-        new NonStrictExpectations(AuthorizeUtil.class) {{
-            AuthorizeUtil.authorizeWithdrawItem((Context) any, (Item) any);
-            result = null;
-            AuthorizeUtil.authorizeReinstateItem((Context) any, (Item) any);
-            result = null;
+        // Allow Item WRITE perms
+        doNothing().when(authorizeServiceSpy).authorizeAction(context, it, Constants.WRITE);
+        // Allow Collection ADD perms (needed to reinstate)
+        doNothing().when(authorizeServiceSpy).authorizeAction(context, collection, Constants.ADD);
 
-        }};
-        new NonStrictExpectations(authorizeService.getClass()) {{
-            // Allow Item withdraw and reinstate permissions
-            authorizeService.authorizeAction((Context) any, (Item) any,
-                                             Constants.WRITE);
-            result = null;
-        }};
-
+        // initialize item as withdrawn
+        context.turnOffAuthorisationSystem();
         itemService.withdraw(context, it);
+        context.restoreAuthSystemState();
+
         itemService.reinstate(context, it);
         assertFalse("testReinstate 0", it.isWithdrawn());
     }
@@ -1313,21 +1163,11 @@ public class ItemTest extends AbstractDSpaceObjectTest {
      */
     @Test(expected = AuthorizeException.class)
     public void testReinstateNoAuth() throws Exception {
-        new NonStrictExpectations(AuthorizeUtil.class) {{
-            // Allow Item withdraw permissions
-            AuthorizeUtil.authorizeWithdrawItem((Context) any, (Item) any);
-            result = null;
-            // Disallow Item reinstate permissions
-            AuthorizeUtil.authorizeReinstateItem((Context) any, (Item) any);
-            result = new AuthorizeException();
-        }};
-        new NonStrictExpectations(authorizeService.getClass()) {{
-            authorizeService.authorizeAction((Context) any, (Item) any,
-                                             Constants.WRITE);
-            result = null;
-        }};
-
+        // initialize item as withdrawn
+        context.turnOffAuthorisationSystem();
         itemService.withdraw(context, it);
+        context.restoreAuthSystemState();
+
         itemService.reinstate(context, it);
         fail("Exception expected");
     }
@@ -1337,21 +1177,20 @@ public class ItemTest extends AbstractDSpaceObjectTest {
      */
     @Test
     public void testDeleteAuth() throws Exception {
-        new NonStrictExpectations(authorizeService.getClass()) {{
-            // Allow Item REMOVE perms
-            authorizeService.authorizeAction((Context) any, (Item) any,
-                                             Constants.REMOVE, true);
-            result = null;
-            authorizeService.authorizeAction((Context) any, (Item) any,
-                                             Constants.DELETE, true);
-            result = null;
-            authorizeService.authorizeAction((Context) any, (Item) any,
-                                             Constants.WRITE);
-            result = null;
-        }};
+        // create a new item to delete
+        context.turnOffAuthorisationSystem();
+        Item item = createItem();
+        context.restoreAuthSystemState();
 
-        UUID id = it.getID();
-        itemService.delete(context, it);
+        // Allow Item REMOVE perms
+        doNothing().when(authorizeServiceSpy).authorizeAction(context, item, Constants.REMOVE, true);
+        // Allow Item DELETE perms
+        doNothing().when(authorizeServiceSpy).authorizeAction(context, item, Constants.DELETE);
+        // Allow Item WRITE perms (required to first delete identifiers)
+        doNothing().when(authorizeServiceSpy).authorizeAction(context, item, Constants.WRITE);
+
+        UUID id = item.getID();
+        itemService.delete(context, item);
         Item found = itemService.find(context, id);
         assertThat("testDeleteAuth 0", found, nullValue());
     }
@@ -1361,13 +1200,6 @@ public class ItemTest extends AbstractDSpaceObjectTest {
      */
     @Test(expected = AuthorizeException.class)
     public void testDeleteNoAuth() throws Exception {
-        new NonStrictExpectations(authorizeService.getClass()) {{
-            // Disallow Item REMOVE perms
-            authorizeService.authorizeAction((Context) any, (Item) any,
-                                             Constants.REMOVE);
-            result = new AuthorizeException();
-        }};
-
         itemService.delete(context, it);
         fail("Exception expected");
     }
@@ -1378,30 +1210,21 @@ public class ItemTest extends AbstractDSpaceObjectTest {
     @Test
     @SuppressWarnings("ObjectEqualsNull")
     public void testEquals() throws SQLException, AuthorizeException, IOException, IllegalAccessException {
-        new NonStrictExpectations(authorizeService.getClass()) {{
-            // Allow Item ADD perms (needed to create an Item)
-            authorizeService.authorizeAction((Context) any, (Collection) any,
-                                             Constants.ADD);
-            result = null;
-            authorizeService.authorizeAction((Context) any, (Item) any,
-                                             Constants.WRITE);
-            result = null;
-            authorizeService.authorizeAction((Context) any, (Item) any,
-                                             Constants.REMOVE);
-            result = null;
-            authorizeService.authorizeAction((Context) any, (Item) any,
-                                             Constants.DELETE);
-            result = null;
-
-        }};
-
         assertFalse("testEquals 0", it.equals(null));
+
+        // create a new item to test against
+        context.turnOffAuthorisationSystem();
         Item item = createItem();
+        context.restoreAuthSystemState();
+
         try {
             assertFalse("testEquals 1", it.equals(item));
             assertTrue("testEquals 2", it.equals(it));
         } finally {
+            //delete item we created
+            context.turnOffAuthorisationSystem();
             itemService.delete(context, item);
+            context.restoreAuthSystemState();
         }
     }
 
@@ -1435,13 +1258,6 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         List<ResourcePolicy> newpolicies = new ArrayList<ResourcePolicy>();
         ResourcePolicy pol1 = resourcePolicyService.create(context);
         newpolicies.add(pol1);
-        new NonStrictExpectations(authorizeService.getClass()) {
-            {
-                authorizeService.authorizeAction((Context) any, (Item) any,
-                                                 Constants.WRITE);
-                result = null;
-            }
-        };
         itemService.replaceAllItemPolicies(context, it, newpolicies);
 
         List<ResourcePolicy> retrieved = authorizeService.getPolicies(context, it);
@@ -1544,13 +1360,8 @@ public class ItemTest extends AbstractDSpaceObjectTest {
 
         context.restoreAuthSystemState();
 
-        new NonStrictExpectations(authorizeService.getClass()) {
-            {
-                authorizeService.authorizeAction((Context) any, (Item) any,
-                                                 Constants.WRITE, true);
-                result = null;
-            }
-        };
+        // Allow Item WRITE perms
+        doNothing().when(authorizeServiceSpy).authorizeAction(context, it, Constants.WRITE, true);
 
         itemService.inheritCollectionDefaultPolicies(context, it, c);
 
@@ -1630,24 +1441,8 @@ public class ItemTest extends AbstractDSpaceObjectTest {
      */
     @Test
     public void testCanEditBooleanAuth() throws Exception {
-        // Test Inheritance of permissions
-        new NonStrictExpectations(authorizeService.getClass()) {{
-            // Allow Item WRITE perms
-            authorizeService.authorizeActionBoolean((Context) any, (Item) any,
-                                                    Constants.WRITE);
-            result = true;
-            // Allow parent Community WRITE and ADD perms
-            authorizeService.authorizeActionBoolean((Context) any, (Community) any,
-                                                    Constants.WRITE, true);
-            result = true;
-            authorizeService.authorizeActionBoolean((Context) any, (Community) any,
-                                                    Constants.ADD, true);
-            result = true;
-            // Allow parent Collection WRITE perms
-            authorizeService.authorizeAction((Context) any, (Collection) any,
-                                             Constants.WRITE, true);
-            result = null;
-        }};
+        // Allow Item WRITE perms
+        when(authorizeServiceSpy.authorizeActionBoolean(context, it, Constants.WRITE)).thenReturn(true);
 
         assertTrue("testCanEditBooleanAuth 0", itemService.canEdit(context, it));
     }
@@ -1657,24 +1452,9 @@ public class ItemTest extends AbstractDSpaceObjectTest {
      */
     @Test
     public void testCanEditBooleanAuth2() throws Exception {
-        // Test Inheritance of permissions
-        new NonStrictExpectations(authorizeService.getClass()) {{
-            // Disallow Item WRITE perms
-            authorizeService.authorizeActionBoolean((Context) any, (Item) any,
-                                                    Constants.WRITE);
-            result = false;
-            // Allow parent Community WRITE and ADD perms
-            authorizeService.authorizeActionBoolean((Context) any, (Community) any,
-                                                    Constants.WRITE, true);
-            result = true;
-            authorizeService.authorizeActionBoolean((Context) any, (Community) any,
-                                                    Constants.ADD, true);
-            result = true;
-            // Allow parent Collection WRITE perms
-            authorizeService.authorizeAction((Context) any, (Collection) any,
-                                             Constants.WRITE, false);
-            result = null;
-        }};
+        // Allow parent Community WRITE perms (test inheritance from community)
+        when(authorizeServiceSpy.authorizeActionBoolean(context, owningCommunity, Constants.WRITE, false))
+            .thenReturn(true);
 
         assertTrue("testCanEditBooleanAuth2 0", itemService.canEdit(context, it));
     }
@@ -1684,23 +1464,14 @@ public class ItemTest extends AbstractDSpaceObjectTest {
      */
     @Test
     public void testCanEditBooleanAuth3() throws Exception {
-        // Test Inheritance of permissions for owning collection
-        new NonStrictExpectations(authorizeService.getClass()) {{
-            // Disallow Item WRITE perms
-            authorizeService.authorizeActionBoolean((Context) any, (Item) any,
-                                                    Constants.WRITE);
-            result = false;
-            // Allow parent Collection WRITE perms
-            authorizeService.authorizeAction((Context) any, (Collection) any,
-                                             Constants.WRITE, false);
-            result = null;
-        }};
-
         // Create a new Collection and assign it as the owner
         context.turnOffAuthorisationSystem();
         Collection c = createCollection();
         it.setOwningCollection(c);
         context.restoreAuthSystemState();
+
+        // Allow parent Collection WRITE perms (test inheritance from new collection)
+        doNothing().when(authorizeServiceSpy).authorizeAction(context, c, Constants.WRITE, false);
 
         // Ensure person with WRITE perms on the Collection can edit item
         assertTrue("testCanEditBooleanAuth3 0", itemService.canEdit(context, it));
@@ -1710,81 +1481,7 @@ public class ItemTest extends AbstractDSpaceObjectTest {
      * Test of canEdit method, of class Item.
      */
     @Test
-    public void testCanEditBooleanAuth4() throws Exception {
-        // Test Inheritance of permissions for Community Admins
-        new NonStrictExpectations(authorizeService.getClass()) {{
-            // Disallow Item WRITE perms
-            authorizeService.authorizeActionBoolean((Context) any, (Item) any,
-                                                    Constants.WRITE);
-            result = false;
-            // Allow parent Community WRITE and ADD perms
-            authorizeService.authorizeActionBoolean((Context) any, (Community) any,
-                                                    Constants.WRITE, true);
-            result = true;
-            authorizeService.authorizeActionBoolean((Context) any, (Community) any,
-                                                    Constants.ADD, false);
-            result = true;
-            // Disallow parent Collection WRITE perms
-            authorizeService.authorizeAction((Context) any, (Collection) any,
-                                             Constants.WRITE, true);
-            result = new AuthorizeException();
-        }};
-
-        // Ensure person with WRITE perms on the Collection can edit item
-        assertTrue("testCanEditBooleanAuth4 0", itemService.canEdit(context, it));
-    }
-
-    /**
-     * Test of canEdit method, of class Item.
-     */
-    @Test
-    public void testCanEditBooleanAuth5() throws Exception {
-        // Test Inheritance of permissions
-        new NonStrictExpectations(authorizeService.getClass()) {{
-            // Disallow Item WRITE perms
-            authorizeService.authorizeAction((Context) any, (Item) any,
-                                             Constants.WRITE);
-            result = new AuthorizeException();
-            // Allow Collection WRITE perms
-            authorizeService.authorizeAction((Context) any, (Collection) any,
-                                             Constants.WRITE, anyBoolean);
-            result = null;
-        }};
-
-        collectionService.createTemplateItem(context, collection);
-        collectionService.update(context, collection);
-        assertTrue("testCanEditBooleanNoAuth5 0", itemService.canEdit(context, collection.getTemplateItem()));
-    }
-
-    /**
-     * Test of canEdit method, of class Item.
-     */
-    @Test
     public void testCanEditBooleanNoAuth() throws Exception {
-        // Test Inheritance of permissions
-        new NonStrictExpectations(authorizeService.getClass()) {{
-            // Disallow Item WRITE perms
-            authorizeService.authorizeActionBoolean((Context) any, (Item) any,
-                                                    Constants.WRITE);
-            result = false;
-            // Disallow parent Community WRITE and ADD perms
-            authorizeService.authorizeActionBoolean((Context) any, (Community) any,
-                                                    Constants.WRITE, anyBoolean);
-            result = false;
-            authorizeService.authorizeActionBoolean((Context) any, (Community) any,
-                                                    Constants.ADD, anyBoolean);
-            result = false;
-            // Disallow parent Collection WRITE perms
-            authorizeService.authorizeAction((Context) any, (Collection) any,
-                                             Constants.WRITE, anyBoolean);
-            result = new AuthorizeException();
-        }};
-
-        context.turnOffAuthorisationSystem();
-        Collection c = createCollection();
-        it.setOwningCollection(c);
-        context.restoreAuthSystemState();
-
         assertFalse("testCanEditBooleanNoAuth 0", itemService.canEdit(context, it));
     }
 
@@ -1793,17 +1490,16 @@ public class ItemTest extends AbstractDSpaceObjectTest {
      */
     @Test
     public void testCanEditBooleanNoAuth2() throws Exception {
+        // Test that a new Item cannot be edited by default
         context.turnOffAuthorisationSystem();
         WorkspaceItem wi = workspaceItemService.create(context, collection, true);
         context.restoreAuthSystemState();
-        // Test Inheritance of permissions
-        new NonStrictExpectations(authorizeService.getClass()) {{
-            // Disallow Item WRITE perms
-            authorizeService.authorizeAction((Context) any, (Item) any,
-                                             Constants.WRITE, anyBoolean);
-            result = new AuthorizeException();
-        }};
-        assertFalse("testCanEditBooleanNoAuth2 0", itemService.canEdit(context, wi.getItem()));
+        Item item = wi.getItem();
+
+        // Disallow Item WRITE perms
+        when(authorizeServiceSpy.authorizeActionBoolean(context, item, Constants.WRITE)).thenReturn(false);
+
+        assertFalse("testCanEditBooleanNoAuth2 0", itemService.canEdit(context, item));
     }
 
     /**
@@ -1880,15 +1576,11 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         assertThat("testFindByMetadataField 0", result, notNullValue());
         assertFalse("testFindByMetadataField 1", result.hasNext());
 
+        // add new metadata to item
+        context.turnOffAuthorisationSystem();
         itemService.addMetadata(context, it, schema, element, qualifier, Item.ANY, value);
-        new NonStrictExpectations(authorizeService.getClass()) {
-            {
-                authorizeService.authorizeAction((Context) any, (Item) any,
-                                                 Constants.WRITE);
-                result = null;
-            }
-        };
         itemService.update(context, it);
+        context.restoreAuthSystemState();
 
         result = itemService.findByMetadataField(context, schema, element, qualifier, value);
         assertThat("testFindByMetadataField 3", result, notNullValue());
@@ -1929,7 +1621,7 @@ public class ItemTest extends AbstractDSpaceObjectTest {
             assertThat("testGetParentObject 1", itemService.getParentObject(context, it), notNullValue());
             assertThat("testGetParentObject 2", (Collection) itemService.getParentObject(context, it), equalTo(parent));
         } catch (AuthorizeException ex) {
-            fail("Authorize exception catched");
+            throw new AssertionError("Authorize Exception occurred", ex);
         }
     }
 
@@ -1949,16 +1641,11 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         assertThat("testFindByAuthorityValue 0", result, notNullValue());
         assertFalse("testFindByAuthorityValue 1", result.hasNext());
 
+        // add new metadata (with authority) to item
+        context.turnOffAuthorisationSystem();
         itemService.addMetadata(context, it, schema, element, qualifier, Item.ANY, value, authority, confidence);
-        //Ensure that the current user can update the item
-        new NonStrictExpectations(authorizeService.getClass()) {
-            {
-                authorizeService.authorizeAction((Context) any, (Item) any,
-                                                 Constants.WRITE);
-                result = null;
-            }
-        };
         itemService.update(context, it);
+        context.restoreAuthSystemState();
 
         result = itemService.findByAuthorityValue(context, schema, element, qualifier, authority);
         assertThat("testFindByAuthorityValue 3", result, notNullValue());

@@ -218,7 +218,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
 
     /**
      * Unindex a Document in the Lucene index.
-     * 
+     *
      * @param context the dspace context
      * @param searchUniqueID the search uniqueID of the document to be deleted
      * @throws IOException  if IO error
@@ -230,7 +230,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
 
     /**
      * Unindex a Document in the Lucene Index.
-     * 
+     *
      * @param context the dspace context
      * @param searchUniqueID the search uniqueID of the document to be deleted
      * @throws IOException  if IO error
@@ -465,7 +465,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                         Locale.getDefault(), "internal_error"));
                 email.addRecipient(recipient);
                 email.addArgument(ConfigurationManager
-                                      .getProperty("dspace.url"));
+                                      .getProperty("dspace.ui.url"));
                 email.addArgument(new Date());
 
                 String stackTrace;

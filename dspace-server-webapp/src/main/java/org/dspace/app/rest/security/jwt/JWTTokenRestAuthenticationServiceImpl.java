@@ -157,9 +157,11 @@ public class JWTTokenRestAuthenticationServiceImpl implements RestAuthentication
 
     private void addTokenToResponse(final HttpServletResponse response, final String token, final Boolean addCookie)
             throws IOException {
+        // we need authentication cookies because Shibboleth can't use the authentication headers due to the redirects
         if (addCookie) {
             Cookie cookie = new Cookie(AUTHORIZATION_COOKIE, token);
             cookie.setHttpOnly(true);
+            cookie.setSecure(true);
             response.addCookie(cookie);
         }
         response.setHeader(AUTHORIZATION_HEADER, String.format("%s %s", AUTHORIZATION_TYPE, token));

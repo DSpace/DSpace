@@ -13,6 +13,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
@@ -25,6 +26,7 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
+import org.dspace.eperson.service.GroupService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -45,6 +47,9 @@ public class ResourcePolicyServiceImpl implements ResourcePolicyService {
 
     @Autowired(required = true)
     protected ResourcePolicyDAO resourcePolicyDAO;
+
+    @Autowired
+    private GroupService groupService;
 
     protected ResourcePolicyServiceImpl() {
     }
@@ -312,5 +317,86 @@ public class ResourcePolicyServiceImpl implements ResourcePolicyService {
     public List<ResourcePolicy> findExceptRpType(Context c, DSpaceObject o, int actionID, String rpType)
         throws SQLException {
         return resourcePolicyDAO.findByDSoAndActionExceptRpType(c, o, actionID, rpType);
+    }
+
+    @Override
+    public List<ResourcePolicy> findByEPerson(Context context, EPerson ePerson, int offset, int limit)
+        throws SQLException {
+        return resourcePolicyDAO.findByEPerson(context, ePerson, offset, limit);
+    }
+
+    @Override
+    public int countByEPerson(Context context, EPerson eperson) throws SQLException {
+        return resourcePolicyDAO.countByEPerson(context, eperson);
+    }
+
+    @Override
+    public List<ResourcePolicy> findByEPersonAndResourceUuid(Context context, EPerson eperson, UUID resourceUuid,
+        int offset, int limit) throws SQLException {
+        return resourcePolicyDAO.findByEPersonAndResourceUuid(context, eperson, resourceUuid, offset, limit);
+    }
+
+    @Override
+    public int countResourcePoliciesByEPersonAndResourceUuid(Context context, EPerson eperson, UUID resourceUuid)
+        throws SQLException {
+        return resourcePolicyDAO.countByEPersonAndResourceUuid(context, eperson, resourceUuid);
+    }
+
+    @Override
+    public List<ResourcePolicy> findByResouceUuidAndActionId(Context context, UUID resourceUuid, int actionId,
+        int offset, int limit) throws SQLException {
+        return resourcePolicyDAO.findByResouceUuidAndActionId(context, resourceUuid, actionId, offset, limit);
+    }
+
+    @Override
+    public int countByResouceUuidAndActionId(Context context, UUID resourceUuid, int actionId) throws SQLException {
+        return resourcePolicyDAO.countByResouceUuidAndActionId(context, resourceUuid, actionId);
+    }
+
+    @Override
+    public List<ResourcePolicy> findByResouceUuid(Context context, UUID resourceUuid, int offset, int limit)
+        throws SQLException {
+        return resourcePolicyDAO.findByResouceUuid(context, resourceUuid, offset, limit);
+    }
+
+    @Override
+    public int countByResourceUuid(Context context, UUID resourceUuid) throws SQLException {
+        return resourcePolicyDAO.countByResourceUuid(context, resourceUuid);
+    }
+
+    @Override
+    public List<ResourcePolicy> findByGroup(Context context, Group group, int offset, int limit) throws SQLException {
+        return resourcePolicyDAO.findByGroup(context, group, offset, limit);
+    }
+
+    @Override
+    public int countResourcePolicyByGroup(Context context, Group group) throws SQLException {
+        return resourcePolicyDAO.countResourcePolicyByGroup(context, group);
+    }
+
+    @Override
+    public List<ResourcePolicy> findByGroupAndResourceUuid(Context context, Group group, UUID resourceUuid,
+        int offset, int limit) throws SQLException {
+        return resourcePolicyDAO.findByGroupAndResourceUuid(context, group, resourceUuid, offset, limit);
+    }
+
+    @Override
+    public int countByGroupAndResourceUuid(Context context, Group group, UUID resourceUuid) throws SQLException {
+        return resourcePolicyDAO.countByGroupAndResourceUuid(context, group, resourceUuid);
+    }
+
+    @Override
+    public boolean isMyResourcePolicy(Context context, EPerson eperson, Integer id) throws SQLException {
+        boolean isMy = false;
+
+        ResourcePolicy resourcePolicy = resourcePolicyDAO.findOneById(context, id);
+        Group group = resourcePolicy.getGroup();
+
+        if (resourcePolicy.getEPerson() != null && resourcePolicy.getEPerson().getID() == eperson.getID()) {
+            isMy = true;
+        } else if (group != null && groupService.isMember(context, eperson, group)) {
+            isMy = true;
+        }
+        return isMy;
     }
 }

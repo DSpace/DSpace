@@ -8,11 +8,15 @@
 package org.dspace.app.rest.projection;
 
 import org.dspace.app.rest.model.LinkRest;
+import org.dspace.app.rest.model.RestAddressableModel;
 import org.dspace.app.rest.model.RestModel;
 import org.dspace.app.rest.model.hateoas.HALResource;
+import org.springframework.hateoas.Link;
 
 /**
- * Abstract base class for projections. By default each method has no effect unless overridden by a subclass.
+ * Abstract base class for projections.
+ *
+ * By default, this does no transformation, and allows linking but not embedding of all subresources.
  */
 public abstract class AbstractProjection implements Projection {
 
@@ -32,12 +36,13 @@ public abstract class AbstractProjection implements Projection {
     }
 
     @Override
-    public boolean allowOptionalEmbed(HALResource halResource, LinkRest linkRest) {
-        return true;
+    public boolean allowEmbedding(HALResource<? extends RestAddressableModel> halResource, LinkRest linkRest,
+                                  Link... oldLinks) {
+        return false;
     }
 
     @Override
-    public boolean allowOptionalLink(HALResource halResource, LinkRest linkRest) {
+    public boolean allowLinking(HALResource halResource, LinkRest linkRest) {
         return true;
     }
 }

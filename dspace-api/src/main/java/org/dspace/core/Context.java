@@ -361,20 +361,18 @@ public class Context implements AutoCloseable {
         // If Context is no longer open/valid, just note that it has already been closed
         if (!isValid()) {
             log.info("complete() was called on a closed Context object. No changes to commit.");
+            return;
         }
 
         try {
             // As long as we have a valid, writeable database connection,
-            // rollback any changes if we are in read-only mode,
-            // otherwise, commit any changes made as part of the transaction
-            if (isReadOnly()) {
-                abort();
-            } else {
+            // commit changes. Otherwise, we'll just close the DB connection (see below)
+            if (!isReadOnly()) {
                 commit();
             }
         } finally {
             if (dbConnection != null) {
-                // Free the DB connection
+                // Free the DB connection and invalidate the Context
                 dbConnection.closeDBConnection();
                 dbConnection = null;
             }
@@ -395,29 +393,24 @@ public class Context implements AutoCloseable {
         // If Context is no longer open/valid, just note that it has already been closed
         if (!isValid()) {
             log.info("commit() was called on a closed Context object. No changes to commit.");
+            return;
         }
 
         if (isReadOnly()) {
             throw new UnsupportedOperationException("You cannot commit a read-only context");
         }
 
-        // Our DB Connection (Hibernate) will decide if an actual commit is required or not
         try {
-            // As long as we have a valid, writeable database connection,
-            // commit any changes made as part of the transaction
-            if (isValid()) {
-                // Dispatch events before committing changes to the database,
-                // as the consumers may change something too
-                dispatchEvents();
-            }
-
+            // Dispatch events before committing changes to the database,
+            // as the consumers may change something too
+            dispatchEvents();
         } finally {
             if (log.isDebugEnabled()) {
                 log.debug("Cache size on commit is " + getCacheSize());
             }
 
             if (dbConnection != null) {
-                //Commit our changes
+                // Commit our changes (this closes the transaction but leaves database connection open)
                 dbConnection.commit();
                 reloadContextBoundEntities();
             }
@@ -425,8 +418,12 @@ public class Context implements AutoCloseable {
     }
 
 
+    /**
+     * Dispatch any events (cached in current Context) to configured EventListeners (consumers)
+     * in the EventService. This should be called prior to any commit as some consumers may add
+     * to the current transaction. Once events are dispatched, the Context's event cache is cleared.
+     */
     public void dispatchEvents() {
-        // Commit any changes made as part of the transaction
         Dispatcher dispatcher = null;
 
         try {
@@ -462,6 +459,7 @@ public class Context implements AutoCloseable {
 
     /**
      * Add an event to be dispatched when this context is committed.
+     * NOTE: Read-only Contexts cannot add events, as they cannot modify objects.
      *
      * @param event event to be dispatched
      */
@@ -490,6 +488,10 @@ public class Context implements AutoCloseable {
         return events;
     }
 
+    /**
+     * Whether or not the context has events cached.
+     * @return true or false
+     */
     public boolean hasEvents() {
         return !CollectionUtils.isEmpty(events);
     }
@@ -521,22 +523,25 @@ public class Context implements AutoCloseable {
         // If Context is no longer open/valid, just note that it has already been closed
         if (!isValid()) {
             log.info("abort() was called on a closed Context object. No changes to abort.");
+            return;
         }
 
         try {
-            // Rollback ONLY if we have a database connection, and it is NOT Read Only
-            if (isValid() && !isReadOnly()) {
+            // Rollback ONLY if we have a database transaction, and it is NOT Read Only
+            if (!isReadOnly() && isTransactionAlive()) {
                 dbConnection.rollback();
             }
         } catch (SQLException se) {
-            log.error(se.getMessage(), se);
+            log.error("Error rolling back transaction during an abort()", se);
         } finally {
             try {
-                if (!dbConnection.isSessionAlive()) {
+                if (dbConnection != null) {
+                    // Free the DB connection & invalidate the Context
                     dbConnection.closeDBConnection();
+                    dbConnection = null;
                 }
             } catch (Exception ex) {
-                log.error("Exception aborting context", ex);
+                log.error("Error closing the database connection", ex);
             }
             events = null;
         }
@@ -558,7 +563,22 @@ public class Context implements AutoCloseable {
      */
     public boolean isValid() {
         // Only return true if our DB connection is live
-        return dbConnection != null && dbConnection.isTransActionAlive();
+        // NOTE: A transaction need not exist for our Context to be valid, as a Context may use multiple transactions.
+        return dbConnection != null && dbConnection.isSessionAlive();
+    }
+
+    /**
+     * Find out whether our context includes an open database transaction.
+     * Returns <code>true</code> if there is an open transaction. Returns
+     * <code>false</code> if the context is invalid (e.g. abort() or complete())
+     * was called OR no current transaction exists (e.g. commit() was just called
+     * and no new transaction has begun)
+     *
+     * @return
+     */
+    protected boolean isTransactionAlive() {
+        // Only return true if both Context is valid *and* transaction is alive
+        return isValid() && dbConnection.isTransActionAlive();
     }
 
     /**
@@ -571,21 +591,22 @@ public class Context implements AutoCloseable {
         return mode != null && mode == Mode.READ_ONLY;
     }
 
+    /**
+     * Add a group's UUID to the list of special groups cached in Context
+     * @param groupID UUID of group
+     */
     public void setSpecialGroup(UUID groupID) {
         specialGroups.add(groupID);
-
-        // System.out.println("Added " + groupID);
     }
 
     /**
-     * test if member of special group
+     * Test if a group is a special group
      *
      * @param groupID ID of special group to test
      * @return true if member
      */
     public boolean inSpecialGroup(UUID groupID) {
         if (specialGroups.contains(groupID)) {
-            // System.out.println("Contains " + groupID);
             return true;
         }
 
@@ -593,10 +614,9 @@ public class Context implements AutoCloseable {
     }
 
     /**
-     * Get an array of all of the special groups that current user is a member
-     * of.
+     * Get an array of all of the special groups that current user is a member of.
      *
-     * @return list of groups
+     * @return list of special groups
      * @throws SQLException if database error
      */
     public List<Group> getSpecialGroups() throws SQLException {
@@ -608,6 +628,10 @@ public class Context implements AutoCloseable {
         return myGroups;
     }
 
+    /**
+     *  Close the context, aborting any open transactions (if any).
+     * @throws Throwable
+     */
     @Override
     protected void finalize() throws Throwable {
         /*

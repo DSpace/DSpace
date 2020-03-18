@@ -27,6 +27,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -37,6 +38,7 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.UUID;
 import javax.annotation.Nullable;
+import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
@@ -56,8 +58,9 @@ import org.dspace.app.rest.model.RestModel;
 import org.dspace.app.rest.model.hateoas.DSpaceResource;
 import org.dspace.app.rest.model.hateoas.EmbeddedPage;
 import org.dspace.app.rest.model.hateoas.HALResource;
+import org.dspace.app.rest.projection.CompositeProjection;
 import org.dspace.app.rest.projection.DefaultProjection;
-import org.dspace.app.rest.projection.ListProjection;
+import org.dspace.app.rest.projection.EmbedRelsProjection;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.repository.DSpaceRestRepository;
 import org.dspace.app.rest.repository.LinkRestRepository;
@@ -91,7 +94,15 @@ public class Utils {
 
     private static final Logger log = Logger.getLogger(Utils.class);
 
-    private static final int EMBEDDED_PAGE_SIZE = 20;
+    /**
+     * The default page size, if unspecified in the request.
+     */
+    private static final int DEFAULT_PAGE_SIZE = 20;
+
+    /**
+     * The maximum number of embed levels to allow.
+     */
+    private static final int EMBED_MAX_LEVELS = 10;
 
     @Autowired
     ApplicationContext applicationContext;
@@ -111,11 +122,12 @@ public class Utils {
     /** Cache to support fast lookups of LinkRest method annotation information. */
     private Map<Method, Optional<LinkRest>> linkAnnotationForMethod = new HashMap<>();
 
-    public <T> Page<T> getPage(List<T> fullContents, Pageable pageable) {
+    public <T> Page<T> getPage(List<T> fullContents, @Nullable Pageable optionalPageable) {
+        Pageable pageable = getPageable(optionalPageable);
         int total = fullContents.size();
         List<T> pageContent = null;
         if (pageable == null) {
-            pageable = new PageRequest(0, EMBEDDED_PAGE_SIZE);
+            pageable = new PageRequest(0, DEFAULT_PAGE_SIZE);
         }
         if (pageable.getOffset() > total) {
             throw new PaginationException(total);
@@ -128,6 +140,16 @@ public class Utils {
             }
             return new PageImpl<T>(pageContent, pageable, total);
         }
+    }
+
+    /**
+     * Convenience method to get a default pageable instance if needed.
+     *
+     * @param optionalPageable the existing pageable instance, may be null.
+     * @return the existing instance if it is not null, a default pageable instance otherwise.
+     */
+    public Pageable getPageable(@Nullable Pageable optionalPageable) {
+        return optionalPageable != null ? optionalPageable : new PageRequest(0, DEFAULT_PAGE_SIZE);
     }
 
     public Link linkToSingleResource(DSpaceResource r, String rel) {
@@ -171,7 +193,7 @@ public class Utils {
         if (modelPlural.equals("authorities")) {
             return AuthorityRest.NAME;
         }
-        if (modelPlural.equals("resourcePolicies")) {
+        if (modelPlural.equals("resourcepolicies")) {
             return ResourcePolicyRest.NAME;
         }
         if (StringUtils.equals(modelPlural, "processes")) {
@@ -424,47 +446,89 @@ public class Utils {
     }
 
     /**
-     * Gets the projection requested by the current servlet request, or a default projection if none is specified.
-     *
-     * @param defaultToList whether to return {@link ListProjection} by default. If false, the no-op
-     *                      {@link DefaultProjection} will be returned by default.
-     * @return the requested or default projection, never {@code null}.
-     * @throws IllegalArgumentException if the request specifies an unknown projection name.
-     */
-    public Projection obtainProjection(boolean defaultToList) {
-        String projectionName = requestService.getCurrentRequest().getServletRequest().getParameter("projection");
-        if (projectionName == null && defaultToList) {
-            projectionName = ListProjection.NAME;
-        }
-        return converter.getProjection(projectionName);
-    }
-
-    /**
-     * Gets the projection requested by the current servlet request, or {@link DefaultProjection} if none
+     * Gets the effective projection requested by the current servlet request, or {@link DefaultProjection} if none
      * is specified.
+     * <p>
+     * Any number of individual {@code Projections} that are spring-registered {@link Component}s may be specified
+     * by name via the {@code projection} parameter. If multiple projections are specified, they will be wrapped in a
+     * {@link CompositeProjection} and applied in order as described there.
+     * </p><p>
+     * In addition, any number of embeds may be specified by rel name via the {@code embed} parameter.
+     * When provided, these act as a whitelist of embeds that may be included in the response, as described
+     * and implemented by {@link EmbedRelsProjection}.
+     * </p>
      *
      * @return the requested or default projection, never {@code null}.
      * @throws IllegalArgumentException if the request specifies an unknown projection name.
      */
     public Projection obtainProjection() {
-        return obtainProjection(false);
+        ServletRequest servletRequest = requestService.getCurrentRequest().getServletRequest();
+        List<String> projectionNames = getValues(servletRequest, "projection");
+        Set<String> embedRels = new HashSet<>(getValues(servletRequest, "embed"));
+
+        List<Projection> projections = new ArrayList<>();
+
+        for (String projectionName : projectionNames) {
+            projections.add(converter.getProjection(projectionName));
+        }
+
+        if (!embedRels.isEmpty()) {
+            projections.add(new EmbedRelsProjection(embedRels));
+        }
+
+        if (projections.isEmpty()) {
+            return Projection.DEFAULT;
+        } else if (projections.size() == 1) {
+            return projections.get(0);
+        } else {
+            return new CompositeProjection(projections);
+        }
     }
 
-
+    /**
+     * Gets zero or more values for the given servlet request parameter.
+     * <p>
+     * This convenience method reads multiple values that have been specified as request parameter in multiple ways:
+     * via * {@code ?paramName=value1&paramName=value2}, via {@code ?paramName=value1,value2},
+     * or a combination.
+     * </p><p>
+     * It provides the values in the order they were given in the request, and automatically de-dupes them.
+     * </p>
+     *
+     * @param servletRequest the servlet request.
+     * @param parameterName the parameter name.
+     * @return the ordered, de-duped values, possibly empty, never {@code null}.
+     */
+    private List<String> getValues(ServletRequest servletRequest, String parameterName) {
+        String[] rawValues = servletRequest.getParameterValues(parameterName);
+        List<String> values = new ArrayList<>();
+        if (rawValues != null) {
+            for (String rawValue : rawValues) {
+                for (String value : rawValue.split(",")) {
+                    String trimmedValue = value.trim();
+                    if (trimmedValue.length() > 0 && !values.contains(trimmedValue)) {
+                        values.add(trimmedValue);
+                    }
+                }
+            }
+        }
+        return values;
+    }
 
     /**
      * Adds embeds or links for all class-level LinkRel annotations for which embeds or links are allowed.
      *
      * @param halResource the resource.
+     * @param oldLinks    previously traversed links
      */
-    public void embedOrLinkClassLevelRels(HALResource<RestAddressableModel> halResource) {
+    public void embedOrLinkClassLevelRels(HALResource<RestAddressableModel> halResource, Link... oldLinks) {
         Projection projection = halResource.getContent().getProjection();
         getLinkRests(halResource.getContent().getClass()).stream().forEach((linkRest) -> {
             Link link = linkToSubResource(halResource.getContent(), linkRest.name());
-            if (!linkRest.embedOptional() || projection.allowOptionalEmbed(halResource, linkRest)) {
-                embedRelFromRepository(halResource, linkRest.name(), link, linkRest);
+            if (projection.allowEmbedding(halResource, linkRest, oldLinks)) {
+                embedRelFromRepository(halResource, linkRest.name(), link, linkRest, oldLinks);
                 halResource.add(link); // unconditionally link if embedding was allowed
-            } else if (!linkRest.linkOptional() || projection.allowOptionalLink(halResource, linkRest)) {
+            } else if (projection.allowLinking(halResource, linkRest)) {
                 halResource.add(link);
             }
         });
@@ -480,7 +544,8 @@ public class Utils {
     }
 
     /**
-     * Embeds a rel whose value comes from a {@link LinkRestRepository}.
+     * Embeds a rel whose value comes from a {@link LinkRestRepository}, if the maximum embed level has not
+     * been exceeded yet.
      * <p>
      * The embed will be skipped if 1) the link repository reports that it is not embeddable or 2) the returned
      * value is null and the LinkRest annotation has embedOptional = true.
@@ -489,7 +554,7 @@ public class Utils {
      * before calling this method.
      * </p>
      *
-     * @param resource the resource.
+     * @param resource the resource from which the embed will be made.
      * @param rel the name of the rel.
      * @param link the link.
      * @param linkRest the LinkRest annotation (must have method defined).
@@ -498,8 +563,37 @@ public class Utils {
      * link repository.
      * @throws RuntimeException if any other problem occurs when trying to invoke the method.
      */
-    private void embedRelFromRepository(HALResource<? extends RestAddressableModel> resource,
+    void embedRelFromRepository(HALResource<? extends RestAddressableModel> resource,
                                         String rel, Link link, LinkRest linkRest) {
+        embedRelFromRepository(resource, rel, link, linkRest, new Link[] {});
+    }
+
+    /**
+     * Embeds a rel whose value comes from a {@link LinkRestRepository}, if the maximum embed level has not
+     * been exceeded yet.
+     * <p>
+     * The embed will be skipped if 1) the link repository reports that it is not embeddable or 2) the returned
+     * value is null and the LinkRest annotation has embedOptional = true.
+     * </p><p>
+     * Implementation note: The caller is responsible for ensuring that the projection allows the embed
+     * before calling this method.
+     * </p>
+     *
+     * @param resource the resource from which the embed will be made.
+     * @param rel the name of the rel.
+     * @param link the link.
+     * @param linkRest the LinkRest annotation (must have method defined).
+     * @param oldLinks    The previously traversed links
+     * @throws RepositoryNotFoundException if the link repository could not be found.
+     * @throws IllegalArgumentException if the method specified by the LinkRest could not be found in the
+     * link repository.
+     * @throws RuntimeException if any other problem occurs when trying to invoke the method.
+     */
+    void embedRelFromRepository(HALResource<? extends RestAddressableModel> resource,
+                                        String rel, Link link, LinkRest linkRest, Link... oldLinks) {
+        if (resource.getContent().getEmbedLevel() == EMBED_MAX_LEVELS) {
+            return;
+        }
         Projection projection = resource.getContent().getProjection();
         LinkRestRepository linkRepository = getLinkResourceRepository(resource.getContent().getCategory(),
                 resource.getContent().getType(), rel);
@@ -508,9 +602,7 @@ public class Utils {
             Object contentId = getContentIdForLinkMethod(resource.getContent(), method);
             try {
                 Object linkedObject = method.invoke(linkRepository, null, contentId, null, projection);
-                if (linkedObject != null || !linkRest.embedOptional()) {
-                    resource.embedResource(rel, wrapForEmbedding(linkedObject, link));
-                }
+                resource.embedResource(rel, wrapForEmbedding(resource, linkedObject, link, oldLinks));
             } catch (InvocationTargetException e) {
                 if (e.getTargetException() instanceof RuntimeException) {
                     throw (RuntimeException) e.getTargetException();
@@ -524,10 +616,13 @@ public class Utils {
     }
 
     /**
-     * Adds embeds for all properties annotated with {@code @LinkRel} or whose return types are
-     * {@link RestAddressableModel} subclasses.
+     * Adds embeds (if the maximum embed level has not been exceeded yet) for all properties annotated with
+     * {@code @LinkRel} or whose return types are {@link RestAddressableModel} subclasses.
      */
     public void embedMethodLevelRels(HALResource<? extends RestAddressableModel> resource) {
+        if (resource.getContent().getEmbedLevel() == EMBED_MAX_LEVELS) {
+            return;
+        }
         try {
             for (PropertyDescriptor pd : Introspector.getBeanInfo(
                     resource.getContent().getClass()).getPropertyDescriptors()) {
@@ -564,6 +659,7 @@ public class Utils {
      * rest repository. Otherwise, the value will come from invoking the method directly on the wrapped
      * rest object.
      *
+     * @param resource the resource from which the embed will be made.
      * @param readMethod the property read method.
      * @param propertyName the property name, which will be used as the rel/embed name unless the @LinkRel
      *                     annotation is present and specifies a different name.
@@ -575,8 +671,7 @@ public class Utils {
         LinkRest linkRest = findLinkAnnotation(readMethod);
         try {
             if (linkRest != null) {
-                if (linkRest.embedOptional()
-                        && !resource.getContent().getProjection().allowOptionalEmbed(resource, linkRest)) {
+                if (!resource.getContent().getProjection().allowEmbedding(resource, linkRest)) {
                     return; // projection disallows this optional method-level embed
                 }
                 if (StringUtils.isNotBlank(linkRest.name())) {
@@ -585,16 +680,14 @@ public class Utils {
                 Link link = linkToSubResource(resource.getContent(), rel);
                 if (StringUtils.isBlank(linkRest.method())) {
                     Object linkedObject = readMethod.invoke(resource.getContent());
-                    if (linkedObject != null || !linkRest.embedOptional()) {
-                        resource.embedResource(rel, wrapForEmbedding(linkedObject, link));
-                    }
+                    resource.embedResource(rel, wrapForEmbedding(resource, linkedObject, link));
                 } else {
                     embedRelFromRepository(resource, rel, link, linkRest);
                 }
             } else if (RestAddressableModel.class.isAssignableFrom(readMethod.getReturnType())) {
                 RestAddressableModel linkedObject = (RestAddressableModel) readMethod.invoke(resource.getContent());
                 resource.embedResource(rel, linkedObject == null ? null :
-                        wrapForEmbedding(linkedObject, linkToSubResource(resource.getContent(), rel)));
+                        wrapForEmbedding(resource, linkedObject, linkToSubResource(resource.getContent(), rel)));
             }
         } catch (IllegalAccessException | InvocationTargetException e) {
             throw new RuntimeException(e);
@@ -603,29 +696,61 @@ public class Utils {
 
     /**
      * Wraps the given linked object (retrieved from a link repository or link method on the rest item)
-     * in an object that is appropriate for embedding, if needed.
+     * in an object that is appropriate for embedding, if needed. Does not perform the actual embed; the
+     * caller is responsible for that.
      *
+     * @param resource the resource from which the embed will be made.
      * @param linkedObject the linked object.
      * @param link the link, which is used if the linked object is a list or page, to determine the self link
      *             and embed property name to use for the subresource.
-     * @return the wrapped object.
+     * @return the wrapped object, which will have an "embed level" one greater than the given parent resource.
      */
-    private Object wrapForEmbedding(Object linkedObject, Link link) {
+    private Object wrapForEmbedding(HALResource<? extends RestAddressableModel> resource,
+                                    Object linkedObject, Link link) {
+        return wrapForEmbedding(resource, linkedObject, link, new Link[] {});
+    }
+
+    /**
+     * Wraps the given linked object (retrieved from a link repository or link method on the rest item)
+     * in an object that is appropriate for embedding, if needed. Does not perform the actual embed; the
+     * caller is responsible for that.
+     *
+     * @param resource the resource from which the embed will be made.
+     * @param linkedObject the linked object.
+     * @param link the link, which is used if the linked object is a list or page, to determine the self link
+     *             and embed property name to use for the subresource.
+     * @param oldLinks    The previously traversed links
+     * @return the wrapped object, which will have an "embed level" one greater than the given parent resource.
+     */
+    private Object wrapForEmbedding(HALResource<? extends RestAddressableModel> resource,
+                                    Object linkedObject, Link link, Link... oldLinks) {
+        int childEmbedLevel = resource.getContent().getEmbedLevel() + 1;
+        //Add the latest link to the list
+        Link[] newList = Arrays.copyOf(oldLinks, oldLinks.length + 1);
+        newList[oldLinks.length] = link;
         if (linkedObject instanceof RestAddressableModel) {
-            return converter.toResource((RestAddressableModel) linkedObject);
+            RestAddressableModel restObject = (RestAddressableModel) linkedObject;
+            restObject.setEmbedLevel(childEmbedLevel);
+            return converter.toResource(restObject, newList);
         } else if (linkedObject instanceof Page) {
             // The first page has already been constructed by a link repository and we only need to wrap it
             Page<RestAddressableModel> page = (Page<RestAddressableModel>) linkedObject;
-            return new EmbeddedPage(link.getHref(), page.map(converter::toResource), null, link.getRel());
+            return new EmbeddedPage(link.getHref(), page.map((restObject) -> {
+                restObject.setEmbedLevel(childEmbedLevel);
+                return converter.toResource(restObject, newList);
+            }), null, link.getRel());
         } else if (linkedObject instanceof List) {
             // The full list has been retrieved and we need to provide the first page for embedding
             List<RestAddressableModel> list = (List<RestAddressableModel>) linkedObject;
             if (list.size() > 0) {
                 PageImpl<RestAddressableModel> page = new PageImpl(
-                        list.subList(0, list.size() > EMBEDDED_PAGE_SIZE ? EMBEDDED_PAGE_SIZE : list.size()),
-                        new PageRequest(0, EMBEDDED_PAGE_SIZE), list.size());
+                        list.subList(0, list.size() > DEFAULT_PAGE_SIZE ? DEFAULT_PAGE_SIZE : list.size()),
+                        new PageRequest(0, DEFAULT_PAGE_SIZE), list.size());
                 return new EmbeddedPage(link.getHref(),
-                        page.map((restObject) -> converter.toResource(restObject)),
+                        page.map((restObject) -> {
+                            restObject.setEmbedLevel(childEmbedLevel);
+                            return converter.toResource(restObject, newList);
+                        }),
                         list, link.getRel());
             } else {
                 PageImpl<RestAddressableModel> page = new PageImpl(list);

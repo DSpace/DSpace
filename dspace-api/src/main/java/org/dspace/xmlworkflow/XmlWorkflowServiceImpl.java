@@ -309,7 +309,7 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
     @Override
     public WorkflowActionConfig doState(Context c, EPerson user, HttpServletRequest request, int workflowItemId,
                                         Workflow workflow, WorkflowActionConfig currentActionConfig)
-        throws SQLException, AuthorizeException, IOException, MessagingException, WorkflowException {
+        throws SQLException, AuthorizeException, IOException, WorkflowException {
         try {
             XmlWorkflowItem wi = xmlWorkflowItemService.find(c, workflowItemId);
             Step currentStep = currentActionConfig.getStep();
@@ -1049,7 +1049,7 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
             email.addArgument(coll.getName());
             email.addArgument(rejector);
             email.addArgument(reason);
-            email.addArgument(ConfigurationManager.getProperty("dspace.url") + "/mydspace");
+            email.addArgument(ConfigurationManager.getProperty("dspace.ui.url") + "/mydspace");
 
             email.send();
         } catch (Exception ex) {
@@ -1063,7 +1063,7 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
 
     @Override
     public String getMyDSpaceLink() {
-        return ConfigurationManager.getProperty("dspace.url") + "/mydspace";
+        return ConfigurationManager.getProperty("dspace.ui.url") + "/mydspace";
     }
 
     protected void revokeReviewerPolicies(Context context, Item item) throws SQLException, AuthorizeException {

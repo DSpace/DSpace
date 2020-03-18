@@ -1400,7 +1400,7 @@ public abstract class AbstractMETSDisseminator
                 }
                 if (handle != null) {
                     return configurationService
-                        .getProperty("dspace.url")
+                        .getProperty("dspace.ui.url")
                         + "/bitstream/"
                         + handle
                         + "/"
@@ -1410,7 +1410,7 @@ public abstract class AbstractMETSDisseminator
                 } else {   //no Handle assigned, so persistent(-ish) URI for bitstream is
                     // Format: {site-base-url}/retrieve/{bitstream-internal-id}
                     return configurationService
-                        .getProperty("dspace.url")
+                        .getProperty("dspace.ui.url")
                         + "/retrieve/"
                         + String.valueOf(bitstream.getID());
                 }

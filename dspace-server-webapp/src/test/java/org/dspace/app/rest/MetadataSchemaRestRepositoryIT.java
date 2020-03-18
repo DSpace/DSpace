@@ -23,6 +23,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.dspace.app.rest.builder.MetadataSchemaBuilder;
 import org.dspace.app.rest.converter.ConverterService;
+import org.dspace.app.rest.matcher.HalMatcher;
 import org.dspace.app.rest.matcher.MetadataschemaMatcher;
 import org.dspace.app.rest.model.MetadataSchemaRest;
 import org.dspace.app.rest.projection.Projection;
@@ -102,6 +103,7 @@ public class MetadataSchemaRestRepositoryIT extends AbstractControllerIntegratio
                         .content(new ObjectMapper().writeValueAsBytes(metadataSchemaRest))
                         .contentType(contentType))
                 .andExpect(status().isCreated())
+                .andExpect(jsonPath("$", HalMatcher.matchNoEmbeds()))
                 .andDo(result -> idRef.set(read(result.getResponse().getContentAsString(), "$.id")));
 
         getClient().perform(get("/api/core/metadataschemas/" + idRef.get()))

@@ -88,10 +88,12 @@ public class AuthenticationRestController implements InitializingBean {
         EPersonRest ePersonRest = null;
         Projection projection = utils.obtainProjection();
         if (context.getCurrentUser() != null) {
-            ePersonRest = ePersonConverter.fromModelWithGroups(context, context.getCurrentUser(), projection);
+            ePersonRest = converter.toRest(context.getCurrentUser(), projection);
         }
 
         AuthenticationStatusRest authenticationStatusRest = new AuthenticationStatusRest(ePersonRest);
+        // Whether authentication status is false add WWW-Authenticate so client can retrieve the available
+        // authentication methods
         if (!authenticationStatusRest.isAuthenticated()) {
             String authenticateHeaderValue = restAuthenticationService
                     .getWwwAuthenticateHeaderValue(request, response);
