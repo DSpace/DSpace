@@ -1,3 +1,5 @@
+<%@ page import="org.dspace.core.Context" %>
+<%@ page import="org.dspace.app.webui.util.UIUtil" %>
 <%@ page contentType="text/html;charset=UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
@@ -111,3 +113,9 @@
     </div>
 
 </dspace:layout>
+
+<%
+    // Obtain DSpace context
+    Context context = UIUtil.obtainContext(request);
+    context.complete();
+%>

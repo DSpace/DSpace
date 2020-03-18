@@ -44,6 +44,7 @@ public class BrowseController {
     public ModelAndView browseInCommunity(ModelAndView model, HttpServletRequest request, HttpServletResponse response, @PathVariable("itemId") String itemId) throws ServletException, AuthorizeException, IOException, SQLException, BrowseException, SortException {
         Context dspaceContext = UIUtil.obtainContext(request);
         DSpaceObject dSpaceObject = handleService.resolveToObject(dspaceContext, "123456789/" + itemId);
+        request.setAttribute("dspace.context", dspaceContext);
         if (authorizeService.authorizeActionBoolean(dspaceContext, dSpaceObject, Constants.READ)) {
             if (dSpaceObject.getType() == Constants.COLLECTION) {
                 request.setAttribute("dspace.collection", dSpaceObject);
@@ -56,7 +57,7 @@ public class BrowseController {
     }
 
     @RequestMapping("/browse")
-    public ModelAndView getBrowseItems(ModelAndView model, HttpServletRequest request, HttpServletResponse response, Context dspaceContext) throws SQLException, SortException, ServletException, IOException, AuthorizeException {
+    public ModelAndView getBrowseItems(ModelAndView model, HttpServletRequest request, HttpServletResponse response, Context dspaceContext) throws SortException, ServletException, IOException, AuthorizeException, SQLException {
         String type = request.getParameter("type");
         String value = request.getParameter("value");
 
@@ -72,7 +73,6 @@ public class BrowseController {
         }
 
         browseRequestProcessor.fillModelWithData(model, items, browseInfo, request, isExtendedTable);
-        dspaceContext.complete();
         return model;
     }
 
