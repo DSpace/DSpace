@@ -13,7 +13,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.deduplication.model.DuplicateDecisionValue;
 import org.dspace.app.rest.model.ItemRest;
-import org.dspace.app.rest.model.LinkRest;
 
 /**
  * Java Bean to expose the section license during in progress submission.
@@ -40,7 +39,7 @@ public class DuplicateMatch implements SectionData {
     @JsonProperty
     private ItemRest matchObject;
 
-    @LinkRest(linkClass = ItemRest.class)
+    //@LinkRest(linkClass = ItemRest.class)
     @JsonIgnore
     public ItemRest getMatchObject() {
         return matchObject;

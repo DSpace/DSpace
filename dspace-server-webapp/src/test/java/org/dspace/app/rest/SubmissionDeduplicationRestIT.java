@@ -22,6 +22,7 @@ import java.util.UUID;
 
 import javax.ws.rs.core.MediaType;
 
+import org.dspace.app.rest.builder.ClaimedTaskBuilder;
 import org.dspace.app.rest.builder.CollectionBuilder;
 import org.dspace.app.rest.builder.CommunityBuilder;
 import org.dspace.app.rest.builder.EPersonBuilder;
@@ -37,6 +38,7 @@ import org.dspace.content.Community;
 import org.dspace.content.Item;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.eperson.EPerson;
+import org.dspace.xmlworkflow.storedcomponents.ClaimedTask;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 import org.hamcrest.Matchers;
 import org.junit.Test;
@@ -91,8 +93,12 @@ public class SubmissionDeduplicationRestIT extends AbstractControllerIntegration
         pdf.close();
         context.restoreAuthSystemState();
 
+        // security check
+        getClient().perform(get("/api/submission/workspaceitems/" + witem.getID()))
+                .andExpect(status().isUnauthorized());
+
         // check for duplicates
-        getClient().perform(get("/api/submission/workspaceitems/" + witem.getID())).andExpect(status().isOk())
+        getClient(authToken).perform(get("/api/submission/workspaceitems/" + witem.getID())).andExpect(status().isOk())
                 .andExpect(jsonPath("$.sections['detect-duplicate'].matches['" + item.getID() + "'].matchObject.id",
                         is(item.getID().toString())))
                 .andExpect(jsonPath("$.sections['detect-duplicate'].matches['" + item.getID() + "'].submitterDecision")
@@ -117,7 +123,7 @@ public class SubmissionDeduplicationRestIT extends AbstractControllerIntegration
                         is("reject")));
 
         // check that changes persist
-        getClient().perform(get("/api/submission/workspaceitems/" + witem.getID())).andExpect(status().isOk())
+        getClient(authToken).perform(get("/api/submission/workspaceitems/" + witem.getID())).andExpect(status().isOk())
                 .andExpect(jsonPath("$.sections['detect-duplicate'].matches['" + item.getID() + "'].matchObject.id",
                         is(item.getID().toString())))
                 .andExpect(jsonPath("$.sections['detect-duplicate'].matches['" + item.getID() + "'].submitterDecision",
@@ -140,8 +146,12 @@ public class SubmissionDeduplicationRestIT extends AbstractControllerIntegration
         pdf.close();
         context.restoreAuthSystemState();
 
+        // security check
+        getClient().perform(get("/api/submission/workspaceitems/" + witem.getID()))
+                .andExpect(status().isUnauthorized());
+
         // check for duplicates
-        getClient().perform(get("/api/submission/workspaceitems/" + witem.getID())).andExpect(status().isOk())
+        getClient(authToken).perform(get("/api/submission/workspaceitems/" + witem.getID())).andExpect(status().isOk())
                 .andExpect(jsonPath("$.sections['detect-duplicate'].matches['" + item.getID() + "'].matchObject.id",
                         is(item.getID().toString())))
                 .andExpect(jsonPath("$.sections['detect-duplicate'].matches['" + item.getID() + "'].submitterDecision")
@@ -178,7 +188,7 @@ public class SubmissionDeduplicationRestIT extends AbstractControllerIntegration
                                 .doesNotExist());
 
         // check that changes persist
-        getClient().perform(get("/api/submission/workspaceitems/" + witem.getID())).andExpect(status().isOk())
+        getClient(authToken).perform(get("/api/submission/workspaceitems/" + witem.getID())).andExpect(status().isOk())
                 .andExpect(jsonPath("$.sections['detect-duplicate'].matches['" + item.getID() + "'].matchObject.id",
                         is(item.getID().toString())))
                 .andExpect(jsonPath("$.sections['detect-duplicate'].matches['" + item.getID() + "'].submitterDecision",
@@ -223,7 +233,7 @@ public class SubmissionDeduplicationRestIT extends AbstractControllerIntegration
                         is("test2")));
 
         // check that changes persist
-        getClient().perform(get("/api/submission/workspaceitems/" + witem.getID())).andExpect(status().isOk())
+        getClient(authToken).perform(get("/api/submission/workspaceitems/" + witem.getID())).andExpect(status().isOk())
                 .andExpect(jsonPath("$.sections['detect-duplicate'].matches['" + item.getID() + "'].matchObject.id",
                         is(item.getID().toString())))
                 .andExpect(jsonPath("$.sections['detect-duplicate'].matches['" + item.getID() + "'].submitterDecision",
@@ -283,10 +293,14 @@ public class SubmissionDeduplicationRestIT extends AbstractControllerIntegration
                 .withFulltext("simple-article.pdf", "/local/path/simple-article.pdf", pdf).build();
         pdf.close();
         context.restoreAuthSystemState();
+        String workflowItemId = workflowItem.getItem().getID().toString();
+
+        // security check
+        getClient().perform(get("/api/submission/workspaceitems/" + witem.getID()))
+                .andExpect(status().isUnauthorized());
 
         // check for duplicates
-        String workflowItemId = workflowItem.getItem().getID().toString();
-        getClient().perform(get("/api/submission/workspaceitems/" + witem.getID())).andExpect(status().isOk())
+        getClient(authToken).perform(get("/api/submission/workspaceitems/" + witem.getID())).andExpect(status().isOk())
                 .andExpect(jsonPath("$.sections['detect-duplicate'].matches['" + workflowItemId + "'].matchObject.id",
                         is(workflowItemId)))
                 .andExpect(
@@ -313,7 +327,7 @@ public class SubmissionDeduplicationRestIT extends AbstractControllerIntegration
                                 is("reject")));
 
         // check that changes persist
-        getClient().perform(get("/api/submission/workspaceitems/" + witem.getID())).andExpect(status().isOk())
+        getClient(authToken).perform(get("/api/submission/workspaceitems/" + witem.getID())).andExpect(status().isOk())
                 .andExpect(jsonPath("$.sections['detect-duplicate'].matches['" + workflowItemId + "'].matchObject.id",
                         is(workflowItemId)))
                 .andExpect(
@@ -337,8 +351,12 @@ public class SubmissionDeduplicationRestIT extends AbstractControllerIntegration
         pdf.close();
         context.restoreAuthSystemState();
 
+        // security check
+        getClient().perform(get("/api/submission/workspaceitems/" + witem.getID()))
+                .andExpect(status().isUnauthorized());
+
         // check for duplicates
-        getClient().perform(get("/api/submission/workspaceitems/" + witem.getID())).andExpect(status().isOk())
+        getClient(authToken).perform(get("/api/submission/workspaceitems/" + witem.getID())).andExpect(status().isOk())
                 .andExpect(jsonPath("$.sections['detect-duplicate'].matches['" + workflowItemId + "'].matchObject.id",
                         is(workflowItemId)))
                 .andExpect(
@@ -377,7 +395,7 @@ public class SubmissionDeduplicationRestIT extends AbstractControllerIntegration
                                 .doesNotExist());
 
         // check that changes persist
-        getClient().perform(get("/api/submission/workspaceitems/" + witem.getID())).andExpect(status().isOk())
+        getClient(authToken).perform(get("/api/submission/workspaceitems/" + witem.getID())).andExpect(status().isOk())
                 .andExpect(jsonPath("$.sections['detect-duplicate'].matches['" + workflowItemId + "'].matchObject.id",
                         is(workflowItemId)))
                 .andExpect(
@@ -423,7 +441,7 @@ public class SubmissionDeduplicationRestIT extends AbstractControllerIntegration
                         is("test2")));
 
         // check that changes persist
-        getClient().perform(get("/api/submission/workspaceitems/" + witem.getID())).andExpect(status().isOk())
+        getClient(authToken).perform(get("/api/submission/workspaceitems/" + witem.getID())).andExpect(status().isOk())
                 .andExpect(jsonPath("$.sections['detect-duplicate'].matches['" + workflowItemId + "'].matchObject.id",
                         is(workflowItemId)))
                 .andExpect(
@@ -485,8 +503,12 @@ public class SubmissionDeduplicationRestIT extends AbstractControllerIntegration
         pdf.close();
         context.restoreAuthSystemState();
 
+        // security check
+        getClient().perform(get("/api/submission/workspaceitems/" + witem.getID()))
+                .andExpect(status().isUnauthorized());
+
         // check for duplicates
-        getClient().perform(get("/api/submission/workspaceitems/" + witem.getID())).andExpect(status().isOk())
+        getClient(authToken).perform(get("/api/submission/workspaceitems/" + witem.getID())).andExpect(status().isOk())
                 .andExpect(jsonPath(
                         "$.sections['detect-duplicate'].matches['" + witemOne.getItem().getID() + "'].matchObject.id",
                         is(witemOne.getItem().getID().toString())))
@@ -513,7 +535,7 @@ public class SubmissionDeduplicationRestIT extends AbstractControllerIntegration
                         + "'].submitterDecision", is("reject")));
 
         // check that changes persist
-        getClient().perform(get("/api/submission/workspaceitems/" + witem.getID())).andExpect(status().isOk())
+        getClient(authToken).perform(get("/api/submission/workspaceitems/" + witem.getID())).andExpect(status().isOk())
                 .andExpect(jsonPath(
                         "$.sections['detect-duplicate'].matches['" + witemOne.getItem().getID() + "'].matchObject.id",
                         is(witemOne.getItem().getID().toString())))
@@ -537,8 +559,12 @@ public class SubmissionDeduplicationRestIT extends AbstractControllerIntegration
         pdf.close();
         context.restoreAuthSystemState();
 
+        // security check
+        getClient().perform(get("/api/submission/workspaceitems/" + witem.getID()))
+                .andExpect(status().isUnauthorized());
+
         // check for duplicates
-        getClient().perform(get("/api/submission/workspaceitems/" + witem.getID())).andExpect(status().isOk())
+        getClient(authToken).perform(get("/api/submission/workspaceitems/" + witem.getID())).andExpect(status().isOk())
                 .andExpect(jsonPath(
                         "$.sections['detect-duplicate'].matches['" + witemOne.getItem().getID() + "'].matchObject.id",
                         is(witemOne.getItem().getID().toString())))
@@ -578,7 +604,7 @@ public class SubmissionDeduplicationRestIT extends AbstractControllerIntegration
                                 .doesNotExist());
 
         // check that changes persist
-        getClient().perform(get("/api/submission/workspaceitems/" + witem.getID())).andExpect(status().isOk())
+        getClient(authToken).perform(get("/api/submission/workspaceitems/" + witem.getID())).andExpect(status().isOk())
                 .andExpect(jsonPath(
                         "$.sections['detect-duplicate'].matches['" + witemOne.getItem().getID() + "'].matchObject.id",
                         is(witemOne.getItem().getID().toString())))
@@ -626,7 +652,7 @@ public class SubmissionDeduplicationRestIT extends AbstractControllerIntegration
                         is("test")));
 
         // check that changes persist
-        getClient().perform(get("/api/submission/workspaceitems/" + witem.getID())).andExpect(status().isOk())
+        getClient(authToken).perform(get("/api/submission/workspaceitems/" + witem.getID())).andExpect(status().isOk())
                 .andExpect(jsonPath(
                         "$.sections['detect-duplicate'].matches['" + witemOne.getItem().getID() + "'].matchObject.id",
                         is(witemOne.getItem().getID().toString())))
@@ -688,7 +714,7 @@ public class SubmissionDeduplicationRestIT extends AbstractControllerIntegration
         context.restoreAuthSystemState();
 
         // check for duplicates
-        getClient().perform(get("/api/submission/workspaceitems/" + witem.getID())).andExpect(status().isOk())
+        getClient(authToken).perform(get("/api/submission/workspaceitems/" + witem.getID())).andExpect(status().isOk())
                 .andExpect(jsonPath("$.sections['detect-duplicate'].matches['" + item.getID() + "'].matchObject.id",
                         is(item.getID().toString())));
 
@@ -799,19 +825,22 @@ public class SubmissionDeduplicationRestIT extends AbstractControllerIntegration
                 .withWorkflowGroup(1, reviewer).build();
 
         // 3. create an item with title "Sample submission" using the first submitter
+        String submitterTocken = getAuthToken(itemSubmitter.getEmail(), password);
         context.setCurrentUser(itemSubmitter);
         Item item = ItemBuilder.createItem(context, colItem).withTitle("Sample submission").withIssueDate("2020-01-31")
                 .withAuthor("Cadili, Francesco").withAuthor("Perelli, Matteo").withSubject("Sample").build();
 
-        // 4a. create workspace items with the reviewer
+        // 4a. create workflow item will all the required fields using reviewer
+        String reviewerToken = getAuthToken(reviewer.getEmail(), password);
         context.setCurrentUser(reviewer);
-        String authToken = getAuthToken(reviewer.getEmail(), password);
 
-        // 3. a workflow item will all the required fields
         InputStream pdf = getClass().getResourceAsStream("simple-article.pdf");
-        XmlWorkflowItem witem = WorkflowItemBuilder.createWorkflowItem(context, colWorkflow)
+        ClaimedTask claimedTask = ClaimedTaskBuilder.createClaimedTask(context, colWorkflow, reviewer)
                 .withTitle("Sample submission").withIssueDate("2017-10-17")
                 .withFulltext("simple-article.pdf", "/local/path/simple-article.pdf", pdf).build();
+        claimedTask.setStepID("editstep");
+        claimedTask.setActionID("editaction");
+        XmlWorkflowItem witem = claimedTask.getWorkflowItem();
         /*
          * ^ BUG: Since DSpaceObject.metadata is set to FetchType.LAZY here a
          * "org.hibernate.LazyInitializationException: failed to lazily initialize a
@@ -825,14 +854,16 @@ public class SubmissionDeduplicationRestIT extends AbstractControllerIntegration
         // Test reject patch operation with a workspace item
         context.restoreAuthSystemState();
 
+        // check security
+        getClient().perform(get("/api/workflow/workflowitems/" + witem.getID())).andExpect(status().isUnauthorized());
+
         // check for duplicates
-        getClient(authToken).perform(get("/api/workflow/workflowitems/" + witem.getID())).andExpect(status().isOk())
+        getClient(reviewerToken).perform(get("/api/workflow/workflowitems/" + witem.getID())).andExpect(status().isOk())
                 .andExpect(jsonPath("$.sections['detect-duplicate'].matches['" + item.getID() + "'].matchObject.id",
                         is(item.getID().toString())))
                 .andExpect(jsonPath("$.sections['detect-duplicate'].matches['" + item.getID() + "'].workflowDecision")
                         .doesNotExist());
 
-        // try to reject
         List<Operation> detectDuplicate = new ArrayList<Operation>();
         Map<String, String> value = new HashMap<String, String>();
         value.put("value", "reject");
@@ -841,7 +872,15 @@ public class SubmissionDeduplicationRestIT extends AbstractControllerIntegration
                 new AddOperation("/sections/detect-duplicate/matches/" + item.getID() + "/workflowDecision", value));
 
         String patchBody = getPatchContent(detectDuplicate);
-        getClient(authToken)
+
+        // check security
+        getClient(submitterTocken)
+                .perform(patch("/api/workflow/workflowitems/" + witem.getID()).content(patchBody)
+                        .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                .andExpect(status().isUnprocessableEntity());
+
+        // execute the patch
+        getClient(reviewerToken)
                 .perform(patch("/api/workflow/workflowitems/" + witem.getID())
                         .content(patchBody).contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
                 .andExpect(status().isOk())
@@ -851,13 +890,14 @@ public class SubmissionDeduplicationRestIT extends AbstractControllerIntegration
                         is("reject")));
 
         // check that changes persist
-        getClient(authToken).perform(get("/api/workflow/workflowitems/" + witem.getID())).andExpect(status().isOk())
+        getClient(reviewerToken).perform(get("/api/workflow/workflowitems/" + witem.getID())).andExpect(status().isOk())
                 .andExpect(jsonPath("$.sections['detect-duplicate'].matches['" + item.getID() + "'].matchObject.id",
                         is(item.getID().toString())))
                 .andExpect(jsonPath("$.sections['detect-duplicate'].matches['" + item.getID() + "'].workflowDecision",
                         is("reject")));
 
         String firstWitemUuid = witem.getItem().getID().toString();
+        claimedTask = null;
         witem = null;
         detectDuplicate = null;
         value = null;
@@ -868,14 +908,20 @@ public class SubmissionDeduplicationRestIT extends AbstractControllerIntegration
 
         // Test verify patch operation with another workspace item
         pdf = getClass().getResourceAsStream("simple-article.pdf");
-        witem = WorkflowItemBuilder.createWorkflowItem(context, colWorkflow).withTitle("Sample submission")
-                .withIssueDate("2017-10-17").withFulltext("simple-article.pdf", "/local/path/simple-article.pdf", pdf)
-                .build();
+        claimedTask = ClaimedTaskBuilder.createClaimedTask(context, colWorkflow, reviewer)
+                .withTitle("Sample submission").withIssueDate("2017-10-17")
+                .withFulltext("simple-article.pdf", "/local/path/simple-article.pdf", pdf).build();
+        claimedTask.setStepID("editstep");
+        claimedTask.setActionID("editaction");
+        witem = claimedTask.getWorkflowItem();
         pdf.close();
         context.restoreAuthSystemState();
 
+        // check security
+        getClient().perform(get("/api/workflow/workflowitems/" + witem.getID())).andExpect(status().isUnauthorized());
+
         // check for duplicates
-        getClient(authToken).perform(get("/api/workflow/workflowitems/" + witem.getID())).andExpect(status().isOk())
+        getClient(reviewerToken).perform(get("/api/workflow/workflowitems/" + witem.getID())).andExpect(status().isOk())
                 .andExpect(jsonPath("$.sections['detect-duplicate'].matches['" + item.getID() + "'].matchObject.id",
                         is(item.getID().toString())))
                 .andExpect(jsonPath("$.sections['detect-duplicate'].matches['" + item.getID() + "'].workflowDecision")
@@ -894,7 +940,15 @@ public class SubmissionDeduplicationRestIT extends AbstractControllerIntegration
                 new AddOperation("/sections/detect-duplicate/matches/" + item.getID() + "/workflowDecision", value));
 
         patchBody = getPatchContent(detectDuplicate);
-        getClient(authToken)
+
+        // check security
+        getClient(submitterTocken)
+                .perform(patch("/api/workflow/workflowitems/" + witem.getID()).content(patchBody)
+                        .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                .andExpect(status().isUnprocessableEntity());
+
+        // patch operation
+        getClient(reviewerToken)
                 .perform(patch("/api/workflow/workflowitems/" + witem.getID())
                         .content(patchBody).contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
                 .andExpect(status().isOk())
@@ -910,7 +964,7 @@ public class SubmissionDeduplicationRestIT extends AbstractControllerIntegration
                         .doesNotExist());
 
         // check that changes persist
-        getClient(authToken).perform(get("/api/workflow/workflowitems/" + witem.getID())).andExpect(status().isOk())
+        getClient(reviewerToken).perform(get("/api/workflow/workflowitems/" + witem.getID())).andExpect(status().isOk())
                 .andExpect(jsonPath("$.sections['detect-duplicate'].matches['" + item.getID() + "'].matchObject.id",
                         is(item.getID().toString())))
                 .andExpect(jsonPath("$.sections['detect-duplicate'].matches['" + item.getID() + "'].workflowDecision",
@@ -935,7 +989,7 @@ public class SubmissionDeduplicationRestIT extends AbstractControllerIntegration
                 new AddOperation("/sections/detect-duplicate/matches/" + firstWitemUuid + "/workflowDecision", value));
 
         patchBody = getPatchContent(detectDuplicate);
-        getClient(authToken)
+        getClient(reviewerToken)
                 .perform(patch("/api/workflow/workflowitems/" + witem.getID())
                         .content(patchBody).contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
                 .andExpect(status().isOk())
@@ -953,7 +1007,7 @@ public class SubmissionDeduplicationRestIT extends AbstractControllerIntegration
                         is("test2")));
 
         // check that changes persist
-        getClient(authToken).perform(get("/api/workflow/workflowitems/" + witem.getID())).andExpect(status().isOk())
+        getClient(reviewerToken).perform(get("/api/workflow/workflowitems/" + witem.getID())).andExpect(status().isOk())
                 .andExpect(jsonPath("$.sections['detect-duplicate'].matches['" + item.getID() + "'].matchObject.id",
                         is(item.getID().toString())))
                 .andExpect(jsonPath("$.sections['detect-duplicate'].matches['" + item.getID() + "'].workflowDecision",
@@ -995,6 +1049,7 @@ public class SubmissionDeduplicationRestIT extends AbstractControllerIntegration
                 .withWorkflowGroup(1, reviewer).build();
 
         // 3. create an item with title "Sample submission" using the first submitter
+        String submitterToken = getAuthToken(submitter.getEmail(), password);
         context.setCurrentUser(submitter);
         WorkspaceItem workspaceItem = WorkspaceItemBuilder.createWorkspaceItem(context, colItem)
                 .withTitle("Sample submission").withIssueDate("2020-01-31").withAuthor("Cadili, Francesco")
@@ -1002,13 +1057,16 @@ public class SubmissionDeduplicationRestIT extends AbstractControllerIntegration
 
         // 4a. create workspace items with the reviewer
         context.setCurrentUser(reviewer);
-        String authToken = getAuthToken(reviewer.getEmail(), password);
+        String reviewerToken = getAuthToken(reviewer.getEmail(), password);
 
         // 3. a workflow item will all the required fields
         InputStream pdf = getClass().getResourceAsStream("simple-article.pdf");
-        XmlWorkflowItem witem = WorkflowItemBuilder.createWorkflowItem(context, colWorkflow)
+        ClaimedTask claimedTask = ClaimedTaskBuilder.createClaimedTask(context, colWorkflow, reviewer)
                 .withTitle("Sample submission").withIssueDate("2017-10-17")
                 .withFulltext("simple-article.pdf", "/local/path/simple-article.pdf", pdf).build();
+        claimedTask.setStepID("editstep");
+        claimedTask.setActionID("editaction");
+        XmlWorkflowItem witem = claimedTask.getWorkflowItem();
         /*
          * ^ BUG: Since DSpaceObject.metadata is set to FetchType.LAZY here a
          * "org.hibernate.LazyInitializationException: failed to lazily initialize a
@@ -1022,9 +1080,13 @@ public class SubmissionDeduplicationRestIT extends AbstractControllerIntegration
         // Test reject patch operation with a workspace item
         context.restoreAuthSystemState();
 
+        // check security
+        getClient().perform(get("/api/workflow/workflowitems/" + witem.getID()))
+                .andExpect(status().isUnauthorized());
+
         // check for duplicates
         String workspaceItemId = workspaceItem.getItem().getID().toString();
-        getClient(authToken).perform(get("/api/workflow/workflowitems/" + witem.getID())).andExpect(status().isOk())
+        getClient(reviewerToken).perform(get("/api/workflow/workflowitems/" + witem.getID())).andExpect(status().isOk())
                 .andExpect(jsonPath("$.sections['detect-duplicate'].matches['" + workspaceItemId + "'].matchObject.id",
                         is(workspaceItemId)))
                 .andExpect(
@@ -1040,7 +1102,13 @@ public class SubmissionDeduplicationRestIT extends AbstractControllerIntegration
                 new AddOperation("/sections/detect-duplicate/matches/" + workspaceItemId + "/workflowDecision", value));
 
         String patchBody = getPatchContent(detectDuplicate);
-        getClient(authToken)
+
+        // check security
+        getClient(submitterToken).perform(patch("/api/workflow/workflowitems/" + witem.getID()).content(patchBody)
+                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON)).andExpect(status().isUnprocessableEntity());
+
+        // make patch
+        getClient(reviewerToken)
                 .perform(patch("/api/workflow/workflowitems/" + witem.getID())
                         .content(patchBody).contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
                 .andExpect(status().isOk())
@@ -1051,7 +1119,7 @@ public class SubmissionDeduplicationRestIT extends AbstractControllerIntegration
                                 is("reject")));
 
         // check that changes persist
-        getClient(authToken).perform(get("/api/workflow/workflowitems/" + witem.getID())).andExpect(status().isOk())
+        getClient(reviewerToken).perform(get("/api/workflow/workflowitems/" + witem.getID())).andExpect(status().isOk())
                 .andExpect(jsonPath("$.sections['detect-duplicate'].matches['" + workspaceItemId + "'].matchObject.id",
                         is(workspaceItemId)))
                 .andExpect(
@@ -1059,6 +1127,7 @@ public class SubmissionDeduplicationRestIT extends AbstractControllerIntegration
                                 is("reject")));
 
         String firstWitemUuid = witem.getItem().getID().toString();
+        claimedTask = null;
         witem = null;
         detectDuplicate = null;
         value = null;
@@ -1069,14 +1138,20 @@ public class SubmissionDeduplicationRestIT extends AbstractControllerIntegration
 
         // Test verify patch operation with another workspace item
         pdf = getClass().getResourceAsStream("simple-article.pdf");
-        witem = WorkflowItemBuilder.createWorkflowItem(context, colWorkflow).withTitle("Sample submission")
-                .withIssueDate("2021-01-01").withFulltext("article.pdf", "/local/path/simple-article.pdf", pdf)
+        claimedTask = ClaimedTaskBuilder.createClaimedTask(context, colWorkflow, reviewer)
+                .withTitle("Sample submission").withIssueDate("2017-10-17")
                 .withFulltext("simple-article.pdf", "/local/path/simple-article.pdf", pdf).build();
+        claimedTask.setStepID("editstep");
+        claimedTask.setActionID("editaction");
+        witem = claimedTask.getWorkflowItem();
         pdf.close();
         context.restoreAuthSystemState();
 
+        // check security
+        getClient().perform(get("/api/workflow/workflowitems/" + witem.getID())).andExpect(status().isUnauthorized());
+
         // check for duplicates
-        getClient(authToken).perform(get("/api/workflow/workflowitems/" + witem.getID())).andExpect(status().isOk())
+        getClient(reviewerToken).perform(get("/api/workflow/workflowitems/" + witem.getID())).andExpect(status().isOk())
                 .andExpect(jsonPath("$.sections['detect-duplicate'].matches['" + workspaceItemId + "'].matchObject.id",
                         is(workspaceItemId)))
                 .andExpect(
@@ -1096,7 +1171,14 @@ public class SubmissionDeduplicationRestIT extends AbstractControllerIntegration
                 new AddOperation("/sections/detect-duplicate/matches/" + workspaceItemId + "/workflowDecision", value));
 
         patchBody = getPatchContent(detectDuplicate);
-        getClient(authToken)
+
+        // check security
+        getClient(submitterToken)
+                .perform(patch("/api/workflow/workflowitems/" + witem.getID()).content(patchBody)
+                        .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                .andExpect(status().isUnprocessableEntity());
+
+        getClient(reviewerToken)
                 .perform(patch("/api/workflow/workflowitems/" + witem.getID())
                         .content(patchBody).contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
                 .andExpect(status().isOk())
@@ -1113,7 +1195,7 @@ public class SubmissionDeduplicationRestIT extends AbstractControllerIntegration
                         .doesNotExist());
 
         // check that changes persist
-        getClient(authToken).perform(get("/api/workflow/workflowitems/" + witem.getID())).andExpect(status().isOk())
+        getClient(reviewerToken).perform(get("/api/workflow/workflowitems/" + witem.getID())).andExpect(status().isOk())
                 .andExpect(jsonPath("$.sections['detect-duplicate'].matches['" + workspaceItemId + "'].matchObject.id",
                         is(workspaceItemId)))
                 .andExpect(
@@ -1139,7 +1221,7 @@ public class SubmissionDeduplicationRestIT extends AbstractControllerIntegration
                 new AddOperation("/sections/detect-duplicate/matches/" + firstWitemUuid + "/workflowDecision", value));
 
         patchBody = getPatchContent(detectDuplicate);
-        getClient(authToken)
+        getClient(reviewerToken)
                 .perform(patch("/api/workflow/workflowitems/" + witem.getID())
                         .content(patchBody).contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
                 .andExpect(status().isOk())
@@ -1158,7 +1240,7 @@ public class SubmissionDeduplicationRestIT extends AbstractControllerIntegration
                         is("test2")));
 
         // check that changes persist
-        getClient(authToken).perform(get("/api/workflow/workflowitems/" + witem.getID())).andExpect(status().isOk())
+        getClient(reviewerToken).perform(get("/api/workflow/workflowitems/" + witem.getID())).andExpect(status().isOk())
                 .andExpect(jsonPath("$.sections['detect-duplicate'].matches['" + workspaceItemId + "'].matchObject.id",
                         is(workspaceItemId.toString())))
                 .andExpect(
@@ -1375,7 +1457,7 @@ public class SubmissionDeduplicationRestIT extends AbstractControllerIntegration
                         .matchItemWithTitleAndDateIssuedAndSubject(witem, "Sample submission", "2020-02-01", "Test"))));
 
         // check for duplicates
-        getClient().perform(get("/api/submission/workspaceitems/" + witem.getID())).andExpect(status().isOk())
+        getClient(authToken).perform(get("/api/submission/workspaceitems/" + witem.getID())).andExpect(status().isOk())
                 .andExpect(jsonPath("$.sections['detect-duplicate'].matches['" + item.getID() + "'].matchObject.id",
                         is(item.getID().toString())))
                 .andExpect(jsonPath("$.sections['detect-duplicate'].matches['" + item.getID() + "'].submitterDecision")

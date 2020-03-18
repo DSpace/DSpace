@@ -32,7 +32,7 @@ import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.utils.DSpace;
 
 /**
- * Curation Task used to populate the deduplication index of solr dedup core.
+ * CLI Tool used to populate the deduplication index of solr dedup core.
  * 
  * Usage: ./dspace index-deduplication [-chfueto[r <item handle/uuid>]]
  */

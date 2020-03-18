@@ -15,9 +15,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.solr.common.SolrInputDocument;
 import org.dspace.app.deduplication.service.SolrDedupServiceIndexPlugin;
+import org.dspace.content.EntityType;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.EntityTypeService;
 import org.dspace.core.Context;
 
 /**
@@ -34,6 +36,8 @@ public class ItemMetadataDedupServiceIndexPlugin implements SolrDedupServiceInde
     private List<String> metadata;
 
     private String field;
+
+    private Integer itemType;
 
     @Override
     public void additionalIndex(Context context, UUID firstId, UUID secondId, SolrInputDocument document) {
@@ -53,6 +57,13 @@ public class ItemMetadataDedupServiceIndexPlugin implements SolrDedupServiceInde
             if (item == null) {
                 // found a zombie reference in solr, ignore it
                 return;
+            } else {
+                EntityType type = getEntityType(context);
+
+                if (type != null && type.getID() != item.getType()) {
+                    // filter the value
+                    return;
+                }
             }
 
             for (String meta : metadata) {
@@ -84,6 +95,27 @@ public class ItemMetadataDedupServiceIndexPlugin implements SolrDedupServiceInde
 
     public void setField(String field) {
         this.field = field;
+    }
+
+    public void setType(Integer itemType) {
+        this.itemType = itemType;
+    }
+
+    private EntityType getEntityType(Context context) {
+        try {
+            if (itemType != null) {
+                EntityTypeService entityService = ContentServiceFactory.getInstance().getEntityTypeService();
+                EntityType type = entityService.find(context, itemType);
+
+                return type;
+            } else {
+                return null;
+            }
+        } catch (Exception e) {
+            log.error("The bean attribute Type is not valid", e);
+
+            return null;
+        }
     }
 
 }
