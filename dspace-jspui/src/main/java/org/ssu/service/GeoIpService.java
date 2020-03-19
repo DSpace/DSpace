@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
+import java.util.Optional;
 
 @Service
 public class GeoIpService {
@@ -87,7 +88,7 @@ public class GeoIpService {
 
             if (!(UNKNOWN_COUNTRY_CODE.equals(countryCode)
                     && latitude == -180 && longitude == -180)) {
-                return countryCode;
+                return Optional.ofNullable(countryCode).orElse(UNKNOWN_COUNTRY_CODE);
             }
 
         } catch (Exception e) {
