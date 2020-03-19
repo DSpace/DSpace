@@ -535,7 +535,7 @@
 
   <servlet-mapping>
     <servlet-name>bitstream</servlet-name>
-    <url-pattern>/bitstream/*</url-pattern>
+    <url-pattern>/bitstream-download/*</url-pattern>
   </servlet-mapping>
 
   <servlet-mapping>
@@ -947,7 +947,7 @@
 
     <servlet-mapping>
         <servlet-name>essuir-servlet</servlet-name>
-        <url-pattern>/item-download/*</url-pattern>
+        <url-pattern>/bitstream/*</url-pattern>
     </servlet-mapping>
 
     <servlet-mapping>

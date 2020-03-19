@@ -204,26 +204,18 @@ public class HandleController {
         return model;
     }
 
-    @RequestMapping("/item-download/{itemId}/{bitstreamId}")
-    public RedirectView downloadBitstream(HttpServletRequest request, @PathVariable("itemId") UUID itemId, @PathVariable("bitstreamId") UUID bitstreamId) throws SQLException {
+    @RequestMapping("/123456789/{handle}/{sequenceId}/{bitstreamName:.+}")
+    public RedirectView downloadBitstream(HttpServletRequest request, @PathVariable("handle") Integer handle, @PathVariable("sequenceId") Integer sequenceId, @PathVariable("bitstreamName") String bitstreamName) throws SQLException {
         Context dspaceContext = UIUtil.obtainContext(request);
-        Function<Bitstream, String> getLinkForBitstream = (bitstream) -> {
-            try {
-                Item item = dspaceItemService.find(dspaceContext, itemId);
-                boolean isSpiderBot = SpiderDetector.isSpider(request);
-                if(!isSpiderBot) {
-                    essuirStatistics.incrementGlobalItemDownloads(itemId);
-                    essuirStatistics.updateItemDownloads(request, item.getID());
-                }
-                return String.format("%s/bitstream/%s/%s/%s", request.getContextPath(), item.getHandle(), bitstream.getSequenceID(), UIUtil.encodeBitstreamName(bitstream.getName(), Constants.DEFAULT_ENCODING));
-            } catch (UnsupportedEncodingException | SQLException e) {
-                e.printStackTrace();
-            }
-            return bitstream.getHandle();
-        };
+        Item item = (Item)handleService.resolveToObject(dspaceContext, String.format("123456789/%d", handle));
+        boolean isSpiderBot = SpiderDetector.isSpider(request);
+        if(!isSpiderBot) {
+            essuirStatistics.incrementGlobalItemDownloads(item.getID());
+            essuirStatistics.updateItemDownloads(request, item.getID());
+        }
+        String downloadString = String.format("%s/bitstream-download/%s/%s/%s", request.getContextPath(), item.getHandle(), sequenceId, bitstreamName);
 
-        Bitstream bitstream = ContentServiceFactory.getInstance().getBitstreamService().find(dspaceContext, bitstreamId);
-        RedirectView redirectView = new RedirectView(getLinkForBitstream.apply(bitstream));
+        RedirectView redirectView = new RedirectView(downloadString);
         dspaceContext.complete();
         return redirectView;
     }
@@ -298,6 +290,14 @@ public class HandleController {
             return "";
         };
 
+        Function<Bitstream, String> getBitStreamLink = (bitstream) -> {
+            try {
+                return String.format("%s/bitstream/%s/%d/%s", request.getContextPath(), item.getHandle(), bitstream.getSequenceID(), UIUtil.encodeBitstreamName(bitstream.getName(), Constants.DEFAULT_ENCODING));
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
+            return "";
+        };
 
 
         List<Bundle> bundles = dspaceItemService.getBundles(item, "ORIGINAL");
@@ -308,7 +308,7 @@ public class HandleController {
                         .withFormat(getBitstreamFormat.apply(bitstream))
                         .withFilename(bitstream.getName())
                         .withHandle(bitstream.getHandle())
-                        .withLink(String.format("%s/handle/item-download/%s/%s", request.getContextPath(), item.getID(), bitstream.getID()))
+                        .withLink(getBitStreamLink.apply(bitstream))
                         .withSize(UIUtil.formatFileSize(bitstream.getSizeBytes()))
                         .build())
                 .collect(Collectors.toList());
