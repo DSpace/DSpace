@@ -16,6 +16,7 @@ import org.dspace.app.rest.projection.Projection;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.service.ItemService;
+import org.dspace.core.Context;
 import org.dspace.discovery.IndexableObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -47,11 +48,13 @@ public class ItemConverter
         item.setWithdrawn(obj.isWithdrawn());
         item.setLastModified(obj.getLastModified());
 
-        List<MetadataValue> fullList = itemService.getMetadata(obj, Item.ANY, Item.ANY, Item.ANY, Item.ANY, true);
-        MetadataValueList metadataValues = new MetadataValueList(fullList);
-        item.setMetadata(converter.toRest(metadataValues, projection));
-
         return item;
+    }
+
+    @Override
+    public MetadataValueList getPermissionFilteredMetadata(Context context, Item obj) {
+        List<MetadataValue> fullList = itemService.getMetadata(obj, Item.ANY, Item.ANY, Item.ANY, Item.ANY, true);
+        return new MetadataValueList(fullList);
     }
 
     @Override
