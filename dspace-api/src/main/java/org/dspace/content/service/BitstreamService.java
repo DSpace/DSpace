@@ -13,7 +13,6 @@ import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
-
 import javax.annotation.Nullable;
 
 import org.dspace.authorize.AuthorizeException;
@@ -46,7 +45,7 @@ public interface BitstreamService extends DSpaceObjectService<Bitstream>, DSpace
      * checksum algorithm as same as the given bitstream.
      * This allows multiple bitstreams to share the same internal identifier of assets .
      * An example of such a use case scenario is versioning.
-     * 
+     *
      * @param context
      *            DSpace context object
      * @param bitstream
