@@ -6,9 +6,8 @@ import org.jooq.Record;
 import org.jooq.TableField;
 import org.jooq.impl.SQLDataType;
 
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Stream;
 
 public class AuthorLocalization {
 
@@ -55,12 +54,19 @@ public class AuthorLocalization {
         return this;
     }
 
+    private Locale checkThatLocaleIsSupporting(Locale locale) {
+        return Stream.of(Locale.forLanguageTag("uk"), Locale.forLanguageTag("ru"), Locale.ENGLISH)
+                .filter(supportedLocale -> supportedLocale.equals(locale))
+                .findFirst()
+                .orElse(Locale.ENGLISH);
+    }
+
     public String getSurname(Locale locale) {
-        return authorLocalizations.get(locale.getLanguage()).getSurname();
+        return authorLocalizations.get(checkThatLocaleIsSupporting(locale).getLanguage()).getSurname();
     }
 
     public String getInitials(Locale locale) {
-        return authorLocalizations.get(locale.getLanguage()).getInitials();
+        return authorLocalizations.get(checkThatLocaleIsSupporting(locale).getLanguage()).getInitials();
     }
 
     public String getFormattedAuthorData(String format, Locale locale) {
