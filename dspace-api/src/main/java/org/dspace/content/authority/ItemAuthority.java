@@ -103,7 +103,7 @@ public class ItemAuthority implements ChoiceAuthority {
 
             Choice[] results = new Choice[choiceList.size()];
             results = choiceList.toArray(results);
-            return new Choices(results, 0, results.length, Choices.CF_AMBIGUOUS,
+            return new Choices(results, 0, (int) resultSearch.getTotalSearchResults(), Choices.CF_AMBIGUOUS,
                                resultSearch.getTotalSearchResults() > (start + limit), 0);
 
         } catch (SearchServiceException e) {

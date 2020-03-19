@@ -13,7 +13,7 @@ import java.util.Arrays;
 import javax.servlet.http.HttpServletResponse;
 
 import org.dspace.app.rest.model.AuthnRest;
-import org.dspace.core.ConfigurationManager;
+import org.dspace.services.ConfigurationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -37,6 +37,9 @@ public class ShibbolethRestController implements InitializingBean {
     private static final Logger log = LoggerFactory.getLogger(ShibbolethRestController.class);
 
     @Autowired
+    ConfigurationService configurationService;
+
+    @Autowired
     DiscoverableEndpointsService discoverableEndpointsService;
 
     @Override
@@ -49,7 +52,7 @@ public class ShibbolethRestController implements InitializingBean {
     public void shibboleth(HttpServletResponse response,
             @RequestParam(name = "redirectUrl", required = false) String redirectUrl) throws IOException {
         if (redirectUrl == null) {
-            redirectUrl = ConfigurationManager.getProperty("dspace.url");
+            redirectUrl = configurationService.getProperty("dspace.ui.url");
         }
         log.info("Redirecting to " + redirectUrl);
         response.sendRedirect(redirectUrl);

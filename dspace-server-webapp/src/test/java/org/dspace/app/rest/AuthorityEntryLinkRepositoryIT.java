@@ -103,11 +103,11 @@ public class AuthorityEntryLinkRepositoryIT extends AbstractControllerIntegratio
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.page.size", is(10)))
             .andExpect(jsonPath("$.page.totalElements", is(5)))
-            .andExpect(jsonPath("$._embedded.authorityEntries[0].value", is("Smith, Donald")))
-            .andExpect(jsonPath("$._embedded.authorityEntries[1].value", is("Smith, Maria")))
-            .andExpect(jsonPath("$._embedded.authorityEntries[2].value", is("Smith, Jack")))
-            .andExpect(jsonPath("$._embedded.authorityEntries[3].value", is("Smith, Joe")))
-            .andExpect(jsonPath("$._embedded.authorityEntries[4].value", is("Smith, J.")));
+            .andExpect(jsonPath("$._embedded.entries[0].value", is("Smith, Donald")))
+            .andExpect(jsonPath("$._embedded.entries[1].value", is("Smith, Maria")))
+            .andExpect(jsonPath("$._embedded.entries[2].value", is("Smith, Joe")))
+            .andExpect(jsonPath("$._embedded.entries[3].value", is("Smith, Jack")))
+            .andExpect(jsonPath("$._embedded.entries[4].value", is("Smith, J.")));
 
         getClient(token).perform(get("/api/integration/authorities/AuthorAuthority/entries")
             .param("query", "Smith, J")
@@ -118,9 +118,9 @@ public class AuthorityEntryLinkRepositoryIT extends AbstractControllerIntegratio
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.page.size", is(10)))
             .andExpect(jsonPath("$.page.totalElements", is(3)))
-            .andExpect(jsonPath("$._embedded.authorityEntries[0].value", is("Smith, J.")))
-            .andExpect(jsonPath("$._embedded.authorityEntries[1].value", is("Smith, Jack")))
-            .andExpect(jsonPath("$._embedded.authorityEntries[2].value", is("Smith, Joe")));
+            .andExpect(jsonPath("$._embedded.entries[0].value", is("Smith, J.")))
+            .andExpect(jsonPath("$._embedded.entries[1].value", is("Smith, Joe")))
+            .andExpect(jsonPath("$._embedded.entries[2].value", is("Smith, Jack")));
 
         getClient(token).perform(get("/api/integration/authorities/AuthorAuthority/entries")
             .param("query", "Smith, J.")
@@ -131,7 +131,7 @@ public class AuthorityEntryLinkRepositoryIT extends AbstractControllerIntegratio
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.page.size", is(10)))
             .andExpect(jsonPath("$.page.totalElements", is(1)))
-            .andExpect(jsonPath("$._embedded.authorityEntries[0].value", is("Smith, J.")));
+            .andExpect(jsonPath("$._embedded.entries[0].value", is("Smith, J.")));
 
         getClient(token).perform(get("/api/integration/authorities/AuthorAuthority/entries")
             .param("query", "Donald")
@@ -142,8 +142,8 @@ public class AuthorityEntryLinkRepositoryIT extends AbstractControllerIntegratio
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.page.size", is(10)))
             .andExpect(jsonPath("$.page.totalElements", is(2)))
-            .andExpect(jsonPath("$._embedded.authorityEntries[0].value", is("Smith, Donald")))
-            .andExpect(jsonPath("$._embedded.authorityEntries[1].value", is("Foe, Donald")));
+            .andExpect(jsonPath("$._embedded.entries[0].value", is("Smith, Donald")))
+            .andExpect(jsonPath("$._embedded.entries[1].value", is("Foe, Donald")));
     }
 
     @Test
@@ -256,10 +256,10 @@ public class AuthorityEntryLinkRepositoryIT extends AbstractControllerIntegratio
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.page.size", is(10)))
             .andExpect(jsonPath("$.page.totalElements", is(4)))
-            .andExpect(jsonPath("$._embedded.authorityEntries[0].value", is("Science Technological journal")))
-            .andExpect(jsonPath("$._embedded.authorityEntries[1].value", is("Bioresource technology journal")))
-            .andExpect(jsonPath("$._embedded.authorityEntries[2].value", is("Journal of High Energy Astrophysics")))
-            .andExpect(jsonPath("$._embedded.authorityEntries[3].value",
+            .andExpect(jsonPath("$._embedded.entries[0].value", is("Science Technological journal")))
+            .andExpect(jsonPath("$._embedded.entries[1].value", is("Bioresource technology journal")))
+            .andExpect(jsonPath("$._embedded.entries[2].value", is("Journal of High Energy Astrophysics")))
+            .andExpect(jsonPath("$._embedded.entries[3].value",
                     is("Nuclear Energy-journal Of The British Nuclear Energy Society")));
 
         getClient(token).perform(get("/api/integration/authorities/JournalAuthority/entries")
@@ -271,13 +271,13 @@ public class AuthorityEntryLinkRepositoryIT extends AbstractControllerIntegratio
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.page.size", is(10)))
             .andExpect(jsonPath("$.page.totalElements", is(7)))
-            .andExpect(jsonPath("$._embedded.authorityEntries[0].value", is("Science")))
-            .andExpect(jsonPath("$._embedded.authorityEntries[1].value", is("Science China-Earth Sciences")))
-            .andExpect(jsonPath("$._embedded.authorityEntries[2].value", is("Management science")))
-            .andExpect(jsonPath("$._embedded.authorityEntries[3].value", is("Ocean Science")))
-            .andExpect(jsonPath("$._embedded.authorityEntries[4].value", is("Service Science")))
-            .andExpect(jsonPath("$._embedded.authorityEntries[5].value", is("Annals of science")))
-            .andExpect(jsonPath("$._embedded.authorityEntries[6].value", is("Science Technological journal")));
+            .andExpect(jsonPath("$._embedded.entries[0].value", is("Science China-Earth Sciences")))
+            .andExpect(jsonPath("$._embedded.entries[1].value", is("Science")))
+            .andExpect(jsonPath("$._embedded.entries[2].value", is("Annals of science")))
+            .andExpect(jsonPath("$._embedded.entries[3].value", is("Management science")))
+            .andExpect(jsonPath("$._embedded.entries[4].value", is("Service Science")))
+            .andExpect(jsonPath("$._embedded.entries[5].value", is("Ocean Science")))
+            .andExpect(jsonPath("$._embedded.entries[6].value", is("Science Technological journal")));
 
         getClient(token).perform(get("/api/integration/authorities/JournalAuthority/entries")
             .param("query", "Annals of science")
@@ -288,6 +288,6 @@ public class AuthorityEntryLinkRepositoryIT extends AbstractControllerIntegratio
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.page.size", is(10)))
             .andExpect(jsonPath("$.page.totalElements", is(1)))
-            .andExpect(jsonPath("$._embedded.authorityEntries[0].value", is("Annals of science")));
+            .andExpect(jsonPath("$._embedded.entries[0].value", is("Annals of science")));
     }
 }

@@ -22,7 +22,6 @@ import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.BundleRest;
 import org.dspace.app.rest.model.ItemRest;
 import org.dspace.app.rest.model.hateoas.BundleResource;
-import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.repository.ItemRestRepository;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.app.rest.utils.Utils;
@@ -108,7 +107,7 @@ public class ItemAddBundleController {
         }
 
         Bundle bundle = itemRestRepository.addBundleToItem(context, item, bundleRest);
-        BundleResource bundleResource = converter.toResource(converter.toRest(bundle, Projection.DEFAULT));
+        BundleResource bundleResource = converter.toResource(converter.toRest(bundle, utils.obtainProjection()));
         return ControllerUtils.toResponseEntity(HttpStatus.CREATED, new HttpHeaders(), bundleResource);
     }
 

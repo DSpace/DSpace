@@ -86,7 +86,8 @@ public class RelationshipTypeRestControllerIT extends AbstractEntityIntegrationT
         RelationshipType relationshipType5 = relationshipTypeService
             .findbyTypesAndTypeName(context, publicationEntityType, orgunitEntityType, "isAuthorOfPublication",
                                   "isPublicationOfAuthor");
-        getClient().perform(get("/api/core/entitytypes/" + publicationEntityType.getID() + "/relationshiptypes"))
+        getClient().perform(get("/api/core/entitytypes/" + publicationEntityType.getID() + "/relationshiptypes")
+                   .param("projection", "full"))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$._embedded.relationshiptypes", containsInAnyOrder(
                        RelationshipTypeMatcher.matchRelationshipTypeEntry(relationshipType1),
@@ -185,7 +186,8 @@ public class RelationshipTypeRestControllerIT extends AbstractEntityIntegrationT
 
         context.restoreAuthSystemState();
         //verify results
-        getClient().perform(get("/api/core/relationships/search/byLabel?label=isAuthorOfPublication"))
+        getClient().perform(get("/api/core/relationships/search/byLabel?label=isAuthorOfPublication")
+                   .param("projection", "full"))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$._embedded.relationships", containsInAnyOrder(
                        RelationshipMatcher.matchRelationship(relationship1),
@@ -201,7 +203,8 @@ public class RelationshipTypeRestControllerIT extends AbstractEntityIntegrationT
 
         //verify results
         getClient().perform(get("/api/core/relationships/search/byLabel?label=isAuthorOfPublication&dso="
-                                    + publication.getID()))
+                                    + publication.getID())
+                   .param("projection", "full"))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$._embedded.relationships", containsInAnyOrder(
                        RelationshipMatcher.matchRelationship(relationship1),
@@ -216,7 +219,8 @@ public class RelationshipTypeRestControllerIT extends AbstractEntityIntegrationT
 
         //verify results
         getClient().perform(get("/api/core/relationships/search/byLabel?label=isAuthorOfPublication&dso="
-                                    + publication2.getID()))
+                                    + publication2.getID())
+                   .param("projection", "full"))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$._embedded.relationships", containsInAnyOrder(
                        RelationshipMatcher.matchRelationship(relationship3),

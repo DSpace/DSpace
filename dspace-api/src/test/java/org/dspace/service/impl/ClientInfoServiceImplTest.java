@@ -18,8 +18,6 @@ import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.statistics.util.DummyHttpServletRequest;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.runners.MockitoJUnitRunner;
 
 /**
  * Unit test class for the {@link ClientInfoServiceImpl} class which implements
@@ -27,7 +25,6 @@ import org.mockito.runners.MockitoJUnitRunner;
  *
  * @author tom dot desair at gmail dot com
  */
-@RunWith(MockitoJUnitRunner.class)
 public class ClientInfoServiceImplTest extends AbstractDSpaceTest {
 
     private ClientInfoService clientInfoService;

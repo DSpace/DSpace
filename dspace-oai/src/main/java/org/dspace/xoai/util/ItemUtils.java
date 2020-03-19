@@ -387,7 +387,7 @@ public class ItemUtils {
 
         // Repository Info
         Element repository = create("repository");
-        repository.getField().add(createValue("url", ConfigurationManager.getProperty("dspace.baseUrl")));
+        repository.getField().add(createValue("url", ConfigurationManager.getProperty("dspace.ui.url")));
         repository.getField().add(createValue("name", ConfigurationManager.getProperty("dspace.name")));
         repository.getField().add(createValue("mail", ConfigurationManager.getProperty("mail.admin")));
         metadata.getElement().add(repository);

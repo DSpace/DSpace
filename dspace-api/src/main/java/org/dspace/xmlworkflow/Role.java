@@ -13,14 +13,15 @@ import java.util.List;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
-import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.GroupService;
-import org.dspace.xmlworkflow.factory.XmlWorkflowServiceFactory;
 import org.dspace.xmlworkflow.storedcomponents.CollectionRole;
 import org.dspace.xmlworkflow.storedcomponents.WorkflowItemRole;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 import org.dspace.xmlworkflow.storedcomponents.service.CollectionRoleService;
 import org.dspace.xmlworkflow.storedcomponents.service.WorkflowItemRoleService;
+import org.springframework.beans.factory.BeanNameAware;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Required;
 
 /**
  * The role that is responsible for a certain step
@@ -32,37 +33,35 @@ import org.dspace.xmlworkflow.storedcomponents.service.WorkflowItemRoleService;
  * @author Ben Bosman (ben at atmire dot com)
  * @author Mark Diggory (markd at atmire dot com)
  */
-public class Role {
+public class Role implements BeanNameAware {
 
-    private GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
-    private CollectionRoleService collectionRoleService = XmlWorkflowServiceFactory.getInstance()
-                                                                                   .getCollectionRoleService();
-    private WorkflowItemRoleService workflowItemRoleService = XmlWorkflowServiceFactory.getInstance()
-                                                                                       .getWorkflowItemRoleService();
+    @Autowired
+    private GroupService groupService;
+    @Autowired
+    private CollectionRoleService collectionRoleService;
+    @Autowired
+    private WorkflowItemRoleService workflowItemRoleService;
+
     private String id;
     private String name;
     private String description;
-    private boolean isInternal;
-    private Scope scope;
+    private boolean isInternal = false;
+    private Scope scope = Scope.COLLECTION;
 
-    public static enum Scope {
+    @Override
+    public void setBeanName(String s) {
+        this.id = s;
+    }
+
+    public enum Scope {
         REPOSITORY,
         COLLECTION,
         ITEM
     }
 
-    public Role(String id, String name, String description, boolean isInternal, Scope scope) {
-        this.id = id;
-        this.name = name;
-        this.description = description;
-        this.isInternal = isInternal;
-        this.scope = scope;
-    }
-
     public String getId() {
         return id;
     }
-
 
     public String getName() {
         return name;
@@ -118,4 +117,41 @@ public class Role {
         }
     }
 
+    /**
+     * The name specified in the name attribute of a role will be used to lookup the in DSpace.
+     * The lookup will depend on the scope specified in the "scope" attribute:
+     * @param name
+     */
+    @Required
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    /**
+     * Set the description of the role
+     * @param description the description
+     */
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    /**
+     * Set the scope attribute, depending on the scope the users will be retrieved in the following manner:
+     * * collection: The collection value specifies that the group will be configured at the level of the collection.
+     * * repository: The repository scope uses groups that are defined at repository level in DSpace.
+     * item: The item scope assumes that a different action in the workflow will assign a number of EPersons or
+     * Groups to a specific workflow-item in order to perform a step.
+     * @param scope the scope parameter
+     */
+    public void setScope(Scope scope) {
+        this.scope = scope;
+    }
+
+    /**
+     * Optional attribute which isn't really used at the moment, false by default
+     * @param internal if the role is internal
+     */
+    public void setInternal(boolean internal) {
+        isInternal = internal;
+    }
 }

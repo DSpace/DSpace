@@ -33,7 +33,6 @@ import org.dspace.app.rest.model.ErrorRest;
 import org.dspace.app.rest.model.WorkspaceItemRest;
 import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.rest.model.patch.Patch;
-import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.repository.handler.service.UriListHandlerService;
 import org.dspace.app.rest.submit.AbstractRestProcessingStep;
 import org.dspace.app.rest.submit.SubmissionService;
@@ -70,6 +69,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.rest.webmvc.json.patch.PatchException;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -127,7 +127,7 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
         submissionConfigReader = new SubmissionConfigReader();
     }
 
-    //TODO @PreAuthorize("hasPermission(#id, 'WORKSPACEITEM', 'READ')")
+    @PreAuthorize("hasPermission(#id, 'WORKSPACEITEM', 'READ')")
     @Override
     public WorkspaceItemRest findOne(Context context, Integer id) {
         WorkspaceItem witem = null;
@@ -142,20 +142,20 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
         return converter.toRest(witem, utils.obtainProjection());
     }
 
-    //TODO @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     @Override
     public Page<WorkspaceItemRest> findAll(Context context, Pageable pageable) {
         try {
             long total = wis.countTotal(context);
             List<WorkspaceItem> witems = wis.findAll(context, pageable.getPageSize(),
                     Math.toIntExact(pageable.getOffset()));
-            return converter.toRestPage(witems, pageable, total, utils.obtainProjection(true));
+            return converter.toRestPage(witems, pageable, total, utils.obtainProjection());
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
     }
 
-    //TODO @PreAuthorize("hasPermission(#submitterID, 'EPERSON', 'READ')")
+    @PreAuthorize("hasPermission(#submitterID, 'EPERSON', 'READ')")
     @SearchRestMethod(name = "findBySubmitter")
     public Page<WorkspaceItemRest> findBySubmitter(@Parameter(value = "uuid", required = true) UUID submitterID,
             Pageable pageable) {
@@ -165,7 +165,7 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
             long total = wis.countByEPerson(context, ep);
             List<WorkspaceItem> witems = wis.findByEPerson(context, ep, pageable.getPageSize(),
                     Math.toIntExact(pageable.getOffset()));
-            return converter.toRestPage(witems, pageable, total, utils.obtainProjection(true));
+            return converter.toRestPage(witems, pageable, total, utils.obtainProjection());
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -201,7 +201,7 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
             source = submissionService.createWorkspaceItem(context, getRequestService().getCurrentRequest());
         }
 
-        return converter.toRest(source, Projection.DEFAULT);
+        return converter.toRest(source, utils.obtainProjection());
     }
 
     @Override
@@ -248,10 +248,10 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
         return WorkspaceItemRest.class;
     }
 
-    //TODO @PreAuthorize("hasPermission(#id, 'WORKSPACEITEM', 'WRITE')")
+    @PreAuthorize("hasPermission(#id, 'WORKSPACEITEM', 'WRITE')")
     @Override
     public WorkspaceItemRest upload(HttpServletRequest request, String apiCategory, String model, Integer id,
-                                    MultipartFile file) throws Exception {
+                                    MultipartFile file) throws SQLException {
 
         Context context = obtainContext();
         WorkspaceItemRest wsi = findOne(context, id);
@@ -288,7 +288,7 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
             }
 
         }
-        wsi = converter.toRest(source, Projection.DEFAULT);
+        wsi = converter.toRest(source, utils.obtainProjection());
 
         if (!errors.isEmpty()) {
             wsi.getErrors().addAll(errors);
@@ -298,7 +298,7 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
         return wsi;
     }
 
-    //TODO @PreAuthorize("hasPermission(#id, 'WORKSPACEITEM', 'WRITE')")
+    @PreAuthorize("hasPermission(#id, 'WORKSPACEITEM', 'WRITE')")
     @Override
     public void patch(Context context, HttpServletRequest request, String apiCategory, String model, Integer id,
                       Patch patch) throws SQLException, AuthorizeException {
@@ -361,7 +361,7 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
         }
     }
 
-    //TODO @PreAuthorize("hasPermission(#id, 'WORKSPACEITEM', 'DELETE')")
+    @PreAuthorize("hasPermission(#id, 'WORKSPACEITEM', 'DELETE')")
     @Override
     protected void delete(Context context, Integer id) throws AuthorizeException {
         WorkspaceItem witem = null;
@@ -507,7 +507,7 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
                             }
                         }
                     }
-                    WorkspaceItemRest wsi = converter.toRest(wi, Projection.DEFAULT);
+                    WorkspaceItemRest wsi = converter.toRest(wi, utils.obtainProjection());
                     if (result.size() == 1) {
                         if (!errors.isEmpty()) {
                             wsi.getErrors().addAll(errors);
@@ -528,7 +528,7 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
 
         HttpServletRequest req = getRequestService().getCurrentRequest().getHttpServletRequest();
         WorkspaceItem workspaceItem = uriListHandlerService.handle(context, req, stringList, WorkspaceItem.class);
-        return converter.toRest(workspaceItem, Projection.DEFAULT);
+        return converter.toRest(workspaceItem, utils.obtainProjection());
     }
 
 

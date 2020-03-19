@@ -71,6 +71,7 @@ import org.springframework.web.context.WebApplicationContext;
 public class AbstractControllerIntegrationTest extends AbstractIntegrationTestWithDatabase {
 
     protected static final String AUTHORIZATION_HEADER = "Authorization";
+    protected static final String AUTHORIZATION_COOKIE = "Authorization-cookie";
 
     //The Authorization header contains a value like "Bearer TOKENVALUE". This constant string represents the part that
     //sits before the actual authentication token and can be used to easily compose or parse the Authorization header.
