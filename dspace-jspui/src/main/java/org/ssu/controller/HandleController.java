@@ -26,6 +26,7 @@ import org.dspace.plugin.CommunityHomeProcessor;
 import org.dspace.plugin.PluginException;
 import org.dspace.sort.SortException;
 import org.dspace.statistics.util.LocationUtils;
+import org.dspace.statistics.util.SpiderDetector;
 import org.jdom.Element;
 import org.jdom.Text;
 import org.jdom.output.XMLOutputter;
@@ -209,8 +210,11 @@ public class HandleController {
         Function<Bitstream, String> getLinkForBitstream = (bitstream) -> {
             try {
                 Item item = dspaceItemService.find(dspaceContext, itemId);
-                essuirStatistics.incrementGlobalItemDownloads(itemId);
-                essuirStatistics.updateItemDownloads(request, item.getID());
+                boolean isSpiderBot = SpiderDetector.isSpider(request);
+                if(!isSpiderBot) {
+                    essuirStatistics.incrementGlobalItemDownloads(itemId);
+                    essuirStatistics.updateItemDownloads(request, item.getID());
+                }
                 return String.format("%s/bitstream/%s/%s/%s", request.getContextPath(), item.getHandle(), bitstream.getSequenceID(), UIUtil.encodeBitstreamName(bitstream.getName(), Constants.DEFAULT_ENCODING));
             } catch (UnsupportedEncodingException | SQLException e) {
                 e.printStackTrace();
@@ -252,8 +256,11 @@ public class HandleController {
         outputXmlWritter.output(outputTags, headMetadata );
         request.setAttribute("dspace.layout.head", headMetadata.toString());
 
-        essuirStatistics.updateItemViews(request, item.getID());
-        essuirStatistics.incrementGlobalItemViews(item.getID());
+        boolean isSpiderBot = SpiderDetector.isSpider(request);
+        if(!isSpiderBot) {
+            essuirStatistics.updateItemViews(request, item.getID());
+            essuirStatistics.incrementGlobalItemViews(item.getID());
+        }
         List<CountryStatisticsResponse> itemViewsByCountry = essuirStatistics.getItemViewsByCountry(item.getID())
                 .entrySet()
                 .stream()
