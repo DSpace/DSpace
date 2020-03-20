@@ -7,7 +7,6 @@
  */
 package org.dspace.app.rest;
 
-import static org.hamcrest.Matchers.startsWith;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -15,7 +14,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import org.dspace.app.rest.builder.CollectionBuilder;
 import org.dspace.app.rest.builder.CommunityBuilder;
 import org.dspace.app.rest.builder.ItemBuilder;
-import org.dspace.app.rest.matcher.EPersonMatcher;
 import org.dspace.app.rest.matcher.ItemMatcher;
 import org.dspace.app.rest.matcher.VersionMatcher;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
@@ -82,18 +80,18 @@ public class VersionRestRepositoryIT extends AbstractControllerIntegrationTest {
     }
 
     @Test
-    public void findOneEPersonLinkVisisbleTest() throws Exception {
+    public void findOneSubmitterNameVisisbleTest() throws Exception {
 
         String adminToken = getAuthToken(admin.getEmail(), password);
 
         getClient(adminToken).perform(get("/api/versioning/versions/" + version.getID()))
                              .andExpect(status().isOk())
                              .andExpect(jsonPath("$", Matchers.is(VersionMatcher.matchEntry(version))))
-                             .andExpect(jsonPath("$._links.eperson.href", startsWith(REST_SERVER_URL)));
+                             .andExpect(jsonPath("$.submitterName", Matchers.is(version.getEPerson().getFullName())));
     }
 
     @Test
-    public void findOneEPersonLinkConfigurationPropertyFalseAdminUserLinkVisibleTest() throws Exception {
+    public void findOneSubmitterNameConfigurationPropertyFalseAdminUserLinkVisibleTest() throws Exception {
 
         configurationService.setProperty("versioning.item.history.include.submitter", false);
 
@@ -102,38 +100,38 @@ public class VersionRestRepositoryIT extends AbstractControllerIntegrationTest {
         getClient(adminToken).perform(get("/api/versioning/versions/" + version.getID()))
                              .andExpect(status().isOk())
                              .andExpect(jsonPath("$", Matchers.is(VersionMatcher.matchEntry(version))))
-                             .andExpect(jsonPath("$._links.eperson.href", startsWith(REST_SERVER_URL)));
+                             .andExpect(jsonPath("$.submitterName", Matchers.is(version.getEPerson().getFullName())));
 
         configurationService.setProperty("versioning.item.history.include.submitter", true);
 
     }
 
     @Test
-    public void findOneEPersonLinkConfigurationPropertyTrueNormalUserLinkVisibleTest() throws Exception {
+    public void findOneSubmitterNameConfigurationPropertyTrueNormalUserLinkVisibleTest() throws Exception {
 
         String adminToken = getAuthToken(admin.getEmail(), password);
 
         getClient(adminToken).perform(get("/api/versioning/versions/" + version.getID()))
                              .andExpect(status().isOk())
                              .andExpect(jsonPath("$", Matchers.is(VersionMatcher.matchEntry(version))))
-                             .andExpect(jsonPath("$._links.eperson.href", startsWith(REST_SERVER_URL)));
+                             .andExpect(jsonPath("$.submitterName", Matchers.is(version.getEPerson().getFullName())));
 
     }
 
     @Test
-    public void findOneEPersonLinkConfigurationPropertyTrueAnonUserLinkVisibleTest() throws Exception {
+    public void findOneSubmitterNameConfigurationPropertyTrueAnonUserLinkVisibleTest() throws Exception {
 
         String adminToken = getAuthToken(admin.getEmail(), password);
 
         getClient(adminToken).perform(get("/api/versioning/versions/" + version.getID()))
                              .andExpect(status().isOk())
                              .andExpect(jsonPath("$", Matchers.is(VersionMatcher.matchEntry(version))))
-                             .andExpect(jsonPath("$._links.eperson.href", startsWith(REST_SERVER_URL)));
+                             .andExpect(jsonPath("$.submitterName", Matchers.is(version.getEPerson().getFullName())));
 
     }
 
     @Test
-    public void findOneEPersonLinkConfigurationPropertyFalseNormalUserLinkInvisibleTest() throws Exception {
+    public void findOneSubmitterNameConfigurationPropertyFalseNormalUserLinkInvisibleTest() throws Exception {
 
         configurationService.setProperty("versioning.item.history.include.submitter", false);
 
@@ -142,7 +140,7 @@ public class VersionRestRepositoryIT extends AbstractControllerIntegrationTest {
         getClient(adminToken).perform(get("/api/versioning/versions/" + version.getID()))
                              .andExpect(status().isOk())
                              .andExpect(jsonPath("$", Matchers.is(VersionMatcher.matchEntry(version))))
-                             .andExpect(jsonPath("$._links.eperson.href").doesNotExist());
+                             .andExpect(jsonPath("$.submitterName").doesNotExist());
 
         configurationService.setProperty("versioning.item.history.include.submitter", true);
 
@@ -171,62 +169,8 @@ public class VersionRestRepositoryIT extends AbstractControllerIntegrationTest {
         getClient().perform(get("/api/core/items/" + version.getItem().getID() + "/version"))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$", Matchers.is(VersionMatcher.matchEntry(version))));
-
     }
 
-    @Test
-    public void versionEPersonTest() throws Exception {
-
-        String adminToken = getAuthToken(admin.getEmail(), password);
-
-        getClient(adminToken).perform(get("/api/versioning/versions/" + version.getID() + "/eperson"))
-                             .andExpect(status().isOk())
-                             .andExpect(
-                                 jsonPath("$", Matchers.is(EPersonMatcher.matchEPersonEntry(item.getSubmitter()))));
-    }
-
-    @Test
-    public void versionEPersonTestConfigurationPropertyFalseAndAdminSucces() throws Exception {
-
-        configurationService.setProperty("versioning.item.history.include.submitter", false);
-        String adminToken = getAuthToken(admin.getEmail(), password);
-
-        getClient(adminToken).perform(get("/api/versioning/versions/" + version.getID() + "/eperson"))
-                             .andExpect(status().isOk())
-                             .andExpect(
-                                 jsonPath("$", Matchers.is(EPersonMatcher.matchEPersonEntry(item.getSubmitter()))));
-        configurationService.setProperty("versioning.item.history.include.submitter", true);
-    }
-
-    @Test
-    public void versionEPersonTestConfigurationPropertyFalseAndNormalUserNotFound() throws Exception {
-
-        configurationService.setProperty("versioning.item.history.include.submitter", false);
-        String token = getAuthToken(eperson.getEmail(), password);
-
-        getClient(token).perform(get("/api/versioning/versions/" + version.getID() + "/eperson"))
-                             .andExpect(status().isNotFound());
-        configurationService.setProperty("versioning.item.history.include.submitter", true);
-    }
-
-    @Test
-    public void versionEPersonTestConfigurationPropertyFalseAndAnonNotFound() throws Exception {
-
-        configurationService.setProperty("versioning.item.history.include.submitter", false);
-
-        getClient().perform(get("/api/versioning/versions/" + version.getID() + "/eperson"))
-                        .andExpect(status().isNotFound());
-        configurationService.setProperty("versioning.item.history.include.submitter", true);
-    }
-
-    @Test
-    public void versionEPersonTestWrongId() throws Exception {
-
-        String adminToken = getAuthToken(admin.getEmail(), password);
-
-        getClient(adminToken).perform(get("/api/versioning/versions/" + ((version.getID() + 5) * 57) + "/eperson"))
-                             .andExpect(status().isNotFound());
-    }
     @Test
     public void versionItemTest() throws Exception {
 
