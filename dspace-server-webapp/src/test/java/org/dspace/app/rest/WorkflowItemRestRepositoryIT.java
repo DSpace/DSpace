@@ -24,7 +24,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
-
 import javax.ws.rs.core.MediaType;
 
 import org.apache.commons.io.IOUtils;
@@ -669,15 +668,15 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
                    .andExpect(status().is(200));
 
         // a workspaceitem should exist now in the submitter workspace
-        getClient(tokenSubmitter).perform(get("/api/submission/workspaceitems"))
-                   .andExpect(status().isOk())
-                   .andExpect(jsonPath("$._embedded.workspaceitems", Matchers.containsInAnyOrder(
-                        WorkspaceItemMatcher.matchItemWithTitleAndDateIssued(null, "Workflow Item 1",
-                                "2017-10-17"))))
-                   .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/submission/workspaceitems")))
-                   .andExpect(jsonPath("$.page.size", is(20)))
-                   .andExpect(jsonPath("$.page.totalElements", is(1)));
-
+        getClient(tokenSubmitter).perform(get("/api/submission/workspaceitems/search/findBySubmitter")
+                .param("uuid", submitter.getID().toString()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$._embedded.workspaceitems", Matchers.containsInAnyOrder(
+                  WorkspaceItemMatcher.matchItemWithTitleAndDateIssued(null, "Workflow Item 1",
+                      "2017-10-17"))))
+                .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/submission/workspaceitems")))
+                .andExpect(jsonPath("$.page.size", is(20)))
+                .andExpect(jsonPath("$.page.totalElements", is(1)));
     }
 
     @Test
@@ -914,12 +913,16 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
 
         context.setCurrentUser(submitter);
 
-        //3. a workflow item
-        XmlWorkflowItem witem = WorkflowItemBuilder.createWorkflowItem(context, col1)
-                .withTitle("Workflow Item 1")
-                .withIssueDate("2017-10-17")
-                .withSubject("ExtraEntry")
-                .build();
+        //3. a claimed task with workflow item in edit step
+        ClaimedTask claimedTask = ClaimedTaskBuilder.createClaimedTask(context, col1, eperson)
+            .withTitle("Workflow Item 1")
+            .withIssueDate("2017-10-17")
+            .withAuthor("Smith, Donald").withAuthor("Doe, John")
+            .withSubject("ExtraEntry")
+            .build();
+        claimedTask.setStepID("editstep");
+        claimedTask.setActionID("editaction");
+        XmlWorkflowItem witem = claimedTask.getWorkflowItem();
 
         context.restoreAuthSystemState();
 
@@ -942,7 +945,6 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
                                 // check the new title and untouched values
                                 Matchers.is(WorkflowItemMatcher.matchItemWithTitleAndDateIssuedAndSubject(witem,
                                         "New Title", "2017-10-17", "ExtraEntry"))));
-        ;
 
         // verify that the patch changes have been persisted
         getClient(authToken).perform(get("/api/workflow/workflowitems/" + witem.getID()))
@@ -1039,12 +1041,15 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
 
         context.setCurrentUser(submitter);
 
-        //3. a workflow item
-        XmlWorkflowItem witem = WorkflowItemBuilder.createWorkflowItem(context, col1)
-                .withTitle("Workflow Item 1")
-                .withIssueDate("2017-10-17")
-                .withSubject("ExtraEntry")
-                .build();
+        //3. a claimed task with workflow item in edit step
+        ClaimedTask claimedTask = ClaimedTaskBuilder.createClaimedTask(context, col1, eperson)
+            .withTitle("Workflow Item 1")
+            .withIssueDate("2017-10-17")
+            .withSubject("ExtraEntry")
+            .build();
+        claimedTask.setStepID("editstep");
+        claimedTask.setActionID("editaction");
+        XmlWorkflowItem witem = claimedTask.getWorkflowItem();
 
         context.restoreAuthSystemState();
 
@@ -1104,30 +1109,40 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
 
         context.setCurrentUser(submitter);
 
-        //3. some workflow items for our test
-        XmlWorkflowItem witem = WorkflowItemBuilder.createWorkflowItem(context, col1)
-                .withTitle("Workflow Item 1")
-                .withIssueDate("2017-10-17")
-                .withSubject("ExtraEntry")
-                .build();
+        //3. some claimed tasks with workflow items in edit step
+        ClaimedTask claimedTask = ClaimedTaskBuilder.createClaimedTask(context, col1, eperson)
+            .withTitle("Workflow Item 1")
+            .withIssueDate("2017-10-17")
+            .withAuthor("Smith, Donald").withAuthor("Doe, John")
+            .withSubject("ExtraEntry")
+            .build();
+        claimedTask.setStepID("editstep");
+        claimedTask.setActionID("editaction");
+        XmlWorkflowItem witem = claimedTask.getWorkflowItem();
 
-        XmlWorkflowItem witemMultipleSubjects = WorkflowItemBuilder.createWorkflowItem(context, col1)
-                .withTitle("Workflow Item 2")
-                .withIssueDate("2017-10-17")
-                .withSubject("Subject1")
-                .withSubject("Subject2")
-                .withSubject("Subject3")
-                .withSubject("Subject4")
-                .build();
+        ClaimedTask claimedTask2 = ClaimedTaskBuilder.createClaimedTask(context, col1, eperson)
+            .withTitle("Workflow Item 2")
+            .withIssueDate("2017-10-17")
+            .withSubject("Subject1")
+            .withSubject("Subject2")
+            .withSubject("Subject3")
+            .withSubject("Subject4")
+            .build();
+        claimedTask2.setStepID("editstep");
+        claimedTask2.setActionID("editaction");
+        XmlWorkflowItem witemMultipleSubjects  = claimedTask2.getWorkflowItem();
 
-        XmlWorkflowItem witemWithTitleDateAndSubjects = WorkflowItemBuilder.createWorkflowItem(context, col1)
-                .withTitle("Workflow Item 3")
-                .withIssueDate("2017-10-17")
-                .withSubject("Subject1")
-                .withSubject("Subject2")
-                .withSubject("Subject3")
-                .withSubject("Subject4")
-                .build();
+        ClaimedTask claimedTask3 = ClaimedTaskBuilder.createClaimedTask(context, col1, eperson)
+            .withTitle("Workflow Item 3")
+            .withIssueDate("2017-10-17")
+            .withSubject("Subject1")
+            .withSubject("Subject2")
+            .withSubject("Subject3")
+            .withSubject("Subject4")
+            .build();
+        claimedTask3.setStepID("editstep");
+        claimedTask3.setActionID("editaction");
+        XmlWorkflowItem witemWithTitleDateAndSubjects = claimedTask3.getWorkflowItem();
 
         context.restoreAuthSystemState();
 
@@ -1294,11 +1309,14 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
 
         context.setCurrentUser(submitter);
 
-        //3. some workflow items for our test
-        XmlWorkflowItem witem = WorkflowItemBuilder.createWorkflowItem(context, col1)
-                .withIssueDate("2017-10-17")
-                .withSubject("ExtraEntry")
-                .build();
+        //3. a claimed task with workflow item in edit step
+        ClaimedTask claimedTask = ClaimedTaskBuilder.createClaimedTask(context, col1, eperson)
+            .withIssueDate("2017-10-17")
+            .withSubject("ExtraEntry")
+            .build();
+        claimedTask.setStepID("editstep");
+        claimedTask.setActionID("editaction");
+        XmlWorkflowItem witem = claimedTask.getWorkflowItem();
 
         context.restoreAuthSystemState();
 
@@ -1359,11 +1377,16 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
 
         context.setCurrentUser(submitter);
 
-        //3. some workflow items for our test
-        XmlWorkflowItem witem = WorkflowItemBuilder.createWorkflowItem(context, col1)
-                .withTitle("Test WorkflowItem")
-                .withIssueDate("2017-10-17")
-                .build();
+        //3. a claimed task with workflow item in edit step
+        ClaimedTask claimedTask = ClaimedTaskBuilder.createClaimedTask(context, col1, eperson)
+            .withTitle("Workflow Item 1")
+            .withIssueDate("2017-10-17")
+            .withAuthor("Smith, Donald").withAuthor("Doe, John")
+            .withSubject("ExtraEntry")
+            .build();
+        claimedTask.setStepID("editstep");
+        claimedTask.setActionID("editaction");
+        XmlWorkflowItem witem = claimedTask.getWorkflowItem();
 
         context.restoreAuthSystemState();
 
