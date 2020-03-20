@@ -36,6 +36,7 @@ import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.converter.JsonPatchConverter;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.exception.PaginationException;
+import org.dspace.app.rest.exception.RESTAuthorizationException;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.exception.RepositoryNotFoundException;
 import org.dspace.app.rest.exception.RepositorySearchMethodNotFoundException;
@@ -580,13 +581,14 @@ public class RestResourceController implements InitializingBean {
                                                                                      MultipartFile uploadfile) {
         checkModelPluralForm(apiCategory, model);
         DSpaceRestRepository<RestAddressableModel, ID> repository = utils.getResourceRepository(apiCategory, model);
-
         RestAddressableModel modelObject = null;
         try {
             modelObject = repository.upload(request, apiCategory, model, id, uploadfile);
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            return ControllerUtils.toEmptyResponse(HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (SQLException | IOException e) {
+            throw new RuntimeException("Error " + e.getMessage() +
+                                       " uploading file to " + model + " with ID= " + id, e);
+        } catch ( AuthorizeException ae) {
+            throw new RESTAuthorizationException(ae);
         }
         DSpaceResource result = converter.toResource(modelObject);
         return ControllerUtils.toResponseEntity(HttpStatus.CREATED, new HttpHeaders(), result);
@@ -910,7 +912,6 @@ public class RestResourceController implements InitializingBean {
                                                                                       Pageable page,
                                                                                       PagedResourcesAssembler assembler,
                                                                                       HttpServletResponse response) {
-
         DSpaceRestRepository<T, ?> repository = utils.getResourceRepository(apiCategory, model);
         Link link = linkTo(methodOn(this.getClass(), apiCategory, model).findAll(apiCategory, model,
                                                                                  page, assembler, response))
