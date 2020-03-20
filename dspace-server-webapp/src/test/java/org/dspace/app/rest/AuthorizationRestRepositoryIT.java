@@ -382,6 +382,12 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
                     Matchers.anyOf(
                             JsonPathMatchers.hasJsonPath("$.type", is("authorization")),
                             JsonPathMatchers.hasJsonPath("$._embedded.feature",
+                                    Matchers.allOf(
+                                                is(alwaysTrue.getName()),
+                                                is(trueForAdmins.getName()),
+                                                is(trueForLoggedUsers.getName())
+                                    )),
+                            JsonPathMatchers.hasJsonPath("$._embedded.feature",
                                     Matchers.not(Matchers.anyOf(
                                                 is(alwaysFalse.getName()),
                                                 is(alwaysException.getName()),
@@ -415,6 +421,11 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
                     Matchers.anyOf(
                             JsonPathMatchers.hasJsonPath("$.type", is("authorization")),
                             JsonPathMatchers.hasJsonPath("$._embedded.feature",
+                                    Matchers.allOf(
+                                                is(alwaysTrue.getName()),
+                                                is(trueForLoggedUsers.getName())
+                                    )),
+                            JsonPathMatchers.hasJsonPath("$._embedded.feature",
                                     Matchers.not(Matchers.anyOf(
                                                 is(alwaysFalse.getName()),
                                                 is(alwaysException.getName()),
@@ -447,6 +458,11 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
             .andExpect(jsonPath("$._embedded.authorizations", Matchers.everyItem(
                     Matchers.anyOf(
                             JsonPathMatchers.hasJsonPath("$.type", is("authorization")),
+                            JsonPathMatchers.hasJsonPath("$._embedded.feature",
+                                    Matchers.allOf(
+                                                is(alwaysTrue.getName()),
+                                                is(trueForLoggedUsers.getName())
+                                    )),
                             JsonPathMatchers.hasJsonPath("$._embedded.feature",
                                     Matchers.not(Matchers.anyOf(
                                                 is(alwaysFalse.getName()),
@@ -482,6 +498,10 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
             .andExpect(jsonPath("$._embedded.authorizations", Matchers.everyItem(
                     Matchers.anyOf(
                             JsonPathMatchers.hasJsonPath("$.type", is("authorization")),
+                            JsonPathMatchers.hasJsonPath("$._embedded.feature",
+                                    Matchers.allOf(
+                                                is(alwaysTrue.getName())
+                                    )),
                             JsonPathMatchers.hasJsonPath("$._embedded.feature",
                                     Matchers.not(Matchers.anyOf(
                                                 is(alwaysFalse.getName()),
