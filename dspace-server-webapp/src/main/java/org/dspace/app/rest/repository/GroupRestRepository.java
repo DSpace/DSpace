@@ -7,6 +7,14 @@
  */
 package org.dspace.app.rest.repository;
 
+import static org.apache.commons.lang3.StringUtils.isBlank;
+
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.List;
+import java.util.UUID;
+import javax.servlet.http.HttpServletRequest;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
@@ -32,14 +40,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
-
-import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.List;
-import java.util.UUID;
-
-import static org.apache.commons.lang3.StringUtils.isBlank;
 
 /**
  * This is the repository responsible to manage Group Rest object
@@ -188,8 +188,15 @@ public class GroupRestRepository extends DSpaceObjectRestRepository<Group, Group
         }
     }
 
+    /**
+     * This returns the DSpace Object (Community, Collection) belonging to this Group.
+     * This is only applicable for roles in that DSpace Object
+     * e.g. the Community Administrator or Collection Submitter Group
+     *
+     * @param uuid The uuid of the group
+     */
     @PreAuthorize("hasAuthority('ADMIN')")
-    public DSpaceObjectRest object(UUID uuid) {
+    public DSpaceObjectRest getParentObject(UUID uuid) {
         Context context = obtainContext();
         try {
             Group group = gs.find(context, uuid);
