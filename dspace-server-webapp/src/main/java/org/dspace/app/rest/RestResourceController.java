@@ -128,7 +128,7 @@ public class RestResourceController implements InitializingBean {
             String plural = English.plural(split[1]);
             Link l = new Link("/api/" + split[0] + "/" + plural, plural);
             links.add(l);
-            System.out.println(l.getRel() + " " + l.getHref());
+            log.debug(l.getRel().value() + " " + l.getHref());
         }
         discoverableEndpointsService.register(this, links);
     }
