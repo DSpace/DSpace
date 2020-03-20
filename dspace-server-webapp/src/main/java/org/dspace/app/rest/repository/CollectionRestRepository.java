@@ -34,6 +34,7 @@ import org.dspace.app.rest.model.TemplateItemRest;
 import org.dspace.app.rest.model.patch.Patch;
 import org.dspace.app.rest.model.wrapper.TemplateItem;
 import org.dspace.app.rest.utils.CollectionRestEqualityUtils;
+import org.dspace.app.util.AuthorizeUtil;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Bitstream;
@@ -408,7 +409,11 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
     public GroupRest createItemReadGroup(Context context, HttpServletRequest request, Collection collection)
         throws SQLException, AuthorizeException {
 
+        AuthorizeUtil.authorizeManageDefaultReadGroup(context, collection);
+
+        context.turnOffAuthorisationSystem();
         Group role = groupService.create(context);
+        context.restoreAuthSystemState();
         groupService.setName(role, "COLLECTION_" + collection.getID().toString() + "_ITEM_DEFAULT_READ");
 
         // Remove existing privileges from the anonymous group.
@@ -451,8 +456,11 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
      */
     public GroupRest createBitstreamReadGroup(Context context, HttpServletRequest request, Collection collection)
         throws SQLException, AuthorizeException {
+        AuthorizeUtil.authorizeManageDefaultReadGroup(context, collection);
 
+        context.turnOffAuthorisationSystem();
         Group role = groupService.create(context);
+        context.restoreAuthSystemState();
         groupService.setName(role, "COLLECTION_" + collection.getID().toString() + "_BITSTREAM_DEFAULT_READ");
 
         // Remove existing privileges from the anonymous group.
@@ -556,7 +564,10 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
     public GroupRest createWorkflowGroupForRole(Context context, HttpServletRequest request, Collection collection,
                                                 String workflowRole)
         throws SQLException, WorkflowConfigurationException, AuthorizeException, WorkflowException, IOException {
+        AuthorizeUtil.authorizeManageWorkflowsGroup(context, collection);
+        context.turnOffAuthorisationSystem();
         Group group = workflowService.createWorkflowRoleGroup(context, collection, workflowRole);
+        context.restoreAuthSystemState();
         populateGroupInformation(context, request, group);
         return converter.toRest(group, utils.obtainProjection());
     }

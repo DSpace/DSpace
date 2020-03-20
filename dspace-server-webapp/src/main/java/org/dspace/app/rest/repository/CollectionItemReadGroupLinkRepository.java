@@ -76,11 +76,6 @@ public class CollectionItemReadGroupLinkRepository extends AbstractDSpaceRestRep
             if (itemReadGroup == null) {
                 return null;
             }
-            if (!authorizeService.authorizeActionBoolean(context, itemReadGroup, Constants.READ)) {
-                throw new AccessDeniedException(
-                    "The current user doesn't have sufficient rights to access the itemReadGroup" +
-                        "group of collection with id: " + collectionId);
-            }
             return converter.toRest(itemReadGroup, projection);
         } catch (SQLException e) {
             throw new RuntimeException(e);
