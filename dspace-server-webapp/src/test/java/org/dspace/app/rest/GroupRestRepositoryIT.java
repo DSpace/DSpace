@@ -17,6 +17,7 @@ import static org.springframework.data.rest.webmvc.RestMediaTypes.TEXT_URI_LIST_
 import static org.springframework.http.MediaType.parseMediaType;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -24,6 +25,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
+import javax.ws.rs.core.MediaType;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.dspace.app.rest.builder.CollectionBuilder;
@@ -422,6 +424,53 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
         String token = getAuthToken(asUser.getEmail(), password);
 
         new MetadataPatchSuite().runWith(getClient(token), "/api/eperson/groups/" + group.getID(), expectedStatus);
+    }
+
+    @Test
+    public void patchGroupMetadataUnprocessable() throws Exception {
+        //We turn off the authorization system in order to create the structure defined below
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        // 1. Two reviewers
+        EPerson reviewer1 = EPersonBuilder.createEPerson(context)
+                .withEmail("reviewer1@example.com")
+                .withPassword(password)
+                .build();
+
+        // 2. A community-collection structure with one parent community with sub-community and two collections.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                .withName("Parent Community")
+                .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                .withName("Sub Community")
+                .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1)
+                .withName("Collection 1")
+                .withWorkflowGroup(1, admin, reviewer1)
+                .build();
+
+        final Group workflowGroup = col1.getWorkflowStep1(context);
+
+        String token = getAuthToken(admin.getEmail(), password);
+        String requestBody
+                = "      [\n"
+                + "        {\n"
+                + "          \"op\": \"replace\",\n"
+                + "          \"path\": \"/metadata/dc.title/1/value\",\n"
+                + "          \"value\": \"title A\"\n"
+                + "        },\n"
+                + "        {\n"
+                + "          \"op\": \"replace\",\n"
+                + "          \"path\": \"/metadata/dc.title/1/language\",\n"
+                + "          \"value\": \"en_US\"\n"
+                + "        }\n"
+                + "      ]";
+
+        getClient(token)
+                .perform(patch("/api/eperson/groups/" + workflowGroup.getID()).content(requestBody)
+                                 .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                .andExpect(status().isUnprocessableEntity()); ;
     }
 
     @Test
