@@ -26,7 +26,6 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
-import org.dspace.eperson.Group;
 import org.dspace.eperson.service.EPersonService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
