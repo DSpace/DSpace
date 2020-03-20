@@ -31,6 +31,7 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.eperson.Group;
 import org.dspace.workflow.WorkflowService;
+import org.dspace.xmlworkflow.WorkflowUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.webmvc.ControllerUtils;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
@@ -420,6 +421,12 @@ public class CollectionGroupRestController {
         if (collection == null) {
             throw new ResourceNotFoundException("No such collection: " + uuid);
         }
+        if (!authorizeService.isAdmin(context) && !authorizeService.authorizeActionBoolean(context, collection,
+                                                                                           Constants.ADMIN, true)) {
+            throw new AccessDeniedException(
+                "The current user was not allowed to retrieve the workflowGroup for" +
+                    " collection: " + uuid);
+        }
 
         GroupRest groupRest = collectionRestRepository.getWorkflowGroupForRole(context, collection, workflowRole);
         return converterService.toResource(groupRest);
@@ -436,15 +443,26 @@ public class CollectionGroupRestController {
      */
     @RequestMapping(method = RequestMethod.POST, value = "/workflowGroups/{workflowRole}")
     @PreAuthorize("hasPermission(#uuid, 'COLLECTION', 'READ')")
-    public GroupResource postWorkflowGroupForRole(@PathVariable UUID uuid, HttpServletResponse response,
-                                                  HttpServletRequest request, @PathVariable String workflowRole)
+    public ResponseEntity<ResourceSupport> postWorkflowGroupForRole(@PathVariable UUID uuid,
+                                                                    HttpServletResponse response,
+                                                                    HttpServletRequest request,
+                                                                    @PathVariable String workflowRole)
         throws Exception {
         Context context = ContextUtil.obtainContext(request);
         Collection collection = collectionService.find(context, uuid);
         if (collection == null) {
             throw new ResourceNotFoundException("No such collection: " + uuid);
         }
-
+        if (!authorizeService.isAdmin(context) && !authorizeService.authorizeActionBoolean(context, collection,
+                                                                                           Constants.ADMIN, true)) {
+            throw new AccessDeniedException(
+                "The current user was not allowed to retrieve the workflowGroup for" +
+                    " collection: " + uuid);
+        }
+        if (WorkflowUtils.getCollectionAndRepositoryRoles(collection).get(workflowRole) == null) {
+            throw new ResourceNotFoundException("Couldn't find role for: " + workflowRole +
+                                                    " in the collection with UUID: " + collection.getID());
+        }
         Group group = workflowService.getWorkflowRoleGroup(context, collection, workflowRole, null);
         if (group != null) {
             throw new UnprocessableEntityException("WorkflowGroup already exists for the role: " + workflowRole +
@@ -453,7 +471,9 @@ public class CollectionGroupRestController {
         GroupRest groupRest = collectionRestRepository
             .createWorkflowGroupForRole(context, request, collection, workflowRole);
         context.complete();
-        return converterService.toResource(groupRest);
+        GroupResource groupResource = converterService.toResource(groupRest);
+        return ControllerUtils.toResponseEntity(HttpStatus.CREATED, new HttpHeaders(), groupResource);
+
     }
 
     /**
@@ -477,7 +497,12 @@ public class CollectionGroupRestController {
         if (collection == null) {
             throw new ResourceNotFoundException("No such collection: " + uuid);
         }
-
+        if (!authorizeService.isAdmin(context) && !authorizeService.authorizeActionBoolean(context, collection,
+                                                                                           Constants.ADMIN, true)) {
+            throw new AccessDeniedException(
+                "The current user was not allowed to retrieve the workflowGroup for" +
+                    " collection: " + uuid);
+        }
         collectionRestRepository.deleteWorkflowGroupForRole(context, request, collection, workflowRole);
         context.complete();
         return ControllerUtils.toEmptyResponse(HttpStatus.NO_CONTENT);

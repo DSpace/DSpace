@@ -522,4 +522,10 @@ public class AuthorizeUtil {
             }
         }
     }
+
+    public static void authorizeManageDefaultReadGroup(Context context,
+                                                      Collection collection) throws AuthorizeException, SQLException {
+        AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
+        authorizeService.authorizeAction(context, collection, Constants.ADMIN);
+    }
 }

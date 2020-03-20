@@ -75,11 +75,6 @@ public class CollectionBitstreamReadGroupLinkRepository extends AbstractDSpaceRe
             if (bitstreamReadGroup == null) {
                 return null;
             }
-            if (!authorizeService.authorizeActionBoolean(context, bitstreamReadGroup, Constants.READ)) {
-                throw new AccessDeniedException(
-                    "The current user doesn't have sufficient rights to access the bitstreamReadGroup" +
-                        "group of collection with id: " + collectionId);
-            }
             return converter.toRest(bitstreamReadGroup, projection);
         } catch (SQLException e) {
             throw new RuntimeException(e);
