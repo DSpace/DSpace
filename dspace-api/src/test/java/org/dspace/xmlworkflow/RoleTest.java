@@ -12,7 +12,6 @@ import static junit.framework.TestCase.assertEquals;
 import org.dspace.AbstractUnitTest;
 import org.dspace.utils.DSpace;
 import org.dspace.xmlworkflow.state.Workflow;
-import org.junit.Ignore;
 import org.junit.Test;
 
 /**

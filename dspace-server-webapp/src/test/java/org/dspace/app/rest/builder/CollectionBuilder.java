@@ -159,7 +159,6 @@ public class CollectionBuilder extends AbstractDSpaceObjectBuilder<Collection> {
         if (collection.getAdministrators() != null) {
             Group adminGroup = collection.getAdministrators();
             collectionService.removeAdministrators(context, collection);
-            groupService.delete(context, adminGroup);
         }
         deleteWorkflowGroups(collection);
         delete(collection);
