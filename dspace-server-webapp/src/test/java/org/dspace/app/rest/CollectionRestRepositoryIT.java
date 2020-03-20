@@ -977,7 +977,9 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                                            .build();
         Collection col2 = CollectionBuilder.createCollection(context, child1child).withName("Collection 2").build();
 
-        getClient().perform(get("/api/core/collections/" + col1.getID())
+        String token = getAuthToken(admin.getEmail(), password);
+
+        getClient(token).perform(get("/api/core/collections/" + col1.getID())
                             .param("projection", "level")
                             .param("embedLevelDepth", "1"))
                    .andExpect(status().isOk())
@@ -999,7 +1001,6 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                    .andExpect(jsonPath("$._embedded.logo._embedded.format").doesNotExist());
 
         // Need this admin call for the AdminGroup embed in the Parentcommunity
-        String token = getAuthToken(admin.getEmail(), password);
         getClient(token).perform(get("/api/core/collections/" + col1.getID())
                             .param("projection", "level")
                             .param("embedLevelDepth", "3"))
