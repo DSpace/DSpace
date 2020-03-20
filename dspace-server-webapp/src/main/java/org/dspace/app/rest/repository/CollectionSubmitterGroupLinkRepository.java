@@ -72,8 +72,8 @@ public class CollectionSubmitterGroupLinkRepository extends AbstractDSpaceRestRe
                 return null;
             }
             if (!authorizeService.authorizeActionBoolean(context, submitters, Constants.READ)) {
-                throw new AccessDeniedException("The current user doesn't have sufficient rights to access the submitter" +
-                                                    "group of collection with id: " + collectionId);
+                throw new AccessDeniedException("The current user doesn't have sufficient rights to access" +
+                                                    " the submitter group of collection with id: " + collectionId);
             }
             return converter.toRest(submitters, projection);
         } catch (SQLException e) {
