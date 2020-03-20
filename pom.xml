@@ -1235,16 +1235,11 @@
                 <artifactId>handle</artifactId>
                 <version>9.1.0.v20190416</version>
             </dependency>
+            <!-- Jetty is needed to run Handle Server -->
             <dependency>
-                <groupId>org.eclipse.jetty.aggregate</groupId>
-                <artifactId>jetty-all</artifactId>
-                <version>8.1.22.v20160922</version>
-                <exclusions>
-                    <exclusion>
-                        <artifactId>javax.servlet</artifactId>
-                        <groupId>org.eclipse.jetty.orbit</groupId>
-                    </exclusion>
-                </exclusions>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-server</artifactId>
+                <version>9.4.8.v20171121</version> <!-- NOTE: synced with jetty provided by solr-cell -->
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>

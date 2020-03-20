@@ -253,10 +253,8 @@
             <version>${spring-boot.version}</version>
         </dependency>
 
-        <!-- Add in log4j support by excluding default logging, and
-	     using starter-log4j -->
-        <!-- See:  http://docs.spring.io/spring-boot/docs/current/reference
-	     /html/howto-logging.html#howto-configure-log4j-for-logging -->
+        <!-- Add in log4j support by excluding default logging, and using starter-log4j -->
+        <!-- See: https://docs.spring.io/spring-boot/docs/current/reference/html/howto.html#howto-logging -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter</artifactId>

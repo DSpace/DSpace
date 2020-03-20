@@ -308,15 +308,10 @@
             <groupId>org.dspace</groupId>
             <artifactId>handle</artifactId>
         </dependency>
+        <!-- Jetty is needed to run Handle Server -->
         <dependency>
-            <groupId>org.eclipse.jetty.aggregate</groupId>
-            <artifactId>jetty-all</artifactId>
-            <exclusions>
-                <exclusion>
-                    <artifactId>javax.servlet</artifactId>
-                    <groupId>org.eclipse.jetty.orbit</groupId>
-                </exclusion>
-            </exclusions>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-server</artifactId>
         </dependency>
         <dependency>
             <groupId>org.dspace</groupId>
