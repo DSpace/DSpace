@@ -428,17 +428,13 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     @Test
     public void patchGroupMetadataUnprocessable() throws Exception {
-        //We turn off the authorization system in order to create the structure defined below
         context.turnOffAuthorisationSystem();
 
-        //** GIVEN **
-        // 1. Two reviewers
         EPerson reviewer1 = EPersonBuilder.createEPerson(context)
                 .withEmail("reviewer1@example.com")
                 .withPassword(password)
                 .build();
 
-        // 2. A community-collection structure with one parent community with sub-community and two collections.
         parentCommunity = CommunityBuilder.createCommunity(context)
                 .withName("Parent Community")
                 .build();
@@ -469,6 +465,33 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         getClient(token)
                 .perform(patch("/api/eperson/groups/" + workflowGroup.getID()).content(requestBody)
+                                 .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                .andExpect(status().isUnprocessableEntity()); ;
+    }
+
+    @Test
+    public void patchPermanentGroupMetadataUnprocessable() throws Exception {
+        context.turnOffAuthorisationSystem();
+        GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
+        final Group group = groupService.findByName(context, Group.ANONYMOUS);
+        context.restoreAuthSystemState();
+        String token = getAuthToken(admin.getEmail(), password);
+        String requestBody
+                = "      [\n"
+                + "        {\n"
+                + "          \"op\": \"replace\",\n"
+                + "          \"path\": \"/metadata/dc.title/1/value\",\n"
+                + "          \"value\": \"title A\"\n"
+                + "        },\n"
+                + "        {\n"
+                + "          \"op\": \"replace\",\n"
+                + "          \"path\": \"/metadata/dc.title/1/language\",\n"
+                + "          \"value\": \"en_US\"\n"
+                + "        }\n"
+                + "      ]";
+
+        getClient(token)
+                .perform(patch("/api/eperson/groups/" + group.getID()).content(requestBody)
                                  .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
                 .andExpect(status().isUnprocessableEntity()); ;
     }
