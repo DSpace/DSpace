@@ -12,6 +12,7 @@ import static junit.framework.TestCase.assertEquals;
 import org.dspace.AbstractUnitTest;
 import org.dspace.utils.DSpace;
 import org.dspace.xmlworkflow.state.Workflow;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -57,21 +58,21 @@ public class RoleTest extends AbstractUnitTest {
 
     @Test
     public void selectSingleReviewer_RoleReviewManagers() {
-        Role role = selectSingleReviewer.getRoles().get("ReviewManagers");
+        Role role = selectSingleReviewer.getRoles().get("reviewmanagers");
         assertEquals("ReviewManagers", role.getName());
         assertEquals(Role.Scope.REPOSITORY, role.getScope());
     }
 
     @Test
     public void selectSingleReviewer_RoleReviewer() {
-        Role role = selectSingleReviewer.getRoles().get("Reviewer");
+        Role role = selectSingleReviewer.getRoles().get("scoreassignedreviewer");
         assertEquals("Reviewer", role.getName());
         assertEquals(Role.Scope.ITEM, role.getScope());
     }
 
     @Test
     public void scoreReview_RoleScoreReviewers() {
-        Role role = scoreReview.getRoles().get("ScoreReviewers");
+        Role role = scoreReview.getRoles().get("scorereviewers");
         assertEquals("ScoreReviewers", role.getName());
         assertEquals(Role.Scope.COLLECTION, role.getScope());
     }

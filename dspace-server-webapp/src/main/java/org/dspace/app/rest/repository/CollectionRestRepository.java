@@ -48,7 +48,6 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.service.GroupService;
-import org.dspace.services.RequestService;
 import org.dspace.workflow.WorkflowException;
 import org.dspace.workflow.WorkflowService;
 import org.dspace.xmlworkflow.WorkflowConfigurationException;
@@ -554,7 +553,8 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
      * @throws WorkflowException    If something goes wrong
      * @throws IOException  If something goes wrong
      */
-    public GroupRest createWorkflowGroupForRole(Context context, HttpServletRequest request, Collection collection, String workflowRole)
+    public GroupRest createWorkflowGroupForRole(Context context, HttpServletRequest request, Collection collection,
+                                                String workflowRole)
         throws SQLException, WorkflowConfigurationException, AuthorizeException, WorkflowException, IOException {
         Group group = workflowService.createWorkflowRoleGroup(context, collection, workflowRole);
         populateGroupInformation(context, request, group);
@@ -573,11 +573,13 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
      * @throws WorkflowException    If something goes wrong
      * @throws IOException  If something goes wrong
      */
-    public void deleteWorkflowGroupForRole(Context context, HttpServletRequest request, Collection collection, String workflowRole)
+    public void deleteWorkflowGroupForRole(Context context, HttpServletRequest request, Collection collection,
+                                           String workflowRole)
         throws SQLException, WorkflowConfigurationException, AuthorizeException, WorkflowException, IOException {
         Group group = workflowService.getWorkflowRoleGroup(context, collection, workflowRole, null);
         if (!poolTaskService.findByGroup(context, group).isEmpty()) {
-            throw new UnprocessableEntityException("The Group that was attempted to be deleted still has Pooltasks open");
+            throw new UnprocessableEntityException("The Group that was attempted to be deleted " +
+                                                       "still has Pooltasks open");
         }
         if (group == null) {
             throw new ResourceNotFoundException("The requested Group was not found");

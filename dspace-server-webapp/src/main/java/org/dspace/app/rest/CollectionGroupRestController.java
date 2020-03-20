@@ -31,7 +31,6 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.eperson.Group;
 import org.dspace.workflow.WorkflowService;
-import org.dspace.xmlworkflow.WorkflowUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.webmvc.ControllerUtils;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
@@ -75,7 +74,7 @@ public class CollectionGroupRestController {
      * @param uuid      The UUID of the collection for which we'll create an adminGroup
      * @param response  The current response
      * @param request   The current request
-     * @return          The created AdminGroup
+     * @return The created AdminGroup
      * @throws SQLException         If something goes wrong
      * @throws AuthorizeException   If something goes wrong
      */
@@ -112,7 +111,7 @@ public class CollectionGroupRestController {
      * @param uuid      The UUID of the collection for which we'll delete the AdminGroup
      * @param response  The current response
      * @param request   The current request
-     * @return          An empty response if the deletion was successful
+     * @return An empty response if the deletion was successful
      * @throws SQLException         If something goes wrong
      * @throws AuthorizeException   If something goes wrong
      * @throws IOException          If something goes wrong
@@ -120,7 +119,7 @@ public class CollectionGroupRestController {
     @RequestMapping(method = RequestMethod.DELETE, value = "/adminGroup")
     @PreAuthorize("hasPermission(#uuid, 'COLLECTION', 'WRITE')")
     public ResponseEntity<ResourceSupport> deleteAdminGroup(@PathVariable UUID uuid, HttpServletResponse response,
-                                                          HttpServletRequest request)
+                                                            HttpServletRequest request)
         throws SQLException, AuthorizeException, IOException {
 
         Context context = ContextUtil.obtainContext(request);
@@ -149,14 +148,14 @@ public class CollectionGroupRestController {
      * @param uuid      The UUID of the collection for which we'll create a submitterGroup
      * @param response  The current response
      * @param request   The current request
-     * @return          The created SubmitterGroup
+     * @return The created SubmitterGroup
      * @throws SQLException         If something goes wrong
      * @throws AuthorizeException   If something goes wrong
      */
     @RequestMapping(method = RequestMethod.POST, value = "/submittersGroup")
     @PreAuthorize("hasPermission(#uuid, 'COLLECTION', 'WRITE')")
     public ResponseEntity<ResourceSupport> postSubmittersGroup(@PathVariable UUID uuid, HttpServletResponse response,
-                                                          HttpServletRequest request)
+                                                               HttpServletRequest request)
         throws SQLException, AuthorizeException {
 
         Context context = ContextUtil.obtainContext(request);
@@ -186,7 +185,7 @@ public class CollectionGroupRestController {
      * @param uuid      The UUID of the collection for which we'll delete the SubmittersGroup
      * @param response  The current response
      * @param request   The current request
-     * @return          An empty response if the deletion was successful
+     * @return An empty response if the deletion was successful
      * @throws SQLException         If something goes wrong
      * @throws AuthorizeException   If something goes wrong
      * @throws IOException          If something goes wrong
@@ -194,7 +193,7 @@ public class CollectionGroupRestController {
     @RequestMapping(method = RequestMethod.DELETE, value = "/submittersGroup")
     @PreAuthorize("hasPermission(#uuid, 'COLLECTION', 'WRITE')")
     public ResponseEntity<ResourceSupport> deleteSubmittersGroup(@PathVariable UUID uuid, HttpServletResponse response,
-                                                            HttpServletRequest request)
+                                                                 HttpServletRequest request)
         throws SQLException, AuthorizeException, IOException {
 
         Context context = ContextUtil.obtainContext(request);
@@ -223,14 +222,14 @@ public class CollectionGroupRestController {
      * @param uuid      The UUID of the collection for which we'll create a ItemReadGroup
      * @param response  The current response
      * @param request   The current request
-     * @return          The created ItemReadGroup
+     * @return The created ItemReadGroup
      * @throws SQLException         If something goes wrong
      * @throws AuthorizeException   If something goes wrong
      */
     @RequestMapping(method = RequestMethod.POST, value = "/itemReadGroup")
     @PreAuthorize("hasPermission(#uuid, 'COLLECTION', 'WRITE')")
     public ResponseEntity<ResourceSupport> postItemReadGroup(@PathVariable UUID uuid, HttpServletResponse response,
-                                                               HttpServletRequest request)
+                                                             HttpServletRequest request)
         throws SQLException, AuthorizeException {
 
         Context context = ContextUtil.obtainContext(request);
@@ -248,8 +247,10 @@ public class CollectionGroupRestController {
             .getAuthorizedGroups(context, collection, Constants.DEFAULT_ITEM_READ);
         if (itemGroups != null && !itemGroups.isEmpty()) {
             Group itemReadGroup = itemGroups.get(0);
-            if (itemReadGroup != null && !StringUtils.equalsIgnoreCase(itemReadGroup.getName(),Group.ANONYMOUS)) {
-                throw new UnprocessableEntityException("Unable to create a new default read group because either the group already exists or multiple groups are assigned the default privileges.");
+            if (itemReadGroup != null && !StringUtils.equalsIgnoreCase(itemReadGroup.getName(), Group.ANONYMOUS)) {
+                throw new UnprocessableEntityException(
+                    "Unable to create a new default read group because either the group already exists or multiple " +
+                        "groups are assigned the default privileges.");
             }
         }
 
@@ -265,7 +266,7 @@ public class CollectionGroupRestController {
      * @param uuid      The UUID of the collection for which we'll delete the ItemReadGroup
      * @param response  The current response
      * @param request   The current request
-     * @return          An empty response if the deletion was successful
+     * @return An empty response if the deletion was successful
      * @throws SQLException         If something goes wrong
      * @throws AuthorizeException   If something goes wrong
      * @throws IOException          If something goes wrong
@@ -273,7 +274,7 @@ public class CollectionGroupRestController {
     @RequestMapping(method = RequestMethod.DELETE, value = "/itemReadGroup")
     @PreAuthorize("hasPermission(#uuid, 'COLLECTION', 'WRITE')")
     public ResponseEntity<ResourceSupport> deleteItemReadGroup(@PathVariable UUID uuid, HttpServletResponse response,
-                                                                 HttpServletRequest request)
+                                                               HttpServletRequest request)
         throws SQLException, AuthorizeException, IOException {
 
         Context context = ContextUtil.obtainContext(request);
@@ -292,7 +293,8 @@ public class CollectionGroupRestController {
         if (itemGroups != null && !itemGroups.isEmpty()) {
             Group itemReadGroup = itemGroups.get(0);
             if (itemReadGroup == null || StringUtils.equalsIgnoreCase(itemReadGroup.getName(), Group.ANONYMOUS)) {
-                throw new UnprocessableEntityException("Unable to delete the default read group because it's the default");
+                throw new UnprocessableEntityException(
+                    "Unable to delete the default read group because it's the default");
             }
         } else {
             throw new UnprocessableEntityException("The collection with UUID: " + uuid + " doesn't have " +
@@ -310,14 +312,14 @@ public class CollectionGroupRestController {
      * @param uuid      The UUID of the collection for which we'll create a BitstreamReadGroup
      * @param response  The current response
      * @param request   The current request
-     * @return          The created BitstreamReadGroup
+     * @return The created BitstreamReadGroup
      * @throws SQLException         If something goes wrong
      * @throws AuthorizeException   If something goes wrong
      */
     @RequestMapping(method = RequestMethod.POST, value = "/bitstreamReadGroup")
     @PreAuthorize("hasPermission(#uuid, 'COLLECTION', 'WRITE')")
     public ResponseEntity<ResourceSupport> postBitstreamReadGroup(@PathVariable UUID uuid, HttpServletResponse response,
-                                                             HttpServletRequest request)
+                                                                  HttpServletRequest request)
         throws SQLException, AuthorizeException {
 
         Context context = ContextUtil.obtainContext(request);
@@ -336,8 +338,10 @@ public class CollectionGroupRestController {
             .getAuthorizedGroups(context, collection, Constants.DEFAULT_BITSTREAM_READ);
         if (bitstreamGroups != null && !bitstreamGroups.isEmpty()) {
             Group bitstreamGroup = bitstreamGroups.get(0);
-            if (bitstreamGroup != null && !StringUtils.equalsIgnoreCase(bitstreamGroup.getName(),Group.ANONYMOUS)) {
-                throw new UnprocessableEntityException("Unable to create a new default read group because either the group already exists or multiple groups are assigned the default privileges.");
+            if (bitstreamGroup != null && !StringUtils.equalsIgnoreCase(bitstreamGroup.getName(), Group.ANONYMOUS)) {
+                throw new UnprocessableEntityException(
+                    "Unable to create a new default read group because either the group already exists or multiple " +
+                        "groups are assigned the default privileges.");
             }
         }
 
@@ -354,15 +358,16 @@ public class CollectionGroupRestController {
      * @param uuid      The UUID of the collection for which we'll delete the bitstreamReadGroup
      * @param response  The current response
      * @param request   The current request
-     * @return          An empty response if the deletion was successful
+     * @return An empty response if the deletion was successful
      * @throws SQLException         If something goes wrong
      * @throws AuthorizeException   If something goes wrong
      * @throws IOException          If something goes wrong
      */
     @RequestMapping(method = RequestMethod.DELETE, value = "/bitstreamReadGroup")
     @PreAuthorize("hasPermission(#uuid, 'COLLECTION', 'WRITE')")
-    public ResponseEntity<ResourceSupport> deleteBitstreamReadGroup(@PathVariable UUID uuid, HttpServletResponse response,
-                                                               HttpServletRequest request)
+    public ResponseEntity<ResourceSupport> deleteBitstreamReadGroup(@PathVariable UUID uuid,
+                                                                    HttpServletResponse response,
+                                                                    HttpServletRequest request)
         throws SQLException, AuthorizeException, IOException {
 
         Context context = ContextUtil.obtainContext(request);
@@ -377,11 +382,14 @@ public class CollectionGroupRestController {
                                                 " collection: " + uuid);
         }
 
-        List<Group> bitstreamGroups = authorizeService.getAuthorizedGroups(context, collection, Constants.DEFAULT_BITSTREAM_READ);
+        List<Group> bitstreamGroups = authorizeService
+            .getAuthorizedGroups(context, collection, Constants.DEFAULT_BITSTREAM_READ);
         if (bitstreamGroups != null && !bitstreamGroups.isEmpty()) {
             Group bitstreamReadGroup = bitstreamGroups.get(0);
-            if (bitstreamReadGroup == null || StringUtils.equalsIgnoreCase(bitstreamReadGroup.getName(), Group.ANONYMOUS)) {
-                throw new UnprocessableEntityException("Unable to delete the default read group because it's the default");
+            if (bitstreamReadGroup == null || StringUtils
+                .equalsIgnoreCase(bitstreamReadGroup.getName(), Group.ANONYMOUS)) {
+                throw new UnprocessableEntityException(
+                    "Unable to delete the default read group because it's the default");
             }
         } else {
             throw new UnprocessableEntityException("The collection with UUID: " + uuid + " doesn't have " +
@@ -399,13 +407,14 @@ public class CollectionGroupRestController {
      * @param response      The current response
      * @param request       The current request
      * @param workflowRole  The given workflowRole
-     * @return              The workflowGroup for the given collection and workflowrole
+     * @return The workflowGroup for the given collection and workflowrole
      * @throws Exception    If something goes wrong
      */
     @RequestMapping(method = RequestMethod.GET, value = "/workflowGroups/{workflowRole}")
     @PreAuthorize("hasPermission(#uuid, 'COLLECTION', 'READ')")
     public GroupResource getWorkflowGroupForRole(@PathVariable UUID uuid, HttpServletResponse response,
-                                                                   HttpServletRequest request, @PathVariable String workflowRole) throws Exception {
+                                                 HttpServletRequest request, @PathVariable String workflowRole)
+        throws Exception {
         Context context = ContextUtil.obtainContext(request);
         Collection collection = collectionService.find(context, uuid);
         if (collection == null) {
@@ -422,13 +431,14 @@ public class CollectionGroupRestController {
      * @param response      The current response
      * @param request       The current request
      * @param workflowRole  The given workflowRole
-     * @return              The workflowGroup for the given collection and workflowrole
+     * @return The workflowGroup for the given collection and workflowrole
      * @throws Exception    If something goes wrong
      */
     @RequestMapping(method = RequestMethod.POST, value = "/workflowGroups/{workflowRole}")
     @PreAuthorize("hasPermission(#uuid, 'COLLECTION', 'READ')")
     public GroupResource postWorkflowGroupForRole(@PathVariable UUID uuid, HttpServletResponse response,
-                                                 HttpServletRequest request, @PathVariable String workflowRole) throws Exception {
+                                                  HttpServletRequest request, @PathVariable String workflowRole)
+        throws Exception {
         Context context = ContextUtil.obtainContext(request);
         Collection collection = collectionService.find(context, uuid);
         if (collection == null) {
@@ -440,7 +450,8 @@ public class CollectionGroupRestController {
             throw new UnprocessableEntityException("WorkflowGroup already exists for the role: " + workflowRole +
                                                        " in collection with UUID: " + collection.getID());
         }
-        GroupRest groupRest = collectionRestRepository.createWorkflowGroupForRole(context, request, collection, workflowRole);
+        GroupRest groupRest = collectionRestRepository
+            .createWorkflowGroupForRole(context, request, collection, workflowRole);
         context.complete();
         return converterService.toResource(groupRest);
     }
@@ -456,8 +467,11 @@ public class CollectionGroupRestController {
      */
     @RequestMapping(method = RequestMethod.DELETE, value = "/workflowGroups/{workflowRole}")
     @PreAuthorize("hasPermission(#uuid, 'COLLECTION', 'READ')")
-    public ResponseEntity<ResourceSupport> deleteWorkflowGroupForRole(@PathVariable UUID uuid, HttpServletResponse response,
-                                                  HttpServletRequest request, @PathVariable String workflowRole) throws Exception {
+    public ResponseEntity<ResourceSupport> deleteWorkflowGroupForRole(@PathVariable UUID uuid,
+                                                                      HttpServletResponse response,
+                                                                      HttpServletRequest request,
+                                                                      @PathVariable String workflowRole)
+        throws Exception {
         Context context = ContextUtil.obtainContext(request);
         Collection collection = collectionService.find(context, uuid);
         if (collection == null) {
