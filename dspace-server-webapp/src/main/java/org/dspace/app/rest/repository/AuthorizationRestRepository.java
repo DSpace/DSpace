@@ -102,15 +102,9 @@ public class AuthorizationRestRepository extends DSpaceRestRepository<Authorizat
                 return null;
             }
             EPerson currUser = context.getCurrentUser();
-            List<UUID> specialGroupsUUID = null;
             if (currUser != user) {
                 // Temporarily change the Context's current user in order to retrieve
                 // authorizations based on that user
-                List<Group> specialGroups = context.getSpecialGroups();
-                specialGroupsUUID = new ArrayList<UUID>(specialGroups.size());
-                for (Group s : specialGroups) {
-                    specialGroupsUUID.add(s.getID());
-                }
                 context.switchContextUser(user);
             }
 
@@ -160,17 +154,11 @@ public class AuthorizationRestRepository extends DSpaceRestRepository<Authorizat
         }
 
         EPerson currUser = context.getCurrentUser();
-        List<UUID> specialGroupsUUID = null;
         // get the user specified in the requested parameters, can be null for anonymous
         EPerson user = getUserFromRequestParameter(context, epersonUuid);
         if (currUser != user) {
             // Temporarily change the Context's current user in order to retrieve
             // authorizations based on that user
-            List<Group> specialGroups = context.getSpecialGroups();
-            specialGroupsUUID = new ArrayList<UUID>(specialGroups.size());
-            for (Group s : specialGroups) {
-                specialGroupsUUID.add(s.getID());
-            }
             context.switchContextUser(user);
         }
 
@@ -221,15 +209,9 @@ public class AuthorizationRestRepository extends DSpaceRestRepository<Authorizat
         EPerson currUser = context.getCurrentUser();
         // get the user specified in the requested parameters, can be null for anonymous
         EPerson user = getUserFromRequestParameter(context, epersonUuid);
-        List<UUID> specialGroupsUUID = null;
         if (currUser != user) {
             // Temporarily change the Context's current user in order to retrieve
             // authorizations based on that user
-            List<Group> specialGroups = context.getSpecialGroups();
-            specialGroupsUUID = new ArrayList<UUID>(specialGroups.size());
-            for (Group s : specialGroups) {
-                specialGroupsUUID.add(s.getID());
-            }
             context.switchContextUser(user);
         }
         AuthorizationFeature feature = authorizationFeatureService.find(featureName);
