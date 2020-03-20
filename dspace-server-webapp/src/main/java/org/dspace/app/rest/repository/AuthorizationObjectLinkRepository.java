@@ -8,7 +8,6 @@
 package org.dspace.app.rest.repository;
 
 import java.sql.SQLException;
-
 import javax.annotation.Nullable;
 import javax.servlet.http.HttpServletRequest;
 

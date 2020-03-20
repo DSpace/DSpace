@@ -14,7 +14,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-
 import javax.servlet.http.HttpServletRequest;
 
 import gr.ekt.bte.core.TransformationEngine;
@@ -532,7 +531,7 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
             throw new RuntimeException(e.getMessage(), e);
         }
     }
-    
+
     @Override
     public WorkspaceItem findDomainObjectByPk(Context context, Integer id) throws SQLException {
         return wis.find(context, id);
