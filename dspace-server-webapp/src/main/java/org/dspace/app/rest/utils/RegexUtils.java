@@ -14,8 +14,14 @@ public class RegexUtils {
     /**
      * Regular expression in the request mapping to accept UUID as identifier
      */
+    public static final String REGEX_UUID =
+        "[0-9a-fxA-FX]{8}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{12}";
+
+    /**
+     * Regular expression in the request mapping to accept UUID as identifier
+     */
     public static final String REGEX_REQUESTMAPPING_IDENTIFIER_AS_UUID =
-        "/{uuid:[0-9a-fxA-FX]{8}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{12}}";
+        "/{uuid:" + REGEX_UUID + "}";
 
     /**
      * Regular expression in the request mapping to accept a string as identifier but not the other kind of
