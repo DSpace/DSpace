@@ -55,6 +55,7 @@ import org.dspace.app.rest.model.ProcessRest;
 import org.dspace.app.rest.model.ResourcePolicyRest;
 import org.dspace.app.rest.model.RestAddressableModel;
 import org.dspace.app.rest.model.RestModel;
+import org.dspace.app.rest.model.VersionHistoryRest;
 import org.dspace.app.rest.model.hateoas.DSpaceResource;
 import org.dspace.app.rest.model.hateoas.EmbeddedPage;
 import org.dspace.app.rest.model.hateoas.HALResource;
@@ -195,6 +196,9 @@ public class Utils {
         }
         if (StringUtils.equals(modelPlural, "processes")) {
             return ProcessRest.NAME;
+        }
+        if (StringUtils.equals(modelPlural, "versionhistories")) {
+            return VersionHistoryRest.NAME;
         }
         return modelPlural.replaceAll("s$", "");
     }
