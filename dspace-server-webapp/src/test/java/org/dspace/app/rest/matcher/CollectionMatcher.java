@@ -85,7 +85,10 @@ public class CollectionMatcher {
                 "mappedItems",
                 "parentCommunity",
                 "self",
-                "adminGroup"
+                "adminGroup",
+                "submittersGroup",
+                "itemReadGroup",
+                "bitstreamReadGroup"
 
         );
     }
