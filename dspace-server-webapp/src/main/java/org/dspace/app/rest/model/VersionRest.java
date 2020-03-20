@@ -9,6 +9,7 @@ package org.dspace.app.rest.model;
 
 import java.util.Date;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import org.dspace.app.rest.RestResourceController;
 
 /**
@@ -22,10 +23,6 @@ import org.dspace.app.rest.RestResourceController;
     @LinkRest(
         name = VersionRest.ITEM,
         method = "getVersionItem"
-    ),
-    @LinkRest(
-        name = VersionRest.EPERSON,
-        method = "getEPersonForVersion"
     )
 })
 public class VersionRest extends BaseObjectRest<Integer> {
@@ -40,6 +37,9 @@ public class VersionRest extends BaseObjectRest<Integer> {
     private Integer version;
     private Date created;
     private String summary;
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private String submitterName;
 
     /**
      * Generic getter for the id
@@ -105,6 +105,22 @@ public class VersionRest extends BaseObjectRest<Integer> {
      */
     public void setSummary(String summary) {
         this.summary = summary;
+    }
+
+    /**
+     * Generic getter for the submitterName
+     * @return the submitterName value of this VersionRest
+     */
+    public String getSubmitterName() {
+        return submitterName;
+    }
+
+    /**
+     * Generic setter for the submitterName
+     * @param submitterName   The submitterName to be set on this VersionRest
+     */
+    public void setSubmitterName(String submitterName) {
+        this.submitterName = submitterName;
     }
 
     @Override

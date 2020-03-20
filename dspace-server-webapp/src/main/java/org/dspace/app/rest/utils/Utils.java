@@ -526,39 +526,13 @@ public class Utils {
         Projection projection = halResource.getContent().getProjection();
         getLinkRests(halResource.getContent().getClass()).stream().forEach((linkRest) -> {
             Link link = linkToSubResource(halResource.getContent(), linkRest.name());
-            if (projection.allowEmbedding(halResource, linkRest, oldLinks) &&
-                allowEmbeddingFromLinkRepository(halResource, linkRest.name())) {
+            if (projection.allowEmbedding(halResource, linkRest, oldLinks)) {
                 embedRelFromRepository(halResource, linkRest.name(), link, linkRest, oldLinks);
                 halResource.add(link); // unconditionally link if embedding was allowed
-            } else if (allowLinkingFromLinkRepository(halResource, linkRest.name()) &&
-                projection.allowLinking(halResource, linkRest)) {
+            } else if (projection.allowLinking(halResource, linkRest)) {
                 halResource.add(link);
             }
         });
-    }
-
-    /**
-     * Calls on the LinkRepository to ask whether it's allowed to embed said relation
-     * @param resource  The current HalResource
-     * @param rel       The relation to be asked if it can be embedded
-     * @return          A boolean indicating the result
-     */
-    private boolean allowEmbeddingFromLinkRepository(HALResource<? extends RestAddressableModel> resource, String rel) {
-        return getLinkResourceRepository(resource.getContent().getCategory(),
-                              resource.getContent().getType(), rel).isEmbeddableRelation(resource.getContent(), rel);
-    }
-
-    /**
-     * Calls on the LinkRepository to ask whether it's allowed to link to said relation
-     * @param resource  The current HalResource
-     * @param rel       The relation to be asked if it can be linked to
-     * @return          A boolean indicating the result
-     */
-    private boolean allowLinkingFromLinkRepository(HALResource<? extends RestAddressableModel> resource, String rel) {
-
-        return getLinkResourceRepository(resource.getContent().getCategory(),
-                                  resource.getContent().getType(), rel).isLinkableRelation(resource.getContent(), rel);
-
     }
 
     private List<LinkRest> getLinkRests(Class<? extends RestAddressableModel> restClass) {

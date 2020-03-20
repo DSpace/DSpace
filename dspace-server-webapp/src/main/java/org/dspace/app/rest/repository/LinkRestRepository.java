@@ -16,14 +16,4 @@ public interface LinkRestRepository {
     default boolean isEmbeddableRelation(Object data, String name) {
         return true;
     }
-
-    /**
-     * Defines whether a relation can create a link to it on the resource or not
-     * @param data  The data for the link
-     * @param name  The name of the link
-     * @return      A boolean indicating whether it's allowed or not
-     */
-    default boolean isLinkableRelation(Object data, String name) {
-        return true;
-    }
 }
