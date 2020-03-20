@@ -34,9 +34,12 @@ import org.dspace.app.util.SubmissionConfigReader;
 import org.dspace.app.util.SubmissionConfigReaderException;
 import org.dspace.app.util.SubmissionStepConfig;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.service.AuthorizeService;
+import org.dspace.content.Item;
 import org.dspace.content.service.BitstreamFormatService;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.ItemService;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.EPersonServiceImpl;
@@ -56,6 +59,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
@@ -96,6 +100,9 @@ public class WorkflowItemRestRepository extends DSpaceRestRepository<WorkflowIte
 
     @Autowired
     WorkflowService<XmlWorkflowItem> wfs;
+
+    @Autowired
+    AuthorizeService authorizeService;
 
     @Autowired
     ClaimedTaskService claimedTaskService;
@@ -354,4 +361,33 @@ public class WorkflowItemRestRepository extends DSpaceRestRepository<WorkflowIte
                 + "#checkIfEditMetadataAllowedInCurrentStep trying to retrieve workflow configuration from config", e);
         }
     }
+
+    /**
+     * This is a search method that will return the WorkflowItemRest object found through the UUID of an item. It'll
+     * find the Item through the given UUID and try to resolve the WorkflowItem relevant for that item and return it.
+     * It'll return a 401/403 if the current user isn't allowed to view the WorkflowItem.
+     * It'll return a 204 if nothing was found
+     * @param itemUuid  The UUID for the Item to be used
+     * @param pageable  The pageable if present
+     * @return          The resulting WorkflowItemRest object
+     */
+    @SearchRestMethod(name = "item")
+    public WorkflowItemRest findByItemUuid(@Parameter(value = "uuid", required = true) UUID itemUuid,
+                                           Pageable pageable) {
+        try {
+            Context context = obtainContext();
+            Item item = itemService.find(context, itemUuid);
+            XmlWorkflowItem xmlWorkflowItem = wis.findByItem(context, item);
+            if (xmlWorkflowItem == null) {
+                return null;
+            }
+            if (!authorizeService.authorizeActionBoolean(context, xmlWorkflowItem.getItem(), Constants.READ)) {
+                throw new AccessDeniedException("The current user does not have rights to view the WorkflowItem");
+            }
+            return converter.toRest(xmlWorkflowItem, utils.obtainProjection());
+        } catch (SQLException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+    }
+
 }
