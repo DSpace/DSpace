@@ -23,6 +23,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 import javax.ws.rs.core.MediaType;
@@ -37,6 +39,8 @@ import org.dspace.app.rest.matcher.HalMatcher;
 import org.dspace.app.rest.model.GroupRest;
 import org.dspace.app.rest.model.MetadataRest;
 import org.dspace.app.rest.model.MetadataValueRest;
+import org.dspace.app.rest.model.patch.Operation;
+import org.dspace.app.rest.model.patch.ReplaceOperation;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.app.rest.test.MetadataPatchSuite;
 import org.dspace.content.Collection;
@@ -1813,4 +1817,33 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
             }
         }
     }
+
+    @Test
+    public void patchNameTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        String testGroupName = "Test group";
+        Group group = GroupBuilder.createGroup(context)
+                .withName(testGroupName)
+                .build();
+
+
+        String newName = "New test name";
+        List<Operation> ops = new ArrayList<Operation>();
+        ReplaceOperation replaceOperation = new ReplaceOperation("/name", newName);
+        ops.add(replaceOperation);
+        String patchBody = getPatchContent(ops);
+
+        String token = getAuthToken(admin.getEmail(), password);
+
+        // updates email
+        getClient(token).perform(
+                patch("/api/eperson/groups/" + group.getID())
+                        .content(patchBody)
+                        .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                .andExpect(jsonPath("$.name", Matchers.is(newName)))
+                .andExpect(status().isOk());
+    }
+
+
 }
