@@ -14,18 +14,21 @@ import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.when;
 
 import java.sql.SQLException;
 import java.util.List;
 
-import mockit.NonStrictExpectations;
 import org.apache.logging.log4j.Logger;
 import org.dspace.AbstractUnitTest;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.MetadataSchemaService;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.test.util.ReflectionTestUtils;
 
 /**
  * Unit Tests for class MetadataSchema
@@ -48,6 +51,12 @@ public class MetadataSchemaTest extends AbstractUnitTest {
                                                                                  .getMetadataSchemaService();
 
     /**
+     * Spy of AuthorizeService to use for tests
+     * (initialized / setup in @Before method)
+     */
+    private AuthorizeService authorizeServiceSpy;
+
+    /**
      * This method will be run before every test as per @Before. It will
      * initialize resources required for the tests.
      *
@@ -60,6 +69,13 @@ public class MetadataSchemaTest extends AbstractUnitTest {
         super.init();
         try {
             this.ms = metadataSchemaService.find(context, MetadataSchemaEnum.DC.getName());
+
+            // Initialize our spy of the autowired (global) authorizeService bean.
+            // This allows us to customize the bean's method return values in tests below
+            authorizeServiceSpy = spy(authorizeService);
+            // "Wire" our spy to be used by the current loaded object services
+            // (To ensure these services use the spy instead of the real service)
+            ReflectionTestUtils.setField(metadataSchemaService, "authorizeService", authorizeServiceSpy);
         } catch (SQLException ex) {
             log.error("SQL Error in init", ex);
             fail("SQL Error in init: " + ex.getMessage());
@@ -130,11 +146,8 @@ public class MetadataSchemaTest extends AbstractUnitTest {
      */
     @Test
     public void testCreateAuth() throws Exception {
-        new NonStrictExpectations(authorizeService.getClass()) {{
-            // Allow full admin permissions
-            authorizeService.isAdmin(context);
-            result = true;
-        }};
+        // Allow full Admin perms
+        when(authorizeServiceSpy.isAdmin(context)).thenReturn(true);
 
         String namespace = "namespace";
         String name = "name";
@@ -149,12 +162,6 @@ public class MetadataSchemaTest extends AbstractUnitTest {
      */
     @Test(expected = AuthorizeException.class)
     public void testCreateNoAuth() throws Exception {
-        new NonStrictExpectations(authorizeService.getClass()) {{
-            // Disallow full admin permissions
-            authorizeService.isAdmin(context);
-            result = false;
-        }};
-
         String namespace = "namespace";
         String name = "name";
         metadataSchemaService.create(context, name, namespace);
@@ -166,11 +173,8 @@ public class MetadataSchemaTest extends AbstractUnitTest {
      */
     @Test(expected = NonUniqueMetadataException.class)
     public void testCreateRepeated() throws Exception {
-        new NonStrictExpectations(authorizeService.getClass()) {{
-            // Allow full admin permissions
-            authorizeService.isAdmin(context);
-            result = true;
-        }};
+        // Allow full Admin perms
+        when(authorizeServiceSpy.isAdmin(context)).thenReturn(true);
 
         String namespace = ms.getNamespace();
         String name = ms.getName();
@@ -194,11 +198,8 @@ public class MetadataSchemaTest extends AbstractUnitTest {
      */
     @Test
     public void testUpdateAuth() throws Exception {
-        new NonStrictExpectations(authorizeService.getClass()) {{
-            // Allow full admin permissions
-            authorizeService.isAdmin(context);
-            result = true;
-        }};
+        // Allow full Admin perms
+        when(authorizeServiceSpy.isAdmin(context)).thenReturn(true);
 
         String namespace = "namespace2";
         String name = "name2";
@@ -215,12 +216,6 @@ public class MetadataSchemaTest extends AbstractUnitTest {
      */
     @Test(expected = AuthorizeException.class)
     public void testUpdateNoAuth() throws Exception {
-        new NonStrictExpectations(authorizeService.getClass()) {{
-            // Disallow full admin permissions
-            authorizeService.isAdmin(context);
-            result = false;
-        }};
-
         metadataSchemaService.update(context, ms);
         fail("Exception expected");
     }
@@ -230,11 +225,8 @@ public class MetadataSchemaTest extends AbstractUnitTest {
      */
     @Test(expected = NonUniqueMetadataException.class)
     public void testUpdateRepeated() throws Exception {
-        new NonStrictExpectations(authorizeService.getClass()) {{
-            // Allow full admin permissions
-            authorizeService.isAdmin(context);
-            result = true;
-        }};
+        // Allow full Admin perms
+        when(authorizeServiceSpy.isAdmin(context)).thenReturn(true);
 
         String namespace = ms.getNamespace();
         String name = ms.getName();
@@ -251,11 +243,8 @@ public class MetadataSchemaTest extends AbstractUnitTest {
      */
     @Test
     public void testDeleteAuth() throws Exception {
-        new NonStrictExpectations(authorizeService.getClass()) {{
-            // Allow full admin permissions
-            authorizeService.isAdmin(context);
-            result = true;
-        }};
+        // Allow full Admin perms
+        when(authorizeServiceSpy.isAdmin(context)).thenReturn(true);
 
         String namespace = "namespace3";
         String name = "name3";
@@ -272,12 +261,6 @@ public class MetadataSchemaTest extends AbstractUnitTest {
      */
     @Test(expected = AuthorizeException.class)
     public void testDeleteNoAuth() throws Exception {
-        new NonStrictExpectations(authorizeService.getClass()) {{
-            // Disallow full admin permissions
-            authorizeService.isAdmin(context);
-            result = false;
-        }};
-
         String namespace = "namespace3";
         String name = "name3";
         MetadataSchema m = metadataSchemaService.create(context, name, namespace);

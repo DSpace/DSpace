@@ -50,7 +50,7 @@
                         </entry>
                         <entry key="accessConditions">
                             <bean
-                                    class="org.dspace.app.rest.submit.factory.impl.ResourcePolicyAddPatchOperation"/>
+                                    class="org.dspace.app.rest.submit.factory.impl.BitstreamResourcePolicyAddPatchOperation"/>
                         </entry>
                     </map>
                 </entry>
@@ -75,7 +75,7 @@
                         </entry>
                         <entry key="accessConditions">
                             <bean
-                                    class="org.dspace.app.rest.submit.factory.impl.ResourcePolicyRemovePatchOperation"/>
+                                    class="org.dspace.app.rest.submit.factory.impl.BitstreamResourcePolicyRemovePatchOperation"/>
                         </entry>
                     </map>
                 </entry>
@@ -96,7 +96,7 @@
                         </entry>
                         <entry key="accessConditions">
                             <bean
-                                    class="org.dspace.app.rest.submit.factory.impl.ResourcePolicyReplacePatchOperation"/>
+                                    class="org.dspace.app.rest.submit.factory.impl.BitstreamResourcePolicyReplacePatchOperation"/>
                         </entry>
                         <entry key="collection">
                             <bean

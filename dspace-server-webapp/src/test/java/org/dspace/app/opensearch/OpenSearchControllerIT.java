@@ -15,13 +15,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import org.dspace.app.rest.builder.CollectionBuilder;
 import org.dspace.app.rest.builder.CommunityBuilder;
 import org.dspace.app.rest.builder.ItemBuilder;
-
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
-
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
-
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.junit.Before;

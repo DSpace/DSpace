@@ -153,7 +153,7 @@ public class AuthorityValueServiceImpl implements AuthorityValueService {
     public List<AuthorityValue> findByValue(Context context, String schema, String element, String qualifier,
                                             String value) {
         String field = fieldParameter(schema, element, qualifier);
-        return findByValue(context, field, qualifier);
+        return findByValue(context, field, value);
     }
 
     @Override
