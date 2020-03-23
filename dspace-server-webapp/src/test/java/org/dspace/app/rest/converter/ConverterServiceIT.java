@@ -182,7 +182,8 @@ public class ConverterServiceIT extends AbstractControllerIntegrationTest {
         r0.setRestPropUnannotated(restPropUnannotatedValue);
         String r0json = new ObjectMapper().writeValueAsString(r0);
 
-        when(mockLink.getRel().value()).thenReturn("mockLink");
+        // return "mockLink" LinkRelation when getRel() is called
+        when(mockLink.getRel()).thenReturn(() -> "mockLink");
         r0.setProjection(new MockProjection(mockLink, mockEmbeddedResource));
 
         MockObjectResource resource = converter.toResource(r0);
