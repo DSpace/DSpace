@@ -16,6 +16,9 @@ import org.dspace.discovery.IndexClient;
 import org.dspace.scripts.DSpaceRunnable;
 import org.springframework.beans.factory.annotation.Autowired;
 
+/**
+ * The {@link ScriptConfiguration} for the {@link IndexClient} script
+ */
 public class IndexDiscoveryScriptConfiguration extends ScriptConfiguration {
 
     @Autowired

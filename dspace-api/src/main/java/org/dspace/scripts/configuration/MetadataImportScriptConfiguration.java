@@ -17,6 +17,9 @@ import org.dspace.core.Context;
 import org.dspace.scripts.DSpaceRunnable;
 import org.springframework.beans.factory.annotation.Autowired;
 
+/**
+ * The {@link ScriptConfiguration} for the {@link MetadataImport} script
+ */
 public class MetadataImportScriptConfiguration extends ScriptConfiguration {
 
     @Autowired
@@ -35,6 +38,7 @@ public class MetadataImportScriptConfiguration extends ScriptConfiguration {
             return false;
         }
     }
+
     @Override
     public Options getOptions() {
         if (options == null) {

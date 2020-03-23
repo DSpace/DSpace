@@ -12,6 +12,9 @@ import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.scripts.DSpaceRunnable;
 import org.springframework.beans.factory.annotation.Autowired;
 
+/**
+ * The {@link ScriptConfiguration} for the {@link org.dspace.app.bulkedit.MetadataImportCLI} CLI script
+ */
 public class MetadataImportCliScriptConfiguration extends MetadataImportScriptConfiguration {
 
     @Autowired

@@ -343,11 +343,6 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
         // Is this a silent run?
         change = false;
     }
-//
-//    public MetadataImport() {
-//        Options options = constructOptions();
-//        this.options = options;
-//    }
 
     /**
      * Run an import. The import can either be read-only to detect changes, or

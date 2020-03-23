@@ -33,6 +33,10 @@ public abstract class DSpaceRunnable<T extends ScriptConfiguration> implements R
      */
     protected DSpaceRunnableHandler handler;
 
+    /**
+     * This method will return the Configuration that the implementing DSpaceRunnable uses
+     * @return  The {@link ScriptConfiguration} that this implementing DspaceRunnable uses
+     */
     public abstract T getScriptConfiguration();
 
 
