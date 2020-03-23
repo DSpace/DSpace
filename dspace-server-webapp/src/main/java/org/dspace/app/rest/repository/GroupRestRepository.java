@@ -27,8 +27,7 @@ import org.dspace.app.rest.model.GroupRest;
 import org.dspace.app.rest.model.patch.Patch;
 import org.dspace.app.rest.utils.Utils;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.Collection;
-import org.dspace.content.Community;
+import org.dspace.content.DSpaceObject;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
 import org.dspace.core.Context;
@@ -182,9 +181,20 @@ public class GroupRestRepository extends DSpaceObjectRestRepository<Group, Group
                                 + " with id: " + uuid + " not found"
                 );
             }
+            if (isDeleteUnprocessable(context, group)) {
+                throw new UnprocessableEntityException("This group cannot be deleted");
+            }
             gs.delete(context, group);
         } catch (SQLException | IOException e) {
             throw new RuntimeException(e.getMessage(), e);
+        }
+    }
+
+    private boolean isDeleteUnprocessable(Context context, Group group) {
+        try {
+            return group.isPermanent() || gs.getParentObject(context, group) != null;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -206,20 +216,15 @@ public class GroupRestRepository extends DSpaceObjectRestRepository<Group, Group
                                 + " with id: " + uuid + " not found"
                 );
             } else {
-                final Collection collection = collectionService.findByGroup(context, group);
-                if (collection != null) {
-                    return converter.toRest(collection, utils.obtainProjection());
+                DSpaceObject parent = gs.getParentObject(context, group);
+                if (parent != null) {
+                    return converter.toRest(parent, utils.obtainProjection());
                 } else {
-                    final Community community = communityService.findByAdminGroup(context, group);
-                    if (community != null) {
-                        return converter.toRest(community, utils.obtainProjection());
-                    } else {
-                        throw new ResourceNotFoundException(
-                                GroupRest.CATEGORY + "." + GroupRest.NAME
-                                        + " with id: " + uuid
-                                        + " has no associated collection or community"
-                        );
-                    }
+                    throw new ResourceNotFoundException(
+                            GroupRest.CATEGORY + "." + GroupRest.NAME
+                                    + " with id: " + uuid
+                                    + " has no associated collection or community"
+                    );
                 }
             }
         } catch (SQLException e) {
