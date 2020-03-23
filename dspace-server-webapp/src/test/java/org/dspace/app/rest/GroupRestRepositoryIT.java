@@ -1664,6 +1664,70 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
     }
 
     @Test
+    public void deleteGroupUnprocessableTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        EPerson reviewer1 = EPersonBuilder.createEPerson(context)
+                .withEmail("reviewer1@example.com")
+                .withPassword(password)
+                .build();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                .withName("Parent Community")
+                .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                .withName("Sub Community")
+                .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1)
+                .withName("Collection 1")
+                .withWorkflowGroup(1, admin, reviewer1)
+                .build();
+
+        final Group workflowGroup = col1.getWorkflowStep1(context);
+        context.commit();
+        context.reloadEntity(workflowGroup);
+
+        String authToken = getAuthToken(admin.getEmail(), password);
+
+        getClient(authToken).perform(
+                get("/api/eperson/groups/" + workflowGroup.getID())
+        ).andExpect(status().isOk());
+
+        getClient(authToken).perform(
+                delete("/api/eperson/groups/" + workflowGroup.getID())
+        ).andExpect(status().isUnprocessableEntity());
+
+        getClient(authToken).perform(
+                get("/api/eperson/groups/" + workflowGroup.getID())
+        ).andExpect(status().isOk());
+
+    }
+
+    @Test
+    public void deletePermanentGroupUnprocessableTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
+        final Group group = groupService.findByName(context, Group.ANONYMOUS);
+        context.restoreAuthSystemState();
+        String token = getAuthToken(admin.getEmail(), password);
+
+        String authToken = getAuthToken(admin.getEmail(), password);
+
+        getClient(authToken).perform(
+                get("/api/eperson/groups/" + group.getID())
+        ).andExpect(status().isOk());
+
+        getClient(authToken).perform(
+                delete("/api/eperson/groups/" + group.getID())
+        ).andExpect(status().isUnprocessableEntity());
+
+        getClient(authToken).perform(
+                get("/api/eperson/groups/" + group.getID())
+        ).andExpect(status().isOk());
+
+    }
+
+    @Test
     public void deleteGroupForbiddenTest() throws Exception {
 
         GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
@@ -1751,18 +1815,28 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
         Community community = null;
         Collection collection = null;
         Group adminGroup = null;
+        Group worfklowGroup = null;
+        Group submitterGroup = null;
 
         try {
             context.turnOffAuthorisationSystem();
             community = communityService.create(null, context);
             collection = collectionService.create(context, community);
             adminGroup = collectionService.createAdministrators(context, collection);
+            worfklowGroup = collectionService.createWorkflowGroup(context, collection, 1);
+            submitterGroup = collectionService.createSubmitters(context, collection);
             context.commit();
             adminGroup = context.reloadEntity(adminGroup);
 
             String authToken = getAuthToken(admin.getEmail(), password);
             getClient(authToken).perform(
                     get("/api/eperson/groups/" + adminGroup.getID() + "/object")
+            ).andExpect(status().isOk());
+            getClient(authToken).perform(
+                    get("/api/eperson/groups/" + worfklowGroup.getID() + "/object")
+            ).andExpect(status().isOk());
+            getClient(authToken).perform(
+                    get("/api/eperson/groups/" + submitterGroup.getID() + "/object")
             ).andExpect(status().isOk());
         } finally {
             if (collection != null) {
@@ -1773,6 +1847,12 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
             }
             if (adminGroup != null) {
                 GroupBuilder.deleteGroup(adminGroup.getID());
+            }
+            if (worfklowGroup != null) {
+                GroupBuilder.deleteGroup(worfklowGroup.getID());
+            }
+            if (submitterGroup != null) {
+                GroupBuilder.deleteGroup(submitterGroup.getID());
             }
         }
     }
