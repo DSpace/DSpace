@@ -534,6 +534,10 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
                     Matchers.anyOf(
                             JsonPathMatchers.hasJsonPath("$.type", is("authorization")),
                             JsonPathMatchers.hasJsonPath("$._embedded.feature",
+                                    Matchers.allOf(
+                                                is(alwaysTrue.getName())
+                                    )),
+                            JsonPathMatchers.hasJsonPath("$._embedded.feature",
                                     Matchers.not(Matchers.anyOf(
                                                 is(alwaysFalse.getName()),
                                                 is(alwaysException.getName()),
