@@ -15,23 +15,24 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.when;
 
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import mockit.NonStrictExpectations;
 import org.apache.logging.log4j.Logger;
 import org.dspace.AbstractUnitTest;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.AuthorizeServiceImpl;
+import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamFormatService;
-import org.dspace.core.Context;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.test.util.ReflectionTestUtils;
 
 /**
  * This class tests BitstreamFormat. Due to it being tighly coupled with the
@@ -60,6 +61,11 @@ public class BitstreamFormatTest extends AbstractUnitTest {
     protected BitstreamFormatService bitstreamFormatService = ContentServiceFactory.getInstance()
                                                                                    .getBitstreamFormatService();
 
+    /**
+     * Spy of AuthorizeService to use for tests
+     * (initialized / setup in @Before method)
+     */
+    private AuthorizeService authorizeServiceSpy;
 
     /**
      * This method will be run before every test as per @Before. It will
@@ -75,6 +81,13 @@ public class BitstreamFormatTest extends AbstractUnitTest {
         try {
             bf = bitstreamFormatService.find(context, 5);
             bunknown = bitstreamFormatService.findUnknown(context);
+
+            // Initialize our spy of the autowired (global) authorizeService bean.
+            // This allows us to customize the bean's method return values in tests below
+            authorizeServiceSpy = spy(authorizeService);
+            // "Wire" our spy to be used by the current loaded bitstreamFormatService
+            // (To ensure it uses the spy instead of the real service)
+            ReflectionTestUtils.setField(bitstreamFormatService, "authorizeService", authorizeServiceSpy);
         } catch (SQLException ex) {
             log.error("SQL Error in init", ex);
             fail("SQL Error in init: " + ex.getMessage());
@@ -199,11 +212,8 @@ public class BitstreamFormatTest extends AbstractUnitTest {
      */
     @Test
     public void testCreateAdmin() throws SQLException, AuthorizeException {
-        new NonStrictExpectations(authorizeService.getClass()) {{
-            // Allow full Admin perms
-            authorizeService.isAdmin((Context) any);
-            result = true;
-        }};
+        // Allow full Admin perms
+        when(authorizeServiceSpy.isAdmin(context)).thenReturn(true);
 
         BitstreamFormat found = bitstreamFormatService.create(context);
         assertThat("testCreate 0", found, notNullValue());
@@ -219,13 +229,10 @@ public class BitstreamFormatTest extends AbstractUnitTest {
      */
     @Test(expected = AuthorizeException.class)
     public void testCreateNotAdmin() throws SQLException, AuthorizeException {
-        new NonStrictExpectations(authorizeService.getClass()) {{
-            // Disallow full Admin perms
-            authorizeService.isAdmin((Context) any);
-            result = false;
-        }};
+        // Disalow full Admin perms
+        when(authorizeServiceSpy.isAdmin(context)).thenReturn(false);
 
-        BitstreamFormat found = bitstreamFormatService.create(context);
+        bitstreamFormatService.create(context);
         fail("Exception should have been thrown");
     }
 
@@ -442,11 +449,8 @@ public class BitstreamFormatTest extends AbstractUnitTest {
      */
     @Test(expected = AuthorizeException.class)
     public void testUpdateNotAdmin() throws SQLException, AuthorizeException {
-        new NonStrictExpectations(authorizeService.getClass()) {{
-            // Disallow full Admin perms
-            authorizeService.isAdmin((Context) any);
-            result = false;
-        }};
+        // Disallow full Admin perms
+        when(authorizeServiceSpy.isAdmin(context)).thenReturn(false);
 
         bitstreamFormatService.update(context, bf);
         fail("Exception should have been thrown");
@@ -457,11 +461,8 @@ public class BitstreamFormatTest extends AbstractUnitTest {
      */
     @Test
     public void testUpdateAdmin() throws SQLException, AuthorizeException {
-        new NonStrictExpectations(authorizeService.getClass()) {{
-            // Allow full Admin perms
-            authorizeService.isAdmin((Context) any);
-            result = true;
-        }};
+        // Allow full Admin perms
+        when(authorizeServiceSpy.isAdmin(context)).thenReturn(true);
 
         String desc = "Test description";
         String oldDescription = bf.getDescription();
@@ -478,11 +479,8 @@ public class BitstreamFormatTest extends AbstractUnitTest {
      */
     @Test(expected = AuthorizeException.class)
     public void testDeleteNotAdmin() throws SQLException, AuthorizeException {
-        new NonStrictExpectations(authorizeService.getClass()) {{
-            // Disallow full Admin perms
-            authorizeService.isAdmin((Context) any);
-            result = false;
-        }};
+        // Disallow full Admin perms
+        when(authorizeServiceSpy.isAdmin(context)).thenReturn(false);
 
         bitstreamFormatService.delete(context, bf);
         fail("Exception should have been thrown");
@@ -493,11 +491,8 @@ public class BitstreamFormatTest extends AbstractUnitTest {
      */
     @Test
     public void testDeleteAdmin() throws SQLException, AuthorizeException {
-        new NonStrictExpectations(authorizeService.getClass()) {{
-            // Allow full Admin perms
-            authorizeService.isAdmin((Context) any);
-            result = true;
-        }};
+        // Allow full Admin perms
+        when(authorizeServiceSpy.isAdmin(context)).thenReturn(true);
 
         BitstreamFormat bitstreamFormat = bitstreamFormatService.create(context);
         int toDeleteIdentifier = bitstreamFormat.getID();
@@ -511,11 +506,8 @@ public class BitstreamFormatTest extends AbstractUnitTest {
      */
     @Test(expected = IllegalArgumentException.class)
     public void testDeleteUnknown() throws SQLException, AuthorizeException {
-        new NonStrictExpectations(AuthorizeServiceImpl.class) {{
-            // Allow full Admin perms
-            authorizeService.isAdmin((Context) any);
-            result = true;
-        }};
+        // Allow full Admin perms
+        when(authorizeServiceSpy.isAdmin(context)).thenReturn(true);
 
         bitstreamFormatService.delete(context, bunknown);
         fail("Exception should have been thrown");

@@ -21,7 +21,6 @@ import net.handle.hdllib.HandleStorage;
 import net.handle.hdllib.HandleValue;
 import net.handle.hdllib.ScanCallback;
 import net.handle.hdllib.Util;
-
 import org.apache.logging.log4j.Logger;
 import org.dspace.core.Context;
 import org.dspace.handle.factory.HandleServiceFactory;

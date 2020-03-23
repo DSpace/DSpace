@@ -128,7 +128,8 @@ public class BundleUploadBitstreamControllerIT extends AbstractEntityIntegration
         String bitstreamId = String.valueOf(map.get("id"));
 
 
-        getClient(token).perform(get("/api/core/bundles/" + bundle.getID() + "/bitstreams"))
+        getClient(token).perform(get("/api/core/bundles/" + bundle.getID() + "/bitstreams")
+                        .param("projection", "full"))
                         .andExpect(status().isOk())
                         .andExpect(jsonPath("_embedded.bitstreams", Matchers.hasItem(
                                 BitstreamMatcher.matchBitstreamEntry(UUID.fromString(bitstreamId), file.getSize(),
@@ -180,7 +181,8 @@ public class BundleUploadBitstreamControllerIT extends AbstractEntityIntegration
         Map<String, Object> map = mapper.readValue(content, Map.class);
         String bitstreamId = String.valueOf(map.get("id"));
 
-        getClient(token).perform(get("/api/core/bundles/" + bundle.getID() + "/bitstreams"))
+        getClient(token).perform(get("/api/core/bundles/" + bundle.getID() + "/bitstreams")
+                        .param("projection", "full"))
                         .andExpect(status().isOk())
                         .andExpect(jsonPath("_embedded.bitstreams", Matchers.hasItem(
                                 BitstreamMatcher.matchBitstreamEntry(UUID.fromString(bitstreamId), file.getSize()))));
@@ -232,7 +234,8 @@ public class BundleUploadBitstreamControllerIT extends AbstractEntityIntegration
         Map<String, Object> map = mapper.readValue(content, Map.class);
         String bitstreamId = String.valueOf(map.get("id"));
 
-        getClient(token).perform(get("/api/core/bundles/" + bundle.getID() + "/bitstreams"))
+        getClient(token).perform(get("/api/core/bundles/" + bundle.getID() + "/bitstreams")
+                        .param("projection", "full"))
                         .andExpect(status().isOk())
                         .andExpect(jsonPath("_embedded.bitstreams", Matchers.hasItem(
                                 BitstreamMatcher.matchBitstreamEntry(UUID.fromString(bitstreamId), file.getSize()))));
@@ -274,9 +277,10 @@ public class BundleUploadBitstreamControllerIT extends AbstractEntityIntegration
                                          .file(file))
                         .andExpect(status().isForbidden());
 
-        getClient(token).perform(get("/api/core/bundles/" + bundle.getID() + "/bitstreams"))
+        getClient(token).perform(get("/api/core/bundles/" + bundle.getID() + "/bitstreams")
+                        .param("projection", "full"))
                         .andExpect(status().isOk())
-                        .andExpect(jsonPath("_embedded.bitstreams").doesNotExist());
+                        .andExpect(jsonPath("_embedded.bitstreams").isEmpty());
     }
 
     @Test
@@ -315,9 +319,10 @@ public class BundleUploadBitstreamControllerIT extends AbstractEntityIntegration
                                                   .file(file))
                    .andExpect(status().isUnauthorized());
 
-        getClient(token).perform(get("/api/core/bundles/" + bundle.getID() + "/bitstreams"))
+        getClient(token).perform(get("/api/core/bundles/" + bundle.getID() + "/bitstreams")
+                        .param("projection", "full"))
                         .andExpect(status().isOk())
-                        .andExpect(jsonPath("_embedded.bitstreams").doesNotExist());
+                        .andExpect(jsonPath("_embedded.bitstreams").isEmpty());
     }
 
     @Test
@@ -375,7 +380,8 @@ public class BundleUploadBitstreamControllerIT extends AbstractEntityIntegration
         Map<String, Object> map = mapper.readValue(content, Map.class);
         String bitstreamId = String.valueOf(map.get("id"));
 
-        getClient(token).perform(get("/api/core/bundles/" + bundle.getID() + "/bitstreams"))
+        getClient(token).perform(get("/api/core/bundles/" + bundle.getID() + "/bitstreams")
+                        .param("projection", "full"))
                         .andExpect(status().isOk())
                         .andExpect(jsonPath("_embedded.bitstreams", Matchers.hasItem(
                                 BitstreamMatcher.matchBitstreamEntry(UUID.fromString(bitstreamId), file.getSize()))));

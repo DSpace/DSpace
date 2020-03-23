@@ -24,7 +24,7 @@ public class ProcessResourceHalLinkFactory extends ProcessHalLinkFactory<Process
     private ConfigurationService configurationService;
 
     protected void addLinks(ProcessResource halResource, Pageable pageable, LinkedList<Link> list) throws Exception {
-        String dspaceRestUrl = configurationService.getProperty("dspace.restUrl");
+        String dspaceRestUrl = configurationService.getProperty("dspace.server.url");
         list.add(buildLink("files", getMethodOn().listFilesFromProcess(halResource.getContent().getProcessId())));
         list.add(
             buildLink("script", dspaceRestUrl + "/api/system/scripts/" + halResource.getContent().getScriptName()));

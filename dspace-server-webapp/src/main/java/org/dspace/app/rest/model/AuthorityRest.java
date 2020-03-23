@@ -16,17 +16,11 @@ import org.dspace.app.rest.RestResourceController;
  */
 @LinksRest(links = {
     @LinkRest(name = AuthorityRest.ENTRIES,
-            linkClass = AuthorityEntryRest.class,
-            method = "query",
-            embedOptional = true,
-            linkOptional = true
+            method = "query"
     ),
     @LinkRest(
             name = AuthorityRest.ENTRY,
-            linkClass = AuthorityEntryRest.class,
-            method = "getResource",
-            embedOptional = true,
-            linkOptional = true
+            method = "getResource"
     )
 })
 public class AuthorityRest extends BaseObjectRest<String> {

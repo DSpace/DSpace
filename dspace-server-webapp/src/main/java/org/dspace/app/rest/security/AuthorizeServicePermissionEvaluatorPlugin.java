@@ -14,6 +14,7 @@ import java.util.UUID;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.DSpaceObject;
+import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.DSpaceObjectService;
 import org.dspace.core.Constants;
@@ -84,8 +85,17 @@ public class AuthorizeServicePermissionEvaluatorPlugin extends RestObjectPermiss
                     return true;
                 }
 
+                // If the item is still inprogress we can process here only the READ permission.
+                // Other actions need to be evaluated against the wrapper object (workspace or workflow item)
+                if (dSpaceObject instanceof Item) {
+                    if (!DSpaceRestPermission.READ.equals(restPermission)
+                        && !((Item) dSpaceObject).isArchived() && !((Item) dSpaceObject).isWithdrawn()) {
+                        return false;
+                    }
+                }
+
                 return authorizeService.authorizeActionBoolean(context, ePerson, dSpaceObject,
-                        restPermission.getDspaceApiActionId(), false);
+                        restPermission.getDspaceApiActionId(), true);
             }
 
         } catch (SQLException e) {

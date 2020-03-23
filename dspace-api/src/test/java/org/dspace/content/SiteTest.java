@@ -58,7 +58,7 @@ public class SiteTest extends AbstractUnitTest {
         try {
             //we have to create a new community in the database
             context.turnOffAuthorisationSystem();
-            this.s = (Site) siteService.findSite(context);
+            this.s = siteService.findSite(context);
             //we need to commit the changes so we don't block the table for testing
             context.restoreAuthSystemState();
         } catch (SQLException ex) {
@@ -120,8 +120,7 @@ public class SiteTest extends AbstractUnitTest {
      */
     @Test
     public void testSiteFind() throws Exception {
-        int id = 0;
-        Site found = (Site) siteService.findSite(context);
+        Site found = siteService.findSite(context);
         assertThat("testSiteFind 0", found, notNullValue());
         assertThat("testSiteFind 1", found, equalTo(s));
     }
@@ -141,7 +140,7 @@ public class SiteTest extends AbstractUnitTest {
      */
     @Test
     public void testGetURL() {
-        assertThat("testGetURL 0", s.getURL(), equalTo(ConfigurationManager.getProperty("dspace.url")));
+        assertThat("testGetURL 0", s.getURL(), equalTo(ConfigurationManager.getProperty("dspace.ui.url")));
     }
 
 }

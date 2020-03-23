@@ -43,7 +43,6 @@ public class PoolTaskConverter
             taskRest.setGroup(converter.toRest(obj.getGroup(), projection));
         }
         taskRest.setAction(obj.getActionID());
-        taskRest.setStep(obj.getStepID());
         return taskRest;
     }
 
@@ -53,8 +52,7 @@ public class PoolTaskConverter
     }
 
     @Override
-    public boolean supportsModel(IndexableObject object) {
-        return object instanceof PoolTask;
+    public boolean supportsModel(IndexableObject idxo) {
+        return idxo.getIndexedObject() instanceof PoolTask;
     }
-
 }

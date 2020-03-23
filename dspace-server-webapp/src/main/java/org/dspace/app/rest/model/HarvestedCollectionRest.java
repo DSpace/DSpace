@@ -156,7 +156,7 @@ public class HarvestedCollectionRest extends BaseObjectRest<Integer> {
         this.lastHarvested = lastHarvested;
     }
 
-    @LinkRest(linkClass = HarvesterMetadataRest.class, name = "harvestermetadata", linkOptional = true)
+    @LinkRest(name = "harvestermetadata")
     @JsonIgnore
     public HarvesterMetadataRest getMetadataConfigs() {
         return metadata_configs;

@@ -12,8 +12,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
-
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -112,7 +110,7 @@ public class OpenSearchController {
             }
 
             // then the rest - we are processing the query
-            IndexableObject<UUID> container = null;
+            IndexableObject container = null;
 
             // support pagination parameters
             DiscoverQuery queryArgs = new DiscoverQuery();

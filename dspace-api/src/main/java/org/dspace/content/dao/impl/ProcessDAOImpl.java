@@ -20,6 +20,7 @@ import org.dspace.scripts.Process;
 import org.dspace.scripts.Process_;
 
 /**
+ *
  * Implementation class for {@link ProcessDAO}
  */
 public class ProcessDAOImpl extends AbstractHibernateDAO<Process> implements ProcessDAO {
