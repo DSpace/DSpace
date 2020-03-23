@@ -17,34 +17,47 @@
     </organization>
 
     <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.reporting.outputEncoding>${project.build.sourceEncoding}</project.reporting.outputEncoding>
+        <!--=== GENERAL / DSPACE-API DEPENDENCIES ===-->
         <java.version>11</java.version>
-        <pdfbox-version>2.0.15</pdfbox-version>
-        <poi-version>3.17</poi-version>
+        <spring.version>5.2.4.RELEASE</spring.version>
+        <spring-boot.version>2.2.5.RELEASE</spring-boot.version>
         <postgresql.driver.version>42.2.9</postgresql.driver.version>
-        <!-- PIN Jena to 2.x until both RDF and SWORDv2 can be updated to Jena 3. Requires package renaming, see
-             https://jena.apache.org/documentation/migrate_jena2_jena3.html -->
-        <jena.version>2.13.0</jena.version>
-        <jaxb-api.version>2.3.1</jaxb-api.version>
-        <jaxb-runtime.version>2.3.1</jaxb-runtime.version>
-        <javax-annotation.version>1.3.2</javax-annotation.version>
-        <axiom.version>1.2.22</axiom.version>
-        <errorprone.version>2.3.4</errorprone.version>
-        <log4j.version>2.11.2</log4j.version>
-        <slf4j.version>1.7.25</slf4j.version>
-        <!-- NOTE: when updating jackson.version, also sync jackson-databind dependency below -->
-        <jackson.version>2.10.2</jackson.version>
-        <jersey.version>2.30.1</jersey.version>
         <hibernate.version>5.4.10.Final</hibernate.version>
         <hibernate-validator.version>6.0.18.Final</hibernate-validator.version>
         <!-- PIN Solr to 7.3.x until SOLR-12858 is fixed. This bug affects all integration tests that use Solr
              https://issues.apache.org/jira/browse/SOLR-12858 -->
         <solr.client.version>7.3.1</solr.client.version>
-        <spring.version>5.2.4.RELEASE</spring.version>
-        <spring-boot.version>2.2.5.RELEASE</spring-boot.version>
-        <!-- Library for reading JSON documents: https://github.com/json-path/JsonPath -->
+        <pdfbox-version>2.0.15</pdfbox-version>
+        <poi-version>3.17</poi-version>
+        <jaxb-api.version>2.3.1</jaxb-api.version>
+        <jaxb-runtime.version>2.3.1</jaxb-runtime.version>
+        <javax-annotation.version>1.3.2</javax-annotation.version>
+        <!-- NOTE: when updating jackson.version, also sync jackson-databind dependency below -->
+        <jackson.version>2.10.2</jackson.version>
+        <axiom.version>1.2.22</axiom.version>
+        <errorprone.version>2.3.4</errorprone.version>
+        <log4j.version>2.11.2</log4j.version>
+        <slf4j.version>1.7.25</slf4j.version>
+
+        <!--=== SERVER WEBAPP DEPENDENCIES ===-->
+        <!-- Spring Data REST HAL Browser (used by Server webapp) -->
+        <spring-hal-browser.version>3.2.5.RELEASE</spring-hal-browser.version>
+        <!-- Library for reading JSON documents: https://github.com/json-path/JsonPath (used by Server webapp) -->
         <json-path.version>2.4.0</json-path.version>
+        <!-- Library for managing JSON Web Tokens (JWT): https://bitbucket.org/connect2id/nimbus-jose-jwt/wiki/Home
+             (used by Server webapp) -->
+        <nimbus-jose-jwt.version>7.9</nimbus-jose-jwt.version>
+
+        <!--=== OTHER MODULE-SPECIFIC DEPENDENCIES ===-->
+        <!-- PIN Jena to 2.x until both RDF and SWORDv2 can be updated to Jena 3. Requires package renaming, see
+             https://jena.apache.org/documentation/migrate_jena2_jena3.html -->
+        <jena.version>2.13.0</jena.version>
+        <!-- Used by (now obsolete) 'dspace-rest' WAR -->
+        <jersey.version>2.30.1</jersey.version>
+
+        <!--=== MAVEN SETTINGS ===-->
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>${project.build.sourceEncoding}</project.reporting.outputEncoding>
         <!-- 'root.basedir' is the path to the root [dspace-src] dir. It must be redefined by each child POM,
                      as it is used to reference the LICENSE_HEADER and *.properties file(s) in that directory. -->
         <root.basedir>${basedir}</root.basedir>
