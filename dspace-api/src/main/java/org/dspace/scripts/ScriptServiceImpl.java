@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 
 import org.dspace.core.Context;
 import org.dspace.kernel.ServiceManager;
+import org.dspace.scripts.configuration.ScriptConfiguration;
 import org.dspace.scripts.service.ScriptService;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -24,13 +25,19 @@ public class ScriptServiceImpl implements ScriptService {
     private ServiceManager serviceManager;
 
     @Override
-    public DSpaceRunnable getScriptForName(String name) {
-        return serviceManager.getServiceByName(name, DSpaceRunnable.class);
+    public ScriptConfiguration getScriptForName(String name) {
+        return serviceManager.getServiceByName(name, ScriptConfiguration.class);
     }
 
     @Override
-    public List<DSpaceRunnable> getDSpaceRunnables(Context context) {
-        return serviceManager.getServicesByType(DSpaceRunnable.class).stream().filter(
-            dSpaceRunnable -> dSpaceRunnable.isAllowedToExecute(context)).collect(Collectors.toList());
+    public List<ScriptConfiguration> getScriptConfigurations(Context context) {
+        return serviceManager.getServicesByType(ScriptConfiguration.class).stream().filter(
+            scriptConfiguration -> scriptConfiguration.isAllowedToExecute(context)).collect(Collectors.toList());
+    }
+
+    @Override
+    public DSpaceRunnable getDSpaceRunnableForScriptConfiguration(ScriptConfiguration scriptToExecute)
+        throws IllegalAccessException, InstantiationException {
+        return scriptToExecute.getDspaceRunnableClass().newInstance();
     }
 }

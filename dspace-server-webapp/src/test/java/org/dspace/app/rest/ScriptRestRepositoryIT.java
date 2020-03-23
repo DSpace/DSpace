@@ -42,7 +42,7 @@ import org.dspace.content.Item;
 import org.dspace.content.ProcessStatus;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.scripts.DSpaceCommandLineParameter;
-import org.dspace.scripts.DSpaceRunnable;
+import org.dspace.scripts.configuration.ScriptConfiguration;
 import org.dspace.scripts.service.ProcessService;
 import org.hamcrest.Matchers;
 import org.junit.After;
@@ -60,7 +60,7 @@ public class ScriptRestRepositoryIT extends AbstractControllerIntegrationTest {
     private BitstreamService bitstreamService;
 
     @Autowired
-    private List<DSpaceRunnable> dSpaceRunnableList;
+    private List<ScriptConfiguration> scriptConfigurations;
 
     @Autowired
     private DSpaceRunnableParameterConverter dSpaceRunnableParameterConverter;
@@ -72,14 +72,14 @@ public class ScriptRestRepositoryIT extends AbstractControllerIntegrationTest {
         getClient(token).perform(get("/api/system/scripts"))
                         .andExpect(status().isOk())
                         .andExpect(jsonPath("$._embedded.scripts", containsInAnyOrder(
-                            ScriptMatcher.matchScript(dSpaceRunnableList.get(0).getName(),
-                                                      dSpaceRunnableList.get(0).getDescription()),
-                            ScriptMatcher.matchScript(dSpaceRunnableList.get(1).getName(),
-                                                      dSpaceRunnableList.get(1).getDescription()),
-                            ScriptMatcher.matchScript(dSpaceRunnableList.get(2).getName(),
-                                                      dSpaceRunnableList.get(2).getDescription()),
-                            ScriptMatcher.matchScript(dSpaceRunnableList.get(3).getName(),
-                                                      dSpaceRunnableList.get(3).getDescription())
+                            ScriptMatcher.matchScript(scriptConfigurations.get(0).getName(),
+                                                      scriptConfigurations.get(0).getDescription()),
+                            ScriptMatcher.matchScript(scriptConfigurations.get(1).getName(),
+                                                      scriptConfigurations.get(1).getDescription()),
+                            ScriptMatcher.matchScript(scriptConfigurations.get(2).getName(),
+                                                      scriptConfigurations.get(2).getDescription()),
+                            ScriptMatcher.matchScript(scriptConfigurations.get(3).getName(),
+                                                      scriptConfigurations.get(3).getDescription())
                         )));
 
     }
@@ -104,12 +104,12 @@ public class ScriptRestRepositoryIT extends AbstractControllerIntegrationTest {
         getClient(token).perform(get("/api/system/scripts").param("size", "1"))
                         .andExpect(status().isOk())
                         .andExpect(jsonPath("$._embedded.scripts", Matchers.not(Matchers.hasItem(
-                            ScriptMatcher.matchScript(dSpaceRunnableList.get(0).getName(),
-                                                      dSpaceRunnableList.get(0).getDescription())
+                            ScriptMatcher.matchScript(scriptConfigurations.get(0).getName(),
+                                                      scriptConfigurations.get(0).getDescription())
                         ))))
                         .andExpect(jsonPath("$._embedded.scripts", hasItem(
-                            ScriptMatcher.matchScript(dSpaceRunnableList.get(1).getName(),
-                                                      dSpaceRunnableList.get(1).getDescription())
+                            ScriptMatcher.matchScript(scriptConfigurations.get(3).getName(),
+                                                      scriptConfigurations.get(3).getDescription())
                         )))
                         .andExpect(jsonPath("$.page",
                                             is(PageMatcher.pageEntry(0, 1))));
@@ -118,12 +118,12 @@ public class ScriptRestRepositoryIT extends AbstractControllerIntegrationTest {
         getClient(token).perform(get("/api/system/scripts").param("size", "1").param("page", "1"))
                         .andExpect(status().isOk())
                         .andExpect(jsonPath("$._embedded.scripts", hasItem(
-                            ScriptMatcher.matchScript(dSpaceRunnableList.get(2).getName(),
-                                                      dSpaceRunnableList.get(2).getDescription())
+                            ScriptMatcher.matchScript(scriptConfigurations.get(0).getName(),
+                                                      scriptConfigurations.get(0).getDescription())
                         )))
                         .andExpect(jsonPath("$._embedded.scripts", Matchers.not(hasItem(
-                            ScriptMatcher.matchScript(dSpaceRunnableList.get(1).getName(),
-                                                      dSpaceRunnableList.get(1).getDescription())
+                            ScriptMatcher.matchScript(scriptConfigurations.get(1).getName(),
+                                                      scriptConfigurations.get(1).getDescription())
                         ))))
                         .andExpect(jsonPath("$.page",
                                             is(PageMatcher.pageEntry(1, 1))));
@@ -136,7 +136,7 @@ public class ScriptRestRepositoryIT extends AbstractControllerIntegrationTest {
         getClient(token).perform(get("/api/system/scripts/mock-script"))
                         .andExpect(status().isOk())
                         .andExpect(jsonPath("$", ScriptMatcher
-                            .matchMockScript(dSpaceRunnableList.get(3).getOptions())));
+                            .matchMockScript(scriptConfigurations.get(3).getOptions())));
     }
 
     @Test

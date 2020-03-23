@@ -11,6 +11,7 @@ import java.util.List;
 
 import org.dspace.core.Context;
 import org.dspace.scripts.DSpaceRunnable;
+import org.dspace.scripts.configuration.ScriptConfiguration;
 
 /**
  * This service will deal with logic to handle DSpaceRunnable objects
@@ -22,12 +23,15 @@ public interface ScriptService {
      * @param name  The name that the script has to match
      * @return      The matching DSpaceRunnable script
      */
-    DSpaceRunnable getScriptForName(String name);
+    ScriptConfiguration getScriptForName(String name);
 
     /**
      * This method will return a list of DSpaceRunnable objects for which the given Context is authorized to use them
      * @param context   The relevant DSpace context
      * @return          The list of accessible DSpaceRunnable scripts for this context
      */
-    List<DSpaceRunnable> getDSpaceRunnables(Context context);
+    List<ScriptConfiguration> getScriptConfigurations(Context context);
+
+    DSpaceRunnable getDSpaceRunnableForScriptConfiguration(ScriptConfiguration scriptToExecute)
+        throws IllegalAccessException, InstantiationException;
 }

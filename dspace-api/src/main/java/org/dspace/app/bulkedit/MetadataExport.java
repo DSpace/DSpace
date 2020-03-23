@@ -7,23 +7,23 @@
  */
 package org.dspace.app.bulkedit;
 
-import java.io.OutputStream;
 import java.sql.SQLException;
 
-import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.dspace.content.service.MetadataDSpaceCsvExportService;
 import org.dspace.core.Context;
+import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.scripts.DSpaceRunnable;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.dspace.scripts.configuration.MetadataExportScriptConfiguration;
+import org.dspace.utils.DSpace;
 
 /**
  * Metadata exporter to allow the batch export of metadata into a file
  *
  * @author Stuart Lewis
  */
-public class MetadataExport extends DSpaceRunnable {
+public class MetadataExport extends DSpaceRunnable<MetadataExportScriptConfiguration> {
 
     private Context context = null;
     private boolean help = false;
@@ -32,33 +32,10 @@ public class MetadataExport extends DSpaceRunnable {
     private boolean exportAllMetadata = false;
     private boolean exportAllItems = false;
 
-    @Autowired
-    private MetadataDSpaceCsvExportService metadataDSpaceCsvExportService;
+    private MetadataDSpaceCsvExportService metadataDSpaceCsvExportService = new DSpace().getServiceManager()
+                .getServicesByType(MetadataDSpaceCsvExportService.class).get(0);
 
-    @Autowired
-    private EPersonService ePersonService;
-
-    private MetadataExport() {
-        this.options = constructOptions();
-    }
-
-    private Options constructOptions() {
-        Options options = new Options();
-
-        options.addOption("i", "id", true, "ID or handle of thing to export (item, collection, or community)");
-        options.getOption("i").setType(String.class);
-        options.addOption("f", "file", true, "destination where you want file written");
-        options.getOption("f").setType(OutputStream.class);
-        options.getOption("f").setRequired(true);
-        options.addOption("a", "all", false,
-                          "include all metadata fields that are not normally changed (e.g. provenance)");
-        options.getOption("a").setType(boolean.class);
-        options.addOption("h", "help", false, "help");
-        options.getOption("h").setType(boolean.class);
-
-
-        return options;
-    }
+    private EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
 
     public void internalRun() throws Exception {
         if (help) {
@@ -74,6 +51,12 @@ public class MetadataExport extends DSpaceRunnable {
         handler.writeFilestream(context, filename, dSpaceCSV.getInputStream(), "exportCSV");
         context.restoreAuthSystemState();
         context.complete();
+    }
+
+    @Override
+    public MetadataExportScriptConfiguration getScriptConfiguration() {
+        return new DSpace().getServiceManager().getServiceByName("metadata-export",
+                                                                 MetadataExportScriptConfiguration.class);
     }
 
     public void setup() throws ParseException {
@@ -99,7 +82,7 @@ public class MetadataExport extends DSpaceRunnable {
         handle = commandLine.getOptionValue('i');
 
         try {
-            context.setCurrentUser(ePersonService.find(context, getEpersonIdentifier()));
+            context.setCurrentUser(ePersonService.find(context, getScriptConfiguration().getEpersonIdentifier()));
         } catch (SQLException e) {
             handler.handleException(e);
         }
