@@ -1,5 +1,5 @@
-<%@ page import="org.dspace.core.Context" %>
 <%@ page import="org.dspace.app.webui.util.UIUtil" %>
+<%@ page import="org.dspace.core.Context" %>
 <%@ page contentType="text/html;charset=UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
@@ -11,25 +11,48 @@
     <c:if test="${not isExtended}">
         <c:set var="divClass" value="col-md-offset-2 col-md-8"/>
     </c:if>
+    <h2>
+        <form action="/export/user?${queryString}" method="post" enctype="application/json" accept-charset="utf-8">
+            <fmt:message key="browse.full.header"><fmt:param value=""/></fmt:message> <fmt:message key="browse.type.metadata.${type}"/> ${searchQuery}
+            <c:if test="${isExtended}">
+                <%--<input type="hidden" name = "publications" id = "publications" value="${exportPublications}">--%>
+                <input type="hidden" name = "author" id = "author" value="${searchQuery}">
+                <button type="submit" class="btn btn-default btn-sm" title="<fmt:message key="browse.publications.export"/>">
+                    <span class="glyphicon glyphicon-save"></span>
+                </button>
+            </c:if>
+        </form>
 
+    </h2>
+
+    <c:if test="${not isExtended}">
+        <div id="browse_navigation" class="well text-center">
+            <br/>
+            <%
+                for (char c = 'A'; c <= 'Z'; c++) {
+            %>
+            <a href="/browse?${queryString.replaceAll('[&]*starts_with=[^&]+', '')}&amp;starts_with=<%= c %>"
+               class="label label-default" style="margin-left:3px;"><%= c %>
+            </a>
+            <%
+                }
+            %>
+
+            <br/>
+            <%
+                for (char c = 'А'; c <= 'Я'; c++) {
+            %>
+            <a href="/browse?${queryString.replaceAll('[&]*starts_with=[^&]+', '')}&amp;starts_with=<%= c %>"
+               class="label label-default" style="margin-left:3px;"><%= c %>
+            </a>
+            <%
+                }
+            %>
+            <br/>
+        </div>
+    </c:if>
+    <br/>
     <div class="${divClass}">
-        <h2>
-
-
-            <form action="/export/user?${queryString}" method="post" enctype="application/json" accept-charset="utf-8">
-                <fmt:message key="browse.full.header"><fmt:param value=""/></fmt:message> <fmt:message key="browse.type.metadata.${type}"/> ${searchQuery}
-                <c:if test="${isExtended}">
-                        <%--<input type="hidden" name = "publications" id = "publications" value="${exportPublications}">--%>
-                    <input type="hidden" name = "author" id = "author" value="${searchQuery}">
-                    <button type="submit" class="btn btn-default btn-sm" title="<fmt:message key="browse.publications.export"/>">
-                        <span class="glyphicon glyphicon-save"></span>
-                    </button>
-                </c:if>
-            </form>
-
-        </h2>
-
-
         <div class="panel panel-primary">
             <div class="panel-heading text-center">
                 <fmt:message key="browse.full.range">
