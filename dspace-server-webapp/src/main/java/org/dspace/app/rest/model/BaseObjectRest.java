@@ -15,7 +15,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
 /**
- * Base class for any REST resource that need to be addressable
+ * Base class for any REST resource that need to be addressable and identifiable (via an ID)
  *
  * @param <T> the class of the resource identifier
  * @author Andrea Bollini (andrea.bollini at 4science.it)
