@@ -34,7 +34,7 @@ public class GroupMatcher {
             hasJsonPath("$.name", is(name)),
             hasJsonPath("$.type", is("group")),
             hasJsonPath("$._links.self.href", containsString("/api/eperson/groups/")),
-            hasJsonPath("$._links.groups.href", endsWith("/groups"))
+            hasJsonPath("$._links.subgroups.href", endsWith("/subgroups"))
         );
     }
 
@@ -43,7 +43,8 @@ public class GroupMatcher {
      */
     public static Matcher<? super Object> matchFullEmbeds() {
         return matchEmbeds(
-                "groups[]"
+                "subgroups[]",
+                "epersons[]"
         );
     }
 
@@ -52,7 +53,8 @@ public class GroupMatcher {
      */
     public static Matcher<? super Object> matchLinks(UUID uuid) {
         return HalMatcher.matchLinks(REST_SERVER_URL + "eperson/groups/" + uuid,
-                "groups",
+                "subgroups",
+                "epersons",
                 "self"
         );
     }
@@ -63,7 +65,8 @@ public class GroupMatcher {
                 hasJsonPath("$.name", is(name)),
                 hasJsonPath("$.type", is("group")),
                 hasJsonPath("$._links.self.href", containsString("/api/eperson/groups/" + uuid.toString())),
-                hasJsonPath("$._links.groups.href", endsWith(uuid.toString() + "/groups"))
+                hasJsonPath("$._links.subgroups.href", endsWith(uuid.toString() + "/subgroups")),
+                hasJsonPath("$._links.epersons.href", endsWith(uuid.toString() + "/epersons"))
         );
     }
 }

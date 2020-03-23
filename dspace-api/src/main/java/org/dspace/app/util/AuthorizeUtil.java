@@ -190,10 +190,11 @@ public class AuthorizeUtil {
     public static void authorizeManageCCLicense(Context context, Item item)
         throws AuthorizeException, SQLException {
         AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
+        CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
         ItemService itemService = ContentServiceFactory.getInstance().getItemService();
         try {
-            authorizeService.authorizeAction(context, item, Constants.ADD);
-            authorizeService.authorizeAction(context, item, Constants.REMOVE);
+            authorizeService.authorizeAction(context, item, Constants.ADD, false);
+            authorizeService.authorizeAction(context, item, Constants.REMOVE, false);
         } catch (AuthorizeException authex) {
             if (AuthorizeConfiguration.canItemAdminManageCCLicense()) {
                 authorizeService
@@ -202,8 +203,10 @@ public class AuthorizeUtil {
                 authorizeService.authorizeAction(context, itemService
                     .getParentObject(context, item), Constants.ADMIN);
             } else if (AuthorizeConfiguration.canCommunityAdminManageCCLicense()) {
-                authorizeService.authorizeAction(context, itemService
-                    .getParentObject(context, item), Constants.ADMIN);
+                Collection collection = (Collection) itemService
+                    .getParentObject(context, item);
+                authorizeService.authorizeAction(context, collectionService.getParentObject(context, collection),
+                        Constants.ADMIN);
             } else {
                 requireAdminRole(context);
             }
