@@ -16,9 +16,11 @@ import java.util.TreeMap;
 import org.apache.commons.cli.ParseException;
 import org.apache.log4j.Logger;
 import org.dspace.scripts.DSpaceRunnable;
+import org.dspace.scripts.configuration.ScriptConfiguration;
 import org.dspace.scripts.factory.ScriptServiceFactory;
 import org.dspace.scripts.handler.DSpaceRunnableHandler;
 import org.dspace.scripts.handler.impl.CommandLineDSpaceRunnableHandler;
+import org.dspace.scripts.service.ScriptService;
 import org.dspace.servicemanager.DSpaceKernelImpl;
 import org.dspace.servicemanager.DSpaceKernelInit;
 import org.dspace.services.RequestService;
@@ -55,7 +57,7 @@ public class ScriptLauncher {
      * @throws FileNotFoundException if file doesn't exist
      */
     public static void main(String[] args)
-        throws FileNotFoundException, IOException {
+        throws FileNotFoundException, IOException, IllegalAccessException, InstantiationException {
         // Initialise the service manager kernel
         try {
             kernelImpl = DSpaceKernelInit.getKernel(null);
@@ -112,9 +114,14 @@ public class ScriptLauncher {
      */
     public static int handleScript(String[] args, Document commandConfigs,
                                    DSpaceRunnableHandler dSpaceRunnableHandler,
-                                   DSpaceKernelImpl kernelImpl) {
+                                   DSpaceKernelImpl kernelImpl) throws InstantiationException, IllegalAccessException {
         int status;
-        DSpaceRunnable script = ScriptServiceFactory.getInstance().getScriptService().getScriptForName(args[0]);
+        ScriptService scriptService = ScriptServiceFactory.getInstance().getScriptService();
+        ScriptConfiguration scriptConfiguration = scriptService.getScriptForName(args[0]);
+        DSpaceRunnable script = null;
+        if (scriptConfiguration != null) {
+            script = scriptService.getDSpaceRunnableForScriptConfiguration(scriptConfiguration);
+        }
         if (script != null) {
             status = executeScript(args, dSpaceRunnableHandler, script);
         } else {

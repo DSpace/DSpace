@@ -22,11 +22,11 @@ import java.util.Set;
 import java.util.UUID;
 import javax.annotation.Nullable;
 
-import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.authority.AuthorityValue;
+import org.dspace.authority.factory.AuthorityServiceFactory;
 import org.dspace.authority.service.AuthorityValueService;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
@@ -57,22 +57,23 @@ import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.factory.EPersonServiceFactory;
+import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
 import org.dspace.scripts.DSpaceRunnable;
+import org.dspace.scripts.configuration.MetadataImportScriptConfiguration;
 import org.dspace.scripts.handler.DSpaceRunnableHandler;
+import org.dspace.utils.DSpace;
 import org.dspace.workflow.WorkflowException;
 import org.dspace.workflow.WorkflowItem;
 import org.dspace.workflow.WorkflowService;
 import org.dspace.workflow.factory.WorkflowServiceFactory;
-import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Metadata importer to allow the batch import of metadata from a file
  *
  * @author Stuart Lewis
  */
-public class MetadataImport extends DSpaceRunnable implements InitializingBean {
+public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfiguration> {
     /**
      * The Context
      */
@@ -150,26 +151,18 @@ public class MetadataImport extends DSpaceRunnable implements InitializingBean {
      */
     protected static final Logger log = org.apache.logging.log4j.LogManager.getLogger(MetadataImport.class);
 
-    @Autowired
-    protected ItemService itemService;
-    @Autowired
-    protected InstallItemService installItemService;
-    @Autowired
-    protected CollectionService collectionService;
-    @Autowired
-    protected HandleService handleService;
-    @Autowired
-    protected WorkspaceItemService workspaceItemService;
-    @Autowired
-    protected RelationshipTypeService relationshipTypeService;
-    @Autowired
-    protected RelationshipService relationshipService;
-    @Autowired
-    protected EntityTypeService entityTypeService;
-    @Autowired
-    protected EntityService entityService;
-    @Autowired
-    protected AuthorityValueService authorityValueService;
+    protected ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+    protected InstallItemService installItemService = ContentServiceFactory.getInstance().getInstallItemService();
+    protected CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
+    protected HandleService handleService = HandleServiceFactory.getInstance().getHandleService();
+    protected WorkspaceItemService workspaceItemService = ContentServiceFactory.getInstance().getWorkspaceItemService();
+    protected RelationshipTypeService relationshipTypeService = ContentServiceFactory.getInstance()
+                                                                                     .getRelationshipTypeService();
+    protected RelationshipService relationshipService = ContentServiceFactory.getInstance().getRelationshipService();
+    protected EntityTypeService entityTypeService = ContentServiceFactory.getInstance().getEntityTypeService();
+    protected EntityService entityService = ContentServiceFactory.getInstance().getEntityService();
+    protected AuthorityValueService authorityValueService = AuthorityServiceFactory.getInstance()
+                                                                                   .getAuthorityValueService();
 
     /**
      * Create an instance of the metadata importer. Requires a context and an array of CSV lines
@@ -188,6 +181,9 @@ public class MetadataImport extends DSpaceRunnable implements InitializingBean {
         if (help) {
             printHelp();
             return;
+        }
+        if (authorityControlled == null) {
+            setAuthorizedMetadataFields();
         }
         // Read commandLines from the CSV file
         try {
@@ -274,6 +270,13 @@ public class MetadataImport extends DSpaceRunnable implements InitializingBean {
         return true;
     }
 
+    @Override
+    public MetadataImportScriptConfiguration getScriptConfiguration() {
+        return new DSpace().getServiceManager().getServiceByName("metadata-import",
+                                                                 MetadataImportScriptConfiguration.class);
+    }
+
+
     public void setup() throws ParseException {
         useTemplate = false;
         filename = null;
@@ -340,40 +343,11 @@ public class MetadataImport extends DSpaceRunnable implements InitializingBean {
         // Is this a silent run?
         change = false;
     }
-
-    public MetadataImport() {
-        Options options = constructOptions();
-        this.options = options;
-    }
-
-    private Options constructOptions() {
-        Options options = new Options();
-
-        options.addOption("f", "file", true, "source file");
-        options.getOption("f").setType(InputStream.class);
-        options.getOption("f").setRequired(true);
-        options.addOption("e", "email", true, "email address or user id of user (required if adding new items)");
-        options.getOption("e").setType(String.class);
-        options.getOption("e").setRequired(true);
-        options.addOption("s", "silent", false,
-                          "silent operation - doesn't request confirmation of changes USE WITH CAUTION");
-        options.getOption("s").setType(boolean.class);
-        options.addOption("w", "workflow", false, "workflow - when adding new items, use collection workflow");
-        options.getOption("w").setType(boolean.class);
-        options.addOption("n", "notify", false,
-                          "notify - when adding new items using a workflow, send notification emails");
-        options.getOption("n").setType(boolean.class);
-        options.addOption("v", "validate-only", false,
-                          "validate - just validate the csv, don't run the import");
-        options.getOption("v").setType(boolean.class);
-        options.addOption("t", "template", false,
-                          "template - when adding new items, use the collection template (if it exists)");
-        options.getOption("t").setType(boolean.class);
-        options.addOption("h", "help", false, "help");
-        options.getOption("h").setType(boolean.class);
-
-        return options;
-    }
+//
+//    public MetadataImport() {
+//        Options options = constructOptions();
+//        this.options = options;
+//    }
 
     /**
      * Run an import. The import can either be read-only to detect changes, or
@@ -1844,7 +1818,4 @@ public class MetadataImport extends DSpaceRunnable implements InitializingBean {
         return foundRelationshipType;
     }
 
-    public void afterPropertiesSet() throws Exception {
-        setAuthorizedMetadataFields();
-    }
 }
