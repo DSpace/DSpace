@@ -8,7 +8,9 @@
 package org.dspace.app.rest;
 
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
-
+import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadata;
+import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadataDoesNotExist;
+import static org.dspace.core.Constants.WRITE;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -35,12 +37,12 @@ import org.dspace.app.rest.builder.CommunityBuilder;
 import org.dspace.app.rest.builder.EPersonBuilder;
 import org.dspace.app.rest.builder.GroupBuilder;
 import org.dspace.app.rest.builder.ItemBuilder;
+import org.dspace.app.rest.builder.ResourcePolicyBuilder;
 import org.dspace.app.rest.builder.WorkspaceItemBuilder;
 import org.dspace.app.rest.matcher.BitstreamMatcher;
 import org.dspace.app.rest.matcher.CollectionMatcher;
 import org.dspace.app.rest.matcher.HalMatcher;
 import org.dspace.app.rest.matcher.ItemMatcher;
-import org.dspace.app.rest.matcher.MetadataMatcher;
 import org.dspace.app.rest.model.ItemRest;
 import org.dspace.app.rest.model.MetadataRest;
 import org.dspace.app.rest.model.MetadataValueRest;
@@ -1753,15 +1755,15 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                             hasJsonPath("$.handle", is(itemHandleString)),
                             hasJsonPath("$.type", is("item")),
                             hasJsonPath("$.metadata", Matchers.allOf(
-                                MetadataMatcher.matchMetadata("dc.description",
+                                matchMetadata("dc.description",
                                     "<p>Some cool HTML code here</p>"),
-                                MetadataMatcher.matchMetadata("dc.description.abstract",
+                                matchMetadata("dc.description.abstract",
                                     "Sample item created via the REST API"),
-                                MetadataMatcher.matchMetadata("dc.description.tableofcontents",
+                                matchMetadata("dc.description.tableofcontents",
                                     "<p>HTML News</p>"),
-                                MetadataMatcher.matchMetadata("dc.rights",
+                                matchMetadata("dc.rights",
                                     "Custom Copyright Text"),
-                                MetadataMatcher.matchMetadata("dc.title",
+                                matchMetadata("dc.title",
                                     "Title Text")
                             )))));
 
@@ -1838,15 +1840,15 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                             hasJsonPath("$.handle", is(itemHandleString)),
                             hasJsonPath("$.type", is("item")),
                             hasJsonPath("$.metadata", Matchers.allOf(
-                                MetadataMatcher.matchMetadata("dc.description",
+                                matchMetadata("dc.description",
                                     "<p>Some cool HTML code here</p>"),
-                                MetadataMatcher.matchMetadata("dc.description.abstract",
+                                matchMetadata("dc.description.abstract",
                                     "Sample item created via the REST API"),
-                                MetadataMatcher.matchMetadata("dc.description.tableofcontents",
+                                matchMetadata("dc.description.tableofcontents",
                                     "<p>HTML News</p>"),
-                                MetadataMatcher.matchMetadata("dc.rights",
+                                matchMetadata("dc.rights",
                                     "New Custom Copyright Text"),
-                                MetadataMatcher.matchMetadata("dc.title",
+                                matchMetadata("dc.title",
                                     "New title")
                             )))));
     }
@@ -1907,15 +1909,15 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                             hasJsonPath("$.handle", is(itemHandleString)),
                             hasJsonPath("$.type", is("item")),
                             hasJsonPath("$.metadata", Matchers.allOf(
-                                MetadataMatcher.matchMetadata("dc.description",
+                                matchMetadata("dc.description",
                                     "<p>Some cool HTML code here</p>"),
-                                MetadataMatcher.matchMetadata("dc.description.abstract",
+                                matchMetadata("dc.description.abstract",
                                     "Sample item created via the REST API"),
-                                MetadataMatcher.matchMetadata("dc.description.tableofcontents",
+                                matchMetadata("dc.description.tableofcontents",
                                     "<p>HTML News</p>"),
-                                MetadataMatcher.matchMetadata("dc.rights",
+                                matchMetadata("dc.rights",
                                     "Custom Copyright Text"),
-                                MetadataMatcher.matchMetadata("dc.title",
+                                matchMetadata("dc.title",
                                     "Title Text")
                             )))));
 
@@ -1981,15 +1983,15 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                             hasJsonPath("$.handle", is(itemHandleString)),
                             hasJsonPath("$.type", is("item")),
                             hasJsonPath("$.metadata", Matchers.allOf(
-                                MetadataMatcher.matchMetadata("dc.description",
+                                matchMetadata("dc.description",
                                     "<p>Some cool HTML code here</p>"),
-                                MetadataMatcher.matchMetadata("dc.description.abstract",
+                                matchMetadata("dc.description.abstract",
                                     "Sample item created via the REST API"),
-                                MetadataMatcher.matchMetadata("dc.description.tableofcontents",
+                                matchMetadata("dc.description.tableofcontents",
                                     "<p>HTML News</p>"),
-                                MetadataMatcher.matchMetadata("dc.rights",
+                                matchMetadata("dc.rights",
                                     "Custom Copyright Text"),
-                                MetadataMatcher.matchMetadata("dc.title",
+                                matchMetadata("dc.title",
                                     "Title Text")
                             )))));
 
@@ -2227,7 +2229,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                             hasJsonPath("$.handle", is(itemHandleString)),
                             hasJsonPath("$.type", is("item")),
                             hasJsonPath("$.metadata", Matchers.allOf(
-                                MetadataMatcher.matchMetadata("dc.contributor.author", "Donald, Smith")
+                                matchMetadata("dc.contributor.author", "Donald, Smith")
                             )))));
     }
 
@@ -2546,4 +2548,94 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                                   .doesNotExist())
         ;
     }
+
+    @Test
+    public void testHiddenMetadataForAnonymousUser() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1").build();
+
+        Item item = ItemBuilder.createItem(context, col1)
+                                      .withTitle("Public item 1")
+                                      .withProvenanceData("Provenance data")
+                                      .build();
+
+        context.restoreAuthSystemState();
+
+
+        getClient().perform(get("/api/core/items/" + item.getID())
+                                    .param("projection", "full"))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$", ItemMatcher.matchFullEmbeds()))
+                   .andExpect(jsonPath("$", ItemMatcher.matchItemProperties(item)))
+                   .andExpect(jsonPath("$.metadata", matchMetadata("dc.title", "Public item 1")))
+                   .andExpect(jsonPath("$.metadata", matchMetadataDoesNotExist("dc.description.provenance")));
+    }
+
+    @Test
+    public void testHiddenMetadataForAdminUser() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1").build();
+
+        Item item = ItemBuilder.createItem(context, col1)
+                               .withTitle("Public item 1")
+                               .withProvenanceData("Provenance data")
+                               .build();
+
+        context.restoreAuthSystemState();
+
+        String token = getAuthToken(admin.getEmail(), password);
+
+        getClient(token).perform(get("/api/core/items/" + item.getID())
+                                    .param("projection", "full"))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$", ItemMatcher.matchFullEmbeds()))
+                   .andExpect(jsonPath("$", ItemMatcher.matchItemProperties(item)))
+                   .andExpect(jsonPath("$.metadata", matchMetadata("dc.title", "Public item 1")))
+                   .andExpect(jsonPath("$.metadata", matchMetadata("dc.description.provenance", "Provenance data")));
+    }
+
+    @Test
+    public void testHiddenMetadataForUserWithWriteRights() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1").build();
+
+        Item item = ItemBuilder.createItem(context, col1)
+                               .withTitle("Public item 1")
+                               .withProvenanceData("Provenance data")
+                               .build();
+
+        context.restoreAuthSystemState();
+
+
+        ResourcePolicyBuilder.createResourcePolicy(context)
+                             .withUser(eperson)
+                             .withAction(WRITE)
+                             .withDspaceObject(item)
+                             .build();
+
+        String token = getAuthToken(eperson.getEmail(), password);
+
+        getClient(token).perform(get("/api/core/items/" + item.getID())
+                                         .param("projection", "full"))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$", ItemMatcher.matchFullEmbeds()))
+                        .andExpect(jsonPath("$", ItemMatcher.matchItemProperties(item)))
+                        .andExpect(jsonPath("$.metadata", matchMetadata("dc.title", "Public item 1")))
+                        .andExpect(jsonPath("$.metadata", matchMetadataDoesNotExist("dc.description.provenance")));
+
+    }
+
+
 }

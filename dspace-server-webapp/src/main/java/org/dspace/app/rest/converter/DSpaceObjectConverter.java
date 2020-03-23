@@ -69,8 +69,14 @@ public abstract class DSpaceObjectConverter<M extends DSpaceObject, R extends or
     protected abstract R newInstance();
 
 
+    /**
+     * Retrieves the metadata list filtered according to the hidden metadata configuration
+     * When the context is null, it will return the metadatalist as for an anonymous user
+     * @param context   The context
+     * @param obj       The object of which the filtered metadata will be retrieved
+     * @return A list of object metadata filtered based on the the hidden metadata configuration
+     */
     public MetadataValueList getPermissionFilteredMetadata(Context context, M obj) {
-
         List<MetadataValue> metadata = obj.getMetadata();
         try {
             if (context != null && authorizeService.isAdmin(context)) {
@@ -79,7 +85,7 @@ public abstract class DSpaceObjectConverter<M extends DSpaceObject, R extends or
             for (MetadataValue mv : metadata) {
                 MetadataField metadataField = mv.getMetadataField();
                 if (metadataExposureService
-                        .isHidden(context, metadataField.getMetadataSchema().getNamespace(),
+                        .isHidden(context, metadataField.getMetadataSchema().getName(),
                                   metadataField.getElement(),
                                   metadataField.getQualifier())) {
                     metadata.remove(mv);
@@ -91,6 +97,11 @@ public abstract class DSpaceObjectConverter<M extends DSpaceObject, R extends or
         return new MetadataValueList(metadata);
     }
 
+    /**
+     * Retrieves the context from the request
+     * If not request is found, will return null
+     * @return  The context retrieved form the current request or null when no context
+     */
     private Context getContext() {
         Request currentRequest = requestService.getCurrentRequest();
         if (currentRequest != null) {
