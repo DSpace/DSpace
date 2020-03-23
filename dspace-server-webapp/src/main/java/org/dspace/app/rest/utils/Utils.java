@@ -57,7 +57,6 @@ import org.dspace.app.rest.model.ResourcePolicyRest;
 import org.dspace.app.rest.model.RestAddressableModel;
 import org.dspace.app.rest.model.RestModel;
 import org.dspace.app.rest.model.VersionHistoryRest;
-import org.dspace.app.rest.model.hateoas.DSpaceResource;
 import org.dspace.app.rest.model.hateoas.EmbeddedPage;
 import org.dspace.app.rest.model.hateoas.HALResource;
 import org.dspace.app.rest.projection.CompositeProjection;
@@ -162,29 +161,61 @@ public class Utils {
         return optionalPageable != null ? optionalPageable : PageRequest.of(0, DEFAULT_PAGE_SIZE);
     }
 
-    public Link linkToSingleResource(DSpaceResource r, String rel) {
-        RestAddressableModel data = r.getContent();
-        return linkToSingleResource(data, rel);
-    }
-
+    /**
+     * Create a HAL Link to a single resource
+     * @param data the resource itself
+     * @param rel name of the link relation to create
+     * @return created Link object
+     */
     public Link linkToSingleResource(RestAddressableModel data, String rel) {
-        return linkTo(data.getController(), data.getCategory(), data.getTypePlural()).slash(data)
+        // Create link using Spring HATEOAS link builder
+        return linkTo(data.getController(), data.getCategory(), data.getTypePlural()).slash(getIdentifierForLink(data))
                                                                                      .withRel(rel);
     }
 
+    /**
+     * Create a HAL Link to a subresource of given resource. This method assumes the name & link to the subresource
+     * are both the same string value. See other linkToSubResource method if they are different.
+     * @param data main resource
+     * @param rel name/subpath of the subresource (assumed to be the same)
+     * @return created Link object
+     */
     public Link linkToSubResource(RestAddressableModel data, String rel) {
         return linkToSubResource(data, rel, rel);
     }
 
+    /**
+     * Create a HAL Link to a subresource of given resource using given path name and link name
+     * @param data main resource
+     * @param rel name of the subresource link relation to create
+     * @param path subpath for the subresource
+     * @return created Link object
+     */
     public Link linkToSubResource(RestAddressableModel data, String rel, String path) {
-        return linkTo(data.getController(), data.getCategory(), data.getTypePlural()).slash(data).slash(path)
+        // Create link using Spring HATEOAS link builder
+        return linkTo(data.getController(), data.getCategory(), data.getTypePlural()).slash(getIdentifierForLink(data))
+                                                                                     .slash(path)
                                                                                      .withRel(rel);
+    }
+
+    /**
+     * Returns an identifier for a given resource, to be used in a Link.
+     * @param data resource to identify
+     * @return identifier, which is either an ID (if exists) or string representation of the object.
+     */
+    private Serializable getIdentifierForLink(RestAddressableModel data) {
+        // If the resource is identifiable by an ID, use it. Otherwise use toString() to represent it.
+        Serializable identifier = data.toString();
+        if (data instanceof BaseObjectRest) {
+            identifier = ((BaseObjectRest) data).getId();
+        }
+        return identifier;
     }
 
     /**
      * Retrieve the {@link DSpaceRestRepository} for the specified category and model in the plural form as used in the endpoints.
      * If the model is available in its singular form use {@link #getResourceRepositoryByCategoryAndModel(String, String)}
-     * 
+     *
      * @param apiCategory
      * @param modelPlural
      * @return
@@ -197,7 +228,7 @@ public class Utils {
     /**
      * Retrieve the {@link DSpaceRestRepository} for the specified category and model. The model is in the singular form
      * as returned by the {@link RestAddressableModel#getType()} method
-     * 
+     *
      * @param apiCategory
      * @param modelSingular
      * @return
@@ -823,7 +854,7 @@ public class Utils {
 
     /**
      * Convert the input string in the primary key class according to the repository interface
-     * 
+     *
      * @param repository
      * @param pkStr
      * @return
@@ -837,7 +868,7 @@ public class Utils {
      * rest object is supported by a {@link DSpaceRestRepository} that also implement the
      * {@link ReloadableEntityObjectRepository} interface. If this is not the case the method will throw an
      * IllegalArgumentException
-     * 
+     *
      * @param context
      *            the DSpace Context
      * @param restObj
@@ -859,7 +890,7 @@ public class Utils {
 
     /**
     * Get the rest object associated with the specified URI
-    * 
+    *
     * @param context the DSpace context
     * @param uri     the uri of a {@link BaseObjectRest}
     * @return the {@link BaseObjectRest} identified by the provided uri
