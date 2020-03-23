@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
+import org.dspace.app.util.Util;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DCDate;
 import org.dspace.content.MetadataSchemaEnum;
@@ -46,12 +47,14 @@ public class AcceptEditRejectAction extends ProcessingAction {
     @Override
     public ActionResult execute(Context c, XmlWorkflowItem wfi, Step step, HttpServletRequest request)
             throws SQLException, AuthorizeException, IOException {
-
-        if (request.getParameter(SUBMIT_APPROVE) != null) {
-            return processAccept(c, wfi);
-        } else {
-            if (request.getParameter(SUBMIT_REJECT) != null) {
-                return processRejectPage(c, wfi, request);
+        if (super.isOptionInParam(request)) {
+            switch (Util.getSubmitButton(request, SUBMIT_CANCEL)) {
+                case SUBMIT_APPROVE:
+                    return processAccept(c, wfi);
+                case SUBMIT_REJECT:
+                    return processRejectPage(c, wfi, request);
+                default:
+                    return new ActionResult(ActionResult.TYPE.TYPE_CANCEL);
             }
         }
         return new ActionResult(ActionResult.TYPE.TYPE_CANCEL);
