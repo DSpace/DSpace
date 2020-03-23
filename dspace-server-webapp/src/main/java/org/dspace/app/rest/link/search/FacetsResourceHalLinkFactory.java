@@ -35,7 +35,8 @@ public class FacetsResourceHalLinkFactory extends DiscoveryRestHalLinkFactory<Fa
 
             halResource.setPageHeader(new EmbeddedPageHeader(buildSearchBaseLink(content), page));
 
-            list.add(buildLink(IanaLinkRelations.SELF.value(), buildSearchFacetsBaseLink(content).build().toUriString()));
+            list.add(buildLink(IanaLinkRelations.SELF.value(),
+                               buildSearchFacetsBaseLink(content).build().toUriString()));
         }
     }
 
