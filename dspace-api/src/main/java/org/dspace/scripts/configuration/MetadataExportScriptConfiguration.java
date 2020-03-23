@@ -17,6 +17,9 @@ import org.dspace.core.Context;
 import org.dspace.scripts.DSpaceRunnable;
 import org.springframework.beans.factory.annotation.Autowired;
 
+/**
+ * The {@link ScriptConfiguration} for the {@link MetadataExport} script
+ */
 public class MetadataExportScriptConfiguration extends ScriptConfiguration {
 
     @Autowired

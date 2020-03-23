@@ -75,7 +75,7 @@ public abstract class ScriptConfiguration implements BeanNameAware {
     public abstract boolean isAllowedToExecute(Context context);
 
     /**
-     * Generic getter for the options
+     * The getter for the options of the Script
      * @return the options value of this ScriptConfiguration
      */
     public abstract Options getOptions();
