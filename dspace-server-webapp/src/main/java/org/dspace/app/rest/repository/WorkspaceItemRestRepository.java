@@ -78,7 +78,8 @@ import org.springframework.web.multipart.MultipartFile;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 @Component(WorkspaceItemRest.CATEGORY + "." + WorkspaceItemRest.NAME)
-public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceItemRest, Integer> {
+public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceItemRest, Integer>
+    implements ReloadableEntityObjectRepository<WorkspaceItem, Integer> {
 
     public static final String OPERATION_PATH_SECTIONS = "sections";
 
@@ -531,4 +532,13 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
         }
     }
 
+    @Override
+    public WorkspaceItem findDomainObjectByPk(Context context, Integer id) throws SQLException {
+        return wis.find(context, id);
+    }
+
+    @Override
+    public Class<Integer> getPKClass() {
+        return Integer.class;
+    }
 }
