@@ -27,10 +27,6 @@
         <resource.delimiter>@</resource.delimiter>
         <!-- Define our starting class for our Spring Boot Application -->
         <start-class>org.dspace.app.rest.Application</start-class>
-        <!-- Library for managing JSON Web Tokens (JWT): https://bitbucket.org/connect2id/nimbus-jose-jwt/wiki/Home -->
-        <nimbus-jose-jwt.version>7.9</nimbus-jose-jwt.version>
-        <!-- Spring Data REST HAL Browser (May require updating when updating spring-boot.version in parent POM) -->
-        <spring-hal-browser.version>3.2.5.RELEASE</spring-hal-browser.version>
     </properties>
 
     <profiles>
@@ -342,6 +338,7 @@
         <dependency>
             <groupId>com.jayway.jsonpath</groupId>
             <artifactId>json-path-assert</artifactId>
+            <version>${json-path.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
