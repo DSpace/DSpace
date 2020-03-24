@@ -239,7 +239,7 @@ public class Constants {
      */
     public static int getTypeID(String type) {
         for (int i = 0; i < typeText.length; i++) {
-            if (typeText[i].equals(type)) {
+            if (typeText[i].equalsIgnoreCase(type)) {
                 return i;
             }
         }
