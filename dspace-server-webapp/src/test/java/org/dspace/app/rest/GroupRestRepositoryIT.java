@@ -8,7 +8,6 @@
 package org.dspace.app.rest;
 
 import static com.jayway.jsonpath.JsonPath.read;
-
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
