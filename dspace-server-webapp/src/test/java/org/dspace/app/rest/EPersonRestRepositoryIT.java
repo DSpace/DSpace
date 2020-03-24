@@ -368,7 +368,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
     }
 
     @Test
-    public void findByMetadata() throws Exception {
+    public void findByMetadataUsingLastName() throws Exception {
         context.turnOffAuthorisationSystem();
         EPerson ePerson = EPersonBuilder.createEPerson(context)
                                         .withNameInMetadata("John", "Doe")
@@ -421,6 +421,160 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                 )))
                 .andExpect(jsonPath("$.page.totalElements", is(4)));
     }
+
+    @Test
+    public void findByMetadataUsingFirstName() throws Exception {
+        context.turnOffAuthorisationSystem();
+        EPerson ePerson = EPersonBuilder.createEPerson(context)
+                                        .withNameInMetadata("John", "Doe")
+                                        .withEmail("Johndoe@fake-email.com")
+                                        .build();
+
+        EPerson ePerson2 = EPersonBuilder.createEPerson(context)
+                                         .withNameInMetadata("Jane", "Smith")
+                                         .withEmail("janesmith@fake-email.com")
+                                         .build();
+
+        EPerson ePerson3 = EPersonBuilder.createEPerson(context)
+                .withNameInMetadata("John", "Smith")
+                .withEmail("tomdoe@fake-email.com")
+                .build();
+
+        EPerson ePerson4 = EPersonBuilder.createEPerson(context)
+                .withNameInMetadata("John-Postfix", "Smath")
+                .withEmail("dirkdoepostfix@fake-email.com")
+                .build();
+
+        EPerson ePerson5 = EPersonBuilder.createEPerson(context)
+                .withNameInMetadata("Prefix-John", "Smoth")
+                .withEmail("harrydoeprefix@fake-email.com")
+                .build();
+
+        String authToken = getAuthToken(admin.getEmail(), password);
+        getClient(authToken).perform(get("/api/eperson/epersons/search/byMetadata")
+                    .param("query", ePerson.getFirstName()))
+                    .andExpect(status().isOk())
+                    .andExpect(content().contentType(contentType))
+                    .andExpect(jsonPath("$._embedded.epersons", Matchers.containsInAnyOrder(
+                            EPersonMatcher.matchEPersonEntry(ePerson),
+                            EPersonMatcher.matchEPersonEntry(ePerson3),
+                            EPersonMatcher.matchEPersonEntry(ePerson4),
+                            EPersonMatcher.matchEPersonEntry(ePerson5)
+                    )))
+                    .andExpect(jsonPath("$.page.totalElements", is(4)));
+
+        // it must be case insensitive
+        getClient(authToken).perform(get("/api/eperson/epersons/search/byMetadata")
+                .param("query", ePerson.getFirstName().toLowerCase()))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$._embedded.epersons", Matchers.containsInAnyOrder(
+                        EPersonMatcher.matchEPersonEntry(ePerson),
+                        EPersonMatcher.matchEPersonEntry(ePerson3),
+                        EPersonMatcher.matchEPersonEntry(ePerson4),
+                        EPersonMatcher.matchEPersonEntry(ePerson5)
+                )))
+                .andExpect(jsonPath("$.page.totalElements", is(4)));
+    }
+
+    @Test
+    public void findByMetadataUsingEmail() throws Exception {
+        context.turnOffAuthorisationSystem();
+        EPerson ePerson = EPersonBuilder.createEPerson(context)
+                                        .withNameInMetadata("John", "Doe")
+                                        .withEmail("Johndoe@fake-email.com")
+                                        .build();
+
+        EPerson ePerson2 = EPersonBuilder.createEPerson(context)
+                                         .withNameInMetadata("Jane", "Smith")
+                                         .withEmail("janesmith@fake-email.com")
+                                         .build();
+
+        EPerson ePerson3 = EPersonBuilder.createEPerson(context)
+                                         .withNameInMetadata("Tom", "Doe")
+                                         .withEmail("tomdoe@fake-email.com")
+                                         .build();
+
+        EPerson ePerson4 = EPersonBuilder.createEPerson(context)
+                                         .withNameInMetadata("Dirk", "Doe-Postfix")
+                                         .withEmail("dirkdoepostfix@fake-email.com")
+                                         .build();
+
+        EPerson ePerson5 = EPersonBuilder.createEPerson(context)
+                                         .withNameInMetadata("Harry", "Prefix-Doe")
+                                         .withEmail("harrydoeprefix@fake-email.com")
+                                         .build();
+
+        String authToken = getAuthToken(admin.getEmail(), password);
+        getClient(authToken).perform(get("/api/eperson/epersons/search/byMetadata")
+                                             .param("query", ePerson.getEmail()))
+                            .andExpect(status().isOk())
+                            .andExpect(content().contentType(contentType))
+                            .andExpect(jsonPath("$._embedded.epersons", Matchers.contains(
+                                    EPersonMatcher.matchEPersonEntry(ePerson)
+                            )))
+                            .andExpect(jsonPath("$.page.totalElements", is(1)));
+
+        // it must be case insensitive
+        getClient(authToken).perform(get("/api/eperson/epersons/search/byMetadata")
+                                             .param("query", ePerson.getEmail().toLowerCase()))
+                            .andExpect(status().isOk())
+                            .andExpect(content().contentType(contentType))
+                            .andExpect(jsonPath("$._embedded.epersons", Matchers.contains(
+                                    EPersonMatcher.matchEPersonEntry(ePerson)
+                            )))
+                            .andExpect(jsonPath("$.page.totalElements", is(1)));
+    }
+
+    @Test
+    public void findByMetadataUsingUuid() throws Exception {
+        context.turnOffAuthorisationSystem();
+        EPerson ePerson = EPersonBuilder.createEPerson(context)
+                                        .withNameInMetadata("John", "Doe")
+                                        .withEmail("Johndoe@fake-email.com")
+                                        .build();
+
+        EPerson ePerson2 = EPersonBuilder.createEPerson(context)
+                                         .withNameInMetadata("Jane", "Smith")
+                                         .withEmail("janesmith@fake-email.com")
+                                         .build();
+
+        EPerson ePerson3 = EPersonBuilder.createEPerson(context)
+                                         .withNameInMetadata("Tom", "Doe")
+                                         .withEmail("tomdoe@fake-email.com")
+                                         .build();
+
+        EPerson ePerson4 = EPersonBuilder.createEPerson(context)
+                                         .withNameInMetadata("Dirk", "Doe-Postfix")
+                                         .withEmail("dirkdoepostfix@fake-email.com")
+                                         .build();
+
+        EPerson ePerson5 = EPersonBuilder.createEPerson(context)
+                                         .withNameInMetadata("Harry", "Prefix-Doe")
+                                         .withEmail("harrydoeprefix@fake-email.com")
+                                         .build();
+
+        String authToken = getAuthToken(admin.getEmail(), password);
+        getClient(authToken).perform(get("/api/eperson/epersons/search/byMetadata")
+                                             .param("query", String.valueOf(ePerson.getID())))
+                            .andExpect(status().isOk())
+                            .andExpect(content().contentType(contentType))
+                            .andExpect(jsonPath("$._embedded.epersons", Matchers.contains(
+                                    EPersonMatcher.matchEPersonEntry(ePerson)
+                            )))
+                            .andExpect(jsonPath("$.page.totalElements", is(1)));
+
+        // it must be case insensitive
+        getClient(authToken).perform(get("/api/eperson/epersons/search/byMetadata")
+                                             .param("query", String.valueOf(ePerson.getID()).toLowerCase()))
+                            .andExpect(status().isOk())
+                            .andExpect(content().contentType(contentType))
+                            .andExpect(jsonPath("$._embedded.epersons", Matchers.contains(
+                                    EPersonMatcher.matchEPersonEntry(ePerson)
+                            )))
+                            .andExpect(jsonPath("$.page.totalElements", is(1)));
+    }
+
 
     @Test
     public void findByMetadataUnauthorized() throws Exception {
