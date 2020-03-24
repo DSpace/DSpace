@@ -50,6 +50,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.sql.SQLException;
 import java.util.*;
 import java.util.function.Function;
@@ -205,7 +206,7 @@ public class HandleController {
     }
 
     @RequestMapping("/123456789/{handle}/{sequenceId}/{bitstreamName:.+}")
-    public RedirectView downloadBitstream(HttpServletRequest request, @PathVariable("handle") Integer handle, @PathVariable("sequenceId") Integer sequenceId, @PathVariable("bitstreamName") String bitstreamName) throws SQLException {
+    public RedirectView downloadBitstream(HttpServletRequest request, @PathVariable("handle") Integer handle, @PathVariable("sequenceId") Integer sequenceId, @PathVariable("bitstreamName") String bitstreamName) throws SQLException, UnsupportedEncodingException {
         Context dspaceContext = UIUtil.obtainContext(request);
         Item item = (Item)handleService.resolveToObject(dspaceContext, String.format("123456789/%d", handle));
         boolean isSpiderBot = SpiderDetector.isSpider(request);
@@ -213,7 +214,7 @@ public class HandleController {
             essuirStatistics.incrementGlobalItemDownloads();
             essuirStatistics.updateItemDownloads(request, item.getID());
         }
-        String downloadString = String.format("%s/bitstream-download/%s/%s/%s", request.getContextPath(), item.getHandle(), sequenceId, bitstreamName);
+        String downloadString = String.format("%s/bitstream-download/%s/%s/%s", request.getContextPath(), item.getHandle(), sequenceId, URLEncoder.encode(bitstreamName, "utf-8"));
 
         RedirectView redirectView = new RedirectView(downloadString);
         dspaceContext.complete();
