@@ -8,7 +8,6 @@
 package org.dspace.app.rest.builder;
 
 import java.io.IOException;
-
 import java.sql.SQLException;
 import java.util.Date;
 
