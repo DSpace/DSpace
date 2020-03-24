@@ -1529,6 +1529,8 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
         context.restoreAuthSystemState();
 
         String tokenEperson1 = getAuthToken(ePerson1.getEmail(), "qwerty01");
+        // by contract the groups embedded in the eperson only contains direct explicit membership,
+        // so the anonymous group is not listed
         getClient(tokenEperson1).perform(get("/api/eperson/epersons/" + ePerson1.getID())
                 .param("projection", "full"))
                 .andExpect(status().isOk())
