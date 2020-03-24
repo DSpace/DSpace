@@ -8,7 +8,6 @@
 package org.dspace.app.rest.security;
 
 import java.io.Serializable;
-
 import java.sql.SQLException;
 
 import org.apache.commons.lang3.StringUtils;

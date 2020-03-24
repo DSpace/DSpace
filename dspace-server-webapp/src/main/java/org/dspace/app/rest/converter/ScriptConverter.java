@@ -38,7 +38,9 @@ public class ScriptConverter implements DSpaceConverter<DSpaceRunnable, ScriptRe
             ParameterRest parameterRest = new ParameterRest();
             parameterRest.setDescription(option.getDescription());
             parameterRest.setName((option.getOpt() != null ? "-" + option.getOpt() : "--" + option.getLongOpt()));
+            parameterRest.setNameLong(option.getLongOpt() != null ? "--" + option.getLongOpt() : null);
             parameterRest.setType(((Class) option.getType()).getSimpleName());
+            parameterRest.setMandatory(option.isRequired());
             parameterRestList.add(parameterRest);
         }
         scriptRest.setParameterRestList(parameterRestList);
