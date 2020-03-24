@@ -8,10 +8,8 @@
 package org.dspace.authorize.dao.impl;
 
 import java.sql.SQLException;
-
 import java.util.List;
 import java.util.UUID;
-
 import javax.persistence.Query;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
