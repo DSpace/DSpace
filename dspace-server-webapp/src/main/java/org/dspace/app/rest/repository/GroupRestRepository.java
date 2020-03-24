@@ -136,6 +136,10 @@ public class GroupRestRepository extends DSpaceObjectRestRepository<Group, Group
     @PreAuthorize("hasPermission(#id, 'GROUP', 'WRITE')")
     protected void patch(Context context, HttpServletRequest request, String apiCategory, String model, UUID id,
                          Patch patch) throws AuthorizeException, SQLException {
+        final Group group = dsoService.find(context, id);
+        if (group != null && isPatchUnprocessable(context, group)) {
+            throw new UnprocessableEntityException("This group cannot be patched.");
+        }
         patchDSpaceObject(apiCategory, model, id, patch);
     }
 
@@ -191,6 +195,14 @@ public class GroupRestRepository extends DSpaceObjectRestRepository<Group, Group
     }
 
     private boolean isDeleteUnprocessable(Context context, Group group) {
+        try {
+            return group.isPermanent() || gs.getParentObject(context, group) != null;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private boolean isPatchUnprocessable(Context context, Group group) {
         try {
             return group.isPermanent() || gs.getParentObject(context, group) != null;
         } catch (SQLException e) {

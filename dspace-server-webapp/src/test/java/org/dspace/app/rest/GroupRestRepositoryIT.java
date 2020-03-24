@@ -431,7 +431,7 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
     }
 
     @Test
-    public void patchGroupMetadataUnprocessable() throws Exception {
+    public void patchGroupWithParentUnprocessable() throws Exception {
         context.turnOffAuthorisationSystem();
 
         EPerson reviewer1 = EPersonBuilder.createEPerson(context)
@@ -453,51 +453,18 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
         final Group workflowGroup = col1.getWorkflowStep1(context);
 
         String token = getAuthToken(admin.getEmail(), password);
-        String requestBody
-                = "      [\n"
-                + "        {\n"
-                + "          \"op\": \"replace\",\n"
-                + "          \"path\": \"/metadata/dc.title/1/value\",\n"
-                + "          \"value\": \"title A\"\n"
-                + "        },\n"
-                + "        {\n"
-                + "          \"op\": \"replace\",\n"
-                + "          \"path\": \"/metadata/dc.title/1/language\",\n"
-                + "          \"value\": \"en_US\"\n"
-                + "        }\n"
-                + "      ]";
 
-        getClient(token)
-                .perform(patch("/api/eperson/groups/" + workflowGroup.getID()).content(requestBody)
-                                 .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
-                .andExpect(status().isUnprocessableEntity()); ;
+        new MetadataPatchSuite().runWith(getClient(token), "/api/eperson/groups/" + workflowGroup.getID(), 422);
     }
 
     @Test
-    public void patchPermanentGroupMetadataUnprocessable() throws Exception {
+    public void patchPermanentGroupUnprocessable() throws Exception {
         context.turnOffAuthorisationSystem();
         GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
         final Group group = groupService.findByName(context, Group.ANONYMOUS);
         context.restoreAuthSystemState();
         String token = getAuthToken(admin.getEmail(), password);
-        String requestBody
-                = "      [\n"
-                + "        {\n"
-                + "          \"op\": \"replace\",\n"
-                + "          \"path\": \"/metadata/dc.title/1/value\",\n"
-                + "          \"value\": \"title A\"\n"
-                + "        },\n"
-                + "        {\n"
-                + "          \"op\": \"replace\",\n"
-                + "          \"path\": \"/metadata/dc.title/1/language\",\n"
-                + "          \"value\": \"en_US\"\n"
-                + "        }\n"
-                + "      ]";
-
-        getClient(token)
-                .perform(patch("/api/eperson/groups/" + group.getID()).content(requestBody)
-                                 .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
-                .andExpect(status().isUnprocessableEntity()); ;
+        new MetadataPatchSuite().runWith(getClient(token), "/api/eperson/groups/" + group.getID(), 422);
     }
 
     @Test
