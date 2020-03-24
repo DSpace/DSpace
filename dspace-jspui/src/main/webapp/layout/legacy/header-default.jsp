@@ -85,7 +85,7 @@
         <script type="text/javascript" src="<%= request.getContextPath() %>/static/js/scriptaculous/effects.js"> </script>
         <script type="text/javascript" src="<%= request.getContextPath() %>/static/js/scriptaculous/builder.js"> </script>
         <script type="text/javascript" src="<%= request.getContextPath() %>/static/js/scriptaculous/controls.js"> </script>
-        <script type="text/javascript" src="<%= request.getContextPath() %>/static/js/choice-support.js"> </script>
+        <script type="text/javascript" src="<%= request.getContextPath() %>/static/js/choice-support.min.js"> </script>
         <dspace:include page="/layout/google-analytics-snippet.jsp" />
 
     <%

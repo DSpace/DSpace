@@ -50,13 +50,13 @@
         <meta name="Generator" content="<%= generator %>" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="shortcut icon" href="<%= request.getContextPath() %>/favicon.ico" type="image/x-icon"/>
-        <link rel="stylesheet" href="<%= request.getContextPath() %>/static/css/jquery-ui-1.10.3.custom/redmond/jquery-ui-1.10.3.custom.css" type="text/css" />
+        <link rel="stylesheet" href="<%= request.getContextPath() %>/static/css/jquery-ui-1.10.3.custom/redmond/jquery-ui-1.10.3.custom.min.css" type="text/css" />
         <link rel="stylesheet" href="<%= request.getContextPath() %>/static/css/bootstrap/bootstrap.min.css" type="text/css" />
         <link rel="stylesheet" href="<%= request.getContextPath() %>/static/css/bootstrap/bootstrap-theme.min.css" type="text/css" />
-        <link rel="stylesheet" href="<%= request.getContextPath() %>/static/css/bootstrap/dspace-theme.css" type="text/css" />
-        <link rel="stylesheet" href="<%= request.getContextPath() %>/static/css/treeview.css" type="text/css"/>
-        <link rel="stylesheet" href="<%= request.getContextPath() %>/static/css/yearpicker.css">
-        <link rel="stylesheet" href="<%= request.getContextPath() %>/static/css/pagination.css">
+        <link rel="stylesheet" href="<%= request.getContextPath() %>/static/css/bootstrap/dspace-theme.min.css" type="text/css" />
+        <link rel="stylesheet" href="<%= request.getContextPath() %>/static/css/treeview.min.css" type="text/css"/>
+        <link rel="stylesheet" href="<%= request.getContextPath() %>/static/css/yearpicker.min.css">
+        <link rel="stylesheet" href="<%= request.getContextPath() %>/static/css/pagination.min.css">
 
     <%
     if (!"NONE".equals(feedRef))
@@ -84,14 +84,7 @@
 %>
         
         <%--<script type='text/javascript' src="<%= request.getContextPath() %>/static/js/jquery/jquery-1.10.2.min.js"></script>--%>
-        <script src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
-        <script type='text/javascript' src='<%= request.getContextPath() %>/static/js/jquery/jquery-ui-1.10.3.custom.min.js'></script>
-        <script type='text/javascript' src='<%= request.getContextPath() %>/static/js/bootstrap/bootstrap.min.js'></script>
-        <script type='text/javascript' src='<%= request.getContextPath() %>/static/js/holder.js'></script>
-        <script type="text/javascript" src="<%= request.getContextPath() %>/utils.js"></script>
-        <script type="text/javascript" src="<%= request.getContextPath() %>/static/js/choice-support.js"> </script>
-        <script type="text/javascript" src="<%= request.getContextPath() %>/static/js/bootstrap-tree.js"> </script>
-        <script src="<%= request.getContextPath() %>/static/js/yearpicker.js" async></script>
+    <script src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
 
     <dspace:include page="/layout/google-analytics-snippet.jsp" />
     <%

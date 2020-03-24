@@ -62,5 +62,12 @@
                                 </div>
 			</div>
     </footer>
+    <script type='text/javascript' src='<%= request.getContextPath() %>/static/js/jquery/jquery-ui-1.10.3.custom.min.js'></script>
+    <script type='text/javascript' src='<%= request.getContextPath() %>/static/js/bootstrap/bootstrap.min.js'></script>
+    <script type='text/javascript' src='<%= request.getContextPath() %>/static/js/holder.min.js'></script>
+    <script type="text/javascript" src="<%= request.getContextPath() %>/utils.js"></script>
+    <script type="text/javascript" src="<%= request.getContextPath() %>/static/js/choice-support.min.js"> </script>
+    <script type="text/javascript" src="<%= request.getContextPath() %>/static/js/bootstrap-tree.js"> </script>
+    <script src="<%= request.getContextPath() %>/static/js/yearpicker.min.js"></script>
     </body>
 </html>
