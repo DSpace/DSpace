@@ -526,6 +526,13 @@ public class AuthorizeUtil {
         }
     }
 
+    /**
+     * This method will check whether the current user has admin rights to the given collection
+     * @param context       The relevant DSpace context
+     * @param collection    The collection for which this will be checked
+     * @throws AuthorizeException   If something goes wrong
+     * @throws SQLException If something goes wrong
+     */
     public static void authorizeManageDefaultReadGroup(Context context,
                                                       Collection collection) throws AuthorizeException, SQLException {
         AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();

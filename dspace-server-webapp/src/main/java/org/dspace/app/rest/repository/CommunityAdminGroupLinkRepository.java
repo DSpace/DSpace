@@ -71,10 +71,6 @@ public class CommunityAdminGroupLinkRepository extends AbstractDSpaceRestReposit
             if (administrators == null) {
                 return null;
             }
-            if (!authorizeService.authorizeActionBoolean(context, administrators, Constants.READ)) {
-                throw new AccessDeniedException("The current user doesn't have sufficient rights to access the admin" +
-                                                    "group of community with id: " + communityId);
-            }
             return converter.toRest(administrators, projection);
         } catch (SQLException e) {
             throw new RuntimeException(e);
