@@ -210,7 +210,7 @@ public class HandleController {
         Item item = (Item)handleService.resolveToObject(dspaceContext, String.format("123456789/%d", handle));
         boolean isSpiderBot = SpiderDetector.isSpider(request);
         if(!isSpiderBot) {
-            essuirStatistics.incrementGlobalItemDownloads(item.getID());
+            essuirStatistics.incrementGlobalItemDownloads();
             essuirStatistics.updateItemDownloads(request, item.getID());
         }
         String downloadString = String.format("%s/bitstream-download/%s/%s/%s", request.getContextPath(), item.getHandle(), sequenceId, bitstreamName);
@@ -251,7 +251,7 @@ public class HandleController {
         boolean isSpiderBot = SpiderDetector.isSpider(request);
         if(!isSpiderBot) {
             essuirStatistics.updateItemViews(request, item.getID());
-            essuirStatistics.incrementGlobalItemViews(item.getID());
+            essuirStatistics.incrementGlobalItemViews();
         }
         List<CountryStatisticsResponse> itemViewsByCountry = essuirStatistics.getItemViewsByCountry(item.getID())
                 .entrySet()

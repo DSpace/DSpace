@@ -7,27 +7,22 @@ import org.dspace.content.Item;
 import org.dspace.content.MetadataSchema;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.factory.ContentServiceFactory;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.sort.SortException;
 import org.dspace.sort.SortOption;
-import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.impl.DSL;
 import org.jooq.lambda.Seq;
 import org.springframework.stereotype.Service;
-
 import org.ssu.entity.AuthorLocalization;
 import org.ssu.entity.statistics.StatisticsData;
+import org.ssu.repository.MetadatavalueRepository;
 import org.ssu.service.AuthorsService;
 import org.ssu.service.GeoIpService;
-import org.ssu.service.localization.AuthorsCache;
-import org.ssu.repository.MetadatavalueRepository;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -38,6 +33,8 @@ public class EssuirStatistics {
     private static final org.ssu.entity.jooq.GeneralStatistics GENERAL_STATISTICS = org.ssu.entity.jooq.GeneralStatistics.TABLE;
     private static final org.ssu.entity.jooq.Statistics STATISTICS = org.ssu.entity.jooq.Statistics.TABLE;
     private static final org.ssu.entity.jooq.Metadatavalue METADATAVALUE = org.ssu.entity.jooq.Metadatavalue.TABLE;
+    private Map<UUID, Integer> viewsForItem;
+    private Map<UUID, Integer> downloadsForItem;
     private org.dspace.content.service.ItemService dspaceItemService = ContentServiceFactory.getInstance().getItemService();
 
     @Resource
@@ -52,8 +49,10 @@ public class EssuirStatistics {
     @Resource
     private GeoIpService geoIpService;
 
-    enum StatisticType {
-        VIEWS, DOWNLOADS;
+    @PostConstruct
+    public void init() {
+        downloadsForItem = getDownloadsStatistics();
+        viewsForItem = getViewsStatistics();
     }
 
     private String getLastUpdate(Context context) {
@@ -111,7 +110,15 @@ public class EssuirStatistics {
                 .collect(Collectors.toMap(item -> item.get(METADATAVALUE.value), item -> item.get(DSL.count())));
     }
 
-    private Map<UUID, Long> getDownloadsStatistics() {
+    private Map<UUID, Integer> getViewsStatistics() {
+        return getStatistics()
+                .entrySet()
+                .stream()
+                .filter(item -> item.getKey().getRight().equals(StatisticType.VIEWS))
+                .collect(Collectors.toMap(item -> item.getKey().getLeft(), item -> item.getValue(), (a, b) -> a));
+    }
+
+    private Map<UUID, Integer> getDownloadsStatistics() {
         return getStatistics()
                 .entrySet()
                 .stream()
@@ -120,32 +127,25 @@ public class EssuirStatistics {
     }
 
     private Integer getTotalViews() {
-        return dsl.select(DSL.sum(STATISTICS.viewCount))
-                .from(STATISTICS)
-                .where(STATISTICS.sequenceId.lessThan(0))
-                .fetchSingle(DSL.sum(STATISTICS.viewCount))
-                .intValue();
+        return viewsForItem.values().stream().reduce(0, Integer::sum);
     }
 
     private Integer getTotalDownloads() {
-        return dsl.select(DSL.sum(STATISTICS.viewCount))
-                .from(STATISTICS)
-                .where(STATISTICS.sequenceId.greaterOrEqual(0))
-                .fetchSingle(DSL.sum(STATISTICS.viewCount))
-                .intValue();    }
+        return downloadsForItem.values().stream().reduce(0, Integer::sum);
+    }
 
-    private Map<Pair<UUID, StatisticType>, Long> getStatistics() {
+    private Map<Pair<UUID, StatisticType>, Integer> getStatistics() {
 
         return Seq.seq(dsl.select(STATISTICS.uuid, STATISTICS.sequenceId, STATISTICS.viewCount)
                 .from(STATISTICS)
                 .fetch())
                 .map(item -> Triple.of(item.get(STATISTICS.uuid), item.get(STATISTICS.sequenceId) >= 0 ? StatisticType.DOWNLOADS : StatisticType.VIEWS, item.get(STATISTICS.viewCount)))
                 .grouped(tuple -> Pair.of(tuple.getLeft(), tuple.getMiddle()), Collectors.summingLong(item -> item.getRight()))
-                .toMap(item -> item.v1(), item -> item.v2());
+                .toMap(item -> item.v1(), item -> item.v2().intValue());
     }
 
     public List<org.ssu.entity.Item> topPublications(int limit) {
-        List<Pair<UUID, Long>> downloads = getDownloadsStatistics().entrySet()
+        List<Pair<UUID, Integer>> downloads = getDownloadsStatistics().entrySet()
                 .stream()
                 .sorted((a, b) -> b.getValue().compareTo(a.getValue()))
                 .limit(limit)
@@ -155,19 +155,19 @@ public class EssuirStatistics {
         return downloads.stream()
                 .map(item -> new org.ssu.entity.Item.Builder()
                         .withItemId(item.getKey())
-                        .withDownloadCount(item.getValue())
+                        .withDownloadCount(Long.valueOf(item.getValue()))
                         .withName(metadatavalueRepository.getItemTitleByDspaceObjectId(item.getKey()))
                         .withLink(metadatavalueRepository.getItemLinkByDspaceObjectId(item.getKey()))
                         .build())
                 .collect(Collectors.toList());
     }
 
-    public List<Pair<AuthorLocalization, Long>> topAuthors(int limit) {
-        Map<UUID, Long> downloads = getDownloadsStatistics();
+    public List<Pair<AuthorLocalization, Integer>> topAuthors(int limit) {
+        Map<UUID, Integer> downloads = getDownloadsStatistics();
         List<Pair<String, UUID>> authors = metadatavalueRepository.getItemAuthorAndItemIdMapping();
-        Map<String, Long> collect = authors.stream()
+        Map<String, Integer> collect = authors.stream()
                 .collect(Collectors.toMap(Pair::getKey,
-                        author -> downloads.getOrDefault(author.getValue(), 0L),
+                        author -> downloads.getOrDefault(author.getValue(), 0),
                         (a, b) -> a + b));
 
         return Seq.seq(collect.entrySet())
@@ -180,28 +180,15 @@ public class EssuirStatistics {
                 .collect(Collectors.toList());
     }
 
-
     public Integer getViewsForItem(UUID itemId) {
-        return dsl.select(STATISTICS.uuid, DSL.sum(STATISTICS.viewCount))
-                .from(STATISTICS)
-                .where(STATISTICS.uuid.equal(itemId).and(STATISTICS.sequenceId.lessThan(0)))
-                .groupBy(STATISTICS.uuid)
-                .fetchOptional(DSL.sum(STATISTICS.viewCount))
-                .map(BigDecimal::intValue)
-                .orElse(0);
+        return viewsForItem.getOrDefault(itemId, 0);
     }
 
     public Integer getDownloadsForItem(UUID itemId) {
-        return dsl.select(STATISTICS.uuid, DSL.sum(STATISTICS.viewCount))
-                .from(STATISTICS)
-                .where(STATISTICS.uuid.equal(itemId).and(STATISTICS.sequenceId.greaterOrEqual(0)))
-                .groupBy(STATISTICS.uuid)
-                .fetchOptional(DSL.sum(STATISTICS.viewCount))
-                .map(BigDecimal::intValue)
-                .orElse(0);
+        return downloadsForItem.getOrDefault(itemId, 0);
     }
 
-    public void incrementGlobalItemViews(UUID itemId) {
+    public void incrementGlobalItemViews() {
         dsl.insertInto(GENERAL_STATISTICS)
                 .set(GENERAL_STATISTICS.year, LocalDate.now().getYear())
                 .set(GENERAL_STATISTICS.month, LocalDate.now().getMonthValue() - 1)
@@ -211,20 +198,22 @@ public class EssuirStatistics {
                 .set(GENERAL_STATISTICS.viewCount, GENERAL_STATISTICS.viewCount.plus(1))
                 .execute();
     }
+
     public void updateItemViews(HttpServletRequest request, UUID itemId) {
         String countryCode = geoIpService.getCountryCode(request);
-
+        Integer currentViews = viewsForItem.getOrDefault(itemId, 0);
+        viewsForItem.put(itemId, currentViews + 1);
         dsl.insertInto(STATISTICS)
                 .set(STATISTICS.uuid, itemId)
                 .set(STATISTICS.sequenceId, -1)
                 .set(STATISTICS.countryCode, countryCode)
                 .set(STATISTICS.viewCount, 1)
                 .onDuplicateKeyUpdate()
-                .set(STATISTICS.viewCount, STATISTICS.viewCount.plus(1))
+                .set(STATISTICS.viewCount, currentViews + 1)
                 .execute();
     }
 
-    public void incrementGlobalItemDownloads(UUID itemId) {
+    public void incrementGlobalItemDownloads() {
         dsl.insertInto(GENERAL_STATISTICS)
                 .set(GENERAL_STATISTICS.year, LocalDate.now().getYear())
                 .set(GENERAL_STATISTICS.month, LocalDate.now().getMonthValue() - 1)
@@ -237,14 +226,15 @@ public class EssuirStatistics {
 
     public void updateItemDownloads(HttpServletRequest request, UUID itemId) {
         String countryCode = geoIpService.getCountryCode(request);
-
+        Integer currentDownloads = viewsForItem.getOrDefault(itemId, 0);
+        viewsForItem.put(itemId, currentDownloads + 1);
         dsl.insertInto(STATISTICS)
                 .set(STATISTICS.uuid, itemId)
                 .set(STATISTICS.sequenceId, 1)
                 .set(STATISTICS.countryCode, countryCode)
                 .set(STATISTICS.viewCount, 1)
                 .onDuplicateKeyUpdate()
-                .set(STATISTICS.viewCount, STATISTICS.viewCount.plus(1))
+                .set(STATISTICS.viewCount, currentDownloads + 1)
                 .execute();
     }
 
@@ -266,5 +256,9 @@ public class EssuirStatistics {
                 .fetch()
                 .stream()
                 .collect(Collectors.toMap(entry -> entry.get(STATISTICS.countryCode), entry -> entry.get(DSL.sum(STATISTICS.viewCount)).intValue()));
+    }
+
+    enum StatisticType {
+        VIEWS, DOWNLOADS;
     }
 }

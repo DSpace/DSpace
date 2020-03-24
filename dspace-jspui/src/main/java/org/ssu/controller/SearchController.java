@@ -25,8 +25,6 @@ import org.dspace.discovery.SearchUtils;
 import org.dspace.discovery.configuration.DiscoveryConfiguration;
 import org.dspace.discovery.configuration.DiscoverySearchFilter;
 import org.dspace.discovery.configuration.DiscoverySearchFilterFacet;
-import org.dspace.handle.factory.HandleServiceFactory;
-import org.dspace.handle.service.HandleService;
 import org.dspace.sort.SortException;
 import org.dspace.sort.SortOption;
 import org.jooq.lambda.Seq;
@@ -56,15 +54,12 @@ import java.util.stream.IntStream;
 @Controller
 @RequestMapping("/")
 public class SearchController {
+    private static final Logger log = Logger.getLogger(SearchController.class);
     @Resource
     private ItemService itemService;
-
     @Resource
     private PaginationProcessor paginationProcessor;
-
-    private static final Logger log = Logger.getLogger(SearchController.class);
     private transient SearchRequestProcessor internalLogic;
-    private HandleService handleService = HandleServiceFactory.getInstance().getHandleService();
     private CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
 
     @PostConstruct
@@ -118,8 +113,6 @@ public class SearchController {
         queryArgs.setSpellCheck(discoveryConfiguration.isSpellCheckEnabled());
         DiscoverResult qResults = SearchUtils.getSearchService().search(dspaceContext, scope, queryArgs);
 
-        List<Community> resultsListComm = getQueryResultsByType(qResults.getDspaceObjects(), Community.class);
-        List<Collection> resultsListColl = getQueryResultsByType(qResults.getDspaceObjects(), Collection.class);
         List<Item> resultsListItem = getQueryResultsByType(qResults.getDspaceObjects(), Item.class);
 
 
@@ -154,7 +147,7 @@ public class SearchController {
 
 
         List<String> sortOptions = discoveryConfiguration.getSearchSortConfiguration().getSortFields().stream()
-                .map(fieldConfiguration -> SearchUtils.getSearchService().toSortFieldIndex(fieldConfiguration.getMetadataField(),fieldConfiguration.getType()))
+                .map(fieldConfiguration -> SearchUtils.getSearchService().toSortFieldIndex(fieldConfiguration.getMetadataField(), fieldConfiguration.getType()))
                 .collect(Collectors.toList());
 
         List<DiscoverySearchFilterFacet> facets = Optional.ofNullable(qResults).map(results -> fetchEnabledFacets(discoveryConfiguration, appliedFilterQueries, qResults)).orElse(new ArrayList<>());
@@ -165,14 +158,14 @@ public class SearchController {
         model.addObject("facetsLimit", facetsLimit);
         model.addObject("facetCurrentPage", facetsCurrentPage);
 
-        model = paginationProcessor.fillModelWithPaginationData(model, request,qResults);
+        model = paginationProcessor.fillModelWithPaginationData(model, request, qResults);
         model.addObject("items", items);
         model.addObject("appliedFilters", appliedFilters);
         model.addObject("appliedFilterQueries", appliedFilterQueries);
         model.addObject("availableFilters", discoveryConfiguration.getSearchFilters());
         model.addObject("totalItems", qResults.getTotalSearchResults());
         model.addObject("startIndex", Math.max(qResults.getStart(), 1));
-        model.addObject("finishIndex", Math.min(qResults.getStart()+qResults.getMaxResults(), qResults.getTotalSearchResults()));
+        model.addObject("finishIndex", Math.min(qResults.getStart() + qResults.getMaxResults(), qResults.getTotalSearchResults()));
         model.addObject("rpp", queryArgs.getMaxResults());
         model.addObject("httpFilters", httpFilters);
         model.addObject("order", queryArgs.getSortOrder().toString());

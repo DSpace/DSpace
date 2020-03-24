@@ -183,7 +183,7 @@ public class EssuirSiteController {
     public ModelAndView topAuthorsPage(ModelAndView model, HttpServletRequest request) throws SQLException {
         Context dspaceContext = UIUtil.obtainContext(request);
         Locale locale = dspaceContext.getCurrentLocale();
-        List<Pair<String, Long>> authors = essuirStatistics.topAuthors(DSpaceServicesFactory.getInstance().getConfigurationService().getIntProperty("jsp.view.top_authors_count"))
+        List<Pair<String, Integer>> authors = essuirStatistics.topAuthors(DSpaceServicesFactory.getInstance().getConfigurationService().getIntProperty("jsp.view.top_authors_count"))
                 .stream()
                 .map(author -> Pair.of(author.getKey().getFormattedAuthorData("%s, %s", locale), author.getValue()))
                 .collect(Collectors.toList());
