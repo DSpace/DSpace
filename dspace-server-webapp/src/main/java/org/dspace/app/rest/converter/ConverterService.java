@@ -19,12 +19,15 @@ import javax.annotation.PostConstruct;
 import org.apache.log4j.Logger;
 import org.dspace.app.rest.link.HalLinkFactory;
 import org.dspace.app.rest.link.HalLinkService;
+import org.dspace.app.rest.model.BaseObjectRest;
 import org.dspace.app.rest.model.RestAddressableModel;
 import org.dspace.app.rest.model.RestModel;
 import org.dspace.app.rest.model.hateoas.HALResource;
 import org.dspace.app.rest.projection.DefaultProjection;
 import org.dspace.app.rest.projection.Projection;
+import org.dspace.app.rest.security.DSpacePermissionEvaluator;
 import org.dspace.app.rest.utils.Utils;
+import org.dspace.authorize.AuthorizeException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider;
@@ -34,6 +37,8 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.Resource;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
@@ -64,6 +69,9 @@ public class ConverterService {
     @Autowired
     private List<Projection> projections;
 
+    @Autowired
+    private DSpacePermissionEvaluator dSpacePermissionEvaluator;
+
     /**
      * Converts the given model object to a rest object, using the appropriate {@link DSpaceConverter} and
      * the given projection.
@@ -86,6 +94,12 @@ public class ConverterService {
         M transformedModel = projection.transformModel(modelObject);
         DSpaceConverter<M, R> converter = requireConverter(modelObject.getClass());
         R restObject = converter.convert(transformedModel, projection);
+        if (restObject instanceof BaseObjectRest) {
+            if (!dSpacePermissionEvaluator.hasPermission(SecurityContextHolder.getContext().getAuthentication(), restObject, "READ")) {
+                log.info("Access denied on " + restObject.getClass());
+                return null;
+            }
+        }
         if (restObject instanceof RestModel) {
             return (R) projection.transformRest((RestModel) restObject);
         }
@@ -177,6 +191,9 @@ public class ConverterService {
      * @return the fully converted resource, with all automatic links and embeds applied.
      */
     public <T extends HALResource> T toResource(RestModel restObject, Link... oldLinks) {
+        if (restObject == null) {
+            return null;
+        }
         T halResource = getResource(restObject);
         if (restObject instanceof RestAddressableModel) {
             utils.embedOrLinkClassLevelRels(halResource, oldLinks);
