@@ -31,12 +31,13 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.GroupRest;
-import org.dspace.app.rest.utils.GroupUtil;
 import org.dspace.app.rest.utils.Utils;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
+import org.dspace.content.DSpaceObject;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
@@ -72,9 +73,6 @@ public class GroupRestController {
 
     @Autowired
     Utils utils;
-
-    @Autowired
-    GroupUtil groupUtil;
 
     /**
      * Method to add one or more subgroups to a group.
@@ -277,8 +275,12 @@ public class GroupRestController {
             return;
         }
 
-        Collection collection = groupUtil.getCollection(context, group);
-        if (collection != null) {
+        DSpaceObject parentObject = groupService.getParentObject(context, group);
+        if (parentObject == null) {
+            throw new AuthorizeException("not authorized to manage this group");
+        }
+        if (parentObject.getType() == Constants.COLLECTION) {
+            Collection collection = (Collection) parentObject;
 
             if (group.equals(collection.getSubmitters())) {
                 authorizeManageSubmittersGroup(context, collection);
@@ -298,10 +300,11 @@ public class GroupRestController {
                 authorizeManageAdminGroup(context, collection);
                 return;
             }
-        }
 
-        Community community = groupUtil.getCommunity(context, group);
-        if (community != null) {
+
+        }
+        if (parentObject.getType() == Constants.COMMUNITY) {
+            Community community = (Community) parentObject;
             authorizeManageAdminGroup(context, community);
             return;
         }
