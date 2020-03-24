@@ -21,22 +21,25 @@
         <java.version>11</java.version>
         <spring.version>5.2.4.RELEASE</spring.version>
         <spring-boot.version>2.2.5.RELEASE</spring-boot.version>
-        <postgresql.driver.version>42.2.9</postgresql.driver.version>
         <hibernate.version>5.4.10.Final</hibernate.version>
         <hibernate-validator.version>6.0.18.Final</hibernate-validator.version>
+        <postgresql.driver.version>42.2.9</postgresql.driver.version>
         <!-- PIN Solr to 7.3.x until SOLR-12858 is fixed. This bug affects all integration tests that use Solr
              https://issues.apache.org/jira/browse/SOLR-12858 -->
         <solr.client.version>7.3.1</solr.client.version>
-        <pdfbox-version>2.0.15</pdfbox-version>
-        <poi-version>3.17</poi-version>
-        <jaxb-api.version>2.3.1</jaxb-api.version>
-        <jaxb-runtime.version>2.3.1</jaxb-runtime.version>
-        <javax-annotation.version>1.3.2</javax-annotation.version>
-        <!-- NOTE: when updating jackson.version, also sync jackson-databind dependency below -->
-        <jackson.version>2.10.2</jackson.version>
+
         <axiom.version>1.2.22</axiom.version>
         <errorprone.version>2.3.4</errorprone.version>
+        <!-- NOTE: when updating jackson.version, also sync jackson-databind dependency below -->
+        <jackson.version>2.10.2</jackson.version>
+        <javax-annotation.version>1.3.2</javax-annotation.version>
+        <jaxb-api.version>2.3.1</jaxb-api.version>
+        <jaxb-runtime.version>2.3.1</jaxb-runtime.version>
+        <!-- NOTE: Jetty needed for Handle Server & tests. Should be synced with version provided by solr-cell -->
+        <jetty.version>9.4.8.v20171121</jetty.version>
         <log4j.version>2.11.2</log4j.version>
+        <pdfbox-version>2.0.15</pdfbox-version>
+        <poi-version>3.17</poi-version>
         <slf4j.version>1.7.25</slf4j.version>
 
         <!--=== SERVER WEBAPP DEPENDENCIES ===-->
@@ -1235,11 +1238,11 @@
                 <artifactId>handle</artifactId>
                 <version>9.1.0.v20190416</version>
             </dependency>
-            <!-- Jetty is needed to run Handle Server -->
+            <!-- Jetty is needed to run Handle Server (and tests in some modules) -->
             <dependency>
                 <groupId>org.eclipse.jetty</groupId>
                 <artifactId>jetty-server</artifactId>
-                <version>9.4.8.v20171121</version> <!-- NOTE: synced with jetty provided by solr-cell -->
+                <version>${jetty.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
