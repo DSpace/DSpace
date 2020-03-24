@@ -8,7 +8,6 @@
 package org.dspace.app.rest.repository;
 
 import java.sql.SQLException;
-
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
@@ -60,12 +59,12 @@ public class CommunityCollectionLinkRepository extends AbstractDSpaceRestReposit
             if (community == null) {
                 throw new ResourceNotFoundException("No such community: " + communityId);
             }
-            // search for all the collections direct children of our community
-            // and let the SOLR security plugins to limit what is returned to what the user can see
             Pageable pageable = utils.getPageable(optionalPageable);
             List<Collection> collections = new LinkedList<Collection>();
             IndexObjectFactoryFactory indexObjectFactory = IndexObjectFactoryFactory.getInstance();
             IndexableObject scopeObject = indexObjectFactory.getIndexableObjects(context, community).get(0);
+            // search for all the collections direct children of our community
+            // and let the SOLR security plugins to limit what is returned to what the user can see
             DiscoverQuery discoverQuery = new DiscoverQuery();
             discoverQuery.setQuery("*:*");
             discoverQuery.setDSpaceObjectFilter(IndexableCollection.TYPE);
