@@ -14,7 +14,6 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-
 import javax.servlet.http.HttpServletRequest;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -380,10 +379,10 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
      * @param file
      *            the uploaded file
      * @return the new state of the REST object
-     * @throws Exception
      */
     public T upload(HttpServletRequest request, String apiCategory, String model,
-                                                     ID id, MultipartFile file) throws Exception {
+                                                     ID id, MultipartFile file)
+             throws SQLException, FileNotFoundException, IOException, AuthorizeException {
         throw new RuntimeException("No implementation found; Method not allowed!");
     }
 

@@ -26,7 +26,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
 /**
- * Link repository for "groups" subresource of an individual group.
+ * Link repository for "epersons" subresource of an individual group.
  */
 @Component(GroupRest.CATEGORY + "." + GroupRest.NAME + "." + GroupRest.EPERSONS)
 public class GroupEPersonLinkRepository extends AbstractDSpaceRestRepository

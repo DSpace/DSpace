@@ -60,7 +60,7 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
 
     @Test
     @Ignore
-    // Ignored until an endpoint is added to return all groups
+    // Ignored until an endpoint is added to return all groups. Anonymous is not considered a direct group.
     public void testStatusAuthenticated() throws Exception {
         String token = getAuthToken(eperson.getEmail(), password);
 

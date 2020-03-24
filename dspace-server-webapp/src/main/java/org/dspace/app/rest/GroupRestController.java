@@ -15,8 +15,6 @@ import static org.dspace.app.rest.utils.RegexUtils.REGEX_UUID;
 import static org.dspace.app.util.AuthorizeUtil.authorizeManageAdminGroup;
 import static org.dspace.app.util.AuthorizeUtil.authorizeManageSubmittersGroup;
 import static org.dspace.app.util.AuthorizeUtil.authorizeManageWorkflowsGroup;
-import static org.dspace.app.util.GroupUtil.getCollection;
-import static org.dspace.app.util.GroupUtil.getCommunity;
 import static org.springframework.web.bind.annotation.RequestMethod.DELETE;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
@@ -28,12 +26,12 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.GroupRest;
+import org.dspace.app.rest.utils.GroupUtil;
 import org.dspace.app.rest.utils.Utils;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
@@ -44,6 +42,8 @@ import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.eperson.service.GroupService;
+import org.dspace.xmlworkflow.storedcomponents.CollectionRole;
+import org.dspace.xmlworkflow.storedcomponents.service.CollectionRoleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -68,15 +68,24 @@ public class GroupRestController {
     private AuthorizeService authorizeService;
 
     @Autowired
+    private CollectionRoleService collectionRoleService;
+
+    @Autowired
     Utils utils;
+
+    @Autowired
+    GroupUtil groupUtil;
 
     /**
      * Method to add one or more subgroups to a group.
      * The subgroups to be added should be provided in the request body as a uri-list.
-     * @param uuid     the uuid of the group to add the subgroups to
+     * Note that only the 'AUTHENTICATED' state will be checked in PreAuthorize, a more detailed check will be done by
+     * using the 'checkAuthorization' method.
+     *
+     * @param uuid the uuid of the group to add the subgroups to
      */
     @PreAuthorize("hasAuthority('AUTHENTICATED')")
-    @RequestMapping( method = POST, path = "/{uuid}/subgroups", consumes = {"text/uri-list"})
+    @RequestMapping(method = POST, path = "/{uuid}/subgroups", consumes = {"text/uri-list"})
     public void addChildGroups(@PathVariable UUID uuid, HttpServletResponse response, HttpServletRequest request)
             throws SQLException, AuthorizeException {
 
@@ -104,7 +113,7 @@ public class GroupRestController {
             groupService.addMember(context, parentGroup, childGroup);
         }
 
-        context.commit();
+        context.complete();
 
         response.setStatus(SC_NO_CONTENT);
     }
@@ -130,10 +139,13 @@ public class GroupRestController {
     /**
      * Method to add one or more members to a group.
      * The members to be added should be provided in the request body as a uri-list.
-     * @param uuid     the uuid of the group to add the members to
+     * Note that only the 'AUTHENTICATED' state will be checked in PreAuthorize, a more detailed check will be done by
+     * using the 'checkAuthorization' method.
+     *
+     * @param uuid the uuid of the group to add the members to
      */
     @PreAuthorize("hasAuthority('AUTHENTICATED')")
-    @RequestMapping( method = POST, path = "/{uuid}/epersons", consumes = {"text/uri-list"})
+    @RequestMapping(method = POST, path = "/{uuid}/epersons", consumes = {"text/uri-list"})
     public void addMembers(@PathVariable UUID uuid, HttpServletResponse response, HttpServletRequest request)
             throws SQLException, AuthorizeException {
 
@@ -161,7 +173,7 @@ public class GroupRestController {
             groupService.addMember(context, parentGroup, member);
         }
 
-        context.commit();
+        context.complete();
 
         response.setStatus(SC_NO_CONTENT);
     }
@@ -181,13 +193,16 @@ public class GroupRestController {
 
     /**
      * Method to remove a subgroup from a group.
-     * @param parentUUID    the uuid of the parent group
-     * @param childUUID     the uuid of the subgroup which has to be removed
+     * Note that only the 'AUTHENTICATED' state will be checked in PreAuthorize, a more detailed check will be done by
+     * using the 'checkAuthorization' method.
+     *
+     * @param parentUUID the uuid of the parent group
+     * @param childUUID  the uuid of the subgroup which has to be removed
      */
     @PreAuthorize("hasAuthority('AUTHENTICATED')")
-    @RequestMapping( method = DELETE, path = "/{parentUUID}/subgroups/{childUUID}")
+    @RequestMapping(method = DELETE, path = "/{parentUUID}/subgroups/{childUUID}")
     public void removeChildGroup(@PathVariable UUID parentUUID, @PathVariable UUID childUUID,
-                     HttpServletResponse response, HttpServletRequest request)
+                                 HttpServletResponse response, HttpServletRequest request)
             throws IOException, SQLException, AuthorizeException {
 
         Context context = obtainContext(request);
@@ -206,18 +221,21 @@ public class GroupRestController {
 
         groupService.removeMember(context, parentGroup, childGroup);
 
-        context.commit();
+        context.complete();
 
         response.setStatus(SC_NO_CONTENT);
     }
 
     /**
      * Method to remove a member from a group.
-     * @param parentUUID    the uuid of the parent group
-     * @param memberUUID    the uuid of the member which has to be removed
+     * Note that only the 'AUTHENTICATED' state will be checked in PreAuthorize, a more detailed check will be done by
+     * using the 'checkAuthorization' method.
+     *
+     * @param parentUUID the uuid of the parent group
+     * @param memberUUID the uuid of the member which has to be removed
      */
     @PreAuthorize("hasAuthority('AUTHENTICATED')")
-    @RequestMapping( method = DELETE, path = "/{parentUUID}/epersons/{memberUUID}")
+    @RequestMapping(method = DELETE, path = "/{parentUUID}/epersons/{memberUUID}")
     public void removeMember(@PathVariable UUID parentUUID, @PathVariable UUID memberUUID,
                              HttpServletResponse response, HttpServletRequest request)
             throws IOException, SQLException, AuthorizeException {
@@ -238,18 +256,28 @@ public class GroupRestController {
 
         groupService.removeMember(context, parentGroup, childGroup);
 
-        context.commit();
+        context.complete();
 
         response.setStatus(SC_NO_CONTENT);
     }
 
+    /**
+     * This method checks whether the current user has sufficient rights to modify the group.
+     * Depending on the kind of group and due to delegated administration, separate checks need to be done to verify
+     * whether the user is allowed to modify the group.
+     *
+     * @param context the context of which the user will be checked
+     * @param group   the group to be checked
+     * @throws SQLException
+     * @throws AuthorizeException
+     */
     private void checkAuthorization(Context context, Group group) throws SQLException, AuthorizeException {
 
         if (authorizeService.isAdmin(context)) {
             return;
         }
 
-        Collection collection = getCollection(context, group);
+        Collection collection = groupUtil.getCollection(context, group);
         if (collection != null) {
 
             if (group.equals(collection.getSubmitters())) {
@@ -257,11 +285,13 @@ public class GroupRestController {
                 return;
             }
 
-            if (group.equals(collection.getWorkflowStep1(context))
-                    || group.equals(collection.getWorkflowStep2(context))
-                    || group.equals(collection.getWorkflowStep3(context))) {
-                authorizeManageWorkflowsGroup(context, collection);
-                return;
+
+            List<CollectionRole> collectionRoles = collectionRoleService.findByCollection(context, collection);
+            for (CollectionRole role : collectionRoles) {
+                if (group.equals(role.getGroup())) {
+                    authorizeManageWorkflowsGroup(context, collection);
+                    return;
+                }
             }
 
             if (group.equals(collection.getAdministrators())) {
@@ -270,7 +300,7 @@ public class GroupRestController {
             }
         }
 
-        Community community = getCommunity(context, group);
+        Community community = groupUtil.getCommunity(context, group);
         if (community != null) {
             authorizeManageAdminGroup(context, community);
             return;
