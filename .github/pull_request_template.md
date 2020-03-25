@@ -22,7 +22,7 @@ _This checklist provides a reminder of what we are going to look for when review
 - [ ] My PR is small in size (e.g. less than 1,000 lines of code, not including comments & integration tests). Exceptions may be made if previously agreed upon.
 - [ ] My PR passes Checkstyle validation based on the [Code Style Guide](https://wiki.lyrasis.org/display/DSPACE/Code+Style+Guide)
 - [ ] My PR includes Javadoc for _all the new (or modified) public methods and classes_. It also includes Javadoc for large or complex private methods.
-- [ ] My PR passes all tests and includes new/updated Unit or Integration Tests for any bug fixes, improvements or new features. A few reminders about what consistutes good tests:
+- [ ] My PR passes all tests and includes new/updated Unit or Integration Tests for any bug fixes, improvements or new features. A few reminders about what constitutes good tests:
     * Include tests for different user types, including: (1) Anonymous user, (2) Logged in user (non-admin), and (3) Administrator.
     * Include tests for known error scenarios and error codes (e.g. `400 Bad Request`, `401 Unauthorized`, `403 Forbidden`, `404 Not Found`, etc)
     * For bug fixes, include a test that reproduces the bug and proves it is fixed. For clarity, it may be useful to provide the test in a separate commit from the bug fix.
