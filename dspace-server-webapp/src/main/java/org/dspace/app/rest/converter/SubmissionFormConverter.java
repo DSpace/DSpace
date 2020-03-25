@@ -10,7 +10,6 @@ package org.dspace.app.rest.converter;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;

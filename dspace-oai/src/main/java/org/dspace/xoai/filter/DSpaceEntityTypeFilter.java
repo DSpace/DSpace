@@ -15,7 +15,6 @@ import com.lyncode.builder.ListBuilder;
 import com.lyncode.xoai.dataprovider.xml.xoaiconfig.parameters.ParameterList;
 import com.lyncode.xoai.dataprovider.xml.xoaiconfig.parameters.ParameterValue;
 import com.lyncode.xoai.dataprovider.xml.xoaiconfig.parameters.SimpleType;
-
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.xoai.data.DSpaceItem;
 import org.dspace.xoai.filter.results.SolrFilterResult;
