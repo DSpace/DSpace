@@ -31,7 +31,7 @@
             <%
                 for (char c = 'A'; c <= 'Z'; c++) {
             %>
-            <a href="/browse?${queryString.replaceAll('[&]*starts_with=[^&]+', '')}&amp;starts_with=<%= c %>"
+            <a href="${requestUri}?${queryString.replaceAll('[&]*starts_with=[^&]+', '')}&amp;starts_with=<%= c %>"
                class="label label-default" style="margin-left:3px;"><%= c %>
             </a>
             <%
@@ -42,7 +42,7 @@
             <%
                 for (char c = 'А'; c <= 'Я'; c++) {
             %>
-            <a href="/browse?${queryString.replaceAll('[&]*starts_with=[^&]+', '')}&amp;starts_with=<%= c %>"
+            <a href="${requestUri}?${queryString.replaceAll('[&]*starts_with=[^&]+', '')}&amp;starts_with=<%= c %>"
                class="label label-default" style="margin-left:3px;"><%= c %>
             </a>
             <%

@@ -15,8 +15,11 @@ import org.ssu.entity.response.CommunityResponse;
 import org.ssu.entity.response.ItemResponse;
 
 import javax.annotation.Resource;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.sql.SQLException;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -69,10 +72,20 @@ public class CommunityService {
     }
 
     public List<ItemResponse> getShortList(Context context, BrowseInfo browserInfo) {
+        Function<String, String> encodeItemTitle = (title) -> {
+            try {
+                return URLEncoder.encode(title, "utf-8");
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
+            return "";
+        };
+
         return Arrays.stream(browserInfo.getStringResults())
                 .map(item -> new ItemResponse.Builder()
-                .withTitle(StringEscapeUtils.escapeHtml(item[0]))
+                .withTitle(item[0])
                 .withViews(Integer.valueOf(item[2]))
+                .withHandle(encodeItemTitle.apply(item[0]))
                 .build())
                 .collect(Collectors.toList());
     }

@@ -12,7 +12,7 @@
 <ul class="list-group">
     <c:forEach items="${items}" var="item">
 
-        <li class="list-group-item"><a href="/browse?type=${type}&value=${item.title}">${item.title}</a>
+        <li class="list-group-item"><a href="${requestUri}?type=${type}&value=${item.handle}">${item.title}</a>
             <span class="badge pull-right">${item.views}</span></li>
     </c:forEach>
 </ul>

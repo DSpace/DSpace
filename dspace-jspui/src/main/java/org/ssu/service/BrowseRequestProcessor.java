@@ -32,7 +32,7 @@ public class BrowseRequestProcessor {
     public ModelAndView fillModelWithData(ModelAndView model, List<ItemResponse> items, BrowseInfo browseInfo, HttpServletRequest request, Boolean isExtendedTable) throws SortException {
         Integer perPage = getResultsPerPage(request.getParameter("rpp"));
 
-
+        model.addObject("requestUri", request.getRequestURI());
         model.addObject("items", items);
         model.addObject("type", request.getParameter("type"));
         model.addObject("startIndex", browseInfo.getStart());
