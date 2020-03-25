@@ -100,16 +100,6 @@ import org.springframework.stereotype.Service;
 @Service
 public class SolrServiceImpl implements SearchService, IndexingService {
 
-    /**
-     * The name of the discover configuration used to search for workflow tasks in the mydspace
-     */
-    public static final String DISCOVER_WORKFLOW_CONFIGURATION_NAME = "workflow";
-
-    /**
-     * The name of the discover configuration used to search for inprogress submission in the mydspace
-     */
-    public static final String DISCOVER_WORKSPACE_CONFIGURATION_NAME = "workspace";
-
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(SolrServiceImpl.class);
 
     @Autowired

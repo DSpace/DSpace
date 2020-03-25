@@ -1,5 +1,8 @@
 package org.dspace.discovery;
 
+import java.sql.SQLException;
+import java.util.Set;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.dspace.authorize.service.AuthorizeService;
@@ -9,17 +12,21 @@ import org.dspace.eperson.Group;
 import org.dspace.eperson.service.GroupService;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.sql.SQLException;
-import java.util.Set;
-
-import static org.dspace.discovery.SolrServiceImpl.DISCOVER_WORKFLOW_CONFIGURATION_NAME;
-import static org.dspace.discovery.SolrServiceImpl.DISCOVER_WORKSPACE_CONFIGURATION_NAME;
-
 /**
  * Created by: Antoine Snyers (antoine at atmire dot com)
  * Date: 18 Mar 2020
  */
 public class SolrServiceWorkspaceWorkflowRestrictionPlugin implements SolrServiceSearchPlugin {
+
+    /**
+     * The name of the discover configuration used to search for inprogress submission in the mydspace
+     */
+    public static final String DISCOVER_WORKSPACE_CONFIGURATION_NAME = "workspace";
+
+    /**
+     * The name of the discover configuration used to search for workflow tasks in the mydspace
+     */
+    public static final String DISCOVER_WORKFLOW_CONFIGURATION_NAME = "workflow";
 
     /**
      * The name of the discover configuration used by administrators to search for workflow tasks
