@@ -9,7 +9,6 @@ package org.dspace.app.rest;
 
 import java.io.IOException;
 import java.util.Arrays;
-
 import javax.servlet.http.HttpServletResponse;
 
 import org.dspace.app.rest.model.AuthnRest;
