@@ -17,6 +17,7 @@ List of changes in this PR:
 
 # Checklist
 Checklist of things all PRs should include. _These are just friendly reminders for you to check off before submitting your PR!_
+- [ ] Your PR must be small in size (e.g. less than 1,000 lines of code, not including comments & integration tests) to make reviewing easier.  Exceptions may be made for larger efforts
 - [ ] Your PR must follow the [Code Style Guide](https://wiki.lyrasis.org/display/DSPACE/Code+Style+Guide).
 - [ ] Your PR must implement an already approved REST Contract or at least be linked to an existing PR 
 - [ ] Your PR must provide javadoc for all the new public methods and classes. You are also requested to update javadoc of touched methods according to your changes and adding javadoc to complex private methods
