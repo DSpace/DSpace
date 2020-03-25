@@ -53,8 +53,12 @@
                <entry key="site" value-ref="homepageConfiguration" />
                <!--<entry key="123456789/7621" value-ref="defaultConfiguration"/>-->
                <!-- Used to show filters and results on MyDSpace -->
+               <!-- Do not change the key of special entries or else they won't work -->
+               <!-- "workspace" is a special entry to search for your own workspace items -->
                 <entry key="workspace" value-ref="workspaceConfiguration" />
+                <!-- "workflow" is a special entry to search for your own workflow items -->
                 <entry key="workflow" value-ref="workflowConfiguration" />
+                <!-- "workflowAdmin" is a special entry to search for all workflow items for which you are an administrator -->
                 <entry key="workflowAdmin" value-ref="workflowConfiguration" />
                 <entry key="undiscoverable" value-ref="unDiscoverableItems" />
                 <entry key="administrativeView" value-ref="administrativeView" />
