@@ -21,7 +21,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.Base64;
-
 import javax.servlet.http.Cookie;
 
 import org.dspace.app.rest.builder.GroupBuilder;
