@@ -124,6 +124,13 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
     }
 
     @Test
+    public void findAllForbiddenTest() throws Exception {
+        String tokenEperson = getAuthToken(eperson.getEmail(), password);
+        getClient(tokenEperson).perform(get("/api/core/items"))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
     public void findAllWithPaginationTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
