@@ -47,8 +47,7 @@ public class ItemBundleLinkRepository extends AbstractDSpaceRestRepository
             if (item == null) {
                 throw new ResourceNotFoundException("No such item: " + itemId);
             }
-            Page<Bundle> bundlePage = utils.getPage(item.getBundles(), optionalPageable);
-            return converter.toRestPage(bundlePage, projection);
+            return converter.toRestPage(item.getBundles(), optionalPageable, item.getBundles().size(), projection);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

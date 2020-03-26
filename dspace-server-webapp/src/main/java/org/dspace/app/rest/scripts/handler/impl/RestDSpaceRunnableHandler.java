@@ -186,10 +186,6 @@ public class RestDSpaceRunnableHandler implements DSpaceRunnableHandler {
             return processService.find(context, processId);
         } catch (SQLException e) {
             log.error("RestDSpaceRunnableHandler with process: " + processId + " could not be found", e);
-        } finally {
-            if (context.isValid()) {
-                context.abort();
-            }
         }
         return null;
     }

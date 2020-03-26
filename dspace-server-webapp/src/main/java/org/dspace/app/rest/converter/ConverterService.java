@@ -10,6 +10,7 @@ package org.dspace.app.rest.converter;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -119,7 +120,14 @@ public class ConverterService {
      * @throws ClassCastException if the converter's return type is not compatible with the inferred return type.
      */
     public <M, R> Page<R> toRestPage(List<M> modelObjects, Pageable pageable, long total, Projection projection) {
-        return new PageImpl<>(modelObjects, pageable, total).map((object) -> toRest(object, projection));
+        List<R> transformedList = new LinkedList<>();
+        for (M modelObject : modelObjects) {
+            R transformedObject = toRest(modelObject, projection);
+            if (transformedObject != null) {
+                transformedList.add(transformedObject);
+            }
+        }
+        return new PageImpl<>(transformedList, pageable, transformedList.size());
     }
 
     /**
@@ -134,7 +142,14 @@ public class ConverterService {
      * @throws ClassCastException if the converter's return type is not compatible with the inferred return type.
      */
     public <M, R> Page<R> toRestPage(Page<M> modelObjects, Projection projection) {
-        return modelObjects.map((object) -> toRest(object, projection));
+        List<R> transformedList = new LinkedList<>();
+        for (M modelObject : modelObjects) {
+            R transformedObject = toRest(modelObject, projection);
+            if (transformedObject != null) {
+                transformedList.add(transformedObject);
+            }
+        }
+        return utils.getPage(transformedList, modelObjects.getPageable());
     }
 
     /**
