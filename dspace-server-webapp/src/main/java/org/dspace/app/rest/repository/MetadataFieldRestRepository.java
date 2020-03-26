@@ -70,7 +70,7 @@ public class MetadataFieldRestRepository extends DSpaceRestRepository<MetadataFi
     public Page<MetadataFieldRest> findAll(Context context, Pageable pageable) {
         try {
             List<MetadataField> metadataFields = metadataFieldService.findAll(context);
-            return converter.toRestPage(utils.getPage(metadataFields, pageable), utils.obtainProjection());
+            return converter.toRestPage(metadataFields, pageable, metadataFields.size(), utils.obtainProjection());
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
