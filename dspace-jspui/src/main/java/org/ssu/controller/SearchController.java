@@ -15,6 +15,7 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CommunityService;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.PluginConfigurationError;
 import org.dspace.core.factory.CoreServiceFactory;
@@ -25,6 +26,8 @@ import org.dspace.discovery.SearchUtils;
 import org.dspace.discovery.configuration.DiscoveryConfiguration;
 import org.dspace.discovery.configuration.DiscoverySearchFilter;
 import org.dspace.discovery.configuration.DiscoverySearchFilterFacet;
+import org.dspace.handle.factory.HandleServiceFactory;
+import org.dspace.handle.service.HandleService;
 import org.dspace.sort.SortException;
 import org.dspace.sort.SortOption;
 import org.jooq.lambda.Seq;
@@ -54,6 +57,7 @@ import java.util.stream.IntStream;
 @Controller
 @RequestMapping("/")
 public class SearchController {
+    private HandleService handleService = HandleServiceFactory.getInstance().getHandleService();
     private static final Logger log = Logger.getLogger(SearchController.class);
     @Resource
     private ItemService itemService;
@@ -86,19 +90,33 @@ public class SearchController {
 
     @RequestMapping(value = "/simple-search")
     public ModelAndView simpleSearch(ModelAndView model, HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException, SQLException, AuthorizeException, SearchProcessorException, SearchServiceException, SortException {
-        model = performSearchRequest(model, request, response);
+        model = performSearchRequest(model, request, null);
         return model;
     }
 
     @RequestMapping(value = "/123456789/{itemId}/simple-search")
-    public ModelAndView simpleSearchInCommunity(ModelAndView model, HttpServletRequest request, HttpServletResponse response, @PathVariable("itemId") String itemId) throws ServletException, IOException, SQLException, AuthorizeException, SearchProcessorException, SearchServiceException, SortException {
-        model = performSearchRequest(model, request, response);
+    public ModelAndView simpleSearchInCommunity(ModelAndView model, HttpServletRequest request, HttpServletResponse response, @PathVariable("itemId") Integer itemId) throws ServletException, IOException, SQLException, AuthorizeException, SearchProcessorException, SearchServiceException, SortException {
+        model = performSearchRequest(model, request, itemId);
         model.addObject("handle", "/handle/123456789/" + itemId);
         return model;
     }
 
-    private ModelAndView performSearchRequest(ModelAndView model, HttpServletRequest request, HttpServletResponse response) throws SQLException, SearchProcessorException, SearchServiceException, UnsupportedEncodingException, SortException {
+    private ModelAndView performSearchRequest(ModelAndView model, HttpServletRequest request, Integer itemId) throws SQLException, SearchProcessorException, SearchServiceException, UnsupportedEncodingException, SortException {
         Context dspaceContext = UIUtil.obtainContext(request);
+        if(itemId != null) {
+            DSpaceObject dSpaceObject = handleService.resolveToObject(dspaceContext, "123456789/" + itemId);
+            switch (dSpaceObject.getType()) {
+                case Constants.COMMUNITY:
+                    request.setAttribute("dspace.community", (Community) dSpaceObject);
+                    break;
+                case Constants.COLLECTION:
+                    request.setAttribute("dspace.collection", (Collection) dSpaceObject);
+                    break;
+                default:
+                    break;
+            }
+        }
+
         DSpaceObject scope;
         try {
             scope = DiscoverUtility.getSearchScope(dspaceContext, request);
