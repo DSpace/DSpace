@@ -28,7 +28,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.dspace.app.rest.builder.BitstreamFormatBuilder;
 import org.dspace.app.rest.builder.EPersonBuilder;
 import org.dspace.app.rest.converter.BitstreamFormatConverter;
-import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.matcher.BitstreamFormatMatcher;
 import org.dspace.app.rest.matcher.HalMatcher;
 import org.dspace.app.rest.model.BitstreamFormatRest;
@@ -464,7 +463,8 @@ public class BitstreamFormatRestRepositoryIT extends AbstractControllerIntegrati
                 .build();
         context.restoreAuthSystemState();
 
-        BitstreamFormatRest bitstreamFormatRest = bitstreamFormatConverter.convert(bitstreamFormat1, Projection.DEFAULT);
+        BitstreamFormatRest bitstreamFormatRest = bitstreamFormatConverter.convert(bitstreamFormat1,
+                                                                                   Projection.DEFAULT);
         String token = getAuthToken(admin.getEmail(), password);
         //Update but id in body is not same id as in URL
         bitstreamFormatRest.setShortDescription("Test short UPDATED");

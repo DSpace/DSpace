@@ -22,7 +22,6 @@ import org.dspace.app.rest.authorization.AlwaysTrueFeature;
 import org.dspace.app.rest.authorization.AuthorizationFeature;
 import org.dspace.app.rest.authorization.AuthorizationFeatureService;
 import org.dspace.app.rest.authorization.TrueForAdminsFeature;
-import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.converter.SiteConverter;
 import org.dspace.app.rest.model.CollectionRest;
 import org.dspace.app.rest.model.SiteRest;

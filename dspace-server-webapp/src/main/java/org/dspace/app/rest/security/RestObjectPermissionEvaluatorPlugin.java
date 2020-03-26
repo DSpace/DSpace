@@ -35,7 +35,8 @@ public abstract class RestObjectPermissionEvaluatorPlugin  implements RestPermis
     public boolean hasPermission(Authentication authentication, Object targetDomainObject,
                                  Object permission) {
         BaseObjectRest restObject = (BaseObjectRest) targetDomainObject;
-        return hasPermission(authentication, restObject.getId(), StringUtils.upperCase(restObject.getType()), permission);
+        return hasPermission(authentication, restObject.getId(), StringUtils.upperCase(restObject.getType()),
+                             permission);
     }
 
     @Override

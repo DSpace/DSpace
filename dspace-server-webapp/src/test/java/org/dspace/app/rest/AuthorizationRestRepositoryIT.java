@@ -32,7 +32,6 @@ import org.dspace.app.rest.builder.CommunityBuilder;
 import org.dspace.app.rest.builder.EPersonBuilder;
 import org.dspace.app.rest.builder.GroupBuilder;
 import org.dspace.app.rest.converter.CommunityConverter;
-import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.converter.EPersonConverter;
 import org.dspace.app.rest.converter.SiteConverter;
 import org.dspace.app.rest.matcher.AuthorizationMatcher;
