@@ -45,6 +45,11 @@ public class ImpBitstreamServiceImpl implements ImpBitstreamService {
     }
 
     @Override
+    public ImpBitstream findByID(Context context, int id) throws SQLException {
+        return impBitstreamDAO.findByID(context, ImpBitstream.class, id);
+    }
+
+    @Override
     public void update(Context context, ImpBitstream impBitstream) throws SQLException {
         impBitstreamDAO.save(context, impBitstream);
     }

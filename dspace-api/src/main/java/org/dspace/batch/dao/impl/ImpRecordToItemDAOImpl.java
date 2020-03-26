@@ -34,4 +34,9 @@ public class ImpRecordToItemDAOImpl extends AbstractHibernateDAO<ImpRecordToItem
         query.setHint("org.hibernate.cacheable", Boolean.TRUE);
         return singleResult(query);
     }
+
+    @Override
+    public void deleteAll(Context context) throws SQLException {
+        getHibernateSession(context).createQuery("delete from ImpRecordToItem").executeUpdate();
+    }
 }

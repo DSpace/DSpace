@@ -208,11 +208,13 @@ public class ItemImportOA {
         options.addOption("I", "importID", true, "import ID");
         options.addOption("k", "handle", true, "handle of item");
         options.addOption("m", "metadata", true,
-                "List of metadata to remove first and after do an update [by default all metadata are delete, specifying only the dc.title it will obtain an append on the other metadata]; use this option many times on the single metadata e.g. -m dc.title -m dc.contributor.*");
+                "List of metadata to remove first and after do an update [by default all metadata are delete,"
+                        + " specifying only the dc.title it will obtain an append on the other metadata];"
+                        + " use this option many times on the single metadata e.g. -m dc.title -m dc.contributor.*");
         options.addOption("o", "item", true, "item UUID");
         options.addOption("p", "workspace", false, "send submission back to workspace");
         options.addOption("r", "replace", false, "update items");
-        options.addOption("w", "workflow1", false, "send submission through collection's workflow");
+        options.addOption("w", "workflow", false, "send submission through collection's workflow");
         options.addOption("z", "reinstate", false, "Reinstate a withdrawn item");
         options.addOption("R", "sourceref", true, "name of the source");
 
@@ -265,27 +267,24 @@ public class ItemImportOA {
         if (line.hasOption('p')) {
             myLoader.setBackToWorkspace(true);
         }
-
-        if (line.hasOption('e')) // eperson
-        {
+        // person
+        if (line.hasOption('e')) {
             epersonID = UUID.fromString(line.getOptionValue('e').trim());
         }
-
-        if (line.hasOption('c')) // collections
-        {
+        // collections
+        if (line.hasOption('c')) {
             collections = line.getOptionValues('c');
         }
-
-        if (line.hasOption('i')) // record ID
-        {
+        // record ID
+        if (line.hasOption('i')) {
             imp_record_id = line.getOptionValue('i').trim();
         }
-        if (line.hasOption('o')) // item ID (replace or delete)
-        {
+        // item ID (replace or delete)
+        if (line.hasOption('o')) {
             item_id = UUID.fromString(line.getOptionValue('o').trim());
         }
-        if (line.hasOption('I')) // item ID (replace or delete)
-        {
+        // item ID (replace or delete)
+        if (line.hasOption('I')) {
             int temp_imp_id = Integer.parseInt(line.getOptionValue('I').trim());
             imp_id = impRecordService.findByID(context, temp_imp_id);
         }
@@ -371,10 +370,9 @@ public class ItemImportOA {
                     if ((mycollections[i] == null) || (mycollections[i].getType() != Constants.COLLECTION)) {
                         mycollections[i] = null;
                     }
-                }
-                // not a handle, try and treat it as an integer collection
-                // database ID
-                else if (collections[i] != null) {
+                } else if (collections[i] != null) {
+                    // not a handle, try and treat it as an integer collection
+                    // database ID
                     mycollections[i] = collectionService.find(context, UUID.fromString(collections[i].trim()));
                 }
 
@@ -390,8 +388,8 @@ public class ItemImportOA {
                     owningPrefix = "Owning ";
                 }
 
-                System.out.println(owningPrefix + " Collection: "
-                        + collectionService.getMetadata(mycollections[i]/* .getMetadata("name") */, "name"));
+                System.out.println(
+                        owningPrefix + " Collection: " + collectionService.getMetadata(mycollections[i], "name"));
             }
         } // end of validating collections
 
@@ -414,8 +412,8 @@ public class ItemImportOA {
                 impRecordToItem = impRecordToItemService.create(context, impRecordToItem);
             } else if (command.equals("replace")) {
                 myLoader.replaceItems(context, mycollections, imp_record_id, item_id, imp_id, clearOldBitstream);
-            } else if (command.equals("delete") || command.equals("deleteintegra")) {
-                Item item = /* Item */itemService.find(context, item_id);
+            } else if (command.equals("delete")) {
+                Item item = itemService.find(context, item_id);
                 if (item != null) {
                     ItemUtils.removeOrWithdrawn(context, item);
                 }
@@ -483,10 +481,10 @@ public class ItemImportOA {
         // and the bitstreams
         processImportBitstream(c, item, imp_id, clearOldBitstream);
 
-        List<AdditionalMetadataUpdateProcessPlugin> additionalMetadataUpdateProcessPlugins = (List<AdditionalMetadataUpdateProcessPlugin>) dspace
-                .getServiceManager().getServicesByType(AdditionalMetadataUpdateProcessPlugin.class);
-        for (AdditionalMetadataUpdateProcessPlugin additionalMetadataUpdateProcessPlugin : additionalMetadataUpdateProcessPlugins) {
-            additionalMetadataUpdateProcessPlugin.process(c, item, getSourceRef());
+        List<AdditionalMetadataUpdateProcessPlugin> plugins = dspace.getServiceManager()
+                .getServicesByType(AdditionalMetadataUpdateProcessPlugin.class);
+        for (AdditionalMetadataUpdateProcessPlugin plugin : plugins) {
+            plugin.process(c, item, getSourceRef());
         }
 
         itemService.update(c, item);
@@ -510,11 +508,9 @@ public class ItemImportOA {
                 if (workflow) {
                     XmlWorkflowItem wfi = workflowService.startWithoutNotify(c, wsi);
 
-                    // TODO: handle workflow
                     processWorkflow(c, wfi, imp_id);
                 }
-            } else if (backToWorkspace
-                    || workflow/* || goToWFStepOne || goToWFStepTwo || goToWFStepThree || goToPublishing */) {
+            } else if (backToWorkspace || workflow) {
 
                 // check if item is in workflow status
                 XmlWorkflowItem wfi = workflowItemService.findByItem(c, item);
@@ -523,12 +519,9 @@ public class ItemImportOA {
                     if (backToWorkspace) {
                         workflowService.abort(c, wfi, batchJob);
                     } else {
-                        // TODO: handle workflow
+
                         processWorkflow(c, wfi, imp_id);
                     }
-                } else {
-                    // TODO: remove?
-                    itemService.update(c, item);
                 }
             }
 
@@ -566,10 +559,10 @@ public class ItemImportOA {
         // and the bitstreams
         processImportBitstream(c, myitem, imp_id, clearOldBitstream);
 
-        List<AdditionalMetadataUpdateProcessPlugin> additionalMetadataUpdateProcessPlugins = (List<AdditionalMetadataUpdateProcessPlugin>) DSpaceServicesFactory
-                .getInstance().getServiceManager().getServicesByType(AdditionalMetadataUpdateProcessPlugin.class);
-        for (AdditionalMetadataUpdateProcessPlugin additionalMetadataUpdateProcessPlugin : additionalMetadataUpdateProcessPlugins) {
-            additionalMetadataUpdateProcessPlugin.process(c, myitem, getSourceRef());
+        List<AdditionalMetadataUpdateProcessPlugin> plugins = DSpaceServicesFactory.getInstance().getServiceManager()
+                .getServicesByType(AdditionalMetadataUpdateProcessPlugin.class);
+        for (AdditionalMetadataUpdateProcessPlugin plugin : plugins) {
+            plugin.process(c, myitem, getSourceRef());
         }
 
         wi.setMultipleFiles(true);
@@ -580,7 +573,6 @@ public class ItemImportOA {
 
         if (workflow) {
             XmlWorkflowItem wfi = workflowService.startWithoutNotify(c, wi);
-            // TODO: handle workflow
             processWorkflow(c, wfi, imp_id);
         }
 
@@ -602,8 +594,9 @@ public class ItemImportOA {
             if (iwns.getImpWNStateEpersonUuid() != null) {
                 user = epersonService.find(context, iwns.getImpWNStateEpersonUuid());
             }
-            if (user == null)
+            if (user == null) {
                 user = batchJob;
+            }
 
             if ("CLAIM".equalsIgnoreCase(iwns.getImpWNStateOp())) {
                 PoolTask task = poolTaskService.findByWorkflowIdAndEPerson(context, wfi, user);
@@ -614,8 +607,6 @@ public class ItemImportOA {
                 WorkflowActionConfig currentActionConfig = step.getActionConfig(task.getActionID());
                 workflowService.doState(context, user, null, task.getWorkflowItem().getID(), workflow,
                         currentActionConfig);
-//                context.addEvent(new Event(Event.MODIFY, Constants.ITEM, task.getWorkflowItem().getItem().getID(), null,
-//                        itemService.getIdentifiers(context, task.getWorkflowItem().getItem())));
             } else if ("ADVANCE".equalsIgnoreCase(iwns.getImpWNStateOp())) {
                 ClaimedTask claimedTask = claimedTaskService.findByWorkflowIdAndEPerson(context, wfi, user);
 
@@ -664,13 +655,14 @@ public class ItemImportOA {
      * @throws SQLException
      * @throws AuthorizeException
      */
-    private void addDCValue(Context c, Item i, String schema, /* TableRow */ImpMetadatavalue n)
+    private void addDCValue(Context c, Item i, String schema, ImpMetadatavalue n)
             throws TransformerException, SQLException, AuthorizeException {
         String value = n.getImpValue();
         // compensate for empty value getting read as "null", which won't
         // display
-        if (value == null)
+        if (value == null) {
             value = "";
+        }
         String impSchema = n.getImpSchema();
         String element = n.getImpElement();
         String qualifier = n.getImpQualifier();
@@ -790,25 +782,30 @@ public class ItemImportOA {
 
             // 0: all
             // 1: embargo
-            // 2: only an authorized group
+            // 2: only authorized group
             // 3: not visible
             int embargo_policy = imp_bitstream.getEmbargoPolicy();
             String embargo_start_date = imp_bitstream.getEmbargoStartDate();
             Group embargoGroup = null;
             if (embargo_policy != -1) {
-                if (embargo_policy == 3) {
+                if (embargo_policy == ImpBitstream.NOT_VISIBLE) {
                     start_date = null;
-                    embargoGroup = groupService.findByLegacyId(c, 1);
-                } else if (embargo_policy == 2) {
-                    embargoGroup = groupService.findByLegacyId(c, embargo_policy);
-                    if (embargo_start_date != null) {
-                        start_date = embargo_start_date;
-                    } else {
-                        start_date = null;
+                    embargoGroup = groupService.findByName(c, Group.ADMIN);
+                } else if (embargo_policy == ImpBitstream.USE_GROUP) {
+                    try {
+                        embargoGroup = groupService.find(c, imp_bitstream.getEmbargoGroup());
+                        if (embargo_start_date != null) {
+                            start_date = embargo_start_date;
+                        } else {
+                            start_date = null;
+                        }
+                    } catch (Exception e) {
+                        throw new SQLException(
+                                "The group with UUID " + imp_bitstream.getEmbargoGroup() + " does not exist", e);
                     }
-                } else if (embargo_policy == 1 && embargo_start_date != null) {
+                } else if (embargo_policy == ImpBitstream.EMBARGO && embargo_start_date != null) {
                     start_date = embargo_start_date;
-                } else if (embargo_policy == 0) {
+                } else if (embargo_policy == ImpBitstream.ALL) {
                     start_date = null;
                 }
             }
@@ -883,7 +880,7 @@ public class ItemImportOA {
             targetBundle = bundleService.create(c, i, newBundleName);
         } else {
             // put bitstreams into first bundle
-            targetBundle = bundles/* [0] */.get(0);
+            targetBundle = bundles.get(0);
         }
 
         // get an input stream
@@ -908,12 +905,13 @@ public class ItemImportOA {
 
         bs.setDescription(c, description);
         if (primaryBitstream) {
-            targetBundle.setPrimaryBitstreamID(bs/* .getID() */);
+            targetBundle.setPrimaryBitstreamID(bs);
         }
-        if (name_file != null)
+        if (name_file != null) {
             bs.setName(c, name_file);
-        else
+        } else {
             bs.setName(c, new File(fullpath).getName());
+        }
 
         // Identify the format
         // FIXME - guessing format guesses license.txt incorrectly as a text
@@ -928,7 +926,7 @@ public class ItemImportOA {
         }
 
         if (embargoGroup == null) {
-            embargoGroup = groupService.findByLegacyId(c, 0);
+            embargoGroup = groupService.findByName(c, Group.ANONYMOUS);
         }
         Date embargoDate = null;
         if (StringUtils.isNotBlank(start_date)) {
@@ -939,6 +937,7 @@ public class ItemImportOA {
             if (embargo_year > 0 && embargo_month > 0 && embargo_day > 0) {
                 Calendar cal = Calendar.getInstance();
                 embargo_month--;
+                cal.clear();
                 cal.set(embargo_year, embargo_month, embargo_day, 0, 0, 0);
                 embargoDate = cal.getTime();
             }

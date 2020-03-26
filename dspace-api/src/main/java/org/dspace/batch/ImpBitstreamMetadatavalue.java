@@ -127,7 +127,11 @@ public class ImpBitstreamMetadatavalue {
     }
 
     public Integer getImpConfidence() {
-        return impConfidence;
+        if (impConfidence == null) {
+            return -1;
+        } else {
+            return impConfidence;
+        }
     }
 
     public void setImpConfidence(Integer impConfidence) {
@@ -135,7 +139,11 @@ public class ImpBitstreamMetadatavalue {
     }
 
     public Integer getImpShare() {
-        return impShare;
+        if (impShare == null) {
+            return -1;
+        } else {
+            return impShare;
+        }
     }
 
     public void setImpShare(Integer impShare) {

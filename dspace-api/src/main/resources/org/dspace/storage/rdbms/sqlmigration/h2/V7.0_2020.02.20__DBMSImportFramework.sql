@@ -46,8 +46,8 @@ CREATE TABLE imp_metadatavalue (
     imp_qualifier VARCHAR2(128),
     imp_value CLOB NOT NULL,
     imp_authority VARCHAR2(256),
-    imp_confidence INTEGER,
-    imp_share INTEGER,
+    imp_confidence INTEGER DEFAULT -1,
+    imp_share INTEGER DEFAULT -1,
     metadata_order INTEGER NOT NULL,
     text_lang VARCHAR2(32)
 );
@@ -62,10 +62,11 @@ CREATE TABLE imp_bitstream (
     bundle VARCHAR2(512),
     bitstream_order INTEGER,
     primary_bitstream BOOLEAN,
-    assetstore INTEGER DEFAULT '-1'::integer,
+    assetstore INTEGER DEFAULT -1,
     name VARCHAR2(512),
     imp_blob VARBINARY(200000),
-    embargo_policy INTEGER DEFAULT '-1'::integer,
+    embargo_policy INTEGER DEFAULT -1,
+    embargo_group UUID,
     embargo_start_date VARCHAR2(100),
     md5value VARCHAR2(32)
 );
@@ -80,8 +81,8 @@ CREATE TABLE imp_bitstream_metadatavalue (
     imp_qualifier VARCHAR2(128),
     imp_value CLOB NOT NULL,
     imp_authority VARCHAR2(256),
-    imp_confidence INTEGER,
-    imp_share INTEGER,
+    imp_confidence INTEGER DEFAULT -1,
+    imp_share INTEGER DEFAULT -1,
     metadata_order INTEGER NOT NULL,
     text_lang VARCHAR2(32)
 );

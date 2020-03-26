@@ -20,19 +20,19 @@ public class ImpServiceFactoryImpl extends ImpServiceFactory {
 
     @Autowired(required = true)
     private ImpBitstreamService impBitstreamService;
-    
+
     @Autowired(required = true)
     private ImpBitstreamMetadatavalueService impBitstreamMetadatavalueService;
-    
+
     @Autowired(required = true)
     private ImpMetadatavalueService impMetadatavalueService;
-    
+
     @Autowired(required = true)
     private ImpRecordService impRecordService;
-    
+
     @Autowired(required = true)
     private ImpRecordToItemService impRecordToItemService;
-    
+
     @Autowired(required = true)
     private ImpWorkflowNStateService impWorkflowNStateService;
 
@@ -45,7 +45,7 @@ public class ImpServiceFactoryImpl extends ImpServiceFactory {
     public ImpBitstreamMetadatavalueService getImpBitstreamMetadatavalueService() {
         return impBitstreamMetadatavalueService;
     }
-    
+
     @Override
     public ImpMetadatavalueService getImpMetadatavalueService() {
         return impMetadatavalueService;
@@ -60,10 +60,10 @@ public class ImpServiceFactoryImpl extends ImpServiceFactory {
     public ImpRecordToItemService getImpRecordToItemService() {
         return impRecordToItemService;
     }
-    
+
     @Override
     public ImpWorkflowNStateService getImpWorkflowNStateService() {
         return impWorkflowNStateService;
     }
-    
+
 }

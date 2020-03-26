@@ -38,4 +38,9 @@ public class ImpMetadatavalueDAOImpl extends AbstractHibernateDAO<ImpMetadataval
         query.setHint("org.hibernate.cacheable", Boolean.TRUE);
         return list(query);
     }
+
+    @Override
+    public void deleteAll(Context context) throws SQLException {
+        getHibernateSession(context).createQuery("delete from ImpMetadatavalue").executeUpdate();
+    }
 }

@@ -38,16 +38,17 @@ public class ImpMetadatavalueServiceImpl implements ImpMetadatavalueService {
         impMetadatavalue = impMetadatavalueDAO.create(context, impMetadatavalue);
         return impMetadatavalue;
     }
-    
+
     @Override
-    public void setMetadata(ImpMetadatavalue impMetadatavalue, String schema, String element, String qualifier, String language, String value) {
+    public void setMetadata(ImpMetadatavalue impMetadatavalue, String schema, String element, String qualifier,
+            String language, String value) {
         impMetadatavalue.setImpSchema(schema);
         impMetadatavalue.setImpElement(element);
         impMetadatavalue.setImpQualifier(qualifier);
         impMetadatavalue.setTextLang(language);
         impMetadatavalue.setImpValue(value);
     }
-    
+
     @Override
     public List<ImpMetadatavalue> searchByImpRecordId(Context context, ImpRecord impRecord) throws SQLException {
         return impMetadatavalueDAO.searchByImpRecord(context, impRecord);

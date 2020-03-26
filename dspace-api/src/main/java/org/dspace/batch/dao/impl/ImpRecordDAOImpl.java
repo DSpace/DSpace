@@ -25,12 +25,11 @@ import org.dspace.core.Context;
  *
  * @author fcadili (francesco.cadili at 4science.it)
  */
-public class ImpRecordDAOImpl extends AbstractHibernateDAO<ImpRecord> implements ImpRecordDAO{
+public class ImpRecordDAOImpl extends AbstractHibernateDAO<ImpRecord> implements ImpRecordDAO {
 
     public List<ImpRecord> searchNewRecords(Context context) throws SQLException {
         Query query = createQuery(context,
-                "SELECT r FROM ImpRecord r WHERE r.lastModified IS NULL "
-                        + "ORDER BY r.impId");
+                "SELECT r FROM ImpRecord r WHERE r.lastModified IS NULL " + "ORDER BY r.impId");
 
         query.setHint("org.hibernate.cacheable", Boolean.TRUE);
         return list(query);
@@ -42,8 +41,13 @@ public class ImpRecordDAOImpl extends AbstractHibernateDAO<ImpRecord> implements
                 "SELECT count(r) FROM ImpRecord r WHERE r.impRecordId = :impRecordId AND r.lastModified IS NULL "
                         + "ORDER BY r.impId");
         query.setParameter("impRecordId", impRecord.getImpRecordId());
-        
+
         query.setHint("org.hibernate.cacheable", Boolean.TRUE);
         return count(query);
+    }
+
+    @Override
+    public void deleteAll(Context context) throws SQLException {
+        getHibernateSession(context).createQuery("delete from ImpRecord").executeUpdate();
     }
 }

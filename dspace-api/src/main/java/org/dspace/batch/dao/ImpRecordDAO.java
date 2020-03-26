@@ -42,4 +42,12 @@ public interface ImpRecordDAO extends GenericDAO<ImpRecord> {
      * @throws SQLException
      */
     public int countNewImpRecords(Context context, ImpRecord impRecord) throws SQLException;
+
+    /***
+     * Remove all ImpRecord objects.
+     * 
+     * @param context
+     * @throws SQLException
+     */
+    public void deleteAll(Context context) throws SQLException;
 }

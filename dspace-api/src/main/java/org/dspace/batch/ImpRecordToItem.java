@@ -34,12 +34,12 @@ public class ImpRecordToItem {
     @Id
     @Column(name = "imp_record_id", length = 256)
     private String impRecordId;
-    
+
     @Column(name = "imp_item_id", nullable = false)
     private UUID impItemId;
-    
+
     @Column(name = "imp_sourceref", length = 256)
-   private String impSourceref;
+    private String impSourceref;
 
     public String getImpRecordId() {
         return impRecordId;

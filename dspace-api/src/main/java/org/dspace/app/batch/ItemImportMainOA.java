@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -32,6 +33,8 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.PosixParser;
 import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Level;
+import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.batch.ImpRecord;
@@ -75,13 +78,17 @@ public class ItemImportMainOA {
         }
     }
 
+    private Level currentLevel = Level.INFO;
+
     public void doAll(Context context, String[] args) {
         String header = "";
 
         String legenda = "LEGENDA: \n" + " -a to build item \n"
                 + " -r to update (add also the metadata list with the option \n"
-                + " -m it will contains the list of metadata to clean, by default delete all metadata otherwise specifying only the dc.title it will obtain an append on the other metadata) \n"
-                + " -b to invert the management of deletion or append of the bitstream (by default append on the item standard and remove on the update) \n"
+                + " -m it will contains the list of metadata to clean, by default delete all metadata"
+                + " otherwise specifying only the dc.title it will obtain an append on the other metadata) \n"
+                + " -b to invert the management of deletion or append of the bitstream"
+                + " (by default append on the item standard and remove on the update) \n"
                 + " -d to delete item. \n Status change: \n" + " -p send submission back to workspace \n"
                 + " -w send submission through collection's workflow \n" + " -g set item in withdrawn state \n"
                 + " -i to verbose the script \n" + " -z reinstate a withdrawn item \n";
@@ -99,7 +106,8 @@ public class ItemImportMainOA {
 
             Options options = new Options();
             options.addOption("p", "notifyAuthor", false,
-                    "Send the email for the in archive event to the authors, coauthors, etc. - the workflow email are EVER disabled");
+                    "Send the email for the in archive event to the authors, coauthors, etc."
+                            + " - the workflow email are EVER disabled");
             options.addOption("E", "batch_user", true, "BatchJob User email");
             options.addOption("x", "noindex", false, "Indexing disabled (improve performance)");
             options.addOption("n", "noemail", false, "Summary EMail disabled (improve performance)");
@@ -107,9 +115,14 @@ public class ItemImportMainOA {
                     "Delete bitstream related to the item in the update phase");
             options.addOption("h", "help", false, "help");
             options.addOption("m", "metadata", true,
-                    "List of metadata to remove first and after do an update [by default all metadata are delete, specifying only the dc.title it will obtain an append on the other metadata]; use this option many times on the single metadata e.g. -m dc.title -m dc.contributor.*");
+                    "List of metadata to remove first and after do an update [by default all metadata are delete,"
+                            + " specifying only the dc.title it will obtain an append on the other metadata];"
+                            + " use this option many times on the single metadata"
+                            + " e.g. -m dc.title -m dc.contributor.*");
             options.addOption("s", "switch", false,
-                    "Invert the logic for the -m option, using the option -s only the metadata list with the option -m are saved (ad es. -m dc.description.provenance) the other will be delete");
+                    "Invert the logic for the -m option, using the option -s only the metadata list"
+                            + " with the option -m are saved (ad es. -m dc.description.provenance)"
+                            + " the other will be delete");
             options.addOption("S", "silent", false, "muted logs");
             options.addOption("t", "threads", true, "Threads numbers (default 0, if omitted read by configuration)");
 //            options.addOption("q", "query", true, "Find by query (work only in singlethread mode)");
@@ -152,7 +165,7 @@ public class ItemImportMainOA {
                     metadataClean = optionValues;
                 } else {
                     List<String> mOptions = Arrays.asList(optionValues);
-                    List<MetadataField> mdfs = getMetadataFieldService()/* MetadataField */.findAll(context);
+                    List<MetadataField> mdfs = getMetadataFieldService().findAll(context);
                     metadataClean = new String[mdfs.size() - optionValues.length];
                     int idx = 0;
                     for (MetadataField mdf : mdfs) {
@@ -184,10 +197,9 @@ public class ItemImportMainOA {
 
             System.out.println(ConfigurationManager.getProperty("dspace.name"));
 
-            // TODO: review
-//            if (commandOptions.getSilent()) {
-//                powerOffLog();
-//            }
+            if (commandOptions.getSilent()) {
+                powerOffLog();
+            }
 
             AtomicInteger count = new AtomicInteger(1);
 
@@ -209,10 +221,9 @@ public class ItemImportMainOA {
                 }
             }
 
-            // TODO: review
-//            if (commandOptions.getSilent()) {
-//                powerOnLog();
-//            }
+            if (commandOptions.getSilent()) {
+                powerOnLog();
+            }
 
             header += "Righe scartate " + row_discarded.intValue() + " su un totale di " + (count.intValue() - 1)
                     + " \n";
@@ -332,12 +343,10 @@ public class ItemImportMainOA {
         // ID external
         record_id = row_data.getImpRecordId();
         // ID of the user to attach the publication
-        // modify: CADILI
         epersonId = row_data.getImpEpersonUuid();
         // ID of the collection
         collectionId = row_data.getImpCollectionUuid();
-        // p = workspace, w = workflow step 1, y = workflow step 2, x =
-        // workflow step 3, z = inarchive
+        // p = workspace, w = workflow
         status = row_data.getStatus();
         // update, delete - the insert will be do with the update if no match in the
         // table imp_record_to_item
@@ -356,9 +365,7 @@ public class ItemImportMainOA {
 
                 if (ep == null) {
                     recordEvent(commandOptions, sb, "Errore, eperson non trovato: " + epersonId, true);
-                }
-
-                else {
+                } else {
                     ImpRecordToItem record_item = getImpRecordToItemService().findByPK(subcontext, record_id);
                     if (record_item != null && StringUtils.equals(sourceref, record_item.getImpSourceref())) {
                         itemId = record_item.getImpItemId();
@@ -388,8 +395,9 @@ public class ItemImportMainOA {
                 }
                 argvTemp.add("-E " + batchJob);
                 argvTemp.add("-I " + imp_id);
-                if (handle != null)
+                if (handle != null) {
                     argvTemp.add("-k " + handle);
+                }
 
                 if (metadataClean != null) {
                     for (String mc : metadataClean) {
@@ -405,8 +413,10 @@ public class ItemImportMainOA {
                 String log_error_or_not = "OK";
                 try {
                     // ##--> Import record
-                    recordEvent(commandOptions, sb, "--> Record: " + record_id + " ...\n"
-                            + "parameters: -o item_id operation_flag -e submitter -c collection -i id record change_status_flag -E batchjob -I imp_id -m clear metadata",
+                    recordEvent(commandOptions, sb,
+                            "--> Record: " + record_id + " ...\n"
+                                    + "parameters: -o item_id operation_flag -e submitter -c collection"
+                                    + " -i id record change_status_flag -E batchjob -I imp_id -m clear metadata",
                             false);
                     String valueinfo = "values: ";
                     for (String arg : argv) {
@@ -471,25 +481,23 @@ public class ItemImportMainOA {
         }
     }
 
-//    private void powerOffLog() {
-////        currentLevel = Logger.getRootLogger().getLevel();
-//        List<Logger> loggers = Collections.<Logger>list(LogManager.getCurrentLoggers());
-//        loggers.add(LogManager.getRootLogger());
-//        for (Logger logger : loggers) {
-//            logger.setLevel(Level.OFF);
-//        }
-//    }
+    private void powerOffLog() {
+        currentLevel = Logger.getRootLogger().getLevel();
+        List<Logger> loggers = Collections.<Logger>list(LogManager.getCurrentLoggers());
+        loggers.add(LogManager.getRootLogger());
+        for (Logger logger : loggers) {
+            logger.setLevel(Level.OFF);
+        }
+    }
 
-//    private void powerOnLog() {
-//
-//        List<Logger> loggers = Collections.<Logger>list(LogManager.getCurrentLoggers());
-//        loggers.add(LogManager.getRootLogger());
-//        for (Logger logger : loggers) {
-//            logger.setLevel(currentLevel);
-//        }
-//
-//        System.setOut(out);
-//    }
+    private void powerOnLog() {
+
+        List<Logger> loggers = Collections.<Logger>list(LogManager.getCurrentLoggers());
+        loggers.add(LogManager.getRootLogger());
+        for (Logger logger : loggers) {
+            logger.setLevel(currentLevel);
+        }
+    }
 
     private int getNumberOfThread(CommandLine line) {
         int numThreads = ConfigurationManager.getIntProperty("batch.framework.itemimport.threads", 0);

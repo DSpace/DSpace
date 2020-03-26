@@ -18,7 +18,7 @@ import org.dspace.services.factory.DSpaceServicesFactory;
 public abstract class ImpServiceFactory {
 
     public abstract ImpBitstreamService getImpBitstreamService();
-    
+
     public abstract ImpBitstreamMetadatavalueService getImpBitstreamMetadatavalueService();
 
     public abstract ImpMetadatavalueService getImpMetadatavalueService();
@@ -28,7 +28,7 @@ public abstract class ImpServiceFactory {
     public abstract ImpRecordToItemService getImpRecordToItemService();
 
     public abstract ImpWorkflowNStateService getImpWorkflowNStateService();
-    
+
     public static ImpServiceFactory getInstance() {
         return DSpaceServicesFactory.getInstance().getServiceManager().getServiceByName("impServiceFactory",
                 ImpServiceFactory.class);

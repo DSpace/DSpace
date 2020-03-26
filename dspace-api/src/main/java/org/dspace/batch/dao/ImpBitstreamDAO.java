@@ -34,4 +34,12 @@ public interface ImpBitstreamDAO extends GenericDAO<ImpBitstream> {
      * @throws SQLException
      */
     public List<ImpBitstream> searchByImpRecord(Context context, ImpRecord impRecord) throws SQLException;
+
+    /***
+     * Remove all ImpBitstream objects.
+     * 
+     * @param context
+     * @throws SQLException
+     */
+    public void deleteAll(Context context) throws SQLException;
 }

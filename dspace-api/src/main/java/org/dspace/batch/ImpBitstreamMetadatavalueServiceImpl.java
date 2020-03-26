@@ -33,15 +33,27 @@ public class ImpBitstreamMetadatavalueServiceImpl implements ImpBitstreamMetadat
 
     @Autowired(required = true)
     private ImpBitstreamMetadatavalueDAO impBitstreamMetadatavalueDAO;
-    
+
     @Override
-    public ImpBitstreamMetadatavalue create(Context context, ImpBitstreamMetadatavalue impBitstreamMetadatavalue) throws SQLException {
+    public ImpBitstreamMetadatavalue create(Context context, ImpBitstreamMetadatavalue impBitstreamMetadatavalue)
+            throws SQLException {
         impBitstreamMetadatavalue = impBitstreamMetadatavalueDAO.create(context, impBitstreamMetadatavalue);
         return impBitstreamMetadatavalue;
     }
-    
+
     @Override
-    public List<ImpBitstreamMetadatavalue> searchByImpBitstream(Context context, ImpBitstream impBitstream) throws SQLException {
+    public void setMetadata(ImpBitstreamMetadatavalue impBitstreamMetadatavalue, String schema, String element,
+            String qualifier, String language, String value) {
+        impBitstreamMetadatavalue.setImpSchema(schema);
+        impBitstreamMetadatavalue.setImpElement(element);
+        impBitstreamMetadatavalue.setImpQualifier(qualifier);
+        impBitstreamMetadatavalue.setTextLang(language);
+        impBitstreamMetadatavalue.setImpValue(value);
+    }
+
+    @Override
+    public List<ImpBitstreamMetadatavalue> searchByImpBitstream(Context context, ImpBitstream impBitstream)
+            throws SQLException {
         return impBitstreamMetadatavalueDAO.searchByImpBitstream(context, impBitstream);
     }
 

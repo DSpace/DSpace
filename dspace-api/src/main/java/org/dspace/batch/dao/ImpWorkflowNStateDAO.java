@@ -1,3 +1,10 @@
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
+ *
+ * http://www.dspace.org/license/
+ */
 package org.dspace.batch.dao;
 
 import java.sql.SQLException;
@@ -26,4 +33,12 @@ public interface ImpWorkflowNStateDAO extends GenericDAO<ImpWorkflowNState> {
      * @throws SQLException
      */
     public List<ImpWorkflowNState> searchWorkflowOps(Context context, ImpRecord impRecord) throws SQLException;
+
+    /***
+     * Remove all ImpWorkflowNState objects.
+     * 
+     * @param context
+     * @throws SQLException
+     */
+    public void deleteAll(Context context) throws SQLException;
 }

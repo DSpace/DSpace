@@ -32,14 +32,14 @@ public class CitationMetadataUpdateProcessPlugin implements AdditionalMetadataUp
 
     @Override
     public void process(Context context, Item item, String provider) {
-        final StreamDisseminationCrosswalk streamCrosswalkDefault = (StreamDisseminationCrosswalk)/* PluginManager*/getPluginService()
+        final StreamDisseminationCrosswalk streamCrosswalkDefault = (StreamDisseminationCrosswalk) getPluginService()
                 .getNamedPlugin(StreamDisseminationCrosswalk.class, provider.trim() + ".citation");
 
-        String type = getItemService().getMetadata(item, /*item.getMetadata(*/"dc.type");
+        String type = getItemService().getMetadata(item, "dc.type");
 
         StreamDisseminationCrosswalk streamCrosswalk = null;
         if (StringUtils.isNotBlank(type)) {
-            streamCrosswalk = (StreamDisseminationCrosswalk) /*PluginManager*/getPluginService().getNamedPlugin(
+            streamCrosswalk = (StreamDisseminationCrosswalk) getPluginService().getNamedPlugin(
                     StreamDisseminationCrosswalk.class,
                     provider.trim() + "-" + StringUtils.deleteWhitespace(type.toLowerCase()).trim() + ".citation");
         }
@@ -52,8 +52,8 @@ public class CitationMetadataUpdateProcessPlugin implements AdditionalMetadataUp
 
         try {
             streamCrosswalk.disseminate(context, item, out);
-            getItemService().addMetadata(context, item, /*item.addMetadata(*/schemaOutputMetadata, elementOutputMetadata, qualifierOutputMetadata, null,
-                    out.toString());
+            getItemService().addMetadata(context, item, schemaOutputMetadata, elementOutputMetadata,
+                    qualifierOutputMetadata, null, out.toString());
         } catch (Exception e) {
             log.error(LogManager.getHeader(context, "citationMetadataUpdateProcessPlugin", "item_id=" + item.getID()),
                     e);
@@ -71,11 +71,11 @@ public class CitationMetadataUpdateProcessPlugin implements AdditionalMetadataUp
     public void setQualifierOutputMetadata(String qualifierOutputMetadata) {
         this.qualifierOutputMetadata = qualifierOutputMetadata;
     }
-    
+
     private PluginService getPluginService() {
         return CoreServiceFactory.getInstance().getPluginService();
     }
-    
+
     private ItemService getItemService() {
         return ContentServiceFactory.getInstance().getItemService();
     }

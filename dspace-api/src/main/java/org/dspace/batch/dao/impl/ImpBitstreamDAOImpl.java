@@ -37,4 +37,9 @@ public class ImpBitstreamDAOImpl extends AbstractHibernateDAO<ImpBitstream> impl
         query.setHint("org.hibernate.cacheable", Boolean.TRUE);
         return list(query);
     }
+
+    @Override
+    public void deleteAll(Context context) throws SQLException {
+        getHibernateSession(context).createQuery("delete from ImpBitstream").executeUpdate();
+    }
 }

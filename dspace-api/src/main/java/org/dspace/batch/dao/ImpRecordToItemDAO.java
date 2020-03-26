@@ -31,4 +31,12 @@ public interface ImpRecordToItemDAO extends GenericDAO<ImpRecordToItem> {
      * @throws SQLException
      */
     public ImpRecordToItem findByPK(Context context, String impRecordId) throws SQLException;
+
+    /***
+     * Remove all ImpRecordToItem objects.
+     * 
+     * @param context
+     * @throws SQLException
+     */
+    public void deleteAll(Context context) throws SQLException;
 }

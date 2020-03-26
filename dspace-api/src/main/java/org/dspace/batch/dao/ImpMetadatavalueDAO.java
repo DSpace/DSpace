@@ -34,4 +34,11 @@ public interface ImpMetadatavalueDAO extends GenericDAO<ImpMetadatavalue> {
      */
     public List<ImpMetadatavalue> searchByImpRecord(Context context, ImpRecord impRecord) throws SQLException;
 
+    /***
+     * Remove all Bitstream objects.
+     * 
+     * @param context
+     * @throws SQLException
+     */
+    public void deleteAll(Context context) throws SQLException;
 }

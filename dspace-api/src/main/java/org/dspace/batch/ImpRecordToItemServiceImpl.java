@@ -8,7 +8,6 @@
 package org.dspace.batch;
 
 import java.sql.SQLException;
-import java.util.List;
 
 import org.apache.logging.log4j.Logger;
 import org.dspace.batch.dao.ImpRecordToItemDAO;
@@ -38,7 +37,7 @@ public class ImpRecordToItemServiceImpl implements ImpRecordToItemService {
         impRecordToItem = impRecordToItemDAO.create(context, impRecordToItem);
         return impRecordToItem;
     }
-    
+
     @Override
     public ImpRecordToItem findByPK(Context context, String impRecordId) throws SQLException {
         return impRecordToItemDAO.findByPK(context, impRecordId);

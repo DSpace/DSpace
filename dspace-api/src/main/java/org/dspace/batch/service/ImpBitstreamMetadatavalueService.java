@@ -37,6 +37,19 @@ public interface ImpBitstreamMetadatavalueService {
             throws SQLException;
 
     /***
+     * Insert a metadata value.
+     * 
+     * @param impBitstreamMetadatavalue
+     * @param schema                    The schema
+     * @param element                   The element
+     * @param qualifier                 The qualifier
+     * @param language                  The language
+     * @param value                     The metadata value
+     */
+    public void setMetadata(ImpBitstreamMetadatavalue impBitstreamMetadatavalue, String schema, String element,
+            String qualifier, String language, String value);
+
+    /***
      * Search all ImpBitstreamMetadatavalue objects by import Bitstream Id
      * 
      * @param context      The relevant DSpace Context

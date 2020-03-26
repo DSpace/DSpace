@@ -66,7 +66,7 @@ public class ImpMetadatavalue {
 
     @Column(name = "text_lang", length = 32)
     private String textLang;
-    
+
     public Integer getMetadatavalueId() {
         return impMetadatavalueId;
     }
@@ -124,10 +124,11 @@ public class ImpMetadatavalue {
     }
 
     public int getImpConfidence() {
-        if (impConfidence == null)
-            return 0;
-        else
+        if (impConfidence == null) {
+            return -1;
+        } else {
             return impConfidence;
+        }
     }
 
     public void setImpConfidence(Integer impConfidence) {
@@ -135,7 +136,11 @@ public class ImpMetadatavalue {
     }
 
     public Integer getImpShare() {
-        return impShare;
+        if (impShare == null) {
+            return -1;
+        } else {
+            return impShare;
+        }
     }
 
     public void setImpShare(Integer impShare) {

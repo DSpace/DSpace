@@ -12,7 +12,6 @@ import java.util.List;
 
 import org.dspace.batch.ImpMetadatavalue;
 import org.dspace.batch.ImpRecord;
-import org.dspace.content.MetadataSchemaEnum;
 import org.dspace.core.Context;
 
 /***
@@ -39,14 +38,15 @@ public interface ImpMetadatavalueService {
      * Insert a metadata value.
      * 
      * @param impMetadatavalue
-     * @param schema The schema
-     * @param element The element
-     * @param qualifier The qualifier
-     * @param language The language
-     * @param value The metadata value
+     * @param schema           The schema
+     * @param element          The element
+     * @param qualifier        The qualifier
+     * @param language         The language
+     * @param value            The metadata value
      */
-    public void setMetadata(ImpMetadatavalue impMetadatavalue, String schema, String element, String qualifier, String language, String value);
-    
+    public void setMetadata(ImpMetadatavalue impMetadatavalue, String schema, String element, String qualifier,
+            String language, String value);
+
     /***
      * Search by import Id
      * 

@@ -16,6 +16,14 @@ import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 
 public interface ImpRecordService {
+    public static final Character SEND_BACK_TO_WORKSPACE_STATUS = 'p';
+    public static final Character SEND_THROUGH_WORKFLOW_STATUS = 'w';
+    public static final Character REINSTATE_WITHDRAW_ITEM_STATUS = 'z';
+    public static final Character SET_ITEM_WITHDRAW_STATUS = 'g';
+
+    public static final String INSERT_OR_UPDATE_OPERATION = "update";
+    public static final String DELETE_OPERATION = "delete";
+
     /**
      * Create a new ImpRecord object
      * 
@@ -30,43 +38,41 @@ public interface ImpRecordService {
     /***
      * Set the collection
      * 
-     * @param impRecord the ImpRecord object
+     * @param impRecord  the ImpRecord object
      * @param collection the collection
      */
     public void setImpCollection(ImpRecord impRecord, Collection collection);
-    
+
     /***
      * Set the eperson to use to perform the action
      * 
      * @param impRecord the ImpRecord object
-     * @param ePerson the person
+     * @param ePerson   the person
      */
     public void setImpEperson(ImpRecord impRecord, EPerson ePerson);
-    
+
     /***
      * Set the status that define a supported action
      * 
-     * p = Send submission back to workspace 
-     * w = Send submission through collection's workflow
-     * z = Reinstate a withdrawn item
-     * g = Set item in withdrawn state
+     * p = Send submission back to workspace w = Send submission through
+     * collection's workflow z = Reinstate a withdrawn item g = Set item in
+     * withdrawn state
      * 
      * @param impRecord the ImpRecord object
-     * @param ePerson the person
+     * @param ePerson   the person
      */
     public void setStatus(ImpRecord impRecord, Character status);
-    
+
     /***
      * Set the operation
      * 
-     * update = update or create a new record
-     * delete = delete the record
+     * update = update or create a new record delete = delete the record
      * 
      * @param impRecord the ImpRecord object
-     * @param ePerson the person
+     * @param ePerson   the person
      */
     public void setOperation(ImpRecord impRecord, String operation);
-    
+
     /**
      * Find the ImpRecord object by its id
      * 
@@ -117,4 +123,12 @@ public interface ImpRecordService {
      *                      access error or other errors.
      */
     public void delete(Context context, ImpRecord impRecord) throws SQLException;
+
+    /***
+     * Remove all object inside imp tables
+     * 
+     * @param context
+     * @throws SQLException
+     */
+    public void cleanupTables(Context context) throws SQLException;
 }

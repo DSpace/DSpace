@@ -37,10 +37,10 @@ public class ImpWorkflowNState {
     @Id
     @Column(name = "imp_wnstate_op_id")
     private Integer impWNStateOpId;
-    
+
     @ManyToMany(cascade = { CascadeType.ALL })
-    @JoinTable(name = "imp_record_wstate", joinColumns = { @JoinColumn(name = "imp_wnstate_op_id") }, inverseJoinColumns = {
-        @JoinColumn(name = "imp_id") })
+    @JoinTable(name = "imp_record_wstate", joinColumns = {
+        @JoinColumn(name = "imp_wnstate_op_id") }, inverseJoinColumns = { @JoinColumn(name = "imp_id") })
     private Set<ImpRecord> impRecords = new HashSet<>();
 
     @Column(name = "imp_wnstate_desc", length = 64)
@@ -48,7 +48,7 @@ public class ImpWorkflowNState {
 
     @Column(name = "imp_wnstate_op", length = 64, nullable = false)
     private String impWNStateOp;
-    
+
     @Column(name = "imp_wnstate_op_par", length = 64)
     private String impWNStateOpPar;
 
@@ -57,7 +57,7 @@ public class ImpWorkflowNState {
 
     @Column(name = "imp_wnstate_eperson_uuid")
     private UUID impWNStateEpersonUuid;
-    
+
     public Integer getImpWNStateOpId() {
         return impWNStateOpId;
     }
@@ -73,7 +73,7 @@ public class ImpWorkflowNState {
     public void setImpRecords(Set<ImpRecord> impRecords) {
         this.impRecords = impRecords;
     }
-    
+
     public String getImpWNStateDesc() {
         return impWNStateDesc;
     }

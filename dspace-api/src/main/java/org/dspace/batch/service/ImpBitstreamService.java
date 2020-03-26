@@ -34,6 +34,17 @@ public interface ImpBitstreamService {
      */
     public ImpBitstream create(Context context, ImpBitstream impBitstream) throws SQLException;
 
+    /**
+     * Find the ImpBitsteamRecord object by its id
+     * 
+     * @param context The relevant DSpace Context.
+     * @param id      The PK of ImpBitstream
+     * @return the created ImpBitstream object
+     * @throws SQLException An exception that provides information on a database
+     *                      access error or other errors.
+     */
+    public ImpBitstream findByID(Context context, int id) throws SQLException;
+
     /***
      * Search all ImpBitstream objects by import Id
      * 
