@@ -66,7 +66,7 @@
                 jQuery(document).ready(function(html){
                     jQuery.ajax({
                         url: '<%= request.getContextPath() + "/tools/sherpaPolicy" %>', 
-                        data: {item_id: <%= subInfo.getSubmissionItem().getItem().getID() %>}})
+                        data: {item_id: "<%= subInfo.getSubmissionItem().getItem().getID() %>"}})
                             .done(function(html) {
                                 jQuery('#sherpaContent').html(html);
                     });
@@ -346,7 +346,7 @@
         <iframe id="uploadFormIFrame" name="uploadFormIFrame" style="display: none"> </iframe>
     <% } %>
     <% if (bSherpa) { %>
-        <div class="col-md-3">
+        <div class="col-md-4">
             <div id="sherpaBox" class="panel panel-info">
                 <div class="panel-heading">
                     <span id="ui-id-1"><fmt:message key="jsp.sherpa.title" /></span>
@@ -359,7 +359,7 @@
             </div>
         </div>
     <% } %>    
-	<div class="col-md-<%= bSherpa?"9":"12" %>">    
+	<div class="col-md-<%= bSherpa?"8":"12" %>">
     <form id="uploadForm" <%= bSherpa?"class=\"sherpa\"":"" %> method="post" 
     	action="<%= request.getContextPath() %>/submit" enctype="multipart/form-data" 
     	onkeydown="return disableEnterKey(event);">

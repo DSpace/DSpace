@@ -17,7 +17,10 @@ import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.log4j.Logger;
+import org.dspace.app.sherpa.v2.SHERPAResponse;
 import org.dspace.core.ConfigurationManager;
+import org.dspace.services.ConfigurationService;
+import org.springframework.beans.factory.annotation.Autowired;
 
 public class SHERPAService
 {
@@ -30,6 +33,9 @@ public class SHERPAService
     /** log4j category */
     private static final Logger log = Logger.getLogger(SHERPAService.class);
 
+    @Autowired
+    ConfigurationService configurationService;
+
     public SHERPAService() {
         HttpClientBuilder builder = HttpClientBuilder.create();
         // httpclient 4.3+ doesn't appear to have any sensible defaults any more. Setting conservative defaults as not to hammer the SHERPA service too much.
@@ -39,11 +45,16 @@ public class SHERPAService
                 .build();
     }
 
-
     public SHERPAResponse searchByJournalISSN(String query)
     {
-        String endpoint = ConfigurationManager.getProperty("sherpa.romeo.url");
-        String apiKey = ConfigurationManager.getProperty("sherpa.romeo.apikey");
+        String endpoint = configurationService.getProperty("sherpa.romeo.url", "https://v2.sherpa.ac.uk/cgi/retrieve");
+        String apiKey = configurationService.getProperty("sherpa.romeo.apikey");
+
+        // API Key is *required* for v2 API calls
+        if (null == apiKey) {
+            log.error("SHERPA ROMeO API Key missing: please register for an API key and set sherpa.romeo.apikey");
+            return new SHERPAResponse("SHERPA/RoMEO configuration invalid or missing");
+        }
 
         HttpGet method = null;
         SHERPAResponse sherpaResponse = null;
@@ -65,10 +76,15 @@ public class SHERPAService
                 Thread.sleep(sleepBetweenTimeouts);
 
                 URIBuilder uriBuilder = new URIBuilder(endpoint);
-                uriBuilder.addParameter("issn", query);
-                uriBuilder.addParameter("versions", "all");
-                if (StringUtils.isNotBlank(apiKey))
-                    uriBuilder.addParameter("ak", apiKey);
+
+                uriBuilder.addParameter("item-type", "publication");
+                uriBuilder.addParameter("filter", "[[\"issn\",\"equals\",\""+query+"\"]]");
+                uriBuilder.addParameter("format", "Json");
+                if (StringUtils.isNotBlank(apiKey)) {
+                    uriBuilder.addParameter("api-key", apiKey);
+                }
+
+                log.debug("Searching SHERPA endpoint with " + uriBuilder.toString());
 
                 method = new HttpGet(uriBuilder.build());
                 method.setConfig(RequestConfig.custom()
@@ -89,7 +105,7 @@ public class SHERPAService
                 HttpEntity responseBody = response.getEntity();
 
                 if (null != responseBody)
-                    sherpaResponse = new SHERPAResponse(responseBody.getContent());
+                    sherpaResponse = new SHERPAResponse(responseBody.getContent(), SHERPAResponse.SHERPAFormat.JSON);
                 else
                     sherpaResponse = new SHERPAResponse("SHERPA/RoMEO returned no response");
             } catch (Exception e) {

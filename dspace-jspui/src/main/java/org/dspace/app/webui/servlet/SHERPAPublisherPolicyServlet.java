@@ -18,10 +18,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-import org.dspace.app.sherpa.SHERPAJournal;
-import org.dspace.app.sherpa.SHERPAPublisher;
-import org.dspace.app.sherpa.SHERPAResponse;
+import org.dspace.app.sherpa.v2.SHERPAJournal;
+import org.dspace.app.sherpa.v2.SHERPAPublisher;
+import org.dspace.app.sherpa.v2.SHERPAPublisherPolicy;
+import org.dspace.app.sherpa.v2.SHERPAResponse;
 import org.dspace.app.sherpa.submit.SHERPASubmitService;
+import org.dspace.app.sherpa.v2.SHERPASystemMetadata;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
@@ -63,8 +65,7 @@ public class SHERPAPublisherPolicyServlet extends DSpaceServlet
         {
             return;
         }
-        SHERPAResponse shresp = sherpaSubmitService.searchRelatedJournals(
-                context, item);
+        SHERPAResponse shresp = sherpaSubmitService.searchRelatedJournals(context, item);
         if (shresp.isError())
         {
             request.setAttribute("error", Boolean.TRUE);
@@ -72,28 +73,15 @@ public class SHERPAPublisherPolicyServlet extends DSpaceServlet
         else
         {
             List<SHERPAJournal> journals = shresp.getJournals();
-            if (journals != null)
-            {
-                Object[][] results = new Object[journals.size()][];
-                if (journals.size() > 0)
-                {
-                    Iterator<SHERPAJournal> ijourn = journals.iterator();
-                    int idx = 0;
-                    while (ijourn.hasNext())
-                    {
-                        SHERPAJournal journ = ijourn.next();
-                        List<SHERPAPublisher> publishers = shresp
-                                .getPublishers();
-                        results[idx] = new Object[] {
-                                journ,
-                                publishers != null && publishers.size() > 0 ? publishers
-                                        .get(0) : null };
-                        idx++;
-                    }
-                }
+            SHERPASystemMetadata metadata = shresp.getMetadata();
 
-                request.setAttribute("result", results);
+            if (journals != null) {
+                request.setAttribute("journals", journals);
             }
+            if (metadata != null) {
+                request.setAttribute("metadata", metadata);
+            }
+
         }
         // Simply forward to the plain form
         JSPManager.showJSP(request, response, "/sherpa/sherpa-policy.jsp");
