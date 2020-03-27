@@ -84,7 +84,8 @@ public class ScriptRestRepository extends DSpaceRestRepository<ScriptRest, Strin
      * @throws SQLException If something goes wrong
      * @throws IOException  If something goes wrong
      */
-    public ProcessRest startProcess(Context context, String scriptName) throws SQLException, IOException, AuthorizeException {
+    public ProcessRest startProcess(Context context, String scriptName) throws SQLException,
+        IOException, AuthorizeException {
         String properties = requestService.getCurrentRequest().getServletRequest().getParameter("properties");
         List<DSpaceCommandLineParameter> dSpaceCommandLineParameters =
             processPropertiesToDSpaceCommandLineParameters(properties);
