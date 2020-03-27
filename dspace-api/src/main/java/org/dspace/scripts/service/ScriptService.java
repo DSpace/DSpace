@@ -24,7 +24,7 @@ public interface ScriptService {
      * @param name  The name that the script has to match
      * @return The matching ScriptConfiguration
      */
-    ScriptConfiguration getScriptForName(String name);
+    ScriptConfiguration getScriptConfiguration(String name);
 
     /**
      * This method will return a list of ScriptConfiguration objects for which the given Context is authorized
@@ -42,6 +42,6 @@ public interface ScriptService {
      * @throws IllegalAccessException   If something goes wrong
      * @throws InstantiationException   If something goes wrong
      */
-    DSpaceRunnable getDSpaceRunnableForScriptConfiguration(ScriptConfiguration scriptToExecute)
+    DSpaceRunnable createDSpaceRunnableForScriptConfiguration(ScriptConfiguration scriptToExecute)
         throws IllegalAccessException, InstantiationException;
 }

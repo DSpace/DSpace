@@ -6,7 +6,7 @@
  * http://www.dspace.org/license/
  */
 
-package org.dspace.scripts.configuration;
+package org.dspace.discovery;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Options;
@@ -35,7 +35,7 @@ public enum IndexClientOptions {
      * @param commandLine   The relevant CommandLine for the index-discovery script
      * @return              The index-discovery option to be ran, parsed from the CommandLine
      */
-    public static IndexClientOptions getIndexClientOption(CommandLine commandLine) {
+    protected static IndexClientOptions getIndexClientOption(CommandLine commandLine) {
         if (commandLine.hasOption("h")) {
             return IndexClientOptions.HELP;
         } else if (commandLine.hasOption("r")) {

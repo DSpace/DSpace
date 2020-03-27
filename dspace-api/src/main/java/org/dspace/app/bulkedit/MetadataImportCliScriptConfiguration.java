@@ -5,11 +5,11 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.scripts.configuration;
+package org.dspace.app.bulkedit;
 
-import org.dspace.app.bulkedit.MetadataImportCLI;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.scripts.DSpaceRunnable;
+import org.dspace.scripts.configuration.ScriptConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**

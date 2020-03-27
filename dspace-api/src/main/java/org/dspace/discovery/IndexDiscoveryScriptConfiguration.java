@@ -5,15 +5,15 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.scripts.configuration;
+package org.dspace.discovery;
 
 import java.sql.SQLException;
 
 import org.apache.commons.cli.Options;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.core.Context;
-import org.dspace.discovery.IndexClient;
 import org.dspace.scripts.DSpaceRunnable;
+import org.dspace.scripts.configuration.ScriptConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -34,7 +34,7 @@ public class IndexDiscoveryScriptConfiguration extends ScriptConfiguration {
         try {
             return authorizeService.isAdmin(context);
         } catch (SQLException e) {
-            return false;
+            throw new RuntimeException("SQLException occured", e);
         }
     }
 

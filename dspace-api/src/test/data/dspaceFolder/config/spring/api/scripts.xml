@@ -4,15 +4,15 @@
     xsi:schemaLocation="http://www.springframework.org/schema/beans
            http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
 
-    <bean id="index-discovery" class="org.dspace.scripts.configuration.IndexDiscoveryScriptConfiguration" scope="prototype">
+    <bean id="index-discovery" class="org.dspace.discovery.IndexDiscoveryScriptConfiguration" scope="prototype">
         <property name="description" value="Update Discovery Solr Search Index"/>
     </bean>
 
-    <bean id="metadata-export" class="org.dspace.scripts.configuration.MetadataExportScriptConfiguration" scope="prototype">
+    <bean id="metadata-export" class="org.dspace.app.bulkedit.MetadataExportScriptConfiguration" scope="prototype">
         <property name="description" value="Export metadata" />
     </bean>
 
-    <bean id="metadata-import" class="org.dspace.scripts.configuration.MetadataImportScriptConfiguration" scope="prototype">
+    <bean id="metadata-import" class="org.dspace.app.bulkedit.MetadataImportScriptConfiguration" scope="prototype">
         <property name="description" value="Import metadata after batch editing" />
     </bean>
 
