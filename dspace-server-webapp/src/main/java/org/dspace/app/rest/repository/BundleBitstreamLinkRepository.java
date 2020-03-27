@@ -15,7 +15,6 @@ import javax.servlet.http.HttpServletRequest;
 import org.dspace.app.rest.model.BitstreamRest;
 import org.dspace.app.rest.model.BundleRest;
 import org.dspace.app.rest.projection.Projection;
-import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.BundleService;

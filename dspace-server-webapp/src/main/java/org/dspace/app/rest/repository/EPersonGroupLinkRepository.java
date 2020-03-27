@@ -17,7 +17,6 @@ import org.dspace.app.rest.model.GroupRest;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
-import org.dspace.eperson.Group;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.eperson.service.GroupService;
 import org.springframework.beans.factory.annotation.Autowired;
