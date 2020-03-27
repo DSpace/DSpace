@@ -52,8 +52,7 @@ public class BundleBitstreamLinkRepository extends AbstractDSpaceRestRepository
                 throw new ResourceNotFoundException("No such bundle: " + bundleId);
             }
             Pageable pageable = utils.getPageable(optionalPageable);
-            Page<Bitstream> page = utils.getPage(bundle.getBitstreams(), pageable);
-            return converter.toRestPage(page, projection);
+            return converter.toRestPage(bundle.getBitstreams(), pageable, projection);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

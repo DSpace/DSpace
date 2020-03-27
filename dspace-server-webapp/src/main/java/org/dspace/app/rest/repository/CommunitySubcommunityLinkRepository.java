@@ -47,7 +47,7 @@ public class CommunitySubcommunityLinkRepository extends AbstractDSpaceRestRepos
                 throw new ResourceNotFoundException("No such community: " + communityId);
             }
             List<Community> subcommunities = community.getSubcommunities();
-            return converter.toRestPage(utils.getPage(subcommunities, optionalPageable), projection);
+            return converter.toRestPage(subcommunities, optionalPageable, projection);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

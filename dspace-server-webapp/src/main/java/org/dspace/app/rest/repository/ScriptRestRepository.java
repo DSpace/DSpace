@@ -68,7 +68,7 @@ public class ScriptRestRepository extends DSpaceRestRepository<ScriptRest, Strin
     @Override
     public Page<ScriptRest> findAll(Context context, Pageable pageable) {
         List<DSpaceRunnable> dSpaceRunnables = scriptService.getDSpaceRunnables(context);
-        return converter.toRestPage(utils.getPage(dSpaceRunnables, pageable), utils.obtainProjection());
+        return converter.toRestPage(dSpaceRunnables, pageable, utils.obtainProjection());
     }
 
     @Override

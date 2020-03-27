@@ -51,8 +51,7 @@ public class EPersonGroupLinkRepository extends AbstractDSpaceRestRepository
             if (eperson == null) {
                 throw new ResourceNotFoundException("No such eperson: " + epersonId);
             }
-            Page<Group> groups = utils.getPage(eperson.getGroups(), optionalPageable);
-            return converter.toRestPage(groups, projection);
+            return converter.toRestPage(eperson.getGroups(), optionalPageable, projection);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
