@@ -60,7 +60,7 @@ public class SiteRestRepository extends DSpaceObjectRestRepository<Site, SiteRes
     public Page<SiteRest> findAll(Context context, Pageable pageable) {
         try {
             List<Site> sites = Arrays.asList(sitesv.findSite(context));
-            return converter.toRestPage(sites, pageable, 1L, utils.obtainProjection());
+            return converter.toRestPage(sites, pageable, utils.obtainProjection());
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }

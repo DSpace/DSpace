@@ -49,7 +49,7 @@ public class CommunityCollectionLinkRepository extends AbstractDSpaceRestReposit
                 throw new ResourceNotFoundException("No such community: " + communityId);
             }
             List<Collection> collections = community.getCollections();
-            return converter.toRestPage(utils.getPage(collections, optionalPageable), projection);
+            return converter.toRestPage(collections, optionalPageable, projection);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

@@ -111,7 +111,6 @@ public class ConverterService {
      *
      * @param modelObjects the list of model objects.
      * @param pageable the pageable.
-     * @param total the total number of items.
      * @param projection the projection to use.
      * @param <M> the model object class.
      * @param <R> the rest object class.
@@ -119,6 +118,20 @@ public class ConverterService {
      * @throws IllegalArgumentException if there is no compatible converter.
      * @throws ClassCastException if the converter's return type is not compatible with the inferred return type.
      */
+    public <M, R> Page<R> toRestPage(List<M> modelObjects, Pageable pageable, Projection projection) {
+        List<R> transformedList = new LinkedList<>();
+        for (M modelObject : modelObjects) {
+            R transformedObject = toRest(modelObject, projection);
+            if (transformedObject != null) {
+                transformedList.add(transformedObject);
+            }
+        }
+        if (pageable == null) {
+            pageable = utils.getPageable(pageable);
+        }
+        return utils.getPage(transformedList, pageable);
+    }
+
     public <M, R> Page<R> toRestPage(List<M> modelObjects, Pageable pageable, long total, Projection projection) {
         List<R> transformedList = new LinkedList<>();
         for (M modelObject : modelObjects) {
@@ -127,30 +140,12 @@ public class ConverterService {
                 transformedList.add(transformedObject);
             }
         }
-        return new PageImpl<>(transformedList, pageable, transformedList.size());
+        if (pageable == null) {
+            pageable = utils.getPageable(pageable);
+        }
+        return new PageImpl(transformedList, pageable, total);
     }
 
-    /**
-     * Converts a list of model objects to a page of rest objects using the given {@link Projection}.
-     *
-     * @param modelObjects the page of model objects.
-     * @param projection the projection to use.
-     * @param <M> the model object class.
-     * @param <R> the rest object class.
-     * @return the page.
-     * @throws IllegalArgumentException if there is no compatible converter.
-     * @throws ClassCastException if the converter's return type is not compatible with the inferred return type.
-     */
-    public <M, R> Page<R> toRestPage(Page<M> modelObjects, Projection projection) {
-        List<R> transformedList = new LinkedList<>();
-        for (M modelObject : modelObjects) {
-            R transformedObject = toRest(modelObject, projection);
-            if (transformedObject != null) {
-                transformedList.add(transformedObject);
-            }
-        }
-        return utils.getPage(transformedList, modelObjects.getPageable());
-    }
 
     /**
      * Gets the converter supporting the given class as input.
