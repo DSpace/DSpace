@@ -29,8 +29,6 @@ import org.dspace.discovery.indexobject.factory.IndexFactory;
 import org.dspace.discovery.indexobject.factory.IndexObjectFactoryFactory;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.scripts.DSpaceRunnable;
-import org.dspace.scripts.configuration.IndexClientOptions;
-import org.dspace.scripts.configuration.IndexDiscoveryScriptConfiguration;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.utils.DSpace;
 

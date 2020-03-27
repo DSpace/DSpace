@@ -117,10 +117,10 @@ public class ScriptLauncher {
                                    DSpaceKernelImpl kernelImpl) throws InstantiationException, IllegalAccessException {
         int status;
         ScriptService scriptService = ScriptServiceFactory.getInstance().getScriptService();
-        ScriptConfiguration scriptConfiguration = scriptService.getScriptForName(args[0]);
+        ScriptConfiguration scriptConfiguration = scriptService.getScriptConfiguration(args[0]);
         DSpaceRunnable script = null;
         if (scriptConfiguration != null) {
-            script = scriptService.getDSpaceRunnableForScriptConfiguration(scriptConfiguration);
+            script = scriptService.createDSpaceRunnableForScriptConfiguration(scriptConfiguration);
         }
         if (script != null) {
             status = executeScript(args, dSpaceRunnableHandler, script);

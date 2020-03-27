@@ -33,7 +33,7 @@ public class MockDSpaceRunnableScriptConfiguration extends ScriptConfiguration {
         try {
             return authorizeService.isAdmin(context);
         } catch (SQLException e) {
-            return false;
+            throw new RuntimeException("SQLException occured", e);
         }
     }
 

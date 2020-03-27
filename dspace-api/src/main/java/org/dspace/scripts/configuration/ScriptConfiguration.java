@@ -14,6 +14,10 @@ import org.dspace.core.Context;
 import org.dspace.scripts.DSpaceRunnable;
 import org.springframework.beans.factory.BeanNameAware;
 
+/**
+ * This class represents an Abstract class that a ScriptConfiguration can inherit to further implement this
+ * and represent a script's configuration
+ */
 public abstract class ScriptConfiguration implements BeanNameAware {
 
     /**

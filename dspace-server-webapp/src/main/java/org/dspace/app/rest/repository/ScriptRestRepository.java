@@ -58,7 +58,7 @@ public class ScriptRestRepository extends DSpaceRestRepository<ScriptRest, Strin
     @Override
     public ScriptRest findOne(Context context, String name) {
 
-        ScriptConfiguration scriptConfiguration = scriptService.getScriptForName(name);
+        ScriptConfiguration scriptConfiguration = scriptService.getScriptConfiguration(name);
         if (scriptConfiguration != null) {
             if (scriptConfiguration.isAllowedToExecute(context)) {
                 return converter.toRest(scriptConfiguration, utils.obtainProjection());
@@ -90,12 +90,12 @@ public class ScriptRestRepository extends DSpaceRestRepository<ScriptRest, Strin
      */
     public ProcessRest startProcess(String scriptName,
                                     List<MultipartFile> files)
-        throws SQLException, IOException, AuthorizeException, IllegalAccessException, InstantiationException {
+        throws IOException, AuthorizeException, IllegalAccessException, InstantiationException {
         Context context = obtainContext();
         String properties = requestService.getCurrentRequest().getServletRequest().getParameter("properties");
         List<DSpaceCommandLineParameter> dSpaceCommandLineParameters =
             processPropertiesToDSpaceCommandLineParameters(properties);
-        ScriptConfiguration scriptToExecute = scriptService.getScriptForName(scriptName);
+        ScriptConfiguration scriptToExecute = scriptService.getScriptConfiguration(scriptName);
         if (scriptToExecute == null) {
             throw new DSpaceBadRequestException("The script for name: " + scriptName + " wasn't found");
         }
@@ -150,7 +150,7 @@ public class ScriptRestRepository extends DSpaceRestRepository<ScriptRest, Strin
     private void runDSpaceScript(List<MultipartFile> files, Context context, ScriptConfiguration scriptToExecute,
                                  RestDSpaceRunnableHandler restDSpaceRunnableHandler, List<String> args)
         throws IOException, SQLException, AuthorizeException, InstantiationException, IllegalAccessException {
-        DSpaceRunnable dSpaceRunnable = scriptService.getDSpaceRunnableForScriptConfiguration(scriptToExecute);
+        DSpaceRunnable dSpaceRunnable = scriptService.createDSpaceRunnableForScriptConfiguration(scriptToExecute);
         try {
             dSpaceRunnable.initialize(args.toArray(new String[0]), restDSpaceRunnableHandler);
             checkFileNames(dSpaceRunnable, files);

@@ -25,7 +25,7 @@ public class ScriptServiceImpl implements ScriptService {
     private ServiceManager serviceManager;
 
     @Override
-    public ScriptConfiguration getScriptForName(String name) {
+    public ScriptConfiguration getScriptConfiguration(String name) {
         return serviceManager.getServiceByName(name, ScriptConfiguration.class);
     }
 
@@ -36,7 +36,7 @@ public class ScriptServiceImpl implements ScriptService {
     }
 
     @Override
-    public DSpaceRunnable getDSpaceRunnableForScriptConfiguration(ScriptConfiguration scriptToExecute)
+    public DSpaceRunnable createDSpaceRunnableForScriptConfiguration(ScriptConfiguration scriptToExecute)
         throws IllegalAccessException, InstantiationException {
         return scriptToExecute.getDspaceRunnableClass().newInstance();
     }

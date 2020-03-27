@@ -60,7 +60,6 @@ import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
 import org.dspace.scripts.DSpaceRunnable;
-import org.dspace.scripts.configuration.MetadataImportScriptConfiguration;
 import org.dspace.scripts.handler.DSpaceRunnableHandler;
 import org.dspace.utils.DSpace;
 import org.dspace.workflow.WorkflowException;
