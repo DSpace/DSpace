@@ -214,7 +214,7 @@ public class HandleController {
             essuirStatistics.incrementGlobalItemDownloads();
             essuirStatistics.updateItemDownloads(request, item.getID());
         }
-        String downloadString = String.format("%s/bitstream-download/%s/%s/%s", request.getContextPath(), item.getHandle(), sequenceId, URLEncoder.encode(bitstreamName, "utf-8"));
+        String downloadString = String.format("%s/bitstream-download/%s/%s/%s", request.getContextPath(), item.getHandle(), sequenceId, UIUtil.encodeBitstreamName(bitstreamName, Constants.DEFAULT_ENCODING));
 
         RedirectView redirectView = new RedirectView(downloadString);
         dspaceContext.complete();
@@ -291,16 +291,6 @@ public class HandleController {
             return "";
         };
 
-        Function<Bitstream, String> getBitStreamLink = (bitstream) -> {
-            try {
-                return String.format("%s/bitstream/%s/%d/%s", request.getContextPath(), item.getHandle(), bitstream.getSequenceID(), UIUtil.encodeBitstreamName(bitstream.getName(), Constants.DEFAULT_ENCODING));
-            } catch (UnsupportedEncodingException e) {
-                e.printStackTrace();
-            }
-            return "";
-        };
-
-
         List<Bundle> bundles = dspaceItemService.getBundles(item, "ORIGINAL");
         List<BitstreamResponse> bitstreams = bundles.stream()
                 .flatMap(bundle -> bundle.getBitstreams().stream())
@@ -309,7 +299,7 @@ public class HandleController {
                         .withFormat(getBitstreamFormat.apply(bitstream))
                         .withFilename(bitstream.getName())
                         .withHandle(bitstream.getHandle())
-                        .withLink(getBitStreamLink.apply(bitstream))
+                        .withLink(String.format("%s/bitstream/%s/%d/%s", request.getContextPath(), item.getHandle(), bitstream.getSequenceID(), bitstream.getName()))
                         .withSize(UIUtil.formatFileSize(bitstream.getSizeBytes()))
                         .build())
                 .collect(Collectors.toList());
