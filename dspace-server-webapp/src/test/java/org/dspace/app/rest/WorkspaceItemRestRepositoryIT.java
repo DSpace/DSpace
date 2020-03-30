@@ -1125,7 +1125,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
             ;
 
             // verify that the patch changes have been persisted
-            getClient().perform(get("/api/submission/workspaceitems/" + witem.getID()))
+            getClient(authToken).perform(get("/api/submission/workspaceitems/" + witem.getID()))
                 .andExpect(status().isOk())
                 // testing lookup
                 .andExpect(jsonPath("$.sections.traditionalpageone['dc.identifier.doi'][0].value",
@@ -1204,7 +1204,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                         is("10.1016/j.joi.2016.11.006")));
 
                 // verify that the patch changes have been persisted
-                getClient().perform(get("/api/submission/workspaceitems/" + witem.getID()))
+                getClient(authToken).perform(get("/api/submission/workspaceitems/" + witem.getID()))
                     .andExpect(status().isOk())
                     // testing lookup
                     .andExpect(jsonPath("$.sections.traditionalpageone['dc.identifier.doi'][0].value",
@@ -1246,7 +1246,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                            " dominance structure in a network is also reversed."))));
 
             // verify that the patch changes have been persisted
-            getClient().perform(get("/api/submission/workspaceitems/" + witem.getID()))
+            getClient(authToken).perform(get("/api/submission/workspaceitems/" + witem.getID()))
                 .andExpect(status().isOk())
                 // testing lookup
                 .andExpect(jsonPath("$.sections.traditionalpageone['dc.identifier.doi'][0].value",
@@ -1328,7 +1328,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                         is("WOS:000270372400005")));
 
                 // verify that the patch changes have been persisted
-                getClient().perform(get("/api/submission/workspaceitems/" + witem.getID()))
+                getClient(authToken).perform(get("/api/submission/workspaceitems/" + witem.getID()))
                     .andExpect(status().isOk())
                     // testing lookup
                     .andExpect(jsonPath("$.sections.traditionalpageone['dc.identifier.isi'][0].value",
@@ -1354,7 +1354,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                         is("0019-8366")));
 
             // verify that the patch changes have been persisted
-            getClient().perform(get("/api/submission/workspaceitems/" + witem.getID()))
+            getClient(authToken).perform(get("/api/submission/workspaceitems/" + witem.getID()))
                 .andExpect(status().isOk())
                 // testing lookup
                 .andExpect(jsonPath("$.sections.traditionalpageone['dc.identifier.isi'][0].value",
@@ -1991,7 +1991,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         ;
 
         // verify that the patch changes have been persisted
-        getClient().perform(get("/api/submission/workspaceitems/" + witem.getID()))
+        getClient(authToken).perform(get("/api/submission/workspaceitems/" + witem.getID()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.sections.traditionalpagetwo['dc.subject']").doesNotExist())
             .andExpect(jsonPath("$.sections.traditionalpagetwo['dc.description.abstract']").doesNotExist())
