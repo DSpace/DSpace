@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 import org.ssu.entity.AuthorLocalization;
 import org.ssu.service.AuthorsService;
+import org.ssu.service.EpersonService;
 
 import javax.annotation.Resource;
 import javax.servlet.ServletException;
@@ -39,6 +40,9 @@ public class ProfileController {
 
     @Resource
     private AuthorsService authorsService;
+
+    @Resource
+    private EpersonService epersonService;
 
     private FacultyService facultyService = EPersonServiceFactory.getInstance().getFacultyService();
 
@@ -82,14 +86,14 @@ public class ProfileController {
         EPerson eperson = dspaceContext.getCurrentUser();
         boolean settingPassword = (!eperson.getRequireCertificate() && !StringUtils.isEmpty(request.getParameter("password")));
 
-        boolean checkUserData = updateUserProfile(dspaceContext, eperson, request);
+        boolean checkUserData = epersonService.updateUserProfile(dspaceContext, eperson, request);
 
         if (!checkUserData) {
             request.setAttribute("missing.fields", Boolean.TRUE);
         }
 
         if (checkUserData && settingPassword) {
-            checkUserData = confirmAndSetPassword(eperson, request);
+            checkUserData = epersonService.confirmAndSetPassword(eperson, request);
             if (!checkUserData) {
                 request.setAttribute("password.problem", Boolean.TRUE);
             }
@@ -113,33 +117,5 @@ public class ProfileController {
         }
 
         return model;
-    }
-
-    private boolean updateUserProfile(Context context, EPerson eperson, HttpServletRequest request) throws SQLException {
-        String lastName = request.getParameter("last_name");
-        String firstName = request.getParameter("first_name");
-        String phone = request.getParameter("phone");
-        String language = request.getParameter("language");
-        eperson.setFirstName(context, firstName);
-        eperson.setLastName(context, lastName);
-        personService.setMetadataSingleValue(context, eperson, "eperson", "phone", null, null, phone);
-        eperson.setLanguage(context, language);
-        String position = request.getParameter("position");
-        Integer chair = Integer.valueOf(request.getParameter("chair_id"));
-        eperson.setPosition(position);
-        eperson.setChairId(chair);
-        return (!StringUtils.isEmpty(lastName) && !StringUtils.isEmpty(firstName));
-    }
-
-    private boolean confirmAndSetPassword(EPerson eperson, HttpServletRequest request) {
-        String password = request.getParameter("password");
-        String passwordConfirm = request.getParameter("password_confirm");
-
-        if ((password == null) || (password.length() < 6) || !password.equals(passwordConfirm)) {
-            return false;
-        } else {
-            personService.setPassword(eperson, password);
-            return true;
-        }
     }
 }

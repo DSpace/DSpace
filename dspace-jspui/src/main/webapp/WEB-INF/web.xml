@@ -388,7 +388,7 @@
   </servlet>
 
   <servlet>
-    <servlet-name>register</servlet-name>
+    <servlet-name>register-dspace</servlet-name>
     <servlet-class>org.dspace.app.webui.servlet.RegisterServlet</servlet-class>
     <init-param>
       <param-name>register</param-name>
@@ -733,9 +733,14 @@
     <url-pattern>/profile</url-pattern>
   </servlet-mapping>
 
+    <servlet-mapping>
+        <servlet-name>essuir-servlet</servlet-name>
+        <url-pattern>/register</url-pattern>
+    </servlet-mapping>
+
   <servlet-mapping>
-    <servlet-name>register</servlet-name>
-    <url-pattern>/register</url-pattern>
+    <servlet-name>register-dspace</servlet-name>
+    <url-pattern>/register-dspace</url-pattern>
   </servlet-mapping>
 
   <servlet-mapping>
