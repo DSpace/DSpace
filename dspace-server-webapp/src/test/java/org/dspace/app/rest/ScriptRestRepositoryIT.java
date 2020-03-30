@@ -108,8 +108,8 @@ public class ScriptRestRepositoryIT extends AbstractControllerIntegrationTest {
                                                       scriptConfigurations.get(0).getDescription())
                         ))))
                         .andExpect(jsonPath("$._embedded.scripts", hasItem(
-                            ScriptMatcher.matchScript(scriptConfigurations.get(3).getName(),
-                                                      scriptConfigurations.get(3).getDescription())
+                            ScriptMatcher.matchScript(scriptConfigurations.get(2).getName(),
+                                                      scriptConfigurations.get(2).getDescription())
                         )))
                         .andExpect(jsonPath("$.page",
                                             is(PageMatcher.pageEntry(0, 1))));
@@ -118,12 +118,12 @@ public class ScriptRestRepositoryIT extends AbstractControllerIntegrationTest {
         getClient(token).perform(get("/api/system/scripts").param("size", "1").param("page", "1"))
                         .andExpect(status().isOk())
                         .andExpect(jsonPath("$._embedded.scripts", hasItem(
-                            ScriptMatcher.matchScript(scriptConfigurations.get(0).getName(),
-                                                      scriptConfigurations.get(0).getDescription())
-                        )))
-                        .andExpect(jsonPath("$._embedded.scripts", Matchers.not(hasItem(
                             ScriptMatcher.matchScript(scriptConfigurations.get(1).getName(),
                                                       scriptConfigurations.get(1).getDescription())
+                        )))
+                        .andExpect(jsonPath("$._embedded.scripts", Matchers.not(hasItem(
+                            ScriptMatcher.matchScript(scriptConfigurations.get(0).getName(),
+                                                      scriptConfigurations.get(0).getDescription())
                         ))))
                         .andExpect(jsonPath("$.page",
                                             is(PageMatcher.pageEntry(1, 1))));

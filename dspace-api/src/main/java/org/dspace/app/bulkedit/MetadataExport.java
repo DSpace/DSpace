@@ -81,7 +81,7 @@ public class MetadataExport extends DSpaceRunnable<MetadataExportScriptConfigura
         handle = commandLine.getOptionValue('i');
 
         try {
-            context.setCurrentUser(ePersonService.find(context, getScriptConfiguration().getEpersonIdentifier()));
+            context.setCurrentUser(ePersonService.find(context, this.getEpersonIdentifier()));
         } catch (SQLException e) {
             handler.handleException(e);
         }

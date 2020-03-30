@@ -7,21 +7,10 @@
  */
 package org.dspace.app.bulkedit;
 
-import org.dspace.authorize.service.AuthorizeService;
-import org.dspace.scripts.DSpaceRunnable;
 import org.dspace.scripts.configuration.ScriptConfiguration;
-import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * The {@link ScriptConfiguration} for the {@link org.dspace.app.bulkedit.MetadataImportCLI} CLI script
  */
-public class MetadataImportCliScriptConfiguration extends MetadataImportScriptConfiguration {
-
-    @Autowired
-    private AuthorizeService authorizeService;
-
-    @Override
-    public Class<? extends DSpaceRunnable> getDspaceRunnableClass() {
-        return MetadataImportCLI.class;
-    }
+public class MetadataImportCliScriptConfiguration extends MetadataImportScriptConfiguration<MetadataImportCLI> {
 }

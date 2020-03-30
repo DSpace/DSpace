@@ -7,8 +7,6 @@
  */
 package org.dspace.scripts.configuration;
 
-import java.util.UUID;
-
 import org.apache.commons.cli.Options;
 import org.dspace.core.Context;
 import org.dspace.scripts.DSpaceRunnable;
@@ -18,7 +16,7 @@ import org.springframework.beans.factory.BeanNameAware;
  * This class represents an Abstract class that a ScriptConfiguration can inherit to further implement this
  * and represent a script's configuration
  */
-public abstract class ScriptConfiguration implements BeanNameAware {
+public abstract class ScriptConfiguration<T extends DSpaceRunnable> implements BeanNameAware {
 
     /**
      * The possible options for this script
@@ -28,8 +26,6 @@ public abstract class ScriptConfiguration implements BeanNameAware {
     private String description;
 
     private String name;
-
-    private UUID epersonIdentifier;
 
     /**
      * Generic getter for the description
@@ -67,7 +63,7 @@ public abstract class ScriptConfiguration implements BeanNameAware {
      * Generic getter for the dspaceRunnableClass
      * @return the dspaceRunnableClass value of this ScriptConfiguration
      */
-    public abstract Class<? extends DSpaceRunnable> getDspaceRunnableClass();
+    public abstract Class<T> getDspaceRunnableClass();
 
     /**
      * This method will return if the script is allowed to execute in the given context. This is by default set
@@ -87,21 +83,5 @@ public abstract class ScriptConfiguration implements BeanNameAware {
     @Override
     public void setBeanName(String beanName) {
         this.name = beanName;
-    }
-
-    /**
-     * Generic getter for the epersonIdentifier
-     * @return the epersonIdentifier value of this ScriptConfiguration
-     */
-    public UUID getEpersonIdentifier() {
-        return epersonIdentifier;
-    }
-
-    /**
-     * Generic setter for the epersonIdentifier
-     * @param epersonIdentifier   The epersonIdentifier to be set on this ScriptConfiguration
-     */
-    public void setEpersonIdentifier(UUID epersonIdentifier) {
-        this.epersonIdentifier = epersonIdentifier;
     }
 }

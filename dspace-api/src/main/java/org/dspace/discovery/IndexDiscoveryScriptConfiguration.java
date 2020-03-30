@@ -12,21 +12,22 @@ import java.sql.SQLException;
 import org.apache.commons.cli.Options;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.core.Context;
-import org.dspace.scripts.DSpaceRunnable;
 import org.dspace.scripts.configuration.ScriptConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * The {@link ScriptConfiguration} for the {@link IndexClient} script
  */
-public class IndexDiscoveryScriptConfiguration extends ScriptConfiguration {
+public class IndexDiscoveryScriptConfiguration<T extends IndexClient> extends ScriptConfiguration<T> {
 
     @Autowired
     private AuthorizeService authorizeService;
 
+    private Class<T> dspaceRunnableClass;
+
     @Override
-    public Class<? extends DSpaceRunnable> getDspaceRunnableClass() {
-        return IndexClient.class;
+    public Class<T> getDspaceRunnableClass() {
+        return dspaceRunnableClass;
     }
 
     @Override
@@ -44,5 +45,13 @@ public class IndexDiscoveryScriptConfiguration extends ScriptConfiguration {
             super.options = IndexClientOptions.constructOptions();
         }
         return options;
+    }
+
+    /**
+     * Generic setter for the dspaceRunnableClass
+     * @param dspaceRunnableClass   The dspaceRunnableClass to be set on this IndexDiscoveryScriptConfiguration
+     */
+    public void setDspaceRunnableClass(Class<T> dspaceRunnableClass) {
+        this.dspaceRunnableClass = dspaceRunnableClass;
     }
 }

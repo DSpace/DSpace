@@ -8,7 +8,8 @@
 
     <!-- This primary attribute is present so that we can assure that in the REST layer we'll always use this
         bean if it is present-->
-    <bean id="metadata-import" class="org.dspace.app.bulkedit.MetadataImportCliScriptConfiguration" primary="true">
+    <bean id="metadata-import" class="org.dspace.app.bulkedit.MetadataImportScriptConfiguration" primary="true">
         <property name="description" value="Import metadata after batch editing" />
+        <property name="dspaceRunnableClass" value="org.dspace.app.bulkedit.MetadataImport"/>
     </bean>
 </beans>

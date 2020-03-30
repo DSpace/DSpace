@@ -13,21 +13,30 @@ import java.sql.SQLException;
 import org.apache.commons.cli.Options;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.core.Context;
-import org.dspace.scripts.DSpaceRunnable;
 import org.dspace.scripts.configuration.ScriptConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * The {@link ScriptConfiguration} for the {@link MetadataImport} script
  */
-public class MetadataImportScriptConfiguration extends ScriptConfiguration {
+public class MetadataImportScriptConfiguration<T extends MetadataImport> extends ScriptConfiguration<T> {
 
     @Autowired
     private AuthorizeService authorizeService;
 
+    private Class<T> dspaceRunnableClass;
+
     @Override
-    public Class<? extends DSpaceRunnable> getDspaceRunnableClass() {
-        return MetadataImport.class;
+    public Class<T> getDspaceRunnableClass() {
+        return dspaceRunnableClass;
+    }
+
+    /**
+     * Generic setter for the dspaceRunnableClass
+     * @param dspaceRunnableClass   The dspaceRunnableClass to be set on this MetadataImportScriptConfiguration
+     */
+    public void setDspaceRunnableClass(Class<T> dspaceRunnableClass) {
+        this.dspaceRunnableClass = dspaceRunnableClass;
     }
 
     @Override
