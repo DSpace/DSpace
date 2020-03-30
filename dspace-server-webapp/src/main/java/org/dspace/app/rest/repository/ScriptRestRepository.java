@@ -103,9 +103,9 @@ public class ScriptRestRepository extends DSpaceRestRepository<ScriptRest, Strin
             throw new AuthorizeException("Current user is not eligible to execute script with name: " + scriptName);
         }
         EPerson currentUser = context.getCurrentUser();
-        if (currentUser != null) {
-            scriptToExecute.setEpersonIdentifier(currentUser.getID());
-        }
+//        if (currentUser != null) {
+//            scriptToExecute.setEpersonIdentifier(currentUser.getID());
+//        }
         RestDSpaceRunnableHandler restDSpaceRunnableHandler = new RestDSpaceRunnableHandler(
             context.getCurrentUser(), scriptName, dSpaceCommandLineParameters);
         List<String> args = constructArgs(dSpaceCommandLineParameters);
@@ -152,7 +152,7 @@ public class ScriptRestRepository extends DSpaceRestRepository<ScriptRest, Strin
         throws IOException, SQLException, AuthorizeException, InstantiationException, IllegalAccessException {
         DSpaceRunnable dSpaceRunnable = scriptService.createDSpaceRunnableForScriptConfiguration(scriptToExecute);
         try {
-            dSpaceRunnable.initialize(args.toArray(new String[0]), restDSpaceRunnableHandler);
+            dSpaceRunnable.initialize(args.toArray(new String[0]), restDSpaceRunnableHandler, context.getCurrentUser());
             checkFileNames(dSpaceRunnable, files);
             processFiles(context, restDSpaceRunnableHandler, files);
             restDSpaceRunnableHandler.schedule(dSpaceRunnable);

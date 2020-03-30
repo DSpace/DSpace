@@ -10,6 +10,7 @@ package org.dspace.scripts;
 import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.UUID;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.DefaultParser;
@@ -17,6 +18,7 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.lang3.StringUtils;
+import org.dspace.eperson.EPerson;
 import org.dspace.scripts.configuration.ScriptConfiguration;
 import org.dspace.scripts.handler.DSpaceRunnableHandler;
 
@@ -26,6 +28,8 @@ public abstract class DSpaceRunnable<T extends ScriptConfiguration> implements R
      * The CommandLine object for the script that'll hold the information
      */
     protected CommandLine commandLine;
+
+    private UUID epersonIdentifier;
 
     /**
      * The handler that deals with this script. This handler can currently either be a RestDSpaceRunnableHandler or
@@ -49,9 +53,14 @@ public abstract class DSpaceRunnable<T extends ScriptConfiguration> implements R
      * the arguments given to the script
      * @param args                  The arguments given to the script
      * @param dSpaceRunnableHandler The DSpaceRunnableHandler object that defines from where the script was ran
+     * @param currentUser
      * @throws ParseException       If something goes wrong
      */
-    public void initialize(String[] args, DSpaceRunnableHandler dSpaceRunnableHandler) throws ParseException {
+    public void initialize(String[] args, DSpaceRunnableHandler dSpaceRunnableHandler,
+                           EPerson currentUser) throws ParseException {
+        if (currentUser != null) {
+            this.setEpersonIdentifier(currentUser.getID());
+        }
         this.setHandler(dSpaceRunnableHandler);
         this.parse(args);
     }
@@ -120,5 +129,21 @@ public abstract class DSpaceRunnable<T extends ScriptConfiguration> implements R
         }
 
         return fileNames;
+    }
+
+    /**
+     * Generic getter for the epersonIdentifier
+     * @return the epersonIdentifier value of this DSpaceRunnable
+     */
+    public UUID getEpersonIdentifier() {
+        return epersonIdentifier;
+    }
+
+    /**
+     * Generic setter for the epersonIdentifier
+     * @param epersonIdentifier   The epersonIdentifier to be set on this DSpaceRunnable
+     */
+    public void setEpersonIdentifier(UUID epersonIdentifier) {
+        this.epersonIdentifier = epersonIdentifier;
     }
 }

@@ -140,7 +140,7 @@ public class ScriptLauncher {
     private static int executeScript(String[] args, DSpaceRunnableHandler dSpaceRunnableHandler,
                                      DSpaceRunnable script) {
         try {
-            script.initialize(args, dSpaceRunnableHandler);
+            script.initialize(args, dSpaceRunnableHandler, null);
             script.run();
             return 0;
         } catch (ParseException e) {

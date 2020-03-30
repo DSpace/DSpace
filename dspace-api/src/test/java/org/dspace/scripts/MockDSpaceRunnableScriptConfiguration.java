@@ -17,15 +17,25 @@ import org.dspace.scripts.configuration.ScriptConfiguration;
 import org.dspace.scripts.impl.MockDSpaceRunnableScript;
 import org.springframework.beans.factory.annotation.Autowired;
 
-public class MockDSpaceRunnableScriptConfiguration extends ScriptConfiguration {
+public class MockDSpaceRunnableScriptConfiguration<T extends MockDSpaceRunnableScript> extends ScriptConfiguration<T> {
 
 
     @Autowired
     private AuthorizeService authorizeService;
 
+    private Class<T> dspaceRunnableClass;
+
     @Override
-    public Class<? extends DSpaceRunnable> getDspaceRunnableClass() {
-        return MockDSpaceRunnableScript.class;
+    public Class<T> getDspaceRunnableClass() {
+        return dspaceRunnableClass;
+    }
+
+    /**
+     * Generic setter for the dspaceRunnableClass
+     * @param dspaceRunnableClass   The dspaceRunnableClass to be set on this MetadataExportScriptConfiguration
+     */
+    public void setDspaceRunnableClass(Class<T> dspaceRunnableClass) {
+        this.dspaceRunnableClass = dspaceRunnableClass;
     }
 
     @Override

@@ -38,6 +38,6 @@ public class ScriptServiceImpl implements ScriptService {
     @Override
     public DSpaceRunnable createDSpaceRunnableForScriptConfiguration(ScriptConfiguration scriptToExecute)
         throws IllegalAccessException, InstantiationException {
-        return scriptToExecute.getDspaceRunnableClass().newInstance();
+        return (DSpaceRunnable) scriptToExecute.getDspaceRunnableClass().newInstance();
     }
 }
