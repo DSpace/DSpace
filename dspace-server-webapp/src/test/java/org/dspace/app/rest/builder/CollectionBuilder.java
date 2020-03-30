@@ -168,6 +168,16 @@ public class CollectionBuilder extends AbstractDSpaceObjectBuilder<Collection> {
 
         try (Context c = new Context()) {
             c.turnOffAuthorisationSystem();
+
+            Group defaultItemReadGroup = groupService.findByName(c, "COLLECTION_" + collection.getID().toString() + "_ITEM_DEFAULT_READ");
+            Group defaultBitstreamReadGroup = groupService.findByName(c, "COLLECTION_" + collection.getID().toString() + "_BITSTREAM_DEFAULT_READ");
+            if (defaultItemReadGroup != null) {
+                groupService.delete(c, defaultItemReadGroup);
+            }
+            if (defaultBitstreamReadGroup != null) {
+                groupService.delete(c, defaultBitstreamReadGroup);
+            }
+
             for (int i = 1; i <= 3; i++) {
                 Group g = collectionService.getWorkflowGroup(c, collection, i);
                 if (g != null) {
