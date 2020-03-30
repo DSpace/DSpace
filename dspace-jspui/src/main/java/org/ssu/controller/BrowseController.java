@@ -53,7 +53,9 @@ public class BrowseController {
                 request.setAttribute("dspace.community", dSpaceObject);
             }
         }
-        return getBrowseItems(model, request, response, dspaceContext);
+        ModelAndView result = getBrowseItems(model, request, response, dspaceContext);
+        result.addObject("contextName", dSpaceObject.getName());
+        return result;
     }
 
     @RequestMapping("/browse")

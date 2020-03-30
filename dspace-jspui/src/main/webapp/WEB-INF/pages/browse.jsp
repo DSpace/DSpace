@@ -13,7 +13,7 @@
     </c:if>
     <h2>
         <form action="/export/user?${queryString}" method="post" enctype="application/json" accept-charset="utf-8">
-            <fmt:message key="browse.full.header"><fmt:param value=""/></fmt:message> <fmt:message key="browse.type.metadata.${type}"/> ${searchQuery}
+            <fmt:message key="browse.full.header"><fmt:param value="${contextName}"/></fmt:message> <fmt:message key="browse.type.metadata.${type}"/> ${searchQuery}
             <c:if test="${isExtended}">
                 <%--<input type="hidden" name = "publications" id = "publications" value="${exportPublications}">--%>
                 <input type="hidden" name = "author" id = "author" value="${searchQuery}">

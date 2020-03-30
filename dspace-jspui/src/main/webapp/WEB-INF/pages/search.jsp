@@ -86,7 +86,7 @@
 
                             <c:forEach items="${scopes}" var="scopeDisplay">
                                 <c:choose>
-                                    <c:when test="${scopeDisplay == searchScope}">
+                                    <c:when test="${scopeDisplay.handle == searchScope}">
                                         <option value="${scopeDisplay.handle}" selected="selected">
                                             ${scopeDisplay.name}
                                         </option>

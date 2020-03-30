@@ -45,7 +45,7 @@ public class BrowseRequestProcessor {
         model.addObject("sortOptions", SortOption.getSortOptions().stream().filter(SortOption::isVisible).collect(Collectors.toSet()));
         model.addObject("queryString", request.getQueryString());
         model.addObject("isExtended", isExtendedTable);
-
+        model.addObject("contextName", "");
         model = paginationProcessor.fillModelWithPaginationData(model, request, browseInfo);
         model.setViewName("browse");
         return model;
