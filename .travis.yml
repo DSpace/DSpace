@@ -45,3 +45,6 @@ script:
 after_success:
   # Run "verify", enabling the "coveralls" profile. This sends our reports to coveralls.io (see coveralls-maven-plugin)
   - "cd dspace && mvn verify -P coveralls"
+
+after_failure:
+  - cat dspace-server-webapp/target/testing/dspace/log/dspace.log
