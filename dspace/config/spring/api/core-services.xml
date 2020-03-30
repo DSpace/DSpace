@@ -125,5 +125,12 @@
     <bean class="org.dspace.discovery.indexobject.WorkflowItemIndexFactoryImpl" autowire-candidate="true"/>
     <bean class="org.dspace.discovery.indexobject.WorkspaceItemIndexFactoryImpl" autowire-candidate="true"/>
 
+	<!-- Imp beans -->
+    <bean class="org.dspace.batch.ImpBitstreamServiceImpl"/>
+    <bean class="org.dspace.batch.ImpMetadatavalueServiceImpl"/>
+    <bean class="org.dspace.batch.ImpRecordServiceImpl"/>
+    <bean class="org.dspace.batch.ImpRecordToItemServiceImpl"/>
+    <bean class="org.dspace.batch.ImpBitstreamMetadatavalueServiceImpl"/>
+    <bean class="org.dspace.batch.ImpWorkflowNStateServiceImpl"/>
 </beans>
 

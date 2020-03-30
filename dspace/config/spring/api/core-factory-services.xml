@@ -49,4 +49,7 @@
 
     <bean id="indexObjectFactoryFactory" class="org.dspace.discovery.indexobject.factory.IndexObjectFactoryFactoryImpl"/>
 
+	<!-- Imp factory -->
+	<bean id="impServiceFactory" class="org.dspace.batch.factory.ImpServiceFactoryImpl"/>
+
 </beans>

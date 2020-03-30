@@ -82,5 +82,13 @@
         <mapping class="org.dspace.xmlworkflow.storedcomponents.WorkflowItemRole"/>
         <mapping class="org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem"/>
 
+        <!-- batch Import -->
+        <mapping class="org.dspace.batch.ImpWorkflowNState"/>
+		<mapping class="org.dspace.batch.ImpRecord"/>
+		<mapping class="org.dspace.batch.ImpBitstream"/>
+		<mapping class="org.dspace.batch.ImpBitstreamMetadatavalue"/>
+		<mapping class="org.dspace.batch.ImpMetadatavalue"/>
+		<mapping class="org.dspace.batch.ImpRecordToItem"/>
+
     </session-factory>
 </hibernate-configuration>
