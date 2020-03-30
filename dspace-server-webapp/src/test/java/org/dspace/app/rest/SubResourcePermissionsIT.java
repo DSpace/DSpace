@@ -56,7 +56,7 @@ public class SubResourcePermissionsIT extends AbstractControllerIntegrationTest 
         Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
 
         //2. Three public items that are readable by Anonymous with different subjects
-        Item publicItem1 = ItemBuilder.createItem(context, col1)
+        Item privateItem1 = ItemBuilder.createItem(context, col1)
                                       .withTitle("Public item 1")
                                       .withIssueDate("2017-10-17")
                                       .withAuthor("Smith, Donald").withAuthor("Doe, John")
@@ -66,25 +66,25 @@ public class SubResourcePermissionsIT extends AbstractControllerIntegrationTest 
         Bundle bundle;
         String bitstreamContent = "Dummy content";
         try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
-            bitstream = BitstreamBuilder.createBitstream(context, publicItem1, is)
+            bitstream = BitstreamBuilder.createBitstream(context, privateItem1, is)
                                         .withName("Bitstream")
                                         .withMimeType("text/plain")
                                         .build();
         }
 
-        bundle = BundleBuilder.createBundle(context, publicItem1)
+        bundle = BundleBuilder.createBundle(context, privateItem1)
                               .withName("testname")
                               .withBitstream(bitstream)
                               .build();
 
 
-        authorizeService.removeAllPolicies(context, publicItem1);
+        authorizeService.removeAllPolicies(context, privateItem1);
 
         String token = getAuthToken(admin.getEmail(), password);
 
         // Test admin retrieval of subresource bundle of private item
         // should succeed
-        getClient(token).perform(get("/api/core/items/" + publicItem1.getID() + "/bundles"))
+        getClient(token).perform(get("/api/core/items/" + privateItem1.getID() + "/bundles"))
                         .andExpect(status().isOk())
                         .andExpect(jsonPath("$._embedded.bundles", Matchers.hasItem(BundleMatcher
                                                                                         .matchProperties(
@@ -97,43 +97,36 @@ public class SubResourcePermissionsIT extends AbstractControllerIntegrationTest 
 
         // Test eperson retrieval of subresource bundle of private item
         // shouldn't succeed
-        getClient(token).perform(get("/api/core/items/" + publicItem1.getID() + "/bundles"))
+        getClient(token).perform(get("/api/core/items/" + privateItem1.getID() + "/bundles"))
                         .andExpect(status().isForbidden());
 
         // Test anon retrieval of subresource bundle of private item
         // shouldn't succeed
-        getClient().perform(get("/api/core/items/" + publicItem1.getID() + "/bundles"))
+        getClient().perform(get("/api/core/items/" + privateItem1.getID() + "/bundles"))
                    .andExpect(status().isUnauthorized());
 
         token = getAuthToken(admin.getEmail(), password);
 
         // Test item retrieval for admin on private item
         // Should succeed
-        getClient(token).perform(get("/api/core/items/" + publicItem1.getID())
+        getClient(token).perform(get("/api/core/items/" + privateItem1.getID())
                                      .param("projection", "full"))
-                        .andExpect(status().isOk())
-                        .andExpect(jsonPath("$._embedded.bundles._embedded.bundles", Matchers.hasItem(BundleMatcher
-                                                                                                          .matchProperties(
-                                                                                                              bundle
-                                                                                                                  .getName(),
-                                                                                                              bundle
-                                                                                                                  .getID(),
-                                                                                                              bundle
-                                                                                                                  .getHandle(),
-                                                                                                              bundle
-                                                                                                                  .getType()))));
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$._embedded.bundles._embedded.bundles", Matchers.hasItem(BundleMatcher
+                                                  .matchProperties(bundle.getName(), bundle.getID(),
+                                                      bundle.getHandle(), bundle.getType()))));
 
         token = getAuthToken(eperson.getEmail(), password);
 
         // Test item retrieval for normal eperson on private item
         // Shouldn't succeed
-        getClient(token).perform(get("/api/core/items/" + publicItem1.getID())
+        getClient(token).perform(get("/api/core/items/" + privateItem1.getID())
                                      .param("projection", "full"))
                         .andExpect(status().isForbidden());
 
         // Test item retrieval for anon on private item
         // Shouldn't succeed
-        getClient().perform(get("/api/core/items/" + publicItem1.getID())
+        getClient().perform(get("/api/core/items/" + privateItem1.getID())
                                 .param("projection", "full"))
                    .andExpect(status().isUnauthorized());
 
