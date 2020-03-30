@@ -58,6 +58,25 @@
                 -->
             </policies>
         </Appender>
+
+        <!-- A3 is for the embedded solr (during test) -->
+        <Appender name='A2'
+                  filePattern="${log.dir}/solr.log-%d{yyyy-MM-dd}"
+                  type='RollingFile'
+                  fileName='${log.dir}/solr.log'>
+            <Layout type='PatternLayout'
+                    pattern='%m%n'/>
+            <policies>
+                <policy type='TimeBasedTriggeringPolicy'>yyyy-MM-dd</policy>
+                <!-- Sample deletion policy:  keep last 30 archived files
+                <Delete basePath='${log.dir}'>
+                            <IfFileName glob='dspace.log-*'/>
+                            <IfAccumulatedFileCount exceeds='30'/>
+                </Delete>
+                -->
+            </policies>
+        </Appender>
+
     </Appenders>
 
     <Loggers>
@@ -74,6 +93,13 @@
                 level='INFO'
                 additivity='false'>
             <AppenderRef ref='A2'/>
+        </Logger>
+
+        <!-- Embedded SOLR (for test) -->
+        <Logger name='org.apache.solr'
+                level='INFO'
+                additivity='false'>
+            <AppenderRef ref='A3'/>
         </Logger>
 
         # Block services logging except on exceptions
