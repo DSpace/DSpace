@@ -17,7 +17,6 @@ CREATE TABLE imp_record (
     imp_collection_uuid UUID NOT NULL REFERENCES collection(uuid),
     status VARCHAR(1),
     operation VARCHAR(64),
-    integra BOOLEAN,
     last_modified TIMESTAMP,
     handle VARCHAR(64),
     imp_sourceref VARCHAR(256)
@@ -47,7 +46,6 @@ CREATE TABLE imp_metadatavalue (
     imp_value CLOB NOT NULL,
     imp_authority VARCHAR2(256),
     imp_confidence INTEGER DEFAULT -1,
-    imp_share INTEGER DEFAULT -1,
     metadata_order INTEGER NOT NULL,
     text_lang VARCHAR2(32)
 );
@@ -82,7 +80,6 @@ CREATE TABLE imp_bitstream_metadatavalue (
     imp_value CLOB NOT NULL,
     imp_authority VARCHAR2(256),
     imp_confidence INTEGER DEFAULT -1,
-    imp_share INTEGER DEFAULT -1,
     metadata_order INTEGER NOT NULL,
     text_lang VARCHAR2(32)
 );

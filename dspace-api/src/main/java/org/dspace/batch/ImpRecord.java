@@ -60,9 +60,6 @@ public class ImpRecord {
     @Column(name = "operation", length = 64)
     private String operation;
 
-    @Column(name = "integra")
-    private Boolean integra;
-
     @Column(name = "last_modified")
     @Temporal(TemporalType.TIMESTAMP)
     private Date lastModified;
@@ -119,14 +116,6 @@ public class ImpRecord {
 
     void setOperation(String operation) {
         this.operation = operation;
-    }
-
-    public Boolean getIntegra() {
-        return integra;
-    }
-
-    public void setIntegra(Boolean integra) {
-        this.integra = integra;
     }
 
     public Date getLastModified() {

@@ -707,32 +707,12 @@ public class ItemImportOA {
             return;
         }
 
-        boolean bShare = ConfigurationManager
-                .getBooleanProperty("sharepriority." + schema + "." + element + "." + qualifier + ".share");
-        int share = -1;
-        if (bShare) {
-            share = n.getImpShare();
-        }
-
         if (authority != null && authority.equalsIgnoreCase("[GUESS]")) {
             // remove placeholder
             authority = null;
-
-            if (bShare) {
-                // TODO not yet implemented
-                // itemService.addMetadata(c, i, schema, element, qualifier, language, value,
-                // authority, confidence, share, -1);
-            } else {
-                itemService.addMetadata(c, i, schema, element, qualifier, language, value);
-            }
+            itemService.addMetadata(c, i, schema, element, qualifier, language, value);
         } else {
-            if (bShare) {
-                // TODO not yet implemented
-                // itemService.addMetadata(c, i, schema, element, qualifier, language, value,
-                // authority, confidence, share, -1);
-            } else {
-                itemService.addMetadata(c, i, schema, element, qualifier, language, value, authority, confidence);
-            }
+            itemService.addMetadata(c, i, schema, element, qualifier, language, value, authority, confidence);
         }
     }
 

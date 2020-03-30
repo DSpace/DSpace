@@ -39,9 +39,6 @@ public class ImpBitstreamMetadatavalue {
     @JoinColumn(name = "imp_bitstream_id", nullable = false)
     private ImpBitstream impBitstream;
 
-//    @Column(name = "imp_bitstream_id")
-//    private Integer impBitstreamId;
-
     @Column(name = "imp_schema", length = 128, nullable = false)
     private String impSchema;
 
@@ -60,9 +57,6 @@ public class ImpBitstreamMetadatavalue {
 
     @Column(name = "imp_confidence")
     private Integer impConfidence;
-
-    @Column(name = "imp_share")
-    private Integer impShare;
 
     @Column(name = "metadata_order", nullable = false)
     private Integer metadataOrder;
@@ -136,18 +130,6 @@ public class ImpBitstreamMetadatavalue {
 
     public void setImpConfidence(Integer impConfidence) {
         this.impConfidence = impConfidence;
-    }
-
-    public Integer getImpShare() {
-        if (impShare == null) {
-            return -1;
-        } else {
-            return impShare;
-        }
-    }
-
-    public void setImpShare(Integer impShare) {
-        this.impShare = impShare;
     }
 
     public Integer getMetadataOrder() {
