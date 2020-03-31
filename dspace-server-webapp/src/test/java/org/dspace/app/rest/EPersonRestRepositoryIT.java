@@ -236,6 +236,28 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
     }
 
     @Test
+    public void findOneForbiddenTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        EPerson ePerson1 = EPersonBuilder.createEPerson(context)
+                .withNameInMetadata("Mik", "Reck")
+                .withEmail("MikReck@email.com")
+                .withPassword("qwerty01")
+                .build();
+
+        EPerson ePerson2 = EPersonBuilder.createEPerson(context)
+                .withNameInMetadata("Bob", "Smith")
+                .withEmail("bobsmith@fake-email.com")
+                .build();
+
+        context.restoreAuthSystemState();
+
+        String tokenEperson1 = getAuthToken(ePerson1.getEmail(), "qwerty01");
+        getClient(tokenEperson1).perform(get("/api/eperson/epersons/" + ePerson2.getID()))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
     public void readEpersonAuthorizationTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
@@ -1494,6 +1516,31 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
         new MetadataPatchSuite().runWith(getClient(token), "/api/eperson/epersons/" + ePerson.getID(), expectedStatus);
     }
 
+    @Test
+    public void newlyCreatedAccountHasNoGroups() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        EPerson ePerson1 = EPersonBuilder.createEPerson(context)
+                .withNameInMetadata("Mik", "Reck")
+                .withEmail("MikReck@email.com")
+                .withPassword("qwerty01")
+                .build();
+
+        context.restoreAuthSystemState();
+
+        String tokenEperson1 = getAuthToken(ePerson1.getEmail(), "qwerty01");
+        // by contract the groups embedded in the eperson only contains direct explicit membership,
+        // so the anonymous group is not listed
+        getClient(tokenEperson1).perform(get("/api/eperson/epersons/" + ePerson1.getID())
+                .param("projection", "full"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$", Matchers.allOf(
+                        hasJsonPath("$._embedded.groups._embedded.groups.length()", is(0)),
+                        hasJsonPath("$._embedded.groups.page.totalElements", is(0))
+                )));
+    }
+
     /**
      * Test that epersons/<:uuid>/groups endpoint returns the direct groups of the epersons
      * @throws Exception
@@ -1543,5 +1590,4 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                             );
 
     }
-
 }

@@ -26,13 +26,14 @@ import org.springframework.stereotype.Service;
 public interface RestAuthenticationService {
 
     void addAuthenticationDataForUser(HttpServletRequest request, HttpServletResponse response,
-                                      DSpaceAuthentication authentication) throws IOException;
+                                      DSpaceAuthentication authentication, boolean addCookie) throws IOException;
 
     EPerson getAuthenticatedEPerson(HttpServletRequest request, Context context);
 
     boolean hasAuthenticationData(HttpServletRequest request);
 
-    void invalidateAuthenticationData(HttpServletRequest request, Context context) throws Exception;
+    void invalidateAuthenticationData(HttpServletRequest request, HttpServletResponse response, Context context)
+            throws Exception;
 
     AuthenticationService getAuthenticationService();
 
@@ -43,5 +44,7 @@ public interface RestAuthenticationService {
      * @return A string value that should be set in the WWWW-Authenticate header
      */
     String getWwwAuthenticateHeaderValue(HttpServletRequest request, HttpServletResponse response);
+
+    void invalidateAuthenticationCookie(HttpServletResponse res);
 
 }
