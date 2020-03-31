@@ -9,6 +9,7 @@ package org.dspace.app.rest.repository;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 import javax.servlet.ServletInputStream;
@@ -17,7 +18,6 @@ import javax.servlet.http.HttpServletRequest;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.logging.log4j.Logger;
-import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
@@ -27,11 +27,18 @@ import org.dspace.app.rest.model.CommunityRest;
 import org.dspace.app.rest.model.patch.Patch;
 import org.dspace.app.rest.utils.CommunityRestEqualityUtils;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Community;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.CommunityService;
 import org.dspace.core.Context;
+import org.dspace.discovery.DiscoverQuery;
+import org.dspace.discovery.DiscoverResult;
+import org.dspace.discovery.IndexableObject;
+import org.dspace.discovery.SearchService;
+import org.dspace.discovery.SearchServiceException;
+import org.dspace.discovery.indexobject.IndexableCommunity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -59,6 +66,11 @@ public class CommunityRestRepository extends DSpaceObjectRestRepository<Communit
     CommunityRestEqualityUtils communityRestEqualityUtils;
 
     @Autowired
+    SearchService searchService;
+
+    @Autowired
+    AuthorizeService authorizeService;
+
     private CommunityService cs;
 
     public CommunityRestRepository(CommunityService dsoService) {
@@ -147,11 +159,28 @@ public class CommunityRestRepository extends DSpaceObjectRestRepository<Communit
     @Override
     public Page<CommunityRest> findAll(Context context, Pageable pageable) {
         try {
-            long total = cs.countTotal(context);
-            List<Community> communities = cs.findAll(context, pageable.getPageSize(),
+            if (authorizeService.isAdmin(context)) {
+                long total = cs.countTotal(context);
+                List<Community> communities = cs.findAll(context, pageable.getPageSize(),
                     Math.toIntExact(pageable.getOffset()));
-            return converter.toRestPage(communities, pageable, total, utils.obtainProjection());
-        } catch (SQLException e) {
+                return converter.toRestPage(communities, pageable, total, utils.obtainProjection());
+            } else {
+                List<Community> communities = new LinkedList<Community>();
+                // search for all the communities and let the SOLR security plugins to limit
+                // what is returned to what the user can see
+                DiscoverQuery discoverQuery = new DiscoverQuery();
+                discoverQuery.setDSpaceObjectFilter(IndexableCommunity.TYPE);
+                discoverQuery.setStart(Math.toIntExact(pageable.getOffset()));
+                discoverQuery.setMaxResults(pageable.getPageSize());
+                DiscoverResult resp = searchService.search(context, discoverQuery);
+                long tot = resp.getTotalSearchResults();
+                for (IndexableObject solrCommunities : resp.getIndexableObjects()) {
+                    Community c = ((IndexableCommunity) solrCommunities).getIndexedObject();
+                    communities.add(c);
+                }
+                return converter.toRestPage(communities, pageable, tot, utils.obtainProjection());
+            }
+        } catch (SQLException | SearchServiceException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
     }
@@ -163,25 +192,6 @@ public class CommunityRestRepository extends DSpaceObjectRestRepository<Communit
         try {
             List<Community> communities = cs.findAllTop(obtainContext());
             return converter.toRestPage(utils.getPage(communities, pageable), utils.obtainProjection());
-        } catch (SQLException e) {
-            throw new RuntimeException(e.getMessage(), e);
-        }
-    }
-
-    // TODO: add method in dspace api to support direct query for subcommunities
-    // with pagination and authorization check
-    @SearchRestMethod(name = "subCommunities")
-    public Page<CommunityRest> findSubCommunities(@Parameter(value = "parent", required = true) UUID parentCommunity,
-            Pageable pageable) {
-        Context context = obtainContext();
-        try {
-            Community community = cs.find(context, parentCommunity);
-            if (community == null) {
-                throw new ResourceNotFoundException(
-                    CommunityRest.CATEGORY + "." + CommunityRest.NAME + " with id: " + parentCommunity + " not found");
-            }
-            List<Community> subCommunities = community.getSubcommunities();
-            return converter.toRestPage(utils.getPage(subCommunities, pageable), utils.obtainProjection());
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
