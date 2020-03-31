@@ -54,4 +54,19 @@ public class SubmissionUploadsControllerIT extends AbstractControllerIntegration
                    .andExpect(jsonPath("$._embedded.submissionuploads", hasSize(greaterThanOrEqualTo(1))))
         ;
     }
+
+    @Test
+    public void findAllWithNewlyCreatedAccountTest() throws Exception {
+        String token = getAuthToken(eperson.getEmail(), password);
+        getClient(token).perform(get("/api/config/submissionuploads"))
+                   .andExpect(status().isOk())
+                   .andExpect(content().contentType(contentType))
+                   .andExpect(jsonPath("$.page.size", is(20)))
+                   .andExpect(jsonPath("$.page.totalElements", greaterThanOrEqualTo(1)))
+                   .andExpect(jsonPath("$.page.totalPages", greaterThanOrEqualTo(1)))
+                   .andExpect(jsonPath("$.page.number", is(0)))
+                   .andExpect(jsonPath("$._links.self.href",
+                                       Matchers.startsWith(REST_SERVER_URL + "config/submissionuploads")))
+                   .andExpect(jsonPath("$._embedded.submissionuploads", hasSize(greaterThanOrEqualTo(1))));
+    }
 }

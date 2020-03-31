@@ -18,7 +18,11 @@ import org.apache.solr.common.SolrInputDocument;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.authorize.service.ResourcePolicyService;
+import org.dspace.content.Collection;
+import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
+import org.dspace.content.Item;
+import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
 import org.dspace.core.Constants;
@@ -76,6 +80,29 @@ public class SolrServiceResourceRestrictionPlugin implements SolrServiceIndexPlu
 
                     //remove the policy from the cache to save memory
                     context.uncacheEntity(resourcePolicy);
+                }
+                 // also index ADMIN policies as ADMIN permissions provides READ access
+                // going up through the hierarchy for communities, collections and items
+                while (dso != null) {
+                    if (dso instanceof Community || dso instanceof Collection || dso instanceof Item) {
+                        List<ResourcePolicy> policiesAdmin = authorizeService
+                                     .getPoliciesActionFilter(context, dso, Constants.ADMIN);
+                        for (ResourcePolicy resourcePolicy : policiesAdmin) {
+                            String fieldValue;
+                            if (resourcePolicy.getGroup() != null) {
+                                // We have a group add it to the value
+                                fieldValue = "g" + resourcePolicy.getGroup().getID();
+                            } else {
+                                // We have an eperson add it to the value
+                                fieldValue = "e" + resourcePolicy.getEPerson().getID();
+                            }
+                            document.addField("read", fieldValue);
+
+                            // remove the policy from the cache to save memory
+                            context.uncacheEntity(resourcePolicy);
+                        }
+                    }
+                    dso = ContentServiceFactory.getInstance().getDSpaceObjectService(dso).getParentObject(context, dso);
                 }
             } catch (SQLException e) {
                 log.error(LogManager.getHeader(context, "Error while indexing resource policies",

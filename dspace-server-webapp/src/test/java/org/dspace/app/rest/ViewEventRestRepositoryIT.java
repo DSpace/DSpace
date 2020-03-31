@@ -453,7 +453,7 @@ public class ViewEventRestRepositoryIT extends AbstractControllerIntegrationTest
 
 
     @Test
-    public void postTestAuthenticatedUserSucces() throws Exception {
+    public void postTestAuthenticatedUserSuccess() throws Exception {
 
         context.turnOffAuthorisationSystem();
 
@@ -485,7 +485,7 @@ public class ViewEventRestRepositoryIT extends AbstractControllerIntegrationTest
 
         ObjectMapper mapper = new ObjectMapper();
 
-        String token = getAuthToken(admin.getEmail(), password);
+        String token = getAuthToken(eperson.getEmail(), password);
 
         getClient(token).perform(post("/api/statistics/viewevents")
                                 .content(mapper.writeValueAsBytes(viewEventRest))
