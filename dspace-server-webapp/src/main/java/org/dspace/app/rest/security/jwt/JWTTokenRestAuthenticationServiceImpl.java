@@ -12,6 +12,7 @@ import java.sql.SQLException;
 import java.text.ParseException;
 import java.util.Iterator;
 import java.util.List;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -37,11 +38,13 @@ import org.springframework.stereotype.Component;
  *
  * @author Frederic Van Reet (frederic dot vanreet at atmire dot com)
  * @author Tom Desair (tom dot desair at atmire dot com)
+ * @author Giuseppe Digilio (giuseppe dot digilio at 4science dot it)
  */
 @Component
 public class JWTTokenRestAuthenticationServiceImpl implements RestAuthenticationService, InitializingBean {
 
     private static final Logger log = LoggerFactory.getLogger(RestAuthenticationService.class);
+    private static final String AUTHORIZATION_COOKIE = "Authorization-cookie";
     private static final String AUTHORIZATION_HEADER = "Authorization";
     private static final String AUTHORIZATION_TYPE = "Bearer";
 
@@ -61,7 +64,7 @@ public class JWTTokenRestAuthenticationServiceImpl implements RestAuthentication
 
     @Override
     public void addAuthenticationDataForUser(HttpServletRequest request, HttpServletResponse response,
-                                             DSpaceAuthentication authentication) throws IOException {
+            DSpaceAuthentication authentication, boolean addCookie) throws IOException {
         try {
             Context context = ContextUtil.obtainContext(request);
             context.setCurrentUser(ePersonService.findByEmail(context, authentication.getName()));
@@ -71,7 +74,7 @@ public class JWTTokenRestAuthenticationServiceImpl implements RestAuthentication
             String token = jwtTokenHandler.createTokenForEPerson(context, request,
                                                                  authentication.getPreviousLoginDate(), groups);
 
-            addTokenToResponse(response, token);
+            addTokenToResponse(response, token, addCookie);
             context.commit();
 
         } catch (JOSEException e) {
@@ -99,13 +102,24 @@ public class JWTTokenRestAuthenticationServiceImpl implements RestAuthentication
 
     @Override
     public boolean hasAuthenticationData(HttpServletRequest request) {
-        return StringUtils.isNotBlank(request.getHeader(AUTHORIZATION_HEADER));
+        return StringUtils.isNotBlank(request.getHeader(AUTHORIZATION_HEADER))
+                || StringUtils.isNotBlank(getAuthorizationCookie(request));
     }
 
     @Override
-    public void invalidateAuthenticationData(HttpServletRequest request, Context context) throws Exception {
+    public void invalidateAuthenticationData(HttpServletRequest request, HttpServletResponse response,
+                                             Context context) throws Exception {
         String token = getToken(request);
+        invalidateAuthenticationCookie(response);
         jwtTokenHandler.invalidateToken(token, request, context);
+    }
+
+    @Override
+    public void invalidateAuthenticationCookie(HttpServletResponse response) {
+        Cookie cookie = new Cookie(AUTHORIZATION_COOKIE, "");
+        cookie.setHttpOnly(true);
+        cookie.setMaxAge(0);
+        response.addCookie(cookie);
     }
 
     @Override
@@ -140,18 +154,42 @@ public class JWTTokenRestAuthenticationServiceImpl implements RestAuthentication
         return wwwAuthenticate.toString();
     }
 
-    private void addTokenToResponse(final HttpServletResponse response, final String token) throws IOException {
+    private void addTokenToResponse(final HttpServletResponse response, final String token, final Boolean addCookie)
+            throws IOException {
+        // we need authentication cookies because Shibboleth can't use the authentication headers due to the redirects
+        if (addCookie) {
+            Cookie cookie = new Cookie(AUTHORIZATION_COOKIE, token);
+            cookie.setHttpOnly(true);
+            cookie.setSecure(true);
+            response.addCookie(cookie);
+        }
         response.setHeader(AUTHORIZATION_HEADER, String.format("%s %s", AUTHORIZATION_TYPE, token));
     }
 
     private String getToken(HttpServletRequest request) {
+        String tokenValue = null;
         String authHeader = request.getHeader(AUTHORIZATION_HEADER);
+        String authCookie = getAuthorizationCookie(request);
         if (StringUtils.isNotBlank(authHeader)) {
-            String tokenValue = authHeader.replace(AUTHORIZATION_TYPE, "").trim();
-            return tokenValue;
-        } else {
-            return null;
+            tokenValue = authHeader.replace(AUTHORIZATION_TYPE, "").trim();
+        } else if (StringUtils.isNotBlank(authCookie)) {
+            tokenValue = authCookie;
         }
+
+        return tokenValue;
+    }
+
+    private String getAuthorizationCookie(HttpServletRequest request) {
+        String authCookie = "";
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if (cookie.getName().equals(AUTHORIZATION_COOKIE) && StringUtils.isNotEmpty(cookie.getValue())) {
+                    authCookie = cookie.getValue();
+                }
+            }
+        }
+        return authCookie;
     }
 
 }

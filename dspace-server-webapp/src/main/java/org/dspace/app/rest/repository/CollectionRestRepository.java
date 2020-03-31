@@ -9,6 +9,7 @@ package org.dspace.app.rest.repository;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 import javax.servlet.ServletInputStream;
@@ -29,6 +30,7 @@ import org.dspace.app.rest.model.patch.Patch;
 import org.dspace.app.rest.model.wrapper.TemplateItem;
 import org.dspace.app.rest.utils.CollectionRestEqualityUtils;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
@@ -39,6 +41,12 @@ import org.dspace.content.service.CommunityService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.discovery.DiscoverQuery;
+import org.dspace.discovery.DiscoverResult;
+import org.dspace.discovery.IndexableObject;
+import org.dspace.discovery.SearchService;
+import org.dspace.discovery.SearchServiceException;
+import org.dspace.discovery.indexobject.IndexableCollection;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -71,6 +79,12 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
     @Autowired
     private ItemService itemService;
 
+    @Autowired
+    SearchService searchService;
+
+    @Autowired
+    AuthorizeService authorizeService;
+
     public CollectionRestRepository(CollectionService dsoService) {
         super(dsoService);
     }
@@ -93,11 +107,28 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
     @Override
     public Page<CollectionRest> findAll(Context context, Pageable pageable) {
         try {
-            long total = cs.countTotal(context);
-            List<Collection> collections = cs.findAll(context, pageable.getPageSize(),
-                Math.toIntExact(pageable.getOffset()));
-            return converter.toRestPage(collections, pageable, total, utils.obtainProjection());
-        } catch (SQLException e) {
+            if (authorizeService.isAdmin(context)) {
+                long total = cs.countTotal(context);
+                List<Collection> collections = cs.findAll(context, pageable.getPageSize(),
+                    Math.toIntExact(pageable.getOffset()));
+                return converter.toRestPage(collections, pageable, total, utils.obtainProjection());
+            } else {
+                List<Collection> collections = new LinkedList<Collection>();
+                // search for all the collections and let the SOLR security plugins to limit
+                // what is returned to what the user can see
+                DiscoverQuery discoverQuery = new DiscoverQuery();
+                discoverQuery.setDSpaceObjectFilter(IndexableCollection.TYPE);
+                discoverQuery.setStart(Math.toIntExact(pageable.getOffset()));
+                discoverQuery.setMaxResults(pageable.getPageSize());
+                DiscoverResult resp = searchService.search(context, discoverQuery);
+                long tot = resp.getTotalSearchResults();
+                for (IndexableObject solrCollections : resp.getIndexableObjects()) {
+                    Collection c = ((IndexableCollection) solrCollections).getIndexedObject();
+                    collections.add(c);
+                }
+                return converter.toRestPage(collections, pageable, tot, utils.obtainProjection());
+            }
+        } catch (SQLException | SearchServiceException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
     }

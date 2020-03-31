@@ -45,6 +45,7 @@ import org.dspace.app.rest.model.patch.MoveOperation;
 import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.authorize.ResourcePolicy;
+import org.dspace.authorize.service.ResourcePolicyService;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
@@ -54,9 +55,13 @@ import org.dspace.eperson.EPerson;
 import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.MvcResult;
 
 public class BundleRestRepositoryIT extends AbstractControllerIntegrationTest {
+
+    @Autowired
+    ResourcePolicyService resourcePolicyService;
 
     private Collection collection;
     private Item item;
@@ -136,6 +141,30 @@ public class BundleRestRepositoryIT extends AbstractControllerIntegrationTest {
         ;
     }
 
+    @Test
+    public void findOneForbiddenTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        String bitstreamContent = "Dummy content";
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+            bitstream1 = BitstreamBuilder.createBitstream(context, item, is)
+                                         .withName("Bitstream")
+                                         .withMimeType("text/plain")
+                                         .build();
+        }
+
+        bundle1 = BundleBuilder.createBundle(context, item)
+                               .withName("testname")
+                               .withBitstream(bitstream1)
+                               .build();
+
+        resourcePolicyService.removePolicies(context, bundle1, Constants.READ);
+        context.restoreAuthSystemState();
+
+        String tokenEperson = getAuthToken(eperson.getEmail(), password);
+        getClient(tokenEperson).perform(get("/api/core/bundles/" + bundle1.getID()))
+                .andExpect(status().isForbidden());
+    }
 
     @Test
     public void getItemBundles() throws Exception {
@@ -383,6 +412,38 @@ public class BundleRestRepositoryIT extends AbstractControllerIntegrationTest {
                            BitstreamMatcher.matchBitstreamEntry(bitstream1),
                            BitstreamMatcher.matchBitstreamEntry(bitstream2)
                    )));
+    }
+
+    @Test
+    public void getBitstreamsForBundleForbiddenTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        String bitstreamContent = "Dummy content";
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+            bitstream1 = BitstreamBuilder.createBitstream(context, item, is)
+                                         .withName("Bitstream")
+                                         .withDescription("Description")
+                                         .withMimeType("text/plain")
+                                         .build();
+            bitstream2 = BitstreamBuilder.createBitstream(context, item, is)
+                                         .withName("Bitstream2")
+                                         .withDescription("Description2")
+                                         .withMimeType("text/plain")
+                                         .build();
+        }
+
+        bundle1 = BundleBuilder.createBundle(context, item)
+                               .withName("testname")
+                               .withBitstream(bitstream1)
+                               .withBitstream(bitstream2)
+                               .build();
+
+        resourcePolicyService.removePolicies(context, bundle1, Constants.READ);
+        context.restoreAuthSystemState();
+
+        String tokenEperson = getAuthToken(eperson.getEmail(), password);
+        getClient(tokenEperson).perform(get("/api/core/bundles/" + bundle1.getID() + "/bitstreams"))
+                   .andExpect(status().isForbidden());
     }
 
     @Test
