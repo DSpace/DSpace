@@ -352,6 +352,61 @@ public class BitstreamControllerIT extends AbstractControllerIntegrationTest {
     }
 
     @Test
+    public void putOnBitstreamInOneBundleForbiddenTest() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
+                                      .withTitle("Test")
+                                      .withIssueDate("2016-11-11")
+                                      .withAuthor("Smith, Donald")
+                                      .withSubject("ExtraEntry")
+                                      .build();
+
+        Item targetItem = ItemBuilder.createItem(context, col1)
+                                     .withTitle("Test")
+                                     .withIssueDate("2016-11-11")
+                                     .withAuthor("Smith, Donald")
+                                     .withSubject("ExtraEntry")
+                                     .build();
+
+
+        Bundle bundle1 = BundleBuilder.createBundle(context, publicItem1)
+                                      .withName("TEST FIRST BUNDLE")
+                                      .build();
+
+        Bundle targetBundle = BundleBuilder.createBundle(context, targetItem)
+                                           .withName("TARGET BUNDLE")
+                                           .build();
+
+        String bitstreamContent = "ThisIsSomeDummyText";
+        Bitstream bitstream = null;
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+            bitstream = BitstreamBuilder.createBitstream(context, bundle1, is)
+                                        .withName("Bitstream")
+                                        .withDescription("description")
+                                        .withMimeType("text/plain")
+                                        .build();
+        }
+
+        context.restoreAuthSystemState();
+        String token = getAuthToken(eperson.getEmail(), password);
+
+        getClient(token).perform(put("/api/core/bitstreams/" + bitstream.getID() + "/bundle")
+                        .contentType(parseMediaType(TEXT_URI_LIST_VALUE))
+                        .content("https://localhost:8080/spring-rest/api/core/bundles/" + targetBundle.getID()))
+                        .andExpect(status().isForbidden());
+    }
+
+    @Test
     public void putOnBitstreamInMultipleBundles() throws Exception {
 
         context.turnOffAuthorisationSystem();
