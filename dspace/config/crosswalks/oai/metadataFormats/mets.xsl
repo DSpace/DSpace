@@ -18,7 +18,7 @@
 			</xsl:attribute>
 			<metsHdr>
 				<xsl:attribute name="CREATEDATE">
-					<xsl:value-of select="concat(format-date(current-date(), 'yyyy-MM-dd'), 'T' , format-time(current-time(), 'HH:mm:ss'), 'Z')"/>
+					<xsl:value-of select="concat(format-date(current-date(), '[Y0001]-[M02]-[D02]'), 'T' , format-time(current-time(), '[H01]:[m01]:[s01]'), 'Z')"/>
 				</xsl:attribute>
 				<agent ROLE="CUSTODIAN" TYPE="ORGANIZATION">
 					<name><xsl:value-of select="doc:metadata/doc:element[@name='repository']/doc:field[@name='name']/text()" /></name>

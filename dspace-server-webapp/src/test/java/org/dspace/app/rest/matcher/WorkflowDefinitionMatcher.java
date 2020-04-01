@@ -18,7 +18,6 @@ import org.dspace.app.rest.model.WorkflowDefinitionRest;
 import org.dspace.xmlworkflow.factory.XmlWorkflowFactory;
 import org.dspace.xmlworkflow.factory.XmlWorkflowServiceFactory;
 import org.dspace.xmlworkflow.state.Workflow;
-
 import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
 
