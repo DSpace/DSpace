@@ -16,6 +16,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
@@ -28,12 +29,15 @@ import org.dspace.services.RequestService;
 import org.dspace.util.UUIDUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+import org.springframework.stereotype.Component;
+import org.springframework.web.servlet.HandlerExceptionResolver;
 
 /**
  * Custom Spring authentication filter for Stateless authentication, intercepts requests to check for valid
@@ -47,11 +51,12 @@ public class StatelessAuthenticationFilter extends BasicAuthenticationFilter {
     private static final Logger log = LoggerFactory.getLogger(StatelessAuthenticationFilter.class);
 
     private static final String ON_BEHALF_OF_REQUEST_PARAM = "X-On-Behalf-Of";
-    private static final String ADMIN = "ADMIN";
 
     private RestAuthenticationService restAuthenticationService;
 
     private EPersonRestAuthenticationProvider authenticationProvider;
+
+    private HandlerExceptionResolver handlerExceptionResolver;
 
     private RequestService requestService;
 
@@ -59,14 +64,19 @@ public class StatelessAuthenticationFilter extends BasicAuthenticationFilter {
 
     private EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
 
+
+    private boolean inErrorOnBehalfOf = false;
+
     public StatelessAuthenticationFilter(AuthenticationManager authenticationManager,
                                          RestAuthenticationService restAuthenticationService,
                                          EPersonRestAuthenticationProvider authenticationProvider,
-                                         RequestService requestService) {
+                                         RequestService requestService,
+                                         HandlerExceptionResolver handlerExceptionResolver) {
         super(authenticationManager);
         this.requestService = requestService;
         this.restAuthenticationService = restAuthenticationService;
         this.authenticationProvider = authenticationProvider;
+        this.handlerExceptionResolver = handlerExceptionResolver;
     }
 
     @Override
@@ -74,16 +84,19 @@ public class StatelessAuthenticationFilter extends BasicAuthenticationFilter {
                                     HttpServletResponse res,
                                     FilterChain chain) throws IOException, ServletException {
 
-        Authentication authentication = getAuthentication(req);
+        inErrorOnBehalfOf = false;
+        Authentication authentication = getAuthentication(req, res);
         if (authentication != null) {
             SecurityContextHolder.getContext().setAuthentication(authentication);
             restAuthenticationService.invalidateAuthenticationCookie(res);
         }
-
+        if (inErrorOnBehalfOf) {
+            return;
+        }
         chain.doFilter(req, res);
     }
 
-    private Authentication getAuthentication(HttpServletRequest request) {
+    private Authentication getAuthentication(HttpServletRequest request, HttpServletResponse res) throws IOException {
 
         if (restAuthenticationService.hasAuthenticationData(request)) {
             // parse the token.
@@ -99,7 +112,7 @@ public class StatelessAuthenticationFilter extends BasicAuthenticationFilter {
                 List<GrantedAuthority> authorities = authenticationProvider.getGrantedAuthorities(context, eperson);
                 String onBehalfOfParameterValue = request.getHeader(ON_BEHALF_OF_REQUEST_PARAM);
                 if (onBehalfOfParameterValue != null) {
-                    return getOnBehalfOfAuthentication(context, onBehalfOfParameterValue);
+                    return getOnBehalfOfAuthentication(context, onBehalfOfParameterValue, request, res);
                 }
 
                 //Return the Spring authentication object
@@ -107,22 +120,36 @@ public class StatelessAuthenticationFilter extends BasicAuthenticationFilter {
             } else {
                 return null;
             }
+        } else {
+            if (request.getHeader(ON_BEHALF_OF_REQUEST_PARAM) != null) {
+                res.setStatus(401);
+                inErrorOnBehalfOf = true;
+            }
         }
 
         return null;
     }
 
-    private Authentication getOnBehalfOfAuthentication(Context context, String onBehalfOfParameterValue) {
+    private byte[] restResponseBytes(ErrorResponse eErrorResponse) throws IOException {
+        String serialized = new ObjectMapper().writeValueAsString(eErrorResponse);
+        return serialized.getBytes();
+    }
+
+    private Authentication getOnBehalfOfAuthentication(Context context, String onBehalfOfParameterValue,
+                                                       HttpServletRequest request,
+                                                       HttpServletResponse res) throws IOException {
         UUID epersonUuid = UUIDUtils.fromString(onBehalfOfParameterValue);
         if (epersonUuid == null) {
-            throw new DSpaceBadRequestException("The parameter value of " + ON_BEHALF_OF_REQUEST_PARAM +
-                " was not a proper UUID");
+            inErrorOnBehalfOf = true;
+            res.sendError(HttpServletResponse.SC_BAD_REQUEST, "THIS IS A TEST");
         }
         try {
             EPerson onBehalfOfEPerson = ePersonService.find(context, epersonUuid);
             if (onBehalfOfEPerson == null) {
-                throw new DSpaceBadRequestException("The parameter value of " + ON_BEHALF_OF_REQUEST_PARAM +
-                                                        " was not a proper EPerson UUID");
+                res.setStatus(400);
+                inErrorOnBehalfOf = true;
+
+                return null;
             }
             if (authorizeService.isAdmin(context)) {
                 requestService.setCurrentUserId(epersonUuid);
@@ -131,8 +158,9 @@ public class StatelessAuthenticationFilter extends BasicAuthenticationFilter {
                                                 authenticationProvider.getGrantedAuthorities(context,
                                                                                              onBehalfOfEPerson));
             } else {
-                throw new AccessDeniedException("The current EPerson was not an admin and " +
-                                                    "cannot use the on behalf of functionality");
+                res.setStatus(403);
+                inErrorOnBehalfOf = true;
+                return null;
             }
 
         } catch (SQLException e) {
