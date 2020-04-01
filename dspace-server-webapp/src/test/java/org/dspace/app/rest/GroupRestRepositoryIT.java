@@ -460,6 +460,33 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
     }
 
     @Test
+    public void patchGroupName() throws Exception {
+        context.turnOffAuthorisationSystem();
+        Group group = GroupBuilder.createGroup(context).withName("Group").build();
+        context.restoreAuthSystemState();
+        String token = getAuthToken(admin.getEmail(), password);
+
+        String requestBody
+                = "      [\n"
+                + "        {\n"
+                + "          \"op\": \"replace\",\n"
+                + "          \"path\": \"/name\",\n"
+                + "          \"value\": \"new name\"\n"
+                + "        }\n"
+                + "      ]";
+        getClient(token)
+                .perform(patch("/api/eperson/groups/" + group.getID()).content(requestBody)
+                                 .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                .andExpect(status().isOk());
+        getClient(token)
+                .perform(get("/api/eperson/groups/" + group.getID()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", Matchers.is(
+                        GroupMatcher.matchGroupEntry(group.getID(), "new name"))
+                ));
+    }
+
+    @Test
     public void patchGroupWithParentUnprocessable() throws Exception {
         context.turnOffAuthorisationSystem();
 
@@ -480,10 +507,29 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
                 .build();
 
         final Group workflowGroup = col1.getWorkflowStep1(context);
+        final String name = workflowGroup.getName();
 
         String token = getAuthToken(admin.getEmail(), password);
 
-        new MetadataPatchSuite().runWith(getClient(token), "/api/eperson/groups/" + workflowGroup.getID(), 422);
+        String requestBody
+                = "      [\n"
+                + "        {\n"
+                + "          \"op\": \"replace\",\n"
+                + "          \"path\": \"/name\",\n"
+                + "          \"value\": \"new name\"\n"
+                + "        }\n"
+                + "      ]";
+        getClient(token)
+                .perform(patch("/api/eperson/groups/" + workflowGroup.getID()).content(requestBody)
+                                 .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                .andExpect(status().isUnprocessableEntity());
+
+        getClient(token)
+                .perform(get("/api/eperson/groups/" + workflowGroup.getID()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", Matchers.is(
+                        GroupMatcher.matchGroupEntry(workflowGroup.getID(), name))
+                ));
     }
 
     @Test
@@ -491,9 +537,29 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
         context.turnOffAuthorisationSystem();
         GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
         final Group group = groupService.findByName(context, Group.ANONYMOUS);
+        final String name = group.getName();
         context.restoreAuthSystemState();
         String token = getAuthToken(admin.getEmail(), password);
-        new MetadataPatchSuite().runWith(getClient(token), "/api/eperson/groups/" + group.getID(), 422);
+
+        String requestBody
+                = "      [\n"
+                + "        {\n"
+                + "          \"op\": \"replace\",\n"
+                + "          \"path\": \"/name\",\n"
+                + "          \"value\": \"new name\"\n"
+                + "        }\n"
+                + "      ]";
+        getClient(token)
+                .perform(patch("/api/eperson/groups/" + group.getID()).content(requestBody)
+                                 .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                .andExpect(status().isUnprocessableEntity());
+
+        getClient(token)
+                .perform(get("/api/eperson/groups/" + group.getID()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", Matchers.is(
+                        GroupMatcher.matchGroupEntry(group.getID(), name))
+                ));
     }
 
     @Test

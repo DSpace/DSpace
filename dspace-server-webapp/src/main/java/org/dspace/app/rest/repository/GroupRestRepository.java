@@ -22,7 +22,6 @@ import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.converter.MetadataConverter;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
-import org.dspace.app.rest.model.DSpaceObjectRest;
 import org.dspace.app.rest.model.GroupRest;
 import org.dspace.app.rest.model.patch.Patch;
 import org.dspace.app.rest.utils.Utils;
@@ -136,10 +135,6 @@ public class GroupRestRepository extends DSpaceObjectRestRepository<Group, Group
     @PreAuthorize("hasPermission(#id, 'GROUP', 'WRITE')")
     protected void patch(Context context, HttpServletRequest request, String apiCategory, String model, UUID id,
                          Patch patch) throws AuthorizeException, SQLException {
-        final Group group = dsoService.find(context, id);
-        if (group != null && isPatchUnprocessable(context, group)) {
-            throw new UnprocessableEntityException("This group cannot be patched.");
-        }
         patchDSpaceObject(apiCategory, model, id, patch);
     }
 
@@ -185,64 +180,24 @@ public class GroupRestRepository extends DSpaceObjectRestRepository<Group, Group
                                 + " with id: " + uuid + " not found"
                 );
             }
-            if (isDeleteUnprocessable(context, group)) {
-                throw new UnprocessableEntityException("This group cannot be deleted");
+            try {
+                if (group.isPermanent()) {
+                    throw new UnprocessableEntityException("A permanent group cannot be deleted");
+                }
+                final DSpaceObject parentObject = gs.getParentObject(context, group);
+                if (parentObject != null) {
+                    throw new UnprocessableEntityException(
+                            "This group cannot be deleted"
+                                    + " as it has a parent " + parentObject.getType()
+                                    + " with id " + parentObject.getID());
+                }
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
             }
             gs.delete(context, group);
         } catch (SQLException | IOException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
     }
-
-    private boolean isDeleteUnprocessable(Context context, Group group) {
-        try {
-            return group.isPermanent() || gs.getParentObject(context, group) != null;
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private boolean isPatchUnprocessable(Context context, Group group) {
-        try {
-            return group.isPermanent() || gs.getParentObject(context, group) != null;
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    /**
-     * This returns the DSpace Object (Community, Collection) belonging to this Group.
-     * This is only applicable for roles in that DSpace Object
-     * e.g. the Community Administrator or Collection Submitter Group
-     *
-     * @param uuid The uuid of the group
-     */
-    @PreAuthorize("hasAuthority('ADMIN')")
-    public DSpaceObjectRest getParentObject(UUID uuid) {
-        Context context = obtainContext();
-        try {
-            Group group = gs.find(context, uuid);
-            if (group == null) {
-                throw new ResourceNotFoundException(
-                        GroupRest.CATEGORY + "." + GroupRest.NAME
-                                + " with id: " + uuid + " not found"
-                );
-            } else {
-                DSpaceObject parent = gs.getParentObject(context, group);
-                if (parent != null) {
-                    return converter.toRest(parent, utils.obtainProjection());
-                } else {
-                    throw new ResourceNotFoundException(
-                            GroupRest.CATEGORY + "." + GroupRest.NAME
-                                    + " with id: " + uuid
-                                    + " has no associated collection or community"
-                    );
-                }
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException(e.getMessage(), e);
-        }
-    }
-
 
 }
