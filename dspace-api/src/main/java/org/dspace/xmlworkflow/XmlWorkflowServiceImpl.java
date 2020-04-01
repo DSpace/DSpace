@@ -164,6 +164,7 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
         }
     }
 
+    @Override
     public Group createWorkflowRoleGroup(Context context, Collection collection, String roleName)
         throws AuthorizeException, SQLException, IOException, WorkflowConfigurationException {
         Group roleGroup;

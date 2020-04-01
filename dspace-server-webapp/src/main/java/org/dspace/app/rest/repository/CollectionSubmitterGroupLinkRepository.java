@@ -60,14 +60,12 @@ public class CollectionSubmitterGroupLinkRepository extends AbstractDSpaceRestRe
             if (collection == null) {
                 throw new ResourceNotFoundException("No such collection: " + collectionId);
             }
-
-            Group submitters = collection.getSubmitters();
-
             if (!authorizeService.isAdmin(context) && !authorizeService.authorizeActionBoolean(context, collection,
                                                                                                Constants.ADMIN, true)) {
                 throw new AccessDeniedException("The current user was not allowed to retrieve the submitterGroup for" +
                                                     " collection: " + collectionId);
             }
+            Group submitters = collection.getSubmitters();
             if (submitters == null) {
                 return null;
             }

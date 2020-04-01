@@ -60,14 +60,12 @@ public class CommunityAdminGroupLinkRepository extends AbstractDSpaceRestReposit
             if (community == null) {
                 throw new ResourceNotFoundException("No such community: " + communityId);
             }
-
-            Group administrators = community.getAdministrators();
-
             if (!authorizeService.isAdmin(context) && !authorizeService.authorizeActionBoolean(context, community,
                                                                                                Constants.ADMIN, true)) {
                 throw new AccessDeniedException("The current user was not allowed to retrieve the AdminGroup for" +
                                                     " community: " + communityId);
             }
+            Group administrators = community.getAdministrators();
             if (administrators == null) {
                 return null;
             }

@@ -62,16 +62,16 @@ public class CollectionBitstreamReadGroupLinkRepository extends AbstractDSpaceRe
             if (collection == null) {
                 throw new ResourceNotFoundException("No such collection: " + collectionId);
             }
-            List<Group> bitstreamGroups = authorizeService
-                .getAuthorizedGroups(context, collection, Constants.DEFAULT_BITSTREAM_READ);
-            Group bitstreamReadGroup = bitstreamGroups.get(0);
-
             if (!authorizeService.isAdmin(context) && !authorizeService.authorizeActionBoolean(context, collection,
                                                                                                Constants.ADMIN, true)) {
                 throw new AccessDeniedException(
                     "The current user was not allowed to retrieve the bitstreamReadGroup for" +
                         " collection: " + collectionId);
             }
+            List<Group> bitstreamGroups = authorizeService
+                .getAuthorizedGroups(context, collection, Constants.DEFAULT_BITSTREAM_READ);
+            Group bitstreamReadGroup = bitstreamGroups.get(0);
+
             if (bitstreamReadGroup == null) {
                 return null;
             }

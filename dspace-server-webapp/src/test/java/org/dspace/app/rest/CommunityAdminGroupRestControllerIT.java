@@ -50,11 +50,14 @@ public class CommunityAdminGroupRestControllerIT extends AbstractControllerInteg
     public void setup() {
         context.turnOffAuthorisationSystem();
         parentCommunity = CommunityBuilder.createCommunity(context).withName("test").build();
+        context.restoreAuthSystemState();
     }
 
     @Test
     public void getCommunityAdminGroupTest() throws Exception {
+        context.turnOffAuthorisationSystem();
         Group adminGroup = communityService.createAdministrators(context, parentCommunity);
+        context.restoreAuthSystemState();
 
         String token = getAuthToken(admin.getEmail(), password);
         getClient(token).perform(get("/api/core/communities/" + parentCommunity.getID() + "/adminGroup"))
@@ -65,8 +68,10 @@ public class CommunityAdminGroupRestControllerIT extends AbstractControllerInteg
 
     @Test
     public void getCommunityAdminGroupTestCommunityAdmin() throws Exception {
+        context.turnOffAuthorisationSystem();
         Group adminGroup = communityService.createAdministrators(context, parentCommunity);
         authorizeService.addPolicy(context, parentCommunity, Constants.ADMIN, eperson);
+        context.restoreAuthSystemState();
 
         String token = getAuthToken(eperson.getEmail(), password);
         getClient(token).perform(get("/api/core/communities/" + parentCommunity.getID() + "/adminGroup"))
@@ -78,7 +83,9 @@ public class CommunityAdminGroupRestControllerIT extends AbstractControllerInteg
 
     @Test
     public void getCommunityAdminGroupUnAuthorizedTest() throws Exception {
+        context.turnOffAuthorisationSystem();
         communityService.createAdministrators(context, parentCommunity);
+        context.restoreAuthSystemState();
 
         getClient().perform(get("/api/core/communities/" + parentCommunity.getID() + "/adminGroup"))
                    .andExpect(status().isUnauthorized());
@@ -86,8 +93,9 @@ public class CommunityAdminGroupRestControllerIT extends AbstractControllerInteg
 
     @Test
     public void getCommunityAdminGroupForbiddenTest() throws Exception {
+        context.turnOffAuthorisationSystem();
         communityService.createAdministrators(context, parentCommunity);
-
+        context.restoreAuthSystemState();
         String token = getAuthToken(eperson.getEmail(), password);
         getClient(token).perform(get("/api/core/communities/" + parentCommunity.getID() + "/adminGroup"))
                         .andExpect(status().isForbidden());
@@ -294,7 +302,10 @@ public class CommunityAdminGroupRestControllerIT extends AbstractControllerInteg
 
     @Test
     public void deleteCommunityAdminGroupTest() throws Exception {
+        context.turnOffAuthorisationSystem();
         Group adminGroup = communityService.createAdministrators(context, parentCommunity);
+        context.restoreAuthSystemState();
+
         String token = getAuthToken(admin.getEmail(), password);
         getClient(token).perform(delete("/api/core/communities/" + parentCommunity.getID() + "/adminGroup"))
                         .andExpect(status().isNoContent());
@@ -321,8 +332,9 @@ public class CommunityAdminGroupRestControllerIT extends AbstractControllerInteg
 
     @Test
     public void deleteCommunityAdminGroupUnAuthorizedTest() throws Exception {
+        context.turnOffAuthorisationSystem();
         Group adminGroup = communityService.createAdministrators(context, parentCommunity);
-
+        context.restoreAuthSystemState();
 
         getClient().perform(delete("/api/core/communities/" + parentCommunity.getID() + "/adminGroup"))
                         .andExpect(status().isUnauthorized());
@@ -330,7 +342,9 @@ public class CommunityAdminGroupRestControllerIT extends AbstractControllerInteg
 
     @Test
     public void deleteCommunityAdminGroupForbiddenTest() throws Exception {
+        context.turnOffAuthorisationSystem();
         Group adminGroup = communityService.createAdministrators(context, parentCommunity);
+        context.restoreAuthSystemState();
 
         String token = getAuthToken(eperson.getEmail(), password);
 
@@ -341,7 +355,9 @@ public class CommunityAdminGroupRestControllerIT extends AbstractControllerInteg
 
     @Test
     public void deleteCommunityAdminGroupNotFoundTest() throws Exception {
+        context.turnOffAuthorisationSystem();
         Group adminGroup = communityService.createAdministrators(context, parentCommunity);
+        context.restoreAuthSystemState();
 
         String token = getAuthToken(eperson.getEmail(), password);
 
