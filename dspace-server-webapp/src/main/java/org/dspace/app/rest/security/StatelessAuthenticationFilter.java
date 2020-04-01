@@ -122,17 +122,13 @@ public class StatelessAuthenticationFilter extends BasicAuthenticationFilter {
             }
         } else {
             if (request.getHeader(ON_BEHALF_OF_REQUEST_PARAM) != null) {
-                res.setStatus(401);
                 inErrorOnBehalfOf = true;
+                res.sendError(HttpServletResponse.SC_UNAUTHORIZED, "There is no logged in user");
+
             }
         }
 
         return null;
-    }
-
-    private byte[] restResponseBytes(ErrorResponse eErrorResponse) throws IOException {
-        String serialized = new ObjectMapper().writeValueAsString(eErrorResponse);
-        return serialized.getBytes();
     }
 
     private Authentication getOnBehalfOfAuthentication(Context context, String onBehalfOfParameterValue,
@@ -141,14 +137,16 @@ public class StatelessAuthenticationFilter extends BasicAuthenticationFilter {
         UUID epersonUuid = UUIDUtils.fromString(onBehalfOfParameterValue);
         if (epersonUuid == null) {
             inErrorOnBehalfOf = true;
-            res.sendError(HttpServletResponse.SC_BAD_REQUEST, "THIS IS A TEST");
+            res.sendError(HttpServletResponse.SC_BAD_REQUEST, "The given UUID in the X-On-Behalf-Of header " +
+                "was not a proper UUID");
+            return null;
         }
         try {
             EPerson onBehalfOfEPerson = ePersonService.find(context, epersonUuid);
             if (onBehalfOfEPerson == null) {
-                res.setStatus(400);
                 inErrorOnBehalfOf = true;
-
+                res.sendError(HttpServletResponse.SC_BAD_REQUEST, "The given UUID in the X-On-Behalf-Of header " +
+                    "was not a proper EPerson UUID");
                 return null;
             }
             if (authorizeService.isAdmin(context)) {
@@ -158,8 +156,8 @@ public class StatelessAuthenticationFilter extends BasicAuthenticationFilter {
                                                 authenticationProvider.getGrantedAuthorities(context,
                                                                                              onBehalfOfEPerson));
             } else {
-                res.setStatus(403);
                 inErrorOnBehalfOf = true;
+                res.sendError(HttpServletResponse.SC_FORBIDDEN, "The current user is not an admin");
                 return null;
             }
 
