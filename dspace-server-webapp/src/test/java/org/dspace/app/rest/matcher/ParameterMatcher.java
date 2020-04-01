@@ -22,8 +22,10 @@ public class ParameterMatcher {
     public static Matcher<? super Object> matchParameter(Option option) {
         return allOf(
             hasJsonPath("$.name", is("-" + option.getOpt())),
+            hasJsonPath("$.nameLong", is("--" + option.getLongOpt())),
             hasJsonPath("$.description", is(option.getDescription())),
-            hasJsonPath("$.type", is(((Class) option.getType()).getSimpleName()))
+            hasJsonPath("$.type", is(((Class) option.getType()).getSimpleName())),
+            hasJsonPath("$.mandatory", is(option.isRequired()))
         );
     }
 }

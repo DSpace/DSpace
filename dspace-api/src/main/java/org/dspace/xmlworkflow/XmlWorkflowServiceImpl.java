@@ -18,7 +18,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.UUID;
-
 import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
 

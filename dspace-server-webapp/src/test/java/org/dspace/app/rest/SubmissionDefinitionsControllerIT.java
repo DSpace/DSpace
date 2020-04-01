@@ -8,6 +8,7 @@
 package org.dspace.app.rest;
 
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
+import static org.dspace.app.rest.test.AbstractControllerIntegrationTest.REST_SERVER_URL;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.Matchers.hasSize;
@@ -63,6 +64,22 @@ public class SubmissionDefinitionsControllerIT extends AbstractControllerIntegra
     }
 
     @Test
+    public void findAllWithNewlyCreatedAccountTest() throws Exception {
+        String token = getAuthToken(eperson.getEmail(), password);
+        getClient(token).perform(get("/api/config/submissiondefinitions"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$.page.size", is(20)))
+                .andExpect(jsonPath("$.page.totalElements", greaterThanOrEqualTo(1)))
+                .andExpect(jsonPath("$.page.totalPages", greaterThanOrEqualTo(1)))
+                .andExpect(jsonPath("$.page.number", is(0)))
+                .andExpect(jsonPath("$._links.search.href", is(REST_SERVER_URL
+                                  + "config/submissiondefinitions/search")))
+                //The array of browse index should have a size greater or equals to 1
+                .andExpect(jsonPath("$._embedded.submissiondefinitions", hasSize(greaterThanOrEqualTo(1))));
+    }
+
+    @Test
     public void findDefault() throws Exception {
         getClient().perform(get("/api/config/submissiondefinitions/traditional"))
                    //The status has to be 403 Not Authorized
@@ -82,6 +99,19 @@ public class SubmissionDefinitionsControllerIT extends AbstractControllerIntegra
                    .andExpect(jsonPath("$", SubmissionDefinitionsMatcher
                        .matchSubmissionDefinition(true, "traditional", "traditional")))
         ;
+    }
+
+    @Test
+    public void findOneWithNewlyCreatedAccountTest() throws Exception {
+        String tokenEPerson = getAuthToken(eperson.getEmail(), password);
+        getClient(tokenEPerson).perform(get("/api/config/submissiondefinitions/traditional"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$", allOf(
+                        hasJsonPath("$.isDefault", is(true)),
+                        hasJsonPath("$.name", is("traditional")),
+                        hasJsonPath("$.id", is("traditional")),
+                        hasJsonPath("$.type", is("submissiondefinition")))));
     }
 
     @Test
@@ -114,6 +144,29 @@ public class SubmissionDefinitionsControllerIT extends AbstractControllerIntegra
                    //We expect the content type to be "application/hal+json;charset=UTF-8"
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$", SubmissionDefinitionsMatcher
+                       .matchSubmissionDefinition(true, "traditional", "traditional")));
+    }
+
+    @Test
+    public void findByCollectionWithNewlyCreatedAccountTest() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                .withName("Community")
+                .build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                .withName("Collection 1")
+                .build();
+
+        String token = getAuthToken(eperson.getEmail(), password);
+        getClient(token).perform(get("/api/config/submissiondefinitions/search/findByCollection")
+                .param("uuid", col1.getID().toString()))
+                .andExpect(status().isOk())
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$", SubmissionDefinitionsMatcher
                        .matchSubmissionDefinition(true, "traditional", "traditional")));
     }
 
