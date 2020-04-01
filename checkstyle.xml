@@ -44,15 +44,16 @@ For more information on CheckStyle configurations below, see: http://checkstyle.
          with @SuppressWarnings. See also SuppressWarningsHolder below -->
     <module name="SuppressWarningsFilter" />
 
+    <!-- Maximum line length is 120 characters -->
+    <module name="LineLength">
+        <property name="fileExtensions" value="java"/>
+        <property name="max" value="120"/>
+        <!-- Only exceptions for packages, imports, URLs, and JavaDoc {@link} tags -->
+        <property name="ignorePattern" value="^package.*|^import.*|http://|https://|@link"/>
+    </module>
+
     <!-- Check individual Java source files for specific rules -->
     <module name="TreeWalker">
-        <!-- Maximum line length is 120 characters -->
-        <module name="LineLength">
-            <property name="max" value="120"/>
-            <!-- Only exceptions for packages, imports, URLs, and JavaDoc {@link} tags -->
-            <property name="ignorePattern" value="^package.*|^import.*|http://|https://|@link"/>
-        </module>
-
         <!-- Highlight any TODO or FIXME comments in info messages -->
         <module name="TodoComment">
             <property name="severity" value="info"/>
@@ -94,11 +95,8 @@ For more information on CheckStyle configurations below, see: http://checkstyle.
             <!-- <property name="scope" value="public"/> -->
             <!-- TODO: Above rule has been disabled because of large amount of missing public method Javadocs -->
             <property name="scope" value="nothing"/>
-            <!-- Allow RuntimeExceptions to be undeclared -->
-            <property name="allowUndeclaredRTE" value="true"/>
             <!-- Allow params, throws and return tags to be optional -->
             <property name="allowMissingParamTags" value="true"/>
-            <property name="allowMissingThrowsTags" value="true"/>
             <property name="allowMissingReturnTag" value="true"/>
         </module>
 

@@ -9,7 +9,6 @@ package org.dspace.xoai.services.impl;
 
 import java.sql.SQLException;
 import java.util.Date;
-
 import javax.persistence.NoResultException;
 
 import org.apache.logging.log4j.LogManager;
