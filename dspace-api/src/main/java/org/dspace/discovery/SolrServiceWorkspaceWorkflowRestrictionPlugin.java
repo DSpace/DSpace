@@ -20,7 +20,8 @@ import org.dspace.eperson.service.GroupService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * @author Antoine Snyers (antoine at atmire dot com)
+ * Plugin to restrict or grant access to workspace and workflow items
+ * based on the discovery configuration used.
  */
 public class SolrServiceWorkspaceWorkflowRestrictionPlugin implements SolrServiceSearchPlugin {
 
