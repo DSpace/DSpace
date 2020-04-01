@@ -24,7 +24,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
-
 import javax.ws.rs.core.MediaType;
 
 import org.apache.commons.io.IOUtils;
@@ -34,6 +33,7 @@ import org.dspace.app.rest.builder.ClaimedTaskBuilder;
 import org.dspace.app.rest.builder.CollectionBuilder;
 import org.dspace.app.rest.builder.CommunityBuilder;
 import org.dspace.app.rest.builder.EPersonBuilder;
+import org.dspace.app.rest.builder.ItemBuilder;
 import org.dspace.app.rest.builder.WorkflowItemBuilder;
 import org.dspace.app.rest.builder.WorkspaceItemBuilder;
 import org.dspace.app.rest.matcher.CollectionMatcher;
@@ -1562,6 +1562,153 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
             .andExpect(jsonPath("$.sections.traditionalpagetwo['dc.subject'][4].value", is("Last Subject")))
             .andExpect(jsonPath("$.sections.traditionalpagetwo['dc.subject'][5].value", is("Final Subject")))
         ;
+    }
+
+
+    @Test
+    public void findByItemUuidTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and two collections.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1")
+                                           .withWorkflowGroup(1, admin).build();
+
+        //2. a workflow item
+        XmlWorkflowItem witem = WorkflowItemBuilder.createWorkflowItem(context, col1)
+                                                   .withTitle("Workflow Item 1")
+                                                   .withIssueDate("2017-10-17")
+                                                   .withAuthor("Smith, Donald").withAuthor("Doe, John")
+                                                   .withSubject("ExtraEntry")
+                                                   .build();
+
+        String authToken = getAuthToken(admin.getEmail(), password);
+
+        getClient(authToken).perform(get("/api/workflow/workflowitems/search/item")
+                                        .param("uuid", String.valueOf(witem.getItem().getID())))
+                            .andExpect(status().isOk())
+                            .andExpect(jsonPath("$",
+                                                Matchers.is(
+                                                    WorkflowItemMatcher.matchItemWithTitleAndDateIssuedAndSubject(witem,
+                                              "Workflow Item 1", "2017-10-17", "ExtraEntry"))));
+
+    }
+
+    @Test
+    public void findByItemUuidMissingParameterTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and two collections.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1")
+                                           .withWorkflowGroup(1, admin).build();
+
+
+        String token = getAuthToken(admin.getEmail(), password);
+        getClient(token).perform(get("/api/workflow/workflowitems/search/item"))
+                        .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void findByItemUuidDoesntExistTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and two collections.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1")
+                                           .withWorkflowGroup(1, admin).build();
+
+
+        Item item = ItemBuilder.createItem(context, col1).build();
+        //2. a workspace item
+        XmlWorkflowItem witem = WorkflowItemBuilder.createWorkflowItem(context, col1)
+                                                   .withTitle("Workflow Item 1")
+                                                   .withIssueDate("2017-10-17")
+                                                   .withAuthor("Smith, Donald").withAuthor("Doe, John")
+                                                   .withSubject("ExtraEntry")
+                                                   .build();
+
+        String token = getAuthToken(admin.getEmail(), password);
+        getClient(token).perform(get("/api/workflow/workflowitems/search/item")
+                                     .param("uuid", String.valueOf(item.getID())))
+                        .andExpect(status().isNoContent());
+    }
+
+    @Test
+    public void findByItemUuidForbiddenTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        context.setCurrentUser(admin);
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and two collections.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1")
+                                           .withWorkflowGroup(1, admin).build();
+
+
+        XmlWorkflowItem witem = WorkflowItemBuilder.createWorkflowItem(context, col1)
+                                                   .withTitle("Workflow Item 1")
+                                                   .withIssueDate("2017-10-17")
+                                                   .withAuthor("Smith, Donald").withAuthor("Doe, John")
+                                                   .withSubject("ExtraEntry")
+                                                   .build();
+
+        context.restoreAuthSystemState();
+
+        String token = getAuthToken(eperson.getEmail(), password);
+        getClient(token).perform(get("/api/workflow/workflowitems/search/item")
+                                     .param("uuid", String.valueOf(witem.getItem().getID())))
+                        .andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void findByItemUuidUnAuthenticatedTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and two collections.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1")
+                                           .withWorkflowGroup(1, admin).build();
+
+
+        XmlWorkflowItem witem = WorkflowItemBuilder.createWorkflowItem(context, col1)
+                                                   .withTitle("Workflow Item 1")
+                                                   .withIssueDate("2017-10-17")
+                                                   .withAuthor("Smith, Donald").withAuthor("Doe, John")
+                                                   .withSubject("ExtraEntry")
+                                                   .build();
+
+        getClient().perform(get("/api/workflow/workflowitems/search/item")
+                                .param("uuid", String.valueOf(witem.getItem().getID())))
+                   .andExpect(status().isUnauthorized());
     }
 
     @Test
