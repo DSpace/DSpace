@@ -62,12 +62,14 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
         parentCommunity = CommunityBuilder.createCommunity(context).withName("test").build();
         collection = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1").build();
 
+        context.restoreAuthSystemState();
     }
 
     @Test
     public void getCollectionAdminGroupTest() throws Exception {
-
+        context.turnOffAuthorisationSystem();
         Group adminGroup = collectionService.createAdministrators(context, collection);
+        context.restoreAuthSystemState();
 
         String token = getAuthToken(admin.getEmail(), password);
         getClient(token).perform(get("/api/core/collections/" + collection.getID() + "/adminGroup"))
@@ -78,8 +80,10 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
     @Test
     public void getCollectionAdminGroupTestParentCommunityAdmin() throws Exception {
+        context.turnOffAuthorisationSystem();
         Group adminGroup = collectionService.createAdministrators(context, collection);
         authorizeService.addPolicy(context, parentCommunity, Constants.ADMIN, eperson);
+        context.restoreAuthSystemState();
 
         String token = getAuthToken(eperson.getEmail(), password);
         getClient(token).perform(get("/api/core/collections/" + collection.getID() + "/adminGroup"))
@@ -90,8 +94,10 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
     @Test
     public void getCollectionAdminGroupTestCollectionAdmin() throws Exception {
+        context.turnOffAuthorisationSystem();
         Group adminGroup = collectionService.createAdministrators(context, collection);
         authorizeService.addPolicy(context, collection, Constants.ADMIN, eperson);
+        context.restoreAuthSystemState();
 
         String token = getAuthToken(eperson.getEmail(), password);
         getClient(token).perform(get("/api/core/collections/" + collection.getID() + "/adminGroup"))
@@ -102,7 +108,9 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
     @Test
     public void getCollectionAdminGroupUnAuthorizedTest() throws Exception {
+        context.turnOffAuthorisationSystem();
         collectionService.createAdministrators(context, collection);
+        context.restoreAuthSystemState();
 
         getClient().perform(get("/api/core/collections/" + collection.getID() + "/adminGroup"))
                    .andExpect(status().isUnauthorized());
@@ -110,7 +118,9 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
     @Test
     public void getCollectionAdminGroupForbiddenTest() throws Exception {
+        context.turnOffAuthorisationSystem();
         collectionService.createAdministrators(context, collection);
+        context.restoreAuthSystemState();
 
         String token = getAuthToken(eperson.getEmail(), password);
         getClient(token).perform(get("/api/core/collections/" + collection.getID() + "/adminGroup"))
@@ -349,7 +359,10 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
     @Test
     public void deleteCollectionAdminGroupTest() throws Exception {
+        context.turnOffAuthorisationSystem();
         Group adminGroup = collectionService.createAdministrators(context, collection);
+        context.restoreAuthSystemState();
+
         String token = getAuthToken(admin.getEmail(), password);
         getClient(token).perform(delete("/api/core/collections/" + collection.getID() + "/adminGroup"))
                         .andExpect(status().isNoContent());
@@ -391,8 +404,9 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
     @Test
     public void deleteCollectionAdminGroupUnAuthorizedTest() throws Exception {
+        context.turnOffAuthorisationSystem();
         Group adminGroup = collectionService.createAdministrators(context, collection);
-
+        context.restoreAuthSystemState();
 
         getClient().perform(delete("/api/core/collections/" + collection.getID() + "/adminGroup"))
                    .andExpect(status().isUnauthorized());
@@ -400,7 +414,9 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
     @Test
     public void deleteCollectionAdminGroupForbiddenTest() throws Exception {
+        context.turnOffAuthorisationSystem();
         Group adminGroup = collectionService.createAdministrators(context, collection);
+        context.restoreAuthSystemState();
 
         String token = getAuthToken(eperson.getEmail(), password);
 
@@ -411,7 +427,9 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
     @Test
     public void deleteCollectionAdminGroupNotFoundTest() throws Exception {
+        context.turnOffAuthorisationSystem();
         Group adminGroup = collectionService.createAdministrators(context, collection);
+        context.restoreAuthSystemState();
 
         String token = getAuthToken(eperson.getEmail(), password);
 
@@ -422,8 +440,9 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
     @Test
     public void getCollectionSubmittersGroupTest() throws Exception {
-
+        context.turnOffAuthorisationSystem();
         Group submitters = collectionService.createSubmitters(context, collection);
+        context.restoreAuthSystemState();
 
         String token = getAuthToken(admin.getEmail(), password);
         getClient(token).perform(get("/api/core/collections/" + collection.getID() + "/submittersGroup"))
@@ -434,9 +453,10 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
     @Test
     public void getCollectionSubmittersGroupTestParentCommunityAdmin() throws Exception {
-
+        context.turnOffAuthorisationSystem();
         Group submitters = collectionService.createSubmitters(context, collection);
         authorizeService.addPolicy(context, parentCommunity, Constants.ADMIN, eperson);
+        context.restoreAuthSystemState();
 
         String token = getAuthToken(eperson.getEmail(), password);
         getClient(token).perform(get("/api/core/collections/" + collection.getID() + "/submittersGroup"))
@@ -447,9 +467,10 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
     @Test
     public void getCollectionSubmittersGroupTestCollectionAdmin() throws Exception {
-
+        context.turnOffAuthorisationSystem();
         Group submitters = collectionService.createSubmitters(context, collection);
         authorizeService.addPolicy(context, collection, Constants.ADMIN, eperson);
+        context.restoreAuthSystemState();
 
         String token = getAuthToken(eperson.getEmail(), password);
         getClient(token).perform(get("/api/core/collections/" + collection.getID() + "/submittersGroup"))
@@ -460,7 +481,9 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
     @Test
     public void getCollectionSubmittersGroupUnAuthorizedTest() throws Exception {
+        context.turnOffAuthorisationSystem();
         collectionService.createSubmitters(context, collection);
+        context.restoreAuthSystemState();
 
         getClient().perform(get("/api/core/collections/" + collection.getID() + "/submittersGroup"))
                    .andExpect(status().isUnauthorized());
@@ -468,7 +491,9 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
     @Test
     public void getCollectionSubmittersGroupForbiddenTest() throws Exception {
+        context.turnOffAuthorisationSystem();
         collectionService.createSubmitters(context, collection);
+        context.restoreAuthSystemState();
 
         String token = getAuthToken(eperson.getEmail(), password);
         getClient(token).perform(get("/api/core/collections/" + collection.getID() + "/submittersGroup"))
@@ -709,7 +734,10 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
     @Test
     public void deleteCollectionSubmitterGroupTest() throws Exception {
+        context.turnOffAuthorisationSystem();
         Group submittersGroup = collectionService.createSubmitters(context, collection);
+        context.restoreAuthSystemState();
+
         String token = getAuthToken(admin.getEmail(), password);
         getClient(token).perform(delete("/api/core/collections/" + collection.getID() + "/submittersGroup"))
                         .andExpect(status().isNoContent());
@@ -751,8 +779,9 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
     @Test
     public void deleteCollectionSubmittersGroupUnAuthorizedTest() throws Exception {
+        context.turnOffAuthorisationSystem();
         Group submittersGroup = collectionService.createSubmitters(context, collection);
-
+        context.restoreAuthSystemState();
 
         getClient().perform(delete("/api/core/collections/" + collection.getID() + "/submittersGroup"))
                    .andExpect(status().isUnauthorized());
@@ -760,7 +789,9 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
     @Test
     public void deleteCollectionSubmittersGroupForbiddenTest() throws Exception {
+        context.turnOffAuthorisationSystem();
         Group submittersGroup = collectionService.createSubmitters(context, collection);
+        context.restoreAuthSystemState();
 
         String token = getAuthToken(eperson.getEmail(), password);
 
@@ -771,7 +802,9 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
     @Test
     public void deleteCollectionSubmittersGroupNotFoundTest() throws Exception {
+        context.turnOffAuthorisationSystem();
         Group submittersGroup = collectionService.createSubmitters(context, collection);
+        context.restoreAuthSystemState();
 
         String token = getAuthToken(eperson.getEmail(), password);
 
@@ -779,7 +812,8 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
                         .andExpect(status().isNotFound());
     }
 
-    private Group createGroup(String itemGroupString, int defaultItemRead) throws SQLException, AuthorizeException {
+    private Group createDefaultReadGroup(String itemGroupString, int defaultItemRead)
+        throws SQLException, AuthorizeException {
         Group role = groupService.create(context);
         groupService.setName(role, "COLLECTION_" + collection.getID().toString() + "_" + itemGroupString +
             "_DEFAULT_READ");
@@ -795,12 +829,12 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
     @Test
     public void getCollectionItemReadGroupTest() throws Exception {
-
+        context.turnOffAuthorisationSystem();
         String itemGroupString = "ITEM";
         int defaultItemRead = Constants.DEFAULT_ITEM_READ;
 
-        Group role = createGroup(itemGroupString, defaultItemRead);
-
+        Group role = createDefaultReadGroup(itemGroupString, defaultItemRead);
+        context.restoreAuthSystemState();
 
         String token = getAuthToken(admin.getEmail(), password);
         getClient(token).perform(get("/api/core/collections/" + collection.getID() + "/itemReadGroup"))
@@ -811,12 +845,14 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
     @Test
     public void getCollectionDefaultItemReadGroupTestParentCommunityAdmin() throws Exception {
+        context.turnOffAuthorisationSystem();
         String itemGroupString = "ITEM";
         int defaultItemRead = Constants.DEFAULT_ITEM_READ;
 
-        Group role = createGroup(itemGroupString, defaultItemRead);
+        Group role = createDefaultReadGroup(itemGroupString, defaultItemRead);
 
         authorizeService.addPolicy(context, parentCommunity, Constants.ADMIN, eperson);
+        context.restoreAuthSystemState();
 
         String token = getAuthToken(eperson.getEmail(), password);
         getClient(token).perform(get("/api/core/collections/" + collection.getID() + "/itemReadGroup"))
@@ -827,11 +863,13 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
     @Test
     public void getCollectionDefaultItemReadGroupTestCollectionAdmin() throws Exception {
+        context.turnOffAuthorisationSystem();
         String itemGroupString = "ITEM";
         int defaultItemRead = Constants.DEFAULT_ITEM_READ;
 
-        Group role = createGroup(itemGroupString, defaultItemRead);
+        Group role = createDefaultReadGroup(itemGroupString, defaultItemRead);
         authorizeService.addPolicy(context, collection, Constants.ADMIN, eperson);
+        context.restoreAuthSystemState();
 
         String token = getAuthToken(eperson.getEmail(), password);
         getClient(token).perform(get("/api/core/collections/" + collection.getID() + "/itemReadGroup"))
@@ -842,10 +880,12 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
     @Test
     public void getCollectionDefaultItemReadGroupUnAuthorizedTest() throws Exception {
+        context.turnOffAuthorisationSystem();
         String itemGroupString = "ITEM";
         int defaultItemRead = Constants.DEFAULT_ITEM_READ;
 
-        Group role = createGroup(itemGroupString, defaultItemRead);
+        Group role = createDefaultReadGroup(itemGroupString, defaultItemRead);
+        context.restoreAuthSystemState();
 
         getClient().perform(get("/api/core/collections/" + collection.getID() + "/itemReadGroup"))
                    .andExpect(status().isUnauthorized());
@@ -853,10 +893,12 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
     @Test
     public void getCollectionDefaultItemReadGroupForbiddenTest() throws Exception {
+        context.turnOffAuthorisationSystem();
         String itemGroupString = "ITEM";
         int defaultItemRead = Constants.DEFAULT_ITEM_READ;
 
-        Group role = createGroup(itemGroupString, defaultItemRead);
+        Group role = createDefaultReadGroup(itemGroupString, defaultItemRead);
+        context.restoreAuthSystemState();
 
         String token = getAuthToken(eperson.getEmail(), password);
         getClient(token).perform(get("/api/core/collections/" + collection.getID() + "/itemReadGroup"))
@@ -1102,11 +1144,13 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
     @Test
     public void deleteCollectionDefaultItemReadGroupTest() throws Exception {
-
+        context.turnOffAuthorisationSystem();
         String itemGroupString = "ITEM";
         int defaultItemRead = Constants.DEFAULT_ITEM_READ;
 
-        Group role = createGroup(itemGroupString, defaultItemRead);
+        Group role = createDefaultReadGroup(itemGroupString, defaultItemRead);
+        context.restoreAuthSystemState();
+
         String token = getAuthToken(admin.getEmail(), password);
         getClient(token).perform(delete("/api/core/collections/" + collection.getID() + "/itemReadGroup"))
                         .andExpect(status().isNoContent());
@@ -1128,7 +1172,7 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
         String itemGroupString = "ITEM";
         int defaultItemRead = Constants.DEFAULT_ITEM_READ;
 
-        Group role = createGroup(itemGroupString, defaultItemRead);
+        Group role = createDefaultReadGroup(itemGroupString, defaultItemRead);
         authorizeService.addPolicy(context, parentCommunity, Constants.ADMIN, eperson);
 
         String token = getAuthToken(eperson.getEmail(), password);
@@ -1147,7 +1191,7 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
         String itemGroupString = "ITEM";
         int defaultItemRead = Constants.DEFAULT_ITEM_READ;
 
-        Group role = createGroup(itemGroupString, defaultItemRead);
+        Group role = createDefaultReadGroup(itemGroupString, defaultItemRead);
         authorizeService.addPolicy(context, collection, Constants.ADMIN, eperson);
 
         String token = getAuthToken(eperson.getEmail(), password);
@@ -1160,11 +1204,12 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
     @Test
     public void deleteCollectionDefaultItemReadGroupUnAuthorizedTest() throws Exception {
-
+        context.turnOffAuthorisationSystem();
         String itemGroupString = "ITEM";
         int defaultItemRead = Constants.DEFAULT_ITEM_READ;
 
-        Group role = createGroup(itemGroupString, defaultItemRead);
+        Group role = createDefaultReadGroup(itemGroupString, defaultItemRead);
+        context.restoreAuthSystemState();
 
         getClient().perform(delete("/api/core/collections/" + collection.getID() + "/itemReadGroup"))
                    .andExpect(status().isUnauthorized());
@@ -1172,11 +1217,12 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
     @Test
     public void deleteCollectionDefaultItemReadGroupForbiddenTest() throws Exception {
-
+        context.turnOffAuthorisationSystem();
         String itemGroupString = "ITEM";
         int defaultItemRead = Constants.DEFAULT_ITEM_READ;
 
-        Group role = createGroup(itemGroupString, defaultItemRead);
+        Group role = createDefaultReadGroup(itemGroupString, defaultItemRead);
+        context.restoreAuthSystemState();
 
         String token = getAuthToken(eperson.getEmail(), password);
 
@@ -1187,11 +1233,12 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
     @Test
     public void deleteCollectionDefaultItemReadGroupNotFoundTest() throws Exception {
-
+        context.turnOffAuthorisationSystem();
         String itemGroupString = "ITEM";
         int defaultItemRead = Constants.DEFAULT_ITEM_READ;
 
-        Group role = createGroup(itemGroupString, defaultItemRead);
+        Group role = createDefaultReadGroup(itemGroupString, defaultItemRead);
+        context.restoreAuthSystemState();
 
         String token = getAuthToken(eperson.getEmail(), password);
 
@@ -1201,12 +1248,12 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
     @Test
     public void getCollectionBitstreamReadGroupTest() throws Exception {
-
+        context.turnOffAuthorisationSystem();
         String bitstreamGroupString = "BITSTREAM";
         int defaultBitstreamRead = Constants.DEFAULT_BITSTREAM_READ;
 
-        Group role = createGroup(bitstreamGroupString, defaultBitstreamRead);
-
+        Group role = createDefaultReadGroup(bitstreamGroupString, defaultBitstreamRead);
+        context.restoreAuthSystemState();
 
         String token = getAuthToken(admin.getEmail(), password);
         getClient(token).perform(get("/api/core/collections/" + collection.getID() + "/bitstreamReadGroup"))
@@ -1217,12 +1264,14 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
     @Test
     public void getCollectionDefaultBitstreamReadGroupTestParentCommunityAdmin() throws Exception {
+        context.turnOffAuthorisationSystem();
         String bitstreamGroupString = "BITSTREAM";
         int defaultBitstreamRead = Constants.DEFAULT_BITSTREAM_READ;
 
-        Group role = createGroup(bitstreamGroupString, defaultBitstreamRead);
+        Group role = createDefaultReadGroup(bitstreamGroupString, defaultBitstreamRead);
 
         authorizeService.addPolicy(context, parentCommunity, Constants.ADMIN, eperson);
+        context.restoreAuthSystemState();
 
         String token = getAuthToken(eperson.getEmail(), password);
         getClient(token).perform(get("/api/core/collections/" + collection.getID() + "/bitstreamReadGroup"))
@@ -1233,11 +1282,13 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
     @Test
     public void getCollectionDefaultBitstreamReadGroupTestCollectionAdmin() throws Exception {
+        context.turnOffAuthorisationSystem();
         String bitstreamGroupString = "BITSTREAM";
         int defaultBitstreamRead = Constants.DEFAULT_BITSTREAM_READ;
 
-        Group role = createGroup(bitstreamGroupString, defaultBitstreamRead);
+        Group role = createDefaultReadGroup(bitstreamGroupString, defaultBitstreamRead);
         authorizeService.addPolicy(context, collection, Constants.ADMIN, eperson);
+        context.restoreAuthSystemState();
 
         String token = getAuthToken(eperson.getEmail(), password);
         getClient(token).perform(get("/api/core/collections/" + collection.getID() + "/bitstreamReadGroup"))
@@ -1248,10 +1299,12 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
     @Test
     public void getCollectionDefaultBitstreamReadGroupUnAuthorizedTest() throws Exception {
+        context.turnOffAuthorisationSystem();
         String bitstreamGroupString = "BITSTREAM";
         int defaultBitstreamRead = Constants.DEFAULT_BITSTREAM_READ;
 
-        Group role = createGroup(bitstreamGroupString, defaultBitstreamRead);
+        Group role = createDefaultReadGroup(bitstreamGroupString, defaultBitstreamRead);
+        context.restoreAuthSystemState();
 
         getClient().perform(get("/api/core/collections/" + collection.getID() + "/bitstreamReadGroup"))
                    .andExpect(status().isUnauthorized());
@@ -1259,10 +1312,12 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
     @Test
     public void getCollectionDefaultBitstreamReadGroupForbiddenTest() throws Exception {
+        context.turnOffAuthorisationSystem();
         String bitstreamGroupString = "BITSTREAM";
         int defaultBitstreamRead = Constants.DEFAULT_BITSTREAM_READ;
 
-        Group role = createGroup(bitstreamGroupString, defaultBitstreamRead);
+        Group role = createDefaultReadGroup(bitstreamGroupString, defaultBitstreamRead);
+        context.restoreAuthSystemState();
 
         String token = getAuthToken(eperson.getEmail(), password);
         getClient(token).perform(get("/api/core/collections/" + collection.getID() + "/bitstreamReadGroup"))
@@ -1512,11 +1567,13 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
     @Test
     public void deleteCollectionDefaultBitstreamReadGroupTest() throws Exception {
-
+        context.turnOffAuthorisationSystem();
         String bitstreamGroupString = "BITSTREAM";
         int defaultBitstreamRead = Constants.DEFAULT_BITSTREAM_READ;
 
-        Group role = createGroup(bitstreamGroupString, defaultBitstreamRead);
+        Group role = createDefaultReadGroup(bitstreamGroupString, defaultBitstreamRead);
+        context.restoreAuthSystemState();
+
         String token = getAuthToken(admin.getEmail(), password);
         getClient(token).perform(delete("/api/core/collections/" + collection.getID() + "/bitstreamReadGroup"))
                         .andExpect(status().isNoContent());
@@ -1537,7 +1594,7 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
         String bitstreamGroupString = "BITSTREAM";
         int defaultBitstreamRead = Constants.DEFAULT_BITSTREAM_READ;
 
-        Group role = createGroup(bitstreamGroupString, defaultBitstreamRead);
+        Group role = createDefaultReadGroup(bitstreamGroupString, defaultBitstreamRead);
         authorizeService.addPolicy(context, parentCommunity, Constants.ADMIN, eperson);
 
         String token = getAuthToken(eperson.getEmail(), password);
@@ -1556,7 +1613,7 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
         String bitstreamGroupString = "BITSTREAM";
         int defaultBitstreamRead = Constants.DEFAULT_BITSTREAM_READ;
 
-        Group role = createGroup(bitstreamGroupString, defaultBitstreamRead);
+        Group role = createDefaultReadGroup(bitstreamGroupString, defaultBitstreamRead);
         authorizeService.addPolicy(context, collection, Constants.ADMIN, eperson);
 
         String token = getAuthToken(eperson.getEmail(), password);
@@ -1569,11 +1626,12 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
     @Test
     public void deleteCollectionDefaultBitstreamReadGroupUnAuthorizedTest() throws Exception {
-
+        context.turnOffAuthorisationSystem();
         String bitstreamGroupString = "BITSTREAM";
         int defaultBitstreamRead = Constants.DEFAULT_BITSTREAM_READ;
 
-        Group role = createGroup(bitstreamGroupString, defaultBitstreamRead);
+        Group role = createDefaultReadGroup(bitstreamGroupString, defaultBitstreamRead);
+        context.restoreAuthSystemState();
 
         getClient().perform(delete("/api/core/collections/" + collection.getID() + "/bitstreamReadGroup"))
                    .andExpect(status().isUnauthorized());
@@ -1581,12 +1639,12 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
     @Test
     public void deleteCollectionDefaultBitstreamReadGroupForbiddenTest() throws Exception {
-
+        context.turnOffAuthorisationSystem();
         String bitstreamGroupString = "BITSTREAM";
         int defaultBitstreamRead = Constants.DEFAULT_BITSTREAM_READ;
 
-        Group role = createGroup(bitstreamGroupString, defaultBitstreamRead);
-
+        Group role = createDefaultReadGroup(bitstreamGroupString, defaultBitstreamRead);
+        context.restoreAuthSystemState();
         String token = getAuthToken(eperson.getEmail(), password);
 
         getClient(token).perform(delete("/api/core/collections/" + collection.getID() + "/bitstreamReadGroup"))
@@ -1596,12 +1654,12 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
     @Test
     public void deleteCollectionDefaultBitstreamReadGroupNotFoundTest() throws Exception {
-
+        context.turnOffAuthorisationSystem();
         String bitstreamGroupString = "BITSTREAM";
         int defaultBitstreamRead = Constants.DEFAULT_BITSTREAM_READ;
 
-        Group role = createGroup(bitstreamGroupString, defaultBitstreamRead);
-
+        Group role = createDefaultReadGroup(bitstreamGroupString, defaultBitstreamRead);
+        context.restoreAuthSystemState();
         String token = getAuthToken(eperson.getEmail(), password);
 
         getClient(token).perform(delete("/api/core/collections/" + UUID.randomUUID() + "/bitstreamReadGroup"))
@@ -1611,8 +1669,9 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
     @Test
     public void getWorkflowGroupForCollectionAndRole() throws Exception {
 
-
+        context.turnOffAuthorisationSystem();
         Group group = workflowService.createWorkflowRoleGroup(context, collection, "reviewer");
+        context.restoreAuthSystemState();
 
         String token = getAuthToken(admin.getEmail(), password);
         getClient(token).perform(get("/api/core/collections/" + collection.getID() + "/workflowGroups/reviewer"))
@@ -1623,8 +1682,10 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
     @Test
     public void getWorkflowGroupForCollectionAndRoleParentCommunityAdmin() throws Exception {
+        context.turnOffAuthorisationSystem();
         Group group = workflowService.createWorkflowRoleGroup(context, collection, "reviewer");
         authorizeService.addPolicy(context, parentCommunity, Constants.ADMIN, eperson);
+        context.restoreAuthSystemState();
 
         String token = getAuthToken(eperson.getEmail(), password);
         getClient(token).perform(get("/api/core/collections/" + collection.getID() + "/workflowGroups/reviewer"))
@@ -1635,8 +1696,9 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
     @Test
     public void getWorkflowGroupForCollectionAndRoleWrongUUIDCollectionNotFound() throws Exception {
-
+        context.turnOffAuthorisationSystem();
         Group group = workflowService.createWorkflowRoleGroup(context, collection, "reviewer");
+        context.restoreAuthSystemState();
 
         String token = getAuthToken(eperson.getEmail(), password);
         getClient(token).perform(get("/api/core/collections/" + UUID.randomUUID() + "/workflowGroups/reviewer"))
@@ -1655,9 +1717,11 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
     @Test
     public void getWorkflowGroupCommunityAdmin() throws Exception {
 
+        context.turnOffAuthorisationSystem();
         Group group = workflowService.createWorkflowRoleGroup(context, collection, "reviewer");
 
         authorizeService.addPolicy(context, parentCommunity, Constants.ADMIN, eperson);
+        context.restoreAuthSystemState();
 
         String token = getAuthToken(eperson.getEmail(), password);
         getClient(token).perform(get("/api/core/collections/" + collection.getID() + "/workflowGroups/reviewer"))
@@ -1668,9 +1732,11 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
     @Test
     public void getWorkflowGroupCollectionAdmin() throws Exception {
+        context.turnOffAuthorisationSystem();
         Group group = workflowService.createWorkflowRoleGroup(context, collection, "reviewer");
 
         authorizeService.addPolicy(context, collection, Constants.ADMIN, eperson);
+        context.restoreAuthSystemState();
 
         String token = getAuthToken(eperson.getEmail(), password);
         getClient(token).perform(get("/api/core/collections/" + collection.getID() + "/workflowGroups/reviewer"))
@@ -1681,7 +1747,9 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
     @Test
     public void getWorkflowGroupUnAuthorized() throws Exception {
+        context.turnOffAuthorisationSystem();
         Group group = workflowService.createWorkflowRoleGroup(context, collection, "reviewer");
+        context.restoreAuthSystemState();
 
         getClient().perform(get("/api/core/collections/" + collection.getID() + "/workflowGroups/reviewer"))
                    .andExpect(status().isUnauthorized());
@@ -1689,7 +1757,9 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
     @Test
     public void getWorkflowGroupForbidden() throws Exception {
+        context.turnOffAuthorisationSystem();
         Group group = workflowService.createWorkflowRoleGroup(context, collection, "reviewer");
+        context.restoreAuthSystemState();
 
         String token = getAuthToken(eperson.getEmail(), password);
         getClient(token).perform(get("/api/core/collections/" + collection.getID() + "/workflowGroups/reviewer"))
@@ -1939,8 +2009,9 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
     @Test
     public void deleteCollectionWorkflowGroupTest() throws Exception {
-
+        context.turnOffAuthorisationSystem();
         Group group = workflowService.createWorkflowRoleGroup(context, collection, "reviewer");
+        context.restoreAuthSystemState();
 
         String token = getAuthToken(admin.getEmail(), password);
         getClient(token).perform(delete("/api/core/collections/" + collection.getID() + "/workflowGroups/reviewer"))
@@ -1987,9 +2058,9 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
     @Test
     public void deleteCollectionWorkflowGroupUnAuthorizedTest() throws Exception {
-
+        context.turnOffAuthorisationSystem();
         Group group = workflowService.createWorkflowRoleGroup(context, collection, "reviewer");
-
+        context.restoreAuthSystemState();
 
         getClient().perform(delete("/api/core/collections/" + collection.getID() + "/workflowGroups/reviewer"))
                    .andExpect(status().isUnauthorized());
@@ -1997,9 +2068,9 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
     @Test
     public void deleteCollectionWorkflowGroupForbiddenTest() throws Exception {
-
+        context.turnOffAuthorisationSystem();
         Group group = workflowService.createWorkflowRoleGroup(context, collection, "reviewer");
-
+        context.restoreAuthSystemState();
 
         String token = getAuthToken(eperson.getEmail(), password);
 
@@ -2010,8 +2081,9 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
     @Test
     public void deleteCollectionWorkflowGroupNotFoundTest() throws Exception {
+        context.turnOffAuthorisationSystem();
         Group group = workflowService.createWorkflowRoleGroup(context, collection, "reviewer");
-
+        context.restoreAuthSystemState();
 
         String token = getAuthToken(eperson.getEmail(), password);
 

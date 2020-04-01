@@ -47,8 +47,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * This RestController will take care of all the calls for a specific collection's admingroup
- * This is handled by calling "/api/core/collections/{uuid}/adminGroup" with the correct RequestMethod
+ * This RestController will take care of all the calls for a specific collection's special group
+ * This is handled by calling "/api/core/collections/{uuid}/{group}" with the correct RequestMethod
+ * This works for specific WorkflowGroups as well given that their role is supplied by calling
+ * "/api/core/collections/{uuid}/workflowGroups/{workflowRole}"
  */
 @RestController
 @RequestMapping("/api/core/collections" + REGEX_REQUESTMAPPING_IDENTIFIER_AS_UUID)

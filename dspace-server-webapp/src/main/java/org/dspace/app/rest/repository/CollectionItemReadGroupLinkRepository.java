@@ -61,6 +61,11 @@ public class CollectionItemReadGroupLinkRepository extends AbstractDSpaceRestRep
             if (collection == null) {
                 throw new ResourceNotFoundException("No such collection: " + collectionId);
             }
+            if (!authorizeService.isAdmin(context) && !authorizeService.authorizeActionBoolean(context, collection,
+                                                                                               Constants.ADMIN, true)) {
+                throw new AccessDeniedException("The current user was not allowed to retrieve the itemReadGroup for" +
+                                                    " collection: " + collectionId);
+            }
             List<Group> itemGroups = authorizeService
                 .getAuthorizedGroups(context, collection, Constants.DEFAULT_ITEM_READ);
             if (itemGroups == null || itemGroups.isEmpty()) {
@@ -68,11 +73,6 @@ public class CollectionItemReadGroupLinkRepository extends AbstractDSpaceRestRep
             }
             Group itemReadGroup = itemGroups.get(0);
 
-            if (!authorizeService.isAdmin(context) && !authorizeService.authorizeActionBoolean(context, collection,
-                                                                                               Constants.ADMIN, true)) {
-                throw new AccessDeniedException("The current user was not allowed to retrieve the itemReadGroup for" +
-                                                    " collection: " + collectionId);
-            }
             if (itemReadGroup == null) {
                 return null;
             }

@@ -156,12 +156,19 @@ public class CollectionBuilder extends AbstractDSpaceObjectBuilder<Collection> {
     @Override
     public void cleanup() throws Exception {
         context.turnOffAuthorisationSystem();
-        if (collection.getAdministrators() != null) {
-            Group adminGroup = collection.getAdministrators();
-            collectionService.removeAdministrators(context, collection);
-        }
+        deleteAdminGroup();
         deleteWorkflowGroups(collection);
         delete(collection);
+    }
+
+    private void deleteAdminGroup() throws SQLException, AuthorizeException {
+        if (collection.getAdministrators() != null) {
+            try (Context c = new Context()) {
+                c.turnOffAuthorisationSystem();
+                collectionService.removeAdministrators(context, collection);
+                c.complete();
+            }
+        }
     }
 
     public void deleteWorkflowGroups(Collection collection) throws Exception {

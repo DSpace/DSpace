@@ -61,13 +61,13 @@ public class CollectionAdminGroupLinkRepository extends AbstractDSpaceRestReposi
                 throw new ResourceNotFoundException("No such collection: " + collectionId);
             }
 
-            Group administrators = collection.getAdministrators();
 
             if (!authorizeService.isAdmin(context) && !authorizeService.authorizeActionBoolean(context, collection,
                                                                                                Constants.ADMIN, true)) {
                 throw new AccessDeniedException("The current user was not allowed to retrieve the AdminGroup for" +
                                                     " collection: " + collectionId);
             }
+            Group administrators = collection.getAdministrators();
             if (administrators == null) {
                 return null;
             }
