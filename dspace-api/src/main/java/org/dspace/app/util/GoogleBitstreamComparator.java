@@ -84,11 +84,15 @@ public class GoogleBitstreamComparator implements Comparator<Bitstream>{
             return 1;
         }
         else if(priority1 == priority2){
-            if(b1.getSizeBytes() <= b2.getSizeBytes()){
+
+            if(b1.getSizeBytes() < b2.getSizeBytes()){
                 return 1;
             }
-            else {
+            else if(b1.getSizeBytes() > b2.getSizeBytes()){
                 return -1;
+            }
+            else {
+                return 0;
             }
         }
         else {
