@@ -316,14 +316,4 @@ public class GroupRestController {
         throw new AuthorizeException("not authorized to manage this group");
     }
 
-    /**
-     * This returns the DSpace Object (Community, Collection) belonging to this Group.
-     * This is only applicable for roles in that DSpace Object
-     * e.g. the Community Administrator or Collection Submitter Group
-     * @param uuid The uuid of the group
-     */
-    @RequestMapping(method = RequestMethod.GET, value = REGEX_REQUESTMAPPING_IDENTIFIER_AS_UUID + "/object")
-    public DSpaceObjectRest getParentObject(@PathVariable UUID uuid) {
-        return repository.getParentObject(uuid);
-    }
 }
