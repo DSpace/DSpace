@@ -19,7 +19,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.StringTokenizer;
 import java.util.UUID;
-
 import javax.mail.MessagingException;
 import javax.xml.transform.TransformerException;
 
@@ -67,7 +66,6 @@ import org.dspace.content.service.MetadataFieldService;
 import org.dspace.content.service.MetadataSchemaService;
 import org.dspace.content.service.MetadataValueService;
 import org.dspace.content.service.WorkspaceItemService;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
@@ -79,6 +77,7 @@ import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
 import org.dspace.identifier.factory.IdentifierServiceFactory;
 import org.dspace.identifier.service.IdentifierService;
+import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.util.ItemUtils;
 import org.dspace.utils.DSpace;
@@ -137,6 +136,7 @@ public class ItemImportOA {
 
     private String sourceRef = null;
 
+    private ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
     private ItemService itemService = ContentServiceFactory.getInstance().getItemService();
     private CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
     private MetadataValueService metadataValueService = ContentServiceFactory.getInstance().getMetadataValueService();
@@ -683,7 +683,7 @@ public class ItemImportOA {
 
         // if language isn't set, use the system's default value
         if (language == null || language.equals("")) {
-            language = ConfigurationManager.getProperty("default.language");
+            language = configurationService.getProperty("default.language");
         }
 
         // a goofy default, but there it is
@@ -799,9 +799,9 @@ public class ItemImportOA {
                 imp_bitstream.setAssetstore(bs.getStoreNumber());
                 String assetstorePath;
                 if (bs.getStoreNumber() == 0) {
-                    assetstorePath = ConfigurationManager.getProperty("assetstore.dir") + File.separatorChar;
+                    assetstorePath = configurationService.getProperty("assetstore.dir") + File.separatorChar;
                 } else {
-                    assetstorePath = ConfigurationManager.getProperty("assetstore.dir." + bs.getStoreNumber())
+                    assetstorePath = configurationService.getProperty("assetstore.dir." + bs.getStoreNumber())
                             + File.separatorChar;
                 }
                 int length = assetstorePath.length();
@@ -834,7 +834,7 @@ public class ItemImportOA {
         if (alreadyInAssetstoreNr == -1) {
             fullpath = bitstreamPath;
         } else {
-            fullpath = ConfigurationManager.getProperty("assetstore.dir." + alreadyInAssetstoreNr) + File.separatorChar
+            fullpath = configurationService.getProperty("assetstore.dir." + alreadyInAssetstoreNr) + File.separatorChar
                     + bitstreamPath;
         }
 

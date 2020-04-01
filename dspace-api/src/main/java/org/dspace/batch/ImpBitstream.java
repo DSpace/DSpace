@@ -8,7 +8,6 @@
 package org.dspace.batch;
 
 import java.util.UUID;
-
 import javax.persistence.Cacheable;
 import javax.persistence.Column;
 import javax.persistence.Entity;

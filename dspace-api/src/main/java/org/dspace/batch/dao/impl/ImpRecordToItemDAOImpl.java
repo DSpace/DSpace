@@ -8,7 +8,6 @@
 package org.dspace.batch.dao.impl;
 
 import java.sql.SQLException;
-
 import javax.persistence.Query;
 
 import org.dspace.batch.ImpRecordToItem;

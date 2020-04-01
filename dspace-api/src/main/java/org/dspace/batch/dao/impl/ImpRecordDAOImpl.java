@@ -9,7 +9,6 @@ package org.dspace.batch.dao.impl;
 
 import java.sql.SQLException;
 import java.util.List;
-
 import javax.persistence.Query;
 
 import org.dspace.batch.ImpRecord;
