@@ -8,7 +8,6 @@
 package org.dspace.app.rest.submit;
 
 import java.io.IOException;
-
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -141,7 +140,7 @@ public class SubmissionService {
  * Build the rest representation of a bitstream as used in the upload section
  * ({@link DataUpload}. It contains all its metadata and the list of applied
  * access conditions (@link {@link UploadBitstreamAccessConditionDTO}
- * 
+ *
  * @param configurationService the DSpace ConfigurationService
  * @param source               the bitstream to translate in its rest submission
  *                             representation
