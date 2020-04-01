@@ -20,8 +20,7 @@ import org.dspace.eperson.service.GroupService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * Created by: Antoine Snyers (antoine at atmire dot com)
- * Date: 18 Mar 2020
+ * @author Antoine Snyers (antoine at atmire dot com)
  */
 public class SolrServiceWorkspaceWorkflowRestrictionPlugin implements SolrServiceSearchPlugin {
 
