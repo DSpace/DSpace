@@ -122,7 +122,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
             // Add a custom Token based authentication filter based on the token previously given to the client
             // before each URL
             .addFilterBefore(new StatelessAuthenticationFilter(authenticationManager(), restAuthenticationService,
-                                                               ePersonRestAuthenticationProvider, requestService, handlerExceptionResolver),
+                                                               ePersonRestAuthenticationProvider, requestService),
                              StatelessLoginFilter.class);
     }
 

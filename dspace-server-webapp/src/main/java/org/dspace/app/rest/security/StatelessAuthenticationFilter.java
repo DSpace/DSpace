@@ -16,8 +16,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
@@ -29,15 +27,11 @@ import org.dspace.services.RequestService;
 import org.dspace.util.UUIDUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
-import org.springframework.stereotype.Component;
-import org.springframework.web.servlet.HandlerExceptionResolver;
 
 /**
  * Custom Spring authentication filter for Stateless authentication, intercepts requests to check for valid
@@ -56,8 +50,6 @@ public class StatelessAuthenticationFilter extends BasicAuthenticationFilter {
 
     private EPersonRestAuthenticationProvider authenticationProvider;
 
-    private HandlerExceptionResolver handlerExceptionResolver;
-
     private RequestService requestService;
 
     private AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
@@ -70,13 +62,11 @@ public class StatelessAuthenticationFilter extends BasicAuthenticationFilter {
     public StatelessAuthenticationFilter(AuthenticationManager authenticationManager,
                                          RestAuthenticationService restAuthenticationService,
                                          EPersonRestAuthenticationProvider authenticationProvider,
-                                         RequestService requestService,
-                                         HandlerExceptionResolver handlerExceptionResolver) {
+                                         RequestService requestService) {
         super(authenticationManager);
         this.requestService = requestService;
         this.restAuthenticationService = restAuthenticationService;
         this.authenticationProvider = authenticationProvider;
-        this.handlerExceptionResolver = handlerExceptionResolver;
     }
 
     @Override
