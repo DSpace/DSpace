@@ -126,6 +126,10 @@ public class Application extends SpringBootServletInitializer {
     public WebMvcConfigurer webMvcConfigurer() {
 
         return new WebMvcConfigurer() {
+            /**
+             * Create a custom CORS mapping for the DSpace REST API (/api/ paths), based on configured allowed origins.
+             * @param registry CorsRegistry
+             */
             @Override
             public void addCorsMappings(@NonNull CorsRegistry registry) {
                 String[] corsAllowedOrigins = configuration.getCorsAllowedOrigins();
