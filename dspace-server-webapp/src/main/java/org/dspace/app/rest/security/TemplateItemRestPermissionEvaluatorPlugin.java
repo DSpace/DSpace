@@ -14,6 +14,10 @@ import org.dspace.app.rest.model.TemplateItemRest;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
+/**
+ * This class will handle calls made to TemplateItemRest endpoints.
+ * It will return true because access can be granted anytime it's linked from another resource
+ */
 @Component
 public class TemplateItemRestPermissionEvaluatorPlugin extends RestObjectPermissionEvaluatorPlugin {
     @Override
