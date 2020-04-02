@@ -10,16 +10,20 @@ package org.dspace.app.rest.security;
 import java.io.Serializable;
 
 import org.apache.commons.lang3.StringUtils;
-import org.dspace.app.rest.model.ExternalSourceRest;
+import org.dspace.app.rest.model.FacetConfigurationRest;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
+/**
+ * This class will handle calls made to FacetConfigurationRest endpoints.
+ * It will return true because access can be granted anytime it's linked from another resource
+ */
 @Component
-public class ExternalSourceRestPermissionEvaluator extends RestObjectPermissionEvaluatorPlugin {
+public class FacetConfigurationRestPermissionEvaluatorPlugin extends RestObjectPermissionEvaluatorPlugin {
     @Override
     public boolean hasDSpacePermission(Authentication authentication, Serializable targetId, String targetType,
                                        DSpaceRestPermission restPermission) {
-        if (!StringUtils.equalsIgnoreCase(ExternalSourceRest.NAME, targetType)) {
+        if (!StringUtils.equalsIgnoreCase(FacetConfigurationRest.NAME, targetType)) {
             return false;
         }
         return true;
