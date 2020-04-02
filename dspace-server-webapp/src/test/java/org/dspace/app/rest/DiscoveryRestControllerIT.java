@@ -3436,8 +3436,22 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
             .andExpect(status().isNoContent());
 
         context.restoreAuthSystemState();
+
+        // summary of the structure, we have:
+        //  a simple collection
+        //  a second collection with 2 workflow steps that have 1 reviewer each (reviewer1 and reviewer2)
+        //  3 public items
+        //  2 workspace items submitted by a regular submitter
+        //  2 workspace items submitted by the admin
+        //  4 workflow items:
+        //   1 pool task in step 1, submitted by the same regular submitter
+        //   1 pool task in step 1, submitted by the admin
+        //   1 claimed task in the first workflow step from the repository admin
+        //   1 pool task task in step 2, from the repository admin
+        //    (This one is created by creating a claimed task for step 1 and approving it)
+
         //** WHEN **
-        // the submitter should not see anything in the workfow configuration
+        // the submitter should not see anything in the workflow configuration
         getClient(epersonToken).perform(get("/api/discover/search/objects").param("configuration", "workflow"))
                 //** THEN **
                 //The status has to be 200 OK
@@ -3453,8 +3467,8 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 .andExpect(jsonPath("$._links.self.href", containsString("/api/discover/search/objects")))
         ;
 
-        // reviewer1 should see two pool items one from the submitter and one from the administrator
-        // the other task in step1 is claimed by the adminstrator so it should be not visible to the reviewer1
+        // reviewer1 should see two pool items, one from the submitter and one from the administrator
+        // the other task in step1 is claimed by the administrator so it should be not visible to the reviewer1
         getClient(reviewer1Token).perform(get("/api/discover/search/objects").param("configuration", "workflow"))
                 //** THEN **
                 //The status has to be 200 OK
@@ -3466,10 +3480,12 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 .andExpect(jsonPath("$._embedded.searchResult.page", is(
                         PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 2)
                 )))
-                // These search results have to be shown in the embedded.objects section two workspaceitems and one
-                // worfklowitem submitted by the admin user as by the structure defined above. Please note that the
-                // claimedTask should be not visible here as this is the workspace configuration
-                //Seeing as everything fits onto one page, they have to all be present
+                // These search results have to be shown in the embedded.objects section:
+                // two workflow items, one submitted by the user and one submitted by the admin.
+                // The claimed task of the administrator and the pool task for step 2 should not be visible to
+                // reviewer1.
+                // Please note that the workspace items should not be visible here either.
+                // Seeing as everything fits onto one page, they have to all be present
                 .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.containsInAnyOrder(
                         Matchers.allOf(
                                 SearchResultMatcher.match("workflow", "pooltask", "pooltasks"),
@@ -3496,8 +3512,9 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 .andExpect(jsonPath("$._links.self.href", containsString("/api/discover/search/objects")))
         ;
 
-        // admin should see two pool items one from the submitter and one from herself
-        // and a claimed task
+        // admin should see two pool items and a claimed task,
+        // one pool item from the submitter and one from herself
+        // because the admin is in the reviewer group for step 1, not because she is an admin
         getClient(adminToken).perform(get("/api/discover/search/objects").param("configuration", "workflow"))
                 //** THEN **
                 //The status has to be 200 OK
@@ -3509,9 +3526,9 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 .andExpect(jsonPath("$._embedded.searchResult.page", is(
                         PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 3)
                 )))
-                // These search results have to be shown in the embedded.objects section two workspaceitems and one
-                // worfklowitem submitted by the admin user as by the structure defined above. Please note that the
-                // claimedTask should be not visible here as this is the workspace configuration
+                // These search results have to be shown in the embedded.objects section:
+                // two workflow items and one claimed task.
+                // For step 1 one submitted by the user and one submitted by the admin and none for step 2.
                 //Seeing as everything fits onto one page, they have to all be present
                 .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.containsInAnyOrder(
                         Matchers.allOf(
@@ -3545,8 +3562,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 .andExpect(jsonPath("$._links.self.href", containsString("/api/discover/search/objects")))
         ;
 
-        // admin should see two pool items one from the submitter and one from herself
-        // and a claimed task
+        // reviewer2 should only see one pool item
         getClient(reviewer2Token).perform(get("/api/discover/search/objects").param("configuration", "workflow"))
                 //** THEN **
                 //The status has to be 200 OK
@@ -3558,10 +3574,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 .andExpect(jsonPath("$._embedded.searchResult.page", is(
                         PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 1)
                 )))
-                // These search results have to be shown in the embedded.objects section two workspaceitems and one
-                // worfklowitem submitted by the admin user as by the structure defined above. Please note that the
-                // claimedTask should be not visible here as this is the workspace configuration
-                //Seeing as everything fits onto one page, they have to all be present
+                // These search results have to be shown in the embedded.objects section
                 .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.containsInAnyOrder(
                         Matchers.allOf(
                                 SearchResultMatcher.match("workflow", "pooltask", "pooltasks"),
@@ -3693,8 +3706,22 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
             .andExpect(status().isNoContent());
 
         context.restoreAuthSystemState();
+
+        // summary of the structure, we have:
+        //  a simple collection
+        //  a second collection with 2 workflow steps that have 1 reviewer each (reviewer1 and reviewer2)
+        //  3 public items
+        //  2 workspace items submitted by a regular submitter
+        //  2 workspace items submitted by the admin
+        //  4 workflow items:
+        //   1 pool task in step 1, submitted by the same regular submitter
+        //   1 pool task in step 1, submitted by the admin
+        //   1 claimed task in the first workflow step from the repository admin
+        //   1 pool task task in step 2, from the repository admin
+        //    (This one is created by creating a claimed task for step 1 and approving it)
+
         //** WHEN **
-        // the submitter should not see anything in the workfowAdmin configuration
+        // the submitter should not see anything in the workflow configuration
         getClient(epersonToken).perform(get("/api/discover/search/objects").param("configuration", "workflowAdmin"))
                 //** THEN **
                 //The status has to be 200 OK
@@ -3710,8 +3737,8 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 .andExpect(jsonPath("$._links.self.href", containsString("/api/discover/search/objects")))
         ;
 
-        // reviewer1 should see two pool items one from the submitter and one from the administrator
-        // the other task in step1 is claimed by the adminstrator so it should be not visible to the reviewer1
+        // reviewer1 should see two pool items, one from the submitter and one from the administrator
+        // the other task in step1 is claimed by the administrator so it should be not visible to the reviewer1
         getClient(reviewer1Token).perform(get("/api/discover/search/objects").param("configuration", "workflowAdmin"))
                 //** THEN **
                 //The status has to be 200 OK
@@ -3723,9 +3750,11 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 .andExpect(jsonPath("$._embedded.searchResult.page", is(
                         PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 2)
                 )))
-                // These search results have to be shown in the embedded.objects section two workspaceitems and one
-                // worfklowitem submitted by the admin user as by the structure defined above. Please note that the
-                // claimedTask should be not visible here as this is the workspace configuration
+                // These search results have to be shown in the embedded.objects section:
+                // two workflow items, one submitted by the user and one submitted by the admin.
+                // The claimed task of the administrator and the pool task for step 2 should not be visible to
+                // reviewer1.
+                // Please note that the workspace items should not be visible here either.
                 //Seeing as everything fits onto one page, they have to all be present
                 .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.containsInAnyOrder(
                         Matchers.allOf(
@@ -3753,8 +3782,9 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 .andExpect(jsonPath("$._links.self.href", containsString("/api/discover/search/objects")))
         ;
 
-        // admin should see two pool items one from the submitter and one from herself
-        // and a claimed task
+
+        // admin should see three pool items and a claimed task
+        // one pool item from the submitter and two from herself
         getClient(adminToken).perform(get("/api/discover/search/objects").param("configuration", "workflowAdmin"))
                 //** THEN **
                 //The status has to be 200 OK
@@ -3764,11 +3794,11 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 //There needs to be a page object that shows the total pages and total elements as well as the
                 // size and the current page (number)
                 .andExpect(jsonPath("$._embedded.searchResult.page", is(
-                        PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 3)
+                        PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 4)
                 )))
-                // These search results have to be shown in the embedded.objects section two workspaceitems and one
-                // worfklowitem submitted by the admin user as by the structure defined above. Please note that the
-                // claimedTask should be not visible here as this is the workspace configuration
+                // These search results have to be shown in the embedded.objects section:
+                // three workflow items and one claimed task.
+                // For step 1 one submitted by the user and one submitted by the admin and one for step 2.
                 //Seeing as everything fits onto one page, they have to all be present
                 .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.containsInAnyOrder(
                         Matchers.allOf(
@@ -3782,6 +3812,12 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                                 JsonPathMatchers.hasJsonPath("$._embedded.indexableObject._embedded.workflowitem",
                                         is(WorkflowItemMatcher.matchItemWithTitleAndDateIssued(
                                                 null, "Admin Workflow Item 1", "2010-11-03")))
+                                ),
+                        Matchers.allOf(
+                                SearchResultMatcher.match("workflow", "pooltask", "pooltasks"),
+                                JsonPathMatchers.hasJsonPath("$._embedded.indexableObject._embedded.workflowitem",
+                                        is(WorkflowItemMatcher.matchItemWithTitleAndDateIssued(
+                                                null, "Pool Step2 Item", "2010-11-04")))
                                 ),
                         Matchers.allOf(
                                 SearchResultMatcher.match("workflow", "claimedtask", "claimedtask"),
@@ -3802,8 +3838,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 .andExpect(jsonPath("$._links.self.href", containsString("/api/discover/search/objects")))
         ;
 
-        // admin should see two pool items one from the submitter and one from herself
-        // and a claimed task
+        // reviewer2 should only see one pool item
         getClient(reviewer2Token).perform(get("/api/discover/search/objects").param("configuration", "workflowAdmin"))
                 //** THEN **
                 //The status has to be 200 OK
@@ -3815,10 +3850,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 .andExpect(jsonPath("$._embedded.searchResult.page", is(
                         PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 1)
                 )))
-                // These search results have to be shown in the embedded.objects section two workspaceitems and one
-                // worfklowitem submitted by the admin user as by the structure defined above. Please note that the
-                // claimedTask should be not visible here as this is the workspace configuration
-                //Seeing as everything fits onto one page, they have to all be present
+                // These search results have to be shown in the embedded.objects section
                 .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.containsInAnyOrder(
                         Matchers.allOf(
                                 SearchResultMatcher.match("workflow", "pooltask", "pooltasks"),
