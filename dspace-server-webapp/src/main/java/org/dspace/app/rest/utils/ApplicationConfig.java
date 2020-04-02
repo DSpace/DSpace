@@ -26,14 +26,26 @@ import org.springframework.data.web.config.EnableSpringDataWebSupport;
 @ComponentScan( {"org.dspace.app.rest.converter", "org.dspace.app.rest.repository", "org.dspace.app.rest.utils",
         "org.dspace.app.configuration"})
 public class ApplicationConfig {
-    // Allowed CORS origins. Defaults to * (everywhere)
+    // Allowed CORS origins ("Access-Control-Allow-Origin" header)
     // Can be overridden in DSpace configuration
-    @Value("${rest.cors.allowed-origins:*}")
-    private String corsAllowedOrigins;
+    @Value("${rest.cors.allowed-origins}")
+    private String[] corsAllowedOrigins;
 
+    // Configured User Interface URL (default: http://localhost:3000)
+    @Value("${dspace.ui.url:http://localhost:3000}")
+    private String uiURL;
+
+    /**
+     * Return the array of allowed origins (client URLs) for the CORS "Access-Control-Allow-Origin" header
+     * Used by Application.
+     * @return Array of URLs
+     */
     public String[] getCorsAllowedOrigins() {
+        // Use "rest.cors.allowed-origins" if configured. Otherwise, default to the "dspace.ui.url" setting.
         if (corsAllowedOrigins != null) {
-            return corsAllowedOrigins.split("\\s*,\\s*");
+            return corsAllowedOrigins;
+        } else if (uiURL != null) {
+            return new String[] {uiURL};
         }
         return null;
     }
