@@ -415,8 +415,10 @@ public class CollectionGroupRestController {
      */
     @RequestMapping(method = RequestMethod.GET, value = "/workflowGroups/{workflowRole}")
     @PreAuthorize("hasPermission(#uuid, 'COLLECTION', 'READ')")
-    public GroupResource getWorkflowGroupForRole(@PathVariable UUID uuid, HttpServletResponse response,
-                                                 HttpServletRequest request, @PathVariable String workflowRole)
+    public ResponseEntity<ResourceSupport> getWorkflowGroupForRole(@PathVariable UUID uuid,
+                                                                   HttpServletResponse response,
+                                                                   HttpServletRequest request,
+                                                                   @PathVariable String workflowRole)
         throws Exception {
         Context context = ContextUtil.obtainContext(request);
         Collection collection = collectionService.find(context, uuid);
@@ -431,7 +433,11 @@ public class CollectionGroupRestController {
         }
 
         GroupRest groupRest = collectionRestRepository.getWorkflowGroupForRole(context, collection, workflowRole);
-        return converterService.toResource(groupRest);
+        if (groupRest == null) {
+            return ControllerUtils.toEmptyResponse(HttpStatus.NO_CONTENT);
+        }
+        GroupResource groupResource = converterService.toResource(groupRest);
+        return ControllerUtils.toResponseEntity(HttpStatus.OK, new HttpHeaders(), groupResource);
     }
 
     /**

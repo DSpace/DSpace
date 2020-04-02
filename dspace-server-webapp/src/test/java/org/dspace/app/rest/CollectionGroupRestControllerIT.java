@@ -2018,7 +2018,7 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
                         .andExpect(status().isNoContent());
 
         getClient(token).perform(get("/api/core/collections/" + collection.getID() + "/workflowGroups/reviewer"))
-                        .andExpect(status().isNotFound());
+                        .andExpect(status().isNoContent());
     }
 
 

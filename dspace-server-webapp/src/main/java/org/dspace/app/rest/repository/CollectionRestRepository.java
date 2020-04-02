@@ -570,7 +570,7 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
         }
         Group group = workflowService.getWorkflowRoleGroup(context, collection, workflowRole, null);
         if (group == null) {
-            throw new ResourceNotFoundException("The requested Group was not found");
+            return null;
         }
         return converter.toRest(group, utils.obtainProjection());
     }
