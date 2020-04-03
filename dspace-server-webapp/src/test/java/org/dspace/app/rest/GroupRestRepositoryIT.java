@@ -1928,7 +1928,7 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
             String authToken = getAuthToken(admin.getEmail(), password);
             getClient(authToken).perform(
                     get("/api/eperson/groups/" + adminGroup.getID() + "/object")
-            ).andExpect(status().isNotFound());
+            ).andExpect(status().isNoContent());
         } finally {
             if (adminGroup != null) {
                 GroupBuilder.deleteGroup(adminGroup.getID());
