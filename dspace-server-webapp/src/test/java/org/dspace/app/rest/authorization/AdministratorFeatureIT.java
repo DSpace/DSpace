@@ -19,12 +19,16 @@ import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.matcher.AuthorizationMatcher;
 import org.dspace.app.rest.model.CollectionRest;
 import org.dspace.app.rest.model.CommunityRest;
+import org.dspace.app.rest.model.SiteRest;
 import org.dspace.app.rest.projection.DefaultProjection;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
+import org.dspace.content.Site;
+import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CommunityService;
+import org.dspace.content.service.SiteService;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.service.GroupService;
 import org.hamcrest.Matchers;
@@ -51,12 +55,18 @@ public class AdministratorFeatureIT extends AbstractControllerIntegrationTest {
     @Autowired
     CommunityService communityService;
 
+    private SiteService siteService;
+
+    /** 
+     * this hold a reference to the test feature {@link AdministratorFeature}
+     */
     private AuthorizationFeature administratorFeature;
 
     @Override
     @Before
     public void setUp() throws Exception {
         super.setUp();
+        siteService = ContentServiceFactory.getInstance().getSiteService();
         administratorFeature = authorizationFeatureService.find(AdministratorFeature.NAME);
     }
 
@@ -101,12 +111,14 @@ public class AdministratorFeatureIT extends AbstractControllerIntegrationTest {
         String tokenAdminComA = getAuthToken(adminComA.getEmail(), password);
         String tokenAdminComB = getAuthToken(adminComB.getEmail(), password);
 
-        // define authorization that we know must exists
+        // define authorizations that we know must exists
         Authorization authAdminCommunityA = new Authorization(adminComA, administratorFeature, communityRestA);
         Authorization authAdminSubCommunityOfA = new Authorization(adminComA, administratorFeature,SubCommunityOfArest);
-        Authorization authAdminBCommunityA = new Authorization(adminComB, administratorFeature, communityRestA);
         Authorization authAdminAColl = new Authorization(adminComA, administratorFeature, collectionRestOfSubComm);
+
+        // define authorizations that we know not exists
         Authorization authAdminBColl = new Authorization(adminComB, administratorFeature, collectionRestOfSubComm);
+        Authorization authAdminBCommunityA = new Authorization(adminComB, administratorFeature, communityRestA);
 
         getClient(tokenAdminComA).perform(get("/api/authz/authorizations/" + authAdminCommunityA.getID()))
                   .andExpect(status().isOk())
@@ -164,9 +176,11 @@ public class AdministratorFeatureIT extends AbstractControllerIntegrationTest {
         String tokenAdminColA = getAuthToken(adminColA.getEmail(), password);
         String tokenAdminColB = getAuthToken(adminColB.getEmail(), password);
 
-        // define authorization that we know must exists
+        // define authorizations that we know must exists
         Authorization authAdminCollectionA = new Authorization(adminColA, administratorFeature, collectionRestA);
         Authorization authAdminCollectionB = new Authorization(adminColB, administratorFeature, collectionRestB);
+
+        // define authorization that we know not exists
         Authorization authAdminBcollectionA = new Authorization(adminColB, administratorFeature, collectionRestA);
 
         getClient(tokenAdminColA).perform(get("/api/authz/authorizations/" + authAdminCollectionA.getID()))
@@ -179,5 +193,75 @@ public class AdministratorFeatureIT extends AbstractControllerIntegrationTest {
 
         getClient(tokenAdminColB).perform(get("/api/authz/authorizations/" + authAdminBcollectionA.getID()))
                   .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void siteWithAdministratorFeatureTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        Community parentCommunity = CommunityBuilder.createCommunity(context)
+                                   .withName("Test Parent Community")
+                                   .build();
+
+        Collection collection = CollectionBuilder.createCollection(context, parentCommunity)
+                               .withName("Test Collection")
+                               .build();
+
+        context.restoreAuthSystemState();
+
+        Site site = siteService.findSite(context);
+        SiteRest siteRest = converterService.toRest(site, DefaultProjection.DEFAULT);
+        CommunityRest communityRest = converterService.toRest(parentCommunity, DefaultProjection.DEFAULT);
+        CollectionRest collectionRest = converterService.toRest(collection, DefaultProjection.DEFAULT);
+
+        // tokens
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        String tokenEperson = getAuthToken(eperson.getEmail(), password);
+
+
+        // define authorizations of Admin that we know must exists
+        Authorization authAdminSite = new Authorization(admin, administratorFeature, siteRest);
+        Authorization authAdminCommunity = new Authorization(admin, administratorFeature, communityRest);
+        Authorization authAdminCollection = new Authorization(admin, administratorFeature, collectionRest);
+
+        // define authorizations of EPerson that we know not exists
+        Authorization authEPersonSite = new Authorization(eperson, administratorFeature, siteRest);
+        Authorization authEpersonCommunity = new Authorization(eperson, administratorFeature, communityRest);
+        Authorization authEpersonCollection = new Authorization(eperson, administratorFeature, collectionRest);
+
+        // define authorizations of Anonymous that we know not exists
+        Authorization authAnonymousSite = new Authorization(null, administratorFeature, siteRest);
+        Authorization authAnonymousCommunity = new Authorization(null, administratorFeature, communityRest);
+        Authorization authAnonymousCollection = new Authorization(null, administratorFeature, collectionRest);
+
+        getClient(tokenAdmin).perform(get("/api/authz/authorizations/" + authAdminSite.getID()))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$", Matchers.is(AuthorizationMatcher.matchAuthorization(authAdminSite))));
+
+        getClient(tokenAdmin).perform(get("/api/authz/authorizations/" + authAdminCommunity.getID()))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$", Matchers.is(AuthorizationMatcher.matchAuthorization(authAdminCommunity))));
+
+        getClient(tokenAdmin).perform(get("/api/authz/authorizations/" + authAdminCollection.getID()))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$", Matchers.is(AuthorizationMatcher.matchAuthorization(authAdminCollection))));
+
+        getClient(tokenEperson).perform(get("/api/authz/authorizations/" + authEPersonSite.getID()))
+                    .andExpect(status().isNotFound());
+
+        getClient(tokenEperson).perform(get("/api/authz/authorizations/" + authEpersonCommunity.getID()))
+                    .andExpect(status().isNotFound());
+
+        getClient(tokenEperson).perform(get("/api/authz/authorizations/" + authEpersonCollection.getID()))
+                    .andExpect(status().isNotFound());
+
+        getClient().perform(get("/api/authz/authorizations/" + authAnonymousSite.getID()))
+                   .andExpect(status().isNotFound());
+
+        getClient().perform(get("/api/authz/authorizations/" + authAnonymousCommunity.getID()))
+                   .andExpect(status().isNotFound());
+
+        getClient().perform(get("/api/authz/authorizations/" + authAnonymousCollection.getID()))
+                   .andExpect(status().isNotFound());
     }
 }
