@@ -18,17 +18,13 @@ import javax.servlet.http.HttpServletRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
-import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.converter.MetadataConverter;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.GroupRest;
 import org.dspace.app.rest.model.patch.Patch;
-import org.dspace.app.rest.utils.Utils;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
-import org.dspace.content.service.CollectionService;
-import org.dspace.content.service.CommunityService;
 import org.dspace.core.Context;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.service.GroupService;
@@ -49,18 +45,6 @@ import org.springframework.stereotype.Component;
 public class GroupRestRepository extends DSpaceObjectRestRepository<Group, GroupRest> {
     @Autowired
     GroupService gs;
-
-    @Autowired
-    CollectionService collectionService;
-
-    @Autowired
-    CommunityService communityService;
-
-    @Autowired
-    protected Utils utils;
-
-    @Autowired
-    protected ConverterService converter;
 
     @Autowired
     GroupRestRepository(GroupService dsoService) {

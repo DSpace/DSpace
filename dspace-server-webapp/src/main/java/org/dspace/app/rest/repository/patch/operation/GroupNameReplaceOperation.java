@@ -21,7 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
- * Implementation for Group password patches.
+ * Implementation for Group name replacement patches.
  *
  * Example: <code>
  * curl -X PATCH http://${dspace.server.url}/api/epersons/groups/<:id-group> -H "
