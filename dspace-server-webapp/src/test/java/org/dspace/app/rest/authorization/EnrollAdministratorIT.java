@@ -33,6 +33,8 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
+ * test that the enroll process for a new administrator, i.e. create an user and
+ * add him to the administrators group, will result in the Administrator Feature(s) to be available to such user.
  * 
  * @author Mykhaylo Boychuk (mykhaylo.boychuk at 4science.it)
  *
@@ -48,14 +50,17 @@ public class EnrollAdministratorIT extends AbstractControllerIntegrationTest {
 
     private SiteService siteService;
 
-    private AuthorizationFeature administratorFuture;
+    /** 
+     * this hold a reference to the test feature {@link AdministratorFeature}
+     */
+    private AuthorizationFeature administratorFeature;
 
     @Override
     @Before
     public void setUp() throws Exception {
         super.setUp();
         siteService = ContentServiceFactory.getInstance().getSiteService();
-        administratorFuture = authorizationFeatureService.find(AdministratorFeature.NAME);
+        administratorFeature = authorizationFeatureService.find(AdministratorFeature.NAME);
     }
 
     @Test
@@ -77,7 +82,6 @@ public class EnrollAdministratorIT extends AbstractControllerIntegrationTest {
 
         // tokens
         String tokenEperson1 = getAuthToken(eperson1.getEmail(), password);
-        String tokenOtherEperson = getAuthToken(eperson.getEmail(), password);
         String tokenAdmin = getAuthToken(admin.getEmail(), password);
 
         // add eperson1 to the admin group
@@ -87,15 +91,11 @@ public class EnrollAdministratorIT extends AbstractControllerIntegrationTest {
                              .andExpect(status().isNoContent());
 
         // define authorization that we know must exists
-        Authorization authAdminSite = new Authorization(eperson1, administratorFuture, siteRest);
-        Authorization authOtherEPersonSite = new Authorization(eperson, administratorFuture, siteRest);
+        Authorization authAdminSite = new Authorization(eperson1, administratorFeature, siteRest);
 
         // access the authorization for the eperson1 user
         getClient(tokenEperson1).perform(get("/api/authz/authorizations/" + authAdminSite.getID()))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$", Matchers.is(AuthorizationMatcher.matchAuthorization(authAdminSite))));
-
-        getClient(tokenOtherEperson).perform(get("/api/authz/authorizations/" + authOtherEPersonSite.getID()))
-                  .andExpect(status().isNotFound());
     }
 }

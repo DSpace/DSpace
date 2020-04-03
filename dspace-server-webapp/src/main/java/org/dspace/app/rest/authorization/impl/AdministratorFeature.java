@@ -24,6 +24,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
+ * The administrator feature. It can be used for verify that an user has access
+ * to the administrative feature of the repository or of a specific community and collection.
  *
  * @author Mykhaylo Boychuk (mykhaylo.boychuk at 4science.it)
  */
