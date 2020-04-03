@@ -10,8 +10,11 @@ package org.dspace.app.rest;
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadata;
 import static org.hamcrest.Matchers.allOf;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 import static org.springframework.data.rest.webmvc.RestMediaTypes.TEXT_URI_LIST_VALUE;
 import static org.springframework.http.MediaType.parseMediaType;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -54,6 +57,10 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
 import org.dspace.content.WorkspaceItem;
+import org.dspace.discovery.DiscoverQuery;
+import org.dspace.discovery.DiscoverResult;
+import org.dspace.discovery.IndexableObject;
+import org.dspace.discovery.SearchService;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.factory.EPersonServiceFactory;
@@ -74,6 +81,9 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
 
     @Autowired
     private ConfigurationService configurationService;
+
+    @Autowired
+    private SearchService searchService;
 
     private Group embargoedGroups;
     private Group embargoedGroup1;
@@ -3160,4 +3170,67 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                         .andExpect(status().isUnauthorized());
     }
 
+    @Test
+    public void workspaceItemDeletionFromSolrTest() throws Exception {
+        //We turn off the authorization system in order to create the structure as defined below
+        context.turnOffAuthorisationSystem();
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and two collections.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+
+        context.restoreAuthSystemState();
+
+        ObjectMapper mapper = new ObjectMapper();
+        // You have to be an admin to create an Item from an ExternalDataObject
+        String token = getAuthToken(admin.getEmail(), password);
+        MvcResult mvcResult = getClient(token).perform(post("/api/submission/workspaceitems?owningCollection="
+                                                                + col1.getID().toString())
+                                                           .contentType(parseMediaType(TEXT_URI_LIST_VALUE))
+                                                           .content("https://localhost:8080/server/api/integration/" +
+                                                                        "externalsources/mock/entryValues/one"))
+                                              .andExpect(status().isCreated()).andReturn();
+
+        String content = mvcResult.getResponse().getContentAsString();
+        Map<String,Object> map = mapper.readValue(content, Map.class);
+        Integer workspaceItemId = (Integer) map.get("id");
+        String itemUuidString = String.valueOf(((Map) ((Map) map.get("_embedded")).get("item")).get("uuid"));
+
+        getClient(token).perform(get("/api/submission/workspaceitems/" + workspaceItemId))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$", Matchers.allOf(
+                            hasJsonPath("$.id", is(workspaceItemId)),
+                            hasJsonPath("$.type", is("workspaceitem")),
+                            hasJsonPath("$._embedded.item", Matchers.allOf(
+                                hasJsonPath("$.id", is(itemUuidString)),
+                                hasJsonPath("$.uuid", is(itemUuidString)),
+                                hasJsonPath("$.type", is("item")),
+                                hasJsonPath("$.metadata", Matchers.allOf(
+                                    MetadataMatcher.matchMetadata("dc.contributor.author", "Donald, Smith")
+                                )))))
+                        ));
+        context.turnOffAuthorisationSystem();
+        DiscoverQuery discoverQuery = new DiscoverQuery();
+        discoverQuery.setQuery("*:*");
+        discoverQuery.addFilterQueries("search.resourceid:" + workspaceItemId);
+        DiscoverResult discoverResult = searchService.search(context, discoverQuery);
+        List<IndexableObject> indexableObjects = discoverResult.getIndexableObjects();
+        context.restoreAuthSystemState();
+        assertThat(indexableObjects.get(0).getIndexedObject().getID(), equalTo(workspaceItemId));
+
+
+        getClient(token).perform(delete("/api/submission/workspaceitems/" + workspaceItemId))
+                   .andExpect(status().isNoContent());
+
+        context.turnOffAuthorisationSystem();
+        discoverResult = searchService.search(context, discoverQuery);
+        context.restoreAuthSystemState();
+        assertTrue(discoverResult.getIndexableObjects().size() == 0);
+
+    }
 }
