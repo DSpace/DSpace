@@ -54,11 +54,7 @@ public class GroupParentObjectLinkRepository extends AbstractDSpaceRestRepositor
                 if (parent != null) {
                     return converter.toRest(parent, utils.obtainProjection());
                 } else {
-                    throw new ResourceNotFoundException(
-                            GroupRest.CATEGORY + "." + GroupRest.NAME
-                                    + " with id: " + groupId
-                                    + " has no associated collection or community"
-                    );
+                    return null;
                 }
             }
         } catch (SQLException e) {
