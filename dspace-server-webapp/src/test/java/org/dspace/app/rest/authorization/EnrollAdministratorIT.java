@@ -73,7 +73,7 @@ public class EnrollAdministratorIT extends AbstractControllerIntegrationTest {
         Site site = siteService.findSite(context);
         SiteRest siteRest = converterService.toRest(site, DefaultProjection.DEFAULT);
 
-        Group adminGroup = groupService.findByName(context, "Administrator");
+        Group adminGroup = groupService.findByName(context, Group.ADMIN);
 
         // tokens
         String tokenEperson1 = getAuthToken(eperson1.getEmail(), password);
@@ -88,13 +88,14 @@ public class EnrollAdministratorIT extends AbstractControllerIntegrationTest {
 
         // define authorization that we know must exists
         Authorization authAdminSite = new Authorization(eperson1, administratorFuture, siteRest);
+        Authorization authOtherEPersonSite = new Authorization(eperson, administratorFuture, siteRest);
 
         // access the authorization for the eperson1 user
         getClient(tokenEperson1).perform(get("/api/authz/authorizations/" + authAdminSite.getID()))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$", Matchers.is(AuthorizationMatcher.matchAuthorization(authAdminSite))));
 
-        getClient(tokenOtherEperson).perform(get("/api/authz/authorizations/" + authAdminSite.getID()))
-                                    .andExpect(status().isForbidden());
+        getClient(tokenOtherEperson).perform(get("/api/authz/authorizations/" + authOtherEPersonSite.getID()))
+                  .andExpect(status().isNotFound());
     }
 }
