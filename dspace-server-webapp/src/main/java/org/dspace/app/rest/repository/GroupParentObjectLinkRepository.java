@@ -9,7 +9,6 @@ package org.dspace.app.rest.repository;
 
 import java.sql.SQLException;
 import java.util.UUID;
-
 import javax.annotation.Nullable;
 import javax.servlet.http.HttpServletRequest;
 
