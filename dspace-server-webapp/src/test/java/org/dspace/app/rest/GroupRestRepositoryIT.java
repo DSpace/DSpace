@@ -47,7 +47,6 @@ import org.dspace.authorize.service.ResourcePolicyService;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.factory.ContentServiceFactory;
-import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
 import org.dspace.core.Constants;
 import org.dspace.eperson.EPerson;
@@ -466,14 +465,10 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
         context.restoreAuthSystemState();
         String token = getAuthToken(admin.getEmail(), password);
 
-        String requestBody
-                = "      [\n"
-                + "        {\n"
-                + "          \"op\": \"replace\",\n"
-                + "          \"path\": \"/name\",\n"
-                + "          \"value\": \"new name\"\n"
-                + "        }\n"
-                + "      ]";
+        List<Operation> ops = new ArrayList<>();
+        ReplaceOperation replaceOperation = new ReplaceOperation("/name", "new name");
+        ops.add(replaceOperation);
+        String requestBody = getPatchContent(ops);
         getClient(token)
                 .perform(patch("/api/eperson/groups/" + group.getID()).content(requestBody)
                                  .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
@@ -511,14 +506,10 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         String token = getAuthToken(admin.getEmail(), password);
 
-        String requestBody
-                = "      [\n"
-                + "        {\n"
-                + "          \"op\": \"replace\",\n"
-                + "          \"path\": \"/name\",\n"
-                + "          \"value\": \"new name\"\n"
-                + "        }\n"
-                + "      ]";
+        List<Operation> ops = new ArrayList<>();
+        ReplaceOperation replaceOperation = new ReplaceOperation("/name", "new name");
+        ops.add(replaceOperation);
+        String requestBody = getPatchContent(ops);
         getClient(token)
                 .perform(patch("/api/eperson/groups/" + workflowGroup.getID()).content(requestBody)
                                  .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
@@ -541,14 +532,10 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
         context.restoreAuthSystemState();
         String token = getAuthToken(admin.getEmail(), password);
 
-        String requestBody
-                = "      [\n"
-                + "        {\n"
-                + "          \"op\": \"replace\",\n"
-                + "          \"path\": \"/name\",\n"
-                + "          \"value\": \"new name\"\n"
-                + "        }\n"
-                + "      ]";
+        List<Operation> ops = new ArrayList<>();
+        ReplaceOperation replaceOperation = new ReplaceOperation("/name", "new name");
+        ops.add(replaceOperation);
+        String requestBody = getPatchContent(ops);
         getClient(token)
                 .perform(patch("/api/eperson/groups/" + group.getID()).content(requestBody)
                                  .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
@@ -1663,9 +1650,7 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
 
             parentGroup = groupService.create(context);
 
-            context.commit();
-
-            parentGroup = context.reloadEntity(parentGroup);
+            context.restoreAuthSystemState();
 
             String authToken = getAuthToken(admin.getEmail(), password);
 
@@ -1700,9 +1685,7 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
 
             parentGroup = groupService.create(context);
 
-            context.commit();
-
-            parentGroup = context.reloadEntity(parentGroup);
+            context.restoreAuthSystemState();
 
             String authToken = getAuthToken(admin.getEmail(), password);
 
@@ -1727,41 +1710,58 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     @Test
     public void deleteGroupUnprocessableTest() throws Exception {
-        context.turnOffAuthorisationSystem();
+        Collection col1 = null;
+        Community child1 = null;
+        Group workflowGroup = null;
+        try {
+            context.turnOffAuthorisationSystem();
 
-        EPerson reviewer1 = EPersonBuilder.createEPerson(context)
-                .withEmail("reviewer1@example.com")
-                .withPassword(password)
-                .build();
+            EPerson reviewer1 = EPersonBuilder.createEPerson(context)
+                    .withEmail("reviewer1@example.com")
+                    .withPassword(password)
+                    .build();
 
-        parentCommunity = CommunityBuilder.createCommunity(context)
-                .withName("Parent Community")
-                .build();
-        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
-                .withName("Sub Community")
-                .build();
-        Collection col1 = CollectionBuilder.createCollection(context, child1)
-                .withName("Collection 1")
-                .withWorkflowGroup(1, admin, reviewer1)
-                .build();
+            parentCommunity = CommunityBuilder.createCommunity(context)
+                    .withName("Parent Community")
+                    .build();
+            child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                    .withName("Sub Community")
+                    .build();
+            col1 = CollectionBuilder.createCollection(context, child1)
+                    .withName("Collection 1")
+                    .withWorkflowGroup(1, admin, reviewer1)
+                    .build();
 
-        final Group workflowGroup = col1.getWorkflowStep1(context);
-        context.commit();
-        context.reloadEntity(workflowGroup);
+            workflowGroup = col1.getWorkflowStep1(context);
+            context.restoreAuthSystemState();
 
-        String authToken = getAuthToken(admin.getEmail(), password);
+            String authToken = getAuthToken(admin.getEmail(), password);
 
-        getClient(authToken).perform(
-                get("/api/eperson/groups/" + workflowGroup.getID())
-        ).andExpect(status().isOk());
+            getClient(authToken).perform(
+                    get("/api/eperson/groups/" + workflowGroup.getID())
+            ).andExpect(status().isOk());
 
-        getClient(authToken).perform(
-                delete("/api/eperson/groups/" + workflowGroup.getID())
-        ).andExpect(status().isUnprocessableEntity());
+            getClient(authToken).perform(
+                    delete("/api/eperson/groups/" + workflowGroup.getID())
+            ).andExpect(status().isUnprocessableEntity());
 
-        getClient(authToken).perform(
-                get("/api/eperson/groups/" + workflowGroup.getID())
-        ).andExpect(status().isOk());
+            getClient(authToken).perform(
+                    get("/api/eperson/groups/" + workflowGroup.getID())
+            ).andExpect(status().isOk());
+        } finally {
+            if (col1 != null) {
+                CollectionBuilder.deleteCollection(col1.getID());
+            }
+            if (child1 != null) {
+                CommunityBuilder.deleteCommunity(child1.getID());
+            }
+            if (parentCommunity != null) {
+                CommunityBuilder.deleteCommunity(parentCommunity.getID());
+            }
+            if (workflowGroup != null) {
+                GroupBuilder.deleteGroup(workflowGroup.getID());
+            }
+        }
 
     }
 
@@ -1771,7 +1771,6 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
         GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
         final Group group = groupService.findByName(context, Group.ANONYMOUS);
         context.restoreAuthSystemState();
-        String token = getAuthToken(admin.getEmail(), password);
 
         String authToken = getAuthToken(admin.getEmail(), password);
 
@@ -1792,18 +1791,16 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
     @Test
     public void deleteGroupForbiddenTest() throws Exception {
 
-        GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
-
         Group parentGroup = null;
 
         try {
             context.turnOffAuthorisationSystem();
 
-            parentGroup = groupService.create(context);
+            parentGroup = GroupBuilder.createGroup(context)
+                    .withName("test group")
+                    .build();
 
-            context.commit();
-
-            parentGroup = context.reloadEntity(parentGroup);
+            context.restoreAuthSystemState();
 
             String adminToken = getAuthToken(admin.getEmail(), password);
             String authToken = getAuthToken(eperson.getEmail(), password);
@@ -1829,10 +1826,6 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     @Test
     public void deleteGroupNotFoundTest() throws Exception {
-
-        context.turnOffAuthorisationSystem();
-        context.commit();
-
         String authToken = getAuthToken(admin.getEmail(), password);
 
         getClient(authToken).perform(
@@ -1842,17 +1835,17 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     @Test
     public void getGroupObjectCommunityTest() throws Exception {
-        CommunityService communityService
-                = ContentServiceFactory.getInstance().getCommunityService();
         Community community = null;
         Group adminGroup = null;
 
         try {
             context.turnOffAuthorisationSystem();
-            community = communityService.create(null, context);
-            adminGroup = communityService.createAdministrators(context, community);
-            context.commit();
-            adminGroup = context.reloadEntity(adminGroup);
+            community =  CommunityBuilder.createCommunity(context)
+                    .withName("Parent Community")
+                    .withAdminGroup(admin)
+                    .build();
+            adminGroup = community.getAdministrators();
+            context.restoreAuthSystemState();
 
             String authToken = getAuthToken(admin.getEmail(), password);
             getClient(authToken).perform(
@@ -1870,10 +1863,6 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     @Test
     public void getGroupObjectCollectionTest() throws Exception {
-        CommunityService communityService
-                = ContentServiceFactory.getInstance().getCommunityService();
-        CollectionService collectionService
-                = ContentServiceFactory.getInstance().getCollectionService();
         Community community = null;
         Collection collection = null;
         Group adminGroup = null;
@@ -1882,13 +1871,20 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         try {
             context.turnOffAuthorisationSystem();
-            community = communityService.create(null, context);
-            collection = collectionService.create(context, community);
-            adminGroup = collectionService.createAdministrators(context, collection);
-            worfklowGroup = collectionService.createWorkflowGroup(context, collection, 1);
-            submitterGroup = collectionService.createSubmitters(context, collection);
-            context.commit();
-            adminGroup = context.reloadEntity(adminGroup);
+            community = CommunityBuilder.createCommunity(context)
+                    .withName("Parent Community")
+                    .withAdminGroup(admin)
+                    .build();
+            collection = CollectionBuilder.createCollection(context, community)
+                    .withName("Collection")
+                    .withAdminGroup(admin)
+                    .withWorkflowGroup(1, admin)
+                    .withSubmitterGroup(admin)
+                    .build();
+            adminGroup = collection.getAdministrators();
+            worfklowGroup = collection.getWorkflowStep1(context);
+            submitterGroup = collection.getSubmitters();
+            context.restoreAuthSystemState();
 
             String authToken = getAuthToken(admin.getEmail(), password);
             getClient(authToken).perform(
@@ -1921,13 +1917,13 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     @Test
     public void getGroupObjectNotFoundTest() throws Exception {
-        GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
         Group adminGroup = null;
         try {
             context.turnOffAuthorisationSystem();
-            adminGroup = groupService.create(context);
-            context.commit();
-            adminGroup = context.reloadEntity(adminGroup);
+            adminGroup = GroupBuilder.createGroup(context)
+                    .withName("test group")
+                    .build();
+            context.restoreAuthSystemState();
 
             String authToken = getAuthToken(admin.getEmail(), password);
             getClient(authToken).perform(
@@ -1942,18 +1938,24 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     @Test
     public void getGroupObjectUnauthorizedTest() throws Exception {
-        GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
         Group adminGroup = null;
+        Community community = null;
         try {
             context.turnOffAuthorisationSystem();
-            adminGroup = groupService.create(context);
-            context.commit();
-            adminGroup = context.reloadEntity(adminGroup);
+            community = CommunityBuilder.createCommunity(context)
+                    .withName("Parent Community")
+                    .withAdminGroup(admin)
+                    .build();
+            adminGroup = community.getAdministrators();
+            context.restoreAuthSystemState();
 
             getClient().perform(
                     get("/api/eperson/groups/" + adminGroup.getID() + "/object")
             ).andExpect(status().isUnauthorized());
         } finally {
+            if (community != null) {
+                CommunityBuilder.deleteCommunity(community.getID());
+            }
             if (adminGroup != null) {
                 GroupBuilder.deleteGroup(adminGroup.getID());
             }
@@ -1968,10 +1970,10 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
         Group group = GroupBuilder.createGroup(context)
                 .withName(testGroupName)
                 .build();
-
+        context.restoreAuthSystemState();
 
         String newName = "New test name";
-        List<Operation> ops = new ArrayList<Operation>();
+        List<Operation> ops = new ArrayList<>();
         ReplaceOperation replaceOperation = new ReplaceOperation("/name", newName);
         ops.add(replaceOperation);
         String patchBody = getPatchContent(ops);

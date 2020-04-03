@@ -11,7 +11,6 @@ import static java.util.regex.Pattern.compile;
 import static org.apache.http.HttpStatus.SC_NO_CONTENT;
 import static org.apache.http.HttpStatus.SC_UNPROCESSABLE_ENTITY;
 import static org.dspace.app.rest.utils.ContextUtil.obtainContext;
-import static org.dspace.app.rest.utils.RegexUtils.REGEX_REQUESTMAPPING_IDENTIFIER_AS_UUID;
 import static org.dspace.app.rest.utils.RegexUtils.REGEX_UUID;
 import static org.dspace.app.util.AuthorizeUtil.authorizeManageAdminGroup;
 import static org.dspace.app.util.AuthorizeUtil.authorizeManageSubmittersGroup;
@@ -31,9 +30,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.dspace.app.rest.exception.UnprocessableEntityException;
-import org.dspace.app.rest.model.DSpaceObjectRest;
 import org.dspace.app.rest.model.GroupRest;
-import org.dspace.app.rest.repository.GroupRestRepository;
 import org.dspace.app.rest.utils.GroupUtil;
 import org.dspace.app.rest.utils.Utils;
 import org.dspace.authorize.AuthorizeException;
@@ -52,7 +49,6 @@ import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -79,9 +75,6 @@ public class GroupRestController {
 
     @Autowired
     GroupUtil groupUtil;
-
-    @Autowired
-    GroupRestRepository repository;
 
     /**
      * Method to add one or more subgroups to a group.
