@@ -24,7 +24,6 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
-import org.springframework.web.servlet.HandlerExceptionResolver;
 
 /**
  * Spring Security configuration for DSpace Spring Rest
@@ -53,10 +52,6 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     @Autowired
     private CustomLogoutHandler customLogoutHandler;
-
-    @Autowired
-    private HandlerExceptionResolver handlerExceptionResolver;
-
     @Override
     public void configure(WebSecurity webSecurity) throws Exception {
         webSecurity

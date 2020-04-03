@@ -23,7 +23,9 @@ import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
+import org.dspace.services.ConfigurationService;
 import org.dspace.services.RequestService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.util.UUIDUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,6 +58,7 @@ public class StatelessAuthenticationFilter extends BasicAuthenticationFilter {
 
     private EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
 
+    private ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
 
     private boolean inErrorOnBehalfOf = false;
 
@@ -102,7 +105,14 @@ public class StatelessAuthenticationFilter extends BasicAuthenticationFilter {
                 List<GrantedAuthority> authorities = authenticationProvider.getGrantedAuthorities(context, eperson);
                 String onBehalfOfParameterValue = request.getHeader(ON_BEHALF_OF_REQUEST_PARAM);
                 if (onBehalfOfParameterValue != null) {
-                    return getOnBehalfOfAuthentication(context, onBehalfOfParameterValue, request, res);
+                    if (configurationService.getBooleanProperty("webui.user.assumelogin")) {
+                        return getOnBehalfOfAuthentication(context, onBehalfOfParameterValue, res);
+                    } else {
+                        inErrorOnBehalfOf = true;
+                        res.sendError(HttpServletResponse.SC_BAD_REQUEST, "The login as feature is not allowed" +
+                            " due to the current configuration");
+                        return null;
+                    }
                 }
 
                 //Return the Spring authentication object
@@ -113,7 +123,8 @@ public class StatelessAuthenticationFilter extends BasicAuthenticationFilter {
         } else {
             if (request.getHeader(ON_BEHALF_OF_REQUEST_PARAM) != null) {
                 inErrorOnBehalfOf = true;
-                res.sendError(HttpServletResponse.SC_UNAUTHORIZED, "There is no logged in user");
+                res.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Only admins are allowed to use the" +
+                    " login as feature");
 
             }
         }
@@ -122,16 +133,22 @@ public class StatelessAuthenticationFilter extends BasicAuthenticationFilter {
     }
 
     private Authentication getOnBehalfOfAuthentication(Context context, String onBehalfOfParameterValue,
-                                                       HttpServletRequest request,
                                                        HttpServletResponse res) throws IOException {
-        UUID epersonUuid = UUIDUtils.fromString(onBehalfOfParameterValue);
-        if (epersonUuid == null) {
-            inErrorOnBehalfOf = true;
-            res.sendError(HttpServletResponse.SC_BAD_REQUEST, "The given UUID in the X-On-Behalf-Of header " +
-                "was not a proper UUID");
-            return null;
-        }
+
         try {
+            if (!authorizeService.isAdmin(context)) {
+                inErrorOnBehalfOf = true;
+                res.sendError(HttpServletResponse.SC_FORBIDDEN, "Only admins are allowed to use the" +
+                    " login as feature");
+                return null;
+            }
+            UUID epersonUuid = UUIDUtils.fromString(onBehalfOfParameterValue);
+            if (epersonUuid == null) {
+                inErrorOnBehalfOf = true;
+                res.sendError(HttpServletResponse.SC_BAD_REQUEST, "The given UUID in the X-On-Behalf-Of header " +
+                    "was not a proper UUID");
+                return null;
+            }
             EPerson onBehalfOfEPerson = ePersonService.find(context, epersonUuid);
             if (onBehalfOfEPerson == null) {
                 inErrorOnBehalfOf = true;
@@ -139,7 +156,7 @@ public class StatelessAuthenticationFilter extends BasicAuthenticationFilter {
                     "was not a proper EPerson UUID");
                 return null;
             }
-            if (authorizeService.isAdmin(context)) {
+            if (!authorizeService.isAdmin(context, onBehalfOfEPerson)) {
                 requestService.setCurrentUserId(epersonUuid);
                 context.switchContextUser(onBehalfOfEPerson);
                 return new DSpaceAuthentication(onBehalfOfEPerson.getEmail(),
@@ -147,7 +164,8 @@ public class StatelessAuthenticationFilter extends BasicAuthenticationFilter {
                                                                                              onBehalfOfEPerson));
             } else {
                 inErrorOnBehalfOf = true;
-                res.sendError(HttpServletResponse.SC_FORBIDDEN, "The current user is not an admin");
+                res.sendError(HttpServletResponse.SC_BAD_REQUEST, "You're unable to use the login as feature to log " +
+                    "in as another admin");
                 return null;
             }
 
