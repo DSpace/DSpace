@@ -13,11 +13,31 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.util.UUID;
 
+import org.dspace.app.rest.builder.EPersonBuilder;
 import org.dspace.app.rest.matcher.EPersonMatcher;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
+import org.dspace.eperson.EPerson;
+import org.dspace.eperson.Group;
+import org.dspace.eperson.service.GroupService;
+import org.dspace.services.ConfigurationService;
+import org.junit.Before;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 public class LoginAsEPersonIT extends AbstractControllerIntegrationTest {
+
+    @Autowired
+    private ConfigurationService configurationService;
+
+    @Autowired
+    private GroupService groupService;
+
+    @Before
+    public void setup() {
+        context.turnOffAuthorisationSystem();
+        configurationService.setProperty("webui.user.assumelogin", true);
+        context.restoreAuthSystemState();
+    }
 
     @Test
     public void loggedInUserRetrievalTest() throws Exception {
@@ -82,6 +102,47 @@ public class LoginAsEPersonIT extends AbstractControllerIntegrationTest {
                                      .param("projection", "full")
                                      .header("X-On-Behalf-Of", eperson.getID()))
                         .andExpect(status().isForbidden());
+
+
+    }
+
+
+    @Test
+    public void loggedInUserPropertyFalseTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        configurationService.setProperty("webui.user.assumelogin", false);
+        context.restoreAuthSystemState();
+
+        String token = getAuthToken(admin.getEmail(), password);
+
+        getClient(token).perform(get("/api/authn/status")
+                                     .header("X-On-Behalf-Of", eperson.getID()))
+                        .andExpect(status().isBadRequest());
+
+        context.turnOffAuthorisationSystem();
+        configurationService.setProperty("webui.user.assumelogin", true);
+        context.restoreAuthSystemState();
+    }
+
+
+    @Test
+    public void loggedInUserOtherAdminTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        EPerson testEperson = EPersonBuilder.createEPerson(context).withEmail("loginasuseradmin@test.com").build();
+
+
+        Group adminGroup = groupService.findByName(context, Group.ADMIN);
+        groupService.addMember(context, adminGroup, testEperson);
+        context.restoreAuthSystemState();
+
+        String token = getAuthToken(admin.getEmail(), password);
+
+        getClient(token).perform(get("/api/authn/status")
+                                     .header("X-On-Behalf-Of", testEperson.getID()))
+                        .andExpect(status().isBadRequest());
+
+
 
 
     }
