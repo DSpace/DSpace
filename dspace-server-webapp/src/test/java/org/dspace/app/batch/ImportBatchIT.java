@@ -8,6 +8,7 @@
 package org.dspace.app.batch;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
@@ -15,9 +16,9 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -265,8 +266,8 @@ public class ImportBatchIT extends AbstractControllerIntegrationTest {
 
             ItemImportMainOA.main(argv);
 
-            assertEquals("Does the workspace item exist?", workspaceItemService.find(context, wi.getID()), wi);
-            assertEquals("Does the item exist?", itemService.find(context, item.getID()), item);
+            assertNotNull("Does the workspace item exist?", workspaceItemService.find(context, wi.getID()));
+            assertNotNull("Does the item exist?", itemService.find(context, item.getID()));
 
             int nItem = workspaceItemService.countByEPerson(context, admin);
             assertEquals("One workspace item found for " + admin.getID(), 1, nItem);
@@ -321,8 +322,8 @@ public class ImportBatchIT extends AbstractControllerIntegrationTest {
 
             ItemImportMainOA.main(argv);
 
-            assertEquals("Does the workspace item exist?", workspaceItemService.find(context, wi.getID()), wi);
-            assertEquals("Does the item exist?", itemService.find(context, item.getID()), item);
+            assertNotNull("Does the workspace item exist?", workspaceItemService.find(context, wi.getID()));
+            assertNotNull("Does the item exist?", itemService.find(context, item.getID()));
 
             int nItem = workspaceItemService.countByEPerson(context, admin);
             assertEquals("One workspace item found for " + admin.getID(), 1, nItem);
@@ -663,21 +664,22 @@ public class ImportBatchIT extends AbstractControllerIntegrationTest {
             ImpRecordToItem impRecordToItem = createImpRecordToItem(context, impRecord, item);
 
             int impBitstreamId = 1;
+            InputStream resource = getClass().getResourceAsStream("/org/dspace/app/rest/simple-article.pdf");
             ImpBitstream impBitstream = createImpBitstream(context, impRecordKey, impBitstreamId,
-                    getClass().getResource("/org/dspace/license/CreativeCommons.xsl"), "CreativeCommons.xsl",
-                    "License file", null, null);
+                    resource, "simple-article.pdf",
+                    "Simple article", null, null);
 
             int impBitstreamMetadatavalueKey = 1;
             createImpBitstreamMetadatavalue(context, impBitstreamId, impBitstreamMetadatavalueKey,
-                    MetadataSchemaEnum.DC.getName(), "description", null, null, "License file");
+                    MetadataSchemaEnum.DC.getName(), "description", null, null, "Simple article");
 
             // Create a new item
             String argv[] = new String[] { "-E", admin.getEmail() };
 
             ItemImportMainOA.main(argv);
 
-            assertEquals("Does workspace item exist?", workspaceItemService.find(context, wi.getID()), wi);
-            assertEquals("Does item exist?", itemService.find(context, item.getID()), item);
+            assertNotNull("Does workspace item exist?", workspaceItemService.find(context, wi.getID()));
+            assertNotNull("Does item exist?", itemService.find(context, item.getID()));
 
             int nItem = workspaceItemService.countByEPerson(context, admin);
             assertEquals("Workspace Item found 1 for " + admin.getID(), 1, nItem);
@@ -699,7 +701,7 @@ public class ImportBatchIT extends AbstractControllerIntegrationTest {
 
                 // check metadata
                 String m = bitstreamService.getMetadata(b, "dc.description");
-                assertEquals("check metadata", "License file", m);
+                assertEquals("check metadata", "Simple article", m);
 
                 // check policy
                 List<ResourcePolicy> p = authorizeService.getPolicies(context, b);
@@ -756,21 +758,22 @@ public class ImportBatchIT extends AbstractControllerIntegrationTest {
             ImpRecordToItem impRecordToItem = createImpRecordToItem(context, impRecord, item);
 
             int impBitstreamId = 1;
+            InputStream resource = getClass().getResourceAsStream("/org/dspace/app/rest/simple-article.pdf");
             ImpBitstream impBitstream = createImpBitstream(context, impRecordKey, impBitstreamId,
-                    getClass().getResource("/org/dspace/license/CreativeCommons.xsl"), "CreativeCommons.xsl",
-                    "License file", adminGroup.getID(), null);
+                    resource, "simple-article.pdf",
+                    "Simple article", adminGroup.getID(), null);
 
             int impBitstreamMetadatavalueKey = 1;
             createImpBitstreamMetadatavalue(context, impBitstreamId, impBitstreamMetadatavalueKey,
-                    MetadataSchemaEnum.DC.getName(), "description", null, null, "License file");
+                    MetadataSchemaEnum.DC.getName(), "description", null, null, "Simple article");
 
             // Create a new item
             String argv[] = new String[] { "-E", admin.getEmail() };
 
             ItemImportMainOA.main(argv);
 
-            assertEquals("Does the workspace item exist?", workspaceItemService.find(context, wi.getID()), wi);
-            assertEquals("Does theh item exist?", itemService.find(context, item.getID()), item);
+            assertNotNull("Does the workspace item exist?", workspaceItemService.find(context, wi.getID()));
+            assertNotNull("Does theh item exist?", itemService.find(context, item.getID()));
 
             int nItem = workspaceItemService.countByEPerson(context, admin);
             assertEquals("One workspace item found for " + admin.getID(), 1, nItem);
@@ -792,13 +795,13 @@ public class ImportBatchIT extends AbstractControllerIntegrationTest {
 
                 // check metadata
                 String m = bitstreamService.getMetadata(b, "dc.description");
-                assertEquals("Check metadata", "License file", m);
+                assertEquals("Check metadata", "Simple article", m);
 
                 // check policy
                 List<ResourcePolicy> p = authorizeService.getPolicies(context, b);
                 assertEquals("Only one embrago policy", 1, p.size());
 
-                assertEquals("Use administrator group in emmargo policy", adminGroup.getName(),
+                assertEquals("Use administrator group in embargo policy", adminGroup.getName(),
                         p.get(0).getGroup().getName());
 
                 context.turnOffAuthorisationSystem();
@@ -852,21 +855,22 @@ public class ImportBatchIT extends AbstractControllerIntegrationTest {
             ImpRecordToItem impRecordToItem = createImpRecordToItem(context, impRecord, item);
 
             int impBitstreamId = 1;
+            InputStream resource = getClass().getResourceAsStream("/org/dspace/app/rest/simple-article.pdf");
             ImpBitstream impBitstream = createImpBitstream(context, impRecordKey, impBitstreamId,
-                    getClass().getResource("/org/dspace/license/CreativeCommons.xsl"), "CreativeCommons.xsl",
-                    "License file", adminGroup.getID(), "01/02/2020");
+                     resource, "simple-article.pdf",
+                     "Simple article", adminGroup.getID(), "01/02/2020");
 
             int impBitstreamMetadatavalueKey = 1;
             createImpBitstreamMetadatavalue(context, impBitstreamId, impBitstreamMetadatavalueKey,
-                    MetadataSchemaEnum.DC.getName(), "description", null, null, "License file");
+                    MetadataSchemaEnum.DC.getName(), "description", null, null, "Simple article");
 
             // Create a new item
             String argv[] = new String[] { "-E", admin.getEmail() };
 
             ItemImportMainOA.main(argv);
 
-            assertEquals("Does the workspace item exist?", workspaceItemService.find(context, wi.getID()), wi);
-            assertEquals("Does theh item exist?", itemService.find(context, item.getID()), item);
+            assertNotNull("Does the workspace item exist?", workspaceItemService.find(context, wi.getID()));
+            assertNotNull("Does theh item exist?", itemService.find(context, item.getID()));
 
             int nItem = workspaceItemService.countByEPerson(context, admin);
             assertEquals("One workspace item found for " + admin.getID(), 1, nItem);
@@ -888,7 +892,7 @@ public class ImportBatchIT extends AbstractControllerIntegrationTest {
 
                 // check metadata
                 String m = bitstreamService.getMetadata(b, "dc.description");
-                assertEquals("Check metadata", "License file", m);
+                assertEquals("Check metadata", "Simple article", m);
 
                 // check policy
                 List<ResourcePolicy> p = authorizeService.getPolicies(context, b);
@@ -952,8 +956,6 @@ public class ImportBatchIT extends AbstractControllerIntegrationTest {
             ItemImportMainOA.main(argv);
 
             assertNull("Does the workspace item exist?", workspaceItemService.find(context, wi.getID()));
-            // assertEquals("Does item exist?", item, itemService.find(context,
-            // item.getID()));
 
             List<XmlWorkflowItem> xwil = workflowItemService.findByCollection(context, collection);
             assertEquals("Ony one workflow item in the collection", 1, xwil.size());
@@ -1021,7 +1023,7 @@ public class ImportBatchIT extends AbstractControllerIntegrationTest {
 
             ItemImportMainOA.main(argv);
 
-            assertEquals("Does item exist?", item, itemService.find(context, item.getID()));
+            assertNotNull("Does item exist?", itemService.find(context, item.getID()));
 
             assertEquals("Is item withdraw ?", false, item.isWithdrawn());
             assertEquals("Is item archived ?", true, item.isArchived());
@@ -1134,11 +1136,13 @@ public class ImportBatchIT extends AbstractControllerIntegrationTest {
      * @throws IOException
      * @throws URISyntaxException
      */
-    private ImpBitstream createImpBitstream(Context context, int impRecordKey, int impBitstreamId, URL resource,
+    private ImpBitstream createImpBitstream(Context context, int impRecordKey, int impBitstreamId, InputStream resource,
             String name, String description, UUID embargoGroup, String embargoStartDate)
             throws SQLException, IOException, URISyntaxException {
         ImpRecord impRecord = impRecordService.findByID(context, impRecordKey);
-        File f = new File(resource.toURI());
+        File f = File.createTempFile("myTempFile", ".pdf");
+        java.nio.file.Files.copy(resource, f.toPath(), StandardCopyOption.REPLACE_EXISTING);
+        resource.close();
         ImpBitstream impBitstream = new ImpBitstream();
         impBitstream.setImpBitstreamId(impBitstreamId);
         impBitstream.setImpRecord(impRecord);
