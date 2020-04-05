@@ -53,8 +53,8 @@ public class PubmedEuropeOnlineDataLoader extends NetworkSubmissionLookupDataLoa
     @Override
     public List<Record> getByIdentifier(Context context,
                                         Map<String, Set<String>> keys) throws HttpException, IOException {
-        Set<String> pmids = keys != null ? keys.get(PUBMED) : null;
-        Set<String> dois = keys != null ? keys.get(DOI) : null;
+        Set<String> pmids = (keys != null) ? keys.get(PUBMED) : null;
+        Set<String> dois = (keys != null) ? keys.get(DOI) : null;
         List<Record> results = new ArrayList<Record>();
         if (pmids != null && pmids.size() > 0
                 && (dois == null || dois.size() == 0)) {
