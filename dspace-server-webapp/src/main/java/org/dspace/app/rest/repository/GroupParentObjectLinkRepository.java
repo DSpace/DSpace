@@ -36,7 +36,7 @@ public class GroupParentObjectLinkRepository extends AbstractDSpaceRestRepositor
 
     @Autowired
     GroupService groupService;
-    
+
     @Autowired
     private AuthorizeService authorizeService;
 
