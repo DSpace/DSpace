@@ -1640,72 +1640,52 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     @Test
     public void deleteGroupTest() throws Exception {
+        context.turnOffAuthorisationSystem();
 
-        GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
+        Group parentGroup = GroupBuilder.createGroup(context)
+                .withName("test group")
+                .build();
 
-        Group parentGroup = null;
+        context.restoreAuthSystemState();
 
-        try {
-            context.turnOffAuthorisationSystem();
+        String authToken = getAuthToken(admin.getEmail(), password);
 
-            parentGroup = groupService.create(context);
+        getClient(authToken).perform(
+                get("/api/eperson/groups/" + parentGroup.getID())
+        ).andExpect(status().isOk());
 
-            context.restoreAuthSystemState();
+        getClient(authToken).perform(
+                delete("/api/eperson/groups/" + parentGroup.getID())
+        ).andExpect(status().isNoContent());
 
-            String authToken = getAuthToken(admin.getEmail(), password);
-
-            getClient(authToken).perform(
-                    get("/api/eperson/groups/" + parentGroup.getID())
-            ).andExpect(status().isOk());
-
-            getClient(authToken).perform(
-                    delete("/api/eperson/groups/" + parentGroup.getID())
-            ).andExpect(status().isNoContent());
-
-            getClient(authToken).perform(
-                    get("/api/eperson/groups/" + parentGroup.getID())
-            ).andExpect(status().isNotFound());
-
-        } finally {
-            if (parentGroup != null) {
-                GroupBuilder.deleteGroup(parentGroup.getID());
-            }
-        }
+        getClient(authToken).perform(
+                get("/api/eperson/groups/" + parentGroup.getID())
+        ).andExpect(status().isNotFound());
     }
 
     @Test
     public void deleteGroupUnauthorizedTest() throws Exception {
+        context.turnOffAuthorisationSystem();
 
-        GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
+        Group parentGroup = GroupBuilder.createGroup(context)
+                .withName("test group")
+                .build();
 
-        Group parentGroup = null;
+        context.restoreAuthSystemState();
 
-        try {
-            context.turnOffAuthorisationSystem();
+        String authToken = getAuthToken(admin.getEmail(), password);
 
-            parentGroup = groupService.create(context);
+        getClient(authToken).perform(
+                get("/api/eperson/groups/" + parentGroup.getID())
+        ).andExpect(status().isOk());
 
-            context.restoreAuthSystemState();
+        getClient().perform(
+                delete("/api/eperson/groups/" + parentGroup.getID())
+        ).andExpect(status().isUnauthorized());
 
-            String authToken = getAuthToken(admin.getEmail(), password);
-
-            getClient(authToken).perform(
-                    get("/api/eperson/groups/" + parentGroup.getID())
-            ).andExpect(status().isOk());
-
-            getClient().perform(
-                    delete("/api/eperson/groups/" + parentGroup.getID())
-            ).andExpect(status().isUnauthorized());
-
-            getClient(authToken).perform(
-                    get("/api/eperson/groups/" + parentGroup.getID())
-            ).andExpect(status().isOk());
-
-        } finally {
-            if (parentGroup != null) {
-                GroupBuilder.deleteGroup(parentGroup.getID());
-            }
-        }
+        getClient(authToken).perform(
+                get("/api/eperson/groups/" + parentGroup.getID())
+        ).andExpect(status().isOk());
     }
 
     @Test
