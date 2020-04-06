@@ -460,7 +460,7 @@ public class ImportBatchIT extends AbstractControllerIntegrationTest {
                                 break;
                             }
                             default: {
-                                assertTrue(recordKey != 1 && recordKey != 2 && recordKey != 11);
+                                assertTrue(recordKey != 1 && recordKey != 2 && recordKey != 10 && recordKey != 11);
                                 break;
                             }
                         }
@@ -478,7 +478,6 @@ public class ImportBatchIT extends AbstractControllerIntegrationTest {
             assertTrue("Selected workspace exists (del11)", del11 != null);
 
             // remove del01 and del11
-            int impRecordKey2 = 15;
             ImpRecord impRecord = createImpRecord(context, 1,
                     ImpRecordService.SEND_BACK_TO_WORKSPACE_STATUS, ImpRecordService.DELETE_OPERATION, admin,
                     collection);
@@ -558,7 +557,7 @@ public class ImportBatchIT extends AbstractControllerIntegrationTest {
                 Item item = wi.getItem();
                 List<MetadataValue> metadata = wi.getItem().getMetadata();
 
-                if (wi.getID() != upd02.getID() && wi.getID() != upd10.getID()) {
+                if (!wi.getID().equals(upd02.getID()) && !wi.getID().equals(upd10.getID())) {
                     assertEquals("Only two metadata found", 2, metadata.size());
                 } else {
                     assertEquals("Only three metadata found", 3, metadata.size());
