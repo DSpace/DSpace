@@ -35,6 +35,7 @@ public class MetadataImportScriptConfiguration<T extends MetadataImport> extends
      * Generic setter for the dspaceRunnableClass
      * @param dspaceRunnableClass   The dspaceRunnableClass to be set on this MetadataImportScriptConfiguration
      */
+    @Override
     public void setDspaceRunnableClass(Class<T> dspaceRunnableClass) {
         this.dspaceRunnableClass = dspaceRunnableClass;
     }

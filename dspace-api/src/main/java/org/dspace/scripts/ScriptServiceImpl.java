@@ -7,6 +7,7 @@
  */
 package org.dspace.scripts;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -14,12 +15,15 @@ import org.dspace.core.Context;
 import org.dspace.kernel.ServiceManager;
 import org.dspace.scripts.configuration.ScriptConfiguration;
 import org.dspace.scripts.service.ScriptService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * The implementation for the {@link ScriptService}
  */
 public class ScriptServiceImpl implements ScriptService {
+    private static final Logger log = LoggerFactory.getLogger(ScriptServiceImpl.class);
 
     @Autowired
     private ServiceManager serviceManager;
@@ -38,6 +42,11 @@ public class ScriptServiceImpl implements ScriptService {
     @Override
     public DSpaceRunnable createDSpaceRunnableForScriptConfiguration(ScriptConfiguration scriptToExecute)
         throws IllegalAccessException, InstantiationException {
-        return (DSpaceRunnable) scriptToExecute.getDspaceRunnableClass().newInstance();
+        try {
+            return (DSpaceRunnable) scriptToExecute.getDspaceRunnableClass().getDeclaredConstructor().newInstance();
+        } catch (InvocationTargetException | NoSuchMethodException e) {
+            log.error(e.getMessage(), e);
+            throw new RuntimeException(e);
+        }
     }
 }

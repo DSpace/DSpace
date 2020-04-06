@@ -6,7 +6,7 @@
 
     <bean id="index-discovery" class="org.dspace.discovery.IndexDiscoveryScriptConfiguration">
         <property name="description" value="Update Discovery Solr Search Index"/>
-        <property name="dspaceRunnableClass" value="org.dspace.app.bulkedit.MetadataImport"/>
+        <property name="dspaceRunnableClass" value="org.dspace.discovery.IndexClient"/>
     </bean>
 
     <bean id="metadata-import" class="org.dspace.app.bulkedit.MetadataImportCliScriptConfiguration">
