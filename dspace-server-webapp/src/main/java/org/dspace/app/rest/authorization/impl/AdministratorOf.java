@@ -25,15 +25,17 @@ import org.springframework.stereotype.Component;
 
 /**
  * The administrator feature. It can be used for verify that an user has access
- * to the administrative feature of the repository or of a specific community and collection.
+ * to the administrative features of the repository or of a specific community and collection.
  *
  * @author Mykhaylo Boychuk (mykhaylo.boychuk at 4science.it)
  */
 @Component
-@AuthorizationFeatureDocumentation(name = AdministratorFeature.NAME)
-public class AdministratorFeature implements AuthorizationFeature {
+@AuthorizationFeatureDocumentation(name = AdministratorOf.NAME,
+        description = "It can be used for verify that an user has access "
+                    + "to the administrative features of the repository or of a specific community and collection")
+public class AdministratorOf implements AuthorizationFeature {
 
-    public static final String NAME = "administratorfeature";
+    public static final String NAME = "administratorOf";
 
     @Autowired
     AuthorizeService authService;

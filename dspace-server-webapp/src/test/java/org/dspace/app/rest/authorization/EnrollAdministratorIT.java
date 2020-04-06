@@ -14,7 +14,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import org.dspace.app.rest.authorization.impl.AdministratorFeature;
+import org.dspace.app.rest.authorization.impl.AdministratorOf;
 import org.dspace.app.rest.builder.EPersonBuilder;
 import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.matcher.AuthorizationMatcher;
@@ -51,7 +51,7 @@ public class EnrollAdministratorIT extends AbstractControllerIntegrationTest {
     private SiteService siteService;
 
     /** 
-     * this hold a reference to the test feature {@link AdministratorFeature}
+     * this hold a reference to the test feature {@link AdministratorOf}
      */
     private AuthorizationFeature administratorFeature;
 
@@ -60,7 +60,7 @@ public class EnrollAdministratorIT extends AbstractControllerIntegrationTest {
     public void setUp() throws Exception {
         super.setUp();
         siteService = ContentServiceFactory.getInstance().getSiteService();
-        administratorFeature = authorizationFeatureService.find(AdministratorFeature.NAME);
+        administratorFeature = authorizationFeatureService.find(AdministratorOf.NAME);
     }
 
     @Test
