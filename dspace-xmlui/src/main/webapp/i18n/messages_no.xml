@@ -344,8 +344,8 @@
     <message key="xmlui.ArtifactBrowser.Navigation.browse_subject">Emneord</message>
     <message key="xmlui.ArtifactBrowser.Navigation.browse_dateissued">Utgivelsesdato</message>
     <message key="xmlui.ArtifactBrowser.Navigation.browse_dateaccessioned">Etter innføringsdato</message>
-    <message key="xmlui.ArtifactBrowser.Navigation.head_this_collection">Bla i denne samlingen</message>
-    <message key="xmlui.ArtifactBrowser.Navigation.head_this_community">Bla i dette delarkivet</message>
+    <message key="xmlui.ArtifactBrowser.Navigation.head_this_collection">Denne samlingen</message>
+    <message key="xmlui.ArtifactBrowser.Navigation.head_this_community">Dette delarkivet</message>
     <message key="xmlui.ArtifactBrowser.Navigation.browse_type">Dokumenttyper</message>
     <message key="xmlui.ArtifactBrowser.Navigation.browse_journal">Tidsskrifter</message>
 
