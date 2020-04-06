@@ -58,4 +58,16 @@
   #aspect_submission_StepTransformer_item_publication-title{
     margin-bottom:5px;
   }
+
+
+  .thumbnail {
+    padding: 0;
+    min-height: 100px;
+    max-height: 100px;
+  }
+
+
+  .thumbnail > img, .thumbnail a > img {
+    border: 1px solid #ddd;
+  }
 }

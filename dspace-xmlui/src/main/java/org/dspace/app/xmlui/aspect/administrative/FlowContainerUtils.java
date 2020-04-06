@@ -40,8 +40,10 @@ import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.workflow.WorkflowException;
 import org.dspace.workflow.WorkflowService;
 import org.dspace.workflow.factory.WorkflowServiceFactory;
+import org.dspace.xmlworkflow.Role;
 import org.dspace.xmlworkflow.WorkflowConfigurationException;
 import org.dspace.xmlworkflow.WorkflowUtils;
+import org.dspace.xmlworkflow.cristin.UpdateWorkflow;
 import org.dspace.xmlworkflow.service.XmlWorkflowService;
 import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
@@ -251,6 +253,17 @@ public class FlowContainerUtils
 				
 				hc.setHarvestParams(Integer.parseInt(harvestType), oaiProvider, oaiSetId, metadataKey);
 				hc.setHarvestStatus(HarvestedCollection.STATUS_READY);
+
+				// additional configuration options
+				String ingestFilter = request.getParameter("ingest_filter");
+				String metadataUpdate = request.getParameter("metadata_update");
+				String bundleVersioning = request.getParameter("bundle_versioning");
+				String ingestWorkflow = request.getParameter("ingest_workflow");
+
+				hc.setIngestFilter(ingestFilter);
+				hc.setMetadataAuthorityType(metadataUpdate);
+				hc.setBundleVersioningStrategy(bundleVersioning);
+				hc.setWorkflowProcess(ingestWorkflow);
 			}
 			else {
 				result.setErrors(subResult.getErrors());
@@ -260,9 +273,19 @@ public class FlowContainerUtils
 			
 			harvestedCollectionService.update(context, hc);
 		}
-		        
-        // No notice...
-        //result.setMessage(new Message("default","Harvesting options successfully modified."));
+		String message = "Harvesting options successfully modified.";
+		if (hc != null) {
+			String workflowProcess = hc.getWorkflowProcess();
+			collection = collectionService.find(context, collectionID);
+			String handle = collection.getHandle();
+			if ("source_normal".equals(contentSource) || "default".equals(workflowProcess) ) {
+				UpdateWorkflow.removeXmlWorkFlowNameMap(handle);
+			} else {
+				UpdateWorkflow.addXmlWorkFlowNameMap(handle, workflowProcess);
+			}
+			message += " If you changed the harvesting workflow you may need to restart Dspace in order for the changes to take effect";
+		}
+        result.setMessage(new Message("default","Harvesting options successfully modified."));
         result.setOutcome(true);
         result.setContinue(true);
 		
@@ -496,7 +519,7 @@ public class FlowContainerUtils
 			if (roleGroup == null)
 				roleGroup = collectionService.createSubmitters(context, collection);
 		}else{
-			roleGroup = workflowService.getWorkflowRoleGroup(context, collection, roleName, roleGroup);
+			roleGroup = getXMLWorkflowRole(context, roleName, collection, roleGroup);
 		}
 
 		// In case we needed to create a group, save our changes
@@ -508,6 +531,53 @@ public class FlowContainerUtils
 
 		return null;
     }
+
+	private static Group getOriginalWorkflowRole(Context context, String roleName, Collection collection, Group roleGroup) throws SQLException, AuthorizeException {
+		if (ROLE_WF_STEP1.equals(roleName))
+		{
+			roleGroup = collectionService.getWorkflowGroup(collection, 1);
+			if (roleGroup == null)
+				roleGroup = collectionService.createWorkflowGroup(context, collection, 1);
+		}
+		else if (ROLE_WF_STEP2.equals(roleName))
+		{
+			roleGroup = collectionService.getWorkflowGroup(collection, 2);
+			if (roleGroup == null)
+				roleGroup = collectionService.createWorkflowGroup(context, collection, 2);
+		}
+		else if (ROLE_WF_STEP3.equals(roleName))
+		{
+			roleGroup = collectionService.getWorkflowGroup(collection, 3);
+			if (roleGroup == null)
+				roleGroup = collectionService.createWorkflowGroup(context, collection, 3);
+		}
+		return roleGroup;
+	}
+
+	private static Group getXMLWorkflowRole(Context context, String roleName, Collection collection, Group roleGroup) throws IOException, WorkflowConfigurationException, SQLException, AuthorizeException {
+		Role role = WorkflowUtils.getCollectionAndRepositoryRoles(collection).get(roleName);
+		if(role.getScope() == Role.Scope.COLLECTION || role.getScope() == Role.Scope.REPOSITORY){
+			roleGroup = WorkflowUtils.getRoleGroup(context, collection, role);
+			if(roleGroup == null){
+				authorizeService.authorizeAction(context, collection, Constants.WRITE);
+				//BIBSYS roleGroup = Group.create(context);
+				String groupName = roleName;
+				if(role.getScope() == Role.Scope.COLLECTION){
+					groupName = "COLLECTION_" + collection.getID() + "_WORKFLOW_ROLE_" + roleName;
+				}else{
+					groupName = role.getName();
+				}
+				roleGroup = groupService.create(context);
+				groupService.setName(roleGroup, groupName);
+				groupService.update(context, roleGroup);
+				authorizeService.addPolicy(context, collection, Constants.ADD, roleGroup);
+				if(role.getScope() == Role.Scope.COLLECTION){
+					WorkflowUtils.createCollectionWorkflowRole(context, collection, roleName, roleGroup);
+				}
+			}
+		}
+		return roleGroup;
+	}
 
 	/**
 	 * Delete one of collection's roles
@@ -650,7 +720,7 @@ public class FlowContainerUtils
         {
             throw new UIException("Unable to create a new default read group because either the group already exists or multiple groups are assigned the default privileges.");
         }
-		
+
 		Group role = groupService.create(context);
         groupService.setName(role, "COLLECTION_"+collection.getID().toString() +"_DEFAULT_READ");
 		

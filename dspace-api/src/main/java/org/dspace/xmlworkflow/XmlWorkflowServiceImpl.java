@@ -22,6 +22,7 @@ import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.service.GroupService;
 import org.dspace.handle.service.HandleService;
+import org.dspace.harvest.factory.HarvestServiceFactory;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.usage.UsageWorkflowEvent;
 import org.dspace.workflow.WorkflowException;
@@ -179,6 +180,9 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
                 }
 
             }
+            // Notify submitter when item is submitted
+            notifySubmitter(context, wfi);
+
             // remove the WorkspaceItem
             workspaceItemService.deleteWrapper(context, wsi);
             context.restoreAuthSystemState();
@@ -920,9 +924,7 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
         itemService.update(context, myitem);
     }
 
-    protected void notifyOfReject(Context c, XmlWorkflowItem wi, EPerson e,
-        String reason)
-    {
+    public void notifyOfReject(Context c, XmlWorkflowItem wi, EPerson e, String reason) {
         try
         {
             // Get the item title
@@ -958,5 +960,57 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
     @Override
     public String getMyDSpaceLink() {
         return ConfigurationManager.getProperty("dspace.url") + "/mydspace";
+    }
+
+    private void notifySubmitter(Context c, XmlWorkflowItem xmlWorkflowItem) throws SQLException {
+        // check to see if notification is turned off
+        // and only do it once - delete key after notification has
+        // been suppressed for the first time
+        UUID myID = xmlWorkflowItem.getItem().getID();
+
+        if (noEMail.containsKey(myID))
+        {
+            // suppress email, and delete key
+            noEMail.remove(myID);
+        }
+        else
+        {
+            try
+            {
+                // Get the item title
+                String title = xmlWorkflowItem.getItem().getName();
+
+                // Get the submitter's name
+                EPerson ePerson = xmlWorkflowItem.getSubmitter();
+                String submitter = "Unknown";
+                if (ePerson != null) {
+                    submitter = ePerson.getFullName() + " (" + ePerson.getEmail() + ")";
+                }
+
+                // Get the collection
+                Collection coll = xmlWorkflowItem.getCollection();
+
+                if (!HarvestServiceFactory.getInstance().getHarvestedCollectionService().isHarvestable(c, coll)) {
+                    // Collection is not harvestable send the email
+                    Locale supportedLocale = I18nUtil.getEPersonLocale(ePerson);
+                    Email email = Email.getEmail(I18nUtil.getEmailFilename(supportedLocale, "submit_item"));
+                    email.addArgument(title);
+                    email.addArgument(coll.getName());
+                    email.addArgument(submitter);
+
+                    email.addArgument(getMyDSpaceLink());
+                    email.addRecipient(ePerson.getEmail());
+                    email.send();
+                }
+            }
+
+            catch (Exception ex) {
+                // log this email error
+                log.warn(LogManager.getHeader(c, "notify_Submitter",
+                        "cannot email user" + " eperson_id" + xmlWorkflowItem.getSubmitter().getID()
+                                + " eperson_email" + xmlWorkflowItem.getSubmitter().getEmail()
+                                + " workflow_item_id" + xmlWorkflowItem.getID()));
+            }
+        }
     }
 }

@@ -103,7 +103,9 @@ public class AccessStep extends AbstractSubmissionStep
         List form = div.addList("submit-access-settings", List.TYPE_FORM);
         form.setHead(T_head);
 
-        addPrivateCheckBox(request, form, item);
+        // Hide private checkbox
+
+        // addPrivateCheckBox(request, form, item);
 
 	    // list Policies already added
 	    asu.addTablePolicies(div, item, collection);

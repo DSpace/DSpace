@@ -1,0 +1,127 @@
+<?xml version="1.0"?>
+
+<dspace-dc-types>
+
+    <dspace-header>
+        <title>Bibsys Metadata Registry</title>
+    </dspace-header>
+
+    <!-- schemas used -->
+
+    <dc-schema>
+        <name>dc</name>
+        <namespace>http://dublincore.org/documents/dcmi-terms/</namespace>
+    </dc-schema>
+
+    <dc-type>
+        <schema>dc</schema>
+        <element>contributor</element>
+        <qualifier>author</qualifier>
+        <scope_note>Use for author</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>dc</schema>
+        <element>rights</element>
+        <qualifier>holder</qualifier>
+        <scope_note>The owner of the copyright</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>dc</schema>
+        <element>rights</element>
+        <qualifier>license</qualifier>
+        <scope_note>Used for License in metadata for collections.</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>dc</schema>
+        <element>contributor</element>
+        <qualifier>editor</qualifier>
+        <scope_note>Use for editor</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>dc</schema>
+        <element>contributor</element>
+        <qualifier>illustrator</qualifier>
+        <scope_note>Use for illustrator</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>dc</schema>
+        <element>description</element>
+        <qualifier>tableofcontents</qualifier>
+        <scope_note>Used for News in metadata for archives, sub-archives and collections</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>dc</schema>
+        <element>subject</element>
+        <qualifier>agrovoc</qualifier>
+        <scope_note>Agrovoc term</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>dc</schema>
+        <element>source</element>
+        <qualifier>articlenumber</qualifier>
+        <scope_note>Journal article number</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>dc</schema>
+        <element>contributor</element>
+        <qualifier>department</qualifier>
+        <scope_note>The department where an item was created (used for import from DiVA).</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>dc</schema>
+        <element>description</element>
+        <qualifier>degree</qualifier>
+        <scope_note>An achieved degree that might be associated with the item (used for import from DiVA).</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>dc</schema>
+        <element>description</element>
+        <qualifier>embargo</qualifier>
+        <scope_note>Do not use; for embargo setter and lifter in items created in Dspace 1.8 or earlier</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>dc</schema>
+        <element>description</element>
+        <qualifier>localcode</qualifier>
+        <scope_note>Can be used for codes or descriptions according to local guidelines at each institution.</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>dc</schema>
+        <element>identifier</element>
+        <qualifier>pmid</qualifier>
+        <scope_note>PubMed is a search engine for the MEDLINE database on life sciences and biomedical topics.</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>dc</schema>
+        <element>identifier</element>
+        <qualifier>urn</qualifier>
+        <scope_note>National URN (used for import from DUO).</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>dc</schema>
+        <element>subject</element>
+        <qualifier>jel</qualifier>
+        <scope_note>JEL classification system for scholarly literature in the field of economics.</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>dc</schema>
+        <element>provenance</element>
+        <scope_note>Used for Provenance in metadata for collections.</scope_note>
+    </dc-type>
+
+</dspace-dc-types>

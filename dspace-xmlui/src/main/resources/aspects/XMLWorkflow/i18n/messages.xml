@@ -71,6 +71,7 @@
     <message key="xmlui.XMLWorkflow.WorkflowOverviewTransformer.search_column2">Step</message>
     <message key="xmlui.XMLWorkflow.WorkflowOverviewTransformer.search_column3">Item</message>
     <message key="xmlui.XMLWorkflow.WorkflowOverviewTransformer.search_column4">Collection</message>
+    <message key="xmlui.XMLWorkflow.WorkflowOverviewTransformer.search_columnAuthor">Authors</message>
     <message key="xmlui.XMLWorkflow.WorkflowOverviewTransformer.search_column5">Submitter</message>
     <message key="xmlui.XMLWorkflow.WorkflowOverviewTransformer.button.submit_submitter">Send items back to submitter</message>
     <message key="xmlui.XMLWorkflow.WorkflowOverviewTransformer.button.submit_delete">Delete items</message>

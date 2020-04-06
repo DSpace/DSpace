@@ -487,6 +487,18 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
                 jumpList.addItemXref(super.generateURL(BROWSE_URL_BASE, letterQuery), Character
                         .toString(c));
             }
+            char c = 'Æ';
+            letterQuery.put(BrowseParams.STARTS_WITH, Character.toString(c));
+            jumpList.addItemXref(super.generateURL(BROWSE_URL_BASE, letterQuery), Character
+                    .toString(c));
+            c = 'Ø';
+            letterQuery.put(BrowseParams.STARTS_WITH, Character.toString(c));
+            jumpList.addItemXref(super.generateURL(BROWSE_URL_BASE, letterQuery), Character
+                    .toString(c));
+            c = 'Å';
+            letterQuery.put(BrowseParams.STARTS_WITH, Character.toString(c));
+            jumpList.addItemXref(super.generateURL(BROWSE_URL_BASE, letterQuery), Character
+                    .toString(c));
 
             // Create a free text field for the initial characters
             Para jumpForm = jump.addPara();
@@ -934,7 +946,7 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
             }
 
             // Get the name of any scoping element (collection / community)
-            String scopeName = "";
+            String scopeName;
             
             if (info.getBrowseContainer() != null)
             {
@@ -942,7 +954,7 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
             }
             else
             {
-                scopeName = "";
+                scopeName = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("dspace.name");;
             }
             
             if (bix.isMetadataIndex())

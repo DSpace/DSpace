@@ -1,0 +1,726 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE input-forms SYSTEM "input-forms.dtd">
+
+
+<input-forms>
+
+    <!-- The form-map maps collection handles to forms. DSpace does not       -->
+    <!-- require a collection name to be unique, not even within a community. -->
+    <!-- DSpace does however ensure that each collection's handle is unique.  -->
+    <!-- Form-map provides the means to associate a unique collection name    -->
+    <!-- with a form. The form-map also provides the special handle "default" -->
+    <!-- (which is never a collection), here mapped to "traditional". Any     -->
+    <!-- collection which does not appear in this map will be associated with -->
+    <!-- the mapping for handle "default".                                    -->
+
+    <form-map>
+        <name-map collection-handle="default" form-name="traditional"/>
+    </form-map>
+
+
+    <!-- The form-definitions map lays out the detailed definition of all the -->
+    <!-- submission forms. Each separate form set has a unique name as an     -->
+    <!-- attribute. This name matches one of the names in the form-map. One   -->
+    <!-- named form set has the name "traditional"; as this name suggests,    -->
+    <!-- it is the old style and is also the default, which gets used when    -->
+    <!-- the specified collection has no correspondingly-named form set.      -->
+    <!--                                                                      -->
+    <!-- Each form set contains an ordered set of pages; each page defines    -->
+    <!-- one submission metadata entry screen. Each page has an ordered list  -->
+    <!-- of field definitions, Each field definition corresponds to one       -->
+    <!-- metatdata entry (a so-called row), which has a DC element name, a    -->
+    <!-- displayed label, a text string prompt which is called a hint, and    -->
+    <!-- an input-type. Each field also may hold optional elements: DC        -->
+    <!-- qualifier name, a repeatable flag, and a text string whose presence  -->
+    <!-- serves as a 'this field is required' flag.                           -->
+
+    <form-definitions>
+
+        <form name="traditional">
+            <page number="1">
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>contributor</dc-element>
+                    <dc-qualifier>author</dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Forfatter</label>
+                    <input-type>name</input-type>
+                    <hint></hint>
+                    <required></required>
+                </field>
+
+				<field>
+					<dc-schema>dc</dc-schema>
+					<dc-element>contributor</dc-element>
+					<dc-qualifier>editor</dc-qualifier>
+					<repeatable>true</repeatable>
+					<label>Redaktør</label>
+					<input-type>name</input-type>
+					<hint></hint>
+					<required></required>
+				</field>
+
+				<field>
+					<dc-schema>dc</dc-schema>
+					<dc-element>contributor</dc-element>
+					<dc-qualifier>advisor</dc-qualifier>
+					<repeatable>true</repeatable>
+					<label>Veileder</label>
+					<input-type>name</input-type>
+					<hint></hint>
+					<required></required>
+				</field>
+
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>title</dc-element>
+                    <dc-qualifier></dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Tittel</label>
+                    <input-type>onebox</input-type>
+                    <hint>Tittel på dokument.</hint>
+                    <required>Tittel er obligatorisk.</required>
+                </field>
+
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>title</dc-element>
+                    <dc-qualifier>alternative</dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Alternativ tittel</label>
+                    <input-type>onebox</input-type>
+                    <hint>Brukes hvis dokumentet har flere titler.</hint>
+                    <required></required>
+                </field>
+
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>date</dc-element>
+                    <dc-qualifier>issued</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Utgivelsesdato</label>
+                    <input-type>date</input-type>
+                    <hint>Kun år er obligatorisk.</hint>
+                    <required>År er obligatorisk.</required>
+                </field>
+
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>publisher</dc-element>
+                    <dc-qualifier></dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Utgiver</label>
+                    <input-type>onebox</input-type>
+                    <hint></hint>
+                    <required></required>
+                </field>
+
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>identifier</dc-element>
+                    <dc-qualifier>citation</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Originalversjon</label>
+                    <input-type>onebox</input-type>
+                    <hint>Henvisning til publiseringskanal for originalversjon. F.eks. Acta Orthopaedica. 2014, 85 (5), 463-469).</hint>
+                    <required></required>
+                </field>
+
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>relation</dc-element>
+                    <dc-qualifier>haspart</dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Består av</label>
+                    <input-type>onebox</input-type>
+                    <hint>Brukes for å beskrive de enkelte delene av et dokument hvis ikke alle kan lastes opp, f.eks.
+                        artikkelbaserte avhandlinger.
+                    </hint>
+                    <required></required>
+                </field>
+
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>relation</dc-element>
+                    <dc-qualifier>ispartofseries</dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Serie</label>
+                    <input-type>series</input-type>
+                    <hint></hint>
+                    <required></required>
+                </field>
+
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>source</dc-element>
+                    <dc-qualifier>journal</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Tidsskrift</label>
+                    <input-type>onebox</input-type>
+                    <hint>Tittel på tidsskrift.</hint>
+                    <required></required>
+                </field>
+
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>source</dc-element>
+                    <dc-qualifier>volume</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Volum</label>
+                    <input-type>onebox</input-type>
+                    <hint>Volum for tidsskrift.</hint>
+                    <required></required>
+                </field>
+
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>source</dc-element>
+                    <dc-qualifier>issue</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Hefte</label>
+                    <input-type>onebox</input-type>
+                    <hint>Heftenummer for tidsskrift.</hint>
+                    <required></required>
+                </field>
+
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>source</dc-element>
+                    <dc-qualifier>pagenumber</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Sidetall</label>
+                    <input-type>onebox</input-type>
+                    <hint>Startside og sluttside for artikkel eller kapittel f.eks.: 9-19. Totalt antall sider for bok f.eks.: 99.</hint>
+                    <required></required>
+                </field>
+
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>relation</dc-element>
+                    <dc-qualifier>project</dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Prosjekt</label>
+                    <input-type>onebox</input-type>
+                    <hint>Finansieringskilde og prosjektkode. EU-prosjekter må registreres slik: EC/[program]/[prosjektreferanse] hvor H2020 må brukes for Horisont 2020
+                        og FP7 for 7. rammeprogram. F.eks: EC/H2020/641918 eller EC/FP7/266213.
+                        Andre prosjekt kan registreres slik: [Finanisieringskilde]: [projektreferanse]. F.eks. Norges forskningsråd: 227607.</hint>
+                    <required></required>
+                </field>
+
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>identifier</dc-element>
+                    <dc-qualifier></dc-qualifier>
+                    <!-- An input-type of qualdrop_value MUST be marked as repeatable -->
+                    <repeatable>true</repeatable>
+                    <label>Identifikator</label>
+                    <input-type value-pairs-name="common_identifiers">qualdrop_value</input-type>
+                    <hint></hint>
+                    <required></required>
+                </field>
+
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>type</dc-element>
+                    <dc-qualifier></dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Dokumenttype</label>
+                    <input-type value-pairs-name="common_types">dropdown</input-type>
+                    <hint>Bruk "ctrl" eller "shift" for å velge mer enn en.</hint>
+                    <required>Angi minst en dokumenttype.</required>
+                </field>
+
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>language</dc-element>
+                    <dc-qualifier>iso</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Språk</label>
+                    <input-type value-pairs-name="common_iso_languages">dropdown</input-type>
+                    <hint></hint>
+                    <required></required>
+                </field>
+            </page>
+
+            <page number="2">
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>subject</dc-element>
+                    <dc-qualifier>nsi</dc-qualifier>
+                    <!-- An input-type of twobox MUST be marked as repeatable -->
+                    <repeatable>true</repeatable>
+                    <label>Norske vitenskapsdisipliner</label>
+                    <input-type>twobox</input-type>
+                    <hint>Hentes fra registeret via lenken nedenfor. Bruk LEGG TIL for å legge til mer enn en.</hint>
+                    <required></required>
+                    <vocabulary>nsi_no</vocabulary>
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>subject</dc-element>
+                    <dc-qualifier></dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Frie emneord</label>
+                    <input-type>onebox</input-type>
+                    <hint>Frie emneord må skilles fra hverandre ved bruk av LEGG TIL.</hint>
+                    <required></required>
+                </field>
+                
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>description</dc-element>
+                    <dc-qualifier>abstract</dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Sammendrag</label>
+                    <input-type>textarea</input-type>
+                    <hint></hint>
+                    <required></required>
+                </field>
+
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>description</dc-element>
+                    <dc-qualifier>sponsorship</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Sponsor</label>
+                    <input-type>textarea</input-type>
+                    <hint></hint>
+                    <required></required>
+                </field>
+                
+                <field>
+				    <dc-schema>dc</dc-schema>
+				    <dc-element>rights</dc-element>
+				    <dc-qualifier>holder</dc-qualifier>
+				    <repeatable>false</repeatable>
+				    <label>Opphavsrett</label>
+				    <input-type>textarea</input-type>
+				    <hint>Informasjon om hvem som har opphavsretten til innholdet.</hint>
+				    <required></required>
+				</field>
+				
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>description</dc-element>
+                    <dc-qualifier></dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Beskrivelse</label>
+                    <input-type>textarea</input-type>
+                    <hint></hint>
+                    <required></required>
+                </field>
+
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>description</dc-element>
+                    <dc-qualifier>localcode</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Lokal kode</label>
+                    <input-type>onebox</input-type>
+                    <hint></hint>
+                    <required></required>
+                </field>
+
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>description</dc-element>
+                    <dc-qualifier>version</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Versjon</label>
+                    <input-type value-pairs-name="common_versions">dropdown</input-type>
+                    <hint></hint>
+                    <required></required>
+                </field>
+
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>coverage</dc-element>
+                    <dc-qualifier>spatial</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Geografisk område</label>
+                    <input-type>onebox</input-type>
+                    <hint>Geografisk referanse for innhold f.eks. Norway eller Norway, Oslo.</hint>
+                    <required></required>
+                </field>
+            </page>
+        </form>
+        
+        <form name="one">
+            <page number="1">
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>contributor</dc-element>
+                    <dc-qualifier>author</dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>En: Forfattere</label>
+                    <input-type>name</input-type>
+                    <hint></hint>
+                    <required></required>
+                </field>
+            </page>
+        </form>
+    </form-definitions>
+
+
+    <!-- form-value-pairs populate dropdown and qualdrop-value lists.          -->
+    <!-- The form-value-pairs element holds child elements named 'value-pairs' -->
+    <!-- A 'value-pairs' element has a value-pairs-name and a dc-term          -->
+    <!-- attribute. The dc-term attribute specifies which to which Dublin Core -->
+    <!-- Term this set of value-pairs applies.                                 -->
+    <!--     Current dc-terms are: identifier-pairs, type-pairs, and           -->
+    <!--     language_iso-pairs. The name attribute matches a name             -->
+    <!--     in the form-map, above.                                           -->
+    <!-- A value-pair contains one 'pair' for each value displayed in the list -->
+    <!-- Each pair contains a 'displayed-value' element and a 'stored-value'   -->
+    <!-- element. A UI list displays the displayed-values, but the program     -->
+    <!-- stores the associated stored-values in the database.                  -->
+
+    <form-value-pairs>
+        <value-pairs value-pairs-name="common_identifiers" dc-term="identifier">
+            <pair>
+                <displayed-value>ISSN</displayed-value>
+                <stored-value>issn</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>ISBN</displayed-value>
+                <stored-value>isbn</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>ISMN</displayed-value>
+                <stored-value>ismn</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>DOI</displayed-value>
+                <stored-value>doi</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>CRIStin</displayed-value>
+                <stored-value>cristin</stored-value>
+            </pair>
+        </value-pairs>
+
+        <value-pairs value-pairs-name="common_types" dc-term="type">
+            <pair>
+                <displayed-value>Arbeidsnotat</displayed-value>
+                <stored-value>Working paper</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Bacheloroppgave</displayed-value>
+                <stored-value>Bachelor thesis</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Bilde</displayed-value>
+                <stored-value>Image</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Bok</displayed-value>
+                <stored-value>Book</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Bokkapittel</displayed-value>
+                <stored-value>Chapter</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Datasett</displayed-value>
+                <stored-value>Dataset</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Designprodukt</displayed-value>
+                <stored-value>Design product</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Doktorgradsavhandling</displayed-value>
+                <stored-value>Doctoral thesis</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Fagfellevurdert</displayed-value>
+                <stored-value>Peer reviewed</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Forelesning</displayed-value>
+                <stored-value>Lecture</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Forskningsrapport</displayed-value>
+                <stored-value>Research report</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Kart</displayed-value>
+                <stored-value>Map</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Konferansebidrag</displayed-value>
+                <stored-value>Conference object</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Kronikk</displayed-value>
+                <stored-value>Chronicle</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Kunstnerisk produksjon</displayed-value>
+                <stored-value>Artistic production</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Lydopptak, musikalsk</displayed-value>
+                <stored-value>Recording, musical</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Lydopptak, verbal</displayed-value>
+                <stored-value>Recording, oral</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Læringsobjekt</displayed-value>
+                <stored-value>Learning object</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Manuskript</displayed-value>
+                <stored-value>Preprint</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Mastergradsoppgave</displayed-value>
+                <stored-value>Master thesis</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Partitur</displayed-value>
+                <stored-value>Musical score</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Patent</displayed-value>
+                <stored-value>Patent</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Plan eller tegning</displayed-value>
+                <stored-value>Plan or blueprint</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Programvare</displayed-value>
+                <stored-value>Software</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Rapport</displayed-value>
+                <stored-value>Report</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Studentoppgave, annet</displayed-value>
+                <stored-value>Student paper, others</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Tidsskriftartikkel</displayed-value>
+                <stored-value>Journal article</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Video</displayed-value>
+                <stored-value>Video</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Andre</displayed-value>
+                <stored-value>Others</stored-value>
+            </pair>
+        </value-pairs>
+
+        <value-pairs value-pairs-name="common_versions" dc-term="description_version">
+            <pair>
+                <displayed-value>Velg versjon</displayed-value>
+                <stored-value></stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Utkast</displayed-value>
+                <stored-value>draft</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Innlevert versjon</displayed-value>
+                <stored-value>submittedVersion</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Akseptert versjon</displayed-value>
+                <stored-value>acceptedVersion</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Publisert versjon</displayed-value>
+                <stored-value>publishedVersion</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Oppdatert versjon</displayed-value>
+                <stored-value>updatedVersion</stored-value>
+            </pair>
+        </value-pairs>
+
+        <!-- default language order: (from dspace 1.2.1)
+             "en_US", "en", "es", "de", "fr", "it", "ja", "zh", "other", ""
+          -->
+        <value-pairs value-pairs-name="common_iso_languages" dc-term="language_iso">
+            <pair>
+                <displayed-value>Velg språk</displayed-value>
+                <stored-value></stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Dansk</displayed-value>
+                <stored-value>dan</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Engelsk</displayed-value>
+                <stored-value>eng</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Finsk</displayed-value>
+                <stored-value>fin</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Fransk</displayed-value>
+                <stored-value>fre</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Islandsk</displayed-value>
+                <stored-value>ice</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Italiensk</displayed-value>
+                <stored-value>ita</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Nederlandsk</displayed-value>
+                <stored-value>dut</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Norsk, Bokmål</displayed-value>
+                <stored-value>nob</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Norsk, Nynorsk</displayed-value>
+                <stored-value>nno</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Portugisisk</displayed-value>
+                <stored-value>por</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Russisk</displayed-value>
+                <stored-value>rus</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Samisk</displayed-value>
+                <stored-value>smi</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Spansk</displayed-value>
+                <stored-value>spa</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Svensk</displayed-value>
+                <stored-value>swe</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Tysk</displayed-value>
+                <stored-value>ger</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>(Annet)</displayed-value>
+                <stored-value>mis</stored-value>
+            </pair>
+        </value-pairs>
+
+        <value-pairs value-pairs-name="is_published" dc-term="ispublished">
+            <pair>
+                <displayed-value>Published</displayed-value>
+                <stored-value>true</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Unpublished</displayed-value>
+                <stored-value>false</stored-value>
+            </pair>
+        </value-pairs>
+
+        <value-pairs value-pairs-name="full_text" dc-term="fulltext">
+            <pair>
+                <displayed-value>Full-Text</displayed-value>
+                <stored-value>true</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Metadata Only</displayed-value>
+                <stored-value>false</stored-value>
+            </pair>
+        </value-pairs>
+
+        <value-pairs value-pairs-name="cristin_document_types" dc-term="type_document">
+            <pair>
+                <displayed-value>Academic anthology</displayed-value>
+                <stored-value>Acadmic anthology</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Scientific book</displayed-value>
+                <stored-value>Scientific book</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Other</displayed-value>
+                <stored-value>Other</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Academic chapter/article</displayed-value>
+                <stored-value>Academic chapter/article</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Academic lecture</displayed-value>
+                <stored-value>Academic lecture</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Doctoral dissertation</displayed-value>
+                <stored-value>Doctoral dissertation</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Report</displayed-value>
+                <stored-value>Report</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Academic article</displayed-value>
+                <stored-value>Academic article</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Popular scientific article</displayed-value>
+                <stored-value>Popular scientific article</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Academic literature review</displayed-value>
+                <stored-value>Academic literature review</stored-value>
+            </pair>
+        </value-pairs>
+
+        <value-pairs value-pairs-name="embargo_types" dc-term="embargotype">
+            <pair>
+                <displayed-value>open</displayed-value>
+                <stored-value>open</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>closed</displayed-value>
+                <stored-value>closed</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>restricted</displayed-value>
+                <stored-value>restricted</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>3 years</displayed-value>
+                <stored-value>3 years</stored-value>
+            </pair>
+        </value-pairs>
+
+        <value-pairs value-pairs-name="cristin_languages" dc-term="language">
+            <pair>
+                <displayed-value>N/A</displayed-value>
+                <stored-value></stored-value>
+            </pair>
+            <pair>
+                <displayed-value>English</displayed-value>
+                <stored-value>en</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Norwegian</displayed-value>
+                <stored-value>no</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>(Other)</displayed-value>
+                <stored-value>other</stored-value>
+            </pair>
+        </value-pairs>
+    </form-value-pairs>
+</input-forms>

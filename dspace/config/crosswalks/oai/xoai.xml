@@ -39,7 +39,9 @@
         <!--
             Driver Guidelines:
 
-            - https://guidelines.openaire.eu/en/latest/literature/use_of_oai_pmh.html
+            - http://www.driver-support.eu/documents/DRIVER_Guidelines_v2_Final_2008-11-13.pdf
+
+            Page 57 - 58
          -->
         <Context baseurl="driver" name="Driver Context">
             <!-- Date format, field prefixes, etc are ensured by the transformer -->
@@ -53,7 +55,7 @@
             <Format ref="mets"/>
             <Format ref="didl"/>
             <Description>
-                This context complies with Driver rules.
+                This contexts complies with Driver rules.
             </Description>
         </Context>
 
@@ -171,8 +173,9 @@
         <Transformer id="driverTransformer">
             <XSLT>transformers/driver.xsl</XSLT>
         </Transformer>
+        <!-- dSpace/Brage complies with the OpenAIRE 3.0 Standard. Driver is not used by dSpaceBrage -->
         <Transformer id="openaireTransformer">
-            <XSLT>transformers/openaire.xsl</XSLT>
+            <XSLT>transformers/openaire30.xsl</XSLT>
         </Transformer>
     </Transformers>
 
@@ -231,8 +234,10 @@
              By default, return an Item record:
                * If a Title & Author field both exist
                * AND a valid DRIVER Document Type exists
-               * AND Item is either publicly accessible OR Withdrawn (for tombstones)
-               * AND the OpenAIRE "dc.relation" is specified
+               * AND Item is not restricted
+               * AND
+                    ** Item is either publicly accessible OR Withdrawn (for tombstones)
+                    ** OR the OpenAIRE "dc.relation" is specified
              This filter is only used in the OpenAIRE context ([oai]/openaire).
         -->
         <Filter id="openAireFilter">
@@ -241,8 +246,6 @@
                     <LeftCondition>
                         <And>
                             <LeftCondition>
-                                <And>
-                                    <LeftCondition>
                                         <Custom ref="titleExistsCondition"/>
                                     </LeftCondition>
                                     <RightCondition>
@@ -251,15 +254,17 @@
                                 </And>
                             </LeftCondition>
                             <RightCondition>
-                                <Custom ref="driverDocumentTypeCondition"/>
-                            </RightCondition>
-                        </And>
+                        <And>
+                            <LeftCondition>
+                                <Not>
+                                    <Condition>
+                                        <Custom ref="restrictedAccessCondition"/>
+                                    </Condition>
+                                </Not>
                     </LeftCondition>
                     <RightCondition>
                         <Or>
                             <LeftCondition>
-                                <And>
-                                    <LeftCondition>
                                         <Or>
                                             <LeftCondition>
                                                 <Custom ref="itemAccessCondition"/>
@@ -270,14 +275,11 @@
                                         </Or>
                                     </LeftCondition>
                                     <RightCondition>
-                                        <Custom ref="driverAccessCondition"/>
-                                    </RightCondition>
-                                </And>
-                            </LeftCondition>
-                            <RightCondition>
                                 <Custom ref="openaireRelationCondition"/>
                             </RightCondition>
                         </Or>
+                    </RightCondition>
+                </And>
                     </RightCondition>
                 </And>
             </Definition>
@@ -371,6 +373,27 @@
             </Configuration>
         </CustomCondition>
 
+
+        <!-- This condition determines if an Item has a "dc.rights.accessrights" field
+             specifying "restricted items", dspace should only expose open access items.
+             The filter is combined with the not filter in order to specify an item as openAccess
+             -->
+        <CustomCondition id="restrictedAccessCondition">
+            <Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
+            <Configuration>
+                <string name="field">dc.rights.accessrights</string>
+                <string name="operator">contains</string>
+                <list name="values">
+                    <string>closed access</string>
+                    <string>closedAccess</string>
+                    <string>embargoed access</string>
+                    <string>embargoedAccess</string>
+                    <string>restricted access</string>
+                    <string>restrictedAccess</string>
+                </list>
+            </Configuration>
+        </CustomCondition>
+
         <!-- This condition determines if an Item has a "dc.rights" field
              specifying "open access", which is required for DRIVER
              OR "openAccess", which is required by OpenAIRE. -->
@@ -380,6 +403,7 @@
                 <string name="field">dc.rights</string>
                 <string name="operator">contains</string>
                 <list name="values">
+                    <string>open access</string>
                     <string>openAccess</string>
                 </list>
             </Configuration>
@@ -399,13 +423,18 @@
         </CustomCondition>
 
         <!-- This condition determines if an Item has a "dc.relation" field
-             which specifies the openAIRE project ID. -->
+             which specifies the openAIRE project ID. and if the documents which are EC funded -->
         <CustomCondition id="openaireRelationCondition">
             <Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
             <Configuration>
-                <string name="field">dc.relation</string>
+                <string name="field">dc.relation.project</string>
                 <string name="operator">starts_with</string>
-                <string name="value">info:eu-repo/grantAgreement/</string>
+                <list name="values">
+                    <string>EC/FP</string>
+                    <string>EC/H2020</string>
+                    <string>info:eu-repo/grantAgreement/EC/FP</string>
+                    <string>info:eu-repo/grantAgreement/EC/H2020</string>
+                </list>
             </Configuration>
         </CustomCondition>
     </Filters>

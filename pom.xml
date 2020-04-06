@@ -626,6 +626,7 @@
         <profile>
             <id>dspace-jspui</id>
             <activation>
+                <activeByDefault>false</activeByDefault>
                 <file>
                     <exists>dspace-jspui/pom.xml</exists>
                 </file>
@@ -641,6 +642,7 @@
         <profile>
             <id>dspace-rdf</id>
             <activation>
+                <activeByDefault>false</activeByDefault>
                 <file>
                     <exists>dspace-rdf/pom.xml</exists>
                 </file>
@@ -654,6 +656,7 @@
        <profile>
            <id>dspace-rest</id>
            <activation>
+               <activeByDefault>false</activeByDefault>
                <file>
                    <exists>dspace-rest/pom.xml</exists>
                </file>
@@ -670,6 +673,7 @@
         <profile>
             <id>dspace-sword</id>
             <activation>
+                <activeByDefault>false</activeByDefault>
                 <file>
                     <exists>dspace-sword/pom.xml</exists>
                 </file>
@@ -701,6 +705,7 @@
         <profile>
             <id>dspace-swordv2</id>
             <activation>
+                <activeByDefault>false</activeByDefault>
                 <file>
                     <exists>dspace-swordv2/pom.xml</exists>
                 </file>
@@ -755,14 +760,14 @@
                  as it does not include any Java source code to release. -->
             <modules>
                 <module>dspace-api</module>
-                <module>dspace-jspui</module>
+<!--                <module>dspace-jspui</module>-->
                 <module>dspace-oai</module>
-                <module>dspace-rdf</module>
-                <module>dspace-rest</module>
+<!--                <module>dspace-rdf</module>-->
+<!--                <module>dspace-rest</module>-->
                 <module>dspace-services</module>
                 <module>dspace-solr</module>
-                <module>dspace-sword</module>
-                <module>dspace-swordv2</module>
+<!--                <module>dspace-sword</module>-->
+<!--                <module>dspace-swordv2</module>-->
                 <module>dspace-xmlui-mirage2</module>
                 <module>dspace-xmlui</module>
             </modules>
@@ -1297,6 +1302,12 @@
                 <version>0.1.12</version>
             </dependency>
             <dependency>
+                <groupId>commons-httpclient</groupId>
+                <artifactId>commons-httpclient</artifactId>
+                <version>3.1</version>
+                <scope>compile</scope>
+            </dependency>
+            <dependency>
                 <groupId>org.apache.httpcomponents</groupId>
                 <artifactId>httpcore</artifactId>
                 <version>4.4.4</version>
@@ -1435,6 +1446,7 @@
                 <artifactId>jackson-annotations</artifactId>
                 <version>${jackson.version}</version>
             </dependency>
+            
         </dependencies>
     </dependencyManagement>
 
@@ -1566,6 +1578,45 @@
           <snapshots>
             <enabled>true</enabled>
           </snapshots>
+        </repository>
+
+        <repository>
+            <id>bibsys-libs-releases</id>
+            <name>Bibsys internal Maven 2 release repository</name>
+            <url>http://artifactory.bibsys.no/artifactory/libs-releases</url>
+            <releases>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>bibsys-libs-snapshots</id>
+            <name>Bibsys internal Maven 2 snapshot repository</name>
+            <url>http://artifactory.bibsys.no/artifactory/libs-snapshots</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
+                <!-- snapshot dependencies will be checked every 60 minutes -->
+                <!--<updatePolicy>interval:60</updatePolicy>-->
+                <!--<updatePolicy>always</updatePolicy>-->
+            </snapshots>
+        </repository>
+        <repository>
+            <id>bibsys-third-party</id>
+            <name>Bibsys third-party repository</name>
+            <url>http://artifactory.bibsys.no/artifactory/third-party</url>
+        </repository>
+        <repository>
+            <id>ext-snapshots-repository</id>
+            <name>Bibsys ext-snapshot repository</name>
+            <url>http://artifactory.bibsys.no/artifactory/ext-snapshots</url>
+        </repository>
+        <repository>
+            <id>ext-release-repository</id>
+            <name>Bibsys ext-release repository</name>
+            <url>http://artifactory.bibsys.no/artifactory/ext-releases</url>
         </repository>
     </repositories>
 

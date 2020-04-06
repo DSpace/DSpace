@@ -1,0 +1,45 @@
+dspace.dir = /brage/{{ kunde }}/app
+dspace.hostname = {{ kundedata[kunde]["virtualhost"] | default(bragevirtualhost) }}
+dspace.baseUrl = {{ (fase == "produksjon") | ternary("https:","http:") }}//${dspace.hostname}{{ (fase == "produksjon") | ternary("",":8080") }}
+dspace.ui = {{ kunde }}-xmlui
+dspace.url = ${dspace.baseUrl}/${dspace.ui}
+dspace.name = {{ kundedata[kunde]["arkivnavn"] | default('Brage') }}
+dspace.orgnr = {{ kundedata[kunde]["orgnr"] }}
+dspace.cristinId = {{ kundedata[kunde]["CristinInstitusjonsnummer"] | default('123') }}
+dspace.epost = {{ kundedata[kunde]["epost"] }}
+dspace.fullname = {{ kundedata[kunde]["navn"] }}
+
+assetstore.dir = /brage/{{ kunde }}/data
+
+solr.server = http://localhost:9080/{{ kunde }}-solr
+
+db.url = jdbc:postgresql://{{ DatabaseHost[fase] }}:5432/brage-{{ kunde }}
+db.password = {{ lookup('hashi_vault', 'secret=secret/service/brage/' + fase + ':db_password auth_method=approle role_id=brage-client-' + fase + ' secret_id=' + vault_secret + ' url=https://vault.bibsys.no:8200')}}
+db.username = {{ lookup('hashi_vault', 'secret=secret/service/brage/' + fase + ':db_username auth_method=approle role_id=brage-client-' + fase + ' secret_id=' + vault_secret + ' url=https://vault.bibsys.no:8200')}}
+
+mail.server = mailhub.bibsys.no
+mail.from.address = noreply@unit.no
+mail.admin = support@unit.no
+
+feedback.recipient = ${dspace.epost}
+
+# CNRI Handle prefix
+handle.prefix = {{ HandleServerConfig[fase]["prefix"] }}
+handle.canonical.prefix = https://hdl.handle.net/
+
+# BIBSYS agora-handle configuration
+handleservice.configuration = ${dspace.dir}/config/handleserver.properties
+
+# XMLUI
+xmlui.user.registration=false
+
+# OAI
+oai.url = ${dspace.baseUrl}/{{ kunde }}-oai
+
+###########################
+#        BUILD INFO       #
+###########################
+jenkins.url = {{ lookup('env', "JENKINS_URL") }}
+jenkins.tag = {{ lookup('env', "BUILD_TAG") }}
+git.branch = {{ lookup('env', "GIT_BRANCH") }}
+git.commit = {{ lookup('env', "GIT_COMMIT") }}

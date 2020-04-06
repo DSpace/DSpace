@@ -393,6 +393,19 @@ public class PrivateItems extends AbstractDSpaceTransformer implements
                         .toString(c));
             }
 
+            char c = 'Æ';
+            letterQuery.put(BrowseParams.STARTS_WITH, Character.toString(c));
+            jumpList.addItemXref(super.generateURL(PRIVATE_URL_BASE, letterQuery), Character
+                    .toString(c));
+            c = 'Ø';
+            letterQuery.put(BrowseParams.STARTS_WITH, Character.toString(c));
+            jumpList.addItemXref(super.generateURL(PRIVATE_URL_BASE, letterQuery), Character
+                    .toString(c));
+            c = 'Å';
+            letterQuery.put(BrowseParams.STARTS_WITH, Character.toString(c));
+            jumpList.addItemXref(super.generateURL(PRIVATE_URL_BASE, letterQuery), Character
+                    .toString(c));
+
             // Create a free text field for the initial characters
             Para jumpForm = jump.addPara();
             jumpForm.addContent(T_starts_with);

@@ -315,6 +315,15 @@
             <artifactId>spring-orm</artifactId>
         </dependency>
         <dependency>
+            <groupId>commons-httpclient</groupId>
+            <artifactId>commons-httpclient</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.squareup.okhttp3</groupId>
+            <artifactId>okhttp</artifactId>
+            <version>3.14.2</version>
+        </dependency>
+        <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>handle</artifactId>
         </dependency>
@@ -719,6 +728,26 @@
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
             <version>20180130</version>
+        </dependency>
+
+        <!-- BIBSYS handle server -->
+        <dependency>
+            <groupId>no.bibsys.dlr</groupId>
+            <artifactId>integration-no-bibsys-handle</artifactId>
+            <version>1.0.1</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>postgresql</artifactId>
+                    <groupId>postgresql</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <!-- Feide authentication -->
+        <dependency>
+            <groupId>no.bibsys</groupId>
+            <artifactId>feidelib-jar</artifactId>
+            <version>1.0.29</version>
         </dependency>
     </dependencies>
 

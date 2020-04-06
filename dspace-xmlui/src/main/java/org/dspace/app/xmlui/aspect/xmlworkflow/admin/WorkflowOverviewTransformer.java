@@ -18,20 +18,18 @@ import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.*;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.AuthorizeServiceImpl;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
+import org.dspace.content.MetadataValue;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
-import org.dspace.handle.HandleServiceImpl;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
 import org.dspace.xmlworkflow.WorkflowConfigurationException;
-import org.dspace.xmlworkflow.XmlWorkflowFactoryImpl;
 import org.dspace.xmlworkflow.factory.XmlWorkflowFactory;
 import org.dspace.xmlworkflow.factory.XmlWorkflowServiceFactory;
 import org.dspace.xmlworkflow.state.Step;
@@ -46,8 +44,10 @@ import org.xml.sax.SAXException;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 /**
  * A transformer that renders all xmlworkflow items
@@ -82,6 +82,7 @@ public class WorkflowOverviewTransformer extends AbstractDSpaceTransformer {
     private static final Message T_search_column3 = message("xmlui.XMLWorkflow.WorkflowOverviewTransformer.search_column3");
     private static final Message T_search_column4 = message("xmlui.XMLWorkflow.WorkflowOverviewTransformer.search_column4");
     private static final Message T_search_column5 = message("xmlui.XMLWorkflow.WorkflowOverviewTransformer.search_column5");
+    private static final Message T_search_columnAuthor = message("xmlui.XMLWorkflow.WorkflowOverviewTransformer.search_columnAuthor");
     private static final Message T_button_back_to_submitter = message("xmlui.XMLWorkflow.WorkflowOverviewTransformer.button.submit_submitter");
     private static final Message T_button_delete = message("xmlui.XMLWorkflow.WorkflowOverviewTransformer.button.submit_delete");
     private static final Message T_no_results = message("xmlui.XMLWorkflow.WorkflowOverviewTransformer.button.no_results");
@@ -166,13 +167,15 @@ public class WorkflowOverviewTransformer extends AbstractDSpaceTransformer {
                 Table table = resultsDiv.addTable("workflow-item-overview-table", results.size() + 1, 5);
 
                 Row headerRow = table.addRow(Row.ROLE_HEADER);
+                headerRow.addCellContent(" ");
                 headerRow.addCellContent(T_search_column1);
                 headerRow.addCellContent(T_search_column2);
                 headerRow.addCellContent(T_search_column3);
+                headerRow.addCellContent(T_search_columnAuthor);
                 headerRow.addCellContent(T_search_column4);
                 headerRow.addCellContent(T_search_column5);
 
-
+                int i = 1;
                 for (XmlWorkflowItem wfi : results) {
                     Item item = wfi.getItem();
                     Row itemRow = table.addRow();
@@ -192,6 +195,20 @@ public class WorkflowOverviewTransformer extends AbstractDSpaceTransformer {
                         state = message("xmlui.XMLWorkflow." + wf.getID() + "." + step.getId());
                     }
 
+                    // get the authors
+                    String authors = "";
+                    List<MetadataValue> authorDC = wfi.getItem().getItemService().getMetadataByMetadataString(wfi.getItem(), "dc.contributor.author");
+                    if (authorDC.size() > 0)
+                    {
+                        for (MetadataValue au : authorDC)
+                        {
+                            if (!"".equals(authors)) { authors += ", "; }
+                            authors += au.getValue();
+                        }
+                    }
+
+                    // add a row number
+                    itemRow.addCell().addContent(i++);
 
                     //Column 0 task Checkbox to delete
                     itemRow.addCell().addCheckBox("workflow_id").addOption(wfi.getID());
@@ -200,10 +217,13 @@ public class WorkflowOverviewTransformer extends AbstractDSpaceTransformer {
                     itemRow.addCellContent(state);
                     //Column 2 Item name
                     itemRow.addCell().addXref(request.getContextPath() + "/admin/display-workflowItem?wfiId=" +wfi.getID(), item.getName() );
+                    itemRow.addCell().addContent(authors);
                     //Column 3 collection
                     itemRow.addCell().addXref(handleService.resolveToURL(context, wfi.getCollection().getHandle()), wfi.getCollection().getName());
                     //Column 4 submitter
                     itemRow.addCell().addXref("mailto:" + wfi.getSubmitter().getEmail(), wfi.getSubmitter().getFullName());
+
+
                 }
 
                 Para buttonsPara = resultsDiv.addPara();

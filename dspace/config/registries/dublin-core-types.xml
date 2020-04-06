@@ -226,14 +226,6 @@
   <dc-type>
 	<schema>dc</schema>
     <element>identifier</element>
-    <qualifier>govdoc</qualifier>
-    <scope_note>A government document number</scope_note>
-  </dc-type>
-
-  <!-- Used by system: do not remove -->
-  <dc-type>
-	<schema>dc</schema>
-    <element>identifier</element>
     <qualifier>isbn</qualifier>
     <scope_note>International Standard Book Number</scope_note>
   </dc-type>
@@ -244,13 +236,6 @@
     <element>identifier</element>
     <qualifier>issn</qualifier>
     <scope_note>International Standard Serial Number</scope_note>
-  </dc-type>
-
-  <dc-type>
-	<schema>dc</schema>
-    <element>identifier</element>
-    <qualifier>sici</qualifier>
-    <scope_note>Serial Item and Contribution Identifier</scope_note>
   </dc-type>
 
   <!-- Used by system: do not remove -->
@@ -313,23 +298,8 @@
   <dc-type>
 	<schema>dc</schema>
     <element>description</element>
-    <qualifier>statementofresponsibility</qualifier>
-    <scope_note>To preserve statement of responsibility from MARC records.</scope_note>
-  </dc-type>
-
-  <dc-type>
-	<schema>dc</schema>
-    <element>description</element>
     <qualifier>tableofcontents</qualifier>
     <scope_note>A table of contents for a given item.</scope_note>
-  </dc-type>
-
-  <dc-type>
-	<schema>dc</schema>
-    <element>description</element>
-    <qualifier>uri</qualifier>
-    <scope_note>Uniform Resource Identifier pointing to description of
-    this item.</scope_note>
   </dc-type>
 
   <!-- Used by system: do not remove -->
@@ -397,13 +367,6 @@
   <dc-type>
 	<schema>dc</schema>
     <element>relation</element>
-    <qualifier>isformatof</qualifier>
-    <scope_note>References additional physical form.</scope_note>
-  </dc-type>
-
-  <dc-type>
-	<schema>dc</schema>
-    <element>relation</element>
     <qualifier>ispartof</qualifier>
     <scope_note>References physically or logically containing item.</scope_note>
   </dc-type>
@@ -421,56 +384,6 @@
     <element>relation</element>
     <qualifier>haspart</qualifier>
     <scope_note>References physically or logically contained item.</scope_note>
-  </dc-type>
-
-  <dc-type>
-	<schema>dc</schema>
-    <element>relation</element>
-    <qualifier>isversionof</qualifier>
-    <scope_note>References earlier version.</scope_note>
-  </dc-type>
-
-  <dc-type>
-	<schema>dc</schema>
-    <element>relation</element>
-    <qualifier>hasversion</qualifier>
-    <scope_note>References later version.</scope_note>
-  </dc-type>
-
-  <dc-type>
-	<schema>dc</schema>
-    <element>relation</element>
-    <qualifier>isbasedon</qualifier>
-    <scope_note>References source.</scope_note>
-  </dc-type>
-
-  <dc-type>
-	<schema>dc</schema>
-    <element>relation</element>
-    <qualifier>isreferencedby</qualifier>
-    <scope_note>Pointed to by referenced resource.</scope_note>
-  </dc-type>
-
-  <dc-type>
-	<schema>dc</schema>
-    <element>relation</element>
-    <qualifier>requires</qualifier>
-    <scope_note>Referenced resource is required to support function,
-    delivery, or coherence of item.</scope_note>
-  </dc-type>
-
-  <dc-type>
-	<schema>dc</schema>
-    <element>relation</element>
-    <qualifier>replaces</qualifier>
-    <scope_note>References preceeding item.</scope_note>
-  </dc-type>
-
-  <dc-type>
-	<schema>dc</schema>
-    <element>relation</element>
-    <qualifier>isreplacedby</qualifier>
-    <scope_note>References succeeding item.</scope_note>
   </dc-type>
 
   <dc-type>
@@ -529,20 +442,6 @@
     <element>subject</element>
     <qualifier>ddc</qualifier>
     <scope_note>Dewey Decimal Classification Number</scope_note>
-  </dc-type>
-
-  <dc-type>
-	<schema>dc</schema>
-    <element>subject</element>
-    <qualifier>lcc</qualifier>
-    <scope_note>Library of Congress Classification Number</scope_note>
-  </dc-type>
-
-  <dc-type>
-	<schema>dc</schema>
-    <element>subject</element>
-    <qualifier>lcsh</qualifier>
-    <scope_note>Library of Congress Subject Headings</scope_note>
   </dc-type>
 
   <dc-type>

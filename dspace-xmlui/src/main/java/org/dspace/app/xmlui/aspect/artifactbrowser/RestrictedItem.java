@@ -88,16 +88,16 @@ public class RestrictedItem extends AbstractDSpaceTransformer //implements Cache
 
 
     // Item states
-    private static final Message T_para_item_restricted_auth =
-            message("xmlui.ArtifactBrowser.RestrictedItem.para_item_restricted_auth");
+//    private static final Message T_para_item_restricted_auth =
+//            message("xmlui.ArtifactBrowser.RestrictedItem.para_item_restricted_auth");
     private static final Message T_para_item_restricted =
             message("xmlui.ArtifactBrowser.RestrictedItem.para_item_restricted");
     private static final Message T_para_item_withdrawn =
             message("xmlui.ArtifactBrowser.RestrictedItem.para_item_withdrawn");
 
-
-    private static final Message T_para_login =
-            message("xmlui.ArtifactBrowser.RestrictedItem.login");
+//
+//    private static final Message T_para_login =
+//            message("xmlui.ArtifactBrowser.RestrictedItem.login");
 
     protected BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
 
@@ -189,10 +189,10 @@ public class RestrictedItem extends AbstractDSpaceTransformer //implements Cache
                     status = T_para_item_withdrawn;
                     isWithdrawn = true;
                 }//if user is not authenticated, display info to authenticate
-                else if (context.getCurrentUser() == null) 
-                {
-                    status = T_para_item_restricted_auth;
-                }
+//                else if (context.getCurrentUser() == null)
+//                {
+//                    status = T_para_item_restricted_auth;
+//                }
                 unauthorized = body.addDivision(divID, "primary");
                 unauthorized.setHead(title);
                 unauthorized.addPara(T_para_item.parameterize(identifier));
@@ -209,19 +209,19 @@ public class RestrictedItem extends AbstractDSpaceTransformer //implements Cache
         }
 
         // add a login link if !loggedIn & not withdrawn
-        if (!isWithdrawn && context.getCurrentUser() == null) 
-        {
-            unauthorized.addPara().addXref(contextPath+"/login", T_para_login);
-
-            // Interrupt request if the user is not authenticated, so they may come back to
-            // the restricted resource afterwards.
-            String header = parameters.getParameter("header", null);
-            String message = parameters.getParameter("message", null);
-            String characters = parameters.getParameter("characters", null);
-
-            // Interrupt this request
-            AuthenticationUtil.interruptRequest(objectModel, header, message, characters);
-        }
+//        if (!isWithdrawn && context.getCurrentUser() == null)
+//        {
+//            unauthorized.addPara().addXref(contextPath+"/login", T_para_login);
+//
+//            // Interrupt request if the user is not authenticated, so they may come back to
+//            // the restricted resource afterwards.
+//            String header = parameters.getParameter("header", null);
+//            String message = parameters.getParameter("message", null);
+//            String characters = parameters.getParameter("characters", null);
+//
+//            // Interrupt this request
+//            AuthenticationUtil.interruptRequest(objectModel, header, message, characters);
+//        }
         
         //Finally, set proper response. Return "404 Not Found" for all restricted/withdrawn items
         HttpServletResponse response = (HttpServletResponse)objectModel

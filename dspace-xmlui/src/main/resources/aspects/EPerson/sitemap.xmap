@@ -39,6 +39,8 @@ registration, forgotten passwords, editing profiles, and changing passwords.
 			</map:transformers>
 		
 		<map:actions>
+			<map:action name="FeideAuthenticateAction" src="org.dspace.app.xmlui.aspect.eperson.FeideAuthenticateAction"/>
+        	<map:action name="FeideUnAuthenticateAction" src="org.dspace.app.xmlui.aspect.eperson.FeideUnAuthenticateAction"/>
 			<map:action name="AuthenticateAction" src="org.dspace.app.xmlui.aspect.eperson.AuthenticateAction"/>
 			<map:action name="ShibbolethAction" src="org.dspace.app.xmlui.aspect.eperson.ShibbolethAction"/>
 			<map:action name="LDAPAuthenticateAction" src="org.dspace.app.xmlui.aspect.eperson.LDAPAuthenticateAction"/>
@@ -151,6 +153,17 @@ registration, forgotten passwords, editing profiles, and changing passwords.
 				<map:transform type="PasswordLogin"/>
 				<map:serialize type="xml"/>
 			</map:match>
+
+			<map:match pattern="feide-login">
+            	<map:act type="FeideAuthenticateAction">
+            		<!-- Login succeeded, request will be forwarded. -->
+            		<map:serialize type="xml"/>
+            	</map:act>
+
+            	<!-- Login failed, try again. -->
+            	<map:transform type="FailedAuthentication"/>
+            	<map:serialize type="xml"/>
+            </map:match>
 			
          <map:match pattern="certificate-login">
             <map:act type="AuthenticateAction">
@@ -188,9 +201,11 @@ registration, forgotten passwords, editing profiles, and changing passwords.
 			<!--
 					Log the user out. The UnAuthenticateAction can not fail and will 
 					always redirect the user to the DSpace homepage.
-					-->
+			-->
+
 			<map:match pattern="logout">
-				<map:act type="UnAuthenticateAction">
+				<map:act type="FeideUnAuthenticateAction">
+				<!--<map:act type="UnAuthenticateAction">-->
 					<!-- logout succeeded, request will be forwarded to the homepage. -->
 					<map:serialize type="xml"/>
 				</map:act>

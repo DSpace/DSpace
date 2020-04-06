@@ -160,6 +160,13 @@
         </step>
     </command>
     <command>
+        <name>map-workflows</name>
+        <description>Map CRIStin/Inspera collections to xmlworkflow in config/workflow.xml (restart tomcat!).</description>
+        <step>
+            <class>org.dspace.xmlworkflow.cristin.LinkCollectionToWorkflow</class>
+        </step>
+    </command>
+    <command>
         <name>metadata-export</name>
         <description>Export metadata for batch editing</description>
         <step>
@@ -213,6 +220,20 @@
         <description>Load entries into a registry</description>
         <step>
             <class>org.dspace.administer.RegistryLoader</class>
+        </step>
+    </command>
+    <command>
+        <name>remove-group</name>
+        <description>Removes a group from the database</description>
+        <step>
+            <class>org.dspace.administer.RemoveGroup</class>
+        </step>
+    </command>
+    <command>
+        <name>remove-legacy-groups</name>
+        <description>Removes legacy groups from the database</description>
+        <step>
+            <class>org.dspace.administer.RemoveLegacyGroups</class>
         </step>
     </command>
     <command>
@@ -378,6 +399,13 @@
         <description>Display the version of DSpace and other troubleshooting information</description>
         <step>
             <class>org.dspace.app.util.Version</class>
+        </step>
+    </command>
+    <command>
+        <name>list-number-of-downloaded-bitstreams</name>
+        <description>List number of downloaded bitstreams for all institutions.</description>
+        <step>
+            <class>org.dspace.app.statistics.ListNumberOfDownloadedBitstreamsPerInstitution</class>
         </step>
     </command>
 </commands>

@@ -85,7 +85,13 @@
 			</xsl:for-each>
 			<!-- dc.identifier.* -->
 			<xsl:for-each select="doc:metadata/doc:element[@name='dc']/doc:element[@name='identifier']/doc:element/doc:element/doc:field[@name='value']">
-				<dc:identifier><xsl:value-of select="." /></dc:identifier>
+				<xsl:choose>
+					<xsl:when test="../../@name='doi' and not(starts-with(.,'http'))"><dc:identifier><xsl:value-of select="concat('https://doi.org/',.)" /></dc:identifier></xsl:when>
+					<xsl:when test="../../@name='issn'"><dc:identifier><xsl:value-of select="concat('urn:issn:',.)" /></dc:identifier></xsl:when>
+					<xsl:when test="../../@name='isbn'"><dc:identifier><xsl:value-of select="concat('urn:isbn:',.)" /></dc:identifier></xsl:when>
+					<xsl:when test="../../@name='cristin'"><dc:identifier><xsl:value-of select="concat('cristin:',.)" /></dc:identifier></xsl:when>
+					<xsl:otherwise><dc:identifier><xsl:value-of select="." /></dc:identifier></xsl:otherwise>
+				</xsl:choose>
 			</xsl:for-each>
 			<!-- dc.language -->
 			<xsl:for-each select="doc:metadata/doc:element[@name='dc']/doc:element[@name='language']/doc:element/doc:field[@name='value']">

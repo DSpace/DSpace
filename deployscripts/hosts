@@ -1,0 +1,15 @@
+[webservers]
+acrux.backupsite.bibsys.no
+becrux.backupsite.bibsys.no
+
+[appservers-produksjon]
+brage1.backupsite.bibsys.no
+brage2.backupsite.bibsys.no
+brage3.backupsite.bibsys.no
+brage4.backupsite.bibsys.no
+
+[appservers-utvikle]
+brage-utvikle.bibsys.no
+
+[appservers-test]
+brage-test.bibsys.no

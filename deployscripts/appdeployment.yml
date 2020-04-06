@@ -1,0 +1,143 @@
+- name: Notify Slack
+  slack:
+    channel: "{{ SlackConfig.channel }}"
+    icon_emoji: "{{ SlackConfig.icon }}"
+    msg: "`[{{kunde}}]` Bygging ferdig. Starter deployment."
+    token: "{{ SlackConfig.token }}"
+    username: "{{ SlackConfig.sender }}"
+  when: fase == "produksjon"
+
+- name: Create target paths
+  file:
+    mode: "755"
+    path: "{{item}}"
+    state: directory
+  with_items:
+    - /brage/{{ kunde }}
+    - /brage/{{ kunde }}/app
+    - /brage/{{ kunde }}/data
+    - /brage/{{ kunde }}/install
+    - /brage/{{ kunde }}/tmp
+
+- name: Customize theme for customer
+  shell: "cat {{ jenkins_workspace }}/customizations/themes/{{ kunde }}/style.css   >> {{ jenkins_workspace }}/dspace/target/dspace-installer/webapps/xmlui/themes/Mirage2/styles/main.css"
+  delegate_to: localhost
+
+- name: Adding logo, favicon and other images for customer
+  shell: "rsync -avh {{ jenkins_workspace }}/customizations/themes/{{ kunde }}/overlay/  {{ jenkins_workspace }}/dspace/target/dspace-installer/webapps/xmlui/themes/Mirage2/"
+  delegate_to: localhost
+
+- name: Deploy DSpace Installer
+  synchronize:
+    delete: yes
+    dest: /brage/{{ kunde }}/install/dspace-installer/
+    src: "{{ jenkins_workspace }}/dspace/target/dspace-installer/"
+
+- name: Make sure brage-{{ kunde }} database is present
+  postgresql_db:
+    lc_collate: nb_NO.utf8
+    lc_ctype: nb_NO.utf8
+    login_host: "{{ DatabaseHost[fase] }}"
+    login_user: "{{ lookup('hashi_vault', 'secret=secret/service/brage/' + fase + ':db_username auth_method=approle role_id=brage-client-' + fase + ' secret_id=' + vault_secret + ' url=https://vault.bibsys.no:8200')}}"
+    login_password: "{{ lookup('hashi_vault', 'secret=secret/service/brage/' + fase + ':db_password auth_method=approle role_id=brage-client-' + fase + ' secret_id=' + vault_secret + ' url=https://vault.bibsys.no:8200')}}"
+    name: brage-{{ kunde }}
+    template: template0
+  when: fase == "produksjon"
+    
+- name: Notify Slack
+  slack:
+    channel: "{{ SlackConfig.channel }}"
+    icon_emoji: "{{ SlackConfig.icon }}"
+    msg: "`[{{kunde}}]` Deployment ferdig. Starter installasjon."
+    token: "{{ SlackConfig.token }}"
+    username: "{{ SlackConfig.sender }}"
+  when: fase == "produksjon"
+
+- name: Install application
+  register: result
+  shell: "ant -buildfile /brage/{{ kunde }}/install/dspace-installer/build.xml fresh_install"
+  ignore_errors: yes
+
+- name: Fail on ant failure
+  fail:
+    msg: "stderr: {{ result.stderr }} stdout: {{ result.stdout }}"
+  when: result.rc > 0
+
+- name: Update configs
+  register: result
+  shell: "ant -buildfile /brage/{{ kunde }}/install/dspace-installer/build.xml update_configs"
+  ignore_errors: yes
+
+- name: Fail on ant failure
+  fail:
+    msg: "stderr: {{ result.stderr }} stdout: {{ result.stdout }}"
+  when: result.rc > 0
+
+- name: Undeploy Apps
+  shell: "curl -s -n 'http://localhost:8080/manager/text/undeploy?path=/{{kunde}}-{{item}}'"
+  with_items:
+    - xmlui
+    - oai
+    - rest
+
+- name: Undeploy SOLR
+  shell: "curl -s -n 'http://localhost:9080/manager/text/undeploy?path=/{{kunde}}-solr'"
+
+- name: Look for database migrations
+  shell: "/brage/{{ kunde }}/app/bin/dspace map-workflows"
+
+- name: Look for database migrations
+  shell: "/brage/{{ kunde }}/app/bin/dspace database info"
+  register: dbinfo
+
+- name: Run database migrations
+  shell: "/brage/{{ kunde }}/app/bin/dspace {{ item }}"
+  when: dbinfo.stdout.find("pending") != -1
+  loop:
+    - "database migrate"
+    - "index-discovery -b"
+    - "oai import -c -o"
+
+- name: Deploy SOLR
+  synchronize:
+    delete: yes
+    dest: /srv/tomcat-solr/webapps/{{ kunde }}-solr/
+    src: /brage/{{ kunde }}/app/webapps/solr/
+  delegate_to: "{{inventory_hostname}}"
+  
+- name: Deploy Apps
+  synchronize:
+    delete: yes
+    dest: /srv/tomcat-xmlui-oai/webapps/{{ kunde }}-{{item}}/
+    src: /brage/{{ kunde }}/app/webapps/{{item}}/
+  delegate_to: "{{inventory_hostname}}"
+  with_items:
+    - oai
+    - xmlui
+    - rest
+
+- name: Deploy maintenance scripts
+  copy:
+    src: ../customizations/maintenance-scripts/
+    dest: /brage/{{ kunde }}/app/bibsys-scripts
+
+- name: Deploy FEIDE authentication properties
+  copy:
+    dest: /brage/{{ kunde }}/app/config/feide.properties
+    content: |
+      SP_ENTITY_ID={{ FeideEntityID }}
+      IDP_BASEPATH=https://{{ FeideConfig[fase]["IDP"] }}
+
+- name: Deploy handle server properties
+  template:
+    dest: /brage/{{ kunde }}/app/config/handleserver.properties
+    src: handleserver.properties.j2
+
+- name: Notify Slack
+  slack:
+    channel: "{{ SlackConfig.channel }}"
+    icon_emoji: "{{ SlackConfig.icon }}"
+    msg: "`[{{kunde}}]` Installasjon utført. Konfigurerer webserver."
+    token: "{{ SlackConfig.token }}"
+    username: "{{ SlackConfig.sender }}"
+  when: fase == "produksjon"

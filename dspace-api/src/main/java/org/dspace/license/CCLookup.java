@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.license.factory.LicenseServiceFactory;
 import org.dspace.license.service.CreativeCommonsService;
@@ -306,7 +307,9 @@ public class CCLookup {
 		try {
 			// parsing document from input stream
 			java.io.InputStream stream = connection.getInputStream();
-			this.license_doc = this.parser.build(stream);
+			this.license_doc = StringUtils.isEmpty((String)answers.get("jurisdiction"))
+					? CC4LocaleConverter.builder(stream).build(lang)
+					: this.parser.build(stream);
 		} catch (JDOMException jde) {
                         log.warn(jde.getMessage());
 		} catch (Exception e) {

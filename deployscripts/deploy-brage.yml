@@ -1,0 +1,45 @@
+- hosts: appservers-{{fase}}
+  gather_facts: false
+#  remote_user: webserv
+  tasks:
+    - name: Bootstrap and sanity checks
+      import_tasks:
+        file: bootstrap.yml
+
+    - name: Save appserver name
+      set_fact:
+        appserver: "{{ inventory_hostname_short }}"
+      when: kunde in kunder
+      tags:
+        - webconf
+
+    - name: ApplicationDeployment
+      import_tasks: appdeployment.yml
+      when: (fase != "produksjon") or (kunde in kunder)
+
+- hosts: webservers
+  gather_facts: false
+#  remote_user: webserv
+  tags:
+    - webconf
+  tasks:
+    - name: Bootstrap and sanity checks
+      import_tasks:
+        file: bootstrap.yml
+
+    - name: Find name of application server
+      set_fact:
+        appserver: "{{ hostvars[item]['appserver'] }}"
+      delegate_to: "{{ item }}"
+      with_items: "{{ groups['appservers-' ~ fase] }}"
+      when: hostvars[item]["appserver"] is defined
+
+    - fail:
+        msg: No appserver
+      when:
+        - appserver is not defined
+        - fase == "produksjon"
+
+    - name: WebserverConfigDeployment
+      import_tasks: webdeployment.yml
+      when: fase == "produksjon"

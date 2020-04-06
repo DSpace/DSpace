@@ -55,6 +55,11 @@
     <servlet-name>Cocoon</servlet-name>
   </filter-mapping>
     -->
+  <!-- Feide lib config -->
+  <context-param>
+      <param-name>feide.configuration</param-name>
+      <param-value>${dspace.dir}/config</param-value>
+  </context-param>
 
 
   <!--

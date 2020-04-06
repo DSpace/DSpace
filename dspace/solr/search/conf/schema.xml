@@ -408,20 +408,20 @@
          With various TokenFilterFactories to produce a sortable field
          that does not include some properties of the source text
       -->
-    <fieldType name="lowerCaseSort" class="solr.TextField" sortMissingLast="true" omitNorms="true">
-      <analyzer>
-        <!-- KeywordTokenizer does no actual tokenizing, so the entire
-             input string is preserved as a single token
-          -->
-        <tokenizer class="solr.KeywordTokenizerFactory"/>
-        <!-- The LowerCase TokenFilter does what you expect, which can be
-             when you want your sorting to be case insensitive
-          -->
-        <filter class="solr.LowerCaseFilterFactory" />
-        <!-- The TrimFilter removes any leading or trailing whitespace -->
-        <filter class="solr.TrimFilterFactory" />
-      </analyzer>
-    </fieldType>
+      <fieldType name="lowerCaseSort" class="solr.TextField" sortMissingLast="true" omitNorms="true">
+          <analyzer>
+              <!-- KeywordTokenizer does no actual tokenizing, so the entire
+                   input string is preserved as a single token
+                -->
+              <tokenizer class="solr.KeywordTokenizerFactory"/>
+              <!-- The LowerCase TokenFilter does what you expect, which can be
+                   when you want your sorting to be case insensitive
+                -->
+              <filter class="solr.LowerCaseFilterFactory" />
+              <!-- The TrimFilter removes any leading or trailing whitespace -->
+              <filter class="solr.TrimFilterFactory" />
+            </analyzer>
+      </fieldType>
     
     <!-- This field is used for store metadatavalue (with authority, prefered label, variants and 
     	 language) to use in projection  -->

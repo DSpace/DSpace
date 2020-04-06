@@ -169,7 +169,8 @@ public class FlowGroupUtils {
 		newList.remove(id);
 		return newList.toArray(new String[newList.size()]);
 	}
-	
+
+
 	/**
 	 * Save the group. If the name has been changed then it will be updated, if any 
 	 * members have been added or removed then they are updated. 
@@ -201,7 +202,7 @@ public class FlowGroupUtils {
             throw new UIException(uee);
         }
 		
-		Group group = null;
+		Group group;
 		if (groupID == null)
 		{
 			// First, check if the name is blank.
@@ -425,15 +426,16 @@ public class FlowGroupUtils {
 	 * 
 	 * Note: the order of these suffixes are important, see getCollectionRole()
 	 */
-	private static final String[] COLLECTION_SUFFIXES = {"_SUBMIT","_ADMIN","_WFSTEP_1","_WORKFLOW_STEP_1","_WFSTEP_2","_WORKFLOW_STEP_2","_WFSTEP_3","_WORKFLOW_STEP_3","_DEFAULT_ITEM_READ"};
+	private static final String[] COLLECTION_SUFFIXES = {"_SUBMIT","_ADMIN","_WFSTEP_1","_WORKFLOW_STEP_1","_WFSTEP_2","_WORKFLOW_STEP_2","_WFSTEP_3","_WORKFLOW_STEP_3","_DEFAULT_ITEM_READ",
+			"_DEFAULT_READ", "_WORKFLOW_ROLE_reviewer", "_WORKFLOW_ROLE_editor", "_WORKFLOW_ROLE_finaleditor"};
 
-	/**
-	 * Extracts the collection id that may be embedded in the given group name.
-	 *
-     * @param context session context.
-	 * @param groupName - the name of a group (ie group.getName())
-	 * @return the integer collection id or -1 if the group is not that of a collection
-	 */
+/**
+ * Extracts the collection id that may be embedded in the given group name.
+ *
+ * @param context session context.
+ * @param groupName - the name of a group (ie group.getName())
+ * @return the integer collection id or -1 if the group is not that of a collection
+ */
 	public static UUID getCollectionId(Context context, String groupName)
 	{
 		if (groupName != null && groupName.startsWith(COLLECTION_PREFIX))

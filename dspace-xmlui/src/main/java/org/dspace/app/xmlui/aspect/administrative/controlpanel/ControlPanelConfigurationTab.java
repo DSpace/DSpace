@@ -42,6 +42,11 @@ public class ControlPanelConfigurationTab extends AbstractControlPanelTab {
 	private static final Message T_FEEDBACK_RECIPIENT = message("xmlui.administrative.ControlPanel.mail_feedback_recipient");
 	private static final Message T_MAIL_ADMIN = message("xmlui.administrative.ControlPanel.mail_admin");
 
+	private static final Message T_JENKINS_URL = message("xmlui.administrative.ControlPanel.jenkins_url");
+	private static final Message T_JENKINS_TAG = message("xmlui.administrative.ControlPanel.jenkins_tag");
+	private static final Message T_GIT_BRANCH = message("xmlui.administrative.ControlPanel.git_branch");
+	private static final Message T_GIT_COMMIT = message("xmlui.administrative.ControlPanel.git_commit");
+
 	private static final String T_UNSET = "UNSET";
         
         protected ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
@@ -61,6 +66,18 @@ public class ControlPanelConfigurationTab extends AbstractControlPanelTab {
 
 		dspace.addLabel(T_DSPACE_VERSION);
 		dspace.addItem(Util.getSourceVersion());
+
+		dspace.addLabel(T_JENKINS_URL);
+		dspace.addItem(notempty(configurationService.getProperty("jenkins.url")));
+
+		dspace.addLabel(T_JENKINS_TAG);
+		dspace.addItem(notempty(configurationService.getProperty("jenkins.tag")));
+
+		dspace.addLabel(T_GIT_BRANCH);
+		dspace.addItem(notempty(configurationService.getProperty("git.branch")));
+
+		dspace.addLabel(T_GIT_COMMIT);
+		dspace.addItem(notempty(configurationService.getProperty("git.commit")));
 
 		dspace.addLabel(T_DSPACE_DIR);
 		dspace.addItem(notempty(configurationService.getProperty("dspace.dir")));

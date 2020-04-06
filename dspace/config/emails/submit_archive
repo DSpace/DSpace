@@ -4,18 +4,19 @@
 # {1}  Name of collection
 # {2}  handle 
 #
-Subject: DSpace: Submission Approved and Archived 
+Subject: Registrering godkjent / Submission accepted
 
-You submitted: {0}
+Du registrerte / You submitted: {0}
 
-To collection: {1}
+I samlingen / To collection: {1}
 
-Your submission has been accepted and archived in DSpace,
-and it has been assigned the following identifier:
+Innførselen er nå publisert i arkivet med følgende identifikator /
+The item is now published in the archive with the following identifier:
 {2}
 
+Bruk denne identifikatoren når du skal sitere til registreringen /
 Please use this identifier when citing your submission.
 
-Many thanks!
+Med vennlig hilsen / Sincerely,
 
-DSpace
+Administrator

@@ -8,11 +8,13 @@
 package org.dspace.harvest;
 
 import ORG.oclc.oai.harvester2.verb.*;
+import com.google.common.base.Predicate;
+import com.google.common.collect.Iterables;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.*;
 import org.dspace.content.Collection;
+import org.dspace.content.*;
 import org.dspace.content.crosswalk.CrosswalkException;
 import org.dspace.content.crosswalk.IngestionCrosswalk;
 import org.dspace.content.factory.ContentServiceFactory;
@@ -22,11 +24,13 @@ import org.dspace.core.factory.CoreServiceFactory;
 import org.dspace.core.service.PluginService;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
+import org.dspace.harvest.cristin.*;
 import org.dspace.harvest.factory.HarvestServiceFactory;
 import org.dspace.harvest.service.HarvestedCollectionService;
 import org.dspace.harvest.service.HarvestedItemService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
+import org.dspace.xmlworkflow.cristin.OAIConfigurableCrosswalk;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.Namespace;
@@ -34,6 +38,7 @@ import org.jdom.input.DOMBuilder;
 import org.jdom.output.XMLOutputter;
 import org.xml.sax.SAXException;
 
+import javax.annotation.Nullable;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 import java.io.*;
@@ -76,6 +81,8 @@ public class OAIHarvester {
 	protected WorkspaceItemService workspaceItemService;
     protected PluginService pluginService;
     protected ConfigurationService configurationService;
+	protected MetadataSchemaService metadataSchemaService;
+	protected MetadataFieldService metadataFieldService;
 
 
     //  The collection this harvester instance is dealing with
@@ -116,7 +123,8 @@ public class OAIHarvester {
         pluginService = CoreServiceFactory.getInstance().getPluginService();
 
 		configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
-
+		metadataSchemaService = ContentServiceFactory.getInstance().getMetadataSchemaService();
+		metadataFieldService = ContentServiceFactory.getInstance().getMetadataFieldService();
 
 		if (dso.getType() != Constants.COLLECTION)
         {
@@ -426,7 +434,9 @@ public class OAIHarvester {
 		// If we got to this point, it means the harvest was completely successful
 		Date finishTime = new Date();
 		long timeTaken = finishTime.getTime() - startTime.getTime();
+		// this is a bit wonky to set both fields to the same value, but there is some inconsistencies in use of them.
 		harvestRow.setHarvestStartTime(startTime);
+		harvestRow.setLastHarvested(startTime);
 		harvestRow.setHarvestMessage("Harvest from " + oaiSource + " successful");
 		harvestRow.setHarvestStatus(HarvestedCollection.STATUS_READY);
 		log.info("Harvest from " + oaiSource + " successful. The process took " + timeTaken + " milliseconds. Harvested " + currentRecord + " items.");
@@ -486,17 +496,47 @@ public class OAIHarvester {
     	Element oreREM = null;
     	if (harvestRow.getHarvestType() > 1) {
     		oreREM = getMDrecord(harvestRow.getOaiSource(), itemOaiID, OREPrefix).get(0);
-    		ORExwalk = (IngestionCrosswalk)pluginService.getNamedPlugin(IngestionCrosswalk.class, this.ORESerialKey);
+    		String oreKey = this.ORESerialKey;
+    		if ("cristin".equals(harvestRow.getMetadataAuthorityType())) {
+    			oreKey = "cristin_ore";
+			}
+    		ORExwalk = (IngestionCrosswalk)pluginService.getNamedPlugin(IngestionCrosswalk.class, oreKey);
 		}
 
     	// Ignore authorization
     	ourContext.turnOffAuthorisationSystem();
 
+        // before we do anything else, find out if the records meet the ingest requirements
+        final String filter = StringUtils.defaultIfEmpty(harvestRow.getIngestFilter(), "none");
+        IngestFilter ingestFilter = "none".equalsIgnoreCase(filter) ?
+                new DefaultIngestFilter() :
+                (IngestFilter) pluginService.getNamedPlugin(IngestFilter.class, filter);
+
+        if (!ingestFilter.acceptIngest(descMD, oreREM))
+        {
+            // if the ingest is not acceptable, reject it
+            return;
+        }
+
+        // if we get to here we are good to go ahead with the ingest
+        // get the ingestion workflow implementation
+        String workflowProcess = harvestRow.getWorkflowProcess();
+        IngestionWorkflow ingestionWorkflow = null;
+        if (workflowProcess != null)
+        {
+            ingestionWorkflow = (IngestionWorkflow) pluginService.getNamedPlugin(IngestionWorkflow.class, workflowProcess);
+        }
+        if (ingestionWorkflow == null)
+        {
+            ingestionWorkflow = new DefaultIngestionWorkflow();
+        }
+
     	HarvestedItem hi;
 
-    	if (item != null) // found an item so we modify
+		if (item != null) // found an item so we modify
     	{
-    		log.debug("Item " + item.getHandle() + " was found locally. Using it to harvest " + itemOaiID + ".");
+			final String handle = item.getHandle();
+			log.debug("Item " + handle + " was found locally. Using it to harvest " + itemOaiID + ".");
 
     		// FIXME: check for null pointer if for some odd reason we don't have a matching hi
     		hi = harvestedItemService.find(ourContext, item);
@@ -506,12 +546,41 @@ public class OAIHarvester {
 			Date OAIDatestamp = Utils.parseISO8601Date(header.getChildText("datestamp", OAI_NS));
 			Date itemLastHarvest = hi.getHarvestDate();
 			if (itemLastHarvest != null && OAIDatestamp.before(itemLastHarvest)) {
-				log.info("Item " + item.getHandle() + " was harvested more recently than the last update time reported by the OAI server; skipping.");
+				log.info("Item " + handle + " was harvested more recently than the last update time reported by the OAI server; skipping.");
 				return;
 			}
 
 			// Otherwise, clear and re-import the metadata and bitstreams
-    		itemService.clearMetadata(ourContext, item, Item.ANY, Item.ANY, Item.ANY, Item.ANY);
+            // first, let's make sure that we're updating the right thing.  Allow the IngestionWorkflow
+            // to give us a new item if necessary, and update the HarvestedItem if it wants
+            item = ingestionWorkflow.preUpdate(ourContext, item, targetCollection, hi, descMD, oreREM);
+
+            //Optimize. Set owningInstitution manually. Avoids lookup for each iteration
+//            item.setBrageInstitution(owningInstitution);
+
+            // Lets take a backup of the handle url in case we clear it in the following steps.
+            // We need to store the metadatum as well for context
+			MetadataValue handleMetadatumBackup = Iterables.find(
+                    itemService.getMetadata(item, Item.ANY, Item.ANY, Item.ANY, Item.ANY),
+                    new Predicate<MetadataValue>()
+                    {
+						@Override
+						public boolean apply(@Nullable MetadataValue metadataValues) {
+							return metadataValues != null && metadataValues.getValue().contains(handle);
+						}
+                    });
+
+            // allow a plugin to clear the metadata if one is configured
+            String mdAuthority = harvestRow.getMetadataAuthorityType();
+            MetadataRemover mdr = mdAuthority != null ?
+                    (MetadataRemover) pluginService.getNamedPlugin(MetadataRemover.class, mdAuthority) :
+                    null;
+			if (mdr == null) {
+				mdr = new DefaultMetadataRemover();
+			}
+
+			mdr.clearMetadata(ourContext, item);
+
     		if (descMD.size() == 1)
             {
                 MDxwalk.ingest(ourContext, item, descMD.get(0), true);
@@ -520,17 +589,54 @@ public class OAIHarvester {
             {
                 MDxwalk.ingest(ourContext, item, descMD, true);
             }
-
+			// Dspace may remove all metadatum -> in these cases the handle metadatum is lost unless the ingested metadadata somehow
+			// provides this data. This step enforces the rule that at least one metadatum field contains the full handle url
+			if (handleMetadatumBackup.getValue() != null)
+			{
+				itemService.addMetadata(ourContext, item, handleMetadatumBackup.getMetadataField().getMetadataSchema().getName(), handleMetadatumBackup.getMetadataField().getElement(),
+						handleMetadatumBackup.getMetadataField().getQualifier(), handleMetadatumBackup.getLanguage(), handleMetadatumBackup.getValue());
+			}
     		// Import the actual bitstreams
     		if (harvestRow.getHarvestType() == 3) {
-    			log.info("Running ORE ingest on: " + item.getHandle());
+    			log.info("Running ORE ingest on: " + handle);
 
-    			List<Bundle> allBundles = item.getBundles();
-    			for (Bundle bundle : allBundles) {
-    				itemService.removeBundle(ourContext, item, bundle);
-    			}
+				boolean updateBitstreams = ingestionWorkflow.updateBitstreams(ourContext, item, hi);
+				if (updateBitstreams) {
+					// allow a plugin to remove the bundles if configured
+					String bundleVersioning = harvestRow.getBundleVersioningStrategy();
+					BundleVersioningStrategy bvs = bundleVersioning != null ?
+							(BundleVersioningStrategy) pluginService.getNamedPlugin(BundleVersioningStrategy.class, bundleVersioning) :
+							null;
+
+					if (bvs != null) {
+						bvs.versionBundles(ourContext, item);
+					} else {
+						List<Bundle> allBundles = item.getBundles();
+						for (Bundle bundle : allBundles) {
+							itemService.removeBundle(ourContext, item, bundle);
+						}
+					}
+				}
+
+				// now do the crosswalk
+				if (ORExwalk instanceof OAIConfigurableCrosswalk)
+				{
+					Properties props = new Properties();
+					props.put("update_bitstreams", updateBitstreams);
+					((OAIConfigurableCrosswalk) ORExwalk).configure(props);
+				}
+
+				// once the xwalk is configured (or not), carry out the crosswalk
     			ORExwalk.ingest(ourContext, item, oreREM, true);
     		}
+
+            scrubMetadata(item);
+
+            // remove duplicate metadata (BIBSYS)
+            deduplicateMetadata(item);
+
+            // let the ingestion workflow process decide what to do with the item
+            ingestionWorkflow.postUpdate(ourContext, item);
     	}
     	else
     		// NOTE: did not find, so we create (presumably, there will never be a case where an item already
@@ -555,35 +661,32 @@ public class OAIHarvester {
     			ORExwalk.ingest(ourContext, item, oreREM, true);
     		}
 
-    		// see if a handle can be extracted for the item
-    		String handle = extractHandle(item);
+            // see if we can do something about the wonky metadata
+            scrubMetadata(item);
 
-    		if (handle != null)
+            // remove duplicate metadata (BIBSYS)
+            deduplicateMetadata(item);
+
+    		// see if a handle can be extracted for the item
+    		final String hdl = extractHandle(item);
+
+    		if (hdl != null)
     		{
-    			DSpaceObject dso = handleService.resolveToObject(ourContext, handle);
+    			DSpaceObject dso = handleService.resolveToObject(ourContext, hdl);
     			if (dso != null)
                 {
-                    throw new HarvestingException("Handle collision: attempted to re-assign handle '" + handle + "' to an incoming harvested item '" + hi.getOaiID() + "'.");
+                    throw new HarvestingException("Handle collision: attempted to re-assign handle '" + hdl + "' to an incoming harvested item '" + hi.getOaiID() + "'.");
                 }
     		}
-
-    		try {
-    			item = installItemService.installItem(ourContext, wi, handle);
-    			//item = InstallItem.installItem(ourContext, wi);
-    		}
-    		// clean up the workspace item if something goes wrong before
-    		catch(SQLException | IOException | AuthorizeException se) {
-				workspaceItemService.deleteWrapper(ourContext, wi);
-    			throw se;
-    		}
+			item = ingestionWorkflow.postCreate(ourContext, wi, hdl);
 		}
 
     	// Now create the special ORE bundle and drop the ORE document in it
 		if (harvestRow.getHarvestType() == 2 || harvestRow.getHarvestType() == 3)
 		{
-			Bundle OREBundle = null;
+			Bundle OREBundle;
             List<Bundle> OREBundles = itemService.getBundles(item, "ORE");
-			Bitstream OREBitstream = null;
+			Bitstream OREBitstream;
 
             if ( OREBundles.size() > 0 )
                 OREBundle = OREBundles.get(0);
@@ -610,14 +713,13 @@ public class OAIHarvester {
 			bundleService.update(ourContext, OREBundle);
 		}
 
-		//item.setHarvestDate(new Date());
 		hi.setHarvestDate(new Date());
 
-                 // Add provenance that this item was harvested via OAI
-                String provenanceMsg = "Item created via OAI harvest from source: "
-                                        + this.harvestRow.getOaiSource() + " on " +  new DCDate(hi.getHarvestDate())
-                                        + " (GMT).  Item's OAI Record identifier: " + hi.getOaiID();
-				itemService.addMetadata(ourContext, item, "dc", "description", "provenance", "en", provenanceMsg);
+		 // Add provenance that this item was harvested via OAI
+		String provenanceMsg = "Item created via OAI harvest from source: "
+								+ this.harvestRow.getOaiSource() + " on " +  new DCDate(hi.getHarvestDate())
+								+ " (GMT).  Item's OAI Record identifier: " + hi.getOaiID();
+		itemService.addMetadata(ourContext, item, "dc", "description", "provenance", "en", provenanceMsg);
 
 		itemService.update(ourContext, item);
 		harvestedItemService.update(ourContext, hi);
@@ -634,6 +736,38 @@ public class OAIHarvester {
     	ourContext.restoreAuthSystemState();
     }
 
+
+    /**
+     * BIBSYS addition. CRIStin items imported via DIM contain duplicate cristin metadata after bitstream ingestion.
+     * This method removes all duplicated metadata before the item is installed into DSpace
+     *
+     * @param item a newly created, but not yet installed, DSpace Item
+     */
+    private void deduplicateMetadata(Item item) {
+        List<MetadataValue> metadatum = itemService.getMetadata(item, Item.ANY, Item.ANY, Item.ANY, Item.ANY);
+
+        Set<MetadataValue> deduplicateMetadatum = new LinkedHashSet<>();
+        deduplicateMetadatum.addAll(metadatum);
+
+        if (metadatum.size() != deduplicateMetadatum.size()) {
+			try {
+				itemService.clearMetadata(ourContext, item, Item.ANY, Item.ANY, Item.ANY, Item.ANY);
+			} catch (SQLException e) {
+				log.trace("Could not clear Metadata on Item "+ item.getID(), e);
+			}
+			for (MetadataValue uniqueMetadatum : deduplicateMetadatum) {
+				try {
+					itemService.addMetadata(ourContext, item, uniqueMetadatum.getMetadataField().getMetadataSchema().getName(),
+							uniqueMetadatum.getMetadataField().getElement(),
+							uniqueMetadatum.getMetadataField().getQualifier(),
+							uniqueMetadatum.getLanguage(),
+							uniqueMetadatum.getValue());
+				} catch (SQLException e) {
+					log.trace("Could not add Metadata on Item "+ item.getID(), e);
+				}
+			}
+        }
+    }
 
 
     /**
@@ -687,6 +821,85 @@ public class OAIHarvester {
 
     	return null;
     }
+
+
+    /**
+     * Scans an item's newly ingested metadata for elements not defined in this DSpace instance. It then takes action based
+     * on a configurable parameter (fail, ignore, add).
+     * @param item a DSpace item recently pushed through an ingestion crosswalk but prior to update/installation
+     */
+    private void scrubMetadata(Item item) throws SQLException, HarvestingException, AuthorizeException, IOException
+    {
+        // The two options, with three possibilities each: add, ignore, fail
+        String schemaChoice = configurationService.getProperty("oai.harvester.unknownSchema");
+        if (schemaChoice == null)
+        {
+            schemaChoice = "fail";
+        }
+
+        String fieldChoice = configurationService.getProperty("oai.harvester.unknownField");
+        if (fieldChoice == null)
+        {
+            fieldChoice = "fail";
+        }
+
+        List<String> clearList = new ArrayList<String>();
+
+        List<MetadataValue> values = itemService.getMetadata(item, Item.ANY, Item.ANY, Item.ANY, Item.ANY);
+        for (MetadataValue value : values)
+        {
+            // Verify that the schema exists
+            MetadataSchema mdSchema = metadataSchemaService.find(ourContext, value.getMetadataField().getMetadataSchema().getID());
+            if (mdSchema == null && !clearList.contains(value.getMetadataField().getMetadataSchema().getName())) {
+                // add a new schema, giving it a namespace of "unknown". Possibly a very bad idea.
+                if (schemaChoice.equals("add")) {
+					try {
+						mdSchema = metadataSchemaService.create(ourContext, value.getMetadataField().getMetadataSchema().getName(),
+								"unknown"+value.getMetadataField().getMetadataSchema().getID());
+					} catch (NonUniqueMetadataException e) {
+						log.error("Could not create schema", e);
+					}
+                    clearList.add(value.getMetadataField().getMetadataSchema().getName());
+                }
+                // ignore the offending schema, quietly dropping all of its metadata elements before they clog our gears
+                else if (schemaChoice.equals("ignore")) {
+                    itemService.clearMetadata(ourContext, item, value.getMetadataField().getMetadataSchema().getName(), Item.ANY, Item.ANY, Item.ANY);
+                    continue;
+                }
+                // otherwise, go ahead and generate the error
+                else {
+                    throw new HarvestingException("The '" + value.getMetadataField().getMetadataSchema().getName() + "' schema has not been defined in this DSpace instance. ");
+                }
+            }
+
+            if (mdSchema != null) {
+                // Verify that the element exists; this part is reachable only if the metadata schema is valid
+                MetadataField mdField = metadataFieldService.findByElement(ourContext, mdSchema,
+						value.getMetadataField().getElement(), value.getMetadataField().getQualifier());
+                if (mdField == null) {
+                    if (fieldChoice.equals("add")) {
+						try {
+							mdField = metadataFieldService.create(ourContext, mdSchema, value.getMetadataField().getElement(),
+									value.getMetadataField().getQualifier(), null);
+						} catch (NonUniqueMetadataException e) {
+							log.error("Could not create metadataField", e);
+						}
+                    }
+                    else if (fieldChoice.equals("ignore")) {
+						itemService.clearMetadata(ourContext, item, value.getMetadataField().getMetadataSchema().getName(),
+								value.getMetadataField().getElement(), value.getMetadataField().getQualifier(), Item.ANY);
+                    }
+                    else {
+                        throw new HarvestingException("The '" + value.getMetadataField().getElement() + "." + value.getMetadataField().getQualifier() + "' element has not been defined in this DSpace instance. ");
+                    }
+                }
+            }
+        }
+
+        return;
+    }
+
+
 
 
    	/**

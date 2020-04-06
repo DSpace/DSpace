@@ -343,7 +343,6 @@
                         </button>
 
                         <a href="{$context-path}/" class="navbar-brand">
-                            <img src="{$theme-path}images/DSpace-logo-line.svg" />
                         </a>
 
 
@@ -701,9 +700,6 @@
                 <div class="row">
                     <hr/>
                     <div class="col-xs-7 col-sm-8">
-                        <div>
-                            <a href="http://www.dspace.org/" target="_blank">DSpace software</a> copyright&#160;&#169;&#160;2002-2016&#160; <a href="http://www.duraspace.org/" target="_blank">DuraSpace</a>
-                        </div>
                         <div class="hidden-print">
                             <a>
                                 <xsl:attribute name="href">
@@ -723,14 +719,22 @@
                                 <i18n:text>xmlui.dri2xhtml.structural.feedback-link</i18n:text>
                             </a>
                         </div>
+                        <br/>
+                        <div id="ds-footer-left">
+                            <a href="https://www.unit.no/sites/default/files/media/filer/2019/04/Personvernerkl%C3%A6ring%20Brage%20NO_ENG.pdf" target="_blank"><i18n:text>xmlui.dri2xhtml.structural.link_gdpr</i18n:text></a>
+                        </div>
                     </div>
                     <div class="col-xs-5 col-sm-4 hidden-print">
-                        <div class="pull-right">
-                            <span class="theme-by">Theme by&#160;</span>
+                        <div id="ds-footer-right">
+                            <div>
+                                <a href="http://www.dspace.org/" target="_blank">DSpace software</a> copyright&#160;&#169;&#160;2002-2019&#160; <a href="http://www.duraspace.org/" target="_blank">DuraSpace</a>
+                            </div>
                             <br/>
-                            <a title="Atmire NV" target="_blank" href="http://atmire.com">
-                                <img alt="Atmire NV" src="{concat($theme-path, 'images/atmire-logo-small.svg')}"/>
-                            </a>
+                            <span class="theme-by"><i18n:text>xmlui.dri2xhtml.structural.link_unit</i18n:text>&#160;
+                                <a title="Unit" target="_blank" href="http://www.unit.no" id="ds-footer-logo-link2">
+                                    <img alt="Unit" src="{concat($theme-path, 'images/unit_product.png')}"/>
+                                </a>
+                            </span>
                         </div>
 
                     </div>

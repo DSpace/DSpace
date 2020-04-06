@@ -34,6 +34,8 @@ import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.service.GroupService;
 import org.dspace.handle.service.HandleService;
+import org.dspace.harvest.factory.HarvestServiceFactory;
+import org.dspace.harvest.service.HarvestedCollectionService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.usage.UsageWorkflowEvent;
@@ -715,6 +717,9 @@ public class BasicWorkflowServiceImpl implements BasicWorkflowService
             // and add them to the list
             createTasks(context, workflowItem, epa);
 
+            // email notification to registrator
+            notifyRegistrator(context, workflowItem, workflowStepGroup);
+
             if (configurationService.getBooleanProperty("workflow.notify.returned.tasks", true)
                     || oldState != correspondingState
                     || oldOwner == null)
@@ -1264,4 +1269,56 @@ public class BasicWorkflowServiceImpl implements BasicWorkflowService
     public List<String> getFlywayMigrationLocations() {
         return Collections.emptyList();
     } // TODO
+
+    private void notifyRegistrator(Context c, BasicWorkflowItem basicWorkflowItem,
+                                          Group mygroup) throws SQLException, IOException
+    {
+        // check to see if notification is turned off
+        // and only do it once - delete key after notification has
+        // been suppressed for the first time
+        UUID myID = basicWorkflowItem.getItem().getID();
+
+        if (noEMail.containsKey(myID))
+        {
+            // suppress email, and delete key
+            noEMail.remove(myID);
+        }
+        else
+        {
+            try
+            {
+                // Get the item title
+                String title = getItemTitle(basicWorkflowItem);
+
+                // Get the submitter's name
+                String submitter = getSubmitterName(basicWorkflowItem);
+
+                // Get the collection
+                Collection coll = basicWorkflowItem.getCollection();
+
+                if (!HarvestServiceFactory.getInstance().getHarvestedCollectionService().isHarvestable(c, coll)) {
+                    // Collection is not harvestable send the email
+                    Locale supportedLocale = I18nUtil.getEPersonLocale(basicWorkflowItem.getSubmitter());
+                    Email email = Email.getEmail(I18nUtil.getEmailFilename(supportedLocale, "submit_item"));
+                    email.addArgument(title);
+                    email.addArgument(coll.getName());
+                    email.addArgument(submitter);
+
+                    email.addArgument(getMyDSpaceLink());
+                    email.addRecipient(basicWorkflowItem.getSubmitter().getEmail());
+                    //email.setReplyTo(ConfigurationManager.getProperty("mail.replyto.address"));
+                    email.send();
+                }
+            }
+
+            catch (MessagingException e)
+            {
+                String gid = (mygroup != null) ?
+                        String.valueOf(mygroup.getID()) : "none";
+                log.warn(LogManager.getHeader(c, "notifyGroupofTask",
+                        "cannot email user" + " group_id" + gid
+                                + " workflow_item_id" + basicWorkflowItem.getID()));
+            }
+        }
+    }
 }

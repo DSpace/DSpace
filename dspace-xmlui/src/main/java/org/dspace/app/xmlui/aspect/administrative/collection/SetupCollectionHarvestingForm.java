@@ -8,10 +8,7 @@
 package org.dspace.app.xmlui.aspect.administrative.collection;
 
 import java.sql.SQLException;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.UUID;
+import java.util.*;
 
 import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
@@ -19,6 +16,7 @@ import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.*;
+import org.dspace.app.xmlui.wing.element.List;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.factory.ContentServiceFactory;
@@ -35,232 +33,259 @@ import org.dspace.harvest.service.HarvestedCollectionService;
  * form to edit that collection's metadata, logo, and item template.
  * @author Alexey Maslov
  */
-public class SetupCollectionHarvestingForm extends AbstractDSpaceTransformer   
-{
-	/** Language Strings */
+public class SetupCollectionHarvestingForm extends AbstractDSpaceTransformer {
+	/**
+	 * Language Strings
+	 */
 	private static final Message T_dspace_home =
-        message("xmlui.general.dspace_home");
-	
+			message("xmlui.general.dspace_home");
+
 	private static final Message T_collection_trail = message("xmlui.administrative.collection.general.collection_trail");
-	private static final Message T_options_metadata = message("xmlui.administrative.collection.general.options_metadata");	
+	private static final Message T_options_metadata = message("xmlui.administrative.collection.general.options_metadata");
 	private static final Message T_options_roles = message("xmlui.administrative.collection.general.options_roles");
-        private static final Message T_options_curate = message("xmlui.administrative.collection.general.options_curate");
+	private static final Message T_options_curate = message("xmlui.administrative.collection.general.options_curate");
 	private static final Message T_main_head = message("xmlui.administrative.collection.EditCollectionMetadataForm.main_head");
-	
+
 	private static final Message T_options_harvest = message("xmlui.administrative.collection.GeneralCollectionHarvestingForm.options_harvest");
 	private static final Message T_title = message("xmlui.administrative.collection.GeneralCollectionHarvestingForm.title");
 	private static final Message T_trail = message("xmlui.administrative.collection.GeneralCollectionHarvestingForm.trail");
-	
+
 	private static final Message T_label_source = message("xmlui.administrative.collection.GeneralCollectionHarvestingForm.label_source");
 	private static final Message T_source_normal = message("xmlui.administrative.collection.GeneralCollectionHarvestingForm.source_normal");
 	private static final Message T_source_harvested = message("xmlui.administrative.collection.GeneralCollectionHarvestingForm.source_harvested");
 
 	private static final Message T_submit_return = message("xmlui.general.return");
 	private static final Message T_submit_save = message("xmlui.administrative.collection.GeneralCollectionHarvestingForm.submit_save");
-		
+
 	private static final Message T_main_settings_head = message("xmlui.administrative.collection.SetupCollectionHarvestingForm.main_settings_head");
 	private static final Message T_options_head = message("xmlui.administrative.collection.SetupCollectionHarvestingForm.options_head");
-	
+
 	private static final Message T_label_oai_provider = message("xmlui.administrative.collection.SetupCollectionHarvestingForm.label_oai_provider");
 	private static final Message T_label_setid = message("xmlui.administrative.collection.SetupCollectionHarvestingForm.label_setid");
 	private static final Message T_label_metadata_format = message("xmlui.administrative.collection.SetupCollectionHarvestingForm.label_metadata_format");
-	
+
 	private static final Message T_help_oaiurl = message("xmlui.administrative.collection.SetupCollectionHarvestingForm.help_oaiurl");
 	private static final Message T_error_oaiurl = message("xmlui.administrative.collection.SetupCollectionHarvestingForm.error_oaiurl");
 	private static final Message T_help_oaisetid = message("xmlui.administrative.collection.SetupCollectionHarvestingForm.help_oaisetid");
 	private static final Message T_error_oaisetid = message("xmlui.administrative.collection.SetupCollectionHarvestingForm.error_oaisetid");
-	
+
 	private static final Message T_label_harvest_level = message("xmlui.administrative.collection.SetupCollectionHarvestingForm.label_harvest_level");
-	
+
 	private static final Message T_option_md_only = message("xmlui.administrative.collection.SetupCollectionHarvestingForm.option_md_only");
 	private static final Message T_option_md_and_ref = message("xmlui.administrative.collection.SetupCollectionHarvestingForm.option_md_and_ref");
 	private static final Message T_option_md_and_bs = message("xmlui.administrative.collection.SetupCollectionHarvestingForm.option_md_and_bs");
 
-	private static final Message T_submit_test = message("xmlui.administrative.collection.SetupCollectionHarvestingForm.submit_test"); 
+	private static final Message T_submit_test = message("xmlui.administrative.collection.SetupCollectionHarvestingForm.submit_test");
+
+	private static final Message T_label_ingest_filter = message("xmlui.administrative.collection.SetupCollectionHarvestingForm.label_ingest_filter");
+	private static final Message T_label_metadata_update = message("xmlui.administrative.collection.SetupCollectionHarvestingForm.label_metadata_update");
+	private static final Message T_label_bundle_versioning = message("xmlui.administrative.collection.SetupCollectionHarvestingForm.label_bundle_versioning");
+	private static final Message T_label_ingest_workflow = message("xmlui.administrative.collection.SetupCollectionHarvestingForm.label_ingest_workflow");
 
 	protected CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
 	protected HarvestedCollectionService harvestedCollectionService = HarvestServiceFactory.getInstance().getHarvestedCollectionService();
 
-	
-	public void addPageMeta(PageMeta pageMeta) throws WingException
-    {
-        pageMeta.addMetadata("title").addContent(T_title);
-        pageMeta.addTrailLink(contextPath + "/", T_dspace_home);
-        pageMeta.addTrail().addContent(T_collection_trail);
-        pageMeta.addTrail().addContent(T_trail);
-    }
-	
-	
-	public void addBody(Body body) throws WingException, SQLException, AuthorizeException
-	{
+
+	public void addPageMeta(PageMeta pageMeta) throws WingException {
+		pageMeta.addMetadata("title").addContent(T_title);
+		pageMeta.addTrailLink(contextPath + "/", T_dspace_home);
+		pageMeta.addTrail().addContent(T_collection_trail);
+		pageMeta.addTrail().addContent(T_trail);
+	}
+
+
+	public void addBody(Body body) throws WingException, SQLException, AuthorizeException {
 		UUID collectionID = UUID.fromString(parameters.getParameter("collectionID", null));
 		Collection thisCollection = collectionService.find(context, collectionID);
 		Request request = ObjectModelHelper.getRequest(objectModel);
-		
+
 		HarvestedCollection hc = harvestedCollectionService.find(context, thisCollection);
 		String baseURL = contextPath + "/admin/collection?administrative-continue=" + knot.getId();
-		
-		String errorString = parameters.getParameter("errors",null);
+
+		String errorString = parameters.getParameter("errors", null);
 		String[] errors = errorString.split(",");
-		HashMap<String,String> errorMap = new HashMap<String,String>();
+		HashMap<String, String> errorMap = new HashMap<String, String>();
 		for (String error : errors) {
 			//System.out.println(errorString);
-			String[] errorPieces = error.split(":",2);
-			
-			if (errorPieces.length > 1)
-            {
-                errorMap.put(errorPieces[0], errorPieces[1]);
-            }
-			else
-            {
-                errorMap.put(errorPieces[0], errorPieces[0]);
-            }
+			String[] errorPieces = error.split(":", 2);
+
+			if (errorPieces.length > 1) {
+				errorMap.put(errorPieces[0], errorPieces[1]);
+			} else {
+				errorMap.put(errorPieces[0], errorPieces[0]);
+			}
 		}
-		
-		
+
+
 		String oaiProviderValue;
 		String oaiSetIdValue;
 		String metadataFormatValue;
 		int harvestLevelValue;
-				
+		String metadataUpdateValue;
+		String bundleVersioningValue;
+		String ingestWorkflowValue;
+		String ingestFilterValue;
+
 		if (hc != null && request.getParameter("submit_test") == null) {
 			oaiProviderValue = hc.getOaiSource();
 			oaiSetIdValue = hc.getOaiSetId();
 			metadataFormatValue = hc.getHarvestMetadataConfig();
-			harvestLevelValue = hc.getHarvestType();			
-		}
-		else {
+			harvestLevelValue = hc.getHarvestType();
+			metadataUpdateValue = hc.getMetadataAuthorityType();
+			bundleVersioningValue = hc.getBundleVersioningStrategy();
+			ingestWorkflowValue = hc.getWorkflowProcess();
+			ingestFilterValue = hc.getIngestFilter();
+		} else {
 			oaiProviderValue = parameters.getParameter("oaiProviderValue", "");
 			oaiSetIdValue = parameters.getParameter("oaiSetAll", "");
-            if(!"all".equals(oaiSetIdValue))
-            {
-                oaiSetIdValue = parameters.getParameter("oaiSetIdValue", null);
-            }
+			if (!"all".equals(oaiSetIdValue)) {
+				oaiSetIdValue = parameters.getParameter("oaiSetIdValue", null);
+			}
 			metadataFormatValue = parameters.getParameter("metadataFormatValue", "");
-			String harvestLevelString = parameters.getParameter("harvestLevelValue","0");
-			if (harvestLevelString.length() == 0)
-            {
-                harvestLevelValue = 0;
-            }
-			else
-            {
-                harvestLevelValue = Integer.parseInt(harvestLevelString);
-            }
+			String harvestLevelString = parameters.getParameter("harvestLevelValue", "0");
+			if (harvestLevelString.length() == 0) {
+				harvestLevelValue = 0;
+			} else {
+				harvestLevelValue = Integer.parseInt(harvestLevelString);
+			}
+
+			// default values for the varions ingest process options
+			metadataUpdateValue = "all";
+			bundleVersioningValue = "all";
+			ingestWorkflowValue = "archive";
+			ingestFilterValue = "none";
 		}
-		
+
 		// DIVISION: main
-	    Division main = body.addInteractiveDivision("collection-harvesting-setup",contextPath+"/admin/collection",Division.METHOD_MULTIPART,"primary administrative collection");
-	    main.setHead(T_main_head.parameterize(thisCollection.getName()));
-	    
-	    List options = main.addList("options",List.TYPE_SIMPLE,"horizontal");
-	    options.addItem().addXref(baseURL+"&submit_metadata",T_options_metadata);
-	    options.addItem().addXref(baseURL+"&submit_roles",T_options_roles);
-	    options.addItem().addHighlight("bold").addXref(baseURL+"&submit_harvesting",T_options_harvest);
-            options.addItem().addXref(baseURL+"&submit_curate",T_options_curate);
-	    
-	    
-	    // The top-level, all-setting, countent source radio button
-	    List harvestSource = main.addList("harvestSource", "form");
-	    
-	    harvestSource.addLabel(T_label_source);
-	    Radio source = harvestSource.addItem().addRadio("source");
-    	source.addOption(hc == null || harvestLevelValue == -1, "source_normal", T_source_normal);
-    	source.addOption(hc != null, "source_harvested", T_source_harvested);
-	    
-	    List settings = main.addList("harvestSettings", "form");
-	    settings.setHead(T_main_settings_head);
-	    
-	    settings.addLabel(T_label_oai_provider);
-	    Text oaiProvider = settings.addItem().addText("oai_provider");
-	    oaiProvider.setSize(40);
-	    oaiProvider.setValue(oaiProviderValue);
-	    oaiProvider.setHelp(T_help_oaiurl);
-	    
-	    if (errorMap.containsKey(OAIHarvester.OAI_ADDRESS_ERROR)) {
-	    	oaiProvider.addError(errorMap.get(OAIHarvester.OAI_ADDRESS_ERROR));
-	    }
-	    if (errorMap.containsKey("oai_provider")) {
-	    	oaiProvider.addError(T_error_oaiurl);
-	    	//oaiProvider.addError("You must provide a set id of the target collection.");
-	    }
-	    
-	    settings.addLabel(T_label_setid);
-        //Composite oaiSetComp = settings.addItem().addComposite("oai-set-comp");
-        Radio oaiSetSettingRadio = settings.addItem().addRadio("oai-set-setting");
-        oaiSetSettingRadio.addOption("all".equals(oaiSetIdValue) || oaiSetIdValue == null, "all", "All sets");
-        oaiSetSettingRadio.addOption(!"all".equals(oaiSetIdValue) && oaiSetIdValue != null, "specific", "Specific sets");
+		Division main = body.addInteractiveDivision("collection-harvesting-setup", contextPath + "/admin/collection", Division.METHOD_MULTIPART, "primary administrative collection");
+		main.setHead(T_main_head.parameterize(thisCollection.getName()));
 
-        Text oaiSetId = settings.addItem().addText("oai_setid");
-	    oaiSetId.setSize(40);
-        if(!"all".equals(oaiSetIdValue) && oaiSetIdValue != null)
-        {
-            oaiSetId.setValue(oaiSetIdValue);
-        }
-	    oaiSetId.setHelp(T_help_oaisetid);
-	    if (errorMap.containsKey(OAIHarvester.OAI_SET_ERROR)) {
-	    	oaiSetId.addError(errorMap.get(OAIHarvester.OAI_SET_ERROR));
-	    }
-	    if (errorMap.containsKey("oai_setid")) {
-	    	oaiSetId.addError(T_error_oaisetid);
-	    }
-	    
-	    settings.addLabel(T_label_metadata_format);
-	    Select metadataFormat = settings.addItem().addSelect("metadata_format");
-	    if (errorMap.containsKey(OAIHarvester.OAI_ORE_ERROR)) {	    	
-	    	metadataFormat.addError(errorMap.get(OAIHarvester.OAI_ORE_ERROR));
-	    }
+		List options = main.addList("options", List.TYPE_SIMPLE, "horizontal");
+		options.addItem().addXref(baseURL + "&submit_metadata", T_options_metadata);
+		options.addItem().addXref(baseURL + "&submit_roles", T_options_roles);
+		options.addItem().addHighlight("bold").addXref(baseURL + "&submit_harvesting", T_options_harvest);
+		options.addItem().addXref(baseURL + "&submit_curate", T_options_curate);
+
+
+		// The top-level, all-setting, countent source radio button
+		List harvestSource = main.addList("harvestSource", "form");
+
+		harvestSource.addLabel(T_label_source);
+		Radio source = harvestSource.addItem().addRadio("source");
+		source.addOption(hc == null || harvestLevelValue == -1, "source_normal", T_source_normal);
+		source.addOption(hc != null, "source_harvested", T_source_harvested);
+
+		List settings = main.addList("harvestSettings", "form");
+		settings.setHead(T_main_settings_head);
+
+		settings.addLabel(T_label_oai_provider);
+		Text oaiProvider = settings.addItem().addText("oai_provider");
+		oaiProvider.setSize(40);
+		oaiProvider.setValue(oaiProviderValue);
+		oaiProvider.setHelp(T_help_oaiurl);
+
+		if (errorMap.containsKey(OAIHarvester.OAI_ADDRESS_ERROR)) {
+			oaiProvider.addError(errorMap.get(OAIHarvester.OAI_ADDRESS_ERROR));
+		}
+		if (errorMap.containsKey("oai_provider")) {
+			oaiProvider.addError(T_error_oaiurl);
+			//oaiProvider.addError("You must provide a set id of the target collection.");
+		}
+
+		settings.addLabel(T_label_setid);
+		//Composite oaiSetComp = settings.addItem().addComposite("oai-set-comp");
+		Radio oaiSetSettingRadio = settings.addItem().addRadio("oai-set-setting");
+		oaiSetSettingRadio.addOption("all".equals(oaiSetIdValue) || oaiSetIdValue == null, "all", "All sets");
+		oaiSetSettingRadio.addOption(!"all".equals(oaiSetIdValue) && oaiSetIdValue != null, "specific", "Specific sets");
+
+		Text oaiSetId = settings.addItem().addText("oai_setid");
+		oaiSetId.setSize(40);
+		if (!"all".equals(oaiSetIdValue) && oaiSetIdValue != null) {
+			oaiSetId.setValue(oaiSetIdValue);
+		}
+		oaiSetId.setHelp(T_help_oaisetid);
+		if (errorMap.containsKey(OAIHarvester.OAI_SET_ERROR)) {
+			oaiSetId.addError(errorMap.get(OAIHarvester.OAI_SET_ERROR));
+		}
+		if (errorMap.containsKey("oai_setid")) {
+			oaiSetId.addError(T_error_oaisetid);
+		}
+
+		settings.addLabel(T_label_metadata_format);
+		Select metadataFormat = settings.addItem().addSelect("metadata_format");
+		if (errorMap.containsKey(OAIHarvester.OAI_ORE_ERROR)) {
+			metadataFormat.addError(errorMap.get(OAIHarvester.OAI_ORE_ERROR));
+		}
 		if (errorMap.containsKey(OAIHarvester.OAI_DMD_ERROR)) {
-	    	metadataFormat.addError(errorMap.get(OAIHarvester.OAI_DMD_ERROR));
-	    }
-	
-	
-	    // Add an entry for each instance of ingestion crosswalks configured for harvesting 
-        String metaString = "oai.harvester.metadataformats.";
-        Enumeration pe = Collections.enumeration(DSpaceServicesFactory.getInstance().getConfigurationService().getPropertyKeys("oai"));
-        while (pe.hasMoreElements())
-        {
-            String key = (String)pe.nextElement();
-            if (key.startsWith(metaString)) {
-            	String metadataString = (DSpaceServicesFactory.getInstance().getConfigurationService().getProperty(key));
-            	String metadataKey = key.substring(metaString.length());
-            	String displayName;
+			metadataFormat.addError(errorMap.get(OAIHarvester.OAI_DMD_ERROR));
+		}
 
-            	if (metadataString.indexOf(',') != -1)
-                {
-                    displayName = metadataString.substring(metadataString.indexOf(',') + 1);
-                }
-            	else
-                {
-                    displayName = metadataKey + "(" + metadataString + ")";
-                }
-            	
-            	metadataFormat.addOption(metadataKey.equalsIgnoreCase(metadataFormatValue), metadataKey, displayName);
-            }
-        }
-        
-        
-        settings.addLabel();
-	    Item harvestButtons = settings.addItem();
-	    harvestButtons.addButton("submit_test").setValue(T_submit_test);
-	    
-	    // Various non-critical harvesting options 
-	    //Division optionsDiv = main.addDivision("collection-harvesting-options","secondary");
-	    //optionsDiv.setHead(T_options_head);
-	    
-	    List harvestOptions = main.addList("harvestOptions", "form");
-	    harvestOptions.setHead(T_options_head);
-	    
-	    harvestOptions.addLabel(T_label_harvest_level);
-	    Radio harvestLevel = harvestOptions.addItem().addRadio("harvest_level");
-	    harvestLevel.addOption(harvestLevelValue == 1, 1, T_option_md_only);
-	    harvestLevel.addOption(harvestLevelValue == 2, 2, T_option_md_and_ref);
-	    harvestLevel.addOption(harvestLevelValue != 1 && harvestLevelValue != 2, 3, T_option_md_and_bs);
-	    
+
+		// Add an entry for each instance of ingestion crosswalks configured for harvesting
+		String metaString = "oai.harvester.metadataformats.";
+		this.getOptions(metadataFormatValue, metadataFormat, metaString);
+
+		settings.addLabel();
+		Item harvestButtons = settings.addItem();
+		harvestButtons.addButton("submit_test").setValue(T_submit_test);
+
+		// Various non-critical harvesting options
+		//Division optionsDiv = main.addDivision("collection-harvesting-options","secondary");
+		//optionsDiv.setHead(T_options_head);
+
+		List harvestOptions = main.addList("harvestOptions", "form");
+		harvestOptions.setHead(T_options_head);
+
+		harvestOptions.addLabel(T_label_harvest_level);
+		Radio harvestLevel = harvestOptions.addItem().addRadio("harvest_level");
+		harvestLevel.addOption(harvestLevelValue == 1, 1, T_option_md_only);
+		harvestLevel.addOption(harvestLevelValue == 2, 2, T_option_md_and_ref);
+		harvestLevel.addOption(harvestLevelValue != 1 && harvestLevelValue != 2, 3, T_option_md_and_bs);
+
+		// Add a metadata removal configuration option
+		harvestOptions.addLabel(T_label_ingest_filter);
+		Select ingestFilter = harvestOptions.addItem().addSelect("ingest_filter");
+		String ingestFilterString = "oai.harvester.ingest_filter.";
+		this.getOptions(ingestFilterValue, ingestFilter, ingestFilterString);
+
+		// Add a metadata removal configuration option
+		harvestOptions.addLabel(T_label_metadata_update);
+		Select metadataUpdate = harvestOptions.addItem().addSelect("metadata_update");
+		String metadataUpdateString = "oai.harvester.metadata_update.";
+		this.getOptions(metadataUpdateValue, metadataUpdate, metadataUpdateString);
+
+		// Add a bundle versioning strategy option
+		harvestOptions.addLabel(T_label_bundle_versioning);
+		Select bundleVersioning = harvestOptions.addItem().addSelect("bundle_versioning");
+		String bundleVersioningString = "oai.harvester.bundle_versioning.";
+		this.getOptions(bundleVersioningValue, bundleVersioning, bundleVersioningString);
+
+		// Add an ingest workflow setup option
+		harvestOptions.addLabel(T_label_ingest_workflow);
+		Select ingestWorkflow = harvestOptions.addItem().addSelect("ingest_workflow");
+		String ingestWorkflowString = "oai.harvester.ingest_workflow.";
+		this.getOptions(ingestWorkflowValue, ingestWorkflow, ingestWorkflowString);
+
 		Para buttonList = main.addPara();
-	    buttonList.addButton("submit_save").setValue(T_submit_save);
-	    buttonList.addButton("submit_return").setValue(T_submit_return);
-	    
-    	main.addHidden("administrative-continue").setValue(knot.getId());
-    }
-	
+		buttonList.addButton("submit_save").setValue(T_submit_save);
+		buttonList.addButton("submit_return").setValue(T_submit_return);
+
+		main.addHidden("administrative-continue").setValue(knot.getId());
+	}
+
+	private void getOptions(String value, Select select, String keyPhrase) throws WingException {
+		Enumeration oaiPrps = Collections.enumeration(DSpaceServicesFactory.getInstance().getConfigurationService().getPropertyKeys("oai"));
+		while (oaiPrps.hasMoreElements()) {
+			String key = (String) oaiPrps.nextElement();
+			if (key.startsWith(keyPhrase)) {
+				String metadataString = (DSpaceServicesFactory.getInstance().getConfigurationService().getProperty(key));
+				if (metadataString.indexOf(',') != -1) 		{
+					metadataString = metadataString.substring(metadataString.indexOf(',') + 1);
+				}
+				String metadataKey = key.substring(keyPhrase.length());
+				select.addOption(metadataKey.equalsIgnoreCase(value), metadataKey, metadataString);
+			}
+		}
+	}
+
 }

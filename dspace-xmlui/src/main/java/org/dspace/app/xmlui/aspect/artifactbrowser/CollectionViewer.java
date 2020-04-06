@@ -146,7 +146,8 @@ public class CollectionViewer extends AbstractDSpaceTransformer implements Cache
         }
         else
         {
-            pageMeta.addMetadata("title").addContent(name);
+            String archiveName = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("dspace.name");
+            pageMeta.addMetadata("title").addContent(archiveName + ": " + name);
         }
 
         pageMeta.addTrailLink(contextPath + "/",T_dspace_home);

@@ -26,6 +26,12 @@ import org.dspace.event.Event;
 import org.dspace.harvest.HarvestedCollection;
 import org.dspace.harvest.service.HarvestedCollectionService;
 import org.dspace.workflow.factory.WorkflowServiceFactory;
+import org.dspace.xmlworkflow.factory.XmlWorkflowServiceFactory;
+import org.dspace.xmlworkflow.storedcomponents.ClaimedTaskServiceImpl;
+import org.dspace.xmlworkflow.storedcomponents.InProgressUser;
+import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
+import org.dspace.xmlworkflow.storedcomponents.service.InProgressUserService;
+import org.dspace.xmlworkflow.storedcomponents.service.XmlWorkflowItemService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
@@ -70,6 +76,10 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
     protected WorkspaceItemService workspaceItemService;
     @Autowired(required=true)
     protected HarvestedCollectionService harvestedCollectionService;
+    @Autowired(required=true)
+    private XmlWorkflowItemService xmlWorkflowItemService;
+    @Autowired(required=true)
+    private InProgressUserService inProgressUserService;
 
 
     protected CollectionServiceImpl()
@@ -617,6 +627,15 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
         if (item.getCollections().size() == 1)
         {
             // Orphan; delete it
+
+            XmlWorkflowItem wfi = xmlWorkflowItemService.findByItem(context, item);
+            if (wfi != null) {
+                List<InProgressUser> inProgressUserList = inProgressUserService.findByWorkflowItem(context, wfi);
+                for (InProgressUser inProgressUser : inProgressUserList) {
+                    inProgressUserService.delete(context, inProgressUser);
+                }
+                xmlWorkflowItemService.deleteWrapper(context, wfi);
+            }
             itemService.delete(context, item);
         } else {
             //Remove the item from the collection if we have multiple collections

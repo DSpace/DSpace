@@ -142,7 +142,9 @@ public class HandleServiceImpl implements HandleService
             throws SQLException
     {
         Handle handle = handleDAO.create(context, new Handle());
-        String handleId = createId(context);
+
+        //BIBSYS modification. External handle server is responsible for handle assignments
+        String handleId = BibsysHandleService.getService().createHandleId();
 
         handle.setHandle(handleId);
         handle.setDSpaceObject(dso);

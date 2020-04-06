@@ -199,14 +199,14 @@
 	  </step> -->
 
        <!-- Find publications based on ID/DOI/Title/Author to pre-fill the submission. XMLUI ONLY.
-            For JSPUI version, see JSPUIStartSubmissionLookupStep under <step-definitions> above.
-       <step>
+            For JSPUI version, see JSPUIStartSubmissionLookupStep under <step-definitions> above. -->
+       <!--<step>
            <heading>submit.progressbar.lookup</heading>
            <processing-class>org.dspace.submit.step.XMLUIStartSubmissionLookupStep</processing-class>
            <xmlui-binding>org.dspace.app.xmlui.aspect.submission.submit.StartSubmissionLookupStep</xmlui-binding>
            <workflow-editable>true</workflow-editable>
-       </step>
-        -->
+       </step>-->
+
       <!--Step 2 will be to Describe the item.-->
       <step>
         <heading>submit.progressbar.describe</heading>
@@ -216,7 +216,7 @@
         <workflow-editable>true</workflow-editable>
       </step>
 
-       <!--Step 3 will be to Manage Item access.
+       <!--Step 3 will be to Manage Item access. -->
        <step>
            <heading>submit.progressbar.access</heading>
            <processing-class>org.dspace.submit.step.AccessStep</processing-class>
@@ -224,9 +224,8 @@
            <xmlui-binding>org.dspace.app.xmlui.aspect.submission.submit.AccessStep</xmlui-binding>
            <workflow-editable>true</workflow-editable>
        </step>
-       -->
 
-      <!--Step 4 will be to Upload the item -->
+      <!--Step 4 will be to Upload the item
       <step>
         <heading>submit.progressbar.upload</heading>
         <processing-class>org.dspace.submit.step.UploadStep</processing-class>
@@ -234,10 +233,11 @@
 		<xmlui-binding>org.dspace.app.xmlui.aspect.submission.submit.UploadStep</xmlui-binding>
         <workflow-editable>true</workflow-editable>
       </step>
-      
+      -->
+
 
        <!-- Step 4 Upload Item with Embargo Features
-            to enable this step, please make sure to comment-out the previous step "UploadStep"  
+            to enable this step, please make sure to comment-out the previous step "UploadStep" -->
        <step>
            <heading>submit.progressbar.upload</heading>
            <processing-class>org.dspace.submit.step.UploadWithEmbargoStep</processing-class>
@@ -245,7 +245,6 @@
            <xmlui-binding>org.dspace.app.xmlui.aspect.submission.submit.UploadWithEmbargoStep</xmlui-binding>
            <workflow-editable>true</workflow-editable>
        </step>
-       -->
 
  	  <!--Step 5 will be to Verify/Review everything -->
  	  <step>
@@ -258,15 +257,13 @@
 
       <!--Step 6 will be to select a Creative Commons License-->
       <!-- Uncomment this step to allow the user to select a Creative Commons license -->
-       <!--
       <step>
         <heading>submit.progressbar.CClicense</heading>
         <processing-class>org.dspace.submit.step.CCLicenseStep</processing-class>
         <jspui-binding>org.dspace.app.webui.submit.step.JSPCCLicenseStep</jspui-binding>
 		<xmlui-binding>org.dspace.app.xmlui.aspect.submission.submit.CCLicenseStep</xmlui-binding>
-		<workflow-editable>false</workflow-editable>
+		<workflow-editable>true</workflow-editable>
       </step>
-      -->
 
       <!--Step 7 will be to Sign off on the License-->
       <step>

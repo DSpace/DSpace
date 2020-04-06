@@ -127,7 +127,8 @@ public class CCLicenseStep extends AbstractSubmissionStep
 	    Select selectList = list.addItem().addSelect("licenseclass_chooser");
 	    selectList.setLabel(T_license);
 	    selectList.setEvtBehavior("submitOnChange");
-	    Iterator<CCLicense> iterator = cclookup.getLicenses(ccLocale).iterator();
+		ccLocale = context.getCurrentLocale().getLanguage();
+		Iterator<CCLicense> iterator = cclookup.getLicenses(ccLocale).iterator();
 	    // build select List - first choice always 'choose a license', last always 'No license'
 	    selectList.addOption(T_select_change.getKey(), T_select_change);
 	    if(T_select_change.getKey().equals(selectedLicense)) {
