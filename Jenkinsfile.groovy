@@ -5,7 +5,6 @@ pipeline {
         maven 'Maven 3.6.1'
     }
 
-
     environment {
         VERSION = "${env.BRANCH_NAME}".replaceAll('/', '_').toLowerCase()
     }
@@ -46,9 +45,17 @@ pipeline {
                         compresslog: true,
                         recipientProviders: [[$class: 'CulpritsRecipientProvider']]
                 )
-
             }
         }
+
+        stage('Doing stuff in workspace') {
+            steps {
+                sh 'echo " --- Doing stuff"'
+                sh 'pwd'
+            }
+        }
+
     }
+
 }
 
