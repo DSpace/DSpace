@@ -66,6 +66,11 @@ public abstract class ScriptConfiguration<T extends DSpaceRunnable> implements B
     public abstract Class<T> getDspaceRunnableClass();
 
     /**
+     * Generic setter for the dspaceRunnableClass
+     * @param dspaceRunnableClass   The dspaceRunnableClass to be set on this IndexDiscoveryScriptConfiguration
+     */
+    public abstract void setDspaceRunnableClass(Class<T> dspaceRunnableClass);
+    /**
      * This method will return if the script is allowed to execute in the given context. This is by default set
      * to the currentUser in the context being an admin, however this can be overwritten by each script individually
      * if different rules apply

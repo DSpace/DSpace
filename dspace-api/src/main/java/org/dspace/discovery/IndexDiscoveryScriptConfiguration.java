@@ -51,6 +51,7 @@ public class IndexDiscoveryScriptConfiguration<T extends IndexClient> extends Sc
      * Generic setter for the dspaceRunnableClass
      * @param dspaceRunnableClass   The dspaceRunnableClass to be set on this IndexDiscoveryScriptConfiguration
      */
+    @Override
     public void setDspaceRunnableClass(Class<T> dspaceRunnableClass) {
         this.dspaceRunnableClass = dspaceRunnableClass;
     }
