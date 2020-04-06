@@ -100,6 +100,11 @@ public class ImportBatchIT extends AbstractControllerIntegrationTest {
     private Community owningCommunity;
     private Collection collection;
 
+    private int impSeq = 0;
+    private int impMedataSeq = 0;
+    private int impBitstreamSeq;
+    private int impBitstreamMetadatavalueSeq = 0;
+
     @Before
     @Override
     public void setUp() throws Exception {
@@ -156,7 +161,7 @@ public class ImportBatchIT extends AbstractControllerIntegrationTest {
 
             // create imp_metadatavalue records
             int impMetadatavalueKey = 1;
-            createImpMetadatavalue(context, impRecordKey, impMetadatavalueKey, MetadataSchemaEnum.DC.getName(), "title",
+            createImpMetadatavalue(context, impRecord, MetadataSchemaEnum.DC.getName(), "title",
                     null, null, "Sample Item");
 
             // Create a new item
@@ -197,10 +202,9 @@ public class ImportBatchIT extends AbstractControllerIntegrationTest {
         try {
             context.turnOffAuthorisationSystem();
             // create an item
-            WorkspaceItem wi = workspaceItemService.create(context, collection, false);
+            WorkspaceItem wi = WorkspaceItemBuilder.createWorkspaceItem(context, collection)
+                    .withTitle("sample item").build();
             Item item = wi.getItem();
-            itemService.setMetadataSingleValue(context, item, MetadataSchemaEnum.DC.getName(), "title", null, null,
-                    "sample item");
             itemService.update(context, item);
             context.restoreAuthSystemState();
 
@@ -255,7 +259,7 @@ public class ImportBatchIT extends AbstractControllerIntegrationTest {
 
             // create imp_metadatavalue records
             int impMetadatavalueKey = 1;
-            createImpMetadatavalue(context, impRecordKey, impMetadatavalueKey, MetadataSchemaEnum.DC.getName(),
+            createImpMetadatavalue(context, impRecord, MetadataSchemaEnum.DC.getName(),
                     "contributor", "author", null, "Francesco Cadili");
 
             // create imp_record_to_item records
@@ -311,7 +315,7 @@ public class ImportBatchIT extends AbstractControllerIntegrationTest {
 
             // create imp_metadatavalue records
             int impMetadatavalueKey = 1;
-            createImpMetadatavalue(context, impRecordKey, impMetadatavalueKey, MetadataSchemaEnum.DC.getName(),
+            createImpMetadatavalue(context, impRecord, MetadataSchemaEnum.DC.getName(),
                     "contributor", "author", null, "Francesco Cadili");
 
             // create imp_record_to_item records
@@ -356,16 +360,11 @@ public class ImportBatchIT extends AbstractControllerIntegrationTest {
         try {
             // create imp_record records
             for (int impRecordKey = 1; impRecordKey < 15; impRecordKey++) {
-                createImpRecord(context, impRecordKey, ImpRecordService.SEND_BACK_TO_WORKSPACE_STATUS,
+                ImpRecord impRecord = createImpRecord(context, impRecordKey,
+                        ImpRecordService.SEND_BACK_TO_WORKSPACE_STATUS,
                         ImpRecordService.INSERT_OR_UPDATE_OPERATION, admin, collection);
-            }
-
-            // create imp_metadatavalue records
-            int impMetadatavalueKey = 1;
-            for (int impRecordKey = 1; impRecordKey < 15; impRecordKey++) {
-                createImpMetadatavalue(context, impRecordKey, impMetadatavalueKey, MetadataSchemaEnum.DC.getName(),
-                        "title", null, null, "Sample Item (" + impMetadatavalueKey + ")");
-                impMetadatavalueKey++;
+                createImpMetadatavalue(context, impRecord, MetadataSchemaEnum.DC.getName(),
+                        "title", null, null, "Sample Item (" + impRecordKey + ")");
             }
 
             // Create a new item
@@ -409,24 +408,18 @@ public class ImportBatchIT extends AbstractControllerIntegrationTest {
             context.turnOffAuthorisationSystem();
             // create imp_record records
             for (int impRecordKey = 1; impRecordKey < 15; impRecordKey++) {
-                createImpRecord(context, impRecordKey, ImpRecordService.SEND_BACK_TO_WORKSPACE_STATUS,
+                ImpRecord impRecord = createImpRecord(context, impRecordKey,
+                        ImpRecordService.SEND_BACK_TO_WORKSPACE_STATUS,
                         ImpRecordService.INSERT_OR_UPDATE_OPERATION, admin, collection);
-            }
-
-            // create imp_metadatavalue records
-            int impMetadatavalueKey = 1;
-            for (int impRecordKey = 1; impRecordKey < 15; impRecordKey++) {
-                createImpMetadatavalue(context, impRecordKey, impMetadatavalueKey, MetadataSchemaEnum.DC.getName(),
+                createImpMetadatavalue(context, impRecord, MetadataSchemaEnum.DC.getName(),
                         "title", null, null, "Sample Object (" + impRecordKey + ")");
-                createImpMetadatavalue(context, impRecordKey, impMetadatavalueKey + 1, MetadataSchemaEnum.DC.getName(),
+                createImpMetadatavalue(context, impRecord, MetadataSchemaEnum.DC.getName(),
                         "contributor", "author", null, "Francesco Cadili");
-                impMetadatavalueKey += 2;
             }
 
             // Create 14 new items
             String argv[] = new String[] { "-E", admin.getEmail() };
             ItemImportMainOA.main(argv);
-            impRecordService.cleanupTables(context);
 
             List<WorkspaceItem> wis = workspaceItemService.findByEPerson(context, admin);
             assertEquals("14 workspace items found for " + admin.getID(), 14, wis.size());
@@ -481,23 +474,20 @@ public class ImportBatchIT extends AbstractControllerIntegrationTest {
 
             assertTrue("Selected workspace exists (del01)", del01 != null);
             assertTrue("Selected workspace exists (upd02)", upd02 != null);
+            assertTrue("Selected workspace exists (upd10)", upd10 != null);
             assertTrue("Selected workspace exists (del11)", del11 != null);
 
             // remove del01 and del11
-            int impRecordKey2 = 1;
-            ImpRecord impRecord = createImpRecord(context, impRecordKey2,
+            int impRecordKey2 = 15;
+            ImpRecord impRecord = createImpRecord(context, 1,
                     ImpRecordService.SEND_BACK_TO_WORKSPACE_STATUS, ImpRecordService.DELETE_OPERATION, admin,
                     collection);
-            ImpRecordToItem impRecordToItem = createImpRecordToItem(context, impRecord, del01.getItem());
-
-            impRecord = createImpRecord(context, impRecordKey2 + 1, ImpRecordService.SEND_BACK_TO_WORKSPACE_STATUS,
+            impRecord = createImpRecord(context, 11, ImpRecordService.SEND_BACK_TO_WORKSPACE_STATUS,
                     ImpRecordService.DELETE_OPERATION, admin, collection);
-            impRecordToItem = createImpRecordToItem(context, impRecord, del11.getItem());
 
             // Delete two items
             argv = new String[] { "-E", admin.getEmail() };
             ItemImportMainOA.main(argv);
-            impRecordService.cleanupTables(context);
 
             assertNull("Is the workspace item null?", workspaceItemService.find(context, del01.getID()));
             assertNull("Is the workspace item null?", workspaceItemService.find(context, del11.getID()));
@@ -545,36 +535,21 @@ public class ImportBatchIT extends AbstractControllerIntegrationTest {
             }
 
             // update (using two records instead of one)
-            // create imp_record records
-            for (int impRecordKey = 1; impRecordKey < 3; impRecordKey++) {
-                impRecord = createImpRecord(context, impRecordKey, ImpRecordService.SEND_BACK_TO_WORKSPACE_STATUS,
-                        ImpRecordService.INSERT_OR_UPDATE_OPERATION, admin, collection);
+            impRecord = createImpRecord(context, 2,
+                    ImpRecordService.SEND_BACK_TO_WORKSPACE_STATUS,
+                    ImpRecordService.INSERT_OR_UPDATE_OPERATION, admin, collection);
+            createImpMetadatavalue(context, impRecord, MetadataSchemaEnum.DC.getName(),
+                    "contributor", "editor", null, "Matteo Perelli");
 
-                // create imp_record_to_item records
-                if (impRecordKey == 1) {
-                    impRecordToItem = createImpRecordToItem(context, impRecord, upd02.getItem());
-                } else {
-                    impRecordToItem = createImpRecordToItem(context, impRecord, upd10.getItem());
-                }
-            }
-
-            // create imp_metadatavalue records
-            impMetadatavalueKey = 1;
-            for (int impRecordKey = 1; impRecordKey < 3; impRecordKey++) {
-                if (impRecordKey == 1) {
-                    createImpMetadatavalue(context, impRecordKey, impMetadatavalueKey, MetadataSchemaEnum.DC.getName(),
-                            "contributor", "editor", null, "Matteo Perelli");
-                } else {
-                    createImpMetadatavalue(context, impRecordKey, impMetadatavalueKey, MetadataSchemaEnum.DC.getName(),
-                            "date", null, null, "2020/03/23");
-                }
-                impMetadatavalueKey++;
-            }
+            impRecord = createImpRecord(context, 10,
+                    ImpRecordService.SEND_BACK_TO_WORKSPACE_STATUS,
+                    ImpRecordService.INSERT_OR_UPDATE_OPERATION, admin, collection);
+            createImpMetadatavalue(context, impRecord, MetadataSchemaEnum.DC.getName(),
+                    "date", null, null, "2020/03/23");
 
             // Create a new item
             argv = new String[] { "-E", admin.getEmail(), "-m", "dc.title", "-m", "dc.contributor.author", "-s" };
             ItemImportMainOA.main(argv);
-            impRecordService.cleanupTables(context);
 
             wis = workspaceItemService.findByEPerson(context, admin);
             assertEquals("Workspace Item found 12 for " + admin.getID(), 12, wis.size());
@@ -655,8 +630,7 @@ public class ImportBatchIT extends AbstractControllerIntegrationTest {
                     ImpRecordService.INSERT_OR_UPDATE_OPERATION, admin, collection);
 
             // create imp_metadatavalue records
-            int impMetadatavalueKey = 1;
-            createImpMetadatavalue(context, impRecordKey, impMetadatavalueKey, MetadataSchemaEnum.DC.getName(),
+            createImpMetadatavalue(context, impRecord, MetadataSchemaEnum.DC.getName(),
                     "contributor", "author", null, "Francesco Cadili");
 
             // create imp_record_to_item records
@@ -665,12 +639,11 @@ public class ImportBatchIT extends AbstractControllerIntegrationTest {
 
             int impBitstreamId = 1;
             InputStream resource = getClass().getResourceAsStream("/org/dspace/app/rest/simple-article.pdf");
-            ImpBitstream impBitstream = createImpBitstream(context, impRecordKey, impBitstreamId,
+            ImpBitstream impBitstream = createImpBitstream(context, impRecord,
                     resource, "simple-article.pdf",
                     "Simple article", null, null);
 
-            int impBitstreamMetadatavalueKey = 1;
-            createImpBitstreamMetadatavalue(context, impBitstreamId, impBitstreamMetadatavalueKey,
+            createImpBitstreamMetadatavalue(context, impBitstream,
                     MetadataSchemaEnum.DC.getName(), "description", null, null, "Simple article");
 
             // Create a new item
@@ -750,21 +723,18 @@ public class ImportBatchIT extends AbstractControllerIntegrationTest {
                     ImpRecordService.INSERT_OR_UPDATE_OPERATION, admin, collection);
 
             // create imp_metadatavalue records
-            int impMetadatavalueKey = 1;
-            createImpMetadatavalue(context, impRecordKey, impMetadatavalueKey, MetadataSchemaEnum.DC.getName(),
+            createImpMetadatavalue(context, impRecord, MetadataSchemaEnum.DC.getName(),
                     "contributor", "author", null, "Francesco Cadili");
 
             // create imp_record_to_item records
             ImpRecordToItem impRecordToItem = createImpRecordToItem(context, impRecord, item);
 
-            int impBitstreamId = 1;
             InputStream resource = getClass().getResourceAsStream("/org/dspace/app/rest/simple-article.pdf");
-            ImpBitstream impBitstream = createImpBitstream(context, impRecordKey, impBitstreamId,
+            ImpBitstream impBitstream = createImpBitstream(context, impRecord,
                     resource, "simple-article.pdf",
                     "Simple article", adminGroup.getID(), null);
 
-            int impBitstreamMetadatavalueKey = 1;
-            createImpBitstreamMetadatavalue(context, impBitstreamId, impBitstreamMetadatavalueKey,
+            createImpBitstreamMetadatavalue(context, impBitstream,
                     MetadataSchemaEnum.DC.getName(), "description", null, null, "Simple article");
 
             // Create a new item
@@ -847,8 +817,7 @@ public class ImportBatchIT extends AbstractControllerIntegrationTest {
                     ImpRecordService.INSERT_OR_UPDATE_OPERATION, admin, collection);
 
             // create imp_metadatavalue records
-            int impMetadatavalueKey = 1;
-            createImpMetadatavalue(context, impRecordKey, impMetadatavalueKey, MetadataSchemaEnum.DC.getName(),
+            createImpMetadatavalue(context, impRecord, MetadataSchemaEnum.DC.getName(),
                     "contributor", "author", null, "Francesco Cadili");
 
             // create imp_record_to_item records
@@ -856,12 +825,11 @@ public class ImportBatchIT extends AbstractControllerIntegrationTest {
 
             int impBitstreamId = 1;
             InputStream resource = getClass().getResourceAsStream("/org/dspace/app/rest/simple-article.pdf");
-            ImpBitstream impBitstream = createImpBitstream(context, impRecordKey, impBitstreamId,
+            ImpBitstream impBitstream = createImpBitstream(context, impRecord,
                      resource, "simple-article.pdf",
                      "Simple article", adminGroup.getID(), "01/02/2020");
 
-            int impBitstreamMetadatavalueKey = 1;
-            createImpBitstreamMetadatavalue(context, impBitstreamId, impBitstreamMetadatavalueKey,
+            createImpBitstreamMetadatavalue(context, impBitstream,
                     MetadataSchemaEnum.DC.getName(), "description", null, null, "Simple article");
 
             // Create a new item
@@ -943,8 +911,7 @@ public class ImportBatchIT extends AbstractControllerIntegrationTest {
                     ImpRecordService.INSERT_OR_UPDATE_OPERATION, admin, collection);
 
             // create imp_metadatavalue records
-            int impMetadatavalueKey = 1;
-            createImpMetadatavalue(context, impRecordKey, impMetadatavalueKey, MetadataSchemaEnum.DC.getName(),
+            createImpMetadatavalue(context, impRecord, MetadataSchemaEnum.DC.getName(),
                     "contributor", "author", null, "Francesco Cadili");
 
             // create imp_record_to_item records
@@ -1011,8 +978,7 @@ public class ImportBatchIT extends AbstractControllerIntegrationTest {
                     admin, collection);
 
             // create imp_metadatavalue records
-            int impMetadatavalueKey = 1;
-            createImpMetadatavalue(context, impRecordKey, impMetadatavalueKey, MetadataSchemaEnum.DC.getName(),
+            createImpMetadatavalue(context, impRecord, MetadataSchemaEnum.DC.getName(),
                     "contributor", "author", null, "Francesco Cadili");
 
             // create imp_record_to_item records
@@ -1063,10 +1029,10 @@ public class ImportBatchIT extends AbstractControllerIntegrationTest {
     private ImpRecord createImpRecord(Context context, int impRecordKey, Character status, String operation,
             EPerson eperson, Collection collection) throws SQLException {
         // create imp_record records
-        String sourceRecordId = UUID.randomUUID().toString();
+        String sourceRecordId = "" + impRecordKey;
         String sourceRef = "TEST";
         ImpRecord impRecord = new ImpRecord();
-        impRecord.setImpId(impRecordKey);
+        impRecord.setImpId(impSeq++);
         impRecordService.setImpCollection(impRecord, collection);
         impRecordService.setImpEperson(impRecord, eperson);
         impRecord.setImpRecordId(sourceRecordId);
@@ -1082,7 +1048,6 @@ public class ImportBatchIT extends AbstractControllerIntegrationTest {
      * 
      * @param context             The context
      * @param impRecordKey        The ImpRecord key
-     * @param impMetadatavalueKey The impMetadatavalue key
      * @param schema              The schema
      * @param qualifier           The qualifier
      * @param language            The language
@@ -1090,11 +1055,10 @@ public class ImportBatchIT extends AbstractControllerIntegrationTest {
      * @return
      * @throws SQLException
      */
-    private ImpMetadatavalue createImpMetadatavalue(Context context, int impRecordKey, int impMetadatavalueKey,
+    private ImpMetadatavalue createImpMetadatavalue(Context context, ImpRecord impRecord,
             String schema, String element, String qualifier, String language, String value) throws SQLException {
-        ImpRecord impRecord = impRecordService.findByID(context, impRecordKey);
         ImpMetadatavalue impMetadatavalue = new ImpMetadatavalue();
-        impMetadatavalue.setMetadatavalueId(impMetadatavalueKey);
+        impMetadatavalue.setMetadatavalueId(impMedataSeq++);
         impMetadatavalue.setImpRecord(impRecord);
         List<ImpMetadatavalue> metadata = impMetadatavalueService.searchByImpRecordId(context, impRecord);
         impMetadatavalueService.setMetadata(impMetadatavalue, schema, element, qualifier, language, value);
@@ -1125,7 +1089,7 @@ public class ImportBatchIT extends AbstractControllerIntegrationTest {
      * 
      * @param context          The context
      * @param impRecordKey     The ImpRecord key
-     * @param impBitstreamId   The impBitstream key
+     * @param impBitstreamSeq   The impBitstream key
      * @param resouce          The resource to upload
      * @param name             The resource name
      * @param description      The resource description
@@ -1136,15 +1100,14 @@ public class ImportBatchIT extends AbstractControllerIntegrationTest {
      * @throws IOException
      * @throws URISyntaxException
      */
-    private ImpBitstream createImpBitstream(Context context, int impRecordKey, int impBitstreamId, InputStream resource,
+    private ImpBitstream createImpBitstream(Context context, ImpRecord impRecord, InputStream resource,
             String name, String description, UUID embargoGroup, String embargoStartDate)
             throws SQLException, IOException, URISyntaxException {
-        ImpRecord impRecord = impRecordService.findByID(context, impRecordKey);
         File f = File.createTempFile("myTempFile", ".pdf");
         java.nio.file.Files.copy(resource, f.toPath(), StandardCopyOption.REPLACE_EXISTING);
         resource.close();
         ImpBitstream impBitstream = new ImpBitstream();
-        impBitstream.setImpBitstreamId(impBitstreamId);
+        impBitstream.setImpBitstreamId(impBitstreamSeq++);
         impBitstream.setImpRecord(impRecord);
         impBitstream.setDescription(description);
         impBitstream.setBitstreamOrder(1);
@@ -1169,8 +1132,6 @@ public class ImportBatchIT extends AbstractControllerIntegrationTest {
      * Create a Metadata of ImpRecord
      * 
      * @param context                      The context
-     * @param impBitstreamId               The ImpBitstreamRecord key
-     * @param impBitstreamMetadatavalueKey The impbitstreamMetadatavalue key
      * @param schema                       The schema
      * @param qualifier                    The qualifier
      * @param language                     The language
@@ -1178,12 +1139,11 @@ public class ImportBatchIT extends AbstractControllerIntegrationTest {
      * @return
      * @throws SQLException
      */
-    private ImpBitstreamMetadatavalue createImpBitstreamMetadatavalue(Context context, int impBitstreamId,
-            int impBitstreamMetadatavalueKey, String schema, String element, String qualifier, String language,
+    private ImpBitstreamMetadatavalue createImpBitstreamMetadatavalue(Context context, ImpBitstream impBitstream,
+            String schema, String element, String qualifier, String language,
             String value) throws SQLException {
-        ImpBitstream impBitstream = impBitstreamService.findByID(context, impBitstreamId);
         ImpBitstreamMetadatavalue impBitstreamMetadatavalue = new ImpBitstreamMetadatavalue();
-        impBitstreamMetadatavalue.setImpBitstreamMetadatavalueId(impBitstreamMetadatavalueKey);
+        impBitstreamMetadatavalue.setImpBitstreamMetadatavalueId(impBitstreamMetadatavalueSeq++);
         impBitstreamMetadatavalue.setImpBitstream(impBitstream);
         List<ImpBitstreamMetadatavalue> metadata = impBitstreamMetadatavalueService.searchByImpBitstream(context,
                 impBitstream);
