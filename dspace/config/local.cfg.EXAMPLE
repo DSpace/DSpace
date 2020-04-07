@@ -4,9 +4,11 @@
 # of the same name in any of the DSpace *.cfg files. This includes overriding
 # settings in any of these files:
 #    * [dspace]/config/dspace.cfg
-#    * Or any configuration file that is included in 'dspace.cfg'
+#    * Any configuration file that is included in 'dspace.cfg'
 #     (See "include = [filepath]" settings near the end of dspace.cfg.
 #      By default, it includes all [dspace]/config/modules/*.cfg files)
+#    * Spring Boot's application.properties
+#      ([dspace-src]/dspace-server-webapp/src/main/resources/application.properties)
 #
 # By default, this EXAMPLE file includes a number of commonly overridden configurations.
 # * ADD configurations by simply copying them into this file from any existing *.cfg file.
@@ -195,6 +197,24 @@ db.schema = public
 # Authentication by Password (encrypted in DSpace's database). See authentication-password.cfg for default configuration.
 # Enabled by default in authentication.cfg
 #plugin.sequence.org.dspace.authenticate.AuthenticationMethod = org.dspace.authenticate.PasswordAuthentication
+
+
+#################################################
+# SPRING BOOT SETTINGS (Used by Server Webapp)  #
+#################################################
+# NOTE: Common Spring Boot application settings may be found at
+# http://docs.spring.io/spring-boot/docs/current/reference/html/common-application-properties.html
+#
+# EXAMPLE OVERRIDE:
+# By uncommenting the below Spring Boot settings, you can increase or decrease the maximum upload size.
+# These defaults are specified in [dspace-src]/dspace-server-webapp/src/main/resources/application.properties
+# but may be overridden in this local.cfg
+#
+# Maximum size of a single uploaded file
+#spring.servlet.multipart.max-file-size = 512MB
+
+# Maximum size of a multipart request (i.e. max total size of all files in one request)
+#spring.servlet.multipart.max-request-size = 512MB
 
 ##########################
 # METADATA EXTRACTION #
