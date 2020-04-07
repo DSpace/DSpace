@@ -52,6 +52,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     @Autowired
     private CustomLogoutHandler customLogoutHandler;
+
     @Override
     public void configure(WebSecurity webSecurity) throws Exception {
         webSecurity
