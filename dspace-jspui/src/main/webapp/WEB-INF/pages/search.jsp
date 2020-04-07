@@ -106,16 +106,16 @@
                     <c:forEach items="${appliedFilters}" var="appliedFilter" varStatus="filterIndex">
                         <div class="form-inline">
                             <div class="form-group">
-                                <input type="text" value="<fmt:message key="jsp.search.filter.${appliedFilter[0]}"/>" name="filter_field_${filterIndex.count}_display" id="filter_field_${filterIndex.count}" class="form-control" readonly="">
+                                <input type="text" value="<fmt:message key="jsp.search.filter.${appliedFilter[0]}"/>" id="filter_field_${filterIndex.count}" class="form-control" readonly="">
                             </div>
 
 
                             <div class="form-group">
 
-                                <input type="text" value="<fmt:message key="jsp.search.filter.op.${appliedFilter[1]}"/>" name="filter_type_${filterIndex.count}_display" class="form-control" readonly="">
+                                <input type="text" value="<fmt:message key="jsp.search.filter.op.${appliedFilter[1]}"/>"  class="form-control" readonly="">
                             </div>
                             <div class="form-group">
-                                <input type="text" id="filter_value_${filterIndex.count}_display" name="filter_value_${filterIndex.count}_display" value="${appliedFilter[2]}" size="45" readonly="" class="form-control">
+                                <input type="text" id="filter_value_${filterIndex.count}_display" value="${appliedFilter[2]}" size="45" readonly="" class="form-control">
                             </div>
 
                             <input type="hidden" value="${appliedFilter[0]}" name="filter_field_${filterIndex.count}">
