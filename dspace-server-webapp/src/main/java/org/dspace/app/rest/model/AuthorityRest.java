@@ -38,6 +38,8 @@ public class AuthorityRest extends BaseObjectRest<String> {
 
     private boolean identifier;
 
+    private Integer preloadLevel;
+
     @Override
     public String getId() {
         return name;
@@ -88,5 +90,13 @@ public class AuthorityRest extends BaseObjectRest<String> {
 
     public void setIdentifier(boolean identifier) {
         this.identifier = identifier;
+    }
+
+    public Integer getPreloadLevel() {
+        return preloadLevel;
+    }
+
+    public void setPreloadLevel(Integer preloadLevel) {
+        this.preloadLevel = preloadLevel;
     }
 }

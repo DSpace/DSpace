@@ -86,6 +86,10 @@ public interface ChoiceAuthority {
         return true;
     }
 
+    default Integer getPreloadLevel() {
+        return 0;
+    }
+
     default public Choice getChoice(String fieldKey, String authKey, String locale) {
         Choice result = new Choice();
         result.authority = authKey;

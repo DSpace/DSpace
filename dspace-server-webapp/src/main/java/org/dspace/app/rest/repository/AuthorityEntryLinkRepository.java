@@ -15,6 +15,8 @@ import javax.annotation.Nullable;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
+import org.dspace.app.rest.SearchRestMethod;
+import org.dspace.app.rest.exception.PaginationException;
 import org.dspace.app.rest.model.AuthorityEntryRest;
 import org.dspace.app.rest.model.AuthorityRest;
 import org.dspace.app.rest.projection.Projection;
@@ -67,16 +69,81 @@ public class AuthorityEntryLinkRepository extends AbstractDSpaceRestRepository
         }
         List<AuthorityEntryRest> results = new ArrayList<>();
         Pageable pageable = utils.getPageable(optionalPageable);
+        Choices choices = null;
         if (StringUtils.isNotBlank(metadata)) {
             String[] tokens = org.dspace.core.Utils.tokenize(metadata);
             String fieldKey = org.dspace.core.Utils.standardize(tokens[0], tokens[1], tokens[2], "_");
-            Choices choices = cas.getMatches(fieldKey, query, collection, Math.toIntExact(pageable.getOffset()),
+            choices = cas.getMatches(fieldKey, query, collection, Math.toIntExact(pageable.getOffset()),
                     pageable.getPageSize(),
                                              context.getCurrentLocale().toString());
             for (Choice value : choices.values) {
                 results.add(authorityUtils.convertEntry(value, name, projection));
             }
         }
-        return new PageImpl<>(results, pageable, results.size());
+        Page<AuthorityEntryRest> resources;
+        try {
+            if (choices.total > results.size()) {
+                resources = new PageImpl<AuthorityEntryRest>(results, pageable, choices.total);
+            } else {
+                resources = utils.getPage(results, pageable);
+            }
+        } catch (PaginationException pe) {
+            resources = new PageImpl<AuthorityEntryRest>(new ArrayList<AuthorityEntryRest>(), pageable, pe.getTotal());
+        }
+        return resources;
+    }
+
+    @SearchRestMethod(name = "byParent")
+    @PreAuthorize("hasAuthority('AUTHENTICATED')")
+    public Page<AuthorityEntryRest> findByParent(HttpServletRequest request, String name,
+                                          Pageable pageable, Projection projection) {
+        Context context = obtainContext();
+        String id = request.getParameter("id");
+
+        List<AuthorityEntryRest> results = new ArrayList<AuthorityEntryRest>();
+        if (StringUtils.isNotBlank(id) && authorityUtils.isHierarchical(name)) {
+            Choices choices = cas.getChoicesByParent(name, id, (int)pageable.getOffset(), pageable.getPageSize(),
+                    context.getCurrentLocale().toString());
+
+            for (Choice value : choices.values) {
+                results.add(authorityUtils.convertEntry(value, name, projection));
+            }
+        }
+
+        Page<AuthorityEntryRest> resources;
+        try {
+            resources = utils.getPage(results, pageable);
+        } catch (PaginationException pe) {
+            resources = new PageImpl<AuthorityEntryRest>(new ArrayList<AuthorityEntryRest>(), pageable, pe.getTotal());
+        }
+        return resources;
+    }
+
+    @SearchRestMethod(name = "top")
+    @PreAuthorize("hasAuthority('AUTHENTICATED')")
+    public Page<AuthorityEntryRest> findAllTop(String name, Pageable pageable, Projection projection) {
+        Context context = obtainContext();
+        List<AuthorityEntryRest> results = new ArrayList<AuthorityEntryRest>();
+        if (authorityUtils.isHierarchical(name)) {
+            Choices choices = cas.getTopChoices(name, (int)pageable.getOffset(), pageable.getPageSize(),
+                    context.getCurrentLocale().toString());
+
+            for (Choice value : choices.values) {
+                results.add(authorityUtils.convertEntry(value, name, projection));
+            }
+        }
+
+        Page<AuthorityEntryRest> resources;
+        try {
+            resources = utils.getPage(results, pageable);
+        } catch (PaginationException pe) {
+            resources = new PageImpl<AuthorityEntryRest>(new ArrayList<AuthorityEntryRest>(), pageable, pe.getTotal());
+        }
+        return resources;
+    }
+
+    @Override
+    public boolean isEmbeddableRelation(Object data, String name) {
+        return false;
     }
 }

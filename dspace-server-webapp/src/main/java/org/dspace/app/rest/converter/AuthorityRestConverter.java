@@ -32,6 +32,7 @@ public class AuthorityRestConverter implements DSpaceConverter<ChoiceAuthority, 
         authorityRest.setHierarchical(step.isHierarchical());
         authorityRest.setScrollable(step.isScrollable());
         authorityRest.setIdentifier(step.hasIdentifier());
+        authorityRest.setPreloadLevel(step.getPreloadLevel());
         return authorityRest;
     }
 

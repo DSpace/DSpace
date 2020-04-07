@@ -32,6 +32,7 @@ public class AuthorityEntryRestConverter implements DSpaceConverter<Choice, Auth
         entry.setDisplay(choice.label);
         entry.setId(choice.authority);
         entry.setOtherInformation(choice.extras);
+        entry.setSelectable(choice.selectable);
         return entry;
     }
 
