@@ -81,6 +81,7 @@ public class ReportService {
 
     public List<ItemResponse> getUploadedItemsByFacultyName(Context context, String faculty, LocalDate from, LocalDate to) throws SQLException, IOException {
         return getItemsBetweenDates(context, from, to)
+                .filter(item -> item.getSubmitter().getChair() != null)
                 .filter(item -> faculty.equals(item.getSubmitter().getChair().getFacultyEntityName()))
                 .map(item -> new ItemResponse.Builder().withTitle(item.getName()).withHandle(item.getHandle()).build())
                 .collect(Collectors.toList());
@@ -88,6 +89,7 @@ public class ReportService {
 
     public List<ItemResponse> getUploadedItemsByChairName(Context context, String chair, LocalDate from, LocalDate to) throws SQLException, IOException {
         return getItemsBetweenDates(context, from, to)
+                .filter(item -> item.getSubmitter().getChair() != null)
                 .filter(item -> chair.equals(item.getSubmitter().getChair().getName()))
                 .map(item -> new ItemResponse.Builder().withTitle(item.getName()).withHandle(item.getHandle()).build())
                 .collect(Collectors.toList());
