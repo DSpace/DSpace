@@ -13,12 +13,16 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.io.File;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.ws.rs.core.MediaType;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.dspace.app.rest.builder.CollectionBuilder;
 import org.dspace.app.rest.builder.CommunityBuilder;
@@ -33,6 +37,12 @@ import org.dspace.services.ConfigurationService;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.web.servlet.MvcResult;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
 
 /**
  * Test suite for the WorkspaceItem endpoint
@@ -97,10 +107,10 @@ public class WorkspaceItemPatentStepIT extends AbstractControllerIntegrationTest
                         "Verfahren zur bedarfsgerechten Regelung einer Vorrichtung für eine Schichtlüftung und Vorrichtung für eine Schichtlüftung")))
                 .andExpect(jsonPath("$.sections.patent['dc.date.issued'][0].value", is("20140306")))
                 .andExpect(jsonPath("$.sections.patent['dc.contributor.author'][0].value", is("HESSELBACH JENS [DE]")))
-                .andExpect(jsonPath("$.sections.patent['dc.contributor.author'][1].value", is(" SCHAEFER MIRKO [DE]")))
-                .andExpect(jsonPath("$.sections.patent['dc.contributor.author'][2].value", is(" DETZER RUEDIGER [DE]")))
+                .andExpect(jsonPath("$.sections.patent['dc.contributor.author'][1].value", is("SCHAEFER MIRKO [DE]")))
+                .andExpect(jsonPath("$.sections.patent['dc.contributor.author'][2].value", is("DETZER RUEDIGER [DE]")))
                 .andExpect(jsonPath("$.sections.patent['dc.description.abstract'][0].value",
-                        is("<p>Um ein Verfahren (100) zur Regelung einer Vorrichtung (10) für eine"
+                        is("Um ein Verfahren (100) zur Regelung einer Vorrichtung (10) für eine"
                                 + "Schichtlüftung in einem zu belüftenden Raum (11), wobei sich eine"
                                 + "Schichtgrenze (12) zwischen einer ersten geodätisch unteren Luftschicht"
                                 + "(13) und einer zweiten geodätisch oberen Luftschicht (14) bildet"
@@ -111,7 +121,7 @@ public class WorkspaceItemPatentStepIT extends AbstractControllerIntegrationTest
                                 + "zu belüftenden Raum (11) ermittelt wird (V4), dass der Ist-Wert mit"
                                 + "einem Soll-Wert verglichen wird (V5), und dass einer Abweichung des"
                                 + "Ist-Werts vom Soll-Wert durch Regelung der Vorrichtung (10) für eine"
-                                + "Schichtlüftung entgegen gesteuert wird (V7).</p>")));
+                                + "Schichtlüftung entgegen gesteuert wird (V7).")));
 
         // verify that the patch changes have been persisted
         getClient().perform(get("/api/submission/workspaceitems/" + witem.getID())).andExpect(status().isOk())

@@ -57,12 +57,13 @@ public class EPOService {
 
     public List<Record> search(String query, String consumerKey, String consumerSecretKey)
             throws HttpException, IOException {
-        List<EPODocumentId> epoDocIds = new ArrayList<EPODocumentId>();
+        List<Record> records = new ArrayList<Record>();
 
         String bearer = login(consumerKey, consumerSecretKey);
         if (StringUtils.isNotBlank(query) && StringUtils.isNotBlank(bearer)) {
             int start = START;
             int end = SIZE;
+            List<EPODocumentId> epoDocIds = new ArrayList<EPODocumentId>();
 
             for (int i = 0; i < MAX; i++) {
                 List<EPODocumentId> ids = searchDocumentIds(bearer, query, start, end);
@@ -76,11 +77,17 @@ public class EPOService {
                     break;
             }
 
+            
             for (EPODocumentId epoDocId : epoDocIds) {
-                searchDocument(bearer, epoDocId);
+                List<Record> recordfounds = searchDocument(bearer, epoDocId);
+                
+                if (recordfounds.size() > 1) {
+                    log.warn("More record are returned with epocID " + epoDocId.toString());
+                }
+                records.addAll(recordfounds);
             }
         }
-        return null;
+        return records;
     }
 
     /***
@@ -137,7 +144,7 @@ public class EPOService {
     private List<EPODocumentId> searchDocumentIds(String bearer, String query, int start, int end) {
         List<EPODocumentId> results = new ArrayList<EPODocumentId>();
 
-        if (StringUtils.isNotBlank(bearer)) {
+        if (StringUtils.isBlank(bearer)) {
             return results;
         }
         try {
@@ -159,15 +166,18 @@ public class EPOService {
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             DocumentBuilder builder = factory.newDocumentBuilder();
             Document inDoc = builder.parse(httpResponse.getEntity().getContent());
+            inDoc.getDocumentElement().normalize();
+            
             Element xmlRoot = inDoc.getDocumentElement();
-
-            String totalRes = XMLUtils.getElementAttribute(xmlRoot, "biblio-search", "total-result-count");
-            Element range = XMLUtils.getSingleElement(xmlRoot, "range");
+            Element biblio = XMLUtils.getSingleElement(xmlRoot, "ops:biblio-search");
+            String totalRes = biblio.getAttribute("total-result-count");
+            Element range = XMLUtils.getSingleElement(biblio, "ops:range");
             String beginRange = range.getAttribute("begin");
             String endRange = range.getAttribute("end");
-            List<Element> searchResults = XMLUtils.getElementList(xmlRoot, "search-result");
+            List<Element> searchResults = XMLUtils.getElementList(biblio, "ops:search-result");
             for (Element searchResult : searchResults) {
-                Element documentId = XMLUtils.getSingleElement(searchResult, "document-id");
+                Element pubReference = XMLUtils.getSingleElement(searchResult, "ops:publication-reference");
+                Element documentId = XMLUtils.getSingleElement(pubReference, "document-id");
 
                 results.add(new EPODocumentId(documentId));
             }
@@ -207,10 +217,13 @@ public class EPOService {
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             DocumentBuilder builder = factory.newDocumentBuilder();
             Document inDoc = builder.parse(httpResponse.getEntity().getContent());
+            inDoc.getDocumentElement().normalize();
+            
             Element xmlRoot = inDoc.getDocumentElement();
-
-            Element biblographicData = XMLUtils.getSingleElement(xmlRoot, "bibliographic-data");
-            results.add(EPOUtils.convertBibliographicData(biblographicData, formats));
+            Element exchangeDocs = XMLUtils.getSingleElement(xmlRoot, "exchange-documents");
+            Element exchangeDoc = XMLUtils.getSingleElement(exchangeDocs, "exchange-document");
+            
+            results.add(EPOUtils.convertBibliographicData(exchangeDoc, formats));
         } catch (ParserConfigurationException e) {
             log.error(e.getMessage(), e);
         } catch (SAXException e) {

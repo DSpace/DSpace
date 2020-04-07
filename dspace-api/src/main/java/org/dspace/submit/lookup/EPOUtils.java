@@ -17,6 +17,13 @@ import org.dspace.app.util.XMLUtils;
 import org.dspace.submit.util.SubmissionLookupPublication;
 import org.w3c.dom.Element;
 
+/***
+ * Class used to convert the dom elements to Records.
+ * 
+ * @See gr.ekt.bte.core.Record
+ * 
+ * @author fcadili (franceso.cadili at 4science.it)
+ */
 public final class EPOUtils {
 
     /**
@@ -26,35 +33,29 @@ public final class EPOUtils {
     }
 
     private static EPODocumentId getDocumentNumber(Element biblographicData, String section, String[] formats) {
-        EPOElementHolder.clear();
 
         Element pubblicationRef = XMLUtils.getSingleElement(biblographicData, section);
         List<Element> documentIds = XMLUtils.getElementList(pubblicationRef, "document-id");
-        for (Element documentId : documentIds) {
-            EPOElementHolder.add(new EPOElementHolder(documentId, "document-id-type"));
-        }
-        Element documentId = EPOElementHolder.get(formats);
+        EPOElementHolder holder = new EPOElementHolder(formats, documentIds, "document-id-type");
+        Element documentId = holder.get();
+        
         EPODocumentId epoDocumentId = new EPODocumentId(documentId);
-
         return epoDocumentId;
     }
 
-    private static Element getApplicantOrInventor(Element biblographicData, String section, int sequence,
+    private static Element getApplicantOrInventor(Element parties, String sectionName, String elementName, int sequence,
             String[] formats) {
-        EPOElementHolder.clear();
 
-        Element applicantsRef = XMLUtils.getSingleElement(biblographicData, section);
-        List<Element> applicants = XMLUtils.getElementList(applicantsRef, "applicant");
-        for (Element applicant : applicants) {
-            if (String.valueOf(sequence).equals(applicant.getAttribute("sequence")))
-                EPOElementHolder.add(new EPOElementHolder(applicant, "data-format"));
-        }
-
-        return EPOElementHolder.get(formats);
+        Element section = XMLUtils.getSingleElement(parties, sectionName);
+        List<Element> element = XMLUtils.getElementList(section, elementName);
+        EPOElementHolder holder = new EPOElementHolder(formats, element, "data-format", String.valueOf(sequence),
+                "sequence");
+        return holder.get();
     }
 
-    public static Record convertBibliographicData(Element biblographicData, String[] formats) {
+    public static Record convertBibliographicData(Element exchangeDoc, String[] formats) {
         MutableRecord record = new SubmissionLookupPublication("");
+        Element biblographicData = XMLUtils.getSingleElement(exchangeDoc, "bibliographic-data");
 
         EPODocumentId epoDocumentId = getDocumentNumber(biblographicData, "publication-reference", formats);
         record.addValue("publicationnumber", new StringValue(epoDocumentId.getId()));
@@ -65,10 +66,11 @@ public final class EPOUtils {
 
         int iseq = 1;
         Element applicant = null;
+        Element parties = XMLUtils.getSingleElement(biblographicData, "parties");
         do {
-            applicant = getApplicantOrInventor(biblographicData, "applicants", iseq, formats);
+            applicant = getApplicantOrInventor(parties, "applicants", "applicant", iseq, formats);
             if (applicant != null) {
-                String applicantName = XMLUtils.getElementValue(applicant, "name");
+                String applicantName = XMLUtils.getElementValue(applicant, "applicant-name");
                 record.addValue("applicant", new StringValue(applicantName));
             }
 
@@ -78,10 +80,10 @@ public final class EPOUtils {
         int iinv = 1;
         Element inventor = null;
         do {
-            inventor = getApplicantOrInventor(biblographicData, "inventor", iinv, formats);
+            inventor = getApplicantOrInventor(parties, "inventors", "inventor", iinv, formats);
             if (inventor != null) {
-                String applicantName = XMLUtils.getElementValue(applicant, "name");
-                record.addValue("inventor", new StringValue(applicantName));
+                String inventorName = XMLUtils.getElementValue(inventor, "inventor-name");
+                record.addValue("inventor", new StringValue(inventorName));
             }
 
             iinv++;
@@ -90,7 +92,7 @@ public final class EPOUtils {
         String inventionTitle = XMLUtils.getElementValue(biblographicData, "invention-title");
         record.addValue("inventiontitle", new StringValue(inventionTitle));
 
-        String summary = XMLUtils.getElementValue(biblographicData, "abstract");
+        String summary = XMLUtils.getElementValue(exchangeDoc, "abstract");
         record.addValue("abstract", new StringValue(summary));
 
         return record;

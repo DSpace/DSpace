@@ -8,8 +8,10 @@
 package org.dspace.submit.lookup;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.Element;
 
 /***
@@ -19,34 +21,80 @@ import org.w3c.dom.Element;
  * @author fcadili (franceso.cadili at 4science.it)
  */
 public class EPOElementHolder {
-    private Element element;
-    private String attribute;
+    private class ElementHolder {
+        private Element element;
+        private String attribute;
 
-    private static Map<String, EPOElementHolder> holder = new HashMap<String, EPOElementHolder>();
+        private ElementHolder(Element element, String name) {
+            this.element = element;
+            this.attribute = name;
+        }
 
-    public EPOElementHolder(Element element, String name) {
-        this.element = element;
-        this.attribute = name;
+        public String getAttributeValue() {
+            return element.getAttribute(attribute);
+        }
+
+        public Element getElement() {
+            return element;
+        }
     }
 
-    public String getAttributeValue() {
-        return element.getAttribute(attribute);
+    private Map<String, ElementHolder> holder = new HashMap<String, ElementHolder>();
+    private String[] formats;
+
+    /***
+     * Add a list of elements with a data format selector to the internal map. The
+     * order defined in format arrays is used when data are retrieved from the
+     * internal map.
+     * 
+     * @param formats            The list of data format values.
+     * @param elements           The elements
+     * @param dataFormatSelector The attribute that store the data format values
+     *                           from the elements.
+     */
+    public EPOElementHolder(String[] formats, List<Element> elements, String dataFormatSelector) {
+        init(formats, elements, dataFormatSelector, null, null);
     }
 
-    public Element getElement() {
-        return element;
+    /***
+     * Add a list of elements with a data format selector to the internal map. The
+     * order defined in format arrays is used when data are retrieved from the
+     * internal map.
+     * 
+     * @param formats            The list of data format values.
+     * @param elements           The elements
+     * @param dataFormatSelector The attribute that store the data format values
+     * @param filterValue        The value used to filter the elements
+     * @param filterSelector     The attribute used to retrieve the filter value
+     *                           from the elements.
+     */
+    public EPOElementHolder(String[] formats, List<Element> elements, String dataFormatSelector, String filterValue,
+            String filterSelector) {
+
+        init(formats, elements, dataFormatSelector, filterValue, filterSelector);
     }
 
-    public static void add(EPOElementHolder element) {
+    private void init(String[] formats, List<Element> elements, String dataFormatSelector, String filterValue,
+            String filterSelector) {
+        this.formats = formats;
+        for (Element element : elements) {
+            if (StringUtils.isEmpty(filterValue) || filterValue.equals(element.getAttribute(filterSelector)))
+                add(new ElementHolder(element, dataFormatSelector));
+        }
+    }
+
+    private void add(ElementHolder element) {
         holder.put(element.getAttributeValue(), element);
     }
 
-    public static void clear() {
-        holder.clear();
-    }
-
-    public static Element get(String[] keys) {
-        for (String key : keys) {
+    /***
+     * Retrieve the data in a ordered way using the internal formats.
+     * 
+     * @param keys
+     * @return
+     */
+    public Element get() {
+        for (String key : formats) {
             if (holder.containsKey(key))
                 return holder.get(key).getElement();
         }

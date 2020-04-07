@@ -37,7 +37,7 @@ public class EPODocumentId {
     private String docNumber;
     private String kind;
     private String date;
-    
+
     public static String DOCDB = "docdb";
     public static String EPODOC = "epodoc";
     public static String ORIGIN = "origin";
@@ -79,5 +79,12 @@ public class EPODocumentId {
         } else {
             return "";
         }
+    }
+
+    @Override
+    public String toString() {
+        return "country: " + ((country != null) ? country : "") + ", docnumber: "
+                + ((docNumber != null) ? docNumber : "") + ", kind: " + ((kind != null) ? kind : "") + ", date: "
+                + ((date != null) ? date : "");
     }
 }

@@ -79,11 +79,13 @@ public class EPOOnlineDataLoader extends NetworkSubmissionLookupDataLoader {
         for (String id : ids) {
             Set<String> values = keys.get(id);
 
-            for (String value : values) {
-                if (query.length() > 0) {
-                    query += " OR ";
+            if (values != null) {
+                for (String value : values) {
+                    if (query.length() > 0) {
+                        query += " OR ";
+                    }
+                    query += id + "=" + value;
                 }
-                query += id + "=" + value;
             }
         }
 
