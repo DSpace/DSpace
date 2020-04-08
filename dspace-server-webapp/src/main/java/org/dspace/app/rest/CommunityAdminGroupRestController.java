@@ -21,11 +21,11 @@ import org.dspace.app.rest.model.GroupRest;
 import org.dspace.app.rest.model.hateoas.GroupResource;
 import org.dspace.app.rest.repository.CommunityRestRepository;
 import org.dspace.app.rest.utils.ContextUtil;
+import org.dspace.app.util.AuthorizeUtil;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Community;
 import org.dspace.content.service.CommunityService;
-import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.webmvc.ControllerUtils;
@@ -34,7 +34,6 @@ import org.springframework.hateoas.ResourceSupport;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -84,11 +83,7 @@ public class CommunityAdminGroupRestController {
         if (community == null) {
             throw new ResourceNotFoundException("No such community: " + uuid);
         }
-        if (!authorizeService.isAdmin(context) && !authorizeService.authorizeActionBoolean(context, community,
-                                                                                           Constants.ADMIN, true)) {
-            throw new AccessDeniedException("The current user was not allowed to retrieve the AdminGroup for" +
-                                                " community: " + uuid);
-        }
+        AuthorizeUtil.authorizeManageAdminGroup(context, community);
         if (community.getAdministrators() != null) {
             throw new UnprocessableEntityException("The community with UUID: " + uuid + " already has " +
                                                        "an admin group");
@@ -121,12 +116,7 @@ public class CommunityAdminGroupRestController {
         if (community == null) {
             throw new ResourceNotFoundException("No such community: " + uuid);
         }
-
-        if (!authorizeService.isAdmin(context) && !authorizeService.authorizeActionBoolean(context, community,
-                                                                                           Constants.ADMIN, true)) {
-            throw new AccessDeniedException("The current user was not allowed to retrieve the AdminGroup for" +
-                                                " community: " + uuid);
-        }
+        AuthorizeUtil.authorizeManageAdminGroup(context, community);
         if (community.getAdministrators() == null) {
             throw new UnprocessableEntityException("The community with UUID: " + uuid + " doesn't have an admin " +
                                                        "group");

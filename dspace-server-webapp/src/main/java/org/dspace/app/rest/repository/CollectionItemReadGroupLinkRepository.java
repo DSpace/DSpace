@@ -16,6 +16,8 @@ import javax.servlet.http.HttpServletRequest;
 import org.dspace.app.rest.model.CollectionRest;
 import org.dspace.app.rest.model.GroupRest;
 import org.dspace.app.rest.projection.Projection;
+import org.dspace.app.util.AuthorizeUtil;
+import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Collection;
 import org.dspace.content.service.CollectionService;
@@ -61,8 +63,9 @@ public class CollectionItemReadGroupLinkRepository extends AbstractDSpaceRestRep
             if (collection == null) {
                 throw new ResourceNotFoundException("No such collection: " + collectionId);
             }
-            if (!authorizeService.isAdmin(context) && !authorizeService.authorizeActionBoolean(context, collection,
-                                                                                               Constants.ADMIN, true)) {
+            try {
+                AuthorizeUtil.authorizeManageDefaultReadGroup(context, collection);
+            } catch (AuthorizeException e) {
                 throw new AccessDeniedException("The current user was not allowed to retrieve the itemReadGroup for" +
                                                     " collection: " + collectionId);
             }

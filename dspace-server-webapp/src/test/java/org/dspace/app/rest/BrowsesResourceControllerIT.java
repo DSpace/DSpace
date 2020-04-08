@@ -417,13 +417,11 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
 
         context.restoreAuthSystemState();
 
-        String token = getAuthToken(admin.getEmail(), password);
 
         //** WHEN **
         //An anonymous user browses the items in the Browse by item endpoint
-        getClient(token).perform(get("/api/discover/browses/title/items")
-               .param("projection", "full"))
-               //** THEN **
+        getClient().perform(get("/api/discover/browses/title/items"))
+                   //** THEN **
                //The status has to be 200 OK
                .andExpect(status().isOk())
                //We expect the content type to be "application/hal+json;charset=UTF-8"
@@ -440,8 +438,7 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
 
         //** WHEN **
         //An anonymous user browses the items in the Browse by item endpoint
-        getClient(token).perform(get("/api/discover/browses/author/entries")
-               .param("projection", "full"))
+        getClient().perform(get("/api/discover/browses/author/entries"))
                //** THEN **
                //The status has to be 200 OK
                .andExpect(status().isOk())
@@ -776,15 +773,11 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
                                 .withSubject("Science Fiction")
                                 .build();
         // ---- BROWSES BY ITEM ----
-
-        String token = getAuthToken(admin.getEmail(), password);
-
         //** WHEN **
         //An anonymous user browses the items in the Browse by date issued endpoint
         //with startsWith set to 1990
-        getClient(token).perform(get("/api/discover/browses/dateissued/items?startsWith=1990")
-                                .param("size", "2")
-                                .param("projection", "full"))
+        getClient().perform(get("/api/discover/browses/dateissued/items?startsWith=1990")
+                                .param("size", "2"))
 
                    //** THEN **
                    //The status has to be 200 OK
@@ -809,9 +802,8 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
         //** WHEN **
         //An anonymous user browses the items in the Browse by Title endpoint
         //with startsWith set to T
-        getClient(token).perform(get("/api/discover/browses/title/items?startsWith=T")
-                            .param("size", "2")
-                            .param("projection", "full"))
+        getClient().perform(get("/api/discover/browses/title/items?startsWith=T")
+                            .param("size", "2"))
 
                    //** THEN **
                    //The status has to be 200 OK
@@ -837,10 +829,9 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
         //** WHEN **
         //An anonymous user browses the items in the Browse by Title endpoint
         //with startsWith set to Blade and scope set to Col 1
-        getClient(token).perform(get("/api/discover/browses/title/items?startsWith=Blade")
+        getClient().perform(get("/api/discover/browses/title/items?startsWith=Blade")
                                 .param("scope", col1.getID().toString())
-                                .param("size", "2")
-                                .param("projection", "full"))
+                                .param("size", "2"))
 
                    //** THEN **
                    //The status has to be 200 OK

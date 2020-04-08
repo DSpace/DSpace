@@ -80,7 +80,7 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
 
 
         getClient().perform(get("/api/core/collections")
-                   .param("embed", CollectionMatcher.getFullEmbedsParameter()))
+                   .param("embed", CollectionMatcher.getEmbedsParameter()))
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$._embedded.collections", Matchers.containsInAnyOrder(
@@ -216,7 +216,7 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
 
         getClient().perform(get("/api/core/collections")
                 .param("size", "1")
-                   .param("embed", CollectionMatcher.getFullEmbedsParameter()))
+                   .param("embed", CollectionMatcher.getEmbedsParameter()))
 
                 .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
@@ -234,7 +234,7 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
         getClient().perform(get("/api/core/collections")
                                 .param("size", "1")
                                 .param("page", "1")
-                                   .param("embed", CollectionMatcher.getFullEmbedsParameter()))
+                                   .param("embed", CollectionMatcher.getEmbedsParameter()))
 
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
@@ -275,7 +275,7 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
 
         // When full projection is requested, response should include expected properties, links, and embeds.
         getClient().perform(get("/api/core/collections/" + col1.getID())
-                   .param("embed", CollectionMatcher.getFullEmbedsParameter()))
+                   .param("embed", CollectionMatcher.getEmbedsParameter()))
 
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
@@ -409,7 +409,7 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
         context.restoreAuthSystemState();
 
         getClient().perform(get("/api/core/collections/" + col1.getID())
-                      .param("embed", CollectionMatcher.getFullEmbedsParameter()))
+                      .param("embed", CollectionMatcher.getEmbedsParameter()))
 
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
@@ -558,7 +558,7 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
         context.restoreAuthSystemState();
 
         getClient().perform(get("/api/core/collections/" + col1.getID())
-                      .param("embed", CollectionMatcher.getFullEmbedsParameter()))
+                      .param("embed", CollectionMatcher.getEmbedsParameter()))
 
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
@@ -589,7 +589,7 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
 
         getClient().perform(get("/api/core/collections/" + col1.getID().toString())
-                      .param("embed", CollectionMatcher.getFullEmbedsParameter()))
+                      .param("embed", CollectionMatcher.getEmbedsParameter()))
 
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
@@ -618,7 +618,7 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
         ;
 
         getClient().perform(get("/api/core/collections/" + col1.getID().toString())
-                      .param("embed", CollectionMatcher.getFullEmbedsParameter()))
+                      .param("embed", CollectionMatcher.getEmbedsParameter()))
 
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
@@ -661,7 +661,7 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
         context.restoreAuthSystemState();
 
         getClient(token).perform(get("/api/core/collections/" + col1.getID().toString())
-                           .param("embed", CollectionMatcher.getFullEmbedsParameter()))
+                           .param("embed", CollectionMatcher.getEmbedsParameter()))
 
                         .andExpect(status().isOk())
                         .andExpect(content().contentType(contentType))
@@ -707,7 +707,7 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
         context.restoreAuthSystemState();
 
         getClient().perform(get("/api/core/collections/" + col1.getID().toString())
-                           .param("embed", CollectionMatcher.getFullEmbedsParameter()))
+                           .param("embed", CollectionMatcher.getEmbedsParameter()))
 
                         .andExpect(status().isOk())
                         .andExpect(content().contentType(contentType))
@@ -757,7 +757,7 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                                          .content(mapper.writeValueAsBytes(collectionRest))
                                          .param("parent", parentCommunity.getID().toString())
                                          .contentType(contentType)
-                                            .param("embed", CollectionMatcher.getFullEmbedsParameter()))
+                                            .param("embed", CollectionMatcher.getEmbedsParameter()))
 
                             .andExpect(status().isCreated())
                             .andExpect(content().contentType(contentType))
@@ -931,7 +931,7 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
         context.restoreAuthSystemState();
 
         getClient(token).perform(get("/api/core/collections/" + col1.getID().toString())
-                           .param("embed", CollectionMatcher.getFullEmbedsParameter()))
+                           .param("embed", CollectionMatcher.getEmbedsParameter()))
 
                         .andExpect(status().isOk())
                         .andExpect(content().contentType(contentType))
@@ -969,7 +969,7 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
 
         getClient().perform(get("/api/core/collections/" + col1.getID().toString())
-                      .param("embed", CollectionMatcher.getFullEmbedsParameter()))
+                      .param("embed", CollectionMatcher.getEmbedsParameter()))
 
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
@@ -1001,7 +1001,7 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
         ;
 
         getClient().perform(get("/api/core/collections/" + col1.getID().toString())
-                      .param("embed", CollectionMatcher.getFullEmbedsParameter()))
+                      .param("embed", CollectionMatcher.getEmbedsParameter()))
 
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
@@ -1143,7 +1143,7 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
 
 
         getClient().perform(get("/api/core/collections")
-                      .param("embed", CollectionMatcher.getFullEmbedsParameter()))
+                      .param("embed", CollectionMatcher.getEmbedsParameter()))
 
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))

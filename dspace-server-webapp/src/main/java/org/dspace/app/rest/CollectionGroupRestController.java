@@ -23,6 +23,7 @@ import org.dspace.app.rest.model.GroupRest;
 import org.dspace.app.rest.model.hateoas.GroupResource;
 import org.dspace.app.rest.repository.CollectionRestRepository;
 import org.dspace.app.rest.utils.ContextUtil;
+import org.dspace.app.util.AuthorizeUtil;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Collection;
@@ -39,7 +40,6 @@ import org.springframework.hateoas.ResourceSupport;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -93,11 +93,7 @@ public class CollectionGroupRestController {
         if (collection == null) {
             throw new ResourceNotFoundException("No such collection: " + uuid);
         }
-        if (!authorizeService.isAdmin(context) && !authorizeService.authorizeActionBoolean(context, collection,
-                                                                                           Constants.ADMIN, true)) {
-            throw new AccessDeniedException("The current user was not allowed to edit the AdminGroup for" +
-                                                " collection: " + uuid);
-        }
+        AuthorizeUtil.authorizeManageAdminGroup(context, collection);
         if (collection.getAdministrators() != null) {
             throw new UnprocessableEntityException("The collection with UUID: " + uuid + " already has " +
                                                        "an admin group");
@@ -131,11 +127,7 @@ public class CollectionGroupRestController {
             throw new ResourceNotFoundException("No such collection: " + uuid);
         }
 
-        if (!authorizeService.isAdmin(context) && !authorizeService.authorizeActionBoolean(context, collection,
-                                                                                           Constants.ADMIN, true)) {
-            throw new AccessDeniedException("The current user was not allowed to retrieve the AdminGroup for" +
-                                                " collection: " + uuid);
-        }
+        AuthorizeUtil.authorizeManageAdminGroup(context, collection);
         if (collection.getAdministrators() == null) {
             throw new UnprocessableEntityException("The collection with UUID: " + uuid + " doesn't have an admin " +
                                                        "group");
@@ -167,11 +159,7 @@ public class CollectionGroupRestController {
         if (collection == null) {
             throw new ResourceNotFoundException("No such collection: " + uuid);
         }
-        if (!authorizeService.isAdmin(context) && !authorizeService.authorizeActionBoolean(context, collection,
-                                                                                           Constants.ADMIN, true)) {
-            throw new AccessDeniedException("The current user was not allowed to edit the SubmitterGroup for" +
-                                                " collection: " + uuid);
-        }
+        AuthorizeUtil.authorizeManageSubmittersGroup(context, collection);
         if (collection.getSubmitters() != null) {
             throw new UnprocessableEntityException("The collection with UUID: " + uuid + " already has " +
                                                        "a submitter group");
@@ -204,12 +192,7 @@ public class CollectionGroupRestController {
         if (collection == null) {
             throw new ResourceNotFoundException("No such collection: " + uuid);
         }
-
-        if (!authorizeService.isAdmin(context) && !authorizeService.authorizeActionBoolean(context, collection,
-                                                                                           Constants.ADMIN, true)) {
-            throw new AccessDeniedException("The current user was not allowed to retrieve the SubmitterGroup for" +
-                                                " collection: " + uuid);
-        }
+        AuthorizeUtil.authorizeManageSubmittersGroup(context, collection);
         if (collection.getSubmitters() == null) {
             throw new UnprocessableEntityException("The collection with UUID: " + uuid + " doesn't have a submitter " +
                                                        "group");
@@ -241,11 +224,7 @@ public class CollectionGroupRestController {
         if (collection == null) {
             throw new ResourceNotFoundException("No such collection: " + uuid);
         }
-        if (!authorizeService.isAdmin(context) && !authorizeService.authorizeActionBoolean(context, collection,
-                                                                                           Constants.ADMIN, true)) {
-            throw new AccessDeniedException("The current user was not allowed to edit the ItemReadGroup for" +
-                                                " collection: " + uuid);
-        }
+        AuthorizeUtil.authorizeManageDefaultReadGroup(context, collection);
         List<Group> itemGroups = authorizeService
             .getAuthorizedGroups(context, collection, Constants.DEFAULT_ITEM_READ);
         if (itemGroups != null && !itemGroups.isEmpty()) {
@@ -285,13 +264,7 @@ public class CollectionGroupRestController {
         if (collection == null) {
             throw new ResourceNotFoundException("No such collection: " + uuid);
         }
-
-        if (!authorizeService.isAdmin(context) && !authorizeService.authorizeActionBoolean(context, collection,
-                                                                                           Constants.ADMIN, true)) {
-            throw new AccessDeniedException("The current user was not allowed to retrieve the ItemReadGroup for" +
-                                                " collection: " + uuid);
-        }
-
+        AuthorizeUtil.authorizeManageDefaultReadGroup(context, collection);
         List<Group> itemGroups = authorizeService.getAuthorizedGroups(context, collection, Constants.DEFAULT_ITEM_READ);
         if (itemGroups != null && !itemGroups.isEmpty()) {
             Group itemReadGroup = itemGroups.get(0);
@@ -331,12 +304,7 @@ public class CollectionGroupRestController {
         if (collection == null) {
             throw new ResourceNotFoundException("No such collection: " + uuid);
         }
-        if (!authorizeService.isAdmin(context) && !authorizeService.authorizeActionBoolean(context, collection,
-                                                                                           Constants.ADMIN, true)) {
-            throw new AccessDeniedException("The current user was not allowed to edit the ItemReadGroup for" +
-                                                " collection: " + uuid);
-        }
-
+        AuthorizeUtil.authorizeManageDefaultReadGroup(context, collection);
         List<Group> bitstreamGroups = authorizeService
             .getAuthorizedGroups(context, collection, Constants.DEFAULT_BITSTREAM_READ);
         if (bitstreamGroups != null && !bitstreamGroups.isEmpty()) {
@@ -378,13 +346,7 @@ public class CollectionGroupRestController {
         if (collection == null) {
             throw new ResourceNotFoundException("No such collection: " + uuid);
         }
-
-        if (!authorizeService.isAdmin(context) && !authorizeService.authorizeActionBoolean(context, collection,
-                                                                                           Constants.ADMIN, true)) {
-            throw new AccessDeniedException("The current user was not allowed to retrieve the BitstreamReadGroup for" +
-                                                " collection: " + uuid);
-        }
-
+        AuthorizeUtil.authorizeManageDefaultReadGroup(context, collection);
         List<Group> bitstreamGroups = authorizeService
             .getAuthorizedGroups(context, collection, Constants.DEFAULT_BITSTREAM_READ);
         if (bitstreamGroups != null && !bitstreamGroups.isEmpty()) {
@@ -425,13 +387,7 @@ public class CollectionGroupRestController {
         if (collection == null) {
             throw new ResourceNotFoundException("No such collection: " + uuid);
         }
-        if (!authorizeService.isAdmin(context) && !authorizeService.authorizeActionBoolean(context, collection,
-                                                                                           Constants.ADMIN, true)) {
-            throw new AccessDeniedException(
-                "The current user was not allowed to retrieve the workflowGroup for" +
-                    " collection: " + uuid);
-        }
-
+        AuthorizeUtil.authorizeManageWorkflowsGroup(context, collection);
         GroupRest groupRest = collectionRestRepository.getWorkflowGroupForRole(context, collection, workflowRole);
         if (groupRest == null) {
             return ControllerUtils.toEmptyResponse(HttpStatus.NO_CONTENT);
@@ -461,12 +417,7 @@ public class CollectionGroupRestController {
         if (collection == null) {
             throw new ResourceNotFoundException("No such collection: " + uuid);
         }
-        if (!authorizeService.isAdmin(context) && !authorizeService.authorizeActionBoolean(context, collection,
-                                                                                           Constants.ADMIN, true)) {
-            throw new AccessDeniedException(
-                "The current user was not allowed to retrieve the workflowGroup for" +
-                    " collection: " + uuid);
-        }
+        AuthorizeUtil.authorizeManageWorkflowsGroup(context, collection);
         if (WorkflowUtils.getCollectionAndRepositoryRoles(collection).get(workflowRole) == null) {
             throw new ResourceNotFoundException("Couldn't find role for: " + workflowRole +
                                                     " in the collection with UUID: " + collection.getID());
@@ -505,12 +456,7 @@ public class CollectionGroupRestController {
         if (collection == null) {
             throw new ResourceNotFoundException("No such collection: " + uuid);
         }
-        if (!authorizeService.isAdmin(context) && !authorizeService.authorizeActionBoolean(context, collection,
-                                                                                           Constants.ADMIN, true)) {
-            throw new AccessDeniedException(
-                "The current user was not allowed to retrieve the workflowGroup for" +
-                    " collection: " + uuid);
-        }
+        AuthorizeUtil.authorizeManageWorkflowsGroup(context, collection);
         collectionRestRepository.deleteWorkflowGroupForRole(context, request, collection, workflowRole);
         context.complete();
         return ControllerUtils.toEmptyResponse(HttpStatus.NO_CONTENT);

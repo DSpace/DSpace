@@ -8,6 +8,8 @@
 package org.dspace.app.rest;
 
 import static com.jayway.jsonpath.JsonPath.read;
+import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadata;
+import static org.hamcrest.Matchers.allOf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -144,13 +146,43 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
     }
 
     @Test
-    public void postCollectionAdminGroupCreateAdminGroupSuccess() throws Exception {
+    public void postCollectionAdminGroupCreateAdminGroupExtraMetadataSuccess() throws Exception {
 
         ObjectMapper mapper = new ObjectMapper();
         GroupRest groupRest = new GroupRest();
         MetadataRest metadataRest = new MetadataRest();
         metadataRest.put("dc.description", new MetadataValueRest("testingDescription"));
         metadataRest.put("dc.subject", new MetadataValueRest("testSubject"));
+
+        groupRest.setMetadata(metadataRest);
+
+        AtomicReference<UUID> idRef = new AtomicReference<>();
+
+        String token = getAuthToken(admin.getEmail(), password);
+        getClient(token).perform(post("/api/core/collections/" + collection.getID() + "/adminGroup")
+                                     .content(mapper.writeValueAsBytes(groupRest))
+                                     .contentType(contentType))
+                        .andExpect(status().isCreated())
+                        .andDo(result -> idRef
+                            .set(UUID.fromString(read(result.getResponse().getContentAsString(), "$.id")))
+                        );
+        Group adminGroup = groupService.find(context, idRef.get());
+        getClient(token).perform(get("/api/core/collections/" + collection.getID() + "/adminGroup"))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.metadata", allOf(
+                            matchMetadata("dc.description", "testingDescription"),
+                            matchMetadata("dc.subject", "testSubject"))))
+                        .andExpect(
+                            jsonPath("$", GroupMatcher.matchGroupEntry(adminGroup.getID(), adminGroup.getName())));
+
+    }
+
+    @Test
+    public void postCollectionAdminGroupCreateAdminGroupSuccess() throws Exception {
+
+        ObjectMapper mapper = new ObjectMapper();
+        GroupRest groupRest = new GroupRest();
+        MetadataRest metadataRest = new MetadataRest();
 
         groupRest.setMetadata(metadataRest);
 
@@ -191,6 +223,9 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
                                      .content(mapper.writeValueAsBytes(groupRest))
                                      .contentType(contentType))
                         .andExpect(status().isUnprocessableEntity());
+
+        getClient(token).perform(get("/api/core/collections/" + collection.getID() + "/adminGroup"))
+                        .andExpect(status().isNoContent());
 
     }
 
@@ -273,6 +308,10 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
                                 .contentType(contentType))
                    .andExpect(status().isUnauthorized());
 
+        String token = getAuthToken(admin.getEmail(), password);
+        getClient(token).perform(get("/api/core/collections/" + collection.getID() + "/adminGroup"))
+                   .andExpect(status().isNoContent());
+
     }
 
     @Test
@@ -293,6 +332,9 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
                                      .contentType(contentType))
                         .andExpect(status().isForbidden());
 
+        token = getAuthToken(admin.getEmail(), password);
+        getClient(token).perform(get("/api/core/collections/" + collection.getID() + "/adminGroup"))
+                        .andExpect(status().isNoContent());
     }
 
     @Test
@@ -334,6 +376,8 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
                                      .contentType(contentType))
                         .andExpect(status().isUnprocessableEntity());
 
+        getClient(token).perform(get("/api/core/collections/" + collection.getID() + "/adminGroup"))
+                        .andExpect(status().isNoContent());
     }
 
     @Test
@@ -355,6 +399,9 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
                                      .contentType(contentType))
                         .andExpect(status().isUnprocessableEntity());
 
+        getClient(token).perform(get("/api/core/collections/" + collection.getID() + "/adminGroup"))
+                        .andExpect(status().isNoContent());
+
     }
 
     @Test
@@ -373,11 +420,12 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
 
     // This is currently not supported in DSpace API
-    @Ignore
     @Test
     public void deleteCollectionAdminGroupTestParentCommunityAdmin() throws Exception {
+        context.turnOffAuthorisationSystem();
         Group adminGroup = collectionService.createAdministrators(context, collection);
         authorizeService.addPolicy(context, parentCommunity, Constants.ADMIN, eperson);
+        context.restoreAuthSystemState();
 
         String token = getAuthToken(eperson.getEmail(), password);
         getClient(token).perform(delete("/api/core/collections/" + collection.getID() + "/adminGroup"))
@@ -391,8 +439,10 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
     @Ignore
     @Test
     public void deleteCollectionAdminGroupTestCollectionAdmin() throws Exception {
+        context.turnOffAuthorisationSystem();
         Group adminGroup = collectionService.createAdministrators(context, collection);
         authorizeService.addPolicy(context, collection, Constants.ADMIN, eperson);
+        context.restoreAuthSystemState();
 
         String token = getAuthToken(eperson.getEmail(), password);
         getClient(token).perform(delete("/api/core/collections/" + collection.getID() + "/adminGroup"))
@@ -409,7 +459,13 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
         context.restoreAuthSystemState();
 
         getClient().perform(delete("/api/core/collections/" + collection.getID() + "/adminGroup"))
-                   .andExpect(status().isUnauthorized());
+                    .andExpect(status().isUnauthorized());
+
+        String token = getAuthToken(admin.getEmail(), password);
+        getClient(token).perform(get("/api/core/collections/" + collection.getID() + "/adminGroup"))
+                    .andExpect(status().isOk())
+                   .andExpect(
+                       jsonPath("$", GroupMatcher.matchGroupEntry(adminGroup.getID(), adminGroup.getName())));
     }
 
     @Test
@@ -422,6 +478,12 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
         getClient(token).perform(delete("/api/core/collections/" + collection.getID() + "/adminGroup"))
                         .andExpect(status().isForbidden());
+
+        token = getAuthToken(admin.getEmail(), password);
+        getClient(token).perform(get("/api/core/collections/" + collection.getID() + "/adminGroup"))
+                        .andExpect(status().isOk())
+                        .andExpect(
+                            jsonPath("$", GroupMatcher.matchGroupEntry(adminGroup.getID(), adminGroup.getName())));
     }
 
 
@@ -435,6 +497,12 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
         getClient(token).perform(delete("/api/core/collections/" + UUID.randomUUID() + "/adminGroup"))
                         .andExpect(status().isNotFound());
+
+        token = getAuthToken(admin.getEmail(), password);
+        getClient(token).perform(get("/api/core/collections/" + collection.getID() + "/adminGroup"))
+                        .andExpect(status().isOk())
+                        .andExpect(
+                            jsonPath("$", GroupMatcher.matchGroupEntry(adminGroup.getID(), adminGroup.getName())));
     }
 
 
@@ -516,6 +584,39 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
 
     @Test
+    public void postCollectionSubmitterGroupCreateSubmitterGroupExtraMetadataSuccess() throws Exception {
+
+        ObjectMapper mapper = new ObjectMapper();
+        GroupRest groupRest = new GroupRest();
+        MetadataRest metadataRest = new MetadataRest();
+        metadataRest.put("dc.description", new MetadataValueRest("testingDescription"));
+        metadataRest.put("dc.subject", new MetadataValueRest("testSubject"));
+
+        groupRest.setMetadata(metadataRest);
+
+        AtomicReference<UUID> idRef = new AtomicReference<>();
+
+        String token = getAuthToken(admin.getEmail(), password);
+        getClient(token).perform(post("/api/core/collections/" + collection.getID() + "/submittersGroup")
+                                     .content(mapper.writeValueAsBytes(groupRest))
+                                     .contentType(contentType))
+                        .andExpect(status().isCreated())
+                        .andDo(result -> idRef
+                            .set(UUID.fromString(read(result.getResponse().getContentAsString(), "$.id")))
+                        );
+        Group submittersGroup = groupService.find(context, idRef.get());
+        getClient(token).perform(get("/api/core/collections/" + collection.getID() + "/submittersGroup"))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.metadata", allOf(
+                            matchMetadata("dc.description", "testingDescription"),
+                            matchMetadata("dc.subject", "testSubject"))))
+                        .andExpect(
+                            jsonPath("$",
+                                     GroupMatcher.matchGroupEntry(submittersGroup.getID(), submittersGroup.getName())));
+
+    }
+
+    @Test
     public void postCollectionSubmitterGroupCreateSubmitterGroupSuccess() throws Exception {
 
         ObjectMapper mapper = new ObjectMapper();
@@ -564,6 +665,8 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
                                      .content(mapper.writeValueAsBytes(groupRest))
                                      .contentType(contentType))
                         .andExpect(status().isUnprocessableEntity());
+        getClient(token).perform(get("/api/core/collections/" + collection.getID() + "/submittersGroup"))
+                        .andExpect(status().isNoContent());
 
     }
 
@@ -647,6 +750,9 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
                                 .content(mapper.writeValueAsBytes(groupRest))
                                 .contentType(contentType))
                    .andExpect(status().isUnauthorized());
+        String token = getAuthToken(admin.getEmail(), password);
+        getClient(token).perform(get("/api/core/collections/" + collection.getID() + "/submittersGroup"))
+                   .andExpect(status().isNoContent());
 
     }
 
@@ -667,6 +773,10 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
                                      .content(mapper.writeValueAsBytes(groupRest))
                                      .contentType(contentType))
                         .andExpect(status().isForbidden());
+
+        token = getAuthToken(admin.getEmail(), password);
+        getClient(token).perform(get("/api/core/collections/" + collection.getID() + "/submittersGroup"))
+                        .andExpect(status().isNoContent());
 
     }
 
@@ -709,6 +819,9 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
                                      .contentType(contentType))
                         .andExpect(status().isUnprocessableEntity());
 
+        getClient(token).perform(get("/api/core/collections/" + collection.getID() + "/submittersGroup"))
+                        .andExpect(status().isNoContent());
+
     }
 
     @Test
@@ -730,6 +843,8 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
                                      .contentType(contentType))
                         .andExpect(status().isUnprocessableEntity());
 
+        getClient(token).perform(get("/api/core/collections/" + collection.getID() + "/submittersGroup"))
+                        .andExpect(status().isNoContent());
     }
 
     @Test
@@ -748,11 +863,12 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
 
     // This is currently not supported in DSpace API
-    @Ignore
     @Test
     public void deleteCollectionSubmittersGroupTestParentCommunityAdmin() throws Exception {
+        context.turnOffAuthorisationSystem();
         Group submittersGroup = collectionService.createSubmitters(context, collection);
         authorizeService.addPolicy(context, parentCommunity, Constants.ADMIN, eperson);
+        context.restoreAuthSystemState();
 
         String token = getAuthToken(eperson.getEmail(), password);
         getClient(token).perform(delete("/api/core/collections/" + collection.getID() + "/submittersGroup"))
@@ -763,11 +879,12 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
     }
 
     // This is currently not supported in DSpace API
-    @Ignore
     @Test
     public void deleteCollectionSubmittersGroupTestCollectionAdmin() throws Exception {
+        context.turnOffAuthorisationSystem();
         Group submittersGroup = collectionService.createSubmitters(context, collection);
         authorizeService.addPolicy(context, collection, Constants.ADMIN, eperson);
+        context.restoreAuthSystemState();
 
         String token = getAuthToken(eperson.getEmail(), password);
         getClient(token).perform(delete("/api/core/collections/" + collection.getID() + "/submittersGroup"))
@@ -785,6 +902,15 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
         getClient().perform(delete("/api/core/collections/" + collection.getID() + "/submittersGroup"))
                    .andExpect(status().isUnauthorized());
+
+        String token = getAuthToken(admin.getEmail(), password);
+
+        getClient(token).perform(get("/api/core/collections/" + collection.getID() + "/submittersGroup"))
+                        .andExpect(status().isOk())
+                        .andExpect(
+                            jsonPath("$", GroupMatcher.matchGroupEntry(submittersGroup.getID(),
+                                                                       submittersGroup.getName())));
+
     }
 
     @Test
@@ -797,6 +923,14 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
         getClient(token).perform(delete("/api/core/collections/" + collection.getID() + "/submittersGroup"))
                         .andExpect(status().isForbidden());
+
+        token = getAuthToken(admin.getEmail(), password);
+
+        getClient(token).perform(get("/api/core/collections/" + collection.getID() + "/submittersGroup"))
+                        .andExpect(status().isOk())
+                        .andExpect(
+                            jsonPath("$", GroupMatcher.matchGroupEntry(submittersGroup.getID(),
+                                                                       submittersGroup.getName())));
     }
 
 
@@ -974,6 +1108,13 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
                                      .contentType(contentType))
                         .andExpect(status().isUnprocessableEntity());
 
+        // Note that the Default Read Group has the expected behaviour of defaulting to the Anonymous group
+        Group anon = groupService.findByName(context, Group.ANONYMOUS);
+        getClient(token).perform(get("/api/core/collections/" + collection.getID() + "/itemReadGroup"))
+                        .andExpect(status().isOk())
+                        .andExpect(
+                            jsonPath("$", GroupMatcher.matchGroupEntry(anon.getID(), anon.getName())));
+
     }
 
 
@@ -1058,6 +1199,15 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
                                 .contentType(contentType))
                    .andExpect(status().isUnauthorized());
 
+        String token = getAuthToken(admin.getEmail(), password);
+        // Note that the Default Read Group has the expected behaviour of defaulting to the Anonymous group
+        Group anon = groupService.findByName(context, Group.ANONYMOUS);
+        getClient(token).perform(get("/api/core/collections/" + collection.getID() + "/itemReadGroup"))
+                        .andExpect(status().isOk())
+                        .andExpect(
+                            jsonPath("$", GroupMatcher.matchGroupEntry(anon.getID(), anon.getName())));
+
+
     }
 
     @Test
@@ -1077,6 +1227,15 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
                                      .content(mapper.writeValueAsBytes(groupRest))
                                      .contentType(contentType))
                         .andExpect(status().isForbidden());
+
+        token = getAuthToken(admin.getEmail(), password);
+        // Note that the Default Read Group has the expected behaviour of defaulting to the Anonymous group
+        Group anon = groupService.findByName(context, Group.ANONYMOUS);
+        getClient(token).perform(get("/api/core/collections/" + collection.getID() + "/itemReadGroup"))
+                        .andExpect(status().isOk())
+                        .andExpect(
+                            jsonPath("$", GroupMatcher.matchGroupEntry(anon.getID(), anon.getName())));
+
 
     }
 
@@ -1119,6 +1278,14 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
                                      .contentType(contentType))
                         .andExpect(status().isUnprocessableEntity());
 
+        // Note that the Default Read Group has the expected behaviour of defaulting to the Anonymous group
+        Group anon = groupService.findByName(context, Group.ANONYMOUS);
+        getClient(token).perform(get("/api/core/collections/" + collection.getID() + "/itemReadGroup"))
+                        .andExpect(status().isOk())
+                        .andExpect(
+                            jsonPath("$", GroupMatcher.matchGroupEntry(anon.getID(), anon.getName())));
+
+
     }
 
     @Test
@@ -1140,6 +1307,14 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
                                      .contentType(contentType))
                         .andExpect(status().isUnprocessableEntity());
 
+
+        // Note that the Default Read Group has the expected behaviour of defaulting to the Anonymous group
+        Group anon = groupService.findByName(context, Group.ANONYMOUS);
+        getClient(token).perform(get("/api/core/collections/" + collection.getID() + "/itemReadGroup"))
+                        .andExpect(status().isOk())
+                        .andExpect(
+                            jsonPath("$", GroupMatcher.matchGroupEntry(anon.getID(), anon.getName())));
+
     }
 
     @Test
@@ -1155,6 +1330,8 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
         getClient(token).perform(delete("/api/core/collections/" + collection.getID() + "/itemReadGroup"))
                         .andExpect(status().isNoContent());
 
+        // Note that deleting a Default Read Group has the expected behaviour of defaulting the DefaultReadGroup back
+        // to the Anonymous group
         Group anon = groupService.findByName(context, Group.ANONYMOUS);
         getClient(token).perform(get("/api/core/collections/" + collection.getID() + "/itemReadGroup"))
                         .andExpect(status().isOk())
@@ -1165,41 +1342,49 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
 
     // This is currently not supported in DSpace API
-    @Ignore
     @Test
     public void deleteCollectionDefaultItemReadGroupTestParentCommunityAdmin() throws Exception {
-
+        context.turnOffAuthorisationSystem();
         String itemGroupString = "ITEM";
         int defaultItemRead = Constants.DEFAULT_ITEM_READ;
 
         Group role = createDefaultReadGroup(itemGroupString, defaultItemRead);
         authorizeService.addPolicy(context, parentCommunity, Constants.ADMIN, eperson);
+        context.restoreAuthSystemState();
 
         String token = getAuthToken(eperson.getEmail(), password);
         getClient(token).perform(delete("/api/core/collections/" + collection.getID() + "/itemReadGroup"))
                         .andExpect(status().isNoContent());
 
+        // Note that the Default Read Group has the expected behaviour of defaulting to the Anonymous group
+        Group anon = groupService.findByName(context, Group.ANONYMOUS);
         getClient(token).perform(get("/api/core/collections/" + collection.getID() + "/itemReadGroup"))
-                        .andExpect(status().isNoContent());
+                        .andExpect(status().isOk())
+                        .andExpect(
+                            jsonPath("$", GroupMatcher.matchGroupEntry(anon.getID(), anon.getName())));
     }
 
     // This is currently not supported in DSpace API
-    @Ignore
     @Test
     public void deleteCollectionDefaultItemReadGroupTestCollectionAdmin() throws Exception {
-
+        context.turnOffAuthorisationSystem();
         String itemGroupString = "ITEM";
         int defaultItemRead = Constants.DEFAULT_ITEM_READ;
 
         Group role = createDefaultReadGroup(itemGroupString, defaultItemRead);
         authorizeService.addPolicy(context, collection, Constants.ADMIN, eperson);
+        context.restoreAuthSystemState();
 
         String token = getAuthToken(eperson.getEmail(), password);
         getClient(token).perform(delete("/api/core/collections/" + collection.getID() + "/itemReadGroup"))
                         .andExpect(status().isNoContent());
 
+        // Note that the Default Read Group has the expected behaviour of defaulting to the Anonymous group
+        Group anon = groupService.findByName(context, Group.ANONYMOUS);
         getClient(token).perform(get("/api/core/collections/" + collection.getID() + "/itemReadGroup"))
-                        .andExpect(status().isNoContent());
+                        .andExpect(status().isOk())
+                        .andExpect(
+                            jsonPath("$", GroupMatcher.matchGroupEntry(anon.getID(), anon.getName())));
     }
 
     @Test
@@ -1213,6 +1398,12 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
         getClient().perform(delete("/api/core/collections/" + collection.getID() + "/itemReadGroup"))
                    .andExpect(status().isUnauthorized());
+
+        String token = getAuthToken(admin.getEmail(), password);
+        getClient(token).perform(get("/api/core/collections/" + collection.getID() + "/itemReadGroup"))
+                   .andExpect(status().isOk())
+                   .andExpect(
+                       jsonPath("$", GroupMatcher.matchGroupEntry(role.getID(), role.getName())));
     }
 
     @Test
@@ -1228,6 +1419,12 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
         getClient(token).perform(delete("/api/core/collections/" + collection.getID() + "/itemReadGroup"))
                         .andExpect(status().isForbidden());
+
+        token = getAuthToken(admin.getEmail(), password);
+        getClient(token).perform(get("/api/core/collections/" + collection.getID() + "/itemReadGroup"))
+                        .andExpect(status().isOk())
+                        .andExpect(
+                            jsonPath("$", GroupMatcher.matchGroupEntry(role.getID(), role.getName())));
     }
 
 
@@ -1393,6 +1590,12 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
                                      .content(mapper.writeValueAsBytes(groupRest))
                                      .contentType(contentType))
                         .andExpect(status().isUnprocessableEntity());
+        Group anon = groupService.findByName(context, Group.ANONYMOUS);
+
+        getClient(token).perform(get("/api/core/collections/" + collection.getID() + "/bitstreamReadGroup"))
+                        .andExpect(status().isOk())
+                        .andExpect(
+                            jsonPath("$", GroupMatcher.matchGroupEntry(anon.getID(), anon.getName())));
 
     }
 
@@ -1479,6 +1682,15 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
                                 .contentType(contentType))
                    .andExpect(status().isUnauthorized());
 
+        String token = getAuthToken(admin.getEmail(), password);
+        Group anon = groupService.findByName(context, Group.ANONYMOUS);
+
+        getClient(token).perform(get("/api/core/collections/" + collection.getID() + "/bitstreamReadGroup"))
+                        .andExpect(status().isOk())
+                        .andExpect(
+                            jsonPath("$", GroupMatcher.matchGroupEntry(anon.getID(), anon.getName())));
+
+
     }
 
     @Test
@@ -1498,6 +1710,15 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
                                      .content(mapper.writeValueAsBytes(groupRest))
                                      .contentType(contentType))
                         .andExpect(status().isForbidden());
+
+
+        token = getAuthToken(admin.getEmail(), password);
+        Group anon = groupService.findByName(context, Group.ANONYMOUS);
+
+        getClient(token).perform(get("/api/core/collections/" + collection.getID() + "/bitstreamReadGroup"))
+                        .andExpect(status().isOk())
+                        .andExpect(
+                            jsonPath("$", GroupMatcher.matchGroupEntry(anon.getID(), anon.getName())));
 
     }
 
@@ -1541,6 +1762,14 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
                                      .contentType(contentType))
                         .andExpect(status().isUnprocessableEntity());
 
+
+        Group anon = groupService.findByName(context, Group.ANONYMOUS);
+
+        getClient(token).perform(get("/api/core/collections/" + collection.getID() + "/bitstreamReadGroup"))
+                        .andExpect(status().isOk())
+                        .andExpect(
+                            jsonPath("$", GroupMatcher.matchGroupEntry(anon.getID(), anon.getName())));
+
     }
 
     @Test
@@ -1563,6 +1792,13 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
                                      .contentType(contentType))
                         .andExpect(status().isUnprocessableEntity());
 
+
+        Group anon = groupService.findByName(context, Group.ANONYMOUS);
+
+        getClient(token).perform(get("/api/core/collections/" + collection.getID() + "/bitstreamReadGroup"))
+                        .andExpect(status().isOk())
+                        .andExpect(
+                            jsonPath("$", GroupMatcher.matchGroupEntry(anon.getID(), anon.getName())));
     }
 
     @Test
@@ -1578,6 +1814,8 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
         getClient(token).perform(delete("/api/core/collections/" + collection.getID() + "/bitstreamReadGroup"))
                         .andExpect(status().isNoContent());
 
+        // Note that deleting a Default Read Group has the expected behaviour of defaulting the DefaultReadGroup back
+        // to the Anonymous group
         Group anon = groupService.findByName(context, Group.ANONYMOUS);
         getClient(token).perform(get("/api/core/collections/" + collection.getID() + "/bitstreamReadGroup"))
                         .andExpect(status().isOk())
@@ -1587,41 +1825,50 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
 
     // This is currently not supported in DSpace API
-    @Ignore
     @Test
     public void deleteCollectionDefaultBitstreamReadGroupTestParentCommunityAdmin() throws Exception {
-
+        context.turnOffAuthorisationSystem();
         String bitstreamGroupString = "BITSTREAM";
         int defaultBitstreamRead = Constants.DEFAULT_BITSTREAM_READ;
 
         Group role = createDefaultReadGroup(bitstreamGroupString, defaultBitstreamRead);
         authorizeService.addPolicy(context, parentCommunity, Constants.ADMIN, eperson);
+        context.restoreAuthSystemState();
 
         String token = getAuthToken(eperson.getEmail(), password);
         getClient(token).perform(delete("/api/core/collections/" + collection.getID() + "/bitstreamReadGroup"))
                         .andExpect(status().isNoContent());
 
+        // Note that the Default Read Group has the expected behaviour of defaulting to the Anonymous group
+        Group anon = groupService.findByName(context, Group.ANONYMOUS);
         getClient(token).perform(get("/api/core/collections/" + collection.getID() + "/bitstreamReadGroup"))
-                        .andExpect(status().isNoContent());
+                        .andExpect(status().isOk())
+                        .andExpect(
+                            jsonPath("$", GroupMatcher.matchGroupEntry(anon.getID(), anon.getName())));
+
     }
 
     // This is currently not supported in DSpace API
-    @Ignore
     @Test
     public void deleteCollectionDefaultBitstreamReadGroupTestCollectionAdmin() throws Exception {
-
+        context.turnOffAuthorisationSystem();
         String bitstreamGroupString = "BITSTREAM";
         int defaultBitstreamRead = Constants.DEFAULT_BITSTREAM_READ;
 
         Group role = createDefaultReadGroup(bitstreamGroupString, defaultBitstreamRead);
         authorizeService.addPolicy(context, collection, Constants.ADMIN, eperson);
+        context.restoreAuthSystemState();
 
         String token = getAuthToken(eperson.getEmail(), password);
         getClient(token).perform(delete("/api/core/collections/" + collection.getID() + "/bitstreamReadGroup"))
                         .andExpect(status().isNoContent());
 
+        // Note that the Default Read Group has the expected behaviour of defaulting to the Anonymous group
+        Group anon = groupService.findByName(context, Group.ANONYMOUS);
         getClient(token).perform(get("/api/core/collections/" + collection.getID() + "/bitstreamReadGroup"))
-                        .andExpect(status().isNoContent());
+                        .andExpect(status().isOk())
+                        .andExpect(
+                            jsonPath("$", GroupMatcher.matchGroupEntry(anon.getID(), anon.getName())));
     }
 
     @Test
@@ -1635,6 +1882,12 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
         getClient().perform(delete("/api/core/collections/" + collection.getID() + "/bitstreamReadGroup"))
                    .andExpect(status().isUnauthorized());
+
+        String token = getAuthToken(admin.getEmail(), password);
+        getClient(token).perform(get("/api/core/collections/" + collection.getID() + "/bitstreamReadGroup"))
+                   .andExpect(status().isOk())
+                   .andExpect(
+                       jsonPath("$", GroupMatcher.matchGroupEntry(role.getID(), role.getName())));
     }
 
     @Test
@@ -1773,6 +2026,34 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
         ObjectMapper mapper = new ObjectMapper();
         GroupRest groupRest = new GroupRest();
         MetadataRest metadataRest = new MetadataRest();
+
+        groupRest.setMetadata(metadataRest);
+
+        AtomicReference<UUID> idRef = new AtomicReference<>();
+
+        String token = getAuthToken(admin.getEmail(), password);
+        getClient(token).perform(post("/api/core/collections/" + collection.getID() + "/workflowGroups/reviewer")
+                                     .content(mapper.writeValueAsBytes(groupRest))
+                                     .contentType(contentType))
+                        .andExpect(status().isCreated())
+                        .andDo(result -> idRef
+                            .set(UUID.fromString(read(result.getResponse().getContentAsString(), "$.id")))
+                        );
+        Group workflowGroup = groupService.find(context, idRef.get());
+        getClient(token).perform(get("/api/core/collections/" + collection.getID() + "/workflowGroups/reviewer"))
+                        .andExpect(status().isOk())
+                        .andExpect(
+                            jsonPath("$",
+                                     GroupMatcher.matchGroupEntry(workflowGroup.getID(), workflowGroup.getName())));
+
+    }
+
+    @Test
+    public void postCollectionWorkflowGroupCreateWorkflowGroupExtraMetadataSuccess() throws Exception {
+
+        ObjectMapper mapper = new ObjectMapper();
+        GroupRest groupRest = new GroupRest();
+        MetadataRest metadataRest = new MetadataRest();
         metadataRest.put("dc.description", new MetadataValueRest("testingDescription"));
         metadataRest.put("dc.subject", new MetadataValueRest("testSubject"));
 
@@ -1791,6 +2072,9 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
         Group workflowGroup = groupService.find(context, idRef.get());
         getClient(token).perform(get("/api/core/collections/" + collection.getID() + "/workflowGroups/reviewer"))
                         .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.metadata", allOf(
+                            matchMetadata("dc.description", "testingDescription"),
+                            matchMetadata("dc.subject", "testSubject"))))
                         .andExpect(
                             jsonPath("$",
                                      GroupMatcher.matchGroupEntry(workflowGroup.getID(), workflowGroup.getName())));
@@ -1860,6 +2144,8 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
                                      .contentType(contentType))
                         .andExpect(status().isUnprocessableEntity());
 
+        getClient(token).perform(get("/api/core/collections/" + collection.getID() + "/workflowGroups/reviewer"))
+                        .andExpect(status().isNoContent());
     }
 
 
@@ -1943,6 +2229,11 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
                                 .contentType(contentType))
                    .andExpect(status().isUnauthorized());
 
+
+        String token = getAuthToken(admin.getEmail(), password);
+        getClient(token).perform(get("/api/core/collections/" + collection.getID() + "/workflowGroups/reviewer"))
+                   .andExpect(status().isNoContent());
+
     }
 
     @Test
@@ -1962,6 +2253,10 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
                                      .content(mapper.writeValueAsBytes(groupRest))
                                      .contentType(contentType))
                         .andExpect(status().isForbidden());
+
+        token = getAuthToken(admin.getEmail(), password);
+        getClient(token).perform(get("/api/core/collections/" + collection.getID() + "/workflowGroups/reviewer"))
+                        .andExpect(status().isNoContent());
 
     }
 
@@ -1984,6 +2279,9 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
                                      .contentType(contentType))
                         .andExpect(status().isUnprocessableEntity());
 
+        getClient(token).perform(get("/api/core/collections/" + collection.getID() + "/workflowGroups/reviewer"))
+                        .andExpect(status().isNoContent());
+
     }
 
     @Test
@@ -2005,6 +2303,9 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
                                      .contentType(contentType))
                         .andExpect(status().isUnprocessableEntity());
 
+        getClient(token).perform(get("/api/core/collections/" + collection.getID() + "/workflowGroups/reviewer"))
+                        .andExpect(status().isNoContent());
+
     }
 
     @Test
@@ -2023,13 +2324,13 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
 
     // This is currently not supported in DSpace API
-    @Ignore
     @Test
     public void deleteCollectionWorkflowGroupTestParentCommunityAdmin() throws Exception {
-
+        context.turnOffAuthorisationSystem();
         Group group = workflowService.createWorkflowRoleGroup(context, collection, "reviewer");
 
         authorizeService.addPolicy(context, parentCommunity, Constants.ADMIN, eperson);
+        context.restoreAuthSystemState();
 
         String token = getAuthToken(eperson.getEmail(), password);
         getClient(token).perform(delete("/api/core/collections/" + collection.getID() + "/workflowGroups/reviewer"))
@@ -2040,13 +2341,13 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
     }
 
     // This is currently not supported in DSpace API
-    @Ignore
     @Test
     public void deleteCollectionWorkflowGroupTestCollectionAdmin() throws Exception {
-
+        context.turnOffAuthorisationSystem();
         Group group = workflowService.createWorkflowRoleGroup(context, collection, "reviewer");
 
         authorizeService.addPolicy(context, collection, Constants.ADMIN, eperson);
+        context.restoreAuthSystemState();
 
         String token = getAuthToken(eperson.getEmail(), password);
         getClient(token).perform(delete("/api/core/collections/" + collection.getID() + "/workflowGroups/reviewer"))
@@ -2064,6 +2365,12 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
         getClient().perform(delete("/api/core/collections/" + collection.getID() + "/workflowGroups/reviewer"))
                    .andExpect(status().isUnauthorized());
+
+        String token = getAuthToken(admin.getEmail(), password);
+        getClient(token).perform(get("/api/core/collections/" + collection.getID() + "/workflowGroups/reviewer"))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$",
+                                     GroupMatcher.matchGroupEntry(group.getID(), group.getName())));
     }
 
     @Test
@@ -2076,6 +2383,12 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
         getClient(token).perform(delete("/api/core/collections/" + collection.getID() + "/workflowGroups/reviewer"))
                         .andExpect(status().isForbidden());
+
+        token = getAuthToken(admin.getEmail(), password);
+        getClient(token).perform(get("/api/core/collections/" + collection.getID() + "/workflowGroups/reviewer"))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$",
+                                            GroupMatcher.matchGroupEntry(group.getID(), group.getName())));
     }
 
 

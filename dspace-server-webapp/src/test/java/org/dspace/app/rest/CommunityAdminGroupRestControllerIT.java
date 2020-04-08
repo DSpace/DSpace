@@ -8,6 +8,8 @@
 package org.dspace.app.rest;
 
 import static com.jayway.jsonpath.JsonPath.read;
+import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadata;
+import static org.hamcrest.Matchers.allOf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -123,6 +125,33 @@ public class CommunityAdminGroupRestControllerIT extends AbstractControllerInteg
         ObjectMapper mapper = new ObjectMapper();
         GroupRest groupRest = new GroupRest();
         MetadataRest metadataRest = new MetadataRest();
+
+        groupRest.setMetadata(metadataRest);
+
+        AtomicReference<UUID> idRef = new AtomicReference<>();
+
+        String token = getAuthToken(admin.getEmail(), password);
+        getClient(token).perform(post("/api/core/communities/" + parentCommunity.getID() + "/adminGroup")
+                                     .content(mapper.writeValueAsBytes(groupRest))
+                                     .contentType(contentType))
+                        .andExpect(status().isCreated())
+                        .andDo(result -> idRef
+                            .set(UUID.fromString(read(result.getResponse().getContentAsString(), "$.id")))
+                        );
+        Group adminGroup = groupService.find(context, idRef.get());
+        getClient(token).perform(get("/api/eperson/groups/" + adminGroup.getID()))
+                        .andExpect(status().isOk())
+                        .andExpect(
+                            jsonPath("$", GroupMatcher.matchGroupEntry(adminGroup.getID(), adminGroup.getName())));
+
+    }
+
+    @Test
+    public void postCommunityAdminGroupCreateAdminGroupExtraMetadataSuccess() throws Exception {
+
+        ObjectMapper mapper = new ObjectMapper();
+        GroupRest groupRest = new GroupRest();
+        MetadataRest metadataRest = new MetadataRest();
         metadataRest.put("dc.description", new MetadataValueRest("testingDescription"));
         metadataRest.put("dc.subject", new MetadataValueRest("testSubject"));
 
@@ -141,6 +170,9 @@ public class CommunityAdminGroupRestControllerIT extends AbstractControllerInteg
         Group adminGroup = groupService.find(context, idRef.get());
         getClient(token).perform(get("/api/eperson/groups/" + adminGroup.getID()))
                         .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.metadata", allOf(
+                            matchMetadata("dc.description", "testingDescription"),
+                            matchMetadata("dc.subject", "testSubject"))))
                         .andExpect(
                             jsonPath("$", GroupMatcher.matchGroupEntry(adminGroup.getID(), adminGroup.getName())));
 
@@ -165,6 +197,9 @@ public class CommunityAdminGroupRestControllerIT extends AbstractControllerInteg
                                      .content(mapper.writeValueAsBytes(groupRest))
                                      .contentType(contentType))
                         .andExpect(status().isUnprocessableEntity());
+
+        getClient(token).perform(get("/api/core/communities/" + parentCommunity.getID() + "/adminGroup"))
+                        .andExpect(status().isNoContent());
 
     }
 
@@ -216,6 +251,10 @@ public class CommunityAdminGroupRestControllerIT extends AbstractControllerInteg
                                 .contentType(contentType))
                    .andExpect(status().isUnauthorized());
 
+        String token = getAuthToken(admin.getEmail(), password);
+        getClient(token).perform(get("/api/core/communities/" + parentCommunity.getID() + "/adminGroup"))
+                        .andExpect(status().isNoContent());
+
     }
 
     @Test
@@ -235,6 +274,11 @@ public class CommunityAdminGroupRestControllerIT extends AbstractControllerInteg
                                      .content(mapper.writeValueAsBytes(groupRest))
                                      .contentType(contentType))
                         .andExpect(status().isForbidden());
+
+
+        token = getAuthToken(admin.getEmail(), password);
+        getClient(token).perform(get("/api/core/communities/" + parentCommunity.getID() + "/adminGroup"))
+                        .andExpect(status().isNoContent());
 
     }
 
@@ -277,6 +321,10 @@ public class CommunityAdminGroupRestControllerIT extends AbstractControllerInteg
                                      .contentType(contentType))
                         .andExpect(status().isUnprocessableEntity());
 
+
+        getClient(token).perform(get("/api/core/communities/" + parentCommunity.getID() + "/adminGroup"))
+                        .andExpect(status().isNoContent());
+
     }
 
     @Test
@@ -297,6 +345,9 @@ public class CommunityAdminGroupRestControllerIT extends AbstractControllerInteg
                                      .content(mapper.writeValueAsBytes(groupRest))
                                      .contentType(contentType))
                         .andExpect(status().isUnprocessableEntity());
+
+        getClient(token).perform(get("/api/core/communities/" + parentCommunity.getID() + "/adminGroup"))
+                        .andExpect(status().isNoContent());
 
     }
 
@@ -319,8 +370,10 @@ public class CommunityAdminGroupRestControllerIT extends AbstractControllerInteg
     @Ignore
     @Test
     public void deleteCommunityAdminGroupTestCommunityAdmin() throws Exception {
+        context.turnOffAuthorisationSystem();
         Group adminGroup = communityService.createAdministrators(context, parentCommunity);
         authorizeService.addPolicy(context, parentCommunity, Constants.ADMIN, eperson);
+        context.restoreAuthSystemState();
 
         String token = getAuthToken(eperson.getEmail(), password);
         getClient(token).perform(delete("/api/core/communities/" + parentCommunity.getID() + "/adminGroup"))
@@ -338,6 +391,13 @@ public class CommunityAdminGroupRestControllerIT extends AbstractControllerInteg
 
         getClient().perform(delete("/api/core/communities/" + parentCommunity.getID() + "/adminGroup"))
                         .andExpect(status().isUnauthorized());
+
+        String token = getAuthToken(admin.getEmail(), password);
+        getClient(token).perform(get("/api/core/communities/" + parentCommunity.getID() + "/adminGroup"))
+                   .andExpect(status().isOk())
+                   .andExpect(
+                       jsonPath("$",
+                                GroupMatcher.matchGroupEntry(adminGroup.getID(), adminGroup.getName())));
     }
 
     @Test
@@ -350,6 +410,13 @@ public class CommunityAdminGroupRestControllerIT extends AbstractControllerInteg
 
         getClient(token).perform(delete("/api/core/communities/" + parentCommunity.getID() + "/adminGroup"))
                    .andExpect(status().isForbidden());
+
+        token = getAuthToken(admin.getEmail(), password);
+        getClient(token).perform(get("/api/core/communities/" + parentCommunity.getID() + "/adminGroup"))
+                   .andExpect(status().isOk())
+                   .andExpect(
+                       jsonPath("$",
+                                GroupMatcher.matchGroupEntry(adminGroup.getID(), adminGroup.getName())));
     }
 
 

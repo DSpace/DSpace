@@ -135,8 +135,8 @@ public class CommunityBuilder extends AbstractDSpaceObjectBuilder<Community> {
             Community community = communityService.find(c, uuid);
             if (community != null) {
                 try {
-                    if (community.getAdministrators() != null) {
-                        Group adminGroup = community.getAdministrators();
+                    Group adminGroup = community.getAdministrators();
+                    if (adminGroup != null) {
                         communityService.removeAdministrators(c, community);
                         groupService.delete(c, adminGroup);
                     }
