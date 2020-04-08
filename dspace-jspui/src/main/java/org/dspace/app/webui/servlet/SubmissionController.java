@@ -234,7 +234,7 @@ public class SubmissionController extends DSpaceServlet
         {
             if (request.getMethod().equals("GET"))
             {
-                DoGetResumable(request, response);
+                DoGetResumable(context, request, response);
             }
         }
         else
@@ -1586,16 +1586,18 @@ public class SubmissionController extends DSpaceServlet
     
     // Resumable.js uses HTTP Get to recognize whether a specific part/chunk of 
     // a file was uploaded already. This method handles those requests.
-    protected void DoGetResumable(HttpServletRequest request, HttpServletResponse response) 
+    protected void DoGetResumable(Context context, HttpServletRequest request, HttpServletResponse response)
         throws IOException
     {
+        String baseDir;
+
         if (ConfigurationManager.getProperty("upload.temp.dir") != null)
         {
-            tempDir = ConfigurationManager.getProperty("upload.temp.dir");
+            baseDir = ConfigurationManager.getProperty("upload.temp.dir");
         }
         else
         {
-            tempDir = System.getProperty("java.io.tmpdir");
+            baseDir = System.getProperty("java.io.tmpdir");
         }
 
         String resumableIdentifier = request.getParameter("resumableIdentifier");
@@ -1603,9 +1605,18 @@ public class SubmissionController extends DSpaceServlet
         long resumableCurrentChunkSize = 
                 Long.valueOf(request.getParameter("resumableCurrentChunkSize"));
 
-        tempDir = tempDir + File.separator + resumableIdentifier;
+        tempDir = baseDir + File.separator + resumableIdentifier;
 
         File fileDir = new File(tempDir);
+
+        // Test fileDir to see if canonical path is within the original baseDir
+        if(!fileDir.getCanonicalPath().startsWith(baseDir)) {
+            log.error("Error processing resumable upload chunk: temporary chunk file would be created outside " +
+                    "permissible temp dir ("+ baseDir +") for submitter: " + context.getCurrentUser().getEmail());
+            throw new IOException("Error processing resumableIdentifier: " + resumableIdentifier +
+                    " (submitter: " + context.getCurrentUser().getEmail() + ")" +
+                    ". Temporary upload directory would be created outside permissible base temp dir ("+ baseDir +")");
+        }
 
         // create a new directory for each resumableIdentifier
         if (!fileDir.exists()) {
@@ -1615,6 +1626,16 @@ public class SubmissionController extends DSpaceServlet
         String chunkPath = tempDir + File.separator + "part" + resumableChunkNumber;
 
         File chunkFile = new File(chunkPath);
+
+        // Test chunkFile to see if canonical path is within the original baseDir
+        if(!chunkFile.getCanonicalPath().startsWith(baseDir)) {
+            log.error("Error processing resumable upload chunk: temporary chunk file would be created outside " +
+                    "permissible temp dir ("+ baseDir +") for submitter: " + context.getCurrentUser().getEmail());
+            throw new IOException("Error processing resumableIdentifier: " + resumableIdentifier +
+                    " (submitter: " + context.getCurrentUser().getEmail() + ")" +
+                    ". Temporary upload directory would be created outside permissible base temp dir ("+ baseDir +")");
+        }
+
         // if the chunk was uploaded already, we send a status code of 200
         if (chunkFile.exists()) {
             if (chunkFile.length() == resumableCurrentChunkSize) {

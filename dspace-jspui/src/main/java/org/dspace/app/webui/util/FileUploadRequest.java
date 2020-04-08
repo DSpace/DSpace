@@ -21,6 +21,7 @@ import org.apache.commons.fileupload.FileUploadBase.IOFileUploadException;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
 import org.dspace.core.ConfigurationManager;
 
 /**
@@ -43,6 +44,10 @@ public class FileUploadRequest extends HttpServletRequestWrapper
     private List<String> filenames = new ArrayList<String>();
 
     private String tempDir = null;
+
+    /** log4j logger */
+    private static Logger log = Logger
+            .getLogger(FileUploadRequest.class);
 
     /** Original request */
     private HttpServletRequest original = null;
@@ -102,8 +107,18 @@ public class FileUploadRequest extends HttpServletRequestWrapper
                         {
                             String chunkDirPath = tempDir + File.separator + parameters.get("resumableIdentifier");
                             String chunkPath = chunkDirPath + File.separator + "part" + parameters.get("resumableChunkNumber");
+
                             File fileDir = new File(chunkDirPath);
-                            
+
+                            // Test fileDir to see if canonical path is within the original tempDir
+                            if(!fileDir.getCanonicalPath().startsWith(tempDir)) {
+                                log.error("Error processing resumable upload chunk: temporary chunk file would be created outside " +
+                                        "permissible temp dir ("+ tempDir +") for file: " + filename);
+                                throw new IOException("Error processing resumable chunk directory " + chunkDirPath +
+                                        " (filename: " + filename + ")" +
+                                        ". Temporary upload directory would be created outside permissible base temp dir ("+ tempDir +")");
+                            }
+
                             if(fileDir.exists())
                             {
                                 item.write(new File(chunkPath));
@@ -119,8 +134,17 @@ public class FileUploadRequest extends HttpServletRequestWrapper
                         String filename = getFilename(item.getName());
                         if (filename != null && !"".equals(filename))
                         {
-                            item.write(new File(tempDir + File.separator
-                                            + filename));
+                            File fileDir = new File(tempDir + File.separator+ filename);
+                            // Test fileDir to see if canonical path is within the original tempDir
+                            if(!fileDir.getCanonicalPath().startsWith(tempDir)) {
+                                log.error("Error processing resumable upload chunk: temporary chunk file would be created outside " +
+                                        "permissible temp dir ("+ tempDir +") for file: " + filename);
+                                throw new IOException("Error processing resumable chunk directory " + fileDir +
+                                        " (filename: " + filename + ")" +
+                                        ". Temporary upload directory would be created outside permissible base temp dir ("+ tempDir +")");
+                            }
+
+                            item.write(fileDir);
                         }
                     }
                 }
