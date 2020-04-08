@@ -10,11 +10,13 @@ package org.dspace.license.service;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
+import java.util.List;
 
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
+import org.dspace.license.CCLicense;
 import org.dspace.license.LicenseMetadataValue;
 import org.jdom.Document;
 
@@ -149,4 +151,19 @@ public interface CreativeCommonsService {
     public void removeLicense(Context context, LicenseMetadataValue uriField,
                               LicenseMetadataValue nameField, Item item)
         throws AuthorizeException, IOException, SQLException;
+
+    /**
+     * Find all CC Licenses using the default language found in the configuration
+     *
+     * @return A list of available CC Licenses
+     */
+    public List<CCLicense> findAllCCLicenses();
+
+    /**
+     * Find all CC Licenses for the provided language
+     *
+     * @param language - the language for which to find the CC Licenses
+     * @return A list of available CC Licenses for the provided language
+     */
+    public List<CCLicense> findAllCCLicenses(String language);
 }
