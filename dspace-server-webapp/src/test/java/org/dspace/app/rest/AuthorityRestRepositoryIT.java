@@ -250,6 +250,35 @@ public class AuthorityRestRepositoryIT extends AbstractControllerIntegrationTest
           .andExpect(jsonPath("$.page.totalElements", is(12)))
           .andExpect(jsonPath("$.page.totalPages", is(3)))
           .andExpect(jsonPath("$.page.number", is(0)));
+
+        //second page
+        getClient(tokenAdmin).perform(get("/api/integration/authorities/srsc/entries/search/top")
+                 .param("page", "1")
+                 .param("size", "5"))
+           .andExpect(status().isOk())
+           .andExpect(jsonPath("$._embedded.authorityEntries", Matchers.containsInAnyOrder(
+               AuthorityEntryMatcher.matchAuthority("SCB16", "TECHNOLOGY"),
+               AuthorityEntryMatcher.matchAuthority("SCB17", "FORESTRY, AGRICULTURAL SCIENCES and LANDSCAPE PLANNING"),
+               AuthorityEntryMatcher.matchAuthority("SCB18", "MEDICINE"),
+               AuthorityEntryMatcher.matchAuthority("SCB19", "ODONTOLOGY"),
+               AuthorityEntryMatcher.matchAuthority("SCB21", "PHARMACY")
+               )))
+           .andExpect(jsonPath("$.page.totalElements", is(12)))
+           .andExpect(jsonPath("$.page.totalPages", is(3)))
+           .andExpect(jsonPath("$.page.number", is(1)));
+
+        // third page
+        getClient(tokenAdmin).perform(get("/api/integration/authorities/srsc/entries/search/top")
+                 .param("page", "2")
+                 .param("size", "5"))
+           .andExpect(status().isOk())
+           .andExpect(jsonPath("$._embedded.authorityEntries", Matchers.containsInAnyOrder(
+               AuthorityEntryMatcher.matchAuthority("SCB22", "VETERINARY MEDICINE"),
+               AuthorityEntryMatcher.matchAuthority("SCB23", "INTERDISCIPLINARY RESEARCH AREAS")
+               )))
+           .andExpect(jsonPath("$.page.totalElements", is(12)))
+           .andExpect(jsonPath("$.page.totalPages", is(3)))
+           .andExpect(jsonPath("$.page.number", is(2)));
     }
 
     @Test
@@ -269,6 +298,7 @@ public class AuthorityRestRepositoryIT extends AbstractControllerIntegrationTest
     @Test
     public void srscSearchByParentFirstLevelPaginationTest() throws Exception {
         String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        // first page
         getClient(tokenAdmin).perform(get("/api/integration/authorities/srsc/entries/search/byParent")
                  .param("id", "SCB14")
                  .param("page", "0")
@@ -281,6 +311,19 @@ public class AuthorityRestRepositoryIT extends AbstractControllerIntegrationTest
                  .andExpect(jsonPath("$.page.totalElements", is(3)))
                  .andExpect(jsonPath("$.page.totalPages", is(2)))
                  .andExpect(jsonPath("$.page.number", is(0)));
+
+        // second page
+        getClient(tokenAdmin).perform(get("/api/integration/authorities/srsc/entries/search/byParent")
+                .param("id", "SCB14")
+                .param("page", "1")
+                .param("size", "2"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$._embedded.authorityEntries", Matchers.containsInAnyOrder(
+                    AuthorityEntryMatcher.matchAuthority("SCB1409", "Other mathematics")
+                    )))
+                .andExpect(jsonPath("$.page.totalElements", is(3)))
+                .andExpect(jsonPath("$.page.totalPages", is(2)))
+                .andExpect(jsonPath("$.page.number", is(1)));
     }
 
     @Test
@@ -303,6 +346,15 @@ public class AuthorityRestRepositoryIT extends AbstractControllerIntegrationTest
         String tokenAdmin = getAuthToken(admin.getEmail(), password);
         getClient(tokenAdmin).perform(get("/api/integration/authorities/srsc/entries/search/byParent")
                              .param("id", "VR140202"))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$.page.totalElements", Matchers.is(0)));
+    }
+
+    @Test
+    public void srscSearchByParentWrongIdTest() throws Exception {
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        getClient(tokenAdmin).perform(get("/api/integration/authorities/srsc/entries/search/byParent")
+                             .param("id", "WRONG_ID"))
                              .andExpect(status().isOk())
                              .andExpect(jsonPath("$.page.totalElements", Matchers.is(0)));
     }
