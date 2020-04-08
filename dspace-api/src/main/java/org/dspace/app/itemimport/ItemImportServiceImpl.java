@@ -55,6 +55,8 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 import java.io.*;
 import java.net.URL;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -1630,17 +1632,20 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
         {
             log.error("Zip file '" + zipfile.getAbsolutePath() + "' does not exist, or is not readable.");
         }
+        log.debug("Extracting zip at " + zipfile.getAbsolutePath());
 
         String destinationDir = destDir;
         if (destinationDir == null){
         	destinationDir = tempWorkDir;
         }
+        log.debug("Using directory " + destinationDir + " for zip extraction. (destDir arg is " + destDir +
+                ", tempWorkDir is " + tempWorkDir + ")");
 
         File tempdir = new File(destinationDir);
         if (!tempdir.isDirectory())
         {
-            log.error("'" + ConfigurationManager.getProperty("org.dspace.app.itemexport.work.dir") +
-                    "' as defined by the key 'org.dspace.app.itemexport.work.dir' in dspace.cfg " +
+            log.error("'" + ConfigurationManager.getProperty("org.dspace.app.batchitemexport.work.dir") +
+                    "' as defined by the key 'org.dspace.app.batchitemexport.work.dir' in dspace.cfg " +
                     "is not a valid directory");
         }
 
@@ -1648,8 +1653,15 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
         {
             log.error("Unable to create temporary directory: " + tempdir.getAbsolutePath());
         }
-        String sourcedir = destinationDir + System.getProperty("file.separator") + zipfile.getName();
-        String zipDir = destinationDir + System.getProperty("file.separator") + zipfile.getName() + System.getProperty("file.separator");
+
+        if(!destinationDir.endsWith(System.getProperty("file.separator"))) {
+            destinationDir += System.getProperty("file.separator");
+        }
+
+        String sourcedir = destinationDir + zipfile.getName();
+        String zipDir = destinationDir + zipfile.getName() + System.getProperty("file.separator");
+
+        log.debug("zip directory to use is " + zipDir);
 
 
         // 3
@@ -1660,11 +1672,27 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
         while (entries.hasMoreElements())
         {
             entry = entries.nextElement();
+            // Check that the true path to extract files is never outside allowed temp directories
+            // without creating any actual files on disk
+            log.debug("Inspecting entry name: " + entry.getName() + " for path traversal security");
+            File potentialExtract = new File(zipDir + entry.getName());
+            String canonicalPath = potentialExtract.getCanonicalPath();
+            log.debug("Canonical path to potential File is " + canonicalPath);
+            if(!canonicalPath.startsWith(zipDir)) {
+                log.error("Rejecting zip file: " + zipfile.getName() + " as it contains an entry that would be extracted " +
+                        "outside the temporary unzip directory: " + canonicalPath);
+                throw new IOException("Error extracting " + zipfile + ": Canonical path of zip entry: " +
+                        entry.getName() + " (" + canonicalPath + ") does not start with permissible temp unzip directory (" + destinationDir +
+                        ")");
+            }
+
             if (entry.isDirectory())
             {
-                if (!new File(zipDir + entry.getName()).mkdir())
-                {
+                // Log error and throw IOException if a directory entry could not be created
+                File newDir = new File(zipDir + entry.getName());
+                if (!newDir.mkdirs()) {
                     log.error("Unable to create contents directory: " + zipDir + entry.getName());
+                    throw new IOException("Unable to create contents directory: " + zipDir + entry.getName());
                 }
             }
             else
@@ -1673,6 +1701,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
                 log.info("Extracting file: " + entry.getName());
 
                 int index = entry.getName().lastIndexOf('/');
+                log.debug("Index of " + entry.getName() + " is " + index);
                 if (index == -1)
                 {
                     // Was it created on Windows instead?
@@ -1701,11 +1730,11 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
                         }
                     }
 
-
                 }
                 byte[] buffer = new byte[1024];
                 int len;
                 InputStream in = zf.getInputStream(entry);
+                log.debug("Reading " + zipDir + entry.getName() + " into InputStream");
                 BufferedOutputStream out = new BufferedOutputStream(
                         new FileOutputStream(zipDir + entry.getName()));
                 while((len = in.read(buffer)) >= 0)
