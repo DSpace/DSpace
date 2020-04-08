@@ -17,14 +17,13 @@ import org.dspace.app.rest.model.GroupRest;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.DSpaceObject;
-import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.service.GroupService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
-import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
 /**
@@ -45,6 +44,7 @@ public class GroupParentObjectLinkRepository extends AbstractDSpaceRestRepositor
      * This is only applicable for roles in that DSpace Object
      * e.g. the Community Administrator or Collection Submitter Group
      */
+    @PreAuthorize("hasPermission(#groupId, 'GROUP', 'READ') or hasAuthority('ADMIN')")
     public DSpaceObjectRest getParentObject(
             @Nullable HttpServletRequest request,
             UUID groupId,
@@ -62,12 +62,7 @@ public class GroupParentObjectLinkRepository extends AbstractDSpaceRestRepositor
             } else {
                 DSpaceObject parent = groupService.getParentObject(context, group);
                 if (parent != null) {
-                    if (groupService.isMember(context, context.getCurrentUser(), group)
-                            || authorizeService.authorizeActionBoolean(context, parent, Constants.ADMIN)) {
-                        return converter.toRest(parent, utils.obtainProjection());
-                    } else {
-                        throw new AccessDeniedException("No admin rights on the parent object");
-                    }
+                    return converter.toRest(parent, utils.obtainProjection());
                 } else {
                     return null;
                 }
