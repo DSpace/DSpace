@@ -147,7 +147,7 @@
 									tmp_val = item.displayedValue;
 								}
 								return {
-									label: item.displayedValue + " (" + item.count + ")",
+									label: escapeHtml(item.displayedValue) + " (" + item.count + ")",
 									value: tmp_val
 								};
 							}))			
@@ -159,6 +159,11 @@
 	function validateFilters() {
 		return document.getElementById("filterquery").value.length > 0;
 	}
+	// Generic HTML escape utility
+	var escapeHtml = s => (s + '').replace(/[&<>"']/g, m => ({
+		'&': '&amp;', '<': '&lt;', '>': '&gt;',
+		'"': '&quot;', "'": '&#39;'
+	})[m]);
 </script>		
 </c:set>
 
