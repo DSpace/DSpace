@@ -17,6 +17,7 @@
     prefix="fmt" %>
 	
 <%@ page import="java.io.PrintWriter" %>
+<%@ page import="org.apache.commons.lang.StringUtils" %>
 
 <%@ page isErrorPage="true" %>
 
@@ -40,17 +41,15 @@
     </p>
         <!--
     <%
-    Throwable ex = (Throwable) request.getAttribute("javax.servlet.error.exception");
-    if(ex == null) out.println("No stack trace available<br/>");
+    String exCode = (String) request.getAttribute("javax.servlet.error.code");
+    if(StringUtils.isBlank(exCode)) {
+		out.println("No error code available");
+    }
     else {
-                for(Throwable t = ex ; t!=null; t = t.getCause())
-                {
-                    out.println(t.getMessage());
-                    out.println("=============================================");
-                    t.printStackTrace(new PrintWriter(out));
-                    out.println("\n\n\n");
-                }
-        }
+		out.println("System error code: " + exCode);
+	}
+    out.println("=============================================");
+    out.println("\n\n\n");
         %>
       -->
 </dspace:layout>

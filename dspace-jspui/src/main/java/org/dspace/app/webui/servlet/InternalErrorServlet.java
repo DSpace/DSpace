@@ -8,6 +8,7 @@
 package org.dspace.app.webui.servlet;
 
 import java.io.IOException;
+import java.util.UUID;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -37,6 +38,8 @@ public class InternalErrorServlet extends HttpServlet
     protected void doGet(HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException
     {
+
+    	UUID errorCode = UUID.randomUUID();
         // Get the exception that occurred, if any
         Throwable t = (Throwable) request
                 .getAttribute("javax.servlet.error.exception");
@@ -45,7 +48,7 @@ public class InternalErrorServlet extends HttpServlet
 
         // Log the error. Since we don't have a context, we need to
         // build the info "by hand"
-        String logMessage = ":session_id=" + request.getSession().getId()
+        String logMessage = ":error_code=" + errorCode + ":session_id=" + request.getSession().getId()
                 + ":internal_error:" + logInfo;
 
         log.warn(logMessage, t);
@@ -53,6 +56,7 @@ public class InternalErrorServlet extends HttpServlet
         // Now we try and mail the designated user, if any
         UIUtil.sendAlert(request, (Exception) t);
 
+        request.setAttribute("javax.servlet.error.code", errorCode.toString());
         JSPManager.showJSP(request, response, "/error/internal.jsp");
     }
 
