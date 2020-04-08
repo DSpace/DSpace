@@ -112,13 +112,19 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService 
     @Override
     public Choices getMatches(String fieldKey, String query, Collection collection,
                               int start, int limit, String locale) {
+        return getMatches(null, fieldKey, query, collection, start, limit, locale);
+    }
+
+    @Override
+    public Choices getMatches(String authorityName, String fieldKey, String query, Collection collection,
+                              int start, int limit, String locale) {
         ChoiceAuthority ma = getChoiceAuthorityMap().get(fieldKey);
         if (ma == null) {
             throw new IllegalArgumentException(
                 "No choices plugin was configured for  field \"" + fieldKey
                     + "\".");
         }
-        return ma.getMatches(fieldKey, query, collection, start, limit, locale);
+        return ma.getMatches(authorityName, fieldKey, query, collection, start, limit, locale);
     }
 
     @Override

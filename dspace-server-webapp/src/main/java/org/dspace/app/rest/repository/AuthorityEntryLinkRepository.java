@@ -73,9 +73,8 @@ public class AuthorityEntryLinkRepository extends AbstractDSpaceRestRepository
         if (StringUtils.isNotBlank(metadata)) {
             String[] tokens = org.dspace.core.Utils.tokenize(metadata);
             String fieldKey = org.dspace.core.Utils.standardize(tokens[0], tokens[1], tokens[2], "_");
-            choices = cas.getMatches(fieldKey, query, collection, Math.toIntExact(pageable.getOffset()),
-                    pageable.getPageSize(),
-                                             context.getCurrentLocale().toString());
+            choices = cas.getMatches(name, fieldKey, query, collection, Math.toIntExact(pageable.getOffset()),
+                    pageable.getPageSize(), context.getCurrentLocale().toString());
             for (Choice value : choices.values) {
                 results.add(authorityUtils.convertEntry(value, name, projection));
             }

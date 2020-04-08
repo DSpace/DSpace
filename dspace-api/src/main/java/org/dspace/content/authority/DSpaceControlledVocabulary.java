@@ -246,7 +246,7 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Hiera
     }
 
     private void readNode(String[] authorities, String[] values, String[] labels, String[] parent,
-                         List<String> children, String[] notes, Boolean[] selectable, int i, Node node) {
+            List<String> children, String[] notes, Boolean[] selectable, int i, Node node) {
         String hierarchy = this.buildString(node);
         if (this.suggestHierarchy) {
             labels[i] = hierarchy;
@@ -286,9 +286,25 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Hiera
                     parentN = parentN.getParentNode();
                     if (parentN != null) {
                         Node parentIdAttr = parentN.getAttributes().getNamedItem("id");
-                        if (null != parentIdAttr  && !parentIdAttr.getNodeValue().equals(rootNodeId)) {
+                        if (null != parentIdAttr && !parentIdAttr.getNodeValue().equals(rootNodeId)) {
                             parent[i] = parentIdAttr.getNodeValue();
                         }
+                    }
+                }
+
+                for (int ci = 0; ci < childNodes.getLength(); ci++) {
+                    Node firstChild = childNodes.item(ci);
+                    if (firstChild != null && "isComposedBy".equals(firstChild.getNodeName())) {
+                        for (int cii = 0; cii < firstChild.getChildNodes().getLength(); cii++) {
+                            Node childN = firstChild.getChildNodes().item(cii);
+                            if (childN != null && "node".equals(childN.getNodeName())) {
+                                Node childIdAttr = childN.getAttributes().getNamedItem("id");
+                                if (null != childIdAttr) {
+                                    children.add(childIdAttr.getNodeValue());
+                                }
+                            }
+                        }
+                        break;
                     }
                 }
             }

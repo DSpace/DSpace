@@ -89,6 +89,24 @@ public interface ChoiceAuthorityService {
     public Choices getMatches(String fieldKey, String query, Collection collection,
                               int start, int limit, String locale);
 
+    /**
+     * Wrapper calls getMatches method of the plugin corresponding to
+     * the metadata field defined by single field key related to a specific authority.
+     *
+     * @param authorityName authority name
+     * @param fieldKey      single string identifying metadata field
+     * @param query         user's value to match
+     * @param collection    database ID of Collection for context (owner of Item)
+     * @param start         choice at which to start, 0 is first.
+     * @param limit         maximum number of choices to return, 0 for no limit.
+     * @param locale        explicit localization key if available, or null
+     * @return a Choices object (never null).
+     * @see org.dspace.content.authority.ChoiceAuthority#getMatches(java.lang.String, java.lang.String, org.dspace
+     * .content.Collection, int, int, java.lang.String)
+     */
+    public Choices getMatches(String authorityName, String fieldKey, String query, Collection collection,
+                              int start, int limit, String locale);
+
     public Choices getMatches(String fieldKey, String query, Collection collection, int start, int limit, String locale,
                               boolean externalInput);
 
@@ -106,6 +124,32 @@ public interface ChoiceAuthorityService {
      */
     public Choices getBestMatch(String fieldKey, String query, Collection collection,
                                 String locale);
+
+    /**
+     * Wrapper that calls getTopChoices method of the plugin.
+     *
+     * @param authorityName authority name
+     * @param start         choice at which to start, 0 is first.
+     * @param limit         maximum number of choices to return, 0 for no limit.
+     * @param locale        explicit localization key if available, or null
+     * @return a Choices object (never null).
+     * @see org.dspace.content.authority.ChoiceAuthority#getTopChoices(java.lang.String, int, int, java.lang.String)
+     */
+    public Choices getTopChoices(String authorityName, int start, int limit, String locale);
+
+    /**
+     * Wrapper that calls getChoicesByParent method of the plugin.
+     *
+     * @param authorityName authority name
+     * @param parentId      parent Id
+     * @param start         choice at which to start, 0 is first.
+     * @param limit         maximum number of choices to return, 0 for no limit.
+     * @param locale        explicit localization key if available, or null
+     * @return a Choices object (never null).
+     * @see org.dspace.content.authority.ChoiceAuthority#getChoicesByParent(java.lang.String, java.lang.String,
+     *  int, int, java.lang.String)
+     */
+    public Choices getChoicesByParent(String authorityName, String parentId, int start, int limit, String locale);
 
     /**
      * Wrapper that calls getLabel method of the plugin corresponding to
@@ -172,31 +216,5 @@ public interface ChoiceAuthorityService {
      * This method has been created to have a way of clearing the cache kept inside the service
      */
     public void clearCache();
-
-    /**
-     * Wrapper that calls getTopChoices method of the plugin.
-     *
-     * @param authorityName authority name
-     * @param start         choice at which to start, 0 is first.
-     * @param limit         maximum number of choices to return, 0 for no limit.
-     * @param locale        explicit localization key if available, or null
-     * @return a Choices object (never null).
-     * @see org.dspace.content.authority.ChoiceAuthority#getTopChoices(java.lang.String, int, int, java.lang.String)
-     */
-    public Choices getTopChoices(String authorityName, int start, int limit, String locale);
-
-    /**
-     * Wrapper that calls getChoicesByParent method of the plugin.
-     *
-     * @param authorityName authority name
-     * @param parentId      parent Id
-     * @param start         choice at which to start, 0 is first.
-     * @param limit         maximum number of choices to return, 0 for no limit.
-     * @param locale        explicit localization key if available, or null
-     * @return a Choices object (never null).
-     * @see org.dspace.content.authority.ChoiceAuthority#getChoicesByParent(java.lang.String, java.lang.String,
-     *  int, int, java.lang.String)
-     */
-    public Choices getChoicesByParent(String authorityName, String parentId, int start, int limit, String locale);
 
 }
