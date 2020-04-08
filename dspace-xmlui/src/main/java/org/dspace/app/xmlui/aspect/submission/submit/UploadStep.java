@@ -10,7 +10,11 @@ package org.dspace.app.xmlui.aspect.submission.submit;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 
 import org.apache.avalon.framework.parameters.Parameters;
 import org.apache.cocoon.ProcessingException;
@@ -393,7 +397,7 @@ public class UploadStep extends AbstractSubmissionStep
                 div.setHead(T_sherpa_title);
 
                 //Since sherpa web service doesn't work reliable with more than 1 issn, perform the service for each issn
-                java.util.List<String> issns = sherpaSubmitService.getISSNs(context, item);
+                Set<String> issns = sherpaSubmitService.getISSNs(context, item);
                 Iterator<String> issnsIterator = issns.iterator();
 
                 int i = 0;

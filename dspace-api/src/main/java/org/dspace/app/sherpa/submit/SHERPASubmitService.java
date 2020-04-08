@@ -7,13 +7,11 @@
  */
 package org.dspace.app.sherpa.submit;
 
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.app.sherpa.v2.SHERPAResponse;
 import org.dspace.app.sherpa.SHERPAService;
@@ -42,7 +40,7 @@ public class SHERPASubmitService
 
     public SHERPAResponse searchRelatedJournals(Context context, Item item)
     {
-        List<String> issns = getISSNs(context, item);
+        Set<String> issns = getISSNs(context, item);
         if (issns == null || issns.size() == 0)
         {
             return null;
@@ -71,9 +69,9 @@ public class SHERPASubmitService
         return sherpaService.searchByJournalISSN(issn);
     }
 
-    public List<String> getISSNs(Context context, Item item)
+    public Set<String> getISSNs(Context context, Item item)
     {
-        List<String> issns = new ArrayList<>();
+        Set<String> issns = new LinkedHashSet<>();
         if (configuration.getIssnItemExtractors() == null)
         {
             log.warn(LogManager.getHeader(context, "searchRelatedJournals",
@@ -96,7 +94,7 @@ public class SHERPASubmitService
 
     public boolean hasISSNs(Context context, Item item)
     {
-        List<String> issns = getISSNs(context, item);
+        Set<String> issns = getISSNs(context, item);
         if (issns == null || issns.size() == 0)
         {
             return false;
