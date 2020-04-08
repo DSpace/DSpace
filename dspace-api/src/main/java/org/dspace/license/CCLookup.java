@@ -128,7 +128,7 @@ public class CCLookup {
                 // add if not filtered
                 String liD = ((Attribute) xp_LicenseID.selectSingleNode(license)).getValue();
                 if (!lcFilter.contains(liD)) {
-                    this.licenses.add(new CCLicense(liD, license.getText(), i));
+//                    this.licenses.add(new CCLicense(liD, license.getText(), i));
                 }
             }
         } catch (JaxenException jaxen_e) {
@@ -213,30 +213,30 @@ public class CCLookup {
         for (int i = 0; i < results.size(); i++) {
             Element field = (Element) results.get(i);
 
-            try {
-                // create the field object
-                CCLicenseField cclicensefield = new CCLicenseField(
-                    ((Attribute) xp_LicenseID.selectSingleNode(field)).getValue(),
-                    ((Element) xp_Label.selectSingleNode(field)).getText());
-
-                // extract additional properties
-                cclicensefield.setDescription(((Element) xp_Description.selectSingleNode(field)).getText());
-                cclicensefield.setType(((Element) xp_FieldType.selectSingleNode(field)).getText());
-
-                enumOptions = xp_Enum.selectNodes(field);
-
-                for (int j = 0; j < enumOptions.size(); j++) {
-                    String id = ((Attribute) xp_LicenseID.selectSingleNode(enumOptions.get(j))).getValue();
-                    String label = ((Element) xp_Label.selectSingleNode(enumOptions.get(j))).getText();
-
-                    cclicensefield.getEnum().put(id, label);
-
-                } // for each enum option
-
-                this.licenseFields.add(cclicensefield);
-            } catch (JaxenException e) {
-                return null;
-            }
+//            try {
+//                // create the field object
+//                CCLicenseField cclicensefield = new CCLicenseField(
+//                    ((Attribute) xp_LicenseID.selectSingleNode(field)).getValue(),
+//                    ((Element) xp_Label.selectSingleNode(field)).getText());
+//
+//                // extract additional properties
+//                cclicensefield.setDescription(((Element) xp_Description.selectSingleNode(field)).getText());
+//                cclicensefield.setType(((Element) xp_FieldType.selectSingleNode(field)).getText());
+//
+//                enumOptions = xp_Enum.selectNodes(field);
+//
+//                for (int j = 0; j < enumOptions.size(); j++) {
+//                    String id = ((Attribute) xp_LicenseID.selectSingleNode(enumOptions.get(j))).getValue();
+//                    String label = ((Element) xp_Label.selectSingleNode(enumOptions.get(j))).getText();
+//
+////                    cclicensefield.getEnum().put(id, label);
+//
+//                } // for each enum option
+//
+//                this.licenseFields.add(cclicensefield);
+//            } catch (JaxenException e) {
+//                return null;
+//            }
         }
 
         return licenseFields;

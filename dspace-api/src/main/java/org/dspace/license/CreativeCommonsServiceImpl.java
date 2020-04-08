@@ -82,8 +82,12 @@ public class CreativeCommonsServiceImpl implements CreativeCommonsService, Initi
     protected BundleService bundleService;
     @Autowired(required = true)
     protected ItemService itemService;
+    @Autowired
+    protected CCLicenseConnectorService ccLicenseConnectorService;
 
     protected ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
+
+    private List<CCLicense> ccLicenses;
 
     protected CreativeCommonsServiceImpl() {
 
@@ -103,8 +107,8 @@ public class CreativeCommonsServiceImpl implements CreativeCommonsService, Initi
 
         try {
             templates = TransformerFactory.newInstance().newTemplates(
-                new StreamSource(CreativeCommonsServiceImpl.class
-                                     .getResourceAsStream("CreativeCommons.xsl")));
+                    new StreamSource(CreativeCommonsServiceImpl.class
+                                             .getResourceAsStream("CreativeCommons.xsl")));
         } catch (TransformerConfigurationException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -120,7 +124,7 @@ public class CreativeCommonsServiceImpl implements CreativeCommonsService, Initi
     // create the CC bundle if it doesn't exist
     // If it does, remove it and create a new one.
     protected Bundle getCcBundle(Context context, Item item)
-        throws SQLException, AuthorizeException, IOException {
+            throws SQLException, AuthorizeException, IOException {
         List<Bundle> bundles = itemService.getBundles(item, CC_BUNDLE_NAME);
 
         if ((bundles.size() > 0) && (bundles.get(0) != null)) {
@@ -131,8 +135,8 @@ public class CreativeCommonsServiceImpl implements CreativeCommonsService, Initi
 
     @Override
     public void setLicenseRDF(Context context, Item item, String licenseRdf)
-        throws SQLException, IOException,
-        AuthorizeException {
+            throws SQLException, IOException,
+            AuthorizeException {
         Bundle bundle = getCcBundle(context, item);
         // set the format
         BitstreamFormat bs_rdf_format = bitstreamFormatService.findByShortDescription(context, "RDF XML");
@@ -144,7 +148,7 @@ public class CreativeCommonsServiceImpl implements CreativeCommonsService, Initi
     @Override
     public void setLicense(Context context, Item item,
                            InputStream licenseStm, String mimeType)
-        throws SQLException, IOException, AuthorizeException {
+            throws SQLException, IOException, AuthorizeException {
         Bundle bundle = getCcBundle(context, item);
 
         // set the format
@@ -160,9 +164,9 @@ public class CreativeCommonsServiceImpl implements CreativeCommonsService, Initi
         Bitstream bs = bitstreamService.create(context, bundle, licenseStm);
         bs.setSource(context, CC_BS_SOURCE);
         bs.setName(context, (mimeType != null &&
-            (mimeType.equalsIgnoreCase("text/xml") ||
-                mimeType.equalsIgnoreCase("text/rdf"))) ?
-            BSN_LICENSE_RDF : BSN_LICENSE_TEXT);
+                (mimeType.equalsIgnoreCase("text/xml") ||
+                        mimeType.equalsIgnoreCase("text/rdf"))) ?
+                BSN_LICENSE_RDF : BSN_LICENSE_TEXT);
         bs.setFormat(context, bs_format);
         bitstreamService.update(context, bs);
     }
@@ -170,7 +174,7 @@ public class CreativeCommonsServiceImpl implements CreativeCommonsService, Initi
 
     @Override
     public void removeLicense(Context context, Item item)
-        throws SQLException, IOException, AuthorizeException {
+            throws SQLException, IOException, AuthorizeException {
         // remove CC license bundle if one exists
         List<Bundle> bundles = itemService.getBundles(item, CC_BUNDLE_NAME);
 
@@ -181,7 +185,7 @@ public class CreativeCommonsServiceImpl implements CreativeCommonsService, Initi
 
     @Override
     public boolean hasLicense(Context context, Item item)
-        throws SQLException, IOException {
+            throws SQLException, IOException {
         // try to find CC license bundle
         List<Bundle> bundles = itemService.getBundles(item, CC_BUNDLE_NAME);
 
@@ -203,20 +207,20 @@ public class CreativeCommonsServiceImpl implements CreativeCommonsService, Initi
 
     @Override
     public String getLicenseRDF(Context context, Item item) throws SQLException,
-        IOException, AuthorizeException {
+            IOException, AuthorizeException {
         return getStringFromBitstream(context, item, BSN_LICENSE_RDF);
     }
 
     @Override
     public Bitstream getLicenseRdfBitstream(Item item) throws SQLException,
-        IOException, AuthorizeException {
+            IOException, AuthorizeException {
         return getBitstream(item, BSN_LICENSE_RDF);
     }
 
     @Deprecated
     @Override
     public Bitstream getLicenseTextBitstream(Item item) throws SQLException,
-        IOException, AuthorizeException {
+            IOException, AuthorizeException {
         return getBitstream(item, BSN_LICENSE_TEXT);
     }
 
@@ -237,8 +241,8 @@ public class CreativeCommonsServiceImpl implements CreativeCommonsService, Initi
 
         try {
             templates.newTransformer().transform(
-                new JDOMSource(license),
-                new StreamResult(result)
+                    new JDOMSource(license),
+                    new StreamResult(result)
             );
         } catch (TransformerException e) {
             throw new IllegalStateException(e.getMessage(), e);
@@ -267,7 +271,7 @@ public class CreativeCommonsServiceImpl implements CreativeCommonsService, Initi
      */
     protected void setBitstreamFromBytes(Context context, Item item, Bundle bundle,
                                          String bitstream_name, BitstreamFormat format, byte[] bytes)
-        throws SQLException, IOException, AuthorizeException {
+            throws SQLException, IOException, AuthorizeException {
         ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
         Bitstream bs = bitstreamService.create(context, bundle, bais);
 
@@ -297,7 +301,7 @@ public class CreativeCommonsServiceImpl implements CreativeCommonsService, Initi
      */
     protected String getStringFromBitstream(Context context, Item item,
                                             String bitstream_name) throws SQLException, IOException,
-        AuthorizeException {
+            AuthorizeException {
         byte[] bytes = getBytesFromBitstream(context, item, bitstream_name);
 
         if (bytes == null) {
@@ -320,7 +324,7 @@ public class CreativeCommonsServiceImpl implements CreativeCommonsService, Initi
      *                            to perform a particular action.
      */
     protected Bitstream getBitstream(Item item, String bitstream_name)
-        throws SQLException, IOException, AuthorizeException {
+            throws SQLException, IOException, AuthorizeException {
         Bundle cc_bundle = null;
 
         // look for the CC bundle
@@ -342,7 +346,7 @@ public class CreativeCommonsServiceImpl implements CreativeCommonsService, Initi
     }
 
     protected byte[] getBytesFromBitstream(Context context, Item item, String bitstream_name)
-        throws SQLException, IOException, AuthorizeException {
+            throws SQLException, IOException, AuthorizeException {
         Bitstream bs = getBitstream(item, bitstream_name);
 
         // no such bitstream
@@ -368,7 +372,7 @@ public class CreativeCommonsServiceImpl implements CreativeCommonsService, Initi
     @Override
     public void removeLicense(Context context, LicenseMetadataValue uriField,
                               LicenseMetadataValue nameField, Item item)
-        throws AuthorizeException, IOException, SQLException {
+            throws AuthorizeException, IOException, SQLException {
         // only remove any previous licenses
         String licenseUri = uriField.ccItemValue(item);
         if (licenseUri != null) {
@@ -381,6 +385,28 @@ public class CreativeCommonsServiceImpl implements CreativeCommonsService, Initi
                 removeLicense(context, item);
             }
         }
+    }
+
+    /**
+     * Find all CC Licenses using the default language found in the configuration
+     * @return A list of available CC Licenses
+     */
+    public List<CCLicense> findAllCCLicenses() {
+        String language = configurationService.getProperty("cc.license.locale", "en");
+        return findAllCCLicenses(language);
+    }
+
+    /**
+     * Find all CC Licenses for the provided language
+     * @param language  - the language for which to find the CC Licenses
+     * @return A list of available CC Licenses for the provided language
+     */
+    public List<CCLicense> findAllCCLicenses(String language) {
+
+        if (ccLicenses == null || ccLicenses.isEmpty()) {
+            ccLicenses = ccLicenseConnectorService.retrieveLicenses(language);
+        }
+        return ccLicenses;
     }
 
 }
