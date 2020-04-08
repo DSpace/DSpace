@@ -12,9 +12,6 @@ import static org.apache.http.HttpStatus.SC_NO_CONTENT;
 import static org.apache.http.HttpStatus.SC_UNPROCESSABLE_ENTITY;
 import static org.dspace.app.rest.utils.ContextUtil.obtainContext;
 import static org.dspace.app.rest.utils.RegexUtils.REGEX_UUID;
-import static org.dspace.app.util.AuthorizeUtil.authorizeManageAdminGroup;
-import static org.dspace.app.util.AuthorizeUtil.authorizeManageSubmittersGroup;
-import static org.dspace.app.util.AuthorizeUtil.authorizeManageWorkflowsGroup;
 import static org.springframework.web.bind.annotation.RequestMethod.DELETE;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
@@ -32,19 +29,13 @@ import javax.servlet.http.HttpServletResponse;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.GroupRest;
 import org.dspace.app.rest.utils.Utils;
+import org.dspace.app.util.AuthorizeUtil;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.service.AuthorizeService;
-import org.dspace.content.Collection;
-import org.dspace.content.Community;
-import org.dspace.content.DSpaceObject;
-import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.eperson.service.GroupService;
-import org.dspace.xmlworkflow.storedcomponents.CollectionRole;
-import org.dspace.xmlworkflow.storedcomponents.service.CollectionRoleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -64,12 +55,6 @@ public class GroupRestController {
 
     @Autowired
     private EPersonService ePersonService;
-
-    @Autowired
-    private AuthorizeService authorizeService;
-
-    @Autowired
-    private CollectionRoleService collectionRoleService;
 
     @Autowired
     Utils utils;
@@ -94,7 +79,7 @@ public class GroupRestController {
             throw new ResourceNotFoundException("parent group is not found for uuid: " + uuid);
         }
 
-        checkAuthorization(context, parentGroup);
+        AuthorizeUtil.checkAuthorizationOnGroup(context, parentGroup);
 
         List<String> groupLinks = utils.getStringListFromRequest(request);
 
@@ -154,7 +139,7 @@ public class GroupRestController {
             throw new ResourceNotFoundException("parent group is not found for uuid: " + uuid);
         }
 
-        checkAuthorization(context, parentGroup);
+        AuthorizeUtil.checkAuthorizationOnGroup(context, parentGroup);
 
         List<String> memberLinks = utils.getStringListFromRequest(request);
 
@@ -210,7 +195,7 @@ public class GroupRestController {
             throw new ResourceNotFoundException("parent group is not found for uuid: " + parentUUID);
         }
 
-        checkAuthorization(context, parentGroup);
+        AuthorizeUtil.checkAuthorizationOnGroup(context, parentGroup);
 
         Group childGroup = groupService.find(context, childUUID);
         if (childGroup == null) {
@@ -245,7 +230,7 @@ public class GroupRestController {
             throw new ResourceNotFoundException("parent group is not found for uuid: " + parentUUID);
         }
 
-        checkAuthorization(context, parentGroup);
+        AuthorizeUtil.checkAuthorizationOnGroup(context, parentGroup);
 
         EPerson childGroup = ePersonService.find(context, memberUUID);
         if (childGroup == null) {
@@ -257,58 +242,5 @@ public class GroupRestController {
         context.complete();
 
         response.setStatus(SC_NO_CONTENT);
-    }
-
-    /**
-     * This method checks whether the current user has sufficient rights to modify the group.
-     * Depending on the kind of group and due to delegated administration, separate checks need to be done to verify
-     * whether the user is allowed to modify the group.
-     *
-     * @param context the context of which the user will be checked
-     * @param group   the group to be checked
-     * @throws SQLException
-     * @throws AuthorizeException
-     */
-    private void checkAuthorization(Context context, Group group) throws SQLException, AuthorizeException {
-
-        if (authorizeService.isAdmin(context)) {
-            return;
-        }
-
-        DSpaceObject parentObject = groupService.getParentObject(context, group);
-        if (parentObject == null) {
-            throw new AuthorizeException("not authorized to manage this group");
-        }
-        if (parentObject.getType() == Constants.COLLECTION) {
-            Collection collection = (Collection) parentObject;
-
-            if (group.equals(collection.getSubmitters())) {
-                authorizeManageSubmittersGroup(context, collection);
-                return;
-            }
-
-
-            List<CollectionRole> collectionRoles = collectionRoleService.findByCollection(context, collection);
-            for (CollectionRole role : collectionRoles) {
-                if (group.equals(role.getGroup())) {
-                    authorizeManageWorkflowsGroup(context, collection);
-                    return;
-                }
-            }
-
-            if (group.equals(collection.getAdministrators())) {
-                authorizeManageAdminGroup(context, collection);
-                return;
-            }
-
-
-        }
-        if (parentObject.getType() == Constants.COMMUNITY) {
-            Community community = (Community) parentObject;
-            authorizeManageAdminGroup(context, community);
-            return;
-        }
-
-        throw new AuthorizeException("not authorized to manage this group");
     }
 }

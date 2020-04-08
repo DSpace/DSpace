@@ -15,10 +15,10 @@ import javax.servlet.http.HttpServletRequest;
 import org.dspace.app.rest.model.CommunityRest;
 import org.dspace.app.rest.model.GroupRest;
 import org.dspace.app.rest.projection.Projection;
-import org.dspace.authorize.service.AuthorizeService;
+import org.dspace.app.util.AuthorizeUtil;
+import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Community;
 import org.dspace.content.service.CommunityService;
-import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.eperson.Group;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,9 +37,6 @@ public class CommunityAdminGroupLinkRepository extends AbstractDSpaceRestReposit
 
     @Autowired
     private CommunityService communityService;
-
-    @Autowired
-    private AuthorizeService authorizeService;
 
     /**
      * This method is responsible for retrieving the AdminGroup of a Community
@@ -60,8 +57,9 @@ public class CommunityAdminGroupLinkRepository extends AbstractDSpaceRestReposit
             if (community == null) {
                 throw new ResourceNotFoundException("No such community: " + communityId);
             }
-            if (!authorizeService.isAdmin(context) && !authorizeService.authorizeActionBoolean(context, community,
-                                                                                               Constants.ADMIN, true)) {
+            try {
+                AuthorizeUtil.authorizeManageAdminGroup(context, community);
+            } catch (AuthorizeException e) {
                 throw new AccessDeniedException("The current user was not allowed to retrieve the AdminGroup for" +
                                                     " community: " + communityId);
             }

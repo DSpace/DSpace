@@ -53,7 +53,6 @@ import org.dspace.usage.UsageWorkflowEvent;
 import org.dspace.workflowbasic.service.BasicWorkflowItemService;
 import org.dspace.workflowbasic.service.BasicWorkflowService;
 import org.dspace.workflowbasic.service.TaskListItemService;
-import org.dspace.xmlworkflow.WorkflowConfigurationException;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class BasicWorkflowServiceImpl implements BasicWorkflowService {
@@ -1219,7 +1218,7 @@ public class BasicWorkflowServiceImpl implements BasicWorkflowService {
 
     @Override
     public Group createWorkflowRoleGroup(Context context, Collection collection, String roleName)
-        throws AuthorizeException, SQLException, IOException, WorkflowConfigurationException {
+        throws AuthorizeException, SQLException {
         return getWorkflowRoleGroup(context, collection, roleName, null);
     }
 

@@ -101,7 +101,7 @@ public class CommunityMatcher {
                 "self",
                 "parentCommunity",
                 "subcommunities",
-                 "adminGroup"
+                "adminGroup"
         );
     }
 

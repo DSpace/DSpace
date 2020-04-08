@@ -156,6 +156,7 @@ public class CollectionBuilder extends AbstractDSpaceObjectBuilder<Collection> {
     @Override
     public void cleanup() throws Exception {
         deleteAdminGroup();
+        deleteDefaultReadGroups(collection);
         deleteWorkflowGroups(collection);
         delete(collection);
     }
@@ -175,6 +176,27 @@ public class CollectionBuilder extends AbstractDSpaceObjectBuilder<Collection> {
         try (Context c = new Context()) {
             c.turnOffAuthorisationSystem();
 
+            for (int i = 1; i <= 3; i++) {
+                Group g = collectionService.getWorkflowGroup(c, collection, i);
+                if (g != null) {
+                    Group attachedDso = c.reloadEntity(g);
+                    if (attachedDso != null) {
+                        collectionService.setWorkflowGroup(c, collection, i, null);
+                        groupService.delete(c, attachedDso);
+                    }
+                }
+            }
+            c.complete();
+        }
+
+        indexingService.commit();
+    }
+
+    public void deleteDefaultReadGroups(Collection collection) throws Exception {
+
+        try (Context c = new Context()) {
+            c.turnOffAuthorisationSystem();
+
             Group defaultItemReadGroup = groupService.findByName(c, "COLLECTION_" +
                 collection.getID().toString() + "_ITEM_DEFAULT_READ");
             Group defaultBitstreamReadGroup = groupService.findByName(c, "COLLECTION_" +
@@ -186,16 +208,6 @@ public class CollectionBuilder extends AbstractDSpaceObjectBuilder<Collection> {
                 groupService.delete(c, defaultBitstreamReadGroup);
             }
 
-            for (int i = 1; i <= 3; i++) {
-                Group g = collectionService.getWorkflowGroup(c, collection, i);
-                if (g != null) {
-                    Group attachedDso = c.reloadEntity(g);
-                    if (attachedDso != null) {
-                        collectionService.setWorkflowGroup(c, collection, i, null);
-                        groupService.delete(c, attachedDso);
-                    }
-                }
-            }
             c.complete();
         }
 

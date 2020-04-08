@@ -15,10 +15,10 @@ import javax.servlet.http.HttpServletRequest;
 import org.dspace.app.rest.model.CollectionRest;
 import org.dspace.app.rest.model.GroupRest;
 import org.dspace.app.rest.projection.Projection;
-import org.dspace.authorize.service.AuthorizeService;
+import org.dspace.app.util.AuthorizeUtil;
+import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.service.CollectionService;
-import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.eperson.Group;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,9 +37,6 @@ public class CollectionSubmitterGroupLinkRepository extends AbstractDSpaceRestRe
 
     @Autowired
     private CollectionService collectionService;
-
-    @Autowired
-    private AuthorizeService authorizeService;
 
     /**
      * This method is responsible for retrieving the Submittergroup of a Collection
@@ -60,8 +57,9 @@ public class CollectionSubmitterGroupLinkRepository extends AbstractDSpaceRestRe
             if (collection == null) {
                 throw new ResourceNotFoundException("No such collection: " + collectionId);
             }
-            if (!authorizeService.isAdmin(context) && !authorizeService.authorizeActionBoolean(context, collection,
-                                                                                               Constants.ADMIN, true)) {
+            try {
+                AuthorizeUtil.authorizeManageSubmittersGroup(context, collection);
+            } catch (AuthorizeException e) {
                 throw new AccessDeniedException("The current user was not allowed to retrieve the submitterGroup for" +
                                                     " collection: " + collectionId);
             }
