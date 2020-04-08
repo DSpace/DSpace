@@ -504,6 +504,8 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
         final Group workflowGroup = col1.getWorkflowStep1(context);
         final String name = workflowGroup.getName();
 
+        context.restoreAuthSystemState();
+
         String token = getAuthToken(admin.getEmail(), password);
 
         List<Operation> ops = new ArrayList<>();
@@ -525,11 +527,9 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     @Test
     public void patchPermanentGroupUnprocessable() throws Exception {
-        context.turnOffAuthorisationSystem();
         GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
         final Group group = groupService.findByName(context, Group.ANONYMOUS);
         final String name = group.getName();
-        context.restoreAuthSystemState();
         String token = getAuthToken(admin.getEmail(), password);
 
         List<Operation> ops = new ArrayList<>();
@@ -1690,67 +1690,46 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     @Test
     public void deleteGroupUnprocessableTest() throws Exception {
-        Collection col1 = null;
-        Community child1 = null;
-        Group workflowGroup = null;
-        try {
-            context.turnOffAuthorisationSystem();
+        context.turnOffAuthorisationSystem();
 
-            EPerson reviewer1 = EPersonBuilder.createEPerson(context)
-                    .withEmail("reviewer1@example.com")
-                    .withPassword(password)
-                    .build();
+        EPerson reviewer1 = EPersonBuilder.createEPerson(context)
+                .withEmail("reviewer1@example.com")
+                .withPassword(password)
+                .build();
 
-            parentCommunity = CommunityBuilder.createCommunity(context)
-                    .withName("Parent Community")
-                    .build();
-            child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
-                    .withName("Sub Community")
-                    .build();
-            col1 = CollectionBuilder.createCollection(context, child1)
-                    .withName("Collection 1")
-                    .withWorkflowGroup(1, admin, reviewer1)
-                    .build();
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                .withName("Parent Community")
+                .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                .withName("Sub Community")
+                .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1)
+                .withName("Collection 1")
+                .withWorkflowGroup(1, admin, reviewer1)
+                .build();
+        Group workflowGroup = col1.getWorkflowStep1(context);
 
-            workflowGroup = col1.getWorkflowStep1(context);
-            context.restoreAuthSystemState();
+        context.restoreAuthSystemState();
 
-            String authToken = getAuthToken(admin.getEmail(), password);
+        String authToken = getAuthToken(admin.getEmail(), password);
 
-            getClient(authToken).perform(
-                    get("/api/eperson/groups/" + workflowGroup.getID())
-            ).andExpect(status().isOk());
+        getClient(authToken).perform(
+                get("/api/eperson/groups/" + workflowGroup.getID())
+        ).andExpect(status().isOk());
 
-            getClient(authToken).perform(
-                    delete("/api/eperson/groups/" + workflowGroup.getID())
-            ).andExpect(status().isUnprocessableEntity());
+        getClient(authToken).perform(
+                delete("/api/eperson/groups/" + workflowGroup.getID())
+        ).andExpect(status().isUnprocessableEntity());
 
-            getClient(authToken).perform(
-                    get("/api/eperson/groups/" + workflowGroup.getID())
-            ).andExpect(status().isOk());
-        } finally {
-            if (col1 != null) {
-                CollectionBuilder.deleteCollection(col1.getID());
-            }
-            if (child1 != null) {
-                CommunityBuilder.deleteCommunity(child1.getID());
-            }
-            if (parentCommunity != null) {
-                CommunityBuilder.deleteCommunity(parentCommunity.getID());
-            }
-            if (workflowGroup != null) {
-                GroupBuilder.deleteGroup(workflowGroup.getID());
-            }
-        }
-
+        getClient(authToken).perform(
+                get("/api/eperson/groups/" + workflowGroup.getID())
+        ).andExpect(status().isOk());
     }
 
     @Test
     public void deletePermanentGroupUnprocessableTest() throws Exception {
-        context.turnOffAuthorisationSystem();
         GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
         final Group group = groupService.findByName(context, Group.ANONYMOUS);
-        context.restoreAuthSystemState();
 
         String authToken = getAuthToken(admin.getEmail(), password);
 
@@ -1770,38 +1749,28 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     @Test
     public void deleteGroupForbiddenTest() throws Exception {
+        context.turnOffAuthorisationSystem();
 
-        Group parentGroup = null;
+        Group parentGroup = GroupBuilder.createGroup(context)
+                .withName("test group")
+                .build();
 
-        try {
-            context.turnOffAuthorisationSystem();
+        context.restoreAuthSystemState();
 
-            parentGroup = GroupBuilder.createGroup(context)
-                    .withName("test group")
-                    .build();
+        String adminToken = getAuthToken(admin.getEmail(), password);
+        String authToken = getAuthToken(eperson.getEmail(), password);
 
-            context.restoreAuthSystemState();
+        getClient(adminToken).perform(
+                get("/api/eperson/groups/" + parentGroup.getID())
+        ).andExpect(status().isOk());
 
-            String adminToken = getAuthToken(admin.getEmail(), password);
-            String authToken = getAuthToken(eperson.getEmail(), password);
+        getClient(authToken).perform(
+                delete("/api/eperson/groups/" + parentGroup.getID())
+        ).andExpect(status().isForbidden());
 
-            getClient(adminToken).perform(
-                    get("/api/eperson/groups/" + parentGroup.getID())
-            ).andExpect(status().isOk());
-
-            getClient(authToken).perform(
-                    delete("/api/eperson/groups/" + parentGroup.getID())
-            ).andExpect(status().isForbidden());
-
-            getClient(adminToken).perform(
-                    get("/api/eperson/groups/" + parentGroup.getID())
-            ).andExpect(status().isOk());
-
-        } finally {
-            if (parentGroup != null) {
-                GroupBuilder.deleteGroup(parentGroup.getID());
-            }
-        }
+        getClient(adminToken).perform(
+                get("/api/eperson/groups/" + parentGroup.getID())
+        ).andExpect(status().isOk());
     }
 
     @Test
@@ -1815,131 +1784,77 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     @Test
     public void getGroupObjectCommunityTest() throws Exception {
-        Community community = null;
-        Group adminGroup = null;
+        context.turnOffAuthorisationSystem();
+        Community community = CommunityBuilder.createCommunity(context)
+                .withName("Parent Community")
+                .withAdminGroup(admin)
+                .build();
+        Group adminGroup = community.getAdministrators();
+        context.restoreAuthSystemState();
 
-        try {
-            context.turnOffAuthorisationSystem();
-            community =  CommunityBuilder.createCommunity(context)
-                    .withName("Parent Community")
-                    .withAdminGroup(admin)
-                    .build();
-            adminGroup = community.getAdministrators();
-            context.restoreAuthSystemState();
-
-            String authToken = getAuthToken(admin.getEmail(), password);
-            getClient(authToken).perform(
-                    get("/api/eperson/groups/" + adminGroup.getID() + "/object")
-            ).andExpect(status().isOk());
-        } finally {
-            if (community != null) {
-                CommunityBuilder.deleteCommunity(community.getID());
-            }
-            if (adminGroup != null) {
-                GroupBuilder.deleteGroup(adminGroup.getID());
-            }
-        }
+        String authToken = getAuthToken(admin.getEmail(), password);
+        getClient(authToken).perform(
+                get("/api/eperson/groups/" + adminGroup.getID() + "/object")
+        ).andExpect(status().isOk());
     }
 
     @Test
     public void getGroupObjectCollectionTest() throws Exception {
-        Community community = null;
-        Collection collection = null;
-        Group adminGroup = null;
-        Group worfklowGroup = null;
-        Group submitterGroup = null;
+        context.turnOffAuthorisationSystem();
+        Community community = CommunityBuilder.createCommunity(context)
+                .withName("Parent Community")
+                .withAdminGroup(admin)
+                .build();
+        Collection collection = CollectionBuilder.createCollection(context, community)
+                .withName("Collection")
+                .withAdminGroup(admin)
+                .withWorkflowGroup(1, admin)
+                .withSubmitterGroup(admin)
+                .build();
+        Group adminGroup = collection.getAdministrators();
+        Group worfklowGroup = collection.getWorkflowStep1(context);
+        Group submitterGroup = collection.getSubmitters();
+        context.restoreAuthSystemState();
 
-        try {
-            context.turnOffAuthorisationSystem();
-            community = CommunityBuilder.createCommunity(context)
-                    .withName("Parent Community")
-                    .withAdminGroup(admin)
-                    .build();
-            collection = CollectionBuilder.createCollection(context, community)
-                    .withName("Collection")
-                    .withAdminGroup(admin)
-                    .withWorkflowGroup(1, admin)
-                    .withSubmitterGroup(admin)
-                    .build();
-            adminGroup = collection.getAdministrators();
-            worfklowGroup = collection.getWorkflowStep1(context);
-            submitterGroup = collection.getSubmitters();
-            context.restoreAuthSystemState();
-
-            String authToken = getAuthToken(admin.getEmail(), password);
-            getClient(authToken).perform(
-                    get("/api/eperson/groups/" + adminGroup.getID() + "/object")
-            ).andExpect(status().isOk());
-            getClient(authToken).perform(
-                    get("/api/eperson/groups/" + worfklowGroup.getID() + "/object")
-            ).andExpect(status().isOk());
-            getClient(authToken).perform(
-                    get("/api/eperson/groups/" + submitterGroup.getID() + "/object")
-            ).andExpect(status().isOk());
-        } finally {
-            if (collection != null) {
-                CollectionBuilder.deleteCollection(collection.getID());
-            }
-            if (community != null) {
-                CommunityBuilder.deleteCommunity(community.getID());
-            }
-            if (adminGroup != null) {
-                GroupBuilder.deleteGroup(adminGroup.getID());
-            }
-            if (worfklowGroup != null) {
-                GroupBuilder.deleteGroup(worfklowGroup.getID());
-            }
-            if (submitterGroup != null) {
-                GroupBuilder.deleteGroup(submitterGroup.getID());
-            }
-        }
+        String authToken = getAuthToken(admin.getEmail(), password);
+        getClient(authToken).perform(
+                get("/api/eperson/groups/" + adminGroup.getID() + "/object")
+        ).andExpect(status().isOk());
+        getClient(authToken).perform(
+                get("/api/eperson/groups/" + worfklowGroup.getID() + "/object")
+        ).andExpect(status().isOk());
+        getClient(authToken).perform(
+                get("/api/eperson/groups/" + submitterGroup.getID() + "/object")
+        ).andExpect(status().isOk());
     }
 
     @Test
     public void getGroupObjectNotFoundTest() throws Exception {
-        Group adminGroup = null;
-        try {
-            context.turnOffAuthorisationSystem();
-            adminGroup = GroupBuilder.createGroup(context)
-                    .withName("test group")
-                    .build();
-            context.restoreAuthSystemState();
+        context.turnOffAuthorisationSystem();
+        Group adminGroup = GroupBuilder.createGroup(context)
+                .withName("test group")
+                .build();
+        context.restoreAuthSystemState();
 
-            String authToken = getAuthToken(admin.getEmail(), password);
-            getClient(authToken).perform(
-                    get("/api/eperson/groups/" + adminGroup.getID() + "/object")
-            ).andExpect(status().isNoContent());
-        } finally {
-            if (adminGroup != null) {
-                GroupBuilder.deleteGroup(adminGroup.getID());
-            }
-        }
+        String authToken = getAuthToken(admin.getEmail(), password);
+        getClient(authToken).perform(
+                get("/api/eperson/groups/" + adminGroup.getID() + "/object")
+        ).andExpect(status().isNoContent());
     }
 
     @Test
     public void getGroupObjectUnauthorizedTest() throws Exception {
-        Group adminGroup = null;
-        Community community = null;
-        try {
-            context.turnOffAuthorisationSystem();
-            community = CommunityBuilder.createCommunity(context)
-                    .withName("Parent Community")
-                    .withAdminGroup(admin)
-                    .build();
-            adminGroup = community.getAdministrators();
-            context.restoreAuthSystemState();
+        context.turnOffAuthorisationSystem();
+        Community community = CommunityBuilder.createCommunity(context)
+                .withName("Parent Community")
+                .withAdminGroup(admin)
+                .build();
+        Group adminGroup = community.getAdministrators();
+        context.restoreAuthSystemState();
 
-            getClient().perform(
-                    get("/api/eperson/groups/" + adminGroup.getID() + "/object")
-            ).andExpect(status().isUnauthorized());
-        } finally {
-            if (community != null) {
-                CommunityBuilder.deleteCommunity(community.getID());
-            }
-            if (adminGroup != null) {
-                GroupBuilder.deleteGroup(adminGroup.getID());
-            }
-        }
+        getClient().perform(
+                get("/api/eperson/groups/" + adminGroup.getID() + "/object")
+        ).andExpect(status().isUnauthorized());
     }
 
     @Test
