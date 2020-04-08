@@ -242,7 +242,7 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Hiera
         } catch (XPathExpressionException e) {
             log.warn(e.getMessage(), e);
         }
-        return new Choice("", "", "");
+        return null;
     }
 
     private void readNode(String[] authorities, String[] values, String[] labels, String[] parent,
@@ -323,7 +323,7 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Hiera
                 return choice;
             }
         }
-        return new Choice("", "", "");
+        return null;
     }
 
     @Override
