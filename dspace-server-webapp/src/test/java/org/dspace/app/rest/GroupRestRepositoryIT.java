@@ -17,15 +17,20 @@ import static org.springframework.data.rest.webmvc.RestMediaTypes.TEXT_URI_LIST_
 import static org.springframework.http.MediaType.parseMediaType;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
+import javax.ws.rs.core.MediaType;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.dspace.app.rest.builder.CollectionBuilder;
 import org.dspace.app.rest.builder.CommunityBuilder;
 import org.dspace.app.rest.builder.EPersonBuilder;
 import org.dspace.app.rest.builder.GroupBuilder;
@@ -34,9 +39,12 @@ import org.dspace.app.rest.matcher.HalMatcher;
 import org.dspace.app.rest.model.GroupRest;
 import org.dspace.app.rest.model.MetadataRest;
 import org.dspace.app.rest.model.MetadataValueRest;
+import org.dspace.app.rest.model.patch.Operation;
+import org.dspace.app.rest.model.patch.ReplaceOperation;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.app.rest.test.MetadataPatchSuite;
 import org.dspace.authorize.service.ResourcePolicyService;
+import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CommunityService;
@@ -448,6 +456,97 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
         String token = getAuthToken(asUser.getEmail(), password);
 
         new MetadataPatchSuite().runWith(getClient(token), "/api/eperson/groups/" + group.getID(), expectedStatus);
+    }
+
+    @Test
+    public void patchGroupName() throws Exception {
+        context.turnOffAuthorisationSystem();
+        Group group = GroupBuilder.createGroup(context).withName("Group").build();
+        context.restoreAuthSystemState();
+        String token = getAuthToken(admin.getEmail(), password);
+
+        List<Operation> ops = new ArrayList<>();
+        ReplaceOperation replaceOperation = new ReplaceOperation("/name", "new name");
+        ops.add(replaceOperation);
+        String requestBody = getPatchContent(ops);
+        getClient(token)
+                .perform(patch("/api/eperson/groups/" + group.getID()).content(requestBody)
+                                 .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                .andExpect(status().isOk());
+        getClient(token)
+                .perform(get("/api/eperson/groups/" + group.getID()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", Matchers.is(
+                        GroupMatcher.matchGroupEntry(group.getID(), "new name"))
+                ));
+    }
+
+    @Test
+    public void patchGroupWithParentUnprocessable() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        EPerson reviewer1 = EPersonBuilder.createEPerson(context)
+                .withEmail("reviewer1@example.com")
+                .withPassword(password)
+                .build();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                .withName("Parent Community")
+                .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                .withName("Sub Community")
+                .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1)
+                .withName("Collection 1")
+                .withWorkflowGroup(1, admin, reviewer1)
+                .build();
+
+        final Group workflowGroup = col1.getWorkflowStep1(context);
+        final String name = workflowGroup.getName();
+
+        context.restoreAuthSystemState();
+
+        String token = getAuthToken(admin.getEmail(), password);
+
+        List<Operation> ops = new ArrayList<>();
+        ReplaceOperation replaceOperation = new ReplaceOperation("/name", "new name");
+        ops.add(replaceOperation);
+        String requestBody = getPatchContent(ops);
+        getClient(token)
+                .perform(patch("/api/eperson/groups/" + workflowGroup.getID()).content(requestBody)
+                                 .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                .andExpect(status().isUnprocessableEntity());
+
+        getClient(token)
+                .perform(get("/api/eperson/groups/" + workflowGroup.getID()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", Matchers.is(
+                        GroupMatcher.matchGroupEntry(workflowGroup.getID(), name))
+                ));
+    }
+
+    @Test
+    public void patchPermanentGroupUnprocessable() throws Exception {
+        GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
+        final Group group = groupService.findByName(context, Group.ANONYMOUS);
+        final String name = group.getName();
+        String token = getAuthToken(admin.getEmail(), password);
+
+        List<Operation> ops = new ArrayList<>();
+        ReplaceOperation replaceOperation = new ReplaceOperation("/name", "new name");
+        ops.add(replaceOperation);
+        String requestBody = getPatchContent(ops);
+        getClient(token)
+                .perform(patch("/api/eperson/groups/" + group.getID()).content(requestBody)
+                                 .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                .andExpect(status().isUnprocessableEntity());
+
+        getClient(token)
+                .perform(get("/api/eperson/groups/" + group.getID()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", Matchers.is(
+                        GroupMatcher.matchGroupEntry(group.getID(), name))
+                ));
     }
 
     @Test
@@ -1538,4 +1637,252 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
             }
         }
     }
+
+    @Test
+    public void deleteGroupTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        Group parentGroup = GroupBuilder.createGroup(context)
+                .withName("test group")
+                .build();
+
+        context.restoreAuthSystemState();
+
+        String authToken = getAuthToken(admin.getEmail(), password);
+
+        getClient(authToken).perform(
+                get("/api/eperson/groups/" + parentGroup.getID())
+        ).andExpect(status().isOk());
+
+        getClient(authToken).perform(
+                delete("/api/eperson/groups/" + parentGroup.getID())
+        ).andExpect(status().isNoContent());
+
+        getClient(authToken).perform(
+                get("/api/eperson/groups/" + parentGroup.getID())
+        ).andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void deleteGroupUnauthorizedTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        Group parentGroup = GroupBuilder.createGroup(context)
+                .withName("test group")
+                .build();
+
+        context.restoreAuthSystemState();
+
+        String authToken = getAuthToken(admin.getEmail(), password);
+
+        getClient(authToken).perform(
+                get("/api/eperson/groups/" + parentGroup.getID())
+        ).andExpect(status().isOk());
+
+        getClient().perform(
+                delete("/api/eperson/groups/" + parentGroup.getID())
+        ).andExpect(status().isUnauthorized());
+
+        getClient(authToken).perform(
+                get("/api/eperson/groups/" + parentGroup.getID())
+        ).andExpect(status().isOk());
+    }
+
+    @Test
+    public void deleteGroupUnprocessableTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        EPerson reviewer1 = EPersonBuilder.createEPerson(context)
+                .withEmail("reviewer1@example.com")
+                .withPassword(password)
+                .build();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                .withName("Parent Community")
+                .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                .withName("Sub Community")
+                .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1)
+                .withName("Collection 1")
+                .withWorkflowGroup(1, admin, reviewer1)
+                .build();
+        Group workflowGroup = col1.getWorkflowStep1(context);
+
+        context.restoreAuthSystemState();
+
+        String authToken = getAuthToken(admin.getEmail(), password);
+
+        getClient(authToken).perform(
+                get("/api/eperson/groups/" + workflowGroup.getID())
+        ).andExpect(status().isOk());
+
+        getClient(authToken).perform(
+                delete("/api/eperson/groups/" + workflowGroup.getID())
+        ).andExpect(status().isUnprocessableEntity());
+
+        getClient(authToken).perform(
+                get("/api/eperson/groups/" + workflowGroup.getID())
+        ).andExpect(status().isOk());
+    }
+
+    @Test
+    public void deletePermanentGroupUnprocessableTest() throws Exception {
+        GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
+        final Group group = groupService.findByName(context, Group.ANONYMOUS);
+
+        String authToken = getAuthToken(admin.getEmail(), password);
+
+        getClient(authToken).perform(
+                get("/api/eperson/groups/" + group.getID())
+        ).andExpect(status().isOk());
+
+        getClient(authToken).perform(
+                delete("/api/eperson/groups/" + group.getID())
+        ).andExpect(status().isUnprocessableEntity());
+
+        getClient(authToken).perform(
+                get("/api/eperson/groups/" + group.getID())
+        ).andExpect(status().isOk());
+
+    }
+
+    @Test
+    public void deleteGroupForbiddenTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        Group parentGroup = GroupBuilder.createGroup(context)
+                .withName("test group")
+                .build();
+
+        context.restoreAuthSystemState();
+
+        String adminToken = getAuthToken(admin.getEmail(), password);
+        String authToken = getAuthToken(eperson.getEmail(), password);
+
+        getClient(adminToken).perform(
+                get("/api/eperson/groups/" + parentGroup.getID())
+        ).andExpect(status().isOk());
+
+        getClient(authToken).perform(
+                delete("/api/eperson/groups/" + parentGroup.getID())
+        ).andExpect(status().isForbidden());
+
+        getClient(adminToken).perform(
+                get("/api/eperson/groups/" + parentGroup.getID())
+        ).andExpect(status().isOk());
+    }
+
+    @Test
+    public void deleteGroupNotFoundTest() throws Exception {
+        String authToken = getAuthToken(admin.getEmail(), password);
+
+        getClient(authToken).perform(
+                delete("/api/eperson/groups/" + UUID.randomUUID())
+        ).andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void getGroupObjectCommunityTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        Community community = CommunityBuilder.createCommunity(context)
+                .withName("Parent Community")
+                .withAdminGroup(admin)
+                .build();
+        Group adminGroup = community.getAdministrators();
+        context.restoreAuthSystemState();
+
+        String authToken = getAuthToken(admin.getEmail(), password);
+        getClient(authToken).perform(
+                get("/api/eperson/groups/" + adminGroup.getID() + "/object")
+        ).andExpect(status().isOk());
+    }
+
+    @Test
+    public void getGroupObjectCollectionTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        Community community = CommunityBuilder.createCommunity(context)
+                .withName("Parent Community")
+                .withAdminGroup(admin)
+                .build();
+        Collection collection = CollectionBuilder.createCollection(context, community)
+                .withName("Collection")
+                .withAdminGroup(admin)
+                .withWorkflowGroup(1, admin)
+                .withSubmitterGroup(admin)
+                .build();
+        Group adminGroup = collection.getAdministrators();
+        Group worfklowGroup = collection.getWorkflowStep1(context);
+        Group submitterGroup = collection.getSubmitters();
+        context.restoreAuthSystemState();
+
+        String authToken = getAuthToken(admin.getEmail(), password);
+        getClient(authToken).perform(
+                get("/api/eperson/groups/" + adminGroup.getID() + "/object")
+        ).andExpect(status().isOk());
+        getClient(authToken).perform(
+                get("/api/eperson/groups/" + worfklowGroup.getID() + "/object")
+        ).andExpect(status().isOk());
+        getClient(authToken).perform(
+                get("/api/eperson/groups/" + submitterGroup.getID() + "/object")
+        ).andExpect(status().isOk());
+    }
+
+    @Test
+    public void getGroupObjectNotFoundTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        Group adminGroup = GroupBuilder.createGroup(context)
+                .withName("test group")
+                .build();
+        context.restoreAuthSystemState();
+
+        String authToken = getAuthToken(admin.getEmail(), password);
+        getClient(authToken).perform(
+                get("/api/eperson/groups/" + adminGroup.getID() + "/object")
+        ).andExpect(status().isNoContent());
+    }
+
+    @Test
+    public void getGroupObjectUnauthorizedTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        Community community = CommunityBuilder.createCommunity(context)
+                .withName("Parent Community")
+                .withAdminGroup(admin)
+                .build();
+        Group adminGroup = community.getAdministrators();
+        context.restoreAuthSystemState();
+
+        getClient().perform(
+                get("/api/eperson/groups/" + adminGroup.getID() + "/object")
+        ).andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    public void patchNameTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        String testGroupName = "Test group";
+        Group group = GroupBuilder.createGroup(context)
+                .withName(testGroupName)
+                .build();
+        context.restoreAuthSystemState();
+
+        String newName = "New test name";
+        List<Operation> ops = new ArrayList<>();
+        ReplaceOperation replaceOperation = new ReplaceOperation("/name", newName);
+        ops.add(replaceOperation);
+        String patchBody = getPatchContent(ops);
+
+        String token = getAuthToken(admin.getEmail(), password);
+
+        // updates email
+        getClient(token).perform(
+                patch("/api/eperson/groups/" + group.getID())
+                        .content(patchBody)
+                        .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                .andExpect(jsonPath("$.name", Matchers.is(newName)))
+                .andExpect(status().isOk());
+    }
+
+
 }
