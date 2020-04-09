@@ -225,6 +225,6 @@ public interface SolrLoggerService {
 
     public void commitShard(String shard) throws Exception;
 
-    public Object anonymiseIp(String ip) throws UnknownHostException;
+    public Object anonymizeIp(String ip) throws UnknownHostException;
 
 }

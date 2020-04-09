@@ -50,7 +50,7 @@ public class AnonymizeStatistics {
 
     private static Logger log = getLogger(AnonymizeStatistics.class);
     private static Context context = new Context();
-    private static String action = "anonymise_statistics";
+    private static String action = "anonymize_statistics";
 
     private static final String HELP_OPTION = "h";
     private static final String SLEEP_OPTION = "s";
@@ -66,13 +66,13 @@ public class AnonymizeStatistics {
     private static int batchSize = 100;
     private static int threads = 2;
 
-    private static final Object ANONYMISED = configurationService.getProperty("anonymise_statistics.dns_mask", "anonymised");
+    private static final Object ANONYMIZE = configurationService.getProperty("anonymize_statistics.dns_mask", "anonymized");
 
     private static final String TIME_LIMIT;
 
     static {
         Calendar calendar = Calendar.getInstance();
-        calendar.add(DAY_OF_YEAR, -configurationService.getIntProperty("anonymise_statistics.time_limit", 90));
+        calendar.add(DAY_OF_YEAR, -configurationService.getIntProperty("anonymize_statistics.time_threshold", 90));
         TIME_LIMIT = format(calendar, DATE_FORMAT_8601);
     }
 
@@ -84,7 +84,7 @@ public class AnonymizeStatistics {
     public static void main(String... args) throws ParseException {
 
         parseCommandLineOptions(createCommandLineOptions(), args);
-        anonymiseStatistics();
+        anonymizeStatistics();
     }
 
     private static Options createCommandLineOptions() {
@@ -167,7 +167,7 @@ public class AnonymizeStatistics {
     }
 
 
-    private static void anonymiseStatistics() {
+    private static void anonymizeStatistics() {
         try {
             long updated = 0;
             long total = getDocuments().getResults().getNumFound();
@@ -231,7 +231,7 @@ public class AnonymizeStatistics {
 
         return solrLoggerService.query(
                 "ip:*",
-                "time:[* TO " + TIME_LIMIT + "] AND -dns:" + ANONYMISED,
+                "time:[* TO " + TIME_LIMIT + "] AND -dns:" + ANONYMIZE,
                 null, batchSize, -1, null, null, null, null, null, false, false, true
         );
     }
@@ -256,8 +256,8 @@ public class AnonymizeStatistics {
                         "dns"
                     ),
                     asList(
-                        singletonList(solrLoggerService.anonymiseIp(document.getFieldValue("ip").toString())),
-                        singletonList(ANONYMISED)
+                        singletonList(solrLoggerService.anonymizeIp(document.getFieldValue("ip").toString())),
+                        singletonList(ANONYMIZE)
                     ),
                     false
                 );
