@@ -8,6 +8,9 @@
 package org.dspace.app.rest;
 
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
+import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadata;
+import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadataDoesNotExist;
+import static org.dspace.core.Constants.WRITE;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
@@ -25,6 +28,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.dspace.app.rest.builder.CollectionBuilder;
 import org.dspace.app.rest.builder.CommunityBuilder;
 import org.dspace.app.rest.builder.EPersonBuilder;
+import org.dspace.app.rest.builder.ResourcePolicyBuilder;
 import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.matcher.CollectionMatcher;
 import org.dspace.app.rest.matcher.CommunityMatcher;
@@ -1269,5 +1273,98 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
         getClient().perform(get("/api/core/collections/" + col1.getID())
                                 .param("projection", "level"))
                    .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void testHiddenMetadataForAonymousUser() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withName("Collection 1")
+                                           .withProvenance("Provenance Data")
+                                           .build();
+
+        context.restoreAuthSystemState();
+
+
+        getClient().perform(get("/api/core/collections/" + col1.getID())
+                                         .param("projection", "full"))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$", CollectionMatcher.matchFullEmbeds()))
+                        .andExpect(jsonPath("$", CollectionMatcher.matchProperties(col1.getName(),
+                                                                                   col1.getID(),
+                                                                                   col1.getHandle())))
+                        .andExpect(jsonPath("$.metadata", matchMetadata("dc.title", "Collection 1")))
+                   .andExpect(jsonPath("$.metadata", matchMetadataDoesNotExist("dc.description.provenance")));
+
+    }
+
+
+    @Test
+    public void testHiddenMetadataForAdminUser() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withName("Collection 1")
+                                           .withProvenance("Provenance Data")
+                                           .build();
+
+
+
+        context.restoreAuthSystemState();
+
+        String token = getAuthToken(admin.getEmail(), password);
+
+        getClient(token).perform(get("/api/core/collections/" + col1.getID())
+                                         .param("projection", "full"))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$", CollectionMatcher.matchFullEmbeds()))
+                        .andExpect(jsonPath("$", CollectionMatcher.matchProperties(col1.getName(),
+                                                                              col1.getID(),
+                                                                              col1.getHandle())))
+                        .andExpect(jsonPath("$.metadata", matchMetadata("dc.title", "Collection 1")))
+                        .andExpect(jsonPath("$.metadata",
+                                            matchMetadata("dc.description.provenance", "Provenance Data")));
+    }
+
+    @Test
+    public void testHiddenMetadataForUserWithWriteRights() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withName("Collection 1")
+                                           .withProvenance("Provenance Data")
+                                           .build();
+
+
+
+        ResourcePolicyBuilder.createResourcePolicy(context)
+                             .withUser(eperson)
+                             .withAction(WRITE)
+                             .withDspaceObject(col1)
+                             .build();
+        context.restoreAuthSystemState();
+
+        String token = getAuthToken(eperson.getEmail(), password);
+
+        getClient(token).perform(get("/api/core/collections/" + col1.getID())
+                                         .param("projection", "full"))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$", CollectionMatcher.matchFullEmbeds()))
+                        .andExpect(jsonPath("$", CollectionMatcher.matchProperties(col1.getName(),
+                                                                              col1.getID(),
+                                                                              col1.getHandle())))
+                        .andExpect(jsonPath("$.metadata", matchMetadata("dc.title", "Collection 1")))
+                        .andExpect(jsonPath("$.metadata.['dc.description.provenance']").doesNotExist());
+
     }
 }
