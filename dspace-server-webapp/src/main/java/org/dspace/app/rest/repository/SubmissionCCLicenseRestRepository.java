@@ -27,18 +27,20 @@ public class SubmissionCCLicenseRestRepository extends DSpaceRestRepository<Subm
     @Autowired
     protected CreativeCommonsService creativeCommonsService;
 
-
+    @Override
     public SubmissionCCLicenseRest findOne(final Context context, final String s) {
         return null;
     }
 
+    @Override
     public Page<SubmissionCCLicenseRest> findAll(final Context context, final Pageable pageable) {
 
         List<CCLicense> allCCLicenses = creativeCommonsService.findAllCCLicenses();
         return converter.toRestPage(utils.getPage(allCCLicenses, pageable), utils.obtainProjection());
     }
 
+    @Override
     public Class<SubmissionCCLicenseRest> getDomainClass() {
-        return null;
+        return SubmissionCCLicenseRest.class;
     }
 }

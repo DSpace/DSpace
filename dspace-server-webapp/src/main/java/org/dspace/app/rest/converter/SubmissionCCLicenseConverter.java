@@ -52,6 +52,7 @@ public class SubmissionCCLicenseConverter implements DSpaceConverter<CCLicense, 
         return submissionCCLicenseRest;
     }
 
+    @Override
     public Class<CCLicense> getModelClass() {
         return CCLicense.class;
     }

@@ -59,19 +59,21 @@ public class CCLicenseConnectorServiceImpl implements CCLicenseConnectorService,
 
     /**
      * Retrieves the CC Licenses for the provided language from the CC License API
+     *
      * @param language - the language to retrieve the licenses for
      * @return a list of licenses obtained for the provided languages
      */
     public List<CCLicense> retrieveLicenses(String language) {
         String ccLicenseUrl = configurationService.getProperty("cc.api.rooturl");
 
-        HttpGet httpGet = new HttpGet(ccLicenseUrl + "/?locale=" + language);
+        String uri = ccLicenseUrl + "/?locale=" + language;
+        HttpGet httpGet = new HttpGet(uri);
 
         List<String> licenses;
         try (CloseableHttpResponse response = client.execute(httpGet)) {
             licenses = retrieveLicenses(response);
         } catch (JDOMException | JaxenException | IOException e) {
-            log.error(e);
+            log.error("Error while retrieving the license details using url: " + uri, e);
             licenses = Collections.emptyList();
         }
 
@@ -79,12 +81,13 @@ public class CCLicenseConnectorServiceImpl implements CCLicenseConnectorService,
 
         for (String license : licenses) {
 
-            HttpGet licenseHttpGet = new HttpGet(ccLicenseUrl + "/license/" + license);
+            String licenseUri = ccLicenseUrl + "/license/" + license;
+            HttpGet licenseHttpGet = new HttpGet(licenseUri);
             try (CloseableHttpResponse response = client.execute(licenseHttpGet)) {
-                CCLicense ccLicense = retrieveLicenseObject(response);
+                CCLicense ccLicense = retrieveLicenseObject(license, response);
                 ccLicenses.add(ccLicense);
             } catch (JaxenException | JDOMException | IOException e) {
-                log.error(e);
+                log.error("Error while retrieving the license details using url: " + licenseUri, e);
             }
         }
 
@@ -94,6 +97,7 @@ public class CCLicenseConnectorServiceImpl implements CCLicenseConnectorService,
     /**
      * Retrieve the list of licenses from the response from the CC License API and remove the licenses configured
      * to be excluded
+     *
      * @param response The response from the API
      * @return a list of license identifiers for which details need to be retrieved
      * @throws IOException
@@ -111,14 +115,16 @@ public class CCLicenseConnectorServiceImpl implements CCLicenseConnectorService,
         JDOMXPath licenseClassXpath = new JDOMXPath("//licenses/license");
 
 
-        InputSource is = new InputSource(new StringReader(responseString));
-        org.jdom.Document classDoc = this.parser.build(is);
+        try (StringReader stringReader = new StringReader(responseString)) {
+            InputSource is = new InputSource(stringReader);
+            org.jdom.Document classDoc = this.parser.build(is);
 
-        List<Element> elements = licenseClassXpath.selectNodes(classDoc);
-        for (Element element : elements) {
-            String licenseId = getSingleNodeValue(element, "@id");
-            if (StringUtils.isNotBlank(licenseId) && !ArrayUtils.contains(excludedLicenses, licenseId)) {
-                domains.add(licenseId);
+            List<Element> elements = licenseClassXpath.selectNodes(classDoc);
+            for (Element element : elements) {
+                String licenseId = getSingleNodeValue(element, "@id");
+                if (StringUtils.isNotBlank(licenseId) && !ArrayUtils.contains(excludedLicenses, licenseId)) {
+                    domains.add(licenseId);
+                }
             }
         }
 
@@ -128,13 +134,15 @@ public class CCLicenseConnectorServiceImpl implements CCLicenseConnectorService,
 
     /**
      * Parse the response for a single CC License and return the corresponding CC License Object
-     * @param response for a specific CC License response
+     *
+     * @param licenseId the license id of the CC License to retrieve
+     * @param response  for a specific CC License response
      * @return the corresponding CC License Object
      * @throws IOException
      * @throws JaxenException
      * @throws JDOMException
      */
-    private CCLicense retrieveLicenseObject(CloseableHttpResponse response)
+    private CCLicense retrieveLicenseObject(final String licenseId, CloseableHttpResponse response)
             throws IOException, JaxenException, JDOMException {
 
         String responseString = EntityUtils.toString(response.getEntity());
@@ -144,26 +152,24 @@ public class CCLicenseConnectorServiceImpl implements CCLicenseConnectorService,
         JDOMXPath licenseFieldXpath = new JDOMXPath("field");
 
 
-        InputSource is;
+        try (StringReader stringReader = new StringReader(responseString)) {
+            InputSource is = new InputSource(stringReader);
 
-        is = new InputSource(new StringReader(responseString));
+            org.jdom.Document classDoc = this.parser.build(is);
 
-        org.jdom.Document classDoc = this.parser.build(is);
+            Object element = licenseClassXpath.selectSingleNode(classDoc);
+            String licenseLabel = getSingleNodeValue(element, "label");
 
-        Object element = licenseClassXpath.selectSingleNode(classDoc);
-        String licenseId = getSingleNodeValue(element, "@id");
-        String licenseLabel = getSingleNodeValue(element, "label");
+            List<CCLicenseField> ccLicenseFields = new LinkedList<>();
 
-        List<CCLicenseField> ccLicenseFields = new LinkedList<>();
+            List<Element> licenseFields = licenseFieldXpath.selectNodes(element);
+            for (Element licenseField : licenseFields) {
+                CCLicenseField ccLicenseField = parseLicenseField(licenseField);
+                ccLicenseFields.add(ccLicenseField);
+            }
 
-        List<Element> licenseFields = licenseFieldXpath.selectNodes(element);
-        for (Element licenseField : licenseFields) {
-            CCLicenseField ccLicenseField = parseLicenseField(licenseField);
-            ccLicenseFields.add(ccLicenseField);
+            return new CCLicense(licenseId, licenseLabel, ccLicenseFields);
         }
-
-
-        return new CCLicense(licenseId, licenseLabel, ccLicenseFields);
     }
 
     private CCLicenseField parseLicenseField(final Element licenseField) throws JaxenException {
