@@ -128,4 +128,7 @@ public interface GroupDAO extends DSpaceObjectDAO<Group>, DSpaceObjectLegacySupp
      */
     Group findByIdAndMembership(Context context, UUID id, EPerson ePerson) throws SQLException;
 
+    List<Group> getAllParentGroups(Context context, UUID groupUuid) throws SQLException;
+    //List<Group> getAllParentGroups(Context context, LinkedList<UUID> groupUuid) throws SQLException;
+
 }

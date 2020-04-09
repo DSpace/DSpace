@@ -12,6 +12,7 @@ import java.io.InputStream;
 import java.net.URLConnection;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 
@@ -224,7 +225,6 @@ public class BitstreamResource extends Resource
         try
         {
             context = createContext();
-            List<org.dspace.content.Bitstream> dspaceBitstreams = bitstreamService.findAll(context);
 
             if (!((limit != null) && (limit >= 0) && (offset != null) && (offset >= 0)))
             {
@@ -233,8 +233,19 @@ public class BitstreamResource extends Resource
                 offset = 0;
             }
 
+            Iterator<org.dspace.content.Bitstream> dspaceBitstreams = bitstreamService.findAllAuthorized(context, limit, offset);
+
+            while(dspaceBitstreams.hasNext()) {
+                org.dspace.content.Bitstream dspaceBitstream = dspaceBitstreams.next();
+
+                bitstreams.add(new Bitstream(dspaceBitstream, servletContext, expand, context));
+                writeStats(dspaceBitstream, UsageEvent.Action.VIEW, user_ip, user_agent,
+                        xforwardedfor, headers, request, context);
+
+            }
+
             // TODO If bitstream doesn't exist, throws exception.
-            for (int i = offset; (i < (offset + limit)) && (i < dspaceBitstreams.size()); i++)
+            /*for (int i = offset; (i < (offset + limit)) && (i < dspaceBitstreams.size()); i++)
             {
                 if (authorizeService.authorizeActionBoolean(context, dspaceBitstreams.get(i), org.dspace.core.Constants.READ))
                 {
@@ -246,7 +257,7 @@ public class BitstreamResource extends Resource
                                 xforwardedfor, headers, request, context);
                     }
                 }
-            }
+            }*/
 
             context.complete();
             log.trace("Bitstreams were successfully read.");

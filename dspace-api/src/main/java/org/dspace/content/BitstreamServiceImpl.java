@@ -20,6 +20,8 @@ import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
+import org.dspace.eperson.Group;
+import org.dspace.eperson.service.GroupService;
 import org.dspace.event.Event;
 import org.dspace.storage.bitstore.service.BitstreamStorageService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,9 +29,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
-import java.util.Iterator;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * Service implementation for the Bitstream object.
@@ -48,6 +48,8 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
     protected BitstreamDAO bitstreamDAO;
     @Autowired(required = true)
     protected ItemService itemService;
+    @Autowired(required = true)
+    protected GroupService groupService;
 
 
     @Autowired(required = true)
@@ -93,6 +95,12 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
     public List<Bitstream> findAll(Context context) throws SQLException
     {
         return bitstreamDAO.findAll(context, Bitstream.class);
+    }
+
+    @Override
+    public Iterator<Bitstream> findAll(Context context, int limit, int offset) throws SQLException
+    {
+        return bitstreamDAO.findAll(context, limit, offset);
     }
 
     @Override
@@ -331,15 +339,15 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
                 return null;
             }
         }
-        else
-        if(bitstream.getCommunity() != null)
+        else if(bitstream.getCommunity() != null)
         {
             return bitstream.getCommunity();
-        }else
-        if(bitstream.getCollection() != null)
+        }
+        else if(bitstream.getCollection() != null)
         {
             return bitstream.getCollection();
         }
+
         return null;
     }
 
@@ -478,5 +486,21 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
     @Override
     public List<Bitstream> getNotReferencedBitstreams(Context context) throws SQLException {
         return bitstreamDAO.getNotReferencedBitstreams(context);
+    }
+
+    @Override
+    public Iterator<Bitstream> findAllAuthorized(Context context, int pageSize, int pageOffset) throws SQLException{
+        //Looks if the context.currentUser() is admin or not
+        if(authorizeService.isAdmin(context)){
+            return findAll(context, pageSize, pageOffset);
+        }
+        Set<Group> groups = new HashSet<>();
+        if(context.getCurrentUser() == null){
+            groups.add(groupService.findByName(context, Group.ANONYMOUS));
+        }
+        else{
+            groups.addAll(groupService.allMemberGroupsSet(context, context.getCurrentUser()));
+        }
+        return bitstreamDAO.findAllAuthorized(context, pageSize, pageOffset, context.getCurrentUser(), Constants.READ, groups);
     }
 }

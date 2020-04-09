@@ -27,6 +27,8 @@ public interface BitstreamService extends DSpaceObjectService<Bitstream>, DSpace
 
     public List<Bitstream> findAll(Context context) throws SQLException;
 
+    public Iterator<Bitstream> findAll(Context context, int limit, int offset) throws SQLException;
+
     /**
      * Clone the given bitstream by firstly creating a new bitstream, with a new ID.
      * Then set the internal identifier, file size, checksum, and 
@@ -216,4 +218,6 @@ public interface BitstreamService extends DSpaceObjectService<Bitstream>, DSpace
     int countBitstreamsWithoutPolicy(Context context) throws SQLException;
 
     List<Bitstream> getNotReferencedBitstreams(Context context) throws SQLException;
+
+    Iterator<Bitstream> findAllAuthorized(Context context, int pageSize, int pageOffset) throws SQLException;
 }

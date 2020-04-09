@@ -185,4 +185,26 @@ public class GroupDAOImpl extends AbstractHibernateDSODAO<Group> implements Grou
         return count(createQuery(context, "SELECT count(*) FROM Group"));
     }
 
+    @Override
+    public List<Group> getAllParentGroups(Context context, UUID groupUuid) throws SQLException{
+        Query query = createQuery(context,
+                "SELECT gc.parent FROM Group2GroupCache gc " +
+                        "JOIN gc.child child " +
+                        "WHERE child.id = :groupId ");
+        query.setParameter("groupId", groupUuid);
+        query.setCacheable(true);
+        return query.list();
+    }
+
+    /*@Override
+    public List<Group> getAllParentGroups(Context context, LinkedList<UUID> groupUuid) throws SQLException{
+        Query query = createQuery(context,
+                "SELECT gc.parent FROM Group2GroupCache gc " +
+                        "JOIN gc.child child " +
+                        "WHERE child.id IN (:groupId) ");
+        query.setParameterList("groupId", groupUuid);
+        query.setCacheable(true);
+        return query.list();
+    }*/
+
 }

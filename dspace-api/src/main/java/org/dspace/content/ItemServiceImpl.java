@@ -12,8 +12,10 @@ import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import org.apache.commons.collections.CollectionUtils;
@@ -41,6 +43,7 @@ import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
+import org.dspace.eperson.service.GroupService;
 import org.dspace.event.Event;
 import org.dspace.harvest.HarvestedItem;
 import org.dspace.harvest.service.HarvestedItemService;
@@ -67,6 +70,9 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
 
     @Autowired(required = true)
     protected ItemDAO itemDAO;
+
+    @Autowired(required = true)
+    protected GroupService groupService;
 
     @Autowired(required = true)
     protected CommunityService communityService;
@@ -198,6 +204,11 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
     @Override
     public Iterator<Item> findAll(Context context) throws SQLException {
         return itemDAO.findAll(context, true);
+    }
+
+    @Override
+    public Iterator<Item> findAll(Context context, Integer limit, Integer offset) throws SQLException {
+        return itemDAO.findAll(context, true, limit, offset);
     }
 
     @Override
@@ -1287,5 +1298,35 @@ prevent the generation of resource policy entry values with null dspace_object a
         }
 
         return false;
+    }
+
+    @Override
+    public Iterator<Item> findAllAuthorized(Context context, int pageSize, int pageOffset) throws SQLException{
+        //Looks if the context.currentUser() is admin or not
+        if(authorizeService.isAdmin(context)){
+            return findAll(context, pageSize, pageOffset);
+        }
+        Set<Group> groups = getGroups(context);
+        return itemDAO.findAllAuthorized(context, pageSize, pageOffset, context.getCurrentUser(), Constants.READ, groups);
+    }
+    @Override
+    public int countTotalAuthorized(Context context) throws SQLException{
+        Set<Group> groups = getGroups(context);
+        if(authorizeService.isAdmin(context)){
+            return countTotal(context);
+        }
+        return itemDAO.countTotalAuthorized(context, context.getCurrentUser(), Constants.READ, groups);
+    }
+    private Set<Group> getGroups(Context context) throws SQLException {
+        Set<Group> groups = new HashSet<>();
+        if(context.getCurrentUser() == null){
+            Group anonGroup = groupService.findByName(context, Group.ANONYMOUS);
+            groups.add(anonGroup);
+            groups.addAll(groupService.getAllParentGroups(context, anonGroup.getID()));
+        }
+        else{
+            groups.addAll(groupService.allMemberGroupsSet(context, context.getCurrentUser()));
+        }
+        return groups;
     }
 }

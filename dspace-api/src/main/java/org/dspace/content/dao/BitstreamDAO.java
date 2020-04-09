@@ -12,10 +12,13 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
+import org.dspace.eperson.EPerson;
+import org.dspace.eperson.Group;
 
 import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Database Access Object interface class for the Bitstream object.
@@ -25,6 +28,8 @@ import java.util.List;
  * @author kevinvandevelde at atmire.com
  */
 public interface BitstreamDAO extends DSpaceObjectLegacySupportDAO<Bitstream> {
+
+    public Iterator<Bitstream> findAll(Context context, int limit, int offset) throws SQLException;
 
     public List<Bitstream> findDeletedBitstreams(Context context) throws SQLException;
 
@@ -49,4 +54,6 @@ public interface BitstreamDAO extends DSpaceObjectLegacySupportDAO<Bitstream> {
     int countWithNoPolicy(Context context) throws SQLException;
 
     List<Bitstream> getNotReferencedBitstreams(Context context) throws SQLException;
+
+    Iterator<Bitstream> findAllAuthorized(Context context, int pageSize, int pageOffset, EPerson currentUser, int action, Set<Group> groups) throws SQLException;
 }
