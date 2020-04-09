@@ -92,7 +92,7 @@ public abstract class DSpaceObjectConverter<M extends DSpaceObject, R extends or
                 }
             }
         } catch (SQLException e) {
-            log.error(e);
+            log.error("Error filtering metadata based on permissions", e);
         }
         return new MetadataValueList(metadata);
     }
