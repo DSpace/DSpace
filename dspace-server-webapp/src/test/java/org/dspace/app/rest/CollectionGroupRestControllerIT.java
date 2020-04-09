@@ -417,7 +417,6 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
     }
 
 
-    // This is currently not supported in DSpace API
     @Test
     public void deleteCollectionAdminGroupTestParentCommunityAdmin() throws Exception {
         context.turnOffAuthorisationSystem();
@@ -860,7 +859,6 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
     }
 
 
-    // This is currently not supported in DSpace API
     @Test
     public void deleteCollectionSubmittersGroupTestParentCommunityAdmin() throws Exception {
         context.turnOffAuthorisationSystem();
@@ -876,7 +874,6 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
                         .andExpect(status().isNoContent());
     }
 
-    // This is currently not supported in DSpace API
     @Test
     public void deleteCollectionSubmittersGroupTestCollectionAdmin() throws Exception {
         context.turnOffAuthorisationSystem();
@@ -1325,7 +1322,6 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
     }
 
 
-    // This is currently not supported in DSpace API
     @Test
     public void deleteCollectionDefaultItemReadGroupTestParentCommunityAdmin() throws Exception {
         context.turnOffAuthorisationSystem();
@@ -1348,7 +1344,6 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
                             jsonPath("$", GroupMatcher.matchGroupEntry(anon.getID(), anon.getName())));
     }
 
-    // This is currently not supported in DSpace API
     @Test
     public void deleteCollectionDefaultItemReadGroupTestCollectionAdmin() throws Exception {
         context.turnOffAuthorisationSystem();
@@ -1813,7 +1808,6 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
     }
 
 
-    // This is currently not supported in DSpace API
     @Test
     public void deleteCollectionDefaultBitstreamReadGroupTestParentCommunityAdmin() throws Exception {
         context.turnOffAuthorisationSystem();
@@ -1838,7 +1832,6 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
     }
 
-    // This is currently not supported in DSpace API
     @Test
     public void deleteCollectionDefaultBitstreamReadGroupTestCollectionAdmin() throws Exception {
         context.turnOffAuthorisationSystem();
@@ -2317,7 +2310,6 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
     }
 
 
-    // This is currently not supported in DSpace API
     @Test
     public void deleteCollectionWorkflowGroupTestParentCommunityAdmin() throws Exception {
         context.turnOffAuthorisationSystem();
@@ -2334,7 +2326,6 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
                         .andExpect(status().isNoContent());
     }
 
-    // This is currently not supported in DSpace API
     @Test
     public void deleteCollectionWorkflowGroupTestCollectionAdmin() throws Exception {
         context.turnOffAuthorisationSystem();
