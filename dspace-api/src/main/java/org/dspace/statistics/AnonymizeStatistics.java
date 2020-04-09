@@ -66,7 +66,7 @@ public class AnonymizeStatistics {
     private static int batchSize = 100;
     private static int threads = 2;
 
-    private static final Object ANONYMIZED = configurationService.getProperty("anonymize_statistics.dns_mask", "anonymized");
+    private static final Object DNS_MASK = configurationService.getProperty("anonymize_statistics.dns_mask", "anonymized");
 
     private static final String TIME_LIMIT;
 
@@ -231,7 +231,7 @@ public class AnonymizeStatistics {
 
         return solrLoggerService.query(
                 "ip:*",
-                "time:[* TO " + TIME_LIMIT + "] AND -dns:" + ANONYMIZED,
+                "time:[* TO " + TIME_LIMIT + "] AND -dns:" + DNS_MASK,
                 null, batchSize, -1, null, null, null, null, null, false, false, true
         );
     }
@@ -257,7 +257,7 @@ public class AnonymizeStatistics {
                     ),
                     asList(
                         singletonList(solrLoggerService.anonymizeIp(document.getFieldValue("ip").toString())),
-                        singletonList(ANONYMIZED)
+                        singletonList(DNS_MASK)
                     ),
                     false
                 );
