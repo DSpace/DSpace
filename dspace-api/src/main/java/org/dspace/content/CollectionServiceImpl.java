@@ -890,6 +890,7 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
         return collectionDAO.getCollectionsWithBitstreamSizesTotal(context);
     }
 
+    @Override
     public Group createDefaultReadGroup(Context context, Collection collection, String typeOfGroupString,
                                         int defaultRead)
         throws SQLException, AuthorizeException {
