@@ -556,7 +556,7 @@ public class AuthorizeUtil {
      * @throws SQLException
      * @throws AuthorizeException
      */
-    public static void checkAuthorizationOnGroup(Context context, Group group) throws SQLException, AuthorizeException {
+    public static void authorizeManageGroup(Context context, Group group) throws SQLException, AuthorizeException {
         AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
         GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
         CollectionRoleService collectionRoleService = XmlWorkflowServiceFactory.getInstance()

@@ -188,8 +188,6 @@ public class CollectionBuilder extends AbstractDSpaceObjectBuilder<Collection> {
             }
             c.complete();
         }
-
-        indexingService.commit();
     }
 
     public void deleteDefaultReadGroups(Collection collection) throws Exception {
@@ -210,8 +208,6 @@ public class CollectionBuilder extends AbstractDSpaceObjectBuilder<Collection> {
 
             c.complete();
         }
-
-        indexingService.commit();
     }
 
     @Override
