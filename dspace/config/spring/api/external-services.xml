@@ -4,31 +4,93 @@
     xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd"
     default-lazy-init="true">
 
-    <bean class="org.dspace.external.service.impl.ExternalDataServiceImpl"/>
+    <bean class="org.dspace.external.service.impl.ExternalDataServiceImpl">
+        <property name="externalDataProviders">
+            <util:list>
+                <ref bean="lcNameDataProvider"/>
+                <ref bean="sherpaJournalDataProvider"/>
+                <ref bean="sherpaPublisherDataProvider"/>
+                <ref bean="orcidV2AuthorDataProvider"/>
+            </util:list>
+        </property>
+    </bean>
 
-    <bean class="org.dspace.external.provider.impl.SherpaJournalDataProvider" init-method="init">
+    <bean class="org.dspace.external.provider.metadata.service.impl.MetadataSuggestionProviderServiceImpl">
+        <property name="metadataSuggestionProviders">
+            <util:list>
+                <ref bean="pubmedArticleMetadataSuggestionProvider"/>
+                <ref bean="orcidV2AuthorMetadataSuggestionProvider"/>
+            </util:list>
+        </property>
+    </bean>
+
+    <bean name="sherpaJournalDataProvider" class="org.dspace.external.provider.impl.SherpaJournalDataProvider" init-method="init">
         <property name="sourceIdentifier" value="sherpaJournal"/>
         <property name="url" value="${sherpa.romeo.url}"/>
         <!-- please register for a free api access key to get many benefits -->
         <property name="apiKey" value="${sherpa.romeo.apikey}"/>
 
     </bean>
-    <bean class="org.dspace.external.provider.impl.SherpaPublisherDataProvider">
+    <bean name="sherpaPublisherDataProvider" class="org.dspace.external.provider.impl.SherpaPublisherDataProvider">
         <property name="sourceIdentifier" value="sherpaPublisher"/>
         <property name="url" value="${sherpa.romeo.url}"/>
         <!-- please register for a free api access key to get many benefits -->
         <property name="apiKey" value="${sherpa.romeo.apikey}"/>
 
     </bean>
-    <bean class="org.dspace.external.provider.impl.OrcidV2AuthorDataProvider" init-method="init">
+    <bean name="orcidV2AuthorDataProvider" class="org.dspace.external.provider.impl.OrcidV2AuthorDataProvider" init-method="init">
         <constructor-arg value="${orcid.api.url}"/>
         <property name="sourceIdentifier" value="orcidV2"/>
         <property name="orcidUrl" value="${orcid.url}" />
     </bean>
 
-    <bean class="org.dspace.external.provider.impl.LCNameDataProvider">
+    <bean name="lcNameDataProvider" class="org.dspace.external.provider.impl.LCNameDataProvider">
         <property name="url" value="${lcname.url}"/>
         <property name="sourceIdentifier" value="lcname"/>
+    </bean>
+
+    <bean name="pubmedArticleDataProvider" class="org.dspace.external.provider.impl.PubmedArticleDataProvider" init-method="init">
+        <property name="sourceIdentifier" value="pubmed"/>
+        <!-- this bean is found in pubmed-integration.xml in order to keep this file clean and not bloated -->
+        <property name="metadataFieldMapping" ref="pubmedMetadataFieldList"/>
+        <property name="baseAddress" value="https://eutils.ncbi.nlm.nih.gov/entrez/eutils/"/>
+    </bean>
+
+    <bean name="orcidV2AuthorMetadataSuggestionProvider"
+        class="org.dspace.external.provider.metadata.impl.OrcidV2AuthorMetadataSuggestionProvider">
+        <property name="externalDataProvider" ref="orcidV2AuthorDataProvider"/>
+        <property name="id" value="orcidv2"/>
+        <property name="fileBased" value="false"/>
+        <property name="metadataBased" value="true"/>
+        <property name="queryBased" value="true"/>
+        <property name="metadataSuggestionProviderFilters">
+            <util:list>
+                <bean class="org.dspace.external.provider.metadata.filter.impl.MetadataSuggestionProviderEqualityFilter">
+                    <property name="metadataFieldString" value="relationship.type"/>
+                    <property name="value" value="author"/>
+                </bean>
+            </util:list>
+        </property>
+    </bean>
+
+    <bean name="pubmedArticleMetadataSuggestionProvider"
+        class="org.dspace.external.provider.metadata.impl.PubmedArticleMetadataSuggestionProvider">
+        <property name="externalDataProvider" ref="pubmedArticleDataProvider"/>
+        <property name="id" value="pubmed"/>
+        <property name="fileBased" value="false"/>
+        <property name="metadataBased" value="true"/>
+        <property name="queryBased" value="true"/>
+        <property name="metadataSuggestionProviderFilters">
+            <util:list>
+                <bean class="org.dspace.external.provider.metadata.filter.impl.MetadataSuggestionProviderEqualityFilter">
+                    <property name="metadataFieldString" value="relationship.type"/>
+                    <property name="value" value="publication"/>
+                </bean>
+                <bean class="org.dspace.external.provider.metadata.filter.impl.MetadataSuggestionProviderEmptyValueFilter">
+                    <property name="metadataFieldString" value="relationship.type"/>
+                </bean>
+            </util:list>
+        </property>
     </bean>
 </beans>
 

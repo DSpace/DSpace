@@ -27,8 +27,7 @@ import org.springframework.stereotype.Component;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 @Component
-public class ItemConverter
-    extends DSpaceObjectConverter<Item, ItemRest>
+public class ItemConverter extends DSpaceObjectConverter<Item, ItemRest>
     implements IndexableObjectConverter<Item, ItemRest> {
 
     @Autowired

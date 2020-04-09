@@ -8,30 +8,27 @@
 package org.dspace.app.rest.converter;
 
 import org.dspace.app.rest.model.MetadataValueRest;
+import org.dspace.app.rest.projection.Projection;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.dto.MetadataValueDTO;
-import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 
 /**
  * Converter to translate between domain {@link MetadataValue}s and {@link MetadataValueRest} representations.
  */
 @Component
-public class MetadataValueDTOConverter implements Converter<MetadataValueDTO, MetadataValueRest> {
+public class MetadataValueDTOConverter implements DSpaceConverter<MetadataValueDTO, MetadataValueRest> {
 
-    /**
-     * Gets a rest representation of the given domain metadata value.
-     *
-     * @param metadataValue the domain value.
-     * @return the rest representation.
-     */
     @Override
-    public MetadataValueRest convert(MetadataValueDTO metadataValue) {
+    public MetadataValueRest convert(MetadataValueDTO modelObject, Projection projection) {
         MetadataValueRest metadataValueRest = new MetadataValueRest();
-        metadataValueRest.setValue(metadataValue.getValue());
-        metadataValueRest.setLanguage(metadataValue.getLanguage());
-        metadataValueRest.setAuthority(metadataValue.getAuthority());
-        metadataValueRest.setConfidence(metadataValue.getConfidence());
-        return metadataValueRest;
+        metadataValueRest.setValue(modelObject.getValue());
+        metadataValueRest.setLanguage(modelObject.getLanguage());
+        metadataValueRest.setAuthority(modelObject.getAuthority());
+        metadataValueRest.setConfidence(modelObject.getConfidence());
+        return metadataValueRest;    }
+
+    public Class<MetadataValueDTO> getModelClass() {
+        return MetadataValueDTO.class;
     }
 }

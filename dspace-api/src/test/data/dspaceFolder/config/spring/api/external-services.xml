@@ -4,11 +4,63 @@
     xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd"
     default-lazy-init="true">
 
-    <bean class="org.dspace.external.service.impl.ExternalDataServiceImpl"/>
+    <bean class="org.dspace.external.service.impl.ExternalDataServiceImpl">
+        <property name="externalDataProviders">
+            <util:list>
+                <ref bean="mockDataProvider"/>
+            </util:list>
+        </property>
+    </bean>
 
-    <bean class="org.dspace.external.provider.impl.MockDataProvider" init-method="init">
+    <bean class="org.dspace.external.provider.metadata.service.impl.MetadataSuggestionProviderServiceImpl">
+        <property name="metadataSuggestionProviders">
+            <util:list>
+                <ref bean="mockMetadataSuggestionProvider1"/>
+                <ref bean="mockMetadataSuggestionProvider2"/>
+            </util:list>
+        </property>
+    </bean>
+
+    <bean name="mockDataProvider" class="org.dspace.external.provider.impl.MockDataProvider" init-method="init">
         <property name="sourceIdentifier" value="mock"/>
 
+    </bean>
+
+    <bean id="mockMetadataSuggestionProvider1" class="org.dspace.external.provider.metadata.impl.MockMetadataSuggestionProvider">
+        <property name="externalDataProvider" ref="mockDataProvider"/>
+        <property name="id" value="mock"/>
+        <property name="fileBased" value="false"/>
+        <property name="metadataBased" value="true"/>
+        <property name="queryBased" value="true"/>
+        <property name="metadataSuggestionProviderFilters">
+            <util:list>
+                <bean class="org.dspace.external.provider.metadata.filter.impl.MetadataSuggestionProviderEqualityFilter">
+                    <property name="metadataFieldString" value="relationship.type"/>
+                    <property name="value" value="publication"/>
+                </bean>
+                <bean class="org.dspace.external.provider.metadata.filter.impl.MetadataSuggestionProviderEmptyValueFilter">
+                    <property name="metadataFieldString" value="relationship.type"/>
+                </bean>
+            </util:list>
+        </property>
+    </bean>
+    <bean id="mockMetadataSuggestionProvider2" class="org.dspace.external.provider.metadata.impl.MockMetadataSuggestionProvider">
+        <property name="externalDataProvider" ref="mockDataProvider"/>
+        <property name="id" value="mock2"/>
+        <property name="fileBased" value="false"/>
+        <property name="metadataBased" value="true"/>
+        <property name="queryBased" value="true"/>
+        <property name="metadataSuggestionProviderFilters">
+            <util:list>
+                <bean class="org.dspace.external.provider.metadata.filter.impl.MetadataSuggestionProviderEqualityFilter">
+                    <property name="metadataFieldString" value="relationship.type"/>
+                    <property name="value" value="publication"/>
+                </bean>
+                <bean class="org.dspace.external.provider.metadata.filter.impl.MetadataSuggestionProviderEmptyValueFilter">
+                    <property name="metadataFieldString" value="relationship.type"/>
+                </bean>
+            </util:list>
+        </property>
     </bean>
 </beans>
 

@@ -7,6 +7,7 @@
  */
 package org.dspace.content.dto;
 
+import org.apache.commons.lang3.StringUtils;
 import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataSchema;
 import org.dspace.content.MetadataValue;
@@ -135,5 +136,17 @@ public class MetadataValueDTO {
 
     public void setConfidence(int confidence) {
         this.confidence = confidence;
+    }
+
+    /**
+     * This method constructs a key based on the schema, element and qualifier separated by a dot
+     * @return  the metadata key
+     */
+    public String getKey() {
+        String key = schema + "." + element;
+        if (StringUtils.isNotBlank(qualifier)) {
+            key += "." + qualifier;
+        }
+        return key;
     }
 }
