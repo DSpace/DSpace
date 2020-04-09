@@ -81,7 +81,7 @@ public class ItemConverter
                 }
             }
         } catch (SQLException e) {
-            log.error(e);
+            log.error("Error filtering item metadata based on permissions", e);
         }
         return new MetadataValueList(returnList);
     }
