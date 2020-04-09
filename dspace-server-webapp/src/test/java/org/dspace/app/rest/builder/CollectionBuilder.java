@@ -93,6 +93,14 @@ public class CollectionBuilder extends AbstractDSpaceObjectBuilder<Collection> {
         }
     }
 
+    public CollectionBuilder withProvenance(final String provenance) {
+        return addMetadataValue(collection,
+                                MetadataSchemaEnum.DC.getName(),
+                                "description",
+                                "provenance",
+                                provenance);
+    }
+
     public CollectionBuilder withTemplateItem() throws SQLException, AuthorizeException {
         collectionService.createTemplateItem(context, collection);
         return this;
