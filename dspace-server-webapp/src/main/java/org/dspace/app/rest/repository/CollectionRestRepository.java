@@ -439,18 +439,8 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
         AuthorizeUtil.authorizeManageDefaultReadGroup(context, collection);
 
         context.turnOffAuthorisationSystem();
-        Group role = groupService.create(context);
+        Group role = cs.createDefaultReadGroup(context, collection, "ITEM", Constants.DEFAULT_ITEM_READ);
         context.restoreAuthSystemState();
-        groupService.setName(role, "COLLECTION_" + collection.getID().toString() + "_ITEM_DEFAULT_READ");
-
-        // Remove existing privileges from the anonymous group.
-        authorizeService.removePoliciesActionFilter(context, collection, Constants.DEFAULT_ITEM_READ);
-
-        // Grant our new role the default privileges.
-        authorizeService.addPolicy(context, collection, Constants.DEFAULT_ITEM_READ, role);
-
-        // Commit the changes
-        groupService.update(context, role);
         return populateGroupInformation(context, request, role);
     }
 
@@ -486,18 +476,8 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
         AuthorizeUtil.authorizeManageDefaultReadGroup(context, collection);
 
         context.turnOffAuthorisationSystem();
-        Group role = groupService.create(context);
+        Group role = cs.createDefaultReadGroup(context, collection, "BITSTREAM", Constants.DEFAULT_BITSTREAM_READ);
         context.restoreAuthSystemState();
-        groupService.setName(role, "COLLECTION_" + collection.getID().toString() + "_BITSTREAM_DEFAULT_READ");
-
-        // Remove existing privileges from the anonymous group.
-        authorizeService.removePoliciesActionFilter(context, collection, Constants.DEFAULT_BITSTREAM_READ);
-
-        // Grant our new role the default privileges.
-        authorizeService.addPolicy(context, collection, Constants.DEFAULT_BITSTREAM_READ, role);
-
-        // Commit the changes
-        groupService.update(context, role);
         return populateGroupInformation(context, request, role);
     }
 

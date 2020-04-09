@@ -16,7 +16,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.sql.SQLException;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -28,7 +27,6 @@ import org.dspace.app.rest.model.GroupRest;
 import org.dspace.app.rest.model.MetadataRest;
 import org.dspace.app.rest.model.MetadataValueRest;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
-import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Collection;
 import org.dspace.content.service.CollectionService;
@@ -946,20 +944,6 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
                         .andExpect(status().isNotFound());
     }
 
-    private Group createDefaultReadGroup(String itemGroupString, int defaultItemRead)
-        throws SQLException, AuthorizeException {
-        Group role = groupService.create(context);
-        groupService.setName(role, "COLLECTION_" + collection.getID().toString() + "_" + itemGroupString +
-            "_DEFAULT_READ");
-
-        // Remove existing privileges from the anonymous group.
-        authorizeService.removePoliciesActionFilter(context, collection, defaultItemRead);
-
-        // Grant our new role the default privileges.
-        authorizeService.addPolicy(context, collection, defaultItemRead, role);
-        groupService.update(context, role);
-        return role;
-    }
 
     @Test
     public void getCollectionItemReadGroupTest() throws Exception {
@@ -967,7 +951,7 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
         String itemGroupString = "ITEM";
         int defaultItemRead = Constants.DEFAULT_ITEM_READ;
 
-        Group role = createDefaultReadGroup(itemGroupString, defaultItemRead);
+        Group role = collectionService.createDefaultReadGroup(context, collection, itemGroupString, defaultItemRead);
         context.restoreAuthSystemState();
 
         String token = getAuthToken(admin.getEmail(), password);
@@ -983,7 +967,7 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
         String itemGroupString = "ITEM";
         int defaultItemRead = Constants.DEFAULT_ITEM_READ;
 
-        Group role = createDefaultReadGroup(itemGroupString, defaultItemRead);
+        Group role = collectionService.createDefaultReadGroup(context, collection, itemGroupString, defaultItemRead);
 
         authorizeService.addPolicy(context, parentCommunity, Constants.ADMIN, eperson);
         context.restoreAuthSystemState();
@@ -1001,7 +985,7 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
         String itemGroupString = "ITEM";
         int defaultItemRead = Constants.DEFAULT_ITEM_READ;
 
-        Group role = createDefaultReadGroup(itemGroupString, defaultItemRead);
+        Group role = collectionService.createDefaultReadGroup(context, collection, itemGroupString, defaultItemRead);
         authorizeService.addPolicy(context, collection, Constants.ADMIN, eperson);
         context.restoreAuthSystemState();
 
@@ -1018,7 +1002,7 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
         String itemGroupString = "ITEM";
         int defaultItemRead = Constants.DEFAULT_ITEM_READ;
 
-        Group role = createDefaultReadGroup(itemGroupString, defaultItemRead);
+        Group role = collectionService.createDefaultReadGroup(context, collection, itemGroupString, defaultItemRead);
         context.restoreAuthSystemState();
 
         getClient().perform(get("/api/core/collections/" + collection.getID() + "/itemReadGroup"))
@@ -1031,7 +1015,7 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
         String itemGroupString = "ITEM";
         int defaultItemRead = Constants.DEFAULT_ITEM_READ;
 
-        Group role = createDefaultReadGroup(itemGroupString, defaultItemRead);
+        Group role = collectionService.createDefaultReadGroup(context, collection, itemGroupString, defaultItemRead);
         context.restoreAuthSystemState();
 
         String token = getAuthToken(eperson.getEmail(), password);
@@ -1323,7 +1307,7 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
         String itemGroupString = "ITEM";
         int defaultItemRead = Constants.DEFAULT_ITEM_READ;
 
-        Group role = createDefaultReadGroup(itemGroupString, defaultItemRead);
+        Group role = collectionService.createDefaultReadGroup(context, collection, itemGroupString, defaultItemRead);
         context.restoreAuthSystemState();
 
         String token = getAuthToken(admin.getEmail(), password);
@@ -1348,7 +1332,7 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
         String itemGroupString = "ITEM";
         int defaultItemRead = Constants.DEFAULT_ITEM_READ;
 
-        Group role = createDefaultReadGroup(itemGroupString, defaultItemRead);
+        Group role = collectionService.createDefaultReadGroup(context, collection, itemGroupString, defaultItemRead);
         authorizeService.addPolicy(context, parentCommunity, Constants.ADMIN, eperson);
         context.restoreAuthSystemState();
 
@@ -1371,7 +1355,7 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
         String itemGroupString = "ITEM";
         int defaultItemRead = Constants.DEFAULT_ITEM_READ;
 
-        Group role = createDefaultReadGroup(itemGroupString, defaultItemRead);
+        Group role = collectionService.createDefaultReadGroup(context, collection, itemGroupString, defaultItemRead);
         authorizeService.addPolicy(context, collection, Constants.ADMIN, eperson);
         context.restoreAuthSystemState();
 
@@ -1393,7 +1377,7 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
         String itemGroupString = "ITEM";
         int defaultItemRead = Constants.DEFAULT_ITEM_READ;
 
-        Group role = createDefaultReadGroup(itemGroupString, defaultItemRead);
+        Group role = collectionService.createDefaultReadGroup(context, collection, itemGroupString, defaultItemRead);
         context.restoreAuthSystemState();
 
         getClient().perform(delete("/api/core/collections/" + collection.getID() + "/itemReadGroup"))
@@ -1412,7 +1396,7 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
         String itemGroupString = "ITEM";
         int defaultItemRead = Constants.DEFAULT_ITEM_READ;
 
-        Group role = createDefaultReadGroup(itemGroupString, defaultItemRead);
+        Group role = collectionService.createDefaultReadGroup(context, collection, itemGroupString, defaultItemRead);
         context.restoreAuthSystemState();
 
         String token = getAuthToken(eperson.getEmail(), password);
@@ -1434,7 +1418,7 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
         String itemGroupString = "ITEM";
         int defaultItemRead = Constants.DEFAULT_ITEM_READ;
 
-        Group role = createDefaultReadGroup(itemGroupString, defaultItemRead);
+        Group role = collectionService.createDefaultReadGroup(context, collection, itemGroupString, defaultItemRead);
         context.restoreAuthSystemState();
 
         String token = getAuthToken(eperson.getEmail(), password);
@@ -1449,7 +1433,8 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
         String bitstreamGroupString = "BITSTREAM";
         int defaultBitstreamRead = Constants.DEFAULT_BITSTREAM_READ;
 
-        Group role = createDefaultReadGroup(bitstreamGroupString, defaultBitstreamRead);
+        Group role = collectionService.createDefaultReadGroup(context, collection, bitstreamGroupString,
+                                                              defaultBitstreamRead);
         context.restoreAuthSystemState();
 
         String token = getAuthToken(admin.getEmail(), password);
@@ -1465,8 +1450,8 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
         String bitstreamGroupString = "BITSTREAM";
         int defaultBitstreamRead = Constants.DEFAULT_BITSTREAM_READ;
 
-        Group role = createDefaultReadGroup(bitstreamGroupString, defaultBitstreamRead);
-
+        Group role = collectionService.createDefaultReadGroup(context, collection, bitstreamGroupString,
+                                                              defaultBitstreamRead);
         authorizeService.addPolicy(context, parentCommunity, Constants.ADMIN, eperson);
         context.restoreAuthSystemState();
 
@@ -1483,7 +1468,8 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
         String bitstreamGroupString = "BITSTREAM";
         int defaultBitstreamRead = Constants.DEFAULT_BITSTREAM_READ;
 
-        Group role = createDefaultReadGroup(bitstreamGroupString, defaultBitstreamRead);
+        Group role = collectionService.createDefaultReadGroup(context, collection, bitstreamGroupString,
+                                                              defaultBitstreamRead);
         authorizeService.addPolicy(context, collection, Constants.ADMIN, eperson);
         context.restoreAuthSystemState();
 
@@ -1500,7 +1486,8 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
         String bitstreamGroupString = "BITSTREAM";
         int defaultBitstreamRead = Constants.DEFAULT_BITSTREAM_READ;
 
-        Group role = createDefaultReadGroup(bitstreamGroupString, defaultBitstreamRead);
+        Group role = collectionService.createDefaultReadGroup(context, collection, bitstreamGroupString,
+                                                              defaultBitstreamRead);
         context.restoreAuthSystemState();
 
         getClient().perform(get("/api/core/collections/" + collection.getID() + "/bitstreamReadGroup"))
@@ -1513,7 +1500,8 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
         String bitstreamGroupString = "BITSTREAM";
         int defaultBitstreamRead = Constants.DEFAULT_BITSTREAM_READ;
 
-        Group role = createDefaultReadGroup(bitstreamGroupString, defaultBitstreamRead);
+        Group role = collectionService.createDefaultReadGroup(context, collection, bitstreamGroupString,
+                                                              defaultBitstreamRead);
         context.restoreAuthSystemState();
 
         String token = getAuthToken(eperson.getEmail(), password);
@@ -1807,7 +1795,8 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
         String bitstreamGroupString = "BITSTREAM";
         int defaultBitstreamRead = Constants.DEFAULT_BITSTREAM_READ;
 
-        Group role = createDefaultReadGroup(bitstreamGroupString, defaultBitstreamRead);
+        Group role = collectionService.createDefaultReadGroup(context, collection, bitstreamGroupString,
+                                                              defaultBitstreamRead);
         context.restoreAuthSystemState();
 
         String token = getAuthToken(admin.getEmail(), password);
@@ -1831,7 +1820,8 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
         String bitstreamGroupString = "BITSTREAM";
         int defaultBitstreamRead = Constants.DEFAULT_BITSTREAM_READ;
 
-        Group role = createDefaultReadGroup(bitstreamGroupString, defaultBitstreamRead);
+        Group role = collectionService.createDefaultReadGroup(context, collection, bitstreamGroupString,
+                                                              defaultBitstreamRead);
         authorizeService.addPolicy(context, parentCommunity, Constants.ADMIN, eperson);
         context.restoreAuthSystemState();
 
@@ -1855,7 +1845,8 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
         String bitstreamGroupString = "BITSTREAM";
         int defaultBitstreamRead = Constants.DEFAULT_BITSTREAM_READ;
 
-        Group role = createDefaultReadGroup(bitstreamGroupString, defaultBitstreamRead);
+        Group role = collectionService.createDefaultReadGroup(context, collection, bitstreamGroupString,
+                                                              defaultBitstreamRead);
         authorizeService.addPolicy(context, collection, Constants.ADMIN, eperson);
         context.restoreAuthSystemState();
 
@@ -1877,7 +1868,8 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
         String bitstreamGroupString = "BITSTREAM";
         int defaultBitstreamRead = Constants.DEFAULT_BITSTREAM_READ;
 
-        Group role = createDefaultReadGroup(bitstreamGroupString, defaultBitstreamRead);
+        Group role = collectionService.createDefaultReadGroup(context, collection, bitstreamGroupString,
+                                                              defaultBitstreamRead);
         context.restoreAuthSystemState();
 
         getClient().perform(delete("/api/core/collections/" + collection.getID() + "/bitstreamReadGroup"))
@@ -1896,7 +1888,8 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
         String bitstreamGroupString = "BITSTREAM";
         int defaultBitstreamRead = Constants.DEFAULT_BITSTREAM_READ;
 
-        Group role = createDefaultReadGroup(bitstreamGroupString, defaultBitstreamRead);
+        Group role = collectionService.createDefaultReadGroup(context, collection, bitstreamGroupString,
+                                                              defaultBitstreamRead);
         context.restoreAuthSystemState();
         String token = getAuthToken(eperson.getEmail(), password);
 
@@ -1911,7 +1904,8 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
         String bitstreamGroupString = "BITSTREAM";
         int defaultBitstreamRead = Constants.DEFAULT_BITSTREAM_READ;
 
-        Group role = createDefaultReadGroup(bitstreamGroupString, defaultBitstreamRead);
+        Group role = collectionService.createDefaultReadGroup(context, collection, bitstreamGroupString,
+                                                              defaultBitstreamRead);
         context.restoreAuthSystemState();
         String token = getAuthToken(eperson.getEmail(), password);
 
