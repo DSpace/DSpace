@@ -27,6 +27,7 @@ import org.dspace.app.rest.model.MetadataRest;
 import org.dspace.app.rest.model.MetadataValueRest;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.authorize.service.AuthorizeService;
+import org.dspace.content.Community;
 import org.dspace.content.service.CommunityService;
 import org.dspace.core.Constants;
 import org.dspace.eperson.Group;
@@ -366,20 +367,21 @@ public class CommunityAdminGroupRestControllerIT extends AbstractControllerInteg
     }
 
 
-    // This is currently not supported in DSpace API
-    @Ignore
     @Test
     public void deleteCommunityAdminGroupTestCommunityAdmin() throws Exception {
         context.turnOffAuthorisationSystem();
-        Group adminGroup = communityService.createAdministrators(context, parentCommunity);
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Group adminGroup = communityService.createAdministrators(context, child1);
         authorizeService.addPolicy(context, parentCommunity, Constants.ADMIN, eperson);
         context.restoreAuthSystemState();
 
         String token = getAuthToken(eperson.getEmail(), password);
-        getClient(token).perform(delete("/api/core/communities/" + parentCommunity.getID() + "/adminGroup"))
+        getClient(token).perform(delete("/api/core/communities/" + child1.getID() + "/adminGroup"))
                         .andExpect(status().isNoContent());
 
-        getClient(token).perform(get("/api/core/communities/" + parentCommunity.getID() + "/adminGroup"))
+        getClient(token).perform(get("/api/core/communities/" + child1.getID() + "/adminGroup"))
                         .andExpect(status().isNoContent());
     }
 

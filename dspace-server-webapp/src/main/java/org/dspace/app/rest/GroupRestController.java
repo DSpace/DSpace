@@ -79,7 +79,7 @@ public class GroupRestController {
             throw new ResourceNotFoundException("parent group is not found for uuid: " + uuid);
         }
 
-        AuthorizeUtil.checkAuthorizationOnGroup(context, parentGroup);
+        AuthorizeUtil.authorizeManageGroup(context, parentGroup);
 
         List<String> groupLinks = utils.getStringListFromRequest(request);
 
@@ -139,7 +139,7 @@ public class GroupRestController {
             throw new ResourceNotFoundException("parent group is not found for uuid: " + uuid);
         }
 
-        AuthorizeUtil.checkAuthorizationOnGroup(context, parentGroup);
+        AuthorizeUtil.authorizeManageGroup(context, parentGroup);
 
         List<String> memberLinks = utils.getStringListFromRequest(request);
 
@@ -195,7 +195,7 @@ public class GroupRestController {
             throw new ResourceNotFoundException("parent group is not found for uuid: " + parentUUID);
         }
 
-        AuthorizeUtil.checkAuthorizationOnGroup(context, parentGroup);
+        AuthorizeUtil.authorizeManageGroup(context, parentGroup);
 
         Group childGroup = groupService.find(context, childUUID);
         if (childGroup == null) {
@@ -230,7 +230,7 @@ public class GroupRestController {
             throw new ResourceNotFoundException("parent group is not found for uuid: " + parentUUID);
         }
 
-        AuthorizeUtil.checkAuthorizationOnGroup(context, parentGroup);
+        AuthorizeUtil.authorizeManageGroup(context, parentGroup);
 
         EPerson childGroup = ePersonService.find(context, memberUUID);
         if (childGroup == null) {
