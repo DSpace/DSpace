@@ -339,9 +339,9 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
 
         if (request != null) {
             String ip = clientInfoService.getClientIp(request);
-            if (configurationService.getBooleanProperty("anonymise_statistics.anonymise_on_log", false)) {
+            if (configurationService.getBooleanProperty("anonymize_statistics.anonymize_on_log", false)) {
                 try {
-                    doc1.addField("ip", anonymiseIp(ip));
+                    doc1.addField("ip", anonymizeIp(ip));
                 } catch (UnknownHostException e) {
                     log.warn(e.getMessage(), e);
                 }
@@ -355,8 +355,8 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
             }
 
             try {
-                String dns = configurationService.getProperty("anonymise_statistics.dns_mask", "anonymised");
-                if (!configurationService.getBooleanProperty("anonymise_statistics.anonymise_on_log", false)) {
+                String dns = configurationService.getProperty("anonymize_statistics.dns_mask", "anonymized");
+                if (!configurationService.getBooleanProperty("anonymize_statistics.anonymize_on_log", false)) {
                     dns = DnsLookup.reverseDns(ip);
                 }
                 doc1.addField("dns", dns.toLowerCase());
@@ -426,9 +426,9 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
         // Save our basic info that we already have
 
         ip = clientInfoService.getClientIp(ip, xforwardedfor);
-        if (configurationService.getBooleanProperty("anonymise_statistics.anonymise_on_log", false)) {
+        if (configurationService.getBooleanProperty("anonymize_statistics.anonymize_on_log", false)) {
             try {
-                doc1.addField("ip", anonymiseIp(ip));
+                doc1.addField("ip", anonymizeIp(ip));
             } catch (UnknownHostException e) {
                 log.warn(e.getMessage(), e);
             }
@@ -437,8 +437,8 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
         }
 
         try {
-            String dns = configurationService.getProperty("anonymise_statistics.dns_mask", "anonymised");
-            if (!configurationService.getBooleanProperty("anonymise_statistics.anonymise_on_log", false)) {
+            String dns = configurationService.getProperty("anonymize_statistics.dns_mask", "anonymized");
+            if (!configurationService.getBooleanProperty("anonymize_statistics.anonymize_on_log", false)) {
                 dns = DnsLookup.reverseDns(ip);
             }
             doc1.addField("dns", dns.toLowerCase());
@@ -1708,14 +1708,14 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
         statisticYearCoresInit = true;
     }
 
-    public Object anonymiseIp(String ip) throws UnknownHostException {
+    public Object anonymizeIp(String ip) throws UnknownHostException {
         InetAddress address = InetAddress.getByName(ip);
         if (address instanceof Inet4Address) {
             return ip.replaceFirst(IP_V4_REGEX, "$1" + configurationService.getProperty(
-                    "anonymise_statistics.ip_v4_mask", "255"));
+                    "anonymize_statistics.ip_v4_mask", "255"));
         } else if (address instanceof Inet6Address) {
             return ip.replaceFirst(IP_V6_REGEX, "$1:" + configurationService.getProperty(
-                    "anonymise_statistics.ip_v6_mask", "FFFF:FFFF"));
+                    "anonymize_statistics.ip_v6_mask", "FFFF:FFFF"));
         }
 
         throw new UnknownHostException("unknown ip format");
