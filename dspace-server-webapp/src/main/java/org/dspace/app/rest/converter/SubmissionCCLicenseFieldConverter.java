@@ -54,6 +54,7 @@ public class SubmissionCCLicenseFieldConverter
         return submissionCCLicenseFieldRest;
     }
 
+    @Override
     public Class<CCLicenseField> getModelClass() {
         return CCLicenseField.class;
     }

@@ -38,6 +38,7 @@ public class SubmissionCCLicenseFieldEnumConverter
         return submissionCCLicenseFieldEnumRest;
     }
 
+    @Override
     public Class<CCLicenseFieldEnum> getModelClass() {
         return CCLicenseFieldEnum.class;
     }
