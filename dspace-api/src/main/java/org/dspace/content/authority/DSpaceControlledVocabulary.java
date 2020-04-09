@@ -173,7 +173,7 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Hiera
             String[] values = new String[results.getLength()];
             String[] labels = new String[results.getLength()];
             String[] parent = new String[results.getLength()];
-            Boolean[] selectable = new Boolean[results.getLength()];
+            boolean[] selectable = new boolean[results.getLength()];
             ArrayList<String>[] children = new ArrayList[results.getLength()];
             String[] notes = new String[results.getLength()];
             for (int i = 0; i < results.getLength(); i++) {
@@ -246,7 +246,7 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Hiera
     }
 
     private void readNode(String[] authorities, String[] values, String[] labels, String[] parent,
-            List<String> children, String[] notes, Boolean[] selectable, int i, Node node) {
+            List<String> children, String[] notes, boolean[] selectable, int i, Node node) {
         String hierarchy = this.buildString(node);
         if (this.suggestHierarchy) {
             labels[i] = hierarchy;
@@ -322,7 +322,7 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Hiera
             String[] parent = new String[1];
             List<String> children = new ArrayList<String>();
             String[] note = new String[1];
-            Boolean[] selectable = new Boolean[1];
+            boolean[] selectable = new boolean[1];
             readNode(authorities, values, labels, parent, children, note, selectable, 0, node);
 
             if (values.length > 0) {
