@@ -30,10 +30,10 @@ import org.springframework.stereotype.Component;
  * @author Mykhaylo Boychuk (mykhaylo.boychuk at 4science.it)
  */
 @Component
-@AuthorizationFeatureDocumentation(name = AdministratorOf.NAME,
+@AuthorizationFeatureDocumentation(name = AdministratorOfFeature.NAME,
         description = "It can be used for verify that an user has access "
                     + "to the administrative features of the repository or of a specific community and collection")
-public class AdministratorOf implements AuthorizationFeature {
+public class AdministratorOfFeature implements AuthorizationFeature {
 
     public static final String NAME = "administratorOf";
 
