@@ -8,6 +8,7 @@
 
 package org.dspace.app.util;
 
+import java.lang.reflect.Array;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
@@ -103,12 +104,16 @@ public class Configuration
         } else {
             if (cmd.hasOption('r')) {
                 // Print "raw" values (without property substitutions)
-                Object[] values = cfg.getPropertyAsType(propName, Object[].class);
-                for (Object value : values) {
-                    System.out.println(value.toString());
-                    if (!cmd.hasOption('a')) {
-                        break; // Unless --all print only one value
+                Object rawValue = cfg.getPropertyValue(propName);
+                if (rawValue.getClass().isArray()) {
+                    for (Object value : (Object[]) rawValue) {
+                        System.out.println(value.toString());
+                        if (!cmd.hasOption('a')) {
+                            break; // Unless --all print only one value
+                        }
                     }
+                } else { // Not an array
+                    System.out.println(rawValue.toString());
                 }
             } else {
                 // Print values with property substitutions
