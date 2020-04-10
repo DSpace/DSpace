@@ -43,4 +43,20 @@ public class SubmissionCCLicenseRestRepositoryIT extends AbstractControllerInteg
                            SubmissionCCLicenseMatcher.matchLicenseEntry(3, new int[]{})
                    )));
     }
+
+    @Test
+    public void findOneTest() throws Exception {
+        getClient().perform(get("/api/config/submissioncclicenses/license1"))
+                   .andExpect(status().isOk())
+                   .andExpect(content().contentType(contentType))
+                   .andExpect(jsonPath("$", Matchers.is(
+                           SubmissionCCLicenseMatcher.matchLicenseEntry(1, new int[]{3, 2, 3})
+                   )));
+    }
+
+    @Test
+    public void findOneTestNonExistingLicense() throws Exception {
+        getClient().perform(get("/api/config/submissioncclicenses/non-existing-license"))
+                   .andExpect(status().isNotFound());
+    }
 }

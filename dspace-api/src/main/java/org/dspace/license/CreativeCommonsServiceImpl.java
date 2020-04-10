@@ -13,7 +13,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
 import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import javax.xml.transform.Templates;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
@@ -87,7 +90,7 @@ public class CreativeCommonsServiceImpl implements CreativeCommonsService, Initi
 
     protected ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
 
-    private List<CCLicense> ccLicenses;
+    private Map<String, Map<String, CCLicense>> ccLicenses;
 
     protected CreativeCommonsServiceImpl() {
 
@@ -104,6 +107,9 @@ public class CreativeCommonsServiceImpl implements CreativeCommonsService, Initi
             System.setProperty("http.proxyHost", proxyHost);
             System.setProperty("http.proxyPort", proxyPort);
         }
+
+        ccLicenses = new HashMap<>();
+
 
         try {
             templates = TransformerFactory.newInstance().newTemplates(
@@ -389,6 +395,7 @@ public class CreativeCommonsServiceImpl implements CreativeCommonsService, Initi
 
     /**
      * Find all CC Licenses using the default language found in the configuration
+     *
      * @return A list of available CC Licenses
      */
     public List<CCLicense> findAllCCLicenses() {
@@ -398,15 +405,55 @@ public class CreativeCommonsServiceImpl implements CreativeCommonsService, Initi
 
     /**
      * Find all CC Licenses for the provided language
-     * @param language  - the language for which to find the CC Licenses
+     *
+     * @param language - the language for which to find the CC Licenses
      * @return A list of available CC Licenses for the provided language
      */
     public List<CCLicense> findAllCCLicenses(String language) {
 
-        if (ccLicenses == null || ccLicenses.isEmpty()) {
-            ccLicenses = ccLicenseConnectorService.retrieveLicenses(language);
+        if (!ccLicenses.containsKey(language)) {
+            initLicenses(language);
         }
-        return ccLicenses;
+        return new LinkedList<>(ccLicenses.get(language).values());
+    }
+
+    /**
+     * Find the CC License corresponding to the provided ID using the default language found in the configuration
+     *
+     * @param id - the ID of the license to be found
+     * @return the corresponding license if found or null when not found
+     */
+    public CCLicense findOne(String id) {
+        String language = configurationService.getProperty("cc.license.locale", "en");
+        return findOne(id, language);
+    }
+
+    /**
+     * Find the CC License corresponding to the provided ID and provided language
+     *
+     * @param id       - the ID of the license to be found
+     * @param language - the language for which to find the CC License
+     * @return the corresponding license if found or null when not found
+     */
+    public CCLicense findOne(String id, String language) {
+        if (!ccLicenses.containsKey(language)) {
+            initLicenses(language);
+        }
+        Map<String, CCLicense> licenseMap = ccLicenses.get(language);
+        if (licenseMap.containsKey(id)) {
+            return licenseMap.get(id);
+        }
+        return null;
+    }
+
+    /**
+     * Retrieves the licenses for a specific language and cache them in this service
+     *
+     * @param language - the language for which to find the CC Licenses
+     */
+    private void initLicenses(final String language) {
+        Map<String, CCLicense> licenseMap = ccLicenseConnectorService.retrieveLicenses(language);
+        ccLicenses.put(language, licenseMap);
     }
 
 }

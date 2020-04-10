@@ -16,6 +16,7 @@ import org.dspace.license.service.CreativeCommonsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.stereotype.Component;
 
 /**
@@ -28,8 +29,12 @@ public class SubmissionCCLicenseRestRepository extends DSpaceRestRepository<Subm
     protected CreativeCommonsService creativeCommonsService;
 
     @Override
-    public SubmissionCCLicenseRest findOne(final Context context, final String s) {
-        return null;
+    public SubmissionCCLicenseRest findOne(final Context context, final String licenseId) {
+        CCLicense ccLicense = creativeCommonsService.findOne(licenseId);
+        if (ccLicense == null) {
+            throw new ResourceNotFoundException("No CC license could be found for ID: " + licenseId );
+        }
+        return converter.toRest(ccLicense, utils.obtainProjection());
     }
 
     @Override
