@@ -166,4 +166,22 @@ public interface CreativeCommonsService {
      * @return A list of available CC Licenses for the provided language
      */
     public List<CCLicense> findAllCCLicenses(String language);
+
+    /**
+     * Find the CC License corresponding to the provided ID using the default language found in the configuration
+     *
+     * @param id    - the ID of the license to be found
+     * @return the corresponding license if found or null when not found
+     */
+    public CCLicense findOne(String id);
+
+    /**
+     * Find the CC License corresponding to the provided ID and provided language
+     *
+     * @param id        - the ID of the license to be found
+     * @param language  - the language for which to find the CC License
+     * @return the corresponding license if found or null when not found
+     */
+    public CCLicense findOne(String id, String language);
+
 }

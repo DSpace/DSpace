@@ -10,8 +10,10 @@ package org.dspace.license;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -61,9 +63,9 @@ public class CCLicenseConnectorServiceImpl implements CCLicenseConnectorService,
      * Retrieves the CC Licenses for the provided language from the CC License API
      *
      * @param language - the language to retrieve the licenses for
-     * @return a list of licenses obtained for the provided languages
+     * @return a map of licenses with the id and the license for the provided language
      */
-    public List<CCLicense> retrieveLicenses(String language) {
+    public Map<String, CCLicense> retrieveLicenses(String language) {
         String ccLicenseUrl = configurationService.getProperty("cc.api.rooturl");
 
         String uri = ccLicenseUrl + "/?locale=" + language;
@@ -77,7 +79,7 @@ public class CCLicenseConnectorServiceImpl implements CCLicenseConnectorService,
             licenses = Collections.emptyList();
         }
 
-        List<CCLicense> ccLicenses = new LinkedList<>();
+        Map<String, CCLicense> ccLicenses = new HashMap<>();
 
         for (String license : licenses) {
 
@@ -85,7 +87,7 @@ public class CCLicenseConnectorServiceImpl implements CCLicenseConnectorService,
             HttpGet licenseHttpGet = new HttpGet(licenseUri);
             try (CloseableHttpResponse response = client.execute(licenseHttpGet)) {
                 CCLicense ccLicense = retrieveLicenseObject(license, response);
-                ccLicenses.add(ccLicense);
+                ccLicenses.put(ccLicense.getLicenseId(), ccLicense);
             } catch (JaxenException | JDOMException | IOException e) {
                 log.error("Error while retrieving the license details using url: " + licenseUri, e);
             }

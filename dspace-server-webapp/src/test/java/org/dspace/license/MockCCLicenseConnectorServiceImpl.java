@@ -7,8 +7,10 @@
  */
 package org.dspace.license;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Mock implementation for the Creative commons license connector service.
@@ -19,13 +21,17 @@ public class MockCCLicenseConnectorServiceImpl extends CCLicenseConnectorService
     /**
      * Retrieves mock CC Licenses for the provided language
      * @param language - the language
-     * @return a list of mocked licenses
+     * @return a map of mocked licenses with the id and the license
      */
-    public List<CCLicense> retrieveLicenses(String language) {
-        List<CCLicense> ccLicenses = new LinkedList<>();
-        ccLicenses.add(createMockLicense(1, new int[]{3, 2, 3}));
-        ccLicenses.add(createMockLicense(2, new int[]{2}));
-        ccLicenses.add(createMockLicense(3, new int[]{}));
+    public Map<String, CCLicense> retrieveLicenses(String language) {
+        Map<String, CCLicense> ccLicenses = new HashMap<>();
+        CCLicense mockLicense1 = createMockLicense(1, new int[]{3, 2, 3});
+        CCLicense mockLicense2 = createMockLicense(2, new int[]{2});
+        CCLicense mockLicense3 = createMockLicense(3, new int[]{});
+
+        ccLicenses.put(mockLicense1.getLicenseId(), mockLicense1);
+        ccLicenses.put(mockLicense2.getLicenseId(), mockLicense2);
+        ccLicenses.put(mockLicense3.getLicenseId(), mockLicense3);
 
         return ccLicenses;
     }
