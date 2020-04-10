@@ -26,5 +26,12 @@
 	        </map>
 	    </property>
     </bean>
-	
+
+	<bean id="lookupListenerConstrain" class="org.dspace.submit.listener.MetadataListenerConstrain">
+		<property name="metadata">
+	        <map>
+                <entry key="dc.identifier.applicationnumber" value="dc.date.filled"/>         
+	        </map>            
+        </property>
+	</bean>
  </beans>
