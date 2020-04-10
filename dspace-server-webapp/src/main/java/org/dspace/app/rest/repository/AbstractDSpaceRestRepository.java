@@ -7,6 +7,7 @@
  */
 package org.dspace.app.rest.repository;
 
+import org.dspace.app.rest.RestRepository;
 import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.app.rest.utils.Utils;
@@ -22,7 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  *
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
-public abstract class AbstractDSpaceRestRepository {
+public abstract class AbstractDSpaceRestRepository implements RestRepository {
 
     @Autowired
     protected Utils utils;

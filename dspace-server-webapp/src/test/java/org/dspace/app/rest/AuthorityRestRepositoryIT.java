@@ -359,6 +359,17 @@ public class AuthorityRestRepositoryIT extends AbstractControllerIntegrationTest
                              .andExpect(jsonPath("$.page.totalElements", Matchers.is(0)));
     }
 
+    @Test
+    public void srscSearchTest() throws Exception {
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        getClient(tokenAdmin).perform(get("/api/integration/authorities/srsc/entries/search"))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$._links.byParent.href", Matchers.containsString(
+                                                 "api/integration/authorities/srsc/entries/search/byParent")))
+                             .andExpect(jsonPath("$._links.top.href", Matchers.containsString(
+                                                 "api/integration/authorities/srsc/entries/search/top")));
+    }
+
     @Override
     public void destroy() throws Exception {
         AuthorityServiceFactory.getInstance().getAuthorityIndexingService().cleanIndex();
