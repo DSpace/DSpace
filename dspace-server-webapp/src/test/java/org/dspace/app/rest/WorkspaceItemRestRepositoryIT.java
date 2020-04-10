@@ -54,7 +54,6 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
 import org.dspace.content.WorkspaceItem;
-import org.dspace.discovery.SearchService;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.factory.EPersonServiceFactory;
@@ -75,9 +74,6 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
 
     @Autowired
     private ConfigurationService configurationService;
-
-    @Autowired
-    private SearchService searchService;
 
     private Group embargoedGroups;
     private Group embargoedGroup1;
