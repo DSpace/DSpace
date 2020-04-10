@@ -7,8 +7,10 @@
  */
 package org.dspace.app.sherpa.submit;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
@@ -17,6 +19,7 @@ import org.dspace.app.sherpa.v2.SHERPAResponse;
 import org.dspace.app.sherpa.SHERPAService;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
+import org.dspace.core.I18nUtil;
 import org.dspace.core.LogManager;
 
 public class SHERPASubmitService
@@ -38,29 +41,28 @@ public class SHERPASubmitService
         this.sherpaService = sherpaService;
     }
 
-    public SHERPAResponse searchRelatedJournals(Context context, Item item)
-    {
+    public List<SHERPAResponse> searchRelatedJournals(Context context, Item item) {
         Set<String> issns = getISSNs(context, item);
-        if (issns == null || issns.size() == 0)
-        {
+        if (issns == null || issns.size() == 0) {
             return null;
-        }
-        else
-        {
-            // SHERPA v2 API no longer supports "OR'd" ISSN search, just return the first matching
-            Iterator<String> issnIternator = issns.iterator();
-            while (issnIternator.hasNext()) {
-                String issn = issnIternator.next();
+        } else {
+            // SHERPA v2 API no longer supports "OR'd" ISSN search, perform individual searches instead
+            Iterator<String> issnIterator = issns.iterator();
+            List<SHERPAResponse> responses = new LinkedList<>();
+            while (issnIterator.hasNext()) {
+                String issn = issnIterator.next();
                 SHERPAResponse response = sherpaService.searchByJournalISSN(issn);
                 if (response.isError()) {
                     // Continue with loop
                     log.warn("Failed to look up SHERPA ROMeO result for ISSN: " + issn);
-                } else {
-                    // Return the first valid SHERPA response
-                    return response;
                 }
+                // Store this response, even if it has an error (useful for UI reporting)
+                responses.add(response);
             }
-            return new SHERPAResponse("SHERPA ROMeO lookup failed");
+            if (responses.isEmpty()) {
+                responses.add(new SHERPAResponse("SHERPA ROMeO lookup failed"));
+            }
+            return responses;
         }
     }
 

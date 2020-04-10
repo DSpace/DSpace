@@ -409,7 +409,14 @@ public class SHERPAResponse
                     this.license = licenceText;
                     this.licenseURL = licenceUrl;
                     this.disclaimer = disclaimerText;
+
+                } else {
+                    error = true;
+                    message = "No results found";
                 }
+            } else {
+                error = true;
+                message = "No results found";
             }
 
         } catch(JSONException e) {
@@ -432,6 +439,10 @@ public class SHERPAResponse
     public String getMessage()
     {
         return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
     }
 
     public String getLicense()

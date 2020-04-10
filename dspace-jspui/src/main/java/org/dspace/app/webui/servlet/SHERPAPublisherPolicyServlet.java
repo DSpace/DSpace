@@ -9,7 +9,9 @@ package org.dspace.app.webui.servlet;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 
@@ -65,24 +67,26 @@ public class SHERPAPublisherPolicyServlet extends DSpaceServlet
         {
             return;
         }
-        SHERPAResponse shresp = sherpaSubmitService.searchRelatedJournals(context, item);
-        if (shresp.isError())
-        {
-            request.setAttribute("error", Boolean.TRUE);
-        }
-        else
-        {
-            List<SHERPAJournal> journals = shresp.getJournals();
-            SHERPASystemMetadata metadata = shresp.getMetadata();
+        List<SHERPAResponse> responses = sherpaSubmitService.searchRelatedJournals(context, item);
+        List<SHERPAResponse> sherpaResponses = new LinkedList<>();
+        // The new structure means we should handle multiple *responses*, (the API 'item' object) not just
+        // multiple journals within a single response.
+        // Only return responses with valid results, unless there are only errors
 
-            if (journals != null) {
-                request.setAttribute("journals", journals);
+        boolean all_errors = true;
+        boolean some_errors = false;
+        for (SHERPAResponse sherpaResponse : responses) {
+            if (sherpaResponse.isError()) {
+                some_errors = true;
+            } else {
+                all_errors = false;
             }
-            if (metadata != null) {
-                request.setAttribute("metadata", metadata);
-            }
-
+            sherpaResponses.add(sherpaResponse);
         }
+        request.setAttribute("sherpaResponses", sherpaResponses);
+        request.setAttribute("error", all_errors);
+        request.setAttribute("some_errors", some_errors);
+
         // Simply forward to the plain form
         JSPManager.showJSP(request, response, "/sherpa/sherpa-policy.jsp");
     }
