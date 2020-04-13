@@ -90,6 +90,7 @@ public class RegisterController {
                 model.addObject("token", token);
                 model.addObject("chairId", -1);
                 model.addObject("facultyId", -1);
+                model.addObject("isAuthorLocalized", false);
                 model.setViewName("register");
                 return model;
             } else {
