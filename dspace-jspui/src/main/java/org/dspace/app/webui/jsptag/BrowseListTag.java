@@ -869,7 +869,7 @@ public class BrowseListTag extends TagSupport
         		Bitstream original = thumbnail.getOriginal();
         		String link = hrq.getContextPath() + "/bitstream/" + item.getHandle() + "/" + original.getSequenceID() + "/" +
         						UIUtil.encodeBitstreamName(original.getName(), Constants.DEFAULT_ENCODING);
-        		thumbFrag.append("<a target=\"_blank\" href=\"").append(link).append("\" />");
+        		thumbFrag.append("<a target=\"_blank\" rel=\"noopener\" href=\"").append(link).append("\" />");
         	}
         	else
         	{

@@ -177,7 +177,7 @@
 			      } %> />
 		</td>
                 <td headers="t2" class="<%= row %>RowOddCol break-all">
-                	<a href="<%= request.getContextPath() %>/retrieve/<%= bitstreams.get(i).getID() %>/<%= org.dspace.app.webui.util.UIUtil.encodeBitstreamName(bitstreams.get(i).getName()) %>" target="_blank"><%= bitstreams.get(i).getName() %></a>
+                	<a href="<%= request.getContextPath() %>/retrieve/<%= bitstreams.get(i).getID() %>/<%= org.dspace.app.webui.util.UIUtil.encodeBitstreamName(bitstreams.get(i).getName()) %>" target="_blank" rel="noopener"><%= bitstreams.get(i).getName() %></a>
             <%      // Don't display "remove" button in workflow mode
 			        if (allowFileEditing)
 			        {
