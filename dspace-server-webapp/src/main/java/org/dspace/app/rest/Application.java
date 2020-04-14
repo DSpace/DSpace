@@ -133,7 +133,7 @@ public class Application extends SpringBootServletInitializer {
                     registry.addMapping("/api/**").allowedMethods(CorsConfiguration.ALL)
                         .allowedOrigins(corsAllowedOrigins).allowedHeaders("Authorization", "Content-Type",
                             "X-Requested-With", "accept", "Origin", "Access-Control-Request-Method",
-                            "Access-Control-Request-Headers")
+                            "Access-Control-Request-Headers", "X-On-Behalf-Of")
                         .exposedHeaders("Access-Control-Allow-Origin", "Authorization");
                 }
             }
