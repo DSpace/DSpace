@@ -29,6 +29,7 @@ public class SubmissionCCLicenseRestRepositoryIT extends AbstractControllerInteg
 
     /**
      * Test the findAll method form the SubmissionCCLicenseRestRepository
+     *
      * @throws Exception
      */
     @Test

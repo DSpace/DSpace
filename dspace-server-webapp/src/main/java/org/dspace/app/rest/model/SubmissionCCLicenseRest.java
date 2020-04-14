@@ -20,6 +20,7 @@ import org.dspace.app.rest.RestResourceController;
  */
 public class SubmissionCCLicenseRest extends BaseObjectRest<String> {
     public static final String NAME = "submissioncclicense";
+    public static final String PLURAL = "submissioncclicenses";
 
     public static final String CATEGORY = RestAddressableModel.CONFIGURATION;
 

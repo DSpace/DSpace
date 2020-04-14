@@ -24,4 +24,16 @@ public interface CCLicenseConnectorService {
      */
     public Map<String, CCLicense> retrieveLicenses(String language);
 
+    /**
+     * Retrieve the CC License URI based on the provided license id, language and answers to the field questions from
+     * the CC License API
+     * @param licenseId - the ID of the license
+     * @param language  - the language for which to retrieve the full answerMap
+     * @param answerMap - the answers to the different field questions
+     * @return the CC License URI
+     */
+    public String retrieveRightsByQuestion(String licenseId,
+                                           String language,
+                                           Map<String, String> answerMap);
+
 }

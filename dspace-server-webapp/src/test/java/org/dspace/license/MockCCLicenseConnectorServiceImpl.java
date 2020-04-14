@@ -75,4 +75,18 @@ public class MockCCLicenseConnectorServiceImpl extends CCLicenseConnectorService
 
     }
 
+    /**
+     * Retrieve a mock CC License URI
+     *
+     * @param licenseId - the ID of the license
+     * @param language  - the language for which to retrieve the full answerMap
+     * @param answerMap - the answers to the different field questions
+     * @return the CC License URI
+     */
+    public String retrieveRightsByQuestion(final String licenseId,
+                                           final String language,
+                                           final Map<String, String> answerMap) {
+
+        return "mock-license-uri";
+    }
 }
