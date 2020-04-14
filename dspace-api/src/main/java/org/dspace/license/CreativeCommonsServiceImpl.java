@@ -90,6 +90,9 @@ public class CreativeCommonsServiceImpl implements CreativeCommonsService, Initi
 
     protected ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
 
+    private String defaultLanguage;
+
+
     private Map<String, Map<String, CCLicense>> ccLicenses;
 
     protected CreativeCommonsServiceImpl() {
@@ -109,7 +112,7 @@ public class CreativeCommonsServiceImpl implements CreativeCommonsService, Initi
         }
 
         ccLicenses = new HashMap<>();
-
+        defaultLanguage = configurationService.getProperty("cc.license.locale", "en");
 
         try {
             templates = TransformerFactory.newInstance().newTemplates(
@@ -399,8 +402,7 @@ public class CreativeCommonsServiceImpl implements CreativeCommonsService, Initi
      * @return A list of available CC Licenses
      */
     public List<CCLicense> findAllCCLicenses() {
-        String language = configurationService.getProperty("cc.license.locale", "en");
-        return findAllCCLicenses(language);
+        return findAllCCLicenses(defaultLanguage);
     }
 
     /**
@@ -424,8 +426,7 @@ public class CreativeCommonsServiceImpl implements CreativeCommonsService, Initi
      * @return the corresponding license if found or null when not found
      */
     public CCLicense findOne(String id) {
-        String language = configurationService.getProperty("cc.license.locale", "en");
-        return findOne(id, language);
+        return findOne(id, defaultLanguage);
     }
 
     /**
@@ -454,6 +455,126 @@ public class CreativeCommonsServiceImpl implements CreativeCommonsService, Initi
     private void initLicenses(final String language) {
         Map<String, CCLicense> licenseMap = ccLicenseConnectorService.retrieveLicenses(language);
         ccLicenses.put(language, licenseMap);
+    }
+
+    /**
+     * Retrieve the CC License URI for the provided license ID, based on the provided answers, using the default
+     * language found in the configuration
+     *
+     * @param licenseId - the ID of the license
+     * @param answerMap - the answers to the different field questions
+     * @return the corresponding license URI
+     */
+    public String retrieveLicenseUri(String licenseId, Map<String, String> answerMap) {
+        return retrieveLicenseUri(licenseId, defaultLanguage, answerMap);
+
+    }
+
+    /**
+     * Retrieve the CC License URI for the provided license ID and language based on the provided answers
+     *
+     * @param licenseId - the ID of the license
+     * @param language  - the language for which to find the CC License URI
+     * @param answerMap - the answers to the different field questions
+     * @return the corresponding license URI
+     */
+    public String retrieveLicenseUri(String licenseId, String language, Map<String, String> answerMap) {
+        return ccLicenseConnectorService.retrieveRightsByQuestion(licenseId, language, answerMap);
+
+    }
+
+    /**
+     * Verify whether the answer map contains a valid response to all field questions and no answers that don't have a
+     * corresponding question in the license, using the default language found in the config to check the license
+     *
+     * @param licenseId     - the ID of the license
+     * @param fullAnswerMap - the answers to the different field questions
+     * @return whether the information is valid
+     */
+    public boolean verifyLicenseInformation(String licenseId, Map<String, String> fullAnswerMap) {
+        return verifyLicenseInformation(licenseId, defaultLanguage, fullAnswerMap);
+    }
+
+    /**
+     * Verify whether the answer map contains a valid response to all field questions and no answers that don't have a
+     * corresponding question in the license, using the provided language to check the license
+     *
+     * @param licenseId     - the ID of the license
+     * @param language      - the language for which to retrieve the full answerMap
+     * @param fullAnswerMap - the answers to the different field questions
+     * @return whether the information is valid
+     */
+    public boolean verifyLicenseInformation(String licenseId, String language, Map<String, String> fullAnswerMap) {
+        CCLicense ccLicense = findOne(licenseId, language);
+
+        List<CCLicenseField> ccLicenseFieldList = ccLicense.getCcLicenseFieldList();
+
+        for (String field : fullAnswerMap.keySet()) {
+            CCLicenseField ccLicenseField = findCCLicenseField(field, ccLicenseFieldList);
+            if (ccLicenseField == null) {
+                return false;
+            }
+            if (!containsAnswerEnum(fullAnswerMap.get(field), ccLicenseField)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Retrieve the full answer map containing empty values when an answer for a field was not provided in the
+     * answerMap, using the default language found in the configuration
+     *
+     * @param licenseId - the ID of the license
+     * @param answerMap - the answers to the different field questions
+     * @return the answerMap supplemented with all other license fields with a blank answer
+     */
+    public Map<String, String> retrieveFullAnswerMap(String licenseId, Map<String, String> answerMap) {
+        return retrieveFullAnswerMap(licenseId, defaultLanguage, answerMap);
+    }
+
+    /**
+     * Retrieve the full answer map for a provided language, containing empty values when an answer for a field was not
+     * provided in the answerMap.
+     *
+     * @param licenseId - the ID of the license
+     * @param language  - the language for which to retrieve the full answerMap
+     * @param answerMap - the answers to the different field questions
+     * @return the answerMap supplemented with all other license fields with a blank answer for the provided language
+     */
+    public Map<String, String> retrieveFullAnswerMap(String licenseId, String language, Map<String, String> answerMap) {
+        CCLicense ccLicense = findOne(licenseId, language);
+        if (ccLicense == null) {
+            return null;
+        }
+        Map<String, String> fullParamMap = new HashMap<>(answerMap);
+        List<CCLicenseField> ccLicenseFieldList = ccLicense.getCcLicenseFieldList();
+        for (CCLicenseField ccLicenseField : ccLicenseFieldList) {
+            if (!fullParamMap.containsKey(ccLicenseField.getId())) {
+                fullParamMap.put(ccLicenseField.getId(), "");
+            }
+        }
+        return fullParamMap;
+    }
+
+    private boolean containsAnswerEnum(final String enumAnswer, final CCLicenseField ccLicenseField) {
+        List<CCLicenseFieldEnum> fieldEnums = ccLicenseField.getFieldEnum();
+        for (CCLicenseFieldEnum fieldEnum : fieldEnums) {
+            if (StringUtils.equals(fieldEnum.getId(), enumAnswer)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private CCLicenseField findCCLicenseField(final String field, final List<CCLicenseField> ccLicenseFieldList) {
+        for (CCLicenseField ccLicenseField : ccLicenseFieldList) {
+            if (StringUtils.equals(ccLicenseField.getId(), field)) {
+                return ccLicenseField;
+            }
+        }
+
+        return null;
     }
 
 }

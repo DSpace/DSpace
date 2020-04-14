@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Map;
 
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
@@ -52,7 +53,7 @@ public interface CreativeCommonsService {
      *                            to perform a particular action.
      */
     public void setLicenseRDF(Context context, Item item, String licenseRdf)
-        throws SQLException, IOException, AuthorizeException;
+            throws SQLException, IOException, AuthorizeException;
 
 
     /**
@@ -74,19 +75,19 @@ public interface CreativeCommonsService {
      */
     public void setLicense(Context context, Item item,
                            InputStream licenseStm, String mimeType)
-        throws SQLException, IOException, AuthorizeException;
+            throws SQLException, IOException, AuthorizeException;
 
     public void removeLicense(Context context, Item item)
-        throws SQLException, IOException, AuthorizeException;
+            throws SQLException, IOException, AuthorizeException;
 
     public boolean hasLicense(Context context, Item item)
-        throws SQLException, IOException;
+            throws SQLException, IOException;
 
     public String getLicenseURL(Context context, Item item)
-        throws SQLException, IOException, AuthorizeException;
+            throws SQLException, IOException, AuthorizeException;
 
     public String getLicenseRDF(Context context, Item item)
-        throws SQLException, IOException, AuthorizeException;
+            throws SQLException, IOException, AuthorizeException;
 
     /**
      * Get Creative Commons license RDF, returning Bitstream object.
@@ -99,7 +100,7 @@ public interface CreativeCommonsService {
      *                            to perform a particular action.
      */
     public Bitstream getLicenseRdfBitstream(Item item)
-        throws SQLException, IOException, AuthorizeException;
+            throws SQLException, IOException, AuthorizeException;
 
     /**
      * Get Creative Commons license Text, returning Bitstream object.
@@ -114,7 +115,7 @@ public interface CreativeCommonsService {
      * is no longer stored (see https://jira.duraspace.org/browse/DS-2604)
      */
     public Bitstream getLicenseTextBitstream(Item item)
-        throws SQLException, IOException, AuthorizeException;
+            throws SQLException, IOException, AuthorizeException;
 
     /**
      * Get a few license-specific properties. We expect these to be cached at
@@ -150,7 +151,7 @@ public interface CreativeCommonsService {
      */
     public void removeLicense(Context context, LicenseMetadataValue uriField,
                               LicenseMetadataValue nameField, Item item)
-        throws AuthorizeException, IOException, SQLException;
+            throws AuthorizeException, IOException, SQLException;
 
     /**
      * Find all CC Licenses using the default language found in the configuration
@@ -170,7 +171,7 @@ public interface CreativeCommonsService {
     /**
      * Find the CC License corresponding to the provided ID using the default language found in the configuration
      *
-     * @param id    - the ID of the license to be found
+     * @param id - the ID of the license to be found
      * @return the corresponding license if found or null when not found
      */
     public CCLicense findOne(String id);
@@ -178,10 +179,72 @@ public interface CreativeCommonsService {
     /**
      * Find the CC License corresponding to the provided ID and provided language
      *
-     * @param id        - the ID of the license to be found
-     * @param language  - the language for which to find the CC License
+     * @param id       - the ID of the license to be found
+     * @param language - the language for which to find the CC License
      * @return the corresponding license if found or null when not found
      */
     public CCLicense findOne(String id, String language);
+
+    /**
+     * Retrieve the CC License URI for the provided license ID, based on the provided answers, using the default
+     * language found in the configuration
+     *
+     * @param licenseId - the ID of the license
+     * @param answerMap - the answers to the different field questions
+     * @return the corresponding license URI
+     */
+    public String retrieveLicenseUri(String licenseId, Map<String, String> answerMap);
+
+    /**
+     * Retrieve the CC License URI for the provided license ID and language based on the provided answers
+     *
+     * @param licenseId - the ID of the license
+     * @param language  - the language for which to find the CC License URI
+     * @param answerMap - the answers to the different field questions
+     * @return the corresponding license URI
+     */
+    public String retrieveLicenseUri(String licenseId, String language, Map<String, String> answerMap);
+
+    /**
+     * Retrieve the full answer map containing empty values when an answer for a field was not provided in the
+     * answerMap, using the default language found in the configuration
+     *
+     * @param licenseId - the ID of the license
+     * @param answerMap - the answers to the different field questions
+     * @return the answerMap supplemented with all other license fields with a blank answer
+     */
+    public Map<String, String> retrieveFullAnswerMap(String licenseId, Map<String, String> answerMap);
+
+    /**
+     * Retrieve the full answer map for a provided language, containing empty values when an answer for a field was not
+     * provided in the answerMap.
+     *
+     * @param licenseId - the ID of the license
+     * @param language  - the language for which to retrieve the full answerMap
+     * @param answerMap - the answers to the different field questions
+     * @return the answerMap supplemented with all other license fields with a blank answer for the provided language
+     */
+    public Map<String, String> retrieveFullAnswerMap(String licenseId, String language, Map<String, String> answerMap);
+
+    /**
+     * Verify whether the answer map contains a valid response to all field questions and no answers that don't have a
+     * corresponding question in the license, using the default language found in the config to check the license
+     *
+     * @param licenseId     - the ID of the license
+     * @param fullAnswerMap - the answers to the different field questions
+     * @return whether the information is valid
+     */
+    public boolean verifyLicenseInformation(String licenseId, Map<String, String> fullAnswerMap);
+
+    /**
+     * Verify whether the answer map contains a valid response to all field questions and no answers that don't have a
+     * corresponding question in the license, using the provided language to check the license
+     *
+     * @param licenseId     - the ID of the license
+     * @param language      - the language for which to retrieve the full answerMap
+     * @param fullAnswerMap - the answers to the different field questions
+     * @return whether the information is valid
+     */
+    public boolean verifyLicenseInformation(String licenseId, String language, Map<String, String> fullAnswerMap);
 
 }
