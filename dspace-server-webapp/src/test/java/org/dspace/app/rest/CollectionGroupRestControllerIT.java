@@ -35,7 +35,6 @@ import org.dspace.eperson.Group;
 import org.dspace.eperson.service.GroupService;
 import org.dspace.workflow.WorkflowService;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -432,8 +431,6 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
                         .andExpect(status().isNoContent());
     }
 
-    // This is currently not supported in DSpace API
-    @Ignore
     @Test
     public void deleteCollectionAdminGroupTestCollectionAdmin() throws Exception {
         context.turnOffAuthorisationSystem();
@@ -443,10 +440,10 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
         String token = getAuthToken(eperson.getEmail(), password);
         getClient(token).perform(delete("/api/core/collections/" + collection.getID() + "/adminGroup"))
-                        .andExpect(status().isNoContent());
+                        .andExpect(status().isForbidden());
 
         getClient(token).perform(get("/api/core/collections/" + collection.getID() + "/adminGroup"))
-                        .andExpect(status().isNoContent());
+                        .andExpect(status().isOk());
     }
 
     @Test
