@@ -762,6 +762,10 @@
 				<entry value="doi" key="dc.identifier" />
 				<entry value="publisher" key="dc.publisher" />
 				<entry value="patentno" key="dc.identifier.patentno" />
+				<entry value="applicationnumber" key="dc.identifier.applicationnumber" />
+				<entry value="applicant" key ="dc.contributor.applicant" />
+				<entry value="applicationdate" key="dc.date.filled" />
+				<entry value="ipc" key="dc.subject.ipc" />
 				<!-- Not used - new metadata fields need to be declared for them in DSpace registry -->
 				<!-- 
 				<entry value="url" key="" />
