@@ -45,7 +45,9 @@ public interface SubmissionLookupDataLoader extends DataLoader {
 
     public final static String EPOPUBLICATIONNUMBER = "publicationnumber";
 
-    public final static String EPOAPPLICANTNUMBER = "applicantnumber";
+    public final static String EPOAPPLICANTNUMBER = "applicationnumber";
+
+    public final static String EPOAPPLICANTDATE = "applicationdate";
 
     List<String> getSupportedIdentifiers();
 

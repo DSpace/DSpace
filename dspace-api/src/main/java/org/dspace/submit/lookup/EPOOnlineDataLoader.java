@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.Set;
 
 import gr.ekt.bte.core.Record;
+import gr.ekt.bte.core.Value;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpException;
 import org.apache.log4j.Logger;
@@ -36,7 +37,7 @@ public class EPOOnlineDataLoader extends NetworkSubmissionLookupDataLoader {
 
     @Override
     public List<String> getSupportedIdentifiers() {
-        return Arrays.asList(new String[] { EPOPUBLICATIONNUMBER, EPOAPPLICANTNUMBER });
+        return Arrays.asList(new String[] { EPOPUBLICATIONNUMBER, EPOAPPLICANTNUMBER, EPOAPPLICANTDATE });
     }
 
     @Override
@@ -56,27 +57,43 @@ public class EPOOnlineDataLoader extends NetworkSubmissionLookupDataLoader {
     @Override
     public List<Record> search(Context context, String title, String author, int year)
             throws HttpException, IOException {
-        List<Record> results = new ArrayList<Record>();
-//        if (title != null && year != 0) {
-//            List<Record> search = epoService.search(null, title, author, year, getConsumerKey(),
-//                    getConsumerSecretKey());
-//            if (search != null) {
-//                for (Record scopus : search) {
-//                    results.add(convertFields(scopus));
-//                }
-//            }
-//        }
-        return results;
+
+        return new ArrayList<Record>();
     }
 
     @Override
     public List<Record> getByIdentifier(Context context, Map<String, Set<String>> keys)
             throws HttpException, IOException {
         String query = "";
+        String applicationDate = "";
+        boolean toCheckWithDate = false;
         List<String> ids = getSupportedIdentifiers();
         List<Record> results = new ArrayList<Record>();
 
+        // Getting application date
+        Set<String> appValues = keys.get(EPOAPPLICANTDATE);
+        if (appValues != null) {
+            for (String value : appValues) {
+                applicationDate = value.trim();
+                break;
+            }
+        }
+
         for (String id : ids) {
+            // skip application date
+            if (id == EPOAPPLICANTDATE) {
+                continue;
+            }
+
+            if (id == EPOAPPLICANTNUMBER) {
+                // skip application number only when date is not provided
+                if (StringUtils.isBlank(applicationDate)) {
+                    continue;
+                } else {
+                    toCheckWithDate = true;
+                }
+            }
+
             Set<String> values = keys.get(id);
 
             if (values != null) {
@@ -88,12 +105,15 @@ public class EPOOnlineDataLoader extends NetworkSubmissionLookupDataLoader {
                 }
             }
         }
-
+//        query = URLEncoder.encode(query, StandardCharsets.UTF_8.toString());
         if (query.length() > 0) {
             List<Record> records = epoService.search(query, getConsumerKey(), getConsumerSecretKey());
 
             for (Record record : records) {
-                results.add(convertFields(record));
+                Record convertedRecord = convertFields(record);
+                if (!toCheckWithDate || (toCheckWithDate && checkWithDate(applicationDate, convertedRecord))) {
+                    results.add(convertedRecord);
+                }
             }
         }
         return results;
@@ -127,5 +147,21 @@ public class EPOOnlineDataLoader extends NetworkSubmissionLookupDataLoader {
 
     public void setConfigurationService(ConfigurationService configurationService) {
         this.configurationService = configurationService;
+    }
+
+    protected boolean checkWithDate(String date, Record record) {
+        boolean isValid = false;
+
+        List<Value> values = record.getValues(EPOAPPLICANTDATE);
+        if (!values.isEmpty()) {
+            for (Value value : values) {
+                if (value != null && StringUtils.isNotBlank(value.getAsString()) && value.getAsString().equals(date)) {
+                    isValid = true;
+                    break;
+                }
+            }
+        }
+
+        return isValid;
     }
 }

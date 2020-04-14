@@ -707,7 +707,7 @@
 				<entry key="inventiontitle" value="title" />
 				<entry key="abstract" value="abstract" />
 				<entry key="dateissued" value="issued" />
-				<entry key="datefilled" value="filled" />
+				<entry key="datefilled" value="applicationdate" />
 				<entry key="ipc" value="ipc" />
 			</map>
 		</constructor-arg>

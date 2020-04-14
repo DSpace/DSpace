@@ -17,7 +17,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import javax.ws.rs.core.MediaType;
 
 import org.dspace.app.rest.builder.CollectionBuilder;
@@ -83,7 +82,8 @@ public class WorkspaceItemPatentStepIT extends AbstractControllerIntegrationTest
         Map<String, String> value = new HashMap<String, String>();
         value.put("value", "DE102012108018");
         values.add(value);
-        addId.add(new AddOperation("/sections/patent/dc.identifier.patentno", values));
+        // dc.identifier.patentnumber is used instead of dc.identifier.patentno
+        addId.add(new AddOperation("/sections/patent/dc.identifier.patentnumber", values));
 
         String patchBody = getPatchContent(addId);
 
@@ -95,7 +95,7 @@ public class WorkspaceItemPatentStepIT extends AbstractControllerIntegrationTest
                 .andExpect(jsonPath("$.sections.patent['dc.title'][0].value",
                         is("Verfahren zur bedarfsgerechten Regelung einer Vorrichtung für eine Schichtlüftung "
                                 + "und Vorrichtung für eine Schichtlüftung")))
-                .andExpect(jsonPath("$.sections.patent['dc.date.issued'][0].value", is("20140306")))
+                .andExpect(jsonPath("$.sections.patent['dc.date.issued'][0].value", is("2014-03-06")))
                 .andExpect(jsonPath("$.sections.patent['dc.contributor.author'][0].value", is("HESSELBACH JENS [DE]")))
                 .andExpect(jsonPath("$.sections.patent['dc.contributor.author'][1].value", is("SCHAEFER MIRKO [DE]")))
                 .andExpect(jsonPath("$.sections.patent['dc.contributor.author'][2].value", is("DETZER RUEDIGER [DE]")))
@@ -114,12 +114,13 @@ public class WorkspaceItemPatentStepIT extends AbstractControllerIntegrationTest
                                 + "Schichtlüftung entgegen gesteuert wird (V7).")));
 
         // verify that the patch changes have been persisted
-        getClient().perform(get("/api/submission/workspaceitems/" + witem.getID())).andExpect(status().isOk())
+        getClient(authToken)
+                .perform(get("/api/submission/workspaceitems/" + witem.getID())).andExpect(status().isOk())
                 // testing lookup
                 .andExpect(jsonPath("$.sections.patent['dc.title'][0].value",
                         is("Verfahren zur bedarfsgerechten Regelung einer Vorrichtung für eine Schichtlüftung "
                                 + "und Vorrichtung für eine Schichtlüftung")))
-                .andExpect(jsonPath("$.sections.patent['dc.date.issued'][0].value", is("20140306")))
+                .andExpect(jsonPath("$.sections.patent['dc.date.issued'][0].value", is("2014-03-06")))
                 .andExpect(jsonPath("$.sections.patent['dc.contributor.author'][0].value", is("HESSELBACH JENS [DE]")))
                 .andExpect(jsonPath("$.sections.patent['dc.contributor.author'][1].value", is("SCHAEFER MIRKO [DE]")))
                 .andExpect(jsonPath("$.sections.patent['dc.contributor.author'][2].value", is("DETZER RUEDIGER [DE]")))

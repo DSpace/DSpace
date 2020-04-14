@@ -11,7 +11,6 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -19,9 +18,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import gr.ekt.bte.core.Record;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpException;
 import org.apache.http.HttpResponse;
@@ -61,34 +58,38 @@ public class EPOService {
             throws HttpException, IOException {
         List<Record> records = new ArrayList<Record>();
 
-        String bearer = login(consumerKey, consumerSecretKey);
-        if (StringUtils.isNotBlank(query) && StringUtils.isNotBlank(bearer)) {
-            int start = START;
-            int end = SIZE;
-            List<EPODocumentId> epoDocIds = new ArrayList<EPODocumentId>();
+        if (StringUtils.isNotBlank(consumerKey) && StringUtils.isNotBlank(consumerSecretKey)) {
 
-            for (int i = 0; i < MAX; i++) {
-                List<EPODocumentId> ids = searchDocumentIds(bearer, query, start, end);
-
-                start = end + 1;
-                end = end + SIZE;
-                if (ids.size() > 0) {
-                    epoDocIds.addAll(ids);
+            String bearer = login(consumerKey, consumerSecretKey);
+            if (StringUtils.isNotBlank(query) && StringUtils.isNotBlank(bearer)) {
+                int start = START;
+                int end = SIZE;
+                List<EPODocumentId> epoDocIds = new ArrayList<EPODocumentId>();
+    
+                for (int i = 0; i < MAX; i++) {
+                    List<EPODocumentId> ids = searchDocumentIds(bearer, query, start, end);
+    
+                    start = end + 1;
+                    end = end + SIZE;
+                    if (ids.size() > 0) {
+                        epoDocIds.addAll(ids);
+                    }
+    
+                    if (ids.size() < SIZE) {
+                        break;
+                    }
                 }
-
-                if (ids.size() < SIZE) {
-                    break;
+    
+                for (EPODocumentId epoDocId : epoDocIds) {
+                    List<Record> recordfounds = searchDocument(bearer, epoDocId);
+    
+                    if (recordfounds.size() > 1) {
+                        log.warn("More record are returned with epocID " + epoDocId.toString());
+                    }
+                    records.addAll(recordfounds);
                 }
             }
 
-            for (EPODocumentId epoDocId : epoDocIds) {
-                List<Record> recordfounds = searchDocument(bearer, epoDocId);
-
-                if (recordfounds.size() > 1) {
-                    log.warn("More record are returned with epocID " + epoDocId.toString());
-                }
-                records.addAll(recordfounds);
-            }
         }
         return records;
     }
@@ -178,9 +179,9 @@ public class EPOService {
             Element range = XMLUtils.getSingleElement(biblio, "ops:range");
             String beginRange = range.getAttribute("begin");
             String endRange = range.getAttribute("end");
-            List<Element> searchResults = XMLUtils.getElementList(biblio, "ops:search-result");
-            for (Element searchResult : searchResults) {
-                Element pubReference = XMLUtils.getSingleElement(searchResult, "ops:publication-reference");
+            Element searchResult = XMLUtils.getSingleElement(biblio, "ops:search-result");
+            List<Element> pubReferences = XMLUtils.getElementList(searchResult, "ops:publication-reference");
+            for (Element pubReference : pubReferences) {
                 Element documentId = XMLUtils.getSingleElement(pubReference, "document-id");
 
                 results.add(new EPODocumentId(documentId));

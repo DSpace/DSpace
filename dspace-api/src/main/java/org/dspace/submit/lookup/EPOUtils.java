@@ -7,12 +7,13 @@
  */
 package org.dspace.submit.lookup;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.List;
 
 import gr.ekt.bte.core.MutableRecord;
 import gr.ekt.bte.core.Record;
 import gr.ekt.bte.core.StringValue;
-
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.util.XMLUtils;
 import org.dspace.submit.util.SubmissionLookupPublication;
@@ -70,10 +71,14 @@ public final class EPOUtils {
             String[] formats) {
 
         Element section = XMLUtils.getSingleElement(parties, sectionName);
-        List<Element> element = XMLUtils.getElementList(section, elementName);
-        EPOElementHolder holder = new EPOElementHolder(formats, element, "data-format", String.valueOf(sequence),
-                "sequence");
-        return holder.get();
+        if (section != null) {
+            List<Element> element = XMLUtils.getElementList(section, elementName);
+            EPOElementHolder holder = new EPOElementHolder(formats, element, "data-format", String.valueOf(sequence),
+                    "sequence");
+            return holder.get();
+        }
+
+        return null;
     }
 
     public static Record convertBibliographicData(Element exchangeDoc, String[] formats, String originFormat) {
@@ -84,14 +89,14 @@ public final class EPOUtils {
         if (epoDocumentId != null) {
             record.addValue("publicationnumber", new StringValue(epoDocumentId.getId()));
             if (StringUtils.isNotBlank(epoDocumentId.getDate())) {
-                record.addValue("dateissued", new StringValue(epoDocumentId.getDate()));
+                record.addValue("dateissued", new StringValue(formatDate(epoDocumentId.getDate())));
             }
         }
 
         EPODocumentId epoOriginDocumentId = getDocumentNumber(biblographicData, "application-reference", formats,
                 originFormat);
         if (epoOriginDocumentId != null && StringUtils.isNotBlank(epoOriginDocumentId.getDate())) {
-            record.addValue("datefilled", new StringValue(epoOriginDocumentId.getDate()));
+            record.addValue("datefilled", new StringValue(formatDate(epoOriginDocumentId.getDate())));
         } else {
             epoOriginDocumentId = null;
         }
@@ -100,7 +105,7 @@ public final class EPOUtils {
         if (epoDocumentId != null) {
             record.addValue("applicationnumber", new StringValue(epoDocumentId.getId()));
             if (epoOriginDocumentId == null && StringUtils.isNotBlank(epoDocumentId.getDate())) {
-                record.addValue("datefilled", new StringValue(epoDocumentId.getDate()));
+                record.addValue("datefilled", new StringValue(formatDate(epoDocumentId.getDate())));
             }
         }
 
@@ -152,5 +157,20 @@ public final class EPOUtils {
         }
 
         return record;
+    }
+
+    protected static String formatDate(String date) {
+        String formattedDate = "";
+        // input format: yyyyMMdd
+        SimpleDateFormat parser = new SimpleDateFormat("yyyyMMdd");
+        // output format: yyyy-MM-dd
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+        try {
+            formattedDate = formatter.format(parser.parse(date.trim()));
+        } catch (ParseException e) {
+            formattedDate = date;
+        }
+
+        return formattedDate;
     }
 }
