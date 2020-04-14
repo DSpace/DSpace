@@ -749,7 +749,6 @@
             <artifactId>feidelib-jar</artifactId>
             <version>1.0.29</version>
         </dependency>
-
         <dependency>
             <groupId>javax.xml.bind</groupId>
             <artifactId>jaxb-api</artifactId>
