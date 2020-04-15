@@ -11,6 +11,7 @@ import static org.junit.Assert.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.util.Iterator;
 import java.util.List;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -33,11 +34,9 @@ public class RegistrationRestControllerIT extends AbstractControllerIntegrationT
 
     @Test
     public void registrationFlowTest() throws Exception {
-        List<RegistrationData> registrationData = registrationDataDAO.findAll(context, RegistrationData.class);
-        assertTrue(registrationData.isEmpty());
+        List<RegistrationData> registrationDataList = registrationDataDAO.findAll(context, RegistrationData.class);
+        assertTrue(registrationDataList.isEmpty());
 
-        String token = getAuthToken(eperson.getEmail(), password);
-        String t = ";;";
         ObjectMapper mapper = new ObjectMapper();
         RegistrationRest registrationRest = new RegistrationRest();
         registrationRest.setEmail(eperson.getEmail());
@@ -45,9 +44,9 @@ public class RegistrationRestControllerIT extends AbstractControllerIntegrationT
                                 .content(mapper.writeValueAsBytes(registrationRest))
                                 .contentType(contentType))
                             .andExpect(status().isCreated());
-        registrationData = registrationDataDAO.findAll(context, RegistrationData.class);
-        assertTrue(registrationData.size() == 1);
-        assertTrue(StringUtils.equalsIgnoreCase(registrationData.get(0).getEmail(), eperson.getEmail()));
+        registrationDataList = registrationDataDAO.findAll(context, RegistrationData.class);
+        assertTrue(registrationDataList.size() == 1);
+        assertTrue(StringUtils.equalsIgnoreCase(registrationDataList.get(0).getEmail(), eperson.getEmail()));
 
         String newEmail = "newEPersonTest@gmail.com";
         registrationRest.setEmail(newEmail);
@@ -55,10 +54,10 @@ public class RegistrationRestControllerIT extends AbstractControllerIntegrationT
                                 .content(mapper.writeValueAsBytes(registrationRest))
                                 .contentType(contentType))
                    .andExpect(status().isCreated());
-        registrationData = registrationDataDAO.findAll(context, RegistrationData.class);
-        assertTrue(registrationData.size() == 2);
-        assertTrue(StringUtils.equalsIgnoreCase(registrationData.get(0).getEmail(), newEmail) ||
-                       StringUtils.equalsIgnoreCase(registrationData.get(1).getEmail(), newEmail));
+        registrationDataList = registrationDataDAO.findAll(context, RegistrationData.class);
+        assertTrue(registrationDataList.size() == 2);
+        assertTrue(StringUtils.equalsIgnoreCase(registrationDataList.get(0).getEmail(), newEmail) ||
+                       StringUtils.equalsIgnoreCase(registrationDataList.get(1).getEmail(), newEmail));
         configurationService.setProperty("user.registration", false);
 
         newEmail = "newEPersonTestTwo@gmail.com";
@@ -68,8 +67,14 @@ public class RegistrationRestControllerIT extends AbstractControllerIntegrationT
                                 .contentType(contentType))
                    .andExpect(status().is(500));
 
-        assertTrue(registrationData.size() == 2);
-        assertTrue(!StringUtils.equalsIgnoreCase(registrationData.get(0).getEmail(), newEmail) &&
-                       !StringUtils.equalsIgnoreCase(registrationData.get(1).getEmail(), newEmail));
+        assertTrue(registrationDataList.size() == 2);
+        assertTrue(!StringUtils.equalsIgnoreCase(registrationDataList.get(0).getEmail(), newEmail) &&
+                       !StringUtils.equalsIgnoreCase(registrationDataList.get(1).getEmail(), newEmail));
+
+        Iterator<RegistrationData> iterator = registrationDataList.iterator();
+        while (iterator.hasNext()) {
+            RegistrationData registrationData = iterator.next();
+            registrationDataDAO.delete(context, registrationData);
+        }
     }
 }

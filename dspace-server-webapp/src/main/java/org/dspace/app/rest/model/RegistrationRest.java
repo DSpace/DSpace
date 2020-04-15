@@ -13,7 +13,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import org.dspace.app.rest.RegistrationRestController;
 
 
-public class RegistrationRest extends BaseObjectRest<UUID> {
+public class RegistrationRest extends RestAddressableModel {
 
     public static final String NAME = "registration";
     public static final String NAME_PLURAL = "registrations";
