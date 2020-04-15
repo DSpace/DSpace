@@ -19,7 +19,10 @@ import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.EPersonRest;
+import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.rest.model.patch.Patch;
+import org.dspace.app.rest.repository.patch.operation.DSpaceObjectMetadataPatchUtils;
+import org.dspace.app.rest.repository.patch.operation.EPersonPasswordReplaceOperation;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.core.Context;
@@ -43,6 +46,9 @@ public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, E
 
     @Autowired
     AuthorizeService authorizeService;
+
+    @Autowired
+    DSpaceObjectMetadataPatchUtils metadataPatchUtils;
 
     private final EPersonService es;
 
@@ -164,10 +170,29 @@ public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, E
     }
 
     @Override
-    @PreAuthorize("hasPermission(#uuid, 'EPERSON', #patch)")
     protected void patch(Context context, HttpServletRequest request, String apiCategory, String model, UUID uuid,
-                         Patch patch) throws AuthorizeException, SQLException {
-        patchDSpaceObject(apiCategory, model, uuid, patch);
+        Patch patch) throws AuthorizeException, SQLException {
+        if (context.getCurrentUser() == null) {
+            throw new AuthorizeException("Need a valid authorization token/bearer");
+        }
+        if (authorizeService.isAdmin(context)) {
+            patchDSpaceObject(apiCategory, model, uuid, patch);
+        } else {
+            List<Operation> operations = patch.getOperations();
+            for (Operation operation : operations) {
+                if ((operation.getPath().startsWith(metadataPatchUtils.OPERATION_METADATA_PATH)
+                    || operation.getPath().equals(metadataPatchUtils.OPERATION_METADATA_PATH))
+                    || operation.getPath().startsWith(EPersonPasswordReplaceOperation.OPERATION_PASSWORD_CHANGE)) {
+                    // A metadata or pw change patch can also be done if editing own eperson's metadata (that is
+                    // performing patch)
+                    if (!context.getCurrentUser().getID().equals(uuid)) {
+                        throw new AuthorizeException("You can only change your own EPerson metadata or password");
+                    }
+                } else {
+                    throw new AuthorizeException("Only admins are allowed to change non-metadata EPerson data");
+                }
+            }
+        }
     }
 
     @Override
