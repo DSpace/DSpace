@@ -16,10 +16,17 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
+import org.dspace.app.rest.authorization.AuthorizationFeature;
+import org.dspace.app.rest.authorization.AuthorizationFeatureService;
+import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.RegistrationRest;
+import org.dspace.app.rest.model.SiteRest;
+import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.content.Site;
+import org.dspace.content.service.SiteService;
 import org.dspace.core.Context;
 import org.dspace.eperson.service.AccountService;
 import org.dspace.eperson.service.EPersonService;
@@ -28,6 +35,7 @@ import org.springframework.data.rest.webmvc.ControllerUtils;
 import org.springframework.hateoas.ResourceSupport;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -36,14 +44,14 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/" + RegistrationRest.CATEGORY + "/" + RegistrationRest.NAME_PLURAL)
 public class RegistrationRestController {
 
-//    @Autowired
-//    private AuthorizationFeatureService authorizationFeatureService;
-//
-//    @Autowired
-//    private SiteService siteService;
-//
-//    @Autowired
-//    private ConverterService converterService;
+    @Autowired
+    private AuthorizationFeatureService authorizationFeatureService;
+
+    @Autowired
+    private SiteService siteService;
+
+    @Autowired
+    private ConverterService converterService;
 
     @Autowired
     private AccountService accountService;
@@ -56,13 +64,13 @@ public class RegistrationRestController {
         throws SQLException, IOException, MessagingException, AuthorizeException {
 
         Context context = ContextUtil.obtainContext(request);
-//        AuthorizationFeature epersonRegistration = authorizationFeatureService.find("epersonRegistration");
-//        Site site = siteService.findSite(context);
-//        SiteRest siteRest = converterService.toRest(site, Projection.DEFAULT);
-//        if (!authorizationFeatureService.isAuthorized(context, epersonRegistration, siteRest)) {
-//            throw new AccessDeniedException("Registration is disabled, you are not authorized to create
-//            a new Authorization");
-//        }
+        AuthorizationFeature epersonRegistration = authorizationFeatureService.find("epersonRegistration");
+        Site site = siteService.findSite(context);
+        SiteRest siteRest = converterService.toRest(site, Projection.DEFAULT);
+        if (!authorizationFeatureService.isAuthorized(context, epersonRegistration, siteRest)) {
+            throw new AccessDeniedException(
+                "Registration is disabled, you are not authorized to create a new Authorization");
+        }
         ObjectMapper mapper = new ObjectMapper();
         RegistrationRest registrationRest;
         try {
