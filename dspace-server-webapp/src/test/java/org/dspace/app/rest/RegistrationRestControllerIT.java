@@ -65,7 +65,7 @@ public class RegistrationRestControllerIT extends AbstractControllerIntegrationT
         getClient().perform(post("/api/eperson/registrations")
                                 .content(mapper.writeValueAsBytes(registrationRest))
                                 .contentType(contentType))
-                   .andExpect(status().is(500));
+                   .andExpect(status().is(401));
 
         assertTrue(registrationDataList.size() == 2);
         assertTrue(!StringUtils.equalsIgnoreCase(registrationDataList.get(0).getEmail(), newEmail) &&
