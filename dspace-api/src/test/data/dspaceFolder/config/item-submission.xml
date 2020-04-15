@@ -18,6 +18,7 @@
     <!-- for handle "default". -->
     <submission-map>
         <name-map collection-handle="default" submission-name="traditional"/>
+        <name-map collection-handle="123456789/publication-1" submission-name="publication"/>
     </submission-map>
 
 
@@ -113,6 +114,28 @@
             <processing-class>org.dspace.submit.step.SampleStep</processing-class>
             <type>sample</type>
         </step>
+
+	    <step id="publication" mandatory="true">
+	      <heading>submit.progressbar.describe.publication</heading>
+	      <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
+	      <type>submission-form</type>
+	    </step>
+	    <step id="publication_indexing" mandatory="false">
+	      <heading>submit.progressbar.describe.publication_indexing</heading>
+	      <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
+	      <type>submission-form</type>
+	    </step>
+	    <step id="publication_bibliographic_details" mandatory="true">
+	      <heading>submit.progressbar.describe.publication_bibliographic_details</heading>
+	      <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
+	      <type>submission-form</type>
+	    </step>
+	    <step id="publication_references" mandatory="false">
+	      <heading>submit.progressbar.describe.publication_references</heading>
+	      <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
+	      <type>submission-form</type>
+	    </step>
+
     </step-definitions>
 
     <!-- The submission-definitions map lays out the detailed definition of -->
@@ -154,6 +177,17 @@
             <!-- <step id="creative-commons"/> -->
             <!-- <step id="verify"/> -->
         </submission-process>
+
+	    <submission-process name="publication">
+	      <step id="collection" />
+	      <step id="extraction" />
+	      <step id="publication" />
+	      <step id="publication_indexing" />
+	      <step id="publication_bibliographic_details" />
+	      <step id="publication_references" />
+	      <step id="upload" />
+	      <step id="license" />
+	    </submission-process>
 
     </submission-definitions>
 

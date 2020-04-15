@@ -303,6 +303,13 @@
         <qualifier>adsbibcode</qualifier>
         <scope_note>ADS Identifier</scope_note>
   </dc-type>
+
+  <dc-type>
+        <schema>dc</schema>
+        <element>identifier</element>
+        <qualifier>arxiv</qualifier>
+        <scope_note>arXiv Identifier</scope_note>
+  </dc-type>
   <!-- Used by system: do not remove -->
   <dc-type>
 	<schema>dc</schema>

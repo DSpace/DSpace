@@ -29,16 +29,12 @@ import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.WorkspaceItem;
-import org.dspace.eperson.Group;
-import org.dspace.eperson.factory.EPersonServiceFactory;
-import org.dspace.eperson.service.GroupService;
 import org.dspace.submit.listener.MetadataListener;
 import org.dspace.submit.lookup.PubmedEuropeOnlineDataLoader;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-
 
 /**
  * Test suite for the Pubmed Europe endpoint
@@ -59,18 +55,7 @@ public class PubmedEuropeOnlineDataLoaderTest extends AbstractControllerIntegrat
     @Before
     public void setUp() throws Exception {
         super.setUp();
-        context.turnOffAuthorisationSystem();
-
-        GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
-        Group adminGroup = groupService.findByName(context, Group.ADMIN);
-
-        if (!adminGroup.getMembers().contains(eperson)) {
-            groupService.addMember(context, adminGroup, eperson);
-            groupService.update(context, adminGroup);
-        }
-
-        context.restoreAuthSystemState();
-        //remove every listener expept PubmedEurope
+        // remove all dataloaders except PubmedEurope
         dataLoaderMap = metadataListener.getDataloadersMap();
         metadataListener.getDataloadersMap().clear();
         metadataListener.getDataloadersMap().put("pubmedEurope", onlineDataLoader);
@@ -78,20 +63,9 @@ public class PubmedEuropeOnlineDataLoaderTest extends AbstractControllerIntegrat
 
     @After
     public void destroy() throws Exception {
-        //restore standard listener
+        // restore standard listener
         metadataListener.getDataloadersMap().clear();
         metadataListener.getDataloadersMap().putAll(dataLoaderMap);
-        //remove eperon from admin group
-        context.turnOffAuthorisationSystem();
-        GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
-        Group adminGroup = groupService.findByName(context, Group.ADMIN);
-
-        if (adminGroup.getMembers().contains(eperson)) {
-            groupService.removeMember(context, adminGroup, eperson);
-            groupService.update(context, adminGroup);
-        }
-        context.restoreAuthSystemState();
-
         super.destroy();
     }
 
@@ -108,8 +82,9 @@ public class PubmedEuropeOnlineDataLoaderTest extends AbstractControllerIntegrat
         Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
             .withName("Sub Community")
             .build();
-        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
-
+        Collection col1 = CollectionBuilder.createCollection(context, child1, "123456789/publication-1")
+                .withName("Collection 1").build();
+        context.setCurrentUser(eperson);
         WorkspaceItem witem = WorkspaceItemBuilder.createWorkspaceItem(context, col1)
             .build();
         context.restoreAuthSystemState();
@@ -123,7 +98,6 @@ public class PubmedEuropeOnlineDataLoaderTest extends AbstractControllerIntegrat
         addId.add(new AddOperation("/sections/publication/dc.identifier.pmid", values));
 
         String pathBody = getPatchContent(addId);
-        context.setCurrentUser(eperson);
         String token = getAuthToken(eperson.getEmail(), password);
 
         getClient(token).perform(patch("/api/submission/workspaceitems/" + witem.getID())
@@ -225,8 +199,9 @@ public class PubmedEuropeOnlineDataLoaderTest extends AbstractControllerIntegrat
         Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
             .withName("Sub Community")
             .build();
-        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
-
+        Collection col1 = CollectionBuilder.createCollection(context, child1, "123456789/publication-1")
+                .withName("Collection 1").build();
+        context.setCurrentUser(eperson);
         WorkspaceItem witem = WorkspaceItemBuilder.createWorkspaceItem(context, col1)
             .build();
         context.restoreAuthSystemState();
@@ -240,7 +215,6 @@ public class PubmedEuropeOnlineDataLoaderTest extends AbstractControllerIntegrat
         addId.add(new AddOperation("/sections/publication/dc.identifier.doi", values));
 
         String pathBody = getPatchContent(addId);
-        context.setCurrentUser(eperson);
         String token = getAuthToken(eperson.getEmail(), password);
 
         getClient(token).perform(patch("/api/submission/workspaceitems/" + witem.getID())
@@ -344,7 +318,9 @@ public class PubmedEuropeOnlineDataLoaderTest extends AbstractControllerIntegrat
         Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
             .withName("Sub Community")
             .build();
-        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1, "123456789/publication-1")
+                .withName("Collection 1").build();
+        context.setCurrentUser(eperson);
         WorkspaceItem witem = WorkspaceItemBuilder.createWorkspaceItem(context, col1)
             .build();
         context.restoreAuthSystemState();
@@ -358,7 +334,6 @@ public class PubmedEuropeOnlineDataLoaderTest extends AbstractControllerIntegrat
         addId.add(new AddOperation("/sections/publication/dc.identifier.doi", values));
 
         String pathBody = getPatchContent(addId);
-        context.setCurrentUser(eperson);
         String token = getAuthToken(eperson.getEmail(), password);
         getClient(token).perform(patch("/api/submission/workspaceitems/" + witem.getID())
             .contentType(MediaType.APPLICATION_JSON_PATCH_JSON).content(pathBody))
@@ -371,7 +346,5 @@ public class PubmedEuropeOnlineDataLoaderTest extends AbstractControllerIntegrat
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.sections.publication.['dc.title'][0].value").doesNotExist())
             .andExpect(jsonPath("$.sections.publication.['dc.date.issued'][0].value").doesNotExist());
-
-
     }
 }

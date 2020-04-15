@@ -29,9 +29,6 @@ import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.WorkspaceItem;
-import org.dspace.eperson.Group;
-import org.dspace.eperson.factory.EPersonServiceFactory;
-import org.dspace.eperson.service.GroupService;
 import org.dspace.submit.listener.MetadataListener;
 import org.dspace.submit.lookup.ADSOnlineDataLoader;
 import org.junit.After;
@@ -58,18 +55,7 @@ public class ADSOnlineDataLoaderTest extends AbstractControllerIntegrationTest {
     @Before
     public void setUp() throws Exception {
         super.setUp();
-        context.turnOffAuthorisationSystem();
-
-        GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
-        Group adminGroup = groupService.findByName(context, Group.ADMIN);
-
-        if (!adminGroup.getMembers().contains(eperson)) {
-            groupService.addMember(context, adminGroup, eperson);
-            groupService.update(context, adminGroup);
-        }
-
-        context.restoreAuthSystemState();
-        //clear every provider in order to test just PubmedEurope endpoint
+        // remove all providers in order to test just ADSOnlineDataLoader
         dataLoaderMap = metadataListener.getDataloadersMap();
         metadataListener.getDataloadersMap().clear();
         metadataListener.getDataloadersMap().put("ads", onlineDataLoader);
@@ -77,20 +63,9 @@ public class ADSOnlineDataLoaderTest extends AbstractControllerIntegrationTest {
 
     @After
     public void destroy() throws Exception {
-        //restore standard listener
+        // restore standard listener
         metadataListener.getDataloadersMap().clear();
         metadataListener.getDataloadersMap().putAll(dataLoaderMap);
-        //remove eperon from admin group
-        context.turnOffAuthorisationSystem();
-        GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
-        Group adminGroup = groupService.findByName(context, Group.ADMIN);
-
-        if (adminGroup.getMembers().contains(eperson)) {
-            groupService.removeMember(context, adminGroup, eperson);
-            groupService.update(context, adminGroup);
-        }
-        context.restoreAuthSystemState();
-
         super.destroy();
     }
 
@@ -107,7 +82,10 @@ public class ADSOnlineDataLoaderTest extends AbstractControllerIntegrationTest {
         Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
             .withName("Sub Community")
             .build();
-        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1, "123456789/publication-1")
+                .withName("Collection 1").build();
+        // make our eperson the submitter
+        context.setCurrentUser(eperson);
         WorkspaceItem witem = WorkspaceItemBuilder.createWorkspaceItem(context, col1)
             .build();
         context.restoreAuthSystemState();
@@ -121,7 +99,6 @@ public class ADSOnlineDataLoaderTest extends AbstractControllerIntegrationTest {
         addId.add(new AddOperation("/sections/publication/dc.identifier.adsbibcode", values));
 
         String pathBody = getPatchContent(addId);
-        context.setCurrentUser(eperson);
         String token = getAuthToken(eperson.getEmail(), password);
         getClient(token).perform(patch("/api/submission/workspaceitems/" + witem.getID())
             .contentType(MediaType.APPLICATION_JSON_PATCH_JSON).content(pathBody))
@@ -133,7 +110,7 @@ public class ADSOnlineDataLoaderTest extends AbstractControllerIntegrationTest {
                 is("Research Development, US EPA Office of")))
             .andExpect(jsonPath("$.sections.publication_indexing.['dc.description.abstract'][0].value",
                 is("The Community Multiscale Air Quality (CMAQ) model is an active open-source " +
-                    "development projecADSOnlineDataLoaderTestt of the U.S. EPA that consists of a suite " +
+                    "development project of the U.S. EPA that consists of a suite " +
                     "of programs for " +
                     "conducting air quality model simulations. CMAQ combines current knowledge in " +
                     "atmospheric science and air quality modeling, multi-processor computing techniques, " +
@@ -200,7 +177,10 @@ public class ADSOnlineDataLoaderTest extends AbstractControllerIntegrationTest {
         Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
             .withName("Sub Community")
             .build();
-        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1, "123456789/publication-1")
+                .withName("Collection 1").build();
+        // make our eperson the submitter
+        context.setCurrentUser(eperson);
         WorkspaceItem witem = WorkspaceItemBuilder.createWorkspaceItem(context, col1)
             .build();
         context.restoreAuthSystemState();
@@ -214,7 +194,6 @@ public class ADSOnlineDataLoaderTest extends AbstractControllerIntegrationTest {
         addId.add(new AddOperation("/sections/publication/dc.identifier.doi", values));
 
         String pathBody = getPatchContent(addId);
-        context.setCurrentUser(eperson);
         String token = getAuthToken(eperson.getEmail(), password);
         getClient(token).perform(patch("/api/submission/workspaceitems/" + witem.getID())
             .contentType(MediaType.APPLICATION_JSON_PATCH_JSON).content(pathBody))
@@ -277,8 +256,6 @@ public class ADSOnlineDataLoaderTest extends AbstractControllerIntegrationTest {
                     "polyaromatic hydrocarbons (PAHs). Incorporation of new binary nucleation and " +
                     "updates to PM2.5 emission size distribution to improve aerosol size distribution " +
                     "simulation. Included gravitational settling for coarse aerosols.")));
-
-
     }
 
     @Test
@@ -294,7 +271,9 @@ public class ADSOnlineDataLoaderTest extends AbstractControllerIntegrationTest {
         Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
             .withName("Sub Community")
             .build();
-        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1, "123456789/publication-1")
+                .withName("Collection 1").build();
+        context.setCurrentUser(eperson);
         WorkspaceItem witem = WorkspaceItemBuilder.createWorkspaceItem(context, col1)
             .build();
         context.restoreAuthSystemState();
@@ -308,7 +287,6 @@ public class ADSOnlineDataLoaderTest extends AbstractControllerIntegrationTest {
         addId.add(new AddOperation("/sections/publication/dc.identifier.arxiv", values));
 
         String pathBody = getPatchContent(addId);
-        context.setCurrentUser(eperson);
         String token = getAuthToken(eperson.getEmail(), password);
         getClient(token).perform(patch("/api/submission/workspaceitems/" + witem.getID())
             .contentType(MediaType.APPLICATION_JSON_PATCH_JSON).content(pathBody))
@@ -384,7 +362,9 @@ public class ADSOnlineDataLoaderTest extends AbstractControllerIntegrationTest {
         Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
             .withName("Sub Community")
             .build();
-        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1, "123456789/publication-1")
+                .withName("Collection 1").build();
+        context.setCurrentUser(eperson);
         WorkspaceItem witem = WorkspaceItemBuilder.createWorkspaceItem(context, col1)
             .build();
         context.restoreAuthSystemState();
@@ -398,7 +378,6 @@ public class ADSOnlineDataLoaderTest extends AbstractControllerIntegrationTest {
         addId.add(new AddOperation("/sections/publication/dc.identifier.doi", values));
 
         String pathBody = getPatchContent(addId);
-        context.setCurrentUser(eperson);
         String token = getAuthToken(eperson.getEmail(), password);
         getClient(token).perform(patch("/api/submission/workspaceitems/" + witem.getID())
             .contentType(MediaType.APPLICATION_JSON_PATCH_JSON).content(pathBody))
@@ -411,7 +390,5 @@ public class ADSOnlineDataLoaderTest extends AbstractControllerIntegrationTest {
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.sections.publication.['dc.title'][0].value").doesNotExist())
             .andExpect(jsonPath("$.sections.publication.['dc.date.issued'][0].value").doesNotExist());
-
-
     }
 }
