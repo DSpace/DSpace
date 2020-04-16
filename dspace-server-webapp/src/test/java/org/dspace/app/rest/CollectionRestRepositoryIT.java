@@ -88,9 +88,9 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$._embedded.collections", Matchers.containsInAnyOrder(
-                       CollectionMatcher.matchCollectionEntryFullProjection(col1.getName(), col1.getID(),
+                       CollectionMatcher.matchCollectionEntrySpecificEmbedProjection(col1.getName(), col1.getID(),
                                                                             col1.getHandle()),
-                       CollectionMatcher.matchCollectionEntryFullProjection(col2.getName(), col2.getID(),
+                       CollectionMatcher.matchCollectionEntrySpecificEmbedProjection(col2.getName(), col2.getID(),
                                                                             col2.getHandle())
                    )));
     }
@@ -225,12 +225,12 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                 .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$._embedded.collections", Matchers.contains(
-                       CollectionMatcher.matchCollectionEntryFullProjection(col1.getName(), col1.getID(),
+                       CollectionMatcher.matchCollectionEntrySpecificEmbedProjection(col1.getName(), col1.getID(),
                                                                             col1.getHandle())
                    )))
                    .andExpect(jsonPath("$._embedded.collections", Matchers.not(
                        Matchers.contains(
-                           CollectionMatcher.matchCollectionEntryFullProjection(col2.getName(), col2.getID(),
+                           CollectionMatcher.matchCollectionEntrySpecificEmbedProjection(col2.getName(), col2.getID(),
                                                                                 col2.getHandle())
                        )
                    )));
@@ -243,12 +243,12 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$._embedded.collections", Matchers.contains(
-                       CollectionMatcher.matchCollectionEntryFullProjection(col2.getName(), col2.getID(),
+                       CollectionMatcher.matchCollectionEntrySpecificEmbedProjection(col2.getName(), col2.getID(),
                                                                             col2.getHandle())
                    )))
                    .andExpect(jsonPath("$._embedded.collections", Matchers.not(
                        Matchers.contains(
-                           CollectionMatcher.matchCollectionEntryFullProjection(col1.getName(), col1.getID(),
+                           CollectionMatcher.matchCollectionEntrySpecificEmbedProjection(col1.getName(), col1.getID(),
                                                                                 col1.getHandle())
                        )
                    )));
@@ -283,7 +283,7 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
 
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
-                .andExpect(jsonPath("$", CollectionMatcher.matchFullEmbeds()))
+                .andExpect(jsonPath("$", CollectionMatcher.matchSpecificEmbeds()))
                 .andExpect(jsonPath("$", CollectionMatcher.matchCollectionEntry(
                         col1.getName(), col1.getID(), col1.getHandle())));
 
@@ -418,12 +418,12 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$", is(
-                       CollectionMatcher.matchCollectionEntryFullProjection(col1.getName(), col1.getID(),
+                       CollectionMatcher.matchCollectionEntrySpecificEmbedProjection(col1.getName(), col1.getID(),
                                                                             col1.getHandle())
                    )))
                    .andExpect(jsonPath("$", Matchers.not(
                        is(
-                           CollectionMatcher.matchCollectionEntryFullProjection(col2.getName(), col2.getID(),
+                           CollectionMatcher.matchCollectionEntrySpecificEmbedProjection(col2.getName(), col2.getID(),
                                                                                 col2.getHandle())
                        )))
                    )
@@ -567,12 +567,12 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$", is(
-                       CollectionMatcher.matchCollectionEntryFullProjection(col1.getName(), col1.getID(),
+                       CollectionMatcher.matchCollectionEntrySpecificEmbedProjection(col1.getName(), col1.getID(),
                                                                             col1.getHandle())
                    )))
                    .andExpect(jsonPath("$", Matchers.not(
                        is(
-                           CollectionMatcher.matchCollectionEntryFullProjection(col2.getName(), col2.getID(),
+                           CollectionMatcher.matchCollectionEntrySpecificEmbedProjection(col2.getName(), col2.getID(),
                                                                                 col2.getHandle())
                        ))));
     }
@@ -598,7 +598,7 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$", Matchers.is(
-                       CollectionMatcher.matchCollectionEntryFullProjection(col1.getName(), col1.getID(),
+                       CollectionMatcher.matchCollectionEntrySpecificEmbedProjection(col1.getName(), col1.getID(),
                                                                             col1.getHandle())
                    )))
                    .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/core/collections")))
@@ -627,8 +627,8 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$", Matchers.is(
-                       CollectionMatcher.matchCollectionEntryFullProjection("Electronic theses and dissertations",
-                                                              col1.getID(), col1.getHandle())
+                       CollectionMatcher.matchCollectionEntrySpecificEmbedProjection(
+                           "Electronic theses and dissertations", col1.getID(), col1.getHandle())
                    )))
                    .andExpect(jsonPath("$._links.self.href",
                                        Matchers.containsString("/api/core/collections")))
@@ -670,7 +670,7 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                         .andExpect(status().isOk())
                         .andExpect(content().contentType(contentType))
                         .andExpect(jsonPath("$", Matchers.is(
-                            CollectionMatcher.matchCollectionEntryFullProjection(col1.getName(), col1.getID(),
+                            CollectionMatcher.matchCollectionEntrySpecificEmbedProjection(col1.getName(), col1.getID(),
                                                                                  col1.getHandle())
                         )))
                         .andExpect(jsonPath("$._links.self.href",
@@ -716,7 +716,7 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                         .andExpect(status().isOk())
                         .andExpect(content().contentType(contentType))
                         .andExpect(jsonPath("$", Matchers.is(
-                            CollectionMatcher.matchCollectionEntryFullProjection(col1.getName(), col1.getID(),
+                            CollectionMatcher.matchCollectionEntrySpecificEmbedProjection(col1.getName(), col1.getID(),
                                                                                  col1.getHandle())
                         )))
                         .andExpect(jsonPath("$._links.self.href",
@@ -765,7 +765,7 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
 
                             .andExpect(status().isCreated())
                             .andExpect(content().contentType(contentType))
-                            .andExpect(jsonPath("$", CollectionMatcher.matchFullEmbeds()))
+                            .andExpect(jsonPath("$", CollectionMatcher.matchSpecificEmbeds()))
                             .andExpect(jsonPath("$", Matchers.allOf(
                                 hasJsonPath("$.id", not(empty())),
                                 hasJsonPath("$.uuid", not(empty())),
@@ -940,7 +940,7 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                         .andExpect(status().isOk())
                         .andExpect(content().contentType(contentType))
                         .andExpect(jsonPath("$", Matchers.is(
-                            CollectionMatcher.matchCollectionEntryFullProjection(col1.getName(), col1.getID(),
+                            CollectionMatcher.matchCollectionEntrySpecificEmbedProjection(col1.getName(), col1.getID(),
                                                                                  col1.getHandle())
                         )))
                         .andExpect(jsonPath("$._links.self.href",
@@ -978,7 +978,7 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$", Matchers.is(
-                       CollectionMatcher.matchCollectionEntryFullProjection(col1.getName(), col1.getID(),
+                       CollectionMatcher.matchCollectionEntrySpecificEmbedProjection(col1.getName(), col1.getID(),
                                                                             col1.getHandle())
                    )))
                    .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/core/collections")))
@@ -1010,8 +1010,8 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$", Matchers.is(
-                       CollectionMatcher.matchCollectionEntryFullProjection("Electronic theses and dissertations",
-                                                              col1.getID(), col1.getHandle())
+                       CollectionMatcher.matchCollectionEntrySpecificEmbedProjection(
+                           "Electronic theses and dissertations", col1.getID(), col1.getHandle())
                    )))
                    .andExpect(jsonPath("$._links.self.href",
                                        Matchers.containsString("/api/core/collections")))
@@ -1152,9 +1152,9 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$._embedded.collections", Matchers.containsInAnyOrder(
-                       CollectionMatcher.matchCollectionEntryFullProjection(col1.getName(), col1.getID(),
+                       CollectionMatcher.matchCollectionEntrySpecificEmbedProjection(col1.getName(), col1.getID(),
                                                                             col1.getHandle()),
-                       CollectionMatcher.matchCollectionEntryFullProjection(col2.getName(), col2.getID(),
+                       CollectionMatcher.matchCollectionEntrySpecificEmbedProjection(col2.getName(), col2.getID(),
                                                                             col2.getHandle())
                    )))
                    .andExpect(jsonPath("$.page", PageMatcher.pageEntryWithTotalPagesAndElements(0, 20,
@@ -1307,10 +1307,8 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
         context.restoreAuthSystemState();
 
 
-        getClient().perform(get("/api/core/collections/" + col1.getID())
-                                         .param("projection", "full"))
+        getClient().perform(get("/api/core/collections/" + col1.getID()))
                         .andExpect(status().isOk())
-                        .andExpect(jsonPath("$", CollectionMatcher.matchFullEmbeds()))
                         .andExpect(jsonPath("$", CollectionMatcher.matchProperties(col1.getName(),
                                                                                    col1.getID(),
                                                                                    col1.getHandle())))
@@ -1338,10 +1336,8 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
 
         String token = getAuthToken(admin.getEmail(), password);
 
-        getClient(token).perform(get("/api/core/collections/" + col1.getID())
-                                         .param("projection", "full"))
+        getClient(token).perform(get("/api/core/collections/" + col1.getID()))
                         .andExpect(status().isOk())
-                        .andExpect(jsonPath("$", CollectionMatcher.matchFullEmbeds()))
                         .andExpect(jsonPath("$", CollectionMatcher.matchProperties(col1.getName(),
                                                                               col1.getID(),
                                                                               col1.getHandle())))
@@ -1373,10 +1369,8 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
 
         String token = getAuthToken(eperson.getEmail(), password);
 
-        getClient(token).perform(get("/api/core/collections/" + col1.getID())
-                                         .param("projection", "full"))
+        getClient(token).perform(get("/api/core/collections/" + col1.getID()))
                         .andExpect(status().isOk())
-                        .andExpect(jsonPath("$", CollectionMatcher.matchFullEmbeds()))
                         .andExpect(jsonPath("$", CollectionMatcher.matchProperties(col1.getName(),
                                                                               col1.getID(),
                                                                               col1.getHandle())))
