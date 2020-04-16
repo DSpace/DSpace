@@ -18,6 +18,7 @@
     <!-- for handle "default". -->
     <submission-map>
         <name-map collection-handle="default" submission-name="traditional"/>
+        <name-map collection-handle="123456789/language-test-1" submission-name="languagetestprocess"/>
     </submission-map>
 
 
@@ -108,6 +109,12 @@
             <processing-class>org.dspace.submit.step.SampleStep</processing-class>
             <type>sample</type>
         </step>
+
+        <step id="languagetest" mandatory="true">
+            <heading>submit.progressbar.describe.stepone</heading>
+            <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
+            <type>submission-form</type>
+        </step>
     </step-definitions>
 
     <!-- The submission-definitions map lays out the detailed definition of -->
@@ -149,6 +156,10 @@
             <!-- <step id="verify"/> -->
         </submission-process>
 
+        <submission-process name="languagetestprocess">
+            <step id="collection"/>
+            <step id="languagetest"/>
+        </submission-process>
     </submission-definitions>
 
 </item-submission>
