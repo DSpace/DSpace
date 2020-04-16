@@ -86,6 +86,24 @@ public interface CreativeCommonsService {
     public String getLicenseURL(Context context, Item item)
             throws SQLException, IOException, AuthorizeException;
 
+
+    /**
+     * Returns the stored license uri of the item
+     *
+     * @param item  - The item for which to retrieve the stored license uri
+     * @return the stored license uri of the item
+     */
+    public String getLicenseURI(Item item);
+
+    /**
+     * Returns the stored license name of the item
+     *
+     * @param item  - The item for which to retrieve the stored license name
+     * @return the stored license name of the item
+     */
+    public String getLicenseName(Item item);
+
+
     public String getLicenseRDF(Context context, Item item)
             throws SQLException, IOException, AuthorizeException;
 
@@ -124,7 +142,7 @@ public interface CreativeCommonsService {
      * @param fieldId name of the property.
      * @return its value.
      */
-    public LicenseMetadataValue getCCField(String fieldId);
+    public String getCCField(String fieldId);
 
     /**
      * Apply same transformation on the document to retrieve only the most
