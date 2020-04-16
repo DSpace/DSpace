@@ -235,13 +235,49 @@ public class CreativeCommonsServiceImpl implements CreativeCommonsService, Initi
 
     @Override
     public String getLicenseURL(Context context, Item item) throws SQLException, IOException, AuthorizeException {
-        String licenseUri = getCCField("uri").ccItemValue(item);
+        String licenseUri = getCCField("uri");
         if (StringUtils.isNotBlank(licenseUri)) {
-            return licenseUri;
+            return getLicenseURI(item);
         }
 
         // JSPUI backward compatibility see https://jira.duraspace.org/browse/DS-2604
         return getStringFromBitstream(context, item, BSN_LICENSE_URL);
+    }
+
+    /**
+     * Returns the stored license uri of the item
+     *
+     * @param item  - The item for which to retrieve the stored license uri
+     * @return the stored license uri of the item
+     */
+    @Override
+    public String getLicenseURI(Item item) {
+        String licenseUriField = getCCField("uri");
+        if (StringUtils.isNotBlank(licenseUriField)) {
+            String metadata = itemService.getMetadata(item, licenseUriField);
+            if (StringUtils.isNotBlank(metadata)) {
+                return metadata;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Returns the stored license name of the item
+     *
+     * @param item  - The item for which to retrieve the stored license name
+     * @return the stored license name of the item
+     */
+    @Override
+    public String getLicenseName( Item item) {
+        String licenseNameField = getCCField("name");
+        if (StringUtils.isNotBlank(licenseNameField)) {
+            String metadata = itemService.getMetadata(item, licenseNameField);
+            if (StringUtils.isNotBlank(metadata)) {
+                return metadata;
+            }
+        }
+        return null;
     }
 
     @Override
@@ -374,8 +410,8 @@ public class CreativeCommonsServiceImpl implements CreativeCommonsService, Initi
      * Returns a metadata field handle for given field Id
      */
     @Override
-    public LicenseMetadataValue getCCField(String fieldId) {
-        return new LicenseMetadataValue(configurationService.getProperty("cc.license." + fieldId));
+    public String getCCField(String fieldId) {
+        return configurationService.getProperty("cc.license." + fieldId);
     }
 
     @Override
@@ -401,6 +437,7 @@ public class CreativeCommonsServiceImpl implements CreativeCommonsService, Initi
      *
      * @return A list of available CC Licenses
      */
+    @Override
     public List<CCLicense> findAllCCLicenses() {
         return findAllCCLicenses(defaultLanguage);
     }
@@ -411,6 +448,7 @@ public class CreativeCommonsServiceImpl implements CreativeCommonsService, Initi
      * @param language - the language for which to find the CC Licenses
      * @return A list of available CC Licenses for the provided language
      */
+    @Override
     public List<CCLicense> findAllCCLicenses(String language) {
 
         if (!ccLicenses.containsKey(language)) {
@@ -425,6 +463,7 @@ public class CreativeCommonsServiceImpl implements CreativeCommonsService, Initi
      * @param id - the ID of the license to be found
      * @return the corresponding license if found or null when not found
      */
+    @Override
     public CCLicense findOne(String id) {
         return findOne(id, defaultLanguage);
     }
@@ -436,6 +475,7 @@ public class CreativeCommonsServiceImpl implements CreativeCommonsService, Initi
      * @param language - the language for which to find the CC License
      * @return the corresponding license if found or null when not found
      */
+    @Override
     public CCLicense findOne(String id, String language) {
         if (!ccLicenses.containsKey(language)) {
             initLicenses(language);
@@ -465,6 +505,7 @@ public class CreativeCommonsServiceImpl implements CreativeCommonsService, Initi
      * @param answerMap - the answers to the different field questions
      * @return the corresponding license URI
      */
+    @Override
     public String retrieveLicenseUri(String licenseId, Map<String, String> answerMap) {
         return retrieveLicenseUri(licenseId, defaultLanguage, answerMap);
 
@@ -478,6 +519,7 @@ public class CreativeCommonsServiceImpl implements CreativeCommonsService, Initi
      * @param answerMap - the answers to the different field questions
      * @return the corresponding license URI
      */
+    @Override
     public String retrieveLicenseUri(String licenseId, String language, Map<String, String> answerMap) {
         return ccLicenseConnectorService.retrieveRightsByQuestion(licenseId, language, answerMap);
 
@@ -491,6 +533,7 @@ public class CreativeCommonsServiceImpl implements CreativeCommonsService, Initi
      * @param fullAnswerMap - the answers to the different field questions
      * @return whether the information is valid
      */
+    @Override
     public boolean verifyLicenseInformation(String licenseId, Map<String, String> fullAnswerMap) {
         return verifyLicenseInformation(licenseId, defaultLanguage, fullAnswerMap);
     }
@@ -504,6 +547,7 @@ public class CreativeCommonsServiceImpl implements CreativeCommonsService, Initi
      * @param fullAnswerMap - the answers to the different field questions
      * @return whether the information is valid
      */
+    @Override
     public boolean verifyLicenseInformation(String licenseId, String language, Map<String, String> fullAnswerMap) {
         CCLicense ccLicense = findOne(licenseId, language);
 
@@ -529,6 +573,7 @@ public class CreativeCommonsServiceImpl implements CreativeCommonsService, Initi
      * @param answerMap - the answers to the different field questions
      * @return the answerMap supplemented with all other license fields with a blank answer
      */
+    @Override
     public Map<String, String> retrieveFullAnswerMap(String licenseId, Map<String, String> answerMap) {
         return retrieveFullAnswerMap(licenseId, defaultLanguage, answerMap);
     }
@@ -542,6 +587,7 @@ public class CreativeCommonsServiceImpl implements CreativeCommonsService, Initi
      * @param answerMap - the answers to the different field questions
      * @return the answerMap supplemented with all other license fields with a blank answer for the provided language
      */
+    @Override
     public Map<String, String> retrieveFullAnswerMap(String licenseId, String language, Map<String, String> answerMap) {
         CCLicense ccLicense = findOne(licenseId, language);
         if (ccLicense == null) {
