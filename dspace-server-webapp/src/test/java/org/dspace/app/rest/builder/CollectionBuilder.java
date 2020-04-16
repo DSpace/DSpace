@@ -164,14 +164,27 @@ public class CollectionBuilder extends AbstractDSpaceObjectBuilder<Collection> {
 
     @Override
     public void cleanup() throws Exception {
+        deleteAdminGroup();
+        deleteDefaultReadGroups(collection);
         deleteWorkflowGroups(collection);
         delete(collection);
+    }
+
+    private void deleteAdminGroup() throws SQLException, AuthorizeException {
+        if (collection.getAdministrators() != null) {
+            try (Context c = new Context()) {
+                c.turnOffAuthorisationSystem();
+                collectionService.removeAdministrators(c, collection);
+                c.complete();
+            }
+        }
     }
 
     public void deleteWorkflowGroups(Collection collection) throws Exception {
 
         try (Context c = new Context()) {
             c.turnOffAuthorisationSystem();
+
             for (int i = 1; i <= 3; i++) {
                 Group g = collectionService.getWorkflowGroup(c, collection, i);
                 if (g != null) {
@@ -184,8 +197,26 @@ public class CollectionBuilder extends AbstractDSpaceObjectBuilder<Collection> {
             }
             c.complete();
         }
+    }
 
-        indexingService.commit();
+    public void deleteDefaultReadGroups(Collection collection) throws Exception {
+
+        try (Context c = new Context()) {
+            c.turnOffAuthorisationSystem();
+
+            Group defaultItemReadGroup = groupService.findByName(c, "COLLECTION_" +
+                collection.getID().toString() + "_ITEM_DEFAULT_READ");
+            Group defaultBitstreamReadGroup = groupService.findByName(c, "COLLECTION_" +
+                collection.getID().toString() + "_BITSTREAM_DEFAULT_READ");
+            if (defaultItemReadGroup != null) {
+                groupService.delete(c, defaultItemReadGroup);
+            }
+            if (defaultBitstreamReadGroup != null) {
+                groupService.delete(c, defaultBitstreamReadGroup);
+            }
+
+            c.complete();
+        }
     }
 
     /**
