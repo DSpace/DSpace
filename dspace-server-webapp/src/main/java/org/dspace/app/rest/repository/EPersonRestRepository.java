@@ -19,6 +19,7 @@ import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.EPersonRest;
+import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.rest.model.patch.Patch;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
@@ -28,6 +29,7 @@ import org.dspace.eperson.service.EPersonService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
@@ -167,6 +169,18 @@ public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, E
     @PreAuthorize("hasPermission(#uuid, 'EPERSON', #patch)")
     protected void patch(Context context, HttpServletRequest request, String apiCategory, String model, UUID uuid,
                          Patch patch) throws AuthorizeException, SQLException {
+        if (StringUtils.isNotBlank(request.getParameter("token"))) {
+            boolean passwordChangeFound = false;
+            for (Operation operation : patch.getOperations()) {
+                if (StringUtils.equalsIgnoreCase(operation.getPath(), "/password")) {
+                    passwordChangeFound = true;
+                }
+            }
+            if (!passwordChangeFound) {
+                throw new AccessDeniedException("Couldn't perform the patch as a token with provided without " +
+                                                    "a password change");
+            }
+        }
         patchDSpaceObject(apiCategory, model, uuid, patch);
     }
 
