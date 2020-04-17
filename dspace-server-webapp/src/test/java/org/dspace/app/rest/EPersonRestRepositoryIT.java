@@ -14,6 +14,8 @@ import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
@@ -28,6 +30,7 @@ import java.util.UUID;
 import javax.ws.rs.core.MediaType;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.builder.CollectionBuilder;
 import org.dspace.app.rest.builder.CommunityBuilder;
 import org.dspace.app.rest.builder.EPersonBuilder;
@@ -39,6 +42,7 @@ import org.dspace.app.rest.matcher.HalMatcher;
 import org.dspace.app.rest.model.EPersonRest;
 import org.dspace.app.rest.model.MetadataRest;
 import org.dspace.app.rest.model.MetadataValueRest;
+import org.dspace.app.rest.model.RegistrationRest;
 import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.rest.model.patch.ReplaceOperation;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
@@ -47,12 +51,25 @@ import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
+import org.dspace.eperson.PasswordHash;
+import org.dspace.eperson.service.AccountService;
+import org.dspace.eperson.service.EPersonService;
+import org.dspace.eperson.service.RegistrationDataService;
 import org.hamcrest.Matchers;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 
 public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
 
+    @Autowired
+    private AccountService accountService;
+
+    @Autowired
+    private RegistrationDataService registrationDataService;
+
+    @Autowired
+    private EPersonService ePersonService;
 
     @Test
     public void createTest() throws Exception {
@@ -1590,4 +1607,200 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                             );
 
     }
+
+    @Test
+    public void patchReplacePasswordWithToken() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        EPerson ePerson = EPersonBuilder.createEPerson(context)
+                                        .withNameInMetadata("John", "Doe")
+                                        .withEmail("Johndoe@fake-email.com")
+                                        .withPassword(password)
+                                        .build();
+
+        String newPassword = "newpassword";
+
+        context.restoreAuthSystemState();
+
+        List<Operation> ops = new ArrayList<Operation>();
+        ReplaceOperation replaceOperation = new ReplaceOperation("/password", newPassword);
+        ops.add(replaceOperation);
+        String patchBody = getPatchContent(ops);
+        accountService.sendRegistrationInfo(context, ePerson.getEmail());
+        String tokenForEPerson = registrationDataService.findByEmail(context, ePerson.getEmail()).getToken();
+        String token = getAuthToken(admin.getEmail(), password);
+        PasswordHash oldPassword = ePersonService.getPasswordHash(ePerson);
+        // updates password
+        getClient(token).perform(patch("/api/eperson/epersons/" + ePerson.getID())
+                                     .content(patchBody)
+                                     .contentType(MediaType.APPLICATION_JSON_PATCH_JSON)
+                                     .param("token", tokenForEPerson))
+                        .andExpect(status().isOk());
+
+        PasswordHash newPasswordHash = ePersonService.getPasswordHash(ePerson);
+        assertFalse(oldPassword.equals(newPasswordHash));
+        assertTrue(registrationDataService.findByEmail(context, ePerson.getEmail()) == null);
+    }
+
+
+    @Test
+    public void patchReplacePasswordWithRandomTokenPatchFail() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        EPerson ePerson = EPersonBuilder.createEPerson(context)
+                                        .withNameInMetadata("John", "Doe")
+                                        .withEmail("Johndoe@fake-email.com")
+                                        .withPassword(password)
+                                        .build();
+
+        String newPassword = "newpassword";
+
+        context.restoreAuthSystemState();
+
+        List<Operation> ops = new ArrayList<Operation>();
+        ReplaceOperation replaceOperation = new ReplaceOperation("/password", newPassword);
+        ops.add(replaceOperation);
+        String patchBody = getPatchContent(ops);
+        accountService.sendRegistrationInfo(context, ePerson.getEmail());
+        String tokenForEPerson = registrationDataService.findByEmail(context, ePerson.getEmail()).getToken();
+        String token = getAuthToken(admin.getEmail(), password);
+        PasswordHash oldPassword = ePersonService.getPasswordHash(ePerson);
+        // updates password
+        getClient(token).perform(patch("/api/eperson/epersons/" + ePerson.getID())
+                                     .content(patchBody)
+                                     .contentType(MediaType.APPLICATION_JSON_PATCH_JSON)
+                                     .param("token", "RandomToken"))
+                        .andExpect(status().isForbidden());
+
+        PasswordHash newPasswordHash = ePersonService.getPasswordHash(ePerson);
+        assertTrue(StringUtils.equalsIgnoreCase(oldPassword.getHashString(),newPasswordHash.getHashString()));
+        assertFalse(registrationDataService.findByEmail(context, ePerson.getEmail()) == null);
+        assertTrue(StringUtils.equals(registrationDataService.findByEmail(context, ePerson.getEmail()).getToken(),
+                                      tokenForEPerson));
+    }
+
+    @Test
+    public void patchReplacePasswordWithOtherUserTokenFail() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        EPerson ePerson = EPersonBuilder.createEPerson(context)
+                                        .withNameInMetadata("John", "Doe")
+                                        .withEmail("Johndoe@fake-email.com")
+                                        .withPassword(password)
+                                        .build();
+
+
+        EPerson ePersonTwo = EPersonBuilder.createEPerson(context)
+                                        .withNameInMetadata("Smith", "Donald")
+                                        .withEmail("donaldSmith@fake-email.com")
+                                        .withPassword(password)
+                                        .build();
+
+        String newPassword = "newpassword";
+
+        context.restoreAuthSystemState();
+
+        List<Operation> ops = new ArrayList<Operation>();
+        ReplaceOperation replaceOperation = new ReplaceOperation("/password", newPassword);
+        ops.add(replaceOperation);
+        String patchBody = getPatchContent(ops);
+        accountService.sendRegistrationInfo(context, ePerson.getEmail());
+        accountService.sendRegistrationInfo(context, ePersonTwo.getEmail());
+        String tokenForEPerson = registrationDataService.findByEmail(context, ePerson.getEmail()).getToken();
+        String tokenForEPersonTwo = registrationDataService.findByEmail(context, ePersonTwo.getEmail()).getToken();
+
+        String token = getAuthToken(admin.getEmail(), password);
+        PasswordHash oldPassword = ePersonService.getPasswordHash(ePerson);
+        // updates password
+        getClient(token).perform(patch("/api/eperson/epersons/" + ePerson.getID())
+                                     .content(patchBody)
+                                     .contentType(MediaType.APPLICATION_JSON_PATCH_JSON)
+                                     .param("token", tokenForEPersonTwo))
+                        .andExpect(status().isForbidden());
+
+        PasswordHash newPasswordHash = ePersonService.getPasswordHash(ePerson);
+        assertTrue(StringUtils.equalsIgnoreCase(oldPassword.getHashString(),newPasswordHash.getHashString()));
+        assertFalse(registrationDataService.findByEmail(context, ePerson.getEmail()) == null);
+    }
+
+    @Test
+    public void patchReplaceEmailWithTokenFail() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        String originalEmail = "Johndoe@fake-email.com";
+        EPerson ePerson = EPersonBuilder.createEPerson(context)
+                                        .withNameInMetadata("John", "Doe")
+                                        .withEmail(originalEmail)
+                                        .withPassword(password)
+                                        .build();
+
+        String newEmail = "johnyandmaria@fake-email.com";
+
+        context.restoreAuthSystemState();
+
+        List<Operation> ops = new ArrayList<Operation>();
+        ReplaceOperation replaceOperation = new ReplaceOperation("/email", newEmail);
+        ops.add(replaceOperation);
+        String patchBody = getPatchContent(ops);
+        accountService.sendRegistrationInfo(context, ePerson.getEmail());
+        String tokenForEPerson = registrationDataService.findByEmail(context, ePerson.getEmail()).getToken();
+        String token = getAuthToken(admin.getEmail(), password);
+        PasswordHash oldPassword = ePersonService.getPasswordHash(ePerson);
+        // updates password
+        getClient(token).perform(patch("/api/eperson/epersons/" + ePerson.getID())
+                                     .content(patchBody)
+                                     .contentType(MediaType.APPLICATION_JSON_PATCH_JSON)
+                                     .param("token", tokenForEPerson))
+                        .andExpect(status().isForbidden());
+
+        PasswordHash newPasswordHash = ePersonService.getPasswordHash(ePerson);
+        assertTrue(StringUtils.equalsIgnoreCase(oldPassword.getHashString(),newPasswordHash.getHashString()));
+        assertFalse(registrationDataService.findByEmail(context, ePerson.getEmail()) == null);
+        assertTrue(StringUtils.equalsIgnoreCase(ePerson.getEmail(), originalEmail));
+    }
+
+    @Test
+    public void registerNewAccountPatchUpdatePasswordRandomUserUuidFail() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        ObjectMapper mapper = new ObjectMapper();
+        String newRegisterEmail = "new-register@fake-email.com";
+        RegistrationRest registrationRest = new RegistrationRest();
+        registrationRest.setEmail(newRegisterEmail);
+        getClient().perform(post("/api/eperson/registrations")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(mapper.writeValueAsBytes(registrationRest)))
+                   .andExpect(status().isCreated());
+
+        EPerson ePerson = EPersonBuilder.createEPerson(context)
+                                        .withNameInMetadata("John", "Doe")
+                                        .withEmail("Johndoe@fake-email.com")
+                                        .withPassword(password)
+                                        .build();
+
+        String newPassword = "newpassword";
+
+        context.restoreAuthSystemState();
+
+        List<Operation> ops = new ArrayList<Operation>();
+        ReplaceOperation replaceOperation = new ReplaceOperation("/password", newPassword);
+        ops.add(replaceOperation);
+        String patchBody = getPatchContent(ops);
+        accountService.sendRegistrationInfo(context, ePerson.getEmail());
+        String newRegisterToken = registrationDataService.findByEmail(context, newRegisterEmail).getToken();
+        String token = getAuthToken(admin.getEmail(), password);
+        PasswordHash oldPassword = ePersonService.getPasswordHash(ePerson);
+        // updates password
+        getClient(token).perform(patch("/api/eperson/epersons/" + ePerson.getID())
+                                     .content(patchBody)
+                                     .contentType(MediaType.APPLICATION_JSON_PATCH_JSON)
+                                     .param("token", newRegisterToken))
+                        .andExpect(status().isForbidden());
+
+        PasswordHash newPasswordHash = ePersonService.getPasswordHash(ePerson);
+        assertTrue(StringUtils.equalsIgnoreCase(oldPassword.getHashString(),newPasswordHash.getHashString()));
+        assertFalse(registrationDataService.findByEmail(context, ePerson.getEmail()) == null);
+        assertFalse(registrationDataService.findByEmail(context, newRegisterEmail) == null);
+    }
+
 }
