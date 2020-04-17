@@ -3737,8 +3737,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 .andExpect(jsonPath("$._links.self.href", containsString("/api/discover/search/objects")))
         ;
 
-        // reviewer1 should see two pool items, one from the submitter and one from the administrator
-        // the other task in step1 is claimed by the administrator so it should be not visible to the reviewer1
+        // reviewer1 should not see pool items, as he is not an administrator
         getClient(reviewer1Token).perform(get("/api/discover/search/objects").param("configuration", "workflowAdmin"))
                 //** THEN **
                 //The status has to be 200 OK
@@ -3748,35 +3747,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 //There needs to be a page object that shows the total pages and total elements as well as the
                 // size and the current page (number)
                 .andExpect(jsonPath("$._embedded.searchResult.page", is(
-                        PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 2)
-                )))
-                // These search results have to be shown in the embedded.objects section:
-                // two workflow items, one submitted by the user and one submitted by the admin.
-                // The claimed task of the administrator and the pool task for step 2 should not be visible to
-                // reviewer1.
-                // Please note that the workspace items should not be visible here either.
-                //Seeing as everything fits onto one page, they have to all be present
-                .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.containsInAnyOrder(
-                        Matchers.allOf(
-                                SearchResultMatcher.match("workflow", "pooltask", "pooltasks"),
-                                JsonPathMatchers.hasJsonPath("$._embedded.indexableObject._embedded.workflowitem",
-                                        is(WorkflowItemMatcher.matchItemWithTitleAndDateIssued(
-                                                null, "Workflow Item 1", "2010-11-03")))
-                                ),
-                        Matchers.allOf(
-                                SearchResultMatcher.match("workflow", "pooltask", "pooltasks"),
-                                JsonPathMatchers.hasJsonPath("$._embedded.indexableObject._embedded.workflowitem",
-                                        is(WorkflowItemMatcher.matchItemWithTitleAndDateIssued(
-                                                null, "Admin Workflow Item 1", "2010-11-03")))
-                                )
-                )))
-                //These facets have to show up in the embedded.facets section as well with the given hasMore
-                // property because we don't exceed their default limit for a hasMore true (the default is 10)
-                .andExpect(jsonPath("$._embedded.facets", Matchers.containsInAnyOrder(
-                        FacetEntryMatcher.resourceTypeFacet(false),
-                        FacetEntryMatcher.typeFacet(false),
-                        FacetEntryMatcher.dateIssuedFacet(false),
-                        FacetEntryMatcher.submitterFacet(false)
+                        PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 0, 0)
                 )))
                 //There always needs to be a self link
                 .andExpect(jsonPath("$._links.self.href", containsString("/api/discover/search/objects")))
@@ -3802,26 +3773,26 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 //Seeing as everything fits onto one page, they have to all be present
                 .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.containsInAnyOrder(
                         Matchers.allOf(
-                                SearchResultMatcher.match("workflow", "pooltask", "pooltasks"),
-                                JsonPathMatchers.hasJsonPath("$._embedded.indexableObject._embedded.workflowitem",
+                                SearchResultMatcher.match("workflow", "workflowitem", "workflowitems"),
+                                JsonPathMatchers.hasJsonPath("$._embedded.indexableObject",
                                         is(WorkflowItemMatcher.matchItemWithTitleAndDateIssued(
                                                 null, "Workflow Item 1", "2010-11-03")))
                                 ),
                         Matchers.allOf(
-                                SearchResultMatcher.match("workflow", "pooltask", "pooltasks"),
-                                JsonPathMatchers.hasJsonPath("$._embedded.indexableObject._embedded.workflowitem",
+                                SearchResultMatcher.match("workflow", "workflowitem", "workflowitems"),
+                                JsonPathMatchers.hasJsonPath("$._embedded.indexableObject",
                                         is(WorkflowItemMatcher.matchItemWithTitleAndDateIssued(
                                                 null, "Admin Workflow Item 1", "2010-11-03")))
                                 ),
                         Matchers.allOf(
-                                SearchResultMatcher.match("workflow", "pooltask", "pooltasks"),
-                                JsonPathMatchers.hasJsonPath("$._embedded.indexableObject._embedded.workflowitem",
+                                SearchResultMatcher.match("workflow", "workflowitem", "workflowitems"),
+                                JsonPathMatchers.hasJsonPath("$._embedded.indexableObject",
                                         is(WorkflowItemMatcher.matchItemWithTitleAndDateIssued(
                                                 null, "Pool Step2 Item", "2010-11-04")))
                                 ),
                         Matchers.allOf(
-                                SearchResultMatcher.match("workflow", "claimedtask", "claimedtask"),
-                                JsonPathMatchers.hasJsonPath("$._embedded.indexableObject._embedded.workflowitem",
+                                SearchResultMatcher.match("workflow", "workflowitem", "workflowitems"),
+                                JsonPathMatchers.hasJsonPath("$._embedded.indexableObject",
                                         is(WorkflowItemMatcher.matchItemWithTitleAndDateIssued(
                                                 null, "Claimed Item", "2010-11-03")))
                                 )
@@ -3838,7 +3809,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 .andExpect(jsonPath("$._links.self.href", containsString("/api/discover/search/objects")))
         ;
 
-        // reviewer2 should only see one pool item
+        // reviewer2 should not see pool items, as he is not an administrator
         getClient(reviewer2Token).perform(get("/api/discover/search/objects").param("configuration", "workflowAdmin"))
                 //** THEN **
                 //The status has to be 200 OK
@@ -3848,24 +3819,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 //There needs to be a page object that shows the total pages and total elements as well as the
                 // size and the current page (number)
                 .andExpect(jsonPath("$._embedded.searchResult.page", is(
-                        PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 1)
-                )))
-                // These search results have to be shown in the embedded.objects section
-                .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.containsInAnyOrder(
-                        Matchers.allOf(
-                                SearchResultMatcher.match("workflow", "pooltask", "pooltasks"),
-                                JsonPathMatchers.hasJsonPath("$._embedded.indexableObject._embedded.workflowitem",
-                                        is(WorkflowItemMatcher.matchItemWithTitleAndDateIssued(
-                                                null, "Pool Step2 Item", "2010-11-04")))
-                                )
-                )))
-                //These facets have to show up in the embedded.facets section as well with the given hasMore
-                // property because we don't exceed their default limit for a hasMore true (the default is 10)
-                .andExpect(jsonPath("$._embedded.facets", Matchers.containsInAnyOrder(
-                        FacetEntryMatcher.resourceTypeFacet(false),
-                        FacetEntryMatcher.typeFacet(false),
-                        FacetEntryMatcher.dateIssuedFacet(false),
-                        FacetEntryMatcher.submitterFacet(false)
+                        PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 0, 0)
                 )))
                 //There always needs to be a self link
                 .andExpect(jsonPath("$._links.self.href", containsString("/api/discover/search/objects")))
