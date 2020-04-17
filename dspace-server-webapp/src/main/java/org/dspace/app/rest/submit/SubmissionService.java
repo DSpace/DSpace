@@ -90,8 +90,10 @@ public class SubmissionService {
     /**
      * Create a workspaceitem using the information in the request
      *
-     * @param context the dspace context
-     * @param request the request containing the details about the workspace to create
+     * @param context
+     *            the dspace context
+     * @param request
+     *            the request containing the details about the workspace to create
      * @return
      * @throws SQLException
      * @throws AuthorizeException
@@ -273,6 +275,15 @@ public class SubmissionService {
         workflowItemService.update(context, source);
     }
 
+    /**
+     * Builds the CC License data of an inprogress submission based on the cc license info present in the metadata
+     *
+     * @param obj   - the in progress submission
+     * @return an object representing the CC License data
+     * @throws SQLException
+     * @throws IOException
+     * @throws AuthorizeException
+     */
     public DataCCLicense getDataCCLicense(InProgressSubmission obj)
             throws SQLException, IOException, AuthorizeException {
         DataCCLicense result = new DataCCLicense();
