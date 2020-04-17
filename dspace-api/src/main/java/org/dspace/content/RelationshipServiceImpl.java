@@ -537,9 +537,9 @@ public class RelationshipServiceImpl implements RelationshipService {
     }
 
     @Override
-    public int countByItemAndRelationshipType(Context context, Item item, RelationshipType relationshipType)
-            throws SQLException {
-        return relationshipDAO.countByItemAndRelationshipType(context, item, relationshipType);
+    public int countByItemAndRelationshipType(Context context, Item item, RelationshipType relationshipType,
+                                              boolean isLeft) throws SQLException {
+        return relationshipDAO.countByItemAndRelationshipType(context, item, relationshipType, isLeft);
     }
 
     @Override
