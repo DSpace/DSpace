@@ -18,9 +18,21 @@ import org.dspace.content.InProgressSubmission;
 import org.dspace.core.Context;
 import org.dspace.services.model.Request;
 
-
+/**
+ * CC License step for DSpace Spring Rest. Expose the creative commons license information about the in progress
+ * submission.
+ */
 public class CCLicenseStep extends org.dspace.submit.step.CCLicenseStep implements AbstractRestProcessingStep {
 
+    /**
+     * Retrieves the CC License data of the in progress submission
+     *
+     * @param submissionService the submission service
+     * @param obj               the in progress submission
+     * @param config            the submission step configuration
+     * @return the CC License data of the in progress submission
+     * @throws Exception
+     */
     @Override
     public DataCCLicense getData(SubmissionService submissionService, InProgressSubmission obj,
                                  SubmissionStepConfig config)
@@ -29,6 +41,15 @@ public class CCLicenseStep extends org.dspace.submit.step.CCLicenseStep implemen
     }
 
 
+    /**
+     * Processes a patch for the CC License data
+     *
+     * @param context        the DSpace context
+     * @param currentRequest the http request
+     * @param source         the in progress submission
+     * @param op             the json patch operation
+     * @throws Exception
+     */
     @Override
     public void doPatchProcessing(Context context, Request currentRequest, InProgressSubmission source, Operation op)
             throws Exception {

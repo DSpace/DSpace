@@ -9,7 +9,9 @@ package org.dspace.app.rest.model.step;
 
 import org.dspace.app.rest.model.BitstreamRest;
 
-
+/**
+ * Java Bean to expose the section creativecommons representing the CC License during in progress submission.
+ */
 public class DataCCLicense implements SectionData {
 
     private String uri;

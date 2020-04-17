@@ -18,8 +18,6 @@ import org.dspace.content.MetadataValue;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
-import org.dspace.license.factory.LicenseServiceFactory;
-import org.dspace.license.service.CreativeCommonsService;
 
 /**
  * Helper class for using CC-related Metadata fields
@@ -29,7 +27,6 @@ import org.dspace.license.service.CreativeCommonsService;
 public class LicenseMetadataValue {
 
     protected final ItemService itemService;
-    protected final CreativeCommonsService creativeCommonsService;
     // Shibboleth for Creative Commons license data - i.e. characters that reliably indicate CC in a URI
     protected static final String ccShib = "creativecommons";
 
@@ -44,7 +41,6 @@ public class LicenseMetadataValue {
             params[3] = Item.ANY;
         }
         itemService = ContentServiceFactory.getInstance().getItemService();
-        creativeCommonsService = LicenseServiceFactory.getInstance().getCreativeCommonsService();
     }
 
     /**
