@@ -17,7 +17,9 @@ import org.springframework.data.domain.Sort;
 import org.springframework.web.util.UriComponentsBuilder;
 
 /**
- * This class constructs the page element in the HalResource on the endpoints.
+ * This class inserts pagination information into the endpoints.
+ * It constructs the "page" element (number, size, totalPages, totalElements) in the HalResource for the endpoints.
+ * It also constructs the "_links" element (next, last, prev, self, first) in the HalResource for the endpoints.
  */
 public class EmbeddedPageHeader {
 
@@ -86,7 +88,13 @@ public class EmbeddedPageHeader {
         return new Href(uriComp.build().toUriString());
     }
 
-    private class Href {
+    /**
+     * Represents an individual "_link", including its HREF property.
+     * (e.g. "next" : { "href": "[next-link]" } )
+     * <P>
+     * NOTE: This inner class is protected to allow for easier unit testing
+     */
+    protected class Href {
         private String href;
 
         public Href(String href) {
