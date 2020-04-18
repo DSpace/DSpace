@@ -154,7 +154,14 @@ public class SHERPAResponse
                             // as per previous functionality (for simple display)
                             if (item.has("publishers")) {
                                 JSONArray publishers = item.getJSONArray("publishers");
-                                sherpaPublisher.setName(parsePublisherName(publishers));
+                                if (publishers.length() > 0) {
+                                    JSONObject publisherElement = publishers.getJSONObject(0);
+                                    if (publisherElement.has("publisher")) {
+                                        JSONObject publisher = publisherElement.getJSONObject("publisher");
+                                        sherpaPublisher.setName(parsePublisherName(publisher));
+                                        sherpaPublisher.setUri(parsePublisherURL(publisher));
+                                    }
+                                }
                             }
 
                             // Parse journal data
@@ -466,27 +473,34 @@ public class SHERPAResponse
 
     /**
      * Parse publisher array and return the first name string found
-     * @param publishers - array of publisher JSON data
+     * @param publisher - array of publisher JSON data
      * @return first publisher name found (trimmed String)
      */
-    private String parsePublisherName(JSONArray publishers) {
+    private String parsePublisherName(JSONObject publisher) {
         String name = null;
-        if (publishers.length() > 0) {
-            JSONObject publisherElement = publishers.getJSONObject(0);
-            if (publisherElement.has("publisher")) {
-                JSONObject publisher = publisherElement.getJSONObject("publisher");
-                if (publisher.has("name")) {
-                    JSONArray publisherNames = publisher.getJSONArray("name");
-                    if (publisherNames.length() > 0) {
-                        JSONObject publisherName = publisherNames.getJSONObject(0);
-                        if (publisherName.has("name")) {
-                            name = publisherName.getString("name").trim();
-                        }
-                    }
+        if (publisher.has("name")) {
+            JSONArray publisherNames = publisher.getJSONArray("name");
+            if (publisherNames.length() > 0) {
+                JSONObject publisherName = publisherNames.getJSONObject(0);
+                if (publisherName.has("name")) {
+                    name = publisherName.getString("name").trim();
                 }
             }
         }
         return name;
+    }
+
+
+    /**
+     * Parse publisher URL from the json data
+     * @param publisher - publisher object (from JSON array)
+     * @return publisher URL as string
+     */
+    private String parsePublisherURL(JSONObject publisher) {
+        if (publisher.has("url")) {
+            return publisher.getString("url");
+        }
+        return null;
     }
 
     /**
