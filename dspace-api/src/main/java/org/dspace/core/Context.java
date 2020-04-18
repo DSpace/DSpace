@@ -179,7 +179,7 @@ public class Context implements AutoCloseable {
         }
 
         currentUser = null;
-        currentLocale = I18nUtil.DEFAULTLOCALE;
+        currentLocale = I18nUtil.getDefaultLocale();
         extraLogInfo = "";
         ignoreAuth = false;
 

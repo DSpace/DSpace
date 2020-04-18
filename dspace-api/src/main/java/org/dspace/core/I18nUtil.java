@@ -37,9 +37,6 @@ import org.dspace.services.factory.DSpaceServicesFactory;
 public class I18nUtil {
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(I18nUtil.class);
 
-    // the default Locale of this DSpace Instance
-    public static final Locale DEFAULTLOCALE = getDefaultLocale();
-
     // delimiters between elements of UNIX/POSIX locale spec, e.g. en_US.UTF-8
     private static final String LOCALE_DELIMITERS = " _.";
 
@@ -127,7 +124,7 @@ public class I18nUtil {
             return parseLocales(locales);
         } else {
             Locale[] availableLocales = new Locale[1];
-            availableLocales[0] = DEFAULTLOCALE;
+            availableLocales[0] = getDefaultLocale();
             return availableLocales;
         }
     }
@@ -148,7 +145,7 @@ public class I18nUtil {
         Locale supportedLocale = null;
         String testLocale = "";
         if (availableLocales == null) {
-            supportedLocale = DEFAULTLOCALE;
+            supportedLocale = getDefaultLocale();
         } else {
             if (!locale.getVariant().equals("")) {
                 testLocale = locale.toString();
@@ -188,7 +185,7 @@ public class I18nUtil {
                 }
             }
             if (!isSupported) {
-                supportedLocale = DEFAULTLOCALE;
+                supportedLocale = getDefaultLocale();
             }
         }
         return supportedLocale;
@@ -220,7 +217,7 @@ public class I18nUtil {
      * String of the message
      */
     public static String getMessage(String key) {
-        return getMessage(key.trim(), DEFAULTLOCALE);
+        return getMessage(key.trim(), getDefaultLocale());
     }
 
     /**
@@ -233,7 +230,7 @@ public class I18nUtil {
      */
     public static String getMessage(String key, Locale locale) {
         if (locale == null) {
-            locale = DEFAULTLOCALE;
+            locale = getDefaultLocale();
         }
         ResourceBundle.Control control =
             ResourceBundle.Control.getNoFallbackControl(
