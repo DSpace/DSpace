@@ -14,6 +14,9 @@ public class SHERPAPermittedVersion {
     // Version (submitted, accepted, published)
     private String articleVersion;
 
+    // Version label
+    private String articleVersionLabel;
+
     // Option number
     private int option;
 
@@ -87,5 +90,13 @@ public class SHERPAPermittedVersion {
 
     public void setOption(int option) {
         this.option = option;
+    }
+
+    public String getArticleVersionLabel() {
+        return articleVersionLabel;
+    }
+
+    public void setArticleVersionLabel(String articleVersionLabel) {
+        this.articleVersionLabel = articleVersionLabel;
     }
 }

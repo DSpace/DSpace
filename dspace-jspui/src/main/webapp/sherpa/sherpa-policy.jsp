@@ -114,7 +114,7 @@
 													<c:when test="${version.option == 1}">
 														<h4>
 															<fmt:message key="jsp.sherpa.version.permissions">
-																<fmt:param value="${version.articleVersion}"/>
+																<fmt:param value="${version.articleVersionLabel}"/>
 															</fmt:message>
 														</h4>
 													</c:when>

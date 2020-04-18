@@ -19,6 +19,7 @@ public class SHERPAJournal {
     private SHERPAPublisher publisher;
     private List<SHERPAPublisher> publishers;
     private List<SHERPAPublisherPolicy> policies;
+    private Boolean inDOAJ;
 
     public SHERPAJournal() {
 
@@ -86,5 +87,13 @@ public class SHERPAJournal {
 
     public void setPolicies(List<SHERPAPublisherPolicy> policies) {
         this.policies = policies;
+    }
+
+    public Boolean getInDOAJ() {
+        return inDOAJ;
+    }
+
+    public void setInDOAJ(Boolean inDOAJ) {
+        this.inDOAJ = inDOAJ;
     }
 }
