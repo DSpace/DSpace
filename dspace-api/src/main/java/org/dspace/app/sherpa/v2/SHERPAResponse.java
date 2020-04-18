@@ -7,6 +7,7 @@
  */
 package org.dspace.app.sherpa.v2;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
@@ -56,11 +57,11 @@ public class SHERPAResponse
 
     private static Logger log = Logger.getLogger(SHERPAResponse.class);
 
-    public SHERPAResponse(InputStream inputStream) {
+    public SHERPAResponse(InputStream inputStream) throws IOException {
         this(inputStream, SHERPAFormat.XML);
     }
 
-    public SHERPAResponse(InputStream input, SHERPAFormat format) {
+    public SHERPAResponse(InputStream input, SHERPAFormat format) throws IOException {
         if (format == SHERPAFormat.JSON) {
             parseJSON(input);
         }
@@ -70,8 +71,9 @@ public class SHERPAResponse
      * Parse the SHERPA v2 API JSON and construct Romeo policy data for display
      * @param jsonData
      */
-    private void parseJSON(InputStream jsonData) {
-        JSONTokener jsonTokener = new JSONTokener(new InputStreamReader(jsonData));
+    private void parseJSON(InputStream jsonData) throws IOException {
+        InputStreamReader streamReader = new InputStreamReader(jsonData);
+        JSONTokener jsonTokener = new JSONTokener(streamReader);
         JSONObject httpResponse;
         try {
             httpResponse = new JSONObject(jsonTokener);
@@ -415,6 +417,8 @@ public class SHERPAResponse
         } catch(JSONException e) {
             log.error("Failed to parse SHERPA response", e);
             error = true;
+        } finally {
+            streamReader.close();
         }
     }
 
