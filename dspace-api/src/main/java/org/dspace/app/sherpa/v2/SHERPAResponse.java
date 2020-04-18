@@ -403,13 +403,6 @@ public class SHERPAResponse
                         this.journals.add(sherpaJournal);
                     }
 
-                    String licenceText = I18nUtil.getMessage("jsp.sherpa.license-default");
-                    String disclaimerText = I18nUtil.getMessage("jsp.sherpa.disclaimer");
-                    String licenceUrl = I18nUtil.getMessage("jsp.sherpa.license-url");
-                    this.license = licenceText;
-                    this.licenseURL = licenceUrl;
-                    this.disclaimer = disclaimerText;
-
                 } else {
                     error = true;
                     message = "No results found";
