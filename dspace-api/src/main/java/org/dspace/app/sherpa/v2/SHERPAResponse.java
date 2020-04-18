@@ -34,9 +34,6 @@ public class SHERPAResponse
 {
     private boolean error;
     private String message;
-    private String license;
-    private String licenseURL;
-    private String disclaimer;
     private SHERPASystemMetadata metadata;
     private List<SHERPAJournal> journals;
 
@@ -47,9 +44,6 @@ public class SHERPAResponse
     // SHERPA URI (the human page version of this API response)
 
     private String uri;
-
-    // Journal / publisher URL
-    private String journalUrl;
 
     public enum SHERPAFormat {
         XML, JSON
@@ -124,9 +118,6 @@ public class SHERPAResponse
                                 metadata.setPubliclyVisible ("yes".equals(systemMetadata
                                     .getString("listed_in_doaj")));
                             }
-                        }
-                        if (item.has("url")) {
-                            this.journalUrl = item.getString("url");
                         }
 
                         boolean inDOAJ = false;
@@ -265,21 +256,6 @@ public class SHERPAResponse
                                             }
                                         }
                                         permittedVersion.setPrerequisites(prerequisites);
-
-                                        // A rough attempt at guessing colour based on the doc in the DSpace page
-                                        // SHERPA have confirmed we shouldn't really use this anymore
-                                        if (allowed.contains("submitted") &&
-                                            (allowed.contains("accepted") || allowed.contains("published"))) {
-                                            sherpaPublisher.setRomeoColour("green");
-                                        } else if (allowed.contains("accepted") || allowed.contains("published")) {
-                                            sherpaPublisher.setRomeoColour("blue");
-                                        } else if (allowed.contains("submitted")) {
-                                            sherpaPublisher.setRomeoColour("yellow");
-                                        } else if (inDOAJ) {
-                                            sherpaPublisher.setRomeoColour("gray");
-                                        } else {
-                                            sherpaPublisher.setRomeoColour("white");
-                                        }
 
                                         // Populate the old indicators
                                         if (allowed.contains("submitted")) {
@@ -440,21 +416,6 @@ public class SHERPAResponse
 
     public void setMessage(String message) {
         this.message = message;
-    }
-
-    public String getLicense()
-    {
-        return license;
-    }
-
-    public String getLicenseURL()
-    {
-        return licenseURL;
-    }
-
-    public String getDisclaimer()
-    {
-        return disclaimer;
     }
 
     public List<SHERPAJournal> getJournals()

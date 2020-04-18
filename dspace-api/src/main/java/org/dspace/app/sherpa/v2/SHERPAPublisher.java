@@ -19,10 +19,6 @@ public class SHERPAPublisher {
     private String paidAccessDescription;
     private String paidAccessUrl;
 
-    // This is deprecated - we should not rely on 'SHERPA ROMeO colour' anymore and it is a bit dangerous
-    // to try and calculated it ourselves, now that it is no longer supplied
-    private String romeoColour;
-
     public SHERPAPublisher() {
     }
 
@@ -82,11 +78,4 @@ public class SHERPAPublisher {
         this.paidAccessUrl = paidAccessUrl;
     }
 
-    public String getRomeoColour() {
-        return romeoColour;
-    }
-
-    public void setRomeoColour(String romeoColour) {
-        this.romeoColour = romeoColour;
-    }
 }
