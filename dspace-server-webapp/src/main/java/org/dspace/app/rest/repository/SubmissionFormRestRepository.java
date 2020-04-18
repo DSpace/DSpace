@@ -87,4 +87,13 @@ public class SubmissionFormRestRepository extends DSpaceRestRepository<Submissio
     public Class<SubmissionFormRest> getDomainClass() {
         return SubmissionFormRest.class;
     }
+
+    public void reload() throws DCInputsReaderException {
+        this.defaultInputReader = new DCInputsReader();
+        Locale[] locales = I18nUtil.getSupportedLocales();
+        this.inputReaders = new HashMap<Locale, DCInputsReader>();
+        for (Locale locale : locales) {
+            inputReaders.put(locale, new DCInputsReader(I18nUtil.getInputFormsFileName(locale)));
+        }
+    }
 }

@@ -47,7 +47,7 @@
             </row>
         </form>
 
-        <form name="testlanguage">
+        <form name="languagetest">
             <row>
                 <relation-field>
                     <relationship-type>isAuthorOfPublication</relationship-type>
@@ -86,10 +86,7 @@
                     <repeatable>false</repeatable>
                     <label>Мова</label>
                     <input-type value-pairs-name="common_iso_languages">dropdown</input-type>
-                    <hint>Виберiть мову головного змiсту файлу, як що мови немає у списку,
-                          вибрати "Iнша". Як що вмiст вайлу не є текстовим, наприклад 
-                          є фотографiєю, тодi вибрати "N/A"
-                    </hint>
+                    <hint>Виберiть мову головного змiсту файлу, як що мови немає у списку, вибрати (Iнша). Як що вмiст вайлу не є текстовим, наприклад є фотографiєю, тодi вибрати (N/A) </hint>
                     <required></required>
                 </field>
             </row>
