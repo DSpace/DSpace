@@ -87,9 +87,7 @@
                     <repeatable>false</repeatable>
                     <label>Lingua</label>
                     <input-type value-pairs-name="common_iso_languages">dropdown</input-type>
-                    <hint>Selezionare la lingua del contenuto principale dell'item. Se la lingua non compare
-                          nell'elenco, selezionare "Altro". Se il contenuto non ha davvero una lingua (ad esempio,
-                          se è un set di dati o un'immagine) selezionare "N/A".
+                    <hint>Selezionare la lingua del contenuto principale dell'item. Se la lingua non compare nell'elenco, selezionare (Altro). Se il contenuto non ha davvero una lingua (ad esempio, se è un set di dati o un'immagine) selezionare (N/A).
                     </hint>
                     <required></required>
                 </field>
