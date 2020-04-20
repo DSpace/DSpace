@@ -9,7 +9,6 @@ package org.dspace.app.rest.model.step;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.deduplication.model.DuplicateDecisionValue;
 import org.dspace.app.rest.model.ItemRest;
