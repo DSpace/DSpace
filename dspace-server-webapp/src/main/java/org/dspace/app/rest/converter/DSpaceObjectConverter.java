@@ -8,6 +8,7 @@
 package org.dspace.app.rest.converter;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
@@ -78,19 +79,24 @@ public abstract class DSpaceObjectConverter<M extends DSpaceObject, R extends or
      */
     public MetadataValueList getPermissionFilteredMetadata(Context context, M obj) {
         List<MetadataValue> metadata = obj.getMetadata();
+        List<MetadataValue> hiddenMetadata = new ArrayList<>();
         try {
+            // If an Admin, no metadata should be hidden
             if (context != null && authorizeService.isAdmin(context)) {
                 return new MetadataValueList(metadata);
             }
+            // Else, loop through and determine if any fields must be hidden
             for (MetadataValue mv : metadata) {
                 MetadataField metadataField = mv.getMetadataField();
                 if (metadataExposureService
                         .isHidden(context, metadataField.getMetadataSchema().getName(),
                                   metadataField.getElement(),
                                   metadataField.getQualifier())) {
-                    metadata.remove(mv);
+                    hiddenMetadata.add(mv);
                 }
             }
+            // hide necessary fields by removing them from original metadata list
+            metadata.removeAll(hiddenMetadata);
         } catch (SQLException e) {
             log.error("Error filtering metadata based on permissions", e);
         }
