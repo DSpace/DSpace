@@ -8,7 +8,11 @@
 package org.dspace.license;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.StringReader;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
 import java.text.MessageFormat;
 import java.util.Collections;
 import java.util.HashMap;
@@ -31,6 +35,7 @@ import org.dspace.services.ConfigurationService;
 import org.jaxen.JaxenException;
 import org.jaxen.jdom.JDOMXPath;
 import org.jdom.Attribute;
+import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
@@ -237,6 +242,7 @@ public class CCLicenseConnectorServiceImpl implements CCLicenseConnectorService,
     /**
      * Retrieve the CC License URI based on the provided license id, language and answers to the field questions from
      * the CC License API
+     *
      * @param licenseId - the ID of the license
      * @param language  - the language for which to retrieve the full answerMap
      * @param answerMap - the answers to the different field questions
@@ -273,7 +279,7 @@ public class CCLicenseConnectorServiceImpl implements CCLicenseConnectorService,
     /**
      * Parse the response for the CC License URI request and return the corresponding CC License URI
      *
-     * @param response  for a specific CC License URI response
+     * @param response for a specific CC License URI response
      * @return the corresponding CC License URI as a string
      * @throws IOException
      * @throws JaxenException
@@ -314,5 +320,52 @@ public class CCLicenseConnectorServiceImpl implements CCLicenseConnectorService,
         return sb.toString();
     }
 
+    /**
+     * Retrieve the license RDF document based on the license URI
+     *
+     * @param licenseURI - The license URI for which to retrieve the license RDF document
+     * @return the license RDF document
+     * @throws IOException
+     */
+    @Override
+    public Document retrieveLicenseRDFDoc(String licenseURI) throws IOException {
+        String ccLicenseUrl = configurationService.getProperty("cc.api.rooturl");
+
+        String issueUrl = ccLicenseUrl + "/details?license-uri=" + licenseURI;
+
+        URL request_url;
+        try {
+            request_url = new URL(issueUrl);
+        } catch (MalformedURLException e) {
+            return null;
+        }
+        URLConnection connection = request_url.openConnection();
+        connection.setDoOutput(true);
+        try {
+            // parsing document from input stream
+            InputStream stream = connection.getInputStream();
+            Document doc = parser.build(stream);
+            return doc;
+
+        } catch (Exception e) {
+            log.error("Error while retrieving the license document for URI: " + licenseURI, e);
+        }
+        return null;
+    }
+
+    /**
+     * Retrieve the license Name from the license document
+     *
+     * @param doc - The license document from which to retrieve the license name
+     * @return the license name
+     */
+    public String retrieveLicenseName(final Document doc) {
+        try {
+            return getSingleNodeValue(doc, "//result/license-uri");
+        } catch (JaxenException e) {
+            log.error("Error while retrieving the license name from the license document", e);
+        }
+        return null;
+    }
 
 }
