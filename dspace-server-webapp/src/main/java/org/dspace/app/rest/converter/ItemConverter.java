@@ -7,6 +7,8 @@
  */
 package org.dspace.app.rest.converter;
 
+import java.sql.SQLException;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.logging.log4j.Logger;
@@ -14,8 +16,10 @@ import org.dspace.app.rest.model.ItemRest;
 import org.dspace.app.rest.model.MetadataValueList;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.content.Item;
+import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.service.ItemService;
+import org.dspace.core.Context;
 import org.dspace.discovery.IndexableObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -28,8 +32,8 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class ItemConverter
-    extends DSpaceObjectConverter<Item, ItemRest>
-    implements IndexableObjectConverter<Item, ItemRest> {
+        extends DSpaceObjectConverter<Item, ItemRest>
+        implements IndexableObjectConverter<Item, ItemRest> {
 
     @Autowired
     private ConverterService converter;
@@ -47,11 +51,39 @@ public class ItemConverter
         item.setWithdrawn(obj.isWithdrawn());
         item.setLastModified(obj.getLastModified());
 
-        List<MetadataValue> fullList = itemService.getMetadata(obj, Item.ANY, Item.ANY, Item.ANY, Item.ANY, true);
-        MetadataValueList metadataValues = new MetadataValueList(fullList);
-        item.setMetadata(converter.toRest(metadataValues, projection));
-
         return item;
+    }
+
+    /**
+     * Retrieves the metadata list filtered according to the hidden metadata configuration
+     * When the context is null, it will return the metadatalist as for an anonymous user
+     * Overrides the parent method to include virtual metadata
+     * @param context The context
+     * @param obj     The object of which the filtered metadata will be retrieved
+     * @return A list of object metadata (including virtual metadata) filtered based on the the hidden metadata
+     * configuration
+     */
+    @Override
+    public MetadataValueList getPermissionFilteredMetadata(Context context, Item obj) {
+        List<MetadataValue> fullList = itemService.getMetadata(obj, Item.ANY, Item.ANY, Item.ANY, Item.ANY, true);
+        List<MetadataValue> returnList = new LinkedList<>();
+        try {
+            if (context != null && authorizeService.isAdmin(context)) {
+                return new MetadataValueList(fullList);
+            }
+            for (MetadataValue mv : fullList) {
+                MetadataField metadataField = mv.getMetadataField();
+                if (!metadataExposureService
+                        .isHidden(context, metadataField.getMetadataSchema().getName(),
+                                  metadataField.getElement(),
+                                  metadataField.getQualifier())) {
+                    returnList.add(mv);
+                }
+            }
+        } catch (SQLException e) {
+            log.error("Error filtering item metadata based on permissions", e);
+        }
+        return new MetadataValueList(returnList);
     }
 
     @Override
