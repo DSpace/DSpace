@@ -105,7 +105,7 @@ public class AbstractEntityIntegrationTest extends AbstractControllerIntegration
 
         RelationshipTypeBuilder.createRelationshipTypeBuilder(context, orgUnit, orgUnit, "isParentOrgUnitOf",
                                                               "isChildOrgUnitOf", null,
-                                                              null, null, null)
+                                                              1, null, null)
                                .build();
 
         context.restoreAuthSystemState();
