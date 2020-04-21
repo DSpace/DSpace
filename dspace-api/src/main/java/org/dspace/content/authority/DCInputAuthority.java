@@ -58,6 +58,10 @@ public class DCInputAuthority extends SelfNamedPlugin implements ChoiceAuthority
         super();
     }
 
+    public static void reset() {
+        pluginNames = null;
+    }
+
     public static String[] getPluginNames() {
         if (pluginNames == null) {
             initPluginNames();
@@ -70,11 +74,9 @@ public class DCInputAuthority extends SelfNamedPlugin implements ChoiceAuthority
         Locale[] locales = I18nUtil.getSupportedLocales();
         if (pluginNames == null) {
             try {
-                if (dcis == null) {
-                    dcis = new HashMap<Locale, DCInputsReader>();
-                    for (Locale locale : locales) {
-                        dcis.put(locale, new DCInputsReader(I18nUtil.getInputFormsFileName(locale)));
-                    }
+                dcis = new HashMap<Locale, DCInputsReader>();
+                for (Locale locale : locales) {
+                    dcis.put(locale, new DCInputsReader(I18nUtil.getInputFormsFileName(locale)));
                 }
             } catch (DCInputsReaderException e) {
                 log.error("Failed reading DCInputs initialization: ", e);
