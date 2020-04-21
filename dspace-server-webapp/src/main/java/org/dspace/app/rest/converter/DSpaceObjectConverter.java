@@ -8,6 +8,7 @@
 package org.dspace.app.rest.converter;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
@@ -78,23 +79,24 @@ public abstract class DSpaceObjectConverter<M extends DSpaceObject, R extends or
      */
     public MetadataValueList getPermissionFilteredMetadata(Context context, M obj) {
         List<MetadataValue> metadata = obj.getMetadata();
+        List<MetadataValue> visibleMetadata = new ArrayList<MetadataValue>();
         try {
             if (context != null && authorizeService.isAdmin(context)) {
                 return new MetadataValueList(metadata);
             }
             for (MetadataValue mv : metadata) {
                 MetadataField metadataField = mv.getMetadataField();
-                if (metadataExposureService
+                if (!metadataExposureService
                         .isHidden(context, metadataField.getMetadataSchema().getName(),
                                   metadataField.getElement(),
                                   metadataField.getQualifier())) {
-                    metadata.remove(mv);
+                    visibleMetadata.add(mv);
                 }
             }
         } catch (SQLException e) {
             log.error("Error filtering metadata based on permissions", e);
         }
-        return new MetadataValueList(metadata);
+        return new MetadataValueList(visibleMetadata);
     }
 
     /**
