@@ -3,6 +3,7 @@ package org.ssu.service.localization;
 import org.jooq.DSLContext;
 import org.springframework.stereotype.Service;
 import org.ssu.entity.AuthorLocalization;
+import org.ssu.repository.DspaceObjectRepository;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
@@ -16,6 +17,10 @@ public class AuthorsCache {
 
     @Resource
     private DSLContext dsl;
+
+    @Resource
+    private DspaceObjectRepository dspaceObjectRepository;
+
     private List<AuthorLocalization> authorLocalizations = new ArrayList<>();
     private Map<String, AuthorLocalization> englishMapping;
     private Map<String, AuthorLocalization> russianMapping;
@@ -32,6 +37,8 @@ public class AuthorsCache {
                                 .addAuthorData(author.get(AUTHORS.surnameRussian), author.get(AUTHORS.initialsRussian), Locale.forLanguageTag("ru"))
                                 .addAuthorData(author.get(AUTHORS.surnameUkrainian), author.get(AUTHORS.initialsUkrainian), Locale.forLanguageTag("uk"))
                                 .setOrcid(author.get(AUTHORS.orcid))
+                                .setUuid(author.get(AUTHORS.uuid))
+
                 )
                 .collect(Collectors.toList());
 
@@ -43,6 +50,12 @@ public class AuthorsCache {
 
         ukrainianMapping = authorLocalizations.stream()
                 .collect(Collectors.toMap(author -> author.getFormattedAuthorData("%s, %s", Locale.forLanguageTag("uk")), author -> author, (a, b) -> a));
+    }
+
+    public Optional<AuthorLocalization> getAuthor(UUID uuid) {
+        return authorLocalizations.stream()
+                .filter(author -> author.getUuid().equals(uuid))
+                .findFirst();
     }
 
     public boolean isAuthorLocalizationPresent(String author) {
@@ -68,19 +81,21 @@ public class AuthorsCache {
     public void updateAuthorOrcid(AuthorLocalization author) {
         dsl.update(AUTHORS)
                 .set(AUTHORS.orcid, author.getOrcid())
-                .where(AUTHORS.initialsEnglish.eq(author.getInitials(Locale.ENGLISH)).and(AUTHORS.surnameEnglish.eq(author.getSurname(Locale.ENGLISH))))
+                .where(AUTHORS.uuid.eq(author.getUuid()))
                 .execute();
         updateCache();
     }
 
-    public void removeAuthorData(AuthorLocalization author) {
+    public void removeAuthorData(UUID uuid) {
         dsl.delete(AUTHORS)
-                .where(AUTHORS.initialsEnglish.eq(author.getInitials(Locale.ENGLISH)).and(AUTHORS.surnameEnglish.eq(author.getSurname(Locale.ENGLISH))))
+                .where(AUTHORS.uuid.eq(uuid))
                 .execute();
         updateCache();
     }
 
     public void updateAuthorData(AuthorLocalization author) {
+        dspaceObjectRepository.insertUuid(author.getUuid());
+
         dsl.insertInto(AUTHORS)
                 .set(AUTHORS.surnameEnglish, author.getSurname(Locale.ENGLISH))
                 .set(AUTHORS.initialsEnglish, author.getInitials(Locale.ENGLISH))
@@ -89,7 +104,10 @@ public class AuthorsCache {
                 .set(AUTHORS.surnameUkrainian, author.getSurname(Locale.forLanguageTag("uk")))
                 .set(AUTHORS.initialsUkrainian, author.getInitials(Locale.forLanguageTag("uk")))
                 .set(AUTHORS.orcid, author.getOrcid())
+                .set(AUTHORS.uuid, author.getUuid())
                 .onDuplicateKeyUpdate()
+                .set(AUTHORS.surnameEnglish, author.getSurname(Locale.ENGLISH))
+                .set(AUTHORS.initialsEnglish, author.getInitials(Locale.ENGLISH))
                 .set(AUTHORS.surnameRussian, author.getSurname(Locale.forLanguageTag("ru")))
                 .set(AUTHORS.initialsRussian, author.getInitials(Locale.forLanguageTag("ru")))
                 .set(AUTHORS.surnameUkrainian, author.getSurname(Locale.forLanguageTag("uk")))

@@ -74,6 +74,7 @@
                 </div>
                 <div class="form-group">
                     <div class="col-sm-offset-2 col-sm-10">
+                        <input type="hidden" class="form-control" name="uuid" id="uuid" value="${author.uuid}">
                         <button type="button" class="btn btn-default" onclick="location.href = '/authors/list';">Cancel</button>
 
                         <c:if test="${not empty author}">
@@ -98,6 +99,7 @@
                 </div>
                 <div class="modal-footer">
                     <form action="/authors/delete" method="get">
+                        <input type="hidden" class="form-control" name="uuid" id="uuid" value="${author.uuid}">
                         <input type="hidden" value="${author.getSurname(Locale.ENGLISH)}, ${author.getInitials(Locale.ENGLISH)}" name="author" id="author">
                         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                         <button type="submit" class="btn btn-danger">Delete</button>

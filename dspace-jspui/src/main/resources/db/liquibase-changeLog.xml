@@ -60,4 +60,50 @@
             DELETE FROM statistics WHERE uuid IS NULL;
         </sql>
     </changeSet>
+
+    <changeSet id="13" author="Igor Marchenko">
+        <addColumn tableName="authors">
+            <column name="uuid" defaultValueComputed="gen_random_uuid()" type="UUID"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet author="Igor Marchenko" id="14">
+        <sql>
+            update authors au set uuid = (
+            select ep.uuid from eperson ep
+            where au.surname_en is not null and ((ep.lastname = au.surname_uk and ep.firstname = au.initials_uk) or (ep.lastname = au.surname_ru and ep.firstname = au.initials_ru) or (ep.lastname = au.surname_en and ep.firstname = au.initials_en))
+            limit 1)
+        </sql>
+    </changeSet>
+
+    <changeSet author="Igor Marchenko" id="15">
+        <sql>
+            update authors set uuid = gen_random_uuid() where uuid is null;
+        </sql>
+    </changeSet>
+
+    <changeSet author="Igor Marchenko" id="16">
+        <dropPrimaryKey constraintName="authors_pkey"
+                        tableName="authors"/>
+
+        <addPrimaryKey columnNames="uuid"
+                       constraintName="pk_authors"
+                       tableName="authors"/>
+    </changeSet>
+
+    <changeSet author="Igor Marchenko" id="17">
+        <insert tableName="metadatafieldregistry">
+            <column name="metadata_field_id" value="135"/>
+            <column name="metadata_schema_id" value="3"/>
+            <column name="element" value="orcid"/>
+            <column name="scope_note" value="Orcid for user"/>
+        </insert>
+    </changeSet>
+
+    <changeSet author="Igor Marchenko" id="18">
+        <sql>
+            insert into dspaceobject(uuid)
+            select uuid from authors where uuid not in (select * from dspaceobject);
+        </sql>
+    </changeSet>
 </databaseChangeLog>

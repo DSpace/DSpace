@@ -6,10 +6,7 @@ import org.ssu.entity.AuthorLocalization;
 import org.ssu.service.localization.AuthorsCache;
 
 import javax.annotation.Resource;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Locale;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -28,6 +25,10 @@ public class AuthorsService {
 
     public AuthorLocalization getAuthorLocalization(String authorName) {
         return authorsCache.getAuthorLocalization(authorName);
+    }
+
+    public Optional<AuthorLocalization> getAuthor(UUID uuid) {
+        return authorsCache.getAuthor(uuid);
     }
 
     public List<AuthorLocalization> getAllAuthors(Optional<String> startsWith) {
@@ -50,12 +51,8 @@ public class AuthorsService {
         authorsCache.updateAuthorData(author);
     }
 
-    public void removeAuthorData(String author) {
-        removeAuthorData(authorsCache.getAuthorLocalization(author));
-    }
-
-    public void removeAuthorData(AuthorLocalization author) {
-        authorsCache.removeAuthorData(author);
+    public void removeAuthor(UUID uuid) {
+        authorsCache.removeAuthorData(uuid);
     }
 
     public boolean isAuthorLocalizationPresent(String author) {

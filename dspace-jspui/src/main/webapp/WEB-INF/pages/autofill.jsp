@@ -50,7 +50,7 @@
                 <td>${author.getInitials(Locale.forLanguageTag("uk"))}</td>
                 <td>${author.getOrcid()}</td>
                 <td>
-                    <a href="/authors/edit?author=${author.getSurname(Locale.ENGLISH)}, ${author.getInitials(Locale.ENGLISH)}">
+                    <a href="/authors/edit?author_uuid=${author.uuid}">
                         <span class="glyphicon glyphicon-pencil" aria-hidden="true"
                               style="color:black; font-size:14pt;"></span>
                     </a>

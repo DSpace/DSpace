@@ -39,6 +39,11 @@ public class AuthorLocalization {
 
     private Map<String, AuthorData> authorLocalizations = new HashMap<>();
     private String orcid;
+    private UUID uuid;
+
+    public UUID getUuid() {
+        return uuid;
+    }
 
     public String getOrcid() {
         return orcid;
@@ -46,6 +51,11 @@ public class AuthorLocalization {
 
     public AuthorLocalization addAuthorData(String surname, String initials, Locale locale) {
         authorLocalizations.put(locale.getLanguage(), new AuthorData(surname, initials));
+        return this;
+    }
+
+    public AuthorLocalization setUuid(UUID uuid) {
+        this.uuid = uuid;
         return this;
     }
 

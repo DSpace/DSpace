@@ -1,5 +1,6 @@
 package org.ssu.controller;
 
+import com.google.common.base.Strings;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -12,10 +13,7 @@ import org.ssu.service.AuthorsService;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Locale;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -41,7 +39,7 @@ public class AdminController {
     }
 
     @RequestMapping("/authors/list")
-    public ModelAndView autofillPage(ModelAndView model, HttpServletRequest request, HttpServletResponse response) {
+    public ModelAndView autofillPage(ModelAndView model, HttpServletRequest request) {
         Optional<String> startsWith = Optional.ofNullable(request.getParameter("startsWith"));
         model.addObject("authors", authorsService.getAllAuthors(startsWith));
         model.setViewName("autofill");
@@ -49,9 +47,13 @@ public class AdminController {
     }
 
     @RequestMapping(value = "/authors/edit", method = RequestMethod.GET)
-    public ModelAndView authorEditPage(ModelAndView model, HttpServletRequest request, HttpServletResponse response) {
-        Optional<String> author = Optional.ofNullable(request.getParameter("author"));
-        model.addObject("author", authorsService.getAuthorLocalization(author));
+    public ModelAndView authorEditPage(ModelAndView model, HttpServletRequest request) {
+        Optional<UUID> authorUuid = Optional.ofNullable(request.getParameter("author_uuid")).map(UUID::fromString);
+        if(authorUuid.isPresent()) {
+            Optional<AuthorLocalization> author = authorsService.getAuthor(authorUuid.get());
+            if(author.isPresent())
+                model.addObject("author", author.get());
+        }
         model.setViewName("author-edit");
         return model;
     }
@@ -66,11 +68,13 @@ public class AdminController {
         String surnameUkrainian = request.getParameter("surnameUk");
         String initialsUkrainian = request.getParameter("initialsUk");
         String orcid = Optional.ofNullable(request.getParameter("orcid")).map(param -> param.replaceAll("https://", "").replaceAll("http://", "").replaceAll("orcid.org/", "")).orElse("");
+        UUID authorUuid = Optional.ofNullable(request.getParameter("uuid")).filter(uuid -> !uuid.isEmpty()).map(UUID::fromString).orElse(UUID.randomUUID());
 
         authorLocalization.addAuthorData(surnameEnglish, initialsEnglish, Locale.ENGLISH);
         authorLocalization.addAuthorData(surnameRussian, initialsRussian, Locale.forLanguageTag("ru"));
         authorLocalization.addAuthorData(surnameUkrainian, initialsUkrainian, Locale.forLanguageTag("uk"));
         authorLocalization.setOrcid(orcid);
+        authorLocalization.setUuid(authorUuid);
 
         boolean allFieldsFilled = StringUtils.isNotEmpty(surnameEnglish) &&
                 StringUtils.isNotEmpty(surnameRussian) &&
@@ -94,9 +98,9 @@ public class AdminController {
     }
 
     @RequestMapping(value = "/authors/delete", method = RequestMethod.GET)
-    public String deleteAuthorLocalization(ModelAndView model, HttpServletRequest request, HttpServletResponse response) {
-        String authorData = request.getParameter("author");
-        authorsService.removeAuthorData(authorData);
+    public String deleteAuthorLocalization(HttpServletRequest request) {
+        Optional<UUID> authorUuid = Optional.ofNullable(request.getParameter("uuid")).map(UUID::fromString);
+        authorUuid.ifPresent(uuid -> authorsService.removeAuthor(uuid));
         return "redirect:/authors/list";
     }
 }
