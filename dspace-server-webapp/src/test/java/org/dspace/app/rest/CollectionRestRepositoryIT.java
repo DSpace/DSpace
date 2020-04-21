@@ -1293,15 +1293,17 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
     }
 
     @Test
-    public void testHiddenMetadataForAonymousUser() throws Exception {
+    public void testHiddenMetadataForAnonymousUser() throws Exception {
         context.turnOffAuthorisationSystem();
 
         parentCommunity = CommunityBuilder.createCommunity(context)
                                           .withName("Parent Community")
                                           .build();
+        // use multiple metadata to hit the scenario of the bug DS-4487 related to concurrent modification
         Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
                                            .withName("Collection 1")
                                            .withProvenance("Provenance Data")
+                                           .withNameForLanguage("Col 1", "en")
                                            .build();
 
         context.restoreAuthSystemState();
@@ -1325,9 +1327,11 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
         parentCommunity = CommunityBuilder.createCommunity(context)
                                           .withName("Parent Community")
                                           .build();
+        // use multiple metadata to hit the scenario of the bug DS-4487 related to concurrent modification
         Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
                                            .withName("Collection 1")
                                            .withProvenance("Provenance Data")
+                                           .withNameForLanguage("Col 1", "en")
                                            .build();
 
 
@@ -1353,9 +1357,11 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
         parentCommunity = CommunityBuilder.createCommunity(context)
                                           .withName("Parent Community")
                                           .build();
+        // use multiple metadata to hit the scenario of the bug DS-4487 related to concurrent modification
         Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
                                            .withName("Collection 1")
                                            .withProvenance("Provenance Data")
+                                           .withNameForLanguage("Col 1", "en")
                                            .build();
 
 
@@ -1376,6 +1382,55 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                                                                               col1.getHandle())))
                         .andExpect(jsonPath("$.metadata", matchMetadata("dc.title", "Collection 1")))
                         .andExpect(jsonPath("$.metadata.['dc.description.provenance']").doesNotExist());
+
+    }
+
+    @Test
+    public void findAllWithHiddenMetadataTest() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                         .withName("Parent Community")
+                         .build();
+        // use multiple metadata to hit the scenario of the bug DS-4487 related to concurrent modification
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                         .withName("Collection 1")
+                         .withProvenance("Provenance Test 1")
+                         .withNameForLanguage("col1", "en")
+                         .build();
+        Collection col2 = CollectionBuilder.createCollection(context, parentCommunity)
+                         .withName("Collection 2")
+                         .withProvenance("Provenance Test 2")
+                         .withNameForLanguage("col2", "it")
+                         .build();
+
+        context.turnOffAuthorisationSystem();
+
+        String tokenEPerson = getAuthToken(eperson.getEmail(), password);
+
+        getClient().perform(get("/api/core/collections")
+                   .param("embed", CollectionMatcher.getEmbedsParameter()))
+                   .andExpect(status().isOk())
+                   .andExpect(content().contentType(contentType))
+                   .andExpect(jsonPath("$._embedded.collections", Matchers.containsInAnyOrder(
+                           CollectionMatcher.matchCollectionEntrySpecificEmbedProjection(col1.getName(), col1.getID(),
+                                                                                col1.getHandle()),
+                           CollectionMatcher.matchCollectionEntrySpecificEmbedProjection(col2.getName(), col2.getID(),
+                                                                                col2.getHandle())
+                           )))
+                   .andExpect(jsonPath("$.metadata.['dc.description.provenance']").doesNotExist());
+
+        getClient(tokenEPerson).perform(get("/api/core/collections")
+                .param("embed", CollectionMatcher.getEmbedsParameter()))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$._embedded.collections", Matchers.containsInAnyOrder(
+                        CollectionMatcher.matchCollectionEntrySpecificEmbedProjection(col1.getName(), col1.getID(),
+                                                                             col1.getHandle()),
+                        CollectionMatcher.matchCollectionEntrySpecificEmbedProjection(col2.getName(), col2.getID(),
+                                                                             col2.getHandle())
+                        )))
+                .andExpect(jsonPath("$.metadata.['dc.description.provenance']").doesNotExist());
 
     }
 }
