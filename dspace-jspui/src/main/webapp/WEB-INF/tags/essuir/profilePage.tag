@@ -18,17 +18,20 @@
 <%@ attribute name="isRegisterPage" rtexprvalue="true" required="true" type="java.lang.Boolean"
               description="Is register page." %>
 
+<%@ attribute name="isEditUserPage" rtexprvalue="true" required="true" type="java.lang.Boolean"
+              description="Is edit user page." %>
+
 <div class="form-group">
     <label class="col-md-offset-3 col-md-2 control-label" for="tfirst_name"><fmt:message
             key="jsp.register.profile-form.fname.field"/></label>
     <div class="col-md-3">
-        <input class="form-control" type="text" name="first_name" id="tfirst_name" size="40" value="${firstName}"/>
+        <input class="form-control" type="text" name="firstname" id="tfirst_name" size="40" value="${firstName}"/>
     </div>
 </div>
 <div class="form-group">
     <label class="col-md-offset-3 col-md-2 control-label" for="tlast_name"><fmt:message
             key="jsp.register.profile-form.lname.field"/></label>
-    <div class="col-md-3"><input class="form-control" type="text" name="last_name" id="tlast_name" size="40" value="${lastName}"/></div>
+    <div class="col-md-3"><input class="form-control" type="text" name="lastname" id="tlast_name" size="40" value="${lastName}"/></div>
 </div>
 <div class="form-group">
     <label class="col-md-offset-3 col-md-2 control-label" for="tphone"><fmt:message
@@ -61,9 +64,10 @@
     <div class="col-md-3">
         <select class="form-control" name="faculty" id="faculty">
             <option value="0"></option>
+            <c:set var="facultyId" value="${chair == null ? -1 : chair.facultyEntityId}"/>
             <c:forEach items="${facultyList}" var="facultySelectEntity">
                 <c:set var="facultySelected" value=""/>
-                <c:if test="${chair.facultyEntityId == facultySelectEntity.id}">
+                <c:if test="${facultyId == facultySelectEntity.id}">
                     <c:set var="facultySelected" value="selected = \"selected\""/>
                 </c:if>
                 <option value = '${facultySelectEntity.id}' ${facultySelected}>${facultySelectEntity.name}</option>
@@ -105,27 +109,21 @@
         </div>
     </div>
 </c:if>
+<c:if test="${not isEditUserPage}">
+    <c:if test="${not isRegisterPage}">
+        <p class="alert"><fmt:message key="jsp.register.edit-profile.info5"/></p>
+    </c:if>
+    <div class="form-group">
+        <label class="col-md-offset-3 col-md-2 control-label" for="tpassword"><fmt:message key="jsp.register.edit-profile.pswd.field"/></label>
+        <div class="col-md-3">
+            <input class="form-control" type="password" name="password" id="tpassword" />
+        </div>
+    </div>
 
-<c:if test="${not isRegisterPage}">
-    <p class="alert"><fmt:message key="jsp.register.edit-profile.info5"/></p>
+    <div class="form-group">
+        <label class="col-md-offset-3 col-md-2 control-label" for="tpassword_confirm"><fmt:message key="jsp.register.edit-profile.confirm.field"/></label>
+        <div class="col-md-3">
+            <input class="form-control" type="password" name="password_confirm" id="tpassword_confirm" />
+        </div>
+    </div>
 </c:if>
-<div class="form-group">
-    <label class="col-md-offset-3 col-md-2 control-label" for="tpassword"><fmt:message key="jsp.register.edit-profile.pswd.field"/></label>
-    <div class="col-md-3">
-        <input class="form-control" type="password" name="password" id="tpassword" />
-    </div>
-</div>
-
-<div class="form-group">
-    <label class="col-md-offset-3 col-md-2 control-label" for="tpassword_confirm"><fmt:message key="jsp.register.edit-profile.confirm.field"/></label>
-    <div class="col-md-3">
-        <input class="form-control" type="password" name="password_confirm" id="tpassword_confirm" />
-    </div>
-</div>
-
-<div class="col-md-offset-5">
-    <input type="hidden" id="step" name="step" value="2"/>
-    <input type="hidden" name="token" value="${token}"/>
-    <input class="btn btn-success col-md-4" type="submit" name="submit"
-           value="<fmt:message key="jsp.register.edit-profile.update.button"/>"/>
-</div>

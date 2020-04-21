@@ -71,12 +71,13 @@ public class EssuirStatistics {
                     .findFirst()
                     .orElse(0));
             BrowseInfo browse = be.browseMini(bs);
-            Item item = browse.getBrowseItemResults().stream().findFirst().orElseThrow(NullPointerException::new);
-            return dspaceItemService.getMetadata(item, MetadataSchema.DC_SCHEMA, "date", "accessioned", Item.ANY)
+            Optional<Item> item = browse.getBrowseItemResults().stream().findFirst();
+            return item.map(t -> dspaceItemService.getMetadata(t, MetadataSchema.DC_SCHEMA, "date", "accessioned", Item.ANY)
                     .stream()
                     .findFirst()
                     .map(MetadataValue::getValue)
-                    .orElseThrow(NullPointerException::new);
+                    .orElse(""))
+                    .orElse("01-01-2011");
         } catch (BrowseException e) {
             e.printStackTrace();
         } catch (SortException e) {

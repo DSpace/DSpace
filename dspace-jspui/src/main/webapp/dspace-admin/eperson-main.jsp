@@ -66,7 +66,7 @@
 	     <fmt:message key="jsp.dspace-admin.eperson-main.ResetPassword.success_notice"/>
 	   </p>
 <%  } %>    
-    <form name="epersongroup" method="post" action="">    
+    <form name="epersongroup" method="post" action="/dspace-admin/edit-epeople">
 			<div class="row">
             <%-- <input type="submit" name="submit_add" value="Add EPerson..."> --%>
             	<input class="btn btn-success col-md-2 col-md-offset-5" type="submit" name="submit_add" value="<fmt:message key="jsp.dspace-admin.eperson-main.add"/>" />

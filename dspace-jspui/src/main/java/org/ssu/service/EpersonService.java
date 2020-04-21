@@ -28,8 +28,8 @@ public class EpersonService {
     }
 
     public boolean updateUserProfile(Context context, EPerson eperson, HttpServletRequest request) throws SQLException {
-        String lastName = request.getParameter("last_name");
-        String firstName = request.getParameter("first_name");
+        String lastName = request.getParameter("lastname");
+        String firstName = request.getParameter("firstname");
         String phone = request.getParameter("phone");
         String language = request.getParameter("language");
         eperson.setFirstName(context, firstName);
