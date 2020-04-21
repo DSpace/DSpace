@@ -1404,7 +1404,7 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                          .withNameForLanguage("col2", "it")
                          .build();
 
-        context.turnOffAuthorisationSystem();
+        context.restoreAuthSystemState();
 
         String tokenEPerson = getAuthToken(eperson.getEmail(), password);
 
