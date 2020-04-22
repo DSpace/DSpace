@@ -30,7 +30,7 @@ import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.webmvc.ControllerUtils;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
-import org.springframework.hateoas.ResourceSupport;
+import org.springframework.hateoas.RepresentationModel;;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -73,7 +73,7 @@ public class CommunityAdminGroupRestController {
      */
     @RequestMapping(method = RequestMethod.POST)
     @PreAuthorize("hasPermission(#uuid, 'COMMUNITY', 'WRITE')")
-    public ResponseEntity<ResourceSupport> postAdminGroup(@PathVariable UUID uuid, HttpServletResponse response,
+    public ResponseEntity<RepresentationModel<?>> postAdminGroup(@PathVariable UUID uuid, HttpServletResponse response,
                                                           HttpServletRequest request)
         throws SQLException, AuthorizeException {
 
@@ -107,7 +107,7 @@ public class CommunityAdminGroupRestController {
      */
     @RequestMapping(method = RequestMethod.DELETE)
     @PreAuthorize("hasPermission(#uuid, 'COMMUNITY', 'WRITE')")
-    public ResponseEntity<ResourceSupport> deleteAdminGroup(@PathVariable UUID uuid, HttpServletResponse response,
+    public ResponseEntity<RepresentationModel<?>> deleteAdminGroup(@PathVariable UUID uuid, HttpServletResponse response,
                                                           HttpServletRequest request)
         throws SQLException, AuthorizeException, IOException {
 
