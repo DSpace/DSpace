@@ -28,6 +28,8 @@ import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.*;
 import org.dspace.content.Collection;
 import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.BitstreamService;
+import org.dspace.content.service.BundleService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -201,10 +203,13 @@ public class XOAI {
             SolrDocumentList documents = DSpaceSolrSearch.query(solrServerResolver.getServer(), params);
             List<Item> items = new LinkedList<Item>();
             for (int i = 0; i < documents.getNumFound(); i++) {
-                Item item = itemService.find(context,
-                        UUID.fromString((String) documents.get(i).getFieldValue("item.id")));
-                if (item.getLastModified().before(last)) {
-                    items.add(item);
+                Object fieldValueItemId = documents.get(i).getFieldValue("item.id");
+                if (fieldValueItemId != null) {
+                    Item item = itemService.find(context,
+                            UUID.fromString((String) fieldValueItemId));
+                    if (item.getLastModified().before(last)) {
+                        items.add(item);
+                    }
                 }
             }
             return items.iterator();
@@ -356,6 +361,8 @@ public class XOAI {
         String handle = item.getHandle();
         doc.addField("item.handle", handle);
 
+        boolean hasOriginalBundleWithContent = this.hasOriginalBundleWithContent(item, Constants.CONTENT_BUNDLE_NAME);
+
         boolean isEmbargoed = !this.isPublic(item);
         boolean isCurrentlyVisible = this.checkIfVisibleInOAI(item);
         boolean isIndexed = this.checkIfIndexed(item);
@@ -374,14 +381,19 @@ public class XOAI {
          * status in the future will be marked as such.
          */
 
-        boolean isPublic = isEmbargoed ? (isIndexed ? isCurrentlyVisible : false) : true;
-        
+        boolean isPublic = (!isEmbargoed  && hasOriginalBundleWithContent) || (isIndexed && isCurrentlyVisible);
+        log.info(String.format("This item %s is public: %b  (!isEmbargoed=%b && hasOriginalBundleWithContent= %b) || "
+                        + "(isIndexed=%b && isCurrentlyVisible=%b)", item.getHandle(), isPublic, isEmbargoed,
+                hasOriginalBundleWithContent, isIndexed, isCurrentlyVisible));
+
         doc.addField("item.public", isPublic);
 
         // if the visibility of the item will change in the future due to an
         // embargo, mark it as such.
 
-        doc.addField("item.willChangeStatus", willChangeStatus(item));
+        boolean willChangeStatus = willChangeStatus(item);
+        log.info(String.format("This item %s will change status: %b", item.getHandle(), willChangeStatus));
+        doc.addField("item.willChangeStatus", willChangeStatus);
 
         /*
          * Mark an item as deleted not only if it is withdrawn, but also if it
@@ -464,7 +476,33 @@ public class XOAI {
             }
             context.uncacheEntity(policy);
         }
-        
+
+        boolean hasNoOriginalBundleButOreBundle = !hasOriginalBundleWithContent(item, Constants.DEFAULT_BUNDLE_NAME)
+                && hasOriginalBundleWithContent(item,"ORE");
+        if (hasNoOriginalBundleButOreBundle) {
+            return true;
+        }
+
+        List<Bundle> bundles = item.getBundles(Constants.CONTENT_BUNDLE_NAME);
+        for (Bundle bundle : bundles) {
+            if (Constants.CONTENT_BUNDLE_NAME.equals(bundle.getName())) {
+                for (Bitstream bitstream : bundle.getBitstreams()) {
+                    List<ResourcePolicy> bitstreamPolicies = authorizeService.getPoliciesActionFilter(context,
+                            bitstream, Constants.READ);
+                    for (ResourcePolicy policy : bitstreamPolicies) {
+                        if ((policy.getGroup()!=null) && (policy.getGroup().getName().equals("Anonymous"))) {
+                            if (policy.getStartDate() != null && policy.getStartDate().after(new Date())) {
+                                return true;
+                            }
+                            if (policy.getEndDate() != null && policy.getEndDate().after(new Date())) {
+                                return true;
+                            }
+                        }
+                        context.uncacheEntity(policy);
+                    }
+                }
+            }
+        }
         return false;
     }
 
@@ -670,5 +708,54 @@ public class XOAI {
             System.out.println("     -v Verbose output");
             System.out.println("     -h Shows this text");
         }
+    }
+
+    /**
+     * Checks whether the given item has a bundle with the name e.g. ORIGINAL
+     * containing at least one bitstream.
+     *
+     * @param item
+     *            to check
+     * @param bundleName bundle name e.g. ORIGINAL or ORE
+     * @return true if there is at least on bitstream in the bundle named
+     *         e.g. ORIGINAL, otherwise false
+     */
+    private boolean hasOriginalBundleWithContent(Item item, String bundleName)
+    {
+        List<Bundle> bundles;
+        bundles = item.getBundles();
+        if (bundles != null)
+        {
+            for (Bundle curBundle : bundles)
+            {
+                String bName = curBundle.getName();
+                if ((bName != null) && bName.equals(bundleName))
+                {
+                    List<Bitstream> bitstreams = curBundle.getBitstreams();
+                    boolean isPublicReadable = false;
+                    if (bitstreams != null) {
+                        for (Bitstream bitstream : bitstreams) {
+                            try {
+                                // if one bitstream in ORIGINAL-bundle is public-READ (no embargo on it) the item is
+                                // could be shown in oai
+                                if (authorizeService.authorizeActionBoolean(context, bitstream, Constants.READ)) {
+                                    log.info(String.format("No embargo on bitstream (%s) to item (%s).",
+                                            bitstream.getID(), item.getHandle()));
+                                    isPublicReadable = true;
+                                    break;
+                                } else {
+                                    log.info(String.format("There is an embargo on bitstream (%s) to item (%s).",
+                                            bitstream.getID(), item.getHandle()));
+                                }
+                            } catch (SQLException ex) {
+                                log.error(ex.getMessage());
+                            }
+                        }
+                        return isPublicReadable;
+                    }
+                }
+            }
+        }
+        return false;
     }
 }

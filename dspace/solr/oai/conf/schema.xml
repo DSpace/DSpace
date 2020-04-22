@@ -160,6 +160,7 @@
    <!-- Item always present information -->
    <field name="item.id" type="uuid" indexed="true" stored="true" multiValued="false" />
    <field name="item.public" type="boolean" indexed="true" stored="true" multiValued="false" />
+   <field name="item.has_content_in_original_bundle_filter" type="boolean" indexed="true" stored="true" multiValued="false" />
    <field name="item.handle" type="string" indexed="true" stored="true" multiValued="false" />
    <field name="item.collections" type="string" indexed="true" stored="true" multiValued="true" />
    <field name="item.communities" type="string" indexed="true" stored="true" multiValued="true" />
