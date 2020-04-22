@@ -30,7 +30,7 @@ import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.webmvc.ControllerUtils;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
-import org.springframework.hateoas.RepresentationModel;;
+import org.springframework.hateoas.RepresentationModel;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -107,8 +107,9 @@ public class CommunityAdminGroupRestController {
      */
     @RequestMapping(method = RequestMethod.DELETE)
     @PreAuthorize("hasPermission(#uuid, 'COMMUNITY', 'WRITE')")
-    public ResponseEntity<RepresentationModel<?>> deleteAdminGroup(@PathVariable UUID uuid, HttpServletResponse response,
-                                                          HttpServletRequest request)
+    public ResponseEntity<RepresentationModel<?>> deleteAdminGroup(@PathVariable UUID uuid,
+                                                                   HttpServletResponse response,
+                                                                   HttpServletRequest request)
         throws SQLException, AuthorizeException, IOException {
 
         Context context = ContextUtil.obtainContext(request);
