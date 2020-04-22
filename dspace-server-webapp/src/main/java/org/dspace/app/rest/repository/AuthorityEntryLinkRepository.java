@@ -57,6 +57,9 @@ public class AuthorityEntryLinkRepository extends AbstractDSpaceRestRepository
                                           @Nullable Pageable optionalPageable, Projection projection) {
         Context context = obtainContext();
         String query = request == null ? null : request.getParameter("query");
+        if (query == null) {
+            query = "";
+        }
         String metadata = request == null ? null : request.getParameter("metadata");
         String uuidCollectìon = request == null ? null : request.getParameter("uuid");
         Collection collection = null;
