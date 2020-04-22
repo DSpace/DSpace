@@ -27,6 +27,7 @@ import javax.xml.stream.XMLStreamException;
 import com.lyncode.xoai.dataprovider.exceptions.ConfigurationException;
 import com.lyncode.xoai.dataprovider.exceptions.WritingXmlException;
 import com.lyncode.xoai.dataprovider.xml.XmlOutputContext;
+import com.lyncode.xoai.dataprovider.xml.xoai.Metadata;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.Options;
@@ -95,6 +96,8 @@ public class XOAI {
     private final static ConfigurationService configurationService = DSpaceServicesFactory
             .getInstance().getConfigurationService();
 
+    private List<XOAIItemCompilePlugin> xOAIItemCompilePlugins;
+    
     private List<String> getFileFormats(Item item) {
         List<String> formats = new ArrayList<>();
         try {
@@ -455,7 +458,15 @@ public class XOAI {
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         XmlOutputContext xmlContext = XmlOutputContext.emptyContext(out, Second);
-        retrieveMetadata(context, item).write(xmlContext);
+        Metadata metadata = retrieveMetadata(context, item);
+        
+        //Do any additional metadata element, depends on the plugins
+        for (XOAIItemCompilePlugin xOAIItemCompilePlugin : getxOAIItemCompilePlugins())
+        {
+            metadata = xOAIItemCompilePlugin.additionalMetadata(context, metadata, item);
+        }
+        
+        metadata.write(xmlContext);
         xmlContext.getWriter().flush();
         xmlContext.getWriter().close();
         doc.addField("item.compile", out.toString());
@@ -698,4 +709,20 @@ public class XOAI {
             System.out.println("     -h Shows this text");
         }
     }
+
+	/**
+	 * Do any additional content on "item.compile" field, depends on the plugins
+	 * 
+	 * @return
+	 */
+	public List<XOAIItemCompilePlugin> getxOAIItemCompilePlugins() {
+		if(xOAIItemCompilePlugins==null) {
+			xOAIItemCompilePlugins = DSpaceServicesFactory.getInstance().getServiceManager().getServicesByType(XOAIItemCompilePlugin.class);
+		}
+		return xOAIItemCompilePlugins;
+	}
+
+	public void setxOAIItemCompilePlugins(List<XOAIItemCompilePlugin> xOAIItemCompilePlugins) {
+		this.xOAIItemCompilePlugins = xOAIItemCompilePlugins;
+	}
 }
