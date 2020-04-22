@@ -27,7 +27,6 @@ import org.springframework.beans.factory.annotation.Autowired;
  * application/json" -d '[{ "op": "add", "path": "/sections/cclicense/uri",
  * "value":"http://creativecommons.org/licenses/by-nc-sa/3.0/us/"}]'
  * </code>
- *
  */
 public class CCLicenseAddPatchOperation extends AddPatchOperation<String> {
 
@@ -46,7 +45,7 @@ public class CCLicenseAddPatchOperation extends AddPatchOperation<String> {
 
     @Override
     void add(Context context, Request currentRequest, InProgressSubmission source, String path, Object value)
-        throws Exception {
+            throws Exception {
 
 
         String licenseUri = null;
@@ -56,11 +55,15 @@ public class CCLicenseAddPatchOperation extends AddPatchOperation<String> {
 
         if (StringUtils.isBlank(licenseUri)) {
             throw new IllegalArgumentException(
-                "Value is not a valid license URI");
+                    "Value is not a valid license URI");
         }
 
         Item item = source.getItem();
-        creativeCommonsService.updateLicense(context, licenseUri, item);
+        boolean updateLicense = creativeCommonsService.updateLicense(context, licenseUri, item);
+        if (!updateLicense) {
+            throw new IllegalArgumentException("The license uri: " + licenseUri + ", could not be resolved to a " +
+                                                       "CC license");
+        }
     }
 
 }

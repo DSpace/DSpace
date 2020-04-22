@@ -52,7 +52,7 @@ public class CCLicenseConnectorServiceImpl implements CCLicenseConnectorService,
     private Logger log = org.apache.logging.log4j.LogManager.getLogger(CCLicenseConnectorServiceImpl.class);
 
     private CloseableHttpClient client;
-    private SAXBuilder parser = new SAXBuilder();
+    protected SAXBuilder parser = new SAXBuilder();
 
     private String postArgument = "answers";
     private String postAnswerFormat =
@@ -361,7 +361,7 @@ public class CCLicenseConnectorServiceImpl implements CCLicenseConnectorService,
      */
     public String retrieveLicenseName(final Document doc) {
         try {
-            return getSingleNodeValue(doc, "//result/license-uri");
+            return getSingleNodeValue(doc, "//result/license-name");
         } catch (JaxenException e) {
             log.error("Error while retrieving the license name from the license document", e);
         }

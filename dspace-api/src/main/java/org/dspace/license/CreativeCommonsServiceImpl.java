@@ -672,6 +672,9 @@ public class CreativeCommonsServiceImpl implements CreativeCommonsService, Initi
             throws AuthorizeException, SQLException {
         try {
             Document doc = ccLicenseConnectorService.retrieveLicenseRDFDoc(licenseUri);
+            if (doc == null) {
+                return false;
+            }
             String licenseName = ccLicenseConnectorService.retrieveLicenseName(doc);
             if (StringUtils.isBlank(licenseName)) {
                 return false;
