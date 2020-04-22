@@ -13,6 +13,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.authorization.AuthorizationFeature;
 import org.dspace.app.rest.authorization.AuthorizationFeatureDocumentation;
 import org.dspace.app.rest.model.BaseObjectRest;
+import org.dspace.app.rest.model.EPersonRest;
 import org.dspace.app.rest.model.SiteRest;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.core.Context;
@@ -53,7 +54,7 @@ public class LoginOnBehalfOfFeature implements AuthorizationFeature {
 
     @Override
     public String[] getSupportedTypes() {
-        return new String[] { SiteRest.CATEGORY + "." + SiteRest.NAME };
+        return new String[] {SiteRest.CATEGORY + "." + SiteRest.NAME, EPersonRest.CATEGORY + "." + EPersonRest.NAME};
     }
 
 }

@@ -32,9 +32,7 @@ import org.dspace.app.rest.authorization.impl.LoginOnBehalfOfFeature;
 import org.dspace.app.rest.builder.CommunityBuilder;
 import org.dspace.app.rest.builder.EPersonBuilder;
 import org.dspace.app.rest.builder.GroupBuilder;
-import org.dspace.app.rest.converter.CommunityConverter;
 import org.dspace.app.rest.converter.ConverterService;
-import org.dspace.app.rest.converter.SiteConverter;
 import org.dspace.app.rest.matcher.AuthorizationMatcher;
 import org.dspace.app.rest.model.BaseObjectRest;
 import org.dspace.app.rest.model.CommunityRest;
@@ -42,7 +40,6 @@ import org.dspace.app.rest.model.EPersonRest;
 import org.dspace.app.rest.model.ItemRest;
 import org.dspace.app.rest.model.SiteRest;
 import org.dspace.app.rest.projection.DefaultProjection;
-import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.app.rest.utils.Utils;
 import org.dspace.content.Community;
@@ -79,13 +76,6 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
 
     @Autowired
     private Utils utils;
-
-    @Autowired
-    private SiteConverter siteConverter;
-
-    @Autowired
-    private CommunityConverter communityConverter;
-
     private SiteService siteService;
 
     /** 
@@ -1339,115 +1329,5 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
     private String getAuthorizationID(String epersonUuid, String featureName, String type, Serializable id) {
         return (epersonUuid != null ? epersonUuid + "_" : "") + featureName + "_" + type + "_"
                 + id.toString();
-    }
-
-    @Test
-    public void loginOnBehalfOfTest() throws Exception {
-        Site site = siteService.findSite(context);
-        SiteRest siteRest = siteConverter.convert(site, Projection.DEFAULT);
-        String siteUri = utils.linkToSingleResource(siteRest, "self").getHref();
-
-        String token = getAuthToken(admin.getEmail(), password);
-
-        configurationService.setProperty("org.dspace.app.rest.authorization.AlwaysThrowExceptionFeature.turnoff", true);
-        configurationService.setProperty("webui.user.assumelogin", true);
-
-        Authorization loginOnBehalfOfAuthorization = new Authorization(admin, loginOnBehalfOf, siteRest);
-        getClient(token).perform(get("/api/authz/authorizations/search/object")
-                                .param("uri", siteUri)
-                                .param("eperson", String.valueOf(admin.getID()))
-                                .param("feature", loginOnBehalfOf.getName()))
-                    .andExpect(status().isOk())
-                    .andExpect(jsonPath("$._embedded.authorizations", Matchers.hasItem(
-                        AuthorizationMatcher.matchAuthorization(loginOnBehalfOfAuthorization))));
-    }
-
-    @Test
-    public void loginOnBehalfNonSiteObjectOfTest() throws Exception {
-        context.turnOffAuthorisationSystem();
-        parentCommunity = CommunityBuilder.createCommunity(context)
-                                          .withName("Parent Community")
-                                          .build();
-        context.restoreAuthSystemState();
-
-        CommunityRest communityRest = communityConverter.convert(parentCommunity, Projection.DEFAULT);
-        String communityUri = utils.linkToSingleResource(communityRest, "self").getHref();
-
-        String token = getAuthToken(admin.getEmail(), password);
-
-        configurationService.setProperty("org.dspace.app.rest.authorization.AlwaysThrowExceptionFeature.turnoff", true);
-        configurationService.setProperty("webui.user.assumelogin", true);
-
-        Authorization loginOnBehalfOfAuthorization = new Authorization(admin, loginOnBehalfOf, communityRest);
-        getClient(token).perform(get("/api/authz/authorizations/search/object")
-                                     .param("uri", communityUri)
-                                     .param("eperson", String.valueOf(admin.getID()))
-                                     .param("feature", loginOnBehalfOf.getName()))
-                        .andExpect(status().isOk())
-                        .andExpect(jsonPath("$._embedded.authorizations", Matchers.not(Matchers.hasItem(
-                            AuthorizationMatcher.matchAuthorization(loginOnBehalfOfAuthorization)))));
-    }
-
-    @Test
-    public void loginOnBehalfOfNonAdminUserNotFoundTest() throws Exception {
-        Site site = siteService.findSite(context);
-        SiteRest siteRest = siteConverter.convert(site, Projection.DEFAULT);
-        String siteUri = utils.linkToSingleResource(siteRest, "self").getHref();
-
-        String token = getAuthToken(admin.getEmail(), password);
-
-        configurationService.setProperty("org.dspace.app.rest.authorization.AlwaysThrowExceptionFeature.turnoff", true);
-        configurationService.setProperty("webui.user.assumelogin", true);
-
-        Authorization loginOnBehalfOfAuthorization = new Authorization(eperson, loginOnBehalfOf, siteRest);
-        getClient(token).perform(get("/api/authz/authorizations/search/object")
-                                     .param("uri", siteUri)
-                                     .param("eperson", String.valueOf(eperson.getID()))
-                                     .param("feature", loginOnBehalfOf.getName()))
-                        .andExpect(status().isOk())
-                        .andExpect(jsonPath("$._embedded.authorizations", Matchers.not(
-                            Matchers.hasItem(AuthorizationMatcher.matchAuthorization(loginOnBehalfOfAuthorization)))));
-    }
-
-    @Test
-    public void loginOnBehalfOfNonAdminUserAssumeLoginPropertyFalseNotFoundTest() throws Exception {
-        Site site = siteService.findSite(context);
-        SiteRest siteRest = siteConverter.convert(site, Projection.DEFAULT);
-        String siteUri = utils.linkToSingleResource(siteRest, "self").getHref();
-
-        String token = getAuthToken(admin.getEmail(), password);
-
-        configurationService.setProperty("org.dspace.app.rest.authorization.AlwaysThrowExceptionFeature.turnoff", true);
-        configurationService.setProperty("webui.user.assumelogin", false);
-
-        Authorization loginOnBehalfOfAuthorization = new Authorization(eperson, loginOnBehalfOf, siteRest);
-        getClient(token).perform(get("/api/authz/authorizations/search/object")
-                                     .param("uri", siteUri)
-                                     .param("eperson", String.valueOf(eperson.getID()))
-                                     .param("feature", loginOnBehalfOf.getName()))
-                        .andExpect(status().isOk())
-                        .andExpect(jsonPath("$._embedded.authorizations", Matchers.not(
-                            Matchers.hasItem(AuthorizationMatcher.matchAuthorization(loginOnBehalfOfAuthorization)))));
-    }
-
-    @Test
-    public void loginOnBehalfOfAssumeLoginPropertyFalseNotFoundTest() throws Exception {
-        Site site = siteService.findSite(context);
-        SiteRest siteRest = siteConverter.convert(site, Projection.DEFAULT);
-        String siteUri = utils.linkToSingleResource(siteRest, "self").getHref();
-
-        String token = getAuthToken(admin.getEmail(), password);
-
-        configurationService.setProperty("org.dspace.app.rest.authorization.AlwaysThrowExceptionFeature.turnoff", true);
-        configurationService.setProperty("webui.user.assumelogin", false);
-
-        Authorization loginOnBehalfOfAuthorization = new Authorization(admin, loginOnBehalfOf, siteRest);
-        getClient(token).perform(get("/api/authz/authorizations/search/object")
-                                     .param("uri", siteUri)
-                                     .param("eperson", String.valueOf(admin.getID()))
-                                     .param("feature", loginOnBehalfOf.getName()))
-                        .andExpect(status().isOk())
-                        .andExpect(jsonPath("$._embedded.authorizations", Matchers.not(
-                            Matchers.hasItem(AuthorizationMatcher.matchAuthorization(loginOnBehalfOfAuthorization)))));
     }
 }
