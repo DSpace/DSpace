@@ -34,7 +34,7 @@ public class AuthorityEntryMatcher {
             hasJsonPath("$._links.self.href", containsString("api/integration/authority/")));
     }
 
-    private static Matcher<? super Object> matchProperties(String id, String display, String value) {
+    public static Matcher<? super Object> matchProperties(String id, String display, String value) {
         return allOf(
                 hasJsonPath("$.id", is(id)),
                 hasJsonPath("$.display", is(display)),

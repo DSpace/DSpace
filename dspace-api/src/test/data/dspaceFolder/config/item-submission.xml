@@ -19,6 +19,7 @@
     <submission-map>
         <name-map collection-handle="default" submission-name="traditional"/>
         <name-map collection-handle="123456789/publication-1" submission-name="publication"/>
+        <name-map collection-handle="123456789/language-test-1" submission-name="languagetestprocess"/>
     </submission-map>
 
 
@@ -138,6 +139,12 @@
 	      <type>submission-form</type>
 	    </step>
 
+
+        <step id="languagetest" mandatory="true">
+            <heading>submit.progressbar.describe.stepone</heading>
+            <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
+            <type>submission-form</type>
+        </step>
     </step-definitions>
 
     <!-- The submission-definitions map lays out the detailed definition of -->
@@ -191,6 +198,10 @@
 	      <step id="license" />
 	    </submission-process>
 
+        <submission-process name="languagetestprocess">
+            <step id="collection"/>
+            <step id="languagetest"/>
+        </submission-process>
     </submission-definitions>
 
 </item-submission>

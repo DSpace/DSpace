@@ -24,12 +24,14 @@ import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.GroupRest;
 import org.dspace.app.rest.model.patch.Patch;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.service.GroupService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
@@ -149,4 +151,37 @@ public class GroupRestRepository extends DSpaceObjectRestRepository<Group, Group
     public Class<GroupRest> getDomainClass() {
         return GroupRest.class;
     }
+
+    @Override
+    @PreAuthorize("hasAuthority('ADMIN')")
+    protected void delete(Context context, UUID uuid) throws AuthorizeException {
+        Group group = null;
+        try {
+            group = gs.find(context, uuid);
+            if (group == null) {
+                throw new ResourceNotFoundException(
+                        GroupRest.CATEGORY + "." + GroupRest.NAME
+                                + " with id: " + uuid + " not found"
+                );
+            }
+            try {
+                if (group.isPermanent()) {
+                    throw new UnprocessableEntityException("A permanent group cannot be deleted");
+                }
+                final DSpaceObject parentObject = gs.getParentObject(context, group);
+                if (parentObject != null) {
+                    throw new UnprocessableEntityException(
+                            "This group cannot be deleted"
+                                    + " as it has a parent " + parentObject.getType()
+                                    + " with id " + parentObject.getID());
+                }
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+            gs.delete(context, group);
+        } catch (SQLException | IOException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+    }
+
 }
