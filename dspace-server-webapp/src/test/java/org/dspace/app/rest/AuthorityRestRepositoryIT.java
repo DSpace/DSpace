@@ -19,7 +19,6 @@ import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.dspace.app.rest.builder.EPersonBuilder;
 import org.dspace.app.rest.matcher.AuthorityEntryMatcher;
-import org.dspace.app.rest.repository.SubmissionFormRestRepository;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.authority.PersonAuthorityValue;
 import org.dspace.authority.factory.AuthorityServiceFactory;
@@ -44,14 +43,10 @@ public class AuthorityRestRepositoryIT extends AbstractControllerIntegrationTest
 
     @Autowired
     ConfigurationService configurationService;
-
     @Autowired
     private PluginService pluginService;
-
     @Autowired
     private ChoiceAuthorityService cas;
-    @Autowired
-    private SubmissionFormRestRepository submissionFormRestRepository;
     @Autowired
     private LegacyPluginServiceImpl legacyPluginService;
     @Autowired
