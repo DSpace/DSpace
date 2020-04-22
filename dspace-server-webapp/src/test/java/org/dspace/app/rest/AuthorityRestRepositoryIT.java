@@ -7,6 +7,7 @@
  */
 package org.dspace.app.rest;
 
+import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -217,6 +218,165 @@ public class AuthorityRestRepositoryIT extends AbstractEntityIntegrationTest {
                 get("/api/integration/authorities/SolrAuthorAuthority/entryValues/" + id))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.page.totalElements", Matchers.is(1)));
+    }
+
+    @Test
+    public void srscSearchTopTest() throws Exception {
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        getClient(tokenAdmin).perform(get("/api/integration/authorities/srsc/entries/search/top"))
+          .andExpect(status().isOk())
+          .andExpect(jsonPath("$._embedded.authorityEntries", Matchers.containsInAnyOrder(
+              AuthorityEntryMatcher.matchAuthority("SCB11", "HUMANITIES and RELIGION"),
+              AuthorityEntryMatcher.matchAuthority("SCB12", "LAW/JURISPRUDENCE"),
+              AuthorityEntryMatcher.matchAuthority("SCB13", "SOCIAL SCIENCES"),
+              AuthorityEntryMatcher.matchAuthority("SCB14", "MATHEMATICS"),
+              AuthorityEntryMatcher.matchAuthority("SCB15", "NATURAL SCIENCES"),
+              AuthorityEntryMatcher.matchAuthority("SCB16", "TECHNOLOGY"),
+              AuthorityEntryMatcher.matchAuthority("SCB17", "FORESTRY, AGRICULTURAL SCIENCES and LANDSCAPE PLANNING"),
+              AuthorityEntryMatcher.matchAuthority("SCB18", "MEDICINE"),
+              AuthorityEntryMatcher.matchAuthority("SCB19", "ODONTOLOGY"),
+              AuthorityEntryMatcher.matchAuthority("SCB21", "PHARMACY"),
+              AuthorityEntryMatcher.matchAuthority("SCB22", "VETERINARY MEDICINE"),
+              AuthorityEntryMatcher.matchAuthority("SCB23", "INTERDISCIPLINARY RESEARCH AREAS")
+              )))
+          .andExpect(jsonPath("$.page.totalElements", Matchers.is(12)));
+    }
+
+    @Test
+    public void srscSearchTopPaginationTest() throws Exception {
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        getClient(tokenAdmin).perform(get("/api/integration/authorities/srsc/entries/search/top")
+                             .param("page", "0")
+                             .param("size", "5"))
+          .andExpect(status().isOk())
+          .andExpect(jsonPath("$._embedded.authorityEntries", Matchers.containsInAnyOrder(
+              AuthorityEntryMatcher.matchAuthority("SCB11", "HUMANITIES and RELIGION"),
+              AuthorityEntryMatcher.matchAuthority("SCB12", "LAW/JURISPRUDENCE"),
+              AuthorityEntryMatcher.matchAuthority("SCB13", "SOCIAL SCIENCES"),
+              AuthorityEntryMatcher.matchAuthority("SCB14", "MATHEMATICS"),
+              AuthorityEntryMatcher.matchAuthority("SCB15", "NATURAL SCIENCES")
+              )))
+          .andExpect(jsonPath("$.page.totalElements", is(12)))
+          .andExpect(jsonPath("$.page.totalPages", is(3)))
+          .andExpect(jsonPath("$.page.number", is(0)));
+
+        //second page
+        getClient(tokenAdmin).perform(get("/api/integration/authorities/srsc/entries/search/top")
+                 .param("page", "1")
+                 .param("size", "5"))
+           .andExpect(status().isOk())
+           .andExpect(jsonPath("$._embedded.authorityEntries", Matchers.containsInAnyOrder(
+               AuthorityEntryMatcher.matchAuthority("SCB16", "TECHNOLOGY"),
+               AuthorityEntryMatcher.matchAuthority("SCB17", "FORESTRY, AGRICULTURAL SCIENCES and LANDSCAPE PLANNING"),
+               AuthorityEntryMatcher.matchAuthority("SCB18", "MEDICINE"),
+               AuthorityEntryMatcher.matchAuthority("SCB19", "ODONTOLOGY"),
+               AuthorityEntryMatcher.matchAuthority("SCB21", "PHARMACY")
+               )))
+           .andExpect(jsonPath("$.page.totalElements", is(12)))
+           .andExpect(jsonPath("$.page.totalPages", is(3)))
+           .andExpect(jsonPath("$.page.number", is(1)));
+
+        // third page
+        getClient(tokenAdmin).perform(get("/api/integration/authorities/srsc/entries/search/top")
+                 .param("page", "2")
+                 .param("size", "5"))
+           .andExpect(status().isOk())
+           .andExpect(jsonPath("$._embedded.authorityEntries", Matchers.containsInAnyOrder(
+               AuthorityEntryMatcher.matchAuthority("SCB22", "VETERINARY MEDICINE"),
+               AuthorityEntryMatcher.matchAuthority("SCB23", "INTERDISCIPLINARY RESEARCH AREAS")
+               )))
+           .andExpect(jsonPath("$.page.totalElements", is(12)))
+           .andExpect(jsonPath("$.page.totalPages", is(3)))
+           .andExpect(jsonPath("$.page.number", is(2)));
+    }
+
+    @Test
+    public void srscSearchByParentFirstLevel_MATHEMATICS_Test() throws Exception {
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        getClient(tokenAdmin).perform(get("/api/integration/authorities/srsc/entries/search/byParent")
+                 .param("id", "SCB14"))
+                 .andExpect(status().isOk())
+                 .andExpect(jsonPath("$._embedded.authorityEntries", Matchers.containsInAnyOrder(
+                     AuthorityEntryMatcher.matchAuthority("SCB1401", "Algebra, geometry and mathematical analysis"),
+                     AuthorityEntryMatcher.matchAuthority("SCB1402", "Applied mathematics"),
+                     AuthorityEntryMatcher.matchAuthority("SCB1409", "Other mathematics")
+                     )))
+                 .andExpect(jsonPath("$.page.totalElements", Matchers.is(3)));
+    }
+
+    @Test
+    public void srscSearchByParentFirstLevelPaginationTest() throws Exception {
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        // first page
+        getClient(tokenAdmin).perform(get("/api/integration/authorities/srsc/entries/search/byParent")
+                 .param("id", "SCB14")
+                 .param("page", "0")
+                 .param("size", "2"))
+                 .andExpect(status().isOk())
+                 .andExpect(jsonPath("$._embedded.authorityEntries", Matchers.containsInAnyOrder(
+                     AuthorityEntryMatcher.matchAuthority("SCB1401", "Algebra, geometry and mathematical analysis"),
+                     AuthorityEntryMatcher.matchAuthority("SCB1402", "Applied mathematics")
+                     )))
+                 .andExpect(jsonPath("$.page.totalElements", is(3)))
+                 .andExpect(jsonPath("$.page.totalPages", is(2)))
+                 .andExpect(jsonPath("$.page.number", is(0)));
+
+        // second page
+        getClient(tokenAdmin).perform(get("/api/integration/authorities/srsc/entries/search/byParent")
+                .param("id", "SCB14")
+                .param("page", "1")
+                .param("size", "2"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$._embedded.authorityEntries", Matchers.containsInAnyOrder(
+                    AuthorityEntryMatcher.matchAuthority("SCB1409", "Other mathematics")
+                    )))
+                .andExpect(jsonPath("$.page.totalElements", is(3)))
+                .andExpect(jsonPath("$.page.totalPages", is(2)))
+                .andExpect(jsonPath("$.page.number", is(1)));
+    }
+
+    @Test
+    public void srscSearchByParentSecondLevel_Applied_mathematics_Test() throws Exception {
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        getClient(tokenAdmin).perform(get("/api/integration/authorities/srsc/entries/search/byParent")
+                             .param("id", "SCB1402"))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$._embedded.authorityEntries", Matchers.containsInAnyOrder(
+                                     AuthorityEntryMatcher.matchAuthority("VR140202", "Numerical analysis"),
+                                     AuthorityEntryMatcher.matchAuthority("VR140203", "Mathematical statistics"),
+                                     AuthorityEntryMatcher.matchAuthority("VR140204", "Optimization, systems theory"),
+                                     AuthorityEntryMatcher.matchAuthority("VR140205", "Theoretical computer science")
+                                     )))
+                             .andExpect(jsonPath("$.page.totalElements", Matchers.is(4)));
+    }
+
+    @Test
+    public void srscSearchByParentEmptyTest() throws Exception {
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        getClient(tokenAdmin).perform(get("/api/integration/authorities/srsc/entries/search/byParent")
+                             .param("id", "VR140202"))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$.page.totalElements", Matchers.is(0)));
+    }
+
+    @Test
+    public void srscSearchByParentWrongIdTest() throws Exception {
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        getClient(tokenAdmin).perform(get("/api/integration/authorities/srsc/entries/search/byParent")
+                             .param("id", "WRONG_ID"))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$.page.totalElements", Matchers.is(0)));
+    }
+
+    @Test
+    public void srscSearchTest() throws Exception {
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        getClient(tokenAdmin).perform(get("/api/integration/authorities/srsc/entries/search"))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$._links.byParent.href", Matchers.containsString(
+                                                 "api/integration/authorities/srsc/entries/search/byParent")))
+                             .andExpect(jsonPath("$._links.top.href", Matchers.containsString(
+                                                 "api/integration/authorities/srsc/entries/search/top")));
     }
 
     @Test
