@@ -11,7 +11,7 @@ import java.util.List;
 import javax.servlet.Filter;
 
 import org.dspace.app.rest.filter.DSpaceRequestContextFilter;
-import org.dspace.app.rest.model.hateoas.DSpaceRelProvider;
+import org.dspace.app.rest.model.hateoas.DSpaceLinkRelationProvider;
 import org.dspace.app.rest.parameter.resolver.SearchFilterResolver;
 import org.dspace.app.rest.utils.ApplicationConfig;
 import org.dspace.app.rest.utils.DSpaceConfigurationInitializer;
@@ -118,8 +118,8 @@ public class Application extends SpringBootServletInitializer {
     }
 
     @Bean
-    protected LinkRelationProvider dspaceRelProvider() {
-        return new DSpaceRelProvider();
+    protected LinkRelationProvider dspaceLinkRelationProvider() {
+        return new DSpaceLinkRelationProvider();
     }
 
     @Bean

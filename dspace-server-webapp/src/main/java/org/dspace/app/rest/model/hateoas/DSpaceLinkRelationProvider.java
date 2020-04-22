@@ -13,12 +13,12 @@ import org.springframework.hateoas.LinkRelation;
 import org.springframework.hateoas.server.core.EvoInflectorLinkRelationProvider;
 
 /**
- * A DSpace Relation Provider that use the RelNameDSpaceResource to use the
+ * A DSpace Link Relation Provider that use the RelNameDSpaceResource annotation to use the
  * right names for the embedded collection when a DSpaceResource is requested
  *
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
-public class DSpaceRelProvider extends EvoInflectorLinkRelationProvider {
+public class DSpaceLinkRelationProvider extends EvoInflectorLinkRelationProvider {
 
     @Override
     public LinkRelation getItemResourceRelFor(Class<?> type) {
