@@ -117,8 +117,9 @@ public class CollectionGroupRestController {
      */
     @RequestMapping(method = RequestMethod.DELETE, value = "/adminGroup")
     @PreAuthorize("hasPermission(#uuid, 'COLLECTION', 'WRITE')")
-    public ResponseEntity<RepresentationModel<?>> deleteAdminGroup(@PathVariable UUID uuid, HttpServletResponse response,
-                                                            HttpServletRequest request)
+    public ResponseEntity<RepresentationModel<?>> deleteAdminGroup(@PathVariable UUID uuid,
+                                                                   HttpServletResponse response,
+                                                                   HttpServletRequest request)
         throws SQLException, AuthorizeException, IOException {
 
         Context context = ContextUtil.obtainContext(request);
@@ -149,8 +150,9 @@ public class CollectionGroupRestController {
      */
     @RequestMapping(method = RequestMethod.POST, value = "/submittersGroup")
     @PreAuthorize("hasPermission(#uuid, 'COLLECTION', 'WRITE')")
-    public ResponseEntity<RepresentationModel<?>> postSubmittersGroup(@PathVariable UUID uuid, HttpServletResponse response,
-                                                               HttpServletRequest request)
+    public ResponseEntity<RepresentationModel<?>> postSubmittersGroup(@PathVariable UUID uuid,
+                                                                      HttpServletResponse response,
+                                                                      HttpServletRequest request)
         throws SQLException, AuthorizeException {
 
         Context context = ContextUtil.obtainContext(request);
@@ -183,8 +185,9 @@ public class CollectionGroupRestController {
      */
     @RequestMapping(method = RequestMethod.DELETE, value = "/submittersGroup")
     @PreAuthorize("hasPermission(#uuid, 'COLLECTION', 'WRITE')")
-    public ResponseEntity<RepresentationModel<?>> deleteSubmittersGroup(@PathVariable UUID uuid, HttpServletResponse response,
-                                                                 HttpServletRequest request)
+    public ResponseEntity<RepresentationModel<?>> deleteSubmittersGroup(@PathVariable UUID uuid,
+                                                                        HttpServletResponse response,
+                                                                        HttpServletRequest request)
         throws SQLException, AuthorizeException, IOException {
 
         Context context = ContextUtil.obtainContext(request);
@@ -214,8 +217,9 @@ public class CollectionGroupRestController {
      */
     @RequestMapping(method = RequestMethod.POST, value = "/itemReadGroup")
     @PreAuthorize("hasPermission(#uuid, 'COLLECTION', 'WRITE')")
-    public ResponseEntity<RepresentationModel<?>> postItemReadGroup(@PathVariable UUID uuid, HttpServletResponse response,
-                                                             HttpServletRequest request)
+    public ResponseEntity<RepresentationModel<?>> postItemReadGroup(@PathVariable UUID uuid,
+                                                                    HttpServletResponse response,
+                                                                    HttpServletRequest request)
         throws SQLException, AuthorizeException {
 
         Context context = ContextUtil.obtainContext(request);
@@ -255,8 +259,9 @@ public class CollectionGroupRestController {
      */
     @RequestMapping(method = RequestMethod.DELETE, value = "/itemReadGroup")
     @PreAuthorize("hasPermission(#uuid, 'COLLECTION', 'WRITE')")
-    public ResponseEntity<RepresentationModel<?>> deleteItemReadGroup(@PathVariable UUID uuid, HttpServletResponse response,
-                                                               HttpServletRequest request)
+    public ResponseEntity<RepresentationModel<?>> deleteItemReadGroup(@PathVariable UUID uuid,
+                                                                      HttpServletResponse response,
+                                                                      HttpServletRequest request)
         throws SQLException, AuthorizeException, IOException {
 
         Context context = ContextUtil.obtainContext(request);
@@ -294,8 +299,9 @@ public class CollectionGroupRestController {
      */
     @RequestMapping(method = RequestMethod.POST, value = "/bitstreamReadGroup")
     @PreAuthorize("hasPermission(#uuid, 'COLLECTION', 'WRITE')")
-    public ResponseEntity<RepresentationModel<?>> postBitstreamReadGroup(@PathVariable UUID uuid, HttpServletResponse response,
-                                                                  HttpServletRequest request)
+    public ResponseEntity<RepresentationModel<?>> postBitstreamReadGroup(@PathVariable UUID uuid,
+                                                                         HttpServletResponse response,
+                                                                         HttpServletRequest request)
         throws SQLException, AuthorizeException {
 
         Context context = ContextUtil.obtainContext(request);
@@ -337,8 +343,8 @@ public class CollectionGroupRestController {
     @RequestMapping(method = RequestMethod.DELETE, value = "/bitstreamReadGroup")
     @PreAuthorize("hasPermission(#uuid, 'COLLECTION', 'WRITE')")
     public ResponseEntity<RepresentationModel<?>> deleteBitstreamReadGroup(@PathVariable UUID uuid,
-                                                                    HttpServletResponse response,
-                                                                    HttpServletRequest request)
+                                                                           HttpServletResponse response,
+                                                                           HttpServletRequest request)
         throws SQLException, AuthorizeException, IOException {
 
         Context context = ContextUtil.obtainContext(request);
@@ -378,9 +384,9 @@ public class CollectionGroupRestController {
     @RequestMapping(method = RequestMethod.GET, value = "/workflowGroups/{workflowRole}")
     @PreAuthorize("hasPermission(#uuid, 'COLLECTION', 'READ')")
     public ResponseEntity<RepresentationModel<?>> getWorkflowGroupForRole(@PathVariable UUID uuid,
-                                                                   HttpServletResponse response,
-                                                                   HttpServletRequest request,
-                                                                   @PathVariable String workflowRole)
+                                                                          HttpServletResponse response,
+                                                                          HttpServletRequest request,
+                                                                          @PathVariable String workflowRole)
         throws Exception {
         Context context = ContextUtil.obtainContext(request);
         Collection collection = collectionService.find(context, uuid);
@@ -408,9 +414,9 @@ public class CollectionGroupRestController {
     @RequestMapping(method = RequestMethod.POST, value = "/workflowGroups/{workflowRole}")
     @PreAuthorize("hasPermission(#uuid, 'COLLECTION', 'READ')")
     public ResponseEntity<RepresentationModel<?>> postWorkflowGroupForRole(@PathVariable UUID uuid,
-                                                                    HttpServletResponse response,
-                                                                    HttpServletRequest request,
-                                                                    @PathVariable String workflowRole)
+                                                                           HttpServletResponse response,
+                                                                           HttpServletRequest request,
+                                                                           @PathVariable String workflowRole)
         throws Exception {
         Context context = ContextUtil.obtainContext(request);
         Collection collection = collectionService.find(context, uuid);
@@ -447,9 +453,9 @@ public class CollectionGroupRestController {
     @RequestMapping(method = RequestMethod.DELETE, value = "/workflowGroups/{workflowRole}")
     @PreAuthorize("hasPermission(#uuid, 'COLLECTION', 'READ')")
     public ResponseEntity<RepresentationModel<?>> deleteWorkflowGroupForRole(@PathVariable UUID uuid,
-                                                                      HttpServletResponse response,
-                                                                      HttpServletRequest request,
-                                                                      @PathVariable String workflowRole)
+                                                                             HttpServletResponse response,
+                                                                             HttpServletRequest request,
+                                                                             @PathVariable String workflowRole)
         throws Exception {
         Context context = ContextUtil.obtainContext(request);
         Collection collection = collectionService.find(context, uuid);
