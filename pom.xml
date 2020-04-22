@@ -1583,7 +1583,7 @@
         <repository>
             <id>bibsys-libs-releases</id>
             <name>Bibsys internal Maven 2 release repository</name>
-            <url>http://artifactory.bibsys.no/artifactory/libs-releases</url>
+            <url>http://artifactory.unit.no/artifactory/libs-releases</url>
             <releases>
             </releases>
             <snapshots>
@@ -1593,7 +1593,7 @@
         <repository>
             <id>bibsys-libs-snapshots</id>
             <name>Bibsys internal Maven 2 snapshot repository</name>
-            <url>http://artifactory.bibsys.no/artifactory/libs-snapshots</url>
+            <url>http://artifactory.unit.no/artifactory/libs-snapshots</url>
             <releases>
                 <enabled>false</enabled>
             </releases>
@@ -1606,17 +1606,17 @@
         <repository>
             <id>bibsys-third-party</id>
             <name>Bibsys third-party repository</name>
-            <url>http://artifactory.bibsys.no/artifactory/third-party</url>
+            <url>http://artifactory.unit.no/artifactory/third-party</url>
         </repository>
         <repository>
             <id>ext-snapshots-repository</id>
             <name>Bibsys ext-snapshot repository</name>
-            <url>http://artifactory.bibsys.no/artifactory/ext-snapshots</url>
+            <url>http://artifactory.unit.no/artifactory/ext-snapshots</url>
         </repository>
         <repository>
             <id>ext-release-repository</id>
             <name>Bibsys ext-release repository</name>
-            <url>http://artifactory.bibsys.no/artifactory/ext-releases</url>
+            <url>http://artifactory.unit.no/artifactory/ext-releases</url>
         </repository>
     </repositories>
 

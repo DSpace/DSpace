@@ -41,9 +41,11 @@
     <xsl:template match="mets:fileGrp[@USE='ORE']" mode="itemSummaryView-DIM">
         <xsl:variable name="AtomMapURL" select="concat('cocoon:/',substring-after(mets:file/mets:FLocat[@LOCTYPE='URL']//@*[local-name(.)='href'],$context-path))"/>
         <div class="item-page-field-wrapper table">
-            <h5>
-                <i18n:text>xmlui.dri2xhtml.METS-1.0.item-files-viewOpen</i18n:text>
-            </h5>
+            <xsl:if test="document($AtomMapURL)/atom:entry/atom:link[@rel='http://www.openarchives.org/ore/terms/aggregates']">
+                <h5>
+                    <i18n:text>xmlui.dri2xhtml.METS-1.0.item-files-viewOpen</i18n:text>
+                </h5>
+            </xsl:if>
 
             <xsl:for-each select="document($AtomMapURL)/atom:entry/atom:link[@rel='http://www.openarchives.org/ore/terms/aggregates']">
                 <xsl:variable name="link_href" select="@href"/>
