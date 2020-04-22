@@ -111,7 +111,7 @@
     <step id="detect-duplicate" mandatory="true">
       <heading>submit.progressbar.detect-duplicate</heading>
    	  <processing-class>org.dspace.app.rest.submit.step.DetectPotentialDuplicateStep</processing-class>
-      <type>duplicate</type>
+      <type>detect-duplicate</type>
     </step>
   </step-definitions>
   <submission-definitions>
