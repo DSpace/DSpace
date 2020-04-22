@@ -3,26 +3,21 @@ package org.ssu.config;
 import liquibase.integration.spring.SpringLiquibase;
 import org.apache.tomcat.jdbc.pool.DataSource;
 import org.dspace.core.ConfigurationManager;
-
 import org.hibernate.ejb.HibernatePersistence;
 import org.jooq.SQLDialect;
 import org.jooq.conf.Settings;
 import org.jooq.impl.DataSourceConnectionProvider;
 import org.jooq.impl.DefaultConfiguration;
 import org.jooq.impl.DefaultDSLContext;
-import org.jooq.impl.DefaultExecuteListenerProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
-import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.jdbc.datasource.TransactionAwareDataSourceProxy;
-import org.springframework.orm.hibernate4.LocalSessionFactoryBean;
-import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
-
 
 import java.util.Properties;
 
@@ -57,6 +52,7 @@ public class DataConfig {
     }
 
     @Bean
+    @DependsOn("liquibase")
     public DefaultDSLContext dsl() {
         return new DefaultDSLContext(configuration());
     }
@@ -93,6 +89,7 @@ public class DataConfig {
     }
 
     @Bean
+    @DependsOn("liquibase")
     public LocalContainerEntityManagerFactoryBean entityManagerFactory() {
         LocalContainerEntityManagerFactoryBean entityManagerFactoryBean = new LocalContainerEntityManagerFactoryBean();
         entityManagerFactoryBean.setDataSource(dataSource());
@@ -102,15 +99,6 @@ public class DataConfig {
 
         return entityManagerFactoryBean;
     }
-
-//    @Bean
-//    public JpaTransactionManager transactionManager() {
-//        JpaTransactionManager transactionManager = new JpaTransactionManager();
-//        transactionManager.setEntityManagerFactory(entityManagerFactory().getObject());
-//
-//        return transactionManager;
-//    }
-
 
     private Properties getHibernateProperties() {
         Properties properties = new Properties();
