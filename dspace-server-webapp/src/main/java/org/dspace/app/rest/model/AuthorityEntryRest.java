@@ -80,14 +80,6 @@ public class AuthorityEntryRest extends RestAddressableModel {
         this.authorityName = authorityName;
     }
 
-    public Boolean isSelectable() {
-        return selectable;
-    }
-
-    public void setSelectable(Boolean selectable) {
-        this.selectable = selectable;
-    }
-
     @Override
     public String getCategory() {
         return AuthorityRest.CATEGORY;
