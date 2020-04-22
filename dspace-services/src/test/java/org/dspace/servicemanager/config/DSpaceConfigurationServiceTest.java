@@ -532,7 +532,7 @@ public class DSpaceConfigurationServiceTest {
 
         // Assert a property exists with a specific initial value
         assertNotNull(dscs.getProperty("prop.to.auto.reload"));
-        assertEquals("DSpace", dscs.getProperty("prop.to.auto.reload"));
+        assertEquals("D-space", dscs.getProperty("prop.to.auto.reload"));
 
         // Copy our test local.properties file to a temp location (so we can restore it after tests below)
         File tempPropFile = File.createTempFile("temp", "properties");
@@ -550,7 +550,7 @@ public class DSpaceConfigurationServiceTest {
 
         // Check immediately. Property should be unchanged
         // NOTE: If this fails, then somehow the configuration reloaded *immediately*
-        assertEquals("DSpace", dscs.getProperty("prop.to.auto.reload"));
+        assertEquals("D-space", dscs.getProperty("prop.to.auto.reload"));
 
         // Wait now for 3 seconds
         Thread.sleep(3_000);
