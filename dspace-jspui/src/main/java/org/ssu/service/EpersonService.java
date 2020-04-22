@@ -13,10 +13,17 @@ import javax.servlet.http.HttpServletRequest;
 import java.sql.SQLException;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
 public class EpersonService {
+    private static final org.ssu.entity.jooq.EPerson EPERSON = org.ssu.entity.jooq.EPerson.TABLE;
+
+    @Resource
+    private DSLContext dsl;
+
     private static final EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
 
     public List<EPerson> getLatestRegisteredUsers(Context context, int limit) throws SQLException {
@@ -58,5 +65,11 @@ public class EpersonService {
             ePersonService.setPassword(eperson, password);
             return true;
         }
+    }
+
+    public Optional<UUID> findEpersonUuuidByPersonalName(String firstName, String lastName) {
+        return dsl.selectFrom(EPERSON)
+                .where(EPERSON.firstname.eq(firstName).and(EPERSON.lastname.eq(lastName)))
+                .fetchOptional(EPERSON.uuid);
     }
 }

@@ -3,6 +3,7 @@ package org.ssu.service;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
 import org.ssu.entity.AuthorLocalization;
+import org.ssu.repository.AuthorLocalizationRepository;
 import org.ssu.service.localization.AuthorsCache;
 
 import javax.annotation.Resource;
@@ -15,8 +16,12 @@ public class AuthorsService {
     @Resource
     private AuthorsCache authorsCache;
 
+    @Resource
+    private AuthorLocalizationRepository authorLocalizationRepository;
+
     public void updateAuthorOrcid(AuthorLocalization author) {
-        authorsCache.updateAuthorOrcid(author);
+        authorLocalizationRepository.updateAuthorOrcid(author);
+        authorsCache.updateCache();
     }
 
     public AuthorLocalization getAuthorLocalization(Optional<String> authorName) {
@@ -48,11 +53,13 @@ public class AuthorsService {
     }
 
     public void updateAuthorData(AuthorLocalization author) {
-        authorsCache.updateAuthorData(author);
+        authorLocalizationRepository.updateAuthorData(author);
+        authorsCache.updateCache();
     }
 
     public void removeAuthor(UUID uuid) {
-        authorsCache.removeAuthorData(uuid);
+        authorLocalizationRepository.deleteByUuid(uuid);
+        authorsCache.updateCache();
     }
 
     public boolean isAuthorLocalizationPresent(String author) {
