@@ -17,6 +17,8 @@ import org.dspace.app.rest.model.EPersonRest;
 import org.dspace.app.rest.model.SiteRest;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.core.Context;
+import org.dspace.eperson.EPerson;
+import org.dspace.eperson.service.EPersonService;
 import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -38,9 +40,13 @@ public class LoginOnBehalfOfFeature implements AuthorizationFeature {
     @Autowired
     private ConfigurationService configurationService;
 
+    @Autowired
+    private EPersonService ePersonService;
+
     @Override
     public boolean isAuthorized(Context context, BaseObjectRest object) throws SQLException {
-        if (!StringUtils.equals(object.getType(), SiteRest.NAME)) {
+        if (!StringUtils.equals(object.getType(), SiteRest.NAME) &&
+            !StringUtils.equals(object.getType(), EPersonRest.NAME)) {
             return false;
         }
         if (!authorizeService.isAdmin(context)) {
@@ -48,6 +54,18 @@ public class LoginOnBehalfOfFeature implements AuthorizationFeature {
         }
         if (!configurationService.getBooleanProperty("webui.user.assumelogin")) {
             return false;
+        }
+        if (StringUtils.equals(object.getType(), EPersonRest.NAME)) {
+            EPersonRest ePersonRest = (EPersonRest) object;
+            EPerson currentUser = context.getCurrentUser();
+            if (StringUtils.equalsIgnoreCase(currentUser.getEmail(), ePersonRest.getEmail())) {
+                return false;
+            }
+
+            EPerson ePerson = ePersonService.findByEmail(context, ePersonRest.getEmail());
+            if (authorizeService.isAdmin(context, ePerson)) {
+                return false;
+            }
         }
         return true;
     }
