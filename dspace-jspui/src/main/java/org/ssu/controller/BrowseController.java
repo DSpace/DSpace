@@ -1,5 +1,6 @@
 package org.ssu.controller;
 
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
@@ -71,7 +72,7 @@ public class BrowseController {
         } else {
             items = communityService.getItems(dspaceContext, browseInfo);
             isExtendedTable = true;
-            model.addObject("searchQuery", value);
+            model.addObject("searchQuery",  StringEscapeUtils.escapeHtml4(value));
         }
 
         browseRequestProcessor.fillModelWithData(model, items, browseInfo, request, isExtendedTable);
