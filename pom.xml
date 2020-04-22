@@ -19,8 +19,8 @@
     <properties>
         <!--=== GENERAL / DSPACE-API DEPENDENCIES ===-->
         <java.version>11</java.version>
-        <spring.version>5.2.4.RELEASE</spring.version>
-        <spring-boot.version>2.2.5.RELEASE</spring-boot.version>
+        <spring.version>5.2.5.RELEASE</spring.version>
+        <spring-boot.version>2.2.6.RELEASE</spring-boot.version>
         <hibernate.version>5.4.10.Final</hibernate.version>
         <hibernate-validator.version>6.0.18.Final</hibernate-validator.version>
         <postgresql.driver.version>42.2.9</postgresql.driver.version>
@@ -44,7 +44,7 @@
 
         <!--=== SERVER WEBAPP DEPENDENCIES ===-->
         <!-- Spring Data REST HAL Browser (used by Server webapp) -->
-        <spring-hal-browser.version>3.2.5.RELEASE</spring-hal-browser.version>
+        <spring-hal-browser.version>3.2.6.RELEASE</spring-hal-browser.version>
         <!-- Library for reading JSON documents: https://github.com/json-path/JsonPath (used by Server webapp) -->
         <json-path.version>2.4.0</json-path.version>
         <!-- Library for managing JSON Web Tokens (JWT): https://bitbucket.org/connect2id/nimbus-jose-jwt/wiki/Home
