@@ -16,6 +16,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
@@ -60,8 +61,6 @@ public class StatelessAuthenticationFilter extends BasicAuthenticationFilter {
 
     private ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
 
-    private boolean inErrorOnBehalfOf = false;
-
     public StatelessAuthenticationFilter(AuthenticationManager authenticationManager,
                                          RestAuthenticationService restAuthenticationService,
                                          EPersonRestAuthenticationProvider authenticationProvider,
@@ -77,19 +76,20 @@ public class StatelessAuthenticationFilter extends BasicAuthenticationFilter {
                                     HttpServletResponse res,
                                     FilterChain chain) throws IOException, ServletException {
 
-        inErrorOnBehalfOf = false;
-        Authentication authentication = getAuthentication(req, res);
+        Pair<Authentication, Boolean> pair = getAuthentication(req, res);
+        Authentication authentication = pair.getLeft();
         if (authentication != null) {
             SecurityContextHolder.getContext().setAuthentication(authentication);
             restAuthenticationService.invalidateAuthenticationCookie(res);
         }
-        if (inErrorOnBehalfOf) {
+        if (pair.getRight()) {
             return;
         }
         chain.doFilter(req, res);
     }
 
-    private Authentication getAuthentication(HttpServletRequest request, HttpServletResponse res) throws IOException {
+    private Pair<Authentication, Boolean> getAuthentication(HttpServletRequest request, HttpServletResponse res)
+        throws IOException {
 
         if (restAuthenticationService.hasAuthenticationData(request)) {
             // parse the token.
@@ -108,70 +108,63 @@ public class StatelessAuthenticationFilter extends BasicAuthenticationFilter {
                     if (configurationService.getBooleanProperty("webui.user.assumelogin")) {
                         return getOnBehalfOfAuthentication(context, onBehalfOfParameterValue, res);
                     } else {
-                        inErrorOnBehalfOf = true;
                         res.sendError(HttpServletResponse.SC_BAD_REQUEST, "The login as feature is not allowed" +
                             " due to the current configuration");
-                        return null;
+                        return Pair.of(null, true);
                     }
                 }
 
                 //Return the Spring authentication object
-                return new DSpaceAuthentication(eperson.getEmail(), authorities);
+                return Pair.of(new DSpaceAuthentication(eperson.getEmail(), authorities), false);
             } else {
-                return null;
+                return Pair.of(null, false);
             }
         } else {
             if (request.getHeader(ON_BEHALF_OF_REQUEST_PARAM) != null) {
-                inErrorOnBehalfOf = true;
                 res.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Only admins are allowed to use the" +
                     " login as feature");
-
+                return Pair.of(null, true);
             }
         }
 
-        return null;
+        return Pair.of(null, false);
     }
 
-    private Authentication getOnBehalfOfAuthentication(Context context, String onBehalfOfParameterValue,
+    private Pair<Authentication, Boolean> getOnBehalfOfAuthentication(Context context, String onBehalfOfParameterValue,
                                                        HttpServletResponse res) throws IOException {
 
         try {
             if (!authorizeService.isAdmin(context)) {
-                inErrorOnBehalfOf = true;
                 res.sendError(HttpServletResponse.SC_FORBIDDEN, "Only admins are allowed to use the" +
                     " login as feature");
-                return null;
+                return Pair.of(null, true);
             }
             UUID epersonUuid = UUIDUtils.fromString(onBehalfOfParameterValue);
             if (epersonUuid == null) {
-                inErrorOnBehalfOf = true;
                 res.sendError(HttpServletResponse.SC_BAD_REQUEST, "The given UUID in the X-On-Behalf-Of header " +
                     "was not a proper UUID");
-                return null;
+                return Pair.of(null, true);
             }
             EPerson onBehalfOfEPerson = ePersonService.find(context, epersonUuid);
             if (onBehalfOfEPerson == null) {
-                inErrorOnBehalfOf = true;
                 res.sendError(HttpServletResponse.SC_BAD_REQUEST, "The given UUID in the X-On-Behalf-Of header " +
                     "was not a proper EPerson UUID");
-                return null;
+                return Pair.of(null, true);
             }
             if (!authorizeService.isAdmin(context, onBehalfOfEPerson)) {
                 requestService.setCurrentUserId(epersonUuid);
                 context.switchContextUser(onBehalfOfEPerson);
-                return new DSpaceAuthentication(onBehalfOfEPerson.getEmail(),
-                                                authenticationProvider.getGrantedAuthorities(context,
-                                                                                             onBehalfOfEPerson));
+                return Pair.of(new DSpaceAuthentication(onBehalfOfEPerson.getEmail(),
+                                authenticationProvider.getGrantedAuthorities(context, onBehalfOfEPerson)), false);
             } else {
-                inErrorOnBehalfOf = true;
                 res.sendError(HttpServletResponse.SC_BAD_REQUEST, "You're unable to use the login as feature to log " +
                     "in as another admin");
-                return null;
+                return Pair.of(null, true);
             }
 
         } catch (SQLException e) {
             log.error(e.getMessage(), e);
-            return null;
+            return Pair.of(null, false);
         }
     }
 
