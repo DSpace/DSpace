@@ -81,6 +81,10 @@
                             <bean
                                     class="org.dspace.app.rest.submit.factory.impl.BitstreamResourcePolicyRemovePatchOperation"/>
                         </entry>
+                        <entry key="cclicense/uri">
+                            <bean
+                                    class="org.dspace.app.rest.submit.factory.impl.CCLicenseRemovePatchOperation"/>
+                        </entry>
                     </map>
                 </entry>
                 <entry key="replace">
