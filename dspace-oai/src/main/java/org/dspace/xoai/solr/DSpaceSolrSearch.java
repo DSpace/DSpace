@@ -8,6 +8,8 @@
 
 package org.dspace.xoai.solr;
 
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrQuery.ORDER;
 import org.apache.solr.client.solrj.SolrServer;
@@ -24,17 +26,25 @@ import org.dspace.xoai.solr.exceptions.SolrSearchEmptyException;
  */
 public class DSpaceSolrSearch
 {
+
+
+    private static final Logger log = LogManager.getLogger(DSpaceSolrSearch.class);
+
     public static SolrDocumentList query(SolrServer server, SolrQuery solrParams)
             throws DSpaceSolrException
     {
         try
         {
             solrParams.addSortField("item.id", ORDER.asc);
+            log.info("solrParams query:" + solrParams.getQuery());
+            log.info("solrParams toString:" + solrParams.toString());
             QueryResponse response = server.query(solrParams);
             return response.getResults();
         }
         catch (SolrServerException ex)
         {
+            log.info("solrParams query:" + solrParams.getQuery());
+            log.info("solrParams toString:" + solrParams.toString());
             throw new DSpaceSolrException(ex.getMessage(), ex);
         }
     }

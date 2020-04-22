@@ -38,6 +38,7 @@ public class DSpaceAuthorizationFilter extends DSpaceFilter
     @Override
     public boolean isShown(DSpaceItem item)
     {
+        log.info(("OAI AuthFilter is on "));
         boolean pub = false;
         try
         {

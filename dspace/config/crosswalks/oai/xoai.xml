@@ -246,14 +246,14 @@
                     <LeftCondition>
                         <And>
                             <LeftCondition>
-                                        <Custom ref="titleExistsCondition"/>
-                                    </LeftCondition>
-                                    <RightCondition>
-                                        <Custom ref="authorExistsCondition"/>
-                                    </RightCondition>
-                                </And>
+                                <Custom ref="titleExistsCondition"/>
                             </LeftCondition>
                             <RightCondition>
+                                <Custom ref="authorExistsCondition"/>
+                            </RightCondition>
+                        </And>
+                    </LeftCondition>
+                    <RightCondition>
                         <And>
                             <LeftCondition>
                                 <Not>
@@ -261,10 +261,10 @@
                                         <Custom ref="restrictedAccessCondition"/>
                                     </Condition>
                                 </Not>
-                    </LeftCondition>
-                    <RightCondition>
-                        <Or>
-                            <LeftCondition>
+                            </LeftCondition>
+                            <RightCondition>
+                                <Or>
+                                    <LeftCondition>
                                         <Or>
                                             <LeftCondition>
                                                 <Custom ref="itemAccessCondition"/>
@@ -275,11 +275,11 @@
                                         </Or>
                                     </LeftCondition>
                                     <RightCondition>
-                                <Custom ref="openaireRelationCondition"/>
+                                        <Custom ref="openaireRelationCondition"/>
+                                    </RightCondition>
+                                </Or>
                             </RightCondition>
-                        </Or>
-                    </RightCondition>
-                </And>
+                        </And>
                     </RightCondition>
                 </And>
             </Definition>
@@ -308,10 +308,10 @@
             <Definition>
                 <Or>
                     <LeftCondition>
-                        <Custom ref="itemAccessCondition"/>
+                         <Custom ref="itemAccessCondition"/>
                     </LeftCondition>
                     <RightCondition>
-                        <Custom ref="itemWithdrawnCondition"/>
+                         <Custom ref="itemWithdrawnCondition"/>
                     </RightCondition>
                 </Or>
             </Definition>
