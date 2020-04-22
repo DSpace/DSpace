@@ -204,7 +204,7 @@ public class SubmissionDefinitionsControllerIT extends AbstractControllerIntegra
                    // We expect the content type to be "application/hal+json;charset=UTF-8"
                    .andExpect(content().contentType(contentType))
                    // Match only that a section exists with a submission configuration behind
-                   .andExpect(jsonPath("$._embedded.submissionsections", hasSize(5)))
+                   .andExpect(jsonPath("$._embedded.submissionsections", hasSize(6)))
                    .andExpect(jsonPath("$._embedded.submissionsections",
                                        Matchers.hasItem(
                                            allOf(

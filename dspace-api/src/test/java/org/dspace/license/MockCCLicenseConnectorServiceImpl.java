@@ -7,10 +7,16 @@
  */
 package org.dspace.license;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+
+import org.apache.commons.lang3.StringUtils;
+import org.jdom.Document;
+import org.jdom.JDOMException;
 
 /**
  * Mock implementation for the Creative commons license connector service.
@@ -20,7 +26,6 @@ public class MockCCLicenseConnectorServiceImpl extends CCLicenseConnectorService
 
     /**
      * Retrieves mock CC Licenses for the provided language
-     *
      * @param language - the language
      * @return a map of mocked licenses with the id and the license
      */
@@ -90,4 +95,29 @@ public class MockCCLicenseConnectorServiceImpl extends CCLicenseConnectorService
 
         return "mock-license-uri";
     }
+
+    /**
+     * Retrieve a mock license RDF document.
+     * When the uri contains "invalid", null will be returned to simulate that no document was found for the provided
+     * URI
+     *
+     * @param licenseURI - The license URI for which to retrieve the license RDF document
+     * @return a mock license RDF document or null when the URI contains invalid
+     * @throws IOException
+     */
+    public Document retrieveLicenseRDFDoc(String licenseURI) throws IOException {
+        if (!StringUtils.contains(licenseURI, "invalid")) {
+            try {
+
+                InputStream cclicense = getClass().getResourceAsStream("cc-license-rdf.xml");
+
+                Document doc = parser.build(cclicense);
+                return doc;
+            } catch (JDOMException e) {
+                e.printStackTrace();
+            }
+        }
+        return null;
+    }
+
 }
