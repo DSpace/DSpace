@@ -88,6 +88,20 @@ public class StatelessAuthenticationFilter extends BasicAuthenticationFilter {
         chain.doFilter(req, res);
     }
 
+    /**
+     * This method will return a Pair instance with an Authentication object as the left side of the pair and a Boolean
+     * for the right side of the pair which will indicate whether there was an error in the OnBehalfOf parsing or not
+     * The Authentication object will be attempted to be for the eperson with the uuid in the parameter. Incase
+     * this is able to be done properly, we'll be giving a pair back with the EPerson Authentication in the left side
+     * and a false boolean as the right side.
+     * If the Authentication object returned is not null, we'll be logged in as this EPerson given through from the
+     * request. If the Boolean is true, we'll stop the execution and show a BadRequest error
+     * @param request       The current request
+     * @param res           The current response
+     * @return              A Pair instance with the Authentication object on the left side and the boolean
+     *                      indicating errors on the right side
+     * @throws IOException  If something goes wrong
+     */
     private Pair<Authentication, Boolean> getAuthentication(HttpServletRequest request, HttpServletResponse res)
         throws IOException {
 
