@@ -29,6 +29,8 @@ public class AuthorityUtils {
 
     public static final String PRESENTATION_TYPE_SUGGEST = "suggest";
 
+    public static final String PRESENTATION_TYPE_SELECT = "select";
+
     public static final String RESERVED_KEYMAP_PARENT = "parent";
 
     @Autowired
