@@ -39,7 +39,7 @@ public class AuthorityEntryMatcher {
                 hasJsonPath("$.id", is(id)),
                 hasJsonPath("$.display", is(display)),
                 hasJsonPath("$.value", is(value)),
-                hasJsonPath("$.type", is("authority"))
+                hasJsonPath("$.type", is("authorityEntry"))
         );
     }
 
