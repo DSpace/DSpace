@@ -10,7 +10,6 @@ package org.dspace.deduplication.dao.impl;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
-
 import javax.persistence.Query;
 
 import org.dspace.core.AbstractHibernateDAO;

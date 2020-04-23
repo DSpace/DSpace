@@ -12,7 +12,6 @@ import java.util.Locale;
 import com.ibm.icu.text.CharsetDetector;
 import com.ibm.icu.text.CharsetMatch;
 import com.ibm.icu.text.Normalizer;
-
 import org.dspace.content.DSpaceObject;
 
 public class TitleWithDigitSignature extends MD5ValueSignature {

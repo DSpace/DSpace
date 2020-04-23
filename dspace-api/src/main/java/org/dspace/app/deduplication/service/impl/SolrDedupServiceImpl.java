@@ -21,7 +21,6 @@ import java.util.Map;
 import java.util.UUID;
 
 import com.google.common.collect.ImmutableList;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.validator.routines.UrlValidator;
 import org.apache.log4j.Logger;
