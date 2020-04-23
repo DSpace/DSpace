@@ -94,7 +94,7 @@
 
         <!--Step will be to Check for potential duplicate -->
         <step id="detect-duplicate">
-            <heading>submit.progressbar.detect.detect-duplicate</heading>
+            <heading>submit.progressbar.detect-duplicate</heading>
             <processing-class>org.dspace.app.rest.submit.step.DetectPotentialDuplicateStep</processing-class>
             <type>detect-duplicate</type>
         </step>
