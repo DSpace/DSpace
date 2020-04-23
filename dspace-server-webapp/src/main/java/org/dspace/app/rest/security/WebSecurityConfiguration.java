@@ -53,6 +53,9 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Autowired
     private CustomLogoutHandler customLogoutHandler;
 
+    @Autowired
+    private CustomLogoutSuccessHandler customLogoutSuccessHandler;
+
     @Override
     public void configure(WebSecurity webSecurity) throws Exception {
         webSecurity
@@ -89,7 +92,8 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
                 //Configure the logout entry point
                 .logoutRequestMatcher(new AntPathRequestMatcher("/api/authn/logout"))
                 //When logout is successful, return OK (204) status
-                .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler(HttpStatus.NO_CONTENT))
+                //.logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler(HttpStatus.NO_CONTENT))
+                .logoutSuccessHandler(customLogoutSuccessHandler)
                 //Everyone can call this endpoint
                 .permitAll()
             .and()

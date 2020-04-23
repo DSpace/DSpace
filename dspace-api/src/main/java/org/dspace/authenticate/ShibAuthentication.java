@@ -531,6 +531,19 @@ public class ShibAuthentication implements AuthenticationMethod {
         return "shibboleth";
     }
 
+    @Override
+    public String logoutPageURL(Context context, HttpServletRequest request, HttpServletResponse response) {
+        String shibURL = getShibLogoutURL(request);
+        
+        if ( shibURL != null ) {
+            log.debug("Session will be redirected to: " + shibURL);
+
+            return response.encodeRedirectURL(shibURL);
+        }
+
+        return null;
+    }
+
     /**
      * Identify an existing EPerson based upon the shibboleth attributes provided on
      * the request object. There are three cases where this can occurr, each as
@@ -1254,6 +1267,29 @@ public class ShibAuthentication implements AuthenticationMethod {
 
         // Shibboleth url must be absolute
         if (shibURL.startsWith("/")) {
+            String serverUrl = Utils.getBaseUrl(configurationService.getProperty("dspace.server.url"));
+            shibURL = serverUrl + shibURL;
+            if ((request.isSecure() || forceHTTPS) && shibURL.startsWith("http://")) {
+                shibURL = shibURL.replace("http://", "https://");
+            }
+        }
+        return shibURL;
+
+    }
+
+    /**
+     * It returns if available the logout URL from the configuration service 
+     * @param request
+     * @return fully-qualified URL or null
+     */
+    private String getShibLogoutURL(HttpServletRequest request) {
+        String shibURL = configurationService.getProperty("authentication-shibboleth.lazysession.logouturl",
+                null);
+        boolean forceHTTPS =
+                configurationService.getBooleanProperty("authentication-shibboleth.lazysession.secure", true);
+
+        // Shibboleth url must be absolute
+        if (shibURL != null && shibURL.startsWith("/")) {
             String serverUrl = Utils.getBaseUrl(configurationService.getProperty("dspace.server.url"));
             shibURL = serverUrl + shibURL;
             if ((request.isSecure() || forceHTTPS) && shibURL.startsWith("http://")) {

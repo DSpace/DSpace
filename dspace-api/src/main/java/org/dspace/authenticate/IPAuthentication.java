@@ -273,4 +273,9 @@ public class IPAuthentication implements AuthenticationMethod {
     public String getName() {
         return "ip";
     }
+
+    @Override
+    public String logoutPageURL(Context context, HttpServletRequest request, HttpServletResponse response) {
+        return null;
+    }
 }

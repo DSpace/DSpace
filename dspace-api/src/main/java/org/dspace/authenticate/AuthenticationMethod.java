@@ -212,6 +212,28 @@ public interface AuthenticationMethod {
                                HttpServletResponse response);
 
     /**
+     * Get an external logout page to which to redirect.
+     * 
+     * Returns URL (as string) to redirect after a successful logout process.
+     * 
+     * Note: Starting with DSpace 7, session are managed through the REST
+     * API.  Therefore, only authn providers with external logout pages (such as Shibboleth)
+     * should return a logout page.
+     *
+     * @param context
+     *   DSpace context, will be modified (ePerson set) upon success.
+     * @param request
+     *  The HTTP request that started this operation, or null if not applicable.
+     * @param response
+     *   The HTTP response from the servlet method.
+     *
+     * @return fully-qualified URL or null
+     */
+    public String logoutPageURL(Context context,
+            HttpServletRequest request,
+            HttpServletResponse response);
+
+    /**
      * Returns a short name that uniquely identifies this authentication method
      * @return The authentication method name
      */

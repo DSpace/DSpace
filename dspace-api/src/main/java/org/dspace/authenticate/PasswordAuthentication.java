@@ -247,4 +247,9 @@ public class PasswordAuthentication
     public String getName() {
         return "password";
     }
+
+    @Override
+    public String logoutPageURL(Context context, HttpServletRequest request, HttpServletResponse response) {
+        return null;
+    }
 }
