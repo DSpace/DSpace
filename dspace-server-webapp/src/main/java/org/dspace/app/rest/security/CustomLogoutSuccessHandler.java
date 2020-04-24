@@ -1,3 +1,10 @@
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
+ *
+ * http://www.dspace.org/license/
+ */
 package org.dspace.app.rest.security;
 
 import java.io.IOException;
@@ -19,6 +26,15 @@ import org.springframework.stereotype.Component;
 
 import org.apache.commons.lang3.StringUtils;
 
+/**
+ * Custom logout success handler.
+ * 
+ * It implements a strategy that is called after a successful logout by the
+ * LogoutFilter, to handle redirection or forwarding to the appropriate
+ * destination.
+ *
+ * @author Paulo Graça (paulo dot graca at fccn dot pt)
+ */
 @Component
 public class CustomLogoutSuccessHandler implements LogoutSuccessHandler {
 
@@ -31,7 +47,7 @@ public class CustomLogoutSuccessHandler implements LogoutSuccessHandler {
 
         String redirectPageURL = getRedirectPageURL(request, response);
         if (StringUtils.isNotBlank(redirectPageURL)) {
-            //TODO: for security issues we need to validate redirectPageURL
+            // TODO: for security issues we still need to validate redirectPageURL
             // we have a logout page to redirect to
             response.setHeader("Location", redirectPageURL);
             response.setStatus(HttpServletResponse.SC_FOUND);
