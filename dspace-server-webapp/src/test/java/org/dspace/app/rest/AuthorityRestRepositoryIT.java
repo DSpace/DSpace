@@ -593,11 +593,220 @@ public class AuthorityRestRepositoryIT extends AbstractEntityIntegrationTest {
                  .andExpect(jsonPath("$.page.totalElements", Matchers.is(12)));
 
         configurationService.setProperty("webui.supported.locales",null);
+        configurationService.setProperty("default.locale","en");
         DCInputAuthority.reset();
         legacyPluginService.clearNamedPluginClasses();
         choiceAuthorityServiceImpl.clearCache();
     }
 
+    @Test
+    public void srscSearchTopLanguageSupportTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        String[] supportedLanguage = {"en","it","uk"};
+        configurationService.setProperty("webui.supported.locales",supportedLanguage);
+        legacyPluginService.clearNamedPluginClasses();
+        choiceAuthorityServiceImpl.clearCache();
+
+        Locale it = new Locale("it");
+        Locale uk = new Locale("uk");
+        context.restoreAuthSystemState();
+
+        String tokenEPerson = getAuthToken(eperson.getEmail(), password);
+        getClient(tokenEPerson).perform(get("/api/integration/authorities/srsc/entries/search/top").locale(it))
+          .andExpect(status().isOk())
+          .andExpect(jsonPath("$._embedded.authorityEntries", Matchers.containsInAnyOrder(
+             AuthorityEntryMatcher.matchAuthority("SCB11", "UMANITA e RELIGIONE"),
+             AuthorityEntryMatcher.matchAuthority("SCB12", "DIRITTO/GIURISPRUDENZA"),
+             AuthorityEntryMatcher.matchAuthority("SCB13", "SCIENZE SOCIALI"),
+             AuthorityEntryMatcher.matchAuthority("SCB14", "MATEMATICA"),
+             AuthorityEntryMatcher.matchAuthority("SCB15", "SCIENZE NATURALI"),
+             AuthorityEntryMatcher.matchAuthority("SCB16", "TECNOLOGIA"),
+             AuthorityEntryMatcher.matchAuthority("SCB17", "FORESTRE, SCIENZE AGRICOLE e PIANIFICAZIONE DEL PAESAGGIO"),
+             AuthorityEntryMatcher.matchAuthority("SCB18", "MEDICINA"),
+             AuthorityEntryMatcher.matchAuthority("SCB19", "ODONTOLOGIA"),
+             AuthorityEntryMatcher.matchAuthority("SCB21", "FARMACIA"),
+             AuthorityEntryMatcher.matchAuthority("SCB22", "MEDICINA VETERINARIA"),
+             AuthorityEntryMatcher.matchAuthority("SCB23", "AREE DI RICERCA INTERDISCIPLINARI")
+              )))
+          .andExpect(jsonPath("$.page.totalElements", Matchers.is(12)));
+
+        getClient(tokenEPerson).perform(get("/api/integration/authorities/srsc/entries/search/top").locale(uk))
+          .andExpect(status().isOk())
+          .andExpect(jsonPath("$._embedded.authorityEntries", Matchers.containsInAnyOrder(
+             AuthorityEntryMatcher.matchAuthority("SCB11", "ЛЮДИНА та РЕЛІГІЯ"),
+             AuthorityEntryMatcher.matchAuthority("SCB12", "ЗАКОН/ЮРИСПРУДЕНЦIЯ"),
+             AuthorityEntryMatcher.matchAuthority("SCB13", "СОЦІАЛЬНІ НАУКИ"),
+             AuthorityEntryMatcher.matchAuthority("SCB14", "МАТЕМАТИКА"),
+             AuthorityEntryMatcher.matchAuthority("SCB15", "ПРИРОДНІ НАУКИ"),
+             AuthorityEntryMatcher.matchAuthority("SCB16", "ТЕХНОЛОГІЯ"),
+             AuthorityEntryMatcher.matchAuthority("SCB17", "ЛIСОВЕ ГОСПОДАРСТВО,"
+                                                + " СIЛЬСЬКОГОСПОДАРСЬКі НАУКИ ТА ПЛАНУВАННЯ ЗЕМЛЕРОБСТВА"),
+             AuthorityEntryMatcher.matchAuthority("SCB18", "МЕДИЦИНА"),
+             AuthorityEntryMatcher.matchAuthority("SCB19", "ОДОНТОЛОГІЯ"),
+             AuthorityEntryMatcher.matchAuthority("SCB21", "ЛIКИ"),
+             AuthorityEntryMatcher.matchAuthority("SCB22", "ВЕТЕРИНАРНА МЕДИЦИНА"),
+             AuthorityEntryMatcher.matchAuthority("SCB23", "МІЖДИСЦІПЛІНАРНІ ДОСЛІДЖЕННЯ")
+              )))
+          .andExpect(jsonPath("$.page.totalElements", Matchers.is(12)));
+
+        configurationService.setProperty("webui.supported.locales",null);
+        legacyPluginService.clearNamedPluginClasses();
+        choiceAuthorityServiceImpl.clearCache();
+    }
+
+    @Test
+    public void srscSearchTopUnsupportedLocaleTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        Locale kz = new Locale("kz");
+        context.restoreAuthSystemState();
+
+        String tokenEPerson = getAuthToken(eperson.getEmail(), password);
+        // if locale is not supported, return vocabulary with default language
+        getClient(tokenEPerson).perform(get("/api/integration/authorities/srsc/entries/search/top").locale(kz))
+          .andExpect(status().isOk())
+          .andExpect(jsonPath("$._embedded.authorityEntries", Matchers.containsInAnyOrder(
+              AuthorityEntryMatcher.matchAuthority("SCB11", "HUMANITIES and RELIGION"),
+              AuthorityEntryMatcher.matchAuthority("SCB12", "LAW/JURISPRUDENCE"),
+              AuthorityEntryMatcher.matchAuthority("SCB13", "SOCIAL SCIENCES"),
+              AuthorityEntryMatcher.matchAuthority("SCB14", "MATHEMATICS"),
+              AuthorityEntryMatcher.matchAuthority("SCB15", "NATURAL SCIENCES"),
+              AuthorityEntryMatcher.matchAuthority("SCB16", "TECHNOLOGY"),
+              AuthorityEntryMatcher.matchAuthority("SCB17", "FORESTRY, AGRICULTURAL SCIENCES and LANDSCAPE PLANNING"),
+              AuthorityEntryMatcher.matchAuthority("SCB18", "MEDICINE"),
+              AuthorityEntryMatcher.matchAuthority("SCB19", "ODONTOLOGY"),
+              AuthorityEntryMatcher.matchAuthority("SCB21", "PHARMACY"),
+              AuthorityEntryMatcher.matchAuthority("SCB22", "VETERINARY MEDICINE"),
+              AuthorityEntryMatcher.matchAuthority("SCB23", "INTERDISCIPLINARY RESEARCH AREAS")
+              )))
+          .andExpect(jsonPath("$.page.totalElements", Matchers.is(12)));
+    }
+
+    @Test
+    public void srscSearchTopUserWithPreferLanguageTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        String[] supportedLanguage = {"en","it","uk"};
+        configurationService.setProperty("webui.supported.locales",supportedLanguage);
+        legacyPluginService.clearNamedPluginClasses();
+        choiceAuthorityServiceImpl.clearCache();
+
+        Locale it = new Locale("it");
+
+        EPerson epersonIT = EPersonBuilder.createEPerson(context)
+                           .withEmail("epersonIT@example.com")
+                           .withPassword(password)
+                           .withLanguage("it")
+                           .build();
+
+        EPerson epersonUK = EPersonBuilder.createEPerson(context)
+                           .withEmail("epersonUK@example.com")
+                           .withPassword(password)
+                           .withLanguage("uk")
+                           .build();
+
+        context.restoreAuthSystemState();
+
+        String tokenEPersonIT = getAuthToken(epersonIT.getEmail(), password);
+        String tokenEPersonUK = getAuthToken(epersonUK.getEmail(), password);
+
+        getClient(tokenEPersonIT).perform(get("/api/integration/authorities/srsc/entries/search/top"))
+          .andExpect(status().isOk())
+          .andExpect(jsonPath("$._embedded.authorityEntries", Matchers.containsInAnyOrder(
+             AuthorityEntryMatcher.matchAuthority("SCB11", "UMANITA e RELIGIONE"),
+             AuthorityEntryMatcher.matchAuthority("SCB12", "DIRITTO/GIURISPRUDENZA"),
+             AuthorityEntryMatcher.matchAuthority("SCB13", "SCIENZE SOCIALI"),
+             AuthorityEntryMatcher.matchAuthority("SCB14", "MATEMATICA"),
+             AuthorityEntryMatcher.matchAuthority("SCB15", "SCIENZE NATURALI"),
+             AuthorityEntryMatcher.matchAuthority("SCB16", "TECNOLOGIA"),
+             AuthorityEntryMatcher.matchAuthority("SCB17", "FORESTRE, SCIENZE AGRICOLE e PIANIFICAZIONE DEL PAESAGGIO"),
+             AuthorityEntryMatcher.matchAuthority("SCB18", "MEDICINA"),
+             AuthorityEntryMatcher.matchAuthority("SCB19", "ODONTOLOGIA"),
+             AuthorityEntryMatcher.matchAuthority("SCB21", "FARMACIA"),
+             AuthorityEntryMatcher.matchAuthority("SCB22", "MEDICINA VETERINARIA"),
+             AuthorityEntryMatcher.matchAuthority("SCB23", "AREE DI RICERCA INTERDISCIPLINARI")
+              )))
+          .andExpect(jsonPath("$.page.totalElements", Matchers.is(12)));
+
+        getClient(tokenEPersonUK).perform(get("/api/integration/authorities/srsc/entries/search/top"))
+          .andExpect(status().isOk())
+          .andExpect(jsonPath("$._embedded.authorityEntries", Matchers.containsInAnyOrder(
+             AuthorityEntryMatcher.matchAuthority("SCB11", "ЛЮДИНА та РЕЛІГІЯ"),
+             AuthorityEntryMatcher.matchAuthority("SCB12", "ЗАКОН/ЮРИСПРУДЕНЦIЯ"),
+             AuthorityEntryMatcher.matchAuthority("SCB13", "СОЦІАЛЬНІ НАУКИ"),
+             AuthorityEntryMatcher.matchAuthority("SCB14", "МАТЕМАТИКА"),
+             AuthorityEntryMatcher.matchAuthority("SCB15", "ПРИРОДНІ НАУКИ"),
+             AuthorityEntryMatcher.matchAuthority("SCB16", "ТЕХНОЛОГІЯ"),
+             AuthorityEntryMatcher.matchAuthority("SCB17", "ЛIСОВЕ ГОСПОДАРСТВО,"
+                                                + " СIЛЬСЬКОГОСПОДАРСЬКі НАУКИ ТА ПЛАНУВАННЯ ЗЕМЛЕРОБСТВА"),
+             AuthorityEntryMatcher.matchAuthority("SCB18", "МЕДИЦИНА"),
+             AuthorityEntryMatcher.matchAuthority("SCB19", "ОДОНТОЛОГІЯ"),
+             AuthorityEntryMatcher.matchAuthority("SCB21", "ЛIКИ"),
+             AuthorityEntryMatcher.matchAuthority("SCB22", "ВЕТЕРИНАРНА МЕДИЦИНА"),
+             AuthorityEntryMatcher.matchAuthority("SCB23", "МІЖДИСЦІПЛІНАРНІ ДОСЛІДЖЕННЯ")
+              )))
+          .andExpect(jsonPath("$.page.totalElements", Matchers.is(12)));
+
+        getClient(tokenEPersonUK).perform(get("/api/integration/authorities/srsc/entries/search/top").locale(it))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$._embedded.authorityEntries", Matchers.containsInAnyOrder(
+           AuthorityEntryMatcher.matchAuthority("SCB11", "UMANITA e RELIGIONE"),
+           AuthorityEntryMatcher.matchAuthority("SCB12", "DIRITTO/GIURISPRUDENZA"),
+           AuthorityEntryMatcher.matchAuthority("SCB13", "SCIENZE SOCIALI"),
+           AuthorityEntryMatcher.matchAuthority("SCB14", "MATEMATICA"),
+           AuthorityEntryMatcher.matchAuthority("SCB15", "SCIENZE NATURALI"),
+           AuthorityEntryMatcher.matchAuthority("SCB16", "TECNOLOGIA"),
+           AuthorityEntryMatcher.matchAuthority("SCB17", "FORESTRE, SCIENZE AGRICOLE e PIANIFICAZIONE DEL PAESAGGIO"),
+           AuthorityEntryMatcher.matchAuthority("SCB18", "MEDICINA"),
+           AuthorityEntryMatcher.matchAuthority("SCB19", "ODONTOLOGIA"),
+           AuthorityEntryMatcher.matchAuthority("SCB21", "FARMACIA"),
+           AuthorityEntryMatcher.matchAuthority("SCB22", "MEDICINA VETERINARIA"),
+           AuthorityEntryMatcher.matchAuthority("SCB23", "AREE DI RICERCA INTERDISCIPLINARI")
+            )))
+        .andExpect(jsonPath("$.page.totalElements", Matchers.is(12)));
+
+        configurationService.setProperty("webui.supported.locales",null);
+        legacyPluginService.clearNamedPluginClasses();
+        choiceAuthorityServiceImpl.clearCache();
+    }
+
+    @Test
+    public void srscSearchByParentFirstLevel_MATHEMATICS_SupportLanguageTest() throws Exception {
+         context.turnOffAuthorisationSystem();
+         String[] supportedLanguage = {"en","it","uk"};
+         configurationService.setProperty("webui.supported.locales",supportedLanguage);
+         legacyPluginService.clearNamedPluginClasses();
+         choiceAuthorityServiceImpl.clearCache();
+
+         Locale it = new Locale("it");
+         Locale uk = new Locale("uk");
+         context.restoreAuthSystemState();
+
+         String tokenAdmin = getAuthToken(admin.getEmail(), password);
+         getClient(tokenAdmin).perform(get("/api/integration/authorities/srsc/entries/search/byParent")
+                 .locale(it)
+                 .param("id", "SCB14"))
+                 .andExpect(status().isOk())
+                 .andExpect(jsonPath("$._embedded.authorityEntries", Matchers.containsInAnyOrder(
+                     AuthorityEntryMatcher.matchAuthority("SCB1401", "Algebra, geometria e analisi matematica"),
+                     AuthorityEntryMatcher.matchAuthority("SCB1402", "Matematica applicata"),
+                     AuthorityEntryMatcher.matchAuthority("SCB1409", "Altra matematica")
+                     )))
+                 .andExpect(jsonPath("$.page.totalElements", Matchers.is(3)));
+
+         getClient(tokenAdmin).perform(get("/api/integration/authorities/srsc/entries/search/byParent")
+                 .locale(uk)
+                 .param("id", "SCB14"))
+                 .andExpect(status().isOk())
+                 .andExpect(jsonPath("$._embedded.authorityEntries", Matchers.containsInAnyOrder(
+                     AuthorityEntryMatcher.matchAuthority("SCB1401", "Алгебра, геометрія та математичний аналіз"),
+                     AuthorityEntryMatcher.matchAuthority("SCB1402", "Прикладна математика"),
+                     AuthorityEntryMatcher.matchAuthority("SCB1409", "Інша математика")
+                     )))
+                 .andExpect(jsonPath("$.page.totalElements", Matchers.is(3)));
+
+         configurationService.setProperty("webui.supported.locales",null);
+         legacyPluginService.clearNamedPluginClasses();
+         choiceAuthorityServiceImpl.clearCache();
+    }
     @Override
     public void destroy() throws Exception {
         AuthorityServiceFactory.getInstance().getAuthorityIndexingService().cleanIndex();
