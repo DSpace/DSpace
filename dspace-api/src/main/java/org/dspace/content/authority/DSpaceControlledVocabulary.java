@@ -114,11 +114,9 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Hiera
         if (vocabularies == null) {
             vocabularies = new HashMap<Locale, InputSource>();
             Locale[] locales = I18nUtil.getSupportedLocales();
-            Locale defaultLocale = I18nUtil.getDefaultLocale();
             ConfigurationService config = DSpaceServicesFactory.getInstance().getConfigurationService();
             log.info("Initializing " + this.getClass().getName());
             vocabularyName = this.getPluginInstanceName();
-            String vocabulariesPath = config.getProperty("dspace.dir") + "/config/controlled-vocabularies/";
             String configurationPrefix = "vocabulary.plugin." + vocabularyName;
             storeHierarchy = config.getBooleanProperty(configurationPrefix + ".hierarchy.store", storeHierarchy);
             suggestHierarchy = config.getBooleanProperty(configurationPrefix + ".hierarchy.suggest", suggestHierarchy);
@@ -127,26 +125,10 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Hiera
             if (configuredDelimiter != null) {
                 hierarchyDelimiter = configuredDelimiter.replaceAll("(^\"|\"$)", "");
             }
-            String localFilename;
-            String defaultFilename = vocabulariesPath + vocabularyName + ".xml";
             for (Locale l : locales) {
-                localFilename = vocabulariesPath + vocabularyName + "_" + l.getLanguage() + ".xml";
-                if (l.getLanguage().equals(defaultLocale.getLanguage()) || !checkExistFile(localFilename)) {
-                    vocabularies.put(l, new InputSource(defaultFilename));
-                } else {
-                    vocabularies.put(l, new InputSource(localFilename));
-                }
+                vocabularies.put(l, new InputSource(I18nUtil.getControlledVocabularyFileName(l, vocabularyName)));
             }
         }
-    }
-
-
-    private boolean checkExistFile(String path) {
-        File file = new File(path);
-        if (file != null) {
-            return true;
-        }
-        return false;
     }
 
     protected String buildString(Node node) {
