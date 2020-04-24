@@ -55,6 +55,7 @@ public class CustomLogoutSuccessHandler implements LogoutSuccessHandler {
             // the default logout will return no content
             response.setStatus(HttpServletResponse.SC_NO_CONTENT);
         }
+        response.getWriter().flush();
     }
 
     /**
