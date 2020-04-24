@@ -18,8 +18,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.exception.PaginationException;
-import org.dspace.app.rest.SearchRestMethod;
-import org.dspace.app.rest.exception.PaginationException;
 import org.dspace.app.rest.model.AuthorityEntryRest;
 import org.dspace.app.rest.model.AuthorityRest;
 import org.dspace.app.rest.projection.Projection;
