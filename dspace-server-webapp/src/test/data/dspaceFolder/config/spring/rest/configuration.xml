@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/util https://www.springframework.org/schema/util/spring-util.xsd">
+
+    <bean id="exposedConfigurationProperties" class="java.util.ArrayList">
+        <constructor-arg>
+            <array value-type="java.lang.String">
+                <value>configuration.exposed.single.value</value>
+                <value>configuration.exposed.array.value</value>
+                <value>configuration.not.existing</value>
+            </array>
+        </constructor-arg>
+    </bean>
+</beans>
