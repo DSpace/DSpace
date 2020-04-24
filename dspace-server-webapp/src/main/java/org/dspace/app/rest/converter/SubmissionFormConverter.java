@@ -49,6 +49,7 @@ public class SubmissionFormConverter implements DSpaceConverter<DCInputSet, Subm
     private static final String INPUT_TYPE_NAME = "name";
     private static final String INPUT_TYPE_LOOKUP = "lookup";
     private static final String INPUT_TYPE_LOOKUP_NAME = "lookup-name";
+    private static final String INPUT_TYPE_DROPDOWN = "dropdown";
 
     @Autowired
     private AuthorityUtils authorityUtils;
@@ -204,6 +205,8 @@ public class SubmissionFormConverter implements DSpaceConverter<DCInputSet, Subm
                     return INPUT_TYPE_ONEBOX;
                 } else if (AuthorityUtils.PRESENTATION_TYPE_LOOKUP.equals(presentation)) {
                     return INPUT_TYPE_LOOKUP;
+                } else if (AuthorityUtils.PRESENTATION_TYPE_SELECT.equals(presentation)) {
+                    return INPUT_TYPE_DROPDOWN;
                 }
             } else if (INPUT_TYPE_NAME.equals(inputType)) {
                 if (AuthorityUtils.PRESENTATION_TYPE_LOOKUP.equals(presentation)) {

@@ -2,11 +2,8 @@
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE and NOTICE files at the root of the source
  * tree and available online at
- * <p>
- * http://www.dspace.org/license/
- */
-/**
  *
+ * http://www.dspace.org/license/
  */
 package org.dspace.submit.lookup;
 
@@ -30,17 +27,18 @@ public class PubmedEuropeUtils {
 
     private static final String URL_PREFIX = "http://europepmc.org/abstract/";
 
-    private PubmedEuropeUtils() { }
+    private PubmedEuropeUtils() {
+    }
 
     public static Record convertPubmedEuropeDomToRecord(Element pubArticle) {
         MutableRecord record = new SubmissionLookupPublication("");
 
         String pmID = XMLUtils.getElementValue(pubArticle,
-                "pmid");
+            "pmid");
         record.addValue("pmid", new StringValue(pmID));
 
         String source = XMLUtils.getElementValue(pubArticle,
-                "source");
+            "source");
 
         record.addValue("url", new StringValue(URL_PREFIX + source + "/" + pmID));
 
@@ -48,12 +46,12 @@ public class PubmedEuropeUtils {
         String pmcID = "";
         if (pmc != null) {
             pmcID = XMLUtils.getElementValue(pubArticle,
-                    "pmcid");
+                "pmcid");
             record.addValue("pmcid", new StringValue(pmcID));
         }
 
         String doi = XMLUtils.getElementValue(pubArticle,
-                "doi");
+            "doi");
         record.addValue("doi", new StringValue(doi));
 
         String title = XMLUtils.getElementValue(pubArticle, "title");
@@ -104,8 +102,8 @@ public class PubmedEuropeUtils {
                 }
                 if (firstName != null) {
                     investigator += investigator.length() > 0 ?
-                            (", " + firstName.getTextContent()) :
-                            firstName.getTextContent();
+                        (", " + firstName.getTextContent()) :
+                        firstName.getTextContent();
                 }
                 inv.add(investigator);
 
@@ -121,7 +119,7 @@ public class PubmedEuropeUtils {
 
 
         Element journalInfo = XMLUtils.getSingleElement(pubArticle,
-                "journalInfo");
+            "journalInfo");
         String volume = "";
         String issue = "";
         String journalTitle = "";
@@ -212,10 +210,10 @@ public class PubmedEuropeUtils {
         List<String> primaryKeywords = new LinkedList<String>();
 
         Element keywordsList = XMLUtils.getSingleElement(pubArticle,
-                "keywordList");
+            "keywordList");
         if (keywordsList != null) {
             List<Element> keywords = XMLUtils.getElementList(keywordsList,
-                    "keyword");
+                "keyword");
             for (Element keyword : keywords) {
                 primaryKeywords.add(keyword.getTextContent().trim());
             }
@@ -232,18 +230,18 @@ public class PubmedEuropeUtils {
         List<String> secondaryMeshHeadings = new LinkedList<String>();
 
         Element meshHeadingsList = XMLUtils.getSingleElement(pubArticle,
-                "meshHeadingList");
+            "meshHeadingList");
         if (meshHeadingsList != null) {
             List<Element> meshHeadings = XMLUtils.getElementList(
-                    meshHeadingsList, "meshHeading");
+                meshHeadingsList, "meshHeading");
             for (Element meshHeading : meshHeadings) {
                 if ("Y".equals(XMLUtils.getElementAttribute(meshHeading,
-                        "DescriptorName", "majorTopic_YN"))) {
+                    "DescriptorName", "majorTopic_YN"))) {
                     primaryMeshHeadings.add(XMLUtils.getElementValue(
-                            meshHeading, "DescriptorName"));
+                        meshHeading, "DescriptorName"));
                 } else {
                     secondaryMeshHeadings.add(XMLUtils.getElementValue(
-                            meshHeading, "DescriptorName"));
+                        meshHeading, "DescriptorName"));
                 }
             }
         }

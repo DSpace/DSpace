@@ -17,7 +17,7 @@ import java.util.UUID;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.dspace.app.rest.matcher.AuthorityEntryMatcher;
-import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
+import org.dspace.app.rest.test.AbstractEntityIntegrationTest;
 import org.dspace.authority.PersonAuthorityValue;
 import org.dspace.authority.factory.AuthorityServiceFactory;
 import org.dspace.content.authority.service.ChoiceAuthorityService;
@@ -33,7 +33,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * This class handles all Authority related IT. It alters some config to run the tests, but it gets cleared again
  * after every test
  */
-public class AuthorityRestRepositoryIT extends AbstractControllerIntegrationTest {
+public class AuthorityRestRepositoryIT extends AbstractEntityIntegrationTest {
 
     @Autowired
     ConfigurationService configurationService;

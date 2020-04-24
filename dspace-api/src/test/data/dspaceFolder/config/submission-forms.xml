@@ -277,6 +277,459 @@ it, please enter the types and the actual numbers or codes.</hint>
      </row>
    </form>
 
+
+    <form name="publication-dc-contributor-author">
+      <row>
+        <field>
+          <dc-schema>dc</dc-schema>
+          <dc-element>contributor</dc-element>
+          <dc-qualifier>author</dc-qualifier>
+          <label>Author</label>
+          <input-type>name</input-type>
+          <repeatable>false</repeatable>
+          <required>You must enter at least the author.</required>
+          <hint>Enter the names of the authors of this item in the form Lastname, Firstname [i.e. Smith, Josh or Smith, J].</hint>
+        </field>
+      </row>
+      <row>
+        <field>
+          <dc-schema>local</dc-schema>
+          <dc-element>contributor</dc-element>
+          <dc-qualifier>affiliation</dc-qualifier>
+          <label>Affiliation</label>
+          <input-type>onebox</input-type>
+          <repeatable>false</repeatable>
+          <required />
+          <hint>Enter the affiliation of the author as stated on the publication.</hint>
+        </field>
+      </row>
+    </form>
+    <form name="publication-dc-contributor-editor">
+      <row>
+        <field>
+          <dc-schema>dc</dc-schema>
+          <dc-element>contributor</dc-element>
+          <dc-qualifier>editor</dc-qualifier>
+          <label>Editor</label>
+          <input-type>name</input-type>
+          <repeatable>false</repeatable>
+          <required>You must enter at least the author.</required>
+          <hint>The editors of this publication.</hint>
+        </field>
+      </row>
+      <row>
+        <field>
+          <dc-schema>dc</dc-schema>
+          <dc-element>contributor</dc-element>
+          <dc-qualifier>editoraffiliation</dc-qualifier>
+          <label>Affiliation</label>
+          <input-type>onebox</input-type>
+          <repeatable>false</repeatable>
+          <required />
+          <hint>Enter the affiliation of the editor as stated on the publication.</hint>
+        </field>
+      </row>
+    </form>
+    <form name="publication_references-dc-relation-project">
+      <row>
+        <field>
+          <dc-schema>dc</dc-schema>
+          <dc-element>relation</dc-element>
+          <dc-qualifier>project</dc-qualifier>
+          <label>Project</label>
+          <input-type>onebox</input-type>
+          <repeatable>false</repeatable>
+          <required>You must enter at least the project name.</required>
+          <hint>Enter the name of project, if any, that has supported this publication</hint>
+        </field>
+      </row>
+      <row>
+        <field>
+          <dc-schema>dc</dc-schema>
+          <dc-element>relation</dc-element>
+          <dc-qualifier>grantno</dc-qualifier>
+          <label>Grant Number / Funding identifier</label>
+          <input-type>onebox</input-type>
+          <repeatable>false</repeatable>
+          <required />
+          <hint />
+        </field>
+      </row>
+    </form>
+    <form name="publication">
+      <row>
+        <field>
+          <dc-schema>dc</dc-schema>
+          <dc-element>identifier</dc-element>
+          <label>Identifiers</label>
+          <input-type value-pairs-name="common_identifiers">qualdrop_value</input-type>
+          <repeatable>true</repeatable>
+          <required />
+          <hint>If the item has any identification numbers or codes associated with
+it, please enter the types and the actual numbers or codes.</hint>
+        </field>
+      </row>
+      <row>
+        <field>
+          <dc-schema>dc</dc-schema>
+          <dc-element>title</dc-element>
+          <label>Title</label>
+          <input-type>onebox</input-type>
+          <repeatable>false</repeatable>
+          <required>You must enter a main title for this item.</required>
+          <hint>Enter the main title of the item.</hint>
+        </field>
+      </row>
+      <row>
+        <field>
+          <dc-schema>dc</dc-schema>
+          <dc-element>title</dc-element>
+          <dc-qualifier>alternative</dc-qualifier>
+          <label>Other Titles</label>
+          <input-type>onebox</input-type>
+          <repeatable>true</repeatable>
+          <required />
+          <hint>If the item has any alternative titles, please enter them here.</hint>
+        </field>
+      </row>
+      <row>
+        <field>
+          <dc-schema>dc</dc-schema>
+          <dc-element>date</dc-element>
+          <dc-qualifier>issued</dc-qualifier>
+          <label>Date of Issue</label>
+          <input-type>date</input-type>
+          <repeatable>false</repeatable>
+          <required>You must enter at least the year.</required>
+          <hint>Please give the date of previous publication or public distribution.
+                        You can leave out the day and/or month if they aren't
+                        applicable.</hint>
+        </field>
+      </row>
+      <row>
+        <field>
+          <dc-schema>dc</dc-schema>
+          <dc-element>contributor</dc-element>
+          <dc-qualifier>author</dc-qualifier>
+          <label>Authors</label>
+          <input-type>group</input-type>
+          <repeatable>true</repeatable>
+          <required />
+          <hint>Enter the names of the authors of this item.</hint>
+        </field>
+      </row>
+      <row>
+        <field>
+          <dc-schema>dc</dc-schema>
+          <dc-element>contributor</dc-element>
+          <dc-qualifier>editor</dc-qualifier>
+          <label>Editors</label>
+          <input-type>group</input-type>
+          <repeatable>true</repeatable>
+          <required />
+          <hint>The editors of this publication.</hint>
+        </field>
+      </row>
+      <row>
+        <field>
+          <dc-schema>dc</dc-schema>
+          <dc-element>type</dc-element>
+          <label>Type</label>
+          <input-type>onebox</input-type>
+          <repeatable>false</repeatable>
+          <required>You must select a publication type</required>
+          <hint>Select the type of content of the item.</hint>
+          <vocabulary>types</vocabulary>
+        </field>
+      </row>
+    </form>
+    <form name="publication_indexing">
+      <row>
+        <field>
+          <dc-schema>dc</dc-schema>
+          <dc-element>language</dc-element>
+          <dc-qualifier>iso</dc-qualifier>
+          <label>Language</label>
+          <input-type value-pairs-name="common_iso_languages">dropdown</input-type>
+          <repeatable>false</repeatable>
+          <required />
+          <hint>Select the language of the main content of the item.  If the language does not appear in the list, please select 'Other'.  If the content does not really have a language (for example, if it is a dataset or an image) please select 'N/A'.</hint>
+        </field>
+      </row>
+      <row>
+        <field>
+          <dc-schema>dc</dc-schema>
+          <dc-element>subject</dc-element>
+          <label>Subject Keywords</label>
+          <input-type>tag</input-type>
+          <repeatable>true</repeatable>
+          <required />
+          <hint>Enter appropriate subject keywords or phrases.</hint>
+        </field>
+      </row>
+      <row>
+        <field>
+          <dc-schema>dc</dc-schema>
+          <dc-element>description</dc-element>
+          <dc-qualifier>abstract</dc-qualifier>
+          <label>Abstract</label>
+          <input-type>textarea</input-type>
+          <repeatable>false</repeatable>
+          <required />
+          <hint>Enter the abstract of the item.</hint>
+        </field>
+      </row>
+    </form>
+    <form name="publication_bibliographic_details">
+      <row>
+        <field>
+          <dc-schema>dc</dc-schema>
+          <dc-element>relation</dc-element>
+          <dc-qualifier>publication</dc-qualifier>
+          <label>Part Of</label>
+          <input-type>onebox</input-type>
+          <repeatable>false</repeatable>
+          <required />
+          <hint>The publication where this publication is included. E.g. a book chapter lists here the book, a contribution to a conference lists here the conference proceeding.</hint>
+          <type-bind>book part</type-bind>
+        </field>
+      </row>
+      <row>
+        <field>
+          <dc-schema>dc</dc-schema>
+          <dc-element>relation</dc-element>
+          <dc-qualifier>isbn</dc-qualifier>
+          <label>ISBN (of the container)</label>
+          <input-type>onebox</input-type>
+          <repeatable>false</repeatable>
+          <required />
+          <hint>The ISBN of the book/report if it was not found in the system</hint>
+          <type-bind>book part</type-bind>
+        </field>
+      </row>
+      <row>
+        <field>
+          <dc-schema>dc</dc-schema>
+          <dc-element>relation</dc-element>
+          <dc-qualifier>doi</dc-qualifier>
+          <label>DOI (of the container)</label>
+          <input-type>onebox</input-type>
+          <repeatable>false</repeatable>
+          <required />
+          <hint>The DOI of the book/report if it was not found in the system</hint>
+          <type-bind>book part</type-bind>
+        </field>
+      </row>
+      <row>
+        <field>
+          <dc-schema>dc</dc-schema>
+          <dc-element>relation</dc-element>
+          <dc-qualifier>ispartof</dc-qualifier>
+          <label>Journal or Serie</label>
+          <input-type>onebox</input-type>
+          <repeatable>false</repeatable>
+          <required />
+          <hint>The journal or Serie where this publication has been published</hint>
+        </field>
+      </row>
+      <row>
+        <field>
+          <dc-schema>dc</dc-schema>
+          <dc-element>relation</dc-element>
+          <dc-qualifier>ispartofseries</dc-qualifier>
+          <label>Series/Report No.</label>
+          <input-type>series</input-type>
+          <repeatable>true</repeatable>
+          <required />
+          <hint>Enter the series and number assigned to this item by your community.</hint>
+        </field>
+      </row>
+      <row>
+        <field>
+          <dc-schema>dc</dc-schema>
+          <dc-element>relation</dc-element>
+          <dc-qualifier>issn</dc-qualifier>
+          <label>ISSN</label>
+          <input-type>onebox</input-type>
+          <repeatable>false</repeatable>
+          <required />
+          <hint>The journal or Serie ISSN if it was not found in the system</hint>
+        </field>
+      </row>
+      <row>
+        <field>
+          <dc-schema>dc</dc-schema>
+          <dc-element>coverage</dc-element>
+          <dc-qualifier>publication</dc-qualifier>
+          <label>Review of</label>
+          <input-type>onebox</input-type>
+          <repeatable>false</repeatable>
+          <required />
+          <hint>The publication object of the review</hint>
+          <type-bind>review,book review</type-bind>
+        </field>
+      </row>
+      <row>
+        <field>
+          <dc-schema>dc</dc-schema>
+          <dc-element>coverage</dc-element>
+          <dc-qualifier>isbn</dc-qualifier>
+          <label>ISBN (of the reviewed item)</label>
+          <input-type>onebox</input-type>
+          <repeatable>false</repeatable>
+          <required />
+          <hint>The ISBN of the reviewed item if it was not found in the system</hint>
+          <type-bind>review,book review</type-bind>
+        </field>
+      </row>
+      <row>
+        <field>
+          <dc-schema>dc</dc-schema>
+          <dc-element>coverage</dc-element>
+          <dc-qualifier>doi</dc-qualifier>
+          <label>DOI (of the reviewed item)</label>
+          <input-type>onebox</input-type>
+          <repeatable>false</repeatable>
+          <required />
+          <hint>The DOI of the reviewed item if it was not found in the system</hint>
+          <type-bind>review,book review</type-bind>
+        </field>
+      </row>
+      <row>
+        <field>
+          <dc-schema>dc</dc-schema>
+          <dc-element>description</dc-element>
+          <dc-qualifier>sponsorship</dc-qualifier>
+          <label>Sponsors</label>
+          <input-type>onebox</input-type>
+          <repeatable>true</repeatable>
+          <required />
+          <hint>Enter the name of any sponsors.</hint>
+        </field>
+      </row>
+      <row>
+        <field>
+          <dc-schema>dc</dc-schema>
+          <dc-element>description</dc-element>
+          <dc-qualifier>volume</dc-qualifier>
+          <label>Volume</label>
+          <input-type>onebox</input-type>
+          <repeatable>false</repeatable>
+          <required />
+          <hint>If applicable, the volume of the publishing channel where this publication appeared</hint>
+        </field>
+      </row>
+      <row>
+        <field>
+          <dc-schema>dc</dc-schema>
+          <dc-element>description</dc-element>
+          <dc-qualifier>issue</dc-qualifier>
+          <label>Issue</label>
+          <input-type>onebox</input-type>
+          <repeatable>false</repeatable>
+          <required />
+          <hint>If applicable, the issue of the publishing channel where this publication appeared</hint>
+        </field>
+      </row>
+      <row>
+        <field>
+          <dc-schema>dc</dc-schema>
+          <dc-element>description</dc-element>
+          <dc-qualifier>startpage</dc-qualifier>
+          <label>Start Page</label>
+          <input-type>onebox</input-type>
+          <repeatable>false</repeatable>
+          <required />
+          <hint>If applicable, the page where this publication starts</hint>
+        </field>
+      </row>
+      <row>
+        <field>
+          <dc-schema>dc</dc-schema>
+          <dc-element>description</dc-element>
+          <dc-qualifier>endpage</dc-qualifier>
+          <label>End Page</label>
+          <input-type>onebox</input-type>
+          <repeatable>false</repeatable>
+          <required />
+          <hint>If applicable, the page where this publication ends</hint>
+        </field>
+      </row>
+    </form>
+    <form name="publication_references">
+      <row>
+        <field>
+          <dc-schema>dc</dc-schema>
+          <dc-element>relation</dc-element>
+          <dc-qualifier>project</dc-qualifier>
+          <label>Projects</label>
+          <input-type>group</input-type>
+          <repeatable>true</repeatable>
+          <required />
+          <hint>Enter the name of project, if any, that has produced this publication.</hint>
+        </field>
+      </row>
+      <row>
+        <field>
+          <dc-schema>dc</dc-schema>
+          <dc-element>relation</dc-element>
+          <dc-qualifier>conference</dc-qualifier>
+          <label>Conference</label>
+          <input-type>onebox</input-type>
+          <repeatable>true</repeatable>
+          <required />
+          <hint>Enter the name of the conference where the item has been presented, if any.</hint>
+        </field>
+      </row>
+      <row>
+        <field>
+          <dc-schema>dc</dc-schema>
+          <dc-element>relation</dc-element>
+          <dc-qualifier>dataset</dc-qualifier>
+          <label>Dataset</label>
+          <input-type>onebox</input-type>
+          <repeatable>true</repeatable>
+          <required />
+          <hint>Link the item to one or more existent dataset in the repository used or described by the publication or, put here the dataset citation</hint>
+        </field>
+      </row>
+      <row>
+        <field>
+          <dc-schema>dc</dc-schema>
+          <dc-element>identifier</dc-element>
+          <dc-qualifier>citation</dc-qualifier>
+          <label>Citation</label>
+          <input-type>onebox</input-type>
+          <repeatable>false</repeatable>
+          <required />
+          <hint>Enter the standard citation for the previously issued instance of this item.</hint>
+        </field>
+      </row>
+      <row>
+        <field>
+          <dc-schema>dc</dc-schema>
+          <dc-element>description</dc-element>
+          <label>Description</label>
+          <input-type>textarea</input-type>
+          <repeatable>false</repeatable>
+          <required />
+          <hint>Enter any other description or comments in this box.</hint>
+        </field>
+      </row>
+      <row>
+        <field>
+          <dc-schema>dc</dc-schema>
+          <dc-element>description</dc-element>
+          <dc-qualifier>sponsorship</dc-qualifier>
+          <label>Sponsors</label>
+          <input-type>onebox</input-type>
+          <repeatable>true</repeatable>
+          <required />
+          <hint>Enter the name of any sponsors.</hint>
+        </field>
+      </row>
+    </form>
+    
  </form-definitions>
 
 
@@ -307,6 +760,18 @@ it, please enter the types and the actual numbers or codes.</hint>
        <displayed-value>WOS ID</displayed-value>
        <stored-value>isi</stored-value>
      </pair>
+      <pair>
+        <displayed-value>Ads Code</displayed-value>
+        <stored-value>adsbibcode</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Pubmed ID</displayed-value>
+        <stored-value>pmid</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>arXiv ID</displayed-value>
+        <stored-value>arxiv</stored-value>
+      </pair>
      <pair>
        <displayed-value>ISSN</displayed-value>
        <stored-value>issn</stored-value>
@@ -474,6 +939,181 @@ it, please enter the types and the actual numbers or codes.</hint>
      </pair>
    </value-pairs>
 
+    <value-pairs value-pairs-name="publication_types" dc-term="publication_types">
+      <pair>
+        <displayed-value>Text</displayed-value>
+        <stored-value>text</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Annotation</displayed-value>
+        <stored-value>annotation</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Bibliography</displayed-value>
+        <stored-value>bibliography</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Book</displayed-value>
+        <stored-value>book</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Book Part</displayed-value>
+        <stored-value>book part</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Conference Object</displayed-value>
+        <stored-value>conference object</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Conference Proceedings</displayed-value>
+        <stored-value>conference proceedings</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Conference Paper</displayed-value>
+        <stored-value>conference paper</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Conference Poster</displayed-value>
+        <stored-value>conference poster</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Conference Paper not in Proceedings</displayed-value>
+        <stored-value>conference paper not in proceedings</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Conference Poster not in Proceedings</displayed-value>
+        <stored-value>conference poster not in proceedings</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Lecture</displayed-value>
+        <stored-value>lecture</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Letter</displayed-value>
+        <stored-value>letter</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Periodical</displayed-value>
+        <stored-value>periodical</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Journal</displayed-value>
+        <stored-value>journal</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Contribution to Journal</displayed-value>
+        <stored-value>contribution to journal</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Journal Article</displayed-value>
+        <stored-value>journal article</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Review Article</displayed-value>
+        <stored-value>review article</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Research Article</displayed-value>
+        <stored-value>research article</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Editorial</displayed-value>
+        <stored-value>editorial</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Data Paper</displayed-value>
+        <stored-value>data paper</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Letter to the Editor</displayed-value>
+        <stored-value>letter to the editor</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Preprint</displayed-value>
+        <stored-value>preprint</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Report</displayed-value>
+        <stored-value>report</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Report Part</displayed-value>
+        <stored-value>report part</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Internal Report</displayed-value>
+        <stored-value>internal report</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Memorandum</displayed-value>
+        <stored-value>memorandum</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Other Type of Report</displayed-value>
+        <stored-value>other type of report</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Policy Report</displayed-value>
+        <stored-value>policy report</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Project Deliverable</displayed-value>
+        <stored-value>project deliverable</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Report to Funding Agency</displayed-value>
+        <stored-value>report to funding agency</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Research Report</displayed-value>
+        <stored-value>research report</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Technical Report</displayed-value>
+        <stored-value>technical report</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Research Proposal</displayed-value>
+        <stored-value>research proposal</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Review</displayed-value>
+        <stored-value>review</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Book Review</displayed-value>
+        <stored-value>book review</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Technical Documentation</displayed-value>
+        <stored-value>technical documentation</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Working Paper</displayed-value>
+        <stored-value>working paper</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Thesis</displayed-value>
+        <stored-value>thesis</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Bachelor Thesis</displayed-value>
+        <stored-value>bachelor thesis</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Doctoral Thesis</displayed-value>
+        <stored-value>doctoral thesis</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Master Thesis</displayed-value>
+        <stored-value>master thesis</stored-value>
+      </pair>
+      <pair>
+        <displayed-value>Musical Notation</displayed-value>
+        <stored-value>musical notation</stored-value>
+      </pair>
+    </value-pairs>
+    
  </form-value-pairs>
 
 </input-forms>

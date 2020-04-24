@@ -280,7 +280,8 @@
     <field name="location" type="lowerCaseSort" indexed="true" stored="true" multiValued="true" required="false" omitNorms="true" />
     <field name="location.comm" type="lowerCaseSort" indexed="true" stored="true" multiValued="true" required="false" omitNorms="true" />
     <field name="location.coll" type="lowerCaseSort" indexed="true" stored="true" multiValued="true" required="false" omitNorms="true" />
-
+    <field name="location.parent" type="lowerCaseSort" indexed="true" stored="true" multiValued="false" required="false" omitNorms="true" />
+  
     <field name="a_spell" type="textSpell" />
     <copyField source="fulltext" dest="a_spell" />
     <copyField source="fulltext" dest="fulltext_hl" />
