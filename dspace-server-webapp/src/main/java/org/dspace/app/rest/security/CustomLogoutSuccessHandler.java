@@ -13,7 +13,6 @@ import org.dspace.authenticate.ShibAuthentication;
 import org.dspace.authenticate.service.AuthenticationService;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 import org.springframework.stereotype.Component;
@@ -32,12 +31,13 @@ public class CustomLogoutSuccessHandler implements LogoutSuccessHandler {
 
         String redirectPageURL = getRedirectPageURL(request, response);
         if (StringUtils.isNotBlank(redirectPageURL)) {
+            //TODO: for security issues we need to validate redirectPageURL
             // we have a logout page to redirect to
             response.setHeader("Location", redirectPageURL);
-            response.setStatus(HttpStatus.FOUND.value());
+            response.setStatus(HttpServletResponse.SC_FOUND);
         } else {
             // the default logout will return no content
-            response.setStatus(HttpStatus.NO_CONTENT.value());
+            response.setStatus(HttpServletResponse.SC_NO_CONTENT);
         }
     }
 
@@ -58,7 +58,7 @@ public class CustomLogoutSuccessHandler implements LogoutSuccessHandler {
         String shibLogoutURL = request.getParameter("return");
 
         // is shibboleth action for logout?
-        if (action.equals(ShibAuthentication.SHIBBOLETH_LOGOUT_ACTION) && StringUtils.isNotBlank(shibLogoutURL)) {
+        if (ShibAuthentication.SHIBBOLETH_LOGOUT_ACTION.equals(action) && StringUtils.isNotBlank(shibLogoutURL)) {
             returnURL = shibLogoutURL;
         } else {
             returnURL = getRedirectLogoutURLFromAuthMethod(request, response);

@@ -32,7 +32,7 @@ public class AuthnHalLinkFactory extends HalLinkFactory<AuthnResource, Authentic
             .login(null, null, null)));
 
         list.add(buildLink("logout", methodOn
-            .logout()));
+            .logout(null, null)));
 
         list.add(buildLink("status", methodOn
             .status(null, null)));
