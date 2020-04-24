@@ -89,6 +89,11 @@ public class ShibAuthentication implements AuthenticationMethod {
      **/
     protected final int METADATA_MAX_SIZE = 1024;
 
+    /**
+     * Shibboleth logout action
+     **/
+    public static final String SHIBBOLETH_LOGOUT_ACTION = "logout"; 
+
     protected EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
     protected GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
     protected MetadataFieldService metadataFieldService = ContentServiceFactory.getInstance().getMetadataFieldService();
@@ -1278,18 +1283,19 @@ public class ShibAuthentication implements AuthenticationMethod {
     }
 
     /**
-     * It returns if available the logout URL from the configuration service 
+     * It returns, if available, the logout URL from the configuration service 
      * @param request
      * @return fully-qualified URL or null
      */
     private String getShibLogoutURL(HttpServletRequest request) {
         String shibURL = configurationService.getProperty("authentication-shibboleth.lazysession.logouturl",
                 null);
-        boolean forceHTTPS =
-                configurationService.getBooleanProperty("authentication-shibboleth.lazysession.secure", true);
 
         // Shibboleth url must be absolute
         if (shibURL != null && shibURL.startsWith("/")) {
+            boolean forceHTTPS =
+                    configurationService.getBooleanProperty("authentication-shibboleth.lazysession.secure", true);
+
             String serverUrl = Utils.getBaseUrl(configurationService.getProperty("dspace.server.url"));
             shibURL = serverUrl + shibURL;
             if ((request.isSecure() || forceHTTPS) && shibURL.startsWith("http://")) {
