@@ -60,7 +60,7 @@
         </Appender>
 
         <!-- A3 is for the embedded solr (during test) -->
-        <Appender name='A2'
+        <Appender name='A3'
                   filePattern="${log.dir}/solr.log-%d{yyyy-MM-dd}"
                   type='RollingFile'
                   fileName='${log.dir}/solr.log'>
