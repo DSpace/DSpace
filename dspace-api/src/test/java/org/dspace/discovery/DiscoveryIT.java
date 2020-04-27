@@ -7,7 +7,7 @@
  */
 package org.dspace.discovery;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 import java.sql.SQLException;
@@ -18,6 +18,7 @@ import org.dspace.AbstractIntegrationTest;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
+import org.dspace.content.Item;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
@@ -33,9 +34,9 @@ import org.junit.Test;
 /**
  * This class will aim to test Discovery related use cases
  */
-public class DiscoveryTest extends AbstractIntegrationTest {
+public class DiscoveryIT extends AbstractIntegrationTest {
 
-    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(DiscoveryTest.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(DiscoveryIT.class);
 
     protected CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
     protected CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
@@ -47,6 +48,9 @@ public class DiscoveryTest extends AbstractIntegrationTest {
                                                                                        IndexingService.class);
     protected SearchService searchService = SearchUtils.getSearchService();
 
+
+    Community community;
+    Collection col;
 
     WorkspaceItem leftIs;
     WorkspaceItem rightIs;
@@ -64,9 +68,9 @@ public class DiscoveryTest extends AbstractIntegrationTest {
         super.init();
         try {
             context.turnOffAuthorisationSystem();
-            Community community = communityService.create(null, context);
+            community = communityService.create(null, context);
 
-            Collection col = collectionService.create(context, community);
+            col = collectionService.create(context, community);
             leftIs = workspaceItemService.create(context, col, false);
             rightIs = workspaceItemService.create(context, col, false);
 
@@ -102,7 +106,18 @@ public class DiscoveryTest extends AbstractIntegrationTest {
     @After
     @Override
     public void destroy() {
-        context.abort();
+        try {
+            context.turnOffAuthorisationSystem();
+            Item secondItem = rightIs.getItem();
+            workspaceItemService.deleteWrapper(context, rightIs);
+            itemService.delete(context, secondItem);
+            collectionService.delete(context, col);
+            communityService.delete(context, community);
+            context.restoreAuthSystemState();
+        } catch (Exception e) {
+            log.error(e);
+            fail(e.getMessage());
+        }
         super.destroy();
     }
 
@@ -114,11 +129,11 @@ public class DiscoveryTest extends AbstractIntegrationTest {
         discoverQuery.addFilterQueries("search.resourceid:" + leftIs.getID());
         DiscoverResult discoverResult = searchService.search(context, discoverQuery);
         List<IndexableObject> indexableObjects = discoverResult.getIndexableObjects();
-        assertTrue(indexableObjects.size() == 1);
+        assertEquals(1, indexableObjects.size());
         workspaceItemService.deleteAll(context, leftIs);
         discoverResult = searchService.search(context, discoverQuery);
         indexableObjects = discoverResult.getIndexableObjects();
-        assertTrue(indexableObjects.size() == 0);
+        assertEquals(0, indexableObjects.size());
         context.restoreAuthSystemState();
     }
 }
