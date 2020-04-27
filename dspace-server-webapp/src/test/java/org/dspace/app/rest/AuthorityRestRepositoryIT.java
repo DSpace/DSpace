@@ -807,6 +807,139 @@ public class AuthorityRestRepositoryIT extends AbstractEntityIntegrationTest {
          legacyPluginService.clearNamedPluginClasses();
          choiceAuthorityServiceImpl.clearCache();
     }
+
+    @Test
+    public void testVcbSearchTopSupportLanguageTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        String[] supportedLanguage = {"en","it"};
+        configurationService.setProperty("webui.supported.locales",supportedLanguage);
+        legacyPluginService.clearNamedPluginClasses();
+        choiceAuthorityServiceImpl.clearCache();
+
+        EPerson epersonIT = EPersonBuilder.createEPerson(context)
+                           .withEmail("epersonIT@example.com")
+                           .withPassword(password)
+                           .withLanguage("it")
+                           .build();
+
+        Locale it = new Locale("it");
+        Locale en = new Locale("en");
+        context.restoreAuthSystemState();
+
+        String tokenEPerson = getAuthToken(eperson.getEmail(), password);
+        String tokenEPersonIT = getAuthToken(epersonIT.getEmail(), password);
+
+        // user explicitly chooses the English language
+        getClient(tokenEPerson).perform(get("/api/integration/authorities/testVcb/entries/search/top")
+                 .locale(en))
+                 .andExpect(status().isOk())
+                 .andExpect(jsonPath("$._embedded.authorityEntries", Matchers.containsInAnyOrder(
+                     AuthorityEntryMatcher.matchAuthority("TVC11", "LEVEL 1"),
+                     AuthorityEntryMatcher.matchAuthority("TVC12", "LEVEL 2"),
+                     AuthorityEntryMatcher.matchAuthority("TVC13", "LEVEL 3"))))
+                 .andExpect(jsonPath("$.page.totalElements", Matchers.is(3)));
+
+        // user explicitly chooses the Italian language
+        getClient(tokenEPerson).perform(get("/api/integration/authorities/testVcb/entries/search/top")
+                 .locale(it))
+                 .andExpect(status().isOk())
+                 .andExpect(jsonPath("$._embedded.authorityEntries", Matchers.containsInAnyOrder(
+                     AuthorityEntryMatcher.matchAuthority("TVC11", "LIVELLO 1"),
+                     AuthorityEntryMatcher.matchAuthority("TVC12", "LIVELLO 2"),
+                     AuthorityEntryMatcher.matchAuthority("TVC13", "LIVELLO 3"))))
+                 .andExpect(jsonPath("$.page.totalElements", Matchers.is(3)));
+
+        // user does not choose any language, so he is assigned the default one
+        getClient(tokenEPerson).perform(get("/api/integration/authorities/testVcb/entries/search/top"))
+                 .andExpect(status().isOk())
+                 .andExpect(jsonPath("$._embedded.authorityEntries", Matchers.containsInAnyOrder(
+                     AuthorityEntryMatcher.matchAuthority("TVC11", "LEVEL 1"),
+                     AuthorityEntryMatcher.matchAuthority("TVC12", "LEVEL 2"),
+                     AuthorityEntryMatcher.matchAuthority("TVC13", "LEVEL 3"))))
+                 .andExpect(jsonPath("$.page.totalElements", Matchers.is(3)));
+
+        // user has as preference the Italian language
+        getClient(tokenEPersonIT).perform(get("/api/integration/authorities/testVcb/entries/search/top"))
+                 .andExpect(status().isOk())
+                 .andExpect(jsonPath("$._embedded.authorityEntries", Matchers.containsInAnyOrder(
+                     AuthorityEntryMatcher.matchAuthority("TVC11", "LIVELLO 1"),
+                     AuthorityEntryMatcher.matchAuthority("TVC12", "LIVELLO 2"),
+                     AuthorityEntryMatcher.matchAuthority("TVC13", "LIVELLO 3"))))
+                 .andExpect(jsonPath("$.page.totalElements", Matchers.is(3)));
+
+        configurationService.setProperty("webui.supported.locales",null);
+        legacyPluginService.clearNamedPluginClasses();
+        choiceAuthorityServiceImpl.clearCache();
+    }
+
+    @Test
+    public void testVcbSearchByParentSupportLanguageTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        String[] supportedLanguage = {"en","it"};
+        configurationService.setProperty("webui.supported.locales",supportedLanguage);
+        legacyPluginService.clearNamedPluginClasses();
+        choiceAuthorityServiceImpl.clearCache();
+
+        EPerson epersonIT = EPersonBuilder.createEPerson(context)
+                           .withEmail("epersonIT@example.com")
+                           .withPassword(password)
+                           .withLanguage("it")
+                           .build();
+
+        Locale it = new Locale("it");
+        Locale en = new Locale("en");
+        context.restoreAuthSystemState();
+
+        String tokenEPerson = getAuthToken(eperson.getEmail(), password);
+        String tokenEPersonIT = getAuthToken(epersonIT.getEmail(), password);
+
+        // user explicitly chooses the English language
+        getClient(tokenEPerson).perform(get("/api/integration/authorities/testVcb/entries/search/byParent")
+                 .locale(en)
+                 .param("id", "TVC13"))
+                 .andExpect(status().isOk())
+                 .andExpect(jsonPath("$._embedded.authorityEntries", Matchers.containsInAnyOrder(
+                         AuthorityEntryMatcher.matchAuthority("TVC131", "LEVEL 3.1"),
+                         AuthorityEntryMatcher.matchAuthority("TVC132", "LEVEL 3.2"),
+                         AuthorityEntryMatcher.matchAuthority("TVC133", "LEVEL 3.3"))))
+                 .andExpect(jsonPath("$.page.totalElements", Matchers.is(3)));
+
+        // user explicitly chooses the Italian language
+        getClient(tokenEPerson).perform(get("/api/integration/authorities/testVcb/entries/search/byParent")
+                 .locale(it)
+                 .param("id", "TVC13"))
+                 .andExpect(status().isOk())
+                 .andExpect(jsonPath("$._embedded.authorityEntries", Matchers.containsInAnyOrder(
+                     AuthorityEntryMatcher.matchAuthority("TVC131", "LIVELLO 3.1"),
+                     AuthorityEntryMatcher.matchAuthority("TVC132", "LIVELLO 3.2"),
+                     AuthorityEntryMatcher.matchAuthority("TVC133", "LIVELLO 3.3"))))
+                 .andExpect(jsonPath("$.page.totalElements", Matchers.is(3)));
+
+        // user does not choose any language, so he is assigned the default one
+        getClient(tokenEPerson).perform(get("/api/integration/authorities/testVcb/entries/search/byParent")
+                 .param("id", "TVC13"))
+                 .andExpect(status().isOk())
+                 .andExpect(jsonPath("$._embedded.authorityEntries", Matchers.containsInAnyOrder(
+                     AuthorityEntryMatcher.matchAuthority("TVC131", "LEVEL 3.1"),
+                     AuthorityEntryMatcher.matchAuthority("TVC132", "LEVEL 3.2"),
+                     AuthorityEntryMatcher.matchAuthority("TVC133", "LEVEL 3.3"))))
+                 .andExpect(jsonPath("$.page.totalElements", Matchers.is(3)));
+
+        // user has as preference the Italian language
+        getClient(tokenEPersonIT).perform(get("/api/integration/authorities/testVcb/entries/search/byParent")
+                 .param("id", "TVC13"))
+                 .andExpect(status().isOk())
+                 .andExpect(jsonPath("$._embedded.authorityEntries", Matchers.containsInAnyOrder(
+                     AuthorityEntryMatcher.matchAuthority("TVC131", "LIVELLO 3.1"),
+                     AuthorityEntryMatcher.matchAuthority("TVC132", "LIVELLO 3.2"),
+                     AuthorityEntryMatcher.matchAuthority("TVC133", "LIVELLO 3.3"))))
+                 .andExpect(jsonPath("$.page.totalElements", Matchers.is(3)));
+
+        configurationService.setProperty("webui.supported.locales",null);
+        legacyPluginService.clearNamedPluginClasses();
+        choiceAuthorityServiceImpl.clearCache();
+    }
+
     @Override
     public void destroy() throws Exception {
         AuthorityServiceFactory.getInstance().getAuthorityIndexingService().cleanIndex();
