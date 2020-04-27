@@ -128,6 +128,34 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
     }
 
     @Test
+    public void createAnonAccessDeniedTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        // we should check how to get it from Spring
+        ObjectMapper mapper = new ObjectMapper();
+        EPersonRest data = new EPersonRest();
+        EPersonRest dataFull = new EPersonRest();
+        MetadataRest metadataRest = new MetadataRest();
+        data.setEmail("createtest@fake-email.com");
+        data.setCanLogIn(true);
+        MetadataValueRest surname = new MetadataValueRest();
+        surname.setValue("Doe");
+        metadataRest.put("eperson.lastname", surname);
+        MetadataValueRest firstname = new MetadataValueRest();
+        firstname.setValue("John");
+        metadataRest.put("eperson.firstname", firstname);
+        data.setMetadata(metadataRest);
+        dataFull.setEmail("createtestFull@fake-email.com");
+        dataFull.setCanLogIn(true);
+        dataFull.setMetadata(metadataRest);
+
+        getClient().perform(post("/api/eperson/epersons")
+                                         .content(mapper.writeValueAsBytes(data))
+                                         .contentType(contentType)
+                                         .param("projection", "full"))
+                            .andExpect(status().isUnauthorized());
+    }
+
+    @Test
     public void findAllTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
@@ -2167,5 +2195,52 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
         EPerson createdEPerson = ePersonService.findByEmail(context, newEmail);
         assertNull(createdEPerson);
         assertNotNull(registrationDataService.findByToken(context, forgotPasswordToken));
+    }
+
+    @Test
+    public void postEPersonWithTokenWithEmailPropertyAnonUser() throws Exception {
+
+        ObjectMapper mapper = new ObjectMapper();
+
+        String newRegisterEmail = "new-register@fake-email.com";
+        RegistrationRest registrationRest = new RegistrationRest();
+        registrationRest.setEmail(newRegisterEmail);
+        getClient().perform(post("/api/eperson/registrations")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(mapper.writeValueAsBytes(registrationRest)))
+                   .andExpect(status().isCreated());
+        String newRegisterToken = registrationDataService.findByEmail(context, newRegisterEmail).getToken();
+
+        String json = "{\"metadata\":{\"eperson.firstname\":[{\"value\":\"John\"}]," +
+            "\"eperson.lastname\":[{\"value\":\"Doe\"}]},\"email\":\"" + newRegisterEmail +
+            "\",\"password\":\"somePassword\",\"type\":\"eperson\"}";
+
+        MvcResult mvcResult = getClient().perform(post("/api/eperson/epersons")
+                                                           .param("token", newRegisterToken)
+                                                           .content(json)
+                                                           .contentType(MediaType.APPLICATION_JSON))
+                                              .andExpect(status().isCreated())
+                                              .andExpect(jsonPath("$", Matchers.allOf(
+                                                  hasJsonPath("$.uuid", not(empty())),
+                                                  // is it what you expect? EPerson.getName() returns the email...
+                                                  //hasJsonPath("$.name", is("Doe John")),
+                                                  hasJsonPath("$.email", is(newRegisterEmail)),
+                                                  hasJsonPath("$.type", is("eperson")),
+                                                  hasJsonPath("$._links.self.href", not(empty())),
+                                                  hasJsonPath("$.metadata", Matchers.allOf(
+                                                      matchMetadata("eperson.firstname", "John"),
+                                                      matchMetadata("eperson.lastname", "Doe")
+                                                  ))))).andReturn();
+
+        String content = mvcResult.getResponse().getContentAsString();
+        Map<String,Object> map = mapper.readValue(content, Map.class);
+        String epersonUuid = String.valueOf(map.get("uuid"));
+        EPerson createdEPerson = ePersonService.find(context, UUID.fromString(epersonUuid));
+        assertTrue(ePersonService.checkPassword(context, createdEPerson, "somePassword"));
+        assertNull(registrationDataService.findByToken(context, newRegisterToken));
+
+        context.turnOffAuthorisationSystem();
+        ePersonService.delete(context, createdEPerson);
+        context.restoreAuthSystemState();
     }
 }

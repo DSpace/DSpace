@@ -159,7 +159,9 @@ public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, E
             throw new AccessDeniedException(
                 "Registration is disabled, you are not authorized to create a new Authorization");
         }
+        context.turnOffAuthorisationSystem();
         EPerson ePerson = createEPersonFromRestObject(context, epersonRest);
+        context.restoreAuthSystemState();
         accountService.deleteToken(context, token);
         return converter.toRest(ePerson, utils.obtainProjection());
     }
