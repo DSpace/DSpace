@@ -81,9 +81,8 @@ public class AbstractIntegrationTest extends AbstractUnitTest {
         super.destroy();
         cleanExtraConfigurations();
         // Clear the search core.
-        MockSolrSearchCore searchService = DSpaceServicesFactory.getInstance()
-                                                                .getServiceManager()
-                                                                .getServiceByName(SolrSearchCore.class.getName(), MockSolrSearchCore.class);
+        MockSolrSearchCore searchService = DSpaceServicesFactory.getInstance().getServiceManager()
+                                            .getServiceByName(SolrSearchCore.class.getName(), MockSolrSearchCore.class);
         searchService.reset();
     }
 
