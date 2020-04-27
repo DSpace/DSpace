@@ -5,17 +5,13 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.app.rest.repository;
-
-import org.dspace.app.rest.RestRepository;
+package org.dspace.app.rest;
 
 /**
- * This is the interface for Link Repositories.
+ * This is a placeholder interface to create a shared hierarchy between DSpaceRestRepositories and Link Repositories.
  *
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
-public interface LinkRestRepository extends RestRepository {
-    default boolean isEmbeddableRelation(Object data, String name) {
-        return true;
-    }
+public interface RestRepository {
+
 }
