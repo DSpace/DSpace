@@ -7,6 +7,9 @@
  */
 package org.dspace.app.sherpa;
 
+import java.io.InputStream;
+
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -103,10 +106,14 @@ public class SHERPAService
 
                 HttpEntity responseBody = response.getEntity();
 
-                if (null != responseBody)
-                    sherpaResponse = new SHERPAResponse(responseBody.getContent(), SHERPAResponse.SHERPAFormat.JSON);
-                else
+                if (null != responseBody) {
+                    InputStream content = responseBody.getContent();
+                    sherpaResponse = new SHERPAResponse(content, SHERPAResponse.SHERPAFormat.JSON);
+                    content.close();
+                }
+                else {
                     sherpaResponse = new SHERPAResponse("SHERPA/RoMEO returned no response");
+                }
             } catch (Exception e) {
                 log.warn("Encountered exception while contacting SHERPA/RoMEO: " + e.getMessage(), e);
             } finally {
