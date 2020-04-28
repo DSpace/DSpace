@@ -125,11 +125,6 @@ public class CreativeCommonsServiceImpl implements CreativeCommonsService, Initi
 
     }
 
-    @Override
-    public boolean isEnabled() {
-        return true;
-    }
-
     // create the CC bundle if it doesn't exist
     // If it does, remove it and create a new one.
     protected Bundle getCcBundle(Context context, Item item)
@@ -199,34 +194,6 @@ public class CreativeCommonsServiceImpl implements CreativeCommonsService, Initi
         if ((bundles.size() > 0) && (bundles.get(0) != null)) {
             itemService.removeBundle(context, item, bundles.get(0));
         }
-    }
-
-    @Override
-    public boolean hasLicense(Context context, Item item)
-            throws SQLException, IOException {
-        // try to find CC license bundle
-        List<Bundle> bundles = itemService.getBundles(item, CC_BUNDLE_NAME);
-
-        if (bundles.size() == 0) {
-            return false;
-        }
-
-        // verify it has correct contents
-        try {
-            if ((getLicenseURL(context, item) == null)) {
-                return false;
-            }
-        } catch (AuthorizeException ae) {
-            return false;
-        }
-
-        return true;
-    }
-
-    @Override
-    public String getLicenseRDF(Context context, Item item) throws SQLException,
-            IOException, AuthorizeException {
-        return getStringFromBitstream(context, item, BSN_LICENSE_RDF);
     }
 
     @Override

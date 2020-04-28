@@ -10,6 +10,8 @@ package org.dspace.app.rest;
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -55,6 +57,8 @@ public class CCLicenseAddPatchOperationIT extends AbstractControllerIntegrationT
                                                           .withTitle("Workspace Item")
                                                           .build();
 
+        context.restoreAuthSystemState();
+
         String adminToken = getAuthToken(admin.getEmail(), password);
 
         List<Operation> ops = new ArrayList<Operation>();
@@ -93,6 +97,9 @@ public class CCLicenseAddPatchOperationIT extends AbstractControllerIntegrationT
                                                           .withTitle("Workspace Item")
                                                           .build();
 
+        context.restoreAuthSystemState();
+
+
         String adminToken = getAuthToken(admin.getEmail(), password);
 
         List<Operation> ops = new ArrayList<Operation>();
@@ -106,5 +113,13 @@ public class CCLicenseAddPatchOperationIT extends AbstractControllerIntegrationT
                                               .content(patchBody)
                                               .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
                              .andExpect(status().isInternalServerError());
+
+        getClient(adminToken).perform(get("/api/submission/workspaceitems/" + workspaceItem.getID())
+                                              .content(patchBody)
+                                              .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$.sections", not(hasJsonPath("cclicense"))));
+
+
     }
 }

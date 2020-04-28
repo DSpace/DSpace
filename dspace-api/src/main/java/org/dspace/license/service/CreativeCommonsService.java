@@ -32,13 +32,6 @@ public interface CreativeCommonsService {
     public static final String CC_BUNDLE_NAME = "CC-LICENSE";
 
     /**
-     * Simple accessor for enabling of CC
-     *
-     * @return is CC enabled?
-     */
-    public boolean isEnabled();
-
-    /**
      * setLicenseRDF
      *
      * CC Web Service method for setting the RDF bitstream
@@ -88,8 +81,6 @@ public interface CreativeCommonsService {
     public void removeLicenseFile(Context context, Item item)
             throws SQLException, IOException, AuthorizeException;
 
-    public boolean hasLicense(Context context, Item item)
-            throws SQLException, IOException;
 
     public String getLicenseURL(Context context, Item item)
             throws SQLException, IOException, AuthorizeException;
@@ -110,10 +101,6 @@ public interface CreativeCommonsService {
      * @return the stored license name of the item
      */
     public String getLicenseName(Item item);
-
-
-    public String getLicenseRDF(Context context, Item item)
-            throws SQLException, IOException, AuthorizeException;
 
     /**
      * Get Creative Commons license RDF, returning Bitstream object.

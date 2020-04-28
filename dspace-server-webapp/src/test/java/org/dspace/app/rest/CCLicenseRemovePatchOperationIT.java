@@ -57,6 +57,8 @@ public class CCLicenseRemovePatchOperationIT extends AbstractControllerIntegrati
                                                           .withTitle("Workspace Item")
                                                           .build();
 
+        context.restoreAuthSystemState();
+
         String adminToken = getAuthToken(admin.getEmail(), password);
 
         // First add a license and verify it is added
@@ -78,7 +80,6 @@ public class CCLicenseRemovePatchOperationIT extends AbstractControllerIntegrati
                                                  is("Attribution-NonCommercial-ShareAlike 4.0 International")),
                                      hasJsonPath("$.file.name", is("license_rdf"))
                              )));
-
 
 
         // Remove the license again and verify it is removed

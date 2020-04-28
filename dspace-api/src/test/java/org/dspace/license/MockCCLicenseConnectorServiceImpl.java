@@ -107,14 +107,18 @@ public class MockCCLicenseConnectorServiceImpl extends CCLicenseConnectorService
      */
     public Document retrieveLicenseRDFDoc(String licenseURI) throws IOException {
         if (!StringUtils.contains(licenseURI, "invalid")) {
+            InputStream cclicense = null;
             try {
-
-                InputStream cclicense = getClass().getResourceAsStream("cc-license-rdf.xml");
+                cclicense = getClass().getResourceAsStream("cc-license-rdf.xml");
 
                 Document doc = parser.build(cclicense);
                 return doc;
             } catch (JDOMException e) {
-                e.printStackTrace();
+                throw new RuntimeException(e);
+            } finally {
+                if (cclicense != null) {
+                    cclicense.close();
+                }
             }
         }
         return null;
