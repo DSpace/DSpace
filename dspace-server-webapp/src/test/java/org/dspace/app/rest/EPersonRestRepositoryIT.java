@@ -14,6 +14,7 @@ import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -55,6 +56,8 @@ import org.dspace.content.Item;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.PasswordHash;
+import org.dspace.eperson.RegistrationData;
+import org.dspace.eperson.dao.RegistrationDataDAO;
 import org.dspace.eperson.service.AccountService;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.eperson.service.RegistrationDataService;
@@ -74,6 +77,9 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     @Autowired
     private EPersonService ePersonService;
+
+    @Autowired
+    private RegistrationDataDAO registrationDataDAO;
 
     @Test
     public void createTest() throws Exception {
@@ -1672,6 +1678,10 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
         PasswordHash newPasswordHash = ePersonService.getPasswordHash(ePerson);
         assertFalse(oldPassword.equals(newPasswordHash));
         assertTrue(registrationDataService.findByEmail(context, ePerson.getEmail()) == null);
+
+        context.turnOffAuthorisationSystem();
+        registrationDataService.deleteByToken(context, tokenForEPerson);
+        context.restoreAuthSystemState();
     }
 
 
@@ -1709,6 +1719,10 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
         assertFalse(registrationDataService.findByEmail(context, ePerson.getEmail()) == null);
         assertTrue(StringUtils.equals(registrationDataService.findByEmail(context, ePerson.getEmail()).getToken(),
                                       tokenForEPerson));
+
+        context.turnOffAuthorisationSystem();
+        registrationDataService.deleteByToken(context, tokenForEPerson);
+        context.restoreAuthSystemState();
     }
 
     @Test
@@ -1753,6 +1767,11 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
         PasswordHash newPasswordHash = ePersonService.getPasswordHash(ePerson);
         assertTrue(StringUtils.equalsIgnoreCase(oldPassword.getHashString(),newPasswordHash.getHashString()));
         assertFalse(registrationDataService.findByEmail(context, ePerson.getEmail()) == null);
+
+        context.turnOffAuthorisationSystem();
+        registrationDataService.deleteByToken(context, tokenForEPerson);
+        registrationDataService.deleteByToken(context, tokenForEPersonTwo);
+        context.restoreAuthSystemState();
     }
 
     @Test
@@ -1789,6 +1808,12 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
         assertTrue(StringUtils.equalsIgnoreCase(oldPassword.getHashString(),newPasswordHash.getHashString()));
         assertFalse(registrationDataService.findByEmail(context, ePerson.getEmail()) == null);
         assertTrue(StringUtils.equalsIgnoreCase(ePerson.getEmail(), originalEmail));
+
+        context.turnOffAuthorisationSystem();
+        registrationDataService.delete(context, registrationDataService.findByEmail(context, ePerson.getEmail()));
+        registrationDataService.deleteByToken(context, tokenForEPerson);
+        context.restoreAuthSystemState();
+
     }
 
     @Test
@@ -1833,6 +1858,11 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
         assertTrue(StringUtils.equalsIgnoreCase(oldPassword.getHashString(),newPasswordHash.getHashString()));
         assertFalse(registrationDataService.findByEmail(context, ePerson.getEmail()) == null);
         assertFalse(registrationDataService.findByEmail(context, newRegisterEmail) == null);
+
+        context.turnOffAuthorisationSystem();
+        registrationDataService.delete(context, registrationDataService.findByEmail(context, ePerson.getEmail()));
+        registrationDataService.deleteByToken(context, newRegisterToken);
+        context.restoreAuthSystemState();
     }
 
     @Test
@@ -1879,6 +1909,10 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
         assertNull(registrationDataService.findByToken(context, newRegisterToken));
         context.turnOffAuthorisationSystem();
         ePersonService.delete(context, createdEPerson);
+        context.restoreAuthSystemState();
+
+        context.turnOffAuthorisationSystem();
+        registrationDataService.deleteByToken(context, newRegisterToken);
         context.restoreAuthSystemState();
     }
 
@@ -1928,6 +1962,11 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
         context.turnOffAuthorisationSystem();
         ePersonService.delete(context, createdEPerson);
         context.restoreAuthSystemState();
+
+        context.turnOffAuthorisationSystem();
+        registrationDataService.deleteByToken(context, newRegisterToken);
+        context.restoreAuthSystemState();
+
     }
 
     @Test
@@ -1976,6 +2015,11 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
         context.turnOffAuthorisationSystem();
         ePersonService.delete(context, createdEPerson);
         context.restoreAuthSystemState();
+
+        context.turnOffAuthorisationSystem();
+        registrationDataService.deleteByToken(context, newRegisterToken);
+        context.restoreAuthSystemState();
+
     }
 
     @Test
@@ -2017,6 +2061,11 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
         assertNull(createdEPerson);
         assertNotNull(registrationDataService.findByToken(context, newRegisterToken));
         assertNotNull(registrationDataService.findByToken(context, newRegisterTokenTwo));
+
+        context.turnOffAuthorisationSystem();
+        registrationDataService.deleteByToken(context, newRegisterToken);
+        registrationDataService.deleteByToken(context, newRegisterTokenTwo);
+        context.restoreAuthSystemState();
     }
 
     @Test
@@ -2047,6 +2096,10 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
         EPerson createdEPerson = ePersonService.findByEmail(context, newRegisterEmail);
         assertNull(createdEPerson);
         assertNotNull(registrationDataService.findByToken(context, newRegisterToken));
+
+        context.turnOffAuthorisationSystem();
+        registrationDataService.deleteByToken(context, newRegisterToken);
+        context.restoreAuthSystemState();
     }
 
     @Test
@@ -2077,6 +2130,10 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
         EPerson createdEPerson = ePersonService.findByEmail(context, newRegisterEmail);
         assertNull(createdEPerson);
         assertNotNull(registrationDataService.findByToken(context, newRegisterToken));
+
+        context.turnOffAuthorisationSystem();
+        registrationDataService.deleteByToken(context, newRegisterToken);
+        context.restoreAuthSystemState();
     }
 
     @Test
@@ -2106,6 +2163,10 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
         EPerson createdEPerson = ePersonService.findByEmail(context, newRegisterEmail);
         assertNull(createdEPerson);
         assertNotNull(registrationDataService.findByToken(context, newRegisterToken));
+
+        context.turnOffAuthorisationSystem();
+        registrationDataService.deleteByToken(context, newRegisterToken);
+        context.restoreAuthSystemState();
     }
 
     @Test
@@ -2135,6 +2196,10 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
         EPerson createdEPerson = ePersonService.findByEmail(context, newRegisterEmail);
         assertNull(createdEPerson);
         assertNotNull(registrationDataService.findByToken(context, newRegisterToken));
+
+        context.turnOffAuthorisationSystem();
+        registrationDataService.deleteByToken(context, newRegisterToken);
+        context.restoreAuthSystemState();
     }
 
     @Test
@@ -2165,6 +2230,11 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
         EPerson createdEPerson = ePersonService.findByEmail(context, newRegisterEmail);
         assertNull(createdEPerson);
         assertNotNull(registrationDataService.findByToken(context, newRegisterToken));
+
+        context.turnOffAuthorisationSystem();
+        registrationDataService.deleteByToken(context, newRegisterToken);
+        context.restoreAuthSystemState();
+
     }
 
     @Test
@@ -2195,6 +2265,11 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
         EPerson createdEPerson = ePersonService.findByEmail(context, newEmail);
         assertNull(createdEPerson);
         assertNotNull(registrationDataService.findByToken(context, forgotPasswordToken));
+
+        context.turnOffAuthorisationSystem();
+        registrationDataService.deleteByToken(context, forgotPasswordToken);
+        context.restoreAuthSystemState();
+
     }
 
     @Test
@@ -2241,6 +2316,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         context.turnOffAuthorisationSystem();
         ePersonService.delete(context, createdEPerson);
+        registrationDataService.deleteByToken(context, newRegisterToken);
         context.restoreAuthSystemState();
     }
 }
