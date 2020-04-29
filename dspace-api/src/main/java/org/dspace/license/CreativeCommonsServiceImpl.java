@@ -91,6 +91,8 @@ public class CreativeCommonsServiceImpl implements CreativeCommonsService, Initi
     protected ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
 
     private String defaultLanguage;
+    private String jurisdiction;
+    private static final String JURISDICTION_KEY = "jurisdiction";
 
 
     private Map<String, Map<String, CCLicense>> ccLicenses;
@@ -113,6 +115,7 @@ public class CreativeCommonsServiceImpl implements CreativeCommonsService, Initi
 
         ccLicenses = new HashMap<>();
         defaultLanguage = configurationService.getProperty("cc.license.locale", "en");
+        jurisdiction = configurationService.getProperty("cc.license.jurisdiction", "");
 
         try {
             templates = TransformerFactory.newInstance().newTemplates(
@@ -601,7 +604,16 @@ public class CreativeCommonsServiceImpl implements CreativeCommonsService, Initi
                 fullParamMap.put(ccLicenseField.getId(), "");
             }
         }
+
+        updateJurisdiction(fullParamMap);
+
         return fullParamMap;
+    }
+
+    private void updateJurisdiction(final Map<String, String> fullParamMap) {
+        if (fullParamMap.containsKey(JURISDICTION_KEY)) {
+            fullParamMap.put(JURISDICTION_KEY, jurisdiction);
+        }
     }
 
     private boolean containsAnswerEnum(final String enumAnswer, final CCLicenseField ccLicenseField) {
