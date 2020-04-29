@@ -7,6 +7,7 @@
  */
 package org.dspace.app.rest;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -35,7 +36,7 @@ public class RegistrationRestControllerIT extends AbstractControllerIntegrationT
     @Test
     public void registrationFlowTest() throws Exception {
         List<RegistrationData> registrationDataList = registrationDataDAO.findAll(context, RegistrationData.class);
-        assertTrue(registrationDataList.isEmpty());
+        assertEquals(0, registrationDataList.size());
 
         ObjectMapper mapper = new ObjectMapper();
         RegistrationRest registrationRest = new RegistrationRest();
@@ -45,7 +46,7 @@ public class RegistrationRestControllerIT extends AbstractControllerIntegrationT
                                 .contentType(contentType))
                             .andExpect(status().isCreated());
         registrationDataList = registrationDataDAO.findAll(context, RegistrationData.class);
-        assertTrue(registrationDataList.size() == 1);
+        assertEquals(1, registrationDataList.size());
         assertTrue(StringUtils.equalsIgnoreCase(registrationDataList.get(0).getEmail(), eperson.getEmail()));
 
         String newEmail = "newEPersonTest@gmail.com";
@@ -67,7 +68,7 @@ public class RegistrationRestControllerIT extends AbstractControllerIntegrationT
                                 .contentType(contentType))
                    .andExpect(status().is(401));
 
-        assertTrue(registrationDataList.size() == 2);
+        assertEquals(2, registrationDataList.size());
         assertTrue(!StringUtils.equalsIgnoreCase(registrationDataList.get(0).getEmail(), newEmail) &&
                        !StringUtils.equalsIgnoreCase(registrationDataList.get(1).getEmail(), newEmail));
 
