@@ -80,10 +80,10 @@ public class DiscoveryIT extends AbstractIntegrationTest {
             workspaceItemService.update(context, leftIs);
             workspaceItemService.update(context, rightIs);
 
+            context.dispatchEvents();
             indexingService.commit();
 
             context.restoreAuthSystemState();
-            context.dispatchEvents();
         } catch (AuthorizeException ex) {
             log.error("Authorization Error in init", ex);
             fail("Authorization Error in init: " + ex.getMessage());
