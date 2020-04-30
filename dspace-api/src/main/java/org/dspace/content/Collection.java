@@ -121,7 +121,7 @@ public class Collection extends DSpaceObject implements DSpaceObjectLegacySuppor
         return value == null ? "" : value;
     }
 
-    public String getEntityType() {
+    public String getRelationshipType() {
         String value = getCollectionService()
             .getMetadataFirstValue(this, MetadataSchemaEnum.RELATIONSHIP.getName(), "type", null, Item.ANY);
         return value == null ? "" : value;

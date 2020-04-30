@@ -116,7 +116,7 @@ public class SubmissionService {
                         Constants.ADD)
                     .stream()
                     .filter(coll ->
-                       StringUtils.isBlank(type) ? true : type.equalsIgnoreCase(coll.getEntityType()))
+                       StringUtils.isBlank(type) ? true : type.equalsIgnoreCase(coll.getRelationshipType()))
                     .collect(Collectors.toList());
                 if (findAuthorizedOptimized != null && findAuthorizedOptimized.size() > 0) {
                     collection = findAuthorizedOptimized.get(0);
