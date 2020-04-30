@@ -7,7 +7,7 @@
  */
 package org.dspace.app.rest.link;
 
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 
 import java.util.LinkedList;
 
@@ -18,6 +18,7 @@ import org.dspace.app.rest.model.AuthorityRest;
 import org.dspace.app.rest.model.hateoas.AuthorityEntryResource;
 import org.dspace.app.rest.utils.AuthorityUtils;
 import org.springframework.data.domain.Pageable;
+import org.springframework.hateoas.IanaLinkRelations;
 import org.springframework.hateoas.Link;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -50,7 +51,7 @@ public class AuthorityEntryHalLinkFactory extends HalLinkFactory<AuthorityEntryR
         String selfLinkString = linkTo(
             getMethodOn().findOne(entry.getCategory(), English.plural(entry.getType()), entry.getAuthorityName()))
             .toUriComponentsBuilder().build().toString() + "/entryValues/" + entry.getId();
-        list.add(buildLink(Link.REL_SELF, selfLinkString));
+        list.add(buildLink(IanaLinkRelations.SELF.value(), selfLinkString));
     }
 
     protected Class<RestResourceController> getControllerClass() {
