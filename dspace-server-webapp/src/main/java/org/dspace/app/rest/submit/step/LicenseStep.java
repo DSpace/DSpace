@@ -8,6 +8,7 @@
 package org.dspace.app.rest.submit.step;
 
 import org.atteo.evo.inflector.English;
+import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.BitstreamRest;
 import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.rest.model.step.DataLicense;
@@ -50,8 +51,8 @@ public class LicenseStep extends org.dspace.submit.step.LicenseStep implements A
     }
 
     @Override
-    public void doPatchProcessing(Context context, Request currentRequest, InProgressSubmission source, Operation op)
-        throws Exception {
+    public void doPatchProcessing(Context context, Request currentRequest, InProgressSubmission source, Operation op,
+                                  SubmissionStepConfig stepConf) throws Exception {
 
         if (op.getPath().endsWith(LICENSE_STEP_OPERATION_ENTRY)) {
 
@@ -59,6 +60,8 @@ public class LicenseStep extends org.dspace.submit.step.LicenseStep implements A
                 .instanceOf(LICENSE_STEP_OPERATION_ENTRY, op.getOp());
             patchOperation.perform(context, currentRequest, source, op);
 
+        } else {
+            throw new UnprocessableEntityException("This path : " + op.getPath() + " can not to be replaced");
         }
     }
 }
