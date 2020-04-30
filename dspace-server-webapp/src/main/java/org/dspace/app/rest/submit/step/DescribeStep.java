@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.logging.log4j.Logger;
+import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.MetadataValueRest;
 import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.rest.model.step.DataDescribe;
@@ -110,13 +111,19 @@ public class DescribeStep extends org.dspace.submit.step.DescribeStep implements
     }
 
     @Override
-    public void doPatchProcessing(Context context, Request currentRequest, InProgressSubmission source, Operation op)
-        throws Exception {
+    public void doPatchProcessing(Context context, Request currentRequest, InProgressSubmission source, Operation op,
+                                  SubmissionStepConfig stepConf) throws Exception {
 
         PatchOperation<MetadataValueRest> patchOperation = new PatchOperationFactory()
-            .instanceOf(DESCRIBE_STEP_METADATA_OPERATION_ENTRY, op.getOp());
-        patchOperation.perform(context, currentRequest, source, op);
-
+                        .instanceOf(DESCRIBE_STEP_METADATA_OPERATION_ENTRY, op.getOp());
+        DCInputSet inputConfig = inputReader.getInputsByFormName(stepConf.getId());
+        String[] split = patchOperation.getAbsolutePath(op.getPath()).split("/");
+        if (inputConfig.isFieldPresent(split[0])) {
+            patchOperation.perform(context, currentRequest, source, op);
+        } else {
+            throw new UnprocessableEntityException("The attribute " + split[0] + " does not present in section "
+                                                                               + inputConfig.getFormName());
+        }
     }
 
 }

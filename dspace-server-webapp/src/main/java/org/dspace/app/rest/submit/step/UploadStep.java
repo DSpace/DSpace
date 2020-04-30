@@ -12,6 +12,7 @@ import java.io.InputStream;
 import java.util.List;
 
 import org.apache.logging.log4j.Logger;
+import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.ErrorRest;
 import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.rest.model.step.DataUpload;
@@ -23,6 +24,9 @@ import org.dspace.app.rest.submit.UploadableStep;
 import org.dspace.app.rest.submit.factory.PatchOperationFactory;
 import org.dspace.app.rest.submit.factory.impl.PatchOperation;
 import org.dspace.app.rest.utils.Utils;
+import org.dspace.app.util.DCInputSet;
+import org.dspace.app.util.DCInputsReader;
+import org.dspace.app.util.DCInputsReaderException;
 import org.dspace.app.util.SubmissionStepConfig;
 import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
@@ -45,6 +49,13 @@ public class UploadStep extends org.dspace.submit.step.UploadStep
 
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(UploadStep.class);
 
+    public static final String UPLOAD_STEP_METADATA_SECTION = "bitstream-metadata";
+
+    private DCInputsReader inputReader;
+
+    public UploadStep() throws DCInputsReaderException {
+        inputReader = new DCInputsReader();
+    }
     @Override
     public DataUpload getData(SubmissionService submissionService, InProgressSubmission obj,
                               SubmissionStepConfig config) throws Exception {
@@ -61,8 +72,8 @@ public class UploadStep extends org.dspace.submit.step.UploadStep
     }
 
     @Override
-    public void doPatchProcessing(Context context, Request currentRequest, InProgressSubmission source, Operation op)
-        throws Exception {
+    public void doPatchProcessing(Context context, Request currentRequest, InProgressSubmission source, Operation op,
+                                  SubmissionStepConfig stepConf) throws Exception {
 
         String instance = "";
         if ("remove".equals(op.getOp())) {
@@ -87,8 +98,28 @@ public class UploadStep extends org.dspace.submit.step.UploadStep
             }
         }
         PatchOperation<?> patchOperation = new PatchOperationFactory().instanceOf(instance, op.getOp());
-        patchOperation.perform(context, currentRequest, source, op);
+        if (instance.equals(AbstractRestProcessingStep.UPLOAD_STEP_METADATA_OPERATION_ENTRY)) {
+            DCInputSet inputConfig = inputReader.getInputsByFormName(UploadStep.UPLOAD_STEP_METADATA_SECTION);
+            String[] split = patchOperation.getAbsolutePath(op.getPath()).split("/");
+            String metadata = findMetadata(split);
+            if (inputConfig.isFieldPresent(metadata)) {
+                patchOperation.perform(context, currentRequest, source, op);
+            } else {
+                throw new UnprocessableEntityException("The attribute " + metadata + " does not present in section "
+                                                                        + UploadStep.UPLOAD_STEP_METADATA_SECTION);
+            }
+        } else {
+            patchOperation.perform(context, currentRequest, source, op);
+        }
+    }
 
+    private String findMetadata(String[] metadata) {
+        for (String s : metadata) {
+            if (s.contains("dc.")) {
+                return s;
+            }
+        }
+        return null;
     }
 
     @Override
