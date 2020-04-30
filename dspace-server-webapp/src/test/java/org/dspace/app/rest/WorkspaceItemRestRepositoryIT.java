@@ -3160,4 +3160,341 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                         .andExpect(status().isUnauthorized());
     }
 
+    @Test
+    public void patchAddMetadataOnSectionNotExistentTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                         .withName("Parent Community")
+                         .build();
+
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                          .withName("Sub Community")
+                          .build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, child1)
+                         .withName("Collection 1")
+                         .build();
+
+        WorkspaceItem witem = WorkspaceItemBuilder.createWorkspaceItem(context, col1)
+                             .withIssueDate("2019-04-25")
+                             .withSubject("ExtraEntry")
+                             .build();
+
+        //disable file upload mandatory
+        configurationService.setProperty("webui.submit.upload.required", false);
+
+        context.restoreAuthSystemState();
+
+        String authToken = getAuthToken(eperson.getEmail(), password);
+
+        List<Operation> addTitle = new ArrayList<Operation>();
+        List<Map<String, String>> values = new ArrayList<Map<String, String>>();
+        Map<String, String> value = new HashMap<String, String>();
+        value.put("value", "New Title");
+        values.add(value);
+        addTitle.add(new AddOperation("/sections/not-existing-section/dc.title", values));
+
+        String patchBody = getPatchContent(addTitle);
+        getClient(authToken).perform(patch("/api/submission/workspaceitems/" + witem.getID())
+                 .content(patchBody)
+                 .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                 .andExpect(status().isUnprocessableEntity());
+    }
+
+    @Test
+    public void patchAddMetadataWrongAttributeTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                         .withName("Parent Community")
+                         .build();
+
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                          .withName("Sub Community")
+                          .build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, child1)
+                         .withName("Collection 1")
+                         .build();
+
+        WorkspaceItem witem = WorkspaceItemBuilder.createWorkspaceItem(context, col1)
+                             .withIssueDate("2019-04-25")
+                             .withSubject("ExtraEntry")
+                             .build();
+
+        //disable file upload mandatory
+        configurationService.setProperty("webui.submit.upload.required", false);
+
+        context.restoreAuthSystemState();
+
+        String authToken = getAuthToken(eperson.getEmail(), password);
+
+        List<Operation> addTitle = new ArrayList<Operation>();
+        List<Map<String, String>> values = new ArrayList<Map<String, String>>();
+        Map<String, String> value = new HashMap<String, String>();
+        value.put("value", "New Title");
+        values.add(value);
+        addTitle.add(new AddOperation("/sections/traditionalpageone/dc.not.existing", values));
+
+        String patchBody = getPatchContent(addTitle);
+        getClient(authToken).perform(patch("/api/submission/workspaceitems/" + witem.getID())
+                 .content(patchBody)
+                 .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                 .andExpect(status().isUnprocessableEntity());
+    }
+
+    @Test
+    // try to add Title on tradiotionalpagetwo, but attribute title is placed on tradiotionalpageone
+    public void patchAddTitleOnSectionThatNotContainAttributeTitleTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                         .withName("Parent Community")
+                         .build();
+
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                          .withName("Sub Community")
+                          .build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, child1)
+                         .withName("Collection 1")
+                         .build();
+
+        WorkspaceItem witem = WorkspaceItemBuilder.createWorkspaceItem(context, col1)
+                             .withIssueDate("2019-11-21")
+                             .withSubject("ExtraEntry")
+                             .build();
+
+        //disable file upload mandatory
+        configurationService.setProperty("webui.submit.upload.required", false);
+
+        context.restoreAuthSystemState();
+
+        String authToken = getAuthToken(eperson.getEmail(), password);
+
+        List<Operation> addTitle = new ArrayList<Operation>();
+        List<Map<String, String>> values = new ArrayList<Map<String, String>>();
+        Map<String, String> value = new HashMap<String, String>();
+        value.put("value", "New Title");
+        values.add(value);
+        addTitle.add(new AddOperation("/sections/traditionalpagetwo/dc.title", values));
+
+        String patchBody = getPatchContent(addTitle);
+        getClient(authToken).perform(patch("/api/submission/workspaceitems/" + witem.getID())
+                 .content(patchBody)
+                 .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                 .andExpect(status().isUnprocessableEntity());
+    }
+
+    @Test
+    public void patchAcceptLicenseWrontPathTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                         .withName("Parent Community")
+                         .build();
+
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                          .withName("Sub Community")
+                          .build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, child1)
+                         .withName("Collection 1")
+                         .build();
+
+        WorkspaceItem witem = WorkspaceItemBuilder.createWorkspaceItem(context, col1)
+                             .withTitle("Example Title")
+                             .withIssueDate("2019-11-21")
+                             .withSubject("ExtraEntry")
+                             .build();
+
+        //disable file upload mandatory
+        configurationService.setProperty("webui.submit.upload.required", false);
+
+        context.restoreAuthSystemState();
+
+        String authToken = getAuthToken(eperson.getEmail(), password);
+
+        List<Operation> replaceGrant = new ArrayList<Operation>();
+        replaceGrant.add(new ReplaceOperation("/sections/license/not-existing", true));
+
+        String patchBody = getPatchContent(replaceGrant);
+        getClient(authToken).perform(patch("/api/submission/workspaceitems/" + witem.getID())
+                 .content(patchBody)
+                 .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                 .andExpect(status().isUnprocessableEntity());
+    }
+
+    @Test
+    public void patchAcceptLicenseTryToChangeLicenseUrlTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                         .withName("Parent Community")
+                         .build();
+
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                          .withName("Sub Community")
+                          .build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, child1)
+                         .withName("Collection 1")
+                         .build();
+
+        WorkspaceItem witem = WorkspaceItemBuilder.createWorkspaceItem(context, col1)
+                             .withTitle("Example Title")
+                             .withIssueDate("2019-11-21")
+                             .withSubject("ExtraEntry")
+                             .build();
+
+        //disable file upload mandatory
+        configurationService.setProperty("webui.submit.upload.required", false);
+
+        context.restoreAuthSystemState();
+
+        String authToken = getAuthToken(eperson.getEmail(), password);
+
+        List<Operation> replaceGrant = new ArrayList<Operation>();
+        replaceGrant.add(new ReplaceOperation("/sections/license/granted", true));
+
+        String patchBody = getPatchContent(replaceGrant);
+        getClient(authToken).perform(patch("/api/submission/workspaceitems/" + witem.getID())
+                 .content(patchBody)
+                 .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                 .andExpect(status().isOk());
+
+        List<Operation> replaceLicenseUrl = new ArrayList<Operation>();
+        replaceLicenseUrl.add(new ReplaceOperation("/sections/license/url", "not.existing"));
+
+        patchBody = getPatchContent(replaceLicenseUrl);
+        getClient(authToken).perform(patch("/api/submission/workspaceitems/" + witem.getID())
+                 .content(patchBody)
+                 .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                 .andExpect(status().isUnprocessableEntity());
+    }
+
+    @Test
+    public void patchAcceptLicenseTryToChangeDateAccepteLicenseTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                         .withName("Parent Community")
+                         .build();
+
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                          .withName("Sub Community")
+                          .build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, child1)
+                         .withName("Collection 1")
+                         .build();
+
+        WorkspaceItem witem = WorkspaceItemBuilder.createWorkspaceItem(context, col1)
+                             .withTitle("Example Title")
+                             .withIssueDate("2019-11-21")
+                             .withSubject("ExtraEntry")
+                             .build();
+
+        //disable file upload mandatory
+        configurationService.setProperty("webui.submit.upload.required", false);
+
+        context.restoreAuthSystemState();
+
+        String authToken = getAuthToken(eperson.getEmail(), password);
+
+        List<Operation> replaceGrant = new ArrayList<Operation>();
+        replaceGrant.add(new ReplaceOperation("/sections/license/granted", true));
+
+        String patchBody = getPatchContent(replaceGrant);
+        getClient(authToken).perform(patch("/api/submission/workspaceitems/" + witem.getID())
+                 .content(patchBody)
+                 .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                 .andExpect(status().isOk());
+
+        List<Operation> replaceLicenseUrl = new ArrayList<Operation>();
+        replaceLicenseUrl.add(new ReplaceOperation("/sections/license/acceptanceDate", "2020-02-14"));
+
+        patchBody = getPatchContent(replaceLicenseUrl);
+        getClient(authToken).perform(patch("/api/submission/workspaceitems/" + witem.getID())
+                 .content(patchBody)
+                 .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                 .andExpect(status().isUnprocessableEntity());
+    }
+
+    @Test
+    public void patchUploadMetadatoNotExistTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1)
+                                           .withName("Collection 1")
+                                           .build();
+
+        InputStream pdf = getClass().getResourceAsStream("simple-article.pdf");
+
+        WorkspaceItem witem = WorkspaceItemBuilder.createWorkspaceItem(context, col1)
+                 .withTitle("Test WorkspaceItem")
+                 .withIssueDate("2019-10-25")
+                 .withFulltext("simple-article.pdf", "/local/path/simple-article.pdf", pdf)
+                 .build();
+
+        context.restoreAuthSystemState();
+
+        String authToken = getAuthToken(eperson.getEmail(), password);
+
+        List<Operation> addOpts = new ArrayList<Operation>();
+        Map<String, String> value = new HashMap<String, String>();
+        value.put("value", "some text");
+        addOpts.add(new AddOperation("/sections/upload/files/0/metadata/dc.not.existing", value));
+
+        String patchBody = getPatchContent(addOpts);
+        getClient(authToken).perform(patch("/api/submission/workspaceitems/" + witem.getID())
+                            .content(patchBody)
+                            .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                            .andExpect(status().isUnprocessableEntity());
+    }
+
+    @Test
+    public void patchUploadWrongPathTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1)
+                                           .withName("Collection 1")
+                                           .build();
+
+        InputStream pdf = getClass().getResourceAsStream("simple-article.pdf");
+
+        WorkspaceItem witem = WorkspaceItemBuilder.createWorkspaceItem(context, col1)
+                .withTitle("Test WorkspaceItem")
+                .withIssueDate("2017-10-17")
+                .withFulltext("simple-article.pdf", "/local/path/simple-article.pdf", pdf)
+                .build();
+
+        context.restoreAuthSystemState();
+
+        String authToken = getAuthToken(eperson.getEmail(), password);
+
+        List<Operation> addOpts = new ArrayList<Operation>();
+        Map<String, String> value = new HashMap<String, String>();
+        value.put("value", "2020-01-25");
+        addOpts.add(new AddOperation("/sections/upload/files/0/metadata/dc.date.issued", value));
+
+        String patchBody = getPatchContent(addOpts);
+        getClient(authToken).perform(patch("/api/submission/workspaceitems/" + witem.getID())
+                            .content(patchBody)
+                            .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                            .andExpect(status().isUnprocessableEntity());
+    }
 }
