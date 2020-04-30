@@ -12,6 +12,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
@@ -96,6 +97,11 @@ public class SubmissionService {
         WorkspaceItem wsi = null;
         Collection collection = null;
         String collectionUUID = request.getHttpServletRequest().getParameter("owningCollection");
+        String entityType = request.getHttpServletRequest().getParameter("entityType");
+
+        if (StringUtils.isBlank(entityType)) {
+            entityType = configurationService.getProperty("submission.default.entitytype");
+        }
 
         if (StringUtils.isBlank(collectionUUID)) {
             collectionUUID = configurationService.getProperty("submission.default.collection");
@@ -105,8 +111,13 @@ public class SubmissionService {
             if (StringUtils.isNotBlank(collectionUUID)) {
                 collection = collectionService.find(context, UUID.fromString(collectionUUID));
             } else {
+                final String type = entityType;
                 final List<Collection> findAuthorizedOptimized = collectionService.findAuthorizedOptimized(context,
-                        Constants.ADD);
+                        Constants.ADD)
+                    .stream()
+                    .filter(coll ->
+                       StringUtils.isBlank(type) ? true : type.equalsIgnoreCase(coll.getEntityType()))
+                    .collect(Collectors.toList());
                 if (findAuthorizedOptimized != null && findAuthorizedOptimized.size() > 0) {
                     collection = findAuthorizedOptimized.get(0);
                 } else {
