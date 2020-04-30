@@ -7,7 +7,7 @@
  */
 package org.dspace.app.rest.link;
 
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 
 import java.util.LinkedList;
 
