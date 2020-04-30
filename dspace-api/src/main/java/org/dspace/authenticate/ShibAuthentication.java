@@ -92,7 +92,7 @@ public class ShibAuthentication implements AuthenticationMethod {
     /**
      * Shibboleth logout action
      **/
-    public static final String SHIBBOLETH_LOGOUT_ACTION = "logout"; 
+    public static final String SHIBBOLETH_LOGOUT_ACTION = "logout";
 
     protected EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
     protected GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
@@ -539,8 +539,8 @@ public class ShibAuthentication implements AuthenticationMethod {
     @Override
     public String logoutPageURL(Context context, HttpServletRequest request, HttpServletResponse response) {
         String shibURL = getShibLogoutURL(request);
-        
-        if ( shibURL != null ) {
+
+        if (shibURL != null) {
             log.debug("Session will be redirected to: " + shibURL);
 
             return response.encodeRedirectURL(shibURL);
@@ -1283,7 +1283,7 @@ public class ShibAuthentication implements AuthenticationMethod {
     }
 
     /**
-     * It returns, if available, the logout URL from the configuration service 
+     * It returns, if available, the logout URL from the configuration service
      * @param request
      * @return fully-qualified URL or null
      */
@@ -1307,4 +1307,3 @@ public class ShibAuthentication implements AuthenticationMethod {
     }
 
 }
-
