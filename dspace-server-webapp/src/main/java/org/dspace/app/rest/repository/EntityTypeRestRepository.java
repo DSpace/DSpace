@@ -9,9 +9,9 @@ package org.dspace.app.rest.repository;
 
 import java.sql.SQLException;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.model.EntityTypeRest;
 import org.dspace.content.Collection;
@@ -68,16 +68,19 @@ public class EntityTypeRestRepository extends DSpaceRestRepository<EntityTypeRes
             Context context = obtainContext();
             List<Collection> collections = collectionService.findAuthorized(context, null, Constants.ADD);
 
-            Set<EntityType> entityTypes =
+            List<EntityType> entityTypes =
                 collections.stream().map(type -> type.getRelationshipType()).distinct()
                     .map(type -> {
+                        if (StringUtils.isBlank(type)) {
+                            return null;
+                        }
                         try {
                             return entityTypeService.findByEntityType(context, type);
                         } catch (SQLException e) {
                             throw new RuntimeException(e.getMessage(), e);
                         }
-                    }).collect(Collectors.toSet());
-            return converter.toRestPage(utils.getPage(collections, pageable), utils.obtainProjection());
+                    }).filter(x -> x != null).collect(Collectors.toList());
+            return converter.toRestPage(utils.getPage(entityTypes, pageable), utils.obtainProjection());
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
