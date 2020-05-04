@@ -24,7 +24,7 @@ import org.json.JSONObject;
 import org.json.JSONTokener;
 
 /**
- * Model class for the SHERPAv2 API (JSON) response
+ * Model class for the SHERPAv2 API (JSON) response for a publication (journal) search
  * The structure and approached used is quite different to the simple v1 API used previously
  * 
  * @author Kim Shepherd

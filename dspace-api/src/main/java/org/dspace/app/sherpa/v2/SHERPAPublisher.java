@@ -8,10 +8,11 @@
 package org.dspace.app.sherpa.v2;
 
 public class SHERPAPublisher {
-    private String name;
+    private String name = null;
     private String relationshipType;
     private String country;
-    private String uri;
+    private String uri = null;
+    private String identifier = null;
     private int publicationCount;
 
     // this is not technically in the same place in SHERPA data model but it makes more sense to apply it here
@@ -78,4 +79,11 @@ public class SHERPAPublisher {
         this.paidAccessUrl = paidAccessUrl;
     }
 
+    public String getIdentifier() {
+        return identifier;
+    }
+
+    public void setIdentifier(String identifier) {
+        this.identifier = identifier;
+    }
 }
