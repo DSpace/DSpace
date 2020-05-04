@@ -889,4 +889,22 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
         throws SQLException {
         return collectionDAO.getCollectionsWithBitstreamSizesTotal(context);
     }
+
+    @Override
+    public Group createDefaultReadGroup(Context context, Collection collection, String typeOfGroupString,
+                                        int defaultRead)
+        throws SQLException, AuthorizeException {
+        Group role = groupService.create(context);
+        groupService.setName(role, "COLLECTION_" + collection.getID().toString() + "_" + typeOfGroupString +
+            "_DEFAULT_READ");
+
+        // Remove existing privileges from the anonymous group.
+        authorizeService.removePoliciesActionFilter(context, collection, defaultRead);
+
+        // Grant our new role the default privileges.
+        authorizeService.addPolicy(context, collection, defaultRead, role);
+        groupService.update(context, role);
+        return role;
+    }
+
 }
