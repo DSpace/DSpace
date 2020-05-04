@@ -103,7 +103,7 @@
 										<hr/>
 										<!-- Link to full policy on ROMeO v2 site -->
 										<div class="sherpa-policy-link">
-											<a href='<c:out value="${metadata.uri}"/>' target='_blank'>
+											<a href='<c:out value="${sherpaResponse.metadata.uri}"/>' target='_blank'>
 												<fmt:message key="jsp.sherpa.policy-link"/>
 											</a>
 										</div>
@@ -200,7 +200,7 @@
 							<!-- If there are multiple policies, note this -->
 							<c:if test="${fn:length(journal.policies) > 0}">
 								<p><fmt:message key="jsp.sherpa.multiple-policies">
-									<fmt:param value="${metadata.uri}"/>
+									<fmt:param value="${sherpaResponse.metadata.uri}"/>
 								</fmt:message></p>
 							</c:if>
 						</c:forEach>
