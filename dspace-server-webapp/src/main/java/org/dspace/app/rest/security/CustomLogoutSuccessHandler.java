@@ -19,6 +19,9 @@ import org.dspace.authenticate.AuthenticationMethod;
 import org.dspace.authenticate.ShibAuthentication;
 import org.dspace.authenticate.service.AuthenticationService;
 import org.dspace.core.Context;
+import org.dspace.core.Utils;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
@@ -39,13 +42,15 @@ public class CustomLogoutSuccessHandler implements LogoutSuccessHandler {
     @Autowired
     private RestAuthenticationService restAuthenticationService;
 
+    @Autowired
+    protected ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
+
     @Override
     public void onLogoutSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication)
             throws IOException, ServletException {
 
         String redirectPageURL = getRedirectPageURL(request, response);
         if (StringUtils.isNotBlank(redirectPageURL)) {
-            // TODO: for security issues we still need to validate redirectPageURL
             // we have a logout page to redirect to
             response.setHeader("Location", redirectPageURL);
             response.setStatus(HttpServletResponse.SC_FOUND);
@@ -66,7 +71,7 @@ public class CustomLogoutSuccessHandler implements LogoutSuccessHandler {
      * @param response
      * @return fully-qualified URL or an empty string
      */
-    private String getRedirectPageURL(HttpServletRequest request, HttpServletResponse response) {
+    private String getRedirectPageURL(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String returnURL;
         // verify if we have shibboleth parameters (action and return)
         String action = request.getParameter("action");
@@ -74,6 +79,12 @@ public class CustomLogoutSuccessHandler implements LogoutSuccessHandler {
 
         // is shibboleth action for logout?
         if (ShibAuthentication.SHIBBOLETH_LOGOUT_ACTION.equals(action) && StringUtils.isNotBlank(shibLogoutURL)) {
+            // for security issues we still need to validate return param
+            String serverUrl = Utils.getBaseUrl(configurationService.getProperty("dspace.server.url"));
+
+            if (!shibLogoutURL.startsWith(serverUrl)) {
+                throw new IOException("Invalid 'return' param");
+            }
             returnURL = shibLogoutURL;
         } else {
             returnURL = getRedirectLogoutURLFromAuthMethod(request, response);
