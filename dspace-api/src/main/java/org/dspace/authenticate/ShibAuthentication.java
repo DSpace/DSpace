@@ -7,7 +7,6 @@
  */
 package org.dspace.authenticate;
 
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.sql.SQLException;
