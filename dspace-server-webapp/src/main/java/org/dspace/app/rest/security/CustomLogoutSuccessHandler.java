@@ -19,9 +19,6 @@ import org.dspace.authenticate.AuthenticationMethod;
 import org.dspace.authenticate.ShibAuthentication;
 import org.dspace.authenticate.service.AuthenticationService;
 import org.dspace.core.Context;
-import org.dspace.core.Utils;
-import org.dspace.services.ConfigurationService;
-import org.dspace.services.factory.DSpaceServicesFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
@@ -41,9 +38,6 @@ public class CustomLogoutSuccessHandler implements LogoutSuccessHandler {
 
     @Autowired
     private RestAuthenticationService restAuthenticationService;
-
-    @Autowired
-    protected ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
 
     @Override
     public void onLogoutSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication)
@@ -72,22 +66,19 @@ public class CustomLogoutSuccessHandler implements LogoutSuccessHandler {
      * @return fully-qualified URL or an empty string
      */
     private String getRedirectPageURL(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        String returnURL;
+        String returnURL = null;
         // verify if we have shibboleth parameters (action and return)
-        String action = request.getParameter("action");
-        String shibLogoutURL = request.getParameter("return");
+        try {
+            String shibLogoutURL = ShibAuthentication.getURLFromLogoutActionRequest(request);
 
-        // is shibboleth action for logout?
-        if (ShibAuthentication.SHIBBOLETH_LOGOUT_ACTION.equals(action) && StringUtils.isNotBlank(shibLogoutURL)) {
-            // for security issues we still need to validate return param
-            String serverUrl = Utils.getBaseUrl(configurationService.getProperty("dspace.server.url"));
-
-            if (!shibLogoutURL.startsWith(serverUrl)) {
-                throw new IOException("Invalid 'return' param");
+            // is shibboleth action for logout?
+            if (StringUtils.isNotBlank(shibLogoutURL)) {
+                returnURL = shibLogoutURL;
+            } else {
+                returnURL = getRedirectLogoutURLFromAuthMethod(request, response);
             }
-            returnURL = shibLogoutURL;
-        } else {
-            returnURL = getRedirectLogoutURLFromAuthMethod(request, response);
+        } catch (Exception e) {
+            throw new IOException(e.getMessage());
         }
 
         return returnURL;

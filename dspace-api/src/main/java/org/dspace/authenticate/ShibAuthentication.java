@@ -7,6 +7,7 @@
  */
 package org.dspace.authenticate;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.sql.SQLException;
@@ -547,6 +548,32 @@ public class ShibAuthentication implements AuthenticationMethod {
         }
 
         return null;
+    }
+
+    /**
+     * This method will validate the request and return the proper 'return' URL if valid
+     * @param request
+     * @return The URL from a 'return' argument or null
+     * @throws ShibAuthenticationException
+     */
+    public static String getURLFromLogoutActionRequest(HttpServletRequest request) throws ShibAuthenticationException {
+        String returnURL = null;
+        // verify if we have shibboleth parameters (action and return)
+        String action = request.getParameter("action");
+        String shibLogoutURL = request.getParameter("return");
+
+        // is shibboleth action for logout?
+        if (ShibAuthentication.SHIBBOLETH_LOGOUT_ACTION.equals(action) && StringUtils.isNotBlank(shibLogoutURL)) {
+            // for security issues we still need to validate return param
+            ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
+            String serverUrl = Utils.getBaseUrl(configurationService.getProperty("dspace.server.url"));
+            serverUrl = getSecureURL(serverUrl, request);
+            if (!shibLogoutURL.startsWith(serverUrl)) {
+                throw new ShibAuthenticationException("Invalid 'return' param");
+            }
+            returnURL = shibLogoutURL;
+        }
+        return returnURL;
     }
 
     /**
@@ -1264,9 +1291,13 @@ public class ShibAuthentication implements AuthenticationMethod {
         return valueList;
     }
 
-    private String getShibURL(HttpServletRequest request) {
-        String shibURL = configurationService.getProperty("authentication-shibboleth.lazysession.loginurl",
-                "/Shibboleth.sso/Login");
+    /**
+     * It will validate the secureness of an URL against the configurations
+     * @param request
+     * @return fully-qualified URL
+     */
+    private static String getSecureURL(String shibURL, HttpServletRequest request) {
+        ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
         boolean forceHTTPS =
                 configurationService.getBooleanProperty("authentication-shibboleth.lazysession.secure", true);
 
@@ -1279,7 +1310,12 @@ public class ShibAuthentication implements AuthenticationMethod {
             }
         }
         return shibURL;
+    }
 
+    private String getShibURL(HttpServletRequest request) {
+        String shibURL = configurationService.getProperty("authentication-shibboleth.lazysession.loginurl",
+                "/Shibboleth.sso/Login");
+        return getSecureURL(shibURL,request);
     }
 
     /**
@@ -1292,18 +1328,10 @@ public class ShibAuthentication implements AuthenticationMethod {
                 null);
 
         // Shibboleth url must be absolute
-        if (shibURL != null && shibURL.startsWith("/")) {
-            boolean forceHTTPS =
-                    configurationService.getBooleanProperty("authentication-shibboleth.lazysession.secure", true);
-
-            String serverUrl = Utils.getBaseUrl(configurationService.getProperty("dspace.server.url"));
-            shibURL = serverUrl + shibURL;
-            if ((request.isSecure() || forceHTTPS) && shibURL.startsWith("http://")) {
-                shibURL = shibURL.replace("http://", "https://");
-            }
+        if (shibURL != null) {
+            return getSecureURL(shibURL,request);
         }
         return shibURL;
-
     }
 
 }
