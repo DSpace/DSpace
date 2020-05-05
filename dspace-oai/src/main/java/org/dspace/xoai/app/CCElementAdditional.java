@@ -11,6 +11,8 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 
+import com.lyncode.xoai.dataprovider.xml.xoai.Element;
+import com.lyncode.xoai.dataprovider.xml.xoai.Metadata;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
@@ -22,54 +24,51 @@ import org.dspace.license.factory.LicenseServiceFactory;
 import org.dspace.license.service.CreativeCommonsService;
 import org.dspace.xoai.util.ItemUtils;
 
-import com.lyncode.xoai.dataprovider.xml.xoai.Element;
-import com.lyncode.xoai.dataprovider.xml.xoai.Metadata;
-
 /**
  * Utility class to build xml element to support Creative Commons information
  *
  */
 public class CCElementAdditional implements XOAIItemCompilePlugin {
 
-	private static Logger log = LogManager.getLogger(CCElementAdditional.class);
+    private static Logger log = LogManager.getLogger(CCElementAdditional.class);
 
-	private CreativeCommonsService creativeCommonsService;
-	
-	@Override
-	public Metadata additionalMetadata(Context context, Metadata metadata, Item item) {
+    private CreativeCommonsService creativeCommonsService;
 
-		Element other;
-		List<Element> elements = metadata.getElement();
-		if (ItemUtils.getElement(elements, "others") != null) {
-			other = ItemUtils.getElement(elements, "others");
-		} else {
-			other = ItemUtils.create("others");
-		}
-		String ccLicense = null;
+    @Override
+    public Metadata additionalMetadata(Context context, Metadata metadata, Item item) {
 
-		try {
-			String licenseURL = getCreativeCommonsService().getLicenseURL(context, item);
-			if (StringUtils.isNotBlank(licenseURL)) {
-				CCLookup ccLookup = new CCLookup();
-				ccLookup.issue(licenseURL);
-				String licenseName = ccLookup.getLicenseName();
-				ccLicense = licenseName + "|||" + licenseURL;
-			}
-		} catch (SQLException | IOException | AuthorizeException e) {
-			log.error(e.getMessage(), e);
-		}
-		other.getField().add(ItemUtils.createValue("cc", ccLicense));
-		return metadata;
-	}
+        Element other;
+        List<Element> elements = metadata.getElement();
+        if (ItemUtils.getElement(elements, "others") != null) {
+            other = ItemUtils.getElement(elements, "others");
+        } else {
+            other = ItemUtils.create("others");
+        }
+        String ccLicense = null;
 
-	public CreativeCommonsService getCreativeCommonsService() {
-		if(creativeCommonsService==null) {
-			creativeCommonsService = LicenseServiceFactory.getInstance().getCreativeCommonsService();
-		}
-		return creativeCommonsService;
-	}
+        try {
+            String licenseURL = getCreativeCommonsService().getLicenseURL(context, item);
+            if (StringUtils.isNotBlank(licenseURL)) {
+                CCLookup ccLookup = new CCLookup();
+                ccLookup.issue(licenseURL);
+                String licenseName = ccLookup.getLicenseName();
+                ccLicense = licenseName + "|||" + licenseURL;
+            }
+        } catch (SQLException | IOException | AuthorizeException e) {
+            log.error(e.getMessage(), e);
+        }
+        other.getField().add(ItemUtils.createValue("cc", ccLicense));
+        return metadata;
+    }
 
-	public void setCreativeCommonsService(CreativeCommonsService creativeCommonsService) {
-		this.creativeCommonsService = creativeCommonsService;
-	}
+    public CreativeCommonsService getCreativeCommonsService() {
+        if (creativeCommonsService == null) {
+            creativeCommonsService = LicenseServiceFactory.getInstance().getCreativeCommonsService();
+        }
+        return creativeCommonsService;
+    }
+
+    public void setCreativeCommonsService(CreativeCommonsService creativeCommonsService) {
+        this.creativeCommonsService = creativeCommonsService;
+    }
 }

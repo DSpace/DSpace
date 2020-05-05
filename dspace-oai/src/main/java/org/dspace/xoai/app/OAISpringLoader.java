@@ -14,10 +14,11 @@ import org.dspace.kernel.config.SpringLoader;
 import org.dspace.services.ConfigurationService;
 
 /**
- * Spring Loader to load specific bean implementation only for OAI Spring context
+ * Spring Loader to load specific bean implementation only for OAI Spring
+ * context
  *
  */
-public class OAISpringLoader implements SpringLoader{
+public class OAISpringLoader implements SpringLoader {
 
     @Override
     public String[] getResourcePaths(ConfigurationService configurationService) {
@@ -32,11 +33,10 @@ public class OAISpringLoader implements SpringLoader{
         filePath.append(File.separator);
 
         try {
-            return new String[]{new File(filePath.toString()).toURI().toURL().toString() + XML_SUFFIX};
+            return new String[] { new File(filePath.toString()).toURI().toURL().toString() + XML_SUFFIX };
         } catch (MalformedURLException e) {
             return new String[0];
         }
     }
 
 }
-
