@@ -7,9 +7,6 @@
  */
 package org.dspace.app.rest;
 
-import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
-import static org.hamcrest.Matchers.allOf;
-import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
@@ -119,7 +116,7 @@ public class EntityTypeRestRepositoryIT extends AbstractEntityIntegrationTest {
     }
 
     @Test
-    public void findAllByAuthorizedCollection(){
+    public void findAllByAuthorizedCollection() throws Exception {
         try {
             context.turnOffAuthorisationSystem();
 
@@ -164,8 +161,8 @@ public class EntityTypeRestRepositoryIT extends AbstractEntityIntegrationTest {
                     EntityTypeMatcher.matchEntityTypeEntry(entityTypeService.findByEntityType(context, "Journal"))
                 )));
 
-        }catch (Exception e){
-
+        } finally {
+            CommunityBuilder.deleteCommunity(parentCommunity.getID());
         }
     }
 }

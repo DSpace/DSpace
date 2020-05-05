@@ -10,8 +10,8 @@
 -- Insert default relationship type on collections
 -----------------------------------------------------------------------------------
 
-INSERT INTO metadatavalue (text_value, metadata_field_id, dspace_object_id)
-select 'Publication', uuid, (SELECT metadata_field_id
+INSERT INTO metadatavalue (confidence, place,text_value, dspace_object_id, metadata_field_id)
+select -1,0,'Publication', uuid, (SELECT metadata_field_id
                        FROM metadatafieldregistry
                        WHERE element = 'type' and metadata_schema_id = (
                            SELECT metadata_schema_id
