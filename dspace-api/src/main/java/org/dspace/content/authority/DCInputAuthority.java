@@ -16,10 +16,12 @@ import java.util.Locale;
 import java.util.Map;
 
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.util.DCInputsReader;
 import org.dspace.app.util.DCInputsReaderException;
 import org.dspace.content.Collection;
+import org.dspace.core.Context;
 import org.dspace.core.I18nUtil;
 import org.dspace.core.SelfNamedPlugin;
 
@@ -154,6 +156,12 @@ public class DCInputAuthority extends SelfNamedPlugin implements ChoiceAuthority
     @Override
     public String getLabel(String field, String key, String locale) {
         init();
+        
+        // Get default if locale is empty
+        if (StringUtils.isBlank(locale)) {
+            locale = getDefaultLocale();
+        }
+
         String[] valuesLocale = values.get(locale);
         String[] labelsLocale = labels.get(locale);
         int pos = -1;
@@ -168,5 +176,10 @@ public class DCInputAuthority extends SelfNamedPlugin implements ChoiceAuthority
         } else {
             return "UNKNOWN KEY " + key;
         }
+    }
+    
+    protected String getDefaultLocale() {
+        Context context = new Context();
+        return context.getCurrentLocale().getLanguage();
     }
 }
