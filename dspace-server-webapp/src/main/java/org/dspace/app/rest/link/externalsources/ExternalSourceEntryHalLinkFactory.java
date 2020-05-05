@@ -13,6 +13,7 @@ import org.dspace.app.rest.ExternalSourcesRestController;
 import org.dspace.app.rest.link.HalLinkFactory;
 import org.dspace.app.rest.model.hateoas.ExternalSourceEntryResource;
 import org.springframework.data.domain.Pageable;
+import org.springframework.hateoas.IanaLinkRelations;
 import org.springframework.hateoas.Link;
 import org.springframework.stereotype.Component;
 
@@ -27,7 +28,7 @@ public class ExternalSourceEntryHalLinkFactory
     protected void addLinks(ExternalSourceEntryResource halResource, Pageable pageable, LinkedList<Link> list)
         throws Exception {
 
-        list.add(buildLink(Link.REL_SELF,
+        list.add(buildLink(IanaLinkRelations.SELF.value(),
                            getMethodOn().getExternalSourceEntryValue(halResource.getContent().getExternalSource(),
                                                                      halResource.getContent().getId())));
 
