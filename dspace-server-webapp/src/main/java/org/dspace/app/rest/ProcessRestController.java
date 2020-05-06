@@ -7,8 +7,7 @@
  */
 package org.dspace.app.rest;
 
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -30,7 +29,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.Link;
-import org.springframework.hateoas.PagedResources;
+import org.springframework.hateoas.PagedModel;
+import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -72,7 +72,7 @@ public class ProcessRestController {
     }
 
     @RequestMapping(method = RequestMethod.GET, value = "/{processId}/files/{fileType}")
-    public PagedResources<BitstreamResource> listFilesWithTypeFromProcess(
+    public PagedModel<BitstreamResource> listFilesWithTypeFromProcess(
         @PathVariable(name = "processId") Integer processId,
         @PathVariable(name = "fileType") String fileType,
         Pageable pageable, PagedResourcesAssembler assembler) throws SQLException, AuthorizeException {
@@ -88,13 +88,14 @@ public class ProcessRestController {
 
         Page<BitstreamResource> page = utils.getPage(bitstreamResources, pageable);
 
-        Link link = linkTo(
+        Link link = WebMvcLinkBuilder.linkTo(
             methodOn(this.getClass()).listFilesWithTypeFromProcess(processId, fileType, pageable, assembler))
             .withSelfRel();
-        PagedResources<BitstreamResource> result = assembler.toResource(page, link);
+        PagedModel<BitstreamResource> result = assembler.toModel(page, link);
 
         return result;
     }
+
 
     @RequestMapping(method = RequestMethod.GET, value = "/{processId}/files/name/{fileName:.+}")
     public BitstreamResource getBitstreamByName(@PathVariable(name = "processId") Integer processId,
