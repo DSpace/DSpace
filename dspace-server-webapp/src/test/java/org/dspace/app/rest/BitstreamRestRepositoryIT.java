@@ -39,7 +39,6 @@ import org.dspace.content.Community;
 import org.dspace.content.Item;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.eperson.EPerson;
-import org.hamcrest.Matchers;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -97,14 +96,8 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
 
         String token = getAuthToken(admin.getEmail(), password);
 
-        getClient(token).perform(get("/api/core/bitstreams/")
-                   .param("projection", "full"))
-                   .andExpect(status().isOk())
-                   .andExpect(content().contentType(contentType))
-                   .andExpect(jsonPath("$._embedded.bitstreams", Matchers.containsInAnyOrder(
-                       BitstreamMatcher.matchBitstreamEntry(bitstream),
-                       BitstreamMatcher.matchBitstreamEntry(bitstream1)
-                   )));
+        getClient(token).perform(get("/api/core/bitstreams/"))
+                   .andExpect(status().isMethodNotAllowed());
     }
 
     @Test
@@ -158,33 +151,13 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
         getClient(token).perform(get("/api/core/bitstreams/")
                    .param("size", "1")
                    .param("projection", "full"))
-                   .andExpect(status().isOk())
-                   .andExpect(content().contentType(contentType))
-                   .andExpect(jsonPath("$._embedded.bitstreams", Matchers.contains(
-                       BitstreamMatcher.matchBitstreamEntry(bitstream))
-                   ))
-                   .andExpect(jsonPath("$._embedded.bitstreams", Matchers.not(
-                       Matchers.contains(
-                           BitstreamMatcher.matchBitstreamEntry(bitstream1))
-                                       )
-                   ))
-
-        ;
+                   .andExpect(status().isMethodNotAllowed());
 
         getClient(token).perform(get("/api/core/bitstreams/")
                                 .param("size", "1")
                                 .param("page", "1")
                                 .param("projection", "full"))
-                   .andExpect(status().isOk())
-                   .andExpect(content().contentType(contentType))
-                   .andExpect(jsonPath("$._embedded.bitstreams", Matchers.contains(
-                       BitstreamMatcher.matchBitstreamEntry(bitstream1)
-                   )))
-                   .andExpect(jsonPath("$._embedded.bitstreams", Matchers.not(
-                       Matchers.contains(
-                           BitstreamMatcher.matchBitstreamEntry(bitstream)
-                       )
-                   )));
+                   .andExpect(status().isMethodNotAllowed());
 
         getClient().perform(get("/api/core/bitstreams/"))
                 .andExpect(status().isUnauthorized());
