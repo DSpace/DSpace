@@ -7,6 +7,7 @@
  */
 package org.dspace.app.rest;
 
+import static com.jayway.jsonpath.JsonPath.read;
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadata;
 import static org.hamcrest.Matchers.containsInAnyOrder;
@@ -25,6 +26,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicReference;
 import javax.ws.rs.core.MediaType;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -56,7 +58,6 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     @Test
     public void createTest() throws Exception {
-        context.turnOffAuthorisationSystem();
         // we should check how to get it from Spring
         ObjectMapper mapper = new ObjectMapper();
         EPersonRest data = new EPersonRest();
@@ -75,7 +76,12 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
         dataFull.setCanLogIn(true);
         dataFull.setMetadata(metadataRest);
 
+        AtomicReference<UUID> idRef = new AtomicReference<UUID>();
+        AtomicReference<UUID> idRefNoEmbeds = new AtomicReference<UUID>();
+
         String authToken = getAuthToken(admin.getEmail(), password);
+
+        try {
         getClient(authToken).perform(post("/api/eperson/epersons")
                                         .content(mapper.writeValueAsBytes(data))
                                         .contentType(contentType)
@@ -95,15 +101,23 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                                hasJsonPath("$.metadata", Matchers.allOf(
                                        matchMetadata("eperson.firstname", "John"),
                                        matchMetadata("eperson.lastname", "Doe")
-                               )))));
+                               )))))
+                            .andDo(result -> idRef
+                                    .set(UUID.fromString(read(result.getResponse().getContentAsString(), "$.id"))));
 
         getClient(authToken).perform(post("/api/eperson/epersons")
                 .content(mapper.writeValueAsBytes(dataFull))
                 .contentType(contentType))
                 .andExpect(status().isCreated())
                 .andExpect(content().contentType(contentType))
-                .andExpect(jsonPath("$", HalMatcher.matchNoEmbeds()));
-        // TODO cleanup the context!!!
+                .andExpect(jsonPath("$", HalMatcher.matchNoEmbeds()))
+                .andDo(result -> idRefNoEmbeds
+                        .set(UUID.fromString(read(result.getResponse().getContentAsString(), "$.id"))));;
+
+        } finally {
+            EPersonBuilder.deleteEPerson(idRef.get());
+            EPersonBuilder.deleteEPerson(idRefNoEmbeds.get());
+        }
     }
 
     @Test
@@ -114,6 +128,8 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                                         .withNameInMetadata("John", "Doe")
                                         .withEmail("Johndoe@fake-email.com")
                                         .build();
+
+        context.restoreAuthSystemState();
 
         String authToken = getAuthToken(admin.getEmail(), password);
         getClient(authToken).perform(get("/api/eperson/eperson"))
@@ -156,6 +172,8 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                                         .withNameInMetadata("John", "Doe")
                                         .withEmail("Johndoe@fake-email.com")
                                         .build();
+
+        context.restoreAuthSystemState();
 
         String authToken = getAuthToken(admin.getEmail(), password);
         // NOTE: /eperson/epersons endpoint returns users sorted by email
@@ -210,6 +228,8 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                                          .withNameInMetadata("Jane", "Smith")
                                          .withEmail("janesmith@fake-email.com")
                                          .build();
+
+        context.restoreAuthSystemState();
 
         // When full projection is requested, response should include expected properties, links, and embeds.
         String authToken = getAuthToken(admin.getEmail(), password);
@@ -271,6 +291,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                                          .withEmail("janesmith@fake-email.com")
                                          .build();
 
+        context.restoreAuthSystemState();
 
         // Verify admin can access information about any user (and only one user is included in response)
         String authToken = getAuthToken(admin.getEmail(), password);
@@ -320,6 +341,8 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                                          .withEmail("janesmith@fake-email.com")
                                          .build();
 
+        context.restoreAuthSystemState();
+
         String authToken = getAuthToken(admin.getEmail(), password);
         getClient(authToken).perform(get("/api/eperson/epersons/" + UUID.randomUUID()))
                    .andExpect(status().isNotFound());
@@ -354,6 +377,8 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                                          .withNameInMetadata("Jane", "Smith")
                                          .withEmail("janesmith@fake-email.com")
                                          .build();
+
+        context.restoreAuthSystemState();
 
         String authToken = getAuthToken(admin.getEmail(), password);
         getClient(authToken).perform(get("/api/eperson/epersons/search/byEmail")
@@ -417,6 +442,8 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                 .withEmail("harrydoeprefix@fake-email.com")
                 .build();
 
+        context.restoreAuthSystemState();
+
         String authToken = getAuthToken(admin.getEmail(), password);
         getClient(authToken).perform(get("/api/eperson/epersons/search/byMetadata")
                     .param("query", ePerson.getLastName()))
@@ -471,6 +498,8 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                 .withNameInMetadata("Prefix-John", "Smoth")
                 .withEmail("harrydoeprefix@fake-email.com")
                 .build();
+
+        context.restoreAuthSystemState();
 
         String authToken = getAuthToken(admin.getEmail(), password);
         getClient(authToken).perform(get("/api/eperson/epersons/search/byMetadata")
@@ -527,6 +556,8 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                                          .withEmail("harrydoeprefix@fake-email.com")
                                          .build();
 
+        context.restoreAuthSystemState();
+
         String authToken = getAuthToken(admin.getEmail(), password);
         getClient(authToken).perform(get("/api/eperson/epersons/search/byMetadata")
                                              .param("query", ePerson.getEmail()))
@@ -575,6 +606,8 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                                          .withNameInMetadata("Harry", "Prefix-Doe")
                                          .withEmail("harrydoeprefix@fake-email.com")
                                          .build();
+
+        context.restoreAuthSystemState();
 
         String authToken = getAuthToken(admin.getEmail(), password);
         getClient(authToken).perform(get("/api/eperson/epersons/search/byMetadata")
@@ -638,6 +671,8 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                                         .withEmail("Johndoe@fake-email.com")
                                         .build();
 
+        context.restoreAuthSystemState();
+
         String token = getAuthToken(admin.getEmail(), password);
 
         // Delete
@@ -656,6 +691,8 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                                         .withNameInMetadata("John", "Doe")
                                         .withEmail("Johndoe@fake-email.com")
                                         .build();
+
+        context.restoreAuthSystemState();
 
         // login as a basic user
         String token = getAuthToken(eperson.getEmail(), password);
@@ -679,6 +716,8 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                                         .withNameInMetadata("John", "Doe")
                                         .withEmail("Johndoe@fake-email.com")
                                         .build();
+
+        context.restoreAuthSystemState();
 
         // Delete as anonymous user
         getClient().perform(delete("/api/eperson/epersons/" + ePerson.getID()))
@@ -718,6 +757,8 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
         // 3. Create an item that will prevent the deletation of the eperson account (it is the submitter)
         Item item = ItemBuilder.createItem(context, col).build();
 
+        context.restoreAuthSystemState();
+
         String token = getAuthToken(admin.getEmail(), password);
 
         // 422 error when trying to DELETE the eperson=submitter
@@ -738,6 +779,8 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                                         .withNameInMetadata("John", "Doe")
                                         .withEmail("Johndoe@fake-email.com")
                                         .build();
+
+        context.restoreAuthSystemState();
 
         List<Operation> ops = new ArrayList<Operation>();
         ReplaceOperation replaceOperation = new ReplaceOperation("/netid", "newNetId");
@@ -770,6 +813,8 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                                         .withEmail("Johndoe@fake-email.com")
                                         .build();
 
+        context.restoreAuthSystemState();
+
         List<Operation> ops = new ArrayList<Operation>();
         ReplaceOperation replaceOperation = new ReplaceOperation("/netid", "newNetId");
         ops.add(replaceOperation);
@@ -799,6 +844,8 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                                         .withNetId("testId")
                                         .build();
 
+        context.restoreAuthSystemState();
+
         List<Operation> ops = new ArrayList<Operation>();
         ReplaceOperation replaceOperation = new ReplaceOperation("/netid", "newNetId");
         ops.add(replaceOperation);
@@ -827,6 +874,8 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                                         .withEmail("Johndoe@fake-email.com")
                                         .withNetId("testId")
                                         .build();
+
+        context.restoreAuthSystemState();
 
         String token = getAuthToken(admin.getEmail(), password);
 
@@ -872,6 +921,8 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                                         .withEmail("Johndoe@fake-email.com")
                                         .build();
 
+        context.restoreAuthSystemState();
+
         List<Operation> ops = new ArrayList<Operation>();
         ReplaceOperation replaceOperation = new ReplaceOperation("/netid", "newNetId");
         ops.add(replaceOperation);
@@ -902,6 +953,8 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                                         .withEmail("Johndoe@fake-email.com")
                                         .withNetId("testId")
                                         .build();
+
+        context.restoreAuthSystemState();
 
         String newId = "newId";
 
@@ -951,6 +1004,8 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                                         .withEmail("Johndoe@fake-email.com")
                                         .build();
 
+        context.restoreAuthSystemState();
+
         List<Operation> ops = new ArrayList<Operation>();
         ReplaceOperation replaceOperation = new ReplaceOperation("/canLogin", true);
         ops.add(replaceOperation);
@@ -979,6 +1034,8 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                                         .withNameInMetadata("John", "Doe")
                                         .withEmail("Johndoe@fake-email.com")
                                         .build();
+
+        context.restoreAuthSystemState();
 
         String token = getAuthToken(admin.getEmail(), password);
 
@@ -1025,6 +1082,8 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                                         .withEmail("Johndoe@fake-email.com")
                                         .build();
 
+        context.restoreAuthSystemState();
+
         List<Operation> ops = new ArrayList<Operation>();
         // Boolean operations should accept either string or boolean as value. Try boolean.
         ReplaceOperation replaceOperation = new ReplaceOperation("/certificate", false);
@@ -1053,6 +1112,8 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                                         .withNameInMetadata("John", "Doe")
                                         .withEmail("Johndoe@fake-email.com")
                                         .build();
+
+        context.restoreAuthSystemState();
 
         String token = getAuthToken(admin.getEmail(), password);
 
@@ -1100,6 +1161,8 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                                         .withPassword(password)
                                         .build();
 
+        context.restoreAuthSystemState();
+
         String newPassword = "newpassword";
 
         List<Operation> ops = new ArrayList<Operation>();
@@ -1138,6 +1201,8 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                                           .withEmail("Janedoe@fake-email.com")
                                           .withPassword(password)
                                           .build();
+
+        context.restoreAuthSystemState();
 
         String newPassword = "newpassword";
 
@@ -1205,6 +1270,8 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                 .withNameInMetadata("John", "Doe")
                 .withEmail("Johndoe@fake-email.com")
                 .build();
+
+        context.restoreAuthSystemState();
 
         String newPassword = "newpassword";
 
@@ -1287,6 +1354,8 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                                         .withPassword("testpass79bC")
                                         .build();
 
+        context.restoreAuthSystemState();
+
         String token = getAuthToken(admin.getEmail(), password);
 
         String newPassword = "newpass";
@@ -1331,6 +1400,8 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                                         .withEmail("Johndoe@fake-email.com")
                                         .withPassword(password)
                                         .build();
+
+        context.restoreAuthSystemState();
 
         String newEmail = "janedoe@real-email.com";
 
@@ -1395,6 +1466,8 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                                         .withPassword(password)
                                         .build();
 
+        context.restoreAuthSystemState();
+
         String token = getAuthToken(admin.getEmail(), password);
 
         List<Operation> ops = new ArrayList<Operation>();
@@ -1425,6 +1498,8 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                                         .withEmail("Johndoe@fake-email.com")
                                         .withNetId("testId")
                                         .build();
+
+        context.restoreAuthSystemState();
 
         String token = getAuthToken(admin.getEmail(), password);
 
@@ -1457,6 +1532,8 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                                         .withNameInMetadata("John", "Doe")
                                         .withEmail("Johndoe@fake-email.com")
                                         .build();
+
+        context.restoreAuthSystemState();
 
         String token = getAuthToken(admin.getEmail(), password);
 
@@ -1575,6 +1652,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                                         .addMember(ePerson)
                                         .build();
 
+        context.restoreAuthSystemState();
 
         String authToken = getAuthToken(admin.getEmail(), password);
         getClient(authToken).perform(get("/api/eperson/epersons/" + ePerson.getID() + "/groups"))
