@@ -1120,13 +1120,8 @@ public class ItemImport
         String language = null;
 
         //DS-4493 protection against initialising as an empty string
-        if (!"".equals(getAttributeValue(n, "language"))){
-            language = getAttributeValue(n, "language");
-        }
-
-        if (language != null)
-        {
-            language = language.trim();
+        if (StringUtils.isNotBlank(getAttributeValue(n, "language"))){
+            language = getAttributeValue(n, "language").trim();
         }
 
         if (!isQuiet)
