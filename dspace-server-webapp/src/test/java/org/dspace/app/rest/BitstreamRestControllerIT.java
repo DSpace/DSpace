@@ -569,7 +569,7 @@ public class BitstreamRestControllerIT extends AbstractControllerIntegrationTest
             //An unauthorized request should not log statistics
             checkNumberOfStatsRecords(bitstream, 0);
 
-        }
+
     }
 
     @Test
