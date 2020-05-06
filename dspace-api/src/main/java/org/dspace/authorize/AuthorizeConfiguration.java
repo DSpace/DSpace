@@ -7,7 +7,8 @@
  */
 package org.dspace.authorize;
 
-import org.dspace.core.ConfigurationManager;
+import org.dspace.services.ConfigurationService;
+import org.dspace.utils.DSpace;
 
 /**
  * This class is responsible to provide access to the configuration of the
@@ -16,158 +17,10 @@ import org.dspace.core.ConfigurationManager;
  * @author bollini
  */
 public class AuthorizeConfiguration {
-
-    private static boolean can_communityAdmin_group = ConfigurationManager
-        .getBooleanProperty("core.authorization.community-admin.group",
-                            true);
-
-    // subcommunities and collections
-    private static boolean can_communityAdmin_createSubelement = ConfigurationManager
-        .getBooleanProperty(
-            "core.authorization.community-admin.create-subelement",
-            true);
-
-    private static boolean can_communityAdmin_deleteSubelement = ConfigurationManager
-        .getBooleanProperty(
-            "core.authorization.community-admin.delete-subelement",
-            true);
-
-    private static boolean can_communityAdmin_policies = ConfigurationManager
-        .getBooleanProperty("core.authorization.community-admin.policies",
-                            true);
-
-    private static boolean can_communityAdmin_adminGroup = ConfigurationManager
-        .getBooleanProperty(
-            "core.authorization.community-admin.admin-group", true);
-
-    private static boolean can_communityAdmin_collectionPolicies = ConfigurationManager
-        .getBooleanProperty(
-            "core.authorization.community-admin.collection.policies",
-            true);
-
-    private static boolean can_communityAdmin_collectionTemplateItem = ConfigurationManager
-        .getBooleanProperty(
-            "core.authorization.community-admin.collection.template-item",
-            true);
-
-    private static boolean can_communityAdmin_collectionSubmitters = ConfigurationManager
-        .getBooleanProperty(
-            "core.authorization.community-admin.collection.submitters",
-            true);
-
-    private static boolean can_communityAdmin_collectionWorkflows = ConfigurationManager
-        .getBooleanProperty(
-            "core.authorization.community-admin.collection.workflows",
-            true);
-
-    private static boolean can_communityAdmin_collectionAdminGroup = ConfigurationManager
-        .getBooleanProperty(
-            "core.authorization.community-admin.collection.admin-group",
-            true);
-
-    private static boolean can_communityAdmin_itemDelete = ConfigurationManager
-        .getBooleanProperty(
-            "core.authorization.community-admin.item.delete", true);
-
-    private static boolean can_communityAdmin_itemWithdraw = ConfigurationManager
-        .getBooleanProperty(
-            "core.authorization.community-admin.item.withdraw", true);
-
-    private static boolean can_communityAdmin_itemReinstatiate = ConfigurationManager
-        .getBooleanProperty(
-            "core.authorization.community-admin.item.reinstatiate",
-            true);
-
-    private static boolean can_communityAdmin_itemPolicies = ConfigurationManager
-        .getBooleanProperty(
-            "core.authorization.community-admin.item.policies", true);
-
-    // # also bundle
-    private static boolean can_communityAdmin_itemCreateBitstream = ConfigurationManager
-        .getBooleanProperty(
-            "core.authorization.community-admin.item.create-bitstream",
-            true);
-
-    private static boolean can_communityAdmin_itemDeleteBitstream = ConfigurationManager
-        .getBooleanProperty(
-            "core.authorization.community-admin.item.delete-bitstream",
-            true);
-
-    private static boolean can_communityAdmin_itemAdminccLicense = ConfigurationManager
-        .getBooleanProperty(
-            "core.authorization.community-admin.item-admin.cc-license",
-            true);
-
-    // # COLLECTION ADMIN
-    private static boolean can_collectionAdmin_policies = ConfigurationManager
-        .getBooleanProperty("core.authorization.collection-admin.policies",
-                            true);
-
-    private static boolean can_collectionAdmin_templateItem = ConfigurationManager
-        .getBooleanProperty(
-            "core.authorization.collection-admin.template-item", true);
-
-    private static boolean can_collectionAdmin_submitters = ConfigurationManager
-        .getBooleanProperty(
-            "core.authorization.collection-admin.submitters", true);
-
-    private static boolean can_collectionAdmin_workflows = ConfigurationManager
-        .getBooleanProperty(
-            "core.authorization.collection-admin.workflows", true);
-
-    private static boolean can_collectionAdmin_adminGroup = ConfigurationManager
-        .getBooleanProperty(
-            "core.authorization.collection-admin.admin-group", true);
-
-    private static boolean can_collectionAdmin_itemDelete = ConfigurationManager
-        .getBooleanProperty(
-            "core.authorization.collection-admin.item.delete", true);
-
-    private static boolean can_collectionAdmin_itemWithdraw = ConfigurationManager
-        .getBooleanProperty(
-            "core.authorization.collection-admin.item.withdraw", true);
-
-    private static boolean can_collectionAdmin_itemReinstatiate = ConfigurationManager
-        .getBooleanProperty(
-            "core.authorization.collection-admin.item.reinstatiate",
-            true);
-
-    private static boolean can_collectionAdmin_itemPolicies = ConfigurationManager
-        .getBooleanProperty(
-            "core.authorization.collection-admin.item.policies", true);
-
-    // # also bundle
-    private static boolean can_collectionAdmin_itemCreateBitstream = ConfigurationManager
-        .getBooleanProperty(
-            "core.authorization.collection-admin.item.create-bitstream",
-            true);
-
-    private static boolean can_collectionAdmin_itemDeleteBitstream = ConfigurationManager
-        .getBooleanProperty(
-            "core.authorization.collection-admin.item.delete-bitstream",
-            true);
-
-    private static boolean can_collectionAdmin_itemAdminccLicense = ConfigurationManager
-        .getBooleanProperty(
-            "core.authorization.collection-admin.item-admin.cc-license",
-            true);
-
-    // # ITEM ADMIN
-    private static boolean can_itemAdmin_policies = ConfigurationManager
-        .getBooleanProperty("core.authorization.item-admin.policies", true);
-
-    // # also bundle
-    private static boolean can_itemAdmin_createBitstream = ConfigurationManager
-        .getBooleanProperty(
-            "core.authorization.item-admin.create-bitstream", true);
-
-    private static boolean can_itemAdmin_deleteBitstream = ConfigurationManager
-        .getBooleanProperty(
-            "core.authorization.item-admin.delete-bitstream", true);
-
-    private static boolean can_itemAdmin_ccLicense = ConfigurationManager
-        .getBooleanProperty("core.authorization.item-admin.cc-license",
-                            true);
+    /**
+     * A static reference to the {@link ConfigurationService} see the init method for initialization
+     */
+    private static ConfigurationService configurationService;
 
     /**
      * Default constructor
@@ -175,13 +28,24 @@ public class AuthorizeConfiguration {
     private AuthorizeConfiguration() { }
 
     /**
+     * Complete the initialization of the class retrieving a reference to the {@link ConfigurationService}. MUST be
+     * called at the start of each method
+     */
+    private synchronized static void init() {
+        if (configurationService != null) {
+            return;
+        }
+        configurationService = new DSpace().getConfigurationService();
+    }
+    /**
      * Are community admins allowed to create new, not strictly community
      * related, group?
      *
      * @return true/false
      */
     public static boolean canCommunityAdminPerformGroupCreation() {
-        return can_communityAdmin_group;
+        init();
+        return configurationService.getBooleanProperty("core.authorization.community-admin.group", true);
     }
 
     /**
@@ -190,7 +54,8 @@ public class AuthorizeConfiguration {
      * @return true/false
      */
     public static boolean canCommunityAdminPerformSubelementCreation() {
-        return can_communityAdmin_createSubelement;
+        init();
+        return configurationService.getBooleanProperty("core.authorization.community-admin.create-subelement", true);
     }
 
     /**
@@ -199,7 +64,8 @@ public class AuthorizeConfiguration {
      * @return true/false
      */
     public static boolean canCommunityAdminPerformSubelementDeletion() {
-        return can_communityAdmin_deleteSubelement;
+        init();
+        return configurationService.getBooleanProperty("core.authorization.community-admin.delete-subelement", true);
     }
 
     /**
@@ -209,7 +75,8 @@ public class AuthorizeConfiguration {
      * @return true/false
      */
     public static boolean canCommunityAdminManagePolicies() {
-        return can_communityAdmin_policies;
+        init();
+        return configurationService.getBooleanProperty("core.authorization.community-admin.policies", true);
     }
 
     /**
@@ -219,7 +86,8 @@ public class AuthorizeConfiguration {
      * @return true/false
      */
     public static boolean canCommunityAdminManageAdminGroup() {
-        return can_communityAdmin_adminGroup;
+        init();
+        return configurationService.getBooleanProperty("core.authorization.community-admin.admin-group", true);
     }
 
     /**
@@ -229,7 +97,8 @@ public class AuthorizeConfiguration {
      * @return true/false
      */
     public static boolean canCommunityAdminManageCollectionPolicies() {
-        return can_communityAdmin_collectionPolicies;
+        init();
+        return configurationService.getBooleanProperty("core.authorization.community-admin.collection.policies", true);
     }
 
     /**
@@ -239,7 +108,9 @@ public class AuthorizeConfiguration {
      * @return true/false
      */
     public static boolean canCommunityAdminManageCollectionTemplateItem() {
-        return can_communityAdmin_collectionTemplateItem;
+        init();
+        return configurationService.getBooleanProperty("core.authorization.community-admin.collection.template-item",
+                true);
     }
 
     /**
@@ -249,7 +120,9 @@ public class AuthorizeConfiguration {
      * @return true/false
      */
     public static boolean canCommunityAdminManageCollectionSubmitters() {
-        return can_communityAdmin_collectionSubmitters;
+        init();
+        return configurationService.getBooleanProperty("core.authorization.community-admin.collection.submitters",
+                true);
     }
 
     /**
@@ -259,7 +132,8 @@ public class AuthorizeConfiguration {
      * @return true/false
      */
     public static boolean canCommunityAdminManageCollectionWorkflows() {
-        return can_communityAdmin_collectionWorkflows;
+        init();
+        return configurationService.getBooleanProperty("core.authorization.community-admin.collection.workflows", true);
     }
 
     /**
@@ -269,7 +143,9 @@ public class AuthorizeConfiguration {
      * @return true/false
      */
     public static boolean canCommunityAdminManageCollectionAdminGroup() {
-        return can_communityAdmin_collectionAdminGroup;
+        init();
+        return configurationService.getBooleanProperty("core.authorization.community-admin.collection.admin-group",
+                true);
     }
 
     /**
@@ -278,7 +154,8 @@ public class AuthorizeConfiguration {
      * @return true/false
      */
     public static boolean canCommunityAdminPerformItemDeletion() {
-        return can_communityAdmin_itemDelete;
+        init();
+        return configurationService.getBooleanProperty("core.authorization.community-admin.item.delete", true);
     }
 
     /**
@@ -287,7 +164,8 @@ public class AuthorizeConfiguration {
      * @return true/false
      */
     public static boolean canCommunityAdminPerformItemWithdrawn() {
-        return can_communityAdmin_itemWithdraw;
+        init();
+        return configurationService.getBooleanProperty("core.authorization.community-admin.item.withdraw", true);
     }
 
     /**
@@ -297,7 +175,8 @@ public class AuthorizeConfiguration {
      * @return true/false
      */
     public static boolean canCommunityAdminPerformItemReinstatiate() {
-        return can_communityAdmin_itemReinstatiate;
+        init();
+        return configurationService.getBooleanProperty("core.authorization.community-admin.item.reinstatiate", true);
     }
 
     /**
@@ -307,7 +186,8 @@ public class AuthorizeConfiguration {
      * @return true/false
      */
     public static boolean canCommunityAdminManageItemPolicies() {
-        return can_communityAdmin_itemPolicies;
+        init();
+        return configurationService.getBooleanProperty("core.authorization.community-admin.item.policies", true);
     }
 
     /**
@@ -317,7 +197,9 @@ public class AuthorizeConfiguration {
      * @return true/false
      */
     public static boolean canCommunityAdminPerformBitstreamCreation() {
-        return can_communityAdmin_itemCreateBitstream;
+        init();
+        return configurationService.getBooleanProperty("core.authorization.community-admin.item.create-bitstream",
+                true);
     }
 
     /**
@@ -327,7 +209,9 @@ public class AuthorizeConfiguration {
      * @return true/false
      */
     public static boolean canCommunityAdminPerformBitstreamDeletion() {
-        return can_communityAdmin_itemDeleteBitstream;
+        init();
+        return configurationService.getBooleanProperty("core.authorization.community-admin.item.delete-bitstream",
+                true);
     }
 
     /**
@@ -337,7 +221,9 @@ public class AuthorizeConfiguration {
      * @return true/false
      */
     public static boolean canCommunityAdminManageCCLicense() {
-        return can_communityAdmin_itemAdminccLicense;
+        init();
+        return configurationService.getBooleanProperty("core.authorization.community-admin.item-admin.cc-license",
+                true);
     }
 
     /**
@@ -346,7 +232,8 @@ public class AuthorizeConfiguration {
      * @return true/false
      */
     public static boolean canCollectionAdminManagePolicies() {
-        return can_collectionAdmin_policies;
+        init();
+        return configurationService.getBooleanProperty("core.authorization.collection-admin.policies", true);
     }
 
     /**
@@ -356,7 +243,8 @@ public class AuthorizeConfiguration {
      * @return true/false
      */
     public static boolean canCollectionAdminManageTemplateItem() {
-        return can_collectionAdmin_templateItem;
+        init();
+        return configurationService.getBooleanProperty("core.authorization.collection-admin.template-item", true);
     }
 
     /**
@@ -366,7 +254,8 @@ public class AuthorizeConfiguration {
      * @return true/false
      */
     public static boolean canCollectionAdminManageSubmitters() {
-        return can_collectionAdmin_submitters;
+        init();
+        return configurationService.getBooleanProperty("core.authorization.collection-admin.submitters", true);
     }
 
     /**
@@ -376,7 +265,8 @@ public class AuthorizeConfiguration {
      * @return true/false
      */
     public static boolean canCollectionAdminManageWorkflows() {
-        return can_collectionAdmin_workflows;
+        init();
+        return configurationService.getBooleanProperty("core.authorization.collection-admin.workflows", true);
     }
 
     /**
@@ -386,7 +276,8 @@ public class AuthorizeConfiguration {
      * @return true/false
      */
     public static boolean canCollectionAdminManageAdminGroup() {
-        return can_collectionAdmin_adminGroup;
+        init();
+        return configurationService.getBooleanProperty("core.authorization.collection-admin.admin-group", true);
     }
 
     /**
@@ -395,7 +286,8 @@ public class AuthorizeConfiguration {
      * @return true/false
      */
     public static boolean canCollectionAdminPerformItemDeletion() {
-        return can_collectionAdmin_itemDelete;
+        init();
+        return configurationService.getBooleanProperty("core.authorization.collection-admin.item.delete", true);
     }
 
     /**
@@ -404,7 +296,8 @@ public class AuthorizeConfiguration {
      * @return true/false
      */
     public static boolean canCollectionAdminPerformItemWithdrawn() {
-        return can_collectionAdmin_itemWithdraw;
+        init();
+        return configurationService.getBooleanProperty("core.authorization.collection-admin.item.withdraw", true);
     }
 
     /**
@@ -414,7 +307,8 @@ public class AuthorizeConfiguration {
      * @return true/false
      */
     public static boolean canCollectionAdminPerformItemReinstatiate() {
-        return can_collectionAdmin_itemReinstatiate;
+        init();
+        return configurationService.getBooleanProperty("core.authorization.collection-admin.item.reinstatiate", true);
     }
 
     /**
@@ -424,7 +318,8 @@ public class AuthorizeConfiguration {
      * @return true/false
      */
     public static boolean canCollectionAdminManageItemPolicies() {
-        return can_collectionAdmin_itemPolicies;
+        init();
+        return configurationService.getBooleanProperty("core.authorization.collection-admin.item.policies", true);
     }
 
     /**
@@ -434,7 +329,9 @@ public class AuthorizeConfiguration {
      * @return true/false
      */
     public static boolean canCollectionAdminPerformBitstreamCreation() {
-        return can_collectionAdmin_itemCreateBitstream;
+        init();
+        return configurationService.getBooleanProperty("core.authorization.collection-admin.item.create-bitstream",
+                true);
     }
 
     /**
@@ -444,7 +341,9 @@ public class AuthorizeConfiguration {
      * @return true/false
      */
     public static boolean canCollectionAdminPerformBitstreamDeletion() {
-        return can_collectionAdmin_itemDeleteBitstream;
+        init();
+        return configurationService.getBooleanProperty("core.authorization.collection-admin.item.delete-bitstream",
+                true);
     }
 
     /**
@@ -454,7 +353,9 @@ public class AuthorizeConfiguration {
      * @return true/false
      */
     public static boolean canCollectionAdminManageCCLicense() {
-        return can_collectionAdmin_itemAdminccLicense;
+        init();
+        return configurationService.getBooleanProperty("core.authorization.collection-admin.item-admin.cc-license",
+                true);
     }
 
     /**
@@ -463,7 +364,8 @@ public class AuthorizeConfiguration {
      * @return true/false
      */
     public static boolean canItemAdminManagePolicies() {
-        return can_itemAdmin_policies;
+        init();
+        return configurationService.getBooleanProperty("core.authorization.item-admin.policies", true);
     }
 
     /**
@@ -472,7 +374,8 @@ public class AuthorizeConfiguration {
      * @return true/false
      */
     public static boolean canItemAdminPerformBitstreamCreation() {
-        return can_itemAdmin_createBitstream;
+        init();
+        return configurationService.getBooleanProperty("core.authorization.item-admin.create-bitstream", true);
     }
 
     /**
@@ -481,7 +384,8 @@ public class AuthorizeConfiguration {
      * @return true/false
      */
     public static boolean canItemAdminPerformBitstreamDeletion() {
-        return can_itemAdmin_deleteBitstream;
+        init();
+        return configurationService.getBooleanProperty("core.authorization.item-admin.delete-bitstream", true);
     }
 
     /**
@@ -490,7 +394,8 @@ public class AuthorizeConfiguration {
      * @return true/false
      */
     public static boolean canItemAdminManageCCLicense() {
-        return can_itemAdmin_ccLicense;
+        init();
+        return configurationService.getBooleanProperty("core.authorization.item-admin.cc-license", true);
     }
 
 }

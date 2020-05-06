@@ -32,8 +32,8 @@ import org.springframework.core.type.filter.AssignableTypeFilter;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.Link;
-import org.springframework.hateoas.Resource;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
@@ -286,7 +286,7 @@ public class ConverterService {
         // scan all resource classes and look for compatible rest classes (by naming convention),
         // creating a map of resource constructors keyed by rest class, for later use.
         ClassPathScanningCandidateComponentProvider provider = new ClassPathScanningCandidateComponentProvider(false);
-        provider.addIncludeFilter(new AssignableTypeFilter(Resource.class));
+        provider.addIncludeFilter(new AssignableTypeFilter(EntityModel.class));
         Set<BeanDefinition> beanDefinitions = provider.findCandidateComponents(
                 HALResource.class.getPackage().getName().replaceAll("\\.", "/"));
         for (BeanDefinition beanDefinition : beanDefinitions) {

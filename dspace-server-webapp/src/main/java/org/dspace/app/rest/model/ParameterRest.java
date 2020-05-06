@@ -30,7 +30,10 @@ public class ParameterRest {
      */
     private boolean mandatory;
 
-
+    /**
+     * The long name of the parameter
+     */
+    private String nameLong;
 
     public String getName() {
         return name;
@@ -54,6 +57,22 @@ public class ParameterRest {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    /**
+     * Generic getter for the nameLong
+     * @return the nameLong value of this ParameterRest
+     */
+    public String getNameLong() {
+        return nameLong;
+    }
+
+    /**
+     * Generic setter for the nameLong
+     * @param nameLong   The nameLong to be set on this ParameterRest
+     */
+    public void setNameLong(String nameLong) {
+        this.nameLong = nameLong;
     }
 
     /**

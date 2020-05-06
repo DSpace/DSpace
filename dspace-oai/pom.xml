@@ -8,7 +8,7 @@
     <parent>
         <artifactId>dspace-parent</artifactId>
         <groupId>org.dspace</groupId>
-        <version>7.0-SNAPSHOT</version>
+        <version>7.0-beta3-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
 
@@ -142,17 +142,20 @@
                     <groupId>org.springframework.boot</groupId>
                     <artifactId>spring-boot-starter-web</artifactId>
                 </exclusion>
-                <!-- More recent version is pulled in via solr-core -->
+                <!-- More recent version is pulled in via below dependencies -->
                 <exclusion>
-                    <groupId>org.ow2.asm</groupId>
-                    <artifactId>asm</artifactId>
-                </exclusion>
-                <!-- This exclusion may be removable once we update to Spring Boot v2 -->
-                <exclusion>
-                    <groupId>org.springframework.boot</groupId>
-                    <artifactId>spring-boot-configuration-processor</artifactId>
+                    <groupId>org.parboiled</groupId>
+                    <artifactId>parboiled-java</artifactId>
                 </exclusion>
             </exclusions>
+        </dependency>
+
+        <!-- Newer version, necessary to align with newer version of ASM in parent POM
+             This is needed by both jtwig-spring-boot-starter and our tests. -->
+        <dependency>
+            <groupId>org.parboiled</groupId>
+            <artifactId>parboiled-java</artifactId>
+            <version>1.3.1</version>
         </dependency>
 
         <!-- Internal -->
@@ -190,10 +193,10 @@
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-core</artifactId>
         </dependency>
-	<dependency>
+        <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-web</artifactId>
-	</dependency>
+        </dependency>
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-slf4j-impl</artifactId>
@@ -256,12 +259,6 @@
             <groupId>org.springframework</groupId>
             <artifactId>spring-test</artifactId>
             <version>${spring.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.parboiled</groupId>
-            <artifactId>parboiled-core</artifactId>
-            <version>1.1.7</version>
             <scope>test</scope>
         </dependency>
         <dependency>

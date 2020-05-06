@@ -3436,8 +3436,22 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
             .andExpect(status().isNoContent());
 
         context.restoreAuthSystemState();
+
+        // summary of the structure, we have:
+        //  a simple collection
+        //  a second collection with 2 workflow steps that have 1 reviewer each (reviewer1 and reviewer2)
+        //  3 public items
+        //  2 workspace items submitted by a regular submitter
+        //  2 workspace items submitted by the admin
+        //  4 workflow items:
+        //   1 pool task in step 1, submitted by the same regular submitter
+        //   1 pool task in step 1, submitted by the admin
+        //   1 claimed task in the first workflow step from the repository admin
+        //   1 pool task task in step 2, from the repository admin
+        //    (This one is created by creating a claimed task for step 1 and approving it)
+
         //** WHEN **
-        // the submitter should not see anything in the workfow configuration
+        // the submitter should not see anything in the workflow configuration
         getClient(epersonToken).perform(get("/api/discover/search/objects").param("configuration", "workflow"))
                 //** THEN **
                 //The status has to be 200 OK
@@ -3453,8 +3467,8 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 .andExpect(jsonPath("$._links.self.href", containsString("/api/discover/search/objects")))
         ;
 
-        // reviewer1 should see two pool items one from the submitter and one from the administrator
-        // the other task in step1 is claimed by the adminstrator so it should be not visible to the reviewer1
+        // reviewer1 should see two pool items, one from the submitter and one from the administrator
+        // the other task in step1 is claimed by the administrator so it should be not visible to the reviewer1
         getClient(reviewer1Token).perform(get("/api/discover/search/objects").param("configuration", "workflow"))
                 //** THEN **
                 //The status has to be 200 OK
@@ -3466,10 +3480,12 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 .andExpect(jsonPath("$._embedded.searchResult.page", is(
                         PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 2)
                 )))
-                // These search results have to be shown in the embedded.objects section two workspaceitems and one
-                // worfklowitem submitted by the admin user as by the structure defined above. Please note that the
-                // claimedTask should be not visible here as this is the workspace configuration
-                //Seeing as everything fits onto one page, they have to all be present
+                // These search results have to be shown in the embedded.objects section:
+                // two workflow items, one submitted by the user and one submitted by the admin.
+                // The claimed task of the administrator and the pool task for step 2 should not be visible to
+                // reviewer1.
+                // Please note that the workspace items should not be visible here either.
+                // Seeing as everything fits onto one page, they have to all be present
                 .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.containsInAnyOrder(
                         Matchers.allOf(
                                 SearchResultMatcher.match("workflow", "pooltask", "pooltasks"),
@@ -3496,8 +3512,9 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 .andExpect(jsonPath("$._links.self.href", containsString("/api/discover/search/objects")))
         ;
 
-        // admin should see two pool items one from the submitter and one from herself
-        // and a claimed task
+        // admin should see two pool items and a claimed task,
+        // one pool item from the submitter and one from herself
+        // because the admin is in the reviewer group for step 1, not because she is an admin
         getClient(adminToken).perform(get("/api/discover/search/objects").param("configuration", "workflow"))
                 //** THEN **
                 //The status has to be 200 OK
@@ -3509,9 +3526,9 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 .andExpect(jsonPath("$._embedded.searchResult.page", is(
                         PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 3)
                 )))
-                // These search results have to be shown in the embedded.objects section two workspaceitems and one
-                // worfklowitem submitted by the admin user as by the structure defined above. Please note that the
-                // claimedTask should be not visible here as this is the workspace configuration
+                // These search results have to be shown in the embedded.objects section:
+                // two workflow items and one claimed task.
+                // For step 1 one submitted by the user and one submitted by the admin and none for step 2.
                 //Seeing as everything fits onto one page, they have to all be present
                 .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.containsInAnyOrder(
                         Matchers.allOf(
@@ -3545,8 +3562,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 .andExpect(jsonPath("$._links.self.href", containsString("/api/discover/search/objects")))
         ;
 
-        // admin should see two pool items one from the submitter and one from herself
-        // and a claimed task
+        // reviewer2 should only see one pool item
         getClient(reviewer2Token).perform(get("/api/discover/search/objects").param("configuration", "workflow"))
                 //** THEN **
                 //The status has to be 200 OK
@@ -3558,10 +3574,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 .andExpect(jsonPath("$._embedded.searchResult.page", is(
                         PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 1)
                 )))
-                // These search results have to be shown in the embedded.objects section two workspaceitems and one
-                // worfklowitem submitted by the admin user as by the structure defined above. Please note that the
-                // claimedTask should be not visible here as this is the workspace configuration
-                //Seeing as everything fits onto one page, they have to all be present
+                // These search results have to be shown in the embedded.objects section
                 .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.containsInAnyOrder(
                         Matchers.allOf(
                                 SearchResultMatcher.match("workflow", "pooltask", "pooltasks"),
@@ -3577,6 +3590,236 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                         FacetEntryMatcher.typeFacet(false),
                         FacetEntryMatcher.dateIssuedFacet(false),
                         FacetEntryMatcher.submitterFacet(false)
+                )))
+                //There always needs to be a self link
+                .andExpect(jsonPath("$._links.self.href", containsString("/api/discover/search/objects")))
+        ;
+
+    }
+
+
+    @Test
+    /**
+     * This test is intent to verify that tasks are only visible to the appropriate users (reviewers)
+     *
+     * @throws Exception
+     */
+    public void discoverSearchObjectsWorkflowAdminConfigurationTest() throws Exception {
+
+        //We turn off the authorization system in order to create the structure defined below
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        // 1. Two reviewers
+        EPerson reviewer1 = EPersonBuilder.createEPerson(context).withEmail("reviewer1@example.com")
+                .withPassword(password).build();
+        EPerson reviewer2 = EPersonBuilder.createEPerson(context).withEmail("reviewer2@example.com")
+                .withPassword(password).build();
+
+        // 2. A community-collection structure with one parent community with sub-community and two collections.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                .withName("Parent Community")
+                .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                .withName("Sub Community")
+                .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1)
+                                .withName("Collection 1")
+                                .build();
+        // the second collection has two workflow steps active
+        Collection col2 = CollectionBuilder.createCollection(context, child1)
+                                .withName("Collection 2")
+                                .withWorkflowGroup(1, admin, reviewer1)
+                                .withWorkflowGroup(2, reviewer2)
+                                .build();
+
+        // 2. Three public items that are readable by Anonymous with different subjects
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
+                .withTitle("Test")
+                .withIssueDate("2010-10-17")
+                .withAuthor("Smith, Donald").withAuthor("Testing, Works")
+                .withSubject("ExtraEntry")
+                .build();
+
+        Item publicItem2 = ItemBuilder.createItem(context, col2)
+                .withTitle("Test 2")
+                .withIssueDate("1990-02-13")
+                .withAuthor("Smith, Maria").withAuthor("Doe, Jane").withAuthor("Testing, Works")
+                .withSubject("TestingForMore").withSubject("ExtraEntry")
+                .build();
+
+        Item publicItem3 = ItemBuilder.createItem(context, col2)
+                .withTitle("Public item 2")
+                .withIssueDate("2010-02-13")
+                .withAuthor("Smith, Maria").withAuthor("Doe, Jane").withAuthor("test,test")
+                .withAuthor("test2, test2").withAuthor("Maybe, Maybe")
+                .withSubject("AnotherTest").withSubject("TestingForMore")
+                .withSubject("ExtraEntry")
+                .build();
+
+        //3. three inprogress submission from a normal user (2 ws, 1 wf that will produce also a pooltask)
+        context.setCurrentUser(eperson);
+        WorkspaceItem wsItem1 = WorkspaceItemBuilder.createWorkspaceItem(context, col1).withTitle("Workspace Item 1")
+                .withIssueDate("2010-07-23")
+                .build();
+
+        WorkspaceItem wsItem2 = WorkspaceItemBuilder.createWorkspaceItem(context, col2).withTitle("Workspace Item 2")
+                .withIssueDate("2010-11-03")
+                .build();
+
+        XmlWorkflowItem wfItem1 = WorkflowItemBuilder.createWorkflowItem(context, col2).withTitle("Workflow Item 1")
+                .withIssueDate("2010-11-03")
+                .build();
+
+        // 4. a claimed task from the administrator
+        ClaimedTask cTask = ClaimedTaskBuilder.createClaimedTask(context, col2, admin).withTitle("Claimed Item")
+                .withIssueDate("2010-11-03")
+                .build();
+
+        // 5. other inprogress submissions made by the administrator
+        context.setCurrentUser(admin);
+        WorkspaceItem wsItem1Admin = WorkspaceItemBuilder.createWorkspaceItem(context, col1)
+                .withIssueDate("2010-07-23")
+                .withTitle("Admin Workspace Item 1").build();
+
+        WorkspaceItem wsItem2Admin = WorkspaceItemBuilder.createWorkspaceItem(context, col2)
+                .withIssueDate("2010-11-03")
+                .withTitle("Admin Workspace Item 2").build();
+
+        XmlWorkflowItem wfItem1Admin = WorkflowItemBuilder.createWorkflowItem(context, col2)
+                .withIssueDate("2010-11-03")
+                .withTitle("Admin Workflow Item 1").build();
+
+        // 6. a pool taks in the second step of the workflow
+        ClaimedTask cTask2 = ClaimedTaskBuilder.createClaimedTask(context, col2, admin).withTitle("Pool Step2 Item")
+                .withIssueDate("2010-11-04")
+                .build();
+
+        String epersonToken = getAuthToken(eperson.getEmail(), password);
+        String adminToken = getAuthToken(admin.getEmail(), password);
+        String reviewer1Token = getAuthToken(reviewer1.getEmail(), password);
+        String reviewer2Token = getAuthToken(reviewer2.getEmail(), password);
+
+        getClient(adminToken).perform(post("/api/workflow/claimedtasks/" + cTask2.getID())
+                .param("submit_approve", "true")
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED))
+            .andExpect(status().isNoContent());
+
+        context.restoreAuthSystemState();
+
+        // summary of the structure, we have:
+        //  a simple collection
+        //  a second collection with 2 workflow steps that have 1 reviewer each (reviewer1 and reviewer2)
+        //  3 public items
+        //  2 workspace items submitted by a regular submitter
+        //  2 workspace items submitted by the admin
+        //  4 workflow items:
+        //   1 pool task in step 1, submitted by the same regular submitter
+        //   1 pool task in step 1, submitted by the admin
+        //   1 claimed task in the first workflow step from the repository admin
+        //   1 pool task task in step 2, from the repository admin
+        //    (This one is created by creating a claimed task for step 1 and approving it)
+
+        //** WHEN **
+        // the submitter should not see anything in the workflow configuration
+        getClient(epersonToken).perform(get("/api/discover/search/objects").param("configuration", "workflowAdmin"))
+                //** THEN **
+                //The status has to be 200 OK
+                .andExpect(status().isOk())
+                //The type has to be 'discover'
+                .andExpect(jsonPath("$.type", is("discover")))
+                //There needs to be a page object that shows the total pages and total elements as well as the
+                // size and the current page (number)
+                .andExpect(jsonPath("$._embedded.searchResult.page", is(
+                        PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 0, 0)
+                )))
+                //There always needs to be a self link
+                .andExpect(jsonPath("$._links.self.href", containsString("/api/discover/search/objects")))
+        ;
+
+        // reviewer1 should not see pool items, as he is not an administrator
+        getClient(reviewer1Token).perform(get("/api/discover/search/objects").param("configuration", "workflowAdmin"))
+                //** THEN **
+                //The status has to be 200 OK
+                .andExpect(status().isOk())
+                //The type has to be 'discover'
+                .andExpect(jsonPath("$.type", is("discover")))
+                //There needs to be a page object that shows the total pages and total elements as well as the
+                // size and the current page (number)
+                .andExpect(jsonPath("$._embedded.searchResult.page", is(
+                        PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 0, 0)
+                )))
+                //There always needs to be a self link
+                .andExpect(jsonPath("$._links.self.href", containsString("/api/discover/search/objects")))
+        ;
+
+
+        // admin should see three pool items and a claimed task
+        // one pool item from the submitter and two from herself
+        getClient(adminToken).perform(get("/api/discover/search/objects").param("configuration", "workflowAdmin"))
+                //** THEN **
+                //The status has to be 200 OK
+                .andExpect(status().isOk())
+                //The type has to be 'discover'
+                .andExpect(jsonPath("$.type", is("discover")))
+                //There needs to be a page object that shows the total pages and total elements as well as the
+                // size and the current page (number)
+                .andExpect(jsonPath("$._embedded.searchResult.page", is(
+                        PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 4)
+                )))
+                // These search results have to be shown in the embedded.objects section:
+                // three workflow items and one claimed task.
+                // For step 1 one submitted by the user and one submitted by the admin and one for step 2.
+                //Seeing as everything fits onto one page, they have to all be present
+                .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.containsInAnyOrder(
+                        Matchers.allOf(
+                                SearchResultMatcher.match("workflow", "workflowitem", "workflowitems"),
+                                JsonPathMatchers.hasJsonPath("$._embedded.indexableObject",
+                                        is(WorkflowItemMatcher.matchItemWithTitleAndDateIssued(
+                                                null, "Workflow Item 1", "2010-11-03")))
+                                ),
+                        Matchers.allOf(
+                                SearchResultMatcher.match("workflow", "workflowitem", "workflowitems"),
+                                JsonPathMatchers.hasJsonPath("$._embedded.indexableObject",
+                                        is(WorkflowItemMatcher.matchItemWithTitleAndDateIssued(
+                                                null, "Admin Workflow Item 1", "2010-11-03")))
+                                ),
+                        Matchers.allOf(
+                                SearchResultMatcher.match("workflow", "workflowitem", "workflowitems"),
+                                JsonPathMatchers.hasJsonPath("$._embedded.indexableObject",
+                                        is(WorkflowItemMatcher.matchItemWithTitleAndDateIssued(
+                                                null, "Pool Step2 Item", "2010-11-04")))
+                                ),
+                        Matchers.allOf(
+                                SearchResultMatcher.match("workflow", "workflowitem", "workflowitems"),
+                                JsonPathMatchers.hasJsonPath("$._embedded.indexableObject",
+                                        is(WorkflowItemMatcher.matchItemWithTitleAndDateIssued(
+                                                null, "Claimed Item", "2010-11-03")))
+                                )
+                )))
+                //These facets have to show up in the embedded.facets section as well with the given hasMore
+                // property because we don't exceed their default limit for a hasMore true (the default is 10)
+                .andExpect(jsonPath("$._embedded.facets", Matchers.containsInAnyOrder(
+                        FacetEntryMatcher.resourceTypeFacet(false),
+                        FacetEntryMatcher.typeFacet(false),
+                        FacetEntryMatcher.dateIssuedFacet(false),
+                        FacetEntryMatcher.submitterFacet(false)
+                )))
+                //There always needs to be a self link
+                .andExpect(jsonPath("$._links.self.href", containsString("/api/discover/search/objects")))
+        ;
+
+        // reviewer2 should not see pool items, as he is not an administrator
+        getClient(reviewer2Token).perform(get("/api/discover/search/objects").param("configuration", "workflowAdmin"))
+                //** THEN **
+                //The status has to be 200 OK
+                .andExpect(status().isOk())
+                //The type has to be 'discover'
+                .andExpect(jsonPath("$.type", is("discover")))
+                //There needs to be a page object that shows the total pages and total elements as well as the
+                // size and the current page (number)
+                .andExpect(jsonPath("$._embedded.searchResult.page", is(
+                        PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 0, 0)
                 )))
                 //There always needs to be a self link
                 .andExpect(jsonPath("$._links.self.href", containsString("/api/discover/search/objects")))

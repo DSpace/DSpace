@@ -59,6 +59,11 @@ public class Context implements AutoCloseable {
     private EPerson currentUser;
 
     /**
+     * Temporary store when the current user is temporary switched
+     */
+    private EPerson currentUserPreviousState;
+
+    /**
      * Current Locale
      */
     private Locale currentLocale;
@@ -88,6 +93,11 @@ public class Context implements AutoCloseable {
      * Group IDs of special groups user is a member of
      */
     private List<UUID> specialGroups;
+
+    /**
+     * Temporary store for the specialGroups when the current user is temporary switched
+     */
+    private List<UUID> specialGroupsPreviousState;
 
     /**
      * Content events
@@ -626,6 +636,42 @@ public class Context implements AutoCloseable {
         }
 
         return myGroups;
+    }
+
+    /**
+     * Temporary change the user bound to the context, empty the special groups that
+     * are retained to allow subsequent restore
+     * 
+     * @param newUser the EPerson to bound to the context
+     * 
+     * @throws IllegalStateException if the switch was already performed without be
+     *                               restored
+     */
+    public void switchContextUser(EPerson newUser) {
+        if (currentUserPreviousState != null) {
+            throw new IllegalStateException(
+                    "A previous user is already set, you can only switch back and foreward one time");
+        }
+
+        currentUserPreviousState = currentUser;
+        specialGroupsPreviousState = specialGroups;
+        specialGroups = new ArrayList<UUID>();
+        currentUser = newUser;
+    }
+
+    /**
+     * Restore the user bound to the context and his special groups
+     * 
+     * @throws IllegalStateException if no switch was performed before
+     */
+    public void restoreContextUser() {
+        if (specialGroupsPreviousState == null) {
+            throw new IllegalStateException("No previous state found");
+        }
+        currentUser = currentUserPreviousState;
+        specialGroups = specialGroupsPreviousState;
+        specialGroupsPreviousState = null;
+        currentUserPreviousState = null;
     }
 
     /**
