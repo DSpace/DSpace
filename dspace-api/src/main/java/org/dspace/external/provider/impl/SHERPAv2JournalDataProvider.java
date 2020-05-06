@@ -10,6 +10,7 @@ package org.dspace.external.provider.impl;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -140,7 +141,7 @@ public class SHERPAv2JournalDataProvider implements ExternalDataProvider {
             ExternalDataObject externalDataObject = constructExternalDataObjectFromSherpaJournal(sherpaJournal);
             return Optional.of(externalDataObject);
         }
-        return null;
+        return Optional.empty();
     }
 
     /**
@@ -218,7 +219,7 @@ public class SHERPAv2JournalDataProvider implements ExternalDataProvider {
                 get.releaseConnection();
             }
         }
-        return null;
+        return Collections.emptyList();
     }
 
     /**
