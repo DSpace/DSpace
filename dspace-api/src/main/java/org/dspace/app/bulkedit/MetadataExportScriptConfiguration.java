@@ -45,7 +45,7 @@ public class MetadataExportScriptConfiguration<T extends MetadataExport> extends
         try {
             return authorizeService.isAdmin(context);
         } catch (SQLException e) {
-            throw new RuntimeException("SQLException occured", e);
+            throw new RuntimeException("SQLException occurred when checking if the current user is an admin", e);
         }
     }
 

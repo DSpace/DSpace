@@ -44,7 +44,7 @@ public class MockDSpaceRunnableScriptConfiguration<T extends MockDSpaceRunnableS
         try {
             return authorizeService.isAdmin(context);
         } catch (SQLException e) {
-            throw new RuntimeException("SQLException occurred", e);
+            throw new RuntimeException("SQLException occurred when checking if the current user is an admin", e);
         }
     }
 
