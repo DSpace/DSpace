@@ -238,6 +238,7 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
                                   .withName(testGroupName)
                                   .build();
 
+        context.restoreAuthSystemState();
         String token = getAuthToken(admin.getEmail(), password);
 
         // When full projection is requested, response should include expected properties, links, and embeds.
@@ -280,6 +281,8 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
                                    .withName("Group2")
                                    .addMember(eperson)
                                    .build();
+
+        context.restoreAuthSystemState();
 
         //Admin can access
         String token = getAuthToken(admin.getEmail(), password);
@@ -341,6 +344,8 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
                                   .withName(testGroupName)
                                   .build();
 
+        context.restoreAuthSystemState();
+
         String generatedGroupId = group.getID().toString();
         String groupIdCall = "/api/eperson/groups/" + UUID.randomUUID();
         getClient().perform(get(groupIdCall))
@@ -382,6 +387,7 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
                                    .build();
 
 
+        context.restoreAuthSystemState();
         String authToken = getAuthToken(admin.getEmail(), password);
         getClient(authToken).perform(get("/api/eperson/groups/search/byMetadata")
                                              .param("query", group1.getName()))
@@ -571,6 +577,7 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
             childGroup1 = context.reloadEntity(childGroup1);
             childGroup2 = context.reloadEntity(childGroup2);
 
+            context.restoreAuthSystemState();
             String authToken = getAuthToken(admin.getEmail(), password);
             getClient(authToken).perform(
                     post("/api/eperson/groups/" + parentGroup.getID() + "/subgroups")
@@ -634,6 +641,7 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
             childGroup1 = context.reloadEntity(childGroup1);
             childGroup2 = context.reloadEntity(childGroup2);
 
+            context.restoreAuthSystemState();
             String authToken = getAuthToken(eperson.getEmail(), password);
             getClient(authToken).perform(
                     post("/api/eperson/groups/" + parentGroup.getID() + "/subgroups")
@@ -693,6 +701,7 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
             childGroup1 = context.reloadEntity(childGroup1);
             childGroup2 = context.reloadEntity(childGroup2);
 
+            context.restoreAuthSystemState();
             String authToken = getAuthToken(eperson.getEmail(), password);
             getClient(authToken).perform(
                     post("/api/eperson/groups/" + parentGroup.getID() + "/subgroups")
@@ -737,6 +746,7 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
             childGroup1 = context.reloadEntity(childGroup1);
             childGroup2 = context.reloadEntity(childGroup2);
 
+            context.restoreAuthSystemState();
             getClient().perform(
                     post("/api/eperson/groups/" + parentGroup.getID() + "/subgroups")
                             .contentType(parseMediaType(TEXT_URI_LIST_VALUE))
@@ -780,6 +790,7 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
             childGroup1 = context.reloadEntity(childGroup1);
             childGroup2 = context.reloadEntity(childGroup2);
 
+            context.restoreAuthSystemState();
             String authToken = getAuthToken(admin.getEmail(), password);
             getClient(authToken).perform(
                     post("/api/eperson/groups/" + UUID.randomUUID() + "/subgroups")
@@ -827,6 +838,7 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
             childGroup1 = context.reloadEntity(childGroup1);
             childGroup2 = context.reloadEntity(childGroup2);
 
+            context.restoreAuthSystemState();
             String authToken = getAuthToken(admin.getEmail(), password);
 
             getClient(authToken).perform(
@@ -881,6 +893,7 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
             member1 = context.reloadEntity(member1);
             member2 = context.reloadEntity(member2);
 
+            context.restoreAuthSystemState();
             String authToken = getAuthToken(admin.getEmail(), password);
             getClient(authToken).perform(
                     post("/api/eperson/groups/" + parentGroup.getID() + "/epersons")
@@ -944,6 +957,7 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
             member1 = context.reloadEntity(member1);
             member2 = context.reloadEntity(member2);
 
+            context.restoreAuthSystemState();
             String authToken = getAuthToken(eperson.getEmail(), password);
             getClient(authToken).perform(
                     post("/api/eperson/groups/" + parentGroup.getID() + "/epersons")
@@ -1004,6 +1018,7 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
             member1 = context.reloadEntity(member1);
             member2 = context.reloadEntity(member2);
 
+            context.restoreAuthSystemState();
             String authToken = getAuthToken(eperson.getEmail(), password);
             getClient(authToken).perform(
                     post("/api/eperson/groups/" + parentGroup.getID() + "/epersons")
@@ -1049,6 +1064,7 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
             member1 = context.reloadEntity(member1);
             member2 = context.reloadEntity(member2);
 
+            context.restoreAuthSystemState();
             getClient().perform(
                     post("/api/eperson/groups/" + parentGroup.getID() + "/epersons")
                             .contentType(parseMediaType(TEXT_URI_LIST_VALUE))
@@ -1093,6 +1109,7 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
             member1 = context.reloadEntity(member1);
             member2 = context.reloadEntity(member2);
 
+            context.restoreAuthSystemState();
             String authToken = getAuthToken(admin.getEmail(), password);
             getClient(authToken).perform(
                     post("/api/eperson/groups/" + UUID.randomUUID() + "/epersons")
@@ -1138,6 +1155,7 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
             member1 = context.reloadEntity(member1);
             member2 = context.reloadEntity(member2);
 
+            context.restoreAuthSystemState();
             String authToken = getAuthToken(admin.getEmail(), password);
 
             getClient(authToken).perform(
@@ -1181,6 +1199,7 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
             parentGroup = context.reloadEntity(parentGroup);
             childGroup = context.reloadEntity(childGroup);
 
+            context.restoreAuthSystemState();
             String authToken = getAuthToken(admin.getEmail(), password);
             getClient(authToken).perform(
                     delete("/api/eperson/groups/" + parentGroup.getID() + "/subgroups/" + childGroup.getID())
@@ -1229,6 +1248,7 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
             parentGroup = context.reloadEntity(parentGroup);
             childGroup = context.reloadEntity(childGroup);
 
+            context.restoreAuthSystemState();
             String authToken = getAuthToken(eperson.getEmail(), password);
             getClient(authToken).perform(
                     delete("/api/eperson/groups/" + parentGroup.getID() + "/subgroups/" + childGroup.getID())
@@ -1273,6 +1293,7 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
             parentGroup = context.reloadEntity(parentGroup);
             childGroup = context.reloadEntity(childGroup);
 
+            context.restoreAuthSystemState();
             String authToken = getAuthToken(eperson.getEmail(), password);
             getClient(authToken).perform(
                     delete("/api/eperson/groups/" + parentGroup.getID() + "/subgroups/" + childGroup.getID())
@@ -1307,6 +1328,7 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
             parentGroup = context.reloadEntity(parentGroup);
             childGroup = context.reloadEntity(childGroup);
 
+            context.restoreAuthSystemState();
             getClient().perform(
                     delete("/api/eperson/groups/" + parentGroup.getID() + "/subgroups/" + childGroup.getID())
             ).andExpect(status().isUnauthorized());
@@ -1342,6 +1364,7 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
             parentGroup = context.reloadEntity(parentGroup);
             childGroup = context.reloadEntity(childGroup);
 
+            context.restoreAuthSystemState();
             String authToken = getAuthToken(admin.getEmail(), password);
 
             getClient(authToken).perform(
@@ -1379,6 +1402,7 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
             parentGroup = context.reloadEntity(parentGroup);
             childGroup = context.reloadEntity(childGroup);
 
+            context.restoreAuthSystemState();
             String authToken = getAuthToken(admin.getEmail(), password);
 
             getClient(authToken).perform(
@@ -1417,6 +1441,7 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
             parentGroup = context.reloadEntity(parentGroup);
             member = context.reloadEntity(member);
 
+            context.restoreAuthSystemState();
             String authToken = getAuthToken(admin.getEmail(), password);
             getClient(authToken).perform(
                     delete("/api/eperson/groups/" + parentGroup.getID() + "/epersons/" + member.getID())
@@ -1468,6 +1493,7 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
             parentGroup = context.reloadEntity(parentGroup);
             member = context.reloadEntity(member);
 
+            context.restoreAuthSystemState();
             String authToken = getAuthToken(eperson.getEmail(), password);
             getClient(authToken).perform(
                     delete("/api/eperson/groups/" + parentGroup.getID() + "/epersons/" + member.getID())
@@ -1514,6 +1540,7 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
             parentGroup = context.reloadEntity(parentGroup);
             member = context.reloadEntity(member);
 
+            context.restoreAuthSystemState();
             String authToken = getAuthToken(eperson.getEmail(), password);
             getClient(authToken).perform(
                     delete("/api/eperson/groups/" + parentGroup.getID() + "/epersons/" + member.getID())
@@ -1550,6 +1577,7 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
             parentGroup = context.reloadEntity(parentGroup);
             member = context.reloadEntity(member);
 
+            context.restoreAuthSystemState();
             getClient().perform(
                     delete("/api/eperson/groups/" + parentGroup.getID() + "/epersons/" + member.getID())
             ).andExpect(status().isUnauthorized());
@@ -1585,6 +1613,7 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
             parentGroup = context.reloadEntity(parentGroup);
             member = context.reloadEntity(member);
 
+            context.restoreAuthSystemState();
             String authToken = getAuthToken(admin.getEmail(), password);
 
             getClient(authToken).perform(
@@ -1622,6 +1651,7 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
             parentGroup = context.reloadEntity(parentGroup);
             member = context.reloadEntity(member);
 
+            context.restoreAuthSystemState();
             String authToken = getAuthToken(admin.getEmail(), password);
 
             getClient(authToken).perform(
