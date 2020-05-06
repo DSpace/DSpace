@@ -82,6 +82,7 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
         Collection col2 = CollectionBuilder.createCollection(context, child2).withName("Collection 2").build();
 
+        context.restoreAuthSystemState();
 
         getClient().perform(get("/api/core/collections")
                    .param("embed", CollectionMatcher.getEmbedsParameter()))
@@ -592,6 +593,8 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                                            .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
 
+        context.restoreAuthSystemState();
+
         getClient().perform(get("/api/core/collections/" + col1.getID().toString())
                       .param("embed", CollectionMatcher.getEmbedsParameter()))
 
@@ -613,7 +616,6 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
         collectionRest.setMetadata(new MetadataRest()
                 .put("dc.title", new MetadataValueRest("Electronic theses and dissertations")));
 
-        context.restoreAuthSystemState();
 
         getClient(token).perform(put("/api/core/collections/" + col1.getID().toString())
                                      .contentType(MediaType.APPLICATION_JSON)
@@ -792,6 +794,7 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                 .andExpect(status().isCreated())
                 .andExpect(content().contentType(contentType))
                 .andExpect(jsonPath("$", HalMatcher.matchNoEmbeds()));
+
     }
 
     @Test
@@ -1146,6 +1149,8 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
         Collection col2 = CollectionBuilder.createCollection(context, child2).withName("Collection 2").build();
 
 
+        context.restoreAuthSystemState();
+
         getClient().perform(get("/api/core/collections")
                       .param("embed", CollectionMatcher.getEmbedsParameter()))
 
@@ -1181,6 +1186,8 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                                            .withLogo("TestingContentForLogo")
                                            .build();
         Collection col2 = CollectionBuilder.createCollection(context, child1child).withName("Collection 2").build();
+
+        context.restoreAuthSystemState();
 
         String token = getAuthToken(admin.getEmail(), password);
 
@@ -1262,6 +1269,8 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                                            .withLogo("TestingContentForLogo")
                                            .build();
 
+        context.restoreAuthSystemState();
+
         getClient().perform(get("/api/core/collections/" + col1.getID())
                                 .param("projection", "level")
                                 .param("embedLevelDepth", "100"))
@@ -1286,6 +1295,8 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                                            .withName("Collection 1")
                                            .withLogo("TestingContentForLogo")
                                            .build();
+
+        context.restoreAuthSystemState();
 
         getClient().perform(get("/api/core/collections/" + col1.getID())
                                 .param("projection", "level"))

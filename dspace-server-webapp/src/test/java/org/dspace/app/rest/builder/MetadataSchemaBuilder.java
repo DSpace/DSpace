@@ -7,6 +7,7 @@
  */
 package org.dspace.app.rest.builder;
 
+import java.io.IOException;
 import java.sql.SQLException;
 
 import org.apache.logging.log4j.Logger;
@@ -72,6 +73,26 @@ public class MetadataSchemaBuilder extends AbstractBuilder<MetadataSchema, Metad
         indexingService.commit();
     }
 
+    /**
+     * Delete the Test MetadataSchema referred to by the given ID
+     * @param id Integer of Test MetadataSchema to delete
+     * @throws SQLException
+     * @throws IOException
+     */
+    public static void deleteMetadataSchema(Integer id) throws SQLException, IOException {
+        try (Context c = new Context()) {
+            c.turnOffAuthorisationSystem();
+            MetadataSchema metadataSchema = metadataSchemaService.find(c, id);
+            if (metadataSchema != null) {
+                try {
+                     metadataSchemaService.delete(c, metadataSchema);
+                } catch (AuthorizeException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+            c.complete();
+        }
+    }
 
     public static MetadataSchemaBuilder createMetadataSchema(Context context, String name, String namespace)
         throws SQLException, AuthorizeException {
