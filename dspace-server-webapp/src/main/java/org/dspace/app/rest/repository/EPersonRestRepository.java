@@ -20,7 +20,6 @@ import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.EPersonRest;
 import org.dspace.app.rest.model.patch.Patch;
-import org.dspace.app.rest.repository.patch.operation.DSpaceObjectMetadataPatchUtils;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.core.Context;
@@ -44,9 +43,6 @@ public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, E
 
     @Autowired
     AuthorizeService authorizeService;
-
-    @Autowired
-    DSpaceObjectMetadataPatchUtils metadataPatchUtils;
 
     private final EPersonService es;
 
@@ -111,7 +107,7 @@ public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, E
         try {
             long total = es.countTotal(context);
             List<EPerson> epersons = es.findAll(context, EPerson.EMAIL, pageable.getPageSize(),
-                                                Math.toIntExact(pageable.getOffset()));
+                Math.toIntExact(pageable.getOffset()));
             return converter.toRestPage(epersons, pageable, total, utils.obtainProjection());
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
@@ -122,8 +118,7 @@ public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, E
      * Find the eperson with the provided email address if any. The search is delegated to the
      * {@link EPersonService#findByEmail(Context, String)} method
      *
-     * @param email
-     *            is the *required* email address
+     * @param email is the *required* email address
      * @return a Page of EPersonRest instances matching the user query
      */
     @SearchRestMethod(name = "byEmail")
@@ -145,10 +140,8 @@ public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, E
      * Find the epersons matching the query parameter. The search is delegated to the
      * {@link EPersonService#search(Context, String, int, int)} method
      *
-     * @param query
-     *            is the *required* query string
-     * @param pageable
-     *            contains the pagination information
+     * @param query    is the *required* query string
+     * @param pageable contains the pagination information
      * @return a Page of EPersonRest instances matching the user query
      */
     @PreAuthorize("hasAuthority('ADMIN')")
@@ -160,7 +153,7 @@ public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, E
             Context context = obtainContext();
             long total = es.searchResultCount(context, query);
             List<EPerson> epersons = es.search(context, query, Math.toIntExact(pageable.getOffset()),
-                                               Math.toIntExact(pageable.getOffset() + pageable.getPageSize()));
+                Math.toIntExact(pageable.getOffset() + pageable.getPageSize()));
             return converter.toRestPage(epersons, pageable, total, utils.obtainProjection());
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);

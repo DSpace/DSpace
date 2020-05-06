@@ -107,8 +107,7 @@ public class EPersonRestPermissionEvaluatorPlugin extends RestObjectPermissionEv
          */
         for (Operation op: operations) {
             if (!(op.getPath().contentEquals(EPersonPasswordReplaceOperation.OPERATION_PASSWORD_CHANGE)
-                || (op.getPath().startsWith(DSpaceObjectMetadataPatchUtils.OPERATION_METADATA_PATH)
-                || op.getPath().equals(DSpaceObjectMetadataPatchUtils.OPERATION_METADATA_PATH)))) {
+                || (op.getPath().startsWith(DSpaceObjectMetadataPatchUtils.OPERATION_METADATA_PATH)))) {
                 return false;
             }
         }
