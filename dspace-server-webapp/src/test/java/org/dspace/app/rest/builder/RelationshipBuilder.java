@@ -7,6 +7,7 @@
  */
 package org.dspace.app.rest.builder;
 
+import java.io.IOException;
 import java.sql.SQLException;
 
 import org.apache.log4j.Logger;
@@ -63,6 +64,27 @@ public class RelationshipBuilder extends AbstractBuilder<Relationship, Relations
         }
 
         indexingService.commit();
+    }
+
+    /**
+     * Delete the Test Relationship referred to by the given ID
+     * @param id Integer of Test Relationship to delete
+     * @throws SQLException
+     * @throws IOException
+     */
+    public static void deleteRelationship(Integer id) throws SQLException, IOException {
+        try (Context c = new Context()) {
+            c.turnOffAuthorisationSystem();
+            Relationship relationship = relationshipService.find(c, id);
+            if (relationship != null) {
+                try {
+                    relationshipService.delete(c, relationship);
+                } catch (AuthorizeException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+            c.complete();
+        }
     }
 
     public static RelationshipBuilder createRelationshipBuilder(Context context, Item leftItem, Item rightItem,
