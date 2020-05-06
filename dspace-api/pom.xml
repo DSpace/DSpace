@@ -12,7 +12,7 @@
     <parent>
         <groupId>org.dspace</groupId>
         <artifactId>dspace-parent</artifactId>
-        <version>7.0-SNAPSHOT</version>
+        <version>7.0-beta3-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
 
@@ -308,15 +308,10 @@
             <groupId>org.dspace</groupId>
             <artifactId>handle</artifactId>
         </dependency>
+        <!-- Jetty is needed to run Handle Server -->
         <dependency>
-            <groupId>org.eclipse.jetty.aggregate</groupId>
-            <artifactId>jetty-all</artifactId>
-            <exclusions>
-                <exclusion>
-                    <artifactId>javax.servlet</artifactId>
-                    <groupId>org.eclipse.jetty.orbit</groupId>
-                </exclusion>
-            </exclusions>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-server</artifactId>
         </dependency>
         <dependency>
             <groupId>org.dspace</groupId>
@@ -489,6 +484,13 @@
             <groupId>org.apache.solr</groupId>
             <artifactId>solr-cell</artifactId>
             <version>${solr.client.version}</version>
+            <exclusions>
+                <!-- Newer version provided in our parent POM -->
+                <exclusion>
+                    <groupId>org.ow2.asm</groupId>
+                    <artifactId>asm-commons</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>

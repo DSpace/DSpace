@@ -21,6 +21,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.Base64;
+import javax.servlet.http.Cookie;
 
 import org.dspace.app.rest.builder.GroupBuilder;
 import org.dspace.app.rest.matcher.AuthenticationStatusMatcher;
@@ -40,6 +41,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
  *
  * @author Frederic Van Reet (frederic dot vanreet at atmire dot com)
  * @author Tom Desair (tom dot desair at atmire dot com)
+ * @author Giuseppe Digilio (giuseppe dot digilio at 4science dot it)
  */
 public class AuthenticationRestControllerIT extends AbstractControllerIntegrationTest {
 
@@ -48,6 +50,9 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
 
     public static final String[] PASS_ONLY = {"org.dspace.authenticate.PasswordAuthentication"};
     public static final String[] SHIB_ONLY = {"org.dspace.authenticate.ShibAuthentication"};
+    public static final String[] SHIB_AND_PASS =
+            {"org.dspace.authenticate.ShibAuthentication",
+             "org.dspace.authenticate.PasswordAuthentication"};
     public static final String[] SHIB_AND_IP =
             {"org.dspace.authenticate.IPAuthentication",
             "org.dspace.authenticate.ShibAuthentication"};
@@ -97,7 +102,43 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$.okay", is(true)))
                    .andExpect(jsonPath("$.authenticated", is(false)))
-                   .andExpect(jsonPath("$.type", is("status")));
+                   .andExpect(jsonPath("$.type", is("status")))
+                   .andExpect(header().string("WWW-Authenticate",
+                           "password realm=\"DSpace REST API\""));
+    }
+
+    @Test
+    public void testStatusAuthenticatedWithCookie() throws Exception {
+        context.turnOffAuthorisationSystem();
+        //Enable Shibboleth login
+        configurationService.setProperty("plugin.sequence.org.dspace.authenticate.AuthenticationMethod", SHIB_ONLY);
+
+        context.restoreAuthSystemState();
+
+        //Simulate that a shibboleth authentication has happened
+        String token = getClient().perform(post("/api/authn/login")
+                .requestAttr("SHIB-MAIL", eperson.getEmail())
+                .requestAttr("SHIB-SCOPED-AFFILIATION", "faculty;staff"))
+            .andExpect(status().isOk())
+            .andReturn().getResponse().getHeader(AUTHORIZATION_HEADER).replace("Bearer ", "");
+
+        Cookie[] cookies = new Cookie[1];
+        cookies[0] = new Cookie(AUTHORIZATION_COOKIE, token);
+
+        //Check if we are authenticated with a status request with authorization cookie
+        getClient().perform(get("/api/authn/status")
+                .secure(true)
+                .cookie(cookies))
+                .andExpect(status().isOk())
+                //We expect the content type to be "application/hal+json;charset=UTF-8"
+                .andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$.okay", is(true)))
+                .andExpect(jsonPath("$.authenticated", is(true)))
+                .andExpect(jsonPath("$.type", is("status")));
+
+        //Logout
+        getClient(token).perform(get("/api/authn/logout"))
+                        .andExpect(status().isNoContent());
     }
 
     @Test
@@ -355,6 +396,108 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
     }
 
     @Test
+    public void testShibbolethLoginURLWithDefaultLazyURL() throws Exception {
+        context.turnOffAuthorisationSystem();
+        //Enable Shibboleth login
+        configurationService.setProperty("plugin.sequence.org.dspace.authenticate.AuthenticationMethod", SHIB_ONLY);
+
+        //Create a reviewers group
+        Group reviewersGroup = GroupBuilder.createGroup(context)
+                .withName("Reviewers")
+                .build();
+
+        //Faculty members are assigned to the Reviewers group
+        configurationService.setProperty("authentication-shibboleth.role.faculty", "Reviewers");
+        context.restoreAuthSystemState();
+
+        getClient().perform(post("/api/authn/login").header("Referer", "http://my.uni.edu"))
+                .andExpect(status().isUnauthorized())
+                .andExpect(header().string("WWW-Authenticate",
+                        "shibboleth realm=\"DSpace REST API\", " +
+                                "location=\"https://localhost/Shibboleth.sso/Login?" +
+                                "target=http%3A%2F%2Flocalhost%2Fapi%2Fauthn%2Fshibboleth%3F" +
+                                "redirectUrl%3Dhttp%3A%2F%2Fmy.uni.edu\""));
+    }
+
+    @Test
+    public void testShibbolethLoginURLWithServerlURLConteiningPort() throws Exception {
+        context.turnOffAuthorisationSystem();
+        //Enable Shibboleth login
+        configurationService.setProperty("plugin.sequence.org.dspace.authenticate.AuthenticationMethod", SHIB_ONLY);
+        configurationService.setProperty("dspace.server.url", "http://localhost:8080/server");
+        configurationService.setProperty("authentication-shibboleth.lazysession.secure", false);
+
+        //Create a reviewers group
+        Group reviewersGroup = GroupBuilder.createGroup(context)
+                .withName("Reviewers")
+                .build();
+
+        //Faculty members are assigned to the Reviewers group
+        configurationService.setProperty("authentication-shibboleth.role.faculty", "Reviewers");
+        context.restoreAuthSystemState();
+
+        getClient().perform(post("/api/authn/login").header("Referer", "http://my.uni.edu"))
+                .andExpect(status().isUnauthorized())
+                .andExpect(header().string("WWW-Authenticate",
+                        "shibboleth realm=\"DSpace REST API\", " +
+                                "location=\"http://localhost:8080/Shibboleth.sso/Login?" +
+                                "target=http%3A%2F%2Flocalhost%3A8080%2Fserver%2Fapi%2Fauthn%2Fshibboleth%3F" +
+                                "redirectUrl%3Dhttp%3A%2F%2Fmy.uni.edu\""));
+    }
+
+    @Test
+    public void testShibbolethLoginURLWithConfiguredLazyURL() throws Exception {
+        context.turnOffAuthorisationSystem();
+        //Enable Shibboleth login
+        configurationService.setProperty("plugin.sequence.org.dspace.authenticate.AuthenticationMethod", SHIB_ONLY);
+        configurationService.setProperty("authentication-shibboleth.lazysession.loginurl",
+                "http://shibboleth.org/Shibboleth.sso/Login");
+
+        //Create a reviewers group
+        Group reviewersGroup = GroupBuilder.createGroup(context)
+                .withName("Reviewers")
+                .build();
+
+        //Faculty members are assigned to the Reviewers group
+        configurationService.setProperty("authentication-shibboleth.role.faculty", "Reviewers");
+        context.restoreAuthSystemState();
+
+        getClient().perform(post("/api/authn/login").header("Referer", "http://my.uni.edu"))
+                .andExpect(status().isUnauthorized())
+                .andExpect(header().string("WWW-Authenticate",
+                        "shibboleth realm=\"DSpace REST API\", " +
+                                "location=\"http://shibboleth.org/Shibboleth.sso/Login?" +
+                                "target=http%3A%2F%2Flocalhost%2Fapi%2Fauthn%2Fshibboleth%3F" +
+                                "redirectUrl%3Dhttp%3A%2F%2Fmy.uni.edu\""));
+    }
+
+    @Test
+    public void testShibbolethLoginURLWithConfiguredLazyURLWithPort() throws Exception {
+        context.turnOffAuthorisationSystem();
+        //Enable Shibboleth login
+        configurationService.setProperty("plugin.sequence.org.dspace.authenticate.AuthenticationMethod", SHIB_ONLY);
+        configurationService.setProperty("authentication-shibboleth.lazysession.loginurl",
+                "http://shibboleth.org:8080/Shibboleth.sso/Login");
+
+        //Create a reviewers group
+        Group reviewersGroup = GroupBuilder.createGroup(context)
+                .withName("Reviewers")
+                .build();
+
+        //Faculty members are assigned to the Reviewers group
+        configurationService.setProperty("authentication-shibboleth.role.faculty", "Reviewers");
+        context.restoreAuthSystemState();
+
+        getClient().perform(post("/api/authn/login").header("Referer", "http://my.uni.edu"))
+                .andExpect(status().isUnauthorized())
+                .andExpect(header().string("WWW-Authenticate",
+                        "shibboleth realm=\"DSpace REST API\", " +
+                                "location=\"http://shibboleth.org:8080/Shibboleth.sso/Login?" +
+                                "target=http%3A%2F%2Flocalhost%2Fapi%2Fauthn%2Fshibboleth%3F" +
+                                "redirectUrl%3Dhttp%3A%2F%2Fmy.uni.edu\""));
+    }
+
+    @Test
     @Ignore
     // Ignored until an endpoint is added to return all groups
     public void testShibbolethLoginRequestAttribute() throws Exception {
@@ -375,7 +518,9 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
                 .andExpect(status().isUnauthorized())
                 .andExpect(header().string("WWW-Authenticate",
                         "shibboleth realm=\"DSpace REST API\", " +
-                                "location=\"/Shibboleth.sso/Login?target=http%3A%2F%2Fmy.uni.edu\""));
+                                "location=\"https://localhost/Shibboleth.sso/Login?" +
+                                "target=http%3A%2F%2Flocalhost%2Fapi%2Fauthn%2Fshibboleth%3F" +
+                                "redirectUrl%3Dhttp%3A%2F%2Fmy.uni.edu\""));
 
         //Simulate that a shibboleth authentication has happened
 
@@ -411,7 +556,9 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
                 .andExpect(status().isUnauthorized())
                 .andExpect(header().string("WWW-Authenticate",
                         "ip realm=\"DSpace REST API\", shibboleth realm=\"DSpace REST API\", " +
-                                "location=\"/Shibboleth.sso/Login?target=http%3A%2F%2Fmy.uni.edu\""));
+                                "location=\"https://localhost/Shibboleth.sso/Login?" +
+                                "target=http%3A%2F%2Flocalhost%2Fapi%2Fauthn%2Fshibboleth%3F" +
+                                "redirectUrl%3Dhttp%3A%2F%2Fmy.uni.edu\""));
 
         //Simulate that a shibboleth authentication has happened
         String token = getClient().perform(post("/api/authn/login")
@@ -454,4 +601,164 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
                         EPersonMatcher.matchEPersonWithGroups(eperson.getEmail(), "Anonymous")));
     }
 
+    @Test
+    public void testShibbolethAndPasswordAuthentication() throws Exception {
+        context.turnOffAuthorisationSystem();
+        //Enable Shibboleth and password login
+        configurationService.setProperty("plugin.sequence.org.dspace.authenticate.AuthenticationMethod", SHIB_AND_PASS);
+
+        context.restoreAuthSystemState();
+
+        //Check if WWW-Authenticate header contains shibboleth and password
+        getClient().perform(get("/api/authn/status").header("Referer", "http://my.uni.edu"))
+                .andExpect(status().isOk())
+                .andExpect(header().string("WWW-Authenticate",
+                        "shibboleth realm=\"DSpace REST API\", " +
+                                "location=\"https://localhost/Shibboleth.sso/Login?" +
+                                "target=http%3A%2F%2Flocalhost%2Fapi%2Fauthn%2Fshibboleth%3F" +
+                                "redirectUrl%3Dhttp%3A%2F%2Fmy.uni.edu\"" +
+                                ", password realm=\"DSpace REST API\""));
+
+        //Simulate a password authentication
+        String token = getAuthToken(eperson.getEmail(), password);
+
+        //Check if we have a valid token
+        getClient(token).perform(get("/api/authn/status"))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.okay", is(true)))
+                        .andExpect(jsonPath("$.authenticated", is(true)))
+                        .andExpect(jsonPath("$.type", is("status")));
+
+        //Logout
+        getClient(token).perform(get("/api/authn/logout"))
+                        .andExpect(status().isNoContent());
+
+        //Check if we are actually logged out
+        getClient(token).perform(get("/api/authn/status"))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.okay", is(true)))
+                        .andExpect(jsonPath("$.authenticated", is(false)))
+                        .andExpect(jsonPath("$.type", is("status")));
+
+        //Simulate that a shibboleth authentication has happened
+        token = getClient().perform(post("/api/authn/login")
+                .requestAttr("SHIB-MAIL", eperson.getEmail())
+                .requestAttr("SHIB-SCOPED-AFFILIATION", "faculty;staff"))
+            .andExpect(status().isOk())
+            .andReturn().getResponse().getHeader(AUTHORIZATION_HEADER).replace("Bearer ", "");
+
+        //Check if we have a valid token
+        getClient(token).perform(get("/api/authn/status"))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.okay", is(true)))
+                        .andExpect(jsonPath("$.authenticated", is(true)))
+                        .andExpect(jsonPath("$.type", is("status")));
+
+        //Logout
+        getClient(token).perform(get("/api/authn/logout"))
+                        .andExpect(status().isNoContent());
+
+    }
+
+    @Test
+    public void testOnlyPasswordAuthenticationWorks() throws Exception {
+        context.turnOffAuthorisationSystem();
+        //Enable only password login
+        configurationService.setProperty("plugin.sequence.org.dspace.authenticate.AuthenticationMethod", PASS_ONLY);
+
+        context.restoreAuthSystemState();
+
+        //Check if WWW-Authenticate header contains only
+        getClient().perform(get("/api/authn/status").header("Referer", "http://my.uni.edu"))
+            .andExpect(status().isOk())
+            .andExpect(header().string("WWW-Authenticate",
+                    "password realm=\"DSpace REST API\""));
+
+        //Simulate a password authentication
+        String token = getAuthToken(eperson.getEmail(), password);
+
+        //Check if we have a valid token
+        getClient(token).perform(get("/api/authn/status"))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.okay", is(true)))
+                        .andExpect(jsonPath("$.authenticated", is(true)))
+                        .andExpect(jsonPath("$.type", is("status")));
+
+        //Logout
+        getClient(token).perform(get("/api/authn/logout"))
+                        .andExpect(status().isNoContent());
+    }
+
+    @Test
+    public void testShibbolethAuthenticationDoesNotWorkWithPassOnly() throws Exception {
+        context.turnOffAuthorisationSystem();
+        //Enable only password login
+        configurationService.setProperty("plugin.sequence.org.dspace.authenticate.AuthenticationMethod", PASS_ONLY);
+
+        context.restoreAuthSystemState();
+
+        //Check if WWW-Authenticate header contains only password
+        getClient().perform(get("/api/authn/status").header("Referer", "http://my.uni.edu"))
+        .andExpect(status().isOk())
+        .andExpect(header().string("WWW-Authenticate",
+                "password realm=\"DSpace REST API\""));
+
+        //Check if a shibboleth authentication fails
+        getClient().perform(post("/api/authn/login")
+                .requestAttr("SHIB-MAIL", eperson.getEmail())
+                .requestAttr("SHIB-SCOPED-AFFILIATION", "faculty;staff"))
+            .andExpect(status().isUnauthorized());
+
+    }
+
+    @Test
+    public void testOnlyShibbolethAuthenticationWorks() throws Exception {
+        context.turnOffAuthorisationSystem();
+        //Enable only Shibboleth login
+        configurationService.setProperty("plugin.sequence.org.dspace.authenticate.AuthenticationMethod", SHIB_ONLY);
+
+        context.restoreAuthSystemState();
+
+        //Check if WWW-Authenticate header contains only shibboleth
+        getClient().perform(get("/api/authn/status").header("Referer", "http://my.uni.edu"))
+            .andExpect(status().isOk())
+            .andExpect(header().string("WWW-Authenticate",
+                    "shibboleth realm=\"DSpace REST API\", " +
+                            "location=\"https://localhost/Shibboleth.sso/Login?" +
+                            "target=http%3A%2F%2Flocalhost%2Fapi%2Fauthn%2Fshibboleth%3F" +
+                            "redirectUrl%3Dhttp%3A%2F%2Fmy.uni.edu\""));
+
+        //Simulate that a shibboleth authentication has happened
+        String token = getClient().perform(post("/api/authn/login")
+                .requestAttr("SHIB-MAIL", eperson.getEmail())
+                .requestAttr("SHIB-SCOPED-AFFILIATION", "faculty;staff"))
+            .andExpect(status().isOk())
+            .andReturn().getResponse().getHeader(AUTHORIZATION_HEADER);
+
+        //Logout
+        getClient(token).perform(get("/api/authn/logout"))
+                        .andExpect(status().isNoContent());
+    }
+
+    @Test
+    public void testPasswordAuthenticationDoesNotWorkWithShibOnly() throws Exception {
+        context.turnOffAuthorisationSystem();
+        //Enable only Shibboleth login
+        configurationService.setProperty("plugin.sequence.org.dspace.authenticate.AuthenticationMethod", SHIB_ONLY);
+
+        //Create a reviewers group
+        Group reviewersGroup = GroupBuilder.createGroup(context)
+                .withName("Reviewers")
+                .build();
+
+        //Faculty members are assigned to the Reviewers group
+        configurationService.setProperty("authentication-shibboleth.role.faculty", "Reviewers");
+        context.restoreAuthSystemState();
+
+        getClient().perform(post("/api/authn/login")
+                .param("user", eperson.getEmail())
+                .param("password", password))
+            .andExpect(status().isUnauthorized());
+
+    }
 }

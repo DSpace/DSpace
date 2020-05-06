@@ -32,7 +32,7 @@ import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.webmvc.ControllerUtils;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
-import org.springframework.hateoas.ResourceSupport;
+import org.springframework.hateoas.RepresentationModel;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -49,7 +49,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("/api/core/itemtemplates" + REGEX_REQUESTMAPPING_IDENTIFIER_AS_UUID)
-public class ItemtemplateRestController {
+public class ItemTemplateRestController {
 
     @Autowired
     private Utils utils;
@@ -122,8 +122,8 @@ public class ItemtemplateRestController {
      */
     @PreAuthorize("hasPermission(#uuid, 'ITEM', 'WRITE')")
     @RequestMapping(method = RequestMethod.PATCH)
-    public ResponseEntity<ResourceSupport> patch(HttpServletRequest request, @PathVariable UUID uuid,
-                                                 @RequestBody(required = true) JsonNode jsonNode)
+    public ResponseEntity<RepresentationModel<?>> patch(HttpServletRequest request, @PathVariable UUID uuid,
+                                                        @RequestBody(required = true) JsonNode jsonNode)
         throws SQLException, AuthorizeException {
 
         Context context = ContextUtil.obtainContext(request);
@@ -132,7 +132,7 @@ public class ItemtemplateRestController {
         context.commit();
 
         return ControllerUtils.toResponseEntity(HttpStatus.OK, new HttpHeaders(),
-                                                converter.toResource(templateItemRest));
+                                                (RepresentationModel<?>) converter.toResource(templateItemRest));
     }
 
     /**
@@ -155,7 +155,8 @@ public class ItemtemplateRestController {
      */
     @PreAuthorize("hasPermission(#uuid, 'ITEM', 'DELETE')")
     @RequestMapping(method = RequestMethod.DELETE)
-    public ResponseEntity<ResourceSupport> deleteTemplateItem(HttpServletRequest request, @PathVariable UUID uuid)
+    public ResponseEntity<RepresentationModel<?>> deleteTemplateItem(HttpServletRequest request,
+                                                                     @PathVariable UUID uuid)
         throws SQLException, AuthorizeException, IOException {
 
         Context context = ContextUtil.obtainContext(request);

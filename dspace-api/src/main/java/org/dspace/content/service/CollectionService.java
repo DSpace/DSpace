@@ -339,4 +339,19 @@ public interface CollectionService
      * @throws SQLException if database error
      */
     List<Map.Entry<Collection, Long>> getCollectionsWithBitstreamSizesTotal(Context context) throws SQLException;
+
+    /**
+     * This method will create a default read group for the given Collection. It'll create either a defaultItemRead or
+     * a defaultBitstreamRead group depending on the given parameters
+     *
+     * @param context           The relevant DSpace context
+     * @param collection        The collection for which it'll be created
+     * @param typeOfGroupString The type of group to be made, item or bitstream
+     * @param defaultRead       The defaultRead int, item or bitstream
+     * @return                  The created Group
+     * @throws SQLException     If something goes wrong
+     * @throws AuthorizeException   If something goes wrong
+     */
+    Group createDefaultReadGroup(Context context, Collection collection, String typeOfGroupString, int defaultRead)
+        throws SQLException, AuthorizeException;
 }

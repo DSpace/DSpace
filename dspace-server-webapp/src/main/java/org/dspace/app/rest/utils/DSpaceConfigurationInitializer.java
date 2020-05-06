@@ -41,8 +41,10 @@ public class DSpaceConfigurationInitializer implements ApplicationContextInitial
         ConfigurationPropertySource apacheCommonsConfigPropertySource =
             new ConfigurationPropertySource(configuration.getClass().getName(), configuration);
 
-        // Append it to the Environment's list of PropertySources
-        applicationContext.getEnvironment().getPropertySources().addLast(apacheCommonsConfigPropertySource);
+        // Prepend it to the Environment's list of PropertySources
+        // NOTE: This is added *first* in the list so that settings in DSpace's ConfigurationService *override*
+        // any default values in Spring Boot's application.properties (or similar)
+        applicationContext.getEnvironment().getPropertySources().addFirst(apacheCommonsConfigPropertySource);
     }
 }
 

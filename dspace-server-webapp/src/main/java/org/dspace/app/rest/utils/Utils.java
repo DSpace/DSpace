@@ -9,7 +9,7 @@ package org.dspace.app.rest.utils;
 
 import static java.lang.Integer.parseInt;
 import static java.util.stream.Collectors.toList;
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
@@ -21,6 +21,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.sql.SQLException;
@@ -56,7 +57,6 @@ import org.dspace.app.rest.model.ResourcePolicyRest;
 import org.dspace.app.rest.model.RestAddressableModel;
 import org.dspace.app.rest.model.RestModel;
 import org.dspace.app.rest.model.VersionHistoryRest;
-import org.dspace.app.rest.model.hateoas.DSpaceResource;
 import org.dspace.app.rest.model.hateoas.EmbeddedPage;
 import org.dspace.app.rest.model.hateoas.HALResource;
 import org.dspace.app.rest.projection.CompositeProjection;
@@ -65,18 +65,22 @@ import org.dspace.app.rest.projection.EmbedRelsProjection;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.repository.DSpaceRestRepository;
 import org.dspace.app.rest.repository.LinkRestRepository;
+import org.dspace.app.rest.repository.ReloadableEntityObjectRepository;
 import org.dspace.content.BitstreamFormat;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.service.BitstreamFormatService;
 import org.dspace.content.service.DSpaceObjectService;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
+import org.dspace.services.ConfigurationService;
 import org.dspace.services.RequestService;
 import org.dspace.util.UUIDUtils;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.annotation.AnnotationUtils;
+import org.springframework.core.convert.ConversionService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -111,6 +115,10 @@ public class Utils {
     @Autowired
     RequestService requestService;
 
+    @Autowired
+    @Qualifier("defaultConversionService")
+    ConversionService conversionService;
+
     @Autowired(required = true)
     private List<DSpaceObjectService<? extends DSpaceObject>> dSpaceObjectServices;
 
@@ -119,6 +127,9 @@ public class Utils {
 
     @Autowired
     private ConverterService converter;
+
+    @Autowired
+    private ConfigurationService configurationService;
 
     /** Cache to support fast lookups of LinkRest method annotation information. */
     private Map<Method, Optional<LinkRest>> linkAnnotationForMethod = new HashMap<>();
@@ -147,34 +158,86 @@ public class Utils {
      * @return the existing instance if it is not null, a default pageable instance otherwise.
      */
     public Pageable getPageable(@Nullable Pageable optionalPageable) {
-        return optionalPageable != null ? optionalPageable : new PageRequest(0, DEFAULT_PAGE_SIZE);
+        return optionalPageable != null ? optionalPageable : PageRequest.of(0, DEFAULT_PAGE_SIZE);
     }
 
-    public Link linkToSingleResource(DSpaceResource r, String rel) {
-        RestAddressableModel data = r.getContent();
-        return linkToSingleResource(data, rel);
-    }
-
+    /**
+     * Create a HAL Link to a single resource
+     * @param data the resource itself
+     * @param rel name of the link relation to create
+     * @return created Link object
+     */
     public Link linkToSingleResource(RestAddressableModel data, String rel) {
-        return linkTo(data.getController(), data.getCategory(), data.getTypePlural()).slash(data)
+        // Create link using Spring HATEOAS link builder
+        return linkTo(data.getController(), data.getCategory(), data.getTypePlural()).slash(getIdentifierForLink(data))
                                                                                      .withRel(rel);
     }
 
+    /**
+     * Create a HAL Link to a subresource of given resource. This method assumes the name & link to the subresource
+     * are both the same string value. See other linkToSubResource method if they are different.
+     * @param data main resource
+     * @param rel name/subpath of the subresource (assumed to be the same)
+     * @return created Link object
+     */
     public Link linkToSubResource(RestAddressableModel data, String rel) {
         return linkToSubResource(data, rel, rel);
     }
 
+    /**
+     * Create a HAL Link to a subresource of given resource using given path name and link name
+     * @param data main resource
+     * @param rel name of the subresource link relation to create
+     * @param path subpath for the subresource
+     * @return created Link object
+     */
     public Link linkToSubResource(RestAddressableModel data, String rel, String path) {
-        return linkTo(data.getController(), data.getCategory(), data.getTypePlural()).slash(data).slash(path)
+        // Create link using Spring HATEOAS link builder
+        return linkTo(data.getController(), data.getCategory(), data.getTypePlural()).slash(getIdentifierForLink(data))
+                                                                                     .slash(path)
                                                                                      .withRel(rel);
     }
 
+    /**
+     * Returns an identifier for a given resource, to be used in a Link.
+     * @param data resource to identify
+     * @return identifier, which is either an ID (if exists) or string representation of the object.
+     */
+    private Serializable getIdentifierForLink(RestAddressableModel data) {
+        // If the resource is identifiable by an ID, use it. Otherwise use toString() to represent it.
+        Serializable identifier = data.toString();
+        if (data instanceof BaseObjectRest) {
+            identifier = ((BaseObjectRest) data).getId();
+        }
+        return identifier;
+    }
+
+    /**
+     * Retrieve the {@link DSpaceRestRepository} for the specified category and model in the plural form as used in the endpoints.
+     * If the model is available in its singular form use {@link #getResourceRepositoryByCategoryAndModel(String, String)}
+     *
+     * @param apiCategory
+     * @param modelPlural
+     * @return
+     */
     public DSpaceRestRepository getResourceRepository(String apiCategory, String modelPlural) {
         String model = makeSingular(modelPlural);
+        return getResourceRepositoryByCategoryAndModel(apiCategory, model);
+    }
+
+    /**
+     * Retrieve the {@link DSpaceRestRepository} for the specified category and model. The model is in the singular form
+     * as returned by the {@link RestAddressableModel#getType()} method
+     *
+     * @param apiCategory
+     * @param modelSingular
+     * @return
+     */
+    public DSpaceRestRepository getResourceRepositoryByCategoryAndModel(String apiCategory, String modelSingular) {
         try {
-            return applicationContext.getBean(apiCategory + "." + model, DSpaceRestRepository.class);
+            return applicationContext.getBean(apiCategory + "." + modelSingular, DSpaceRestRepository.class);
         } catch (NoSuchBeanDefinitionException e) {
-            throw new RepositoryNotFoundException(apiCategory, model);
+            throw new RepositoryNotFoundException(apiCategory, modelSingular);
         }
     }
 
@@ -246,7 +309,7 @@ public class Utils {
 
     /**
      * Create a temporary file from a multipart file upload
-     * 
+     *
      * @param multipartFile
      *            the multipartFile representing the uploaded file. Please note that it is a complex object including
      *            additional information other than the binary like the orginal file name and the mimetype
@@ -280,7 +343,7 @@ public class Utils {
     /**
      * Return the filename part from a multipartFile upload that could eventually contains the fullpath on the client
 
-     * 
+     *
      * @param multipartFile
      *            the file uploaded
      * @return the filename part of the file on the client filesystem
@@ -739,23 +802,23 @@ public class Utils {
             return new EmbeddedPage(link.getHref(), page.map((restObject) -> {
                 restObject.setEmbedLevel(childEmbedLevel);
                 return converter.toResource(restObject, newList);
-            }), null, link.getRel());
+            }), null, link.getRel().value());
         } else if (linkedObject instanceof List) {
             // The full list has been retrieved and we need to provide the first page for embedding
             List<RestAddressableModel> list = (List<RestAddressableModel>) linkedObject;
             if (list.size() > 0) {
                 PageImpl<RestAddressableModel> page = new PageImpl(
                         list.subList(0, list.size() > DEFAULT_PAGE_SIZE ? DEFAULT_PAGE_SIZE : list.size()),
-                        new PageRequest(0, DEFAULT_PAGE_SIZE), list.size());
+                        PageRequest.of(0, DEFAULT_PAGE_SIZE), list.size());
                 return new EmbeddedPage(link.getHref(),
                         page.map((restObject) -> {
                             restObject.setEmbedLevel(childEmbedLevel);
                             return converter.toResource(restObject, newList);
                         }),
-                        list, link.getRel());
+                        list, link.getRel().value());
             } else {
                 PageImpl<RestAddressableModel> page = new PageImpl(list);
-                return new EmbeddedPage(link.getHref(), page, list, link.getRel());
+                return new EmbeddedPage(link.getHref(), page, list, link.getRel().value());
             }
         } else {
             return linkedObject;
@@ -787,5 +850,90 @@ public class Utils {
             }
         }
         return contentId;
+    }
+
+    /**
+     * Convert the input string in the primary key class according to the repository interface
+     *
+     * @param repository
+     * @param pkStr
+     * @return
+     */
+    public Serializable castToPKClass(ReloadableEntityObjectRepository repository, String pkStr) {
+        return (Serializable) conversionService.convert(pkStr, repository.getPKClass());
+    }
+
+    /**
+     * Return the dspace api model object corresponding to the provided, not null, rest object. This only works when the
+     * rest object is supported by a {@link DSpaceRestRepository} that also implement the
+     * {@link ReloadableEntityObjectRepository} interface. If this is not the case the method will throw an
+     * IllegalArgumentException
+     *
+     * @param context
+     *            the DSpace Context
+     * @param restObj
+     *            the not null rest object. If null the method will throws an {@link IllegalArgumentException}
+     * @return the dspace api model object corresponding to the provided, not null, rest object
+     * @throws IllegalArgumentException
+     *             if the restObj is not supported by a {@link DSpaceRestRepository} that also implement the
+     *             {@link ReloadableEntityObjectRepository} interface
+     * @throws SQLException
+     *             if a database error occur
+     */
+    public Object getDSpaceAPIObjectFromRest(Context context, BaseObjectRest restObj)
+            throws IllegalArgumentException, SQLException {
+        DSpaceRestRepository repository = getResourceRepositoryByCategoryAndModel(restObj.getCategory(),
+                restObj.getType());
+        Serializable pk = castToPKClass((ReloadableEntityObjectRepository) repository, restObj.getId().toString());
+        return ((ReloadableEntityObjectRepository) repository).findDomainObjectByPk(context, pk);
+    }
+
+    /**
+    * Get the rest object associated with the specified URI
+    *
+    * @param context the DSpace context
+    * @param uri     the uri of a {@link BaseObjectRest}
+    * @return the {@link BaseObjectRest} identified by the provided uri
+    * @throws SQLException             if a database error occur
+    * @throws IllegalArgumentException if the uri is not valid
+    */
+    public BaseObjectRest getBaseObjectRestFromUri(Context context, String uri) throws SQLException {
+        String dspaceUrl = configurationService.getProperty("dspace.server.url");
+        // first check if the uri could be valid
+        if (!StringUtils.startsWith(uri, dspaceUrl)) {
+            throw new IllegalArgumentException("the supplied uri is not valid: " + uri);
+        }
+        // extract from the uri the category, model and id components
+        // they start after the dspaceUrl/api/{apiCategory}/{apiModel}/{id}
+        String[] uriParts = uri.substring(dspaceUrl.length() + (dspaceUrl.endsWith("/") ? 0 : 1) + "api/".length())
+                .split("/", 3);
+        if (uriParts.length != 3) {
+            throw new IllegalArgumentException("the supplied uri is not valid: " + uri);
+        }
+
+        DSpaceRestRepository repository;
+        try {
+            repository = getResourceRepository(uriParts[0], uriParts[1]);
+            if (!(repository instanceof ReloadableEntityObjectRepository)) {
+                throw new IllegalArgumentException("the supplied uri is not valid: " + uri);
+            }
+        } catch (RepositoryNotFoundException e) {
+            throw new IllegalArgumentException("the supplied uri is not valid: " + uri, e);
+        }
+
+        Serializable pk;
+        try {
+            // cast the string id in the uriParts to the real pk class
+            pk = castToPKClass((ReloadableEntityObjectRepository) repository, uriParts[2]);
+        } catch (Exception e) {
+            throw new IllegalArgumentException("the supplied uri is not valid: " + uri, e);
+        }
+        try {
+            // disable the security as we only need to retrieve the object to further process the authorization
+            context.turnOffAuthorisationSystem();
+            return (BaseObjectRest) repository.findOne(context, pk);
+        } finally {
+            context.restoreAuthSystemState();
+        }
     }
 }
