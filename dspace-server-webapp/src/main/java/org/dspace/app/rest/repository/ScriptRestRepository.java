@@ -102,10 +102,6 @@ public class ScriptRestRepository extends DSpaceRestRepository<ScriptRest, Strin
         if (!scriptToExecute.isAllowedToExecute(context)) {
             throw new AuthorizeException("Current user is not eligible to execute script with name: " + scriptName);
         }
-        EPerson currentUser = context.getCurrentUser();
-//        if (currentUser != null) {
-//            scriptToExecute.setEpersonIdentifier(currentUser.getID());
-//        }
         RestDSpaceRunnableHandler restDSpaceRunnableHandler = new RestDSpaceRunnableHandler(
             context.getCurrentUser(), scriptName, dSpaceCommandLineParameters);
         List<String> args = constructArgs(dSpaceCommandLineParameters);
