@@ -7,6 +7,7 @@
  */
 package org.dspace.app.rest;
 
+import static com.jayway.jsonpath.JsonPath.read;
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadata;
 import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadataDoesNotExist;
@@ -23,6 +24,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicReference;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.dspace.app.rest.builder.CollectionBuilder;
@@ -741,6 +743,10 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                                           .build();
         context.restoreAuthSystemState();
 
+        AtomicReference<UUID> idRef = new AtomicReference<>();
+        AtomicReference<UUID> idRefNoEmbeds = new AtomicReference<>();
+        try {
+
         ObjectMapper mapper = new ObjectMapper();
         CollectionRest collectionRest = new CollectionRest();
         // We send a name but the created collection should set this to the title
@@ -785,7 +791,10 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                                             "Custom Copyright Text"),
                                     MetadataMatcher.matchMetadata("dc.title",
                                             "Title Text")
-                                )))));
+                                )))))
+                            .andDo(result -> idRef
+                                    .set(UUID.fromString(read(result.getResponse().getContentAsString(), "$.id"))));;
+
 
         getClient(authToken).perform(post("/api/core/collections")
                 .content(mapper.writeValueAsBytes(collectionRest))
@@ -793,8 +802,13 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                 .contentType(contentType))
                 .andExpect(status().isCreated())
                 .andExpect(content().contentType(contentType))
-                .andExpect(jsonPath("$", HalMatcher.matchNoEmbeds()));
-
+                .andExpect(jsonPath("$", HalMatcher.matchNoEmbeds()))
+                .andDo(result -> idRefNoEmbeds
+                        .set(UUID.fromString(read(result.getResponse().getContentAsString(), "$.id"))));
+        } finally {
+            CollectionBuilder.deleteCollection(idRef.get());
+            CollectionBuilder.deleteCollection(idRefNoEmbeds.get());
+        }
     }
 
     @Test
@@ -831,6 +845,8 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
         authorizeService.addPolicy(context, parentCommunity, Constants.ADD, eperson);
         context.restoreAuthSystemState();
 
+        AtomicReference<UUID> idRef = new AtomicReference<UUID>();
+        try {
         String authToken = getAuthToken(eperson.getEmail(), password);
 
         getClient(authToken).perform(post("/api/core/collections")
@@ -856,8 +872,12 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                                         "Custom Copyright Text"),
                                     MetadataMatcher.matchMetadata("dc.title",
                                         "Title Text")
-                                )))));
-
+                                )))))
+                            .andDo(result -> idRef
+                                    .set(UUID.fromString(read(result.getResponse().getContentAsString(), "$.id"))));
+        } finally {
+            CollectionBuilder.deleteCollection(idRef.get());
+        }
     }
 
     @Test
