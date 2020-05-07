@@ -25,7 +25,13 @@ import org.springframework.stereotype.Component;
 
 /**
  * The LoginOnBehalfOf feature. It can be used by Administrators when the webui.user.assumelogin property is set to true
- * to allow the admin to login as another user
+ * to allow the admin to login as another user.
+ * Calling this with the Site URI will check if the current logged in user can use this feature
+ * without specifying a specific eperson. This will be the case if the logged in user is an Admin
+ * and if the webui.user.assumelogin is set to true
+ * Calling this with the EPerson URI will check if the current logged in user can perform the loginOnBehalfOf
+ * as the given user. This will then additionally check that the eperson given isn't the same as the logged in
+ * user and it'll also check that the eperson given isn't an admin
  */
 @Component
 @AuthorizationFeatureDocumentation(name = LoginOnBehalfOfFeature.NAME,
