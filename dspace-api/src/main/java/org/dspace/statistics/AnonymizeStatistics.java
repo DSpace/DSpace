@@ -13,7 +13,6 @@ import static java.lang.Thread.sleep;
 import static java.util.Arrays.asList;
 import static java.util.Calendar.DAY_OF_YEAR;
 import static java.util.Collections.singletonList;
-
 import static org.apache.commons.cli.Option.builder;
 import static org.apache.commons.lang.StringUtils.isNotBlank;
 import static org.apache.commons.lang.time.DateFormatUtils.format;
