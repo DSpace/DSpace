@@ -21,6 +21,7 @@ import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrQuery.ORDER;
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.SolrInputDocument;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
@@ -202,8 +203,9 @@ public class XOAI {
             SolrQuery params = new SolrQuery("item.willChangeStatus:true").addField("item.id");
             SolrDocumentList documents = DSpaceSolrSearch.query(solrServerResolver.getServer(), params);
             List<Item> items = new LinkedList<Item>();
-            for (int i = 0; i < documents.getNumFound(); i++) {
-                Object fieldValueItemId = documents.get(i).getFieldValue("item.id");
+            for (SolrDocument document : documents) {
+//            for (int i = 0; i < documents.getNumFound(); i++) { // small change to prevent ArrayIndexOutOfBounds
+                Object fieldValueItemId = document.getFieldValue("item.id");
                 if (fieldValueItemId != null) {
                     Item item = itemService.find(context,
                             UUID.fromString((String) fieldValueItemId));
