@@ -98,6 +98,7 @@ public class EssuirSiteController {
         model.addObject("sideNews", sideNews);
         model.addObject("submissions", submissionStatisticsByType);
         model.addObject("communities", communityResponse);
+        model.addObject("locale", dspaceContext.getCurrentLocale());
         request.setAttribute("dspace.context", dspaceContext);
         model.setViewName("home");
         return model;

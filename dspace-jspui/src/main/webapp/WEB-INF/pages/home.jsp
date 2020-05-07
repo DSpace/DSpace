@@ -40,7 +40,19 @@
 				${topNews}
 		</td>
 		<td width="20px"/><td valign="top" class="jumbotron">
-			<p align="center" style="margin-bottom:22px"><a href="http://sumdu.edu.ua"><img src="/image/sumdu-logo-tr.gif" style="margin-top: 38px;"></a></p>
+			<p align="center" style="margin-bottom:22px">
+				<c:choose>
+					<c:when test="${locale.language.equals(\"en\")}">
+						<a href="http://sumdu.edu.ua/int/en"><img src="/image/sumdu_logo_en.png" width="158px"></a>
+					</c:when>
+					<c:when test="${locale.language.equals(\"uk\")}">
+						<a href="http://sumdu.edu.ua/int/en"><img src="/image/sumdu_logo_ua.png" width="158px"></a>
+					</c:when>
+					<c:otherwise>
+						<a href="http://sumdu.edu.ua/"><img src="/image/sumdu_logo_en.png" width="158px"></a>
+					</c:otherwise>
+				</c:choose>
+			</p>
 				${sideNews}
 		</td></tr>
 	</table>
