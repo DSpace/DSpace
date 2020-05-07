@@ -21,7 +21,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.io.IOException;
 import java.util.Base64;
 import javax.servlet.http.Cookie;
 
@@ -840,7 +839,7 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
                 .andExpect(redirectedUrl("http://localhost:8080/server/logout"));
     }
 
-    @Test(expected = IOException.class)
+    @Test(expected = javax.servlet.ServletException.class)
     public void testShibbolethLogoutWithInvalidReturnParam() throws Exception {
         context.turnOffAuthorisationSystem();
         // Enable Shibboleth login
