@@ -7,8 +7,11 @@
  */
 package org.dspace.app.rest.builder;
 
+import java.io.IOException;
 import java.io.InputStream;
+import java.sql.SQLException;
 
+import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Collection;
 import org.dspace.content.DCDate;
@@ -93,6 +96,26 @@ public class WorkspaceItemBuilder extends AbstractBuilder<WorkspaceItem, Workspa
         indexingService.commit();
     }
 
+    /**
+     * Delete the Test WorkspaceItem referred to by the given ID
+     * @param id Integer of Test WorkspaceItem to delete
+     * @throws SQLException
+     * @throws IOException
+     */
+    public static void deleteWorkspaceItem(Integer id) throws SQLException, IOException {
+        try (Context c = new Context()) {
+            c.turnOffAuthorisationSystem();
+            WorkspaceItem workspaceItem = workspaceItemService.find(c, id);
+            if (workspaceItem != null) {
+                try {
+                    workspaceItemService.deleteAll(c, workspaceItem);
+                } catch (AuthorizeException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+            c.complete();
+        }
+    }
     @Override
     public void cleanup() throws Exception {
         delete(workspaceItem);
