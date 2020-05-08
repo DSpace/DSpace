@@ -164,7 +164,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                 log.info(LogManager.getHeader(context, "indexed_object", indexableObject.getUniqueIndexID()));
             }
         } catch (Exception e) {
-            log.error(e.getMessage(), e);
+            throw new RuntimeException(e.getMessage(), e);
         }
     }
 
@@ -332,7 +332,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
             }
 
         } catch (Exception e) {
-            log.error(e.getMessage(), e);
+            throw new RuntimeException(e.getMessage(), e);
         }
     }
 
@@ -1101,7 +1101,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
             // Any acception that we get ignore it.
             // We do NOT want any crashed to shown by the user
             log.error(LogManager.getHeader(context, "Error while quering solr", "Query: " + query), e);
-            return new ArrayList<>(0);
+            throw new RuntimeException(e.getMessage(), e);
         }
     }
 
@@ -1413,5 +1413,10 @@ public class SolrServiceImpl implements SearchService, IndexingService {
             }
         }
         return null;
+    }
+
+    @Override
+    public SolrSearchCore getSolrSearchCore() {
+        return solrSearchCore;
     }
 }
