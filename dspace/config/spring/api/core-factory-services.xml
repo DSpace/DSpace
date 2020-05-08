@@ -49,6 +49,9 @@
 
     <bean id="indexObjectFactoryFactory" class="org.dspace.discovery.indexobject.factory.IndexObjectFactoryFactoryImpl"/>
 
+	<!-- Configurable layout service factory -->
+	<bean id="crisLayoutServiceFactory" class="org.dspace.layout.factory.impl.CrisLayoutServiceFactoryImpl"/>
+
 	<!-- Imp factory -->
 	<bean id="impServiceFactory" class="org.dspace.batch.factory.ImpServiceFactoryImpl"/>
 
