@@ -10,6 +10,8 @@
 -- Create tables for Tabs/Boxes Configuration
 -----------------------------------------------------------------------------------
 
+CREATE SEQUENCE cris_layout_box_id_seq;
+
 CREATE TABLE cris_layout_box
 (
     id INTEGER NOT NULL,
@@ -38,6 +40,8 @@ CREATE TABLE cris_layout_box2securityfield
         REFERENCES metadatafieldregistry (metadata_field_id)
 );
 
+CREATE SEQUENCE cris_layout_field_field_id_seq;
+
 CREATE TABLE cris_layout_field
 (
     field_id INTEGER NOT NULL,
@@ -64,6 +68,8 @@ CREATE TABLE cris_layout_box2field
         REFERENCES cris_layout_box (id)
 );
 
+CREATE SEQUENCE cris_layout_fieldbitstream2metadata_fieldbitstream_id_seq;
+
 CREATE TABLE cris_layout_fieldbitstream2metadata 
 (
     fieldbitstream_id INTEGER NOT NULL,
@@ -82,6 +88,8 @@ CREATE TABLE cris_layout_fieldbitstream2metadata
     CONSTRAINT cris_layout_fieldbitstream2metadata_field_id_fkey FOREIGN KEY (metadata_field_id)
         REFERENCES metadatafieldregistry (metadata_field_id)
 );
+
+CREATE SEQUENCE cris_layout_tab_id_seq;
 
 CREATE TABLE cris_layout_tab
 (
