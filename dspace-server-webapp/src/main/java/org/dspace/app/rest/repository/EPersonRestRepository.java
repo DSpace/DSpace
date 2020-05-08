@@ -54,7 +54,7 @@ public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, E
 
     @Override
     protected EPersonRest createAndReturn(Context context)
-        throws AuthorizeException {
+            throws AuthorizeException {
         // this need to be revisited we should receive an EPersonRest as input
         HttpServletRequest req = getRequestService().getCurrentRequest().getHttpServletRequest();
         ObjectMapper mapper = new ObjectMapper();
@@ -107,7 +107,7 @@ public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, E
         try {
             long total = es.countTotal(context);
             List<EPerson> epersons = es.findAll(context, EPerson.EMAIL, pageable.getPageSize(),
-                Math.toIntExact(pageable.getOffset()));
+                    Math.toIntExact(pageable.getOffset()));
             return converter.toRestPage(epersons, pageable, total, utils.obtainProjection());
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
@@ -118,7 +118,8 @@ public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, E
      * Find the eperson with the provided email address if any. The search is delegated to the
      * {@link EPersonService#findByEmail(Context, String)} method
      *
-     * @param email is the *required* email address
+     * @param email
+     *            is the *required* email address
      * @return a Page of EPersonRest instances matching the user query
      */
     @SearchRestMethod(name = "byEmail")
@@ -140,20 +141,22 @@ public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, E
      * Find the epersons matching the query parameter. The search is delegated to the
      * {@link EPersonService#search(Context, String, int, int)} method
      *
-     * @param query    is the *required* query string
-     * @param pageable contains the pagination information
+     * @param query
+     *            is the *required* query string
+     * @param pageable
+     *            contains the pagination information
      * @return a Page of EPersonRest instances matching the user query
      */
     @PreAuthorize("hasAuthority('ADMIN')")
     @SearchRestMethod(name = "byMetadata")
     public Page<EPersonRest> findByMetadata(@Parameter(value = "query", required = true) String query,
-                                            Pageable pageable) {
+            Pageable pageable) {
 
         try {
             Context context = obtainContext();
             long total = es.searchResultCount(context, query);
             List<EPerson> epersons = es.search(context, query, Math.toIntExact(pageable.getOffset()),
-                Math.toIntExact(pageable.getOffset() + pageable.getPageSize()));
+                                               Math.toIntExact(pageable.getOffset() + pageable.getPageSize()));
             return converter.toRestPage(epersons, pageable, total, utils.obtainProjection());
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
@@ -175,8 +178,8 @@ public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, E
             List<String> constraints = es.getDeleteConstraints(context, eperson);
             if (constraints != null && constraints.size() > 0) {
                 throw new UnprocessableEntityException(
-                    "The eperson cannot be deleted due to the following constraints: "
-                    + StringUtils.join(constraints, ", "));
+                        "The eperson cannot be deleted due to the following constraints: "
+                                + StringUtils.join(constraints, ", "));
             }
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
