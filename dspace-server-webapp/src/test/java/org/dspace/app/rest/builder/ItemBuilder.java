@@ -152,7 +152,14 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
 
     @Override
     public void cleanup() throws Exception {
-        delete(item);
+       try (Context c = new Context()) {
+            c.turnOffAuthorisationSystem();
+            item = c.reloadEntity(item);
+            if (item != null) {
+                 delete(c, item);
+                 c.complete();
+            }
+       }
     }
 
     @Override

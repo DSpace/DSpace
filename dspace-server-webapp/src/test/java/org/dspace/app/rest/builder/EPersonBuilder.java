@@ -28,7 +28,14 @@ public class EPersonBuilder extends AbstractDSpaceObjectBuilder<EPerson> {
 
     @Override
     public void cleanup() throws Exception {
-        delete(ePerson);
+       try (Context c = new Context()) {
+            c.turnOffAuthorisationSystem();
+            ePerson = c.reloadEntity(ePerson);
+            if (ePerson != null) {
+                delete(c, ePerson);
+                c.complete();
+            }
+       }
     }
 
     protected DSpaceObjectService<EPerson> getService() {
