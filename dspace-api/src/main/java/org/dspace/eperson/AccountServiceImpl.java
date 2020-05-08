@@ -239,8 +239,8 @@ public class AccountServiceImpl implements AccountService {
         //  Note change from "key=" to "token="
         String specialLink = new StringBuffer().append(base).append(
             base.endsWith("/") ? "" : "/").append(
-            isRegister ? "register" : "forgot").append("?")
-                                               .append("token=").append(rd.getToken())
+            isRegister ? "register" : "forgot").append("/")
+                                               .append(rd.getToken())
                                                .toString();
         Locale locale = context.getCurrentLocale();
         Email bean = Email.getEmail(I18nUtil.getEmailFilename(locale, isRegister ? "register"
