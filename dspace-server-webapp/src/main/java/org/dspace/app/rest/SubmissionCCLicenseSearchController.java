@@ -12,9 +12,8 @@ import java.util.Map;
 import javax.servlet.ServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
+import org.dspace.app.rest.model.PlainTextValueRest;
 import org.dspace.app.rest.model.SubmissionCCLicenseRest;
 import org.dspace.app.rest.utils.Utils;
 import org.dspace.license.service.CreativeCommonsService;
@@ -24,7 +23,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -34,8 +32,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/" + SubmissionCCLicenseRest.CATEGORY + "/" + SubmissionCCLicenseRest.PLURAL + "/search" +
         "/rightsByQuestions")
 public class SubmissionCCLicenseSearchController {
-
-    private static final Logger log = LogManager.getLogger();
 
     @Autowired
     protected Utils utils;
@@ -52,8 +48,7 @@ public class SubmissionCCLicenseSearchController {
      * @return the CC License URI as a string
      */
     @RequestMapping(method = RequestMethod.GET)
-    @ResponseBody
-    public String findByRightsByQuestions() {
+    public PlainTextValueRest findByRightsByQuestions() {
         ServletRequest servletRequest = requestService.getCurrentRequest()
                                                       .getServletRequest();
         Map<String, String[]> requestParameterMap = servletRequest
@@ -90,6 +85,7 @@ public class SubmissionCCLicenseSearchController {
         if (StringUtils.isBlank(licenseUri)) {
             throw new ResourceNotFoundException("No CC License URI could be found for ID: " + licenseId);
         }
-        return licenseUri;
+        PlainTextValueRest plainTextValueRest = new PlainTextValueRest(licenseUri);
+        return plainTextValueRest;
     }
 }
