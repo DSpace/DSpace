@@ -246,4 +246,12 @@ public abstract class AbstractDSpaceObjectBuilder<T extends DSpaceObject>
 
         indexingService.commit();
     }
+
+    public void delete(Context c, T dso) throws Exception {
+       if (dso != null) {
+           getService().delete(c, dso);
+       }
+       c.complete();
+       indexingService.commit();
+    }
 }

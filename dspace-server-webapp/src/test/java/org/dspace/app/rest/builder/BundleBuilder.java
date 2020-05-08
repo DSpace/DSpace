@@ -53,7 +53,14 @@ public class BundleBuilder extends AbstractDSpaceObjectBuilder<Bundle>  {
     }
 
     public void cleanup() throws Exception {
-        delete(bundle);
+        try (Context c = new Context()) {
+            c.turnOffAuthorisationSystem();
+            bundle = c.reloadEntity(bundle);
+            if (bundle != null) {
+                delete(c, bundle);
+                c.complete();
+            }
+        }
     }
 
     protected DSpaceObjectService<Bundle> getService() {

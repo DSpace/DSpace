@@ -164,58 +164,54 @@ public class CollectionBuilder extends AbstractDSpaceObjectBuilder<Collection> {
 
     @Override
     public void cleanup() throws Exception {
-        deleteAdminGroup();
-        deleteDefaultReadGroups(collection);
-        deleteWorkflowGroups(collection);
-        delete(collection);
-    }
-
-    private void deleteAdminGroup() throws SQLException, AuthorizeException {
-        if (collection.getAdministrators() != null) {
-            try (Context c = new Context()) {
-                c.turnOffAuthorisationSystem();
-                collectionService.removeAdministrators(c, collection);
+       try (Context c = new Context()) {
+            c.turnOffAuthorisationSystem();
+            collection = c.reloadEntity(collection);
+            if (collection != null) {
+                deleteAdminGroup(c);
+                deleteItemTemplate(c);
+                deleteDefaultReadGroups(c, collection);
+                deleteWorkflowGroups(c, collection);
+                delete(c ,collection);
                 c.complete();
             }
+       }
+    }
+
+    private void deleteAdminGroup(Context c) throws SQLException, AuthorizeException, IOException {
+        Group group = collection.getAdministrators();
+        if (group != null) {
+            collectionService.removeAdministrators(c, collection);
+            groupService.delete(c, group);
         }
     }
 
-    public void deleteWorkflowGroups(Collection collection) throws Exception {
-
-        try (Context c = new Context()) {
-            c.turnOffAuthorisationSystem();
-
-            for (int i = 1; i <= 3; i++) {
-                Group g = collectionService.getWorkflowGroup(c, collection, i);
-                if (g != null) {
-                    Group attachedDso = c.reloadEntity(g);
-                    if (attachedDso != null) {
-                        collectionService.setWorkflowGroup(c, collection, i, null);
-                        groupService.delete(c, attachedDso);
-                    }
-                }
-            }
-            c.complete();
+    private void deleteItemTemplate(Context c) throws SQLException, AuthorizeException, IOException {
+        if (collection.getTemplateItem() != null) {
+                 collectionService.removeTemplateItem(c, collection);
         }
     }
 
-    public void deleteDefaultReadGroups(Collection collection) throws Exception {
-
-        try (Context c = new Context()) {
-            c.turnOffAuthorisationSystem();
-
-            Group defaultItemReadGroup = groupService.findByName(c, "COLLECTION_" +
-                collection.getID().toString() + "_ITEM_DEFAULT_READ");
-            Group defaultBitstreamReadGroup = groupService.findByName(c, "COLLECTION_" +
-                collection.getID().toString() + "_BITSTREAM_DEFAULT_READ");
-            if (defaultItemReadGroup != null) {
-                groupService.delete(c, defaultItemReadGroup);
+    public void deleteWorkflowGroups(Context c, Collection collection) throws Exception {
+       for (int i = 1; i <= 3; i++) {
+            Group group = collectionService.getWorkflowGroup(c, collection, i);
+            if (group != null) {
+                collectionService.setWorkflowGroup(c, collection, i, null);
+                groupService.delete(c, group);
             }
-            if (defaultBitstreamReadGroup != null) {
-                groupService.delete(c, defaultBitstreamReadGroup);
-            }
+       }
+    }
 
-            c.complete();
+    public void deleteDefaultReadGroups(Context c, Collection collection) throws Exception {
+        Group defaultItemReadGroup = groupService.findByName(c, "COLLECTION_" +
+              collection.getID().toString() + "_ITEM_DEFAULT_READ");
+        Group defaultBitstreamReadGroup = groupService.findByName(c, "COLLECTION_" +
+              collection.getID().toString() + "_BITSTREAM_DEFAULT_READ");
+        if (defaultItemReadGroup != null) {
+            groupService.delete(c, defaultItemReadGroup);
+        }
+        if (defaultBitstreamReadGroup != null) {
+            groupService.delete(c, defaultBitstreamReadGroup);
         }
     }
 
@@ -227,8 +223,7 @@ public class CollectionBuilder extends AbstractDSpaceObjectBuilder<Collection> {
      * @throws IOException
      */
     public static void deleteCollection(UUID uuid) throws SQLException, IOException {
-        try (Context c = new Context()) {
-            c.turnOffAuthorisationSystem();
+       try (Context c = new Context()) {
             Collection collection = collectionService.find(c, uuid);
             if (collection != null) {
                 try {
@@ -237,8 +232,7 @@ public class CollectionBuilder extends AbstractDSpaceObjectBuilder<Collection> {
                     throw new RuntimeException(e.getMessage(), e);
                 }
             }
-            c.complete();
-        }
+       }
     }
 
     @Override

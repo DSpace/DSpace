@@ -115,19 +115,22 @@ public class CommunityBuilder extends AbstractDSpaceObjectBuilder<Community> {
 
     @Override
     public void cleanup() throws Exception {
-        deleteAdminGroup();
-        delete(community);
-    }
-
-    private void deleteAdminGroup() throws SQLException, AuthorizeException, IOException {
-        Group group = community.getAdministrators();
-        if (group != null) {
-            try (Context c = new Context()) {
-                c.turnOffAuthorisationSystem();
-                communityService.removeAdministrators(c, community);
-                groupService.delete(c, group);
+       try (Context c = new Context()) {
+            c.turnOffAuthorisationSystem();
+            community = c.reloadEntity(community);
+            if (community != null) {
+                deleteAdminGroup(c);
+                delete(c, community);
                 c.complete();
             }
+       }
+    }
+
+    private void deleteAdminGroup(Context c) throws SQLException, AuthorizeException, IOException {
+        Group group = community.getAdministrators();
+        if (group != null) {
+            communityService.removeAdministrators(c, community);
+            groupService.delete(c, group);
         }
     }
 
