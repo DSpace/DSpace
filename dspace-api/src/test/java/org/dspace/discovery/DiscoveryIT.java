@@ -8,6 +8,7 @@
 package org.dspace.discovery;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
 import java.sql.SQLException;
@@ -135,5 +136,10 @@ public class DiscoveryIT extends AbstractIntegrationTest {
         indexableObjects = discoverResult.getIndexableObjects();
         assertEquals(0, indexableObjects.size());
         context.restoreAuthSystemState();
+    }
+
+    @Test
+    public void assertSolrNotNull() {
+        assertNotNull(searchService.getSolrSearchCore().getSolr());
     }
 }
