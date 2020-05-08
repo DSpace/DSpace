@@ -11,10 +11,10 @@ import org.dspace.core.Context;
 import org.dspace.eperson.ChairEntity;
 import org.dspace.eperson.FacultyEntity;
 import org.dspace.eperson.Speciality;
+import org.dspace.eperson.SpecialityDetailedInfo;
 import org.jooq.lambda.Seq;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-import org.ssu.entity.SpecialityDetailedInfo;
 import org.ssu.repository.MetadatavalueRepository;
 
 import javax.annotation.Resource;
@@ -46,46 +46,6 @@ public class SpecialityReportFetcher {
         }
         return Optional.empty();
     };
-
-    private Speciality extractSpecialityCode(String data) {
-        FacultyEntity defaultFacultyEntity = new FacultyEntity.Builder().withId(-1).withName("-").build();
-        ChairEntity defaultChairEntity = new ChairEntity.Builder().withId(-1).withChairName("-").withFacultyEntityName(defaultFacultyEntity).build();
-        Speciality defaultSpecialityEntity = new Speciality.Builder().withId(-1).withName("-").withCode("-1").withChairEntity(defaultChairEntity).build();
-
-        try {
-            ObjectMapper objectMapper = new ObjectMapper();
-            JsonNode jsonNode = objectMapper.readTree(data);
-            FacultyEntity.Builder facultyBuilder = new FacultyEntity.Builder(defaultFacultyEntity);
-            if (jsonNode.has(0)) {
-                facultyBuilder
-                        .withId(jsonNode.get(0).get("code").asInt())
-                        .withName(jsonNode.get(0).get("name").asText());
-            }
-
-            ChairEntity.Builder chairBuilder = new ChairEntity.Builder(defaultChairEntity)
-                    .withFacultyEntityName(facultyBuilder.build());
-            if (jsonNode.has(1)) {
-                chairBuilder
-                        .withId(jsonNode.get(1).get("code").asInt())
-                        .withChairName(jsonNode.get(1).get("name").asText());
-            }
-
-            Speciality.Builder speciality = new Speciality.Builder(defaultSpecialityEntity)
-                    .withChairEntity(chairBuilder.build());
-            if (jsonNode.has(2)) {
-                speciality.withName(jsonNode.get(2).get("name").asText())
-                        .withCode(jsonNode.get(2).get("code").asText());
-            } else {
-                speciality.withName(chairBuilder.build().getName())
-                        .withCode(chairBuilder.build().getId().toString());
-            }
-            return speciality.build();
-
-        } catch (Exception ex) {
-            log.error(ex.getMessage());
-        }
-        return defaultSpecialityEntity;
-    }
 
     @Transactional
     public List<Speciality> getBachelorsPapersMetadata(Context context, LocalDate from, LocalDate to) throws IOException, SQLException {

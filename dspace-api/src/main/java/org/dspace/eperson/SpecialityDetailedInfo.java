@@ -1,4 +1,5 @@
-package org.ssu.entity;
+package org.dspace.eperson;
+
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -19,3 +20,4 @@ public class SpecialityDetailedInfo {
         return name;
     }
 }
+
