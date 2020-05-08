@@ -28,7 +28,6 @@ import org.dspace.app.rest.authorization.TrueForAdminsFeature;
 import org.dspace.app.rest.authorization.TrueForLoggedUsersFeature;
 import org.dspace.app.rest.authorization.TrueForTestUsersFeature;
 import org.dspace.app.rest.authorization.TrueForUsersInGroupTestFeature;
-import org.dspace.app.rest.authorization.impl.LoginOnBehalfOfFeature;
 import org.dspace.app.rest.builder.CommunityBuilder;
 import org.dspace.app.rest.builder.EPersonBuilder;
 import org.dspace.app.rest.builder.GroupBuilder;
@@ -113,11 +112,6 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
      */
     private AuthorizationFeature trueForUsersInGroupTest;
 
-    /**
-     * This holds a reference to the feature {@link LoginOnBehalfOfFeature}
-     */
-    private AuthorizationFeature loginOnBehalfOf;
-
     @Override
     @Before
     public void setUp() throws Exception {
@@ -130,7 +124,6 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
         trueForLoggedUsers = authorizationFeatureService.find(TrueForLoggedUsersFeature.NAME);
         trueForTestUsers = authorizationFeatureService.find(TrueForTestUsersFeature.NAME);
         trueForUsersInGroupTest = authorizationFeatureService.find(TrueForUsersInGroupTestFeature.NAME);
-        loginOnBehalfOf = authorizationFeatureService.find(LoginOnBehalfOfFeature.NAME);
     }
 
     @Test
