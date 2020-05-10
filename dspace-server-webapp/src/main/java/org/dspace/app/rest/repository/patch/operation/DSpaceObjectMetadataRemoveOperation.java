@@ -99,8 +99,7 @@ public class DSpaceObjectMetadataRemoveOperation<R extends DSpaceObject> extends
 
     @Override
     public boolean supports(Object objectToMatch, Operation operation) {
-        return ((operation.getPath().startsWith(metadataPatchUtils.OPERATION_METADATA_PATH)
-                || operation.getPath().equals(metadataPatchUtils.OPERATION_METADATA_PATH))
+        return (operation.getPath().startsWith(metadataPatchUtils.OPERATION_METADATA_PATH)
                 && operation.getOp().trim().equalsIgnoreCase(OPERATION_REMOVE)
                 && objectToMatch instanceof DSpaceObject);
     }
