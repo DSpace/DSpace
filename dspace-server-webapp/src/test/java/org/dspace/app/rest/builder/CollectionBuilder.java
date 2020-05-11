@@ -20,6 +20,7 @@ import org.dspace.content.Community;
 import org.dspace.content.MetadataSchemaEnum;
 import org.dspace.content.service.DSpaceObjectService;
 import org.dspace.core.Context;
+import org.dspace.discovery.SearchServiceException;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 
@@ -221,9 +222,11 @@ public class CollectionBuilder extends AbstractDSpaceObjectBuilder<Collection> {
      * @param uuid UUID of Test Collection to delete
      * @throws SQLException
      * @throws IOException
+     * @throws SearchServiceException
      */
-    public static void deleteCollection(UUID uuid) throws SQLException, IOException {
+    public static void deleteCollection(UUID uuid) throws SQLException, IOException, SearchServiceException {
        try (Context c = new Context()) {
+            c.turnOffAuthorisationSystem();
             Collection collection = collectionService.find(c, uuid);
             if (collection != null) {
                 try {
@@ -232,6 +235,8 @@ public class CollectionBuilder extends AbstractDSpaceObjectBuilder<Collection> {
                     throw new RuntimeException(e.getMessage(), e);
                 }
             }
+            c.complete();
+            indexingService.commit();
        }
     }
 
