@@ -25,6 +25,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.stereotype.Component;
 
+/**
+ * This is the repository that is responsible for managing Registration Rest objects
+ */
 @Component(RegistrationRest.CATEGORY + "." + RegistrationRest.NAME)
 public class RegistrationRestRepository extends DSpaceRestRepository<RegistrationRest, Integer> {
 
@@ -49,6 +52,13 @@ public class RegistrationRestRepository extends DSpaceRestRepository<Registratio
         return RegistrationRest.class;
     }
 
+    /**
+     * This method will find the RegistrationRest object that is associated with the token given
+     * @param token The token to be found and for which a RegistrationRest object will be found
+     * @return      A RegistrationRest object for the given token
+     * @throws SQLException If something goes wrong
+     * @throws AuthorizeException If something goes wrong
+     */
     @SearchRestMethod(name = "findByToken")
     public RegistrationRest findByToken(@Parameter(value = "token", required = true) String token)
         throws SQLException, AuthorizeException {

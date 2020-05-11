@@ -93,6 +93,7 @@ public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, E
             throw new UnprocessableEntityException("error parsing the body... maybe this is not the right error code");
         }
         String token = req.getParameter("token");
+        // If a token is available, we'll swap to the execution that is token based
         if (StringUtils.isNotBlank(token)) {
             try {
                 return createAndReturn(context, epersonRest, token);
@@ -101,6 +102,7 @@ public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, E
                 throw new RuntimeException("Something with wrong in the creation of an EPerson with token: " + token);
             }
         }
+        // If no token is present, we simply do the admin execution
         EPerson eperson = createEPersonFromRestObject(context, epersonRest);
 
         return converter.toRest(eperson, utils.obtainProjection());
@@ -159,9 +161,11 @@ public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, E
             throw new AccessDeniedException(
                 "Registration is disabled, you are not authorized to create a new Authorization");
         }
+        // We'll turn off authorisation system because this call isn't admin based as it's token based
         context.turnOffAuthorisationSystem();
         EPerson ePerson = createEPersonFromRestObject(context, epersonRest);
         context.restoreAuthSystemState();
+        // Restoring authorisation state right after the creation call
         accountService.deleteToken(context, token);
         return converter.toRest(ePerson, utils.obtainProjection());
     }

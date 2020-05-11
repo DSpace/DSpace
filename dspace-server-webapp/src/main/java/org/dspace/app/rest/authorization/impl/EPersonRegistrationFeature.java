@@ -20,6 +20,10 @@ import org.dspace.services.RequestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+/**
+ * The EPerson Registration feature. It's able to be used on site objects if the user.registration property is set to
+ * true. If it's set to true, it'll check if the current context is allowed to set the password.
+ */
 @Component
 @AuthorizationFeatureDocumentation(name = EPersonRegistrationFeature.NAME,
     description = "It can be used to register an eperson")
