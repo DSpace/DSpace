@@ -12,6 +12,7 @@ import java.sql.SQLException;
 import java.util.Locale;
 import javax.mail.MessagingException;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.ConfigurationManager;
@@ -159,6 +160,17 @@ public class AccountServiceImpl implements AccountService {
     public void deleteToken(Context context, String token)
         throws SQLException {
         registrationDataService.deleteByToken(context, token);
+    }
+
+    @Override
+    public boolean verifyPasswordStructure(String password) {
+        if (StringUtils.isBlank(password)) {
+            return false;
+        }
+        if (StringUtils.length(password) < 6) {
+            return false;
+        }
+        return true;
     }
 
     /**

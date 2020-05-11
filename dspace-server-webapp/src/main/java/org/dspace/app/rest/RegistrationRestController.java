@@ -16,18 +16,17 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
-import org.dspace.app.rest.authorization.AuthorizationFeature;
 import org.dspace.app.rest.authorization.AuthorizationFeatureService;
 import org.dspace.app.rest.converter.ConverterService;
+import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.RegistrationRest;
-import org.dspace.app.rest.model.SiteRest;
-import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.utils.ContextUtil;
+import org.dspace.app.util.AuthorizeUtil;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.Site;
 import org.dspace.content.service.SiteService;
 import org.dspace.core.Context;
+import org.dspace.eperson.EPerson;
 import org.dspace.eperson.service.AccountService;
 import org.dspace.eperson.service.EPersonService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -83,13 +82,6 @@ public class RegistrationRestController {
         throws SQLException, IOException, MessagingException, AuthorizeException {
 
         Context context = ContextUtil.obtainContext(request);
-        AuthorizationFeature epersonRegistration = authorizationFeatureService.find("epersonRegistration");
-        Site site = siteService.findSite(context);
-        SiteRest siteRest = converterService.toRest(site, Projection.DEFAULT);
-        if (!authorizationFeatureService.isAuthorized(context, epersonRegistration, siteRest)) {
-            throw new AccessDeniedException(
-                "Registration is disabled, you are not authorized to create a new Authorization");
-        }
         ObjectMapper mapper = new ObjectMapper();
         RegistrationRest registrationRest;
         try {
@@ -101,9 +93,18 @@ public class RegistrationRestController {
         if (StringUtils.isBlank(registrationRest.getEmail())) {
             throw new UnprocessableEntityException("The email cannot be omitted from the Registration endpoint");
         }
-        if (ePersonService.findByEmail(context, registrationRest.getEmail()) != null) {
+        EPerson eperson = ePersonService.findByEmail(context, registrationRest.getEmail());
+        if (eperson != null) {
+            if (!AuthorizeUtil.authorizeUpdatePassword(context, eperson.getEmail(), eperson.canLogIn())) {
+                throw new DSpaceBadRequestException("Password cannot be updated for the given EPerson with email: " +
+                                                        eperson.getEmail());
+            }
             accountService.sendForgotPasswordInfo(context, registrationRest.getEmail());
         } else {
+            if (!AuthorizeUtil.authorizeNewAccountRegistration(context, request)) {
+                throw new AccessDeniedException(
+                    "Registration is disabled, you are not authorized to create a new Authorization");
+            }
             accountService.sendRegistrationInfo(context, registrationRest.getEmail());
         }
         context.complete();

@@ -46,4 +46,6 @@ public interface AccountService {
 
     public void deleteToken(Context context, String token)
         throws SQLException;
+
+    public boolean verifyPasswordStructure(String password);
 }

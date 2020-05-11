@@ -18,19 +18,17 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
-import org.dspace.app.rest.authorization.AuthorizationFeature;
 import org.dspace.app.rest.authorization.AuthorizationFeatureService;
+import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.EPersonRest;
 import org.dspace.app.rest.model.MetadataRest;
 import org.dspace.app.rest.model.MetadataValueRest;
-import org.dspace.app.rest.model.SiteRest;
 import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.rest.model.patch.Patch;
-import org.dspace.app.rest.projection.Projection;
+import org.dspace.app.util.AuthorizeUtil;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
-import org.dspace.content.Site;
 import org.dspace.content.service.SiteService;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
@@ -133,32 +131,30 @@ public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, E
         throws AuthorizeException, SQLException {
         RegistrationData registrationData = registrationDataService.findByToken(context, token);
         if (registrationData == null) {
-            throw new AccessDeniedException("The token given as parameter: " + token + " does not exist" +
+            throw new DSpaceBadRequestException("The token given as parameter: " + token + " does not exist" +
                                                 " in the database");
         }
         if (es.findByEmail(context, registrationData.getEmail()) != null) {
-            throw new AccessDeniedException("The token given already contains an email address that resolves" +
+            throw new DSpaceBadRequestException("The token given already contains an email address that resolves" +
                                                 "to an eperson");
         }
         String emailFromJson = epersonRest.getEmail();
         if (StringUtils.isNotBlank(emailFromJson)) {
             if (!StringUtils.equalsIgnoreCase(registrationData.getEmail(), emailFromJson)) {
-                throw new AccessDeniedException("The email resulting from the token does not match the email given" +
-                                                    " in the json body. Email from token: " +
+                throw new DSpaceBadRequestException("The email resulting from the token does not match the email given"
+                                                        + " in the json body. Email from token: " +
                                                     registrationData.getEmail() + " email from the json body: "
                                                     + emailFromJson);
             }
         }
         if (epersonRest.isSelfRegistered() != null && !epersonRest.isSelfRegistered()) {
-            throw new AccessDeniedException("The self registered property cannot be set to false using this method" +
-                                                " with a token");
+            throw new DSpaceBadRequestException("The self registered property cannot be set to false using this method"
+                                                    + " with a token");
         }
         checkRequiredProperties(epersonRest);
-        AuthorizationFeature epersonRegistration = authorizationFeatureService.find("epersonRegistration");
-        Site site = siteService.findSite(context);
-        SiteRest siteRest = converter.toRest(site, Projection.DEFAULT);
-        if (!authorizationFeatureService.isAuthorized(context, epersonRegistration, siteRest)) {
-            throw new AccessDeniedException(
+        if (!AuthorizeUtil.authorizeNewAccountRegistration(context, requestService
+            .getCurrentRequest().getHttpServletRequest())) {
+            throw new DSpaceBadRequestException(
                 "Registration is disabled, you are not authorized to create a new Authorization");
         }
         // We'll turn off authorisation system because this call isn't admin based as it's token based
@@ -177,13 +173,13 @@ public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, E
             List<MetadataValueRest> epersonLastName = metadataRest.getMap().get("eperson.lastname");
             if (epersonFirstName == null || epersonLastName == null ||
                 epersonFirstName.isEmpty() || epersonLastName.isEmpty()) {
-                throw new AccessDeniedException("The eperson.firstname and eperson.lastname values need to be " +
+                throw new DSpaceBadRequestException("The eperson.firstname and eperson.lastname values need to be " +
                                                     "filled in");
             }
         }
         String password = epersonRest.getPassword();
-        if (StringUtils.isBlank(password)) {
-            throw new AccessDeniedException("the password cannot be left blank");
+        if (!accountService.verifyPasswordStructure(password)) {
+            throw new DSpaceBadRequestException("the password cannot be left blank");
         }
     }
 

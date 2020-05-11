@@ -13,6 +13,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.model.patch.Operation;
+import org.dspace.app.util.AuthorizeUtil;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
@@ -60,6 +61,10 @@ public class EPersonPasswordReplaceOperation<R> extends PatchOperation<R> {
             checkModelForExistingValue(eperson);
             if (StringUtils.isNotBlank(token)) {
                 patchWithToken(context,eperson, token, operation);
+            }
+            if (!AuthorizeUtil.authorizeUpdatePassword(context, eperson.getEmail(), eperson.canLogIn())) {
+                throw new DSpaceBadRequestException("Password cannot be updated for the given EPerson with email: " +
+                                                        eperson.getEmail());
             }
             ePersonService.setPassword(eperson, (String) operation.getValue());
             return object;
