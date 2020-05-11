@@ -15,6 +15,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.Link;
 import org.springframework.stereotype.Component;
 
+/**
+ * This class' purpose is to remove all links from the PropertyResource.
+ */
 @Component
 public class PropertyResourceHalLinkFactory extends HalLinkFactory<PropertyResource, RestResourceController> {
     @Override

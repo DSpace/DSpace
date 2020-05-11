@@ -49,15 +49,11 @@ public class ConfigurationRestRepository extends DSpaceRestRepository<PropertyRe
      */
     @Override
     public PropertyRest findOne(Context context, String property) {
-        if (!exposedProperties.contains(property)) {
-            throw new ResourceNotFoundException("No such configuration property" + property);
+        if (!exposedProperties.contains(property) || configurationService.getArrayProperty(property).length == 0) {
+            throw new ResourceNotFoundException("No such configuration property: " + property);
         }
 
         String[] propertyValues = configurationService.getArrayProperty(property);
-
-        if (propertyValues.length == 0) {
-            throw new ResourceNotFoundException("No such configuration property" + property);
-        }
 
         PropertyRest propertyRest = new PropertyRest();
         propertyRest.setName(property);
@@ -68,7 +64,7 @@ public class ConfigurationRestRepository extends DSpaceRestRepository<PropertyRe
 
     @Override
     public Page<PropertyRest> findAll(Context context, Pageable pageable) {
-        throw new RepositoryMethodNotImplementedException("No implementation found; Method not allowed!", "");
+        throw new RepositoryMethodNotImplementedException("No implementation found; Method not allowed", "");
     }
 
     @Override

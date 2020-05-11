@@ -11,6 +11,10 @@ import java.util.List;
 
 import org.dspace.app.rest.RestResourceController;
 
+/**
+ * This class acts as the REST representation of a DSpace configuration property.
+ * This class acts as a data holder for the PropertyResource
+ */
 public class PropertyRest extends RestAddressableModel {
     public static final String NAME = "property";
     public static final String CATEGORY = RestAddressableModel.CONFIGURATION;
