@@ -7,18 +7,19 @@
  */
 package org.dspace.app.rest.model.hateoas;
 
-import org.dspace.app.rest.model.CrisTabLayoutRest;
+import org.dspace.app.rest.model.CrisLayoutTabRest;
 import org.dspace.app.rest.model.hateoas.annotations.RelNameDSpaceResource;
+import org.dspace.app.rest.utils.Utils;
 
 /**
  * @author Danilo Di Nuzzo (danilo dot dinuzzo at 4science dot it)
  *
  */
-@RelNameDSpaceResource(CrisTabLayoutRest.NAME)
-public class CrisLayoutTabResource extends HALResource<CrisTabLayoutRest> {
+@RelNameDSpaceResource(CrisLayoutTabRest.NAME)
+public class CrisLayoutTabResource extends DSpaceResource<CrisLayoutTabRest> {
 
-    public CrisLayoutTabResource(CrisTabLayoutRest data) {
-        super(data);
+    public CrisLayoutTabResource(CrisLayoutTabRest data, Utils utils) {
+        super(data, utils);
     }
 
 }

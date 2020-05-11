@@ -9,7 +9,7 @@ package org.dspace.app.rest.repository;
 
 import java.sql.SQLException;
 
-import org.dspace.app.rest.model.CrisTabLayoutRest;
+import org.dspace.app.rest.model.CrisLayoutTabRest;
 import org.dspace.core.Context;
 import org.dspace.layout.CrisLayoutTab;
 import org.dspace.layout.service.CrisLayoutTabService;
@@ -21,8 +21,8 @@ import org.springframework.stereotype.Component;
  * @author Danilo Di Nuzzo (danilo dot dinuzzo at 4science dot it)
  *
  */
-@Component(CrisTabLayoutRest.CATEGORY + "." + CrisTabLayoutRest.NAME)
-public class CrisLayoutTabRepository extends DSpaceRestRepository<CrisTabLayoutRest, Integer>
+@Component(CrisLayoutTabRest.CATEGORY + "." + CrisLayoutTabRest.NAME)
+public class CrisLayoutTabRepository extends DSpaceRestRepository<CrisLayoutTabRest, Integer>
     implements ReloadableEntityObjectRepository<CrisLayoutTab, Integer> {
 
     private final CrisLayoutTabService service;
@@ -35,7 +35,7 @@ public class CrisLayoutTabRepository extends DSpaceRestRepository<CrisTabLayoutR
      * @see org.dspace.app.rest.repository.DSpaceRestRepository#findOne(org.dspace.core.Context, java.io.Serializable)
      */
     @Override
-    public CrisTabLayoutRest findOne(Context context, Integer id) {
+    public CrisLayoutTabRest findOne(Context context, Integer id) {
         CrisLayoutTab tab = null;
         try {
             tab = service.find(context, id);
@@ -53,7 +53,7 @@ public class CrisLayoutTabRepository extends DSpaceRestRepository<CrisTabLayoutR
      * (org.dspace.core.Context, org.springframework.data.domain.Pageable)
      */
     @Override
-    public Page<CrisTabLayoutRest> findAll(Context context, Pageable pageable) {
+    public Page<CrisLayoutTabRest> findAll(Context context, Pageable pageable) {
         // TODO Auto-generated method stub
         return null;
     }
@@ -62,7 +62,7 @@ public class CrisLayoutTabRepository extends DSpaceRestRepository<CrisTabLayoutR
      * @see org.dspace.app.rest.repository.DSpaceRestRepository#getDomainClass()
      */
     @Override
-    public Class<CrisTabLayoutRest> getDomainClass() {
+    public Class<CrisLayoutTabRest> getDomainClass() {
         // TODO Auto-generated method stub
         return null;
     }

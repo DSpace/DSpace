@@ -7,7 +7,7 @@
  */
 package org.dspace.app.rest.converter;
 
-import org.dspace.app.rest.model.CrisTabLayoutRest;
+import org.dspace.app.rest.model.CrisLayoutTabRest;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.layout.CrisLayoutTab;
 import org.springframework.stereotype.Component;
@@ -17,15 +17,15 @@ import org.springframework.stereotype.Component;
  *
  */
 @Component
-public class CrisLayoutTabConverter implements DSpaceConverter<CrisLayoutTab, CrisTabLayoutRest> {
+public class CrisLayoutTabConverter implements DSpaceConverter<CrisLayoutTab, CrisLayoutTabRest> {
 
     /* (non-Javadoc)
      * @see org.dspace.app.rest.converter.DSpaceConverter#convert
      * (java.lang.Object, org.dspace.app.rest.projection.Projection)
      */
     @Override
-    public CrisTabLayoutRest convert(CrisLayoutTab mo, Projection projection) {
-        CrisTabLayoutRest rest = new CrisTabLayoutRest();
+    public CrisLayoutTabRest convert(CrisLayoutTab mo, Projection projection) {
+        CrisLayoutTabRest rest = new CrisLayoutTabRest();
         rest.setId(mo.getID());
         rest.setShortname(mo.getShortName());
         rest.setHeader(mo.getHeader());

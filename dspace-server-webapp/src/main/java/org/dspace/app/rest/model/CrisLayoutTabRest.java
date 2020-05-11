@@ -17,11 +17,11 @@ import org.dspace.app.rest.RestResourceController;
  */
 @LinksRest(links = {
         @LinkRest(
-                name = CrisTabLayoutRest.BOXES,
+                name = CrisLayoutTabRest.BOXES,
                 method = "getBoxes"
         )
 })
-public class CrisTabLayoutRest extends BaseObjectRest<Integer> {
+public class CrisLayoutTabRest extends BaseObjectRest<Integer> {
 
     private static final long serialVersionUID = -6032412882381032490L;
 
