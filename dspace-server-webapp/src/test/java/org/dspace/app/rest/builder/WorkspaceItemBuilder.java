@@ -68,32 +68,17 @@ public class WorkspaceItemBuilder extends AbstractBuilder<WorkspaceItem, Workspa
 
     }
 
-    private void deleteItem(Item dso) throws Exception {
-        try (Context c = new Context()) {
-            c.turnOffAuthorisationSystem();
-            Item attachedDso = c.reloadEntity(dso);
-            if (attachedDso != null) {
-                itemService.delete(c, attachedDso);
-            }
-            c.complete();
+    private void deleteItem(Context c, Item dso) throws Exception {
+        if (dso != null) {
+            itemService.delete(c, dso);
         }
-
-        indexingService.commit();
     }
 
     @Override
-    public void delete(WorkspaceItem dso) throws Exception {
-        try (Context c = new Context()) {
-            c.turnOffAuthorisationSystem();
-            WorkspaceItem attachedDso = c.reloadEntity(dso);
-            if (attachedDso != null) {
-                getService().deleteAll(c, attachedDso);
-                item = null;
-            }
-            c.complete();
+    public void delete( Context c, WorkspaceItem dso) throws Exception {
+        if (dso != null) {
+            getService().deleteAll(c, dso);
         }
-
-        indexingService.commit();
     }
 
     /**
@@ -116,11 +101,21 @@ public class WorkspaceItemBuilder extends AbstractBuilder<WorkspaceItem, Workspa
             c.complete();
         }
     }
+
     @Override
     public void cleanup() throws Exception {
-        delete(workspaceItem);
-        if (item != null) {
-            deleteItem(item);
+        try (Context c = new Context()) {
+            c.turnOffAuthorisationSystem();
+            workspaceItem = c.reloadEntity(workspaceItem);
+            if (workspaceItem != null) {
+                delete(c, workspaceItem);
+            }
+            item = c.reloadEntity(item);
+            if (item != null) {
+                deleteItem(c, item);
+            }
+            c.complete();
+            indexingService.commit();
         }
     }
 

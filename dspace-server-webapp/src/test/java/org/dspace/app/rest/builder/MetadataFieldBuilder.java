@@ -37,7 +37,22 @@ public class MetadataFieldBuilder extends AbstractBuilder<MetadataField, Metadat
 
     @Override
     public void cleanup() throws Exception {
-        delete(metadataField);
+        try (Context c = new Context()) {
+            c.turnOffAuthorisationSystem();
+            metadataField = c.reloadEntity(metadataField);
+            if (metadataField != null) {
+                delete(c, metadataField);
+            }
+            c.complete();
+            indexingService.commit();
+        }
+    }
+
+    @Override
+    public void delete(Context c, MetadataField dso) throws Exception {
+        if (dso != null) {
+            getService().delete(c, dso);
+        }
     }
 
     @Override

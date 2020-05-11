@@ -36,7 +36,22 @@ public class MetadataSchemaBuilder extends AbstractBuilder<MetadataSchema, Metad
 
     @Override
     public void cleanup() throws Exception {
-        delete(metadataSchema);
+        try (Context c = new Context()) {
+            c.turnOffAuthorisationSystem();
+            metadataSchema = c.reloadEntity(metadataSchema);
+            if (metadataSchema != null) {
+                delete(c, metadataSchema);
+            }
+            c.complete();
+            indexingService.commit();
+        }
+    }
+
+    @Override
+    public void delete(Context c, MetadataSchema dso) throws Exception {
+        if (dso != null) {
+            getService().delete(c, dso);
+        }
     }
 
     @Override

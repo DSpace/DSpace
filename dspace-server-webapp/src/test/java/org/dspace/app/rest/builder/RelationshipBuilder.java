@@ -37,7 +37,22 @@ public class RelationshipBuilder extends AbstractBuilder<Relationship, Relations
 
     @Override
     public void cleanup() throws Exception {
-        delete(relationship);
+        try (Context c = new Context()) {
+            c.turnOffAuthorisationSystem();
+            relationship = c.reloadEntity(relationship);
+            if (relationship != null) {
+                delete(c, relationship);
+            }
+            c.complete();
+            indexingService.commit();
+        }
+    }
+
+    @Override
+    public void delete(Context c, Relationship dso) throws Exception {
+        if (dso != null) {
+            getService().delete(c, dso);
+        }
     }
 
     public Relationship build() {
