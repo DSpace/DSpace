@@ -233,17 +233,25 @@ public abstract class AbstractDSpaceObjectBuilder<T extends DSpaceObject>
 
     public abstract T build() throws SQLException, AuthorizeException;
 
-    public void delete(T dso) throws Exception {
+//    public void delete(T dso) throws Exception {
+//
+//        try (Context c = new Context()) {
+//            c.turnOffAuthorisationSystem();
+//            T attachedDso = c.reloadEntity(dso);
+//            if (attachedDso != null) {
+//                getService().delete(c, attachedDso);
+//            }
+//            c.complete();
+//        }
+//
+//        indexingService.commit();
+//    }
 
-        try (Context c = new Context()) {
-            c.turnOffAuthorisationSystem();
-            T attachedDso = c.reloadEntity(dso);
-            if (attachedDso != null) {
-                getService().delete(c, attachedDso);
-            }
-            c.complete();
-        }
-
-        indexingService.commit();
+    public void delete(Context c, T dso) throws Exception {
+       if (dso != null) {
+           getService().delete(c, dso);
+       }
+       c.complete();
+       indexingService.commit();
     }
 }
