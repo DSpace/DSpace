@@ -9,7 +9,10 @@ package org.dspace.app.util;
 
 import java.sql.SQLException;
 import java.util.List;
+import javax.servlet.http.HttpServletRequest;
 
+import org.apache.logging.log4j.Logger;
+import org.dspace.authenticate.factory.AuthenticateServiceFactory;
 import org.dspace.authorize.AuthorizeConfiguration;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.ResourcePolicy;
@@ -25,6 +28,8 @@ import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.eperson.factory.EPersonServiceFactory;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
  * This class is an addition to the AuthorizeManager that perform authorization
@@ -34,6 +39,7 @@ import org.dspace.core.Context;
  */
 public class AuthorizeUtil {
 
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(AuthorizeUtil.class);
     /**
      * Default constructor
      */
@@ -524,5 +530,43 @@ public class AuthorizeUtil {
                                                  Constants.ADD);
             }
         }
+    }
+
+    /**
+     * This method will return a boolean indicating whether the current user is allowed to register a new
+     * account or not
+     * @param context   The relevant DSpace context
+     * @param request   The current request
+     * @return          A boolean indicating whether the current user can register a new account or not
+     * @throws SQLException If something goes wrong
+     */
+    public static boolean authorizeNewAccountRegistration(Context context, HttpServletRequest request)
+        throws SQLException {
+        if (DSpaceServicesFactory.getInstance().getConfigurationService()
+                                 .getBooleanProperty("user.registration", true)) {
+            return AuthenticateServiceFactory.getInstance().getAuthenticationService()
+                                             .allowSetPassword(context, request, null);
+        }
+        return false;
+    }
+
+    /**
+     * This method will return a boolean indicating whether it's allowed to update the password for the EPerson
+     * with the given email and canLogin property
+     * @param context   The relevant DSpace context
+     * @param email     The email to be checked
+     * @param canLogin  The boolean canLogin property
+     * @return          A boolean indicating if the password can be updated or not
+     */
+    public static boolean authorizeUpdatePassword(Context context, String email, boolean canLogin) {
+        try {
+            if (EPersonServiceFactory.getInstance().getEPersonService().findByEmail(context, email) != null
+                && canLogin) {
+                return true;
+            }
+        } catch (SQLException e) {
+            log.error("Something went wrong trying to retrieve EPerson for email: " + email, e);
+        }
+        return false;
     }
 }

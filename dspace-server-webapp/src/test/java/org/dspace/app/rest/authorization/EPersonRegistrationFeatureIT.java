@@ -62,12 +62,9 @@ public class EPersonRegistrationFeatureIT extends AbstractControllerIntegrationT
         SiteRest SiteRest = siteConverter.convert(site, Projection.DEFAULT);
         String siteUri = utils.linkToSingleResource(SiteRest, "self").getHref();
 
-        // access the authorization for the admin user
-        String adminToken = getAuthToken(admin.getEmail(), password);
 
-        getClient(adminToken).perform(get("/api/authz/authorizations/search/objectAndFeature")
+        getClient().perform(get("/api/authz/authorizations/search/objectAndFeature")
                                           .param("uri", siteUri)
-                                          .param("eperson", admin.getID().toString())
                                           .param("feature", epersonRegistrationFeature.getName()))
                              .andExpect(status().isOk());
     }
@@ -82,12 +79,9 @@ public class EPersonRegistrationFeatureIT extends AbstractControllerIntegrationT
         context.turnOffAuthorisationSystem();
         configurationService.setProperty("user.registration", false);
         context.restoreAuthSystemState();
-        // access the authorization for the admin user
-        String adminToken = getAuthToken(admin.getEmail(), password);
 
-        getClient(adminToken).perform(get("/api/authz/authorizations/search/objectAndFeature")
+        getClient().perform(get("/api/authz/authorizations/search/objectAndFeature")
                                           .param("uri", siteUri)
-                                          .param("eperson", admin.getID().toString())
                                           .param("feature", epersonRegistrationFeature.getName()))
                              .andExpect(status().isNoContent());
 
@@ -104,12 +98,9 @@ public class EPersonRegistrationFeatureIT extends AbstractControllerIntegrationT
         SiteRest SiteRest = siteConverter.convert(site, Projection.DEFAULT);
         String siteUri = utils.linkToSingleResource(SiteRest, "self").getHref();
 
-        // access the authorization for the admin user
-        String adminToken = getAuthToken(admin.getEmail(), password);
 
-        getClient(adminToken).perform(get("/api/authz/authorizations/search/objectAndFeature")
+        getClient().perform(get("/api/authz/authorizations/search/objectAndFeature")
                                           .param("uri", siteUri)
-                                          .param("eperson", admin.getID().toString())
                                           .param("feature", epersonRegistrationFeature.getName()))
                              .andExpect(status().isOk());
 
@@ -118,9 +109,8 @@ public class EPersonRegistrationFeatureIT extends AbstractControllerIntegrationT
         configurationService.setProperty("plugin.sequence.org.dspace.authenticate.AuthenticationMethod", SHIB_ONLY);
         context.restoreAuthSystemState();
 
-        getClient(adminToken).perform(get("/api/authz/authorizations/search/objectAndFeature")
+        getClient().perform(get("/api/authz/authorizations/search/objectAndFeature")
                                           .param("uri", siteUri)
-                                          .param("eperson", admin.getID().toString())
                                           .param("feature", epersonRegistrationFeature.getName()))
                              .andExpect(status().isNoContent());
 

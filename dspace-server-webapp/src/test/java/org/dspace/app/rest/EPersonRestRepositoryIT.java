@@ -1881,8 +1881,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
             "\"eperson.lastname\":[{\"value\":\"Doe\"}]},\"password\":\"somePassword\"," +
             "\"type\":\"eperson\"}";
 
-        String token = getAuthToken(admin.getEmail(), password);
-        MvcResult mvcResult = getClient(token).perform(post("/api/eperson/epersons")
+        MvcResult mvcResult = getClient().perform(post("/api/eperson/epersons")
                                 .param("token", newRegisterToken)
                                 .content(json)
                                 .contentType(MediaType.APPLICATION_JSON))
@@ -1932,8 +1931,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
             "\"eperson.lastname\":[{\"value\":\"Doe\"}]},\"email\":\"" + newRegisterEmail +
             "\",\"password\":\"somePassword\",\"type\":\"eperson\"}";
 
-        String token = getAuthToken(admin.getEmail(), password);
-        MvcResult mvcResult = getClient(token).perform(post("/api/eperson/epersons")
+        MvcResult mvcResult = getClient().perform(post("/api/eperson/epersons")
                                                            .param("token", newRegisterToken)
                                                            .content(json)
                                                            .contentType(MediaType.APPLICATION_JSON))
@@ -1985,8 +1983,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
             "\"eperson.lastname\":[{\"value\":\"Doe\"}]},\"selfRegistered\":true,\"email\":\"" + newRegisterEmail +
             "\",\"password\":\"somePassword\",\"type\":\"eperson\"}";
 
-        String token = getAuthToken(admin.getEmail(), password);
-        MvcResult mvcResult = getClient(token).perform(post("/api/eperson/epersons")
+        MvcResult mvcResult = getClient().perform(post("/api/eperson/epersons")
                                                            .param("token", newRegisterToken)
                                                            .content(json)
                                                            .contentType(MediaType.APPLICATION_JSON))
@@ -2048,12 +2045,11 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
             "\"eperson.lastname\":[{\"value\":\"Doe\"}]},\"email\":\"" + newRegisterEmailTwo +
             "\",\"password\":\"somePassword\",\"type\":\"eperson\"}";
 
-        String token = getAuthToken(admin.getEmail(), password);
-        getClient(token).perform(post("/api/eperson/epersons")
+        getClient().perform(post("/api/eperson/epersons")
                                                            .param("token", newRegisterToken)
                                                            .content(json)
                                                            .contentType(MediaType.APPLICATION_JSON))
-                                              .andExpect(status().isForbidden());
+                                              .andExpect(status().isBadRequest());
 
         EPerson createdEPerson = ePersonService.findByEmail(context, newRegisterEmailTwo);
         assertNull(createdEPerson);
@@ -2084,12 +2080,11 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
             "\"eperson.lastname\":[{\"value\":\"Doe\"}]},\"email\":\"" + newRegisterEmail +
             "\",\"password\":\"somePassword\",\"type\":\"eperson\"}";
 
-        String token = getAuthToken(admin.getEmail(), password);
-        getClient(token).perform(post("/api/eperson/epersons")
+        getClient().perform(post("/api/eperson/epersons")
                                      .param("token", "randomToken")
                                      .content(json)
                                      .contentType(MediaType.APPLICATION_JSON))
-                        .andExpect(status().isForbidden());
+                        .andExpect(status().isBadRequest());
 
         EPerson createdEPerson = ePersonService.findByEmail(context, newRegisterEmail);
         assertNull(createdEPerson);
@@ -2118,12 +2113,11 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
             "\"eperson.lastname\":[{\"value\":\"Doe\"}]},\"selfRegistered\":false,\"email\":\"" + newRegisterEmail +
             "\",\"password\":\"somePassword\",\"type\":\"eperson\"}";
 
-        String token = getAuthToken(admin.getEmail(), password);
-        getClient(token).perform(post("/api/eperson/epersons")
+        getClient().perform(post("/api/eperson/epersons")
                                                            .param("token", newRegisterToken)
                                                            .content(json)
                                                            .contentType(MediaType.APPLICATION_JSON))
-                                              .andExpect(status().isForbidden());
+                                              .andExpect(status().isBadRequest());
 
         EPerson createdEPerson = ePersonService.findByEmail(context, newRegisterEmail);
         assertNull(createdEPerson);
@@ -2151,12 +2145,11 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
         String json = "{\"metadata\":{\"eperson.firstname\":[{\"value\":\"John\"}]},\"selfRegistered\":true," +
             "\"email\":\"" + newRegisterEmail + "\",\"password\":\"somePassword\",\"type\":\"eperson\"}";
 
-        String token = getAuthToken(admin.getEmail(), password);
-        getClient(token).perform(post("/api/eperson/epersons")
+        getClient().perform(post("/api/eperson/epersons")
                                      .param("token", newRegisterToken)
                                      .content(json)
                                      .contentType(MediaType.APPLICATION_JSON))
-                        .andExpect(status().isForbidden());
+                        .andExpect(status().isBadRequest());
 
         EPerson createdEPerson = ePersonService.findByEmail(context, newRegisterEmail);
         assertNull(createdEPerson);
@@ -2184,12 +2177,11 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
         String json = "{\"metadata\":{\"eperson.lastname\":[{\"value\":\"Doe\"}]},\"selfRegistered\":true," +
             "\"email\":\"" + newRegisterEmail + "\",\"password\":\"somePassword\",\"type\":\"eperson\"}";
 
-        String token = getAuthToken(admin.getEmail(), password);
-        getClient(token).perform(post("/api/eperson/epersons")
+        getClient().perform(post("/api/eperson/epersons")
                                      .param("token", newRegisterToken)
                                      .content(json)
                                      .contentType(MediaType.APPLICATION_JSON))
-                        .andExpect(status().isForbidden());
+                        .andExpect(status().isBadRequest());
 
         EPerson createdEPerson = ePersonService.findByEmail(context, newRegisterEmail);
         assertNull(createdEPerson);
@@ -2218,12 +2210,11 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
             "\"eperson.lastname\":[{\"value\":\"Doe\"}]}," +
             "\"type\":\"eperson\"}";
 
-        String token = getAuthToken(admin.getEmail(), password);
-        getClient(token).perform(post("/api/eperson/epersons")
+        getClient().perform(post("/api/eperson/epersons")
                                      .param("token", newRegisterToken)
                                      .content(json)
                                      .contentType(MediaType.APPLICATION_JSON))
-                        .andExpect(status().isForbidden());
+                        .andExpect(status().isBadRequest());
 
         EPerson createdEPerson = ePersonService.findByEmail(context, newRegisterEmail);
         assertNull(createdEPerson);
@@ -2253,12 +2244,11 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
             "\"eperson.lastname\":[{\"value\":\"Doe\"}]},\"selfRegistered\":true,\"password\":\"somePassword\"," +
             "\"type\":\"eperson\"}";
 
-        String token = getAuthToken(admin.getEmail(), password);
-        getClient(token).perform(post("/api/eperson/epersons")
+        getClient().perform(post("/api/eperson/epersons")
                                      .param("token", forgotPasswordToken)
                                      .content(json)
                                      .contentType(MediaType.APPLICATION_JSON))
-                        .andExpect(status().isForbidden());
+                        .andExpect(status().isBadRequest());
 
         EPerson createdEPerson = ePersonService.findByEmail(context, newEmail);
         assertNull(createdEPerson);

@@ -78,4 +78,30 @@ public class RegistrationRestControllerIT extends AbstractControllerIntegrationT
             registrationDataDAO.delete(context, registrationData);
         }
     }
+
+    @Test
+    public void forgotPasswordTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        configurationService.setProperty("user.registration", false);
+        context.restoreAuthSystemState();
+
+        List<RegistrationData> registrationDataList = registrationDataDAO.findAll(context, RegistrationData.class);
+        assertEquals(0, registrationDataList.size());
+
+        ObjectMapper mapper = new ObjectMapper();
+        RegistrationRest registrationRest = new RegistrationRest();
+        registrationRest.setEmail(eperson.getEmail());
+        getClient().perform(post("/api/eperson/registrations")
+                                .content(mapper.writeValueAsBytes(registrationRest))
+                                .contentType(contentType))
+                   .andExpect(status().isCreated());
+        registrationDataList = registrationDataDAO.findAll(context, RegistrationData.class);
+        assertEquals(1, registrationDataList.size());
+        assertTrue(StringUtils.equalsIgnoreCase(registrationDataList.get(0).getEmail(), eperson.getEmail()));
+        Iterator<RegistrationData> iterator = registrationDataList.iterator();
+        while (iterator.hasNext()) {
+            RegistrationData registrationData = iterator.next();
+            registrationDataDAO.delete(context, registrationData);
+        }
+    }
 }
