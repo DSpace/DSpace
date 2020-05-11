@@ -10,6 +10,9 @@ package org.dspace.app.rest.model.hateoas;
 import org.dspace.app.rest.model.PropertyRest;
 import org.dspace.app.rest.utils.Utils;
 
+/**
+ * The purpose of this class is to wrap the information of the PropertyRest into a HAL resource
+ */
 public class PropertyResource extends DSpaceResource<PropertyRest> {
 
     public PropertyResource(PropertyRest data, Utils utils) {
