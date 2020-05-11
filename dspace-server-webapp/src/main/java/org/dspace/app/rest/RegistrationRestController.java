@@ -40,6 +40,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * This will be the Controller class that handles calls to the /api/eperson/registrations endpoints
+ */
 @RestController
 @RequestMapping("/api/" + RegistrationRest.CATEGORY + "/" + RegistrationRest.NAME_PLURAL)
 public class RegistrationRestController {
@@ -59,6 +62,22 @@ public class RegistrationRestController {
     @Autowired
     private EPersonService ePersonService;
 
+    /**
+     * This method will be used to either register a new user or to send forgotten password info in a mail.
+     * It can be called by doing a POST request to the /api/eperson/registrations endpoint.
+     * It'll create a RegistrationRest object from the inputstream in the request and it'll check whether the email
+     * defined in that object is in the DB or not.
+     * If it is in the db then we'll send the forgotten password info, if it wasn't in the database then we'll send
+     * registration info.
+     *
+     * @param request   The current request
+     * @param response  The current response
+     * @return          An empty response containing a 201 status code
+     * @throws SQLException If something goes wrong
+     * @throws IOException  If something goes wrong
+     * @throws MessagingException   If something goes wrong
+     * @throws AuthorizeException   If something goes wrong
+     */
     @RequestMapping(method = RequestMethod.POST)
     public ResponseEntity<ResourceSupport> register(HttpServletRequest request, HttpServletResponse response)
         throws SQLException, IOException, MessagingException, AuthorizeException {

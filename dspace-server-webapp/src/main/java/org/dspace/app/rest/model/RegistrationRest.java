@@ -13,6 +13,11 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import org.dspace.app.rest.RegistrationRestController;
 
 
+/**
+ * This class acts as the REST representation of the RegistrationData model class.
+ * This class acts as a data holder for the RegistrationResource
+ * Refer to {@link org.dspace.eperson.RegistrationData} for explanation about the properties
+ */
 public class RegistrationRest extends RestAddressableModel {
 
     public static final String NAME = "registration";
