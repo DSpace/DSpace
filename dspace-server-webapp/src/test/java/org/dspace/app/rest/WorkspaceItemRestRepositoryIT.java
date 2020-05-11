@@ -2422,9 +2422,8 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                     is("Description")))
         ;
 
-        // try to remove the description and the source now
+        // try to remove the description
         List<Operation> removeOpts = new ArrayList<Operation>();
-        removeOpts.add(new RemoveOperation("/sections/upload/files/0/metadata/dc.source/0"));
         removeOpts.add(new RemoveOperation("/sections/upload/files/0/metadata/dc.description"));
 
         patchBody = getPatchContent(removeOpts);
@@ -2432,8 +2431,6 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                 .content(patchBody)
                 .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
                             .andExpect(status().isOk())
-                            // check the removed source
-                            .andExpect(jsonPath("$.sections.upload.files[0].metadata['dc.source']").doesNotExist())
                             // check the filename still here
                             .andExpect(jsonPath("$.sections.upload.files[0].metadata['dc.title'][0].value",
                                     is("newfilename.pdf")))
@@ -2444,7 +2441,8 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         // check that changes persist
         getClient(authToken).perform(get("/api/submission/workspaceitems/" + witem.getID()))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.sections.upload.files[0].metadata['dc.source']").doesNotExist())
+            .andExpect(jsonPath("$.sections.upload.files[0].metadata['dc.source'][0].value",
+                    is("/local/path/simple-article.pdf")))
             .andExpect(jsonPath("$.sections.upload.files[0].metadata['dc.title'][0].value",
                     is("newfilename.pdf")))
             .andExpect(jsonPath("$.sections.upload.files[0].metadata['dc.description']").doesNotExist())        ;
