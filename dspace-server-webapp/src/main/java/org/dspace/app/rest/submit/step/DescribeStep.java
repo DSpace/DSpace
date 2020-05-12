@@ -15,7 +15,6 @@ import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.MetadataValueRest;
 import org.dspace.app.rest.model.patch.Operation;
-import org.dspace.app.rest.model.patch.RemoveOperation;
 import org.dspace.app.rest.model.step.DataDescribe;
 import org.dspace.app.rest.submit.AbstractRestProcessingStep;
 import org.dspace.app.rest.submit.SubmissionService;

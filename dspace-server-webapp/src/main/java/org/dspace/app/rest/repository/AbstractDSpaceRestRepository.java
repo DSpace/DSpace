@@ -7,10 +7,10 @@
  */
 package org.dspace.app.rest.repository;
 
-import org.dspace.app.rest.RestRepository;
 import java.util.Locale;
 
 import org.apache.commons.lang3.StringUtils;
+import org.dspace.app.rest.RestRepository;
 import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.app.rest.utils.Utils;

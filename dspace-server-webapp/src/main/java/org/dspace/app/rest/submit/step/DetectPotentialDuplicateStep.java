@@ -107,13 +107,11 @@ public class DetectPotentialDuplicateStep extends AbstractProcessingStep impleme
     }
 
     @Override
-    public void doPatchProcessing(Context context, Request currentRequest, InProgressSubmission source, Operation op)
-            throws Exception {
-
+    public void doPatchProcessing(Context context, Request currentRequest, InProgressSubmission source, Operation op,
+        SubmissionStepConfig stepConf) throws Exception {
         PatchOperation<MetadataValueRest> patchOperation = new PatchOperationFactory()
                 .instanceOf(DETECT_DUPLICATE_STEP_ADD_OPERATION_ENTRY, op.getOp());
         patchOperation.perform(context, currentRequest, source, op);
-
     }
 
     private Context getContext() {

@@ -7,7 +7,7 @@
  */
 package org.dspace.app.rest;
 
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.ControllerLinkBuilder.linkTo;
 
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
@@ -34,7 +34,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.Link;
-import org.springframework.hateoas.ResourceSupport;
+import org.springframework.hateoas.RepresentationModel;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -76,8 +76,8 @@ public class AuthorityEntrySearchRestController {
 
     @RequestMapping(method = RequestMethod.GET, value = REGEX_REQUESTMAPPING_IDENTIFIER_AS_STRING_VERSION_STRONG + "/"
                                              + AuthorityRest.ENTRIES + "/" + AuthorityEntrySearchRestController.SEARCH)
-    public <ID extends Serializable> ResourceSupport listSearchMethods(@PathVariable String id) {
-        ResourceSupport root = new ResourceSupport();
+    public <ID extends Serializable> RepresentationModel listSearchMethods(@PathVariable String id) {
+        RepresentationModel root = new RepresentationModel();
         DSpaceRestRepository<RestAddressableModel, ID> repository = utils.getResourceRepository(
                                  AuthorityRest.CATEGORY, AuthorityEntrySearchRestController.MODEL);
         Class<RestAddressableModel> domainClass = repository.getDomainClass();
@@ -97,7 +97,7 @@ public class AuthorityEntrySearchRestController {
     @SuppressWarnings({ "rawtypes", "unchecked" })
     @RequestMapping(method = RequestMethod.GET, value = REGEX_REQUESTMAPPING_IDENTIFIER_AS_STRING_VERSION_STRONG +
             "/" + AuthorityRest.ENTRIES + "/" + AuthorityEntrySearchRestController.SEARCH + "/{searchMethodName}")
-    public <ID extends Serializable> ResourceSupport searchMethod(@PathVariable String id,
+    public <ID extends Serializable> RepresentationModel searchMethod(@PathVariable String id,
                                 @PathVariable String searchMethodName,
                                 HttpServletRequest request,
                                 HttpServletResponse response,
@@ -135,7 +135,7 @@ public class AuthorityEntrySearchRestController {
 
             halResources.forEach(linkService::addLinks);
 
-            return assembler.toResource(halResources, link);
+            return assembler.toModel(halResources, link);
         } else {
             throw new ResourceNotFoundException(AuthorityRest.ENTRIES + " undefined for "
                     + AuthorityEntrySearchRestController.MODEL);

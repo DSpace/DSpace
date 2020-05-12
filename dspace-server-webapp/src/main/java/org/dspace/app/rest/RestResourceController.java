@@ -817,7 +817,7 @@ public class RestResourceController implements InitializingBean {
                             link = linkTo(this.getClass(), apiCategory, model).slash(uuid).slash(subpath).withSelfRel();
                         }
 
-                    return new EntityModel(new EmbeddedPage(link.getHref(),
+                        return new EntityModel(new EmbeddedPage(link.getHref(),
                             pageResult.map(converter::toResource), null, subpath));
                     } else {
                         RestModel object = (RestModel) linkMethod.invoke(linkRepository, request, uuid, page,
