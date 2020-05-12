@@ -1,0 +1,19 @@
+image: maven:3.6.1
+
+pipelines:
+  default:
+    - step:
+        caches:
+          - gradle
+          - gradlewrapper
+          - maven
+        script:
+          - ./dspace-api/src/test/data/dspaceFolder/bin/install_grobid.sh
+          - mvn clean install license:check -Dmaven.test.skip=false -DskipITs=false -Pdspace-rest -P !assembly -B -V -Dsurefire.rerunFailingTestsCount=2
+
+definitions:
+  caches:
+    gradlewrapper: ~/.gradle/wrapper
+
+
+
