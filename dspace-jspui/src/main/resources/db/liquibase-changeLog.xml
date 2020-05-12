@@ -106,4 +106,16 @@
             select uuid from authors where uuid not in (select * from dspaceobject);
         </sql>
     </changeSet>
+
+    <changeSet author="Igor Marchenko" id="19">
+        <sql>
+            UPDATE chair SET chair_name = 'Кафедра маркетингу' WHERE chair_id = 32;
+        </sql>
+        <sql>
+            UPDATE chair SET chair_name = 'Кафедра фізичної терапії, ерготерапії та спортивної медицини' WHERE chair_id = 91;
+        </sql>
+        <sql>
+            UPDATE chair SET chair_name = 'Кафедра теоретичної та прикладної хімії' WHERE chair_id = 20;
+        </sql>
+    </changeSet>
 </databaseChangeLog>
