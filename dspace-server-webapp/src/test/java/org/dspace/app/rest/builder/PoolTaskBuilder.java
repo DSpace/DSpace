@@ -105,6 +105,7 @@ public class PoolTaskBuilder extends AbstractBuilder<PoolTask, PoolTaskService> 
     public void cleanup() throws Exception {
         try (Context c = new Context()) {
             c.turnOffAuthorisationSystem();
+            // Ensure object and any related objects are reloaded before checking to see what needs cleanup
             workspaceItem = c.reloadEntity(workspaceItem);
             if (workspaceItem != null) {
                 deleteWsi(c, workspaceItem);
