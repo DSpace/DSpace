@@ -45,6 +45,7 @@ public class MetadataSchemaRestRepository extends DSpaceRestRepository<MetadataS
     MetadataSchemaService metadataSchemaService;
 
     @Override
+    @PreAuthorize("permitAll()")
     public MetadataSchemaRest findOne(Context context, Integer id) {
         MetadataSchema metadataSchema = null;
         try {

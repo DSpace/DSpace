@@ -53,6 +53,7 @@ public class MetadataFieldRestRepository extends DSpaceRestRepository<MetadataFi
     MetadataSchemaService metadataSchemaService;
 
     @Override
+    @PreAuthorize("permitAll()")
     public MetadataFieldRest findOne(Context context, Integer id) {
         MetadataField metadataField = null;
         try {

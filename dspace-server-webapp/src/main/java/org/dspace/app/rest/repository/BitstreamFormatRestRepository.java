@@ -42,6 +42,7 @@ public class BitstreamFormatRestRepository extends DSpaceRestRepository<Bitstrea
     BitstreamFormatService bitstreamFormatService;
 
     @Override
+    @PreAuthorize("permitAll()")
     public BitstreamFormatRest findOne(Context context, Integer id) {
         BitstreamFormat bit = null;
         try {
