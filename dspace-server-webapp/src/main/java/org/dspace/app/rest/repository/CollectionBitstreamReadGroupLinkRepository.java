@@ -72,6 +72,9 @@ public class CollectionBitstreamReadGroupLinkRepository extends AbstractDSpaceRe
             }
             List<Group> bitstreamGroups = authorizeService
                 .getAuthorizedGroups(context, collection, Constants.DEFAULT_BITSTREAM_READ);
+            if (bitstreamGroups == null || bitstreamGroups.isEmpty()) {
+                return null;
+            }
             Group bitstreamReadGroup = bitstreamGroups.get(0);
 
             if (bitstreamReadGroup == null) {

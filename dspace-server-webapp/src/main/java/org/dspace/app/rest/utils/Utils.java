@@ -86,6 +86,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.Link;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -668,7 +669,10 @@ public class Utils {
                 Object linkedObject = method.invoke(linkRepository, null, contentId, null, projection);
                 resource.embedResource(rel, wrapForEmbedding(resource, linkedObject, link, oldLinks));
             } catch (InvocationTargetException e) {
-                if (e.getTargetException() instanceof RuntimeException) {
+                // Can't do this beforehand because we lack information to call Evaluators
+                if (e.getTargetException() instanceof AccessDeniedException) {
+                    log.warn("Tried fetching resource: " + linkRest.name() + " for DSpaceObject with ID: " + contentId);
+                } else if (e.getTargetException() instanceof RuntimeException) {
                     throw (RuntimeException) e.getTargetException();
                 } else {
                     throw new RuntimeException(e);
