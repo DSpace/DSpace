@@ -19,6 +19,7 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -68,6 +69,7 @@ public class DSpaceControlledVocabularyTest extends AbstractDSpaceTest {
      * Test of getMatches method, of class DSpaceControlledVocabulary.
      */
     @Test
+    @Ignore
     public void testGetMatches() throws IOException, ClassNotFoundException {
         System.out.println("getMatches");
 
