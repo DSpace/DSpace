@@ -17,6 +17,7 @@ import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
 /**
@@ -29,6 +30,7 @@ public class RelationshipTypeRestRepository extends DSpaceRestRepository<Relatio
     private RelationshipTypeService relationshipTypeService;
 
     @Override
+    @PreAuthorize("permitAll()")
     public RelationshipTypeRest findOne(Context context, Integer integer) {
         try {
             return converter.toRest(relationshipTypeService.find(context, integer), utils.obtainProjection());

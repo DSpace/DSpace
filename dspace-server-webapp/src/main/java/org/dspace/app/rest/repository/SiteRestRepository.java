@@ -43,6 +43,7 @@ public class SiteRestRepository extends DSpaceObjectRestRepository<Site, SiteRes
     }
 
     @Override
+    @PreAuthorize("permitAll()")
     public SiteRest findOne(Context context, UUID id) {
         Site site = null;
         try {

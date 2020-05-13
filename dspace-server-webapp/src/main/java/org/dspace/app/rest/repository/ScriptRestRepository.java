@@ -35,6 +35,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
 /**
@@ -52,6 +53,7 @@ public class ScriptRestRepository extends DSpaceRestRepository<ScriptRest, Strin
     private DSpaceRunnableParameterConverter dSpaceRunnableParameterConverter;
 
     @Override
+    @PreAuthorize("permitAll()")
     public ScriptRest findOne(Context context, String name) {
 
         DSpaceRunnable dSpaceRunnable = scriptService.getScriptForName(name);
