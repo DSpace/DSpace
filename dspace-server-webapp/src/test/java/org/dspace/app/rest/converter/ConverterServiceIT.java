@@ -37,6 +37,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.Resource;
 import org.springframework.mock.web.MockHttpServletRequest;
@@ -168,7 +169,7 @@ public class ConverterServiceIT extends AbstractControllerIntegrationTest {
         assertHasEmbeds(resource, new String[] {
                 "restPropUnannotated" // embedded; unannotated properties can't be omitted by projections
         }, new Class[] {
-                Resource.class
+                EntityModel.class
         });
 
         assertHasLinks(resource, new String[] {
@@ -197,7 +198,8 @@ public class ConverterServiceIT extends AbstractControllerIntegrationTest {
         r0.setRestPropUnannotated(restPropUnannotatedValue);
         String r0json = new ObjectMapper().writeValueAsString(r0);
 
-        when(mockLink.getRel()).thenReturn("mockLink");
+        // return "mockLink" LinkRelation when getRel() is called
+        when(mockLink.getRel()).thenReturn(() -> "mockLink");
         r0.setProjection(new MockProjection(mockLink, mockEmbeddedResource));
 
         MockObjectResource resource = converter.toResource(r0);
@@ -213,10 +215,10 @@ public class ConverterServiceIT extends AbstractControllerIntegrationTest {
                 "optionallyEmbeddedChildren",
                 "resource" // added by MockProjection
         }, new Class[] {
-                Resource.class,
+                EntityModel.class,
                 null,
-                Resource.class,
-                Resource.class,
+                EntityModel.class,
+                EntityModel.class,
                 EmbeddedPage.class,
                 Object.class
         });
@@ -232,9 +234,9 @@ public class ConverterServiceIT extends AbstractControllerIntegrationTest {
         });
     }
 
-    private void assertHasLinks(Resource resource, String[] rels) {
+    private void assertHasLinks(EntityModel resource, String[] rels) {
         Map<String, Link> map = new HashMap<>();
-        resource.getLinks().stream().forEach((link) -> map.put(link.getRel(), link));
+        resource.getLinks().stream().forEach((link) -> map.put(link.getRel().value(), link));
         assertThat(new TreeSet(map.keySet()), equalTo(new TreeSet(Sets.newHashSet(rels))));
     }
 

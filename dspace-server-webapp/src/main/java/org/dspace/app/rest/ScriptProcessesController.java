@@ -19,7 +19,7 @@ import org.dspace.core.Context;
 import org.dspace.services.RequestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.webmvc.ControllerUtils;
-import org.springframework.hateoas.ResourceSupport;
+import org.springframework.hateoas.RepresentationModel;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -56,7 +56,7 @@ public class ScriptProcessesController {
      */
     @RequestMapping(method = RequestMethod.POST)
     @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<ResourceSupport> startProcess(@PathVariable(name = "name") String scriptName)
+    public ResponseEntity<RepresentationModel<?>> startProcess(@PathVariable(name = "name") String scriptName)
         throws Exception {
         if (log.isTraceEnabled()) {
             log.trace("Starting Process for Script with name: " + scriptName);

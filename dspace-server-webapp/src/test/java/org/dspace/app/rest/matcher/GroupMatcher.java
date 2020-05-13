@@ -44,7 +44,8 @@ public class GroupMatcher {
     public static Matcher<? super Object> matchFullEmbeds() {
         return matchEmbeds(
                 "subgroups[]",
-                "epersons[]"
+                "epersons[]",
+                "object"
         );
     }
 
@@ -55,6 +56,7 @@ public class GroupMatcher {
         return HalMatcher.matchLinks(REST_SERVER_URL + "eperson/groups/" + uuid,
                 "subgroups",
                 "epersons",
+                "object",
                 "self"
         );
     }

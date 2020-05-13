@@ -10,6 +10,7 @@ package org.dspace.app.rest.builder;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
+import java.util.UUID;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.CharEncoding;
@@ -92,6 +93,14 @@ public class CollectionBuilder extends AbstractDSpaceObjectBuilder<Collection> {
         }
     }
 
+    public CollectionBuilder withProvenance(final String provenance) {
+        return addMetadataValue(collection,
+                                MetadataSchemaEnum.DC.getName(),
+                                "description",
+                                "provenance",
+                                provenance);
+    }
+
     public CollectionBuilder withTemplateItem() throws SQLException, AuthorizeException {
         collectionService.createTemplateItem(context, collection);
         return this;
@@ -155,14 +164,27 @@ public class CollectionBuilder extends AbstractDSpaceObjectBuilder<Collection> {
 
     @Override
     public void cleanup() throws Exception {
+        deleteAdminGroup();
+        deleteDefaultReadGroups(collection);
         deleteWorkflowGroups(collection);
         delete(collection);
+    }
+
+    private void deleteAdminGroup() throws SQLException, AuthorizeException {
+        if (collection.getAdministrators() != null) {
+            try (Context c = new Context()) {
+                c.turnOffAuthorisationSystem();
+                collectionService.removeAdministrators(c, collection);
+                c.complete();
+            }
+        }
     }
 
     public void deleteWorkflowGroups(Collection collection) throws Exception {
 
         try (Context c = new Context()) {
             c.turnOffAuthorisationSystem();
+
             for (int i = 1; i <= 3; i++) {
                 Group g = collectionService.getWorkflowGroup(c, collection, i);
                 if (g != null) {
@@ -175,8 +197,48 @@ public class CollectionBuilder extends AbstractDSpaceObjectBuilder<Collection> {
             }
             c.complete();
         }
+    }
 
-        indexingService.commit();
+    public void deleteDefaultReadGroups(Collection collection) throws Exception {
+
+        try (Context c = new Context()) {
+            c.turnOffAuthorisationSystem();
+
+            Group defaultItemReadGroup = groupService.findByName(c, "COLLECTION_" +
+                collection.getID().toString() + "_ITEM_DEFAULT_READ");
+            Group defaultBitstreamReadGroup = groupService.findByName(c, "COLLECTION_" +
+                collection.getID().toString() + "_BITSTREAM_DEFAULT_READ");
+            if (defaultItemReadGroup != null) {
+                groupService.delete(c, defaultItemReadGroup);
+            }
+            if (defaultBitstreamReadGroup != null) {
+                groupService.delete(c, defaultBitstreamReadGroup);
+            }
+
+            c.complete();
+        }
+    }
+
+    /**
+     * Delete the Test Collection referred to by the given UUID
+     *
+     * @param uuid UUID of Test Collection to delete
+     * @throws SQLException
+     * @throws IOException
+     */
+    public static void deleteCollection(UUID uuid) throws SQLException, IOException {
+        try (Context c = new Context()) {
+            c.turnOffAuthorisationSystem();
+            Collection collection = collectionService.find(c, uuid);
+            if (collection != null) {
+                try {
+                    collectionService.delete(c, collection);
+                } catch (AuthorizeException e) {
+                    throw new RuntimeException(e.getMessage(), e);
+                }
+            }
+            c.complete();
+        }
     }
 
     @Override

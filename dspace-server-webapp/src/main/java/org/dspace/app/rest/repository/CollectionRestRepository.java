@@ -11,12 +11,15 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.SortedMap;
 import java.util.UUID;
 import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
@@ -25,10 +28,14 @@ import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.BitstreamRest;
 import org.dspace.app.rest.model.CollectionRest;
 import org.dspace.app.rest.model.CommunityRest;
+import org.dspace.app.rest.model.GroupRest;
+import org.dspace.app.rest.model.MetadataRest;
+import org.dspace.app.rest.model.MetadataValueRest;
 import org.dspace.app.rest.model.TemplateItemRest;
 import org.dspace.app.rest.model.patch.Patch;
 import org.dspace.app.rest.model.wrapper.TemplateItem;
 import org.dspace.app.rest.utils.CollectionRestEqualityUtils;
+import org.dspace.app.util.AuthorizeUtil;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Bitstream;
@@ -47,6 +54,15 @@ import org.dspace.discovery.IndexableObject;
 import org.dspace.discovery.SearchService;
 import org.dspace.discovery.SearchServiceException;
 import org.dspace.discovery.indexobject.IndexableCollection;
+import org.dspace.eperson.Group;
+import org.dspace.eperson.service.GroupService;
+import org.dspace.workflow.WorkflowException;
+import org.dspace.workflow.WorkflowService;
+import org.dspace.xmlworkflow.WorkflowConfigurationException;
+import org.dspace.xmlworkflow.WorkflowUtils;
+import org.dspace.xmlworkflow.storedcomponents.CollectionRole;
+import org.dspace.xmlworkflow.storedcomponents.service.CollectionRoleService;
+import org.dspace.xmlworkflow.storedcomponents.service.PoolTaskService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -64,6 +80,8 @@ import org.springframework.web.multipart.MultipartFile;
 @Component(CollectionRest.CATEGORY + "." + CollectionRest.NAME)
 public class CollectionRestRepository extends DSpaceObjectRestRepository<Collection, CollectionRest> {
 
+    public static Logger log = org.apache.logging.log4j.LogManager.getLogger(CollectionRestRepository.class);
+
     @Autowired
     CommunityService communityService;
 
@@ -80,10 +98,22 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
     private ItemService itemService;
 
     @Autowired
-    SearchService searchService;
+    private GroupService groupService;
 
     @Autowired
-    AuthorizeService authorizeService;
+    private AuthorizeService authorizeService;
+
+    @Autowired
+    private WorkflowService workflowService;
+
+    @Autowired
+    private PoolTaskService poolTaskService;
+
+    @Autowired
+    private CollectionRoleService collectionRoleService;
+
+    @Autowired
+    SearchService searchService;
 
     public CollectionRestRepository(CollectionService dsoService) {
         super(dsoService);
@@ -330,5 +360,258 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
         } catch (IllegalArgumentException e) {
             throw new UnprocessableEntityException("The item with id " + item.getID() + " is not a template item");
         }
+    }
+
+    /**
+     * This method will create an AdminGroup for the given Collection with the given Information through JSON
+     * @param context   The current context
+     * @param request   The current request
+     * @param collection The collection for which we'll create an admingroup
+     * @return          The created AdminGroup's REST object
+     * @throws SQLException If something goes wrong
+     * @throws AuthorizeException   If something goes wrong
+     */
+    public GroupRest createAdminGroup(Context context, HttpServletRequest request, Collection collection)
+        throws SQLException, AuthorizeException {
+
+        Group group = cs.createAdministrators(context, collection);
+        return populateGroupInformation(context, request, group);
+    }
+
+    /**
+     * This method will delete the AdminGroup for the given Collection
+     * @param context       The current context
+     * @param collection     The community for which we'll delete the admingroup
+     * @throws SQLException If something goes wrong
+     * @throws AuthorizeException   If something goes wrong
+     * @throws IOException  If something goes wrong
+     */
+    public void deleteAdminGroup(Context context, Collection collection)
+        throws SQLException, AuthorizeException, IOException {
+        Group adminGroup = collection.getAdministrators();
+        cs.removeAdministrators(context, collection);
+        groupService.delete(context, adminGroup);
+    }
+
+    /**
+     * This method will create a SubmitterGroup for the given Collection with the given Information through JSON
+     * @param context   The current context
+     * @param request   The current request
+     * @param collection The collection for which we'll create a submittergroup
+     * @return          The created SubmitterGroup's REST object
+     * @throws SQLException If something goes wrong
+     * @throws AuthorizeException   If something goes wrong
+     */
+    public GroupRest createSubmitterGroup(Context context, HttpServletRequest request, Collection collection)
+        throws SQLException, AuthorizeException {
+
+        Group group = cs.createSubmitters(context, collection);
+        return populateGroupInformation(context, request, group);
+    }
+
+    /**
+     * This method will delete the SubmitterGroup for the given Collection
+     * @param context       The current context
+     * @param collection     The community for which we'll delete the submittergroup
+     * @throws SQLException If something goes wrong
+     * @throws AuthorizeException   If something goes wrong
+     * @throws IOException  If something goes wrong
+     */
+    public void deleteSubmitterGroup(Context context, Collection collection)
+        throws SQLException, AuthorizeException, IOException {
+        Group submitters = collection.getSubmitters();
+        cs.removeSubmitters(context, collection);
+        groupService.delete(context, submitters);
+    }
+
+    /**
+     * This method will create an ItemReadGroup for the given Collection with the given Information through JSON
+     * @param context   The current context
+     * @param request   The current request
+     * @param collection The collection for which we'll create an ItemReadGroup
+     * @return          The created ItemReadGroup's REST object
+     * @throws SQLException If something goes wrong
+     * @throws AuthorizeException   If something goes wrong
+     */
+    public GroupRest createItemReadGroup(Context context, HttpServletRequest request, Collection collection)
+        throws SQLException, AuthorizeException {
+
+        AuthorizeUtil.authorizeManageDefaultReadGroup(context, collection);
+
+        context.turnOffAuthorisationSystem();
+        Group role = cs.createDefaultReadGroup(context, collection, "ITEM", Constants.DEFAULT_ITEM_READ);
+        context.restoreAuthSystemState();
+        return populateGroupInformation(context, request, role);
+    }
+
+    /**
+     * This method will delete the ItemReadGroup for the given Collection
+     * @param context       The current context
+     * @param collection     The community for which we'll delete the ItemReadGroup
+     * @throws SQLException If something goes wrong
+     * @throws AuthorizeException   If something goes wrong
+     * @throws IOException  If something goes wrong
+     */
+    public void deleteItemReadGroup(Context context, Collection collection)
+        throws SQLException, AuthorizeException, IOException {
+        List<Group> itemGroups = authorizeService
+            .getAuthorizedGroups(context, collection, Constants.DEFAULT_ITEM_READ);
+        Group itemReadGroup = itemGroups.get(0);
+        groupService.delete(context, itemReadGroup);
+        authorizeService.addPolicy(context, collection, Constants.DEFAULT_ITEM_READ,
+                                   groupService.findByName(context, Group.ANONYMOUS));
+    }
+
+    /**
+     * This method will create an BitstreamReadGroup for the given Collection with the given Information through JSON
+     * @param context   The current context
+     * @param request   The current request
+     * @param collection The collection for which we'll create an BitstreamReadGroup
+     * @return          The created BitstreamReadGroup's REST object
+     * @throws SQLException If something goes wrong
+     * @throws AuthorizeException   If something goes wrong
+     */
+    public GroupRest createBitstreamReadGroup(Context context, HttpServletRequest request, Collection collection)
+        throws SQLException, AuthorizeException {
+        AuthorizeUtil.authorizeManageDefaultReadGroup(context, collection);
+
+        context.turnOffAuthorisationSystem();
+        Group role = cs.createDefaultReadGroup(context, collection, "BITSTREAM", Constants.DEFAULT_BITSTREAM_READ);
+        context.restoreAuthSystemState();
+        return populateGroupInformation(context, request, role);
+    }
+
+    /**
+     * This method will delete the BitstreamReadGroup for the given Collection
+     * @param context       The current context
+     * @param collection     The community for which we'll delete the BitstreamReadGroup
+     * @throws SQLException If something goes wrong
+     * @throws AuthorizeException   If something goes wrong
+     * @throws IOException  If something goes wrong
+     */
+    public void deleteBitstreamReadGroup(Context context, Collection collection)
+        throws SQLException, AuthorizeException, IOException {
+        List<Group> itemGroups = authorizeService
+            .getAuthorizedGroups(context, collection, Constants.DEFAULT_BITSTREAM_READ);
+        Group itemReadGroup = itemGroups.get(0);
+        groupService.delete(context, itemReadGroup);
+        authorizeService.addPolicy(context, collection, Constants.DEFAULT_BITSTREAM_READ,
+                                   groupService.findByName(context, Group.ANONYMOUS));
+    }
+
+
+
+    private GroupRest populateGroupInformation(Context context, HttpServletRequest request, Group group)
+        throws SQLException, AuthorizeException {
+        ObjectMapper mapper = new ObjectMapper();
+        GroupRest groupRest = new GroupRest();
+        try {
+            ServletInputStream input = request.getInputStream();
+            groupRest = mapper.readValue(input, GroupRest.class);
+            if (groupRest.isPermanent() || StringUtils.isNotBlank(groupRest.getName())) {
+                throw new UnprocessableEntityException("The given GroupRest object has to be non-permanent and can't" +
+                                                           " contain a name");
+            }
+            MetadataRest metadata = groupRest.getMetadata();
+            SortedMap<String, List<MetadataValueRest>> map = metadata.getMap();
+            if (map != null) {
+                List<MetadataValueRest> dcTitleMetadata = map.get("dc.title");
+                if (dcTitleMetadata != null) {
+                    if (!dcTitleMetadata.isEmpty()) {
+                        throw new UnprocessableEntityException("The given GroupRest can't contain a dc.title mdv");
+                    }
+                }
+            }
+            metadataConverter.setMetadata(context, group, metadata);
+        } catch (IOException e1) {
+            throw new UnprocessableEntityException("Error parsing request body.", e1);
+        }
+        return converter.toRest(group, utils.obtainProjection());
+    }
+
+    /**
+     * This method will retrieve the GroupRest object for the workflowGroup for the given Collection and workflowRole
+     * @param context       The relevant DSpace context
+     * @param collection    The given collection
+     * @param workflowRole  The given workflowRole
+     * @return              The GroupRest for the WorkflowGroup for the given Collection and workflowRole
+     * @throws SQLException If something goes wrong
+     * @throws IOException  If something goes wrong
+     * @throws WorkflowConfigurationException   If something goes wrong
+     * @throws AuthorizeException   If something goes wrong
+     * @throws WorkflowException    If something goes wrong
+     */
+    public GroupRest getWorkflowGroupForRole(Context context, Collection collection, String workflowRole)
+        throws SQLException, IOException, WorkflowConfigurationException, AuthorizeException, WorkflowException {
+
+        if (WorkflowUtils.getCollectionAndRepositoryRoles(collection).get(workflowRole) == null) {
+            throw new ResourceNotFoundException("Couldn't find role for: " + workflowRole +
+                                                    " in the collection with UUID: " + collection.getID());
+        }
+        Group group = workflowService.getWorkflowRoleGroup(context, collection, workflowRole, null);
+        if (group == null) {
+            return null;
+        }
+        return converter.toRest(group, utils.obtainProjection());
+    }
+
+    /**
+     * This method will create the WorkflowGroup for the given Collection and workflowRole
+     * @param context       The relevant DSpace context
+     * @param request       The current request
+     * @param collection    The given collection
+     * @param workflowRole  The given workflowRole
+     * @return              The created WorkflowGroup for the given Collection and workflowRole
+     * @throws SQLException If something goes wrong
+     * @throws WorkflowConfigurationException   If something goes wrong
+     * @throws AuthorizeException   If something goes wrong
+     * @throws WorkflowException    If something goes wrong
+     * @throws IOException  If something goes wrong
+     */
+    public GroupRest createWorkflowGroupForRole(Context context, HttpServletRequest request, Collection collection,
+                                                String workflowRole)
+        throws SQLException, WorkflowConfigurationException, AuthorizeException, WorkflowException, IOException {
+        AuthorizeUtil.authorizeManageWorkflowsGroup(context, collection);
+        context.turnOffAuthorisationSystem();
+        Group group = workflowService.createWorkflowRoleGroup(context, collection, workflowRole);
+        context.restoreAuthSystemState();
+        populateGroupInformation(context, request, group);
+        return converter.toRest(group, utils.obtainProjection());
+    }
+
+    /**
+     * This method will delete the WorkflowGroup for a given Collection and workflowRole
+     * @param context       The relevant DSpace context
+     * @param request       The current DSpace request
+     * @param collection    The given Collection
+     * @param workflowRole  The given WorkflowRole
+     * @throws SQLException    If something goes wrong
+     * @throws WorkflowConfigurationException   If something goes wrong
+     * @throws AuthorizeException   If something goes wrong
+     * @throws WorkflowException    If something goes wrong
+     * @throws IOException  If something goes wrong
+     */
+    public void deleteWorkflowGroupForRole(Context context, HttpServletRequest request, Collection collection,
+                                           String workflowRole)
+        throws SQLException, WorkflowConfigurationException, AuthorizeException, WorkflowException, IOException {
+        Group group = workflowService.getWorkflowRoleGroup(context, collection, workflowRole, null);
+        if (!poolTaskService.findByGroup(context, group).isEmpty()) {
+            throw new UnprocessableEntityException("The Group that was attempted to be deleted " +
+                                                       "still has Pooltasks open");
+        }
+        if (group == null) {
+            throw new ResourceNotFoundException("The requested Group was not found");
+        }
+        List<CollectionRole> collectionRoles = collectionRoleService.findByGroup(context, group);
+        if (!collectionRoles.isEmpty()) {
+            collectionRoles.stream().forEach(collectionRole -> {
+                try {
+                    collectionRoleService.delete(context, collectionRole);
+                } catch (SQLException e) {
+                    log.error(e.getMessage(), e);
+                }
+            });
+        }
+        groupService.delete(context, group);
     }
 }
