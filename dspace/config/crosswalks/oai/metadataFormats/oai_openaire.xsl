@@ -129,7 +129,7 @@
 			
 			<!-- DC PUBLISHER -->
 			<xsl:for-each
-				select="doc:metadata/doc:element[@name='dc']/doc:element[@name='publisher']/doc:element/doc:element/doc:field[@name='value']">
+				select="doc:metadata/doc:element[@name='dc']/doc:element[@name='publisher']/doc:element/doc:field[@name='value']">
 				<dc:publisher>
 					<xsl:value-of select="." />
 				</dc:publisher>
@@ -223,9 +223,9 @@
 			<!-- select all funding references -->
 					<xsl:variable name="funder" select="doc:metadata/doc:element[@name='project']/doc:element[@name='funder']/doc:element[@name='name']/doc:element/doc:field[@name='value']"/>
 					<xsl:variable name="funderid" select="doc:metadata/doc:element[@name='project']/doc:element[@name='funder']/doc:element[@name='identifier']/doc:element/doc:field[@name='value']"/>
-					<xsl:variable name="awardnumber" select="doc:metadata/doc:element[@name='oaire']/doc:element[@name='awardNumber']/doc:element/doc:element/doc:field[@name='value']"/>
-					<xsl:variable name="awarduri" select="doc:metadata/doc:element[@name='oaire']/doc:element[@name='awardURI']/doc:element/doc:element/doc:field[@name='value']"/>
-					<xsl:variable name="awardtitle" select="doc:metadata/doc:element[@name='dc']/doc:element[@name='relation']/doc:element/doc:element/doc:field[@name='value']"/>
+					<xsl:variable name="awardnumber" select="doc:metadata/doc:element[@name='oaire']/doc:element[@name='awardNumber']/doc:element/doc:field[@name='value']"/>
+					<xsl:variable name="awarduri" select="doc:metadata/doc:element[@name='oaire']/doc:element[@name='awardURI']/doc:element/doc:field[@name='value']"/>
+					<xsl:variable name="awardtitle" select="doc:metadata/doc:element[@name='dc']/doc:element[@name='relation']/doc:element/doc:field[@name='value']"/>
 					
 					<xsl:variable name="check_fundingreference"> 
 						<xsl:for-each select="$awardtitle">
@@ -293,23 +293,14 @@
 		match="doc:element[@name='dc']/doc:element[@name='subject']"
 		mode="datacite">
 		<datacite:subjects>
-			<xsl:for-each select="./doc:element">
-				<xsl:apply-templates select="." mode="datacite" />
+			<xsl:for-each select="./doc:element/doc:field[@name='value']">
+				<datacite:subject>
+					<xsl:value-of select="./text()" />
+				</datacite:subject>
 			</xsl:for-each>
 		</datacite:subjects>
 	</xsl:template>
 
-	<!-- datacite:subject -->
-	<xsl:template
-		match="doc:element[@name='dc']/doc:element[@name='subject']/doc:element"
-		mode="datacite">
-		<xsl:for-each select="./doc:element/doc:field[@name='value']">
-			<datacite:subject>
-				<xsl:value-of select="./text()" />
-			</datacite:subject>
-		</xsl:for-each>
-	</xsl:template>
-		
 	<xsl:template
 		match="doc:element[@name='dc']/doc:element[@name='identifier']/doc:element[@name='issn']"
 		mode="datacite_ids">
