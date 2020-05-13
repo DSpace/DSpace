@@ -70,4 +70,31 @@ public class CrisLayoutBoxServiceImpl implements CrisLayoutBoxService {
         return dao.create(context, box);
     }
 
+    /* (non-Javadoc)
+     * @see org.dspace.layout.service.CrisLayoutBoxService#findByTabId(org.dspace.core.Context, java.lang.Integer)
+     */
+    @Override
+    public List<CrisLayoutBox> findByTabId(Context context, Integer tabId) throws SQLException {
+        return dao.findByTabId(context, tabId);
+    }
+
+    /* (non-Javadoc)
+     * @see org.dspace.layout.service.CrisLayoutBoxService#findByTabId
+     * (org.dspace.core.Context, java.lang.Integer, java.lang.Integer, java.lang.Integer)
+     */
+    @Override
+    public List<CrisLayoutBox> findByTabId(Context context, Integer tabId, Integer limit, Integer offset)
+            throws SQLException {
+        return dao.findByTabId(context, tabId, limit, offset);
+    }
+
+    /* (non-Javadoc)
+     * @see org.dspace.layout.service.CrisLayoutBoxService#countTotalBoxesInTab
+     * (org.dspace.core.Context, java.lang.Integer)
+     */
+    @Override
+    public Long countTotalBoxesInTab(Context context, Integer tabId) throws SQLException {
+        return dao.countTotalBoxesInTab(context, tabId);
+    }
+
 }

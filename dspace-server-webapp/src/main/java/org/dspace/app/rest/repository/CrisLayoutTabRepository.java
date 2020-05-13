@@ -7,16 +7,34 @@
  */
 package org.dspace.app.rest.repository;
 
+import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+import javax.servlet.http.HttpServletRequest;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.dspace.app.rest.Parameter;
+import org.dspace.app.rest.SearchRestMethod;
+import org.dspace.app.rest.converter.CrisLayoutTabConverter;
+import org.dspace.app.rest.exception.DSpaceBadRequestException;
+import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.CrisLayoutTabRest;
+import org.dspace.app.rest.model.patch.Patch;
+import org.dspace.app.rest.repository.patch.ResourcePatch;
+import org.dspace.authorize.AuthorizeException;
+import org.dspace.content.Item;
+import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.layout.CrisLayoutTab;
 import org.dspace.layout.service.CrisLayoutTabService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.rest.webmvc.ResourceNotFoundException;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
-
 /**
  * @author Danilo Di Nuzzo (danilo dot dinuzzo at 4science dot it)
  *
@@ -27,8 +45,17 @@ public class CrisLayoutTabRepository extends DSpaceRestRepository<CrisLayoutTabR
 
     private final CrisLayoutTabService service;
 
-    public CrisLayoutTabRepository(CrisLayoutTabService service) {
+    private final ItemService itemService;
+
+    @Autowired
+    private CrisLayoutTabConverter tabConverter;
+
+    @Autowired
+    private ResourcePatch<CrisLayoutTab> resourcePatch;
+
+    public CrisLayoutTabRepository(CrisLayoutTabService service, ItemService itemService) {
         this.service = service;
+        this.itemService = itemService;
     }
 
     /* (non-Javadoc)
@@ -54,8 +81,58 @@ public class CrisLayoutTabRepository extends DSpaceRestRepository<CrisLayoutTabR
      */
     @Override
     public Page<CrisLayoutTabRest> findAll(Context context, Pageable pageable) {
-        // TODO Auto-generated method stub
-        return null;
+        List<CrisLayoutTab> tabList = new ArrayList<>();
+        return converter.toRestPage(tabList, pageable, 0L, utils.obtainProjection());
+    }
+
+    @SearchRestMethod(name = "findByItem")
+    public Page<CrisLayoutTabRest> findByItem(
+            @Parameter(value = "uuid", required = true) String itemUuid, Pageable pageable) {
+        Context context = obtainContext();
+        List<CrisLayoutTab> tabList = null;
+        Long totalRow = null;
+        try {
+            Item item = itemService.find(context, UUID.fromString(itemUuid));
+            String itemMetadata = "";
+            if (item != null) {
+                itemMetadata = itemService.getMetadata(item, "relationship.type");
+            }
+            totalRow = service.countByEntityType(context, itemMetadata);
+            tabList = service.findByEntityType(
+                context,
+                itemMetadata,
+                pageable.getPageSize(),
+                (pageable.getPageNumber() * pageable.getPageSize()) );
+        } catch (SQLException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+        if (tabList == null) {
+            return null;
+        }
+        return converter.toRestPage(tabList, pageable, totalRow, utils.obtainProjection());
+    }
+
+    @SearchRestMethod(name = "findByEntityType")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public Page<CrisLayoutTabRest> findByEntityType(
+            @Parameter(value = "type", required = true) String type, Pageable pageable) {
+        Context context = obtainContext();
+        List<CrisLayoutTab> tabList = null;
+        Long totalRow = null;
+        try {
+            totalRow = service.countByEntityType(context, type);
+            tabList = service.findByEntityType(
+                context,
+                type,
+                pageable.getPageSize(),
+                (pageable.getPageNumber() * pageable.getPageSize()) );
+        } catch (SQLException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+        if (tabList == null) {
+            return null;
+        }
+        return converter.toRestPage(tabList, pageable, totalRow, utils.obtainProjection());
     }
 
     /* (non-Javadoc)
@@ -63,8 +140,7 @@ public class CrisLayoutTabRepository extends DSpaceRestRepository<CrisLayoutTabR
      */
     @Override
     public Class<CrisLayoutTabRest> getDomainClass() {
-        // TODO Auto-generated method stub
-        return null;
+        return CrisLayoutTabRest.class;
     }
 
     /* (non-Javadoc)
@@ -73,8 +149,7 @@ public class CrisLayoutTabRepository extends DSpaceRestRepository<CrisLayoutTabR
      */
     @Override
     public CrisLayoutTab findDomainObjectByPk(Context context, Integer id) throws SQLException {
-        // TODO Auto-generated method stub
-        return null;
+        return service.find(context, id);
     }
 
     /* (non-Javadoc)
@@ -82,8 +157,59 @@ public class CrisLayoutTabRepository extends DSpaceRestRepository<CrisLayoutTabR
      */
     @Override
     public Class<Integer> getPKClass() {
-        // TODO Auto-generated method stub
-        return null;
+        return Integer.class;
     }
 
+    @Override
+    @PreAuthorize("hasAuthority('ADMIN')")
+    protected CrisLayoutTabRest createAndReturn(Context context) {
+        HttpServletRequest req = getRequestService().getCurrentRequest().getHttpServletRequest();
+        ObjectMapper mapper = new ObjectMapper();
+        CrisLayoutTabRest tabRest = null;
+        try {
+            tabRest = mapper.readValue(req.getInputStream(), CrisLayoutTabRest.class);
+        } catch (IOException e1) {
+            throw new UnprocessableEntityException("error parsing the body... maybe this is not the right error code");
+        }
+
+        CrisLayoutTab tab = tabConverter.toModel(context, tabRest);
+        try {
+            service.create(context, tab);
+        } catch (SQLException | AuthorizeException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+        return converter.toRest(tab, utils.obtainProjection());
+    }
+
+    @Override
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public CrisLayoutTabRest patch(
+            HttpServletRequest request, String apiCategory, String model, Integer id, Patch patch)
+            throws UnprocessableEntityException, DSpaceBadRequestException {
+        Context context = obtainContext();
+        CrisLayoutTab tab = null;
+        try {
+            tab = service.find(context, id);
+            if (tab == null) {
+                throw new ResourceNotFoundException(apiCategory + "." + model + " with id: " + id + " not found");
+            }
+            resourcePatch.patch(obtainContext(), tab, patch.getOperations());
+            service.update(context, tab);
+        } catch (SQLException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        } catch (AuthorizeException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+        return converter.toRest(tab, utils.obtainProjection());
+    }
+
+    @Override
+    protected void delete(Context context, Integer id) throws AuthorizeException {
+        try {
+            CrisLayoutTab tab = service.find(context, id);
+            service.delete(context, tab);
+        } catch (SQLException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+    }
 }

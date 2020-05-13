@@ -13,7 +13,9 @@ import java.util.List;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.EntityType;
+import org.dspace.content.MetadataField;
 import org.dspace.core.Context;
 import org.dspace.layout.CrisLayoutTab;
 import org.dspace.layout.dao.CrisLayoutTabDAO;
@@ -27,13 +29,24 @@ public class CrisLayoutTabServiceImpl implements CrisLayoutTabService {
     @Autowired(required = true)
     private CrisLayoutTabDAO dao;
 
+    @Autowired(required = true)
+    protected AuthorizeService authorizeService;
+
     @Override
-    public CrisLayoutTab create(Context c, CrisLayoutTab tab) throws SQLException {
+    public CrisLayoutTab create(Context c, CrisLayoutTab tab) throws SQLException, AuthorizeException {
+        if (!authorizeService.isAdmin(c)) {
+            throw new AuthorizeException(
+                "You must be an admin to create a Tab");
+        }
         return dao.create(c, tab);
     }
 
     @Override
     public CrisLayoutTab create(Context context) throws SQLException, AuthorizeException {
+        if (!authorizeService.isAdmin(context)) {
+            throw new AuthorizeException(
+                "You must be an admin to create a Tab");
+        }
         return dao.create(context, new CrisLayoutTab());
     }
 
@@ -49,6 +62,10 @@ public class CrisLayoutTabServiceImpl implements CrisLayoutTabService {
 
     @Override
     public void update(Context context, List<CrisLayoutTab> tabList) throws SQLException, AuthorizeException {
+        if (!authorizeService.isAdmin(context)) {
+            throw new AuthorizeException(
+                "You must be an admin to update a Tab");
+        }
         if (CollectionUtils.isNotEmpty(tabList)) {
             for (CrisLayoutTab tab: tabList) {
                 dao.save(context, tab);
@@ -58,15 +75,77 @@ public class CrisLayoutTabServiceImpl implements CrisLayoutTabService {
 
     @Override
     public void delete(Context context, CrisLayoutTab tab) throws SQLException, AuthorizeException {
+        if (!authorizeService.isAdmin(context)) {
+            throw new AuthorizeException(
+                "You must be an admin to delete a Tab");
+        }
         dao.delete(context, tab);
     }
 
     @Override
-    public CrisLayoutTab create(Context context, EntityType eType, Integer priority) throws SQLException {
+    public CrisLayoutTab create(Context context, EntityType eType, Integer priority)
+            throws SQLException, AuthorizeException {
+        if (!authorizeService.isAdmin(context)) {
+            throw new AuthorizeException(
+                "You must be an admin to create a Tab");
+        }
         CrisLayoutTab tab = new CrisLayoutTab();
         tab.setEntity(eType);
         tab.setPriority(priority);
         return dao.create(context, tab);
+    }
+
+    /* (non-Javadoc)
+     * @see org.dspace.layout.service.CrisLayoutTabService#findAll(org.dspace.core.Context)
+     */
+    @Override
+    public List<CrisLayoutTab> findAll(Context context, Integer limit, Integer offset) throws SQLException {
+        return dao.findAll(context, CrisLayoutTab.class, limit, offset);
+    }
+
+    /* (non-Javadoc)
+     * @see org.dspace.layout.service.CrisLayoutTabService#countTotal(org.dspace.core.Context)
+     */
+    @Override
+    public Long countTotal(Context context) throws SQLException {
+        return dao.countTotal(context);
+    }
+
+    /* (non-Javadoc)
+     * @see org.dspace.layout.service.CrisLayoutTabService#findByEntityType(org.dspace.core.Context, java.lang.String)
+     */
+    @Override
+    public List<CrisLayoutTab> findByEntityType(Context context, String entityType) throws SQLException {
+        return dao.findByEntityType(context, entityType);
+    }
+
+    /* (non-Javadoc)
+     * @see org.dspace.layout.service.CrisLayoutTabService#findByEntityType
+     * (org.dspace.core.Context, java.lang.String, java.lang.Integer, java.lang.Integer)
+     */
+    @Override
+    public List<CrisLayoutTab> findByEntityType(Context context, String entityType, Integer limit, Integer offset)
+            throws SQLException {
+        return dao.findByEntityType(context, entityType, limit, offset);
+    }
+
+    /* (non-Javadoc)
+     * @see org.dspace.layout.service.CrisLayoutTabService#countByEntityType(org.dspace.core.Context, java.lang.String)
+     */
+    @Override
+    public Long countByEntityType(Context context, String entityType) throws SQLException {
+        return dao.countByEntityType(context, entityType);
+    }
+
+    @Override
+    public List<MetadataField> getMetadataField(Context context, Integer tabId, Integer limit, Integer offset)
+            throws SQLException {
+        return dao.getMetadataField(context, tabId, limit, offset);
+    }
+
+    @Override
+    public Long totalMetadataField(Context context, Integer tabId) throws SQLException {
+        return dao.totalMetadatafield(context, tabId);
     }
 
 }

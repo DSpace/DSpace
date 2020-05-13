@@ -12,6 +12,7 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.dspace.content.EntityType;
+import org.dspace.content.MetadataField;
 import org.dspace.core.Context;
 import org.dspace.layout.CrisLayoutBox;
 import org.dspace.layout.CrisLayoutTab;
@@ -104,6 +105,19 @@ public class CrisLayoutTabBuilder extends AbstractBuilder<CrisLayoutTab, CrisLay
             this.tab.setBoxes(new HashSet<>());
         }
         this.tab.getBoxes().add(box);
+        return this;
+    }
+
+    public CrisLayoutTabBuilder withMetadatasecurity(Set<MetadataField> metadataFields) {
+        this.tab.setMetadataFields(metadataFields);
+        return this;
+    }
+
+    public CrisLayoutTabBuilder addMetadatasecurity(MetadataField metadataField) {
+        if (this.tab.getMetadataFields() == null) {
+            this.tab.setMetadataFields(new HashSet<>());
+        }
+        this.tab.getMetadataFields().add(metadataField);
         return this;
     }
 }

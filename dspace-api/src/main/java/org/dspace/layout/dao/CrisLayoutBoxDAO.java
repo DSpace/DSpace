@@ -7,9 +7,19 @@
  */
 package org.dspace.layout.dao;
 
+import java.sql.SQLException;
+import java.util.List;
+
+import org.dspace.core.Context;
 import org.dspace.core.GenericDAO;
 import org.dspace.layout.CrisLayoutBox;
 
 public interface CrisLayoutBoxDAO extends GenericDAO<CrisLayoutBox> {
 
+    public List<CrisLayoutBox> findByTabId(Context context, Integer tabId) throws SQLException;
+
+    public List<CrisLayoutBox> findByTabId(
+            Context context, Integer tabId, Integer limit, Integer offset) throws SQLException;
+
+    public Long countTotalBoxesInTab(Context context, Integer tabId) throws SQLException;
 }

@@ -7,9 +7,15 @@
  */
 package org.dspace.app.rest.converter;
 
+import java.sql.SQLException;
+
 import org.dspace.app.rest.model.CrisLayoutTabRest;
 import org.dspace.app.rest.projection.Projection;
+import org.dspace.content.EntityType;
+import org.dspace.content.service.EntityTypeService;
+import org.dspace.core.Context;
 import org.dspace.layout.CrisLayoutTab;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -19,6 +25,9 @@ import org.springframework.stereotype.Component;
 @Component
 public class CrisLayoutTabConverter implements DSpaceConverter<CrisLayoutTab, CrisLayoutTabRest> {
 
+    @Autowired
+    private EntityTypeService eService;
+
     /* (non-Javadoc)
      * @see org.dspace.app.rest.converter.DSpaceConverter#convert
      * (java.lang.Object, org.dspace.app.rest.projection.Projection)
@@ -27,6 +36,7 @@ public class CrisLayoutTabConverter implements DSpaceConverter<CrisLayoutTab, Cr
     public CrisLayoutTabRest convert(CrisLayoutTab mo, Projection projection) {
         CrisLayoutTabRest rest = new CrisLayoutTabRest();
         rest.setId(mo.getID());
+        rest.setEntityType(mo.getEntity().getLabel());
         rest.setShortname(mo.getShortName());
         rest.setHeader(mo.getHeader());
         rest.setPriority(mo.getPriority());
@@ -42,4 +52,19 @@ public class CrisLayoutTabConverter implements DSpaceConverter<CrisLayoutTab, Cr
         return CrisLayoutTab.class;
     }
 
+    public CrisLayoutTab toModel(Context context, CrisLayoutTabRest rest) {
+        EntityType eType = null;
+        try {
+            eType = eService.findByEntityType(context, rest.getEntityType());
+        } catch (SQLException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+        CrisLayoutTab tab = new CrisLayoutTab();
+        tab.setHeader(rest.getHeader());
+        tab.setPriority(rest.getPriority());
+        tab.setSecurity(rest.getSecurity());
+        tab.setShortName(rest.getShortname());
+        tab.setEntity(eType);
+        return tab;
+    }
 }

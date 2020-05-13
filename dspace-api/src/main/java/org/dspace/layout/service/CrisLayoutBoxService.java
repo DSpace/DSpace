@@ -8,6 +8,7 @@
 package org.dspace.layout.service;
 
 import java.sql.SQLException;
+import java.util.List;
 
 import org.dspace.content.EntityType;
 import org.dspace.core.Context;
@@ -41,5 +42,35 @@ public interface CrisLayoutBoxService extends DSpaceCRUDService<CrisLayoutBox> {
             boolean collapsed,
             int priority,
             boolean minor) throws SQLException;
+
+    /**
+     * Find all boxes by tab id
+     * @param context DSpace application context
+     * @param tabId Id of tab container
+     * @return
+     * @throws SQLException
+     */
+    public List<CrisLayoutBox> findByTabId(Context context, Integer tabId) throws SQLException;
+
+    /**
+     * Find all boxes by tab id
+     * @param context
+     * @param tabId
+     * @param limit
+     * @param offeset
+     * @return
+     * @throws SQLException
+     */
+    public List<CrisLayoutBox> findByTabId(Context context, Integer tabId, Integer limit, Integer offset)
+            throws SQLException;
+
+    /**
+     * Returns the total number of boxes contained in the tab identified by its id
+     * @param context
+     * @param tabId
+     * @return
+     * @throws SQLException
+     */
+    public Long countTotalBoxesInTab(Context context, Integer tabId) throws SQLException;
 
 }

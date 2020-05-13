@@ -71,6 +71,13 @@ public class CrisLayoutBox implements ReloadableEntity<Integer> {
         inverseJoinColumns = {@JoinColumn(name = "cris_layout_field_id")}
     )
     private Set<CrisLayoutField> layoutFields;
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+        name = "cris_layout_tab2box",
+        joinColumns = {@JoinColumn(name = "cris_layout_box_id")},
+        inverseJoinColumns = {@JoinColumn(name = "cris_layout_tab_id")}
+    )
+    private Set<CrisLayoutTab> tabs;
 
     @Override
     public Integer getID() {
@@ -167,5 +174,13 @@ public class CrisLayoutBox implements ReloadableEntity<Integer> {
 
     public void setLayoutFields(Set<CrisLayoutField> layoutFields) {
         this.layoutFields = layoutFields;
+    }
+
+    public Set<CrisLayoutTab> getTabs() {
+        return tabs;
+    }
+
+    public void setTabs(Set<CrisLayoutTab> tabs) {
+        this.tabs = tabs;
     }
 }

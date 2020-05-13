@@ -15,30 +15,23 @@ import org.dspace.app.rest.RestResourceController;
  * @author Danilo Di Nuzzo (danilo dot dinuzzo at 4science dot it)
  *
  */
-@LinksRest(links = {
-        @LinkRest(
-                name = CrisLayoutTabRest.BOXES,
-                method = "getBoxes"
-        ),
-        @LinkRest(
-                name = CrisLayoutTabRest.SECURITY_METADATA,
-                method = "getSecurityMetadata"
-        )
-})
-public class CrisLayoutTabRest extends BaseObjectRest<Integer> {
+public class CrisLayoutBoxRest extends BaseObjectRest<Integer> {
 
-    private static final long serialVersionUID = -6032412882381032490L;
+    private static final long serialVersionUID = 1759482359230180793L;
 
-    public static final String NAME = "tab";
+    public static final String NAME = "box";
     public static final String CATEGORY = RestAddressableModel.LAYOUT;
-    public static final String BOXES = "boxes";
-    public static final String SECURITY_METADATA = "securitymetadata";
 
     private String shortname;
     private String header;
     private String entityType;
+    private Boolean collapsed;
+    private Boolean minor;
+    private String style;
     private Integer priority;
+    private Integer group;
     private Integer security;
+    private String boxType;
 
     /* (non-Javadoc)
      * @see org.dspace.app.rest.model.RestModel#getType()
@@ -82,13 +75,37 @@ public class CrisLayoutTabRest extends BaseObjectRest<Integer> {
         this.header = header;
     }
 
-    @JsonProperty(value = "entity-type")
+    @JsonProperty( value = "entity-type" )
     public String getEntityType() {
         return entityType;
     }
 
     public void setEntityType(String entityType) {
         this.entityType = entityType;
+    }
+
+    public Boolean getCollapsed() {
+        return collapsed;
+    }
+
+    public void setCollapsed(Boolean collapsed) {
+        this.collapsed = collapsed;
+    }
+
+    public Boolean getMinor() {
+        return minor;
+    }
+
+    public void setMinor(Boolean minor) {
+        this.minor = minor;
+    }
+
+    public String getStyle() {
+        return style;
+    }
+
+    public void setStyle(String style) {
+        this.style = style;
     }
 
     public Integer getPriority() {
@@ -99,12 +116,29 @@ public class CrisLayoutTabRest extends BaseObjectRest<Integer> {
         this.priority = priority;
     }
 
+    public Integer getGroup() {
+        return group;
+    }
+
+    public void setGroup(Integer group) {
+        this.group = group;
+    }
+
     public Integer getSecurity() {
         return security;
     }
 
     public void setSecurity(Integer security) {
         this.security = security;
+    }
+
+    @JsonProperty(value = "box-type")
+    public String getBoxType() {
+        return boxType;
+    }
+
+    public void setBoxType(String boxType) {
+        this.boxType = boxType;
     }
 
 }
