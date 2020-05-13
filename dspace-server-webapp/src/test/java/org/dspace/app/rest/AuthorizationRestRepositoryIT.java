@@ -82,7 +82,6 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
 
     @Autowired
     private Utils utils;
-
     private SiteService siteService;
 
     /** 
@@ -816,7 +815,8 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
         String adminToken = getAuthToken(admin.getEmail(), password);
         getClient(adminToken).perform(get("/api/authz/authorizations/search/objectAndFeature")
                 .param("uri", comUri)
-                .param("projection", "full")
+                .param("projection", "level")
+                .param("embedLevelDepth", "1")
                 .param("feature", alwaysTrue.getName())
                 .param("eperson", admin.getID().toString()))
             .andExpect(status().isOk())
@@ -829,7 +829,8 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
         String epersonToken = getAuthToken(eperson.getEmail(), password);
         getClient(epersonToken).perform(get("/api/authz/authorizations/search/objectAndFeature")
                 .param("uri", comUri)
-                .param("projection", "full")
+                .param("projection", "level")
+                .param("embedLevelDepth", "1")
                 .param("feature", alwaysTrue.getName())
                 .param("eperson", eperson.getID().toString()))
             .andExpect(status().isOk())
@@ -841,7 +842,8 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
         // verify that it works for administators inspecting other users
         getClient(adminToken).perform(get("/api/authz/authorizations/search/objectAndFeature")
                 .param("uri", comUri)
-                .param("projection", "full")
+                .param("projection", "level")
+                .param("embedLevelDepth", "1")
                 .param("feature", alwaysTrue.getName())
                 .param("eperson", eperson.getID().toString()))
             .andExpect(status().isOk())
@@ -853,7 +855,8 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
         // verify that it works for anonymous users
         getClient().perform(get("/api/authz/authorizations/search/objectAndFeature")
                 .param("uri", comUri)
-                .param("projection", "full")
+                .param("projection", "level")
+                .param("embedLevelDepth", "1")
                 .param("feature", alwaysTrue.getName()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.type", is("authorization")))
@@ -864,7 +867,8 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
         // verify that it works for administrators inspecting anonymous users
         getClient(adminToken).perform(get("/api/authz/authorizations/search/objectAndFeature")
                 .param("uri", comUri)
-                .param("projection", "full")
+                .param("projection", "level")
+                .param("embedLevelDepth", "1")
                 .param("feature", alwaysTrue.getName()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.type", is("authorization")))
@@ -1331,5 +1335,4 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
         return (epersonUuid != null ? epersonUuid + "_" : "") + featureName + "_" + type + "_"
                 + id.toString();
     }
-
 }

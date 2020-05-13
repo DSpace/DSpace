@@ -131,6 +131,11 @@ public class PoolTaskServiceImpl implements PoolTaskService {
     }
 
     @Override
+    public List<PoolTask> findByGroup(Context context, Group group) throws SQLException {
+        return poolTaskDAO.findByGroup(context, group);
+    }
+
+    @Override
     public PoolTask create(Context context) throws SQLException, AuthorizeException {
         return poolTaskDAO.create(context, new PoolTask());
     }
