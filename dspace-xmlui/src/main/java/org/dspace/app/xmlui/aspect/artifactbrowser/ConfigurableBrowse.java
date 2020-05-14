@@ -743,7 +743,12 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
             params.scope.setJumpToItem(RequestUtils.getIntParameter(request, BrowseParams.JUMPTO_ITEM));
             params.scope.setOrder(request.getParameter(BrowseParams.ORDER));
             updateOffset(request, params);
-            params.scope.setResultsPerPage(RequestUtils.getIntParameter(request, BrowseParams.RESULTS_PER_PAGE));
+            int rpp = RequestUtils.getIntParameter(request, BrowseParams.RESULTS_PER_PAGE);
+            int maxRpp = RESULTS_PER_PAGE_PROGRESSION[RESULTS_PER_PAGE_PROGRESSION.length-1];
+            if (rpp > maxRpp) {
+                rpp = maxRpp;
+            }
+            params.scope.setResultsPerPage(rpp);
             params.scope.setStartsWith(decodeFromURL(request.getParameter(BrowseParams.STARTS_WITH)));
             String filterValue = request.getParameter(BrowseParams.FILTER_VALUE[0]);
             if (filterValue == null)
