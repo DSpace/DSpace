@@ -1650,15 +1650,20 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         context.restoreAuthSystemState();
 
         // try to add the title
-        List<Operation> addTitle = new ArrayList<Operation>();
+        List<Operation> operations = new ArrayList<Operation>();
         // create a list of values to use in add operation
-        List<Map<String, String>> values = new ArrayList<Map<String, String>>();
+        List<Map<String, String>> titelValues = new ArrayList<Map<String, String>>();
+        List<Map<String, String>> uriValues = new ArrayList<Map<String, String>>();
         Map<String, String> value = new HashMap<String, String>();
+        Map<String, String> value2 = new HashMap<String, String>();
         value.put("value", "New Title");
-        values.add(value);
-        addTitle.add(new AddOperation("/sections/traditionalpageone/dc.title", values));
+        value2.put("value", "https://www.dspace.org");
+        titelValues.add(value);
+        uriValues.add(value2);
+        operations.add(new AddOperation("/sections/traditionalpageone/dc.title", titelValues));
+        operations.add(new AddOperation("/sections/traditionalpageone/dc.identifier.uri", uriValues));
 
-        String patchBody = getPatchContent(addTitle);
+        String patchBody = getPatchContent(operations);
         getClient(authToken).perform(patch("/api/submission/workspaceitems/" + witem.getID())
                 .content(patchBody)
                 .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
@@ -1667,7 +1672,10 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                             .andExpect(jsonPath("$",
                                     // check if the new title if back and the other values untouched
                                     Matchers.is(WorkspaceItemMatcher.matchItemWithTitleAndDateIssuedAndSubject(witem,
-                                            "New Title", "2017-10-17", "ExtraEntry"))));
+                                            "New Title", "2017-10-17", "ExtraEntry"))))
+                            .andExpect(jsonPath("$", Matchers.allOf(
+                                    hasJsonPath("$.sections.traditionalpageone['dc.identifier.uri'][0].value",
+                                             is("https://www.dspace.org")))));
 
         // verify that the patch changes have been persisted
         getClient(authToken).perform(get("/api/submission/workspaceitems/" + witem.getID()))
@@ -1676,6 +1684,9 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
             .andExpect(jsonPath("$",
                     Matchers.is(WorkspaceItemMatcher.matchItemWithTitleAndDateIssuedAndSubject(witem,
                             "New Title", "2017-10-17", "ExtraEntry"))))
+            .andExpect(jsonPath("$", Matchers.allOf(
+                    hasJsonPath("$.sections.traditionalpageone['dc.identifier.uri'][0].value",
+                             is("https://www.dspace.org")))))
         ;
     }
 
