@@ -47,6 +47,12 @@ public class SendFeedbackAction extends AbstractAction
         String session = request.getSession().getId();
         String comments = request.getParameter("comments");
 
+        //Check captcha
+        String number1 = request.getParameter("number1");
+        String number2 = request.getParameter("number2");
+        String result = request.getParameter("captcha_input");
+        Boolean isValidUser = isValidUser(number1,number2,result);
+
         // Obtain information from request
         // The page where the user came from
         String fromPage = request.getHeader("Referer");
@@ -89,7 +95,9 @@ public class SendFeedbackAction extends AbstractAction
 
         // Check all data is there
         if ((address == null) || address.equals("")
-                || (comments == null) || comments.equals(""))
+                || (comments == null) || comments.equals("")
+                || (number1 == null) || number2 == null
+                || (result == null) || !isValidUser)
         {
             // Either the user did not fill out the form or this is the
             // first time they are visiting the page.
@@ -106,6 +114,12 @@ public class SendFeedbackAction extends AbstractAction
             }
 
             map.put("comments",comments);
+
+            if (!isValidUser && result!=null) {
+                map.put("captchaError", "true");
+            } else {
+                map.put("captchaError", "");
+            }
 
             return map;
         }
@@ -150,4 +164,17 @@ public class SendFeedbackAction extends AbstractAction
         return false;
     }
 
+    private boolean isValidUser(String number1,String number2,String result) {
+        boolean isValidUser=false;
+        if(number1!=null && number2!=null && result!=null) {
+            try {
+                if (Integer.parseInt(number1)+Integer.parseInt(number2)==Integer.parseInt(result))
+                    isValidUser=true;
+            }
+            catch (NumberFormatException e) {
+                isValidUser=false;
+            }
+        }
+        return isValidUser;
+    }
 }

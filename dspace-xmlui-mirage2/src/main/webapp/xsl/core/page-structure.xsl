@@ -874,7 +874,17 @@
         </xsl:if>
 
         <xsl:call-template name="addJavascript-google-analytics" />
+
+        <!-- javascript for captcha -->
+        <xsl:if test="/dri:document/dri:body/dri:div[@id='aspect.artifactbrowser.FeedbackForm.div.feedback-form']">
+            <script src='https://www.google.com/recaptcha/api.js'>&#160;</script>
+            <script type="text/javascript">
+                add_captcha();
+            </script>
+        </xsl:if>
+
     </xsl:template>
+
 
     <xsl:template name="addJavascript-google-analytics">
         <!-- Add a google analytics script if the key is present -->

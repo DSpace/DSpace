@@ -279,6 +279,7 @@ collections / items / and bitstreams
 						<map:parameter name="comments" value="{comments}" />
 						<map:parameter name="email" value="{email}" />
 						<map:parameter name="page" value="{page}" />
+						<map:parameter name="captchaError" value="{captchaError}" />
 					</map:transform>
 
 					<map:serialize type="xml" />
