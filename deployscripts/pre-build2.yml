@@ -20,4 +20,4 @@
         token: "{{ SlackConfig.token }}"
         username: "{{ SlackConfig.sender }}"
       delegate_to: localhost
-      when: `[{{fase}}]` == "produksjon"
+      when: "{{ fase }}" == "produksjon"
