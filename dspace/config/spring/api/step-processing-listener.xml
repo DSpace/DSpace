@@ -17,7 +17,6 @@
         </property>
         <property name="dataloadersMap">
 	        <map>
-                <entry key="pubmedEurope" value-ref="pubmedEuropeOnlineDataLoader"/>
                 <entry key="pubmed" value-ref="pubmedOnlineDataLoader"/>
                 <entry key="adsbibcode" value-ref="adsOnlineDataLoader"/>
 	            <entry key="crossref" value-ref="crossRefOnlineDataLoader"/>
@@ -26,6 +25,7 @@
  	            <entry key="wos" value-ref="wosOnlineDataLoader"/>
 	            <entry key="scopus" value-ref="scopusOnlineDataLoader"/>
 	            <entry key="scival" value-ref="scivalOnlineDataLoader"/>
+	            <entry key="pubmedEurope" value-ref="pubmedEuropeOnlineDataLoader"/>
 	        </map>
 	    </property>
     </bean>
