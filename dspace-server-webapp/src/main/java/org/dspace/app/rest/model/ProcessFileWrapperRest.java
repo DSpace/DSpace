@@ -11,7 +11,12 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-public class ProcessFileWrapperRest {
+
+/**
+ * The ProcessFileWrapper REST Resource
+ *
+ */
+public class ProcessFileWrapperRest implements RestModel {
     private Integer processId;
 
     @JsonIgnore
@@ -31,5 +36,15 @@ public class ProcessFileWrapperRest {
 
     public List<BitstreamRest> getBitstreams() {
         return bitstreams;
+    }
+
+    @Override
+    public String getType() {
+        return "processfilewrapper";
+    }
+
+    @Override
+    public String getTypePlural() {
+        return "processfilewrappers";
     }
 }

@@ -20,12 +20,18 @@ import org.dspace.scripts.Process;
 /**
  * This class serves as a REST representation for the {@link Process} class
  */
+@LinksRest(links = {
+    @LinkRest(
+        name = ProcessRest.FILES,
+        method = "getFilesFromProcess"
+    ),
+})
 public class ProcessRest extends BaseObjectRest<Integer> {
     public static final String NAME = "process";
     public static final String PLURAL_NAME = "processes";
     public static final String CATEGORY = RestAddressableModel.SYSTEM;
 
-
+    public static final String FILES = "files";
     public String getCategory() {
         return CATEGORY;
     }

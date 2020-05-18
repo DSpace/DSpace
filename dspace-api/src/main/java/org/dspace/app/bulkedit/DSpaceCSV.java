@@ -11,6 +11,7 @@ import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Serializable;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -24,7 +25,6 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.pdfbox.util.Charsets;
 import org.dspace.authority.AuthorityValue;
 import org.dspace.authority.factory.AuthorityServiceFactory;
 import org.dspace.authority.service.AuthorityValueService;
@@ -149,7 +149,7 @@ public class DSpaceCSV implements Serializable {
         // Open the CSV file
         BufferedReader input = null;
         try {
-            input = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));
+            input = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
 
             // Read the heading line
             String head = input.readLine();
@@ -619,12 +619,16 @@ public class DSpaceCSV implements Serializable {
         return csvLines;
     }
 
+    /**
+     * Creates and returns an InputStream from the CSV Lines in this DSpaceCSV
+     * @return  The InputStream created from the CSVLines in this DSpaceCSV
+     */
     public InputStream getInputStream() {
         StringBuilder stringBuilder = new StringBuilder();
         for (String csvLine : getCSVLinesAsStringArray()) {
             stringBuilder.append(csvLine + "\n");
         }
-        return IOUtils.toInputStream(stringBuilder.toString(), Charsets.UTF_8);
+        return IOUtils.toInputStream(stringBuilder.toString(), StandardCharsets.UTF_8);
     }
 
     /**

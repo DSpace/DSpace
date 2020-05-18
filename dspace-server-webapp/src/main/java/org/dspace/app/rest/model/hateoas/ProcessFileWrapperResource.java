@@ -17,16 +17,25 @@ import org.dspace.app.rest.model.MetadataValueRest;
 import org.dspace.app.rest.model.ProcessFileWrapperRest;
 import org.dspace.app.rest.utils.Utils;
 
-
+/**
+ * This is the Resource object for the {@link ProcessFileWrapperRest}
+ * It'll create a Resource object to return and include the associated bitstreams in an embed that's properly
+ * made for the type of file that that particular bitstream is
+ */
 public class ProcessFileWrapperResource extends HALResource<ProcessFileWrapperRest> {
 
+    /**
+     * Constructor for this object. Calls on super and creates separate embedded lists
+     * @param content   The {@link ProcessFileWrapperRest} object associated with this resource
+     * @param utils     Utils class
+     */
     public ProcessFileWrapperResource(ProcessFileWrapperRest content, Utils utils) {
         super(content);
 
         if (content != null) {
             HashMap<String, List<BitstreamResource>> bitstreamResourceMap = new HashMap<>();
             for (BitstreamRest bitstreamRest : content.getBitstreams()) {
-                List<MetadataValueRest> fileType = bitstreamRest.getMetadata().getMap().get("process.type");
+                List<MetadataValueRest> fileType = bitstreamRest.getMetadata().getMap().get("dspace.process.type");
                 if (fileType != null && !fileType.isEmpty()) {
                     bitstreamResourceMap
                         .computeIfAbsent(fileType.get(0).getValue(), k -> new ArrayList<>())
