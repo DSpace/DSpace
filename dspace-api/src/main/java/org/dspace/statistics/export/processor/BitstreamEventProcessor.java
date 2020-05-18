@@ -30,6 +30,7 @@ public class BitstreamEventProcessor extends ExportEventProcessor {
 
     /**
      * Creates a new BitstreamEventProcessor that will set the params and obtain the parent item of the bitstream
+     *
      * @param context
      * @param request
      * @param bitstream
@@ -44,6 +45,7 @@ public class BitstreamEventProcessor extends ExportEventProcessor {
 
     /**
      * Returns the parent item of the bitsream
+     *
      * @return parent item of the bitstream
      * @throws SQLException
      */
@@ -68,6 +70,7 @@ public class BitstreamEventProcessor extends ExportEventProcessor {
      * Process the event
      * Check if the item should be processed
      * Create the url to be transmitted based on item and bitstream data
+     *
      * @throws SQLException
      * @throws IOException
      */
@@ -81,7 +84,8 @@ public class BitstreamEventProcessor extends ExportEventProcessor {
 
     /**
      * Adds additional item and bitstream data to the url
-     * @param string to which the additional data needs to be added
+     *
+     * @param string    to which the additional data needs to be added
      * @param item
      * @param bitstream
      * @return the string with additional data
@@ -102,13 +106,14 @@ public class BitstreamEventProcessor extends ExportEventProcessor {
 
     /**
      * Get Bitstream info used for the url
+     *
      * @param item
      * @param bitstream
      * @return bitstream info
      */
     private String getBitstreamInfo(final Item item, final Bitstream bitstream) {
 
-        StringBuilder sb = new StringBuilder(configurationService.getProperty("dspace.url"));
+        StringBuilder sb = new StringBuilder(configurationService.getProperty("dspace.ui.url"));
 
         String identifier;
         if (item != null && item.getHandle() != null) {

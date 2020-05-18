@@ -13,7 +13,7 @@ import java.sql.SQLException;
 import org.dspace.core.Context;
 
 /**
- * The Service responsible for processing urls to be send to IRUS
+ * The Service responsible for processing urls
  */
 public interface OpenUrlService {
     /**
@@ -26,7 +26,7 @@ public interface OpenUrlService {
     void processUrl(Context c, String urlStr) throws SQLException;
 
     /**
-     * Will process all urls stored in the database and try contacting IRUS again
+     * Will process all urls stored in the database and try contacting them again
      * @param context
      * @throws SQLException
      */
