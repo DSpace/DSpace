@@ -43,13 +43,13 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.deduplication.Deduplication;
 import org.dspace.deduplication.service.DeduplicationService;
 import org.dspace.discovery.SearchServiceException;
 import org.dspace.handle.factory.HandleServiceFactory;
+import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.utils.DSpace;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -156,6 +156,9 @@ public class SolrDedupServiceImpl implements DedupService {
     @Autowired(required = true)
     private DeduplicationService deduplicationService;
 
+    @Autowired(required = true)
+    protected ConfigurationService configurationService;
+
     /***
      * Deduplication status
      * <p>
@@ -212,7 +215,7 @@ public class SolrDedupServiceImpl implements DedupService {
 
             UrlValidator urlValidator = new UrlValidator(UrlValidator.ALLOW_LOCAL_URLS);
             if (urlValidator.isValid(solrService)
-                    || ConfigurationManager.getBooleanProperty("deduplication", "solr.url.validation.enabled", true)) {
+                    || configurationService.getBooleanProperty("deduplication.solr.url.validation.enabled", true)) {
                 try {
                     log.debug("Solr URL: " + solrService);
                     solr = new HttpSolrClient.Builder(solrService).build();
@@ -567,7 +570,7 @@ public class SolrDedupServiceImpl implements DedupService {
                 QueryResponse rsp = getSolr().query(query);
                 SolrDocumentList docs = rsp.getResults();
 
-                Iterator iter = docs.iterator();
+                Iterator<SolrDocument> iter = docs.iterator();
                 while (iter.hasNext()) {
 
                     SolrDocument doc = (SolrDocument) iter.next();
@@ -639,7 +642,6 @@ public class SolrDedupServiceImpl implements DedupService {
     public void unIndexContent(Context context, String handleOrUuid) throws IllegalStateException, SQLException {
         Item item = null;
         if (StringUtils.isNotEmpty(handleOrUuid)) {
-            String handlePrefix = ConfigurationManager.getProperty("handle.prefix");
 
             item = (Item) HandleServiceFactory.getInstance().getHandleService().resolveToObject(context, handleOrUuid);
         }
@@ -649,7 +651,7 @@ public class SolrDedupServiceImpl implements DedupService {
     }
 
     private void startMultiThreadIndex(Context context, boolean onlyFake, List<UUID> ids) throws SQLException {
-        int numThreads = ConfigurationManager.getIntProperty("deduplication", "indexer.items.threads", 5);
+        int numThreads = configurationService.getIntProperty("deduplication.indexer.items.threads", 5);
 
         if (ids == null) {
             ids = new ArrayList<>();
