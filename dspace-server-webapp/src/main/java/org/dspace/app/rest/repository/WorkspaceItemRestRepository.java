@@ -295,6 +295,8 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
             }
 
         }
+        context.commit();
+        context.reloadEntity(source);
         wsi = converter.toRest(source, utils.obtainProjection());
 
         if (!errors.isEmpty()) {
