@@ -13,6 +13,7 @@ import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.dspace.app.rest.RestResourceController;
 /**
  * The CrisLayoutMetadataComponent REST Resource
@@ -108,27 +109,74 @@ public class CrisLayoutMetadataComponentRest extends BaseObjectRest<String> {
         public void setMetadata(String metadata) {
             this.metadata = metadata;
         }
+        /**
+         * This attribute is the i18n key for the field label to visualize
+         * @return
+         */
         public String getLabel() {
             return label;
         }
+        /**
+         * This attribute is the i18n key for the field label to visualize
+         * @param label
+         */
         public void setLabel(String label) {
             this.label = label;
         }
+        /**
+         * This attribute defines the component to use to visualize the field.
+         * Examples are browselink, longtext, identifier, date, etc. for metadata
+         * field and preview, thubmnail, etc. for bitstream field
+         * @return
+         */
         public String getRendering() {
             return rendering;
         }
+        /**
+         * This attribute defines the component to use to visualize the field.
+         * Examples are browselink, longtext, identifier, date, etc. for metadata
+         * field and preview, thubmnail, etc. for bitstream field
+         * @param rendering
+         */
         public void setRendering(String rendering) {
             this.rendering = rendering;
         }
+        /**
+         * This is one of metadata or bitstream a corresponding attribute will be present
+         * <ul>
+         * <li>metadata: is the canonical name of the metadata to use (eg dc.contributor.author, dc.title, etc.)</li>
+         * <li>bitstream: is an object containing details to filter the bitstreams to use.
+         * It can be the name of the bundle to use and/or the value of specfic bitstream metadata</li>
+         * </ul>
+         * @return
+         */
+        @JsonProperty( value = "field-type" )
         public String getFieldType() {
             return fieldType;
         }
+        /**
+         * This is one of metadata or bitstream a corresponding attribute will be present
+         * <ul>
+         * <li>metadata: is the canonical name of the metadata to use (eg dc.contributor.author, dc.title, etc.)</li>
+         * <li>bitstream: is an object containing details to filter the bitstreams to use.
+         * It can be the name of the bundle to use and/or the value of specfic bitstream metadata</li>
+         * </ul>
+         * @return
+         */
         public void setFieldType(String fieldType) {
             this.fieldType = fieldType;
         }
+        /**
+         * This attribute allows to set arbitrary css styles to the generated html
+         * @return
+         */
         public String getStyle() {
             return style;
         }
+        /**
+         * This attribute allows to set arbitrary css styles to the generated html
+         * @param style
+         */
         public void setStyle(String style) {
             this.style = style;
         }

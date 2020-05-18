@@ -96,14 +96,32 @@ public class CrisLayoutTab implements ReloadableEntity<Integer> {
         this.shortName = shortName;
     }
 
+    /**
+     * This attribute is the label or the i18n key to use to present the section to the user
+     * @return
+     */
     public String getHeader() {
         return header;
     }
 
+    /**
+     * This attribute is the label or the i18n key to use to present the section to the user
+     * @param header
+     */
     public void setHeader(String header) {
         this.header = header;
     }
 
+    /**
+     * This field manages the visibility of the tab
+     * It can take the following values:
+     * 0-PUBLIC
+     * 1-ADMINISTRATOR
+     * 2-OWNER ONLY
+     * 3-OWNER & ADMINISTRATOR
+     * 4-CUSTOM DATA
+     * @return
+     */
     public Integer getSecurity() {
         return security;
     }

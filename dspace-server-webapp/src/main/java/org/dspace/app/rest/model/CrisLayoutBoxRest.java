@@ -86,10 +86,18 @@ public class CrisLayoutBoxRest extends BaseObjectRest<Integer> {
         this.shortname = shortname;
     }
 
+    /**
+     * This attribute is the label or the i18n key to use to present the section to the user
+     * @return
+     */
     public String getHeader() {
         return header;
     }
 
+    /**
+     * This attribute is the label or the i18n key to use to present the section to the user
+     * @param header
+     */
     public void setHeader(String header) {
         this.header = header;
     }
@@ -111,10 +119,18 @@ public class CrisLayoutBoxRest extends BaseObjectRest<Integer> {
         this.collapsed = collapsed;
     }
 
+    /**
+     * This attribute is used to flag box that should be ignored in the determination of the tab visualization
+     * @return
+     */
     public Boolean getMinor() {
         return minor;
     }
 
+    /**
+     * This attribute is used to flag box that should be ignored in the determination of the tab visualization
+     * @param minor
+     */
     public void setMinor(Boolean minor) {
         this.minor = minor;
     }
@@ -143,19 +159,47 @@ public class CrisLayoutBoxRest extends BaseObjectRest<Integer> {
         this.group = group;
     }
 
+    /**
+     * This field manages the visibility of the box
+     * It can take the following values:
+     * 0-PUBLIC
+     * 1-ADMINISTRATOR
+     * 2-OWNER ONLY
+     * 3-OWNER & ADMINISTRATOR
+     * 4-CUSTOM DATA
+     * @return
+     */
     public Integer getSecurity() {
         return security;
     }
 
+    /**
+     * This field manages the visibility of the box
+     * It can take the following values:
+     * 0-PUBLIC
+     * 1-ADMINISTRATOR
+     * 2-OWNER ONLY
+     * 3-OWNER & ADMINISTRATOR
+     * 4-CUSTOM DATA
+     * @param security
+     */
     public void setSecurity(Integer security) {
         this.security = security;
     }
 
+    /**
+     * This attribute is used to choice the appropriate component. It could be metadata, search, bibliometrics
+     * @return
+     */
     @JsonProperty(value = "box-type")
     public String getBoxType() {
         return boxType;
     }
 
+    /**
+     * This attribute is used to choice the appropriate component. It could be metadata, search, bibliometrics
+     * @param boxType
+     */
     public void setBoxType(String boxType) {
         this.boxType = boxType;
     }
