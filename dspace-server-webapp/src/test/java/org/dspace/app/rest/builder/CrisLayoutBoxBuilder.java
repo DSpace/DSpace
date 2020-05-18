@@ -118,16 +118,16 @@ public class CrisLayoutBoxBuilder extends AbstractBuilder<CrisLayoutBox, CrisLay
         return this;
     }
 
-    public CrisLayoutBoxBuilder withMetadataField(Set<MetadataField> fields) {
-        this.box.setMetadataFields(fields);
+    public CrisLayoutBoxBuilder withMetadataSecurityField(Set<MetadataField> fields) {
+        this.box.setMetadataSecurityFields(fields);
         return this;
     }
 
-    public CrisLayoutBoxBuilder addMetadataField(MetadataField field) {
-        if (this.box.getMetadataFields() == null) {
-            this.box.setMetadataFields(new HashSet<>());
+    public CrisLayoutBoxBuilder addMetadataSecurityField(MetadataField field) {
+        if (this.box.getMetadataSecurityFields() == null) {
+            this.box.setMetadataSecurityFields(new HashSet<>());
         }
-        this.box.getMetadataFields().add(field);
+        this.box.getMetadataSecurityFields().add(field);
         return this;
     }
 

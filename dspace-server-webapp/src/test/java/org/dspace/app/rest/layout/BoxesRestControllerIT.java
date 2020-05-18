@@ -365,18 +365,18 @@ public class BoxesRestControllerIT extends AbstractControllerIntegrationTest {
         EntityType eType = EntityTypeBuilder.createEntityTypeBuilder(context, "Publication").build();
         CrisLayoutBoxBuilder.createBuilder(context, eType, true, 0, true)
             .withShortname("Box one shortname")
-            .addMetadataField(sponsorship)
+            .addMetadataSecurityField(sponsorship)
             .build();
         CrisLayoutBox boxTwo = CrisLayoutBoxBuilder.createBuilder(context, eType, true, 0, true)
             .withShortname("Box two shortname")
-            .addMetadataField(isbn)
-            .addMetadataField(uri)
-            .addMetadataField(abs)
-            .addMetadataField(provenance)
+            .addMetadataSecurityField(isbn)
+            .addMetadataSecurityField(uri)
+            .addMetadataSecurityField(abs)
+            .addMetadataSecurityField(provenance)
             .build();
         CrisLayoutBoxBuilder.createBuilder(context, eType, true, 0, true)
             .withShortname("Box three shortname")
-            .addMetadataField(extent)
+            .addMetadataSecurityField(extent)
             .build();
         context.restoreAuthSystemState();
         // Test WS endpoint
@@ -459,12 +459,12 @@ public class BoxesRestControllerIT extends AbstractControllerIntegrationTest {
                 .addField(fieldProvenance)
                 .addField(fieldSponsorship)
                 .addField(fieldExtent)
-                .addMetadataField(isbn)
-                .addMetadataField(uri)
-                .addMetadataField(abs)
-                .addMetadataField(provenance)
-                .addMetadataField(sponsorship)
-                .addMetadataField(extent)
+                .addMetadataSecurityField(isbn)
+                .addMetadataSecurityField(uri)
+                .addMetadataSecurityField(abs)
+                .addMetadataSecurityField(provenance)
+                .addMetadataSecurityField(sponsorship)
+                .addMetadataSecurityField(extent)
                 .build();
         CrisLayoutBoxBuilder.createBuilder(context, eType, true, 0, true)
                 .withShortname("Box shortname 3")

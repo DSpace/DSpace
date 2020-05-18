@@ -55,7 +55,7 @@ public class CrisLayoutTab implements ReloadableEntity<Integer> {
         joinColumns = {@JoinColumn(name = "tab_id")},
         inverseJoinColumns = {@JoinColumn(name = "authorized_field_id")}
     )
-    private Set<MetadataField> metadataFields;
+    private Set<MetadataField> metadataSecurityFields;
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
         name = "cris_layout_tab2box",
@@ -140,12 +140,12 @@ public class CrisLayoutTab implements ReloadableEntity<Integer> {
         this.security = security.getValue();
     }
 
-    public Set<MetadataField> getMetadataFields() {
-        return metadataFields;
+    public Set<MetadataField> getMetadataSecurityFields() {
+        return metadataSecurityFields;
     }
 
-    public void setMetadataFields(Set<MetadataField> metadataFields) {
-        this.metadataFields = metadataFields;
+    public void setMetadataSecurityFields(Set<MetadataField> metadataFields) {
+        this.metadataSecurityFields = metadataFields;
     }
 
     public Set<CrisLayoutBox> getBoxes() {

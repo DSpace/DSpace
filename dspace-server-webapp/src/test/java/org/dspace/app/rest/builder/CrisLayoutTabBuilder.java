@@ -110,15 +110,15 @@ public class CrisLayoutTabBuilder extends AbstractBuilder<CrisLayoutTab, CrisLay
     }
 
     public CrisLayoutTabBuilder withMetadatasecurity(Set<MetadataField> metadataFields) {
-        this.tab.setMetadataFields(metadataFields);
+        this.tab.setMetadataSecurityFields(metadataFields);
         return this;
     }
 
     public CrisLayoutTabBuilder addMetadatasecurity(MetadataField metadataField) {
-        if (this.tab.getMetadataFields() == null) {
-            this.tab.setMetadataFields(new HashSet<>());
+        if (this.tab.getMetadataSecurityFields() == null) {
+            this.tab.setMetadataSecurityFields(new HashSet<>());
         }
-        this.tab.getMetadataFields().add(metadataField);
+        this.tab.getMetadataSecurityFields().add(metadataField);
         return this;
     }
 }

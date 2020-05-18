@@ -63,7 +63,7 @@ public class CrisLayoutBox implements ReloadableEntity<Integer> {
         joinColumns = {@JoinColumn(name = "box_id")},
         inverseJoinColumns = {@JoinColumn(name = "authorized_field_id")}
     )
-    private Set<MetadataField> metadataFields;
+    private Set<MetadataField> metadataSecurityFields;
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
         name = "cris_layout_box2field",
@@ -196,12 +196,12 @@ public class CrisLayoutBox implements ReloadableEntity<Integer> {
         this.style = style;
     }
 
-    public Set<MetadataField> getMetadataFields() {
-        return metadataFields;
+    public Set<MetadataField> getMetadataSecurityFields() {
+        return metadataSecurityFields;
     }
 
-    public void setMetadataFields(Set<MetadataField> metadataFields) {
-        this.metadataFields = metadataFields;
+    public void setMetadataSecurityFields(Set<MetadataField> metadataFields) {
+        this.metadataSecurityFields = metadataFields;
     }
 
     public Set<CrisLayoutField> getLayoutFields() {
