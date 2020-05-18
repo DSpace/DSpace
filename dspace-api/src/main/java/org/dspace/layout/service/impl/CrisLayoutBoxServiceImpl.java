@@ -24,6 +24,7 @@ import org.dspace.content.MetadataValue;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.layout.CrisLayoutBox;
+import org.dspace.layout.CrisLayoutField;
 import org.dspace.layout.dao.CrisLayoutBoxDAO;
 import org.dspace.layout.service.CrisLayoutBoxService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -172,15 +173,10 @@ public class CrisLayoutBoxServiceImpl implements CrisLayoutBoxService {
         List<CrisLayoutBox> resBoxes = new ArrayList<>();
         if (boxes != null && !boxes.isEmpty()) {
             List<MetadataValue> itemMetadata = item.getMetadata();
-            for (CrisLayoutBox box: boxes) {
-                Set<MetadataField> fields = box.getMetadataFields();
-                if (fields != null && !fields.isEmpty()) {
-                    METADATA_LOOP:
-                    for (MetadataValue metadata: itemMetadata) {
-                        if (fields.contains(metadata.getMetadataField())) {
-                            resBoxes.add(box);
-                            break METADATA_LOOP;
-                        }
+            if ( itemMetadata != null && !itemMetadata.isEmpty() ) {
+                for (CrisLayoutBox box: boxes) {
+                    if (hasContent(box, itemMetadata) ) {
+                        resBoxes.add(box);
                     }
                 }
             }
@@ -196,4 +192,26 @@ public class CrisLayoutBoxServiceImpl implements CrisLayoutBoxService {
         return dao.findByShortname(context, shortname);
     }
 
+    /* (non-Javadoc)
+     * @see org.dspace.layout.service.CrisLayoutBoxService#hasContent()
+     */
+    @Override
+    public boolean hasContent(CrisLayoutBox box, List<MetadataValue> values) {
+        boolean found = false;
+        Set<CrisLayoutField> boxFields = box.getLayoutFields();
+        if ( boxFields != null && !boxFields.isEmpty() ) {
+            for (MetadataValue value: values) {
+                for (CrisLayoutField field: boxFields) {
+                    if (value.getMetadataField().equals(field.getMetadataField())) {
+                        found = true;
+                        break;
+                    }
+                }
+                if (found) {
+                    break;
+                }
+            }
+        }
+        return found;
+    }
 }

@@ -23,8 +23,10 @@ import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
+import org.dspace.layout.CrisLayoutBox;
 import org.dspace.layout.CrisLayoutTab;
 import org.dspace.layout.dao.CrisLayoutTabDAO;
+import org.dspace.layout.service.CrisLayoutBoxService;
 import org.dspace.layout.service.CrisLayoutTabService;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -44,6 +46,9 @@ public class CrisLayoutTabServiceImpl implements CrisLayoutTabService {
 
     @Autowired
     private ItemService itemService;
+
+    @Autowired
+    private CrisLayoutBoxService boxService;
 
     @Override
     public CrisLayoutTab create(Context c, CrisLayoutTab tab) throws SQLException, AuthorizeException {
@@ -175,14 +180,15 @@ public class CrisLayoutTabServiceImpl implements CrisLayoutTabService {
         List<CrisLayoutTab> resTabs = new ArrayList<>();
         if (tabs != null && !tabs.isEmpty()) {
             List<MetadataValue> itemMetadata = item.getMetadata();
-            for (CrisLayoutTab tab: tabs) {
-                Set<MetadataField> fields = tab.getMetadataFields();
-                if (fields != null && !fields.isEmpty()) {
-                    METADATA_LOOP:
-                    for (MetadataValue metadata: itemMetadata) {
-                        if (fields.contains(metadata.getMetadataField())) {
-                            resTabs.add(tab);
-                            break METADATA_LOOP;
+            if (itemMetadata != null && !itemMetadata.isEmpty() ) {
+                for (CrisLayoutTab tab: tabs) {
+                    Set<CrisLayoutBox> boxes = tab.getBoxes();
+                    if (boxes != null && !boxes.isEmpty()) {
+                        for (CrisLayoutBox box: boxes) {
+                            if (boxService.hasContent(box, itemMetadata)) {
+                                resTabs.add(tab);
+                                break;
+                            }
                         }
                     }
                 }

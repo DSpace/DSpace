@@ -15,6 +15,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import org.dspace.app.rest.builder.CollectionBuilder;
 import org.dspace.app.rest.builder.CommunityBuilder;
 import org.dspace.app.rest.builder.CrisLayoutBoxBuilder;
+import org.dspace.app.rest.builder.CrisLayoutFieldBuilder;
 import org.dspace.app.rest.builder.CrisLayoutTabBuilder;
 import org.dspace.app.rest.builder.EntityTypeBuilder;
 import org.dspace.app.rest.builder.ItemBuilder;
@@ -30,6 +31,7 @@ import org.dspace.content.MetadataSchema;
 import org.dspace.content.service.MetadataFieldService;
 import org.dspace.content.service.MetadataSchemaService;
 import org.dspace.layout.CrisLayoutBox;
+import org.dspace.layout.CrisLayoutField;
 import org.dspace.layout.CrisLayoutTab;
 import org.dspace.layout.LayoutSecurity;
 import org.hamcrest.Matchers;
@@ -273,17 +275,35 @@ public class TabsRestControllerIT extends AbstractControllerIntegrationTest {
         MetadataField provenance = mfss.findByElement(context, schema, "description", "provenance");
         MetadataField sponsorship = mfss.findByElement(context, schema, "description", "sponsorship");
         // Create tabs for Person Entity
+        CrisLayoutField fieldFirstname = CrisLayoutFieldBuilder.createField(context, firstName, 0, 1)
+            .withBundle("BUNDLE")
+            .withLabel("LAST NAME")
+            .withRendering("TEXT")
+            .build();
+       CrisLayoutBox boxOne = CrisLayoutBoxBuilder.createBuilder(context, eTypePer, false, 0, false)
+           .withShortname("Box shortname 1")
+           .addField(fieldFirstname)
+           .build();
         CrisLayoutTab tab = CrisLayoutTabBuilder.createTab(context, eTypePer, 0)
             .withShortName("TabOne For Person - priority 0")
             .withSecurity(LayoutSecurity.PUBLIC)
             .withHeader("New Tab header")
-            .addMetadatasecurity(firstName)
+            .addBox(boxOne)
+            .build();
+        CrisLayoutField field = CrisLayoutFieldBuilder.createField(context, lastName, 0, 1)
+             .withBundle("BUNDLE")
+             .withLabel("LAST NAME")
+             .withRendering("TEXT")
+             .build();
+        CrisLayoutBox box = CrisLayoutBoxBuilder.createBuilder(context, eTypePer, false, 0, false)
+            .withShortname("Box shortname 2")
+            .addField(field)
             .build();
         CrisLayoutTab tabTwo = CrisLayoutTabBuilder.createTab(context, eTypePer, 1)
             .withShortName("TabTwo For Person - priority 1")
             .withSecurity(LayoutSecurity.PUBLIC)
             .withHeader("New Tab header")
-            .addMetadatasecurity(lastName)
+            .addBox(box)
             .build();
         // tab without data
         CrisLayoutTabBuilder.createTab(context, eTypePer, 2)

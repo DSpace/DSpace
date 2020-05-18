@@ -202,55 +202,61 @@ public class BoxesRestControllerIT extends AbstractControllerIntegrationTest {
             .build();
         EntityType eTypePer = EntityTypeBuilder.createEntityTypeBuilder(context, "Person")
             .build();
+        // Create new person item
         Item item = ItemBuilder.createItem(context, collection)
-            .withAuthor("Danilo Di Nuzzo")
-            .withTitle("Test Content")
-            .withPublicationIssueNumber("ISNENENE")
-            .withPublicationVolumeNumber("34FDEEEE")
-            .withRelationshipType(eType.getLabel())
+            .withPersonIdentifierFirstName("Danilo")
+            .withPersonIdentifierLastName("Di Nuzzo")
+            .withRelationshipType(eTypePer.getLabel())
             .build();
         // get metadata field
-        MetadataSchema publicationissue = mdss.find(context, "publicationissue");
-        MetadataSchema publicationvolume = mdss.find(context, "publicationvolume");
-        MetadataField issueNumber = mfss.findByElement(context, publicationissue, "issueNumber", null);
-        MetadataField volumeNumber = mfss.findByElement(context, publicationvolume, "identifier", null);
+        MetadataSchema schema = mdss.find(context, "person");
+        MetadataField firstName = mfss.findByElement(context, schema, "givenName", null);
+        MetadataField lastName = mfss.findByElement(context, schema, "familyName", null);
+        MetadataField provenance = mfss.findByElement(context, schema, "description", "provenance");
+        MetadataField sponsorship = mfss.findByElement(context, schema, "description", "sponsorship");
         // Create box without content
-        CrisLayoutBox boxOne = CrisLayoutBoxBuilder.createBuilder(context, eType, false, 0, false)
+        CrisLayoutBox boxOne = CrisLayoutBoxBuilder.createBuilder(context, eTypePer, false, 0, false)
             .withShortname("Shortname 2")
             .withSecurity(LayoutSecurity.PUBLIC)
             .withHeader("Header")
             .withStyle("Style")
             .build();
         // Create boxes with content
-        CrisLayoutBox boxTwo = CrisLayoutBoxBuilder.createBuilder(context, eType, false, 1, false)
+        CrisLayoutField fieldFirstName = CrisLayoutFieldBuilder.createField(context, firstName, 0, 0)
+            .withBundle("BUNDLE")
+            .withLabel("ISSUE NUMBER")
+            .withRendering("TEXT")
+            .build();
+        CrisLayoutBox boxTwo = CrisLayoutBoxBuilder.createBuilder(context, eTypePer, false, 1, false)
             .withShortname("Shortname 1")
             .withSecurity(LayoutSecurity.PUBLIC)
             .withHeader("Header")
             .withStyle("Style")
-            .addMetadataField(issueNumber)
-            .addMetadataField(volumeNumber)
+            .addField(fieldFirstName)
             .build();
-        CrisLayoutBox boxThree = CrisLayoutBoxBuilder.createBuilder(context, eType, false, 2, false)
+        CrisLayoutField fieldLastName = CrisLayoutFieldBuilder.createField(context, lastName, 0, 0)
+            .withBundle("BUNDLE")
+            .withLabel("ISSUE NUMBER")
+            .withRendering("TEXT")
+            .build();
+        CrisLayoutBox boxThree = CrisLayoutBoxBuilder.createBuilder(context, eTypePer, false, 2, false)
             .withShortname("Shortname 3")
             .withSecurity(LayoutSecurity.PUBLIC)
             .withHeader("Header")
             .withStyle("Style")
-            .addMetadataField(issueNumber)
-            .addMetadataField(volumeNumber)
+            .addField(fieldLastName)
             .build();
         // Create tab
-        CrisLayoutTab tab = CrisLayoutTabBuilder.createTab(context, eType, 0)
+        CrisLayoutTab tab = CrisLayoutTabBuilder.createTab(context, eTypePer, 0)
             .withShortName("Tab Shortname 1")
             .withHeader("tab header")
-            .addMetadatasecurity(issueNumber)
-            .addMetadatasecurity(volumeNumber)
             .withSecurity(LayoutSecurity.PUBLIC)
             .addBox(boxOne)
             .addBox(boxTwo)
             .addBox(boxThree)
             .build();
         // Create box and tab for other entity type
-        CrisLayoutBox boxFour = CrisLayoutBoxBuilder.createBuilder(context, eTypePer, false, 0, false)
+        CrisLayoutBox boxFour = CrisLayoutBoxBuilder.createBuilder(context, eType, false, 0, false)
             .withShortname("Shortname 4")
             .withSecurity(LayoutSecurity.PUBLIC)
             .withHeader("Header")
@@ -259,8 +265,8 @@ public class BoxesRestControllerIT extends AbstractControllerIntegrationTest {
         CrisLayoutTabBuilder.createTab(context, eType, 0)
             .withShortName("Tab Shortname 2")
             .withHeader("tab header")
-            .addMetadatasecurity(issueNumber)
-            .addMetadatasecurity(volumeNumber)
+            .addMetadatasecurity(provenance)
+            .addMetadatasecurity(sponsorship)
             .withSecurity(LayoutSecurity.PUBLIC)
             .addBox(boxFour)
             .build();

@@ -14,6 +14,7 @@ import java.util.UUID;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.EntityType;
 import org.dspace.content.MetadataField;
+import org.dspace.content.MetadataValue;
 import org.dspace.core.Context;
 import org.dspace.layout.CrisLayoutBox;
 import org.dspace.service.DSpaceCRUDService;
@@ -147,4 +148,12 @@ public interface CrisLayoutBoxService extends DSpaceCRUDService<CrisLayoutBox> {
      * @throws SQLException An exception that provides information on a database errors.
      */
     public CrisLayoutBox findByShortname(Context context, String shortname) throws SQLException;
+
+    /**
+     * Check if the box has content to show
+     * @param box CrisLayoutBox instance
+     * @param values metadataValue of item
+     * @return true if the box has contet to show, false otherwise
+     */
+    public boolean hasContent(CrisLayoutBox box, List<MetadataValue> values);
 }
