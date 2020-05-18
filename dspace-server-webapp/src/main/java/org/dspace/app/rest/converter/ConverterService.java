@@ -96,7 +96,8 @@ public class ConverterService {
         if (restObject instanceof BaseObjectRest) {
             if (!dSpacePermissionEvaluator.hasPermission(SecurityContextHolder.getContext().getAuthentication(),
                                                          restObject, "READ")) {
-                log.info("Access denied on " + restObject.getClass());
+                log.debug("Access denied on " + restObject.getClass() + " with id: " +
+                              ((BaseObjectRest) restObject).getId());
                 return null;
             }
         }

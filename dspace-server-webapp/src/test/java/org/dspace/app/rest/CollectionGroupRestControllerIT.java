@@ -958,6 +958,7 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
     // Put on ignore because there's no support to identify read rights on a group for a user in a special
     // com/coll admin group
+    // Please refer to: https://jira.lyrasis.org/browse/DS-4505
     @Test
     @Ignore
     public void getCollectionDefaultItemReadGroupTestParentCommunityAdmin() throws Exception {
@@ -979,6 +980,7 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
     // Put on ignore because there's no support to identify read rights on a group for a user in a special
     // com/coll admin group
+    // Please refer to: https://jira.lyrasis.org/browse/DS-4505
     @Test
     @Ignore
     public void getCollectionDefaultItemReadGroupTestCollectionAdmin() throws Exception {
@@ -1106,6 +1108,7 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
     // Put on ignore because there's no support to identify read rights on a group for a user in a special
     // com/coll admin group
+    // Please refer to: https://jira.lyrasis.org/browse/DS-4505
     @Test
     @Ignore
     public void postCollectionDefaultItemReadGroupCreateDefaultItemReadGroupSuccessParentCommunityAdmin()
@@ -1143,6 +1146,7 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
     // Put on ignore because there's no support to identify read rights on a group for a user in a special
     // com/coll admin group
+    // Please refer to: https://jira.lyrasis.org/browse/DS-4505
     @Test
     @Ignore
     public void postCollectionDefaultItemReadGroupCreateDefaultItemReadGroupSuccessCollectionAdmin() throws Exception {
@@ -1453,6 +1457,7 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
     // Put on ignore because there's no support to identify read rights on a group for a user in a special
     // com/coll admin group
+    // Please refer to: https://jira.lyrasis.org/browse/DS-4505
     @Test
     @Ignore
     public void getCollectionDefaultBitstreamReadGroupTestParentCommunityAdmin() throws Exception {
@@ -1474,6 +1479,7 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
     // Put on ignore because there's no support to identify read rights on a group for a user in a special
     // com/coll admin group
+    // Please refer to: https://jira.lyrasis.org/browse/DS-4505
     @Test
     @Ignore
     public void getCollectionDefaultBitstreamReadGroupTestCollectionAdmin() throws Exception {
@@ -1604,6 +1610,7 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
     // Put on ignore because there's no support to identify read rights on a group for a user in a special
     // com/coll admin group
+    // Please refer to: https://jira.lyrasis.org/browse/DS-4505
     @Test
     @Ignore
     public void postCollectionDefaultBitstreamReadGroupCreateDefaultBitstreamReadGroupSuccessParentCommunityAdmin()
@@ -1641,6 +1648,7 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
     // Put on ignore because there's no support to identify read rights on a group for a user in a special
     // com/coll admin group
+    // Please refer to: https://jira.lyrasis.org/browse/DS-4505
     @Test
     @Ignore
     public void postCollectionDefaultBitstreamReadGroupCreateDefaultBitstreamReadGroupSuccessCollectionAdmin()
