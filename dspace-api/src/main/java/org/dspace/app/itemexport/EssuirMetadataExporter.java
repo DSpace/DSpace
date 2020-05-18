@@ -2,7 +2,6 @@ package org.dspace.app.itemexport;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvSchema;
@@ -16,7 +15,10 @@ import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.SpecialityDetailedInfo;
 
-import java.io.*;
+import java.io.BufferedWriter;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.List;
@@ -61,6 +63,7 @@ public class EssuirMetadataExporter {
                 .map(MetadataValue::getValue)
                 .orElse(defaultValue);
     }
+
     private static ItemExportMetadata constructItemMetadata(Item item) throws JsonProcessingException {
         EPerson submitter = item.getSubmitter();
         String dateAvailable = fetchMetadataFieldValue(item, "date", "available", "Unknown date");
@@ -81,7 +84,7 @@ public class EssuirMetadataExporter {
                 .withSubmitterLastName(submitter.getLastName())
                 .withPresentationDate(presentationDate);
 
-        if(specialityDetailedInfoList.size() == 3) {
+        if (specialityDetailedInfoList.size() == 3) {
             String facultyName = specialityDetailedInfoList.get(0).getName();
             String chairName = specialityDetailedInfoList.get(1).getName();
             String specialityName = specialityDetailedInfoList.get(2).getName();
@@ -91,7 +94,7 @@ public class EssuirMetadataExporter {
         }
 
         if (submitter.getChair() != null) {
-            builder.withChairName(submitter.getChair().getName());
+            builder.withChairName(String.format("%s (%d)", submitter.getChair().getName(), submitter.getChair().getId()));
             if (submitter.getChair().getFacultyEntity() != null) {
                 builder.withFacultyName(submitter.getChair().getFacultyEntityName());
             }
