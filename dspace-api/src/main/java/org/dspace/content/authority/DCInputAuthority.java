@@ -125,6 +125,12 @@ public class DCInputAuthority extends SelfNamedPlugin implements ChoiceAuthority
     @Override
     public Choices getMatches(String field, String query, Collection collection, int start, int limit, String locale) {
         init();
+
+        // Get default if locale is empty
+        if (StringUtils.isBlank(locale)) {
+            locale = getDefaultLocale();
+        }
+
         String[] valuesLocale = values.get(locale);
         String[] labelsLocale = labels.get(locale);
         int dflt = -1;
@@ -141,6 +147,12 @@ public class DCInputAuthority extends SelfNamedPlugin implements ChoiceAuthority
     @Override
     public Choices getBestMatch(String field, String text, Collection collection, String locale) {
         init();
+
+        // Get default if locale is empty
+        if (StringUtils.isBlank(locale)) {
+            locale = getDefaultLocale();
+        }
+
         String[] valuesLocale = values.get(locale);
         String[] labelsLocale = labels.get(locale);
         for (int i = 0; i < valuesLocale.length; ++i) {
