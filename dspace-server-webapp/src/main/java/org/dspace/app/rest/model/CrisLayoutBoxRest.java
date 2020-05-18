@@ -48,9 +48,9 @@ public class CrisLayoutBoxRest extends BaseObjectRest<Integer> {
     private Boolean minor;
     private String style;
     private Integer priority;
-    private Integer group;
     private Integer security;
     private String boxType;
+    private Boolean clear;
 
     /* (non-Javadoc)
      * @see org.dspace.app.rest.model.RestModel#getType()
@@ -151,14 +151,6 @@ public class CrisLayoutBoxRest extends BaseObjectRest<Integer> {
         this.priority = priority;
     }
 
-    public Integer getGroup() {
-        return group;
-    }
-
-    public void setGroup(Integer group) {
-        this.group = group;
-    }
-
     /**
      * This field manages the visibility of the box
      * It can take the following values:
@@ -202,6 +194,14 @@ public class CrisLayoutBoxRest extends BaseObjectRest<Integer> {
      */
     public void setBoxType(String boxType) {
         this.boxType = boxType;
+    }
+
+    public Boolean getClear() {
+        return clear;
+    }
+
+    public void setClear(Boolean clear) {
+        this.clear = clear;
     }
 
 }

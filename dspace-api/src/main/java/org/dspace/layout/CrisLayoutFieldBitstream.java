@@ -47,18 +47,8 @@ public class CrisLayoutFieldBitstream implements ReloadableEntity<Integer> {
     private MetadataField metadataField;
     @Column(name = "bundle")
     private String bundle;
-    @Column(name = "rendering")
-    private String rendering;
-    @Column(name = "row", nullable = false)
-    private Integer row;
-    @Column(name = "priority", nullable = false)
-    private Integer priority;
-    @Column(name = "type")
-    private String type;
-    @Column(name = "label")
-    private String label;
-    @Column(name = "style")
-    private String style;
+    @Column(name = "metadata_value")
+    private String metadataValue;
 
     @Override
     public Integer getID() {
@@ -93,52 +83,12 @@ public class CrisLayoutFieldBitstream implements ReloadableEntity<Integer> {
         this.bundle = bundle;
     }
 
-    public String getRendering() {
-        return rendering;
+    public void setMetadataValue(String metadataValue) {
+        this.metadataValue = metadataValue;
     }
 
-    public void setRendering(String rendering) {
-        this.rendering = rendering;
-    }
-
-    public Integer getRow() {
-        return row;
-    }
-
-    public void setRow(Integer row) {
-        this.row = row;
-    }
-
-    public Integer getPriority() {
-        return priority;
-    }
-
-    public void setPriority(Integer priority) {
-        this.priority = priority;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    public String getLabel() {
-        return label;
-    }
-
-    public void setLabel(String label) {
-        this.label = label;
-    }
-
-    public String getStyle() {
-        return style;
-    }
-
-    public void setStyle(String style) {
-        this.style = style;
+    public String getMetadataValue() {
+        return metadataValue;
     }
 
 }

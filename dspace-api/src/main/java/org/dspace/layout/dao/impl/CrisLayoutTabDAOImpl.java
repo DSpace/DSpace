@@ -96,7 +96,7 @@ public class CrisLayoutTabDAOImpl extends AbstractHibernateDAO<CrisLayoutTab> im
         CriteriaBuilder cb = getCriteriaBuilder(context);
         CriteriaQuery<Long> metadatacount = cb.createQuery(Long.class);
         Root<CrisLayoutTab> tabRoot = metadatacount.from(CrisLayoutTab.class);
-        Join<CrisLayoutTab, MetadataField> join = tabRoot.join(CrisLayoutTab_.metadataFields);
+        Join<CrisLayoutTab, MetadataField> join = tabRoot.join(CrisLayoutTab_.metadataSecurityFields);
         metadatacount.select(cb.count(join)).where(cb.equal(tabRoot.get(CrisLayoutTab_.ID), tabId));
         return getHibernateSession(context).createQuery(metadatacount).getSingleResult();
     }
@@ -107,7 +107,7 @@ public class CrisLayoutTabDAOImpl extends AbstractHibernateDAO<CrisLayoutTab> im
         CriteriaBuilder cb = getCriteriaBuilder(context);
         CriteriaQuery<MetadataField> metadata = cb.createQuery(MetadataField.class);
         Root<CrisLayoutTab> tabRoot = metadata.from(CrisLayoutTab.class);
-        Join<CrisLayoutTab, MetadataField> join = tabRoot.join(CrisLayoutTab_.metadataFields);
+        Join<CrisLayoutTab, MetadataField> join = tabRoot.join(CrisLayoutTab_.metadataSecurityFields);
         metadata.select(join).where(cb.equal(tabRoot.get(CrisLayoutTab_.ID), tabId));
         TypedQuery<MetadataField> query = getHibernateSession(context).createQuery(metadata);
         if (limit != null && offset != null) {

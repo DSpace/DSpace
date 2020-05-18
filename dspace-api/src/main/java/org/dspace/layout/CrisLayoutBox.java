@@ -78,6 +78,8 @@ public class CrisLayoutBox implements ReloadableEntity<Integer> {
         inverseJoinColumns = {@JoinColumn(name = "cris_layout_tab_id")}
     )
     private Set<CrisLayoutTab> tabs;
+    @Column(name = "clear")
+    private Boolean clear;
 
     @Override
     public Integer getID() {
@@ -218,5 +220,13 @@ public class CrisLayoutBox implements ReloadableEntity<Integer> {
 
     public void setTabs(Set<CrisLayoutTab> tabs) {
         this.tabs = tabs;
+    }
+
+    public Boolean getClear() {
+        return clear;
+    }
+
+    public void setClear(Boolean clear) {
+        this.clear = clear;
     }
 }

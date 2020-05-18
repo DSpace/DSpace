@@ -47,23 +47,18 @@ public class CrisLayoutMetadataComponentConverter  {
                     field.setRendering(layoutField.getRendering());
                     field.setStyle(layoutField.getStyle());
                     field.setFieldType(layoutField.getType());
-                    if (layoutField.getMetadataField() != null) {
-                        MetadataField mf = layoutField.getMetadataField();
-                        StringBuffer sb = new StringBuffer(mf.getMetadataSchema().getName())
-                                .append(".")
-                                .append(mf.getElement());
-                        if (mf.getQualifier() != null) {
-                            sb.append(".").append(mf.getQualifier());
-                        }
-                        field.setMetadata(sb.toString());
-                    } else if (layoutField.getBitstreams() != null) {
+                    if (layoutField.getType() != null && layoutField.getType().equals("metadata")) {
+                        field.setMetadata(composeMetadataFieldIdentifier(layoutField.getMetadataField()));
+                    } else if (layoutField.getType() != null && layoutField.getType().equals("bitstream")) {
                         Set<CrisLayoutFieldBitstream> bitstreams = layoutField.getBitstreams();
                         Iterator<CrisLayoutFieldBitstream> it = bitstreams.iterator();
                         if (it.hasNext()) {
                             CrisLayoutFieldBitstream bitstream = it.next();
                             Bitstream bits = new Bitstream();
                             bits.setBundle(bitstream.getBundle());
-                            // TODO metadata?
+                            bits.setMetadataValue(bitstream.getMetadataValue());
+                            bits.setMetadataField(composeMetadataFieldIdentifier(bitstream.getMetadataField()));
+                            field.setBitstream(bits);
                         }
                     }
                     row.addField(field);
@@ -77,4 +72,16 @@ public class CrisLayoutMetadataComponentConverter  {
         return rest;
     }
 
+    private String composeMetadataFieldIdentifier(MetadataField mf) {
+        StringBuffer sb = null;
+        if (mf != null) {
+            sb = new StringBuffer(mf.getMetadataSchema().getName())
+                    .append(".")
+                    .append(mf.getElement());
+            if (mf.getQualifier() != null) {
+                sb.append(".").append(mf.getQualifier());
+            }
+        }
+        return sb != null ? sb.toString() : null;
+    }
 }

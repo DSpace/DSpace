@@ -24,6 +24,7 @@ CREATE TABLE cris_layout_box
     minor BOOLEAN NOT NULL,
     security INTEGER,
     style VARCHAR(255),
+    clear BOOLEAN,
     CONSTRAINT cris_layout_box_pkey PRIMARY KEY (id),
     CONSTRAINT cris_layout_box_shortname_key UNIQUE (shortname),
     CONSTRAINT cris_layout_box_entity_id_fkey FOREIGN KEY (entity_id)
@@ -76,12 +77,7 @@ CREATE TABLE cris_layout_fieldbitstream2metadata
     layout_field_id INTEGER NOT NULL,
     metadata_field_id INTEGER NOT NULL,
     bundle VARCHAR(255),
-    rendering VARCHAR(255),
-    row INTEGER NOT NULL, 
-    priority INTEGER NOT NULL,
-    type VARCHAR(255),
-    label VARCHAR(255),
-    style VARCHAR(255),
+    metadata_value VARCHAR(255),
     CONSTRAINT cris_layout_fieldbitstream2metadata_pkey PRIMARY KEY (fieldbitstream_id),
     CONSTRAINT cris_layout_fieldbitstream2metadata_layout_field_id_fkey FOREIGN KEY (layout_field_id)
         REFERENCES cris_layout_field (field_id),

@@ -9,7 +9,6 @@ package org.dspace.app.rest.model;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
@@ -190,18 +189,25 @@ public class CrisLayoutMetadataComponentRest extends BaseObjectRest<String> {
 
     public static final class Bitstream {
         private String bundle;
-        private Map<String, String> metadata;
+        private String metadataField;
+        private String metadataValue;
         public String getBundle() {
             return bundle;
         }
         public void setBundle(String bundle) {
             this.bundle = bundle;
         }
-        public Map<String, String> getMetadata() {
-            return this.metadata;
+        public String getMetadataField() {
+            return metadataField;
         }
-        public void setMetadata(Map<String, String> metadata) {
-            this.metadata = metadata;
+        public void setMetadataField(String metadataField) {
+            this.metadataField = metadataField;
+        }
+        public String getMetadataValue() {
+            return metadataValue;
+        }
+        public void setMetadataValue(String metadataValue) {
+            this.metadataValue = metadataValue;
         }
     }
 }
