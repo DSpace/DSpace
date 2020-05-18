@@ -73,7 +73,7 @@ public class ItemEventProcessor extends ExportEventProcessor {
      * @return item info
      */
     private String getItemInfo(final Item item) {
-        StringBuilder sb = new StringBuilder(configurationService.getProperty("dspace.url"));
+        StringBuilder sb = new StringBuilder(configurationService.getProperty("dspace.ui.url"));
         sb.append("/handle/").append(item.getHandle());
 
         return sb.toString();

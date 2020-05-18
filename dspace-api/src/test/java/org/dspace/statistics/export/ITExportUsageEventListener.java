@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.regex.Pattern;
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.codec.CharEncoding;
 import org.apache.log4j.Logger;
 import org.dspace.AbstractIntegrationTest;
 import org.dspace.authorize.AuthorizeException;
@@ -88,10 +89,14 @@ public class ITExportUsageEventListener extends AbstractIntegrationTest {
     ExportUsageEventListener exportUsageEventListener;
 
     private Item item;
+    private Item itemNotToBeProcessed;
     private Bitstream bitstream;
+    private Bitstream bitstreamNotToBeProcessed;
     private EntityType entityType;
     private Community community;
     private Collection collection;
+
+    private String encodedUrl;
 
 
     /**
@@ -100,6 +105,12 @@ public class ITExportUsageEventListener extends AbstractIntegrationTest {
     @Before()
     public void init() {
         super.init();
+
+        configurationService.setProperty("stats.tracker.enabled", true);
+        configurationService.setProperty("stats.tracker.type-field", "dc.type");
+        configurationService.setProperty("stats.tracker.type-value", "Excluded type");
+
+
         context.turnOffAuthorisationSystem();
         try {
             exportUsageEventListener.configurationService = configurationService;
@@ -112,6 +123,20 @@ public class ITExportUsageEventListener extends AbstractIntegrationTest {
             File f = new File(testProps.get("test.bitstream").toString());
             bitstream = itemService.createSingleBitstream(context, new FileInputStream(f), item);
             itemService.update(context, item);
+
+            itemNotToBeProcessed = installItemService
+                    .installItem(context, workspaceItemService.create(context, collection, false));
+            itemService.addMetadata(context, itemNotToBeProcessed, "relationship", "type", null, null, "Publication");
+            itemService.addMetadata(context, itemNotToBeProcessed, "dc", "type", null, null, "Excluded type");
+            File itemNotToBeProcessedFile = new File(testProps.get("test.bitstream").toString());
+            bitstreamNotToBeProcessed = itemService.createSingleBitstream(context,
+                                                          new FileInputStream(itemNotToBeProcessedFile),
+                                                          itemNotToBeProcessed);
+            itemService.update(context, itemNotToBeProcessed);
+
+            String dspaceUrl = configurationService.getProperty("dspace.ui.url");
+            encodedUrl = URLEncoder.encode(dspaceUrl, CharEncoding.UTF_8);
+
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
@@ -185,7 +210,7 @@ public class ITExportUsageEventListener extends AbstractIntegrationTest {
         String regex = "https://irus.jisc.ac.uk/counter/test/\\?url_ver=Z39.88-2004&req_id=" +
                 URLEncoder.encode(request.getRemoteAddr(), "UTF-8") + "&req_dat=&rft" +
                 ".artnum=oai%3Alocalhost%3A" + URLEncoder.encode(item.getHandle(), "UTF-8") + "&rfr_dat=&rfr_id" +
-                "=localhost&url_tim=" + ".*" + "?&svc_dat=http%3A%2F%2Flocalhost%2Fhandle%2F" + URLEncoder
+                "=localhost&url_tim=" + ".*" + "?&svc_dat=" + encodedUrl + "%2Fhandle%2F" + URLEncoder
                 .encode(item.getHandle(), "UTF-8") + "&rft_dat=Investigation";
 
         boolean isMatch = matchesString(String.valueOf(testProcessedUrls.get(0)), regex);
@@ -220,7 +245,7 @@ public class ITExportUsageEventListener extends AbstractIntegrationTest {
         String regex = "https://irus.jisc.ac.uk/counter/test/\\?url_ver=Z39.88-2004&req_id=" +
                 URLEncoder.encode(request.getRemoteAddr(), "UTF-8") + "&req_dat=&rft" +
                 ".artnum=oai%3Alocalhost%3A" + URLEncoder.encode(item.getHandle(), "UTF-8") + "&rfr_dat=&rfr_id" +
-                "=localhost&url_tim=" + ".*" + "?&svc_dat=http%3A%2F%2Flocalhost%2Fhandle%2F" + URLEncoder
+                "=localhost&url_tim=" + ".*" + "?&svc_dat=" + encodedUrl + "%2Fhandle%2F" + URLEncoder
                 .encode(item.getHandle(), "UTF-8") + "&rft_dat=Investigation";
 
         boolean isMatch = matchesString(all.get(0).getUrl(), regex);
@@ -241,7 +266,7 @@ public class ITExportUsageEventListener extends AbstractIntegrationTest {
         HttpServletRequest request = mock(HttpServletRequest.class);
 
         UsageEvent usageEvent = mock(UsageEvent.class);
-        when(usageEvent.getObject()).thenReturn(item);
+        when(usageEvent.getObject()).thenReturn(itemNotToBeProcessed);
         when(usageEvent.getRequest()).thenReturn(request);
         when(usageEvent.getContext()).thenReturn(new Context());
 
@@ -281,7 +306,7 @@ public class ITExportUsageEventListener extends AbstractIntegrationTest {
         String regex = "https://irus.jisc.ac.uk/counter/test/\\?url_ver=Z39.88-2004&req_id=" +
                 URLEncoder.encode(request.getRemoteAddr(), "UTF-8") + "&req_dat=&rft" +
                 ".artnum=oai%3Alocalhost%3A" + URLEncoder.encode(item.getHandle(), "UTF-8") + "&rfr_dat=&rfr_id" +
-                "=localhost&url_tim=" + ".*" + "?&svc_dat=http%3A%2F%2Flocalhost%2Fbitstream%2Fhandle%2F" +
+                "=localhost&url_tim=" + ".*" + "?&svc_dat=" + encodedUrl + "%2Fbitstream%2Fhandle%2F" +
                 URLEncoder.encode(item.getHandle(), "UTF-8") + "%2F%3Fsequence%3D\\d+" + "&rft_dat=Request";
 
         boolean isMatch = matchesString(String.valueOf(testProcessedUrls.get(0)), regex);
@@ -316,7 +341,7 @@ public class ITExportUsageEventListener extends AbstractIntegrationTest {
         String regex = "https://irus.jisc.ac.uk/counter/test/\\?url_ver=Z39.88-2004&req_id=" +
                 URLEncoder.encode(request.getRemoteAddr(), "UTF-8") + "&req_dat=&rft" +
                 ".artnum=oai%3Alocalhost%3A" + URLEncoder.encode(item.getHandle(), "UTF-8") + "&rfr_dat=&rfr_id" +
-                "=localhost&url_tim=" + ".*" + "?&svc_dat=http%3A%2F%2Flocalhost%2Fbitstream%2Fhandle%2F" +
+                "=localhost&url_tim=" + ".*" + "?&svc_dat=" + encodedUrl + "%2Fbitstream%2Fhandle%2F" +
                 URLEncoder.encode(item.getHandle(), "UTF-8") + "%2F%3Fsequence%3D\\d+" + "&rft_dat=Request";
 
 
@@ -339,7 +364,7 @@ public class ITExportUsageEventListener extends AbstractIntegrationTest {
         when(request.getHeader(anyString())).thenReturn(null);
 
         UsageEvent usageEvent = mock(UsageEvent.class);
-        when(usageEvent.getObject()).thenReturn(bitstream);
+        when(usageEvent.getObject()).thenReturn(bitstreamNotToBeProcessed);
         when(usageEvent.getRequest()).thenReturn(request);
         when(usageEvent.getContext()).thenReturn(new Context());
 

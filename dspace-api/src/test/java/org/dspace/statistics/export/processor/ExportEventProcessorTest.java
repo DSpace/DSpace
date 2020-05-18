@@ -30,6 +30,8 @@ import org.dspace.content.service.EntityService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -48,8 +50,8 @@ public class ExportEventProcessorTest extends AbstractDSpaceTest {
     private HttpServletRequest request = mock(HttpServletRequest.class);
     @Mock
     private Item item = mock(Item.class);
-    @Mock
-    private ConfigurationService configurationService = mock(ConfigurationService.class);
+
+    private ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
     @Mock
     private ItemService itemService = mock(ItemService.class);
     @Mock
@@ -59,6 +61,10 @@ public class ExportEventProcessorTest extends AbstractDSpaceTest {
     @InjectMocks
     ExportEventProcessor exportEventProcessor = mock(ExportEventProcessor.class);
 
+    @Before
+    public void setUp() {
+        configurationService.setProperty("stats.tracker.enabled", true);
+    }
 
     @Test
     /**
@@ -75,8 +81,6 @@ public class ExportEventProcessorTest extends AbstractDSpaceTest {
         when(request.getRemoteAddr()).thenReturn("test-client-ip");
         when(request.getHeader("USER-AGENT")).thenReturn("test-user-agent");
         when(request.getHeader("referer")).thenReturn("test-referer");
-        when(configurationService.getBooleanProperty("useProxies", false)).thenReturn(false);
-        when(configurationService.getProperty("dspace.hostname")).thenReturn("localhost");
 
         when(item.getHandle()).thenReturn("123456/1");
 
@@ -271,12 +275,12 @@ public class ExportEventProcessorTest extends AbstractDSpaceTest {
 
         String itemField = "dc.type";
 
-        exportEventProcessor.trackerType = itemField;
+        exportEventProcessor.trackerTypeMetadataField = itemField;
 
         List<String> typeList = new ArrayList<>();
         typeList.add("type1");
         typeList.add("type2");
-        exportEventProcessor.trackerValues = typeList;
+        exportEventProcessor.trackerTypeMetadataValues = typeList;
 
         MetadataValue metadataValue = mock(MetadataValue.class);
         when(metadataValue.getValue()).thenReturn("type2");
@@ -301,12 +305,12 @@ public class ExportEventProcessorTest extends AbstractDSpaceTest {
 
         String itemField = "dc.type";
 
-        exportEventProcessor.trackerType = itemField;
+        exportEventProcessor.trackerTypeMetadataField = itemField;
 
         List<String> typeList = new ArrayList<>();
         typeList.add("type1");
         typeList.add("type2");
-        exportEventProcessor.trackerValues = typeList;
+        exportEventProcessor.trackerTypeMetadataValues = typeList;
 
         MetadataValue metadataValue = mock(MetadataValue.class);
         when(metadataValue.getValue()).thenReturn("type3");

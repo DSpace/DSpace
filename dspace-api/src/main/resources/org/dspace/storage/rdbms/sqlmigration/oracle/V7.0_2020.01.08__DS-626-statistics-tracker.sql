@@ -20,10 +20,10 @@
 
 CREATE SEQUENCE openurltracker_seq;
 
-CREATE TABLE OpenUrlTracker
+CREATE TABLE openurltracker
 (
-    tracker_id INTEGER,
-    tracker_url VARCHAR(1000),
+    tracker_id NUMBER,
+    tracker_url VARCHAR2(1000),
     uploaddate DATE,
-    CONSTRAINT  OpenUrlTracker_PK PRIMARY KEY (tracker_id)
+    CONSTRAINT  openurltracker_PK PRIMARY KEY (tracker_id)
 );
