@@ -31,11 +31,14 @@ public class MetadataExport extends DSpaceRunnable<MetadataExportScriptConfigura
     private boolean exportAllMetadata = false;
     private boolean exportAllItems = false;
 
+    private static final String EXPORT_CSV = "exportCSV";
+
     private MetadataDSpaceCsvExportService metadataDSpaceCsvExportService = new DSpace().getServiceManager()
                 .getServicesByType(MetadataDSpaceCsvExportService.class).get(0);
 
     private EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
 
+    @Override
     public void internalRun() throws Exception {
         if (help) {
             handler.logInfo("\nfull export: metadata-export -f filename");
@@ -47,7 +50,7 @@ public class MetadataExport extends DSpaceRunnable<MetadataExportScriptConfigura
         DSpaceCSV dSpaceCSV = metadataDSpaceCsvExportService
             .handleExport(context, exportAllItems, exportAllMetadata, handle,
                           handler);
-        handler.writeFilestream(context, filename, dSpaceCSV.getInputStream(), "exportCSV");
+        handler.writeFilestream(context, filename, dSpaceCSV.getInputStream(), EXPORT_CSV);
         context.restoreAuthSystemState();
         context.complete();
     }
@@ -58,6 +61,7 @@ public class MetadataExport extends DSpaceRunnable<MetadataExportScriptConfigura
                                                                  MetadataExportScriptConfiguration.class);
     }
 
+    @Override
     public void setup() throws ParseException {
         context = new Context();
         context.turnOffAuthorisationSystem();

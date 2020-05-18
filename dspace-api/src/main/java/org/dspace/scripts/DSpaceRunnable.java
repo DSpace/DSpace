@@ -29,6 +29,9 @@ public abstract class DSpaceRunnable<T extends ScriptConfiguration> implements R
      */
     protected CommandLine commandLine;
 
+    /**
+     * This EPerson identifier variable is the uuid of the eperson that's running the script
+     */
     private UUID epersonIdentifier;
 
     /**

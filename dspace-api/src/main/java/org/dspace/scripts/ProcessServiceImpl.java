@@ -136,7 +136,7 @@ public class ProcessServiceImpl implements ProcessService {
         Bitstream bitstream = bitstreamService.create(context, is);
         bitstream.setName(context, fileName);
         bitstreamService.setFormat(context, bitstream, bitstreamFormatService.guessFormat(context, bitstream));
-        bitstreamService.addMetadata(context, bitstream, "process", "type", null, null, type);
+        bitstreamService.addMetadata(context, bitstream, "dspace", "process", "type", null, type);
         authorizeService.addPolicy(context, bitstream, Constants.READ, context.getCurrentUser());
         authorizeService.addPolicy(context, bitstream, Constants.WRITE, context.getCurrentUser());
         authorizeService.addPolicy(context, bitstream, Constants.DELETE, context.getCurrentUser());
@@ -197,7 +197,7 @@ public class ProcessServiceImpl implements ProcessService {
         } else {
             List<Bitstream> filteredBitstreams = new ArrayList<>();
             for (Bitstream bitstream : allBitstreams) {
-                if (StringUtils.equals(bitstreamService.getMetadata(bitstream, "process.type"), type)) {
+                if (StringUtils.equals(bitstreamService.getMetadata(bitstream, "dspace.process.type"), type)) {
                     filteredBitstreams.add(bitstream);
                 }
             }

@@ -17,24 +17,30 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.Link;
 import org.springframework.stereotype.Component;
 
+/**
+ * This HalLinkFactory provides the {@link ProcessResource} with links
+ */
 @Component
 public class ProcessResourceHalLinkFactory extends ProcessHalLinkFactory<ProcessResource> {
 
     @Autowired
     private ConfigurationService configurationService;
 
+    @Override
     protected void addLinks(ProcessResource halResource, Pageable pageable, LinkedList<Link> list) throws Exception {
         String dspaceRestUrl = configurationService.getProperty("dspace.server.url");
-        list.add(buildLink("files", getMethodOn().listFilesFromProcess(halResource.getContent().getProcessId())));
+//        list.add(buildLink("files", getMethodOn().listFilesFromProcess(halResource.getContent().getProcessId())));
         list.add(
             buildLink("script", dspaceRestUrl + "/api/system/scripts/" + halResource.getContent().getScriptName()));
 
     }
 
+    @Override
     protected Class<ProcessRestController> getControllerClass() {
         return ProcessRestController.class;
     }
 
+    @Override
     protected Class<ProcessResource> getResourceClass() {
         return ProcessResource.class;
     }

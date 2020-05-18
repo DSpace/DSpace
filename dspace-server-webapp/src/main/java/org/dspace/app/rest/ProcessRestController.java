@@ -20,7 +20,6 @@ import org.dspace.app.rest.link.process.ProcessResourceHalLinkFactory;
 import org.dspace.app.rest.model.BitstreamRest;
 import org.dspace.app.rest.model.ProcessRest;
 import org.dspace.app.rest.model.hateoas.BitstreamResource;
-import org.dspace.app.rest.model.hateoas.ProcessFileWrapperResource;
 import org.dspace.app.rest.repository.ProcessRestRepository;
 import org.dspace.app.rest.utils.Utils;
 import org.dspace.authorize.AuthorizeException;
@@ -52,24 +51,7 @@ public class ProcessRestController {
     private Utils utils;
 
     @Autowired
-    private HalLinkService halLinkService;
-
-    @Autowired
     ProcessResourceHalLinkFactory processResourceHalLinkFactory;
-
-    @RequestMapping(method = RequestMethod.GET, value = "/{processId}/files")
-    public ProcessFileWrapperResource listFilesFromProcess(@PathVariable(name = "processId") Integer processId)
-        throws SQLException, AuthorizeException {
-
-        if (log.isTraceEnabled()) {
-            log.trace("Retrieving Files from Process with ID: " + processId);
-        }
-
-        ProcessFileWrapperResource processFileWrapperResource =
-            new ProcessFileWrapperResource(processRestRepository.getProcessFileWrapperRest(processId), utils);
-        halLinkService.addLinks(processFileWrapperResource);
-        return processFileWrapperResource;
-    }
 
     @RequestMapping(method = RequestMethod.GET, value = "/{processId}/files/{fileType}")
     public PagedModel<BitstreamResource> listFilesWithTypeFromProcess(
