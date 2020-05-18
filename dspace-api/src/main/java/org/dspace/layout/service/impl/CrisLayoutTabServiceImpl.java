@@ -8,22 +8,32 @@
 package org.dspace.layout.service.impl;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.EntityType;
+import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
+import org.dspace.content.MetadataValue;
+import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.layout.CrisLayoutTab;
 import org.dspace.layout.dao.CrisLayoutTabDAO;
 import org.dspace.layout.service.CrisLayoutTabService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
-@Service
+/**
+ * Implementation of service to manage Tabs component of layout
+ * 
+ * @author Danilo Di Nuzzo (danilo.dinuzzo at 4science.it)
+ *
+ */
 public class CrisLayoutTabServiceImpl implements CrisLayoutTabService {
 
     @Autowired(required = true)
@@ -31,6 +41,9 @@ public class CrisLayoutTabServiceImpl implements CrisLayoutTabService {
 
     @Autowired(required = true)
     protected AuthorizeService authorizeService;
+
+    @Autowired
+    private ItemService itemService;
 
     @Override
     public CrisLayoutTab create(Context c, CrisLayoutTab tab) throws SQLException, AuthorizeException {
@@ -146,6 +159,36 @@ public class CrisLayoutTabServiceImpl implements CrisLayoutTabService {
     @Override
     public Long totalMetadataField(Context context, Integer tabId) throws SQLException {
         return dao.totalMetadatafield(context, tabId);
+    }
+
+    /* (non-Javadoc)
+     * @see org.dspace.layout.service.CrisLayoutTabService#findByItem(org.dspace.core.Context, java.util.UUID)
+     */
+    @Override
+    public List<CrisLayoutTab> findByItem(Context context, String itemUuid) throws SQLException {
+        Item item = itemService.find(context, UUID.fromString(itemUuid));
+        String entityType = "";
+        if (item != null) {
+            entityType = itemService.getMetadata(item, "relationship.type");
+        }
+        List<CrisLayoutTab> tabs = dao.findByEntityType(context, entityType);
+        List<CrisLayoutTab> resTabs = new ArrayList<>();
+        if (tabs != null && !tabs.isEmpty()) {
+            List<MetadataValue> itemMetadata = item.getMetadata();
+            for (CrisLayoutTab tab: tabs) {
+                Set<MetadataField> fields = tab.getMetadataFields();
+                if (fields != null && !fields.isEmpty()) {
+                    METADATA_LOOP:
+                    for (MetadataValue metadata: itemMetadata) {
+                        if (fields.contains(metadata.getMetadataField())) {
+                            resTabs.add(tab);
+                            break METADATA_LOOP;
+                        }
+                    }
+                }
+            }
+        }
+        return resTabs;
     }
 
 }

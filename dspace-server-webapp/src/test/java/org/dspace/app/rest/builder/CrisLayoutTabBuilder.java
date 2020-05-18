@@ -16,6 +16,7 @@ import org.dspace.content.MetadataField;
 import org.dspace.core.Context;
 import org.dspace.layout.CrisLayoutBox;
 import org.dspace.layout.CrisLayoutTab;
+import org.dspace.layout.LayoutSecurity;
 import org.dspace.layout.service.CrisLayoutTabService;
 
 public class CrisLayoutTabBuilder extends AbstractBuilder<CrisLayoutTab, CrisLayoutTabService> {
@@ -90,7 +91,7 @@ public class CrisLayoutTabBuilder extends AbstractBuilder<CrisLayoutTab, CrisLay
         return this;
     }
 
-    public CrisLayoutTabBuilder withSecurity(Integer security) {
+    public CrisLayoutTabBuilder withSecurity(LayoutSecurity security) {
         this.tab.setSecurity(security);
         return this;
     }

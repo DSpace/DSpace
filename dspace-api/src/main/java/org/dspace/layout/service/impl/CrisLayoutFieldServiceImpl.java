@@ -12,12 +12,19 @@ import java.util.List;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.content.MetadataField;
 import org.dspace.core.Context;
 import org.dspace.layout.CrisLayoutField;
 import org.dspace.layout.dao.CrisLayoutFieldDAO;
 import org.dspace.layout.service.CrisLayoutFieldService;
 import org.springframework.beans.factory.annotation.Autowired;
 
+/**
+ * Implementation of service to manage Fields component of layout
+ * 
+ * @author Danilo Di Nuzzo (danilo.dinuzzo at 4science.it)
+ *
+ */
 public class CrisLayoutFieldServiceImpl implements CrisLayoutFieldService {
 
     @Autowired
@@ -54,6 +61,31 @@ public class CrisLayoutFieldServiceImpl implements CrisLayoutFieldService {
 
     @Override
     public CrisLayoutField create(Context context, CrisLayoutField field) throws SQLException {
+        return dao.create(context, field);
+    }
+
+    @Override
+    public Long countFieldInBox(Context context, Integer boxId) throws SQLException {
+        return dao.countByBoxId(context, boxId);
+    }
+
+    @Override
+    public List<CrisLayoutField> findFieldByBoxId(Context context, Integer boxId, Integer limit, Integer offset)
+            throws SQLException {
+        return dao.findByBoxId(context, boxId, limit, offset);
+    }
+
+    /* (non-Javadoc)
+     * @see org.dspace.layout.service.CrisLayoutFieldService#
+     * create(org.dspace.core.Context, java.lang.Integer, java.lang.Integer)
+     */
+    @Override
+    public CrisLayoutField create(Context context, MetadataField mf, Integer row, Integer priority)
+            throws SQLException {
+        CrisLayoutField field = new CrisLayoutField();
+        field.setRow(row);
+        field.setPriority(priority);
+        field.setMetadataField(mf);
         return dao.create(context, field);
     }
 

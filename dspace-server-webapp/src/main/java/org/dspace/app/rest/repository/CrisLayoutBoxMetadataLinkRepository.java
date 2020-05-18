@@ -12,40 +12,38 @@ import java.util.List;
 import javax.annotation.Nullable;
 import javax.servlet.http.HttpServletRequest;
 
-import org.dspace.app.rest.model.CrisLayoutTabRest;
+import org.dspace.app.rest.model.CrisLayoutBoxRest;
 import org.dspace.app.rest.model.MetadataFieldRest;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.content.MetadataField;
 import org.dspace.core.Context;
 import org.dspace.layout.factory.CrisLayoutServiceFactory;
-import org.dspace.layout.service.CrisLayoutTabService;
+import org.dspace.layout.service.CrisLayoutBoxService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
 /**
- * Link repository for the security metadata subresource of a specific tab
+ * Link repository for the security metadata subresource of a specific box
  * 
  * @author Danilo Di Nuzzo (danilo.dinuzzo at 4science.it)
  *
  */
-@Component(CrisLayoutTabRest.CATEGORY + "." + CrisLayoutTabRest.NAME + "." + CrisLayoutTabRest.SECURITY_METADATA)
-public class CrisLayoutTabMetadataLinkRepository extends AbstractDSpaceRestRepository
+@Component(CrisLayoutBoxRest.CATEGORY + "." + CrisLayoutBoxRest.NAME + "." + CrisLayoutBoxRest.SECURITY_METADATA)
+public class CrisLayoutBoxMetadataLinkRepository extends AbstractDSpaceRestRepository
     implements LinkRestRepository {
 
     @Autowired
     private CrisLayoutServiceFactory serviceFactory;
 
-    @PreAuthorize("hasAuthority('ADMIN')")
     public Page<MetadataFieldRest> getSecurityMetadata(
             @Nullable HttpServletRequest request,
-            Integer tabId,
+            Integer boxId,
             @Nullable Pageable pageable,
             Projection projection) {
         Context context = obtainContext();
-        CrisLayoutTabService service = serviceFactory.getTabService();
+        CrisLayoutBoxService service = serviceFactory.getBoxService();
         List<MetadataField> metadata = null;
         Long totalRow = null;
 
@@ -56,10 +54,10 @@ public class CrisLayoutTabMetadataLinkRepository extends AbstractDSpaceRestRepos
             offset = pageable.getPageNumber() * pageable.getPageSize();
         }
         try {
-            totalRow = service.totalMetadataField(context, tabId);
+            totalRow = service.totalMetadataField(context, boxId);
             metadata = service.getMetadataField(
                 context,
-                tabId,
+                boxId,
                 limit,
                 offset);
         } catch (SQLException e) {

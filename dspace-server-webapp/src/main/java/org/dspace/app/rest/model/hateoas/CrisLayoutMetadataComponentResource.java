@@ -7,25 +7,25 @@
  */
 package org.dspace.app.rest.model.hateoas;
 
-import org.dspace.app.rest.model.CrisLayoutBoxRest;
+import org.dspace.app.rest.model.CrisLayoutMetadataComponentRest;
 import org.dspace.app.rest.model.hateoas.annotations.RelNameDSpaceResource;
 import org.dspace.app.rest.utils.Utils;
 
 /**
- * CrisLayoutBox Rest HAL Resource. The HAL Resource wraps the REST Resource
- * adding support for the links and embedded resources
+ * CrisLayoutMetadataComponent Rest HAL Resource.
+ * The HAL Resource wraps the REST Resource adding support for the links and embedded resources
  * 
  * @author Danilo Di Nuzzo (danilo.dinuzzo at 4science.it)
  *
  */
-@RelNameDSpaceResource(CrisLayoutBoxRest.NAME)
-public class CrisLayoutBoxResource  extends DSpaceResource<CrisLayoutBoxRest> {
+@RelNameDSpaceResource(CrisLayoutMetadataComponentRest.NAME)
+public class CrisLayoutMetadataComponentResource extends DSpaceResource<CrisLayoutMetadataComponentRest> {
 
     /**
      * @param data
      * @param utils
      */
-    public CrisLayoutBoxResource(CrisLayoutBoxRest data, Utils utils) {
+    public CrisLayoutMetadataComponentResource(CrisLayoutMetadataComponentRest data, Utils utils) {
         super(data, utils);
     }
 

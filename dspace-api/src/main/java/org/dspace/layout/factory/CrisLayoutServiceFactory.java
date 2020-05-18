@@ -7,12 +7,18 @@
  */
 package org.dspace.layout.factory;
 
-import org.dspace.layout.service.CrisLayoutBitstreamService;
 import org.dspace.layout.service.CrisLayoutBoxService;
+import org.dspace.layout.service.CrisLayoutFieldBitstreamService;
 import org.dspace.layout.service.CrisLayoutFieldService;
 import org.dspace.layout.service.CrisLayoutTabService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 
+/**
+ * Abstract factory for layout services.
+ * 
+ * @author Danilo Di Nuzzo (danilo.dinuzzo at 4science.it)
+ *
+ */
 public abstract class CrisLayoutServiceFactory {
 
     public static CrisLayoutServiceFactory getInstance() {
@@ -26,6 +32,6 @@ public abstract class CrisLayoutServiceFactory {
 
     public abstract CrisLayoutFieldService getFieldService();
 
-    public abstract CrisLayoutBitstreamService getBitstreamService();
+    public abstract CrisLayoutFieldBitstreamService getBitstreamService();
 
 }

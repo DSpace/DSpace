@@ -12,7 +12,10 @@ import org.dspace.app.rest.model.hateoas.annotations.RelNameDSpaceResource;
 import org.dspace.app.rest.utils.Utils;
 
 /**
- * @author Danilo Di Nuzzo (danilo dot dinuzzo at 4science dot it)
+ * CrisLayoutTab Rest HAL Resource. The HAL Resource wraps the REST Resource
+ * adding support for the links and embedded resources
+ * 
+ * @author Danilo Di Nuzzo (danilo.dinuzzo at 4science.it)
  *
  */
 @RelNameDSpaceResource(CrisLayoutTabRest.NAME)

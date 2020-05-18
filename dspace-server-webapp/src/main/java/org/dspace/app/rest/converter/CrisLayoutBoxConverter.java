@@ -29,7 +29,7 @@ public class CrisLayoutBoxConverter implements DSpaceConverter<CrisLayoutBox, Cr
         rest.setBoxType(mo.getType());
         rest.setCollapsed(mo.getCollapsed());
         rest.setEntityType(mo.getEntitytype().getLabel());
-        rest.setGroup(-1); // TODO cosa devo inserire in questo capo?
+        rest.setGroup(-1); // TODO cosa devo inserire in questo campo?
         rest.setHeader(mo.getHeader());
         rest.setId(mo.getID());
         rest.setMinor(mo.getMinor());

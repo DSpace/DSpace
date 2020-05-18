@@ -40,8 +40,8 @@ import org.dspace.eperson.service.EPersonService;
 import org.dspace.eperson.service.GroupService;
 import org.dspace.eperson.service.RegistrationDataService;
 import org.dspace.layout.factory.CrisLayoutServiceFactory;
-import org.dspace.layout.service.CrisLayoutBitstreamService;
 import org.dspace.layout.service.CrisLayoutBoxService;
+import org.dspace.layout.service.CrisLayoutFieldBitstreamService;
 import org.dspace.layout.service.CrisLayoutFieldService;
 import org.dspace.layout.service.CrisLayoutTabService;
 import org.dspace.scripts.factory.ScriptServiceFactory;
@@ -97,7 +97,7 @@ public abstract class AbstractBuilder<T, S> {
     static CrisLayoutTabService crisLayoutTabService;
     static CrisLayoutBoxService crisLayoutBoxService;
     static CrisLayoutFieldService crisLayoutFieldService;
-    static CrisLayoutBitstreamService crisLayoutBitstreamService;
+    static CrisLayoutFieldBitstreamService crisLayoutBitstreamService;
 
     protected Context context;
 

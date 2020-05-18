@@ -15,6 +15,7 @@ import org.dspace.content.EntityType;
 import org.dspace.content.service.EntityTypeService;
 import org.dspace.core.Context;
 import org.dspace.layout.CrisLayoutTab;
+import org.dspace.layout.LayoutSecurity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -62,7 +63,7 @@ public class CrisLayoutTabConverter implements DSpaceConverter<CrisLayoutTab, Cr
         CrisLayoutTab tab = new CrisLayoutTab();
         tab.setHeader(rest.getHeader());
         tab.setPriority(rest.getPriority());
-        tab.setSecurity(rest.getSecurity());
+        tab.setSecurity(LayoutSecurity.valueOf(rest.getSecurity()));
         tab.setShortName(rest.getShortname());
         tab.setEntity(eType);
         return tab;

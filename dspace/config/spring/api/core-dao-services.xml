@@ -76,5 +76,5 @@
 	<bean class="org.dspace.layout.dao.impl.CrisLayoutTabDAOImpl" />
 	<bean class="org.dspace.layout.dao.impl.CrisLayoutBoxDAOImpl" />
 	<bean class="org.dspace.layout.dao.impl.CrisLayoutFieldDAOImpl" />
-	<bean class="org.dspace.layout.dao.impl.CrisLayoutBitstreamDAOImpl" />
+	<bean class="org.dspace.layout.dao.impl.CrisLayoutFieldBitstreamDAOImpl" />
 </beans>

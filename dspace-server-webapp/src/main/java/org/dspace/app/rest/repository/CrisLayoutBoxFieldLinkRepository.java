@@ -12,62 +12,56 @@ import java.util.List;
 import javax.annotation.Nullable;
 import javax.servlet.http.HttpServletRequest;
 
-import org.dspace.app.rest.model.CrisLayoutTabRest;
-import org.dspace.app.rest.model.MetadataFieldRest;
+import org.dspace.app.rest.model.CrisLayoutBoxRest;
+import org.dspace.app.rest.model.CrisLayoutFieldRest;
 import org.dspace.app.rest.projection.Projection;
-import org.dspace.content.MetadataField;
 import org.dspace.core.Context;
+import org.dspace.layout.CrisLayoutField;
 import org.dspace.layout.factory.CrisLayoutServiceFactory;
-import org.dspace.layout.service.CrisLayoutTabService;
+import org.dspace.layout.service.CrisLayoutFieldService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
 /**
- * Link repository for the security metadata subresource of a specific tab
+ * Link repository for the fields subresource of a specific box
  * 
  * @author Danilo Di Nuzzo (danilo.dinuzzo at 4science.it)
  *
  */
-@Component(CrisLayoutTabRest.CATEGORY + "." + CrisLayoutTabRest.NAME + "." + CrisLayoutTabRest.SECURITY_METADATA)
-public class CrisLayoutTabMetadataLinkRepository extends AbstractDSpaceRestRepository
+@Component(CrisLayoutBoxRest.CATEGORY + "." + CrisLayoutBoxRest.NAME + "." + CrisLayoutBoxRest.FIELDS)
+public class CrisLayoutBoxFieldLinkRepository extends AbstractDSpaceRestRepository
     implements LinkRestRepository {
 
     @Autowired
     private CrisLayoutServiceFactory serviceFactory;
 
-    @PreAuthorize("hasAuthority('ADMIN')")
-    public Page<MetadataFieldRest> getSecurityMetadata(
+    public Page<CrisLayoutFieldRest> getFields(
             @Nullable HttpServletRequest request,
-            Integer tabId,
-            @Nullable Pageable pageable,
+            Integer boxId,
+            @Nullable Pageable optionalPageable,
             Projection projection) {
         Context context = obtainContext();
-        CrisLayoutTabService service = serviceFactory.getTabService();
-        List<MetadataField> metadata = null;
+        CrisLayoutFieldService service = serviceFactory.getFieldService();
+        List<CrisLayoutField> fields = null;
         Long totalRow = null;
 
         Integer limit = null;
         Integer offset = null;
-        if ( pageable != null ) {
-            limit = pageable.getPageSize();
-            offset = pageable.getPageNumber() * pageable.getPageSize();
+        if ( optionalPageable != null ) {
+            limit = optionalPageable.getPageSize();
+            offset = optionalPageable.getPageNumber() * optionalPageable.getPageSize();
         }
         try {
-            totalRow = service.totalMetadataField(context, tabId);
-            metadata = service.getMetadataField(
-                context,
-                tabId,
-                limit,
-                offset);
+            totalRow = service.countFieldInBox(context, boxId);
+            fields = service.findFieldByBoxId(context, boxId, limit, offset);
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-        if (metadata == null) {
+        if ( fields == null ) {
             return null;
         }
-        return converter.toRestPage(metadata, pageable, totalRow, utils.obtainProjection());
+        return converter.toRestPage(fields, optionalPageable, totalRow, utils.obtainProjection());
     }
 }

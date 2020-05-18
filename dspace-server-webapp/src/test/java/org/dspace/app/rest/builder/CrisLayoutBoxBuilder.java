@@ -14,9 +14,11 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.EntityType;
+import org.dspace.content.MetadataField;
 import org.dspace.core.Context;
 import org.dspace.layout.CrisLayoutBox;
 import org.dspace.layout.CrisLayoutField;
+import org.dspace.layout.LayoutSecurity;
 import org.dspace.layout.service.CrisLayoutBoxService;
 
 public class CrisLayoutBoxBuilder extends AbstractBuilder<CrisLayoutBox, CrisLayoutBoxService> {
@@ -93,7 +95,7 @@ public class CrisLayoutBoxBuilder extends AbstractBuilder<CrisLayoutBox, CrisLay
         return this;
     }
 
-    public CrisLayoutBoxBuilder withSecurity(int security) {
+    public CrisLayoutBoxBuilder withSecurity(LayoutSecurity security) {
         this.box.setSecurity(security);
         return this;
     }
@@ -116,4 +118,21 @@ public class CrisLayoutBoxBuilder extends AbstractBuilder<CrisLayoutBox, CrisLay
         return this;
     }
 
+    public CrisLayoutBoxBuilder withMetadataField(Set<MetadataField> fields) {
+        this.box.setMetadataFields(fields);
+        return this;
+    }
+
+    public CrisLayoutBoxBuilder addMetadataField(MetadataField field) {
+        if (this.box.getMetadataFields() == null) {
+            this.box.setMetadataFields(new HashSet<>());
+        }
+        this.box.getMetadataFields().add(field);
+        return this;
+    }
+
+    public CrisLayoutBoxBuilder withPriority(int priority) {
+        this.box.setPriority(priority);
+        return this;
+    }
 }

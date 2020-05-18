@@ -9,9 +9,7 @@ package org.dspace.app.rest.repository;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -19,13 +17,12 @@ import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.converter.CrisLayoutTabConverter;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
+import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.CrisLayoutTabRest;
 import org.dspace.app.rest.model.patch.Patch;
 import org.dspace.app.rest.repository.patch.ResourcePatch;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.Item;
-import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.layout.CrisLayoutTab;
 import org.dspace.layout.service.CrisLayoutTabService;
@@ -36,6 +33,8 @@ import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 /**
+ * This is the repository responsible to manage CrisLayoutTab Rest object
+ * 
  * @author Danilo Di Nuzzo (danilo dot dinuzzo at 4science dot it)
  *
  */
@@ -45,17 +44,14 @@ public class CrisLayoutTabRepository extends DSpaceRestRepository<CrisLayoutTabR
 
     private final CrisLayoutTabService service;
 
-    private final ItemService itemService;
-
     @Autowired
     private CrisLayoutTabConverter tabConverter;
 
     @Autowired
     private ResourcePatch<CrisLayoutTab> resourcePatch;
 
-    public CrisLayoutTabRepository(CrisLayoutTabService service, ItemService itemService) {
+    public CrisLayoutTabRepository(CrisLayoutTabService service) {
         this.service = service;
-        this.itemService = itemService;
     }
 
     /* (non-Javadoc)
@@ -81,8 +77,7 @@ public class CrisLayoutTabRepository extends DSpaceRestRepository<CrisLayoutTabR
      */
     @Override
     public Page<CrisLayoutTabRest> findAll(Context context, Pageable pageable) {
-        List<CrisLayoutTab> tabList = new ArrayList<>();
-        return converter.toRestPage(tabList, pageable, 0L, utils.obtainProjection());
+        throw new RepositoryMethodNotImplementedException("No implementation found; Method not allowed!", "");
     }
 
     @SearchRestMethod(name = "findByItem")
@@ -92,22 +87,16 @@ public class CrisLayoutTabRepository extends DSpaceRestRepository<CrisLayoutTabR
         List<CrisLayoutTab> tabList = null;
         Long totalRow = null;
         try {
-            Item item = itemService.find(context, UUID.fromString(itemUuid));
-            String itemMetadata = "";
-            if (item != null) {
-                itemMetadata = itemService.getMetadata(item, "relationship.type");
-            }
-            totalRow = service.countByEntityType(context, itemMetadata);
-            tabList = service.findByEntityType(
+            tabList = service.findByItem(
                 context,
-                itemMetadata,
-                pageable.getPageSize(),
-                (pageable.getPageNumber() * pageable.getPageSize()) );
+                itemUuid);
+            totalRow = Long.valueOf(tabList.size());
+            int lastIndex = (pageable.getPageNumber() + 1) * pageable.getPageSize();
+            tabList = tabList.subList(
+                    pageable.getPageNumber() * pageable.getPageSize(),
+                    (tabList.size() < lastIndex) ? tabList.size() : lastIndex );
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
-        }
-        if (tabList == null) {
-            return null;
         }
         return converter.toRestPage(tabList, pageable, totalRow, utils.obtainProjection());
     }

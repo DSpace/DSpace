@@ -12,13 +12,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import org.apache.log4j.Logger;
 import org.dspace.app.rest.builder.CollectionBuilder;
 import org.dspace.app.rest.builder.CommunityBuilder;
 import org.dspace.app.rest.builder.CrisLayoutBoxBuilder;
 import org.dspace.app.rest.builder.CrisLayoutTabBuilder;
 import org.dspace.app.rest.builder.EntityTypeBuilder;
 import org.dspace.app.rest.builder.ItemBuilder;
+import org.dspace.app.rest.matcher.CrisLayoutBoxMatcher;
 import org.dspace.app.rest.matcher.CrisLayoutTabMatcher;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.content.Collection;
@@ -31,6 +31,7 @@ import org.dspace.content.service.MetadataFieldService;
 import org.dspace.content.service.MetadataSchemaService;
 import org.dspace.layout.CrisLayoutBox;
 import org.dspace.layout.CrisLayoutTab;
+import org.dspace.layout.LayoutSecurity;
 import org.hamcrest.Matchers;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,12 +39,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 /**
  * This test class verify the REST Services for the Layout Tabs functionality (endpoint /api/layout/tabs)
  * 
- * @author Danilo Di Nuzzo (danilo dot dinuzzo at 4science dot it)
+ * @author Danilo Di Nuzzo (danilo.dinuzzo at 4science.it)
  *
  */
 public class TabsRestControllerIT extends AbstractControllerIntegrationTest {
-
-    private static final Logger log = Logger.getLogger(TabsRestControllerIT.class);
 
     @Autowired
     private MetadataSchemaService mdss;
@@ -58,209 +57,318 @@ public class TabsRestControllerIT extends AbstractControllerIntegrationTest {
      */
     @Test
     public void getSingleTab() throws Exception {
-        try {
-            context.turnOffAuthorisationSystem();
-            // Create new EntityType Person
-            EntityType eType = EntityTypeBuilder.createEntityTypeBuilder(context, "Person").build();
-            // Create new Tab for Person Entity
-            CrisLayoutTab tab = CrisLayoutTabBuilder.createTab(context, eType, 0)
-                    .withShortName("New Tab shortname")
-                    .withSecurity(4)
-                    .withHeader("New Tab header")
-                    .build();
-            context.restoreAuthSystemState();
-            // Get created tab by id from REST service and check its response
-            getClient().perform(get("/api/layout/tabs/" + tab.getID()))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(contentType))
-                .andExpect(jsonPath("$", Matchers.is(
-                        CrisLayoutTabMatcher.matchTab(tab))));
-        } catch ( Exception e ) {
-            log.error("getSingleTab ERROR! e:", e);
-            // Throw a new exception with method information
-            throw new Exception("Error in getSingleTab(), e: ", e);
-        }
+        context.turnOffAuthorisationSystem();
+        // Create new EntityType Person
+        EntityType eType = EntityTypeBuilder.createEntityTypeBuilder(context, "Person").build();
+        // Create new Tab for Person Entity
+        CrisLayoutTabBuilder.createTab(context, eType, 0)
+                .withShortName("New Person Tab")
+                .withSecurity(LayoutSecurity.PUBLIC)
+                .withHeader("New Person Tab header")
+                .build();
+        // Create new EntityType Publication
+        EntityType eTypeTwo = EntityTypeBuilder.createEntityTypeBuilder(context, "Publication").build();
+        // Create new Tab for Publication Entity
+        CrisLayoutTab tab = CrisLayoutTabBuilder.createTab(context, eTypeTwo, 0)
+                .withShortName("First Publication Tab")
+                .withSecurity(LayoutSecurity.PUBLIC)
+                .withHeader("First Publication Tab header")
+                .build();
+        // Create second Tab for Publication Entity
+        CrisLayoutTabBuilder.createTab(context, eTypeTwo, 0)
+                .withShortName("Second Publication Tab")
+                .withSecurity(LayoutSecurity.PUBLIC)
+                .withHeader("Second Publication Tab header")
+                .build();
+        context.restoreAuthSystemState();
+        // Get created tab by id from REST service and check its response
+        getClient().perform(get("/api/layout/tabs/" + tab.getID()))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(contentType))
+            .andExpect(jsonPath("$", Matchers.is(
+                    CrisLayoutTabMatcher.matchTab(tab))));
     }
 
     /**
-     * Test for endpoin /api/layout/tabs/<ID_TAB>/boxes. It returns all the boxes
-     * included in the tab. This endpoin is reseved for the admin user
+     * Test for endpoint /api/layout/tabs/<ID_TAB>/boxes. It returns all the boxes
+     * included in the tab. The boxes are sorted by priority ascending.
+     * This endpoint is reseved for the admin user
      * @throws Exception
      */
     @Test
     public void getTabBoxes() throws Exception {
-        try {
-            context.turnOffAuthorisationSystem();
-            // Create new EntityType Person
-            EntityType eType = EntityTypeBuilder.createEntityTypeBuilder(context, "Person").build();
-            // Create new Boxes
-            CrisLayoutBox boxOne = CrisLayoutBoxBuilder.createBuilder(context, eType, false, 0, false)
-                    .withHeader("First New Box Header")
-                    .withSecurity(0)
-                    .withShortname("Shortname for new first box")
-                    .withStyle("STYLE")
-                    .build();
-            CrisLayoutBox boxTwo = CrisLayoutBoxBuilder.createBuilder(context, eType, false, 0, false)
-                    .withHeader("Second New Box Header")
-                    .withSecurity(0)
-                    .withShortname("Shortname for new second box")
-                    .withStyle("STYLE")
-                    .build();
-            // Create new Tab for Person Entity
-            CrisLayoutTab tab = CrisLayoutTabBuilder.createTab(context, eType, 0)
-                    .withShortName("New Tab shortname")
-                    .withSecurity(4)
-                    .withHeader("New Tab header")
-                    .addBox(boxOne)
-                    .addBox(boxTwo)
-                    .build();
-            context.restoreAuthSystemState();
-            // Test without authentication
-            getClient().perform(get("/api/layout/tabs/" + tab.getID() + "/boxes"))
-                .andExpect(status().is4xxClientError()); // 401 Unauthorized;
-            // Test with non admin user
-            String token = getAuthToken(eperson.getEmail(), password);
-            getClient(token).perform(get("/api/layout/tabs/" + tab.getID() + "/boxes"))
-                .andExpect(status().is4xxClientError()); // 403 - user haven't sufficient permission
-            // Test with admin
-            String tokenAdmin = getAuthToken(admin.getEmail(), password);
-            getClient(tokenAdmin).perform(get("/api/layout/tabs/" + tab.getID() + "/boxes"))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(contentType))
-                .andExpect(jsonPath("$._embedded.boxes", Matchers.not(Matchers.empty())))
-                .andExpect(jsonPath("$.page.totalElements", Matchers.is(2)));
-        } catch (Exception e) {
-            log.error("getTabWithBoxes ERROR! e:", e);
-            // Throw a new exception with method information
-            throw new Exception("Error in getTabWithBoxes(), e: ", e);
-        }
+        context.turnOffAuthorisationSystem();
+        // Create new EntityType Person
+        EntityType eType = EntityTypeBuilder.createEntityTypeBuilder(context, "Person").build();
+        // Create new Boxes
+        CrisLayoutBox boxOne = CrisLayoutBoxBuilder.createBuilder(context, eType, false, 0, false)
+                .withHeader("First New Box Header")
+                .withSecurity(LayoutSecurity.PUBLIC)
+                .withShortname("Shortname for new first box")
+                .withStyle("STYLE")
+                .build();
+        CrisLayoutBox boxTwo = CrisLayoutBoxBuilder.createBuilder(context, eType, false, 0, false)
+                .withHeader("Second New Box Header")
+                .withSecurity(LayoutSecurity.PUBLIC)
+                .withShortname("Shortname for new second box")
+                .withStyle("STYLE")
+                .build();
+        // Create new Tab for Person Entity with two boxes
+        CrisLayoutTabBuilder.createTab(context, eType, 0)
+                .withShortName("New Tab shortname")
+                .withSecurity(LayoutSecurity.PUBLIC)
+                .withHeader("New Tab header")
+                .addBox(boxOne)
+                .addBox(boxTwo)
+                .build();
+        // Create new Boxes
+        CrisLayoutBox boxThree = CrisLayoutBoxBuilder.createBuilder(context, eType, false, 0, false)
+                .withHeader("Third New Box Header - priority 0")
+                .withSecurity(LayoutSecurity.PUBLIC)
+                .withShortname("Shortname 3")
+                .withStyle("STYLE")
+                .build();
+        // Create new Boxes
+        CrisLayoutBox boxFour = CrisLayoutBoxBuilder.createBuilder(context, eType, false, 1, false)
+                .withHeader("Fourth New Box Header - priority 1")
+                .withSecurity(LayoutSecurity.PUBLIC)
+                .withShortname("Shortname 4")
+                .withStyle("STYLE")
+                .build();
+        // Create new Boxes
+        CrisLayoutBox boxFive = CrisLayoutBoxBuilder.createBuilder(context, eType, false, 2, false)
+                .withHeader("Fifth New Box Header - priority 2")
+                .withSecurity(LayoutSecurity.PUBLIC)
+                .withShortname("Shortname 5")
+                .withStyle("STYLE")
+                .build();
+        // Create new Tab for Person Entity with three boxes
+        CrisLayoutTab tab = CrisLayoutTabBuilder.createTab(context, eType, 0)
+                .withShortName("Another New Tab shortname")
+                .withSecurity(LayoutSecurity.PUBLIC)
+                .withHeader("New Tab header")
+                .addBox(boxThree)
+                .addBox(boxFour)
+                .addBox(boxFive)
+                .build();
+        // Create new Tab for Person Entity without boxes
+        CrisLayoutTabBuilder.createTab(context, eType, 0)
+                .withShortName("Tab no box")
+                .withSecurity(LayoutSecurity.PUBLIC)
+                .withHeader("New Tab header")
+                .build();
+        context.restoreAuthSystemState();
+        // Test without authentication
+        getClient().perform(get("/api/layout/tabs/" + tab.getID() + "/boxes"))
+            .andExpect(status().isUnauthorized()); // 401 Unauthorized;
+        // Test with non admin user
+        String token = getAuthToken(eperson.getEmail(), password);
+        getClient(token).perform(get("/api/layout/tabs/" + tab.getID() + "/boxes"))
+            .andExpect(status().isForbidden()); // 403 - user haven't sufficient permission
+        // Test with admin
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        getClient(tokenAdmin).perform(get("/api/layout/tabs/" + tab.getID() + "/boxes"))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(contentType))
+            .andExpect(jsonPath("$._embedded.boxes", Matchers.not(Matchers.empty())))
+            .andExpect(jsonPath("$.page.totalElements", Matchers.is(3)))
+            .andExpect(jsonPath("$._embedded.boxes[0]", Matchers.is(
+                    CrisLayoutBoxMatcher.matchBox(boxThree))))
+            .andExpect(jsonPath("$._embedded.boxes[1]", Matchers.is(
+                    CrisLayoutBoxMatcher.matchBox(boxFour))))
+            .andExpect(jsonPath("$._embedded.boxes[2]", Matchers.is(
+                    CrisLayoutBoxMatcher.matchBox(boxFive))));
     }
 
     /**
      * Test for endpoint /api/layout/tabs/<ID_TAB>/securitymetadata.
-     * It returns all the metadatafields that defined the security.
-     * This endpoin is reseved for the admin user
+     * It returns all the metadatafields that define the security.
+     * This endpoint is reseved for the admin user
      * @throws Exception
      */
     @Test
     public void getTabMetadatasecurity() throws Exception {
-        try {
-            context.turnOffAuthorisationSystem();
-            MetadataSchema schema = mdss.find(context, "dc");
-            MetadataField fieldOne = mfss.findByElement(context, schema, "identifier", "isbn");
-            MetadataField fieldTwo = mfss.findByElement(context, schema, "identifier", "uri");
-            EntityType eType = EntityTypeBuilder.createEntityTypeBuilder(context, "Publication").build();
-            CrisLayoutTab tab = CrisLayoutTabBuilder.createTab(context, eType, 0)
-                    .withShortName("New Tab shortname")
-                    .withSecurity(4)
-                    .withHeader("New Tab header")
-                    .addMetadatasecurity(fieldOne)
-                    .addMetadatasecurity(fieldTwo)
-                    .build();
-            context.restoreAuthSystemState();
-            // Test without authentication
-            getClient().perform(get("/api/layout/tabs/" + tab.getID() + "/securitymetadata"))
-                .andExpect(status().is4xxClientError()); // 401 Unauthorized;
-            // Test with non admin user
-            String token = getAuthToken(eperson.getEmail(), password);
-            getClient(token).perform(get("/api/layout/tabs/" + tab.getID() + "/securitymetadata"))
-                .andExpect(status().is4xxClientError()); // 403 - user haven't sufficient permission
-            // Test with admin user
-            String tokenAdmin = getAuthToken(admin.getEmail(), password);
-            getClient(tokenAdmin).perform(get("/api/layout/tabs/" + tab.getID() + "/securitymetadata"))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(contentType))
-                .andExpect(jsonPath("$._embedded.securitymetadata", Matchers.not(Matchers.empty())))
-                .andExpect(jsonPath("$.page.totalElements", Matchers.is(2)));
-        } catch (Exception e) {
-            log.error("getTabMetadatasecurity ERROR! e:", e);
-            // Throw a new exception with method information
-            throw new Exception("Error in getTabMetadatasecurity(), e: ", e);
-        }
+        context.turnOffAuthorisationSystem();
+        // get metadata field
+        MetadataSchema schema = mdss.find(context, "dc");
+        MetadataField isbn = mfss.findByElement(context, schema, "identifier", "isbn");
+        MetadataField uri = mfss.findByElement(context, schema, "identifier", "uri");
+        MetadataField abs = mfss.findByElement(context, schema, "description", "abstract");
+        MetadataField provenance = mfss.findByElement(context, schema, "description", "provenance");
+        MetadataField sponsorship = mfss.findByElement(context, schema, "description", "sponsorship");
+        MetadataField extent = mfss.findByElement(context, schema, "format", "extent");
+        // Create entity type Publication
+        EntityType eType = EntityTypeBuilder.createEntityTypeBuilder(context, "Publication").build();
+        // Create tabs
+        CrisLayoutTabBuilder.createTab(context, eType, 0)
+            .withShortName("New Tab 1")
+            .withSecurity(LayoutSecurity.PUBLIC)
+            .withHeader("New Tab header")
+            .addMetadatasecurity(isbn)
+            .addMetadatasecurity(uri)
+            .build();
+        CrisLayoutTab tab = CrisLayoutTabBuilder.createTab(context, eType, 0)
+            .withShortName("New Tab 2")
+            .withSecurity(LayoutSecurity.PUBLIC)
+            .withHeader("New Tab header")
+            .addMetadatasecurity(abs)
+            .addMetadatasecurity(provenance)
+            .addMetadatasecurity(sponsorship)
+            .build();
+        CrisLayoutTabBuilder.createTab(context, eType, 0)
+            .withShortName("New Tab 3")
+            .withSecurity(LayoutSecurity.PUBLIC)
+            .withHeader("New Tab header")
+            .addMetadatasecurity(extent)
+            .build();
+        context.restoreAuthSystemState();
+        // Test without authentication
+        getClient().perform(get("/api/layout/tabs/" + tab.getID() + "/securitymetadata"))
+            .andExpect(status().isUnauthorized()); // 401 Unauthorized;
+        // Test with non admin user
+        String token = getAuthToken(eperson.getEmail(), password);
+        getClient(token).perform(get("/api/layout/tabs/" + tab.getID() + "/securitymetadata"))
+            .andExpect(status().isForbidden()); // 403 - user haven't sufficient permission
+        // Test with admin user
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        getClient(tokenAdmin).perform(get("/api/layout/tabs/" + tab.getID() + "/securitymetadata"))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(contentType))
+            .andExpect(jsonPath("$._embedded.securitymetadata", Matchers.not(Matchers.empty())))
+            .andExpect(jsonPath("$.page.totalElements", Matchers.is(3)));
     }
 
     /**
-     * Test for endpoin /api/layout/tabs/search/findByItem?uuid=
+     * Test for endpoint /api/layout/tabs/search/findByItem?uuid=<ITEM-UUID>
+     * The tabs are sorted by priority ascending. This are filtered based on the permission of the
+     * current user and available data.
      * @throws Exception
      */
     @Test
     public void findByItem() throws Exception {
-        try {
-            context.turnOffAuthorisationSystem();
-            Community community = CommunityBuilder.createCommunity(context)
-                    .withName("Test Community")
-                    .withTitle("Title test community")
-                    .build();
-            Collection collection = CollectionBuilder.createCollection(context, community)
-                    .withName("Test Collection")
-                    .build();
-            EntityType eType = EntityTypeBuilder.createEntityTypeBuilder(context, "Publication")
-                    .build();
-            Item item = ItemBuilder.createItem(context, collection)
-                    .withAuthor("Danilo Di Nuzzo")
-                    .withTitle("Test Content")
-                    .withRelationshipType(eType.getLabel())
-                    .build();
-            CrisLayoutTab tab = CrisLayoutTabBuilder.createTab(context, eType, 0)
-                    .withShortName("New Tab For Publication")
-                    .withSecurity(4)
-                    .withHeader("New Tab header")
-                    .build();
-            context.restoreAuthSystemState();
-            getClient().perform(get("/api/layout/tabs/search/findByItem").param("uuid", item.getID().toString()))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(contentType))
-                .andExpect(jsonPath("$._embedded.tabs[0]", Matchers.is(
-                        CrisLayoutTabMatcher.matchTab(tab))));
-        } catch (Exception e) {
-            log.error("findByItem ERROR! e:", e);
-            throw new Exception("Error in findByItem(), e: ", e);
-        }
+        context.turnOffAuthorisationSystem();
+        // Create new community
+        Community community = CommunityBuilder.createCommunity(context)
+            .withName("Test Community")
+            .withTitle("Title test community")
+            .build();
+        // Create new collection
+        Collection collection = CollectionBuilder.createCollection(context, community)
+            .withName("Test Collection")
+            .build();
+        // Create entity Type
+        EntityTypeBuilder.createEntityTypeBuilder(context, "Publication")
+            .build();
+        EntityType eTypePer = EntityTypeBuilder.createEntityTypeBuilder(context, "Person")
+            .build();
+        // Create new person item
+        Item item = ItemBuilder.createItem(context, collection)
+            .withPersonIdentifierFirstName("Danilo")
+            .withPersonIdentifierLastName("Di Nuzzo")
+            .withRelationshipType(eTypePer.getLabel())
+            .build();
+        MetadataSchema schema = mdss.find(context, "person");
+        MetadataField firstName = mfss.findByElement(context, schema, "givenName", null);
+        MetadataField lastName = mfss.findByElement(context, schema, "familyName", null);
+        MetadataField provenance = mfss.findByElement(context, schema, "description", "provenance");
+        MetadataField sponsorship = mfss.findByElement(context, schema, "description", "sponsorship");
+        // Create tabs for Person Entity
+        CrisLayoutTab tab = CrisLayoutTabBuilder.createTab(context, eTypePer, 0)
+            .withShortName("TabOne For Person - priority 0")
+            .withSecurity(LayoutSecurity.PUBLIC)
+            .withHeader("New Tab header")
+            .addMetadatasecurity(firstName)
+            .build();
+        CrisLayoutTab tabTwo = CrisLayoutTabBuilder.createTab(context, eTypePer, 1)
+            .withShortName("TabTwo For Person - priority 1")
+            .withSecurity(LayoutSecurity.PUBLIC)
+            .withHeader("New Tab header")
+            .addMetadatasecurity(lastName)
+            .build();
+        // tab without data
+        CrisLayoutTabBuilder.createTab(context, eTypePer, 2)
+            .withShortName("New Tab For Person 2")
+            .withSecurity(LayoutSecurity.PUBLIC)
+            .withHeader("New Tab header")
+            .addMetadatasecurity(provenance)
+            .addMetadatasecurity(sponsorship)
+            .build();
+        context.restoreAuthSystemState();
+        // Test
+        getClient().perform(get("/api/layout/tabs/search/findByItem").param("uuid", item.getID().toString()))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(contentType))
+            .andExpect(jsonPath("$.page.totalElements", Matchers.is(2))) // only two tabs have contents to show
+            .andExpect(jsonPath("$._embedded.tabs[0]", Matchers.is(
+                    CrisLayoutTabMatcher.matchTab(tab))))
+            .andExpect(jsonPath("$._embedded.tabs[1]", Matchers.is(
+                    CrisLayoutTabMatcher.matchTab(tabTwo))));
     }
 
     /**
-     * Test for endpoin /api/layout/tabs/search/findByEntityType?type=<:string>. It returns all the tabs
+     * Test for endpoint /api/layout/tabs/search/findByEntityType?type=<:string>. It returns all the tabs
      * that are available for the items of the specified type. This endpoint is reserved to system administrators
-     * and this test invoke WS with admin user
      * @throws Exception
      */
     @Test
-    public void findByEntityTypeAdmin() throws Exception {
-        try {
-            context.turnOffAuthorisationSystem();
-            // Create new EntityType Person
-            EntityType eType = EntityTypeBuilder.createEntityTypeBuilder(context, "Person").build();
-            // Create new Tab for Person Entity
-            CrisLayoutTab tab = CrisLayoutTabBuilder.createTab(context, eType, 0)
-                    .withShortName("New Tab shortname")
-                    .withSecurity(4)
-                    .withHeader("New Tab header")
-                    .build();
-            context.restoreAuthSystemState();
-            // Test without authentication
-            getClient().perform(get("/api/layout/tabs/search/findByEntityType")
-                    .param("type", tab.getEntity().getLabel()))
-                    .andExpect(status().is4xxClientError()); // 401 Unauthorized;
-            // Test with a non admin user
-            String token = getAuthToken(eperson.getEmail(), password);
-            // Get created tab by id from REST service and check its response
-            getClient(token).perform(get("/api/layout/tabs/search/findByEntityType")
-                    .param("type", tab.getEntity().getLabel()))
-                    .andExpect(status().is4xxClientError()); // 403 - user haven't sufficient permission
-            // Get auth token of an admin user
-            String tokenAdmin = getAuthToken(admin.getEmail(), password);
-            // Get created tab by id from REST service and check its response
-            getClient(tokenAdmin).perform(get("/api/layout/tabs/search/findByEntityType")
-                    .param("type", eType.getLabel()))
-                    .andExpect(status().isOk())
-                    .andExpect(content().contentType(contentType))
-                    .andExpect(jsonPath("$._embedded.tabs[0]", Matchers.is(
-                        CrisLayoutTabMatcher.matchTab(tab))));
-        } catch ( Exception e ) {
-            log.error("findByEntityType ERROR! e:", e);
-            // Throw a new exception with method information
-            throw new Exception("Error in findByEntityType(), e: ", e);
-        }
+    public void findByEntityType() throws Exception {
+        context.turnOffAuthorisationSystem();
+        // Create entity type
+        EntityType eTypePer = EntityTypeBuilder.createEntityTypeBuilder(context, "Person").build();
+        EntityType eTypePub = EntityTypeBuilder.createEntityTypeBuilder(context, "Publication").build();
+        EntityTypeBuilder.createEntityTypeBuilder(context, "Project").build();
+        // Create new Tab for Publication Entity
+        CrisLayoutTab tab = CrisLayoutTabBuilder.createTab(context, eTypePub, 0)
+            .withShortName("New Tab shortname priority 0")
+            .withSecurity(LayoutSecurity.PUBLIC)
+            .withHeader("New Tab header")
+            .build();
+        CrisLayoutTab tabTwo = CrisLayoutTabBuilder.createTab(context, eTypePub, 1)
+            .withShortName("New Tab shortname priority 1")
+            .withSecurity(LayoutSecurity.PUBLIC)
+            .withHeader("New Tab header")
+            .build();
+        CrisLayoutTab tabThree = CrisLayoutTabBuilder.createTab(context, eTypePub, 2)
+            .withShortName("New Tab shortname priority 2")
+            .withSecurity(LayoutSecurity.PUBLIC)
+            .withHeader("New Tab header")
+            .build();
+        // Create tabs for Person
+        CrisLayoutTabBuilder.createTab(context, eTypePer, 0)
+            .withShortName("First Person Tab")
+            .withSecurity(LayoutSecurity.PUBLIC)
+            .withHeader("New Tab header")
+            .build();
+        CrisLayoutTabBuilder.createTab(context, eTypePer, 0)
+            .withShortName("Second Person Tab")
+            .withSecurity(LayoutSecurity.PUBLIC)
+            .withHeader("New Tab header")
+            .build();
+        context.restoreAuthSystemState();
+        // Test without authentication
+        getClient().perform(get("/api/layout/tabs/search/findByEntityType")
+            .param("type", tab.getEntity().getLabel()))
+            .andExpect(status().isUnauthorized()); // 401 Unauthorized;
+        // Test with a non admin user
+        String token = getAuthToken(eperson.getEmail(), password);
+        // Get created tab by id from REST service and check its response
+        getClient(token).perform(get("/api/layout/tabs/search/findByEntityType")
+            .param("type", tab.getEntity().getLabel()))
+            .andExpect(status().isForbidden()); // 403 - user haven't sufficient permission
+        // Get auth token of an admin user
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        // Get created tab by id from REST service and check its response
+        getClient(tokenAdmin).perform(get("/api/layout/tabs/search/findByEntityType")
+            .param("type", eTypePub.getLabel()))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(contentType))
+            .andExpect(jsonPath("$.page.totalElements", Matchers.is(3)))
+            .andExpect(jsonPath("$._embedded.tabs[0]", Matchers.is(
+                CrisLayoutTabMatcher.matchTab(tab))))
+            .andExpect(jsonPath("$._embedded.tabs[1]", Matchers.is(
+                    CrisLayoutTabMatcher.matchTab(tabTwo))))
+            .andExpect(jsonPath("$._embedded.tabs[2]", Matchers.is(
+                    CrisLayoutTabMatcher.matchTab(tabThree))));
     }
 
 }

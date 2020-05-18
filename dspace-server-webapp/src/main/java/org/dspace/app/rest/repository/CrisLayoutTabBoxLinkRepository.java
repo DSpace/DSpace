@@ -26,6 +26,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
 /**
+ * Link repository for the boxes subresource of a specific tab
+ * 
  * @author Danilo Di Nuzzo (danilo dot dinuzzo at 4science dot it)
  *
  */

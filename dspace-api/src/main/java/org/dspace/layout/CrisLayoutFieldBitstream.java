@@ -27,7 +27,7 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 @Table(name = "cris_layout_fieldbitstream2metadata")
 @Cacheable
 @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE, include = "non-lazy")
-public class CrisLayoutBitstream implements ReloadableEntity<Integer> {
+public class CrisLayoutFieldBitstream implements ReloadableEntity<Integer> {
 
     @Id
     @GeneratedValue(

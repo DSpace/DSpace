@@ -12,15 +12,34 @@ import com.fasterxml.jackson.annotation.JsonProperty.Access;
 import org.dspace.app.rest.RestResourceController;
 
 /**
- * @author Danilo Di Nuzzo (danilo dot dinuzzo at 4science dot it)
+ * The CrisLayoutBox REST Resource
+ * 
+ * @author Danilo Di Nuzzo (danilo.dinuzzo at 4science.it)
  *
  */
+@LinksRest(links = {
+        @LinkRest(
+                name = CrisLayoutBoxRest.FIELDS,
+                method = "getFields"
+        ),
+        @LinkRest(
+                name = CrisLayoutBoxRest.SECURITY_METADATA,
+                method = "getSecurityMetadata"
+        ),
+        @LinkRest(
+                name = CrisLayoutBoxRest.CONFIGURATON,
+                method = "getConfiguration"
+        )
+})
 public class CrisLayoutBoxRest extends BaseObjectRest<Integer> {
 
     private static final long serialVersionUID = 1759482359230180793L;
 
     public static final String NAME = "box";
     public static final String CATEGORY = RestAddressableModel.LAYOUT;
+    public static final String FIELDS = "fields";
+    public static final String SECURITY_METADATA = "securitymetadata";
+    public static final String CONFIGURATON = "configuration";
 
     private String shortname;
     private String header;

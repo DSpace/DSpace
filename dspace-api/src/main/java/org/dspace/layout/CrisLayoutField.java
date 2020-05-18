@@ -66,7 +66,7 @@ public class CrisLayoutField implements ReloadableEntity<Integer> {
     )
     private Set<CrisLayoutBox> boxes;
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "layoutField")
-    private Set<CrisLayoutBitstream> bitstreams;
+    private Set<CrisLayoutFieldBitstream> bitstreams;
 
     @Override
     public Integer getID() {
@@ -139,6 +139,22 @@ public class CrisLayoutField implements ReloadableEntity<Integer> {
 
     public void setStyle(String style) {
         this.style = style;
+    }
+
+    public Set<CrisLayoutBox> getBoxes() {
+        return boxes;
+    }
+
+    public void setBoxes(Set<CrisLayoutBox> boxes) {
+        this.boxes = boxes;
+    }
+
+    public Set<CrisLayoutFieldBitstream> getBitstreams() {
+        return bitstreams;
+    }
+
+    public void setBitstreams(Set<CrisLayoutFieldBitstream> bitstreams) {
+        this.bitstreams = bitstreams;
     }
 
 }

@@ -12,7 +12,9 @@ import com.fasterxml.jackson.annotation.JsonProperty.Access;
 import org.dspace.app.rest.RestResourceController;
 
 /**
- * @author Danilo Di Nuzzo (danilo dot dinuzzo at 4science dot it)
+ * The CrisLayoutTab REST Resource
+ * 
+ * @author Danilo Di Nuzzo (danilo.dinuzzo at 4science.it)
  *
  */
 @LinksRest(links = {

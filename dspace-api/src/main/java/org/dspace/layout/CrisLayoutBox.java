@@ -148,8 +148,18 @@ public class CrisLayoutBox implements ReloadableEntity<Integer> {
         return security;
     }
 
-    public void setSecurity(Integer security) {
-        this.security = security;
+    /**
+     * This field manages the visibility of the box
+     * It can take the following values:
+     * 0-PUBLIC
+     * 1-ADMINISTRATOR
+     * 2-OWNER ONLY
+     * 3-OWNER & ADMINISTRATOR
+     * 4-CUSTOM DATA
+     * @param security {@link LayoutSecurity}
+     */
+    public void setSecurity(LayoutSecurity security) {
+        this.security = security.getValue();
     }
 
     public String getStyle() {

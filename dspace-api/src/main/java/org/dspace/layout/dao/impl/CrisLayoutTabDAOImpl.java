@@ -9,6 +9,7 @@ package org.dspace.layout.dao.impl;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.UUID;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -25,6 +26,12 @@ import org.dspace.layout.CrisLayoutTab;
 import org.dspace.layout.CrisLayoutTab_;
 import org.dspace.layout.dao.CrisLayoutTabDAO;
 
+/**
+ * Database Access Object implementation class for the CrisLayoutTab object
+ * 
+ * @author Danilo Di Nuzzo (danilo.dinuzzo at 4science.it)
+ *
+ */
 public class CrisLayoutTabDAOImpl extends AbstractHibernateDAO<CrisLayoutTab> implements CrisLayoutTabDAO {
 
     /* (non-Javadoc)
@@ -107,6 +114,11 @@ public class CrisLayoutTabDAOImpl extends AbstractHibernateDAO<CrisLayoutTab> im
             query.setMaxResults(limit).setFirstResult(offset);
         }
         return query.getResultList();
+    }
+
+    @Override
+    public List<CrisLayoutTab> findByItem(Context context, UUID intemUUid) throws SQLException {
+        return null;
     }
 
 }

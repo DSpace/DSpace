@@ -8,25 +8,49 @@
 package org.dspace.layout.service.impl;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.EntityType;
+import org.dspace.content.Item;
+import org.dspace.content.MetadataField;
+import org.dspace.content.MetadataValue;
+import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.layout.CrisLayoutBox;
 import org.dspace.layout.dao.CrisLayoutBoxDAO;
 import org.dspace.layout.service.CrisLayoutBoxService;
 import org.springframework.beans.factory.annotation.Autowired;
 
+/**
+ * Implementation of service to manage Boxes component of layout
+ * 
+ * @author Danilo Di Nuzzo (danilo.dinuzzo at 4science.it)
+ *
+ */
 public class CrisLayoutBoxServiceImpl implements CrisLayoutBoxService {
 
     @Autowired
     private CrisLayoutBoxDAO dao;
 
+    @Autowired
+    private ItemService itemService;
+
+    @Autowired
+    protected AuthorizeService authorizeService;
+
     @Override
     public CrisLayoutBox create(Context context) throws SQLException, AuthorizeException {
+        if (!authorizeService.isAdmin(context)) {
+            throw new AuthorizeException(
+                "You must be an admin to create a Box");
+        }
         return dao.create(context, new CrisLayoutBox());
     }
 
@@ -42,6 +66,10 @@ public class CrisLayoutBoxServiceImpl implements CrisLayoutBoxService {
 
     @Override
     public void update(Context context, List<CrisLayoutBox> boxList) throws SQLException, AuthorizeException {
+        if (!authorizeService.isAdmin(context)) {
+            throw new AuthorizeException(
+                "You must be an admin to update a Box");
+        }
         if (CollectionUtils.isNotEmpty(boxList)) {
             for (CrisLayoutBox box: boxList) {
                 dao.save(context, box);
@@ -51,17 +79,29 @@ public class CrisLayoutBoxServiceImpl implements CrisLayoutBoxService {
 
     @Override
     public void delete(Context context, CrisLayoutBox box) throws SQLException, AuthorizeException {
+        if (!authorizeService.isAdmin(context)) {
+            throw new AuthorizeException(
+                "You must be an admin to delete a Box");
+        }
         dao.delete(context, box);
     }
 
     @Override
-    public CrisLayoutBox create(Context context, CrisLayoutBox box) throws SQLException {
+    public CrisLayoutBox create(Context context, CrisLayoutBox box) throws SQLException, AuthorizeException {
+        if (!authorizeService.isAdmin(context)) {
+            throw new AuthorizeException(
+                "You must be an admin to create a Box");
+        }
         return dao.create(context, box);
     }
 
     @Override
     public CrisLayoutBox create(Context context, EntityType eType, boolean collapsed, int priority, boolean minor)
-            throws SQLException {
+            throws SQLException, AuthorizeException {
+        if (!authorizeService.isAdmin(context)) {
+            throw new AuthorizeException(
+                "You must be an admin to create a Box");
+        }
         CrisLayoutBox box = new CrisLayoutBox();
         box.setEntitytype(eType);
         box.setCollapsed(collapsed);
@@ -95,6 +135,65 @@ public class CrisLayoutBoxServiceImpl implements CrisLayoutBoxService {
     @Override
     public Long countTotalBoxesInTab(Context context, Integer tabId) throws SQLException {
         return dao.countTotalBoxesInTab(context, tabId);
+    }
+
+    @Override
+    public Long countTotalEntityBoxes(Context context, String entityType) throws SQLException {
+        return dao.countTotalEntityBoxes(context, entityType);
+    }
+
+    @Override
+    public List<CrisLayoutBox> findEntityBoxes(Context context, String entityType, Integer limit, Integer offset)
+            throws SQLException {
+        return dao.findByEntityType(context, entityType, null, limit, offset);
+    }
+
+    @Override
+    public List<MetadataField> getMetadataField(Context context, Integer boxId, Integer limit, Integer offset)
+            throws SQLException {
+        return dao.getMetadataField(context, boxId, limit, offset);
+    }
+
+    @Override
+    public Long totalMetadataField(Context context, Integer boxId) throws SQLException {
+        return dao.totalMetadatafield(context, boxId);
+    }
+
+    @Override
+    public List<CrisLayoutBox> findByItem(
+            Context context, UUID itemUuid, Integer tabId) throws SQLException {
+        Item item = itemService.find(context, itemUuid);
+        String entityType = "";
+        if ( item != null ) {
+            entityType = itemService.getMetadata(item, "relationship.type");
+        }
+        List<CrisLayoutBox> boxes = dao.findByEntityType(context, entityType, tabId, null, null);
+        // resBoxes contains only the box with available data for the associated item
+        List<CrisLayoutBox> resBoxes = new ArrayList<>();
+        if (boxes != null && !boxes.isEmpty()) {
+            List<MetadataValue> itemMetadata = item.getMetadata();
+            for (CrisLayoutBox box: boxes) {
+                Set<MetadataField> fields = box.getMetadataFields();
+                if (fields != null && !fields.isEmpty()) {
+                    METADATA_LOOP:
+                    for (MetadataValue metadata: itemMetadata) {
+                        if (fields.contains(metadata.getMetadataField())) {
+                            resBoxes.add(box);
+                            break METADATA_LOOP;
+                        }
+                    }
+                }
+            }
+        }
+        return resBoxes;
+    }
+
+    /* (non-Javadoc)
+     * @see org.dspace.layout.service.CrisLayoutBoxService#findByShortname(org.dspace.core.Context, java.lang.String)
+     */
+    @Override
+    public CrisLayoutBox findByShortname(Context context, String shortname) throws SQLException {
+        return dao.findByShortname(context, shortname);
     }
 
 }

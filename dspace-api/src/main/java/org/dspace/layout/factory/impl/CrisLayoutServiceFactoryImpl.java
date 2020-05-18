@@ -8,12 +8,18 @@
 package org.dspace.layout.factory.impl;
 
 import org.dspace.layout.factory.CrisLayoutServiceFactory;
-import org.dspace.layout.service.CrisLayoutBitstreamService;
 import org.dspace.layout.service.CrisLayoutBoxService;
+import org.dspace.layout.service.CrisLayoutFieldBitstreamService;
 import org.dspace.layout.service.CrisLayoutFieldService;
 import org.dspace.layout.service.CrisLayoutTabService;
 import org.springframework.beans.factory.annotation.Autowired;
 
+/**
+ * Implementation of factory for layout services.
+ * 
+ * @author Danilo Di Nuzzo (danilo.dinuzzo at 4science.it)
+ *
+ */
 public class CrisLayoutServiceFactoryImpl extends CrisLayoutServiceFactory {
 
     @Autowired(required = true)
@@ -26,7 +32,7 @@ public class CrisLayoutServiceFactoryImpl extends CrisLayoutServiceFactory {
     private CrisLayoutFieldService fieldService;
 
     @Autowired(required = true)
-    private CrisLayoutBitstreamService bitstreamService;
+    private CrisLayoutFieldBitstreamService bitstreamService;
 
     @Override
     public CrisLayoutTabService getTabService() {
@@ -44,7 +50,7 @@ public class CrisLayoutServiceFactoryImpl extends CrisLayoutServiceFactory {
     }
 
     @Override
-    public CrisLayoutBitstreamService getBitstreamService() {
+    public CrisLayoutFieldBitstreamService getBitstreamService() {
         return this.bitstreamService;
     }
 

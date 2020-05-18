@@ -139,6 +139,6 @@
     <bean class="org.dspace.layout.service.impl.CrisLayoutTabServiceImpl"/>
     <bean class="org.dspace.layout.service.impl.CrisLayoutBoxServiceImpl"/>
     <bean class="org.dspace.layout.service.impl.CrisLayoutFieldServiceImpl"/>
-    <bean class="org.dspace.layout.service.impl.CrisLayoutBitstreamServiceImpl"/>
+    <bean class="org.dspace.layout.service.impl.CrisLayoutFieldBitstreamServiceImpl"/>
 </beans>
 
