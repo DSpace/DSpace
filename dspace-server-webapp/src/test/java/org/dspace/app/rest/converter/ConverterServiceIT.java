@@ -67,6 +67,11 @@ public class ConverterServiceIT extends AbstractControllerIntegrationTest {
 
     @Before
     public void setup() {
+        // We're mocking a request here because we've started using the Context in the ConverterService#toRest
+        // method by invoking the DSpacePermissionEvaluator. This will traverse the RestPermissionEvaluatorPlugins
+        // and thus also invoke the AdminRestPermissionEvaluator which will try to retrieve the Context from a
+        // Request. This Request isn't available through tests on itself and thus we have to mock it here to avoid
+        // the PermissionEvaluator from crashing because of this.
         MockHttpServletRequest mockHttpServletRequest = new MockHttpServletRequest();
         mockHttpServletRequest.setAttribute("dspace.context", new Context());
         MockHttpServletResponse mockHttpServletResponse = new MockHttpServletResponse();
