@@ -4,7 +4,7 @@
     <groupId>org.dspace</groupId>
     <artifactId>dspace-parent</artifactId>
     <packaging>pom</packaging>
-    <version>7.0-SNAPSHOT</version>
+    <version>7.0-beta3-SNAPSHOT</version>
     <name>DSpace Parent Project</name>
     <description>
    	DSpace open source software is a turnkey institutional repository application.
@@ -17,34 +17,50 @@
     </organization>
 
     <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.reporting.outputEncoding>${project.build.sourceEncoding}</project.reporting.outputEncoding>
+        <!--=== GENERAL / DSPACE-API DEPENDENCIES ===-->
         <java.version>11</java.version>
-        <pdfbox-version>2.0.15</pdfbox-version>
-        <poi-version>3.17</poi-version>
-        <postgresql.driver.version>42.2.9</postgresql.driver.version>
-        <!-- PIN Jena to 2.x until both RDF and SWORDv2 can be updated to Jena 3. Requires package renaming, see
-             https://jena.apache.org/documentation/migrate_jena2_jena3.html -->
-        <jena.version>2.13.0</jena.version>
-        <jaxb-api.version>2.3.1</jaxb-api.version>
-        <jaxb-runtime.version>2.3.1</jaxb-runtime.version>
-        <javax-annotation.version>1.3.2</javax-annotation.version>
-        <axiom.version>1.2.22</axiom.version>
-        <errorprone.version>2.3.4</errorprone.version>
-        <log4j.version>2.11.2</log4j.version>
-        <slf4j.version>1.7.25</slf4j.version>
-        <!-- NOTE: when updating jackson.version, also sync jackson-databind dependency below -->
-        <jackson.version>2.10.2</jackson.version>
-        <jersey.version>2.28</jersey.version>
+        <spring.version>5.2.5.RELEASE</spring.version>
+        <spring-boot.version>2.2.6.RELEASE</spring-boot.version>
         <hibernate.version>5.4.10.Final</hibernate.version>
-        <hibernate-validator.version>6.0.17.Final</hibernate-validator.version>
+        <hibernate-validator.version>6.0.18.Final</hibernate-validator.version>
+        <postgresql.driver.version>42.2.9</postgresql.driver.version>
         <!-- PIN Solr to 7.3.x until SOLR-12858 is fixed. This bug affects all integration tests that use Solr
              https://issues.apache.org/jira/browse/SOLR-12858 -->
         <solr.client.version>7.3.1</solr.client.version>
-        <spring.version>5.1.9.RELEASE</spring.version>
-        <spring-boot.version>2.1.8.RELEASE</spring-boot.version>
-        <!-- Library for reading JSON documents: https://github.com/json-path/JsonPath -->
+
+        <axiom.version>1.2.22</axiom.version>
+        <errorprone.version>2.3.4</errorprone.version>
+        <!-- NOTE: when updating jackson.version, also sync jackson-databind dependency below -->
+        <jackson.version>2.10.2</jackson.version>
+        <javax-annotation.version>1.3.2</javax-annotation.version>
+        <jaxb-api.version>2.3.1</jaxb-api.version>
+        <jaxb-runtime.version>2.3.1</jaxb-runtime.version>
+        <!-- NOTE: Jetty needed for Handle Server & tests. Should be synced with version provided by solr-cell -->
+        <jetty.version>9.4.8.v20171121</jetty.version>
+        <log4j.version>2.11.2</log4j.version>
+        <pdfbox-version>2.0.15</pdfbox-version>
+        <poi-version>3.17</poi-version>
+        <slf4j.version>1.7.25</slf4j.version>
+
+        <!--=== SERVER WEBAPP DEPENDENCIES ===-->
+        <!-- Spring Data REST HAL Browser (used by Server webapp) -->
+        <spring-hal-browser.version>3.2.6.RELEASE</spring-hal-browser.version>
+        <!-- Library for reading JSON documents: https://github.com/json-path/JsonPath (used by Server webapp) -->
         <json-path.version>2.4.0</json-path.version>
+        <!-- Library for managing JSON Web Tokens (JWT): https://bitbucket.org/connect2id/nimbus-jose-jwt/wiki/Home
+             (used by Server webapp) -->
+        <nimbus-jose-jwt.version>7.9</nimbus-jose-jwt.version>
+
+        <!--=== OTHER MODULE-SPECIFIC DEPENDENCIES ===-->
+        <!-- PIN Jena to 2.x until both RDF and SWORDv2 can be updated to Jena 3. Requires package renaming, see
+             https://jena.apache.org/documentation/migrate_jena2_jena3.html -->
+        <jena.version>2.13.0</jena.version>
+        <!-- Used by (now obsolete) 'dspace-rest' WAR -->
+        <jersey.version>2.30.1</jersey.version>
+
+        <!--=== MAVEN SETTINGS ===-->
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>${project.build.sourceEncoding}</project.reporting.outputEncoding>
         <!-- 'root.basedir' is the path to the root [dspace-src] dir. It must be redefined by each child POM,
                      as it is used to reference the LICENSE_HEADER and *.properties file(s) in that directory. -->
         <root.basedir>${basedir}</root.basedir>
@@ -829,6 +845,23 @@
            <modules>
                <module>dspace-rest</module>
            </modules>
+           <dependencyManagement>
+               <dependencies>
+                   <dependency>
+                       <groupId>org.dspace</groupId>
+                       <artifactId>dspace-rest</artifactId>
+                       <version>7.0-beta3-SNAPSHOT</version>
+                       <type>jar</type>
+                       <classifier>classes</classifier>
+                   </dependency>
+                   <dependency>
+                       <groupId>org.dspace</groupId>
+                       <artifactId>dspace-rest</artifactId>
+                       <version>7.0-beta3-SNAPSHOT</version>
+                       <type>war</type>
+                   </dependency>
+               </dependencies>
+           </dependencyManagement>
        </profile>
 
 
@@ -977,63 +1010,50 @@
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-api</artifactId>
-                <version>7.0-SNAPSHOT</version>
+                <version>7.0-beta3-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.dspace.modules</groupId>
                 <artifactId>additions</artifactId>
-                <version>7.0-SNAPSHOT</version>
+                <version>7.0-beta3-SNAPSHOT</version>
             </dependency>
 
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-sword</artifactId>
-                <version>7.0-SNAPSHOT</version>
+                <version>7.0-beta3-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-swordv2</artifactId>
-                <version>7.0-SNAPSHOT</version>
+                <version>7.0-beta3-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-oai</artifactId>
-                <version>7.0-SNAPSHOT</version>
+                <version>7.0-beta3-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-services</artifactId>
-                <version>7.0-SNAPSHOT</version>
+                <version>7.0-beta3-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-rdf</artifactId>
-                <version>7.0-SNAPSHOT</version>
-            </dependency>
-            <dependency>
-                <groupId>org.dspace</groupId>
-                <artifactId>dspace-rest</artifactId>
-                <version>7.0-SNAPSHOT</version>
-                <type>jar</type>
-                <classifier>classes</classifier>
-            </dependency>
-            <dependency>
-                <groupId>org.dspace</groupId>
-                <artifactId>dspace-rest</artifactId>
-                <version>7.0-SNAPSHOT</version>
-                <type>war</type>
+                <version>7.0-beta3-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-server-webapp</artifactId>
-                <version>7.0-SNAPSHOT</version>
+                <version>7.0-beta3-SNAPSHOT</version>
                 <type>jar</type>
                 <classifier>classes</classifier>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-server-webapp</artifactId>
-                <version>7.0-SNAPSHOT</version>
+                <version>7.0-beta3-SNAPSHOT</version>
                 <type>war</type>
             </dependency>
             <!-- DSpace API Localization Packages -->
@@ -1064,7 +1084,7 @@
             <dependency>
                 <groupId>org.ow2.asm</groupId>
                 <artifactId>asm</artifactId>
-                <version>5.1</version>
+                <version>7.1</version>
             </dependency>
 
             <dependency>
@@ -1168,21 +1188,22 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-starter-test</artifactId>
                 <version>${spring-boot.version}</version>
+                <scope>test</scope>
                 <exclusions>
-                    <!-- Temporary exclusion to avoid dependency conflict with version of org.json:json used by dspace-api.
-                         NOTE: THIS CAN BE REMOVED ONCE WE UPGRADE TO SPRING-BOOT v1.5 (or above), see DS-3802
-                         As of Spring-Boot 1.5, org.json:json is no longer used by spring-boot-starter-test -->
+                    <!-- We are still using JUnit 4, while Spring Boot defaults to JUnit 5 -->
                     <exclusion>
-                        <groupId>org.json</groupId>
-                        <artifactId>json</artifactId>
+                        <groupId>org.junit.jupiter</groupId>
+                        <artifactId>junit-jupiter</artifactId>
                     </exclusion>
-                    <!-- More recent version used for testing below -->
                     <exclusion>
-                        <groupId>com.jayway.jsonpath</groupId>
-                        <artifactId>json-path</artifactId>
+                        <groupId>org.junit.vintage</groupId>
+                        <artifactId>junit-vintage-engine</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.mockito</groupId>
+                        <artifactId>mockito-junit-jupiter</artifactId>
                     </exclusion>
                 </exclusions>
-                <scope>test</scope>
             </dependency>
 
             <dependency>
@@ -1196,19 +1217,6 @@
                 <groupId>org.apache.lucene</groupId>
                 <artifactId>lucene-analyzers-icu</artifactId>
                 <version>${solr.client.version}</version>
-                <scope>test</scope>
-            </dependency>
-
-            <dependency>
-                <groupId>com.jayway.jsonpath</groupId>
-                <artifactId>json-path-assert</artifactId>
-                <version>${json-path.version}</version>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
-                <groupId>com.jayway.jsonpath</groupId>
-                <artifactId>json-path</artifactId>
-                <version>${json-path.version}</version>
                 <scope>test</scope>
             </dependency>
 
@@ -1234,16 +1242,11 @@
                 <artifactId>handle</artifactId>
                 <version>9.1.0.v20190416</version>
             </dependency>
+            <!-- Jetty is needed to run Handle Server (and tests in some modules) -->
             <dependency>
-                <groupId>org.eclipse.jetty.aggregate</groupId>
-                <artifactId>jetty-all</artifactId>
-                <version>8.1.22.v20160922</version>
-                <exclusions>
-                    <exclusion>
-                        <artifactId>javax.servlet</artifactId>
-                        <groupId>org.eclipse.jetty.orbit</groupId>
-                    </exclusion>
-                </exclusions>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-server</artifactId>
+                <version>${jetty.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
@@ -1576,7 +1579,7 @@
             <dependency>
                 <groupId>org.mockito</groupId>
                 <artifactId>mockito-core</artifactId>
-                <version>2.28.2</version>
+                <version>3.1.0</version>
                 <scope>test</scope>
             </dependency>
             <!-- H2 is an in-memory database used for Unit/Integration tests -->

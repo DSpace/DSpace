@@ -161,7 +161,7 @@ public class DiscoveryRestRepository extends AbstractDSpaceRestRepository {
                                           List<SearchFilter> searchFilters) {
 
         Context context = obtainContext();
-        Pageable page = new PageRequest(1, 1);
+        Pageable page = PageRequest.of(1, 1);
         IndexableObject scopeObject = scopeResolver.resolveScope(context, dsoScope);
         DiscoveryConfiguration discoveryConfiguration = searchConfigurationService
             .getDiscoveryConfigurationByNameOrDso(configuration, scopeObject);

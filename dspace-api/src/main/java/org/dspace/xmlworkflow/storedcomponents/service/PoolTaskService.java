@@ -14,6 +14,7 @@ import java.util.List;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
+import org.dspace.eperson.Group;
 import org.dspace.service.DSpaceCRUDService;
 import org.dspace.xmlworkflow.storedcomponents.PoolTask;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
@@ -41,4 +42,13 @@ public interface PoolTaskService extends DSpaceCRUDService<PoolTask> {
         throws SQLException, AuthorizeException;
 
     public List<PoolTask> findByEPerson(Context context, EPerson ePerson) throws SQLException;
+
+    /**
+     * This method will return a list of PoolTask for the given group
+     * @param context   The relevant DSpace context
+     * @param group     The Group to be searched on
+     * @return          The list of PoolTask objects
+     * @throws SQLException If something goes wrong
+     */
+    public List<PoolTask> findByGroup(Context context, Group group) throws SQLException;
 }

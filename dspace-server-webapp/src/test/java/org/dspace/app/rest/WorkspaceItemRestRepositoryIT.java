@@ -839,7 +839,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
 
         // create a workspaceitem without an explicit collection, this will go in the first valid collection for the
         // user: the col1
-        getClient(authToken).perform(post("/api/submission/workspaceitems").param("projection", "full")
+        getClient(authToken).perform(post("/api/submission/workspaceitems")
                 .contentType(org.springframework.http.MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$._embedded.collection.id", is(col1.getID().toString())))
