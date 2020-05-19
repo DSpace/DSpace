@@ -62,7 +62,7 @@ public class EPersonPasswordReplaceOperation<R> extends PatchOperation<R> {
             if (StringUtils.isNotBlank(token)) {
                 patchWithToken(context,eperson, token, operation);
             }
-            if (!AuthorizeUtil.authorizeUpdatePassword(context, eperson.getEmail(), eperson.canLogIn())) {
+            if (!AuthorizeUtil.authorizeUpdatePassword(context, eperson.getEmail())) {
                 throw new DSpaceBadRequestException("Password cannot be updated for the given EPerson with email: " +
                                                         eperson.getEmail());
             }

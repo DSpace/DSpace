@@ -28,6 +28,7 @@ import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.eperson.EPerson;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.services.factory.DSpaceServicesFactory;
 
@@ -555,13 +556,12 @@ public class AuthorizeUtil {
      * with the given email and canLogin property
      * @param context   The relevant DSpace context
      * @param email     The email to be checked
-     * @param canLogin  The boolean canLogin property
      * @return          A boolean indicating if the password can be updated or not
      */
-    public static boolean authorizeUpdatePassword(Context context, String email, boolean canLogin) {
+    public static boolean authorizeUpdatePassword(Context context, String email) {
         try {
-            if (EPersonServiceFactory.getInstance().getEPersonService().findByEmail(context, email) != null
-                && canLogin) {
+            EPerson eperson = EPersonServiceFactory.getInstance().getEPersonService().findByEmail(context, email);
+            if (eperson != null && eperson.canLogIn()) {
                 return true;
             }
         } catch (SQLException e) {
