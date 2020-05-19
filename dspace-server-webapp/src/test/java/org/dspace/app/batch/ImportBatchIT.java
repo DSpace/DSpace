@@ -144,6 +144,7 @@ public class ImportBatchIT extends AbstractControllerIntegrationTest {
         }
         context.restoreAuthSystemState();
         impRecordService.cleanupTables(context);
+        context.commit();
         super.destroy();
     }
     /***
