@@ -14,6 +14,9 @@ import org.dspace.app.rest.model.ScriptRest;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
+/**
+ * This class will handle Permissions for the {@link ScriptRest} object and its calls
+ */
 @Component
 public class ScriptRestPermissionEvaluatorPlugin extends RestObjectPermissionEvaluatorPlugin {
     @Override

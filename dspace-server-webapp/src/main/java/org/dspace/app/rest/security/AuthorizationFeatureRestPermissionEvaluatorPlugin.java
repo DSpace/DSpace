@@ -15,8 +15,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
 /**
- * This class determines that any AuthorizationFeatureRest object can be viewed as it'll be a subresource of
- * AuthorizationRest
+ * This class will handle calls made to AuthorizationRest endpoints. It will return true because access can be granted
+ * anytime it's linked from another resource.
  */
 @Component
 public class AuthorizationFeatureRestPermissionEvaluatorPlugin extends RestObjectPermissionEvaluatorPlugin {
