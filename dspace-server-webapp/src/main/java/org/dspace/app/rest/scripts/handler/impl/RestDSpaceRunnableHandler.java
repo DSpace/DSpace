@@ -179,9 +179,9 @@ public class RestDSpaceRunnableHandler implements DSpaceRunnableHandler {
     /**
      * This method will return the process created by this handler
      * @return The Process database object created by this handler
+     * @param context
      */
-    public Process getProcess() {
-        Context context = new Context();
+    public Process getProcess(Context context) {
         try {
             return processService.find(context, processId);
         } catch (SQLException e) {
