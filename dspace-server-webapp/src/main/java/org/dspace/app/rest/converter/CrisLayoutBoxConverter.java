@@ -13,7 +13,9 @@ import org.dspace.layout.CrisLayoutBox;
 import org.springframework.stereotype.Component;
 
 /**
- * @author Danilo Di Nuzzo (danilo dot dinuzzo at 4science dot it)
+ * This is the converter from Entity CrisLayoutBox to the REST data model
+ * 
+ * @author Danilo Di Nuzzo (danilo.dinuzzo at 4science.it)
  *
  */
 @Component

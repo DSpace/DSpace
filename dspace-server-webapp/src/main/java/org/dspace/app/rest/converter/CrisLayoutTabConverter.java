@@ -20,7 +20,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
- * @author Danilo Di Nuzzo (danilo dot dinuzzo at 4science dot it)
+ * This is the converter from Entity CrisLayoutTab to the REST data model
+ * 
+ * @author Danilo Di Nuzzo (danilo.dinuzzo at 4science.it)
  *
  */
 @Component
