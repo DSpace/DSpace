@@ -95,7 +95,7 @@ public class RegistrationRestController {
         }
         EPerson eperson = ePersonService.findByEmail(context, registrationRest.getEmail());
         if (eperson != null) {
-            if (!AuthorizeUtil.authorizeUpdatePassword(context, eperson.getEmail(), eperson.canLogIn())) {
+            if (!AuthorizeUtil.authorizeUpdatePassword(context, eperson.getEmail())) {
                 throw new DSpaceBadRequestException("Password cannot be updated for the given EPerson with email: " +
                                                         eperson.getEmail());
             }
