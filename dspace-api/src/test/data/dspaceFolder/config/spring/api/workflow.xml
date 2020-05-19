@@ -43,7 +43,7 @@
         </property>
     </bean>
 
-    <bean name="reviewer" class="org.dspace.xmlworkflow.Role">
+    <bean id="reviewer" class="org.dspace.xmlworkflow.Role">
         <property name="scope" value="#{ T(org.dspace.xmlworkflow.Role.Scope).COLLECTION}"/>
         <property name="name" value="Reviewer"/>
         <property name="description"
@@ -66,7 +66,7 @@
         </property>
     </bean>
 
-    <bean name="editor" class="org.dspace.xmlworkflow.Role">
+    <bean id="editor" class="org.dspace.xmlworkflow.Role">
         <property name="scope" value="#{ T(org.dspace.xmlworkflow.Role.Scope).COLLECTION}"/>
         <property name="name" value="Editor"/>
         <property name="description"
@@ -83,7 +83,7 @@
         </property>
     </bean>
 
-    <bean name="finaleditor" class="org.dspace.xmlworkflow.Role">
+    <bean id="finaleditor" class="org.dspace.xmlworkflow.Role">
         <property name="scope" value="#{ T(org.dspace.xmlworkflow.Role.Scope).COLLECTION}"/>
         <property name="name" value="Final Editor"/>
         <property name="description"
@@ -118,14 +118,14 @@
         </property>
     </bean>
 
-    <bean name="reviewmanagers" class="org.dspace.xmlworkflow.Role">
+    <bean id="reviewmanagers" class="org.dspace.xmlworkflow.Role">
         <property name="scope" value="#{ T(org.dspace.xmlworkflow.Role.Scope).REPOSITORY}"/>
         <property name="name" value="ReviewManagers"/>
     </bean>
 
     <bean name="singleUserReviewStep" class="org.dspace.xmlworkflow.state.Step">
         <property name="userSelectionMethod" ref="autoassignAction"/>
-        <property name="role" ref="scoreAssignedReviewer">
+        <property name="role" ref="scoreassignedreviewer">
         </property>
         <property name="actions">
             <list>
@@ -140,7 +140,7 @@
         </property>
     </bean>
 
-    <bean name="scoreAssignedReviewer" class="org.dspace.xmlworkflow.Role">
+    <bean id="scoreassignedreviewer" class="org.dspace.xmlworkflow.Role">
         <property name="scope" value="#{ T(org.dspace.xmlworkflow.Role.Scope).ITEM}"/>
         <property name="name" value="Reviewer"/>
     </bean>
@@ -159,7 +159,7 @@
 
     <bean name="scoreReviewStep" class="org.dspace.xmlworkflow.state.Step">
         <property name="userSelectionMethod" ref="claimaction"/>
-        <property name="role" ref="scoreReviewers"/>
+        <property name="role" ref="scorereviewers"/>
         <property name="outcomes">
             <util:map>
                 <entry key="#{ T(org.dspace.xmlworkflow.state.actions.ActionResult).OUTCOME_COMPLETE}"
@@ -183,7 +183,7 @@
         </property>
     </bean>
 
-    <bean name="scoreReviewers" class="org.dspace.xmlworkflow.Role">
+    <bean id="scorereviewers" class="org.dspace.xmlworkflow.Role">
         <property name="scope" value="#{ T(org.dspace.xmlworkflow.Role.Scope).COLLECTION}"/>
         <property name="name" value="ScoreReviewers"/>
     </bean>

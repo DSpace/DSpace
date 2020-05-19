@@ -22,6 +22,7 @@ import org.dspace.app.rest.model.hateoas.DSpaceResource;
 import org.dspace.app.rest.utils.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
+import org.springframework.hateoas.IanaLinkRelations;
 import org.springframework.hateoas.Link;
 import org.springframework.stereotype.Component;
 
@@ -80,7 +81,7 @@ public class DSpaceResourceHalLinkFactory extends HalLinkFactory<DSpaceResource,
             e.printStackTrace();
         }
 
-        halResource.add(utils.linkToSingleResource(data, Link.REL_SELF));
+        halResource.add(utils.linkToSingleResource(data, IanaLinkRelations.SELF.value()));
     }
 
     protected Class<RestResourceController> getControllerClass() {

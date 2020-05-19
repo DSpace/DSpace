@@ -26,7 +26,7 @@ import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.webmvc.ControllerUtils;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
-import org.springframework.hateoas.ResourceSupport;
+import org.springframework.hateoas.RepresentationModel;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -89,8 +89,9 @@ public class CommunityLogoController {
     @PreAuthorize("hasPermission(#uuid, 'COMMUNITY', 'WRITE')")
     @RequestMapping(method = RequestMethod.POST,
             headers = "content-type=multipart/form-data")
-    public ResponseEntity<ResourceSupport> createLogo(HttpServletRequest request, @PathVariable UUID uuid,
-                                      @RequestParam(value = "file", required = false) MultipartFile uploadfile)
+    public ResponseEntity<RepresentationModel<?>> createLogo(HttpServletRequest request, @PathVariable UUID uuid,
+                                                             @RequestParam(value = "file", required = false)
+                                                                 MultipartFile uploadfile)
             throws SQLException, IOException, AuthorizeException {
 
         if (uploadfile == null) {
