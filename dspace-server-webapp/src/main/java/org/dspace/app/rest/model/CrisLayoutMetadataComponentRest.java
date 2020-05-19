@@ -197,12 +197,14 @@ public class CrisLayoutMetadataComponentRest extends BaseObjectRest<String> {
         public void setBundle(String bundle) {
             this.bundle = bundle;
         }
+        @JsonProperty( value = "metadata-field" )
         public String getMetadataField() {
             return metadataField;
         }
         public void setMetadataField(String metadataField) {
             this.metadataField = metadataField;
         }
+        @JsonProperty( value = "metadata-value" )
         public String getMetadataValue() {
             return metadataValue;
         }
