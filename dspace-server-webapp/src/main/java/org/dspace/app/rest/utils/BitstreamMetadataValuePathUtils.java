@@ -44,7 +44,7 @@ public class BitstreamMetadataValuePathUtils {
                                                                     + UploadStep.UPLOAD_STEP_METADATA_SECTION);
             }
         } else {
-            throw new UnprocessableEntityException("The path " + split.toString() + " cannot be patched ");
+            throw new UnprocessableEntityException("The path " + absolutePath + " cannot be patched ");
         }
     }
 }
