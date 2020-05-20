@@ -134,24 +134,22 @@
             return string.charAt(0).toUpperCase() + string.slice(1);
         }
 
-        $("#login-form").submit(function() {
+        $("#login-form").submit(function(event) {
+            event.preventDefault();
             $.ajax({
                 //This depends on this file to be called login.html
                 url : window.location.href.replace("login.html", "") + 'api/authn/login',
                 type : 'POST',
                 async : false,
-                data : 'password='+encodeURIComponent($("#password").val())+'&user='+encodeURIComponent($("#username").val()),
-                headers : {
-                    "Content-Type" : 'application/x-www-form-urlencoded',
-                    "Accept:" : '*/*'
+                data: {
+                    user: $("#username").val(),
+                    password: $("#password").val()
                 },
                 success : successHandler,
                 error : function() {
                     toastr.error('The credentials you entered are invalid. Please try again.', 'Login Failed');
                 }
             });
-
-            return false;
         });
     });
 </script>
