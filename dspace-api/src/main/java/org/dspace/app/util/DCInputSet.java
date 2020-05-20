@@ -108,6 +108,7 @@ public class DCInputSet {
         for (int i = 0; i < inputs.length; i++) {
             for (int j = 0; j < inputs[i].length; j++) {
                 DCInput field = inputs[i][j];
+                // If this is a "qualdrop_value" field, then the full field name is the field + dropdown qualifier
                 if (field.getInputType().equals("qualdrop_value")) {
                     List<String> pairs = field.getPairs();
                     for (int k = 0; k < pairs.size(); k += 2) {
