@@ -40,6 +40,7 @@ public class RestResourceControllerIT extends AbstractControllerIntegrationTest 
         // 1. A community-collection structure with one parent community with sub-community and one collection.
         parentCommunity = CommunityBuilder.createCommunity(context).withName("Parent Community").build();
 
+        context.restoreAuthSystemState();
         // When we call the root endpoint
         getClient().perform(get("/api/core/communities/" + parentCommunity.getID().toString() + "/undefined"))
                 // The status has to be 404 Not Found
@@ -55,6 +56,7 @@ public class RestResourceControllerIT extends AbstractControllerIntegrationTest 
         // 1. A community-collection structure with one parent community with sub-community and one collection.
         parentCommunity = CommunityBuilder.createCommunity(context).withName("Parent Community").build();
 
+        context.restoreAuthSystemState();
         // When we call the root endpoint
         getClient().perform(get("/api/core/communities/" + parentCommunity.getID().toString() + "/self"))
                 // The status has to be 404 Not Found

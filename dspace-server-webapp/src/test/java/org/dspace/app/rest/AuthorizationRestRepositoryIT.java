@@ -75,7 +75,6 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
 
     @Autowired
     private Utils utils;
-
     private SiteService siteService;
 
     /** 
@@ -1329,5 +1328,4 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
         return (epersonUuid != null ? epersonUuid + "_" : "") + featureName + "_" + type + "_"
                 + id.toString();
     }
-
 }

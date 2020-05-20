@@ -95,6 +95,8 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
                                          .build();
         }
 
+        context.restoreAuthSystemState();
+
         String token = getAuthToken(admin.getEmail(), password);
 
         getClient(token).perform(get("/api/core/bitstreams/")
@@ -152,6 +154,8 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
                                          .withMimeType("text/plain")
                                          .build();
         }
+
+        context.restoreAuthSystemState();
 
         String token = getAuthToken(admin.getEmail(), password);
 
@@ -298,6 +302,8 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
                                          .build();
         }
 
+        context.restoreAuthSystemState();
+
         // When full projection is requested, response should include expected properties, links, and embeds.
         getClient().perform(get("/api/core/bitstreams/" + bitstream.getID())
                    .param("projection", "full"))
@@ -363,6 +369,8 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
                                          .build();
         }
 
+        context.restoreAuthSystemState();
+
         getClient().perform(get("/api/core/bitstreams/" + bitstream.getID() + "/format"))
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
@@ -391,6 +399,8 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
         Collection col = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection")
                                           .withLogo("logo_collection").build();
 
+        context.restoreAuthSystemState();
+
         getClient().perform(get("/api/core/bitstreams/" + parentCommunity.getLogo().getID()))
                    .andExpect(status().isOk());
 
@@ -412,6 +422,8 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
         // 2. A collection with a logo
         Collection col = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection")
                                           .withLogo("logo_collection").build();
+
+        context.restoreAuthSystemState();
 
         getClient().perform(get("/api/core/bitstreams/" + parentCommunity.getLogo().getID() + "/content"))
                    .andExpect(status().isOk()).andExpect(content().string("logo_community"));
@@ -435,6 +447,8 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
                                            .withName("Sub Community")
                                            .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+
+        context.restoreAuthSystemState();
 
         String token = getAuthToken(admin.getEmail(), password);
 
@@ -479,6 +493,8 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
                                         .withMimeType("text/plain")
                                         .build();
         }
+
+        context.restoreAuthSystemState();
 
         String token = getAuthToken(admin.getEmail(), password);
 
@@ -527,6 +543,8 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
                                         .build();
         }
 
+        context.restoreAuthSystemState();
+
         String token = getAuthToken(eperson.getEmail(), password);
 
         // Delete using an unauthorized user
@@ -574,6 +592,8 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
                                         .build();
         }
 
+        context.restoreAuthSystemState();
+
         // Delete as anonymous
         getClient().perform(delete("/api/core/bitstreams/" + bitstream.getID()))
                 .andExpect(status().isUnauthorized());
@@ -596,6 +616,8 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
         // 2. A collection with a logo
         Collection col = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection")
                                           .withLogo("logo_collection").build();
+
+        context.restoreAuthSystemState();
 
         String token = getAuthToken(admin.getEmail(), password);
 
@@ -655,6 +677,8 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
                     .withMimeType("text/plain")
                     .build();
         }
+
+        context.restoreAuthSystemState();
 
         String token = getAuthToken(admin.getEmail(), password);
 
@@ -727,6 +751,8 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
                                         .build();
         }
 
+        context.restoreAuthSystemState();
+
         // When full projection is requested, response should include expected properties, links, and embeds.
         getClient().perform(get("/api/core/bitstreams/" + bitstream.getID())
                                     .param("projection", "full"))
@@ -777,6 +803,8 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
                                         .withMimeType("text/plain")
                                         .build();
         }
+
+        context.restoreAuthSystemState();
 
         String token = getAuthToken(admin.getEmail(), password);
 
@@ -837,6 +865,8 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
                              .withAction(WRITE)
                              .withDspaceObject(col1)
                              .build();
+
+        context.restoreAuthSystemState();
 
         String token = getAuthToken(eperson.getEmail(), password);
 
