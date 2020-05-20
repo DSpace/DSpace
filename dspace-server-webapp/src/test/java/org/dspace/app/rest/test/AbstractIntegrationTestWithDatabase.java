@@ -16,6 +16,8 @@ import org.apache.logging.log4j.Logger;
 import org.dspace.app.launcher.ScriptLauncher;
 import org.dspace.app.rest.builder.AbstractBuilder;
 import org.dspace.app.scripts.handler.impl.TestDSpaceRunnableHandler;
+import org.dspace.authority.AuthoritySearchService;
+import org.dspace.authority.MockAuthoritySolrServiceImpl;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Community;
 import org.dspace.core.Context;
@@ -28,6 +30,7 @@ import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.eperson.service.GroupService;
 import org.dspace.services.factory.DSpaceServicesFactory;
+import org.dspace.statistics.MockSolrLoggerServiceImpl;
 import org.dspace.storage.rdbms.DatabaseUtils;
 import org.jdom.Document;
 import org.junit.After;
@@ -184,6 +187,15 @@ public class AbstractIntegrationTestWithDatabase extends AbstractDSpaceIntegrati
                     .getServiceByName(SolrSearchCore.class.getName(), MockSolrSearchCore.class);
             searchService.reset();
 
+            MockSolrLoggerServiceImpl statisticsService = DSpaceServicesFactory.getInstance()
+                    .getServiceManager()
+                    .getServiceByName("solrLoggerService", MockSolrLoggerServiceImpl.class);
+            statisticsService.reset();
+
+            MockAuthoritySolrServiceImpl authorityService = DSpaceServicesFactory.getInstance()
+                    .getServiceManager()
+                    .getServiceByName(AuthoritySearchService.class.getName(), MockAuthoritySolrServiceImpl.class);
+            authorityService.reset();
             // Reload our ConfigurationService (to reset configs to defaults again)
             DSpaceServicesFactory.getInstance().getConfigurationService().reloadConfig();
 

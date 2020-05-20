@@ -167,6 +167,8 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
                                       .withSubject("ExtraEntry")
                                       .build();
 
+        context.restoreAuthSystemState();
+
         //** WHEN **
         //An anonymous user browses this endpoint to find which subjects are currently in the repository
         getClient().perform(get("/api/discover/browses/subject/entries")
@@ -250,6 +252,8 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
                                       .withAuthor("Smith, Maria").withAuthor("Doe, Jane")
                                       .withSubject("AnotherTest")
                                       .build();
+
+        context.restoreAuthSystemState();
 
         //** WHEN **
         //An anonymous user browses the items that correspond with the ExtraEntry subject query
@@ -508,6 +512,8 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
                                 .withIssueDate("2016-01-12")
                                 .build();
 
+        context.restoreAuthSystemState();
+
         //** WHEN **
         //An anonymous user browses the items in the Browse by date issued endpoint
         //sorted ascending by tile with a page size of 5
@@ -631,6 +637,8 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
                                 .withIssueDate("2029")
                                 .withSubject("Science Fiction")
                                 .build();
+
+        context.restoreAuthSystemState();
 
          // ---- BROWSES BY ENTRIES ----
 
@@ -772,6 +780,9 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
                                 .withIssueDate("2029")
                                 .withSubject("Science Fiction")
                                 .build();
+
+        context.restoreAuthSystemState();
+
         // ---- BROWSES BY ITEM ----
         //** WHEN **
         //An anonymous user browses the items in the Browse by date issued endpoint
@@ -919,6 +930,8 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
                                 .withIssueDate("2018-01-01")
                                 .withSubject("Astronomy")
                                 .build();
+
+        context.restoreAuthSystemState();
 
         // ---- BROWSES BY ITEM ----
 

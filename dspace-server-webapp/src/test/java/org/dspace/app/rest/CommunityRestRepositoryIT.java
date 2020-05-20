@@ -357,6 +357,7 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
                                            .withName("Sub Community")
                                            .build();
 
+        context.restoreAuthSystemState();
 
         getClient().perform(get("/api/core/communities").param("size", "2")
                                                         .param("embed", CommunityMatcher.getFullEmbedsParameters()))
@@ -429,6 +430,8 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
         context.turnOffAuthorisationSystem();
         parentCommunity = CommunityBuilder.createCommunity(context).withName("test").build();
 
+        context.restoreAuthSystemState();
+
         getClient().perform(get("/api/core/communities")
                       .param("embed", CommunityMatcher.getFullEmbedsParameters()))
                 .andExpect(status().isOk())
@@ -462,6 +465,8 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
         Community community3 = CommunityBuilder.createCommunity(context)
             .withName(orderedTitles.get(2))
             .build();
+
+        context.restoreAuthSystemState();
 
         ObjectMapper mapper = new ObjectMapper();
         MvcResult result = getClient().perform(get("/api/core/communities")).andReturn();
@@ -1329,6 +1334,8 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
                                            .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
 
+        context.restoreAuthSystemState();
+
         getClient().perform(get("/api/core/communities/" + parentCommunity.getID().toString())
                       .param("embed", CommunityMatcher.getFullEmbedsParameters()))
                    .andExpect(status().isOk())
@@ -1348,6 +1355,8 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
         ;
 
         String token = getAuthToken(admin.getEmail(), password);
+
+        context.turnOffAuthorisationSystem();
 
         ObjectMapper mapper = new ObjectMapper();
 
@@ -1551,6 +1560,8 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
                                            .withName("Sub Community")
                                            .build();
 
+        context.restoreAuthSystemState();
+
         getClient().perform(get("/api/core/communities/" + parentCommunity.getID().toString())
                       .param("embed", CommunityMatcher.getFullEmbedsParameters()))
                    .andExpect(status().isOk())
@@ -1568,6 +1579,8 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
                    )))
                    .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/core/communities")))
         ;
+
+        context.turnOffAuthorisationSystem();
 
         ObjectMapper mapper = new ObjectMapper();
 

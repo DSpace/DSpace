@@ -215,9 +215,9 @@ public class BundleRestRepositoryIT extends AbstractControllerIntegrationTest {
         ObjectMapper mapper = new ObjectMapper();
         BundleRest bundleRest = new BundleRest();
         bundleRest.setName("Create Bundle Without Metadata");
-
+        UUID bundleUuid = null;
         String token = getAuthToken(admin.getEmail(), password);
-
+        try {
         MvcResult mvcResult = getClient(token).perform(post("/api/core/items/" + item.getID() + "/bundles")
                                                                .content(mapper.writeValueAsBytes(bundleRest))
                                                                .contentType(contentType))
@@ -226,7 +226,7 @@ public class BundleRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         String content = mvcResult.getResponse().getContentAsString();
         Map<String, Object> map = mapper.readValue(content, Map.class);
-        UUID bundleUuid = UUID.fromString(String.valueOf(map.get("uuid")));
+        bundleUuid = UUID.fromString(String.valueOf(map.get("uuid")));
 
 
         getClient().perform(get("/api/core/bundles/" + bundleUuid)
@@ -236,12 +236,16 @@ public class BundleRestRepositoryIT extends AbstractControllerIntegrationTest {
                    .andExpect(jsonPath("$", BundleMatcher.matchBundle(
                            "Create Bundle Without Metadata",
                            bundleUuid, null, Constants.BUNDLE, new ArrayList<>())));
+        } finally {
+            BundleBuilder.deleteBundle(bundleUuid);
+        }
     }
 
     @Test
     public void createBundleWithMetadata() throws Exception {
         ObjectMapper mapper = new ObjectMapper();
-
+        UUID bundleUuid = null;
+        try {
         BundleRest bundleRest = new BundleRest();
         bundleRest.setName("Create Bundle Without Metadata");
         bundleRest.setMetadata(new MetadataRest()
@@ -261,7 +265,7 @@ public class BundleRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         String content = mvcResult.getResponse().getContentAsString();
         Map<String, Object> map = mapper.readValue(content, Map.class);
-        UUID bundleUuid = UUID.fromString(String.valueOf(map.get("uuid")));
+        bundleUuid = UUID.fromString(String.valueOf(map.get("uuid")));
 
 
         getClient().perform(get("/api/core/bundles/" + bundleUuid)
@@ -277,6 +281,9 @@ public class BundleRestRepositoryIT extends AbstractControllerIntegrationTest {
                                                                  "A description"),
                                    MetadataMatcher.matchMetadata("dc.relation",
                                                                  "A relation"))))));
+        } finally {
+            BundleBuilder.deleteBundle(bundleUuid);
+        }
     }
 
     @Test
@@ -332,8 +339,8 @@ public class BundleRestRepositoryIT extends AbstractControllerIntegrationTest {
                                                   .withAction(Constants.ADD)
                                                   .withDspaceObject(item).build();
         context.restoreAuthSystemState();
-
-
+        UUID bundleUuid = null;
+        try {
         BundleRest bundleRest = new BundleRest();
         bundleRest.setName("Create Bundle Without Metadata");
 
@@ -349,7 +356,7 @@ public class BundleRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         String content = mvcResult.getResponse().getContentAsString();
         Map<String, Object> map = mapper.readValue(content, Map.class);
-        UUID bundleUuid = UUID.fromString(String.valueOf(map.get("uuid")));
+        bundleUuid = UUID.fromString(String.valueOf(map.get("uuid")));
 
 
         getClient().perform(get("/api/core/bundles/" + bundleUuid)
@@ -359,7 +366,9 @@ public class BundleRestRepositoryIT extends AbstractControllerIntegrationTest {
                    .andExpect(jsonPath("$", BundleMatcher.matchBundle(
                            "Create Bundle Without Metadata",
                            bundleUuid, null, Constants.BUNDLE, new ArrayList<>())));
-
+        } finally {
+            BundleBuilder.deleteBundle(bundleUuid);
+        }
     }
 
     @Test
