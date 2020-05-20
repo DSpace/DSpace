@@ -115,9 +115,9 @@
         <!--Step will be to select a Creative Commons License -->
         <!-- Uncomment this step to allow the user to select a Creative Commons 
             license -->
-         <!-- <step id="cclicense"> <heading>submit.progressbar.CClicense</heading>
+         <step id="cclicense"> <heading>submit.progressbar.CClicense</heading>
             <processing-class>org.dspace.app.rest.submit.step.CCLicenseStep</processing-class>
-	       <type>cclicense</type> </step> -->
+	       <type>cclicense</type> </step>
 
         <!--Step will be to Check for potential duplicate -->
         <!-- <step id="detect-duplicate"> <heading>submit.progressbar.detect.duplicate</heading> 
@@ -203,9 +203,7 @@
             <!-- <step id="upload-with-embargo"/> -->
             <!-- <step id="detect-duplicate"/> -->
 
-            <!--Step will be to select a Creative Commons License -->
-            <!-- Uncomment this step to allow the user to select a Creative Commons -->
-            <!-- <step id="cclicense"/> -->
+            <step id="cclicense"/>
 
             <!--Step will be to Sign off on the License -->
             <step id="license"/>
