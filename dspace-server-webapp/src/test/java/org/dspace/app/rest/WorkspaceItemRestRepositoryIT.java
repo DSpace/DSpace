@@ -3632,4 +3632,44 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                             .andExpect(status().isUnprocessableEntity());
     }
 
+    @Test
+    public void patchDeleteSectionTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1)
+                                           .withName("Collection 1")
+                                           .build();
+        WorkspaceItem witem = WorkspaceItemBuilder.createWorkspaceItem(context, col1)
+                             .withTitle("Test WorkspaceItem")
+                             .withIssueDate("2020-01-21")
+                             .withSubject("Subject 1")
+                             .withSubject("Subject 2")
+                             .build();
+
+        context.restoreAuthSystemState();
+
+        List<Operation> operations = new ArrayList<Operation>();
+        operations.add(new RemoveOperation("/sections/traditionalpagetwo"));
+        String patchBody = getPatchContent(operations);
+
+        String authToken = getAuthToken(eperson.getEmail(), password);
+
+        getClient(authToken).perform(patch("/api/submission/workspaceitems/" + witem.getID())
+                 .content(patchBody)
+                 .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                 .andExpect(status().isOk())
+                 .andExpect(jsonPath("$.sections.traditionalpagetwo['dc.subject']").doesNotExist())
+                 .andExpect(jsonPath("$.sections.traditionalpagetwo['dc.description.abstract']").doesNotExist());
+
+        // verify that the patch changes have been persisted
+        getClient(authToken).perform(get("/api/submission/workspaceitems/" + witem.getID()))
+                 .andExpect(status().isOk())
+                 .andExpect(jsonPath("$.sections.traditionalpagetwo['dc.subject']").doesNotExist())
+                 .andExpect(jsonPath("$.sections.traditionalpagetwo['dc.description.abstract']").doesNotExist());
+    }
 }
