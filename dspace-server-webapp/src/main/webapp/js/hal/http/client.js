@@ -74,15 +74,17 @@ HAL.Http.Client.prototype.get = function(url) {
                 jqxhr: jqXHR,
                 headers: jqXHR.getAllResponseHeaders()
             });
-        }
-    }).error(function (response) {
-        self.vent.trigger('fail-response', {jqxhr: jqxhr});
-        var contentTypeResponseHeader = jqxhr.getResponseHeader("content-type");
-        if (contentTypeResponseHeader != undefined
-                && !contentTypeResponseHeader.startsWith("application/hal")
-                && !contentTypeResponseHeader.startsWith("application/json")) {
-            downloadFile(url);
-        }});
+        },
+        error: function() {
+            self.vent.trigger('fail-response', { jqxhr: jqxhr });
+                var contentTypeResponseHeader = jqxhr.getResponseHeader("content-type");
+                if (contentTypeResponseHeader != undefined
+                        && !contentTypeResponseHeader.startsWith("application/hal")
+                        && !contentTypeResponseHeader.startsWith("application/json")) {
+                    downloadFile(url);
+                }
+            }
+        });
 };
 
 HAL.Http.Client.prototype.request = function(opts) {
