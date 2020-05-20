@@ -108,4 +108,5 @@
         </property>
     </bean>
 
+    <bean class="org.dspace.app.rest.utils.BitstreamMetadataValuePathUtils"/>
 </beans>
