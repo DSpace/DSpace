@@ -138,6 +138,8 @@ public class CommunityAdminGroupRestControllerIT extends AbstractControllerInteg
                         .andDo(result -> idRef
                             .set(UUID.fromString(read(result.getResponse().getContentAsString(), "$.id")))
                         );
+        // no needs to explicitly cleanup the group created as the community comes
+        // from a CommunityBuilder that will cleanup also related groups
         Group adminGroup = groupService.find(context, idRef.get());
         getClient(token).perform(get("/api/eperson/groups/" + adminGroup.getID()))
                         .andExpect(status().isOk())
@@ -167,6 +169,8 @@ public class CommunityAdminGroupRestControllerIT extends AbstractControllerInteg
                         .andDo(result -> idRef
                             .set(UUID.fromString(read(result.getResponse().getContentAsString(), "$.id")))
                         );
+        // no needs to explicitly cleanup the group created as the community comes
+        // from a CommunityBuilder that will cleanup also related groups
         Group adminGroup = groupService.find(context, idRef.get());
         getClient(token).perform(get("/api/eperson/groups/" + adminGroup.getID()))
                         .andExpect(status().isOk())
@@ -190,7 +194,6 @@ public class CommunityAdminGroupRestControllerIT extends AbstractControllerInteg
 
         groupRest.setMetadata(metadataRest);
 
-        AtomicReference<UUID> idRef = new AtomicReference<>();
 
         String token = getAuthToken(admin.getEmail(), password);
         getClient(token).perform(post("/api/core/communities/" + parentCommunity.getID() + "/adminGroup")
@@ -227,6 +230,8 @@ public class CommunityAdminGroupRestControllerIT extends AbstractControllerInteg
                         .andDo(result -> idRef
                             .set(UUID.fromString(read(result.getResponse().getContentAsString(), "$.id")))
                         );
+        // no needs to explicitly cleanup the group created as the community comes
+        // from a CommunityBuilder that will cleanup also related groups
         Group adminGroup = groupService.find(context, idRef.get());
         getClient(token).perform(get("/api/eperson/groups/" + adminGroup.getID()))
                         .andExpect(status().isOk())

@@ -42,7 +42,16 @@ public class ProcessBuilder extends AbstractBuilder<Process, ProcessService> {
     }
 
     public void cleanup() throws Exception {
-        delete(process);
+        try (Context c = new Context()) {
+            c.turnOffAuthorisationSystem();
+            // Ensure object and any related objects are reloaded before checking to see what needs cleanup
+            process = c.reloadEntity(process);
+            if (process != null) {
+                delete(c, process);
+            }
+            c.complete();
+            indexingService.commit();
+        }
     }
 
     public Process build() {
@@ -56,21 +65,14 @@ public class ProcessBuilder extends AbstractBuilder<Process, ProcessService> {
         return process;
     }
 
-    public void delete(Process dso) throws Exception {
-        try (Context c = new Context()) {
-            c.turnOffAuthorisationSystem();
-            Process attachedDso = c.reloadEntity(dso);
-            if (attachedDso != null) {
-                getService().delete(c, attachedDso);
-            }
-            c.complete();
-        }
-
-        indexingService.commit();
-    }
-
-
     protected ProcessService getService() {
         return processService;
+    }
+
+    @Override
+    public void delete(Context c, Process dso) throws Exception {
+        if (dso != null) {
+            getService().delete(c, dso);
+        }
     }
 }

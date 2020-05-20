@@ -7,6 +7,7 @@
  */
 package org.dspace.app.rest;
 
+import static com.jayway.jsonpath.JsonPath.read;
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadata;
 import static org.hamcrest.Matchers.allOf;
@@ -26,6 +27,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicReference;
 import javax.ws.rs.core.MediaType;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -58,7 +60,6 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     @Test
     public void createTest() throws Exception {
-        context.turnOffAuthorisationSystem();
         // we should check how to get it from Spring
         ObjectMapper mapper = new ObjectMapper();
         EPersonRest data = new EPersonRest();
@@ -77,9 +78,12 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
         dataFull.setCanLogIn(true);
         dataFull.setMetadata(metadataRest);
 
-        context.restoreAuthSystemState();
+        AtomicReference<UUID> idRef = new AtomicReference<UUID>();
+        AtomicReference<UUID> idRefNoEmbeds = new AtomicReference<UUID>();
 
         String authToken = getAuthToken(admin.getEmail(), password);
+
+        try {
         getClient(authToken).perform(post("/api/eperson/epersons")
                                         .content(mapper.writeValueAsBytes(data))
                                         .contentType(contentType)
@@ -99,15 +103,23 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                                hasJsonPath("$.metadata", Matchers.allOf(
                                        matchMetadata("eperson.firstname", "John"),
                                        matchMetadata("eperson.lastname", "Doe")
-                               )))));
+                               )))))
+                            .andDo(result -> idRef
+                                    .set(UUID.fromString(read(result.getResponse().getContentAsString(), "$.id"))));
 
         getClient(authToken).perform(post("/api/eperson/epersons")
                 .content(mapper.writeValueAsBytes(dataFull))
                 .contentType(contentType))
                 .andExpect(status().isCreated())
                 .andExpect(content().contentType(contentType))
-                .andExpect(jsonPath("$", HalMatcher.matchNoEmbeds()));
-        // TODO cleanup the context!!!
+                .andExpect(jsonPath("$", HalMatcher.matchNoEmbeds()))
+                .andDo(result -> idRefNoEmbeds
+                        .set(UUID.fromString(read(result.getResponse().getContentAsString(), "$.id"))));;
+
+        } finally {
+            EPersonBuilder.deleteEPerson(idRef.get());
+            EPersonBuilder.deleteEPerson(idRefNoEmbeds.get());
+        }
     }
 
     @Test
@@ -1523,9 +1535,10 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                                         .withEmail("Johndoe@example.com")
                                         .build();
 
+        context.restoreAuthSystemState();
+
         String token = getAuthToken(admin.getEmail(), password);
 
-        context.restoreAuthSystemState();
 
         List<Operation> ops = new ArrayList<Operation>();
         ReplaceOperation replaceOperation0 = new ReplaceOperation("/canLogin", true);

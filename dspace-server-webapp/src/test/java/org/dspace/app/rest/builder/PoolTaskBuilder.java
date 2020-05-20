@@ -86,42 +86,37 @@ public class PoolTaskBuilder extends AbstractBuilder<PoolTask, PoolTaskService> 
     }
 
     @Override
-    public void delete(PoolTask poolTask) throws Exception {
-        try (Context c = new Context()) {
-            c.turnOffAuthorisationSystem();
-            PoolTask attachedPoolTask = c.reloadEntity(poolTask);
-            if (attachedPoolTask != null) {
-                // to delete a pooltask keeping the system in a consistent state you need to delete the underline
-                // workflowitem
-                WorkflowItemBuilder.deleteWorkflowItem(attachedPoolTask.getWorkflowItem().getID());
-            }
-            c.complete();
+    public void delete(Context c, PoolTask poolTask) throws Exception {
+        if (poolTask != null) {
+            // to delete a pooltask keeping the system in a consistent state you need to delete the underline
+            // workflowitem
+            WorkflowItemBuilder.deleteWorkflowItem(poolTask.getWorkflowItem().getID());
         }
     }
 
-    private void deleteWsi(WorkspaceItem dso) throws Exception {
-        try (Context c = new Context()) {
-            c.turnOffAuthorisationSystem();
-            WorkspaceItem attachedDso = c.reloadEntity(dso);
-            if (attachedDso != null) {
-                workspaceItemService.deleteAll(c, attachedDso);
-            }
-            c.complete();
+    private void deleteWsi(Context c, WorkspaceItem dso) throws Exception {
+        if (dso != null) {
+            workspaceItemService.deleteAll(c, dso);
         }
-
-        indexingService.commit();
     }
 
 
     @Override
     public void cleanup() throws Exception {
-        if (workspaceItem != null) {
-            deleteWsi(workspaceItem);
-        }
-        if (workflowItem != null) {
+        try (Context c = new Context()) {
+            c.turnOffAuthorisationSystem();
+            // Ensure object and any related objects are reloaded before checking to see what needs cleanup
+            workspaceItem = c.reloadEntity(workspaceItem);
+            if (workspaceItem != null) {
+                deleteWsi(c, workspaceItem);
+            }
+            if (workflowItem != null) {
             // to delete the pooltask keeping the system in a consistent state you need to delete the underline
             // workflowitem
             WorkflowItemBuilder.deleteWorkflowItem(workflowItem.getID());
+            }
+            c.complete();
+            indexingService.commit();
         }
     }
 
