@@ -184,7 +184,6 @@
                         <exclude>src/main/webapp/index.html</exclude>
                         <exclude>src/main/webapp/login.html</exclude>
                         <exclude>src/main/webapp/js/hal/**</exclude>
-                        <exclude>src/main/webapp/vendor/**</exclude>
                     </excludes>
                 </configuration>
             </plugin>
@@ -256,6 +255,15 @@
             <groupId>org.springframework.data</groupId>
             <artifactId>spring-data-rest-hal-browser</artifactId>
             <version>${spring-hal-browser.version}</version>
+        </dependency>
+
+        <!-- WebJars dependencies used to update/enhance the default HAL Browser -->
+        <!-- Pull in current version of JQuery via WebJars
+             Available at: /webjars/jquery/dist/jquery.min.js -->
+        <dependency>
+            <groupId>org.webjars.bowergithub.jquery</groupId>
+            <artifactId>jquery-dist</artifactId>
+            <version>3.5.1</version>
         </dependency>
 
         <!-- Add in Spring Security for AuthN and AuthZ -->
