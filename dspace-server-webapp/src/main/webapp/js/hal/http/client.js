@@ -77,14 +77,13 @@ HAL.Http.Client.prototype.get = function(url) {
         },
         error: function() {
             self.vent.trigger('fail-response', { jqxhr: jqxhr });
-                var contentTypeResponseHeader = jqxhr.getResponseHeader("content-type");
-                if (contentTypeResponseHeader != undefined
-                        && !contentTypeResponseHeader.startsWith("application/hal")
-                        && !contentTypeResponseHeader.startsWith("application/json")) {
-                    downloadFile(url);
-                }
+            var contentTypeResponseHeader = jqxhr.getResponseHeader("content-type");
+            if (contentTypeResponseHeader != undefined
+                    && !contentTypeResponseHeader.startsWith("application/hal")
+                    && !contentTypeResponseHeader.startsWith("application/json")) {
+                downloadFile(url);
             }
-        });
+        }});
 };
 
 HAL.Http.Client.prototype.request = function(opts) {
