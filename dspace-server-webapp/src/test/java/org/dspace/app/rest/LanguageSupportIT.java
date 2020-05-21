@@ -18,6 +18,7 @@ import org.dspace.content.authority.ChoiceAuthorityServiceImpl;
 import org.dspace.core.LegacyPluginServiceImpl;
 import org.dspace.eperson.EPerson;
 import org.dspace.services.ConfigurationService;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -42,6 +43,7 @@ public class LanguageSupportIT extends AbstractControllerIntegrationTest {
     }
 
     @Test
+    @Ignore
     public void checkEnabledMultipleLanguageSupportTest() throws Exception {
         context.turnOffAuthorisationSystem();
         String[] supportedLanguage = {"uk","it"};
