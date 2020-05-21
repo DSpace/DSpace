@@ -3,6 +3,7 @@ image: maven:3.6.1
 pipelines:
   default:
     - step:
+        size: 2x
         caches:
           - gradle
           - gradlewrapper
