@@ -104,7 +104,7 @@
                 </div>
                 <div class="discovery-search-appliedFilters" style="margin-top:20px;">
                     <c:forEach items="${appliedFilters}" var="appliedFilter" varStatus="filterIndex">
-                        <div class="form-inline">
+                        <div class="form-inline row">
                             <div class="form-group">
                                 <input type="text" value="<fmt:message key="jsp.search.filter.${appliedFilter[0]}"/>" id="filter_field_${filterIndex.count}" class="form-control" readonly="">
                             </div>

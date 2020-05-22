@@ -1,7 +1,9 @@
 package org.ssu.controller;
 
+import com.google.common.html.HtmlEscapers;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.log4j.Logger;
 import org.dspace.app.webui.discovery.DiscoverUtility;
 import org.dspace.app.webui.discovery.DiscoverySearchRequestProcessor;
@@ -50,6 +52,7 @@ import java.net.URLEncoder;
 import java.sql.SQLException;
 import java.util.*;
 import java.util.function.BiFunction;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -96,35 +99,45 @@ public class SearchController {
 
     @RequestMapping(value = "/123456789/{itemId}/simple-search")
     public ModelAndView simpleSearchInCommunity(ModelAndView model, HttpServletRequest request, HttpServletResponse response, @PathVariable("itemId") Integer itemId) throws ServletException, IOException, SQLException, AuthorizeException, SearchProcessorException, SearchServiceException, SortException {
+        setNavigationAttributes(request, itemId);
         model = performSearchRequest(model, request, itemId);
         model.addObject("handle", "/handle/123456789/" + itemId);
         return model;
     }
 
+    private DSpaceObject obtainSearchScopeFromRequest(HttpServletRequest request) {
+        try {
+            Context dspaceContext = UIUtil.obtainContext(request);
+            return DiscoverUtility.getSearchScope(dspaceContext, request);
+        } catch (IllegalStateException | SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    private void setNavigationAttributes(HttpServletRequest request, Integer itemId) throws SQLException {
+        Context dspaceContext = UIUtil.obtainContext(request);
+        DSpaceObject dSpaceObject = handleService.resolveToObject(dspaceContext, "123456789/" + itemId);
+        switch (dSpaceObject.getType()) {
+            case Constants.COMMUNITY:
+                request.setAttribute("dspace.community", (Community) dSpaceObject);
+                break;
+            case Constants.COLLECTION:
+                request.setAttribute("dspace.collection", (Collection) dSpaceObject);
+                break;
+            default:
+                break;
+        }
+    }
+
+    private String escapeInputValue(String value) {
+        return Optional.ofNullable(value).map(val -> HtmlEscapers.htmlEscaper().escape(val)).orElse("");
+    };
+
     private ModelAndView performSearchRequest(ModelAndView model, HttpServletRequest request, Integer itemId) throws SQLException, SearchProcessorException, SearchServiceException, UnsupportedEncodingException, SortException {
         Context dspaceContext = UIUtil.obtainContext(request);
-        if(itemId != null) {
-            DSpaceObject dSpaceObject = handleService.resolveToObject(dspaceContext, "123456789/" + itemId);
-            switch (dSpaceObject.getType()) {
-                case Constants.COMMUNITY:
-                    request.setAttribute("dspace.community", (Community) dSpaceObject);
-                    break;
-                case Constants.COLLECTION:
-                    request.setAttribute("dspace.collection", (Collection) dSpaceObject);
-                    break;
-                default:
-                    break;
-            }
-        }
 
-        DSpaceObject scope;
-        try {
-            scope = DiscoverUtility.getSearchScope(dspaceContext, request);
-        } catch (IllegalStateException e) {
-            throw new SearchProcessorException(e.getMessage(), e);
-        } catch (SQLException e) {
-            throw new SearchProcessorException(e.getMessage(), e);
-        }
+        DSpaceObject scope = obtainSearchScopeFromRequest(request);
 
         DiscoveryConfiguration discoveryConfiguration = SearchUtils.getDiscoveryConfiguration();
         DiscoverQuery queryArgs = DiscoverUtility.getDiscoverQuery(dspaceContext, request, scope, true);
@@ -132,27 +145,21 @@ public class SearchController {
         DiscoverResult qResults = SearchUtils.getSearchService().search(dspaceContext, scope, queryArgs);
 
         List<Item> resultsListItem = getQueryResultsByType(qResults.getDspaceObjects(), Item.class);
-
-
         Locale locale = dspaceContext.getCurrentLocale();
         List<ItemResponse> items = resultsListItem.stream()
                 .map(item -> itemService.fetchItemresponseDataForItem(item, locale))
                 .collect(Collectors.toList());
 
-        List<String[]> appliedFilters = DiscoverUtility.getFilters(request);
+        List<String[]> appliedFilters = DiscoverUtility.getFilters(request).stream()
+                .map(filter -> Arrays.stream(filter).map(this::escapeInputValue).toArray(String[]::new))
+                .collect(Collectors.toList());
+
         List<String> appliedFilterQueries = appliedFilters.stream()
                 .map(filter -> String.format("%s::%s::%s", filter[0], filter[1], filter[2]))
                 .collect(Collectors.toList());
 
         BiFunction<String[], Integer, String> joinHttpFilterParameters = (filter, index) ->
-        {
-            try {
-                return String.format("&amp;filter_field_%d=%s&amp;filter_type_%d=%s&amp;filter_value_%d=%s", index, URLEncoder.encode(filter[0], "UTF-8"), index, URLEncoder.encode(filter[1], "UTF-8"), index, URLEncoder.encode(filter[2], "UTF-8"));
-            } catch (UnsupportedEncodingException e) {
-                e.printStackTrace();
-            }
-            return "";
-        };
+                String.format("&amp;filter_field_%d=%s&amp;filter_type_%d=%s&amp;filter_value_%d=%s", index, filter[0], index, filter[1], index, filter[2]);
 
         String httpFilters = Seq.zip(Seq.seq(appliedFilters), Seq.seq(IntStream.range(1, appliedFilters.size() + 1)))
                 .filter(filter -> ArrayUtils.isNotEmpty(filter.v1))
@@ -161,7 +168,7 @@ public class SearchController {
                 .collect(Collectors.joining(""));
 
 
-        String query = request.getParameter("query");
+        String query = escapeInputValue(request.getParameter("query"));
 
 
         List<String> sortOptions = discoveryConfiguration.getSearchSortConfiguration().getSortFields().stream()
