@@ -44,6 +44,7 @@ public class LanguageSupportIT extends AbstractControllerIntegrationTest {
 
     @Test
     @Ignore
+    //TODO investigate way the language support introduce such issue
     public void checkEnabledMultipleLanguageSupportTest() throws Exception {
         context.turnOffAuthorisationSystem();
         String[] supportedLanguage = {"uk","it"};
