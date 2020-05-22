@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 import java.util.SortedMap;
 import java.util.UUID;
 import javax.servlet.ServletInputStream;
@@ -20,6 +21,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
+import org.apache.solr.client.solrj.util.ClientUtils;
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
@@ -54,6 +56,7 @@ import org.dspace.discovery.IndexableObject;
 import org.dspace.discovery.SearchService;
 import org.dspace.discovery.SearchServiceException;
 import org.dspace.discovery.indexobject.IndexableCollection;
+import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.service.GroupService;
 import org.dspace.workflow.WorkflowException;
@@ -165,7 +168,8 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
 
     @SearchRestMethod(name = "findAuthorizedByCommunity")
     public Page<CollectionRest> findAuthorizedByCommunity(
-        @Parameter(value = "uuid", required = true) UUID communityUuid, Pageable pageable) {
+        @Parameter(value = "uuid", required = true) UUID communityUuid, Pageable pageable,
+        @Parameter(value = "query") String q) {
         try {
             Context context = obtainContext();
             Community com = communityService.find(context, communityUuid);
@@ -174,19 +178,74 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
                     CommunityRest.CATEGORY + "." + CommunityRest.NAME + " with id: " + communityUuid
                         + " not found");
             }
-            List<Collection> collections = cs.findAuthorized(context, com, Constants.ADD);
-            return converter.toRestPage(utils.getPage(collections, pageable), utils.obtainProjection());
-        } catch (SQLException e) {
+            List<Collection> collections = new LinkedList<Collection>();
+            DiscoverResult resp = discoverAuthorizedCollections(pageable, q, context, com);
+            long tot = resp.getTotalSearchResults();
+            for (IndexableObject solrCollections : resp.getIndexableObjects()) {
+                Collection c = ((IndexableCollection) solrCollections).getIndexedObject();
+                collections.add(c);
+            }
+            return converter.toRestPage(collections, pageable, tot , utils.obtainProjection());
+        } catch (SQLException | SearchServiceException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
     }
 
+    private DiscoverResult discoverAuthorizedCollections(Pageable pageable, String q, Context context, Community com)
+           throws SQLException, SearchServiceException {
+        StringBuilder query = new StringBuilder();
+        DiscoverQuery discoverQuery = new DiscoverQuery();
+        discoverQuery.setDSpaceObjectFilter(IndexableCollection.TYPE);
+        discoverQuery.setStart(Math.toIntExact(pageable.getOffset()));
+        discoverQuery.setMaxResults(pageable.getPageSize());
+        if (!authorizeService.isAdmin(context)) {
+            if (q == null) {
+                Group anonymousGroup = groupService.findByName(context, Group.ANONYMOUS);
+                String anonGroupId = "";
+                if (anonymousGroup != null) {
+                    anonGroupId = anonymousGroup.getID().toString();
+                }
+                query.append("submit:(g").append(anonGroupId);
+                EPerson currentUser = context.getCurrentUser();
+                if (currentUser != null) {
+                    query.append(" OR e").append(currentUser.getID());
+                }
+                Set<Group> groups = groupService.allMemberGroupsSet(context, currentUser);
+                for (Group group : groups) {
+                    query.append(" OR g").append(group.getID());
+                }
+                query.append(")");
+            } else {
+                query.append(q);
+            }
+            discoverQuery.addFilterQueries(query.toString());
+        }
+        if (com != null) {
+            discoverQuery.addFilterQueries("location.comm:" + com.getID().toString());
+        }
+        if (StringUtils.isNotBlank(q)) {
+            StringBuilder buildQuery = new StringBuilder();
+            String cleanQuery = ClientUtils.escapeQueryChars(q);
+            buildQuery.append(cleanQuery).append(" OR ").append(cleanQuery).append("*");
+            discoverQuery.setQuery(buildQuery.toString());
+        }
+        DiscoverResult resp = searchService.search(context, discoverQuery);
+        return resp;
+    }
+
     @SearchRestMethod(name = "findAuthorized")
-    public Page<CollectionRest> findAuthorized(Pageable pageable) {
+    public Page<CollectionRest> findAuthorized(@Parameter(value = "query") String q,
+                                                Pageable pageable) throws SearchServiceException {
         try {
             Context context = obtainContext();
-            List<Collection> collections = cs.findAuthorizedOptimized(context, Constants.ADD);
-            return converter.toRestPage(utils.getPage(collections, pageable), utils.obtainProjection());
+            List<Collection> collections = new LinkedList<Collection>();
+            DiscoverResult resp = discoverAuthorizedCollections(pageable, q, context, null);
+            long tot = resp.getTotalSearchResults();
+            for (IndexableObject solrCollections : resp.getIndexableObjects()) {
+                Collection c = ((IndexableCollection) solrCollections).getIndexedObject();
+                collections.add(c);
+            }
+            return converter.toRestPage(collections, pageable, tot , utils.obtainProjection());
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
