@@ -39,7 +39,23 @@ public class ResourcePolicyBuilder extends AbstractBuilder<ResourcePolicy, Resou
 
     @Override
     public void cleanup() throws Exception {
-        delete(resourcePolicy);
+        try (Context c = new Context()) {
+            c.turnOffAuthorisationSystem();
+            // Ensure object and any related objects are reloaded before checking to see what needs cleanup
+            resourcePolicy = c.reloadEntity(resourcePolicy);
+            if (resourcePolicy != null) {
+                delete(c, resourcePolicy);
+            }
+            c.complete();
+            indexingService.commit();
+        }
+    }
+
+    @Override
+    public void delete(Context c, ResourcePolicy dso) throws Exception {
+        if (dso != null) {
+            getService().delete(c, dso);
+        }
     }
 
     @Override

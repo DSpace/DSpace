@@ -49,7 +49,8 @@ import org.springframework.security.crypto.keygen.KeyGenerators;
 import org.springframework.stereotype.Component;
 
 /**
- * Class responsible for creating and parsing JWTs, supports both JWS and JWE
+ * Class responsible for creating and parsing JSON Web Tokens (JWTs), supports both JWS and JWE
+ * https://jwt.io/
  *
  * @author Frederic Van Reet (frederic dot vanreet at atmire dot com)
  * @author Tom Desair (tom dot desair at atmire dot com)
@@ -95,12 +96,12 @@ public class JWTTokenHandler implements InitializingBean {
     }
 
     /**
-     * Retrieve EPerson from a jwt
+     * Retrieve EPerson from a JSON Web Token (JWT)
      *
-     * @param token
-     * @param request
-     * @param context
-     * @return
+     * @param token token as a string
+     * @param request current request
+     * @param context current Context
+     * @return DSpace EPerson object parsed from the token
      * @throws JOSEException
      * @throws ParseException
      * @throws SQLException
@@ -110,13 +111,14 @@ public class JWTTokenHandler implements InitializingBean {
         if (StringUtils.isBlank(token)) {
             return null;
         }
-
+        // parse/decrypt the token
         SignedJWT signedJWT = getSignedJWT(token);
-
+        // get the claims set from the parsed token
         JWTClaimsSet jwtClaimsSet = signedJWT.getJWTClaimsSet();
-
+        // retrieve the EPerson from the claims set
         EPerson ePerson = getEPerson(context, jwtClaimsSet);
 
+        // As long as the JWT is valid, parse all claims and return the EPerson
         if (isValidToken(request, signedJWT, jwtClaimsSet, ePerson)) {
 
             log.debug("Received valid token for username: " + ePerson.getEmail());
@@ -133,22 +135,25 @@ public class JWTTokenHandler implements InitializingBean {
     }
 
     /**
-     * Create a jwt with the EPerson details in it
+     * Create a JWT with the EPerson details in it
      *
-     * @param context
-     * @param request
-     * @param previousLoginDate
-     * @param groups
-     * @return
+     * @param context current Context
+     * @param request current Request
+     * @param previousLoginDate date of last login (before this one)
+     * @param groups List of user Groups
+     * @return string version of signed JWT
      * @throws JOSEException
      */
     public String createTokenForEPerson(Context context, HttpServletRequest request, Date previousLoginDate,
                                         List<Group> groups) throws JOSEException, SQLException {
 
+        // Update the saved session salt for the currently logged in user, returning the user object
         EPerson ePerson = updateSessionSalt(context, previousLoginDate);
 
+        // Create a claims set based on currently logged in user
         JWTClaimsSet claimsSet = buildJwtClaimsSet(context, request);
 
+        // Create a signed JWT from those two things
         SignedJWT signedJWT = createSignedJWT(request, ePerson, claimsSet);
 
         String token;
@@ -161,6 +166,13 @@ public class JWTTokenHandler implements InitializingBean {
         return token;
     }
 
+    /**
+     * Invalidate the current Java Web Token (JWT) in the current request
+     * @param token current token
+     * @param request current request
+     * @param context current Context
+     * @throws Exception
+     */
     public void invalidateToken(String token, HttpServletRequest request, Context context) throws Exception {
         if (StringUtils.isNotBlank(token)) {
 
@@ -197,6 +209,17 @@ public class JWTTokenHandler implements InitializingBean {
         return jweObject;
     }
 
+    /**
+     * Determine if current JWT is valid for the given EPerson object.
+     * To be valid, current JWT *must* have been signed by the EPerson and not be expired.
+     * If EPerson is null or does not have a known active session, false is returned immediately.
+     * @param request current request
+     * @param signedJWT current signed JWT
+     * @param jwtClaimsSet claims set of current JWT
+     * @param ePerson EPerson parsed from current signed JWT
+     * @return true if valid, false otherwise
+     * @throws JOSEException
+     */
     private boolean isValidToken(HttpServletRequest request, SignedJWT signedJWT, JWTClaimsSet jwtClaimsSet,
                                  EPerson ePerson) throws JOSEException {
         if (ePerson == null || StringUtils.isBlank(ePerson.getSessionSalt())) {
@@ -213,6 +236,15 @@ public class JWTTokenHandler implements InitializingBean {
         }
     }
 
+    /**
+     * Return the signed JWT.
+     * If JWT encryption is enabled, decrypt the token and return.
+     * Otherwise, parse the string into a signed JWT
+     * @param token string token
+     * @return parsed (possibly decrypted) SignedJWT
+     * @throws ParseException
+     * @throws JOSEException
+     */
     private SignedJWT getSignedJWT(String token) throws ParseException, JOSEException {
         SignedJWT signedJWT;
 
@@ -227,10 +259,26 @@ public class JWTTokenHandler implements InitializingBean {
         return signedJWT;
     }
 
+    /**
+     * Based on the given JWT claims set (which should include an EPerson ID), locate the
+     * corresponding EPerson in the current Context
+     * @param context current context
+     * @param jwtClaimsSet JWT claims set
+     * @return EPerson object (or null, if not found)
+     * @throws SQLException
+     */
     private EPerson getEPerson(Context context, JWTClaimsSet jwtClaimsSet) throws SQLException {
         return ePersonClaimProvider.getEPerson(context, jwtClaimsSet);
     }
 
+    /**
+     * Create a signed JWT from the given EPerson and claims set.
+     * @param request current request
+     * @param ePerson EPerson to create signed JWT for
+     * @param claimsSet claims set of JWT
+     * @return signed JWT
+     * @throws JOSEException
+     */
     private SignedJWT createSignedJWT(HttpServletRequest request, EPerson ePerson, JWTClaimsSet claimsSet)
         throws JOSEException {
         SignedJWT signedJWT = new SignedJWT(
@@ -241,6 +289,13 @@ public class JWTTokenHandler implements InitializingBean {
         return signedJWT;
     }
 
+    /**
+     * Create a new JWT claims set based on the current Context (and currently logged in user).
+     * Set its expiration time based on the configured expiration period.
+     * @param context current Context
+     * @param request current Request
+     * @return new JWTClaimsSet
+     */
     private JWTClaimsSet buildJwtClaimsSet(Context context, HttpServletRequest request) {
         JWTClaimsSet.Builder builder = new JWTClaimsSet.Builder();
 
@@ -283,6 +338,16 @@ public class JWTTokenHandler implements InitializingBean {
         return clientInfoService.getClientIp(request);
     }
 
+
+    /**
+     * Update session salt information for the currently logged in user.
+     * The session salt is a random key that is saved to EPerson object (and database table) and used to validate
+     * a JWT on later requests.
+     * @param context current DSpace Context
+     * @param previousLoginDate date of last login (prior to this one)
+     * @return EPerson object of current user, with an updated session salt
+     * @throws SQLException
+     */
     private EPerson updateSessionSalt(final Context context, final Date previousLoginDate) throws SQLException {
         EPerson ePerson;
 
@@ -306,6 +371,11 @@ public class JWTTokenHandler implements InitializingBean {
         return ePerson;
     }
 
+    /**
+     * Retrieve the given secret key from configuration. If not specified, generate a random 32 byte key
+     * @param property configuration property to check for
+     * @return configuration value or random 32 byte key
+     */
     private String getSecret(String property) {
         String secret = configurationService.getProperty(property);
 
