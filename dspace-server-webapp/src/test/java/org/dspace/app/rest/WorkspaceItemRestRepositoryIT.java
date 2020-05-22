@@ -7,6 +7,7 @@
  */
 package org.dspace.app.rest;
 
+import static com.jayway.jsonpath.JsonPath.read;
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadata;
 import static org.hamcrest.Matchers.allOf;
@@ -28,6 +29,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicReference;
 import javax.ws.rs.core.MediaType;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -676,6 +678,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                                       .withIssueDate("2016-02-13")
                                       .build();
 
+        context.restoreAuthSystemState();
         // the first submitter has two workspace
         String tokenSubmitter1 = getAuthToken(submitter1.getEmail(), "qwerty01");
         getClient(tokenSubmitter1).perform(get("/api/submission/workspaceitems/search/findBySubmitter")
@@ -777,6 +780,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                                       .withIssueDate("2018-02-13")
                                       .build();
 
+        context.restoreAuthSystemState();
         String tokenSubmitter1 = getAuthToken(submitter1.getEmail(), "qwerty01");
         getClient(tokenSubmitter1).perform(get("/api/submission/workspaceitems/search/findBySubmitter")
                 .param("uuid", submitter1.getID().toString()))
@@ -821,6 +825,11 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                                            .build();
         context.restoreAuthSystemState();
 
+        AtomicReference<Integer> idRef1 = new AtomicReference<>();
+        AtomicReference<Integer> idRef2 = new AtomicReference<>();
+        AtomicReference<Integer> idRef3 = new AtomicReference<>();
+        try {
+
         String authToken = getAuthToken(eperson.getEmail(), password);
 
         // create a workspaceitem explicitly in the col1
@@ -828,14 +837,16 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                     .param("owningCollection", col1.getID().toString())
                     .contentType(org.springframework.http.MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$._embedded.collection.id", is(col1.getID().toString())));
+                .andExpect(jsonPath("$._embedded.collection.id", is(col1.getID().toString())))
+                .andDo(result -> idRef1.set(read(result.getResponse().getContentAsString(), "$.id")));
 
         // create a workspaceitem explicitly in the col2
         getClient(authToken).perform(post("/api/submission/workspaceitems")
                     .param("owningCollection", col2.getID().toString())
                     .contentType(org.springframework.http.MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$._embedded.collection.id", is(col2.getID().toString())));
+                .andExpect(jsonPath("$._embedded.collection.id", is(col2.getID().toString())))
+                .andDo(result -> idRef2.set(read(result.getResponse().getContentAsString(), "$.id")));
 
         // create a workspaceitem without an explicit collection, this will go in the first valid collection for the
         // user: the col1
@@ -843,9 +854,15 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                 .contentType(org.springframework.http.MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$._embedded.collection.id", is(col1.getID().toString())))
-                .andExpect(jsonPath("$", WorkspaceItemMatcher.matchFullEmbeds()));
+                .andExpect(jsonPath("$", WorkspaceItemMatcher.matchFullEmbeds()))
+                .andDo(result -> idRef3.set(read(result.getResponse().getContentAsString(), "$.id")));
 
-        // TODO cleanup the context!!!
+
+        } finally {
+            WorkspaceItemBuilder.deleteWorkspaceItem(idRef1.get());
+            WorkspaceItemBuilder.deleteWorkspaceItem(idRef2.get());
+            WorkspaceItemBuilder.deleteWorkspaceItem(idRef3.get());
+        }
     }
 
     @Test
@@ -1016,6 +1033,9 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
 
         context.restoreAuthSystemState();
 
+        AtomicReference<Integer> idRef = new AtomicReference<>();
+        try {
+
         getClient(authToken).perform(get("/api/submission/workspaceitems/" + workspaceItem1.getID()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.errors").doesNotExist())
@@ -1043,7 +1063,11 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                                         hasJsonPath("$", Matchers.is("/sections/traditionalpageone/dc.title")),
                                         hasJsonPath("$", Matchers.is("/sections/traditionalpageone/dc.date.issued"))
                                 )))))
-        ;
+                .andDo(result -> idRef.set(read(result.getResponse().getContentAsString(), "$.id")));
+        } finally {
+            WorkspaceItemBuilder.deleteWorkspaceItem(idRef.get());
+        }
+
     }
 
     @Test
@@ -2780,6 +2804,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         final MockMultipartFile pdfFile = new MockMultipartFile("file", "/local/path/simple-article.pdf",
             "application/pdf", pdf);
 
+        context.restoreAuthSystemState();
         // upload the file in our workspaceitem
         getClient(authToken).perform(fileUpload("/api/submission/workspaceitems/" + witem.getID())
             .file(pdfFile))
@@ -2817,6 +2842,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
             .withIssueDate("2017-10-17")
             .build();
 
+        context.restoreAuthSystemState();
         //Verify there is an error since no file was uploaded (with upload required set to true)
         getClient(authToken).perform(get("/api/submission/workspaceitems/" + witem.getID()))
             .andExpect(status().isOk())
@@ -2844,6 +2870,9 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
 
         context.restoreAuthSystemState();
 
+        Integer workspaceItemId = null;
+        try {
+
         ObjectMapper mapper = new ObjectMapper();
         // You have to be an admin to create an Item from an ExternalDataObject
         String token = getAuthToken(admin.getEmail(), password);
@@ -2856,7 +2885,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
 
         String content = mvcResult.getResponse().getContentAsString();
         Map<String,Object> map = mapper.readValue(content, Map.class);
-        Integer workspaceItemId = (Integer) map.get("id");
+        workspaceItemId = (Integer) map.get("id");
         String itemUuidString = String.valueOf(((Map) ((Map) map.get("_embedded")).get("item")).get("uuid"));
 
         getClient(token).perform(get("/api/submission/workspaceitems/" + workspaceItemId))
@@ -2872,6 +2901,9 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                                     MetadataMatcher.matchMetadata("dc.contributor.author", "Donald, Smith")
                                 )))))
                         ));
+        } finally {
+            WorkspaceItemBuilder.deleteWorkspaceItem(workspaceItemId);
+        }
     }
 
     @Test
@@ -2882,7 +2914,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                                          TEXT_URI_LIST_VALUE))
                                      .content("https://localhost:8080/server/api/integration/externalsources/" +
                                                 "mock/entryValues/one"))
-                        .andExpect(status().isBadRequest()).andReturn();
+                        .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -2893,7 +2925,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                                          TEXT_URI_LIST_VALUE))
                                      .content("https://localhost:8080/server/api/integration/externalsources/" +
                                                   "mock/entryValues/one"))
-                        .andExpect(status().isBadRequest()).andReturn();
+                        .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -3049,6 +3081,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                                                   .withSubject("ExtraEntry")
                                                   .build();
 
+        context.restoreAuthSystemState();
         String token = getAuthToken(admin.getEmail(), password);
         getClient(token).perform(get("/api/submission/workspaceitems/search/item")
                                 .param("uuid", String.valueOf(witem.getItem().getID())))
@@ -3080,6 +3113,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                                                   .withAuthor("Smith, Donald").withAuthor("Doe, John")
                                                   .withSubject("ExtraEntry")
                                                   .build();
+        context.restoreAuthSystemState();
         String token = getAuthToken(admin.getEmail(), password);
         getClient(token).perform(get("/api/submission/workspaceitems/search/item"))
                    .andExpect(status().isBadRequest());
@@ -3107,6 +3141,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                                                   .withAuthor("Smith, Donald").withAuthor("Doe, John")
                                                   .withSubject("ExtraEntry")
                                                   .build();
+        context.restoreAuthSystemState();
         String token = getAuthToken(admin.getEmail(), password);
         getClient(token).perform(get("/api/submission/workspaceitems/search/item")
                                 .param("uuid", String.valueOf(item.getID())))
@@ -3164,6 +3199,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                                                   .withAuthor("Smith, Donald").withAuthor("Doe, John")
                                                   .withSubject("ExtraEntry")
                                                   .build();
+        context.restoreAuthSystemState();
         getClient().perform(get("/api/submission/workspaceitems/search/item")
                                      .param("uuid", String.valueOf(witem.getItem().getID())))
                         .andExpect(status().isUnauthorized());

@@ -181,12 +181,14 @@ public class BitstreamRestControllerIT extends AbstractControllerIntegrationTest
                                           .withAuthor("Smith, Donald").withAuthor("Doe, John")
                                           .build();
 
-            Bitstream bitstream = BitstreamBuilder
+             bitstream = BitstreamBuilder
                 .createBitstream(context, publicItem1, is)
                 .withName("Test bitstream")
                 .withDescription("This is a bitstream to test range requests")
                 .withMimeType("text/plain")
                 .build();
+        }
+        context.restoreAuthSystemState();
 
             //** WHEN **
             //We download the bitstream
@@ -213,7 +215,6 @@ public class BitstreamRestControllerIT extends AbstractControllerIntegrationTest
 
             //The download and head request should also be logged as a statistics record
             checkNumberOfStatsRecords(bitstream, 2);
-        }
     }
 
     @Test
@@ -239,12 +240,14 @@ public class BitstreamRestControllerIT extends AbstractControllerIntegrationTest
                                           .withAuthor("Smith, Donald").withAuthor("Doe, John")
                                           .build();
 
-            Bitstream bitstream = BitstreamBuilder
+            bitstream = BitstreamBuilder
                 .createBitstream(context, publicItem1, is)
                 .withName("Test bitstream")
                 .withDescription("This is a bitstream to test range requests")
                 .withMimeType("text/plain")
                 .build();
+        }
+        context.restoreAuthSystemState();
 
             //** WHEN **
             //We download only a specific byte range of the bitstream
@@ -290,7 +293,6 @@ public class BitstreamRestControllerIT extends AbstractControllerIntegrationTest
 
             //Check that NO statistics record was logged for the Range requests
             checkNumberOfStatsRecords(bitstream, 0);
-        }
     }
 
     @Test
@@ -322,13 +324,15 @@ public class BitstreamRestControllerIT extends AbstractControllerIntegrationTest
                                           .withAuthor("Smith, Donald").withAuthor("Doe, John")
                                           .build();
 
-            Bitstream bitstream = BitstreamBuilder
+            bitstream = BitstreamBuilder
                 .createBitstream(context, publicItem1, is)
                 .withName("Test Embargoed Bitstream")
                 .withDescription("This bitstream is embargoed")
                 .withMimeType("text/plain")
                 .withEmbargoPeriod("6 months")
                 .build();
+        }
+        context.restoreAuthSystemState();
 
             //** WHEN **
             //We download the bitstream
@@ -339,7 +343,6 @@ public class BitstreamRestControllerIT extends AbstractControllerIntegrationTest
 
             //An unauthorized request should not log statistics
             checkNumberOfStatsRecords(bitstream, 0);
-        }
     }
 
     @Test
@@ -397,6 +400,7 @@ public class BitstreamRestControllerIT extends AbstractControllerIntegrationTest
                 .withName("Collection 1")
                 .build();
 
+
         String bitstreamContent = "Embargoed!";
 
         try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
@@ -407,7 +411,7 @@ public class BitstreamRestControllerIT extends AbstractControllerIntegrationTest
                     .withAuthor("Smith, Donald")
                     .build();
 
-            Bitstream bitstream = BitstreamBuilder
+            bitstream = BitstreamBuilder
                 .createBitstream(context, publicItem1, is)
                 .withName("Test Embargoed Bitstream")
                 .withDescription("This bitstream is embargoed")
@@ -546,14 +550,15 @@ public class BitstreamRestControllerIT extends AbstractControllerIntegrationTest
         String bitstreamContent = "Private!";
         try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
 
-            Bitstream bitstream = BitstreamBuilder
+             bitstream = BitstreamBuilder
                 .createBitstream(context, publicItem1, is)
                 .withName("Test Embargoed Bitstream")
                 .withDescription("This bitstream is embargoed")
                 .withMimeType("text/plain")
                 .withReaderGroup(internalGroup)
                 .build();
-
+        }
+            context.restoreAuthSystemState();
             //** WHEN **
             //We download the bitstream
             getClient().perform(get("/api/core/bitstreams/" + bitstream.getID() + "/content"))
@@ -564,7 +569,7 @@ public class BitstreamRestControllerIT extends AbstractControllerIntegrationTest
             //An unauthorized request should not log statistics
             checkNumberOfStatsRecords(bitstream, 0);
 
-        }
+
     }
 
     @Test
@@ -754,13 +759,14 @@ public class BitstreamRestControllerIT extends AbstractControllerIntegrationTest
                     .withAuthor("Smith, Donald").withAuthor("Doe, John")
                     .build();
 
-            Bitstream bitstream = BitstreamBuilder
+            bitstream = BitstreamBuilder
                     .createBitstream(context, publicItem1, is)
                     .withName("Test bitstream")
                     .withDescription("This is a bitstream to test the citation cover page.")
                     .withMimeType("application/pdf")
                     .build();
-
+        }
+            context.restoreAuthSystemState();
             //** WHEN **
             //We download the bitstream
             byte[] content = getClient().perform(get("/api/core/bitstreams/" + bitstream.getID() + "/content"))
@@ -796,7 +802,6 @@ public class BitstreamRestControllerIT extends AbstractControllerIntegrationTest
 
             //The download and head request should also be logged as a statistics record
             checkNumberOfStatsRecords(bitstream, 2);
-        }
     }
 
     private String extractPDFText(byte[] content) throws IOException {

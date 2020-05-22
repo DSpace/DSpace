@@ -33,7 +33,23 @@ public class BitstreamFormatBuilder extends AbstractCRUDBuilder<BitstreamFormat>
 
     @Override
     public void cleanup() throws Exception {
-        delete(bitstreamFormat);
+        try (Context c = new Context()) {
+            c.turnOffAuthorisationSystem();
+            // Ensure object and any related objects are reloaded before checking to see what needs cleanup
+            bitstreamFormat = c.reloadEntity(bitstreamFormat);
+            if (bitstreamFormat != null) {
+                delete(c, bitstreamFormat);
+            }
+            c.complete();
+            indexingService.commit();
+        }
+    }
+
+    @Override
+    public void delete(Context c, BitstreamFormat dso) throws Exception {
+        if (dso != null) {
+            getService().delete(c, dso);
+        }
     }
 
     @Override
