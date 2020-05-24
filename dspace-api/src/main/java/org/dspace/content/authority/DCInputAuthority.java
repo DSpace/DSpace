@@ -156,7 +156,7 @@ public class DCInputAuthority extends SelfNamedPlugin implements ChoiceAuthority
     @Override
     public String getLabel(String field, String key, String locale) {
         init();
-        
+
         // Get default if locale is empty
         if (StringUtils.isBlank(locale)) {
             locale = getDefaultLocale();
@@ -177,7 +177,7 @@ public class DCInputAuthority extends SelfNamedPlugin implements ChoiceAuthority
             return "UNKNOWN KEY " + key;
         }
     }
-    
+
     protected String getDefaultLocale() {
         Context context = new Context();
         return context.getCurrentLocale().getLanguage();
