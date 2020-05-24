@@ -156,6 +156,27 @@ public class Utils {
     }
 
     /**
+     * @param rel
+     * @param domainClass
+     * @return the LinkRest annotation corresponding to the specified rel in the
+     * domainClass. Null if not found
+     */
+    public LinkRest getLinkRest(String rel, Class<RestAddressableModel> domainClass) {
+        LinkRest linkRest = null;
+        LinksRest linksAnnotation = domainClass.getDeclaredAnnotation(LinksRest.class);
+        if (linksAnnotation != null) {
+            LinkRest[] links = linksAnnotation.links();
+            for (LinkRest l : links) {
+                if (StringUtils.equals(rel, l.name())) {
+                    linkRest = l;
+                    break;
+                }
+            }
+        }
+        return linkRest;
+    }
+
+    /**
      * Convenience method to get a default pageable instance if needed.
      *
      * @param optionalPageable the existing pageable instance, may be null.

@@ -18,6 +18,8 @@
     <!-- for handle "default". -->
     <submission-map>
         <name-map collection-handle="default" submission-name="traditional"/>
+        <name-map collection-handle="123456789/publication-1" submission-name="publication"/>
+        <name-map collection-handle="123456789/language-test-1" submission-name="languagetestprocess"/>
     </submission-map>
 
 
@@ -92,9 +94,11 @@
             <type>cclicense</type> </step> -->
 
         <!--Step will be to Check for potential duplicate -->
-        <!-- <step id="detect-duplicate"> <heading>submit.progressbar.detect.duplicate</heading>
-            <processing-class>org.dspace.submit.step.DetectPotentialDuplicate</processing-class>
-            <type>duplicate</type> </step> -->
+        <step id="detect-duplicate">
+            <heading>submit.progressbar.detect-duplicate</heading>
+            <processing-class>org.dspace.app.rest.submit.step.DetectPotentialDuplicateStep</processing-class>
+            <type>detect-duplicate</type>
+        </step>
 
         <!--Step will be to Verify/Review everything -->
         <!-- <step id="verify"> <heading>submit.progressbar.verify</heading> <processing-class>org.dspace.submit.step.VerifyStep</processing-class>
@@ -112,6 +116,34 @@
             <heading>Sample</heading>
             <processing-class>org.dspace.submit.step.SampleStep</processing-class>
             <type>sample</type>
+        </step>
+
+	    <step id="publication" mandatory="true">
+	      <heading>submit.progressbar.describe.publication</heading>
+	      <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
+	      <type>submission-form</type>
+	    </step>
+	    <step id="publication_indexing" mandatory="false">
+	      <heading>submit.progressbar.describe.publication_indexing</heading>
+	      <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
+	      <type>submission-form</type>
+	    </step>
+	    <step id="publication_bibliographic_details" mandatory="true">
+	      <heading>submit.progressbar.describe.publication_bibliographic_details</heading>
+	      <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
+	      <type>submission-form</type>
+	    </step>
+	    <step id="publication_references" mandatory="false">
+	      <heading>submit.progressbar.describe.publication_references</heading>
+	      <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
+	      <type>submission-form</type>
+	    </step>
+
+
+        <step id="languagetest" mandatory="true">
+            <heading>submit.progressbar.describe.stepone</heading>
+            <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
+            <type>submission-form</type>
         </step>
     </step-definitions>
 
@@ -147,7 +179,7 @@
             <!--Step will be to Upload the item -->
             <step id="upload"/>
             <!-- <step id="upload-with-embargo"/> -->
-            <!-- <step id="detect-duplicate"/> -->
+            <step id="detect-duplicate"/>
 
             <!--Step will be to Sign off on the License -->
             <step id="license"/>
@@ -155,6 +187,21 @@
             <!-- <step id="verify"/> -->
         </submission-process>
 
+	    <submission-process name="publication">
+	      <step id="collection" />
+	      <step id="extraction" />
+	      <step id="publication" />
+	      <step id="publication_indexing" />
+	      <step id="publication_bibliographic_details" />
+	      <step id="publication_references" />
+	      <step id="upload" />
+	      <step id="license" />
+	    </submission-process>
+
+        <submission-process name="languagetestprocess">
+            <step id="collection"/>
+            <step id="languagetest"/>
+        </submission-process>
     </submission-definitions>
 
 </item-submission>

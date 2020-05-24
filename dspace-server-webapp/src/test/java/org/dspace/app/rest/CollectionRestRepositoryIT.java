@@ -10,6 +10,9 @@ package org.dspace.app.rest;
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadata;
+import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadataDoesNotExist;
+import static org.dspace.core.Constants.WRITE;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
@@ -30,6 +33,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.dspace.app.rest.builder.CollectionBuilder;
 import org.dspace.app.rest.builder.CommunityBuilder;
 import org.dspace.app.rest.builder.EPersonBuilder;
+import org.dspace.app.rest.builder.ResourcePolicyBuilder;
 import org.dspace.app.rest.builder.MetadataFieldBuilder;
 import org.dspace.app.rest.builder.MetadataSchemaBuilder;
 import org.dspace.app.rest.converter.ConverterService;
@@ -99,13 +103,13 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
 
 
         getClient().perform(get("/api/core/collections")
-                   .param("projection", "full"))
+                   .param("embed", CollectionMatcher.getEmbedsParameter()))
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$._embedded.collections", Matchers.containsInAnyOrder(
-                       CollectionMatcher.matchCollectionEntryFullProjection(col1.getName(), col1.getID(),
+                       CollectionMatcher.matchCollectionEntrySpecificEmbedProjection(col1.getName(), col1.getID(),
                                                                             col1.getHandle()),
-                       CollectionMatcher.matchCollectionEntryFullProjection(col2.getName(), col2.getID(),
+                       CollectionMatcher.matchCollectionEntrySpecificEmbedProjection(col2.getName(), col2.getID(),
                                                                             col2.getHandle())
                    )));
     }
@@ -235,16 +239,17 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
 
         getClient().perform(get("/api/core/collections")
                 .param("size", "1")
-                .param("projection", "full"))
+                   .param("embed", CollectionMatcher.getEmbedsParameter()))
+
                 .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$._embedded.collections", Matchers.contains(
-                       CollectionMatcher.matchCollectionEntryFullProjection(col1.getName(), col1.getID(),
+                       CollectionMatcher.matchCollectionEntrySpecificEmbedProjection(col1.getName(), col1.getID(),
                                                                             col1.getHandle())
                    )))
                    .andExpect(jsonPath("$._embedded.collections", Matchers.not(
                        Matchers.contains(
-                           CollectionMatcher.matchCollectionEntryFullProjection(col2.getName(), col2.getID(),
+                           CollectionMatcher.matchCollectionEntrySpecificEmbedProjection(col2.getName(), col2.getID(),
                                                                                 col2.getHandle())
                        )
                    )));
@@ -252,16 +257,17 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
         getClient().perform(get("/api/core/collections")
                                 .param("size", "1")
                                 .param("page", "1")
-                                .param("projection", "full"))
+                                   .param("embed", CollectionMatcher.getEmbedsParameter()))
+
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$._embedded.collections", Matchers.contains(
-                       CollectionMatcher.matchCollectionEntryFullProjection(col2.getName(), col2.getID(),
+                       CollectionMatcher.matchCollectionEntrySpecificEmbedProjection(col2.getName(), col2.getID(),
                                                                             col2.getHandle())
                    )))
                    .andExpect(jsonPath("$._embedded.collections", Matchers.not(
                        Matchers.contains(
-                           CollectionMatcher.matchCollectionEntryFullProjection(col1.getName(), col1.getID(),
+                           CollectionMatcher.matchCollectionEntrySpecificEmbedProjection(col1.getName(), col1.getID(),
                                                                                 col1.getHandle())
                        )
                    )));
@@ -292,10 +298,11 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
 
         // When full projection is requested, response should include expected properties, links, and embeds.
         getClient().perform(get("/api/core/collections/" + col1.getID())
-                .param("projection", "full"))
+                   .param("embed", CollectionMatcher.getEmbedsParameter()))
+
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
-                .andExpect(jsonPath("$", CollectionMatcher.matchFullEmbeds()))
+                .andExpect(jsonPath("$", CollectionMatcher.matchSpecificEmbeds()))
                 .andExpect(jsonPath("$", CollectionMatcher.matchCollectionEntry(
                         col1.getName(), col1.getID(), col1.getHandle())));
 
@@ -425,16 +432,17 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
         context.restoreAuthSystemState();
 
         getClient().perform(get("/api/core/collections/" + col1.getID())
-                   .param("projection", "full"))
+                      .param("embed", CollectionMatcher.getEmbedsParameter()))
+
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$", is(
-                       CollectionMatcher.matchCollectionEntryFullProjection(col1.getName(), col1.getID(),
+                       CollectionMatcher.matchCollectionEntrySpecificEmbedProjection(col1.getName(), col1.getID(),
                                                                             col1.getHandle())
                    )))
                    .andExpect(jsonPath("$", Matchers.not(
                        is(
-                           CollectionMatcher.matchCollectionEntryFullProjection(col2.getName(), col2.getID(),
+                           CollectionMatcher.matchCollectionEntrySpecificEmbedProjection(col2.getName(), col2.getID(),
                                                                                 col2.getHandle())
                        )))
                    )
@@ -781,16 +789,17 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
         context.restoreAuthSystemState();
 
         getClient().perform(get("/api/core/collections/" + col1.getID())
-                   .param("projection", "full"))
+                      .param("embed", CollectionMatcher.getEmbedsParameter()))
+
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$", is(
-                       CollectionMatcher.matchCollectionEntryFullProjection(col1.getName(), col1.getID(),
+                       CollectionMatcher.matchCollectionEntrySpecificEmbedProjection(col1.getName(), col1.getID(),
                                                                             col1.getHandle())
                    )))
                    .andExpect(jsonPath("$", Matchers.not(
                        is(
-                           CollectionMatcher.matchCollectionEntryFullProjection(col2.getName(), col2.getID(),
+                           CollectionMatcher.matchCollectionEntrySpecificEmbedProjection(col2.getName(), col2.getID(),
                                                                                 col2.getHandle())
                        ))));
     }
@@ -811,11 +820,12 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
 
         getClient().perform(get("/api/core/collections/" + col1.getID().toString())
-                   .param("projection", "full"))
+                      .param("embed", CollectionMatcher.getEmbedsParameter()))
+
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$", Matchers.is(
-                       CollectionMatcher.matchCollectionEntryFullProjection(col1.getName(), col1.getID(),
+                       CollectionMatcher.matchCollectionEntrySpecificEmbedProjection(col1.getName(), col1.getID(),
                                                                             col1.getHandle())
                    )))
                    .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/core/collections")))
@@ -839,12 +849,13 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
         ;
 
         getClient().perform(get("/api/core/collections/" + col1.getID().toString())
-                   .param("projection", "full"))
+                      .param("embed", CollectionMatcher.getEmbedsParameter()))
+
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$", Matchers.is(
-                       CollectionMatcher.matchCollectionEntryFullProjection("Electronic theses and dissertations",
-                                                              col1.getID(), col1.getHandle())
+                       CollectionMatcher.matchCollectionEntrySpecificEmbedProjection(
+                           "Electronic theses and dissertations", col1.getID(), col1.getHandle())
                    )))
                    .andExpect(jsonPath("$._links.self.href",
                                        Matchers.containsString("/api/core/collections")))
@@ -881,11 +892,12 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
         context.restoreAuthSystemState();
 
         getClient(token).perform(get("/api/core/collections/" + col1.getID().toString())
-                        .param("projection", "full"))
+                           .param("embed", CollectionMatcher.getEmbedsParameter()))
+
                         .andExpect(status().isOk())
                         .andExpect(content().contentType(contentType))
                         .andExpect(jsonPath("$", Matchers.is(
-                            CollectionMatcher.matchCollectionEntryFullProjection(col1.getName(), col1.getID(),
+                            CollectionMatcher.matchCollectionEntrySpecificEmbedProjection(col1.getName(), col1.getID(),
                                                                                  col1.getHandle())
                         )))
                         .andExpect(jsonPath("$._links.self.href",
@@ -926,11 +938,12 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
         context.restoreAuthSystemState();
 
         getClient().perform(get("/api/core/collections/" + col1.getID().toString())
-                        .param("projection", "full"))
+                           .param("embed", CollectionMatcher.getEmbedsParameter()))
+
                         .andExpect(status().isOk())
                         .andExpect(content().contentType(contentType))
                         .andExpect(jsonPath("$", Matchers.is(
-                            CollectionMatcher.matchCollectionEntryFullProjection(col1.getName(), col1.getID(),
+                            CollectionMatcher.matchCollectionEntrySpecificEmbedProjection(col1.getName(), col1.getID(),
                                                                                  col1.getHandle())
                         )))
                         .andExpect(jsonPath("$._links.self.href",
@@ -975,10 +988,11 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                                          .content(mapper.writeValueAsBytes(collectionRest))
                                          .param("parent", parentCommunity.getID().toString())
                                          .contentType(contentType)
-                                         .param("projection", "full"))
+                                            .param("embed", CollectionMatcher.getEmbedsParameter()))
+
                             .andExpect(status().isCreated())
                             .andExpect(content().contentType(contentType))
-                            .andExpect(jsonPath("$", CollectionMatcher.matchFullEmbeds()))
+                            .andExpect(jsonPath("$", CollectionMatcher.matchSpecificEmbeds()))
                             .andExpect(jsonPath("$", Matchers.allOf(
                                 hasJsonPath("$.id", not(empty())),
                                 hasJsonPath("$.uuid", not(empty())),
@@ -1148,11 +1162,12 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
         context.restoreAuthSystemState();
 
         getClient(token).perform(get("/api/core/collections/" + col1.getID().toString())
-                        .param("projection", "full"))
+                           .param("embed", CollectionMatcher.getEmbedsParameter()))
+
                         .andExpect(status().isOk())
                         .andExpect(content().contentType(contentType))
                         .andExpect(jsonPath("$", Matchers.is(
-                            CollectionMatcher.matchCollectionEntryFullProjection(col1.getName(), col1.getID(),
+                            CollectionMatcher.matchCollectionEntrySpecificEmbedProjection(col1.getName(), col1.getID(),
                                                                                  col1.getHandle())
                         )))
                         .andExpect(jsonPath("$._links.self.href",
@@ -1185,11 +1200,12 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
 
         getClient().perform(get("/api/core/collections/" + col1.getID().toString())
-                   .param("projection", "full"))
+                      .param("embed", CollectionMatcher.getEmbedsParameter()))
+
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$", Matchers.is(
-                       CollectionMatcher.matchCollectionEntryFullProjection(col1.getName(), col1.getID(),
+                       CollectionMatcher.matchCollectionEntrySpecificEmbedProjection(col1.getName(), col1.getID(),
                                                                             col1.getHandle())
                    )))
                    .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/core/collections")))
@@ -1216,12 +1232,13 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
         ;
 
         getClient().perform(get("/api/core/collections/" + col1.getID().toString())
-                   .param("projection", "full"))
+                      .param("embed", CollectionMatcher.getEmbedsParameter()))
+
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$", Matchers.is(
-                       CollectionMatcher.matchCollectionEntryFullProjection("Electronic theses and dissertations",
-                                                              col1.getID(), col1.getHandle())
+                       CollectionMatcher.matchCollectionEntrySpecificEmbedProjection(
+                           "Electronic theses and dissertations", col1.getID(), col1.getHandle())
                    )))
                    .andExpect(jsonPath("$._links.self.href",
                                        Matchers.containsString("/api/core/collections")))
@@ -1357,13 +1374,14 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
 
 
         getClient().perform(get("/api/core/collections")
-                   .param("projection", "full"))
+                      .param("embed", CollectionMatcher.getEmbedsParameter()))
+
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$._embedded.collections", Matchers.containsInAnyOrder(
-                       CollectionMatcher.matchCollectionEntryFullProjection(col1.getName(), col1.getID(),
+                       CollectionMatcher.matchCollectionEntrySpecificEmbedProjection(col1.getName(), col1.getID(),
                                                                             col1.getHandle()),
-                       CollectionMatcher.matchCollectionEntryFullProjection(col2.getName(), col2.getID(),
+                       CollectionMatcher.matchCollectionEntrySpecificEmbedProjection(col2.getName(), col2.getID(),
                                                                             col2.getHandle())
                    )))
                    .andExpect(jsonPath("$.page", PageMatcher.pageEntryWithTotalPagesAndElements(0, 20,
@@ -1391,7 +1409,9 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                                            .build();
         Collection col2 = CollectionBuilder.createCollection(context, child1child).withName("Collection 2").build();
 
-        getClient().perform(get("/api/core/collections/" + col1.getID())
+        String token = getAuthToken(admin.getEmail(), password);
+
+        getClient(token).perform(get("/api/core/collections/" + col1.getID())
                             .param("projection", "level")
                             .param("embedLevelDepth", "1"))
                    .andExpect(status().isOk())
@@ -1412,7 +1432,8 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                    // .doesNotExist() makes sure that this section is not embedded, it's not there at all
                    .andExpect(jsonPath("$._embedded.logo._embedded.format").doesNotExist());
 
-        getClient().perform(get("/api/core/collections/" + col1.getID())
+        // Need this admin call for the AdminGroup embed in the Parentcommunity
+        getClient(token).perform(get("/api/core/collections/" + col1.getID())
                             .param("projection", "level")
                             .param("embedLevelDepth", "3"))
                    .andExpect(status().isOk())
@@ -1496,5 +1517,147 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
         getClient().perform(get("/api/core/collections/" + col1.getID())
                                 .param("projection", "level"))
                    .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void testHiddenMetadataForAnonymousUser() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        // use multiple metadata to hit the scenario of the bug DS-4487 related to concurrent modification
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withName("Collection 1")
+                                           .withProvenance("Provenance Data")
+                                           .withNameForLanguage("Col 1", "en")
+                                           .build();
+
+        context.restoreAuthSystemState();
+
+
+        getClient().perform(get("/api/core/collections/" + col1.getID()))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$", CollectionMatcher.matchProperties(col1.getName(),
+                                                                                   col1.getID(),
+                                                                                   col1.getHandle())))
+                        .andExpect(jsonPath("$.metadata", matchMetadata("dc.title", "Collection 1")))
+                   .andExpect(jsonPath("$.metadata", matchMetadataDoesNotExist("dc.description.provenance")));
+
+    }
+
+
+    @Test
+    public void testHiddenMetadataForAdminUser() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        // use multiple metadata to hit the scenario of the bug DS-4487 related to concurrent modification
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withName("Collection 1")
+                                           .withProvenance("Provenance Data")
+                                           .withNameForLanguage("Col 1", "en")
+                                           .build();
+
+
+
+        context.restoreAuthSystemState();
+
+        String token = getAuthToken(admin.getEmail(), password);
+
+        getClient(token).perform(get("/api/core/collections/" + col1.getID()))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$", CollectionMatcher.matchProperties(col1.getName(),
+                                                                              col1.getID(),
+                                                                              col1.getHandle())))
+                        .andExpect(jsonPath("$.metadata", matchMetadata("dc.title", "Collection 1")))
+                        .andExpect(jsonPath("$.metadata",
+                                            matchMetadata("dc.description.provenance", "Provenance Data")));
+    }
+
+    @Test
+    public void testHiddenMetadataForUserWithWriteRights() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        // use multiple metadata to hit the scenario of the bug DS-4487 related to concurrent modification
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withName("Collection 1")
+                                           .withProvenance("Provenance Data")
+                                           .withNameForLanguage("Col 1", "en")
+                                           .build();
+
+
+
+        ResourcePolicyBuilder.createResourcePolicy(context)
+                             .withUser(eperson)
+                             .withAction(WRITE)
+                             .withDspaceObject(col1)
+                             .build();
+        context.restoreAuthSystemState();
+
+        String token = getAuthToken(eperson.getEmail(), password);
+
+        getClient(token).perform(get("/api/core/collections/" + col1.getID()))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$", CollectionMatcher.matchProperties(col1.getName(),
+                                                                              col1.getID(),
+                                                                              col1.getHandle())))
+                        .andExpect(jsonPath("$.metadata", matchMetadata("dc.title", "Collection 1")))
+                        .andExpect(jsonPath("$.metadata.['dc.description.provenance']").doesNotExist());
+
+    }
+
+    @Test
+    public void findAllWithHiddenMetadataTest() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                         .withName("Parent Community")
+                         .build();
+        // use multiple metadata to hit the scenario of the bug DS-4487 related to concurrent modification
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                         .withName("Collection 1")
+                         .withProvenance("Provenance Test 1")
+                         .withNameForLanguage("col1", "en")
+                         .build();
+        Collection col2 = CollectionBuilder.createCollection(context, parentCommunity)
+                         .withName("Collection 2")
+                         .withProvenance("Provenance Test 2")
+                         .withNameForLanguage("col2", "it")
+                         .build();
+
+        context.restoreAuthSystemState();
+
+        String tokenEPerson = getAuthToken(eperson.getEmail(), password);
+
+        getClient().perform(get("/api/core/collections")
+                   .param("embed", CollectionMatcher.getEmbedsParameter()))
+                   .andExpect(status().isOk())
+                   .andExpect(content().contentType(contentType))
+                   .andExpect(jsonPath("$._embedded.collections", Matchers.containsInAnyOrder(
+                           CollectionMatcher.matchCollectionEntrySpecificEmbedProjection(col1.getName(), col1.getID(),
+                                                                                col1.getHandle()),
+                           CollectionMatcher.matchCollectionEntrySpecificEmbedProjection(col2.getName(), col2.getID(),
+                                                                                col2.getHandle())
+                           )))
+                   .andExpect(jsonPath("$.metadata.['dc.description.provenance']").doesNotExist());
+
+        getClient(tokenEPerson).perform(get("/api/core/collections")
+                .param("embed", CollectionMatcher.getEmbedsParameter()))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$._embedded.collections", Matchers.containsInAnyOrder(
+                        CollectionMatcher.matchCollectionEntrySpecificEmbedProjection(col1.getName(), col1.getID(),
+                                                                             col1.getHandle()),
+                        CollectionMatcher.matchCollectionEntrySpecificEmbedProjection(col2.getName(), col2.getID(),
+                                                                             col2.getHandle())
+                        )))
+                .andExpect(jsonPath("$.metadata.['dc.description.provenance']").doesNotExist());
+
     }
 }

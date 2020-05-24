@@ -7,13 +7,17 @@
  */
 package org.dspace.app.rest.repository;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 import org.dspace.app.rest.model.SubmissionFormRest;
 import org.dspace.app.util.DCInputSet;
 import org.dspace.app.util.DCInputsReader;
 import org.dspace.app.util.DCInputsReaderException;
 import org.dspace.core.Context;
+import org.dspace.core.I18nUtil;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -26,32 +30,50 @@ import org.springframework.stereotype.Component;
  */
 @Component(SubmissionFormRest.CATEGORY + "." + SubmissionFormRest.NAME)
 public class SubmissionFormRestRepository extends DSpaceRestRepository<SubmissionFormRest, String> {
-
-    private DCInputsReader inputReader;
+    private Map<Locale, DCInputsReader> inputReaders;
+    private DCInputsReader defaultInputReader;
 
     public SubmissionFormRestRepository() throws DCInputsReaderException {
-        inputReader = new DCInputsReader();
+        defaultInputReader = new DCInputsReader();
+        Locale[] locales = I18nUtil.getSupportedLocales();
+        inputReaders = new HashMap<Locale,DCInputsReader>();
+        for (Locale locale : locales) {
+            inputReaders.put(locale, new DCInputsReader(I18nUtil.getInputFormsFileName(locale)));
+        }
     }
 
     @PreAuthorize("hasAuthority('AUTHENTICATED')")
     @Override
-    public SubmissionFormRest findOne(Context context, String submitName) {
-        DCInputSet inputConfig;
+    public SubmissionFormRest findOne(Context context, String submitName)  {
         try {
-            inputConfig = inputReader.getInputsByFormName(submitName);
+            Locale currentLocale = context.getCurrentLocale();
+            DCInputsReader inputReader;
+            if (currentLocale != null) {
+                inputReader = inputReaders.get(currentLocale);
+            } else {
+                inputReader = defaultInputReader;
+            }
+            DCInputSet subConfs = inputReader.getInputsByFormName(submitName);
+            if (subConfs == null) {
+                return null;
+            }
+            return converter.toRest(subConfs, utils.obtainProjection());
         } catch (DCInputsReaderException e) {
             throw new IllegalStateException(e.getMessage(), e);
         }
-        if (inputConfig == null) {
-            return null;
-        }
-        return converter.toRest(inputConfig, utils.obtainProjection());
     }
 
     @PreAuthorize("hasAuthority('AUTHENTICATED')")
     @Override
     public Page<SubmissionFormRest> findAll(Context context, Pageable pageable) {
         try {
+            Locale currentLocale = context.getCurrentLocale();
+            DCInputsReader inputReader;
+            if (currentLocale != null) {
+                inputReader = inputReaders.get(currentLocale);
+            } else {
+                inputReader = defaultInputReader;
+            }
             long total = inputReader.countInputs();
             List<DCInputSet> subConfs = inputReader.getAllInputs(pageable.getPageSize(),
                     Math.toIntExact(pageable.getOffset()));
@@ -64,5 +86,14 @@ public class SubmissionFormRestRepository extends DSpaceRestRepository<Submissio
     @Override
     public Class<SubmissionFormRest> getDomainClass() {
         return SubmissionFormRest.class;
+    }
+
+    public void reload() throws DCInputsReaderException {
+        this.defaultInputReader = new DCInputsReader();
+        Locale[] locales = I18nUtil.getSupportedLocales();
+        this.inputReaders = new HashMap<Locale, DCInputsReader>();
+        for (Locale locale : locales) {
+            inputReaders.put(locale, new DCInputsReader(I18nUtil.getInputFormsFileName(locale)));
+        }
     }
 }

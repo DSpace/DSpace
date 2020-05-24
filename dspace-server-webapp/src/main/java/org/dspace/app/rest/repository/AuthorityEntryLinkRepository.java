@@ -15,6 +15,7 @@ import javax.annotation.Nullable;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
+import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.exception.PaginationException;
 import org.dspace.app.rest.model.AuthorityEntryRest;
@@ -57,6 +58,9 @@ public class AuthorityEntryLinkRepository extends AbstractDSpaceRestRepository
                                           @Nullable Pageable optionalPageable, Projection projection) {
         Context context = obtainContext();
         String query = request == null ? null : request.getParameter("query");
+        if (query == null) {
+            query = "";
+        }
         String metadata = request == null ? null : request.getParameter("metadata");
         String uuidCollectìon = request == null ? null : request.getParameter("uuid");
         Collection collection = null;
@@ -95,18 +99,18 @@ public class AuthorityEntryLinkRepository extends AbstractDSpaceRestRepository
 
     @SearchRestMethod(name = "byParent")
     @PreAuthorize("hasAuthority('AUTHENTICATED')")
-    public Page<AuthorityEntryRest> findByParent(HttpServletRequest request, String name,
-                                          Pageable pageable, Projection projection) {
-        Context context = obtainContext();
-        String id = request.getParameter("id");
+    public Page<AuthorityEntryRest> findByParent(@Parameter(value = "authority", required = true) String name,
+                                                 @Parameter(value = "id", required = true) String id,
+                                                  Pageable pageable) {
 
+        Context context = obtainContext();
         List<AuthorityEntryRest> results = new ArrayList<AuthorityEntryRest>();
         if (StringUtils.isNotBlank(id) && authorityUtils.isHierarchical(name)) {
-            Choices choices = cas.getChoicesByParent(name, id, (int) pageable.getOffset(), pageable.getPageSize(),
+            Choices choices = cas.getChoicesByParent(name, id, (int)pageable.getOffset(), pageable.getPageSize(),
                     context.getCurrentLocale().toString());
 
             for (Choice value : choices.values) {
-                results.add(authorityUtils.convertEntry(value, name, projection));
+                results.add(authorityUtils.convertEntry(value, name, utils.obtainProjection()));
             }
         }
 
@@ -121,15 +125,16 @@ public class AuthorityEntryLinkRepository extends AbstractDSpaceRestRepository
 
     @SearchRestMethod(name = "top")
     @PreAuthorize("hasAuthority('AUTHENTICATED')")
-    public Page<AuthorityEntryRest> findAllTop(String name, Pageable pageable, Projection projection) {
+    public Page<AuthorityEntryRest> findAllTop(@Parameter(value = "authority", required = true) String name,
+                                                Pageable pageable) {
         Context context = obtainContext();
         List<AuthorityEntryRest> results = new ArrayList<AuthorityEntryRest>();
         if (authorityUtils.isHierarchical(name)) {
-            Choices choices = cas.getTopChoices(name, (int) pageable.getOffset(), pageable.getPageSize(),
+            Choices choices = cas.getTopChoices(name, (int)pageable.getOffset(), pageable.getPageSize(),
                     context.getCurrentLocale().toString());
 
             for (Choice value : choices.values) {
-                results.add(authorityUtils.convertEntry(value, name, projection));
+                results.add(authorityUtils.convertEntry(value, name, utils.obtainProjection()));
             }
         }
 

@@ -86,6 +86,12 @@
          In addition, resource policies are the core security mechanism in DSpace so want need to be 100% we
          do not receive a stale policy when querying them. -->
 
+    <!-- The total number of epersons in Deduplication can be very large. So it makes sense to cache Deduplication records because the cache hit rate is likely to be high. -->
+    <cache name="rg.dspace.deduplication.Deduplication"
+           maxElementsInMemory="1000" eternal="false" timeToIdleSeconds="1800"
+           timeToLiveSeconds="1800" overflowToDisk="false"
+           memoryStoreEvictionPolicy="LRU"/>
+
     <!-- The total number of epersons in DSpace can be very large, but the number of concurrent authenticated users is mostly
          limited. Therefor having the authenticated users data cached will increase performance as the cache hit rate will
          be high. -->

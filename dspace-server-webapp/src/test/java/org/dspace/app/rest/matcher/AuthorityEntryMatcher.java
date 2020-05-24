@@ -34,13 +34,21 @@ public class AuthorityEntryMatcher {
             hasJsonPath("$._links.self.href", containsString("api/integration/authority/")));
     }
 
-    private static Matcher<? super Object> matchProperties(String id, String display, String value) {
+    public static Matcher<? super Object> matchProperties(String id, String display, String value) {
         return allOf(
                 hasJsonPath("$.id", is(id)),
                 hasJsonPath("$.display", is(display)),
                 hasJsonPath("$.value", is(value)),
-                hasJsonPath("$.type", is("authority"))
+                hasJsonPath("$.type", is("authorityEntry"))
         );
+    }
+
+    public static Matcher<? super Object> matchAuthority(String id, String value) {
+        return allOf(
+                hasJsonPath("$.id", is(id)),
+                hasJsonPath("$.value", is(value)),
+                hasJsonPath("$.type", is("authorityEntry"))
+                 );
     }
 
     /**

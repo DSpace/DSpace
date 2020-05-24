@@ -11,6 +11,7 @@ import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasNoJsonPath;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.Matchers.is;
 
 import java.util.ArrayList;
@@ -79,7 +80,7 @@ public class HalMatcher {
             String href = rel.equals("self") ? selfHref : selfHref + "/" + rel;
             matchers.add(hasJsonPath("$._links." + rel + ".href", is(href)));
         }
-        matchers.add(hasJsonPath("$._links.length()", equalTo(rels.length)));
+        matchers.add(hasJsonPath("$._links.length()", greaterThanOrEqualTo(rels.length)));
         return allOf(matchers);
     }
 }

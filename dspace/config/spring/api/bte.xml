@@ -107,6 +107,8 @@
 	            <!-- Specify here any data loaders you want to include in the submission lookup process.
 	            	Dataloaders must either extend the "NetworkSubmissionLookupDataLoader" abstract class
 	            	or conform to "FileDataLoader" interface of BTE -->
+                <entry key="ads" value-ref="adsOnlineDataLoader"/>
+                <entry key="pubmedEurope" value-ref="pubmedEuropeOnlineDataLoader"/>
 	            <entry key="pubmed" value-ref="pubmedOnlineDataLoader"/>
 	            <entry key="crossref" value-ref="crossRefOnlineDataLoader"/>
 	            <entry key="arxiv" value-ref="arXivOnlineDataLoader"/>
@@ -752,9 +754,103 @@
 				<entry value="ncid" key="" />
 				<entry value="naid" key="" />
 				 -->
-				 
-			</map>
-		</constructor-arg>
-	</bean>
+
+            </map>
+        </constructor-arg>
+    </bean>
+
+    <!-- PubmedEurope -->
+    <bean id="pubmedEuropeOnlineDataLoader" class="org.dspace.submit.lookup.PubmedEuropeOnlineDataLoader">
+        <property name="searchProvider" value="false"/>
+        <property name="fieldMap" ref="pubmedEuropeInputMap"/>
+    </bean>
+    <bean id="pubmedEuropeFileDataLoader" class="org.dspace.submit.lookup.PubmedEuropeFileDataLoader">
+        <property name="fieldMap" ref="pubmedEuropeInputMap"/>
+    </bean>
+    <bean name="pubmedEuropeInputMap" class="java.util.HashMap" scope="prototype">
+        <constructor-arg>
+            <map key-type="java.lang.String" value-type="java.lang.String">
+                <entry key="pmid" value="pubmedID"/>
+                <entry key="pmcid" value="pubmedcentralID"/>
+                <entry key="doi" value="doi"/>
+                <entry key="ISSN" value="jissn"/>
+                <entry key="EISSN" value="jeissn"/>
+                <entry key="jTitle" value="journal"/>
+                <entry key="startPage" value="firstpage"/>
+                <entry key="endPage" value="lastpage"/>
+                <entry key="title" value="title"/>
+                <entry key="pubDate" value="issued"/>
+                <entry key="volume" value="volume"/>
+                <entry key="issue" value="issue"/>
+                <entry key="language" value="language"/>
+                <entry key="pubType" value="subtype"/>
+                <entry key="keyword" value="keywords"/>
+                <entry key="primaryMeshHeading" value="meshheadings"/>
+                <entry key="secondaryMeshHeading" value="meshqualifiers"/>
+                <entry key="abstractText" value="abstract"/>
+                <entry key="author" value="authors"/>
+                <entry key="investigator" value="others"/>
+                <entry key="publisher" value="publisher"/>
+                <entry key="series" value="seriestitle"/>
+                <entry key="bookTitle" value="booktitle"/>
+                <entry key="isbn" value="pisbn"/>
+                <entry key="sISSN" value="jissn"/>
+                <entry key="edition" value="editionnumber"/>
+                <entry key="url" value="url"/>
+                <entry key="uri" value="uri"/>
+            </map>
+        </constructor-arg>
+    </bean>
+
+    <!-- ADS -->
+
+    <bean id="adsOnlineDataLoader" class="org.dspace.submit.lookup.ADSOnlineDataLoader">
+        <property name="searchProvider" value="false"/>
+        <property name="fieldMap" ref="adsInputMap"/>
+    </bean>
+
+    <bean name="adsInputMap" class="java.util.HashMap" scope="prototype">
+        <constructor-arg>
+            <map key-type="java.lang.String" value-type="java.lang.String">
+                <entry key="abstract" value="abstract"/>
+                <entry key="aff" value="affiliation"/>
+                <entry key="alternate_title" value="titlealternative"/>
+                <entry key="arxiv_class" value="arXivCategory"/>
+                <entry key="author" value="authors"/>
+                <entry key="bibcode" value="adsbibcode"/>
+                <entry key="doi" value="doi"/>
+                <entry key="doctype" value="subtype"/>
+                <entry key="adstype" value="providerType"/>
+                <entry key="id" value="adsid"/>
+                <entry key="issue" value="issue"/>
+                <entry key="keyword" value="keywords"/>
+                <entry key="lang" value="language"/>
+                <entry key="page" value="firstpage"/>
+                <entry key="pub" value="journal"/>
+                <entry key="year" value="issued"/>
+                <entry key="volume" value="volume"/>
+                <entry key="title" value="title"/>
+                <entry key="copyright" value="rights"/>
+                <entry key="ack" value="note"/>
+                <!--  <entry key="vizier" value="" />
+                        <entry key="indexstamp" value="" />
+                        <entry key="alternate_bibcode" value="" />
+                        <entry key="read_count" value="" />
+                        <entry key="year" value="" />
+                          <entry key="orcid_pub" value="" />
+                        <entry key="orcid_user" value="" />
+                        <entry key="orcid_other" value="" />
+                        <entry key="property" value="" />
+                        <entry key="bibgroup" value="" />
+                        <entry key="bibstem" value="" />
+                        <entry key="citation_count" value="" />
+                        <entry key="database" value="" />
+                        <entry key="first_author" value="" />
+                        <entry key="grant" value="" />
+                        <entry key="identifier" value="" /> TODO: should parse to find out which identifier is;
+                -->
+            </map>
+        </constructor-arg>
+    </bean>
 
 </beans>
