@@ -198,26 +198,22 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
         discoverQuery.setDSpaceObjectFilter(IndexableCollection.TYPE);
         discoverQuery.setStart(Math.toIntExact(pageable.getOffset()));
         discoverQuery.setMaxResults(pageable.getPageSize());
+        EPerson currentUser = context.getCurrentUser();
         if (!authorizeService.isAdmin(context)) {
-            if (q == null) {
-                Group anonymousGroup = groupService.findByName(context, Group.ANONYMOUS);
-                String anonGroupId = "";
-                if (anonymousGroup != null) {
-                    anonGroupId = anonymousGroup.getID().toString();
-                }
-                query.append("submit:(g").append(anonGroupId);
-                EPerson currentUser = context.getCurrentUser();
-                if (currentUser != null) {
-                    query.append(" OR e").append(currentUser.getID());
-                }
-                Set<Group> groups = groupService.allMemberGroupsSet(context, currentUser);
-                for (Group group : groups) {
-                    query.append(" OR g").append(group.getID());
-                }
-                query.append(")");
-            } else {
-                query.append(q);
+            Group anonymousGroup = groupService.findByName(context, Group.ANONYMOUS);
+            String anonGroupId = "";
+            if (anonymousGroup != null) {
+                anonGroupId = anonymousGroup.getID().toString();
             }
+            query.append("submit:(g").append(anonGroupId);
+            if (currentUser != null) {
+                query.append(" OR e").append(currentUser.getID());
+            }
+            Set<Group> groups = groupService.allMemberGroupsSet(context, currentUser);
+            for (Group group : groups) {
+                query.append(" OR g").append(group.getID());
+            }
+            query.append(")");
             discoverQuery.addFilterQueries(query.toString());
         }
         if (com != null) {
@@ -225,8 +221,8 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
         }
         if (StringUtils.isNotBlank(q)) {
             StringBuilder buildQuery = new StringBuilder();
-            String cleanQuery = ClientUtils.escapeQueryChars(q);
-            buildQuery.append(cleanQuery).append(" OR ").append(cleanQuery).append("*");
+            String escapedQuery = ClientUtils.escapeQueryChars(q);
+            buildQuery.append(escapedQuery).append(" OR ").append(escapedQuery).append("*");
             discoverQuery.setQuery(buildQuery.toString());
         }
         DiscoverResult resp = searchService.search(context, discoverQuery);
