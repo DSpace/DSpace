@@ -22,7 +22,7 @@ import org.dspace.app.rest.authorization.AlwaysTrueFeature;
 import org.dspace.app.rest.authorization.AuthorizationFeature;
 import org.dspace.app.rest.authorization.AuthorizationFeatureService;
 import org.dspace.app.rest.authorization.TrueForAdminsFeature;
-import org.dspace.app.rest.converter.ConverterService;
+import org.dspace.app.rest.converter.SiteConverter;
 import org.dspace.app.rest.model.CollectionRest;
 import org.dspace.app.rest.model.SiteRest;
 import org.dspace.app.rest.projection.DefaultProjection;
@@ -60,7 +60,7 @@ public class AuthorizationFeatureServiceIT extends AbstractIntegrationTestWithDa
     private SiteService siteService;
 
     @Autowired
-    private ConverterService converterService;
+    private SiteConverter siteConverter;
 
     @Autowired
     private AuthorizationFeatureService authzFeatureService;
@@ -143,7 +143,7 @@ public class AuthorizationFeatureServiceIT extends AbstractIntegrationTestWithDa
      */
     public void isAuthorizedTest() throws Exception {
         Site site = siteService.findSite(context);
-        SiteRest siteRest = converterService.toRest(site, DefaultProjection.DEFAULT);
+        SiteRest siteRest = siteConverter.convert(site, DefaultProjection.DEFAULT);
 
         AuthorizationFeature alwaysTrue = authzFeatureService.find(AlwaysTrueFeature.NAME);
         AuthorizationFeature alwaysFalse = authzFeatureService.find(AlwaysFalseFeature.NAME);

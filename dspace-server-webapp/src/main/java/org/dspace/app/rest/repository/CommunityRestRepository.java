@@ -201,7 +201,7 @@ public class CommunityRestRepository extends DSpaceObjectRestRepository<Communit
     public Page<CommunityRest> findAllTop(Pageable pageable) {
         try {
             List<Community> communities = cs.findAllTop(obtainContext());
-            return converter.toRestPage(utils.getPage(communities, pageable), utils.obtainProjection());
+            return converter.toRestPage(communities, pageable, utils.obtainProjection());
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
