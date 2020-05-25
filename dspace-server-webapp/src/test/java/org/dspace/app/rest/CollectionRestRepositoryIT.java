@@ -7,6 +7,7 @@
  */
 package org.dspace.app.rest;
 
+import static com.jayway.jsonpath.JsonPath.read;
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadata;
 import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadataDoesNotExist;
@@ -23,6 +24,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicReference;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.dspace.app.rest.builder.CollectionBuilder;
@@ -82,6 +84,7 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
         Collection col2 = CollectionBuilder.createCollection(context, child2).withName("Collection 2").build();
 
+        context.restoreAuthSystemState();
 
         getClient().perform(get("/api/core/collections")
                    .param("embed", CollectionMatcher.getEmbedsParameter()))
@@ -592,6 +595,8 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                                            .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
 
+        context.restoreAuthSystemState();
+
         getClient().perform(get("/api/core/collections/" + col1.getID().toString())
                       .param("embed", CollectionMatcher.getEmbedsParameter()))
 
@@ -613,7 +618,6 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
         collectionRest.setMetadata(new MetadataRest()
                 .put("dc.title", new MetadataValueRest("Electronic theses and dissertations")));
 
-        context.restoreAuthSystemState();
 
         getClient(token).perform(put("/api/core/collections/" + col1.getID().toString())
                                      .contentType(MediaType.APPLICATION_JSON)
@@ -739,6 +743,10 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                                           .build();
         context.restoreAuthSystemState();
 
+        AtomicReference<UUID> idRef = new AtomicReference<>();
+        AtomicReference<UUID> idRefNoEmbeds = new AtomicReference<>();
+        try {
+
         ObjectMapper mapper = new ObjectMapper();
         CollectionRest collectionRest = new CollectionRest();
         // We send a name but the created collection should set this to the title
@@ -783,7 +791,10 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                                             "Custom Copyright Text"),
                                     MetadataMatcher.matchMetadata("dc.title",
                                             "Title Text")
-                                )))));
+                                )))))
+                            .andDo(result -> idRef
+                                    .set(UUID.fromString(read(result.getResponse().getContentAsString(), "$.id"))));;
+
 
         getClient(authToken).perform(post("/api/core/collections")
                 .content(mapper.writeValueAsBytes(collectionRest))
@@ -791,7 +802,13 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                 .contentType(contentType))
                 .andExpect(status().isCreated())
                 .andExpect(content().contentType(contentType))
-                .andExpect(jsonPath("$", HalMatcher.matchNoEmbeds()));
+                .andExpect(jsonPath("$", HalMatcher.matchNoEmbeds()))
+                .andDo(result -> idRefNoEmbeds
+                        .set(UUID.fromString(read(result.getResponse().getContentAsString(), "$.id"))));
+        } finally {
+            CollectionBuilder.deleteCollection(idRef.get());
+            CollectionBuilder.deleteCollection(idRefNoEmbeds.get());
+        }
     }
 
     @Test
@@ -828,6 +845,8 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
         authorizeService.addPolicy(context, parentCommunity, Constants.ADD, eperson);
         context.restoreAuthSystemState();
 
+        AtomicReference<UUID> idRef = new AtomicReference<UUID>();
+        try {
         String authToken = getAuthToken(eperson.getEmail(), password);
 
         getClient(authToken).perform(post("/api/core/collections")
@@ -853,8 +872,12 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                                         "Custom Copyright Text"),
                                     MetadataMatcher.matchMetadata("dc.title",
                                         "Title Text")
-                                )))));
-
+                                )))))
+                            .andDo(result -> idRef
+                                    .set(UUID.fromString(read(result.getResponse().getContentAsString(), "$.id"))));
+        } finally {
+            CollectionBuilder.deleteCollection(idRef.get());
+        }
     }
 
     @Test
@@ -1146,6 +1169,8 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
         Collection col2 = CollectionBuilder.createCollection(context, child2).withName("Collection 2").build();
 
 
+        context.restoreAuthSystemState();
+
         getClient().perform(get("/api/core/collections")
                       .param("embed", CollectionMatcher.getEmbedsParameter()))
 
@@ -1181,6 +1206,8 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                                            .withLogo("TestingContentForLogo")
                                            .build();
         Collection col2 = CollectionBuilder.createCollection(context, child1child).withName("Collection 2").build();
+
+        context.restoreAuthSystemState();
 
         String token = getAuthToken(admin.getEmail(), password);
 
@@ -1262,6 +1289,8 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                                            .withLogo("TestingContentForLogo")
                                            .build();
 
+        context.restoreAuthSystemState();
+
         getClient().perform(get("/api/core/collections/" + col1.getID())
                                 .param("projection", "level")
                                 .param("embedLevelDepth", "100"))
@@ -1286,6 +1315,8 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                                            .withName("Collection 1")
                                            .withLogo("TestingContentForLogo")
                                            .build();
+
+        context.restoreAuthSystemState();
 
         getClient().perform(get("/api/core/collections/" + col1.getID())
                                 .param("projection", "level"))

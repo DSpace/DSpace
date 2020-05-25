@@ -98,6 +98,7 @@ public class MetadataSchemaRestRepositoryIT extends AbstractControllerIntegratio
         AtomicReference<Integer> idRef = new AtomicReference<>();
 
 
+        try {
         getClient(authToken)
                 .perform(post("/api/core/metadataschemas")
                         .content(new ObjectMapper().writeValueAsBytes(metadataSchemaRest))
@@ -109,6 +110,9 @@ public class MetadataSchemaRestRepositoryIT extends AbstractControllerIntegratio
         getClient().perform(get("/api/core/metadataschemas/" + idRef.get()))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$", MetadataschemaMatcher.matchEntry(TEST_NAME, TEST_NAMESPACE)));
+        } finally {
+            MetadataSchemaBuilder.deleteMetadataSchema(idRef.get());
+        }
     }
 
     @Test

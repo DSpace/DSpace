@@ -11,7 +11,7 @@ import java.util.List;
 import javax.servlet.Filter;
 
 import org.dspace.app.rest.filter.DSpaceRequestContextFilter;
-import org.dspace.app.rest.model.hateoas.DSpaceRelProvider;
+import org.dspace.app.rest.model.hateoas.DSpaceLinkRelationProvider;
 import org.dspace.app.rest.parameter.resolver.SearchFilterResolver;
 import org.dspace.app.rest.utils.ApplicationConfig;
 import org.dspace.app.rest.utils.DSpaceConfigurationInitializer;
@@ -26,7 +26,7 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.annotation.Order;
-import org.springframework.hateoas.RelProvider;
+import org.springframework.hateoas.server.LinkRelationProvider;
 import org.springframework.lang.NonNull;
 import org.springframework.web.context.request.RequestContextListener;
 import org.springframework.web.cors.CorsConfiguration;
@@ -118,8 +118,8 @@ public class Application extends SpringBootServletInitializer {
     }
 
     @Bean
-    protected RelProvider dspaceRelProvider() {
-        return new DSpaceRelProvider();
+    protected LinkRelationProvider dspaceLinkRelationProvider() {
+        return new DSpaceLinkRelationProvider();
     }
 
     @Bean
@@ -133,7 +133,7 @@ public class Application extends SpringBootServletInitializer {
                     registry.addMapping("/api/**").allowedMethods(CorsConfiguration.ALL)
                         .allowedOrigins(corsAllowedOrigins).allowedHeaders("Authorization", "Content-Type",
                             "X-Requested-With", "accept", "Origin", "Access-Control-Request-Method",
-                            "Access-Control-Request-Headers")
+                            "Access-Control-Request-Headers", "X-On-Behalf-Of")
                         .exposedHeaders("Access-Control-Allow-Origin", "Authorization");
                 }
             }

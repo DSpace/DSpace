@@ -46,7 +46,7 @@ public class HalLinkService {
             links.addAll(halLinkFactory.getLinksFor(halResource, pageable));
         }
 
-        links.sort((Link l1, Link l2) -> ObjectUtils.compare(l1.getRel(), l2.getRel()));
+        links.sort((Link l1, Link l2) -> ObjectUtils.compare(l1.getRel().value(), l2.getRel().value()));
 
         halResource.add(links);
 

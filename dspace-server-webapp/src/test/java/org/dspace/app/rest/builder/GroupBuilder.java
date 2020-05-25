@@ -34,7 +34,14 @@ public class GroupBuilder extends AbstractDSpaceObjectBuilder<Group> {
 
     @Override
     public void cleanup() throws Exception {
-        delete(group);
+       try (Context c = new Context()) {
+            c.turnOffAuthorisationSystem();
+            group = c.reloadEntity(group);
+            if (group != null) {
+                delete(c, group);
+                c.complete();
+            }
+       }
     }
 
     public static GroupBuilder createGroup(final Context context) {

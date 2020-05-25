@@ -152,7 +152,14 @@ public class BitstreamBuilder extends AbstractDSpaceObjectBuilder<Bitstream> {
 
     @Override
     public void cleanup() throws Exception {
-        delete(bitstream);
+       try (Context c = new Context()) {
+            c.turnOffAuthorisationSystem();
+            bitstream = c.reloadEntity(bitstream);
+            if (bitstream != null) {
+                delete(c, bitstream);
+                c.complete();
+            }
+        }
     }
 
     protected DSpaceObjectService<Bitstream> getService() {
