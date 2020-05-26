@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.Optional;
 
 @Service
@@ -50,7 +51,25 @@ public class GeoIpService {
         log.info("useProxies=" + useProxies);
     }
 
-    public static String getCountryCode(HttpServletRequest request) {
+    private String fetchIpAddressFromRequest(HttpServletRequest request) {
+        String ip = request.getRemoteAddr();
+
+        if(useProxies && request.getHeader("X-Real-IP") != null) {
+            /* This header is a comma delimited list */
+            for(String xfip : request.getHeader("X-Real-IP").split(",")) {
+                    /* proxy itself will sometime populate this header with the same value in
+                        remote address. ordering in spec is vague, we'll just take the last
+                        not equal to the proxy
+                    */
+                if(!request.getHeader("X-Real-IP").contains(ip)) {
+                    ip = xfip.trim();
+                }
+            }
+        }
+        return ip;
+    }
+
+    public String getCountryCode(HttpServletRequest request) {
         if (geoipLookup == null)
             return UNKNOWN_COUNTRY_CODE;
 
@@ -60,21 +79,7 @@ public class GeoIpService {
             if(isSpiderBot) {
                 return UNKNOWN_COUNTRY_CODE;
             }
-
-            String ip = request.getRemoteAddr();
-
-            if(useProxies && request.getHeader("X-Real-IP") != null) {
-                /* This header is a comma delimited list */
-                for(String xfip : request.getHeader("X-Real-IP").split(",")) {
-                    /* proxy itself will sometime populate this header with the same value in
-                        remote address. ordering in spec is vague, we'll just take the last
-                        not equal to the proxy
-                    */
-                    if(!request.getHeader("X-Real-IP").contains(ip)) {
-                        ip = xfip.trim();
-                    }
-                }
-            }
+            String ip = fetchIpAddressFromRequest(request);
 
             // Save the location information if valid, save the event without
             // location information if not valid
@@ -96,5 +101,15 @@ public class GeoIpService {
         }
 
         return UNKNOWN_COUNTRY_CODE;
+    }
+
+    public boolean isLocalhost(HttpServletRequest request) {
+        String ip = fetchIpAddressFromRequest(request);
+        try {
+            return InetAddress.getLocalHost().equals(InetAddress.getByName(ip));
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        }
+        return true;
     }
 }

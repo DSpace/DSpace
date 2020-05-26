@@ -83,6 +83,9 @@ public class HandleController {
     @Resource
     private AuthorsService authorsService;
 
+    @Resource
+    private GeoIpService geoIpService;
+
     @RequestMapping(value = "/123456789/{itemId}")
     public ModelAndView entrypoint(HttpServletRequest request, HttpServletResponse response,  @PathVariable("itemId") String itemId, ModelAndView model) throws SQLException, ItemCountException, PluginException, AuthorizeException, ServletException, BrowseException, IOException, SortException, CrosswalkException {
         Context dspaceContext = UIUtil.obtainContext(request);
@@ -210,7 +213,7 @@ public class HandleController {
         Context dspaceContext = UIUtil.obtainContext(request);
         Item item = (Item)handleService.resolveToObject(dspaceContext, String.format("123456789/%d", handle));
         boolean isSpiderBot = SpiderDetector.isSpider(request);
-        if(!isSpiderBot) {
+        if(!isSpiderBot && !geoIpService.isLocalhost(request)) {
             essuirStatistics.incrementGlobalItemDownloads();
             essuirStatistics.updateItemDownloads(request, item.getID());
         }
@@ -250,7 +253,7 @@ public class HandleController {
         request.setAttribute("dspace.layout.head", headMetadata.toString());
 
         boolean isSpiderBot = SpiderDetector.isSpider(request);
-        if(!isSpiderBot) {
+        if(!isSpiderBot && !geoIpService.isLocalhost(request)) {
             essuirStatistics.updateItemViews(request, item.getID());
             essuirStatistics.incrementGlobalItemViews();
         }
