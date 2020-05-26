@@ -106,7 +106,7 @@ public class EssuirSiteController {
 
     @RequestMapping("/provision")
     public String provisionPage() {
-        return "position";
+        return "provision";
     }
 
     @RequestMapping("/about")
