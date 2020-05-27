@@ -37,6 +37,7 @@ public class SubmissionCCLicenseUrlResourceHalLinkFactory
      * @param list          - The list of present links
      * @throws Exception
      */
+    @Override
     protected void addLinks(SubmissionCCLicenseUrlResource halResource, final Pageable pageable,
                             LinkedList<Link> list)
             throws Exception {
@@ -54,10 +55,12 @@ public class SubmissionCCLicenseUrlResourceHalLinkFactory
     }
 
 
+    @Override
     protected Class<SubmissionCCLicenseSearchController> getControllerClass() {
         return SubmissionCCLicenseSearchController.class;
     }
 
+    @Override
     protected Class<SubmissionCCLicenseUrlResource> getResourceClass() {
         return SubmissionCCLicenseUrlResource.class;
     }
