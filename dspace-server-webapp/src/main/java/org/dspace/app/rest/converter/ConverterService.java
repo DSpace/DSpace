@@ -7,8 +7,10 @@
  */
 package org.dspace.app.rest.converter;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -17,6 +19,7 @@ import java.util.Set;
 import javax.annotation.Nullable;
 import javax.annotation.PostConstruct;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.app.rest.link.HalLinkFactory;
 import org.dspace.app.rest.link.HalLinkService;
@@ -26,17 +29,20 @@ import org.dspace.app.rest.model.RestModel;
 import org.dspace.app.rest.model.hateoas.HALResource;
 import org.dspace.app.rest.projection.DefaultProjection;
 import org.dspace.app.rest.projection.Projection;
+import org.dspace.app.rest.repository.DSpaceRestRepository;
 import org.dspace.app.rest.security.DSpacePermissionEvaluator;
 import org.dspace.app.rest.utils.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider;
+import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.core.type.filter.AssignableTypeFilter;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.Link;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
@@ -94,17 +100,77 @@ public class ConverterService {
         DSpaceConverter<M, R> converter = requireConverter(modelObject.getClass());
         R restObject = converter.convert(transformedModel, projection);
         if (restObject instanceof BaseObjectRest) {
-            if (!dSpacePermissionEvaluator.hasPermission(SecurityContextHolder.getContext().getAuthentication(),
-                                                         restObject, "READ")) {
-                log.debug("Access denied on " + restObject.getClass() + " with id: " +
-                              ((BaseObjectRest) restObject).getId());
-                return null;
+            String permission = getPermissionForRestObject((BaseObjectRest) restObject);
+            if (!StringUtils.equalsIgnoreCase(permission, "permitAll")) {
+                if (StringUtils.equalsIgnoreCase(permission, "admin")) {
+                    //TODO
+                } else if (StringUtils.equalsIgnoreCase(permission, "authenticated")) {
+                    //TODO
+                } else {
+                    if (!dSpacePermissionEvaluator.hasPermission(SecurityContextHolder.getContext().getAuthentication(),
+                                                                 restObject, permission)) {
+                        log.info("Access denied on " + restObject.getClass());
+                        return null;
+                    }
+                }
             }
         }
         if (restObject instanceof RestModel) {
             return (R) projection.transformRest((RestModel) restObject);
         }
         return restObject;
+    }
+
+    private String getPermissionForRestObject(BaseObjectRest restObject) {
+        Annotation preAuthorize = getAnnotationForRestObject(restObject);
+        if (preAuthorize == null) {
+            preAuthorize = getDefaultFindOnePreAuthorize();
+
+        }
+        String permission = "READ";
+        permission = parseAnnotation(preAuthorize);
+        return permission;
+    }
+
+    private String parseAnnotation(Annotation preAuthorize) {
+        String permission = "";
+        if (preAuthorize != null) {
+            String annotationValue = (String) AnnotationUtils.getValue(preAuthorize);
+            if (StringUtils.contains(annotationValue, "permitAll")) {
+                permission = "permitAll";
+            } else if (StringUtils.contains(annotationValue, "hasAuthority")) {
+                permission = StringUtils.substringBetween(annotationValue, "hasAuthority('", "')");
+            } else if (StringUtils.contains(annotationValue,"hasPermission")) {
+                permission = StringUtils.split(annotationValue, ",")[2];
+                permission = StringUtils.substringBetween(permission, "'");
+            }
+        }
+        return permission;
+    }
+
+    private Annotation getAnnotationForRestObject(BaseObjectRest restObject) {
+        BaseObjectRest baseObjectRest = restObject;
+        DSpaceRestRepository repositoryToUse = utils
+            .getResourceRepositoryByCategoryAndModel(baseObjectRest.getCategory(), baseObjectRest.getType());
+        Annotation preAuthorize = null;
+        for (Method m : repositoryToUse.getClass().getMethods()) {
+            if (StringUtils.equalsIgnoreCase(m.getName(), "findOne")) {
+                preAuthorize = AnnotationUtils.findAnnotation(m, PreAuthorize.class);
+            }
+        }
+        return preAuthorize;
+    }
+
+    private Annotation getDefaultFindOnePreAuthorize() {
+        for (Method m : DSpaceRestRepository.class.getMethods()) {
+            if (StringUtils.equalsIgnoreCase(m.getName(), "findOne")) {
+                Annotation annotation = AnnotationUtils.findAnnotation(m, PreAuthorize.class);
+                if (annotation != null) {
+                    return annotation;
+                }
+            }
+        }
+        return null;
     }
 
     /**
