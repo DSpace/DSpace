@@ -5,7 +5,9 @@
  *
  * http://www.dspace.org/license/
  */
-module.exports = {
+import { GlobalConfig } from '../src/config/global-config.interface';
+
+export const environment: Partial<GlobalConfig> = {
   rest: {
     ssl: false,
     host: 'localhost',
