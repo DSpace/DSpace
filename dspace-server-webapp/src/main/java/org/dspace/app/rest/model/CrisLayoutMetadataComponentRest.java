@@ -12,7 +12,6 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import org.dspace.app.rest.RestResourceController;
 /**
  * The CrisLayoutMetadataComponent REST Resource
@@ -149,7 +148,6 @@ public class CrisLayoutMetadataComponentRest extends BaseObjectRest<String> {
          * </ul>
          * @return
          */
-        @JsonProperty( value = "field-type" )
         public String getFieldType() {
             return fieldType;
         }
@@ -197,14 +195,12 @@ public class CrisLayoutMetadataComponentRest extends BaseObjectRest<String> {
         public void setBundle(String bundle) {
             this.bundle = bundle;
         }
-        @JsonProperty( value = "metadata-field" )
         public String getMetadataField() {
             return metadataField;
         }
         public void setMetadataField(String metadataField) {
             this.metadataField = metadataField;
         }
-        @JsonProperty( value = "metadata-value" )
         public String getMetadataValue() {
             return metadataValue;
         }

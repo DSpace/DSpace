@@ -102,7 +102,6 @@ public class CrisLayoutBoxRest extends BaseObjectRest<Integer> {
         this.header = header;
     }
 
-    @JsonProperty( value = "entity-type" )
     public String getEntityType() {
         return entityType;
     }
@@ -183,7 +182,6 @@ public class CrisLayoutBoxRest extends BaseObjectRest<Integer> {
      * This attribute is used to choice the appropriate component. It could be metadata, search, bibliometrics
      * @return
      */
-    @JsonProperty(value = "box-type")
     public String getBoxType() {
         return boxType;
     }

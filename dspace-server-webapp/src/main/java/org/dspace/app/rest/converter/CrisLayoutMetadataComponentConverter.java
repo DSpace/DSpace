@@ -7,8 +7,11 @@
  */
 package org.dspace.app.rest.converter;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -16,6 +19,7 @@ import org.dspace.app.rest.model.CrisLayoutMetadataComponentRest;
 import org.dspace.app.rest.model.CrisLayoutMetadataComponentRest.Bitstream;
 import org.dspace.app.rest.model.CrisLayoutMetadataComponentRest.Field;
 import org.dspace.app.rest.model.CrisLayoutMetadataComponentRest.Row;
+import org.dspace.content.CrisLayoutFieldRowPriorityComparator;
 import org.dspace.content.MetadataField;
 import org.dspace.layout.CrisLayoutBox;
 import org.dspace.layout.CrisLayoutField;
@@ -35,7 +39,10 @@ public class CrisLayoutMetadataComponentConverter  {
         CrisLayoutMetadataComponentRest rest = new CrisLayoutMetadataComponentRest();
         if ( box != null ) {
             rest.setId(box.getShortname());
-            Set<CrisLayoutField> layoutFields = box.getLayoutFields();
+            Set<CrisLayoutField> uLayoutFields = box.getLayoutFields();
+            List<CrisLayoutField> layoutFields = new ArrayList<>();
+            layoutFields.addAll(uLayoutFields);
+            Collections.sort(layoutFields, new CrisLayoutFieldRowPriorityComparator());
             if (layoutFields != null && !layoutFields.isEmpty()) {
                 Map<Integer, Row> rows = new HashMap<>();
                 for (CrisLayoutField layoutField: layoutFields) {
