@@ -33,16 +33,23 @@ public class SubmissionCCLicenseSearchControllerIT extends AbstractControllerInt
                 "/api/config/submissioncclicenses/search/rightsByQuestions?license=license2&answer_license2-field0" +
                         "=license2-field0-enum1"))
                    .andExpect(status().isOk())
-                   .andExpect(jsonPath("$.value", is("mock-license-uri")))
-                   .andExpect(jsonPath("$.type", is("plaintextvalue")));
+                   .andExpect(jsonPath("$.url", is("mock-license-uri")))
+                   .andExpect(jsonPath("$.type", is("submissioncclicenseUrl")))
+                   .andExpect(jsonPath("$._links.self.href",
+                                       is("http://localhost/api/config/submissioncclicenses/search/rightsByQuestions" +
+                                                  "?license=license2" +
+                                                  "&answer_license2-field0=license2-field0-enum1")));
     }
 
     @Test
     public void searchRightsByQuestionsTestLicenseWithoutFields() throws Exception {
         getClient().perform(get("/api/config/submissioncclicenses/search/rightsByQuestions?license=license3"))
                    .andExpect(status().isOk())
-                   .andExpect(jsonPath("$.value", is("mock-license-uri")))
-                   .andExpect(jsonPath("$.type", is("plaintextvalue")));
+                   .andExpect(jsonPath("$.url", is("mock-license-uri")))
+                   .andExpect(jsonPath("$.type", is("submissioncclicenseUrl")))
+                   .andExpect(jsonPath("$._links.self.href",
+                                       is("http://localhost/api/config/submissioncclicenses/search/rightsByQuestions" +
+                                                  "?license=license3")));
     }
 
     @Test
