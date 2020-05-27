@@ -2097,4 +2097,297 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
                 .param("query", group1.getName()))
                 .andExpect(status().isForbidden());
     }
+
+    @Test
+    public void colAdminManageSubmitterGroupAndAdminGroupTest() throws Exception {
+
+        GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
+
+        context.turnOffAuthorisationSystem();
+
+        EPerson adminChild1 = EPersonBuilder.createEPerson(context)
+                .withNameInMetadata("Oliver", "Rossi")
+                .withEmail("adminChild1@example.com")
+                .withPassword(password)
+                .build();
+        EPerson adminCol1 = EPersonBuilder.createEPerson(context)
+                .withNameInMetadata("James", "Rossi")
+                .withEmail("adminCol1@example.com")
+                .withPassword(password)
+                .build();
+        EPerson submitter1 = EPersonBuilder.createEPerson(context)
+                .withNameInMetadata("Carl", "Rossi")
+                .withEmail("submitter1@example.com")
+                .withPassword(password)
+                .build();
+        EPerson submitter2 = EPersonBuilder.createEPerson(context)
+                .withNameInMetadata("Robert", "Clarks")
+                .withEmail("submitter2@example.com")
+                .withPassword(password)
+                .build();
+        EPerson submitter3 = EPersonBuilder.createEPerson(context)
+                .withNameInMetadata("Jack", "Brown")
+                .withEmail("submitter3@example.com")
+                .withPassword(password)
+                .build();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .withAdminGroup(eperson)
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .withAdminGroup(adminChild1)
+                                           .build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, child1)
+                                           .withName("Collection 1")
+                                           .withAdminGroup(adminCol1)
+                                           .withSubmitterGroup(eperson)
+                                           .build();
+
+        Group groupSubmitters = col1.getSubmitters();
+        Group groupAdmins = col1.getAdministrators();
+
+        context.restoreAuthSystemState();
+
+        String tokenAdminCol = getAuthToken(adminCol1.getEmail(), password);
+
+        assertFalse(groupService.isMember(context, submitter1, groupSubmitters));
+
+        getClient(tokenAdminCol).perform(post("/api/eperson/groups/" + groupSubmitters.getID() + "/epersons")
+                        .contentType(parseMediaType(TEXT_URI_LIST_VALUE))
+                        .content(REST_SERVER_URL + "eperson/groups/" + submitter1.getID() + "/\n"
+                               + REST_SERVER_URL + "eperson/groups/" + submitter2.getID()
+                        ))
+               .andExpect(status().isNoContent());
+
+        assertTrue(groupService.isMember(context, submitter1, groupSubmitters));
+        assertTrue(groupService.isMember(context, submitter2, groupSubmitters));
+
+        assertFalse(groupService.isMember(context, submitter3, groupAdmins));
+
+        getClient(tokenAdminCol).perform(
+                post("/api/eperson/groups/" + groupAdmins.getID() + "/epersons")
+                        .contentType(parseMediaType(TEXT_URI_LIST_VALUE))
+                        .content(REST_SERVER_URL + "eperson/groups/" + submitter3.getID()
+                        ))
+               .andExpect(status().isNoContent());
+
+        assertTrue(groupService.isMember(context, submitter3, groupAdmins));
+    }
+
+    @Test
+    public void colAdminWithoutRightsTest() throws Exception {
+
+        GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
+
+        context.turnOffAuthorisationSystem();
+
+        List<String> confPropsCollectionAdmins = new LinkedList<>();
+        confPropsCollectionAdmins.add("core.authorization.collection-admin.policies");
+        confPropsCollectionAdmins.add("core.authorization.collection-admin.submitters");
+        confPropsCollectionAdmins.add("core.authorization.collection-admin.workflows");
+        confPropsCollectionAdmins.add("core.authorization.collection-admin.admin-group");
+
+        EPerson adminChild1 = EPersonBuilder.createEPerson(context)
+                .withNameInMetadata("Oliver", "Rossi")
+                .withEmail("adminChild1@example.com")
+                .withPassword(password)
+                .build();
+        EPerson adminCol1 = EPersonBuilder.createEPerson(context)
+                .withNameInMetadata("James", "Rossi")
+                .withEmail("adminCol1@example.com")
+                .withPassword(password)
+                .build();
+        EPerson submitter1 = EPersonBuilder.createEPerson(context)
+                .withNameInMetadata("Carl", "Rossi")
+                .withEmail("submitter1@example.com")
+                .withPassword(password)
+                .build();
+        EPerson submitter2 = EPersonBuilder.createEPerson(context)
+                .withNameInMetadata("Robert", "Clarks")
+                .withEmail("submitter2@example.com")
+                .withPassword(password)
+                .build();
+        EPerson submitter3 = EPersonBuilder.createEPerson(context)
+                .withNameInMetadata("Jack", "Brown")
+                .withEmail("submitter3@example.com")
+                .withPassword(password)
+                .build();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .withAdminGroup(eperson)
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .withAdminGroup(adminChild1)
+                                           .build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, child1)
+                                           .withName("Collection 1")
+                                           .withAdminGroup(adminCol1)
+                                           .withSubmitterGroup(submitter2)
+                                           .build();
+
+        Group groupSubmitters = col1.getSubmitters();
+
+        context.restoreAuthSystemState();
+
+        String tokenAdminCol = getAuthToken(adminCol1.getEmail(), password);
+
+        assertFalse(groupService.isMember(context, submitter1, groupSubmitters));
+
+        getClient(tokenAdminCol).perform(
+                post("/api/eperson/groups/" + groupSubmitters.getID() + "/epersons")
+                        .contentType(parseMediaType(TEXT_URI_LIST_VALUE))
+                        .content(REST_SERVER_URL + "eperson/groups/" + submitter1.getID()
+                        ))
+               .andExpect(status().isNoContent());
+
+        assertTrue(groupService.isMember(context, submitter1, groupSubmitters));
+
+        for (String prop : confPropsCollectionAdmins) {
+            configurationService.setProperty(prop, false);
+        }
+
+        assertFalse(groupService.isMember(context, submitter3, groupSubmitters));
+
+        getClient(tokenAdminCol).perform(post("/api/eperson/groups/" + groupSubmitters.getID() + "/epersons")
+                 .contentType(parseMediaType(TEXT_URI_LIST_VALUE))
+                 .content(REST_SERVER_URL + "eperson/groups/" + submitter3.getID()
+                 ))
+                 .andExpect(status().isForbidden());
+
+        assertFalse(groupService.isMember(context, submitter3, groupSubmitters));
+    }
+
+    @Test
+    public void commAdminManageSubmitterGroupAndAdminGroupTest() throws Exception {
+
+        GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
+
+        context.turnOffAuthorisationSystem();
+
+        EPerson adminChild1 = EPersonBuilder.createEPerson(context)
+                .withNameInMetadata("Oliver", "Rossi")
+                .withEmail("adminChild1@example.com")
+                .withPassword(password)
+                .build();
+        EPerson adminCol1 = EPersonBuilder.createEPerson(context)
+                .withNameInMetadata("James", "Rossi")
+                .withEmail("adminCol1@example.com")
+                .withPassword(password)
+                .build();
+        EPerson submitter1 = EPersonBuilder.createEPerson(context)
+                .withNameInMetadata("Carl", "Rossi")
+                .withEmail("submitter1@example.com")
+                .withPassword(password)
+                .build();
+        EPerson submitter2 = EPersonBuilder.createEPerson(context)
+                .withNameInMetadata("Robert", "Clarks")
+                .withEmail("submitter2@example.com")
+                .withPassword(password)
+                .build();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .withAdminGroup(eperson)
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .withAdminGroup(adminChild1)
+                                           .build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, child1)
+                                           .withName("Collection 1")
+                                           .withAdminGroup(adminCol1)
+                                           .withSubmitterGroup(eperson)
+                                           .build();
+
+        Group groupSubmitters = col1.getSubmitters();
+
+        context.restoreAuthSystemState();
+
+        String tokenAdminComm = getAuthToken(adminChild1.getEmail(), password);
+
+        assertFalse(groupService.isMember(context, submitter1, groupSubmitters));
+
+        getClient(tokenAdminComm).perform(post("/api/eperson/groups/" + groupSubmitters.getID() + "/epersons")
+                 .contentType(parseMediaType(TEXT_URI_LIST_VALUE))
+                 .content(REST_SERVER_URL + "eperson/groups/" + submitter1.getID() + "/\n"
+                        + REST_SERVER_URL + "eperson/groups/" + submitter2.getID()
+                         ))
+                 .andExpect(status().isNoContent());
+
+        assertTrue(groupService.isMember(context, submitter1, groupSubmitters));
+        assertTrue(groupService.isMember(context, submitter2, groupSubmitters));
+
+    }
+
+    @Test
+    public void commAdminDeleteColAdminFromAdminGroupTest() throws Exception {
+
+        GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
+
+        context.turnOffAuthorisationSystem();
+
+        EPerson adminChild1 = EPersonBuilder.createEPerson(context)
+                .withNameInMetadata("Oliver", "Rossi")
+                .withEmail("adminChild1@example.com")
+                .withPassword(password)
+                .build();
+        EPerson adminCol1 = EPersonBuilder.createEPerson(context)
+                .withNameInMetadata("James", "Rossi")
+                .withEmail("adminCol1@example.com")
+                .withPassword(password)
+                .build();
+        EPerson submitter1 = EPersonBuilder.createEPerson(context)
+                .withNameInMetadata("Carl", "Rossi")
+                .withEmail("submitter1@example.com")
+                .withPassword(password)
+                .build();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .withAdminGroup(eperson)
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .withAdminGroup(adminChild1)
+                                           .build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, child1)
+                                           .withName("Collection 1")
+                                           .withAdminGroup(adminCol1)
+                                           .withSubmitterGroup(eperson)
+                                           .build();
+
+        Group groupAdministrators = col1.getAdministrators();
+        Group groupSubmitters = col1.getSubmitters();
+
+        context.restoreAuthSystemState();
+
+        String tokenAdminComm = getAuthToken(adminChild1.getEmail(), password);
+        String tokenAdminCol = getAuthToken(adminCol1.getEmail(), password);
+
+        assertTrue(groupService.isMember(context, adminCol1, groupAdministrators));
+
+        getClient(tokenAdminComm).perform(delete("/api/eperson/groups/"
+                                          + groupAdministrators.getID() + "/epersons/" + adminCol1.getID()))
+                 .andExpect(status().isNoContent());
+
+        assertFalse(groupService.isMember(context, adminCol1, groupAdministrators));
+        assertFalse(groupService.isMember(context, submitter1, groupSubmitters));
+
+        getClient(tokenAdminCol).perform(post("/api/eperson/groups/" + groupSubmitters.getID() + "/epersons")
+                 .contentType(parseMediaType(TEXT_URI_LIST_VALUE))
+                 .content(REST_SERVER_URL + "eperson/groups/" + submitter1.getID()
+                         ))
+                 .andExpect(status().isForbidden());
+
+        assertFalse(groupService.isMember(context, submitter1, groupSubmitters));
+
+    }
 }
