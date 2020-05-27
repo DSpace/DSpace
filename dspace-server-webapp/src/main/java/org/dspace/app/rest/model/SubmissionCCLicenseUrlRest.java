@@ -40,6 +40,7 @@ public class SubmissionCCLicenseUrlRest extends BaseObjectRest<String> {
         return NAME;
     }
 
+    @Override
     public String getCategory() {
         return SubmissionCCLicenseRest.CATEGORY;
     }
