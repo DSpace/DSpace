@@ -99,6 +99,7 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
     }
 
     @Override
+    @PreAuthorize("hasPermission(#id, 'ITEM', 'WRITE')")
     public ItemRest findOne(Context context, UUID id) {
         Item item = null;
         try {
