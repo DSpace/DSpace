@@ -97,6 +97,7 @@ public class ITExportUsageEventListener extends AbstractIntegrationTest {
     private Collection collection;
 
     private String encodedUrl;
+    private String encodedUIUrl;
 
 
     /**
@@ -130,12 +131,14 @@ public class ITExportUsageEventListener extends AbstractIntegrationTest {
             itemService.addMetadata(context, itemNotToBeProcessed, "dc", "type", null, null, "Excluded type");
             File itemNotToBeProcessedFile = new File(testProps.get("test.bitstream").toString());
             bitstreamNotToBeProcessed = itemService.createSingleBitstream(context,
-                                                          new FileInputStream(itemNotToBeProcessedFile),
-                                                          itemNotToBeProcessed);
+                                                                          new FileInputStream(itemNotToBeProcessedFile),
+                                                                          itemNotToBeProcessed);
             itemService.update(context, itemNotToBeProcessed);
 
-            String dspaceUrl = configurationService.getProperty("dspace.ui.url");
+            String dspaceUrl = configurationService.getProperty("dspace.server.url");
             encodedUrl = URLEncoder.encode(dspaceUrl, CharEncoding.UTF_8);
+            String dspaceUIUrl = configurationService.getProperty("dspace.ui.url");
+            encodedUIUrl = URLEncoder.encode(dspaceUIUrl, CharEncoding.UTF_8);
 
 
         } catch (Exception e) {
@@ -210,7 +213,7 @@ public class ITExportUsageEventListener extends AbstractIntegrationTest {
         String regex = "https://irus.jisc.ac.uk/counter/test/\\?url_ver=Z39.88-2004&req_id=" +
                 URLEncoder.encode(request.getRemoteAddr(), "UTF-8") + "&req_dat=&rft" +
                 ".artnum=oai%3Alocalhost%3A" + URLEncoder.encode(item.getHandle(), "UTF-8") + "&rfr_dat=&rfr_id" +
-                "=localhost&url_tim=" + ".*" + "?&svc_dat=" + encodedUrl + "%2Fhandle%2F" + URLEncoder
+                "=localhost&url_tim=" + ".*" + "?&svc_dat=" + encodedUIUrl + "%2Fhandle%2F" + URLEncoder
                 .encode(item.getHandle(), "UTF-8") + "&rft_dat=Investigation";
 
         boolean isMatch = matchesString(String.valueOf(testProcessedUrls.get(0)), regex);
@@ -245,7 +248,7 @@ public class ITExportUsageEventListener extends AbstractIntegrationTest {
         String regex = "https://irus.jisc.ac.uk/counter/test/\\?url_ver=Z39.88-2004&req_id=" +
                 URLEncoder.encode(request.getRemoteAddr(), "UTF-8") + "&req_dat=&rft" +
                 ".artnum=oai%3Alocalhost%3A" + URLEncoder.encode(item.getHandle(), "UTF-8") + "&rfr_dat=&rfr_id" +
-                "=localhost&url_tim=" + ".*" + "?&svc_dat=" + encodedUrl + "%2Fhandle%2F" + URLEncoder
+                "=localhost&url_tim=" + ".*" + "?&svc_dat=" + encodedUIUrl + "%2Fhandle%2F" + URLEncoder
                 .encode(item.getHandle(), "UTF-8") + "&rft_dat=Investigation";
 
         boolean isMatch = matchesString(all.get(0).getUrl(), regex);
@@ -306,8 +309,8 @@ public class ITExportUsageEventListener extends AbstractIntegrationTest {
         String regex = "https://irus.jisc.ac.uk/counter/test/\\?url_ver=Z39.88-2004&req_id=" +
                 URLEncoder.encode(request.getRemoteAddr(), "UTF-8") + "&req_dat=&rft" +
                 ".artnum=oai%3Alocalhost%3A" + URLEncoder.encode(item.getHandle(), "UTF-8") + "&rfr_dat=&rfr_id" +
-                "=localhost&url_tim=" + ".*" + "?&svc_dat=" + encodedUrl + "%2Fbitstream%2Fhandle%2F" +
-                URLEncoder.encode(item.getHandle(), "UTF-8") + "%2F%3Fsequence%3D\\d+" + "&rft_dat=Request";
+                "=localhost&url_tim=" + ".*" + "?&svc_dat=" + encodedUrl + "%2Fapi%2Fcore%2Fbitstreams" +
+                "%2F" + bitstream.getID() + "%2Fcontent" + "&rft_dat=Request";
 
         boolean isMatch = matchesString(String.valueOf(testProcessedUrls.get(0)), regex);
 
@@ -341,8 +344,8 @@ public class ITExportUsageEventListener extends AbstractIntegrationTest {
         String regex = "https://irus.jisc.ac.uk/counter/test/\\?url_ver=Z39.88-2004&req_id=" +
                 URLEncoder.encode(request.getRemoteAddr(), "UTF-8") + "&req_dat=&rft" +
                 ".artnum=oai%3Alocalhost%3A" + URLEncoder.encode(item.getHandle(), "UTF-8") + "&rfr_dat=&rfr_id" +
-                "=localhost&url_tim=" + ".*" + "?&svc_dat=" + encodedUrl + "%2Fbitstream%2Fhandle%2F" +
-                URLEncoder.encode(item.getHandle(), "UTF-8") + "%2F%3Fsequence%3D\\d+" + "&rft_dat=Request";
+                "=localhost&url_tim=" + ".*" + "?&svc_dat=" + encodedUrl + "%2Fapi%2Fcore%2Fbitstreams" +
+                "%2F" + bitstream.getID() + "%2Fcontent" + "&rft_dat=Request";
 
 
         boolean isMatch = matchesString(all.get(0).getUrl(), regex);
