@@ -13,7 +13,6 @@ import java.net.URLEncoder;
 import java.sql.SQLException;
 import javax.servlet.http.HttpServletRequest;
 
-import org.dspace.app.util.Util;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.Item;
@@ -77,7 +76,7 @@ public class BitstreamEventProcessor extends ExportEventProcessor {
     public void processEvent() throws SQLException, IOException {
         if (shouldProcessItem(item)) {
             String baseParam = getBaseParameters(item);
-            String fullParam = addObjectSpecificData(baseParam, item, bitstream);
+            String fullParam = addObjectSpecificData(baseParam, bitstream);
             processObject(fullParam);
         }
     }
@@ -86,16 +85,15 @@ public class BitstreamEventProcessor extends ExportEventProcessor {
      * Adds additional item and bitstream data to the url
      *
      * @param string    to which the additional data needs to be added
-     * @param item
      * @param bitstream
      * @return the string with additional data
      * @throws UnsupportedEncodingException
      */
-    protected String addObjectSpecificData(final String string, Item item, Bitstream bitstream)
+    protected String addObjectSpecificData(final String string, Bitstream bitstream)
             throws UnsupportedEncodingException {
         StringBuilder data = new StringBuilder(string);
 
-        String bitstreamInfo = getBitstreamInfo(item, bitstream);
+        String bitstreamInfo = getBitstreamInfo(bitstream);
         data.append("&").append(URLEncoder.encode("svc_dat", UTF_8)).append("=")
             .append(URLEncoder.encode(bitstreamInfo, UTF_8));
         data.append("&").append(URLEncoder.encode("rft_dat", UTF_8)).append("=")
@@ -107,39 +105,19 @@ public class BitstreamEventProcessor extends ExportEventProcessor {
     /**
      * Get Bitstream info used for the url
      *
-     * @param item
      * @param bitstream
      * @return bitstream info
      */
-    private String getBitstreamInfo(final Item item, final Bitstream bitstream) {
+    private String getBitstreamInfo(final Bitstream bitstream) {
 
-        StringBuilder sb = new StringBuilder(configurationService.getProperty("dspace.ui.url"));
+        String dspaceRestUrl = configurationService.getProperty("dspace.server.url");
 
-        String identifier;
-        if (item != null && item.getHandle() != null) {
-            identifier = "handle/" + item.getHandle();
-        } else if (item != null) {
-            identifier = "item/" + item.getID();
-        } else {
-            identifier = "id/" + bitstream.getID();
-        }
+        StringBuilder sb = new StringBuilder();
 
-
-        sb.append("/bitstream/").append(identifier).append("/");
-
-        // If we can, append the pretty name of the bitstream to the URL
-        try {
-            if (bitstream.getName() != null) {
-                sb.append(Util.encodeBitstreamName(bitstream.getName(), UTF_8));
-            }
-        } catch (UnsupportedEncodingException uee) {
-            // just ignore it, we don't have to have a pretty
-            // name at the end of the URL because the sequence id will
-            // locate it. However it means that links in this file might
-            // not work....
-        }
-
-        sb.append("?sequence=").append(bitstream.getSequenceID());
+        sb.append(dspaceRestUrl);
+        sb.append("/api/core/bitstreams/");
+        sb.append(bitstream.getID());
+        sb.append("/content");
 
         return sb.toString();
     }
