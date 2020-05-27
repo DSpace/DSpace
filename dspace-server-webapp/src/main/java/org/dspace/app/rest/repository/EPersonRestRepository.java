@@ -147,7 +147,7 @@ public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, E
      *            contains the pagination information
      * @return a Page of EPersonRest instances matching the user query
      */
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN') || hasAuthority('ACCOUNT_ADMIN')")
     @SearchRestMethod(name = "byMetadata")
     public Page<EPersonRest> findByMetadata(@Parameter(value = "query", required = true) String query,
             Pageable pageable) {

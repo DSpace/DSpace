@@ -430,7 +430,10 @@ public class AuthorizeServiceImpl implements AuthorizeService {
 
     public boolean isCommunityAdmin(Context c) throws SQLException {
         EPerson e = c.getCurrentUser();
+        return isCommunityAdmin(c, e);
+    }
 
+    public boolean isCommunityAdmin(Context c, EPerson e) throws SQLException {
         if (e != null) {
             List<ResourcePolicy> policies = resourcePolicyService.find(c, e,
                                                                        groupService.allMemberGroups(c, e),
@@ -446,7 +449,10 @@ public class AuthorizeServiceImpl implements AuthorizeService {
 
     public boolean isCollectionAdmin(Context c) throws SQLException {
         EPerson e = c.getCurrentUser();
+        return isCollectionAdmin(c, e);
+    }
 
+    public boolean isCollectionAdmin(Context c, EPerson e) throws SQLException {
         if (e != null) {
             List<ResourcePolicy> policies = resourcePolicyService.find(c, e,
                                                                        groupService.allMemberGroups(c, e),
