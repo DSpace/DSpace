@@ -12,9 +12,11 @@ import java.util.Map;
 import javax.servlet.ServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
+import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
-import org.dspace.app.rest.model.PlainTextValueRest;
 import org.dspace.app.rest.model.SubmissionCCLicenseRest;
+import org.dspace.app.rest.model.SubmissionCCLicenseUrlRest;
+import org.dspace.app.rest.model.hateoas.SubmissionCCLicenseUrlResource;
 import org.dspace.app.rest.utils.Utils;
 import org.dspace.license.service.CreativeCommonsService;
 import org.dspace.services.RequestService;
@@ -39,16 +41,19 @@ public class SubmissionCCLicenseSearchController {
     @Autowired
     protected CreativeCommonsService creativeCommonsService;
 
+    @Autowired
+    protected ConverterService converter;
+
     protected RequestService requestService = new DSpace().getRequestService();
 
     /**
      * Retrieves the CC License URI based on the license ID and answers in the field questions, provided as parameters
      * to this request
      *
-     * @return the CC License URI as a string
+     * @return the CC License URI as a SubmissionCCLicenseUrlResource
      */
     @RequestMapping(method = RequestMethod.GET)
-    public PlainTextValueRest findByRightsByQuestions() {
+    public SubmissionCCLicenseUrlResource findByRightsByQuestions() {
         ServletRequest servletRequest = requestService.getCurrentRequest()
                                                       .getServletRequest();
         Map<String, String[]> requestParameterMap = servletRequest
@@ -85,7 +90,9 @@ public class SubmissionCCLicenseSearchController {
         if (StringUtils.isBlank(licenseUri)) {
             throw new ResourceNotFoundException("No CC License URI could be found for ID: " + licenseId);
         }
-        PlainTextValueRest plainTextValueRest = new PlainTextValueRest(licenseUri);
-        return plainTextValueRest;
+
+        SubmissionCCLicenseUrlRest submissionCCLicenseUrlRest = converter.toRest(licenseUri, utils.obtainProjection());
+        return converter.toResource(submissionCCLicenseUrlRest);
+
     }
 }

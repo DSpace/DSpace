@@ -15,7 +15,7 @@ import org.dspace.app.rest.RestResourceController;
 
 /**
  * This class is the REST representation of the CCLicense model object and acts as a data object
- *  * for the SubmissionCCLicenseResource class.
+ * for the SubmissionCCLicenseResource class.
  * Refer to {@link org.dspace.license.CCLicense} for explanation of the properties
  */
 public class SubmissionCCLicenseRest extends BaseObjectRest<String> {
