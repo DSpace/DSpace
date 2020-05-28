@@ -9,7 +9,7 @@ package org.dspace.app.rest.link.process;
 
 import java.util.LinkedList;
 
-import org.dspace.app.rest.ProcessRestController;
+import org.dspace.app.rest.ProcessFilesRestController;
 import org.dspace.app.rest.model.hateoas.ProcessResource;
 import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,8 +35,8 @@ public class ProcessResourceHalLinkFactory extends ProcessHalLinkFactory<Process
     }
 
     @Override
-    protected Class<ProcessRestController> getControllerClass() {
-        return ProcessRestController.class;
+    protected Class<ProcessFilesRestController> getControllerClass() {
+        return ProcessFilesRestController.class;
     }
 
     @Override

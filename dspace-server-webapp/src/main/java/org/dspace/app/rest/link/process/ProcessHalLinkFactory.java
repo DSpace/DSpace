@@ -7,7 +7,7 @@
  */
 package org.dspace.app.rest.link.process;
 
-import org.dspace.app.rest.ProcessRestController;
+import org.dspace.app.rest.ProcessFilesRestController;
 import org.dspace.app.rest.link.HalLinkFactory;
 
 /**
@@ -15,5 +15,5 @@ import org.dspace.app.rest.link.HalLinkFactory;
  * and make it more easy to read or define which methods should be found in the getMethodOn methods when building links
  * @param <T>   This parameter should be of type {@link org.dspace.app.rest.model.hateoas.HALResource}
  */
-public abstract class ProcessHalLinkFactory<T> extends HalLinkFactory<T, ProcessRestController> {
+public abstract class ProcessHalLinkFactory<T> extends HalLinkFactory<T, ProcessFilesRestController> {
 }
