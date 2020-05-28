@@ -37,6 +37,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -55,6 +56,7 @@ public class ScriptRestRepository extends DSpaceRestRepository<ScriptRest, Strin
     private DSpaceRunnableParameterConverter dSpaceRunnableParameterConverter;
 
     @Override
+    @PreAuthorize("permitAll()")
     public ScriptRest findOne(Context context, String name) {
 
         ScriptConfiguration scriptConfiguration = scriptService.getScriptConfiguration(name);
@@ -71,7 +73,7 @@ public class ScriptRestRepository extends DSpaceRestRepository<ScriptRest, Strin
     @Override
     public Page<ScriptRest> findAll(Context context, Pageable pageable) {
         List<ScriptConfiguration> scriptConfigurations = scriptService.getScriptConfigurations(context);
-        return converter.toRestPage(utils.getPage(scriptConfigurations, pageable), utils.obtainProjection());
+        return converter.toRestPage(scriptConfigurations, pageable, utils.obtainProjection());
     }
 
     @Override
@@ -87,10 +89,8 @@ public class ScriptRestRepository extends DSpaceRestRepository<ScriptRest, Strin
      * @throws SQLException If something goes wrong
      * @throws IOException  If something goes wrong
      */
-    public ProcessRest startProcess(String scriptName,
-                                    List<MultipartFile> files)
-        throws IOException, AuthorizeException, IllegalAccessException, InstantiationException {
-        Context context = obtainContext();
+    public ProcessRest startProcess(Context context, String scriptName, List<MultipartFile> files) throws SQLException,
+        IOException, AuthorizeException, IllegalAccessException, InstantiationException {
         String properties = requestService.getCurrentRequest().getServletRequest().getParameter("properties");
         List<DSpaceCommandLineParameter> dSpaceCommandLineParameters =
             processPropertiesToDSpaceCommandLineParameters(properties);
@@ -104,16 +104,8 @@ public class ScriptRestRepository extends DSpaceRestRepository<ScriptRest, Strin
         RestDSpaceRunnableHandler restDSpaceRunnableHandler = new RestDSpaceRunnableHandler(
             context.getCurrentUser(), scriptName, dSpaceCommandLineParameters);
         List<String> args = constructArgs(dSpaceCommandLineParameters);
-        try {
-            runDSpaceScript(files, context, scriptToExecute, restDSpaceRunnableHandler, args);
-            context.complete();
-            return converter.toRest(restDSpaceRunnableHandler.getProcess(), utils.obtainProjection());
-        } catch (SQLException e) {
-            log.error("Failed to create a process with user: " + context.getCurrentUser() +
-                          " scriptname: " + scriptName + " and parameters " + DSpaceCommandLineParameter
-                .concatenate(dSpaceCommandLineParameters), e);
-        }
-        return null;
+        runDSpaceScript(files, context, scriptToExecute, restDSpaceRunnableHandler, args);
+        return converter.toRest(restDSpaceRunnableHandler.getProcess(context), utils.obtainProjection());
     }
 
     private List<DSpaceCommandLineParameter> processPropertiesToDSpaceCommandLineParameters(String propertiesJson)

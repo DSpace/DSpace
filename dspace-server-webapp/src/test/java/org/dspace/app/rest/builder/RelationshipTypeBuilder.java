@@ -39,15 +39,27 @@ public class RelationshipTypeBuilder extends AbstractBuilder<RelationshipType, R
     public void cleanup() throws Exception {
         try (Context c = new Context()) {
             c.turnOffAuthorisationSystem();
+            // Ensure object and any related objects are reloaded before checking to see what needs cleanup
+            relationshipType = c.reloadEntity(relationshipType);
             List<Relationship> byRelationshipType = relationshipService
                 .findByRelationshipType(c, relationshipType);
             for (Relationship relationship : byRelationshipType) {
                 relationshipService.delete(c, relationship);
             }
+            if (relationshipType != null) {
+                delete(c, relationshipType);
+            }
             c.complete();
+            indexingService.commit();
         }
 
-        delete(relationshipType);
+    }
+
+    @Override
+    public void delete(Context c, RelationshipType dso) throws Exception {
+        if (dso != null) {
+            getService().delete(c,dso);
+        }
     }
 
     public RelationshipType build() {

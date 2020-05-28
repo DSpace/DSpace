@@ -52,6 +52,6 @@ public class WorkflowStepActionsLinkRepository extends AbstractDSpaceRestReposit
                                                Projection projection) {
         List<WorkflowActionConfig> actions = xmlWorkflowFactory.getStepByName(workflowStepName).getActions();
         Pageable pageable = optionalPageable != null ? optionalPageable : PageRequest.of(0, 20);
-        return converter.toRestPage(utils.getPage(actions, pageable), projection);
+        return converter.toRestPage(actions, pageable, projection);
     }
 }

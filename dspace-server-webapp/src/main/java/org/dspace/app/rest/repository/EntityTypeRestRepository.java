@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
 /**
@@ -29,6 +30,7 @@ public class EntityTypeRestRepository extends DSpaceRestRepository<EntityTypeRes
     @Autowired
     private EntityTypeService entityTypeService;
 
+    @PreAuthorize("permitAll()")
     public EntityTypeRest findOne(Context context, Integer integer) {
         try {
             EntityType entityType = entityTypeService.find(context, integer);
@@ -44,7 +46,7 @@ public class EntityTypeRestRepository extends DSpaceRestRepository<EntityTypeRes
     public Page<EntityTypeRest> findAll(Context context, Pageable pageable) {
         try {
             List<EntityType> entityTypes = entityTypeService.findAll(context);
-            return converter.toRestPage(utils.getPage(entityTypes, pageable), utils.obtainProjection());
+            return converter.toRestPage(entityTypes, pageable, utils.obtainProjection());
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
