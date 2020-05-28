@@ -30,14 +30,15 @@ import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/" + ProcessRest.CATEGORY + "/" + ProcessRest.PLURAL_NAME)
-public class ProcessRestController {
+@RequestMapping("/api/" + ProcessRest.CATEGORY + "/" + ProcessRest.PLURAL_NAME + "/{processId}/files")
+public class ProcessFilesRestController {
 
     private static final Logger log = LogManager.getLogger();
 
@@ -53,7 +54,8 @@ public class ProcessRestController {
     @Autowired
     ProcessResourceHalLinkFactory processResourceHalLinkFactory;
 
-    @RequestMapping(method = RequestMethod.GET, value = "/{processId}/files/{fileType}")
+    @RequestMapping(method = RequestMethod.GET, value = "/{fileType}")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public PagedModel<BitstreamResource> listFilesWithTypeFromProcess(
         @PathVariable(name = "processId") Integer processId,
         @PathVariable(name = "fileType") String fileType,
@@ -79,7 +81,8 @@ public class ProcessRestController {
     }
 
 
-    @RequestMapping(method = RequestMethod.GET, value = "/{processId}/files/name/{fileName:.+}")
+    @RequestMapping(method = RequestMethod.GET, value = "/name/{fileName:.+}")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public BitstreamResource getBitstreamByName(@PathVariable(name = "processId") Integer processId,
                                                 @PathVariable(name = "fileName") String fileName)
         throws SQLException, AuthorizeException {
