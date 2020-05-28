@@ -55,7 +55,7 @@ public class ProcessFilesRestController {
     ProcessResourceHalLinkFactory processResourceHalLinkFactory;
 
     @RequestMapping(method = RequestMethod.GET, value = "/{fileType}")
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasPermission(#processId, 'PROCESS', 'READ')")
     public PagedModel<BitstreamResource> listFilesWithTypeFromProcess(
         @PathVariable(name = "processId") Integer processId,
         @PathVariable(name = "fileType") String fileType,
@@ -82,7 +82,7 @@ public class ProcessFilesRestController {
 
 
     @RequestMapping(method = RequestMethod.GET, value = "/name/{fileName:.+}")
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasPermission(#processId, 'PROCESS', 'READ')")
     public BitstreamResource getBitstreamByName(@PathVariable(name = "processId") Integer processId,
                                                 @PathVariable(name = "fileName") String fileName)
         throws SQLException, AuthorizeException {

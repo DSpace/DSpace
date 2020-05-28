@@ -175,7 +175,8 @@ public class ProcessRestRepository extends DSpaceRestRepository<ProcessRest, Int
         try {
             processService.delete(context, processService.find(context, integer));
         } catch (SQLException | IOException e) {
-            log.error("Something went wrong trying to find Process with id: " + integer);
+            log.error("Something went wrong trying to find Process with id: " + integer, e);
+            throw new RuntimeException(e.getMessage(), e);
         }
     }
 
