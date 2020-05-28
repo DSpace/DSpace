@@ -174,10 +174,8 @@ public class ProcessRestRepository extends DSpaceRestRepository<ProcessRest, Int
         throws AuthorizeException, RepositoryMethodNotImplementedException {
         try {
             processService.delete(context, processService.find(context, integer));
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (SQLException | IOException e) {
+            log.error("Something went wrong trying to find Process with id: " + integer);
         }
     }
 
