@@ -110,42 +110,36 @@ public class ClaimedTaskBuilder extends AbstractBuilder<ClaimedTask, ClaimedTask
     }
 
     @Override
-    public void delete(ClaimedTask claimedTask) throws Exception {
-        try (Context c = new Context()) {
-            c.turnOffAuthorisationSystem();
-            ClaimedTask attachedClaimedTask = c.reloadEntity(claimedTask);
-            if (attachedClaimedTask != null) {
-                // to delete a pooltask keeping the system in a consistent state you need to delete the underline
-                // workflowitem
-                WorkflowItemBuilder.deleteWorkflowItem(attachedClaimedTask.getWorkflowItem().getID());
-            }
-            c.complete();
+    public void delete(Context c, ClaimedTask claimedTask) throws Exception {
+        if (claimedTask != null) {
+            // to delete a pooltask keeping the system in a consistent state you need to delete the underline
+            // workflowitem
+            WorkflowItemBuilder.deleteWorkflowItem(claimedTask.getWorkflowItem().getID());
         }
     }
 
-    private void deleteWsi(WorkspaceItem dso) throws Exception {
-        try (Context c = new Context()) {
-            c.turnOffAuthorisationSystem();
-            WorkspaceItem attachedDso = c.reloadEntity(dso);
-            if (attachedDso != null) {
-                workspaceItemService.deleteAll(c, attachedDso);
-            }
-            c.complete();
+    private void deleteWsi(Context c, WorkspaceItem dso) throws Exception {
+        if (dso != null) {
+            workspaceItemService.deleteAll(c, dso);
         }
-
-        indexingService.commit();
     }
 
 
     @Override
     public void cleanup() throws Exception {
-        if (workspaceItem != null) {
-            deleteWsi(workspaceItem);
-        }
-        if (workflowItem != null) {
+        try (Context c = new Context()) {
+            c.turnOffAuthorisationSystem();
+            // Ensure object and any related objects are reloaded before checking to see what needs cleanup
+            workspaceItem = c.reloadEntity(workspaceItem);
+            workflowItem = c.reloadEntity(workflowItem);
+            if (workspaceItem != null) {
+                deleteWsi(c, workspaceItem);
+            }
+            if (workflowItem != null) {
             // to delete the claimedtask keeping the system in a consistent state you need to delete the underline
             // workflowitem
             WorkflowItemBuilder.deleteWorkflowItem(workflowItem.getID());
+            }
         }
     }
 

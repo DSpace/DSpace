@@ -1217,6 +1217,12 @@ public class BasicWorkflowServiceImpl implements BasicWorkflowService {
     }
 
     @Override
+    public Group createWorkflowRoleGroup(Context context, Collection collection, String roleName)
+        throws AuthorizeException, SQLException {
+        return getWorkflowRoleGroup(context, collection, roleName, null);
+    }
+
+    @Override
     public List<String> getFlywayMigrationLocations() {
         return Collections.emptyList();
     } // TODO

@@ -31,7 +31,9 @@ import org.dspace.app.rest.authorization.TrueForUsersInGroupTestFeature;
 import org.dspace.app.rest.builder.CommunityBuilder;
 import org.dspace.app.rest.builder.EPersonBuilder;
 import org.dspace.app.rest.builder.GroupBuilder;
-import org.dspace.app.rest.converter.ConverterService;
+import org.dspace.app.rest.converter.CommunityConverter;
+import org.dspace.app.rest.converter.EPersonConverter;
+import org.dspace.app.rest.converter.SiteConverter;
 import org.dspace.app.rest.matcher.AuthorizationMatcher;
 import org.dspace.app.rest.model.BaseObjectRest;
 import org.dspace.app.rest.model.CommunityRest;
@@ -68,14 +70,18 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
     private AuthorizationFeatureService authorizationFeatureService;
 
     @Autowired
-    private ConverterService converterService;
+    private SiteConverter siteConverter;
 
+    @Autowired
+    private EPersonConverter ePersonConverter;
+
+    @Autowired
+    private CommunityConverter communityConverter;
     @Autowired
     private ConfigurationService configurationService;
 
     @Autowired
     private Utils utils;
-
     private SiteService siteService;
 
     /** 
@@ -149,7 +155,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
      */
     public void findOneTest() throws Exception {
         Site site = siteService.findSite(context);
-        SiteRest siteRest = converterService.toRest(site, DefaultProjection.DEFAULT);
+        SiteRest siteRest = siteConverter.convert(site, DefaultProjection.DEFAULT);
 
         // define three authorizations that we know must exists
         Authorization authAdminSite = new Authorization(admin, trueForAdmins, siteRest);
@@ -191,7 +197,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
      */
     public void findOneUnauthorizedTest() throws Exception {
         Site site = siteService.findSite(context);
-        SiteRest siteRest = converterService.toRest(site, DefaultProjection.DEFAULT);
+        SiteRest siteRest = siteConverter.convert(site, DefaultProjection.DEFAULT);
 
         // define two authorizations that we know must exists
         Authorization authAdminSite = new Authorization(admin, alwaysTrue, siteRest);
@@ -215,7 +221,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
     public void findOneForbiddenTest() throws Exception {
         context.turnOffAuthorisationSystem();
         Site site = siteService.findSite(context);
-        SiteRest siteRest = converterService.toRest(site, DefaultProjection.DEFAULT);
+        SiteRest siteRest = siteConverter.convert(site, DefaultProjection.DEFAULT);
         EPerson testEPerson = EPersonBuilder.createEPerson(context)
                 .withEmail("test-authorization@example.com")
                 .withPassword(password).build();
@@ -251,8 +257,8 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
     public void findOneNotFoundTest() throws Exception {
         context.turnOffAuthorisationSystem();
         Site site = siteService.findSite(context);
-        SiteRest siteRest = converterService.toRest(site, DefaultProjection.DEFAULT);
-        EPersonRest epersonRest = converterService.toRest(eperson, DefaultProjection.DEFAULT);
+        SiteRest siteRest = siteConverter.convert(site, DefaultProjection.DEFAULT);
+        EPersonRest epersonRest = ePersonConverter.convert(eperson, DefaultProjection.DEFAULT);
         context.restoreAuthSystemState();
 
         String epersonToken = getAuthToken(eperson.getEmail(), password);
@@ -337,7 +343,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
      */
     public void findOneInternalServerErrorTest() throws Exception {
         Site site = siteService.findSite(context);
-        SiteRest siteRest = converterService.toRest(site, DefaultProjection.DEFAULT);
+        SiteRest siteRest = siteConverter.convert(site, DefaultProjection.DEFAULT);
         // define two authorizations that we know will throw exceptions
         Authorization authAdminSite = new Authorization(admin, alwaysException, siteRest);
         Authorization authNormalUserSite = new Authorization(eperson, alwaysException, siteRest);
@@ -364,7 +370,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
      */
     public void findByObjectTest() throws Exception {
         Site site = siteService.findSite(context);
-        SiteRest siteRest = converterService.toRest(site, converterService.getProjection(DefaultProjection.NAME));
+        SiteRest siteRest = siteConverter.convert(site, DefaultProjection.DEFAULT);
         String siteUri = utils.linkToSingleResource(siteRest, "self").getHref();
 
         // disarm the alwaysThrowExceptionFeature
@@ -700,7 +706,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
      */
     public void findByObjectUnauthorizedTest() throws Exception {
         Site site = siteService.findSite(context);
-        SiteRest siteRest = converterService.toRest(site, converterService.getProjection(DefaultProjection.NAME));
+        SiteRest siteRest = siteConverter.convert(site, DefaultProjection.DEFAULT);
         String siteUri = utils.linkToSingleResource(siteRest, "self").getHref();
 
         // disarm the alwaysThrowExceptionFeature
@@ -727,7 +733,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
      */
     public void findByObjectForbiddenTest() throws Exception {
         Site site = siteService.findSite(context);
-        SiteRest siteRest = converterService.toRest(site, converterService.getProjection(DefaultProjection.NAME));
+        SiteRest siteRest = siteConverter.convert(site, DefaultProjection.DEFAULT);
         String siteUri = utils.linkToSingleResource(siteRest, "self").getHref();
         context.turnOffAuthorisationSystem();
         EPerson anotherEperson = EPersonBuilder.createEPerson(context).withEmail("another@example.com")
@@ -756,7 +762,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
      */
     public void findByObjectInternalServerErrorTest() throws Exception {
         Site site = siteService.findSite(context);
-        SiteRest siteRest = converterService.toRest(site, converterService.getProjection(DefaultProjection.NAME));
+        SiteRest siteRest = siteConverter.convert(site, DefaultProjection.DEFAULT);
         String siteUri = utils.linkToSingleResource(siteRest, "self").getHref();
 
         // verify that it works for administrators
@@ -801,7 +807,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
     public void findByObjectAndFeatureTest() throws Exception {
         context.turnOffAuthorisationSystem();
         Community com = CommunityBuilder.createCommunity(context).withName("A test community").build();
-        CommunityRest comRest = converterService.toRest(com, converterService.getProjection(DefaultProjection.NAME));
+        CommunityRest comRest = communityConverter.convert(com, DefaultProjection.DEFAULT);
         String comUri = utils.linkToSingleResource(comRest, "self").getHref();
         context.restoreAuthSystemState();
 
@@ -809,7 +815,8 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
         String adminToken = getAuthToken(admin.getEmail(), password);
         getClient(adminToken).perform(get("/api/authz/authorizations/search/objectAndFeature")
                 .param("uri", comUri)
-                .param("projection", "full")
+                .param("projection", "level")
+                .param("embedLevelDepth", "1")
                 .param("feature", alwaysTrue.getName())
                 .param("eperson", admin.getID().toString()))
             .andExpect(status().isOk())
@@ -822,7 +829,8 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
         String epersonToken = getAuthToken(eperson.getEmail(), password);
         getClient(epersonToken).perform(get("/api/authz/authorizations/search/objectAndFeature")
                 .param("uri", comUri)
-                .param("projection", "full")
+                .param("projection", "level")
+                .param("embedLevelDepth", "1")
                 .param("feature", alwaysTrue.getName())
                 .param("eperson", eperson.getID().toString()))
             .andExpect(status().isOk())
@@ -834,7 +842,8 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
         // verify that it works for administators inspecting other users
         getClient(adminToken).perform(get("/api/authz/authorizations/search/objectAndFeature")
                 .param("uri", comUri)
-                .param("projection", "full")
+                .param("projection", "level")
+                .param("embedLevelDepth", "1")
                 .param("feature", alwaysTrue.getName())
                 .param("eperson", eperson.getID().toString()))
             .andExpect(status().isOk())
@@ -846,7 +855,8 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
         // verify that it works for anonymous users
         getClient().perform(get("/api/authz/authorizations/search/objectAndFeature")
                 .param("uri", comUri)
-                .param("projection", "full")
+                .param("projection", "level")
+                .param("embedLevelDepth", "1")
                 .param("feature", alwaysTrue.getName()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.type", is("authorization")))
@@ -857,7 +867,8 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
         // verify that it works for administrators inspecting anonymous users
         getClient(adminToken).perform(get("/api/authz/authorizations/search/objectAndFeature")
                 .param("uri", comUri)
-                .param("projection", "full")
+                .param("projection", "level")
+                .param("embedLevelDepth", "1")
                 .param("feature", alwaysTrue.getName()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.type", is("authorization")))
@@ -874,7 +885,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
      */
     public void findByObjectAndFeatureNotGrantedTest() throws Exception {
         Site site = siteService.findSite(context);
-        SiteRest siteRest = converterService.toRest(site, converterService.getProjection(DefaultProjection.NAME));
+        SiteRest siteRest = siteConverter.convert(site, DefaultProjection.DEFAULT);
         String siteUri = utils.linkToSingleResource(siteRest, "self").getHref();
 
         // verify that it works for administrators
@@ -923,7 +934,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
     public void findByNotExistingObjectAndFeatureTest() throws Exception {
         String wrongSiteUri = "http://localhost/api/core/sites/" + UUID.randomUUID();
         Site site = siteService.findSite(context);
-        SiteRest siteRest = converterService.toRest(site, converterService.getProjection(DefaultProjection.NAME));
+        SiteRest siteRest = siteConverter.convert(site, DefaultProjection.DEFAULT);
         String siteUri = utils.linkToSingleResource(siteRest, "self").getHref();
 
         // disarm the alwaysThrowExceptionFeature
@@ -1007,7 +1018,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
                 "http://localhost/api/core/sites/this-is-not-an-uuid"
         };
         Site site = siteService.findSite(context);
-        SiteRest siteRest = converterService.toRest(site, converterService.getProjection(DefaultProjection.NAME));
+        SiteRest siteRest = siteConverter.convert(site, DefaultProjection.DEFAULT);
         String siteUri = utils.linkToSingleResource(siteRest, "self").getHref();
         // disarm the alwaysThrowExceptionFeature
         configurationService.setProperty("org.dspace.app.rest.authorization.AlwaysThrowExceptionFeature.turnoff", true);
@@ -1092,7 +1103,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
      */
     public void findByObjectAndFeatureUnauthorizedTest() throws Exception {
         Site site = siteService.findSite(context);
-        SiteRest siteRest = converterService.toRest(site, converterService.getProjection(DefaultProjection.NAME));
+        SiteRest siteRest = siteConverter.convert(site, DefaultProjection.DEFAULT);
         String siteUri = utils.linkToSingleResource(siteRest, "self").getHref();
 
         // disarm the alwaysThrowExceptionFeature
@@ -1121,7 +1132,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
      */
     public void findByObjectAndFeatureForbiddenTest() throws Exception {
         Site site = siteService.findSite(context);
-        SiteRest siteRest = converterService.toRest(site, converterService.getProjection(DefaultProjection.NAME));
+        SiteRest siteRest = siteConverter.convert(site, DefaultProjection.DEFAULT);
         String siteUri = utils.linkToSingleResource(siteRest, "self").getHref();
         context.turnOffAuthorisationSystem();
         EPerson anotherEperson = EPersonBuilder.createEPerson(context).withEmail("another@example.com")
@@ -1152,7 +1163,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
      */
     public void findByObjectAndFeatureInternalServerErrorTest() throws Exception {
         Site site = siteService.findSite(context);
-        SiteRest siteRest = converterService.toRest(site, converterService.getProjection(DefaultProjection.NAME));
+        SiteRest siteRest = siteConverter.convert(site, DefaultProjection.DEFAULT);
         String siteUri = utils.linkToSingleResource(siteRest, "self").getHref();
 
         // verify that it works for administrators
@@ -1188,7 +1199,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
      */
     public void verifySpecialGroupMembershipTest() throws Exception {
         Site site = siteService.findSite(context);
-        SiteRest siteRest = converterService.toRest(site, converterService.getProjection(DefaultProjection.NAME));
+        SiteRest siteRest = siteConverter.convert(site, DefaultProjection.DEFAULT);
         String siteUri = utils.linkToSingleResource(siteRest, "self").getHref();
         context.turnOffAuthorisationSystem();
         // create two normal users and put one in the test group directly
@@ -1324,5 +1335,4 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
         return (epersonUuid != null ? epersonUuid + "_" : "") + featureName + "_" + type + "_"
                 + id.toString();
     }
-
 }

@@ -9,6 +9,7 @@ package org.dspace.app.rest.security;
 
 import java.io.Serializable;
 
+import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.model.BaseObjectRest;
 import org.dspace.app.rest.model.patch.Patch;
 import org.springframework.security.core.Authentication;
@@ -34,7 +35,8 @@ public abstract class RestObjectPermissionEvaluatorPlugin  implements RestPermis
     public boolean hasPermission(Authentication authentication, Object targetDomainObject,
                                  Object permission) {
         BaseObjectRest restObject = (BaseObjectRest) targetDomainObject;
-        return hasPermission(authentication, restObject.getId(), restObject.getType(), permission);
+        return hasPermission(authentication, restObject.getId(), StringUtils.upperCase(restObject.getType()),
+                             permission);
     }
 
     @Override

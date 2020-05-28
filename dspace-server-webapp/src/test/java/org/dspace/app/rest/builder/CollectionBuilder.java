@@ -10,6 +10,7 @@ package org.dspace.app.rest.builder;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
+import java.util.UUID;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.CharEncoding;
@@ -19,6 +20,7 @@ import org.dspace.content.Community;
 import org.dspace.content.MetadataSchemaEnum;
 import org.dspace.content.service.DSpaceObjectService;
 import org.dspace.core.Context;
+import org.dspace.discovery.SearchServiceException;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 
@@ -92,6 +94,14 @@ public class CollectionBuilder extends AbstractDSpaceObjectBuilder<Collection> {
         }
     }
 
+    public CollectionBuilder withProvenance(final String provenance) {
+        return addMetadataValue(collection,
+                                MetadataSchemaEnum.DC.getName(),
+                                "description",
+                                "provenance",
+                                provenance);
+    }
+
     public CollectionBuilder withTemplateItem() throws SQLException, AuthorizeException {
         collectionService.createTemplateItem(context, collection);
         return this;
@@ -155,28 +165,80 @@ public class CollectionBuilder extends AbstractDSpaceObjectBuilder<Collection> {
 
     @Override
     public void cleanup() throws Exception {
-        deleteWorkflowGroups(collection);
-        delete(collection);
+       try (Context c = new Context()) {
+            c.turnOffAuthorisationSystem();
+            // Ensure object and any related objects are reloaded before checking to see what needs cleanup
+            collection = c.reloadEntity(collection);
+            if (collection != null) {
+                deleteAdminGroup(c);
+                deleteItemTemplate(c);
+                deleteDefaultReadGroups(c, collection);
+                deleteWorkflowGroups(c, collection);
+                delete(c ,collection);
+                c.complete();
+            }
+       }
     }
 
-    public void deleteWorkflowGroups(Collection collection) throws Exception {
+    private void deleteAdminGroup(Context c) throws SQLException, AuthorizeException, IOException {
+        Group group = collection.getAdministrators();
+        if (group != null) {
+            collectionService.removeAdministrators(c, collection);
+            groupService.delete(c, group);
+        }
+    }
 
-        try (Context c = new Context()) {
+    private void deleteItemTemplate(Context c) throws SQLException, AuthorizeException, IOException {
+        if (collection.getTemplateItem() != null) {
+                 collectionService.removeTemplateItem(c, collection);
+        }
+    }
+
+    public void deleteWorkflowGroups(Context c, Collection collection) throws Exception {
+       for (int i = 1; i <= 3; i++) {
+            Group group = collectionService.getWorkflowGroup(c, collection, i);
+            if (group != null) {
+                collectionService.setWorkflowGroup(c, collection, i, null);
+                groupService.delete(c, group);
+            }
+       }
+    }
+
+    public void deleteDefaultReadGroups(Context c, Collection collection) throws Exception {
+        Group defaultItemReadGroup = groupService.findByName(c, "COLLECTION_" +
+              collection.getID().toString() + "_ITEM_DEFAULT_READ");
+        Group defaultBitstreamReadGroup = groupService.findByName(c, "COLLECTION_" +
+              collection.getID().toString() + "_BITSTREAM_DEFAULT_READ");
+        if (defaultItemReadGroup != null) {
+            groupService.delete(c, defaultItemReadGroup);
+        }
+        if (defaultBitstreamReadGroup != null) {
+            groupService.delete(c, defaultBitstreamReadGroup);
+        }
+    }
+
+    /**
+     * Delete the Test Collection referred to by the given UUID
+     *
+     * @param uuid UUID of Test Collection to delete
+     * @throws SQLException
+     * @throws IOException
+     * @throws SearchServiceException
+     */
+    public static void deleteCollection(UUID uuid) throws SQLException, IOException, SearchServiceException {
+       try (Context c = new Context()) {
             c.turnOffAuthorisationSystem();
-            for (int i = 1; i <= 3; i++) {
-                Group g = collectionService.getWorkflowGroup(c, collection, i);
-                if (g != null) {
-                    Group attachedDso = c.reloadEntity(g);
-                    if (attachedDso != null) {
-                        collectionService.setWorkflowGroup(c, collection, i, null);
-                        groupService.delete(c, attachedDso);
-                    }
+            Collection collection = collectionService.find(c, uuid);
+            if (collection != null) {
+                try {
+                    collectionService.delete(c, collection);
+                } catch (AuthorizeException e) {
+                    throw new RuntimeException(e.getMessage(), e);
                 }
             }
             c.complete();
-        }
-
-        indexingService.commit();
+            indexingService.commit();
+       }
     }
 
     @Override
