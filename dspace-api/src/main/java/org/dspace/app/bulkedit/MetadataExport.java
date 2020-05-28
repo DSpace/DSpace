@@ -24,7 +24,6 @@ import org.dspace.utils.DSpace;
  */
 public class MetadataExport extends DSpaceRunnable<MetadataExportScriptConfiguration> {
 
-    private Context context = null;
     private boolean help = false;
     private String filename = null;
     private String handle = null;
@@ -40,13 +39,20 @@ public class MetadataExport extends DSpaceRunnable<MetadataExportScriptConfigura
 
     @Override
     public void internalRun() throws Exception {
+
         if (help) {
             handler.logInfo("\nfull export: metadata-export -f filename");
             handler.logInfo("partial export: metadata-export -i handle -f filename");
             printHelp();
             return;
         }
-
+        Context context = new Context();
+        context.turnOffAuthorisationSystem();
+        try {
+            context.setCurrentUser(ePersonService.find(context, this.getEpersonIdentifier()));
+        } catch (SQLException e) {
+            handler.handleException(e);
+        }
         DSpaceCSV dSpaceCSV = metadataDSpaceCsvExportService
             .handleExport(context, exportAllItems, exportAllMetadata, handle,
                           handler);
@@ -63,8 +69,6 @@ public class MetadataExport extends DSpaceRunnable<MetadataExportScriptConfigura
 
     @Override
     public void setup() throws ParseException {
-        context = new Context();
-        context.turnOffAuthorisationSystem();
 
         if (commandLine.hasOption('h')) {
             help = true;
@@ -83,11 +87,5 @@ public class MetadataExport extends DSpaceRunnable<MetadataExportScriptConfigura
             exportAllItems = true;
         }
         handle = commandLine.getOptionValue('i');
-
-        try {
-            context.setCurrentUser(ePersonService.find(context, this.getEpersonIdentifier()));
-        } catch (SQLException e) {
-            handler.handleException(e);
-        }
     }
 }

@@ -136,6 +136,7 @@ public abstract class DSpaceRunnable<T extends ScriptConfiguration> implements R
 
     /**
      * Generic getter for the epersonIdentifier
+     * This EPerson identifier variable is the uuid of the eperson that's running the script
      * @return the epersonIdentifier value of this DSpaceRunnable
      */
     public UUID getEpersonIdentifier() {
@@ -144,6 +145,7 @@ public abstract class DSpaceRunnable<T extends ScriptConfiguration> implements R
 
     /**
      * Generic setter for the epersonIdentifier
+     * This EPerson identifier variable is the uuid of the eperson that's running the script
      * @param epersonIdentifier   The epersonIdentifier to be set on this DSpaceRunnable
      */
     public void setEpersonIdentifier(UUID epersonIdentifier) {
