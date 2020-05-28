@@ -14,7 +14,6 @@ import static org.junit.Assert.assertTrue;
 import java.io.IOException;
 import java.io.InputStream;
 
-
 import org.apache.commons.collections4.CollectionUtils;
 import org.dspace.AbstractDSpaceTest;
 import org.junit.After;
@@ -23,6 +22,9 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+/**
+ * @author Kim Shepherd
+ */
 public class SHERPAPublisherResponseTest extends AbstractDSpaceTest {
 
     public SHERPAPublisherResponseTest() {
@@ -84,7 +86,7 @@ public class SHERPAPublisherResponseTest extends AbstractDSpaceTest {
             assertEquals("Response publisher ID did not match expected ID " + expectedId,
                 expectedId, response.getPublishers().get(0).getIdentifier());
 
-        } catch(IOException e) {
+        } catch (IOException e) {
             throw new RuntimeException(e.getMessage(), e);
         } finally {
             if (content != null) {

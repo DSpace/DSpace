@@ -7,21 +7,23 @@
  */
 package org.dspace.app.sherpa.v2;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import java.io.IOException;
 import java.io.InputStream;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.dspace.AbstractDSpaceTest;
-
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.assertFalse;
-
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+/**
+ * @author Kim Shepherd
+ */
 public class SHERPAResponseTest extends AbstractDSpaceTest {
 
     public SHERPAResponseTest() {
@@ -94,7 +96,7 @@ public class SHERPAResponseTest extends AbstractDSpaceTest {
             String expectedPublisherName = "Elsevier";
             assertTrue("Response did not contain expected publisher name '" + expectedPublisherName + "'",
                 expectedPublisherName.equals(response.getJournals().get(0).getPublisher().getName()));
-        } catch(IOException e) {
+        } catch (IOException e) {
             throw new RuntimeException(e.getMessage(), e);
         } finally {
             if (content != null) {
