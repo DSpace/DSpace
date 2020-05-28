@@ -7,8 +7,11 @@
  */
 package org.dspace.app.rest.builder;
 
+import java.io.IOException;
 import java.io.InputStream;
+import java.sql.SQLException;
 
+import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Collection;
 import org.dspace.content.DCDate;
@@ -65,39 +68,55 @@ public class WorkspaceItemBuilder extends AbstractBuilder<WorkspaceItem, Workspa
 
     }
 
-    private void deleteItem(Item dso) throws Exception {
-        try (Context c = new Context()) {
-            c.turnOffAuthorisationSystem();
-            Item attachedDso = c.reloadEntity(dso);
-            if (attachedDso != null) {
-                itemService.delete(c, attachedDso);
-            }
-            c.complete();
+    private void deleteItem(Context c, Item dso) throws Exception {
+        if (dso != null) {
+            itemService.delete(c, dso);
         }
-
-        indexingService.commit();
     }
 
     @Override
-    public void delete(WorkspaceItem dso) throws Exception {
+    public void delete( Context c, WorkspaceItem dso) throws Exception {
+        if (dso != null) {
+            getService().deleteAll(c, dso);
+        }
+    }
+
+    /**
+     * Delete the Test WorkspaceItem referred to by the given ID
+     * @param id Integer of Test WorkspaceItem to delete
+     * @throws SQLException
+     * @throws IOException
+     */
+    public static void deleteWorkspaceItem(Integer id) throws SQLException, IOException {
         try (Context c = new Context()) {
             c.turnOffAuthorisationSystem();
-            WorkspaceItem attachedDso = c.reloadEntity(dso);
-            if (attachedDso != null) {
-                getService().deleteAll(c, attachedDso);
-                item = null;
+            WorkspaceItem workspaceItem = workspaceItemService.find(c, id);
+            if (workspaceItem != null) {
+                try {
+                    workspaceItemService.deleteAll(c, workspaceItem);
+                } catch (AuthorizeException e) {
+                    throw new RuntimeException(e);
+                }
             }
             c.complete();
         }
-
-        indexingService.commit();
     }
 
     @Override
     public void cleanup() throws Exception {
-        delete(workspaceItem);
-        if (item != null) {
-            deleteItem(item);
+        try (Context c = new Context()) {
+            c.turnOffAuthorisationSystem();
+            // Ensure object and any related objects are reloaded before checking to see what needs cleanup
+            workspaceItem = c.reloadEntity(workspaceItem);
+            if (workspaceItem != null) {
+                delete(c, workspaceItem);
+            }
+            item = c.reloadEntity(item);
+            if (item != null) {
+                deleteItem(c, item);
+            }
+            c.complete();
+            indexingService.commit();
         }
     }
 
