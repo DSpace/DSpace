@@ -7,6 +7,7 @@
  */
 package org.dspace.app.rest.repository;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Collections;
 import java.util.List;
@@ -14,6 +15,7 @@ import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
 import org.dspace.app.rest.converter.ConverterService;
+import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.model.BitstreamRest;
 import org.dspace.app.rest.model.ProcessFileWrapperRest;
 import org.dspace.app.rest.model.ProcessRest;
@@ -165,6 +167,18 @@ public class ProcessRestRepository extends DSpaceRestRepository<ProcessRest, Int
         }
 
         return converterService.toRest(bitstream, Projection.DEFAULT);
+    }
+
+    @Override
+    protected void delete(Context context, Integer integer)
+        throws AuthorizeException, RepositoryMethodNotImplementedException {
+        try {
+            processService.delete(context, processService.find(context, integer));
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
