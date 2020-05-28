@@ -109,11 +109,8 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
 
     @Test
     public void testStatusAuthenticatedWithCookie() throws Exception {
-        context.turnOffAuthorisationSystem();
         //Enable Shibboleth login
         configurationService.setProperty("plugin.sequence.org.dspace.authenticate.AuthenticationMethod", SHIB_ONLY);
-
-        context.restoreAuthSystemState();
 
         //Simulate that a shibboleth authentication has happened
         String token = getClient().perform(post("/api/authn/login")
@@ -603,11 +600,8 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
 
     @Test
     public void testShibbolethAndPasswordAuthentication() throws Exception {
-        context.turnOffAuthorisationSystem();
         //Enable Shibboleth and password login
         configurationService.setProperty("plugin.sequence.org.dspace.authenticate.AuthenticationMethod", SHIB_AND_PASS);
-
-        context.restoreAuthSystemState();
 
         //Check if WWW-Authenticate header contains shibboleth and password
         getClient().perform(get("/api/authn/status").header("Referer", "http://my.uni.edu"))
@@ -658,15 +652,19 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
         getClient(token).perform(get("/api/authn/logout"))
                         .andExpect(status().isNoContent());
 
+        //Check if we are actually logged out (again)
+        getClient(token).perform(get("/api/authn/status"))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.okay", is(true)))
+                        .andExpect(jsonPath("$.authenticated", is(false)))
+                        .andExpect(jsonPath("$.type", is("status")));
+
     }
 
     @Test
     public void testOnlyPasswordAuthenticationWorks() throws Exception {
-        context.turnOffAuthorisationSystem();
         //Enable only password login
         configurationService.setProperty("plugin.sequence.org.dspace.authenticate.AuthenticationMethod", PASS_ONLY);
-
-        context.restoreAuthSystemState();
 
         //Check if WWW-Authenticate header contains only
         getClient().perform(get("/api/authn/status").header("Referer", "http://my.uni.edu"))
@@ -687,15 +685,19 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
         //Logout
         getClient(token).perform(get("/api/authn/logout"))
                         .andExpect(status().isNoContent());
+
+        //Check if we are actually logged out
+        getClient(token).perform(get("/api/authn/status"))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.okay", is(true)))
+                        .andExpect(jsonPath("$.authenticated", is(false)))
+                        .andExpect(jsonPath("$.type", is("status")));
     }
 
     @Test
     public void testShibbolethAuthenticationDoesNotWorkWithPassOnly() throws Exception {
-        context.turnOffAuthorisationSystem();
         //Enable only password login
         configurationService.setProperty("plugin.sequence.org.dspace.authenticate.AuthenticationMethod", PASS_ONLY);
-
-        context.restoreAuthSystemState();
 
         //Check if WWW-Authenticate header contains only password
         getClient().perform(get("/api/authn/status").header("Referer", "http://my.uni.edu"))
@@ -713,11 +715,8 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
 
     @Test
     public void testOnlyShibbolethAuthenticationWorks() throws Exception {
-        context.turnOffAuthorisationSystem();
         //Enable only Shibboleth login
         configurationService.setProperty("plugin.sequence.org.dspace.authenticate.AuthenticationMethod", SHIB_ONLY);
-
-        context.restoreAuthSystemState();
 
         //Check if WWW-Authenticate header contains only shibboleth
         getClient().perform(get("/api/authn/status").header("Referer", "http://my.uni.edu"))
@@ -738,22 +737,19 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
         //Logout
         getClient(token).perform(get("/api/authn/logout"))
                         .andExpect(status().isNoContent());
+
+        //Check if we are actually logged out
+        getClient(token).perform(get("/api/authn/status"))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.okay", is(true)))
+                        .andExpect(jsonPath("$.authenticated", is(false)))
+                        .andExpect(jsonPath("$.type", is("status")));
     }
 
     @Test
     public void testPasswordAuthenticationDoesNotWorkWithShibOnly() throws Exception {
-        context.turnOffAuthorisationSystem();
         //Enable only Shibboleth login
         configurationService.setProperty("plugin.sequence.org.dspace.authenticate.AuthenticationMethod", SHIB_ONLY);
-
-        //Create a reviewers group
-        Group reviewersGroup = GroupBuilder.createGroup(context)
-                .withName("Reviewers")
-                .build();
-
-        //Faculty members are assigned to the Reviewers group
-        configurationService.setProperty("authentication-shibboleth.role.faculty", "Reviewers");
-        context.restoreAuthSystemState();
 
         getClient().perform(post("/api/authn/login")
                 .param("user", eperson.getEmail())

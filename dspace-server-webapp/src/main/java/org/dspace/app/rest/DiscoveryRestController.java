@@ -34,7 +34,7 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.Link;
-import org.springframework.hateoas.ResourceSupport;
+import org.springframework.hateoas.RepresentationModel;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -171,15 +171,15 @@ public class DiscoveryRestController implements InitializingBean {
     }
 
     @RequestMapping(method = RequestMethod.GET, value = "/facets/{name}")
-    public ResourceSupport getFacetValues(@PathVariable("name") String facetName,
-                                          @RequestParam(name = "prefix", required = false) String prefix,
-                                          @RequestParam(name = "query", required = false) String query,
-                                          @RequestParam(name = "dsoType", required = false) String dsoType,
-                                          @RequestParam(name = "scope", required = false) String dsoScope,
-                                          @RequestParam(name = "configuration", required = false) String
-                                              configuration,
-                                          List<SearchFilter> searchFilters,
-                                          Pageable page) throws Exception {
+    public RepresentationModel getFacetValues(@PathVariable("name") String facetName,
+                                              @RequestParam(name = "prefix", required = false) String prefix,
+                                              @RequestParam(name = "query", required = false) String query,
+                                              @RequestParam(name = "dsoType", required = false) String dsoType,
+                                              @RequestParam(name = "scope", required = false) String dsoScope,
+                                              @RequestParam(name = "configuration", required = false) String
+                                                      configuration,
+                                              List<SearchFilter> searchFilters,
+                                              Pageable page) throws Exception {
         if (log.isTraceEnabled()) {
             log.trace("Facetting on facet " + facetName + " with scope: " + StringUtils.trimToEmpty(dsoScope)
                           + ", dsoType: " + StringUtils.trimToEmpty(dsoType)

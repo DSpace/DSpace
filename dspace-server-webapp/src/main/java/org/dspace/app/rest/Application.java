@@ -11,7 +11,7 @@ import java.util.List;
 import javax.servlet.Filter;
 
 import org.dspace.app.rest.filter.DSpaceRequestContextFilter;
-import org.dspace.app.rest.model.hateoas.DSpaceRelProvider;
+import org.dspace.app.rest.model.hateoas.DSpaceLinkRelationProvider;
 import org.dspace.app.rest.parameter.resolver.SearchFilterResolver;
 import org.dspace.app.rest.utils.ApplicationConfig;
 import org.dspace.app.rest.utils.DSpaceConfigurationInitializer;
@@ -26,7 +26,7 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.annotation.Order;
-import org.springframework.hateoas.RelProvider;
+import org.springframework.hateoas.server.LinkRelationProvider;
 import org.springframework.lang.NonNull;
 import org.springframework.web.context.request.RequestContextListener;
 import org.springframework.web.cors.CorsConfiguration;
@@ -118,23 +118,34 @@ public class Application extends SpringBootServletInitializer {
     }
 
     @Bean
-    protected RelProvider dspaceRelProvider() {
-        return new DSpaceRelProvider();
+    protected LinkRelationProvider dspaceLinkRelationProvider() {
+        return new DSpaceLinkRelationProvider();
     }
 
     @Bean
     public WebMvcConfigurer webMvcConfigurer() {
 
         return new WebMvcConfigurer() {
+            /**
+             * Create a custom CORS mapping for the DSpace REST API (/api/ paths), based on configured allowed origins.
+             * @param registry CorsRegistry
+             */
             @Override
             public void addCorsMappings(@NonNull CorsRegistry registry) {
                 String[] corsAllowedOrigins = configuration.getCorsAllowedOrigins();
+                boolean corsAllowCredentials = configuration.getCorsAllowCredentials();
                 if (corsAllowedOrigins != null) {
                     registry.addMapping("/api/**").allowedMethods(CorsConfiguration.ALL)
-                        .allowedOrigins(corsAllowedOrigins).allowedHeaders("Authorization", "Content-Type",
-                            "X-Requested-With", "accept", "Origin", "Access-Control-Request-Method",
-                            "Access-Control-Request-Headers")
-                        .exposedHeaders("Access-Control-Allow-Origin", "Authorization");
+                            // Set Access-Control-Allow-Credentials to "true" and specify which origins are valid
+                            // for our Access-Control-Allow-Origin header
+                            .allowCredentials(corsAllowCredentials).allowedOrigins(corsAllowedOrigins)
+                            // Whitelist of request preflight headers allowed to be sent to us from the client
+                            .allowedHeaders("Authorization", "Content-Type", "X-Requested-With", "accept", "Origin",
+                                            "Access-Control-Request-Method", "Access-Control-Request-Headers",
+                                            "X-On-Behalf-Of")
+                            // Whitelist of response headers allowed to be sent by us (the server)
+                            .exposedHeaders("Access-Control-Allow-Origin", "Access-Control-Allow-Credentials",
+                                            "Authorization");
                 }
             }
 

@@ -33,6 +33,7 @@ public class SiteRestRepositoryIT extends AbstractControllerIntegrationTest {
         //This will always return just one site, DSpace doesn't allow for more to be created
         Site site = SiteBuilder.createSite(context).build();
 
+        context.restoreAuthSystemState();
 
         getClient().perform(get("/api/core/sites"))
                    .andExpect(status().isOk())
@@ -50,6 +51,7 @@ public class SiteRestRepositoryIT extends AbstractControllerIntegrationTest {
         //This will always return just one site, DSpace doesn't allow for more to be created
         Site site = SiteBuilder.createSite(context).build();
 
+        context.restoreAuthSystemState();
 
         getClient().perform(get("/api/core/sites/" + site.getID()))
                    .andExpect(status().isOk())
@@ -61,13 +63,8 @@ public class SiteRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     @Test
     public void findOneWrongUUID() throws Exception {
-
-
-        context.turnOffAuthorisationSystem();
-
         getClient().perform(get("/api/core/sites/" + UUID.randomUUID()))
                    .andExpect(status().isNotFound());
-
     }
 
     @Test

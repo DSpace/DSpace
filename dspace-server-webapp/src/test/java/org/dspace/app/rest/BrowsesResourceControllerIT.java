@@ -167,6 +167,8 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
                                       .withSubject("ExtraEntry")
                                       .build();
 
+        context.restoreAuthSystemState();
+
         //** WHEN **
         //An anonymous user browses this endpoint to find which subjects are currently in the repository
         getClient().perform(get("/api/discover/browses/subject/entries")
@@ -250,6 +252,8 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
                                       .withAuthor("Smith, Maria").withAuthor("Doe, Jane")
                                       .withSubject("AnotherTest")
                                       .build();
+
+        context.restoreAuthSystemState();
 
         //** WHEN **
         //An anonymous user browses the items that correspond with the ExtraEntry subject query
@@ -364,23 +368,18 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
                    //We expect the content type to be "application/hal+json;charset=UTF-8"
                    .andExpect(content().contentType(contentType))
 
-                   //We expect only the two public items and the embargoed item to be present
                    .andExpect(jsonPath("$.page.size", is(20)))
-                   .andExpect(jsonPath("$.page.totalElements", is(3)))
+                   .andExpect(jsonPath("$.page.totalElements", is(2)))
                    .andExpect(jsonPath("$.page.totalPages", is(1)))
                    .andExpect(jsonPath("$.page.number", is(0)))
 
-                   //Verify that the title of the public and embargoed items are present and sorted descending
                    .andExpect(jsonPath("$._embedded.items",
                                        contains(ItemMatcher.matchItemWithTitleAndDateIssued(publicItem2,
                                                                                             "Public item 2",
                                                                                             "2016-02-13"),
                                                 ItemMatcher.matchItemWithTitleAndDateIssued(publicItem1,
                                                                                             "Public item 1",
-                                                                                            "2017-10-17"),
-                                                ItemMatcher.matchItemWithTitleAndDateIssued(embargoedItem,
-                                                                                            "An embargoed publication",
-                                                                                            "2017-08-10"))))
+                                                                                            "2017-10-17"))))
 
                    //The private and internal items must not be present
                    .andExpect(jsonPath("$._embedded.items[*].metadata", Matchers.allOf(
@@ -417,11 +416,11 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
 
         context.restoreAuthSystemState();
 
+
         //** WHEN **
         //An anonymous user browses the items in the Browse by item endpoint
-        getClient().perform(get("/api/discover/browses/title/items")
-               .param("projection", "full"))
-               //** THEN **
+        getClient().perform(get("/api/discover/browses/title/items"))
+                   //** THEN **
                //The status has to be 200 OK
                .andExpect(status().isOk())
                //We expect the content type to be "application/hal+json;charset=UTF-8"
@@ -438,8 +437,7 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
 
         //** WHEN **
         //An anonymous user browses the items in the Browse by item endpoint
-        getClient().perform(get("/api/discover/browses/author/entries")
-               .param("projection", "full"))
+        getClient().perform(get("/api/discover/browses/author/entries"))
                //** THEN **
                //The status has to be 200 OK
                .andExpect(status().isOk())
@@ -508,6 +506,8 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
                                 .withTitle("Item 7")
                                 .withIssueDate("2016-01-12")
                                 .build();
+
+        context.restoreAuthSystemState();
 
         //** WHEN **
         //An anonymous user browses the items in the Browse by date issued endpoint
@@ -632,6 +632,8 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
                                 .withIssueDate("2029")
                                 .withSubject("Science Fiction")
                                 .build();
+
+        context.restoreAuthSystemState();
 
          // ---- BROWSES BY ENTRIES ----
 
@@ -773,14 +775,15 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
                                 .withIssueDate("2029")
                                 .withSubject("Science Fiction")
                                 .build();
-        // ---- BROWSES BY ITEM ----
 
+        context.restoreAuthSystemState();
+
+        // ---- BROWSES BY ITEM ----
         //** WHEN **
         //An anonymous user browses the items in the Browse by date issued endpoint
         //with startsWith set to 1990
         getClient().perform(get("/api/discover/browses/dateissued/items?startsWith=1990")
-                                .param("size", "2")
-                                .param("projection", "full"))
+                                .param("size", "2"))
 
                    //** THEN **
                    //The status has to be 200 OK
@@ -806,8 +809,7 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
         //An anonymous user browses the items in the Browse by Title endpoint
         //with startsWith set to T
         getClient().perform(get("/api/discover/browses/title/items?startsWith=T")
-                            .param("size", "2")
-                            .param("projection", "full"))
+                            .param("size", "2"))
 
                    //** THEN **
                    //The status has to be 200 OK
@@ -835,8 +837,7 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
         //with startsWith set to Blade and scope set to Col 1
         getClient().perform(get("/api/discover/browses/title/items?startsWith=Blade")
                                 .param("scope", col1.getID().toString())
-                                .param("size", "2")
-                                .param("projection", "full"))
+                                .param("size", "2"))
 
                    //** THEN **
                    //The status has to be 200 OK
@@ -924,6 +925,8 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
                                 .withIssueDate("2018-01-01")
                                 .withSubject("Astronomy")
                                 .build();
+
+        context.restoreAuthSystemState();
 
         // ---- BROWSES BY ITEM ----
 

@@ -15,7 +15,7 @@
     <parent>
         <groupId>org.dspace</groupId>
         <artifactId>dspace-parent</artifactId>
-        <version>7.0-SNAPSHOT</version>
+        <version>7.0-beta3-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
 
@@ -27,8 +27,6 @@
         <resource.delimiter>@</resource.delimiter>
         <!-- Define our starting class for our Spring Boot Application -->
         <start-class>org.dspace.app.rest.Application</start-class>
-        <!-- Library for managing JSON Web Tokens (JWT): https://bitbucket.org/connect2id/nimbus-jose-jwt/wiki/Home -->
-        <nimbus-jose-jwt.version>7.9</nimbus-jose-jwt.version>
     </properties>
 
     <profiles>
@@ -241,11 +239,7 @@
         <dependency>
             <groupId>org.springframework.data</groupId>
             <artifactId>spring-data-rest-hal-browser</artifactId>
-            <version>3.1.10.RELEASE</version>
-            <!-- if you get a java.util.zip.ZipException: invalid LOC
-                 header (bad signature) during the tomcat startup
-                 force the use of the previous version as the jar file
-                 looks corrupted in the maven repository -->
+            <version>${spring-hal-browser.version}</version>
         </dependency>
 
         <!-- Add in Spring Security for AuthN and AuthZ -->
@@ -255,10 +249,8 @@
             <version>${spring-boot.version}</version>
         </dependency>
 
-        <!-- Add in log4j support by excluding default logging, and
-	     using starter-log4j -->
-        <!-- See:  http://docs.spring.io/spring-boot/docs/current/reference
-	     /html/howto-logging.html#howto-configure-log4j-for-logging -->
+        <!-- Add in log4j support by excluding default logging, and using starter-log4j -->
+        <!-- See: https://docs.spring.io/spring-boot/docs/current/reference/html/howto.html#howto-logging -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter</artifactId>
@@ -346,6 +338,7 @@
         <dependency>
             <groupId>com.jayway.jsonpath</groupId>
             <artifactId>json-path-assert</artifactId>
+            <version>${json-path.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>

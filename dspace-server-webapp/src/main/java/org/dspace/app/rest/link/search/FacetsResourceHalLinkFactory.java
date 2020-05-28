@@ -16,6 +16,7 @@ import org.dspace.app.rest.model.hateoas.FacetsResource;
 import org.dspace.app.rest.model.hateoas.SearchFacetEntryResource;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.hateoas.IanaLinkRelations;
 import org.springframework.hateoas.Link;
 import org.springframework.stereotype.Component;
 
@@ -34,7 +35,8 @@ public class FacetsResourceHalLinkFactory extends DiscoveryRestHalLinkFactory<Fa
 
             halResource.setPageHeader(new EmbeddedPageHeader(buildSearchBaseLink(content), page));
 
-            list.add(buildLink(Link.REL_SELF, buildSearchFacetsBaseLink(content).build().toUriString()));
+            list.add(buildLink(IanaLinkRelations.SELF.value(),
+                               buildSearchFacetsBaseLink(content).build().toUriString()));
         }
     }
 
