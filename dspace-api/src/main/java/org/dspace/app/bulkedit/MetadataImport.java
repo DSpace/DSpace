@@ -163,7 +163,6 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
      * Create an instance of the metadata importer. Requires a context and an array of CSV lines
      * to examine.
      *
-     * @param c        The context
      * @param toImport An array of CSV lines to examine
      */
     public void initMetadataImport(DSpaceCSV toImport) {
@@ -317,6 +316,10 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
             throw new ParseException("Required parameter -f missing!");
         }
         filename = commandLine.getOptionValue('f');
+        
+        if (!commandLine.hasOption('e')) {
+            throw new ParseException("Required parameter -e missing!");
+        }
 
         // Option to apply template to new items
         if (commandLine.hasOption('t')) {
