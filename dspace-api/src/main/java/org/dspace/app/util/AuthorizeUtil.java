@@ -590,8 +590,11 @@ public class AuthorizeUtil {
                 authorizeManageAdminGroup(context, collection);
                 return;
             }
-
-
+            // if we reach this point, it means that the group is related
+            // to a collection but as it is not the submitters, nor the administrators,
+            // nor a workflow groups it must be a default item/bitstream groups
+            authorizeManageDefaultReadGroup(context, collection);
+            return;
         }
         if (parentObject.getType() == Constants.COMMUNITY) {
             Community community = (Community) parentObject;

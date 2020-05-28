@@ -1915,18 +1915,18 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
         String tokenAdminCol = getAuthToken(adminCol.getEmail(), password);
         String tokenAdminComm = getAuthToken(adminChild1.getEmail(), password);
 
-        getClient(tokenAdminCol).perform(get("/api/eperson/epersons/search/byMetadata")
-                 .param("query", "Rossi"))
-                 .andExpect(status().isOk())
-                 .andExpect(content().contentType(contentType))
-                 .andExpect(jsonPath("$._embedded.epersons", Matchers.containsInAnyOrder(
-                            EPersonMatcher.matchEPersonEntry(adminChild1),
-                            EPersonMatcher.matchEPersonEntry(adminCol),
-                            EPersonMatcher.matchEPersonEntry(col1Submitter)
-                            )))
-                 .andExpect(jsonPath("$.page.totalElements", is(3)));
-
         for (String prop : confPropsCollectionAdmins) {
+            getClient(tokenAdminCol).perform(get("/api/eperson/epersons/search/byMetadata")
+                    .param("query", "Rossi"))
+                    .andExpect(status().isOk())
+                    .andExpect(content().contentType(contentType))
+                    .andExpect(jsonPath("$._embedded.epersons", Matchers.containsInAnyOrder(
+                               EPersonMatcher.matchEPersonEntry(adminChild1),
+                               EPersonMatcher.matchEPersonEntry(adminCol),
+                               EPersonMatcher.matchEPersonEntry(col1Submitter)
+                               )))
+                    .andExpect(jsonPath("$.page.totalElements", is(3)));
+
             configurationService.setProperty(prop, false);
         }
 
@@ -1934,18 +1934,18 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                 .param("query", "Rossi"))
                 .andExpect(status().isForbidden());
 
-        getClient(tokenAdminComm).perform(get("/api/eperson/epersons/search/byMetadata")
-                .param("query", "Rossi"))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(contentType))
-                .andExpect(jsonPath("$._embedded.epersons", Matchers.containsInAnyOrder(
-                           EPersonMatcher.matchEPersonEntry(adminChild1),
-                           EPersonMatcher.matchEPersonEntry(adminCol),
-                           EPersonMatcher.matchEPersonEntry(col1Submitter)
-                           )))
-                .andExpect(jsonPath("$.page.totalElements", is(3)));
-
         for (String prop : confPropsCommunityAdmins) {
+            getClient(tokenAdminComm).perform(get("/api/eperson/epersons/search/byMetadata")
+                    .param("query", "Rossi"))
+                    .andExpect(status().isOk())
+                    .andExpect(content().contentType(contentType))
+                    .andExpect(jsonPath("$._embedded.epersons", Matchers.containsInAnyOrder(
+                               EPersonMatcher.matchEPersonEntry(adminChild1),
+                               EPersonMatcher.matchEPersonEntry(adminCol),
+                               EPersonMatcher.matchEPersonEntry(col1Submitter)
+                               )))
+                    .andExpect(jsonPath("$.page.totalElements", is(3)));
+
             configurationService.setProperty(prop, false);
         }
 
