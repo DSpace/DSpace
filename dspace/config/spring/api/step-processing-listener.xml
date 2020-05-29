@@ -14,6 +14,7 @@
                 <entry key="dc.identifier.adsbibcode" value="adsbibcode"/>
                 <entry key="dc.identifier.arxiv" value="arxiv"/>
                 <entry key="dc.identifier.patentno" value="publicationnumber"/>
+                <entry key="dc.identifier.patentnumber" value="publicationnumber"/>
                 <entry key="dc.identifier.applicationnumber" value="applicationnumber"/>
                 <entry key="dc.date.filled" value="applicationdate"/>
 	        </map>            

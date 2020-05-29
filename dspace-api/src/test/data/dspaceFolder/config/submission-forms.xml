@@ -951,12 +951,48 @@ You can leave out the day and/or month if they aren't applicable.</hint>
      <row>
        <field>
          <dc-schema>dc</dc-schema>
+         <dc-element>identifier</dc-element>
+         <dc-qualifier>patentnumber</dc-qualifier>
+         <label>Patent Number</label>
+         <input-type>onebox</input-type>
+         <repeatable>false</repeatable>
+         <required />
+         <hint>The patent number.</hint>
+       </field>
+     </row>
+     <row>
+       <field>
+         <dc-schema>dc</dc-schema>
          <dc-element>type</dc-element>
          <label>Type</label>
          <input-type value-pairs-name="patent_types">dropdown</input-type>
          <repeatable>false</repeatable>
          <required>You must select a patent type</required>
          <hint>Select the type of content of the patent.</hint>
+       </field>
+     </row>
+     <row>
+       <field>
+         <dc-schema>dc</dc-schema>
+         <dc-element>identifier</dc-element>
+         <dc-qualifier>applicationnumber</dc-qualifier>
+         <label>Application Number</label>
+         <input-type>onebox</input-type>
+         <repeatable>false</repeatable>
+         <required />
+         <hint>The Application number.</hint>
+       </field>
+     </row>
+     <row>
+       <field>
+         <dc-schema>dc</dc-schema>
+         <dc-element>date</dc-element>
+         <dc-qualifier>filled</dc-qualifier>
+         <label>Date filled</label>
+         <input-type>date</input-type>
+         <repeatable>false</repeatable>
+         <required />
+         <hint>The date Filled.</hint>
        </field>
      </row>
    </form>

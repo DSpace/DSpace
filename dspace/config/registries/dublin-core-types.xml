@@ -773,6 +773,13 @@
   </dc-type>
 
   <dc-type>
+	<schema>dc</schema>
+    <element>identifier</element>
+    <qualifier>patentnumber</qualifier>
+    <scope_note></scope_note>
+  </dc-type>
+
+  <dc-type>
     <schema>dc</schema>
     <element>identifier</element>
     <qualifier>applicationnumber</qualifier>
