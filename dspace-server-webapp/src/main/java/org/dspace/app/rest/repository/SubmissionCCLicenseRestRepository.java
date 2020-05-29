@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
 /**
@@ -29,6 +30,7 @@ public class SubmissionCCLicenseRestRepository extends DSpaceRestRepository<Subm
     protected CreativeCommonsService creativeCommonsService;
 
     @Override
+    @PreAuthorize("permitAll()")
     public SubmissionCCLicenseRest findOne(final Context context, final String licenseId) {
         CCLicense ccLicense = creativeCommonsService.findOne(licenseId);
         if (ccLicense == null) {
@@ -38,10 +40,11 @@ public class SubmissionCCLicenseRestRepository extends DSpaceRestRepository<Subm
     }
 
     @Override
+    @PreAuthorize("permitAll()")
     public Page<SubmissionCCLicenseRest> findAll(final Context context, final Pageable pageable) {
 
         List<CCLicense> allCCLicenses = creativeCommonsService.findAllCCLicenses();
-        return converter.toRestPage(utils.getPage(allCCLicenses, pageable), utils.obtainProjection());
+        return converter.toRestPage(allCCLicenses, pageable, utils.obtainProjection());
     }
 
     @Override

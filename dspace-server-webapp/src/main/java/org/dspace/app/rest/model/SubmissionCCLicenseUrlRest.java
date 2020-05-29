@@ -26,6 +26,10 @@ public class SubmissionCCLicenseUrlRest extends BaseObjectRest<String> {
         return id;
     }
 
+    public void setId(String id) {
+        this.id = id;
+    }
+
     public String getUrl() {
         return url;
     }
