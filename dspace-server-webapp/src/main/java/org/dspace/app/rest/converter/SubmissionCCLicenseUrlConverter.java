@@ -29,6 +29,7 @@ public class SubmissionCCLicenseUrlConverter implements DSpaceConverter<String, 
     public SubmissionCCLicenseUrlRest convert(final String modelObject, final Projection projection) {
         SubmissionCCLicenseUrlRest submissionCCLicenseUrlRest = new SubmissionCCLicenseUrlRest();
         submissionCCLicenseUrlRest.setUrl(modelObject);
+        submissionCCLicenseUrlRest.setId(modelObject);
 
         return submissionCCLicenseUrlRest;
     }
