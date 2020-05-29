@@ -222,7 +222,7 @@ public class WorkspaceItemPatentStepIT extends AbstractControllerIntegrationTest
                                 + "Schichtlüftung entgegen gesteuert wird (V7).")));
 
     }
-    
+
     @Test
     /**
      * Test the metadata lookup
@@ -268,7 +268,7 @@ public class WorkspaceItemPatentStepIT extends AbstractControllerIntegrationTest
                 .andExpect(jsonPath("$.sections.patent['dc.type']").doesNotExist());
 
     }
-    
+
     @Test
     /**
      * Test the metadata lookup
@@ -313,8 +313,10 @@ public class WorkspaceItemPatentStepIT extends AbstractControllerIntegrationTest
                         is("Spielgerät für Schweine")))
                 .andExpect(jsonPath("$.sections.patent['dc.date.issued'][0].value", is("2010-05-12")))
                 .andExpect(jsonPath("$.sections.patent['dc.date.filled'][0].value", is("2008-11-12")))
-                .andExpect(jsonPath("$.sections.patent['dc.identifier.applicationnumber'][0].value", is("202008015010")))
-                .andExpect(jsonPath("$.sections.patent['dc.identifier.applicationnumber'][1].value", is("DE20082015010U")));
+                .andExpect(jsonPath("$.sections.patent['dc.identifier.applicationnumber'][0].value",
+                        is("202008015010")))
+                .andExpect(jsonPath("$.sections.patent['dc.identifier.applicationnumber'][1].value",
+                        is("DE20082015010U")));
 
         // verify that the patch changes have been persisted
         getClient(authToken)
@@ -324,8 +326,10 @@ public class WorkspaceItemPatentStepIT extends AbstractControllerIntegrationTest
                         is("Spielgerät für Schweine")))
                 .andExpect(jsonPath("$.sections.patent['dc.date.issued'][0].value", is("2010-05-12")))
                 .andExpect(jsonPath("$.sections.patent['dc.date.filled'][0].value", is("2008-11-12")))
-                .andExpect(jsonPath("$.sections.patent['dc.identifier.applicationnumber'][0].value", is("202008015010")))
-                .andExpect(jsonPath("$.sections.patent['dc.identifier.applicationnumber'][1].value", is("DE20082015010U")));
+                .andExpect(jsonPath("$.sections.patent['dc.identifier.applicationnumber'][0].value",
+                        is("202008015010")))
+                .andExpect(jsonPath("$.sections.patent['dc.identifier.applicationnumber'][1].value",
+                        is("DE20082015010U")));
 
     }
 }
