@@ -35,6 +35,7 @@ import org.dspace.app.rest.builder.CollectionBuilder;
 import org.dspace.app.rest.builder.CommunityBuilder;
 import org.dspace.app.rest.builder.EPersonBuilder;
 import org.dspace.app.rest.builder.GroupBuilder;
+import org.dspace.app.rest.matcher.EPersonMatcher;
 import org.dspace.app.rest.matcher.GroupMatcher;
 import org.dspace.app.rest.matcher.HalMatcher;
 import org.dspace.app.rest.model.GroupRest;
@@ -59,6 +60,7 @@ import org.dspace.eperson.service.EPersonService;
 import org.dspace.eperson.service.GroupService;
 import org.dspace.services.ConfigurationService;
 import org.hamcrest.Matchers;
+import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -74,8 +76,20 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
     private ConfigurationService configurationService;
     @Autowired
     private CollectionService collectionService;
+
     @Autowired
     private AuthorizeService authorizeService;
+
+    Collection collection;
+
+    @Before
+    public void setup() {
+        context.turnOffAuthorisationSystem();
+        parentCommunity = CommunityBuilder.createCommunity(context).withName("test").build();
+        collection = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1").build();
+
+        context.restoreAuthSystemState();
+    }
 
     @Test
     public void createTest()
@@ -2320,7 +2334,7 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
     }
 
     @Test
-    public void commAdminManageSunCollectionOfSubmittersAndAdminsTest() throws Exception {
+    public void communityAdminCanManageCollectionSubmittersGroupAndAdminsGroupsTest() throws Exception {
 
         GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
 
@@ -2388,6 +2402,13 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
         assertFalse(groupService.isMember(context, submitter1, groupSubmitters));
         assertTrue(groupService.isMember(context, submitter2, groupSubmitters));
 
+        getClient(tokenAdminComm).perform(post("/api/eperson/groups/" + groupAdministrators.getID() + "/epersons")
+                .contentType(parseMediaType(TEXT_URI_LIST_VALUE))
+                .content(REST_SERVER_URL + "eperson/groups/" + submitter1.getID()
+                        ))
+                .andExpect(status().isNoContent());
+
+        assertTrue(groupService.isMember(context, submitter1, groupAdministrators));
         assertTrue(groupService.isMember(context, adminCol1, groupAdministrators));
         getClient(tokenAdminComm).perform(delete("/api/eperson/groups/"
                                           + groupAdministrators.getID() + "/epersons/" + adminCol1.getID()))
@@ -2643,4 +2664,261 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
       assertFalse(groupService.isMember(context, submitter1, workflowGroupStep1));
       assertFalse(groupService.isMember(context, submitter2, workflowGroupStep2));
     }
+
+    @Test
+    public void collectionAdminRemoveMembersFromCollectionAdminGroupSuccess() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+        Group adminGroup = collectionService.createAdministrators(context, collection);
+        authorizeService.addPolicy(context, collection, Constants.ADMIN, eperson);
+        EPerson ePerson = EPersonBuilder.createEPerson(context).withEmail("testToAdd@test.com").build();
+        context.restoreAuthSystemState();
+
+
+        String token = getAuthToken(eperson.getEmail(), password);
+        getClient(token).perform(
+            post("/api/eperson/groups/" + adminGroup.getID() + "/epersons")
+                .contentType(parseMediaType
+                    (org.springframework.data.rest.webmvc.RestMediaTypes
+                         .TEXT_URI_LIST_VALUE))
+                .content("https://localhost:8080/server/api/eperson/epersons/" + ePerson.getID()));
+
+        getClient(token).perform(get("/api/eperson/groups/" + adminGroup.getID() + "/epersons"))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$._embedded.epersons", Matchers.hasItem(
+                            EPersonMatcher.matchEPersonOnEmail(ePerson.getEmail())
+                        )));
+
+        getClient(token).perform(delete("/api/eperson/groups/" + adminGroup.getID() + "/epersons/" + ePerson.getID()))
+                        .andExpect(status().isNoContent());
+
+        getClient(token).perform(get("/api/eperson/groups/" + adminGroup.getID() + "/epersons"))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$._embedded.epersons", Matchers.not(Matchers.hasItem(
+                            EPersonMatcher.matchEPersonOnEmail(ePerson.getEmail())
+                        ))));
+
+    }
+
+    @Test
+    public void collectionAdminAddChildGroupToCollectionAdminGroupSuccess() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+        Group adminGroup = collectionService.createAdministrators(context, collection);
+        authorizeService.addPolicy(context, collection, Constants.ADMIN, eperson);
+        Group group = GroupBuilder.createGroup(context).withName("testGroup").build();
+        context.restoreAuthSystemState();
+
+
+        String token = getAuthToken(eperson.getEmail(), password);
+        getClient(token).perform(
+            post("/api/eperson/groups/" + adminGroup.getID() + "/subgroups")
+                .contentType(parseMediaType
+                    (org.springframework.data.rest.webmvc.RestMediaTypes
+                         .TEXT_URI_LIST_VALUE))
+                .content("https://localhost:8080/server/api/eperson/groups/" + group.getID()));
+
+        getClient(token).perform(get("/api/eperson/groups/" + adminGroup.getID() + "/subgroups"))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$._embedded.subgroups", Matchers.hasItem(
+                            GroupMatcher.matchGroupWithName(group.getName())
+                        )));
+
+    }
+
+    @Test
+    public void collectionAdminRemoveChildGroupFromCollectionAdminGroupSuccess() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+        Group adminGroup = collectionService.createAdministrators(context, collection);
+        authorizeService.addPolicy(context, collection, Constants.ADMIN, eperson);
+        Group group = GroupBuilder.createGroup(context).withName("testGroup").build();
+        context.restoreAuthSystemState();
+
+
+        String token = getAuthToken(eperson.getEmail(), password);
+        getClient(token).perform(
+            post("/api/eperson/groups/" + adminGroup.getID() + "/subgroups")
+                .contentType(parseMediaType
+                    (org.springframework.data.rest.webmvc.RestMediaTypes
+                         .TEXT_URI_LIST_VALUE))
+                .content("https://localhost:8080/server/api/eperson/groups/" + group.getID()));
+
+        getClient(token).perform(get("/api/eperson/groups/" + adminGroup.getID() + "/subgroups"))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$._embedded.subgroups", Matchers.hasItem(
+                            GroupMatcher.matchGroupWithName(group.getName())
+                        )));
+
+
+        getClient(token).perform(delete("/api/eperson/groups/" + adminGroup.getID() + "/subgroups/" + group.getID()))
+                        .andExpect(status().isNoContent());
+
+        getClient(token).perform(get("/api/eperson/groups/" + adminGroup.getID() + "/subgroups"))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$._embedded.subgroups", Matchers.not(Matchers.hasItem(
+                            GroupMatcher.matchGroupWithName(group.getName())
+                        ))));
+
+    }
+
+    @Test
+    public void collectionAdminAddMembersToCollectionAdminGroupPropertySetToFalse() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+        Group adminGroup = collectionService.createAdministrators(context, collection);
+        authorizeService.addPolicy(context, collection, Constants.ADMIN, eperson);
+        EPerson ePerson = EPersonBuilder.createEPerson(context).withEmail("testToAdd@test.com").build();
+        configurationService.setProperty("core.authorization.community-admin.collection.admin-group", false);
+        configurationService.setProperty("core.authorization.collection-admin.admin-group", false);
+        context.restoreAuthSystemState();
+
+
+        String token = getAuthToken(eperson.getEmail(), password);
+        getClient(token).perform(
+            post("/api/eperson/groups/" + adminGroup.getID() + "/epersons")
+                .contentType(parseMediaType
+                    (org.springframework.data.rest.webmvc.RestMediaTypes.TEXT_URI_LIST_VALUE))
+                .content("https://localhost:8080/server/api/eperson/epersons/" + ePerson.getID()))
+                        .andExpect(status().isForbidden());
+
+        token = getAuthToken(admin.getEmail(), password);
+        getClient(token).perform(get("/api/eperson/groups/" + adminGroup.getID() + "/epersons"))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$._embedded.epersons", Matchers.not(Matchers.hasItem(
+                            EPersonMatcher.matchEPersonOnEmail(ePerson.getEmail())
+                        ))));
+
+        context.turnOffAuthorisationSystem();
+        configurationService.setProperty("core.authorization.community-admin.collection.admin-group", true);
+        configurationService.setProperty("core.authorization.collection-admin.admin-group", true);
+        context.restoreAuthSystemState();
+
+    }
+
+    @Test
+    public void collectionAdminRemoveMembersFromCollectionAdminGroupPropertySetToFalse() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+        Group adminGroup = collectionService.createAdministrators(context, collection);
+        authorizeService.addPolicy(context, collection, Constants.ADMIN, eperson);
+        EPerson ePerson = EPersonBuilder.createEPerson(context).withEmail("testToAdd@test.com").build();
+        context.restoreAuthSystemState();
+
+
+        String token = getAuthToken(eperson.getEmail(), password);
+        getClient(token).perform(
+            post("/api/eperson/groups/" + adminGroup.getID() + "/epersons")
+                .contentType(parseMediaType
+                    (org.springframework.data.rest.webmvc.RestMediaTypes
+                         .TEXT_URI_LIST_VALUE))
+                .content("https://localhost:8080/server/api/eperson/epersons/" + ePerson.getID()));
+
+        getClient(token).perform(get("/api/eperson/groups/" + adminGroup.getID() + "/epersons"))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$._embedded.epersons", Matchers.hasItem(
+                            EPersonMatcher.matchEPersonOnEmail(ePerson.getEmail())
+                        )));
+        context.turnOffAuthorisationSystem();
+        configurationService.setProperty("core.authorization.community-admin.collection.admin-group", false);
+        configurationService.setProperty("core.authorization.collection-admin.admin-group", false);
+        context.restoreAuthSystemState();
+
+        getClient(token).perform(delete("/api/eperson/groups/" + adminGroup.getID() + "/epersons/" + ePerson.getID()))
+                        .andExpect(status().isForbidden());
+
+        token = getAuthToken(admin.getEmail(), password);
+        getClient(token).perform(get("/api/eperson/groups/" + adminGroup.getID() + "/epersons"))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$._embedded.epersons", Matchers.hasItem(
+                            EPersonMatcher.matchEPersonOnEmail(ePerson.getEmail())
+                        )));
+
+        context.turnOffAuthorisationSystem();
+        configurationService.setProperty("core.authorization.community-admin.collection.admin-group", true);
+        configurationService.setProperty("core.authorization.collection-admin.admin-group", true);
+        context.restoreAuthSystemState();
+
+    }
+
+    @Test
+    public void collectionAdminAddChildGroupToCollectionAdminGroupPropertySetToFalse() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+        Group adminGroup = collectionService.createAdministrators(context, collection);
+        authorizeService.addPolicy(context, collection, Constants.ADMIN, eperson);
+        Group group = GroupBuilder.createGroup(context).withName("testGroup").build();
+        configurationService.setProperty("core.authorization.community-admin.collection.admin-group", false);
+        configurationService.setProperty("core.authorization.collection-admin.admin-group", false);
+        context.restoreAuthSystemState();
+
+
+        String token = getAuthToken(eperson.getEmail(), password);
+        getClient(token).perform(
+            post("/api/eperson/groups/" + adminGroup.getID() + "/subgroups")
+                .contentType(parseMediaType
+                    (org.springframework.data.rest.webmvc.RestMediaTypes
+                         .TEXT_URI_LIST_VALUE))
+                .content("https://localhost:8080/server/api/eperson/groups/" + group.getID()))
+                        .andExpect(status().isForbidden());
+
+        token = getAuthToken(admin.getEmail(), password);
+        getClient(token).perform(get("/api/eperson/groups/" + adminGroup.getID() + "/subgroups"))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$._embedded.subgroups", Matchers.not(Matchers.hasItem(
+                            GroupMatcher.matchGroupWithName(group.getName())
+                        ))));
+
+        context.turnOffAuthorisationSystem();
+        configurationService.setProperty("core.authorization.community-admin.collection.admin-group", true);
+        configurationService.setProperty("core.authorization.collection-admin.admin-group", true);
+        context.restoreAuthSystemState();
+
+    }
+
+    @Test
+    public void collectionAdminRemoveChildGroupFromCollectionAdminGroupPropertySetToFalse() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+        Group adminGroup = collectionService.createAdministrators(context, collection);
+        authorizeService.addPolicy(context, collection, Constants.ADMIN, eperson);
+        Group group = GroupBuilder.createGroup(context).withName("testGroup").build();
+        context.restoreAuthSystemState();
+
+
+        String token = getAuthToken(eperson.getEmail(), password);
+        getClient(token).perform(
+            post("/api/eperson/groups/" + adminGroup.getID() + "/subgroups")
+                .contentType(parseMediaType
+                    (org.springframework.data.rest.webmvc.RestMediaTypes
+                         .TEXT_URI_LIST_VALUE))
+                .content("https://localhost:8080/server/api/eperson/groups/" + group.getID()));
+
+        getClient(token).perform(get("/api/eperson/groups/" + adminGroup.getID() + "/subgroups"))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$._embedded.subgroups", Matchers.hasItem(
+                            GroupMatcher.matchGroupWithName(group.getName())
+                        )));
+
+        context.turnOffAuthorisationSystem();
+        configurationService.setProperty("core.authorization.community-admin.collection.admin-group", false);
+        configurationService.setProperty("core.authorization.collection-admin.admin-group", false);
+        context.restoreAuthSystemState();
+
+        getClient(token).perform(delete("/api/eperson/groups/" + adminGroup.getID() + "/subgroups/" + group.getID()))
+                        .andExpect(status().isForbidden());
+
+        token = getAuthToken(admin.getEmail(), password);
+        getClient(token).perform(get("/api/eperson/groups/" + adminGroup.getID() + "/subgroups"))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$._embedded.subgroups", Matchers.hasItem(
+                            GroupMatcher.matchGroupWithName(group.getName())
+                        )));
+
+        context.turnOffAuthorisationSystem();
+        configurationService.setProperty("core.authorization.community-admin.collection.admin-group", true);
+        configurationService.setProperty("core.authorization.collection-admin.admin-group", true);
+        context.restoreAuthSystemState();
+    }
+
 }
