@@ -316,7 +316,6 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
             throw new ParseException("Required parameter -f missing!");
         }
         filename = commandLine.getOptionValue('f');
-        
         if (!commandLine.hasOption('e')) {
             throw new ParseException("Required parameter -e missing!");
         }
