@@ -65,24 +65,24 @@ public class EPOService {
                 int start = START;
                 int end = SIZE;
                 List<EPODocumentId> epoDocIds = new ArrayList<EPODocumentId>();
-    
+
                 for (int i = 0; i < MAX; i++) {
                     List<EPODocumentId> ids = searchDocumentIds(bearer, query, start, end);
-    
+
                     start = end + 1;
                     end = end + SIZE;
                     if (ids.size() > 0) {
                         epoDocIds.addAll(ids);
                     }
-    
+
                     if (ids.size() < SIZE) {
                         break;
                     }
                 }
-    
+
                 for (EPODocumentId epoDocId : epoDocIds) {
                     List<Record> recordfounds = searchDocument(bearer, epoDocId);
-    
+
                     if (recordfounds.size() > 1) {
                         log.warn("More record are returned with epocID " + epoDocId.toString());
                     }
