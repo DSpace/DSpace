@@ -202,7 +202,7 @@ public abstract class AbstractBuilder<T, S> {
 
     public abstract T build() throws SQLException, AuthorizeException;
 
-    public abstract void delete(T dso) throws Exception;
+    public abstract void delete(Context c, T dso) throws Exception;
 
     protected abstract S getService();
 

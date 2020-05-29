@@ -37,6 +37,8 @@ public interface SubmissionLookupDataLoader extends DataLoader {
 
     public final static String CINII = "cinii";
 
+    public final static String ADSBIBCODE = "adsbibcode";
+
     public final static String TYPE = "type";
 
     public final static String WOSID = "isiid";

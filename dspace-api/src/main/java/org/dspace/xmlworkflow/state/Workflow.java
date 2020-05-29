@@ -104,7 +104,7 @@ public class Workflow implements BeanNameAware {
         Map<String, Role> roles = new HashMap<>();
         for (Step step : steps) {
             if (step.getRole() != null) {
-                roles.put(step.getRole().getName(), step.getRole());
+                roles.put(step.getRole().getId(), step.getRole());
             }
         }
         return roles;

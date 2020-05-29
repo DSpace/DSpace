@@ -98,6 +98,13 @@ public class BitstreamBuilder extends AbstractDSpaceObjectBuilder<Bitstream> {
         return this;
     }
 
+    public BitstreamBuilder withProvenance(String provenance) throws SQLException {
+
+        bitstreamService.addMetadata(context, bitstream, "dc", "description", "provenance", null, provenance);
+
+        return this;
+    }
+
     private Bundle getOriginalBundle(Item item) throws SQLException, AuthorizeException {
         List<Bundle> bundles = itemService.getBundles(item, ORIGINAL);
         Bundle targetBundle = null;
@@ -145,7 +152,14 @@ public class BitstreamBuilder extends AbstractDSpaceObjectBuilder<Bitstream> {
 
     @Override
     public void cleanup() throws Exception {
-        delete(bitstream);
+       try (Context c = new Context()) {
+            c.turnOffAuthorisationSystem();
+            bitstream = c.reloadEntity(bitstream);
+            if (bitstream != null) {
+                delete(c, bitstream);
+                c.complete();
+            }
+        }
     }
 
     protected DSpaceObjectService<Bitstream> getService() {

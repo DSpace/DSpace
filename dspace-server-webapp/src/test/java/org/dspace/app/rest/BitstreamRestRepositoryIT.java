@@ -7,6 +7,9 @@
  */
 package org.dspace.app.rest;
 
+import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadata;
+import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadataDoesNotExist;
+import static org.dspace.core.Constants.WRITE;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.not;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -24,6 +27,7 @@ import org.dspace.app.rest.builder.BitstreamBuilder;
 import org.dspace.app.rest.builder.CollectionBuilder;
 import org.dspace.app.rest.builder.CommunityBuilder;
 import org.dspace.app.rest.builder.ItemBuilder;
+import org.dspace.app.rest.builder.ResourcePolicyBuilder;
 import org.dspace.app.rest.matcher.BitstreamFormatMatcher;
 import org.dspace.app.rest.matcher.BitstreamMatcher;
 import org.dspace.app.rest.matcher.HalMatcher;
@@ -91,6 +95,8 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
                                          .build();
         }
 
+        context.restoreAuthSystemState();
+
         String token = getAuthToken(admin.getEmail(), password);
 
         getClient(token).perform(get("/api/core/bitstreams/")
@@ -148,6 +154,8 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
                                          .withMimeType("text/plain")
                                          .build();
         }
+
+        context.restoreAuthSystemState();
 
         String token = getAuthToken(admin.getEmail(), password);
 
@@ -294,6 +302,8 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
                                          .build();
         }
 
+        context.restoreAuthSystemState();
+
         // When full projection is requested, response should include expected properties, links, and embeds.
         getClient().perform(get("/api/core/bitstreams/" + bitstream.getID())
                    .param("projection", "full"))
@@ -359,6 +369,8 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
                                          .build();
         }
 
+        context.restoreAuthSystemState();
+
         getClient().perform(get("/api/core/bitstreams/" + bitstream.getID() + "/format"))
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
@@ -387,6 +399,8 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
         Collection col = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection")
                                           .withLogo("logo_collection").build();
 
+        context.restoreAuthSystemState();
+
         getClient().perform(get("/api/core/bitstreams/" + parentCommunity.getLogo().getID()))
                    .andExpect(status().isOk());
 
@@ -408,6 +422,8 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
         // 2. A collection with a logo
         Collection col = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection")
                                           .withLogo("logo_collection").build();
+
+        context.restoreAuthSystemState();
 
         getClient().perform(get("/api/core/bitstreams/" + parentCommunity.getLogo().getID() + "/content"))
                    .andExpect(status().isOk()).andExpect(content().string("logo_community"));
@@ -431,6 +447,8 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
                                            .withName("Sub Community")
                                            .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+
+        context.restoreAuthSystemState();
 
         String token = getAuthToken(admin.getEmail(), password);
 
@@ -475,6 +493,8 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
                                         .withMimeType("text/plain")
                                         .build();
         }
+
+        context.restoreAuthSystemState();
 
         String token = getAuthToken(admin.getEmail(), password);
 
@@ -523,6 +543,8 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
                                         .build();
         }
 
+        context.restoreAuthSystemState();
+
         String token = getAuthToken(eperson.getEmail(), password);
 
         // Delete using an unauthorized user
@@ -570,6 +592,8 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
                                         .build();
         }
 
+        context.restoreAuthSystemState();
+
         // Delete as anonymous
         getClient().perform(delete("/api/core/bitstreams/" + bitstream.getID()))
                 .andExpect(status().isUnauthorized());
@@ -592,6 +616,8 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
         // 2. A collection with a logo
         Collection col = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection")
                                           .withLogo("logo_collection").build();
+
+        context.restoreAuthSystemState();
 
         String token = getAuthToken(admin.getEmail(), password);
 
@@ -652,6 +678,8 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
                     .build();
         }
 
+        context.restoreAuthSystemState();
+
         String token = getAuthToken(admin.getEmail(), password);
 
         // Delete
@@ -683,4 +711,178 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
         new MetadataPatchSuite().runWith(getClient(token), "/api/core/bitstreams/"
                 + parentCommunity.getLogo().getID(), expectedStatus);
     }
+
+
+    @Test
+    public void testHiddenMetadataForAnonymousUser() throws Exception {
+
+        //We turn off the authorization system in order to create the structure as defined below
+        context.turnOffAuthorisationSystem();
+
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and one collection.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+
+        //2. One public items that is readable by Anonymous
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
+                                      .withTitle("Test")
+                                      .withIssueDate("2010-10-17")
+                                      .withAuthor("Smith, Donald")
+                                      .withSubject("ExtraEntry")
+                                      .build();
+
+        String bitstreamContent = "ThisIsSomeDummyText";
+        //Add a bitstream to an item
+        Bitstream bitstream = null;
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+            bitstream = BitstreamBuilder.
+                                                createBitstream(context, publicItem1, is)
+                                        .withName("Bitstream")
+                                        .withDescription("Description")
+                                        .withProvenance("Provenance Data")
+                                        .withMimeType("text/plain")
+                                        .build();
+        }
+
+        context.restoreAuthSystemState();
+
+        // When full projection is requested, response should include expected properties, links, and embeds.
+        getClient().perform(get("/api/core/bitstreams/" + bitstream.getID())
+                                    .param("projection", "full"))
+                   .andExpect(status().isOk())
+                   .andExpect(content().contentType(contentType))
+                   .andExpect(jsonPath("$", BitstreamMatcher.matchFullEmbeds()))
+                   .andExpect(jsonPath("$", BitstreamMatcher.matchBitstreamEntry(bitstream)))
+                   .andExpect(jsonPath("$.metadata", matchMetadata("dc.title", "Bitstream")))
+                   .andExpect(jsonPath("$.metadata", matchMetadataDoesNotExist("dc.description.provenance")))
+        ;
+
+    }
+
+    @Test
+    public void testHiddenMetadataForAdminUser() throws Exception {
+
+        //We turn off the authorization system in order to create the structure as defined below
+        context.turnOffAuthorisationSystem();
+
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and one collection.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+
+        //2. One public items that is readable by Anonymous
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
+                                      .withTitle("Test")
+                                      .withIssueDate("2010-10-17")
+                                      .withAuthor("Smith, Donald")
+                                      .withSubject("ExtraEntry")
+                                      .build();
+
+        String bitstreamContent = "ThisIsSomeDummyText";
+        //Add a bitstream to an item
+        Bitstream bitstream = null;
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+            bitstream = BitstreamBuilder.
+                                                createBitstream(context, publicItem1, is)
+                                        .withName("Bitstream")
+                                        .withDescription("Description")
+                                        .withProvenance("Provenance Data")
+                                        .withMimeType("text/plain")
+                                        .build();
+        }
+
+        context.restoreAuthSystemState();
+
+        String token = getAuthToken(admin.getEmail(), password);
+
+        // When full projection is requested, response should include expected properties, links, and embeds.
+        getClient(token).perform(get("/api/core/bitstreams/" + bitstream.getID())
+                                    .param("projection", "full"))
+                   .andExpect(status().isOk())
+                   .andExpect(content().contentType(contentType))
+                   .andExpect(jsonPath("$", BitstreamMatcher.matchFullEmbeds()))
+                   .andExpect(jsonPath("$", BitstreamMatcher.matchBitstreamEntry(bitstream)))
+                   .andExpect(jsonPath("$.metadata", matchMetadata("dc.title", "Bitstream")))
+                   .andExpect(jsonPath("$.metadata", matchMetadata("dc.description.provenance", "Provenance Data")))
+        ;
+
+    }
+
+
+    @Test
+    public void testHiddenMetadataForUserWithWriteRights() throws Exception {
+
+        //We turn off the authorization system in order to create the structure as defined below
+        context.turnOffAuthorisationSystem();
+
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and one collection.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+
+        //2. One public items that is readable by Anonymous
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
+                                      .withTitle("Test")
+                                      .withIssueDate("2010-10-17")
+                                      .withAuthor("Smith, Donald")
+                                      .withSubject("ExtraEntry")
+                                      .build();
+
+        String bitstreamContent = "ThisIsSomeDummyText";
+        //Add a bitstream to an item
+        Bitstream bitstream = null;
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+            bitstream = BitstreamBuilder.
+                                                createBitstream(context, publicItem1, is)
+                                        .withName("Bitstream")
+                                        .withDescription("Description")
+                                        .withProvenance("Provenance Data")
+                                        .withMimeType("text/plain")
+                                        .build();
+        }
+
+        ResourcePolicyBuilder.createResourcePolicy(context)
+                             .withUser(eperson)
+                             .withAction(WRITE)
+                             .withDspaceObject(col1)
+                             .build();
+
+        context.restoreAuthSystemState();
+
+        String token = getAuthToken(eperson.getEmail(), password);
+
+
+        // When full projection is requested, response should include expected properties, links, and embeds.
+        getClient(token).perform(get("/api/core/bitstreams/" + bitstream.getID())
+                                         .param("projection", "full"))
+                        .andExpect(status().isOk())
+                        .andExpect(content().contentType(contentType))
+                        .andExpect(jsonPath("$", BitstreamMatcher.matchFullEmbeds()))
+                        .andExpect(jsonPath("$", BitstreamMatcher.matchBitstreamEntry(bitstream)))
+                        .andExpect(jsonPath("$.metadata", matchMetadata("dc.title", "Bitstream")))
+                        .andExpect(jsonPath("$.metadata", matchMetadataDoesNotExist("dc.description.provenance")))
+        ;
+
+    }
+
+
 }

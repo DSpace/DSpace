@@ -7,13 +7,11 @@
  */
 package org.dspace.app.rest;
 
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.ControllerLinkBuilder.linkTo;
 
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -36,8 +34,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.Link;
-import org.springframework.hateoas.PagedResources;
-import org.springframework.hateoas.ResourceSupport;
+import org.springframework.hateoas.RepresentationModel;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -66,9 +63,6 @@ public class AuthorityEntrySearchRestController {
         "(?!^[0-9a-fxA-FX]{8}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{12}$)[\\w+\\-]+$+}";
 
     @Autowired
-    ConverterService converter;
-
-    @Autowired
     HalLinkService linkService;
 
     @Autowired
@@ -77,12 +71,20 @@ public class AuthorityEntrySearchRestController {
     @Autowired
     Utils utils;
 
-    @RequestMapping(method = RequestMethod.GET, value = REGEX_REQUESTMAPPING_IDENTIFIER_AS_STRING_VERSION_STRONG +
-            "/" + AuthorityRest.ENTRIES + "/" + AuthorityEntrySearchRestController.SEARCH)
-    public ResourceSupport listSearchMethods(@PathVariable String id) {
-        ResourceSupport root = new ResourceSupport();
-        List<String> searchMethods = new ArrayList<String>(Arrays.asList("top", "byParent"));
+    @Autowired
+    ConverterService converter;
 
+    @RequestMapping(method = RequestMethod.GET, value = REGEX_REQUESTMAPPING_IDENTIFIER_AS_STRING_VERSION_STRONG + "/"
+                                             + AuthorityRest.ENTRIES + "/" + AuthorityEntrySearchRestController.SEARCH)
+    public <ID extends Serializable> RepresentationModel listSearchMethods(@PathVariable String id) {
+        RepresentationModel root = new RepresentationModel();
+        DSpaceRestRepository<RestAddressableModel, ID> repository = utils.getResourceRepository(
+                                 AuthorityRest.CATEGORY, AuthorityEntrySearchRestController.MODEL);
+        Class<RestAddressableModel> domainClass = repository.getDomainClass();
+        LinkRest linkRest = utils.getLinkRest(AuthorityRest.ENTRIES, domainClass);
+        LinkRestRepository linkRepository = utils.getLinkResourceRepository(AuthorityRest.CATEGORY,
+                AuthorityEntrySearchRestController.MODEL, linkRest.name());
+        List<String> searchMethods = repositoryUtils.listSearchMethods(linkRepository);
         for (String name : searchMethods) {
             Link link = linkTo(this.getClass(), AuthorityRest.CATEGORY, AuthorityEntrySearchRestController.MODEL)
                     .slash(id).slash(AuthorityRest.ENTRIES).slash("search").slash(name).withRel(name);
@@ -94,28 +96,27 @@ public class AuthorityEntrySearchRestController {
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
     @RequestMapping(method = RequestMethod.GET, value = REGEX_REQUESTMAPPING_IDENTIFIER_AS_STRING_VERSION_STRONG +
-            "/" + AuthorityRest.ENTRIES + "/" + AuthorityEntrySearchRestController.SEARCH + "/top")
-    public <ID extends Serializable> ResourceSupport findAlltop(@PathVariable String id,
-                                                                HttpServletRequest request,
-                                                                HttpServletResponse response,
-                                                                Pageable pageable, Sort sort,
-                                                                PagedResourcesAssembler assembler,
-                                                                @RequestParam MultiValueMap<String,
-                                                                Object> parameters)
+            "/" + AuthorityRest.ENTRIES + "/" + AuthorityEntrySearchRestController.SEARCH + "/{searchMethodName}")
+    public <ID extends Serializable> RepresentationModel searchMethod(@PathVariable String id,
+                                @PathVariable String searchMethodName,
+                                HttpServletRequest request,
+                                HttpServletResponse response,
+                                Pageable pageable, Sort sort,
+                                PagedResourcesAssembler assembler,
+                                @RequestParam MultiValueMap<String,
+                                Object> parameters)
         throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
 
-        PagedResources<? extends HALResource> result = null;
         DSpaceRestRepository<RestAddressableModel, ID> repository = utils.getResourceRepository(
-                AuthorityRest.CATEGORY, AuthorityEntrySearchRestController.MODEL);
+                                 AuthorityRest.CATEGORY, AuthorityEntrySearchRestController.MODEL);
         Class<RestAddressableModel> domainClass = repository.getDomainClass();
-        String searchMethodName = "top";
 
-        LinkRest linkRest = utils.getClassLevelLinkRest(AuthorityRest.ENTRIES, domainClass);
+        LinkRest linkRest = utils.getLinkRest(AuthorityRest.ENTRIES, domainClass);
 
         if (linkRest != null) {
             LinkRestRepository linkRepository = utils.getLinkResourceRepository(AuthorityRest.CATEGORY,
                     AuthorityEntrySearchRestController.MODEL, linkRest.name());
-            Method linkMethod = repositoryUtils.getSearchMethod(searchMethodName, linkRepository);
+            Method searchMethod = repositoryUtils.getSearchMethod(searchMethodName, linkRepository);
             String querystring = request.getQueryString();
             Link link;
             if (querystring != null && querystring.length() > 0) {
@@ -126,61 +127,15 @@ public class AuthorityEntrySearchRestController {
                 link = linkTo(this.getClass(), AuthorityRest.CATEGORY, AuthorityEntrySearchRestController.MODEL)
                         .slash(id).slash(AuthorityRest.ENTRIES).slash("search").slash(searchMethodName).withSelfRel();
             }
-
-            Page<? extends RestModel> pageResult = (Page<? extends RestAddressableModel>) linkMethod
-                    .invoke(linkRepository, id, pageable, utils.obtainProjection());
-
-            Page<HALResource> halResources = pageResult.map(restObject -> converter.toResource(restObject));
-
-            return assembler.toResource(halResources, link);
-        } else {
-            throw new ResourceNotFoundException(AuthorityRest.ENTRIES + " undefined for "
-                    + AuthorityEntrySearchRestController.MODEL);
-        }
-
-    }
-
-    @RequestMapping(method = RequestMethod.GET, value = REGEX_REQUESTMAPPING_IDENTIFIER_AS_STRING_VERSION_STRONG +
-            "/" + AuthorityRest.ENTRIES + "/" + AuthorityEntrySearchRestController.SEARCH + "/byParent")
-    public <ID extends Serializable> ResourceSupport findByParent(@PathVariable String id,
-                                                                  HttpServletRequest request,
-                                                                  HttpServletResponse response,
-                                                                  Pageable pageable, Sort sort,
-                                                                  PagedResourcesAssembler assembler,
-                                                                  @RequestParam MultiValueMap<String,
-                                                                  Object> parameters)
-        throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
-
-        PagedResources<? extends HALResource> result = null;
-        DSpaceRestRepository<RestAddressableModel, ID> repository = utils.getResourceRepository(
-                AuthorityRest.CATEGORY, AuthorityEntrySearchRestController.MODEL);
-        Class<RestAddressableModel> domainClass = repository.getDomainClass();
-        String searchMethodName = "byParent";
-
-        LinkRest linkRest = utils.getClassLevelLinkRest(AuthorityRest.ENTRIES, domainClass);
-
-        if (linkRest != null) {
-            LinkRestRepository linkRepository = utils.getLinkResourceRepository(AuthorityRest.CATEGORY,
-                    AuthorityEntrySearchRestController.MODEL, linkRest.name());
-            Method linkMethod = repositoryUtils.getSearchMethod(searchMethodName, linkRepository);
-
-            String querystring = request.getQueryString();
-            Link link;
-            if (querystring != null && querystring.length() > 0) {
-                link = linkTo(this.getClass(), AuthorityRest.CATEGORY, AuthorityEntrySearchRestController.MODEL)
-                        .slash(id).slash(AuthorityRest.ENTRIES).slash("search")
-                        .slash(searchMethodName + '?' + querystring).withSelfRel();
-            } else {
-                link = linkTo(this.getClass(), AuthorityRest.CATEGORY, AuthorityEntrySearchRestController.MODEL)
-                        .slash(id).slash(AuthorityRest.ENTRIES).slash("search").slash(searchMethodName).withSelfRel();
-            }
-
-            Page<? extends RestModel> pageResult = (Page<? extends RestAddressableModel>) linkMethod
-                    .invoke(linkRepository, request, id, pageable, utils.obtainProjection());
+            parameters.add("authority", id);
+            Page<? extends RestModel> pageResult = (Page<? extends RestAddressableModel>) repositoryUtils
+                              .executeQueryMethod(linkRepository, parameters, searchMethod, pageable, sort, assembler);
 
             Page<HALResource> halResources = pageResult.map(restObject -> converter.toResource(restObject));
 
-            return assembler.toResource(halResources, link);
+            halResources.forEach(linkService::addLinks);
+
+            return assembler.toModel(halResources, link);
         } else {
             throw new ResourceNotFoundException(AuthorityRest.ENTRIES + " undefined for "
                     + AuthorityEntrySearchRestController.MODEL);

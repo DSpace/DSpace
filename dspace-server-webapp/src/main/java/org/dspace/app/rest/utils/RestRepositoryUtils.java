@@ -14,6 +14,7 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.app.rest.Parameter;
+import org.dspace.app.rest.RestRepository;
 import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.exception.MissingParameterException;
 import org.dspace.app.rest.repository.DSpaceRestRepository;
@@ -29,8 +30,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.repository.support.QueryMethodParameterConversionException;
 import org.springframework.data.web.PagedResourcesAssembler;
-import org.springframework.hateoas.core.AnnotationAttribute;
-import org.springframework.hateoas.core.MethodParameters;
+import org.springframework.hateoas.server.core.AnnotationAttribute;
+import org.springframework.hateoas.server.core.MethodParameters;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
@@ -77,7 +78,7 @@ public class RestRepositoryUtils {
      * @param repository
      * @return the names of the search methods if any. Otherwise an empty list
      */
-    public List<String> listSearchMethods(DSpaceRestRepository repository) {
+    public List<String> listSearchMethods(RestRepository repository) {
         List<String> searchMethods = new LinkedList<String>();
         for (Method method : repository.getClass().getMethods()) {
             // We need to use AnnotationUtils because the DSpaceRestRepository is possibly enhanced by a Spring AOP
@@ -153,7 +154,7 @@ public class RestRepositoryUtils {
      * executeQueryMethod(RepositoryInvoker, MultiValueMap<String, Object>,
      * Method, DefaultedPageable, Sort, PersistentEntityResourceAssembler)
      */
-    public Object executeQueryMethod(DSpaceRestRepository repository, MultiValueMap<String, Object> parameters,
+    public Object executeQueryMethod(RestRepository repository, MultiValueMap<String, Object> parameters,
                                      Method method, Pageable pageable, Sort sort, PagedResourcesAssembler assembler) {
 
         MultiValueMap<String, Object> result = new LinkedMultiValueMap<String, Object>(parameters);
@@ -184,7 +185,7 @@ public class RestRepositoryUtils {
      * invokeQueryMethod(Method, MultiValueMap<String, ? extends Object>,
      * Pageable, Sort)
      */
-    public Object invokeQueryMethod(DSpaceRestRepository repository, Method method,
+    public Object invokeQueryMethod(RestRepository repository, Method method,
                                     MultiValueMap<String, ? extends Object> parameters, Pageable pageable, Sort sort) {
 
         Assert.notNull(method, "Method must not be null!");

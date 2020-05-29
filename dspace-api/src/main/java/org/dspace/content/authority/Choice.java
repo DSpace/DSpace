@@ -36,7 +36,7 @@ public class Choice {
     /**
      * A boolean representing if choice entry value can selected
      */
-    public Boolean selectable = true;
+    public boolean selectable = true;
 
     public Map<String, String> extras = new HashMap<String, String>();
 
@@ -56,7 +56,7 @@ public class Choice {
         this.extras = extras;
     }
 
-    public Choice(String authority, String label, String value, Boolean selectable) {
+    public Choice(String authority, String label, String value, boolean selectable) {
         this.authority = authority;
         this.label = label;
         this.value = value;

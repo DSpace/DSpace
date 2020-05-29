@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<node id="Testvcb" label="test vocabulary">
+	<isComposedBy>
+		<node id="TVC11" label="LEVEL 1">
+			<isComposedBy>
+			</isComposedBy>
+			<hasNote>note level 1</hasNote>
+		</node>
+		<node id="TVC12" label="LEVEL 2">
+			<isComposedBy>
+			</isComposedBy>
+			<hasNote>note level 2</hasNote>
+		</node>
+		<node id="TVC13" label="LEVEL 3">
+			<isComposedBy>
+				<node id="TVC131" label="LEVEL 3.1">
+					 <isComposedBy>
+					 </isComposedBy>
+					<hasNote>note level 3.1</hasNote>
+				</node>
+				<node id="TVC132" label="LEVEL 3.2">
+					 <isComposedBy>
+					 </isComposedBy>
+					<hasNote>note level 3.2</hasNote>
+				</node>
+				<node id="TVC133" label="LEVEL 3.3">
+				     <isComposedBy>
+					 </isComposedBy>
+					<hasNote>note level 3.3</hasNote>
+				</node>
+			</isComposedBy>
+			<hasNote>note level 3</hasNote>
+		</node>
+	</isComposedBy>
+	<hasNote>note root</hasNote>
+</node>

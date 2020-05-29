@@ -292,7 +292,8 @@ public class WorkflowItemRestRepository extends DSpaceRestRepository<WorkflowIte
                         AbstractRestProcessingStep stepProcessing =
                             (AbstractRestProcessingStep) stepClass.newInstance();
                         stepProcessing.doPreProcessing(context, source);
-                        stepProcessing.doPatchProcessing(context, getRequestService().getCurrentRequest(), source, op);
+                        stepProcessing.doPatchProcessing(context, getRequestService().getCurrentRequest(),
+                                                          source, op, stepConfig);
                         stepProcessing.doPostProcessing(context, source);
                     } else {
                         throw new DSpaceBadRequestException(
@@ -301,6 +302,9 @@ public class WorkflowItemRestRepository extends DSpaceRestRepository<WorkflowIte
                             " Therefore it cannot be used by the Configurable Submission as the <processing-class>!");
                     }
 
+                } catch (UnprocessableEntityException ue) {
+                    log.error(ue.getMessage(), ue);
+                    throw ue;
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
                 }

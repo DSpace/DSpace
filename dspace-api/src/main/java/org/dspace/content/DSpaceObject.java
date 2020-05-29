@@ -48,7 +48,7 @@ public abstract class DSpaceObject implements Serializable, ReloadableEntity<jav
     @Transient
     private StringBuffer eventDetails = null;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "dSpaceObject", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "dSpaceObject", cascade = CascadeType.ALL, orphanRemoval = true)
     @OrderBy("metadataField, place")
     private List<MetadataValue> metadata = new ArrayList<>();
 

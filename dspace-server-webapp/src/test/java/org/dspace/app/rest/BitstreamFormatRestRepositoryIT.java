@@ -92,6 +92,8 @@ public class BitstreamFormatRestRepositoryIT extends AbstractControllerIntegrati
                                                                 .withMimeType("application/octet-stream")
                                                                 .withDescription("Description")
                                                                 .build();
+        context.restoreAuthSystemState();
+
         getClient().perform(get("/api/core/bitstreamformats"))
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))

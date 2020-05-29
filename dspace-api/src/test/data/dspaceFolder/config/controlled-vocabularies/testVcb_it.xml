@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<node id="Testvcb" label="test vocabulary">
+	<isComposedBy>
+		<node id="TVC11" label="LIVELLO 1">
+			<isComposedBy>
+			</isComposedBy>
+			<hasNote>note level 1</hasNote>
+		</node>
+		<node id="TVC12" label="LIVELLO 2">
+			<isComposedBy>
+			</isComposedBy>
+			<hasNote>note level 2</hasNote>
+		</node>
+		<node id="TVC13" label="LIVELLO 3">
+			<isComposedBy>
+				<node id="TVC131" label="LIVELLO 3.1">
+					 <isComposedBy>
+					 </isComposedBy>
+					<hasNote>note level 3.1</hasNote>
+				</node>
+				<node id="TVC132" label="LIVELLO 3.2">
+					 <isComposedBy>
+					 </isComposedBy>
+					<hasNote>note level 3.2</hasNote>
+				</node>
+				<node id="TVC133" label="LIVELLO 3.3">
+				     <isComposedBy>
+					 </isComposedBy>
+					<hasNote>note level 3.3</hasNote>
+				</node>
+			</isComposedBy>
+			<hasNote>note level 3</hasNote>
+		</node>
+	</isComposedBy>
+	<hasNote>note root</hasNote>
+</node>

@@ -168,7 +168,7 @@ public class DiscoverQueryBuilderTest {
 
         query = "my test case";
         searchFilter = new SearchFilter("subject", "equals", "Java");
-        page = new PageRequest(1, 10, Sort.Direction.ASC, "dc.title");
+        page = PageRequest.of(1, 10, Sort.Direction.ASC, "dc.title");
 
         queryBuilder.afterPropertiesSet();
     }
@@ -230,7 +230,7 @@ public class DiscoverQueryBuilderTest {
 
     @Test
     public void testSortByScore() throws Exception {
-        page = new PageRequest(2, 10, Sort.Direction.ASC, "SCORE");
+        page = PageRequest.of(2, 10, Sort.Direction.ASC, "SCORE");
 
         DiscoverQuery discoverQuery =
             queryBuilder.buildQuery(context, null, discoveryConfiguration, null, null, null, page);

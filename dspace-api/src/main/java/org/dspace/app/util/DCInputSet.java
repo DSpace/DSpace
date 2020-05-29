@@ -10,6 +10,8 @@ package org.dspace.app.util;
 import java.util.List;
 import java.util.Map;
 
+import org.dspace.core.Utils;
+
 /**
  * Class representing all DC inputs required for a submission, organized into pages
  *
@@ -107,9 +109,20 @@ public class DCInputSet {
         for (int i = 0; i < inputs.length; i++) {
             for (int j = 0; j < inputs[i].length; j++) {
                 DCInput field = inputs[i][j];
-                String fullName = field.getFieldName();
-                if (fullName.equals(fieldName)) {
-                    return true;
+                if (field.getInputType().equals("qualdrop_value")) {
+                    List<String> pairs = field.getPairs();
+                    for (int k = 0; k < pairs.size(); k += 2) {
+                        String qualifier = pairs.get(k + 1);
+                        String fullName = Utils.standardize(field.getSchema(), field.getElement(), qualifier, ".");
+                        if (fullName.equals(fieldName)) {
+                            return true;
+                        }
+                    }
+                } else {
+                    String fullName = field.getFieldName();
+                    if (fullName.equals(fieldName)) {
+                        return true;
+                    }
                 }
             }
         }

@@ -52,6 +52,10 @@
                             <bean
                                     class="org.dspace.app.rest.submit.factory.impl.BitstreamResourcePolicyAddPatchOperation"/>
                         </entry>
+                        <entry key="detectduplicateadd">
+                            <bean
+                                class="org.dspace.app.rest.submit.factory.impl.DetectDuplicateAddPatchOperation" />
+                        </entry>
                     </map>
                 </entry>
                 <entry key="remove">
@@ -107,5 +111,4 @@
             </map>
         </property>
     </bean>
-
 </beans>

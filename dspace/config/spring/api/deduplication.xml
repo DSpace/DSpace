@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    The contents of this file are subject to the license and copyright
+    detailed in the LICENSE and NOTICE files at the root of the source
+    tree and available online at
+
+    http://www.dspace.org/license/
+
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+                  http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+                  http://www.springframework.org/schema/context
+                  http://www.springframework.org/schema/context/spring-context-2.5.xsd">
+
+	<context:annotation-config /> <!-- allows us to use spring annotations in beans -->
+
+	<bean class="org.dspace.app.deduplication.utils.DedupUtils" name="dedupUtils">
+		<property name="dedupService" ref="org.dspace.app.deduplication.service.DedupService" />
+	</bean>
+
+	<bean class="org.dspace.app.deduplication.utils.TitleSignature" name="TitleSignaturePlugin">
+		<property name="signatureType" value="title" />
+		<property name="metadata" value="dc.title" />
+		<property name="resourceTypeID" value="2" />
+	</bean>
+
+ 	<bean class="org.dspace.app.deduplication.utils.MD5ValueSignature" name="ArXivSignature">
+ 		<property name="signatureType" value="identifier" />
+		<property name="metadata" value="dc.identifier.arxiv" />
+		<property name="resourceTypeID" value="2" />
+		<property name="prefix" value="arxiv:"/>
+		<!-- remember to add the prefix to the ignoreprefix list -->
+		<property name="ignorePrefix">
+			<list>
+				<value>arXiv:</value>
+				<value>ARXIV:</value>
+				<value>arxiv:</value>
+			</list>
+		</property>
+	</bean>
+
+	<bean class="org.dspace.app.deduplication.utils.MD5ValueSignature" name="IsiSignature">
+		<property name="signatureType" value="identifier" />
+		<property name="metadata" value="dc.identifier.isi" />
+		<property name="resourceTypeID" value="2" />
+		<property name="prefix" value="isi:"/>
+	</bean>
+
+	<bean class="org.dspace.app.deduplication.utils.MD5ValueSignature" name="ScopusSignature">
+		<property name="signatureType" value="identifier" />
+		<property name="metadata" value="dc.identifier.scopus" />
+		<property name="resourceTypeID" value="2" />
+		<property name="prefix" value="scopus:"/>
+	</bean>
+
+	<bean class="org.dspace.app.deduplication.utils.MD5ValueSignature" name="PubmedIDSignature">
+		<property name="signatureType" value="identifier" />
+		<property name="metadata" value="dc.identifier.pmid" />
+		<property name="resourceTypeID" value="2" />
+		<property name="prefix" value="pmid:"/>
+		<!-- remember to add the prefix to the ignoreprefix list -->
+		<property name="ignorePrefix">
+			<list>
+				<value>pmid://</value>
+				<value>pmid:</value>
+				<value>PMID://</value>
+				<value>PMID:</value>
+			</list>
+		</property>
+	</bean>
+
+	<bean class="org.dspace.app.deduplication.utils.MD5ValueSignature" name="DOISignature">
+		<property name="signatureType" value="identifier" />
+		<property name="metadata" value="dc.identifier.doi" />
+		<property name="resourceTypeID" value="2" />
+		<property name="prefix" value="doi:"/>
+		<!-- remember to add the prefix to the ignoreprefix list -->
+		<property name="ignorePrefix">
+			<list>
+				<value>doi://</value>
+				<value>doi:</value>
+				<value>DOI:</value>
+				<value>DOI://</value>
+				<value>http://dx.doi.org/</value>
+				<value>dx.doi.org/</value>
+			</list>
+		</property>
+	</bean>	
+
+	<bean class="org.dspace.app.deduplication.service.SearchDeduplication" name="ITEMSearchDeduplication">
+		<property name="solrIndexPlugin">
+			<list>
+				<ref bean="itemLocationSearchDeduplication"/>
+				<ref bean="itemStatusSearchDeduplication"/>
+				<ref bean="itemWithdrawnSearchDeduplication"/>
+				<ref bean="itemTitleSearchDeduplication"/>
+				<ref bean="itemIdentifierSearchDeduplication"/>
+			</list>
+		</property>
+	</bean>
+
+	<bean class="org.dspace.app.deduplication.service.impl.ItemLocationDedupServiceIndexPlugin" id="itemLocationSearchDeduplication"/>
+	<bean class="org.dspace.app.deduplication.service.impl.ItemStatusDedupServiceIndexPlugin" id="itemStatusSearchDeduplication"/>
+	<bean class="org.dspace.app.deduplication.service.impl.ItemWithdrawnDedupServiceIndexPlugin" id="itemWithdrawnSearchDeduplication"/>
+	<bean class="org.dspace.app.deduplication.service.impl.ItemMetadataDedupServiceIndexPlugin" id="itemTitleSearchDeduplication">
+		<property name="metadata">
+			<list>
+				<value>dc.title</value>
+			</list>
+		</property>
+	</bean>
+	<bean class="org.dspace.app.deduplication.service.impl.ItemMetadataDedupServiceIndexPlugin" id="itemIdentifierSearchDeduplication">
+		<property name="metadata">
+			<list>
+				<value>dc.identifier.doi</value>
+				<value>dc.identifier.arxiv</value>
+				<value>dc.identifier.pmid</value>
+				<value>dc.identifier.scopus</value>
+				<value>dc.identifier.isi</value>
+			</list>
+		</property>
+		<property name="field" value="dc.identifier_s"/>
+	</bean>
+
+</beans>

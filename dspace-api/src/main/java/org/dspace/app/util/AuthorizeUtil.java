@@ -19,12 +19,19 @@ import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
+import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.eperson.Group;
+import org.dspace.eperson.factory.EPersonServiceFactory;
+import org.dspace.eperson.service.GroupService;
+import org.dspace.xmlworkflow.factory.XmlWorkflowServiceFactory;
+import org.dspace.xmlworkflow.storedcomponents.CollectionRole;
+import org.dspace.xmlworkflow.storedcomponents.service.CollectionRoleService;
 
 /**
  * This class is an addition to the AuthorizeManager that perform authorization
@@ -524,5 +531,74 @@ public class AuthorizeUtil {
                                                  Constants.ADD);
             }
         }
+    }
+
+    /**
+     * This method will check whether the current user is authorized to manage the default read group
+     * @param context       The relevant DSpace context
+     * @param collection    The collection for which this will be checked
+     * @throws AuthorizeException   If something goes wrong
+     * @throws SQLException If something goes wrong
+     */
+    public static void authorizeManageDefaultReadGroup(Context context,
+                                                      Collection collection) throws AuthorizeException, SQLException {
+        AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
+        authorizeService.authorizeAction(context, collection, Constants.ADMIN);
+    }
+
+    /**
+     * This method checks whether the current user has sufficient rights to modify the group.
+     * Depending on the kind of group and due to delegated administration, separate checks need to be done to verify
+     * whether the user is allowed to modify the group.
+     *
+     * @param context the context of which the user will be checked
+     * @param group   the group to be checked
+     * @throws SQLException
+     * @throws AuthorizeException
+     */
+    public static void authorizeManageGroup(Context context, Group group) throws SQLException, AuthorizeException {
+        AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
+        GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
+        CollectionRoleService collectionRoleService = XmlWorkflowServiceFactory.getInstance()
+                                                                               .getCollectionRoleService();
+        if (authorizeService.isAdmin(context)) {
+            return;
+        }
+
+        DSpaceObject parentObject = groupService.getParentObject(context, group);
+        if (parentObject == null) {
+            throw new AuthorizeException("not authorized to manage this group");
+        }
+        if (parentObject.getType() == Constants.COLLECTION) {
+            Collection collection = (Collection) parentObject;
+
+            if (group.equals(collection.getSubmitters())) {
+                authorizeManageSubmittersGroup(context, collection);
+                return;
+            }
+
+
+            List<CollectionRole> collectionRoles = collectionRoleService.findByCollection(context, collection);
+            for (CollectionRole role : collectionRoles) {
+                if (group.equals(role.getGroup())) {
+                    authorizeManageWorkflowsGroup(context, collection);
+                    return;
+                }
+            }
+
+            if (group.equals(collection.getAdministrators())) {
+                authorizeManageAdminGroup(context, collection);
+                return;
+            }
+
+
+        }
+        if (parentObject.getType() == Constants.COMMUNITY) {
+            Community community = (Community) parentObject;
+            authorizeManageAdminGroup(context, community);
+            return;
+        }
+
+        throw new AuthorizeException("not authorized to manage this group");
     }
 }
