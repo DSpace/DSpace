@@ -10,7 +10,6 @@ package org.dspace.app.rest.security;
 import java.io.Serializable;
 
 import org.apache.commons.lang3.StringUtils;
-import org.dspace.app.rest.model.DiscoveryResultsRest;
 import org.dspace.app.rest.model.SubmissionCCLicenseUrlRest;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
