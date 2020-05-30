@@ -232,6 +232,7 @@ bte.crossref.apikey =
 submission.lookup.scopus.apikey =
 # use SciVal or Scopus service
 submission.lookup.scivalcontent.apikey =
+
 # In order to use the WOS services you need to require access to http://search.webofknowledge.com/esti/wokmws/ws/WokSearch
 # Note that when credentials are configured, or ip authentication is enabled, by default the service is enabled,
 # see bte.xml for further configuration
@@ -239,4 +240,8 @@ submission.lookup.webofknowledge.ip.authentication = false
 # or
 submission.lookup.webofknowledge.user =
 submission.lookup.webofknowledge.password =
+
+# In order to use the Astrophysics Data System services you need to obtain an API Key from Astrophysics Data System. Once you get it, add it to the following configuration value.
+# Note that when apikey is configured by default the service is enabled, see bte.xml for further configuration
+submission.lookup.ads.apikey =
 

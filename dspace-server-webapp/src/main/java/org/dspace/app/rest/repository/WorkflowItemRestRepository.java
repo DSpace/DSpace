@@ -292,7 +292,8 @@ public class WorkflowItemRestRepository extends DSpaceRestRepository<WorkflowIte
                         AbstractRestProcessingStep stepProcessing =
                             (AbstractRestProcessingStep) stepClass.newInstance();
                         stepProcessing.doPreProcessing(context, source);
-                        stepProcessing.doPatchProcessing(context, getRequestService().getCurrentRequest(), source, op);
+                        stepProcessing.doPatchProcessing(context, getRequestService().getCurrentRequest(),
+                                                          source, op, stepConfig);
                         stepProcessing.doPostProcessing(context, source);
                     } else {
                         throw new DSpaceBadRequestException(

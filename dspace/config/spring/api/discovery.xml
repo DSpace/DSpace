@@ -25,7 +25,8 @@
     <context:annotation-config /> <!-- allows us to use spring annotations in beans -->
 
     <bean id="solrServiceResourceIndexPlugin" class="org.dspace.discovery.SolrServiceResourceRestrictionPlugin" scope="prototype"/>
-    <bean id="SolrServiceSpellIndexingPlugin" class="org.dspace.discovery.SolrServiceSpellIndexingPlugin" scope="prototype"/>
+    <bean id="solrServiceWorkspaceWorkflowPlugin" class="org.dspace.discovery.SolrServiceWorkspaceWorkflowRestrictionPlugin" scope="prototype"/>
+    <bean id="solrServiceSpellIndexingPlugin" class="org.dspace.discovery.SolrServiceSpellIndexingPlugin" scope="prototype"/>
     <bean id="solrServiceMetadataBrowseIndexingPlugin" class="org.dspace.discovery.SolrServiceMetadataBrowseIndexingPlugin" scope="prototype"/>
     <bean id="solrServicePrivateItemPlugin" class="org.dspace.discovery.SolrServicePrivateItemPlugin" scope="prototype"/>
     <bean id="SolrServiceParentObjectIndexingPlugin" class="org.dspace.discovery.SolrServiceParentObjectIndexingPlugin" scope="prototype"/>
@@ -53,8 +54,13 @@
                <entry key="site" value-ref="homepageConfiguration" />
                <!--<entry key="123456789/7621" value-ref="defaultConfiguration"/>-->
                <!-- Used to show filters and results on MyDSpace -->
+               <!-- Do not change the id of special entries or else they won't work -->
+               <!-- "workspace" is a special entry to search for your own workspace items -->
                 <entry key="workspace" value-ref="workspaceConfiguration" />
+                <!-- "workflow" is a special entry to search for your own workflow tasks -->
                 <entry key="workflow" value-ref="workflowConfiguration" />
+                <!-- "workflowAdmin" is a special entry to search for all workflow items if you are an administrator -->
+                <entry key="workflowAdmin" value-ref="workflowAdminConfiguration" />
                 <entry key="undiscoverable" value-ref="unDiscoverableItems" />
                 <entry key="administrativeView" value-ref="administrativeView" />
                 <entry key="publication" value-ref="publication"/>
@@ -775,6 +781,82 @@
             <list>
                 <!--Only find PoolTask and ClaimedTask -->
                 <value>search.resourcetype:PoolTask OR search.resourcetype:ClaimedTask</value>
+            </list>
+        </property>
+        <!--Default result per page  -->
+        <property name="defaultRpp" value="10" />
+        <property name="hitHighlightingConfiguration">
+            <bean class="org.dspace.discovery.configuration.DiscoveryHitHighlightingConfiguration">
+                <property name="metadataFields">
+                    <list>
+                        <bean class="org.dspace.discovery.configuration.DiscoveryHitHighlightFieldConfiguration">
+                            <property name="field" value="dc.title"/>
+                            <property name="snippets" value="5"/>
+                        </bean>
+                        <bean class="org.dspace.discovery.configuration.DiscoveryHitHighlightFieldConfiguration">
+                            <property name="field" value="dc.contributor.author"/>
+                            <property name="snippets" value="5"/>
+                        </bean>
+                        <bean class="org.dspace.discovery.configuration.DiscoveryHitHighlightFieldConfiguration">
+                            <property name="field" value="dc.description.abstract"/>
+                            <property name="maxSize" value="250"/>
+                            <property name="snippets" value="2"/>
+                        </bean>
+                        <bean class="org.dspace.discovery.configuration.DiscoveryHitHighlightFieldConfiguration">
+                            <property name="field" value="fulltext"/>
+                            <property name="maxSize" value="250"/>
+                            <property name="snippets" value="2"/>
+                        </bean>
+                    </list>
+                </property>
+            </bean>
+        </property>
+        <!-- When true a "did you mean" example will be displayed, value can be true or false -->
+        <property name="spellCheckEnabled" value="true"/>
+    </bean>
+
+    <!--The workflowAdmin configuration settings for discovery -->
+    <bean id="workflowAdminConfiguration"
+        class="org.dspace.discovery.configuration.DiscoveryConfiguration"
+        scope="prototype">
+        <property name="id" value="workflowAdmin" />
+        <!--Which sidebar facets are to be displayed -->
+        <property name="sidebarFacets">
+            <list>
+                <ref bean="searchFilterObjectNamedType" />
+                <ref bean="searchFilterType" />
+                <ref bean="searchFilterIssued" />
+                <ref bean="searchFilterSubmitter" />
+            </list>
+        </property>
+        <!--The search filters which can be used on the discovery search page -->
+        <property name="searchFilters">
+            <list>
+                <ref bean="searchFilterObjectNamedType" />
+                <ref bean="searchFilterType" />
+                <ref bean="searchFilterIssued" />
+                <ref bean="searchFilterSubmitter" />
+            </list>
+        </property>
+        <!--The sort filters for the discovery search-->
+        <property name="searchSortConfiguration">
+            <bean class="org.dspace.discovery.configuration.DiscoverySortConfiguration">
+                <!--<property name="defaultSort" ref="sortDateIssued"/>-->
+                <!--DefaultSortOrder can either be desc or asc (desc is default)-->
+                <property name="defaultSortOrder" value="desc"/>
+                <property name="sortFields">
+                    <list>
+                        <ref bean="sortTitle" />
+                        <ref bean="sortDateIssued" />
+                    </list>
+                </property>
+            </bean>
+        </property>
+        <!--Any default filter queries, these filter queries will be used for all
+            queries done by discovery for this configuration -->
+        <property name="defaultFilterQueries">
+            <list>
+                <value>search.resourcetype:XmlWorkflowItem</value>
             </list>
         </property>
         <!--Default result per page  -->

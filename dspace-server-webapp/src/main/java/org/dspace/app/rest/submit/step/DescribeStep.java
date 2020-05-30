@@ -12,6 +12,7 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
+import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.MetadataValueRest;
 import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.rest.model.patch.RemoveOperation;
@@ -142,29 +143,33 @@ public class DescribeStep extends org.dspace.submit.step.DescribeStep implements
     }
 
     @Override
-    public void doPatchProcessing(Context context, Request currentRequest, InProgressSubmission source, Operation op)
-        throws Exception {
-
+    public void doPatchProcessing(Context context, Request currentRequest, InProgressSubmission source, Operation op,
+                                  SubmissionStepConfig stepConf) throws Exception {
         String[] pathParts = op.getPath().substring(1).split("/");
-        if ("remove".equals(op.getOp()) && pathParts.length < 3 ) {
+        DCInputSet inputConfig = inputReader.getInputsByFormName(stepConf.getId());
+        if ("remove".equals(op.getOp()) && pathParts.length < 3) {
             // manage delete all step fields
             String[] path = op.getPath().substring(1).split("/", 3);
             String configId = path[1];
-            DCInputSet inputConfig = inputReader.getInputsByFormName(configId);
             List<String> fieldsName = getInputFieldsName(inputConfig, configId);
             for (String fieldName : fieldsName) {
                 String fieldPath = op.getPath() + "/" + fieldName;
                 Operation fieldRemoveOp = new RemoveOperation(fieldPath);
                 PatchOperation<MetadataValueRest> patchOperation = new PatchOperationFactory()
-                        .instanceOf(DESCRIBE_STEP_METADATA_OPERATION_ENTRY, fieldRemoveOp.getOp());
+                     .instanceOf(DESCRIBE_STEP_METADATA_OPERATION_ENTRY, fieldRemoveOp.getOp());
                 patchOperation.perform(context, currentRequest, source, fieldRemoveOp);
             }
         } else {
             PatchOperation<MetadataValueRest> patchOperation = new PatchOperationFactory()
-                .instanceOf(DESCRIBE_STEP_METADATA_OPERATION_ENTRY, op.getOp());
-            patchOperation.perform(context, currentRequest, source, op);
+                        .instanceOf(DESCRIBE_STEP_METADATA_OPERATION_ENTRY, op.getOp());
+            String[] split = patchOperation.getAbsolutePath(op.getPath()).split("/");
+            if (inputConfig.isFieldPresent(split[0])) {
+                patchOperation.perform(context, currentRequest, source, op);
+            } else {
+                throw new UnprocessableEntityException("The field " + split[0] + " is not present in section "
+                                                                                   + inputConfig.getFormName());
+            }
         }
-
     }
 
 }

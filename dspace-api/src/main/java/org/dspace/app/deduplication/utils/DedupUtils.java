@@ -38,12 +38,12 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.deduplication.Deduplication;
 import org.dspace.deduplication.service.DeduplicationService;
 import org.dspace.discovery.SearchServiceException;
+import org.dspace.services.ConfigurationService;
 import org.dspace.util.ItemUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -60,6 +60,9 @@ public class DedupUtils {
 
     @Autowired(required = true)
     private DeduplicationService deduplicationService;
+
+    @Autowired(required = true)
+    protected ConfigurationService configurationService;
 
     public DuplicateInfoList findSignatureWithDuplicate(Context context, String signatureType, int resourceType,
             int limit, int offset, int rule) throws SearchServiceException, SQLException {
@@ -79,7 +82,7 @@ public class DedupUtils {
         solrQuery.addFilterQuery(SolrDedupServiceImpl.RESOURCE_FLAG_FIELD + ":"
                 + SolrDedupServiceImpl.DeduplicationFlag.MATCH.getDescription());
         solrQuery.addFilterQuery(SolrDedupServiceImpl.RESOURCE_RESOURCETYPE_FIELD + ":" + resourceTypeId);
-        if (ConfigurationManager.getBooleanProperty("deduplication", "tool.duplicatechecker.ignorewithdrawn")) {
+        if (configurationService.getBooleanProperty("deduplication.tool.duplicatechecker.ignorewithdrawn")) {
             solrQuery.addFilterQuery("-" + SolrDedupServiceImpl.RESOURCE_WITHDRAWN_FIELD + ":true");
         }
         QueryResponse response = dedupService.search(solrQuery);
@@ -95,7 +98,7 @@ public class DedupUtils {
                 solrQuery.addFacetField(count.getName());
                 solrQuery.addFilterQuery(SolrDedupServiceImpl.RESOURCE_FLAG_FIELD + ":"
                         + SolrDedupServiceImpl.DeduplicationFlag.MATCH.getDescription());
-                if (ConfigurationManager.getBooleanProperty("deduplication", "tool.duplicatechecker.ignorewithdrawn")) {
+                if (configurationService.getBooleanProperty("deduplication.tool.duplicatechecker.ignorewithdrawn")) {
                     solrQuery.addFilterQuery("-" + SolrDedupServiceImpl.RESOURCE_WITHDRAWN_FIELD + ":true");
                 }
                 solrQuery.addFilterQuery(count.getAsFilterQuery());
@@ -117,12 +120,12 @@ public class DedupUtils {
         SolrQuery solrQuery = new SolrQuery();
         solrQuery.setQuery(query);
         solrQuery.setRows(0);
-        boolean ignoreSubmitterSuggestion = ConfigurationManager.getBooleanProperty("deduplication",
-                "tool.duplicatechecker.ignore.submitter.suggestion", true);
+        boolean ignoreSubmitterSuggestion = configurationService.getBooleanProperty(
+                "deduplication.tool.duplicatechecker.ignore.submitter.suggestion", true);
         solrQuery.addFilterQuery(SolrDedupServiceImpl.RESOURCE_FLAG_FIELD + ":"
                 + (ignoreSubmitterSuggestion ? SolrDedupServiceImpl.DeduplicationFlag.VERIFYWF.getDescription()
                         : "verify*"));
-        if (ConfigurationManager.getBooleanProperty("deduplication", "tool.duplicatechecker.ignorewithdrawn")) {
+        if (configurationService.getBooleanProperty("deduplication.tool.duplicatechecker.ignorewithdrawn")) {
             solrQuery.addFilterQuery("-" + SolrDedupServiceImpl.RESOURCE_WITHDRAWN_FIELD + ":true");
         }
         solrQuery.addFilterQuery(SolrDedupServiceImpl.RESOURCE_RESOURCETYPE_FIELD + ":" + resourceTypeId);
@@ -147,9 +150,6 @@ public class DedupUtils {
      */
     private List<DuplicateItemInfo> findDuplicate(Context context, UUID targetItemID, Integer resourceType,
             String signatureType, Boolean isInWorkflow) throws SQLException, SearchServiceException {
-
-        List<UUID> result = new ArrayList<UUID>();
-        Map<UUID, String> verify = new HashMap<UUID, String>();
 
         SolrQuery findDuplicateBySignature = new SolrQuery();
         findDuplicateBySignature.setQuery((isInWorkflow == null ? SolrDedupServiceImpl.SUBQUERY_NOT_IN_REJECTED
@@ -177,7 +177,7 @@ public class DedupUtils {
 
         findDuplicateBySignature.setFields("dedup.ids", "dedup.note", "dedup.flag");
 
-        if (ConfigurationManager.getBooleanProperty("deduplication", "tool.duplicatechecker.ignorewithdrawn")) {
+        if (configurationService.getBooleanProperty("deduplication.tool.duplicatechecker.ignorewithdrawn")) {
             findDuplicateBySignature.addFilterQuery("-" + SolrDedupServiceImpl.RESOURCE_WITHDRAWN_FIELD + ":true");
         }
 
@@ -576,7 +576,7 @@ public class DedupUtils {
         solrQueryExternal.addFilterQuery(SolrDedupServiceImpl.RESOURCE_RESOURCETYPE_FIELD + ":" + resourceType);
         solrQueryExternal.addFilterQuery(SolrDedupServiceImpl.RESOURCE_FLAG_FIELD + ":"
                 + SolrDedupServiceImpl.DeduplicationFlag.MATCH.getDescription());
-        if (ConfigurationManager.getBooleanProperty("deduplication", "tool.duplicatechecker.ignorewithdrawn")) {
+        if (configurationService.getBooleanProperty("deduplication.tool.duplicatechecker.ignorewithdrawn")) {
             solrQueryExternal.addFilterQuery("-" + SolrDedupServiceImpl.RESOURCE_WITHDRAWN_FIELD + ":true");
         }
         solrQueryExternal.setFacet(true);
@@ -609,7 +609,7 @@ public class DedupUtils {
                 solrQueryInternal.setRows(Integer.MAX_VALUE);
                 solrQueryInternal.addFilterQuery(SolrDedupServiceImpl.RESOURCE_FLAG_FIELD + ":"
                         + SolrDedupServiceImpl.DeduplicationFlag.MATCH.getDescription());
-                if (ConfigurationManager.getBooleanProperty("deduplication", "tool.duplicatechecker.ignorewithdrawn")) {
+                if (configurationService.getBooleanProperty("deduplication.tool.duplicatechecker.ignorewithdrawn")) {
                     solrQueryInternal.addFilterQuery("-" + SolrDedupServiceImpl.RESOURCE_WITHDRAWN_FIELD + ":true");
                 }
                 QueryResponse response = getDedupService().search(solrQueryInternal);
@@ -625,8 +625,6 @@ public class DedupUtils {
                         if (name.equals(signatureTypeString)) {
 
                             dsi.setSignature(signatureTypeString);
-                            Integer resourceTypeString = (Integer) (solrDocument
-                                    .getFieldValue(SolrDedupServiceImpl.RESOURCE_RESOURCETYPE_FIELD));
                             List<String> ids = (List<String>) solrDocument
                                     .getFieldValue(SolrDedupServiceImpl.RESOURCE_IDS_FIELD);
 
@@ -682,8 +680,6 @@ public class DedupUtils {
 
             dsi.setSignature(signatureTypeString);
 
-            Integer resourceTypeString = (Integer) (solrDocument
-                    .getFieldValue(SolrDedupServiceImpl.RESOURCE_RESOURCETYPE_FIELD));
             List<String> ids = (List<String>) solrDocument.getFieldValue(SolrDedupServiceImpl.RESOURCE_IDS_FIELD);
 
             for (String obj : ids) {
@@ -734,8 +730,8 @@ public class DedupUtils {
         solrQueryInternal.setQuery(SolrDedupServiceImpl.SUBQUERY_NOT_IN_REJECTED);
 
         solrQueryInternal.addFilterQuery(SolrDedupServiceImpl.RESOURCE_RESOURCETYPE_FIELD + ":" + resourceType);
-        boolean ignoreSubmitterSuggestion = ConfigurationManager.getBooleanProperty("deduplication",
-                "tool.duplicatechecker.ignore.submitter.suggestion", true);
+        boolean ignoreSubmitterSuggestion = configurationService.getBooleanProperty(
+                "deduplication.tool.duplicatechecker.ignore.submitter.suggestion", true);
         if (ignoreSubmitterSuggestion) {
             solrQueryInternal.addFilterQuery(SolrDedupServiceImpl.RESOURCE_FLAG_FIELD + ":"
                     + SolrDedupServiceImpl.DeduplicationFlag.VERIFYWF.getDescription());
@@ -758,8 +754,6 @@ public class DedupUtils {
             DuplicateSignatureInfo dsi = new DuplicateSignatureInfo("suggested",
                     (String) solrDocument.getFirstValue("_version_"));
 
-            Integer resourceTypeString = (Integer) (solrDocument
-                    .getFieldValue(SolrDedupServiceImpl.RESOURCE_RESOURCETYPE_FIELD));
             List<String> ids = (List<String>) solrDocument.getFieldValue(SolrDedupServiceImpl.RESOURCE_IDS_FIELD);
 
             for (String obj : ids) {

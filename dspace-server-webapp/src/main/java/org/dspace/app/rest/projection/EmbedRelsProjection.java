@@ -44,7 +44,7 @@ public class EmbedRelsProjection extends AbstractProjection {
 
         StringBuilder fullName = new StringBuilder();
         for (Link oldLink : oldLinks) {
-            fullName.append(oldLink.getRel()).append("/");
+            fullName.append(oldLink.getRel().value()).append("/");
         }
         fullName.append(linkRest.name());
         // If the full name matches, the link can be embedded (e.g. mappedItems/owningCollection on a collection page)

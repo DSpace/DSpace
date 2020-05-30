@@ -18,6 +18,7 @@ import org.dspace.app.rest.model.hateoas.SearchFacetEntryResource;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.hateoas.IanaLinkRelations;
 import org.springframework.hateoas.Link;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -49,14 +50,14 @@ public class SearchFacetEntryHalLinkFactory extends DiscoveryRestHalLinkFactory<
 
         //If our rest data contains a list of values, construct the page links. Otherwise, only add a self link
         if (CollectionUtils.isNotEmpty(facetData.getValues())) {
-            PageImpl page = new PageImpl<>(facetData.getValues(), new PageRequest(0, facetData.getFacetLimit()),
+            PageImpl page = new PageImpl<>(facetData.getValues(), PageRequest.of(0, facetData.getFacetLimit()),
                                            facetData.getValues().size() + (BooleanUtils
                                                .isTrue(facetData.isHasMore()) ? 1 : 0));
 
             halResource.setPageHeader(new EmbeddedPageHeader(uriBuilder, page, false));
 
         } else {
-            list.add(buildLink(Link.REL_SELF, uriBuilder.build().toUriString()));
+            list.add(buildLink(IanaLinkRelations.SELF.value(), uriBuilder.build().toUriString()));
         }
 
     }

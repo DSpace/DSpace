@@ -153,7 +153,7 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Hiera
     @Override
     public Choices getMatches(String field, String text, Collection collection, int start, int limit, String locale) {
         init();
-        Locale currentLocale = new Locale(locale);
+        Locale currentLocale = I18nUtil.getSupportedLocale(locale);
         log.debug("Getting matches for '" + text + "'");
         String xpathExpression = "";
         String[] textHierarchy = text.split(hierarchyDelimiter, -1);
@@ -215,7 +215,7 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Hiera
     @Override
     public String getLabel(String field, String key, String locale) {
         init();
-        Locale currentLocale = new Locale(locale);
+        Locale currentLocale = I18nUtil.getSupportedLocale(locale);
         String xpathExpression = String.format(idTemplate, key);
         XPath xpath = XPathFactory.newInstance().newXPath();
         try {
@@ -348,22 +348,23 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Hiera
     @Override
     public Choices getTopChoices(String authorityName, int start, int limit, String locale) {
         init();
+        Locale currentLocale = I18nUtil.getSupportedLocale(locale);
         String xpathExpression = rootTemplate;
-        List<Choice> choices = getChoicesByXpath(xpathExpression, locale);
+        List<Choice> choices = getChoicesByXpath(xpathExpression, currentLocale);
         return new Choices(choices.toArray(new Choice[choices.size()]), 0, choices.size(), Choices.CF_AMBIGUOUS, false);
     }
 
     @Override
     public Choices getChoicesByParent(String authorityName, String parentId, int start, int limit, String locale) {
         init();
+        Locale currentLocale = I18nUtil.getSupportedLocale(locale);
         String xpathExpression = String.format(idTemplate, parentId);
-        List<Choice> choices = getChoicesByXpath(xpathExpression, locale);
+        List<Choice> choices = getChoicesByXpath(xpathExpression, currentLocale);
         return new Choices(choices.toArray(new Choice[choices.size()]), 0, choices.size(), Choices.CF_AMBIGUOUS, false);
     }
 
-    private List<Choice> getChoicesByXpath(String xpathExpression, String locale) {
+    private List<Choice> getChoicesByXpath(String xpathExpression, Locale currentLocale) {
         List<Choice> choices = new ArrayList<Choice>();
-        Locale currentLocale = new Locale(locale);
         XPath xpath = XPathFactory.newInstance().newXPath();
         try {
             Node parentNode = (Node) xpath.evaluate(xpathExpression,

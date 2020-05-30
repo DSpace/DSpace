@@ -45,6 +45,7 @@ import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.content.virtual.VirtualMetadataPopulator;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.core.I18nUtil;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
@@ -1242,7 +1243,8 @@ prevent the generation of resource policy entry values with null dspace_object a
     @Override
     protected void getAuthoritiesAndConfidences(String fieldKey, Collection collection, List<String> values,
                                                 List<String> authorities, List<Integer> confidences, int i) {
-        Choices c = choiceAuthorityService.getBestMatch(fieldKey, values.get(i), collection, null);
+        String locale = I18nUtil.getDefaultLocale().getLanguage();
+        Choices c = choiceAuthorityService.getBestMatch(fieldKey, values.get(i), collection, locale);
         authorities.add(c.values.length > 0 && c.values[0] != null ? c.values[0].authority : null);
         confidences.add(c.confidence);
     }

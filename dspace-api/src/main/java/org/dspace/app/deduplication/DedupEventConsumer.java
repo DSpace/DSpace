@@ -18,6 +18,8 @@ import java.util.UUID;
 import org.apache.log4j.Logger;
 import org.dspace.app.deduplication.service.DedupService;
 import org.dspace.app.deduplication.utils.Signature;
+import org.dspace.content.Bundle;
+import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.factory.ContentServiceFactory;
@@ -70,20 +72,24 @@ public class DedupEventConsumer implements Consumer {
         }
 
         int st = event.getSubjectType();
-        if (!(st == Constants.ITEM)) {
+
+        DSpaceObject subject = event.getSubject(ctx);
+        DSpaceObject object = event.getObject(ctx);
+
+        if (st != Constants.ITEM && st != Constants.BUNDLE) {
             log.warn("IndexConsumer should not have been given this kind of Subject in an event, skipping: "
                     + event.toString());
             return;
         }
 
-        Item subject = (Item)event.getSubject(ctx);
-
-        Item object = (Item)event.getObject(ctx);
-
         // If event subject is a Bundle and event was Add or Remove,
         // transform the event to be a Modify on the owning Item.
         // It could be a new bitstream in the TEXT bundle which
         // would change the index.
+        if (st == Constants.BUNDLE) {
+            subject = ((Bundle) subject).getItems().get(0);
+        }
+
         int et = event.getEventType();
 
         switch (et) {
@@ -96,19 +102,19 @@ public class DedupEventConsumer implements Consumer {
                             + ", perhaps it has been deleted.");
                 } else {
                     log.debug("consume() adding event to update queue: " + event.toString());
-                    fillObjectToUpdate(subject);
+                    fillObjectToUpdate((Item) subject);
                 }
                 break;
 
             case Event.REMOVE:
             case Event.ADD:
-                if (object == null) {
+                if (subject == null) {
                     log.warn(event.getEventTypeAsString() + " event, could not get object for "
                             + event.getObjectTypeAsString() + " id=" + String.valueOf(event.getObjectID())
                             + ", perhaps it has been deleted.");
                 } else {
                     log.debug("consume() adding event to update queue: " + event.toString());
-                    fillObjectToUpdate(object);
+                    fillObjectToUpdate((Item) subject);
                 }
                 break;
 

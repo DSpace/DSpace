@@ -16,7 +16,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.hateoas.mvc.ControllerLinkBuilder;
+import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 
 /**
  * This class' purpose is to test the FacetConfigurationResourceHalLinkFactory
@@ -25,7 +25,7 @@ public class FacetConfigurationResourceHalLinkFactoryTest {
 
 
     @Mock
-    ControllerLinkBuilder controllerLinkBuilder;
+    WebMvcLinkBuilder webMvcLinkBuilder;
 
     @Mock
     HalLinkFactory halLinkFactory;

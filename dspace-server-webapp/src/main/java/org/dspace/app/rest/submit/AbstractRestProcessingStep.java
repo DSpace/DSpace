@@ -94,7 +94,7 @@ public interface AbstractRestProcessingStep extends ListenerProcessingStep {
      *            the json patch operation
      * @throws Exception
      */
-    public void doPatchProcessing(Context context, Request currentRequest, InProgressSubmission source, Operation op)
-        throws Exception;
+    public void doPatchProcessing(Context context, Request currentRequest, InProgressSubmission source, Operation op,
+                                  SubmissionStepConfig stepConf) throws Exception;
 
 }
