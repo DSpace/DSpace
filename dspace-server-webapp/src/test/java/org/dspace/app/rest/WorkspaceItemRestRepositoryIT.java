@@ -58,14 +58,11 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
 import org.dspace.content.WorkspaceItem;
-import org.dspace.content.service.CollectionService;
-import org.dspace.core.Constants;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
-import org.dspace.usage.UsageEvent;
 import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
@@ -3981,7 +3978,6 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
 
 
 
-            System.out.println("aaa");
         } finally {
 
         }
@@ -4018,7 +4014,6 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                     .andExpect(jsonPath("$._embedded.collection.metadata.['relationship.type'][0].value",
                             equalTo("Journal")));
 
-            System.out.println("aaa");
         } finally {
 
         }

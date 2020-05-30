@@ -125,7 +125,7 @@ public class SubmissionService {
                 throw new RESTAuthorizationException("No collection suitable for submission for the current user");
             }
 
-            if(StringUtils.isNotEmpty(entityType) && !collection.getRelationshipType().equalsIgnoreCase(entityType)){
+            if (StringUtils.isNotEmpty(entityType) && !collection.getRelationshipType().equalsIgnoreCase(entityType)) {
                 throw new UnprocessableEntityException("Collection relationship type does not match with entity type");
             }
 
