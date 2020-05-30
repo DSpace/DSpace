@@ -11,6 +11,7 @@ import static com.jayway.jsonpath.JsonPath.read;
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadata;
 import static org.hamcrest.Matchers.allOf;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.data.rest.webmvc.RestMediaTypes.TEXT_URI_LIST_VALUE;
@@ -57,11 +58,14 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
 import org.dspace.content.WorkspaceItem;
+import org.dspace.content.service.CollectionService;
+import org.dspace.core.Constants;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
+import org.dspace.usage.UsageEvent;
 import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
@@ -3909,5 +3913,114 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                             .content(patchBody)
                             .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
                             .andExpect(status().isUnprocessableEntity());
+    }
+
+    @Test
+    public void createEmptyWorkspateItemWithEntityTypeTest() throws Exception {
+
+        AtomicReference<Integer> idRef1 = new AtomicReference<>();
+        AtomicReference<Integer> idRef2 = new AtomicReference<>();
+        try {
+
+            String authToken = getAuthToken(eperson.getEmail(), password);
+
+            // create a workspaceitem explicitly with entityType Publication
+            getClient(authToken).perform(post("/api/submission/workspaceitems")
+                    .param("entityType", "Publication")
+                    .contentType(org.springframework.http.MediaType.APPLICATION_JSON))
+                    .andExpect(status().isCreated())
+                    .andExpect(jsonPath("$._embedded.collection.metadata.['relationship.type'][0].value",
+                            equalTo("Publication")))
+                    .andDo(result -> idRef1.set(read(result.getResponse().getContentAsString(), "$.id")));
+
+
+            // create a workspaceitem explicitly with entityType Journal
+            getClient(authToken).perform(post("/api/submission/workspaceitems")
+                    .param("entityType", "Journal")
+                    .contentType(org.springframework.http.MediaType.APPLICATION_JSON))
+                    .andExpect(status().isCreated())
+                    .andExpect(jsonPath("$._embedded.collection.metadata.['relationship.type'][0].value",
+                            equalTo("Journal")))
+                    .andDo(result -> idRef2.set(read(result.getResponse().getContentAsString(), "$.id")));
+
+
+        } finally {
+
+        }
+    }
+
+    @Test
+    public void createEmptyWorkspateItemWithEntityTypeAndCollectionWithNoMatchTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        context.setCurrentUser(eperson);
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                .withName("Parent Community")
+                .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                .withName("Sub Community")
+                .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1)
+                .withName("Collection 1")
+                .withRelationshipType("Publication")
+                .build();
+
+        context.restoreAuthSystemState();
+
+        try {
+
+            String authToken = getAuthToken(eperson.getEmail(), password);
+
+            // create a workspaceitem explicitly with entityType Publication
+            getClient(authToken).perform(post("/api/submission/workspaceitems")
+                    .param("entityType", "Journal")
+                    .param("owningCollection", col1.getID().toString())
+                    .contentType(org.springframework.http.MediaType.APPLICATION_JSON))
+                    .andExpect(status().isUnprocessableEntity())
+                    .andExpect(jsonPath("$.id").doesNotExist());
+
+
+
+            System.out.println("aaa");
+        } finally {
+
+        }
+    }
+
+    @Test
+    public void entityTypeInvalidTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        context.setCurrentUser(eperson);
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                .withName("Parent Community")
+                .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                .withName("Sub Community")
+                .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1)
+                .withName("Collection 1")
+                .withRelationshipType("Publication")
+                .build();
+
+        context.restoreAuthSystemState();
+
+
+        try {
+
+            String authToken = getAuthToken(eperson.getEmail(), password);
+
+
+            getClient(authToken).perform(post("/api/submission/workspaceitems")
+                    .param("entityType", "NotValidType")
+                    .contentType(org.springframework.http.MediaType.APPLICATION_JSON))
+                    .andExpect(status().isCreated())
+                    .andExpect(jsonPath("$._embedded.collection.metadata.['relationship.type'][0].value",
+                            equalTo("Journal")));
+
+            System.out.println("aaa");
+        } finally {
+
+        }
     }
 }
