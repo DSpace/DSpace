@@ -5,7 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-// This file is based on environment.common.ts provided by Angular UI
+// This file is based on environment.template.ts provided by Angular UI
 export const environment = {
   // Default to using the local REST API (running in Docker)
   rest: {
