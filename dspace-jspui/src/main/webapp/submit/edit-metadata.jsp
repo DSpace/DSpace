@@ -271,7 +271,7 @@
       for (int i = 0; i < fieldCount; i++)
       {
     	 sb.append("<div class=\"row col-md-12\">");
-    	 if ("lookup".equalsIgnoreCase(authorityType))
+    	 if ("lookup".equalsIgnoreCase(authorityType) || "authorLookup".equalsIgnoreCase(authorityType))
     	 {
     	 	sb.append("<div class=\"row col-md-10\">");
     	 }
@@ -321,7 +321,7 @@
          sb.append("value=\"")
            .append(dpn.getFirstNames()).append("\"/></span>");         
          
-         if ("lookup".equalsIgnoreCase(authorityType))
+         if ("lookup".equalsIgnoreCase(authorityType) || "authorLookup".equalsIgnoreCase(authorityType))
     	 {
              sb.append(doAuthority(pageContext, fieldName, i, fieldCount, fieldName,
                      auth, conf, true, repeatable, defaults, null, collection));

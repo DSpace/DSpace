@@ -5,7 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.app.sherpa;
+package org.dspace.app.sherpa.v1;
 
 /**
  * POJO representation for a SHERPA journal
@@ -13,6 +13,7 @@ package org.dspace.app.sherpa;
  * @author Andrea Bollini
  * 
  */
+@Deprecated
 public class SHERPAJournal
 {
     private String title;
@@ -22,6 +23,10 @@ public class SHERPAJournal
     private String zetopub;
 
     private String romeopub;
+
+    public SHERPAJournal() {
+
+    }
 
     public SHERPAJournal(String title, String issn, String zetopub,
             String romeopub)
@@ -53,4 +58,19 @@ public class SHERPAJournal
         return romeopub;
     }
 
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public void setIssn(String issn) {
+        this.issn = issn;
+    }
+
+    public void setZetopub(String zetopub) {
+        this.zetopub = zetopub;
+    }
+
+    public void setRomeopub(String romeopub) {
+        this.romeopub = romeopub;
+    }
 }

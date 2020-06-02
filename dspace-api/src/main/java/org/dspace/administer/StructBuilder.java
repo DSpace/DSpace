@@ -22,8 +22,10 @@ import javax.xml.transform.TransformerException;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
-import org.apache.commons.cli.PosixParser;
+import org.apache.commons.cli.ParseException;
 import org.apache.xpath.XPathAPI;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
@@ -46,6 +48,7 @@ import org.xml.sax.SAXException;
  * an XML file.
  * 
  * The XML file structure needs to be:
+ * <p>
  * {@code
  * <import_structure>
  *     <community>
@@ -57,26 +60,32 @@ import org.xml.sax.SAXException;
  *     </community>
  * </import_structure>
  * }
- * it can be arbitrarily deep, and supports all the metadata elements
+ * <p>
+ * It can be arbitrarily deep, and supports all the metadata elements
  * that make up the community and collection metadata.  See the system
- * documentation for more details
- * 
+ * documentation for more details.
+ *
  * @author Richard Jones
  *
  */
 
-public class StructBuilder
-{
-    /** the output xml document which will contain updated information about the 
-     * imported structure
+public class StructBuilder {
+    /**
+     * The output XML document which will contain updated information about the
+     * imported structure.
      */
-    private static org.jdom.Document xmlOutput = new org.jdom.Document(new Element("imported_structure"));
-    
-    /** a hashtable to hold metadata for the collection being worked on */
-    private static Map<String, String> collectionMap = new HashMap<String, String>();
-    
-    /** a hashtable to hold metadata for the community being worked on */
-    private static Map<String, String> communityMap = new HashMap<String, String>();
+    private static final org.jdom.Document xmlOutput
+            = new org.jdom.Document(new Element("imported_structure"));
+
+    /**
+     * A hash table to hold metadata for the collection being worked on.
+     */
+    private static final Map<String, String> collectionMap = new HashMap<>();
+
+    /**
+     * A hash table to hold metadata for the community being worked on.
+     */
+    private static final Map<String, String> communityMap = new HashMap<>();
 
     protected static CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
     protected static CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
@@ -92,60 +101,90 @@ public class StructBuilder
      * 
      * The output file will contain exactly the same as the source xml document, but
      * with the handle for each imported item added as an attribute.
-     * @param argv commandline arguments
-     * @throws Exception if an error occurs
+     *
+     * @param argv the command line arguments given
+     * @throws ParserConfigurationException passed through.
+     * @throws SQLException passed through.
      */
-    public static void main(String[] argv) 
-    	throws Exception
-    {
-        CommandLineParser parser = new PosixParser();
+    public static void main(String[] argv)
+            throws ParserConfigurationException, SQLException {
+        CommandLineParser parser = new DefaultParser();
 
-    	Options options = new Options();
+        Options options = new Options();
 
-    	options.addOption( "f", "file", true, "file");
-    	options.addOption( "e", "eperson", true, "eperson");
-    	options.addOption("o", "output", true, "output");
-    	
-    	CommandLine line = parser.parse( options, argv );
-    	
-    	String file = null;
-    	String eperson = null;
-    	String output = null;
-    	
-    	if (line.hasOption('f'))
-    	{
-    	    file = line.getOptionValue('f');
-    	}
-    	
-    	if (line.hasOption('e'))
-    	{
-    	    eperson = line.getOptionValue('e');
-    	}
-    	
-    	if (line.hasOption('o'))
-    	{
-    	    output = line.getOptionValue('o');
-    	}
-    	
-    	if (output == null || eperson == null || file == null)
-    	{
-    	    usage();
-    	    System.exit(0);
-    	}
-    	
+        options.addOption("h", "help", false, "help");
+        options.addOption("?", "help");
+        options.addOption("f", "file", true, "input structure document");
+        options.addOption("e", "eperson", true, "eperson");
+        options.addOption("o", "output", true, "output structure document");
+
+        CommandLine line = null;
+        try {
+            line = parser.parse(options, argv);
+        } catch (ParseException ex) {
+            System.err.println(ex.getMessage());
+            usage(options);
+            System.exit(1);
+        }
+
+        if (line.hasOption('h') || line.hasOption('?')) {
+            usage(options);
+            System.exit(0);
+        }
+
+        String file = null;
+        String eperson = null;
+        String output = null;
+
+        if (line.hasOption('f')) {
+            file = line.getOptionValue('f');
+        }
+
+        if (line.hasOption('e')) {
+            eperson = line.getOptionValue('e');
+        }
+
+        if (line.hasOption('o')) {
+            output = line.getOptionValue('o');
+        }
+
+        if (output == null || eperson == null || file == null) {
+            usage(options);
+            System.exit(1);
+        }
+
         // create a context
         Context context = new Context();
         
         // set the context
-        context.setCurrentUser(ePersonService.findByEmail(context, eperson));
- 
+        try {
+            context.setCurrentUser(ePersonService.findByEmail(context, eperson));
+        } catch (SQLException ex) {
+            System.err.format("That user could not be found:  %s%n", ex.getMessage());
+            System.exit(1);
+        }
+
         // load the XML
-        Document document = loadXML(file);
-        
+        Document document = null;
+        try {
+            document = loadXML(file);
+        } catch (IOException ex) {
+            System.err.format("The input document could not be read:  %s%n", ex.getMessage());
+            System.exit(1);
+        } catch (SAXException ex) {
+            System.err.format("The input document could not be parsed:  %s%n", ex.getMessage());
+            System.exit(1);
+        }
+
         // run the preliminary validation, to be sure that the the XML document
         // is properly structured
-        validate(document);
-        
+        try {
+            validate(document);
+        } catch (TransformerException ex) {
+            System.err.format("The input document is invalid:  %s%n", ex.getMessage());
+            System.exit(1);
+        }
+
         // load the mappings into the member variable hashmaps
         communityMap.put("name", "name");
         communityMap.put("description", "short_description");
@@ -160,67 +199,71 @@ public class StructBuilder
         collectionMap.put("sidebar", "side_bar_text");
         collectionMap.put("license", "license");
         collectionMap.put("provenance", "provenance_description");
-        
-        // get the top level community list
-        NodeList first = XPathAPI.selectNodeList(document, "/import_structure/community");
-        
-        // run the import starting with the top level communities
-        Element[] elements = handleCommunities(context, first, null);
-        
+
+        Element[] elements = new Element[]{};
+        try {
+            // get the top level community list
+            NodeList first = XPathAPI.selectNodeList(document, "/import_structure/community");
+
+            // run the import starting with the top level communities
+            elements = handleCommunities(context, first, null);
+        } catch (TransformerException ex) {
+            System.err.format("Input content not understood:  %s%n", ex.getMessage());
+            System.exit(1);
+        } catch (AuthorizeException ex) {
+            System.err.format("Not authorized:  %s%n", ex.getMessage());
+            System.exit(1);
+        }
+
         // generate the output
         Element root = xmlOutput.getRootElement();
-        for (int i = 0; i < elements.length; i++)
-        {
-            root.addContent(elements[i]);
+        for (Element element : elements) {
+            root.addContent(element);
         }
         
         // finally write the string into the output file
-        try 
-        {
-            BufferedWriter out = new BufferedWriter(new FileWriter(output));
+        try (BufferedWriter out = new BufferedWriter(new FileWriter(output));) {
             out.write(new XMLOutputter().outputString(xmlOutput));
-            out.close();
-        } 
-        catch (IOException e) 
-        {
+        } catch (IOException e) {
             System.out.println("Unable to write to output file " + output);
-            System.exit(0);
+            System.exit(1);
         }
         
         context.complete();
     }
     
     /**
-     * Output the usage information
+     * Output the usage information.
      */
-    private static void usage()
-    {
-        System.out.println("Usage: java StructBuilder -f <source XML file> -o <output file> -e <eperson email>");
-        System.out.println("Communities will be created from the top level, and a map of communities to handles will be returned in the output file");
-        return;
+    private static void usage(Options options) {
+        HelpFormatter helper = new HelpFormatter();
+        helper.printHelp("java StructBuilder -f <source XML file> -o <output file> -e <eperson email>",
+                "Load community/collection structure from a file.",
+                options,
+                "Communities will be created from the top level,"
+                        + " and a map of communities to handles will be returned"
+                        + " in the output file.");
     }
     
     /**
-     * Validate the XML document.  This method does not return, but if validation
-     * fails it generates an error and ceases execution
-     * 
-     * @param	document	the XML document object
+     * Validate the XML document.  This method returns if the document is valid.
+     * If validation fails it generates an error and ceases execution.
+     *
+     * @param document the XML document object
      * @throws TransformerException if transformer error
      * 
      */
     private static void validate(org.w3c.dom.Document document)
-    	throws TransformerException
-    {
-        StringBuffer err = new StringBuffer();
+        throws TransformerException {
+        StringBuilder err = new StringBuilder();
         boolean trip = false;
-        
-        err.append("The following errors were encountered parsing the source XML\n");
-        err.append("No changes have been made to the DSpace instance\n\n");
-        
+
+        err.append("The following errors were encountered parsing the source XML.\n");
+        err.append("No changes have been made to the DSpace instance.\n\n");
+
         NodeList first = XPathAPI.selectNodeList(document, "/import_structure/community");
-        if (first.getLength() == 0)
-        {
-            err.append("-There are no top level communities in the source document");
+        if (first.getLength() == 0) {
+            err.append("-There are no top level communities in the source document.");
             System.out.println(err.toString());
             System.exit(0);
         }
@@ -241,8 +284,8 @@ public class StructBuilder
     
     /**
      * Validate the communities section of the XML document.  This returns a string
-     * containing any errors encountered, or null if there were no errors
-     * 
+     * containing any errors encountered, or null if there were no errors.
+     *
      * @param communities the NodeList of communities to validate
      * @param level the level in the XML document that we are at, for the purposes
      * 			of error reporting
@@ -251,41 +294,38 @@ public class StructBuilder
      * 			no errors.
      */
     private static String validateCommunities(NodeList communities, int level)
-    	throws TransformerException
-    {
-        StringBuffer err = new StringBuffer();
+            throws TransformerException {
+        StringBuilder err = new StringBuilder();
         boolean trip = false;
         String errs = null;
         
         for (int i = 0; i < communities.getLength(); i++)
         {
             Node n = communities.item(i);
-	        NodeList name = XPathAPI.selectNodeList(n, "name");
-	        if (name.getLength() != 1)
-	        {
-	            String pos = Integer.toString(i + 1);
-	            err.append("-The level " + level + " community in position " + pos);
-	            err.append(" does not contain exactly one name field\n");
-	            trip = true;
-	        }
-	        
-	        // validate sub communities
-	        NodeList subCommunities = XPathAPI.selectNodeList(n, "community");
-	        String comErrs = validateCommunities(subCommunities, level + 1);
-	        if (comErrs != null)
-	        {
-	            err.append(comErrs);
-	            trip = true;
-	        }
-	        
-	        // validate collections
-	        NodeList collections = XPathAPI.selectNodeList(n, "collection");
-	        String colErrs = validateCollections(collections, level + 1);
-	        if (colErrs != null)
-	        {
-	            err.append(colErrs);
-	            trip = true;
-	        }
+            NodeList name = XPathAPI.selectNodeList(n, "name");
+            if (name.getLength() != 1) {
+                String pos = Integer.toString(i + 1);
+                err.append("-The level ").append(level)
+                        .append(" community in position ").append(pos)
+                        .append(" does not contain exactly one name field.\n");
+                trip = true;
+            }
+
+            // validate sub communities
+            NodeList subCommunities = XPathAPI.selectNodeList(n, "community");
+            String comErrs = validateCommunities(subCommunities, level + 1);
+            if (comErrs != null) {
+                err.append(comErrs);
+                trip = true;
+            }
+
+            // validate collections
+            NodeList collections = XPathAPI.selectNodeList(n, "collection");
+            String colErrs = validateCollections(collections, level + 1);
+            if (colErrs != null) {
+                err.append(colErrs);
+                trip = true;
+            }
         }
         
         if (trip)
@@ -298,31 +338,30 @@ public class StructBuilder
     
     /**
      * validate the collection section of the XML document.  This generates a
-     * string containing any errors encountered, or returns null if no errors
-     * 
+     * string containing any errors encountered, or returns null if no errors.
+     *
      * @param collections a NodeList of collections to validate
      * @param level the level in the XML document for the purposes of error reporting
      * 
      * @return the errors to be generated by the calling method, or null if none
      */
     private static String validateCollections(NodeList collections, int level)
-    	throws TransformerException
-    {
-        StringBuffer err = new StringBuffer();
+            throws TransformerException {
+        StringBuilder err = new StringBuilder();
         boolean trip = false;
         String errs = null;
         
         for (int i = 0; i < collections.getLength(); i++)
         {
             Node n = collections.item(i);
-	        NodeList name = XPathAPI.selectNodeList(n, "name");
-	        if (name.getLength() != 1)
-	        {
-	            String pos = Integer.toString(i + 1);
-	            err.append("-The level " + level + " collection in position " + pos);
-	            err.append(" does not contain exactly one name field\n");
-	            trip = true;
-	        }
+            NodeList name = XPathAPI.selectNodeList(n, "name");
+            if (name.getLength() != 1) {
+                String pos = Integer.toString(i + 1);
+                err.append("-The level ").append(level)
+                        .append(" collection in position ").append(pos)
+                        .append(" does not contain exactly one name field.\n");
+                trip = true;
+            }
         }
         
         if (trip)
@@ -388,8 +427,7 @@ public class StructBuilder
      * 			created communities (e.g. the handles they have been assigned)
      */
     private static Element[] handleCommunities(Context context, NodeList communities, Community parent)
-    	throws TransformerException, SQLException, Exception
-    {
+            throws TransformerException, SQLException, AuthorizeException {
         Element[] elements = new Element[communities.getLength()];
         
         for (int i = 0; i < communities.getLength(); i++)
@@ -422,12 +460,10 @@ public class StructBuilder
             }
             
             // FIXME: at the moment, if the community already exists by name
-            // then this will throw a PSQLException on a duplicate key
-            // violation
-            // Ideally we'd skip this row and continue to create sub
-            // communities
-            // and so forth where they don't exist, but it's proving
-            // difficult
+            // then this will throw an SQLException on a duplicate key
+            // violation.
+            // Ideally we'd skip this row and continue to create sub communities
+            // and so forth where they don't exist, but it's proving difficult
             // to isolate the community that already exists without hitting
             // the database directly.
             communityService.update(context, community);
@@ -509,8 +545,7 @@ public class StructBuilder
      * 			created collections (e.g. the handle)
      */
     private static Element[] handleCollections(Context context, NodeList collections, Community parent)
-    	throws TransformerException, SQLException, AuthorizeException, IOException, Exception
-    {
+            throws TransformerException, SQLException, AuthorizeException {
         Element[] elements = new Element[collections.getLength()];
         
         for (int i = 0; i < collections.getLength(); i++)

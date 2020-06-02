@@ -295,7 +295,8 @@ public class Harvest
                 // database ID
                 else
                 {
-                    System.out.println("Looking up by id: " + collectionID + ", parsed as '" + Integer.parseInt(collectionID) + "', " + "in context: " + context);
+                    // not a handle, try and treat it as an collection database UUID
+                    System.out.println("Looking up by UUID: " + collectionID + ", " + "in context: " + context);
                     targetCollection = collectionService.find(context, UUID.fromString(collectionID));
                 }
             }

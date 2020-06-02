@@ -7,13 +7,14 @@
  */
 package org.dspace.app.sherpa.submit;
 
+import java.util.Iterator;
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.dspace.app.sherpa.SHERPAResponse;
+import org.dspace.app.sherpa.v2.SHERPAResponse;
 import org.dspace.app.sherpa.SHERPAService;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
@@ -38,16 +39,28 @@ public class SHERPASubmitService
         this.sherpaService = sherpaService;
     }
 
-    public SHERPAResponse searchRelatedJournals(Context context, Item item)
-    {
+    public List<SHERPAResponse> searchRelatedJournals(Context context, Item item) {
         Set<String> issns = getISSNs(context, item);
-        if (issns == null || issns.size() == 0)
-        {
+        if (issns == null || issns.size() == 0) {
             return null;
-        }
-        else
-        {
-            return sherpaService.searchByJournalISSN(StringUtils.join(issns, ","));
+        } else {
+            // SHERPA v2 API no longer supports "OR'd" ISSN search, perform individual searches instead
+            Iterator<String> issnIterator = issns.iterator();
+            List<SHERPAResponse> responses = new LinkedList<>();
+            while (issnIterator.hasNext()) {
+                String issn = issnIterator.next();
+                SHERPAResponse response = sherpaService.searchByJournalISSN(issn);
+                if (response.isError()) {
+                    // Continue with loop
+                    log.warn("Failed to look up SHERPA ROMeO result for ISSN: " + issn);
+                }
+                // Store this response, even if it has an error (useful for UI reporting)
+                responses.add(response);
+            }
+            if (responses.isEmpty()) {
+                responses.add(new SHERPAResponse("SHERPA ROMeO lookup failed"));
+            }
+            return responses;
         }
     }
 
@@ -58,7 +71,7 @@ public class SHERPASubmitService
 
     public Set<String> getISSNs(Context context, Item item)
     {
-        Set<String> issns = new LinkedHashSet<String>();
+        Set<String> issns = new LinkedHashSet<>();
         if (configuration.getIssnItemExtractors() == null)
         {
             log.warn(LogManager.getHeader(context, "searchRelatedJournals",

@@ -171,19 +171,22 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
             } catch (FileNotFoundException fe) {
                 log.error(
                     "The GeoLite Database file is missing (" + dbPath + ")! Solr Statistics cannot generate location " +
-                        "based reports! Please see the DSpace installation instructions for instructions to install " +
-                        "this file.",
+                        "based reports! GeoLite databases are now managed outside of DSpace. " +
+                        "Please see the DSpace installation instructions for more information.",
                     fe);
             } catch (IOException e) {
                 log.error(
-                    "Unable to load GeoLite Database file (" + dbPath + ")! You may need to reinstall it. See the " +
-                        "DSpace installation instructions for more details.",
+                    "Unable to load GeoLite Database file (" + dbPath + ")! You may need to reinstall it. " +
+                            "GeoLite databases are now managed outside of DSpace. " +
+                            "Please see the DSpace installation instructions for more information.",
                     e);
             }
         }
         else
         {
-            log.error("The required 'dbfile' configuration is missing in solr-statistics.cfg!");
+            log.error("The required 'dbfile' configuration is missing in usage-statistics.cfg! " +
+                    "GeoLite databases are now managed outside of DSpace. " +
+                    "Please see the DSpace installation instructions for more information.");
         }
         locationService = service;
 

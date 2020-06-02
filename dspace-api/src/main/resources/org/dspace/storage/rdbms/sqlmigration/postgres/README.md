@@ -17,4 +17,15 @@ not realize you manually ran one or more scripts.
 
 Please see the Flyway Documentation for more information: http://flywaydb.org/
 
+## Using the update-sequences.sql script
 
+The `update-sequences.sql` script in this directory may still be used to update
+your internal database counts if you feel they have gotten out of "sync". This
+may sometimes occur after large restores of content (e.g. when using the DSpace
+[AIP Backup and Restore](https://wiki.duraspace.org/display/DSDOC5x/AIP+Backup+and+Restore) 
+feature).
+
+This `update-sequences.sql` script can be executed by running 
+"dspace database update-sequences". It will not harm your 
+database (or its contents) in any way. It just ensures all database counts (i.e.
+sequences) are properly set to the next available value.

@@ -1,11 +1,13 @@
 language: java
 sudo: false
+dist: trusty
 
 env: 
   # Give Maven 1GB of memory to work with
   - MAVEN_OPTS=-Xmx1024M
 
 # Install prerequisites for building Mirage2 more rapidly
+# These versions should be kept in sync with ./dspace/modules/xml-mirage2/pom.xml
 before_install:
   # Remove outdated settings.xml from Travis builds. Workaround for https://github.com/travis-ci/travis-ci/issues/4629
   - rm ~/.m2/settings.xml
@@ -23,7 +25,7 @@ before_install:
   # Print ruby version info (should be installed)
   - ruby -v
   # Install Sass & print version info
-  - gem install sass -v 3.3.14
+  - gem install sass -v 3.4.25
   - sass -v
   # Install Compass & print version info
   - gem install compass -v 1.0.1
