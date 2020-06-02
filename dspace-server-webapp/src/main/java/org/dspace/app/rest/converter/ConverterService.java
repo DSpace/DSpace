@@ -31,6 +31,8 @@ import org.dspace.app.rest.projection.DefaultProjection;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.repository.DSpaceRestRepository;
 import org.dspace.app.rest.security.DSpacePermissionEvaluator;
+import org.dspace.app.rest.spel.ExpressionValidationException;
+import org.dspace.app.rest.spel.ExpressionValidator;
 import org.dspace.app.rest.utils.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -40,8 +42,12 @@ import org.springframework.core.type.filter.AssignableTypeFilter;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.expression.Expression;
+import org.springframework.expression.ExpressionParser;
+import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.Link;
+import org.springframework.security.access.expression.SecurityExpressionRoot;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -136,6 +142,16 @@ public class ConverterService {
         String permission = "";
         if (preAuthorize != null) {
             String annotationValue = (String) AnnotationUtils.getValue(preAuthorize);
+            ExpressionValidator validator = new ExpressionValidator();
+            try {
+                validator.validate("hasPermission(123, 'ITEM', 'WRITE')", SecurityExpressionRoot.class);
+            } catch (ExpressionValidationException e) {
+                e.printStackTrace();
+            }
+
+//            ExpressionParser parser = new SpelExpressionParser();
+//            Expression exp = parser.parseExpression("hasPermission('123', 'ITEM', 'WRITE')");
+//            exp.getValue(SecurityExpressionRoot.class, boolean.class);
             if (StringUtils.contains(annotationValue, "permitAll")) {
                 permission = "permitAll";
             } else if (StringUtils.contains(annotationValue, "hasAuthority")) {
