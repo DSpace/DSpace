@@ -101,7 +101,7 @@ public class PoolTaskRestRepository extends DSpaceRestRepository<PoolTaskRest, I
             if (authorizeService.isAdmin(context) || userID.equals(currentUser.getID())) {
                 EPerson ep = epersonService.find(context, userID);
                 List<PoolTask> tasks = poolTaskService.findByEperson(context, ep);
-                return converter.toRestPage(utils.getPage(tasks, pageable), utils.obtainProjection());
+                return converter.toRestPage(tasks, pageable, utils.obtainProjection());
             } else {
                 throw new RESTAuthorizationException("Only administrators can search for pool tasks of other users");
             }

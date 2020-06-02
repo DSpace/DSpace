@@ -15,7 +15,9 @@ import org.dspace.app.rest.authorization.impl.AdministratorOfFeature;
 import org.dspace.app.rest.builder.CollectionBuilder;
 import org.dspace.app.rest.builder.CommunityBuilder;
 import org.dspace.app.rest.builder.EPersonBuilder;
-import org.dspace.app.rest.converter.ConverterService;
+import org.dspace.app.rest.converter.CollectionConverter;
+import org.dspace.app.rest.converter.CommunityConverter;
+import org.dspace.app.rest.converter.SiteConverter;
 import org.dspace.app.rest.matcher.AuthorizationMatcher;
 import org.dspace.app.rest.model.CollectionRest;
 import org.dspace.app.rest.model.CommunityRest;
@@ -47,13 +49,17 @@ public class AdministratorFeatureIT extends AbstractControllerIntegrationTest {
     @Autowired
     private AuthorizationFeatureService authorizationFeatureService;
     @Autowired
-    private ConverterService converterService;
-    @Autowired
     GroupService groupService;
     @Autowired
     AuthorizeService authService;
     @Autowired
     CommunityService communityService;
+    @Autowired
+    private CommunityConverter communityConverter;
+    @Autowired
+    private CollectionConverter collectionConverter;
+    @Autowired
+    private SiteConverter siteConverter;
 
     private SiteService siteService;
 
@@ -103,9 +109,10 @@ public class AdministratorFeatureIT extends AbstractControllerIntegrationTest {
 
         context.restoreAuthSystemState();
 
-        CommunityRest communityRestA = converterService.toRest(communityA, DefaultProjection.DEFAULT);
-        CommunityRest SubCommunityOfArest = converterService.toRest(subCommunityOfA, DefaultProjection.DEFAULT);
-        CollectionRest collectionRestOfSubComm = converterService.toRest(collectionOfSubComm,DefaultProjection.DEFAULT);
+        CommunityRest communityRestA = communityConverter.convert(communityA, DefaultProjection.DEFAULT);
+        CommunityRest SubCommunityOfArest = communityConverter.convert(subCommunityOfA, DefaultProjection.DEFAULT);
+        CollectionRest collectionRestOfSubComm = collectionConverter.convert(collectionOfSubComm,
+                                                                             DefaultProjection.DEFAULT);
 
         // tokens
         String tokenAdminComA = getAuthToken(adminComA.getEmail(), password);
@@ -170,8 +177,8 @@ public class AdministratorFeatureIT extends AbstractControllerIntegrationTest {
 
         context.restoreAuthSystemState();
 
-        CollectionRest collectionRestA = converterService.toRest(collectionA, DefaultProjection.DEFAULT);
-        CollectionRest collectionRestB = converterService.toRest(collectionB, DefaultProjection.DEFAULT);
+        CollectionRest collectionRestA = collectionConverter.convert(collectionA, DefaultProjection.DEFAULT);
+        CollectionRest collectionRestB = collectionConverter.convert(collectionB, DefaultProjection.DEFAULT);
 
         String tokenAdminColA = getAuthToken(adminColA.getEmail(), password);
         String tokenAdminColB = getAuthToken(adminColB.getEmail(), password);
@@ -210,9 +217,9 @@ public class AdministratorFeatureIT extends AbstractControllerIntegrationTest {
         context.restoreAuthSystemState();
 
         Site site = siteService.findSite(context);
-        SiteRest siteRest = converterService.toRest(site, DefaultProjection.DEFAULT);
-        CommunityRest communityRest = converterService.toRest(parentCommunity, DefaultProjection.DEFAULT);
-        CollectionRest collectionRest = converterService.toRest(collection, DefaultProjection.DEFAULT);
+        SiteRest siteRest = siteConverter.convert(site, DefaultProjection.DEFAULT);
+        CommunityRest communityRest = communityConverter.convert(parentCommunity, DefaultProjection.DEFAULT);
+        CollectionRest collectionRest = collectionConverter.convert(collection, DefaultProjection.DEFAULT);
 
         // tokens
         String tokenAdmin = getAuthToken(admin.getEmail(), password);
