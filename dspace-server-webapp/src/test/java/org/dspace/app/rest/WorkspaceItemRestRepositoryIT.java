@@ -4010,9 +4010,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
             getClient(authToken).perform(post("/api/submission/workspaceitems")
                     .param("entityType", "NotValidType")
                     .contentType(org.springframework.http.MediaType.APPLICATION_JSON))
-                    .andExpect(status().isCreated())
-                    .andExpect(jsonPath("$._embedded.collection.metadata.['relationship.type'][0].value",
-                            equalTo("Journal")));
+                    .andExpect(status().isUnprocessableEntity());
 
         } finally {
 
