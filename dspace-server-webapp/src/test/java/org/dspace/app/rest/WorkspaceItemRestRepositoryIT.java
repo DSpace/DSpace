@@ -3685,15 +3685,21 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                              .withIssueDate("2020-01-21")
                              .withSubject("Subject 1")
                              .withSubject("Subject 2")
+                             .withAbstract("Test description abstract")
                              .build();
 
         context.restoreAuthSystemState();
 
+        String authToken = getAuthToken(eperson.getEmail(), password);
+
+        getClient(authToken).perform(get("/api/submission/workspaceitems/" + witem.getID()))
+                 .andExpect(status().isOk())
+                 .andExpect(jsonPath("$.sections.traditionalpagetwo['dc.subject']").isNotEmpty())
+                 .andExpect(jsonPath("$.sections.traditionalpagetwo['dc.description.abstract']").isNotEmpty());
+
         List<Operation> operations = new ArrayList<Operation>();
         operations.add(new RemoveOperation("/sections/traditionalpagetwo"));
         String patchBody = getPatchContent(operations);
-
-        String authToken = getAuthToken(eperson.getEmail(), password);
 
         getClient(authToken).perform(patch("/api/submission/workspaceitems/" + witem.getID())
                  .content(patchBody)
