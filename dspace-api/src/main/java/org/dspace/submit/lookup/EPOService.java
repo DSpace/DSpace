@@ -105,6 +105,7 @@ public class EPOService {
      */
     private String login(String consumerKey, String consumerSecretKey) throws IOException, HttpException {
         HttpPost method = null;
+        String accessToken = null;
         try {
             // open session
             HttpClient client = HttpClientBuilder.create().build();
@@ -132,14 +133,18 @@ public class EPOService {
             // find "access_token"
             ObjectMapper mapper = new ObjectMapper(factory);
             JsonNode rootNode = mapper.readTree(json);
-            JsonNode accessToken = rootNode.get("access_token");
+            JsonNode accessTokenNode = rootNode.get("access_token");
 
-            return accessToken.asText();
+            accessToken = accessTokenNode.asText();
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
         } finally {
             if (method != null) {
                 method.releaseConnection();
             }
         }
+
+        return accessToken;
     }
 
     private void logout(String sid) {
