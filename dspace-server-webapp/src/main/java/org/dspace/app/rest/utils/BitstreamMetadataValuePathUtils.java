@@ -38,6 +38,7 @@ public class BitstreamMetadataValuePathUtils {
     public void validate(String absolutePath) throws DCInputsReaderException {
         String[] split = absolutePath.split("/");
         DCInputSet inputConfig = inputReader.getInputsByFormName(UploadStep.UPLOAD_STEP_METADATA_SECTION);
+        // according to the rest contract the absolute path must be something like files/:idx/metadata/dc.title
         if (split.length >= 4) {
             if (!inputConfig.isFieldPresent(split[3])) {
                 throw new UnprocessableEntityException("The field " + split[3] + " is not present in section "
