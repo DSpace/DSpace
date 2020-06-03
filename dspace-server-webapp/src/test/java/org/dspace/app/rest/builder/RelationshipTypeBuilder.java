@@ -39,6 +39,7 @@ public class RelationshipTypeBuilder extends AbstractBuilder<RelationshipType, R
     public void cleanup() throws Exception {
         try (Context c = new Context()) {
             c.turnOffAuthorisationSystem();
+            // Ensure object and any related objects are reloaded before checking to see what needs cleanup
             relationshipType = c.reloadEntity(relationshipType);
             List<Relationship> byRelationshipType = relationshipService
                 .findByRelationshipType(c, relationshipType);

@@ -154,6 +154,7 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
     public void cleanup() throws Exception {
        try (Context c = new Context()) {
             c.turnOffAuthorisationSystem();
+            // Ensure object and any related objects are reloaded before checking to see what needs cleanup
             item = c.reloadEntity(item);
             if (item != null) {
                  delete(c, item);

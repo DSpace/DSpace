@@ -33,7 +33,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.dspace.app.rest.builder.CollectionBuilder;
 import org.dspace.app.rest.builder.CommunityBuilder;
 import org.dspace.app.rest.builder.EPersonBuilder;
-import org.dspace.app.rest.converter.ConverterService;
+import org.dspace.app.rest.converter.CommunityConverter;
 import org.dspace.app.rest.matcher.CollectionMatcher;
 import org.dspace.app.rest.matcher.CommunityMatcher;
 import org.dspace.app.rest.matcher.HalMatcher;
@@ -66,7 +66,7 @@ import org.springframework.test.web.servlet.MvcResult;
 public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     @Autowired
-    ConverterService converter;
+    CommunityConverter communityConverter;
 
     @Autowired
     CommunityService communityService;
@@ -1360,7 +1360,7 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
 
         ObjectMapper mapper = new ObjectMapper();
 
-        CommunityRest communityRest = converter.toRest(parentCommunity, Projection.DEFAULT);
+        CommunityRest communityRest = communityConverter.convert(parentCommunity, Projection.DEFAULT);
 
         communityRest.setMetadata(new MetadataRest()
                 .put("dc.title", new MetadataValueRest("Electronic theses and dissertations")));
@@ -1584,7 +1584,7 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
 
         ObjectMapper mapper = new ObjectMapper();
 
-        CommunityRest communityRest = converter.toRest(parentCommunity, Projection.DEFAULT);
+        CommunityRest communityRest = communityConverter.convert(parentCommunity, Projection.DEFAULT);
 
         communityRest.setMetadata(new MetadataRest()
                 .put("dc.title", new MetadataValueRest("Electronic theses and dissertations")));

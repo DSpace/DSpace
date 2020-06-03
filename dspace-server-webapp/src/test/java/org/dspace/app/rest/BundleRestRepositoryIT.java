@@ -237,7 +237,7 @@ public class BundleRestRepositoryIT extends AbstractControllerIntegrationTest {
                            "Create Bundle Without Metadata",
                            bundleUuid, null, Constants.BUNDLE, new ArrayList<>())));
         } finally {
-            BundleBuilder.deleteBundel(bundleUuid);
+            BundleBuilder.deleteBundle(bundleUuid);
         }
     }
 
@@ -282,7 +282,7 @@ public class BundleRestRepositoryIT extends AbstractControllerIntegrationTest {
                                    MetadataMatcher.matchMetadata("dc.relation",
                                                                  "A relation"))))));
         } finally {
-            BundleBuilder.deleteBundel(bundleUuid);
+            BundleBuilder.deleteBundle(bundleUuid);
         }
     }
 
@@ -367,7 +367,7 @@ public class BundleRestRepositoryIT extends AbstractControllerIntegrationTest {
                            "Create Bundle Without Metadata",
                            bundleUuid, null, Constants.BUNDLE, new ArrayList<>())));
         } finally {
-            BundleBuilder.deleteBundel(bundleUuid);
+            BundleBuilder.deleteBundle(bundleUuid);
         }
     }
 
