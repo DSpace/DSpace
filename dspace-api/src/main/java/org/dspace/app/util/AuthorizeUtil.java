@@ -34,6 +34,7 @@ import org.dspace.eperson.Group;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.GroupService;
 import org.dspace.services.factory.DSpaceServicesFactory;
+import org.dspace.utils.DSpace;
 import org.dspace.xmlworkflow.factory.XmlWorkflowServiceFactory;
 import org.dspace.xmlworkflow.storedcomponents.CollectionRole;
 import org.dspace.xmlworkflow.storedcomponents.service.CollectionRoleService;
@@ -637,7 +638,10 @@ public class AuthorizeUtil {
         try {
             EPerson eperson = EPersonServiceFactory.getInstance().getEPersonService().findByEmail(context, email);
             if (eperson != null && eperson.canLogIn()) {
-                return true;
+                HttpServletRequest request = new DSpace().getRequestService().getCurrentRequest()
+                                                         .getHttpServletRequest();
+                return AuthenticateServiceFactory.getInstance().getAuthenticationService()
+                                                 .allowSetPassword(context, request, null);
             }
         } catch (SQLException e) {
             log.error("Something went wrong trying to retrieve EPerson for email: " + email, e);

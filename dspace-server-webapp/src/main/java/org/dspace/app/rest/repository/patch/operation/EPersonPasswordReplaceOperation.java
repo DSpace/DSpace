@@ -57,14 +57,14 @@ public class EPersonPasswordReplaceOperation<R> extends PatchOperation<R> {
         checkOperationValue(operation.getValue());
         if (supports(object, operation)) {
             EPerson eperson = (EPerson) object;
-            String token = requestService.getCurrentRequest().getHttpServletRequest().getParameter("token");
-            checkModelForExistingValue(eperson);
-            if (StringUtils.isNotBlank(token)) {
-                patchWithToken(context,eperson, token, operation);
-            }
             if (!AuthorizeUtil.authorizeUpdatePassword(context, eperson.getEmail())) {
                 throw new DSpaceBadRequestException("Password cannot be updated for the given EPerson with email: " +
                                                         eperson.getEmail());
+            }
+            String token = requestService.getCurrentRequest().getHttpServletRequest().getParameter("token");
+            checkModelForExistingValue(eperson);
+            if (StringUtils.isNotBlank(token)) {
+                verifyAndDeleteToken(context, eperson, token, operation);
             }
             ePersonService.setPassword(eperson, (String) operation.getValue());
             return object;
@@ -73,7 +73,7 @@ public class EPersonPasswordReplaceOperation<R> extends PatchOperation<R> {
         }
     }
 
-    private void patchWithToken(Context context, EPerson eperson, String token, Operation operation) {
+    private void verifyAndDeleteToken(Context context, EPerson eperson, String token, Operation operation) {
         try {
             EPerson ePersonFromToken = accountService.getEPerson(context, token);
             if (ePersonFromToken == null) {
@@ -86,7 +86,7 @@ public class EPersonPasswordReplaceOperation<R> extends PatchOperation<R> {
             }
             accountService.deleteToken(context, token);
         } catch (SQLException | AuthorizeException e) {
-            log.error(e.getMessage(), e);
+            log.error("Failed to verify or delete the token for an EPerson patch", e);
         }
     }
 

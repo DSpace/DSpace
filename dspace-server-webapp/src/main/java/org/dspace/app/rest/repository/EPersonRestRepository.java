@@ -96,8 +96,8 @@ public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, E
             try {
                 return createAndReturn(context, epersonRest, token);
             } catch (SQLException e) {
-                log.error(e.getMessage(), e);
-                throw new RuntimeException("Something with wrong in the creation of an EPerson with token: " + token);
+                log.error("Something went wrong in the creation of an EPerson with token: " + token, e);
+                throw new RuntimeException("Something went wrong in the creation of an EPerson with token: " + token);
             }
         }
         // If no token is present, we simply do the admin execution
@@ -127,8 +127,28 @@ public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, E
         return eperson;
     }
 
+    /**
+     * This method will perform checks on whether or not the given Request was valid for the creation of an EPerson
+     * with a token or not.
+     * It'll check that the token exists, that the token doesn't yet resolve to an actual eperson already,
+     * that the email in the given json is equal to the email for the token and that other properties are set to
+     * what we expect in this creation.
+     * It'll check if all of those constraints hold true and if we're allowed to register new accounts.
+     * If this is the case, we'll create an EPerson without any authorization checks and delete the token
+     * @param context       The DSpace context
+     * @param epersonRest   The EPersonRest given to be created
+     * @param token         The token to be used
+     * @return              The EPersonRest after the creation of the EPerson object
+     * @throws AuthorizeException   If something goes wrong
+     * @throws SQLException         If something goes wrong
+     */
     private EPersonRest createAndReturn(Context context, EPersonRest epersonRest, String token)
         throws AuthorizeException, SQLException {
+        if (!AuthorizeUtil.authorizeNewAccountRegistration(context, requestService
+            .getCurrentRequest().getHttpServletRequest())) {
+            throw new DSpaceBadRequestException(
+                "Registration is disabled, you are not authorized to create a new Authorization");
+        }
         RegistrationData registrationData = registrationDataService.findByToken(context, token);
         if (registrationData == null) {
             throw new DSpaceBadRequestException("The token given as parameter: " + token + " does not exist" +
@@ -152,11 +172,6 @@ public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, E
                                                     + " with a token");
         }
         checkRequiredProperties(epersonRest);
-        if (!AuthorizeUtil.authorizeNewAccountRegistration(context, requestService
-            .getCurrentRequest().getHttpServletRequest())) {
-            throw new DSpaceBadRequestException(
-                "Registration is disabled, you are not authorized to create a new Authorization");
-        }
         // We'll turn off authorisation system because this call isn't admin based as it's token based
         context.turnOffAuthorisationSystem();
         EPerson ePerson = createEPersonFromRestObject(context, epersonRest);
@@ -179,7 +194,7 @@ public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, E
         }
         String password = epersonRest.getPassword();
         if (!accountService.verifyPasswordStructure(password)) {
-            throw new DSpaceBadRequestException("the password cannot be left blank");
+            throw new DSpaceBadRequestException("The given password is invalid");
         }
     }
 
@@ -272,8 +287,8 @@ public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, E
                 }
             }
             if (!passwordChangeFound) {
-                throw new AccessDeniedException("Couldn't perform the patch as a token with provided without " +
-                                                    "a password change");
+                throw new AccessDeniedException("Refused to perform the EPerson patch based on a token without " +
+                                                    "changing the password");
             }
         }
         patchDSpaceObject(apiCategory, model, uuid, patch);
