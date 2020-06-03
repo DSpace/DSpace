@@ -130,13 +130,6 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
     @Autowired
     CollectionService collectionService;
 
-    @Autowired
-    MetadataFieldService metadataFieldService;
-    @Autowired
-    MetadataValueService metadataValueService;
-    @Autowired
-    CollectionService collectionService;
-
     public CollectionRestRepository(CollectionService dsoService) {
         super(dsoService);
     }
