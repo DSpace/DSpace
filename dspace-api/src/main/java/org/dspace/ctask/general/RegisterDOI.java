@@ -10,8 +10,7 @@ package org.dspace.ctask.general;
 import java.io.IOException;
 import java.sql.SQLException;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.curate.AbstractCurationTask;
@@ -29,15 +28,15 @@ import org.dspace.utils.DSpace;
  */
 public class RegisterDOI extends AbstractCurationTask {
     // Curation task status
-    private int status = Curator.CURATE_UNSET;
+    private int status = Curator.CURATE_SUCCESS;
     // The skipFilter boolean has a default value of 'true', as per intended operation
     private boolean skipFilter = true;
     // The distributed boolean has a default value of 'false' for safest operation
     private boolean distributed = false;
     // Prefix for configuration module
-    private static final String PLUGIN_PREFIX = "doicuration";
+    private static final String PLUGIN_PREFIX = "doi-curation";
     // Logger
-    private static final Logger log = LogManager.getLogger(RegisterDOI.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(RegisterDOI.class);
     // DOI provider
     private DOIIdentifierProvider provider;
 
@@ -51,6 +50,8 @@ public class RegisterDOI extends AbstractCurationTask {
         skipFilter = configurationService.getBooleanProperty(PLUGIN_PREFIX + ".skip-filter", true);
         // Get distribution behaviour from configuration, with a default value of 'false'
         distributed = configurationService.getBooleanProperty(PLUGIN_PREFIX + ".distributed", false);
+        log.debug("PLUGIN_PREFIX = " + PLUGIN_PREFIX + ", skipFilter = " + skipFilter +
+            ", distributed = " + distributed);
         // Instantiate DOI provider singleton
         provider = new DSpace().getSingletonService(DOIIdentifierProvider.class);
     }
@@ -117,6 +118,7 @@ public class RegisterDOI extends AbstractCurationTask {
         String doi = null;
         // Attempt DOI registration and report successes and failures
         try {
+            log.debug("Registering DOI with skipFilter = " + skipFilter);
             doi = provider.register(Curator.curationContext(), item, skipFilter);
             if (doi != null) {
                 String message = "New DOI minted in database for item " + item.getHandle() + ": " + doi
