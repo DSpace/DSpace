@@ -164,9 +164,6 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public boolean verifyPasswordStructure(String password) {
-        if (StringUtils.isBlank(password)) {
-            return false;
-        }
         if (StringUtils.length(password) < 6) {
             return false;
         }
