@@ -9,13 +9,15 @@ package org.dspace.app.rest.model;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.dspace.app.rest.RestResourceController;
+import org.springframework.hateoas.Identifiable;
 
 /**
  * This class acts as the REST representation of a DSpace configuration property.
  * This class acts as a data holder for the PropertyResource
  */
-public class PropertyRest extends RestAddressableModel {
+public class PropertyRest extends RestAddressableModel implements Identifiable<String> {
     public static final String NAME = "property";
     public static final String CATEGORY = RestAddressableModel.CONFIGURATION;
 
@@ -37,6 +39,12 @@ public class PropertyRest extends RestAddressableModel {
 
     public String name;
     public List<String> values;
+
+    @Override
+    @JsonIgnore
+    public String getId() {
+        return this.name;
+    }
 
     @Override
     public String getCategory() {
