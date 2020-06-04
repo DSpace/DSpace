@@ -1786,4 +1786,18 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                             );
 
     }
+
+    @Test
+    public void discoverableNestedLinkTest() throws Exception {
+        String token = getAuthToken(eperson.getEmail(), password);
+        getClient(token).perform(get("/api"))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$._links",Matchers.allOf(
+                                hasJsonPath("$.epersons.href",
+                                         is("http://localhost/api/eperson/epersons")),
+                                hasJsonPath("$.eperson-registration.href",
+                                         is("http://localhost/api/eperson/registrations"))
+                        )));
+    }
+
 }
