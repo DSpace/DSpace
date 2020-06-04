@@ -14,9 +14,12 @@ import org.dspace.app.rest.model.ProcessRest;
 import org.dspace.app.rest.model.ScriptRest;
 import org.dspace.app.rest.model.hateoas.ProcessResource;
 import org.dspace.app.rest.repository.ScriptRestRepository;
+import org.dspace.app.rest.utils.ContextUtil;
+import org.dspace.core.Context;
+import org.dspace.services.RequestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.webmvc.ControllerUtils;
-import org.springframework.hateoas.ResourceSupport;
+import org.springframework.hateoas.RepresentationModel;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -41,6 +44,9 @@ public class ScriptProcessesController {
     @Autowired
     private ScriptRestRepository scriptRestRepository;
 
+    @Autowired
+    private RequestService requestService;
+
     /**
      * This method can be called by sending a POST request to the system/scripts/{name}/processes endpoint
      * This will start a process for the script that matches the given name
@@ -50,13 +56,15 @@ public class ScriptProcessesController {
      */
     @RequestMapping(method = RequestMethod.POST)
     @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<ResourceSupport> startProcess(@PathVariable(name = "name") String scriptName)
+    public ResponseEntity<RepresentationModel<?>> startProcess(@PathVariable(name = "name") String scriptName)
         throws Exception {
         if (log.isTraceEnabled()) {
             log.trace("Starting Process for Script with name: " + scriptName);
         }
-        ProcessRest processRest = scriptRestRepository.startProcess(scriptName);
+        Context context = ContextUtil.obtainContext(requestService.getCurrentRequest().getServletRequest());
+        ProcessRest processRest = scriptRestRepository.startProcess(context, scriptName);
         ProcessResource processResource = converter.toResource(processRest);
+        context.complete();
         return ControllerUtils.toResponseEntity(HttpStatus.ACCEPTED, new HttpHeaders(), processResource);
     }
 

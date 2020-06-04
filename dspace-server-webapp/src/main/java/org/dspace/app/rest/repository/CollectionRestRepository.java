@@ -175,7 +175,7 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
                         + " not found");
             }
             List<Collection> collections = cs.findAuthorized(context, com, Constants.ADD);
-            return converter.toRestPage(utils.getPage(collections, pageable), utils.obtainProjection());
+            return converter.toRestPage(collections, pageable, utils.obtainProjection());
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -186,7 +186,7 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
         try {
             Context context = obtainContext();
             List<Collection> collections = cs.findAuthorizedOptimized(context, Constants.ADD);
-            return converter.toRestPage(utils.getPage(collections, pageable), utils.obtainProjection());
+            return converter.toRestPage(collections, pageable, utils.obtainProjection());
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }

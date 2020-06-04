@@ -16,10 +16,10 @@ import org.dspace.app.rest.builder.CollectionBuilder;
 import org.dspace.app.rest.builder.CommunityBuilder;
 import org.dspace.app.rest.builder.ItemBuilder;
 import org.dspace.app.rest.builder.ResourcePolicyBuilder;
-import org.dspace.app.rest.converter.ConverterService;
+import org.dspace.app.rest.converter.ItemConverter;
 import org.dspace.app.rest.matcher.AuthorizationMatcher;
 import org.dspace.app.rest.model.ItemRest;
-import org.dspace.app.rest.projection.DefaultProjection;
+import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.app.rest.utils.Utils;
 import org.dspace.authorize.ResourcePolicy;
@@ -45,10 +45,10 @@ public class CCLicenseFeatureRestIT extends AbstractControllerIntegrationTest {
     private AuthorizationFeatureService authorizationFeatureService;
 
     @Autowired
-    private ConverterService converterService;
+    private ConfigurationService configurationService;
 
     @Autowired
-    private ConfigurationService configurationService;
+    private ItemConverter itemConverter;
 
     @Autowired
     private Utils utils;
@@ -70,7 +70,7 @@ public class CCLicenseFeatureRestIT extends AbstractControllerIntegrationTest {
         Item item = ItemBuilder.createItem(context, col).withTitle("Item to withdraw").build();
         context.restoreAuthSystemState();
 
-        ItemRest itemRest = converterService.toRest(item, converterService.getProjection(DefaultProjection.NAME));
+        ItemRest itemRest = itemConverter.convert(item, Projection.DEFAULT);
         String itemUri = utils.linkToSingleResource(itemRest, "self").getHref();
         Authorization authAdminCCLicense = new Authorization(admin, ccLicenseFeature, itemRest);
 
@@ -99,7 +99,7 @@ public class CCLicenseFeatureRestIT extends AbstractControllerIntegrationTest {
         Item item = ItemBuilder.createItem(context, col).withTitle("Item to withdraw").build();
         context.restoreAuthSystemState();
 
-        ItemRest itemRest = converterService.toRest(item, converterService.getProjection(DefaultProjection.NAME));
+        ItemRest itemRest = itemConverter.convert(item, Projection.DEFAULT);
         String itemUri = utils.linkToSingleResource(itemRest, "self").getHref();
         Authorization authAdminCCLicense = new Authorization(eperson, ccLicenseFeature, itemRest);
 
@@ -159,7 +159,7 @@ public class CCLicenseFeatureRestIT extends AbstractControllerIntegrationTest {
         Item item = ItemBuilder.createItem(context, col).withTitle("Item to withdraw").build();
         context.restoreAuthSystemState();
 
-        ItemRest itemRest = converterService.toRest(item, converterService.getProjection(DefaultProjection.NAME));
+        ItemRest itemRest = itemConverter.convert(item, Projection.DEFAULT);
         String itemUri = utils.linkToSingleResource(itemRest, "self").getHref();
         Authorization authAdminCCLicense = new Authorization(eperson, ccLicenseFeature, itemRest);
 
@@ -200,7 +200,7 @@ public class CCLicenseFeatureRestIT extends AbstractControllerIntegrationTest {
                 .withUser(eperson).withDspaceObject(item).build();
         context.restoreAuthSystemState();
 
-        ItemRest itemRest = converterService.toRest(item, converterService.getProjection(DefaultProjection.NAME));
+        ItemRest itemRest = itemConverter.convert(item, Projection.DEFAULT);
         String itemUri = utils.linkToSingleResource(itemRest, "self").getHref();
         Authorization authAdminCCLicense = new Authorization(eperson, ccLicenseFeature, itemRest);
 
@@ -238,7 +238,7 @@ public class CCLicenseFeatureRestIT extends AbstractControllerIntegrationTest {
         Item item = ItemBuilder.createItem(context, col).withTitle("Item to withdraw").build();
         context.restoreAuthSystemState();
 
-        ItemRest itemRest = converterService.toRest(item, converterService.getProjection(DefaultProjection.NAME));
+        ItemRest itemRest = itemConverter.convert(item, Projection.DEFAULT);
         String itemUri = utils.linkToSingleResource(itemRest, "self").getHref();
         Authorization authEpersonCCLicense = new Authorization(eperson, ccLicenseFeature, itemRest);
         Authorization authAnonymousCCLicense = new Authorization(null, ccLicenseFeature, itemRest);

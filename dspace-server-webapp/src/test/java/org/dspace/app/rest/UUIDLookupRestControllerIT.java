@@ -237,7 +237,9 @@ public class UUIDLookupRestControllerIT extends AbstractControllerIntegrationTes
         String uuid = eperson.getID().toString();
         String epersonDetail = REST_SERVER_URL + "eperson/epersons/" + uuid;
 
-        getClient().perform(get("/api/dso/find?uuid={uuid}",uuid))
+        String token = getAuthToken(admin.getEmail(), password);
+
+        getClient(token).perform(get("/api/dso/find?uuid={uuid}",uuid))
                         .andExpect(status().isFound())
                         //We expect a Location header to redirect to the eperson details
                         .andExpect(header().string("Location", epersonDetail));
@@ -262,7 +264,9 @@ public class UUIDLookupRestControllerIT extends AbstractControllerIntegrationTes
         String uuid = group.getID().toString();
         String groupDetail = REST_SERVER_URL + "eperson/groups/" + uuid;
 
-        getClient().perform(get("/api/dso/find?uuid={uuid}",uuid))
+        String token = getAuthToken(admin.getEmail(), password);
+
+        getClient(token).perform(get("/api/dso/find?uuid={uuid}",uuid))
                         .andExpect(status().isFound())
                         //We expect a Location header to redirect to the group details
                         .andExpect(header().string("Location", groupDetail));

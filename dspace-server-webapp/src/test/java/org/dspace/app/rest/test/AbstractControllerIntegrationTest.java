@@ -11,7 +11,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 
-import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
@@ -58,7 +57,7 @@ import org.springframework.web.context.WebApplicationContext;
  * @author Tim Donohue
  * @see org.dspace.app.rest.test.AbstractWebClientIntegrationTest
  */
-// Run tests with JUnit 4 and Spring TestContext Framework
+// Run tests with JUnit and Spring TestContext Framework
 @RunWith(SpringRunner.class)
 // Specify main class to use to load Spring ApplicationContext
 // NOTE: By default, Spring caches and reuses ApplicationContext for each integration test (to speed up tests)
@@ -81,7 +80,7 @@ public class AbstractControllerIntegrationTest extends AbstractIntegrationTestWi
     public static final String BASE_REST_SERVER_URL = "http://localhost";
 
     protected MediaType contentType = new MediaType(MediaTypes.HAL_JSON.getType(),
-                                                    MediaTypes.HAL_JSON.getSubtype(), StandardCharsets.UTF_8);
+                                                    MediaTypes.HAL_JSON.getSubtype());
 
     protected MediaType textUriContentType = RestMediaTypes.TEXT_URI_LIST;
 
@@ -121,7 +120,7 @@ public class AbstractControllerIntegrationTest extends AbstractIntegrationTestWi
 
         if (StringUtils.isNotBlank(authToken)) {
             mockMvcBuilder.defaultRequest(
-                get("").header(AUTHORIZATION_HEADER, AUTHORIZATION_TYPE + authToken));
+                get("/").header(AUTHORIZATION_HEADER, AUTHORIZATION_TYPE + authToken));
         }
 
         return mockMvcBuilder
