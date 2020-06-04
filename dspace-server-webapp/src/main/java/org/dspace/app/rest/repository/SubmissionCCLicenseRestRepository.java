@@ -30,7 +30,7 @@ public class SubmissionCCLicenseRestRepository extends DSpaceRestRepository<Subm
     protected CreativeCommonsService creativeCommonsService;
 
     @Override
-    @PreAuthorize("permitAll()")
+    @PreAuthorize("hasAuthority('AUTHENTICATED')")
     public SubmissionCCLicenseRest findOne(final Context context, final String licenseId) {
         CCLicense ccLicense = creativeCommonsService.findOne(licenseId);
         if (ccLicense == null) {
@@ -40,7 +40,7 @@ public class SubmissionCCLicenseRestRepository extends DSpaceRestRepository<Subm
     }
 
     @Override
-    @PreAuthorize("permitAll()")
+    @PreAuthorize("hasAuthority('AUTHENTICATED')")
     public Page<SubmissionCCLicenseRest> findAll(final Context context, final Pageable pageable) {
 
         List<CCLicense> allCCLicenses = creativeCommonsService.findAllCCLicenses();

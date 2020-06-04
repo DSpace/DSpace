@@ -29,7 +29,9 @@ public class SubmissionCCLicenseSearchControllerIT extends AbstractControllerInt
 
     @Test
     public void searchRightsByQuestionsTest() throws Exception {
-        getClient().perform(get(
+        String epersonToken = getAuthToken(eperson.getEmail(), password);
+
+        getClient(epersonToken).perform(get(
                 "/api/config/submissioncclicenses/search/rightsByQuestions?license=license2&answer_license2-field0" +
                         "=license2-field0-enum1"))
                    .andExpect(status().isOk())
@@ -43,7 +45,10 @@ public class SubmissionCCLicenseSearchControllerIT extends AbstractControllerInt
 
     @Test
     public void searchRightsByQuestionsTestLicenseWithoutFields() throws Exception {
-        getClient().perform(get("/api/config/submissioncclicenses/search/rightsByQuestions?license=license3"))
+        String epersonToken = getAuthToken(eperson.getEmail(), password);
+
+        getClient(epersonToken)
+                .perform(get("/api/config/submissioncclicenses/search/rightsByQuestions?license=license3"))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$.url", is("mock-license-uri")))
                    .andExpect(jsonPath("$.type", is("submissioncclicenseUrl")))
@@ -54,7 +59,9 @@ public class SubmissionCCLicenseSearchControllerIT extends AbstractControllerInt
 
     @Test
     public void searchRightsByQuestionsNonExistingLicense() throws Exception {
-        getClient().perform(get(
+        String epersonToken = getAuthToken(eperson.getEmail(), password);
+
+        getClient(epersonToken).perform(get(
                 "/api/config/submissioncclicenses/search/rightsByQuestions?license=nonexisting-license" +
                         "&answer_license2-field0=license2-field0-enum1"))
                    .andExpect(status().isNotFound());
@@ -62,7 +69,9 @@ public class SubmissionCCLicenseSearchControllerIT extends AbstractControllerInt
 
     @Test
     public void searchRightsByQuestionsMissingRequiredAnswer() throws Exception {
-        getClient().perform(get(
+        String epersonToken = getAuthToken(eperson.getEmail(), password);
+
+        getClient(epersonToken).perform(get(
                 "/api/config/submissioncclicenses/search/rightsByQuestions?license=license1&answer_license1field0" +
                         "=license1field0enum1"))
                    .andExpect(status().isBadRequest());
@@ -70,9 +79,21 @@ public class SubmissionCCLicenseSearchControllerIT extends AbstractControllerInt
 
     @Test
     public void searchRightsByQuestionsAdditionalNonExistingAnswer() throws Exception {
-        getClient().perform(get(
+        String epersonToken = getAuthToken(eperson.getEmail(), password);
+
+        getClient(epersonToken).perform(get(
                 "/api/config/submissioncclicenses/search/rightsByQuestions?license=license2" +
                         "&answer_license2field0=license2field0enum1&answer_nonexisting=test"))
                    .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void searchRightsByQuestionsAdditionalUnAuthorized() throws Exception {
+
+        getClient().perform(get(
+                "/api/config/submissioncclicenses/search/rightsByQuestions?license=license2&answer_license2-field0" +
+                        "=license2-field0-enum1"))
+                               .andExpect(status().isUnauthorized());
+
     }
 }

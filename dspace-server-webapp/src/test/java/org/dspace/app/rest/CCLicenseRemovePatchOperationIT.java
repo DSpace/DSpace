@@ -59,7 +59,7 @@ public class CCLicenseRemovePatchOperationIT extends AbstractControllerIntegrati
 
         context.restoreAuthSystemState();
 
-        String adminToken = getAuthToken(admin.getEmail(), password);
+        String epersonToken = getAuthToken(eperson.getEmail(), password);
 
         // First add a license and verify it is added
         List<Operation> ops = new ArrayList<Operation>();
@@ -70,7 +70,7 @@ public class CCLicenseRemovePatchOperationIT extends AbstractControllerIntegrati
         String patchBody = getPatchContent(ops);
 
 
-        getClient(adminToken).perform(patch("/api/submission/workspaceitems/" + workspaceItem.getID())
+        getClient(epersonToken).perform(patch("/api/submission/workspaceitems/" + workspaceItem.getID())
                                               .content(patchBody)
                                               .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
                              .andExpect(status().isOk())
@@ -91,10 +91,46 @@ public class CCLicenseRemovePatchOperationIT extends AbstractControllerIntegrati
         String removePatch = getPatchContent(removeOps);
 
 
-        getClient(adminToken).perform(patch("/api/submission/workspaceitems/" + workspaceItem.getID())
+        getClient(epersonToken).perform(patch("/api/submission/workspaceitems/" + workspaceItem.getID())
                                               .content(removePatch)
                                               .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
                              .andExpect(status().isOk())
                              .andExpect(jsonPath("$.sections", not(hasJsonPath("cclicense"))));
+    }
+
+
+    @Test
+    public void patchRemoveSubmissionCCLicenseNonExisting() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        Community community = CommunityBuilder.createCommunity(context)
+                                              .withName("Community")
+                                              .build();
+
+        Collection collection = CollectionBuilder.createCollection(context, community)
+                                                 .withName("Collection")
+                                                 .build();
+
+        WorkspaceItem workspaceItem = WorkspaceItemBuilder.createWorkspaceItem(context, collection)
+                                                          .withTitle("Workspace Item")
+                                                          .build();
+
+        context.restoreAuthSystemState();
+
+        String epersonToken = getAuthToken(eperson.getEmail(), password);
+
+
+        List<Operation> removeOps = new ArrayList<Operation>();
+        RemoveOperation removeOperation = new RemoveOperation("/sections/cclicense/uri");
+
+        removeOps.add(removeOperation);
+        String removePatch = getPatchContent(removeOps);
+
+
+        getClient(epersonToken).perform(patch("/api/submission/workspaceitems/" + workspaceItem.getID())
+                                                .content(removePatch)
+                                                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                               .andExpect(status().isOk())
+                               .andExpect(jsonPath("$.sections", not(hasJsonPath("cclicense"))));
     }
 }

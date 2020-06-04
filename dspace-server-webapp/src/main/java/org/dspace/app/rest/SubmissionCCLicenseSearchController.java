@@ -34,7 +34,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/" + SubmissionCCLicenseRest.CATEGORY + "/" + SubmissionCCLicenseRest.PLURAL + "/search" +
         "/rightsByQuestions")
-@PreAuthorize("permitAll()")
+@PreAuthorize("hasAuthority('AUTHENTICATED')")
 public class SubmissionCCLicenseSearchController {
 
     @Autowired
