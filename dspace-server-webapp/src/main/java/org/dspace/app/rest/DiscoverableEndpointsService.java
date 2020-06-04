@@ -68,10 +68,11 @@ public class DiscoverableEndpointsService {
                         discoverableEndpoints.add(link);
                         // sanity check
                         // FIXME improve logging for debugging
-                        if (rels.contains(link.getRel())) {
-                            throw new IllegalStateException("The rel " + link.getRel() + " is defined multiple times!");
+                        if (rels.contains(link.getRel().value())) {
+                            throw new IllegalStateException("The rel " + link.getRel().value()
+                                                                + " is defined multiple times!");
                         }
-                        rels.add(link.getRel());
+                        rels.add(link.getRel().value());
                     }
                 }
             }

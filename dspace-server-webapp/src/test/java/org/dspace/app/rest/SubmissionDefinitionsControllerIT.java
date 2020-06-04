@@ -125,6 +125,7 @@ public class SubmissionDefinitionsControllerIT extends AbstractControllerIntegra
 
         Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1").build();
 
+        context.restoreAuthSystemState();
         getClient().perform(get("/api/config/submissiondefinitions/search/findByCollection")
                                     .param("uuid", col1.getID().toString()))
                    //** THEN **
@@ -160,6 +161,7 @@ public class SubmissionDefinitionsControllerIT extends AbstractControllerIntegra
                 .withName("Collection 1")
                 .build();
 
+        context.restoreAuthSystemState();
         String token = getAuthToken(eperson.getEmail(), password);
         getClient(token).perform(get("/api/config/submissiondefinitions/search/findByCollection")
                 .param("uuid", col1.getID().toString()))

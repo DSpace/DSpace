@@ -9,7 +9,7 @@ package org.dspace.app.rest.utils;
 
 import static java.lang.Integer.parseInt;
 import static java.util.stream.Collectors.toList;
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
@@ -58,7 +58,6 @@ import org.dspace.app.rest.model.ResourcePolicyRest;
 import org.dspace.app.rest.model.RestAddressableModel;
 import org.dspace.app.rest.model.RestModel;
 import org.dspace.app.rest.model.VersionHistoryRest;
-import org.dspace.app.rest.model.hateoas.DSpaceResource;
 import org.dspace.app.rest.model.hateoas.EmbeddedPage;
 import org.dspace.app.rest.model.hateoas.HALResource;
 import org.dspace.app.rest.projection.CompositeProjection;
@@ -88,6 +87,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.Link;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -160,32 +160,64 @@ public class Utils {
      * @return the existing instance if it is not null, a default pageable instance otherwise.
      */
     public Pageable getPageable(@Nullable Pageable optionalPageable) {
-        return optionalPageable != null ? optionalPageable : new PageRequest(0, DEFAULT_PAGE_SIZE);
+        return optionalPageable != null ? optionalPageable : PageRequest.of(0, DEFAULT_PAGE_SIZE);
     }
 
-    public Link linkToSingleResource(DSpaceResource r, String rel) {
-        RestAddressableModel data = r.getContent();
-        return linkToSingleResource(data, rel);
-    }
-
+    /**
+     * Create a HAL Link to a single resource
+     * @param data the resource itself
+     * @param rel name of the link relation to create
+     * @return created Link object
+     */
     public Link linkToSingleResource(RestAddressableModel data, String rel) {
-        return linkTo(data.getController(), data.getCategory(), data.getTypePlural()).slash(data)
+        // Create link using Spring HATEOAS link builder
+        return linkTo(data.getController(), data.getCategory(), data.getTypePlural()).slash(getIdentifierForLink(data))
                                                                                      .withRel(rel);
     }
 
+    /**
+     * Create a HAL Link to a subresource of given resource. This method assumes the name & link to the subresource
+     * are both the same string value. See other linkToSubResource method if they are different.
+     * @param data main resource
+     * @param rel name/subpath of the subresource (assumed to be the same)
+     * @return created Link object
+     */
     public Link linkToSubResource(RestAddressableModel data, String rel) {
         return linkToSubResource(data, rel, rel);
     }
 
+    /**
+     * Create a HAL Link to a subresource of given resource using given path name and link name
+     * @param data main resource
+     * @param rel name of the subresource link relation to create
+     * @param path subpath for the subresource
+     * @return created Link object
+     */
     public Link linkToSubResource(RestAddressableModel data, String rel, String path) {
-        return linkTo(data.getController(), data.getCategory(), data.getTypePlural()).slash(data).slash(path)
+        // Create link using Spring HATEOAS link builder
+        return linkTo(data.getController(), data.getCategory(), data.getTypePlural()).slash(getIdentifierForLink(data))
+                                                                                     .slash(path)
                                                                                      .withRel(rel);
+    }
+
+    /**
+     * Returns an identifier for a given resource, to be used in a Link.
+     * @param data resource to identify
+     * @return identifier, which is either an ID (if exists) or string representation of the object.
+     */
+    private Serializable getIdentifierForLink(RestAddressableModel data) {
+        // If the resource is identifiable by an ID, use it. Otherwise use toString() to represent it.
+        Serializable identifier = data.toString();
+        if (data instanceof BaseObjectRest) {
+            identifier = ((BaseObjectRest) data).getId();
+        }
+        return identifier;
     }
 
     /**
      * Retrieve the {@link DSpaceRestRepository} for the specified category and model in the plural form as used in the endpoints.
      * If the model is available in its singular form use {@link #getResourceRepositoryByCategoryAndModel(String, String)}
-     * 
+     *
      * @param apiCategory
      * @param modelPlural
      * @return
@@ -198,7 +230,7 @@ public class Utils {
     /**
      * Retrieve the {@link DSpaceRestRepository} for the specified category and model. The model is in the singular form
      * as returned by the {@link RestAddressableModel#getType()} method
-     * 
+     *
      * @param apiCategory
      * @param modelSingular
      * @return
@@ -282,7 +314,7 @@ public class Utils {
 
     /**
      * Create a temporary file from a multipart file upload
-     * 
+     *
      * @param multipartFile
      *            the multipartFile representing the uploaded file. Please note that it is a complex object including
      *            additional information other than the binary like the orginal file name and the mimetype
@@ -316,7 +348,7 @@ public class Utils {
     /**
      * Return the filename part from a multipartFile upload that could eventually contains the fullpath on the client
 
-     * 
+     *
      * @param multipartFile
      *            the file uploaded
      * @return the filename part of the file on the client filesystem
@@ -641,7 +673,13 @@ public class Utils {
                 Object linkedObject = method.invoke(linkRepository, null, contentId, null, projection);
                 resource.embedResource(rel, wrapForEmbedding(resource, linkedObject, link, oldLinks));
             } catch (InvocationTargetException e) {
-                if (e.getTargetException() instanceof RuntimeException) {
+                // This will be thrown from the LinkRepository if a Resource has been requested that'll try to embed
+                // something that we don't have READ rights to. It'll then throw an AccessDeniedException from that
+                // linkRepository and we want to catch it here since we don't want our entire request to fail if a
+                // subresource of the requested resource is not available to be embedded. Instead we'll log it here
+                if (e.getTargetException() instanceof AccessDeniedException) {
+                    log.warn("Tried fetching resource: " + linkRest.name() + " for DSpaceObject with ID: " + contentId);
+                } else if (e.getTargetException() instanceof RuntimeException) {
                     throw (RuntimeException) e.getTargetException();
                 } else {
                     throw new RuntimeException(e);
@@ -775,23 +813,23 @@ public class Utils {
             return new EmbeddedPage(link.getHref(), page.map((restObject) -> {
                 restObject.setEmbedLevel(childEmbedLevel);
                 return converter.toResource(restObject, newList);
-            }), null, link.getRel());
+            }), null, link.getRel().value());
         } else if (linkedObject instanceof List) {
             // The full list has been retrieved and we need to provide the first page for embedding
             List<RestAddressableModel> list = (List<RestAddressableModel>) linkedObject;
             if (list.size() > 0) {
                 PageImpl<RestAddressableModel> page = new PageImpl(
                         list.subList(0, list.size() > DEFAULT_PAGE_SIZE ? DEFAULT_PAGE_SIZE : list.size()),
-                        new PageRequest(0, DEFAULT_PAGE_SIZE), list.size());
+                        PageRequest.of(0, DEFAULT_PAGE_SIZE), list.size());
                 return new EmbeddedPage(link.getHref(),
                         page.map((restObject) -> {
                             restObject.setEmbedLevel(childEmbedLevel);
                             return converter.toResource(restObject, newList);
                         }),
-                        list, link.getRel());
+                        list, link.getRel().value());
             } else {
                 PageImpl<RestAddressableModel> page = new PageImpl(list);
-                return new EmbeddedPage(link.getHref(), page, list, link.getRel());
+                return new EmbeddedPage(link.getHref(), page, list, link.getRel().value());
             }
         } else {
             return linkedObject;
@@ -827,7 +865,7 @@ public class Utils {
 
     /**
      * Convert the input string in the primary key class according to the repository interface
-     * 
+     *
      * @param repository
      * @param pkStr
      * @return
@@ -841,7 +879,7 @@ public class Utils {
      * rest object is supported by a {@link DSpaceRestRepository} that also implement the
      * {@link ReloadableEntityObjectRepository} interface. If this is not the case the method will throw an
      * IllegalArgumentException
-     * 
+     *
      * @param context
      *            the DSpace Context
      * @param restObj
@@ -863,7 +901,7 @@ public class Utils {
 
     /**
     * Get the rest object associated with the specified URI
-    * 
+    *
     * @param context the DSpace context
     * @param uri     the uri of a {@link BaseObjectRest}
     * @return the {@link BaseObjectRest} identified by the provided uri

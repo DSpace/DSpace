@@ -34,7 +34,23 @@ public class EntityTypeBuilder extends AbstractBuilder<EntityType, EntityTypeSer
 
     @Override
     public void cleanup() throws Exception {
-        delete(entityType);
+        try (Context c = new Context()) {
+            c.turnOffAuthorisationSystem();
+            // Ensure object and any related objects are reloaded before checking to see what needs cleanup
+            entityType = c.reloadEntity(entityType);
+            if (entityType != null) {
+                delete(entityType);
+            }
+            c.complete();
+            indexingService.commit();
+        }
+    }
+
+    @Override
+    public void delete(Context c, EntityType dso) throws Exception {
+        if (dso != null) {
+            getService().delete(c, dso);
+        }
     }
 
     public EntityType build() {

@@ -98,20 +98,6 @@
                     </execution>
                 </executions>
             </plugin>
-            <!-- Verify OS license headers for all source code files -->
-            <plugin>
-                <groupId>com.mycila</groupId>
-                <artifactId>license-maven-plugin</artifactId>
-                <configuration>
-                    <excludes>
-                        <exclude>**/src/test/resources/**</exclude>
-                        <exclude>**/src/test/data/**</exclude>
-                        <exclude>**/.gitignore</exclude>
-                        <exclude>**/src/main/resources/rebel.xml</exclude>
-                        <exclude>src/test/data/dspaceFolder/config/spiders/**</exclude>
-                    </excludes>
-                </configuration>
-            </plugin>
 
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
@@ -308,15 +294,10 @@
             <groupId>org.dspace</groupId>
             <artifactId>handle</artifactId>
         </dependency>
+        <!-- Jetty is needed to run Handle Server -->
         <dependency>
-            <groupId>org.eclipse.jetty.aggregate</groupId>
-            <artifactId>jetty-all</artifactId>
-            <exclusions>
-                <exclusion>
-                    <artifactId>javax.servlet</artifactId>
-                    <groupId>org.eclipse.jetty.orbit</groupId>
-                </exclusion>
-            </exclusions>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-server</artifactId>
         </dependency>
         <dependency>
             <groupId>org.dspace</groupId>
@@ -489,6 +470,13 @@
             <groupId>org.apache.solr</groupId>
             <artifactId>solr-cell</artifactId>
             <version>${solr.client.version}</version>
+            <exclusions>
+                <!-- Newer version provided in our parent POM -->
+                <exclusion>
+                    <groupId>org.ow2.asm</groupId>
+                    <artifactId>asm-commons</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>

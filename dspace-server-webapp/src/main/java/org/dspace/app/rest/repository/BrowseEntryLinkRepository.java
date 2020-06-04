@@ -115,7 +115,7 @@ public class BrowseEntryLinkRepository extends AbstractDSpaceRestRepository
         }
 
         BrowseInfo binfo = be.browse(bs);
-        Pageable pageResultInfo = new PageRequest((binfo.getStart() - 1) / binfo.getResultsPerPage(),
+        Pageable pageResultInfo = PageRequest.of((binfo.getStart() - 1) / binfo.getResultsPerPage(),
                                                   binfo.getResultsPerPage());
         Page<BrowseEntryRest> page = new PageImpl<>(Arrays.asList(binfo.getStringResults()), pageResultInfo,
                                                             binfo.getTotal()).map(browseEntryConverter);

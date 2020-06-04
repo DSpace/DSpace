@@ -7,6 +7,11 @@
  */
 package org.dspace.app.rest.builder;
 
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.UUID;
+
+import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.DCDate;
 import org.dspace.content.Item;
@@ -147,11 +152,40 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
 
     @Override
     public void cleanup() throws Exception {
-        delete(item);
+       try (Context c = new Context()) {
+            c.turnOffAuthorisationSystem();
+            // Ensure object and any related objects are reloaded before checking to see what needs cleanup
+            item = c.reloadEntity(item);
+            if (item != null) {
+                 delete(c, item);
+                 c.complete();
+            }
+       }
     }
 
     @Override
     protected DSpaceObjectService<Item> getService() {
         return itemService;
+    }
+
+    /**
+     * Delete the Test Item referred to by the given UUID
+     * @param uuid UUID of Test Item to delete
+     * @throws SQLException
+     * @throws IOException
+     */
+    public static void deleteItem(UUID uuid) throws SQLException, IOException {
+        try (Context c = new Context()) {
+            c.turnOffAuthorisationSystem();
+            Item item = itemService.find(c, uuid);
+            if (item != null) {
+                try {
+                    itemService.delete(c, item);
+                } catch (AuthorizeException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+            c.complete();
+        }
     }
 }
