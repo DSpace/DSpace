@@ -25,7 +25,7 @@ public class ConfigurationRestRepositoryIT extends AbstractControllerIntegration
             .andExpect(jsonPath("$.values[0]", is("public_value")))
             .andExpect(jsonPath("$.type", is("property")))
             .andExpect(jsonPath("$.name", is("configuration.exposed.single.value")))
-            .andExpect(jsonPath("$._links").doesNotExist());
+            .andExpect(jsonPath("$._links.self.href", is("http://localhost/api/config/properties/configuration.exposed.single.value")));
     }
 
     @Test
