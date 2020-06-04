@@ -34,8 +34,9 @@ public class SubmissionCCLicenseRestRepositoryIT extends AbstractControllerInteg
      */
     @Test
     public void findAllTest() throws Exception {
+        String epersonToken = getAuthToken(eperson.getEmail(), password);
 
-        getClient().perform(get("/api/config/submissioncclicenses"))
+        getClient(epersonToken).perform(get("/api/config/submissioncclicenses"))
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$._embedded.submissioncclicenses", Matchers.containsInAnyOrder(
@@ -47,7 +48,9 @@ public class SubmissionCCLicenseRestRepositoryIT extends AbstractControllerInteg
 
     @Test
     public void findOneTest() throws Exception {
-        getClient().perform(get("/api/config/submissioncclicenses/license1"))
+        String epersonToken = getAuthToken(eperson.getEmail(), password);
+
+        getClient(epersonToken).perform(get("/api/config/submissioncclicenses/license1"))
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$", Matchers.is(
@@ -57,7 +60,23 @@ public class SubmissionCCLicenseRestRepositoryIT extends AbstractControllerInteg
 
     @Test
     public void findOneTestNonExistingLicense() throws Exception {
-        getClient().perform(get("/api/config/submissioncclicenses/non-existing-license"))
+        String epersonToken = getAuthToken(eperson.getEmail(), password);
+
+        getClient(epersonToken).perform(get("/api/config/submissioncclicenses/non-existing-license"))
                    .andExpect(status().isNotFound());
     }
+
+    @Test
+    public void findAllTestUnAuthorized() throws Exception {
+        getClient().perform(get("/api/config/submissioncclicenses"))
+                               .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    public void findOneTestUnAuthorized() throws Exception {
+
+        getClient().perform(get("/api/config/submissioncclicenses/license1"))
+                               .andExpect(status().isUnauthorized());
+    }
+
 }
