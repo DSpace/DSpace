@@ -20,7 +20,9 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
+import org.dspace.discovery.SearchServiceException;
 import org.dspace.eperson.Group;
+
 
 /**
  * Service interface class for the Collection object.
@@ -354,4 +356,34 @@ public interface CollectionService
      */
     Group createDefaultReadGroup(Context context, Collection collection, String typeOfGroupString, int defaultRead)
         throws SQLException, AuthorizeException;
+
+    /**
+     * 
+     * @param q                limit the returned collection to those with metadata values matching the query terms.
+     *                         The terms are used to make also a prefix query on SOLR so it can be used to implement
+     *                         an autosuggest feature over the collection name
+     * @param context          DSpace Context
+     * @param community        parent community
+     * @param offset           the position of the first result to return
+     * @param limit            paging limit
+     * @return                 discovery search result objects
+     * @throws SQLException              if something goes wrong
+     * @throws SearchServiceException    if search error
+     */
+    public List<Collection> findAuthorizedCollectionsInSOLR(String q, Context context, Community community,
+        int offset, int limit) throws SQLException, SearchServiceException;
+
+    /**
+     * 
+     * @param q                limit the returned collection to those with metadata values matching the query terms.
+     *                         The terms are used to make also a prefix query on SOLR so it can be used to implement
+     *                         an autosuggest feature over the collection name
+     * @param context          DSpace Context
+     * @param community        parent community
+     * @return                 total collections found
+     * @throws SQLException              if something goes wrong
+     * @throws SearchServiceException    if search error
+     */
+    public int countAuthorizedCollectionsInSOLR(String q, Context context, Community community)
+        throws SQLException, SearchServiceException;
 }

@@ -17,11 +17,13 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.MissingResourceException;
+import java.util.Set;
 import java.util.UUID;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
+import org.apache.solr.client.solrj.util.ClientUtils;
 import org.dspace.app.util.AuthorizeUtil;
 import org.dspace.authorize.AuthorizeConfiguration;
 import org.dspace.authorize.AuthorizeException;
@@ -40,6 +42,13 @@ import org.dspace.core.Context;
 import org.dspace.core.I18nUtil;
 import org.dspace.core.LogManager;
 import org.dspace.core.service.LicenseService;
+import org.dspace.discovery.DiscoverQuery;
+import org.dspace.discovery.DiscoverResult;
+import org.dspace.discovery.IndexableObject;
+import org.dspace.discovery.SearchService;
+import org.dspace.discovery.SearchServiceException;
+import org.dspace.discovery.indexobject.IndexableCollection;
+import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.service.GroupService;
 import org.dspace.eperson.service.SubscribeService;
@@ -99,6 +108,9 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
 
     @Autowired(required = true)
     protected CollectionRoleService collectionRoleService;
+
+    @Autowired(required = true)
+    protected SearchService searchService;
 
     protected CollectionServiceImpl() {
         super();
@@ -907,4 +919,66 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
         return role;
     }
 
+    @Override
+    public List<Collection> findAuthorizedCollectionsInSOLR(String q, Context context, Community community,
+        int offset, int limit) throws SQLException, SearchServiceException {
+
+        List<Collection> collections = new ArrayList<Collection>();
+        StringBuilder query = new StringBuilder();
+        DiscoverQuery discoverQuery = new DiscoverQuery();
+        discoverQuery.setDSpaceObjectFilter(IndexableCollection.TYPE);
+        discoverQuery.setStart(offset);
+        discoverQuery.setMaxResults(limit);
+        DiscoverResult resp = resultSolrQuery(context, query, discoverQuery,community, q);
+        for (IndexableObject solrCollections : resp.getIndexableObjects()) {
+            Collection c = ((IndexableCollection) solrCollections).getIndexedObject();
+            collections.add(c);
+        }
+        return collections;
+    }
+
+    @Override
+    public int countAuthorizedCollectionsInSOLR(String q, Context context, Community community)
+        throws SQLException, SearchServiceException {
+
+        StringBuilder query = new StringBuilder();
+        DiscoverQuery discoverQuery = new DiscoverQuery();
+        discoverQuery.setDSpaceObjectFilter(IndexableCollection.TYPE);
+        DiscoverResult resp = resultSolrQuery(context, query, discoverQuery,community,q);
+        return (int)resp.getTotalSearchResults();
+    }
+
+    private DiscoverResult resultSolrQuery(Context context, StringBuilder query, DiscoverQuery discoverQuery,
+                                   Community community, String q) throws SQLException, SearchServiceException {
+
+        EPerson currentUser = context.getCurrentUser();
+        if (!authorizeService.isAdmin(context)) {
+            Group anonymousGroup = groupService.findByName(context, Group.ANONYMOUS);
+            String anonGroupId = "";
+            if (anonymousGroup != null) {
+                anonGroupId = anonymousGroup.getID().toString();
+            }
+            query.append("submit:(g").append(anonGroupId);
+            if (currentUser != null) {
+                query.append(" OR e").append(currentUser.getID());
+            }
+            Set<Group> groups = groupService.allMemberGroupsSet(context, currentUser);
+            for (Group group : groups) {
+                query.append(" OR g").append(group.getID());
+            }
+            query.append(")");
+            discoverQuery.addFilterQueries(query.toString());
+        }
+        if (community != null) {
+            discoverQuery.addFilterQueries("location.comm:" + community.getID().toString());
+        }
+        if (StringUtils.isNotBlank(q)) {
+            StringBuilder buildQuery = new StringBuilder();
+            String escapedQuery = ClientUtils.escapeQueryChars(q);
+            buildQuery.append(escapedQuery).append(" OR ").append(escapedQuery).append("*");
+            discoverQuery.setQuery(buildQuery.toString());
+        }
+        DiscoverResult resp = searchService.search(context, discoverQuery);
+        return resp;
+    }
 }
