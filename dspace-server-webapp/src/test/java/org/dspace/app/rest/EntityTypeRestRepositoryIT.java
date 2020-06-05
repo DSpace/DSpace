@@ -162,28 +162,29 @@ public class EntityTypeRestRepositoryIT extends AbstractEntityIntegrationTest {
                 .withName("Parent Community")
                 .build();
             Collection col1 =
-                CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1").build();
-            Collection col2 =
-                CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 2").build();
-            Collection col3 =
-                CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 3").build();
-            Collection col4 =
-                CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 4").build();
-            CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
-
-            collectionService.addMetadata(context, col1, MetadataSchemaEnum.RELATIONSHIP.getName(), "type", null, null,
-                "JournalIssue");
-
-            collectionService.addMetadata(context, col2, MetadataSchemaEnum.RELATIONSHIP.getName(), "type", null, null,
-                "Publication");
-
-            collectionService.addMetadata(context, col3, MetadataSchemaEnum.RELATIONSHIP.getName(), "type", null, null,
-                "DataPackage");
-
-            collectionService.addMetadata(context, col4, MetadataSchemaEnum.RELATIONSHIP.getName(), "type", null, null,
-                "Journal");
+                CollectionBuilder.createCollection(context, parentCommunity)
+                        .withRelationshipType("JournalIssue")
+                        .withSubmitterGroup(eperson)
+                        .withName("Collection 1")
+                        .build();
+            Collection col2 = CollectionBuilder.createCollection(context, parentCommunity)
+                    .withRelationshipType("Publication")
+                    .withSubmitterGroup(eperson)
+                     .withName("Collection 2")
+                    .build();
+            Collection col3 = CollectionBuilder.createCollection(context, parentCommunity)
+                    .withRelationshipType("DataPackage")
+                    .withSubmitterGroup(eperson)
+                    .withName("Collection 3")
+                    .build();
+            Collection col4 = CollectionBuilder.createCollection(context, parentCommunity)
+                    .withRelationshipType("Journal")
+                    .withSubmitterGroup(eperson)
+                    .withName("Collection 4")
+                    .build();
 
             context.restoreAuthSystemState();
+
 
             context.setCurrentUser(eperson);
             String token = getAuthToken(eperson.getEmail(), password);
@@ -196,7 +197,6 @@ public class EntityTypeRestRepositoryIT extends AbstractEntityIntegrationTest {
                     EntityTypeMatcher.matchEntityTypeEntry(entityTypeService.findByEntityType(context, "DataPackage")),
                     EntityTypeMatcher.matchEntityTypeEntry(entityTypeService.findByEntityType(context, "Journal"))
                 )));
-            System.out.println("OK");
         } finally {
             CommunityBuilder.deleteCommunity(parentCommunity.getID());
         }
