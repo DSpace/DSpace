@@ -7,6 +7,8 @@
  */
 package org.dspace.app.rest;
 
+import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
+import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -193,6 +195,19 @@ public class AuthorityRestRepositoryIT extends AbstractControllerIntegrationTest
                 get("/api/integration/authorities/common_types/entryValues/Learning+Object"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.page.totalElements", Matchers.is(1)));
+    }
+
+    @Test
+    public void discoverableNestedLinkTest() throws Exception {
+        String token = getAuthToken(eperson.getEmail(), password);
+        getClient(token).perform(get("/api"))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$._links",Matchers.allOf(
+                                hasJsonPath("$.authorizations.href",
+                                         is("http://localhost/api/authz/authorizations")),
+                                hasJsonPath("$.authorization-search.href",
+                                         is("http://localhost/api/authz/authorization/search"))
+                        )));
     }
 
     @Test

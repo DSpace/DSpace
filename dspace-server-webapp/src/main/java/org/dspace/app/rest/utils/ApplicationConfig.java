@@ -36,8 +36,8 @@ public class ApplicationConfig {
     @Value("${rest.cors.allow-credentials:true}")
     private boolean corsAllowCredentials;
 
-    // Configured User Interface URL (default: http://localhost:3000)
-    @Value("${dspace.ui.url:http://localhost:3000}")
+    // Configured User Interface URL (default: http://localhost:4000)
+    @Value("${dspace.ui.url:http://localhost:4000}")
     private String uiURL;
 
     /**
