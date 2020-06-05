@@ -20,7 +20,7 @@
         <name-map collection-handle="default" submission-name="traditional"/>
         <name-map collection-handle="123456789/publication-1" submission-name="publication"/>
         <name-map collection-handle="123456789/language-test-1" submission-name="languagetestprocess"/>
-        <name-map collection-handle="123456789/2001" submission-name="patent"/>
+        <name-map collection-handle="123456789/patent-test" submission-name="patent"/>
     </submission-map>
 
 

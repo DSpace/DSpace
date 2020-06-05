@@ -44,7 +44,7 @@ public class WorkspaceItemPatentStepIT extends AbstractControllerIntegrationTest
     @Autowired
     private ConfigurationService configurationService;
 
-    private static final String patentCollectionHandle = "123456789/2001";
+    private static final String PATENT_COLLECTION_HANDLE_TEST = "123456789/patent-test";
 
     @Before
     @Override
@@ -71,7 +71,7 @@ public class WorkspaceItemPatentStepIT extends AbstractControllerIntegrationTest
         parentCommunity = CommunityBuilder.createCommunity(context).withName("Parent Community").build();
         Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity).withName("Sub Community")
                 .build();
-        Collection col1 = CollectionBuilder.createCollection(context, child1, patentCollectionHandle)
+        Collection col1 = CollectionBuilder.createCollection(context, child1, PATENT_COLLECTION_HANDLE_TEST)
                 .withName("Collection 1").build();
         String authToken = getAuthToken(admin.getEmail(), password);
 
@@ -154,7 +154,7 @@ public class WorkspaceItemPatentStepIT extends AbstractControllerIntegrationTest
         parentCommunity = CommunityBuilder.createCommunity(context).withName("Parent Community").build();
         Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity).withName("Sub Community")
                 .build();
-        Collection col1 = CollectionBuilder.createCollection(context, child1, patentCollectionHandle)
+        Collection col1 = CollectionBuilder.createCollection(context, child1, PATENT_COLLECTION_HANDLE_TEST)
                 .withName("Collection 1").build();
         String authToken = getAuthToken(admin.getEmail(), password);
 
@@ -238,7 +238,7 @@ public class WorkspaceItemPatentStepIT extends AbstractControllerIntegrationTest
         parentCommunity = CommunityBuilder.createCommunity(context).withName("Parent Community").build();
         Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity).withName("Sub Community")
                 .build();
-        Collection col1 = CollectionBuilder.createCollection(context, child1, patentCollectionHandle)
+        Collection col1 = CollectionBuilder.createCollection(context, child1, PATENT_COLLECTION_HANDLE_TEST)
                 .withName("Collection 1").build();
         String authToken = getAuthToken(admin.getEmail(), password);
 
@@ -284,7 +284,7 @@ public class WorkspaceItemPatentStepIT extends AbstractControllerIntegrationTest
         parentCommunity = CommunityBuilder.createCommunity(context).withName("Parent Community").build();
         Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity).withName("Sub Community")
                 .build();
-        Collection col1 = CollectionBuilder.createCollection(context, child1, patentCollectionHandle)
+        Collection col1 = CollectionBuilder.createCollection(context, child1, PATENT_COLLECTION_HANDLE_TEST)
                 .withName("Collection 1").build();
         String authToken = getAuthToken(admin.getEmail(), password);
 
