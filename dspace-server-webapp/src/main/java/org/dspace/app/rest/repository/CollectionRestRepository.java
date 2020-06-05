@@ -209,7 +209,7 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
                 '.');
             if (metadataField == null) {
                 throw new ResourceNotFoundException(
-                    "MetadataField relationship.type does not found");
+                        "MetadataField " + metadata + " does not found");
             }
             Community com = communityService.find(context, communityUuid);
             if (com == null) {
@@ -221,12 +221,13 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
 
             collections = collections.stream().filter(collection -> {
                 try {
-                    List<MetadataValue> metadataValues = this.collectionService.getMetadata(collection,
-                        metadata, Item.ANY);
+                    List<MetadataValue> metadataValues = collection.getMetadata();
                     if (StringUtils.isNotBlank(metadataValue)) {
                         return metadataValues.stream().map(x -> x.getValue()).anyMatch(x -> metadataValue.equals(x));
                     } else {
-                        return CollectionUtils.isNotEmpty(metadataValues);
+                        return metadataValues.stream().filter(
+                                x -> x.getMetadataField().toString().equals(metadata.replaceAll("\\.","_")))
+                                .findFirst().orElse(null) != null;
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
