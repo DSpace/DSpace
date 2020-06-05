@@ -34,8 +34,6 @@ public class EntityTypeRestRepositoryIT extends AbstractEntityIntegrationTest {
 
     @Autowired
     private EntityTypeService entityTypeService;
-    @Autowired
-    EntityTypeService entityTypeService;
     private EntityType publicationType;
     private EntityType journalType;
     private EntityType journalIssueType;
@@ -198,7 +196,7 @@ public class EntityTypeRestRepositoryIT extends AbstractEntityIntegrationTest {
                     EntityTypeMatcher.matchEntityTypeEntry(entityTypeService.findByEntityType(context, "DataPackage")),
                     EntityTypeMatcher.matchEntityTypeEntry(entityTypeService.findByEntityType(context, "Journal"))
                 )));
-
+            System.out.println("OK");
         } finally {
             CommunityBuilder.deleteCommunity(parentCommunity.getID());
         }
