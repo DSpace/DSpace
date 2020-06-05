@@ -31,9 +31,9 @@ import org.dspace.app.rest.projection.DefaultProjection;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.repository.DSpaceRestRepository;
 import org.dspace.app.rest.security.DSpacePermissionEvaluator;
-import org.dspace.app.rest.spel.ExpressionValidationException;
-import org.dspace.app.rest.spel.ExpressionValidator;
+import org.dspace.app.rest.security.WebSecurityExpressionEvaluator;
 import org.dspace.app.rest.utils.Utils;
+import org.dspace.services.RequestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider;
@@ -42,14 +42,9 @@ import org.springframework.core.type.filter.AssignableTypeFilter;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.expression.Expression;
-import org.springframework.expression.ExpressionParser;
-import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.Link;
-import org.springframework.security.access.expression.SecurityExpressionRoot;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
@@ -83,6 +78,12 @@ public class ConverterService {
     @Autowired
     private DSpacePermissionEvaluator dSpacePermissionEvaluator;
 
+    @Autowired
+    private WebSecurityExpressionEvaluator webSecurityExpressionEvaluator;
+
+    @Autowired
+    private RequestService requestService;
+
     /**
      * Converts the given model object to a rest object, using the appropriate {@link DSpaceConverter} and
      * the given projection.
@@ -106,19 +107,12 @@ public class ConverterService {
         DSpaceConverter<M, R> converter = requireConverter(modelObject.getClass());
         R restObject = converter.convert(transformedModel, projection);
         if (restObject instanceof BaseObjectRest) {
-            String permission = getPermissionForRestObject((BaseObjectRest) restObject);
-            if (!StringUtils.equalsIgnoreCase(permission, "permitAll")) {
-                if (StringUtils.equalsIgnoreCase(permission, "admin")) {
-                    //TODO
-                } else if (StringUtils.equalsIgnoreCase(permission, "authenticated")) {
-                    //TODO
-                } else {
-                    if (!dSpacePermissionEvaluator.hasPermission(SecurityContextHolder.getContext().getAuthentication(),
-                                                                 restObject, permission)) {
-                        log.info("Access denied on " + restObject.getClass());
-                        return null;
-                    }
-                }
+            String preAuthorizeValue = getPreAuthorizeAnnotationForBaseObject((BaseObjectRest) restObject);
+            if (!webSecurityExpressionEvaluator
+                .evaluate(preAuthorizeValue, requestService.getCurrentRequest().getHttpServletRequest(),
+                          requestService.getCurrentRequest().getHttpServletResponse())) {
+                log.info("Access denied on " + restObject.getClass());
+                return null;
             }
         }
         if (restObject instanceof RestModel) {
@@ -127,41 +121,21 @@ public class ConverterService {
         return restObject;
     }
 
-    private String getPermissionForRestObject(BaseObjectRest restObject) {
+    private String getPreAuthorizeAnnotationForBaseObject(BaseObjectRest restObject) {
         Annotation preAuthorize = getAnnotationForRestObject(restObject);
         if (preAuthorize == null) {
             preAuthorize = getDefaultFindOnePreAuthorize();
 
         }
-        String permission = "READ";
-        permission = parseAnnotation(preAuthorize);
-        return permission;
+        return parseAnnotation(preAuthorize);
+
     }
 
     private String parseAnnotation(Annotation preAuthorize) {
-        String permission = "";
         if (preAuthorize != null) {
-            String annotationValue = (String) AnnotationUtils.getValue(preAuthorize);
-            ExpressionValidator validator = new ExpressionValidator();
-            try {
-                validator.validate("hasPermission(123, 'ITEM', 'WRITE')", SecurityExpressionRoot.class);
-            } catch (ExpressionValidationException e) {
-                e.printStackTrace();
-            }
-
-//            ExpressionParser parser = new SpelExpressionParser();
-//            Expression exp = parser.parseExpression("hasPermission('123', 'ITEM', 'WRITE')");
-//            exp.getValue(SecurityExpressionRoot.class, boolean.class);
-            if (StringUtils.contains(annotationValue, "permitAll")) {
-                permission = "permitAll";
-            } else if (StringUtils.contains(annotationValue, "hasAuthority")) {
-                permission = StringUtils.substringBetween(annotationValue, "hasAuthority('", "')");
-            } else if (StringUtils.contains(annotationValue,"hasPermission")) {
-                permission = StringUtils.split(annotationValue, ",")[2];
-                permission = StringUtils.substringBetween(permission, "'");
-            }
+            return (String) AnnotationUtils.getValue(preAuthorize);
         }
-        return permission;
+        return null;
     }
 
     private Annotation getAnnotationForRestObject(BaseObjectRest restObject) {
@@ -410,19 +384,19 @@ public class ConverterService {
         ClassPathScanningCandidateComponentProvider provider = new ClassPathScanningCandidateComponentProvider(false);
         provider.addIncludeFilter(new AssignableTypeFilter(EntityModel.class));
         Set<BeanDefinition> beanDefinitions = provider.findCandidateComponents(
-                HALResource.class.getPackage().getName().replaceAll("\\.", "/"));
+            HALResource.class.getPackage().getName().replaceAll("\\.", "/"));
         for (BeanDefinition beanDefinition : beanDefinitions) {
             String resourceClassName = beanDefinition.getBeanClassName();
             String resourceClassSimpleName = resourceClassName.substring(resourceClassName.lastIndexOf(".") + 1);
             String restClassSimpleName = resourceClassSimpleName
-                    .replaceAll("ResourceWrapper$", "RestWrapper")
-                    .replaceAll("Resource$", "Rest");
+                .replaceAll("ResourceWrapper$", "RestWrapper")
+                .replaceAll("Resource$", "Rest");
             String restClassName = RestModel.class.getPackage().getName() + "." + restClassSimpleName;
             try {
                 Class<? extends RestModel> restClass =
-                        (Class<? extends RestModel>) Class.forName(restClassName);
+                    (Class<? extends RestModel>) Class.forName(restClassName);
                 Class<HALResource<? extends RestModel>> resourceClass =
-                        (Class<HALResource<? extends RestModel>>) Class.forName(resourceClassName);
+                    (Class<HALResource<? extends RestModel>>) Class.forName(resourceClassName);
                 Constructor compatibleConstructor = null;
                 for (Constructor constructor : resourceClass.getDeclaredConstructors()) {
                     if (constructor.getParameterCount() == 2 && constructor.getParameterTypes()[1] == Utils.class) {
@@ -436,11 +410,11 @@ public class ConverterService {
                     resourceConstructors.put(restClass, compatibleConstructor);
                 } else {
                     log.warn("Skipping registration of resource class " + resourceClassName
-                                    + "; compatible constructor not found");
+                                 + "; compatible constructor not found");
                 }
             } catch (ClassNotFoundException e) {
                 log.warn("Skipping registration of resource class " + resourceClassName
-                        + "; rest class not found: " + restClassName);
+                             + "; rest class not found: " + restClassName);
             }
         }
     }
