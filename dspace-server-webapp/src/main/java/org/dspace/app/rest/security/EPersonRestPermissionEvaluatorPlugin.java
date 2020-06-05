@@ -14,6 +14,7 @@ import java.util.UUID;
 
 import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.rest.model.patch.Patch;
+import org.dspace.app.rest.repository.patch.operation.DSpaceObjectMetadataPatchUtils;
 import org.dspace.app.rest.repository.patch.operation.EPersonPasswordReplaceOperation;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.authorize.service.AuthorizeService;
@@ -102,10 +103,11 @@ public class EPersonRestPermissionEvaluatorPlugin extends RestObjectPermissionEv
         /**
          * The entire Patch request should be denied if it contains operations that are
          * restricted to Dspace administrators. The authenticated user is currently allowed to
-         * update their own password.
+         * update their own password and their own metadata.
          */
         for (Operation op: operations) {
-            if (!op.getPath().contentEquals(EPersonPasswordReplaceOperation.OPERATION_PASSWORD_CHANGE)) {
+            if (!(op.getPath().contentEquals(EPersonPasswordReplaceOperation.OPERATION_PASSWORD_CHANGE)
+                || (op.getPath().startsWith(DSpaceObjectMetadataPatchUtils.OPERATION_METADATA_PATH)))) {
                 return false;
             }
         }

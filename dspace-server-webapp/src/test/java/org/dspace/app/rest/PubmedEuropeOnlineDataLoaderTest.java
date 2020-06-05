@@ -111,13 +111,13 @@ public class PubmedEuropeOnlineDataLoaderTest extends AbstractControllerIntegrat
             .andExpect(jsonPath("$.sections.publication.['dc.date.issued'][0].value",
                 is("2020-04-04")))
             .andExpect(jsonPath("$.sections.publication.['dc.contributor.author'][0].value",
-                is("Li, Guixia")))
-            .andExpect(jsonPath("$.sections.publication.['dc.contributor.author'][1].value",
                 is("Wang, Le")))
-            .andExpect(jsonPath("$.sections.publication.['dc.contributor.author'][2].value",
+            .andExpect(jsonPath("$.sections.publication.['dc.contributor.author'][1].value",
                 is("Yang, Shuo")))
+            .andExpect(jsonPath("$.sections.publication.['dc.contributor.author'][2].value",
+                is("Yan, Xiaotong")))
             .andExpect(jsonPath("$.sections.publication_indexing.['dc.description.abstract'][0].value",
-                is("<title>Abstract</title>  <p>  Background Acute respiratory tract infections " +
+                is("Abstract Background Acute respiratory tract infections " +
                     "(ARTI), including the common cold, pharyngitis, sinusitis, otitis media, " +
                     "tonsillitis, bronchiolitis and pneumonia are the most common diagnoses in " +
                     "pediatric patients, and account for most antibiotic prescriptions. A confirmed and " +
@@ -141,7 +141,7 @@ public class PubmedEuropeOnlineDataLoaderTest extends AbstractControllerIntegrat
                     "hospitalized children, except for Influenza B and coronavirus. A higher sensitivity " +
                     "was observed in the melting curve assay. By using this sensitive and rapid test, it " +
                     "may be possible to achieve improved patient prognosis and antimicrobial " +
-                    "management.  </p>")));
+                    "management.")));
 
         getClient(token).perform(get("/api/submission/workspaceitems/" + witem.getID()))
             .andExpect(status().isOk())
@@ -153,13 +153,13 @@ public class PubmedEuropeOnlineDataLoaderTest extends AbstractControllerIntegrat
             .andExpect(jsonPath("$.sections.publication.['dc.date.issued'][0].value",
                 is("2020-04-04")))
             .andExpect(jsonPath("$.sections.publication.['dc.contributor.author'][0].value",
-                is("Li, Guixia")))
-            .andExpect(jsonPath("$.sections.publication.['dc.contributor.author'][1].value",
                 is("Wang, Le")))
-            .andExpect(jsonPath("$.sections.publication.['dc.contributor.author'][2].value",
+            .andExpect(jsonPath("$.sections.publication.['dc.contributor.author'][1].value",
                 is("Yang, Shuo")))
+            .andExpect(jsonPath("$.sections.publication.['dc.contributor.author'][2].value",
+                is("Yan, Xiaotong")))
             .andExpect(jsonPath("$.sections.publication_indexing.['dc.description.abstract'][0].value",
-                is("<title>Abstract</title>  <p>  Background Acute respiratory tract infections " +
+                is("Abstract Background Acute respiratory tract infections " +
                     "(ARTI), including the common cold, pharyngitis, sinusitis, otitis media, " +
                     "tonsillitis, bronchiolitis and pneumonia are the most common diagnoses in " +
                     "pediatric patients, and account for most antibiotic prescriptions. A confirmed and " +
@@ -183,7 +183,7 @@ public class PubmedEuropeOnlineDataLoaderTest extends AbstractControllerIntegrat
                     "hospitalized children, except for Influenza B and coronavirus. A higher sensitivity " +
                     "was observed in the melting curve assay. By using this sensitive and rapid test, it " +
                     "may be possible to achieve improved patient prognosis and antimicrobial " +
-                    "management.  </p>")));
+                    "management.")));
     }
 
 
@@ -228,13 +228,13 @@ public class PubmedEuropeOnlineDataLoaderTest extends AbstractControllerIntegrat
             .andExpect(jsonPath("$.sections.publication.['dc.date.issued'][0].value",
                 is("2020-04-04")))
             .andExpect(jsonPath("$.sections.publication.['dc.contributor.author'][0].value",
-                is("Li, Guixia")))
-            .andExpect(jsonPath("$.sections.publication.['dc.contributor.author'][1].value",
                 is("Wang, Le")))
-            .andExpect(jsonPath("$.sections.publication.['dc.contributor.author'][2].value",
+            .andExpect(jsonPath("$.sections.publication.['dc.contributor.author'][1].value",
                 is("Yang, Shuo")))
+            .andExpect(jsonPath("$.sections.publication.['dc.contributor.author'][2].value",
+                is("Yan, Xiaotong")))
             .andExpect(jsonPath("$.sections.publication_indexing.['dc.description.abstract'][0].value",
-                is("<title>Abstract</title>  <p>  Background Acute respiratory tract infections " +
+                is("Abstract Background Acute respiratory tract infections " +
                     "(ARTI), including the common cold, pharyngitis, sinusitis, otitis media, " +
                     "tonsillitis, bronchiolitis and pneumonia are the most common diagnoses in " +
                     "pediatric patients, and account for most antibiotic prescriptions. A confirmed and " +
@@ -258,7 +258,7 @@ public class PubmedEuropeOnlineDataLoaderTest extends AbstractControllerIntegrat
                     "hospitalized children, except for Influenza B and coronavirus. A higher sensitivity " +
                     "was observed in the melting curve assay. By using this sensitive and rapid test, it " +
                     "may be possible to achieve improved patient prognosis and antimicrobial " +
-                    "management.  </p>")));
+                    "management.")));
 
         getClient(token).perform(get("/api/submission/workspaceitems/" + witem.getID()))
             .andExpect(status().isOk())
@@ -270,13 +270,13 @@ public class PubmedEuropeOnlineDataLoaderTest extends AbstractControllerIntegrat
             .andExpect(jsonPath("$.sections.publication.['dc.date.issued'][0].value",
                 is("2020-04-04")))
             .andExpect(jsonPath("$.sections.publication.['dc.contributor.author'][0].value",
-                is("Li, Guixia")))
-            .andExpect(jsonPath("$.sections.publication.['dc.contributor.author'][1].value",
                 is("Wang, Le")))
-            .andExpect(jsonPath("$.sections.publication.['dc.contributor.author'][2].value",
+            .andExpect(jsonPath("$.sections.publication.['dc.contributor.author'][1].value",
                 is("Yang, Shuo")))
+            .andExpect(jsonPath("$.sections.publication.['dc.contributor.author'][2].value",
+                is("Yan, Xiaotong")))
             .andExpect(jsonPath("$.sections.publication_indexing.['dc.description.abstract'][0].value",
-                is("<title>Abstract</title>  <p>  Background Acute respiratory tract infections " +
+                is("Abstract Background Acute respiratory tract infections " +
                     "(ARTI), including the common cold, pharyngitis, sinusitis, otitis media, " +
                     "tonsillitis, bronchiolitis and pneumonia are the most common diagnoses in " +
                     "pediatric patients, and account for most antibiotic prescriptions. A confirmed and " +
@@ -300,7 +300,7 @@ public class PubmedEuropeOnlineDataLoaderTest extends AbstractControllerIntegrat
                     "hospitalized children, except for Influenza B and coronavirus. A higher sensitivity " +
                     "was observed in the melting curve assay. By using this sensitive and rapid test, it " +
                     "may be possible to achieve improved patient prognosis and antimicrobial " +
-                    "management.  </p>")));
+                    "management.")));
 
     }
 

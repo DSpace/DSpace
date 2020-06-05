@@ -295,6 +295,8 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
             }
 
         }
+        context.commit();
+        context.reloadEntity(source);
         wsi = converter.toRest(source, utils.obtainProjection());
 
         if (!errors.isEmpty()) {
@@ -328,6 +330,7 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
 
     private void evaluatePatch(Context context, HttpServletRequest request, WorkspaceItem source, WorkspaceItemRest wsi,
                                String section, Operation op) {
+        boolean sectionExist = false;
         SubmissionConfig submissionConfig = submissionConfigReader
             .getSubmissionConfigByName(wsi.getSubmissionDefinition().getName());
         for (int stepNum = 0; stepNum < submissionConfig.getNumberOfSteps(); stepNum++) {
@@ -335,6 +338,7 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
             SubmissionStepConfig stepConfig = submissionConfig.getStep(stepNum);
 
             if (section.equals(stepConfig.getId())) {
+                sectionExist = true;
                 /*
                  * First, load the step processing class (using the current
                  * class loader)
@@ -351,7 +355,8 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
                         AbstractRestProcessingStep stepProcessing =
                             (AbstractRestProcessingStep) stepClass.newInstance();
                         stepProcessing.doPreProcessing(context, source);
-                        stepProcessing.doPatchProcessing(context, getRequestService().getCurrentRequest(), source, op);
+                        stepProcessing.doPatchProcessing(context,
+                                       getRequestService().getCurrentRequest(), source, op, stepConfig);
                         stepProcessing.doPostProcessing(context, source);
                     } else {
                         throw new DSpaceBadRequestException(
@@ -360,14 +365,18 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
                             " Therefore it cannot be used by the Configurable Submission as the <processing-class>!");
                     }
 
-                } catch (UnprocessableEntityException ue) {
-                    log.error(ue.getMessage(), ue);
-                    throw ue;
+                } catch (UnprocessableEntityException e) {
+                    log.error(e.getMessage(), e);
+                    throw new UnprocessableEntityException("Error processing the patch request", e);
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
                     throw new PatchException("Error processing the patch request", e);
                 }
             }
+        }
+        if (!sectionExist) {
+            throw new UnprocessableEntityException("The section with name " + section +
+                                                   " does not exist in this submission!");
         }
     }
 
