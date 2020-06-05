@@ -7,15 +7,9 @@
  */
 package org.dspace.app.rest;
 
-import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.is;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 import org.dspace.app.rest.builder.CollectionBuilder;
 import org.dspace.app.rest.builder.CommunityBuilder;
+import org.dspace.app.rest.builder.EntityTypeBuilder;
 import org.dspace.app.rest.matcher.EntityTypeMatcher;
 import org.dspace.app.rest.test.AbstractEntityIntegrationTest;
 import org.dspace.content.Collection;
@@ -24,14 +18,58 @@ import org.dspace.content.MetadataSchemaEnum;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.EntityTypeService;
+import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.is;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 public class EntityTypeRestRepositoryIT extends AbstractEntityIntegrationTest {
 
 
     @Autowired
     private EntityTypeService entityTypeService;
+    @Autowired
+    EntityTypeService entityTypeService;
+    private EntityType publicationType;
+    private EntityType journalType;
+    private EntityType journalIssueType;
+    private EntityType orgUnitType;
+    private EntityType dataPackageType;
+
+    @Before
+    @Override
+    public void setUp() throws Exception {
+        super.setUp();
+        context.turnOffAuthorisationSystem();
+
+        publicationType = entityTypeService.findByEntityType(context, "Publication");
+        if (publicationType == null) {
+            publicationType = EntityTypeBuilder.createEntityTypeBuilder(context, "Publication").build();
+        }
+        journalType = entityTypeService.findByEntityType(context, "Journal");
+        if (journalType == null) {
+            journalType = EntityTypeBuilder.createEntityTypeBuilder(context, "Journal").build();
+        }
+        orgUnitType = entityTypeService.findByEntityType(context, "OrgUnit");
+        if (orgUnitType == null) {
+            orgUnitType = EntityTypeBuilder.createEntityTypeBuilder(context, "OrgUnit").build();
+        }
+        dataPackageType = entityTypeService.findByEntityType(context, "DataPackage");
+        if (dataPackageType == null) {
+            dataPackageType = EntityTypeBuilder.createEntityTypeBuilder(context, "DataPackage").build();
+        }
+        journalIssueType = entityTypeService.findByEntityType(context, "JournalIssue");
+        if (journalIssueType == null) {
+            journalIssueType = EntityTypeBuilder.createEntityTypeBuilder(context, "JournalIssue").build();
+        }
+        context.restoreAuthSystemState();
+    }
 
     @Test
     public void getAllEntityTypeEndpoint() throws Exception {
