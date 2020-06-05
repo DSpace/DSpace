@@ -23,7 +23,7 @@ public class CrisLayoutBoxMatcher {
                 hasJsonPath("$.id", is(box.getID())),
                 hasJsonPath("$.shortname", is(box.getShortname())),
                 hasJsonPath("$.header", is(box.getHeader())),
-                hasJsonPath("$.entity-type", is(box.getEntitytype().getLabel())),
+                hasJsonPath("$.entityType", is(box.getEntitytype().getLabel())),
                 hasJsonPath("$.collapsed", is(box.getCollapsed())),
                 hasJsonPath("$.minor", is(box.getMinor())),
                 hasJsonPath("$.style", is(box.getStyle())),

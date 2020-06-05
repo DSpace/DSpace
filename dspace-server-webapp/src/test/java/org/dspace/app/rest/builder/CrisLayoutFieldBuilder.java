@@ -68,10 +68,13 @@ public class CrisLayoutFieldBuilder extends AbstractBuilder<CrisLayoutField, Cri
         return this;
     }
 
-    /* (non-Javadoc)
-     * @see org.dspace.app.rest.builder.AbstractBuilder#delete(java.lang.Object)
-     */
     @Override
+    public void delete(Context c, CrisLayoutField dso) throws Exception {
+        if (dso != null) {
+            getService().delete(c, dso);
+        }
+    }
+
     public void delete(CrisLayoutField dso) throws Exception {
         try (Context c = new Context()) {
             c.turnOffAuthorisationSystem();

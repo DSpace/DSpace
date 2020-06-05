@@ -67,6 +67,12 @@ public class CrisLayoutBoxBuilder extends AbstractBuilder<CrisLayoutBox, CrisLay
     }
 
     @Override
+    public void delete(Context c, CrisLayoutBox dso) throws Exception {
+        if ( dso != null ) {
+            getService().delete(c, dso);
+        }
+    }
+
     public void delete(CrisLayoutBox dso) throws Exception {
         try (Context c = new Context()) {
             c.turnOffAuthorisationSystem();

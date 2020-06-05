@@ -68,6 +68,12 @@ public class CrisLayoutTabBuilder extends AbstractBuilder<CrisLayoutTab, CrisLay
     }
 
     @Override
+    public void delete(Context c, CrisLayoutTab tab) throws Exception {
+        if (tab != null) {
+            getService().delete(c, tab);
+        }
+    }
+
     public void delete(CrisLayoutTab tab) throws Exception {
         try (Context c = new Context()) {
             c.turnOffAuthorisationSystem();
