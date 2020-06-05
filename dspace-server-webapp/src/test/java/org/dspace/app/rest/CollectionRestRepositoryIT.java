@@ -7,51 +7,6 @@
  */
 package org.dspace.app.rest;
 
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
-import java.util.concurrent.atomic.AtomicReference;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.dspace.app.rest.builder.CollectionBuilder;
-import org.dspace.app.rest.builder.CommunityBuilder;
-import org.dspace.app.rest.builder.EPersonBuilder;
-import org.dspace.app.rest.builder.EntityTypeBuilder;
-import org.dspace.app.rest.builder.MetadataFieldBuilder;
-import org.dspace.app.rest.builder.MetadataSchemaBuilder;
-import org.dspace.app.rest.builder.ResourcePolicyBuilder;
-import org.dspace.app.rest.converter.ConverterService;
-import org.dspace.app.rest.matcher.CollectionMatcher;
-import org.dspace.app.rest.matcher.CommunityMatcher;
-import org.dspace.app.rest.matcher.HalMatcher;
-import org.dspace.app.rest.matcher.MetadataMatcher;
-import org.dspace.app.rest.matcher.PageMatcher;
-import org.dspace.app.rest.model.CollectionRest;
-import org.dspace.app.rest.model.MetadataRest;
-import org.dspace.app.rest.model.MetadataValueRest;
-import org.dspace.app.rest.projection.Projection;
-import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
-import org.dspace.app.rest.test.MetadataPatchSuite;
-import org.dspace.authorize.service.AuthorizeService;
-import org.dspace.authorize.service.ResourcePolicyService;
-import org.dspace.content.Collection;
-import org.dspace.content.Community;
-import org.dspace.content.EntityType;
-import org.dspace.content.MetadataField;
-import org.dspace.content.MetadataSchema;
-import org.dspace.content.MetadataValue;
-import org.dspace.content.service.EntityTypeService;
-import org.dspace.content.service.MetadataFieldService;
-import org.dspace.content.service.MetadataSchemaService;
-import org.dspace.content.service.MetadataValueService;
-import org.dspace.core.Constants;
-import org.dspace.eperson.EPerson;
-import org.hamcrest.Matchers;
-import org.junit.Before;
-import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
-
 import static com.jayway.jsonpath.JsonPath.read;
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadata;
@@ -70,6 +25,48 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.atomic.AtomicReference;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.dspace.app.rest.builder.CollectionBuilder;
+import org.dspace.app.rest.builder.CommunityBuilder;
+import org.dspace.app.rest.builder.EPersonBuilder;
+import org.dspace.app.rest.builder.EntityTypeBuilder;
+import org.dspace.app.rest.builder.ResourcePolicyBuilder;
+import org.dspace.app.rest.converter.ConverterService;
+import org.dspace.app.rest.matcher.CollectionMatcher;
+import org.dspace.app.rest.matcher.CommunityMatcher;
+import org.dspace.app.rest.matcher.HalMatcher;
+import org.dspace.app.rest.matcher.MetadataMatcher;
+import org.dspace.app.rest.matcher.PageMatcher;
+import org.dspace.app.rest.model.CollectionRest;
+import org.dspace.app.rest.model.MetadataRest;
+import org.dspace.app.rest.model.MetadataValueRest;
+import org.dspace.app.rest.projection.Projection;
+import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
+import org.dspace.app.rest.test.MetadataPatchSuite;
+import org.dspace.authorize.service.AuthorizeService;
+import org.dspace.authorize.service.ResourcePolicyService;
+import org.dspace.content.Collection;
+import org.dspace.content.Community;
+import org.dspace.content.EntityType;
+import org.dspace.content.MetadataValue;
+import org.dspace.content.service.EntityTypeService;
+import org.dspace.content.service.MetadataFieldService;
+import org.dspace.content.service.MetadataSchemaService;
+import org.dspace.content.service.MetadataValueService;
+import org.dspace.core.Constants;
+import org.dspace.eperson.EPerson;
+import org.hamcrest.Matchers;
+import org.junit.Before;
+import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
+
 
 public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTest {
 
@@ -100,16 +97,16 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
         context.turnOffAuthorisationSystem();
 
         publicationType = entityTypeService.findByEntityType(context, "Publication");
-        if(publicationType == null) {
+        if (publicationType == null) {
             publicationType = EntityTypeBuilder.createEntityTypeBuilder(context, "Publication").build();
         }
         journalType = entityTypeService.findByEntityType(context, "Journal");
-        if(journalType == null) {
+        if (journalType == null) {
             journalType = EntityTypeBuilder.createEntityTypeBuilder(context, "Journal").build();
         }
         orgUnitType = entityTypeService.findByEntityType(context, "OrgUnit");
-        if(orgUnitType == null) {
-            orgUnitType =  EntityTypeBuilder.createEntityTypeBuilder(context, "OrgUnit").build();
+        if (orgUnitType == null) {
+            orgUnitType = EntityTypeBuilder.createEntityTypeBuilder(context, "OrgUnit").build();
         }
         context.restoreAuthSystemState();
     }
@@ -587,7 +584,6 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                 .andExpect(jsonPath("$.page.totalElements", equalTo(1)))
                 .andExpect(jsonPath("$._embedded.collections[0].metadata['relationship.type'][0].value",
                     equalTo(entityType)));
-            System.out.println("OK");
         } finally {
 
         }
@@ -634,8 +630,6 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                 .andExpect(jsonPath("$._embedded.collections", containsInAnyOrder(
                     CollectionMatcher.matchCollection(col1),
                     CollectionMatcher.matchCollection(col2))));
-
-            System.out.println("OK");
 
         } finally {
 
@@ -689,7 +683,6 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                     CollectionMatcher.matchCollection(col3))))
                 .andExpect(jsonPath("$._embedded.collections",
                     not(contains(CollectionMatcher.matchCollection(colWithoutMetadata)))));
-            System.out.println("OK");
 
         } finally {
 

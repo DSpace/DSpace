@@ -19,7 +19,6 @@ import javax.servlet.http.HttpServletRequest;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.Parameter;
@@ -225,9 +224,11 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
                     if (StringUtils.isNotBlank(metadataValue)) {
                         return metadataValues.stream().map(x -> x.getValue()).anyMatch(x -> metadataValue.equals(x));
                     } else {
-                        return metadataValues.stream().filter(
-                                x -> x.getMetadataField().toString().equals(metadata.replaceAll("\\.","_")))
-                                .findFirst().orElse(null) != null;
+                        MetadataValue value = metadataValues.stream().
+                                filter(x -> x.getMetadataField().toString().equals(metadata.replaceAll("\\.", "_")))
+                                .findFirst()
+                                .orElse(null);
+                        return value != null;
                     }
                 } catch (Exception e) {
                     e.printStackTrace();

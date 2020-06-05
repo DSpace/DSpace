@@ -7,6 +7,23 @@
  */
 package org.dspace.app.rest;
 
+import static com.jayway.jsonpath.JsonPath.read;
+import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
+import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadata;
+import static org.hamcrest.Matchers.allOf;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
+import static org.springframework.data.rest.webmvc.RestMediaTypes.TEXT_URI_LIST_VALUE;
+import static org.springframework.http.MediaType.parseMediaType;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.fileUpload;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -56,22 +73,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MvcResult;
 
-import static com.jayway.jsonpath.JsonPath.read;
-import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
-import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadata;
-import static org.hamcrest.Matchers.allOf;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
-import static org.springframework.data.rest.webmvc.RestMediaTypes.TEXT_URI_LIST_VALUE;
-import static org.springframework.http.MediaType.parseMediaType;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.fileUpload;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
  * Test suite for the WorkspaceItem endpoint
@@ -114,16 +115,16 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
 
         anonymousGroup = EPersonServiceFactory.getInstance().getGroupService().findByName(context, Group.ANONYMOUS);
         publicationType = entityTypeService.findByEntityType(context, "Publication");
-        if(publicationType == null) {
+        if (publicationType == null) {
             publicationType = EntityTypeBuilder.createEntityTypeBuilder(context, "Publication").build();
         }
         journalType = entityTypeService.findByEntityType(context, "Journal");
-        if(journalType == null) {
+        if (journalType == null) {
             journalType = EntityTypeBuilder.createEntityTypeBuilder(context, "Journal").build();
         }
         orgUnitType = entityTypeService.findByEntityType(context, "OrgUnit");
-        if(orgUnitType == null) {
-            orgUnitType =  EntityTypeBuilder.createEntityTypeBuilder(context, "OrgUnit").build();
+        if (orgUnitType == null) {
+            orgUnitType = EntityTypeBuilder.createEntityTypeBuilder(context, "OrgUnit").build();
         }
         context.restoreAuthSystemState();
     }
@@ -1341,11 +1342,11 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         //** GIVEN **
         //1. A community-collection structure with one parent community with sub-community and two collections.
         parentCommunity = CommunityBuilder.createCommunity(context)
-                                          .withName("Parent Community")
-                                          .build();
+                .withName("Parent Community")
+                .build();
         Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
-                                           .withName("Sub Community")
-                                           .build();
+                .withName("Sub Community")
+                .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
         String authToken = getAuthToken(admin.getEmail(), password);
 
@@ -3196,12 +3197,12 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         context.restoreAuthSystemState();
         // upload the file in our workspaceitem
         getClient(authToken).perform(fileUpload("/api/submission/workspaceitems/" + witem.getID())
-            .file(pdfFile))
-            .andExpect(status().isCreated())
-            .andExpect(jsonPath("$.sections.upload.files[0].metadata['dc.title'][0].value",
-                is("simple-article.pdf")))
-            .andExpect(jsonPath("$.sections.upload.files[0].metadata['dc.source'][0].value",
-                is("/local/path/simple-article.pdf")))
+                .file(pdfFile))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.sections.upload.files[0].metadata['dc.title'][0].value",
+                        is("simple-article.pdf")))
+                .andExpect(jsonPath("$.sections.upload.files[0].metadata['dc.source'][0].value",
+                        is("/local/path/simple-article.pdf")))
         ;
 
         //Verify there are no errors since file was uploaded (with upload required set to true)
@@ -4017,7 +4018,6 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                     .contentType(org.springframework.http.MediaType.APPLICATION_JSON))
                     .andExpect(status().isUnprocessableEntity())
                     .andExpect(jsonPath("$.id").doesNotExist());
-
 
 
         } finally {
