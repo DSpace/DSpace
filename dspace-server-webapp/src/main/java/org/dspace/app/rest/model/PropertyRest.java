@@ -11,13 +11,12 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.dspace.app.rest.RestResourceController;
-import org.springframework.hateoas.Identifiable;
 
 /**
  * This class acts as the REST representation of a DSpace configuration property.
  * This class acts as a data holder for the PropertyResource
  */
-public class PropertyRest extends RestAddressableModel implements Identifiable<String> {
+public class PropertyRest extends BaseObjectRest<String> {
     public static final String NAME = "property";
     public static final String CATEGORY = RestAddressableModel.CONFIGURATION;
 
