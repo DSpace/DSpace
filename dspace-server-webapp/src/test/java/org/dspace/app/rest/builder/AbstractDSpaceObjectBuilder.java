@@ -51,7 +51,7 @@ public abstract class AbstractDSpaceObjectBuilder<T extends DSpaceObject>
 
     protected <B> B handleException(final Exception e) {
         log.error(e.getMessage(), e);
-        return null;
+        throw new RuntimeException(e);
     }
 
 
