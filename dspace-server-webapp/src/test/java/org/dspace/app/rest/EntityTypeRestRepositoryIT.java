@@ -7,13 +7,6 @@
  */
 package org.dspace.app.rest;
 
-import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.is;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 import org.dspace.app.rest.builder.CollectionBuilder;
 import org.dspace.app.rest.builder.CommunityBuilder;
 import org.dspace.app.rest.builder.EntityTypeBuilder;
@@ -25,6 +18,13 @@ import org.dspace.content.service.EntityTypeService;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.is;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
 
@@ -38,6 +38,9 @@ public class EntityTypeRestRepositoryIT extends AbstractEntityIntegrationTest {
     private EntityType journalIssueType;
     private EntityType orgUnitType;
     private EntityType dataPackageType;
+    private EntityType personType;
+    private EntityType journalVolumeType;
+    private EntityType projectType;
 
     @Before
     @Override
@@ -53,18 +56,27 @@ public class EntityTypeRestRepositoryIT extends AbstractEntityIntegrationTest {
         if (journalType == null) {
             journalType = EntityTypeBuilder.createEntityTypeBuilder(context, "Journal").build();
         }
-        orgUnitType = entityTypeService.findByEntityType(context, "OrgUnit");
-        if (orgUnitType == null) {
-            orgUnitType = EntityTypeBuilder.createEntityTypeBuilder(context, "OrgUnit").build();
+        personType = entityTypeService.findByEntityType(context, "Person");
+        if (personType == null) {
+            personType = EntityTypeBuilder.createEntityTypeBuilder(context, "Person").build();
         }
-        dataPackageType = entityTypeService.findByEntityType(context, "DataPackage");
-        if (dataPackageType == null) {
-            dataPackageType = EntityTypeBuilder.createEntityTypeBuilder(context, "DataPackage").build();
+        projectType = entityTypeService.findByEntityType(context, "Project");
+        if (projectType == null) {
+            projectType = EntityTypeBuilder.createEntityTypeBuilder(context, "Project").build();
+        }
+        journalVolumeType = entityTypeService.findByEntityType(context, "JournalVolume");
+        if (journalVolumeType == null) {
+            journalVolumeType = EntityTypeBuilder.createEntityTypeBuilder(context, "JournalVolume").build();
         }
         journalIssueType = entityTypeService.findByEntityType(context, "JournalIssue");
         if (journalIssueType == null) {
             journalIssueType = EntityTypeBuilder.createEntityTypeBuilder(context, "JournalIssue").build();
         }
+        orgUnitType = entityTypeService.findByEntityType(context, "OrgUnit");
+        if (orgUnitType == null) {
+            orgUnitType = EntityTypeBuilder.createEntityTypeBuilder(context, "OrgUnit").build();
+        }
+
         context.restoreAuthSystemState();
     }
 
@@ -172,7 +184,7 @@ public class EntityTypeRestRepositoryIT extends AbstractEntityIntegrationTest {
                      .withName("Collection 2")
                     .build();
             Collection col3 = CollectionBuilder.createCollection(context, parentCommunity)
-                    .withRelationshipType("DataPackage")
+                    .withRelationshipType("Project")
                     .withSubmitterGroup(eperson)
                     .withName("Collection 3")
                     .build();
@@ -193,7 +205,7 @@ public class EntityTypeRestRepositoryIT extends AbstractEntityIntegrationTest {
                     EntityTypeMatcher
                         .matchEntityTypeEntry(entityTypeService.findByEntityType(context, "JournalIssue")),
                     EntityTypeMatcher.matchEntityTypeEntry(entityTypeService.findByEntityType(context, "Publication")),
-                    EntityTypeMatcher.matchEntityTypeEntry(entityTypeService.findByEntityType(context, "DataPackage")),
+                    EntityTypeMatcher.matchEntityTypeEntry(entityTypeService.findByEntityType(context, "Project")),
                     EntityTypeMatcher.matchEntityTypeEntry(entityTypeService.findByEntityType(context, "Journal"))
                 )));
         } finally {
