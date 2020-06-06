@@ -7,6 +7,13 @@
  */
 package org.dspace.app.rest;
 
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.is;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import org.dspace.app.rest.builder.CollectionBuilder;
 import org.dspace.app.rest.builder.CommunityBuilder;
 import org.dspace.app.rest.builder.EntityTypeBuilder;
@@ -18,15 +25,6 @@ import org.dspace.content.service.EntityTypeService;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.is;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
-
 
 public class EntityTypeRestRepositoryIT extends AbstractEntityIntegrationTest {
 
