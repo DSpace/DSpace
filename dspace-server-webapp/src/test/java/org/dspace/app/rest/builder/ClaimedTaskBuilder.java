@@ -129,6 +129,7 @@ public class ClaimedTaskBuilder extends AbstractBuilder<ClaimedTask, ClaimedTask
     public void cleanup() throws Exception {
         try (Context c = new Context()) {
             c.turnOffAuthorisationSystem();
+            // Ensure object and any related objects are reloaded before checking to see what needs cleanup
             workspaceItem = c.reloadEntity(workspaceItem);
             workflowItem = c.reloadEntity(workflowItem);
             if (workspaceItem != null) {

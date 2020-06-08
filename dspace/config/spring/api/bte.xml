@@ -25,6 +25,9 @@
 				<entry key="tsv" value-ref="tsvDataLoader" />
 				<entry key="oai" value-ref="oaipmhDataLoader" />
 				<entry key="grobid" value-ref="grobidDataLoader" />
+				<!--
+				<entry key="epo" value-ref="epoOnlineDataLoader" />
+				-->
 			</map>
 		</property>
 		
@@ -126,6 +129,7 @@
 	            <entry key="scopus" value-ref="scopusOnlineDataLoader"/>
 	            <entry key="scival" value-ref="scivalOnlineDataLoader"/>
 	            <entry key="wos" value-ref="wosOnlineDataLoader"/>
+				<entry key="epo" value-ref="epoOnlineDataLoader" />
 			</map>
 	    </property>
 	</bean>
@@ -684,6 +688,33 @@
 		</constructor-arg>
 	</bean>
 
+	<!-- EPO Data Loaders -->
+	<bean id="epoOnlineDataLoader" class="org.dspace.submit.lookup.EPOOnlineDataLoader"
+		scope="prototype">
+		<property name="searchProvider" value="false" />
+		<property name="fieldMap" ref="epoInputMap" />
+		<property name="configurationService" ref="org.dspace.services.ConfigurationService"/>
+	</bean>
+
+	<alias name="epoOnlineDataLoader"
+		alias="org.dspace.submit.lookup.EPOOnlineDataLoader" />
+
+	<bean name="epoInputMap" class="java.util.HashMap" scope="prototype">
+		<constructor-arg>
+			<map key-type="java.lang.String" value-type="java.lang.String">
+				<entry key="applicationnumber" value="applicationnumber" />
+				<entry key="publicationnumber" value="patentno" />
+				<entry key="applicant" value="applicant" />
+				<entry key="inventor" value="authors" />
+				<entry key="inventiontitle" value="title" />
+				<entry key="abstract" value="abstract" />
+				<entry key="dateissued" value="issued" />
+				<entry key="datefilled" value="applicationdate" />
+				<entry key="ipc" value="ipc" />
+			</map>
+		</constructor-arg>
+	</bean>
+
 	<!-- Grobid -->
 	
 	<bean id="grobidDataLoader" class="org.dspace.submit.extraction.GrobidFileDataLoader">
@@ -701,7 +732,7 @@
 				<entry key="profiledesckeywordsterm" value="allkeywords" />
 			</map>
 		</property>
-	</bean>	
+	</bean>
 
 	<!-- **************************************************************************************************** -->
 	<!-- Output Mapping 																					  -->
@@ -732,6 +763,12 @@
 				<entry value="arxivCategory" key="dc.subject" />
 				<entry value="doi" key="dc.identifier" />
 				<entry value="publisher" key="dc.publisher" />
+				<entry value="patentno" key="dc.identifier.patentno" />
+				<entry value="patentno" key="dc.identifier.patentnumber" />
+				<entry value="applicationnumber" key="dc.identifier.applicationnumber" />
+				<entry value="applicant" key ="dc.contributor.applicant" />
+				<entry value="applicationdate" key="dc.date.filled" />
+				<entry value="ipc" key="dc.subject.ipc" />
 				<!-- Not used - new metadata fields need to be declared for them in DSpace registry -->
 				<!-- 
 				<entry value="url" key="" />

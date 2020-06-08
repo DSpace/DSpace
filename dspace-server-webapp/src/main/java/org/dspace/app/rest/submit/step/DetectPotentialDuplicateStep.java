@@ -33,6 +33,7 @@ import org.dspace.content.InProgressSubmission;
 import org.dspace.content.Item;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.core.Context;
+import org.dspace.services.RequestService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.services.model.Request;
 import org.dspace.submit.AbstractProcessingStep;
@@ -73,11 +74,15 @@ public class DetectPotentialDuplicateStep extends AbstractProcessingStep impleme
     private Map<UUID, DuplicateMatch> processPotentialDuplicates(UUID itemID, boolean check,
             List<DuplicateItemInfo> potentialDuplicates) {
         Map<UUID, DuplicateMatch> matches = new HashMap<UUID, DuplicateMatch>();
-
+        //FIXME we need to find a more strict rule about when potential duplicate can be seen
+        RequestService requestService = new DSpace().getServiceManager().getServiceByName(
+                RequestService.class.getName(), RequestService.class);
+        Request request = requestService.getCurrentRequest();
+        Context context = ContextUtil.obtainContext(request.getServletRequest());
+        context.turnOffAuthorisationSystem();
         for (DuplicateItemInfo itemInfo : potentialDuplicates) {
             DuplicateMatch match = new DuplicateMatch();
             DSpaceObject duplicateItem = itemInfo.getDuplicateItem();
-
             match.setMatchObject(ConverterServiceFactoryImpl.getInstance().getConverterService()
                     .toRest((Item) duplicateItem, Projection.DEFAULT));
             match.setSubmitterDecision(itemInfo.getDecision(DuplicateDecisionType.WORKSPACE));
@@ -91,6 +96,7 @@ public class DetectPotentialDuplicateStep extends AbstractProcessingStep impleme
                 matches.put((UUID) duplicateItem.getID(), match);
             }
         }
+        context.restoreAuthSystemState();
 
         return matches;
     }

@@ -368,23 +368,18 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
                    //We expect the content type to be "application/hal+json;charset=UTF-8"
                    .andExpect(content().contentType(contentType))
 
-                   //We expect only the two public items and the embargoed item to be present
                    .andExpect(jsonPath("$.page.size", is(20)))
-                   .andExpect(jsonPath("$.page.totalElements", is(3)))
+                   .andExpect(jsonPath("$.page.totalElements", is(2)))
                    .andExpect(jsonPath("$.page.totalPages", is(1)))
                    .andExpect(jsonPath("$.page.number", is(0)))
 
-                   //Verify that the title of the public and embargoed items are present and sorted descending
                    .andExpect(jsonPath("$._embedded.items",
                                        contains(ItemMatcher.matchItemWithTitleAndDateIssued(publicItem2,
                                                                                             "Public item 2",
                                                                                             "2016-02-13"),
                                                 ItemMatcher.matchItemWithTitleAndDateIssued(publicItem1,
                                                                                             "Public item 1",
-                                                                                            "2017-10-17"),
-                                                ItemMatcher.matchItemWithTitleAndDateIssued(embargoedItem,
-                                                                                            "An embargoed publication",
-                                                                                            "2017-08-10"))))
+                                                                                            "2017-10-17"))))
 
                    //The private and internal items must not be present
                    .andExpect(jsonPath("$._embedded.items[*].metadata", Matchers.allOf(

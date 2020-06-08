@@ -772,4 +772,39 @@
     <scope_note></scope_note>
   </dc-type>
 
+  <dc-type>
+	<schema>dc</schema>
+    <element>identifier</element>
+    <qualifier>patentnumber</qualifier>
+    <scope_note></scope_note>
+  </dc-type>
+
+  <dc-type>
+    <schema>dc</schema>
+    <element>identifier</element>
+    <qualifier>applicationnumber</qualifier>
+    <scope_note></scope_note>
+  </dc-type>
+
+  <dc-type>
+    <schema>dc</schema>
+    <element>contributor</element>
+    <qualifier>applicant</qualifier>
+    <scope_note></scope_note>
+  </dc-type>
+
+  <dc-type>
+    <schema>dc</schema>
+    <element>date</element>
+    <qualifier>filled</qualifier>
+    <scope_note></scope_note>
+  </dc-type>
+
+  <dc-type>
+    <schema>dc</schema>
+    <element>subject</element>
+    <qualifier>ipc</qualifier>
+    <scope_note></scope_note>
+  </dc-type>
+
 </dspace-dc-types>

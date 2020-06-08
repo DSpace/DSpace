@@ -108,7 +108,7 @@ public class ClaimedTaskRestRepository extends DSpaceRestRepository<ClaimedTaskR
             if (authorizeService.isAdmin(context) || userID.equals(currentUser.getID())) {
                 EPerson ep = epersonService.find(context, userID);
                 List<ClaimedTask> tasks = claimedTaskService.findByEperson(context, ep);
-                return converter.toRestPage(utils.getPage(tasks, pageable), utils.obtainProjection());
+                return converter.toRestPage(tasks, pageable, utils.obtainProjection());
             } else {
                 throw new RESTAuthorizationException("Only administrators can search for claimed tasks of other users");
             }
