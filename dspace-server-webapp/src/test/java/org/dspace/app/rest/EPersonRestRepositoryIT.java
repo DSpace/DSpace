@@ -32,7 +32,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 import javax.ws.rs.core.MediaType;
@@ -68,7 +67,6 @@ import org.dspace.eperson.service.RegistrationDataService;
 import org.hamcrest.Matchers;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.web.servlet.MvcResult;
 
 
 public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
@@ -2083,36 +2081,41 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
             "\"eperson.lastname\":[{\"value\":\"Doe\"}]},\"password\":\"somePassword\"," +
             "\"type\":\"eperson\"}";
 
-        MvcResult mvcResult = getClient().perform(post("/api/eperson/epersons")
-                                .param("token", newRegisterToken)
-                                .content(json)
-                                .contentType(MediaType.APPLICATION_JSON))
-                                  .andExpect(status().isCreated())
-                                  .andExpect(jsonPath("$", Matchers.allOf(
-                            hasJsonPath("$.uuid", not(empty())),
-                            // is it what you expect? EPerson.getName() returns the email...
-                            //hasJsonPath("$.name", is("Doe John")),
-                            hasJsonPath("$.type", is("eperson")),
-                            hasJsonPath("$._links.self.href", not(empty())),
-                            hasJsonPath("$.metadata", Matchers.allOf(
-                                matchMetadata("eperson.firstname", "John"),
-                                matchMetadata("eperson.lastname", "Doe")
-                            ))))).andReturn();
+        AtomicReference<UUID> idRef = new AtomicReference<UUID>();
 
-        String content = mvcResult.getResponse().getContentAsString();
-        Map<String,Object> map = mapper.readValue(content, Map.class);
-        String epersonUuid = String.valueOf(map.get("uuid"));
-        EPerson createdEPerson = ePersonService.find(context, UUID.fromString(epersonUuid));
-        assertTrue(ePersonService.checkPassword(context, createdEPerson, "somePassword"));
+        try {
+            getClient().perform(post("/api/eperson/epersons")
+                                    .param("token", newRegisterToken)
+                                    .content(json)
+                                    .contentType(MediaType.APPLICATION_JSON))
+                                      .andExpect(status().isCreated())
+                                      .andExpect(jsonPath("$", Matchers.allOf(
+                                hasJsonPath("$.uuid", not(empty())),
+                                // is it what you expect? EPerson.getName() returns the email...
+                                //hasJsonPath("$.name", is("Doe John")),
+                                hasJsonPath("$.type", is("eperson")),
+                                hasJsonPath("$._links.self.href", not(empty())),
+                                hasJsonPath("$.metadata", Matchers.allOf(
+                                    matchMetadata("eperson.firstname", "John"),
+                                    matchMetadata("eperson.lastname", "Doe")
+                                )))))
+                                .andDo(result -> idRef
+                                    .set(UUID.fromString(read(result.getResponse().getContentAsString(), "$.id"))));
 
-        assertNull(registrationDataService.findByToken(context, newRegisterToken));
-        context.turnOffAuthorisationSystem();
-        ePersonService.delete(context, createdEPerson);
-        context.restoreAuthSystemState();
 
-        context.turnOffAuthorisationSystem();
-        registrationDataService.deleteByToken(context, newRegisterToken);
-        context.restoreAuthSystemState();
+
+            String epersonUuid = String.valueOf(idRef.get());
+            EPerson createdEPerson = ePersonService.find(context, UUID.fromString(epersonUuid));
+            assertTrue(ePersonService.checkPassword(context, createdEPerson, "somePassword"));
+
+            assertNull(registrationDataService.findByToken(context, newRegisterToken));
+
+            context.turnOffAuthorisationSystem();
+            registrationDataService.deleteByToken(context, newRegisterToken);
+            context.restoreAuthSystemState();
+        } finally {
+            EPersonBuilder.deleteEPerson(idRef.get());
+        }
     }
 
     @Test
@@ -2135,37 +2138,38 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
             "\"eperson.lastname\":[{\"value\":\"Doe\"}]},\"email\":\"" + newRegisterEmail +
             "\",\"password\":\"somePassword\",\"type\":\"eperson\"}";
 
-        MvcResult mvcResult = getClient().perform(post("/api/eperson/epersons")
-                                                           .param("token", newRegisterToken)
-                                                           .content(json)
-                                                           .contentType(MediaType.APPLICATION_JSON))
-                                              .andExpect(status().isCreated())
-                                              .andExpect(jsonPath("$", Matchers.allOf(
-                                                  hasJsonPath("$.uuid", not(empty())),
-                                                  // is it what you expect? EPerson.getName() returns the email...
-                                                  //hasJsonPath("$.name", is("Doe John")),
-                                                  hasJsonPath("$.email", is(newRegisterEmail)),
-                                                  hasJsonPath("$.type", is("eperson")),
-                                                  hasJsonPath("$._links.self.href", not(empty())),
-                                                  hasJsonPath("$.metadata", Matchers.allOf(
-                                                      matchMetadata("eperson.firstname", "John"),
-                                                      matchMetadata("eperson.lastname", "Doe")
-                                                  ))))).andReturn();
+        AtomicReference<UUID> idRef = new AtomicReference<UUID>();
 
-        String content = mvcResult.getResponse().getContentAsString();
-        Map<String,Object> map = mapper.readValue(content, Map.class);
-        String epersonUuid = String.valueOf(map.get("uuid"));
-        EPerson createdEPerson = ePersonService.find(context, UUID.fromString(epersonUuid));
-        assertTrue(ePersonService.checkPassword(context, createdEPerson, "somePassword"));
-        assertNull(registrationDataService.findByToken(context, newRegisterToken));
+        try {
+            getClient().perform(post("/api/eperson/epersons")
+                                                               .param("token", newRegisterToken)
+                                                               .content(json)
+                                                               .contentType(MediaType.APPLICATION_JSON))
+                                                  .andExpect(status().isCreated())
+                                                  .andExpect(jsonPath("$", Matchers.allOf(
+                                                      hasJsonPath("$.uuid", not(empty())),
+                                                      // is it what you expect? EPerson.getName() returns the email...
+                                                      //hasJsonPath("$.name", is("Doe John")),
+                                                      hasJsonPath("$.email", is(newRegisterEmail)),
+                                                      hasJsonPath("$.type", is("eperson")),
+                                                      hasJsonPath("$._links.self.href", not(empty())),
+                                                      hasJsonPath("$.metadata", Matchers.allOf(
+                                                          matchMetadata("eperson.firstname", "John"),
+                                                          matchMetadata("eperson.lastname", "Doe")
+                                                      ))))).andDo(result -> idRef
+                            .set(UUID.fromString(read(result.getResponse().getContentAsString(), "$.id"))));
 
-        context.turnOffAuthorisationSystem();
-        ePersonService.delete(context, createdEPerson);
-        context.restoreAuthSystemState();
+            String epersonUuid = String.valueOf(idRef.get());
+            EPerson createdEPerson = ePersonService.find(context, UUID.fromString(epersonUuid));
+            assertTrue(ePersonService.checkPassword(context, createdEPerson, "somePassword"));
+            assertNull(registrationDataService.findByToken(context, newRegisterToken));
 
-        context.turnOffAuthorisationSystem();
-        registrationDataService.deleteByToken(context, newRegisterToken);
-        context.restoreAuthSystemState();
+            context.turnOffAuthorisationSystem();
+            registrationDataService.deleteByToken(context, newRegisterToken);
+            context.restoreAuthSystemState();
+        } finally {
+            EPersonBuilder.deleteEPerson(idRef.get());
+        }
 
     }
 
@@ -2189,37 +2193,42 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
             "\"eperson.lastname\":[{\"value\":\"Doe\"}]},\"selfRegistered\":true,\"email\":\"" + newRegisterEmail +
             "\",\"password\":\"somePassword\",\"type\":\"eperson\"}";
 
-        MvcResult mvcResult = getClient().perform(post("/api/eperson/epersons")
-                                                           .param("token", newRegisterToken)
-                                                           .content(json)
-                                                           .contentType(MediaType.APPLICATION_JSON))
-                                              .andExpect(status().isCreated())
-                                              .andExpect(jsonPath("$", Matchers.allOf(
-                                                  hasJsonPath("$.uuid", not(empty())),
-                                                  // is it what you expect? EPerson.getName() returns the email...
-                                                  //hasJsonPath("$.name", is("Doe John")),
-                                                  hasJsonPath("$.email", is(newRegisterEmail)),
-                                                  hasJsonPath("$.type", is("eperson")),
-                                                  hasJsonPath("$._links.self.href", not(empty())),
-                                                  hasJsonPath("$.metadata", Matchers.allOf(
-                                                      matchMetadata("eperson.firstname", "John"),
-                                                      matchMetadata("eperson.lastname", "Doe")
-                                                  ))))).andReturn();
+        AtomicReference<UUID> idRef = new AtomicReference<UUID>();
 
-        String content = mvcResult.getResponse().getContentAsString();
-        Map<String,Object> map = mapper.readValue(content, Map.class);
-        String epersonUuid = String.valueOf(map.get("uuid"));
-        EPerson createdEPerson = ePersonService.find(context, UUID.fromString(epersonUuid));
-        assertTrue(ePersonService.checkPassword(context, createdEPerson, "somePassword"));
-        assertNull(registrationDataService.findByToken(context, newRegisterToken));
+        try {
+            getClient().perform(post("/api/eperson/epersons")
+                                                               .param("token", newRegisterToken)
+                                                               .content(json)
+                                                               .contentType(MediaType.APPLICATION_JSON))
+                                                  .andExpect(status().isCreated())
+                                                  .andExpect(jsonPath("$", Matchers.allOf(
+                                                      hasJsonPath("$.uuid", not(empty())),
+                                                      // is it what you expect? EPerson.getName() returns the email...
+                                                      //hasJsonPath("$.name", is("Doe John")),
+                                                      hasJsonPath("$.email", is(newRegisterEmail)),
+                                                      hasJsonPath("$.type", is("eperson")),
+                                                      hasJsonPath("$._links.self.href", not(empty())),
+                                                      hasJsonPath("$.metadata", Matchers.allOf(
+                                                          matchMetadata("eperson.firstname", "John"),
+                                                          matchMetadata("eperson.lastname", "Doe")
+                                                      ))))).andDo(result -> idRef
+                    .set(UUID.fromString(read(result.getResponse().getContentAsString(), "$.id"))));
 
-        context.turnOffAuthorisationSystem();
-        ePersonService.delete(context, createdEPerson);
-        context.restoreAuthSystemState();
 
-        context.turnOffAuthorisationSystem();
-        registrationDataService.deleteByToken(context, newRegisterToken);
-        context.restoreAuthSystemState();
+            String epersonUuid = String.valueOf(idRef.get());
+            EPerson createdEPerson = ePersonService.find(context, UUID.fromString(epersonUuid));
+            assertTrue(ePersonService.checkPassword(context, createdEPerson, "somePassword"));
+            assertNull(registrationDataService.findByToken(context, newRegisterToken));
+
+            context.turnOffAuthorisationSystem();
+            context.restoreAuthSystemState();
+
+            context.turnOffAuthorisationSystem();
+            registrationDataService.deleteByToken(context, newRegisterToken);
+            context.restoreAuthSystemState();
+        } finally {
+            EPersonBuilder.deleteEPerson(idRef.get());
+        }
 
     }
 
@@ -2499,34 +2508,38 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
             "\"eperson.lastname\":[{\"value\":\"Doe\"}]},\"email\":\"" + newRegisterEmail +
             "\",\"password\":\"somePassword\",\"type\":\"eperson\"}";
 
-        MvcResult mvcResult = getClient().perform(post("/api/eperson/epersons")
-                                                           .param("token", newRegisterToken)
-                                                           .content(json)
-                                                           .contentType(MediaType.APPLICATION_JSON))
-                                              .andExpect(status().isCreated())
-                                              .andExpect(jsonPath("$", Matchers.allOf(
-                                                  hasJsonPath("$.uuid", not(empty())),
-                                                  // is it what you expect? EPerson.getName() returns the email...
-                                                  //hasJsonPath("$.name", is("Doe John")),
-                                                  hasJsonPath("$.email", is(newRegisterEmail)),
-                                                  hasJsonPath("$.type", is("eperson")),
-                                                  hasJsonPath("$._links.self.href", not(empty())),
-                                                  hasJsonPath("$.metadata", Matchers.allOf(
-                                                      matchMetadata("eperson.firstname", "John"),
-                                                      matchMetadata("eperson.lastname", "Doe")
-                                                  ))))).andReturn();
+        AtomicReference<UUID> idRef = new AtomicReference<UUID>();
 
-        String content = mvcResult.getResponse().getContentAsString();
-        Map<String,Object> map = mapper.readValue(content, Map.class);
-        String epersonUuid = String.valueOf(map.get("uuid"));
-        EPerson createdEPerson = ePersonService.find(context, UUID.fromString(epersonUuid));
-        assertTrue(ePersonService.checkPassword(context, createdEPerson, "somePassword"));
-        assertNull(registrationDataService.findByToken(context, newRegisterToken));
+        try {
+            getClient().perform(post("/api/eperson/epersons")
+                                                               .param("token", newRegisterToken)
+                                                               .content(json)
+                                                               .contentType(MediaType.APPLICATION_JSON))
+                                                  .andExpect(status().isCreated())
+                                                  .andExpect(jsonPath("$", Matchers.allOf(
+                                                      hasJsonPath("$.uuid", not(empty())),
+                                                      // is it what you expect? EPerson.getName() returns the email...
+                                                      //hasJsonPath("$.name", is("Doe John")),
+                                                      hasJsonPath("$.email", is(newRegisterEmail)),
+                                                      hasJsonPath("$.type", is("eperson")),
+                                                      hasJsonPath("$._links.self.href", not(empty())),
+                                                      hasJsonPath("$.metadata", Matchers.allOf(
+                                                          matchMetadata("eperson.firstname", "John"),
+                                                          matchMetadata("eperson.lastname", "Doe")
+                                                      ))))).andDo(result -> idRef
+                    .set(UUID.fromString(read(result.getResponse().getContentAsString(), "$.id"))));
 
-        context.turnOffAuthorisationSystem();
-        ePersonService.delete(context, createdEPerson);
-        registrationDataService.deleteByToken(context, newRegisterToken);
-        context.restoreAuthSystemState();
+            String epersonUuid = String.valueOf(idRef.get());
+            EPerson createdEPerson = ePersonService.find(context, UUID.fromString(epersonUuid));
+            assertTrue(ePersonService.checkPassword(context, createdEPerson, "somePassword"));
+            assertNull(registrationDataService.findByToken(context, newRegisterToken));
+
+            context.turnOffAuthorisationSystem();
+            registrationDataService.deleteByToken(context, newRegisterToken);
+            context.restoreAuthSystemState();
+        } finally {
+            EPersonBuilder.deleteEPerson(idRef.get());
+        }
     }
 
     @Test
