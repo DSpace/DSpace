@@ -181,7 +181,61 @@ it, please enter the types and the actual numbers or codes.</hint>
        </field>
      </row>
 	</form>
-   
+
+    <form name="traditionalpageone-cris-dc-contributor-author">
+      <row>
+        <field>
+          <dc-schema>dc</dc-schema>
+          <dc-element>contributor</dc-element>
+          <dc-qualifier>author</dc-qualifier>
+          <label>Author</label>
+          <input-type>name</input-type>
+          <repeatable>false</repeatable>
+          <required>You must enter at least the author.</required>
+          <hint>Enter the names of the authors of this item in the form Lastname, Firstname [i.e. Smith, Josh or Smith, J].</hint>
+        </field>
+      </row>
+      <row>
+        <field>
+          <dc-schema>person</dc-schema>
+          <dc-element>affiliation</dc-element>
+          <dc-qualifier>name</dc-qualifier>
+          <label>Affiliation</label>
+          <input-type>onebox</input-type>
+          <repeatable>false</repeatable>
+          <required />
+          <hint>Enter the affiliation of the author as stated on the publication.</hint>
+        </field>
+      </row>
+    </form>
+
+    <form name="traditionalpageone-cris-orgunit-identifier-name">
+      <row>
+        <field>
+         <dc-schema>orgunit</dc-schema>
+         <dc-element>identifier</dc-element>
+         <dc-qualifier>name</dc-qualifier>
+          <label>Orgunit name</label>
+          <input-type>onebox</input-type>
+          <repeatable>false</repeatable>
+          <required>You must enter at least the Orgunit name.</required>
+          <hint>Enter the name of the Orgunit of this item</hint>
+        </field>
+      </row>
+      <row>
+        <field>
+         <dc-schema>orgunit</dc-schema>
+         <dc-element>identifier</dc-element>
+         <dc-qualifier>id</dc-qualifier>
+          <label>Orgunit id</label>
+          <input-type>onebox</input-type>
+          <repeatable>false</repeatable>
+          <required />
+          <hint>Enter the id of the Orgunit of this item</hint>
+        </field>
+      </row>
+    </form>
+
    <form name="traditionalpageone-cris">
 	 <row>
        <field>
@@ -190,7 +244,7 @@ it, please enter the types and the actual numbers or codes.</hint>
          <dc-qualifier>author</dc-qualifier>
          <repeatable>true</repeatable>
          <label>Authors</label>
-         <input-type>name</input-type>
+         <input-type>group</input-type>
          <hint>Enter the names of the authors of this item.</hint>
          <required></required>
        </field>
@@ -306,6 +360,18 @@ it, please enter the types and the actual numbers or codes.</hint>
          <label>Language</label>
          <input-type value-pairs-name="common_iso_languages">dropdown</input-type>
          <hint>Select the language of the main content of the item.  If the language does not appear in the list, please select 'Other'.  If the content does not really have a language (for example, if it is a dataset or an image) please select 'N/A'.</hint>
+         <required></required>
+       </field>
+     </row>
+	 <row>
+       <field>
+         <dc-schema>orgunit</dc-schema>
+         <dc-element>identifier</dc-element>
+         <dc-qualifier>name</dc-qualifier>
+         <repeatable>true</repeatable>
+         <label>Orgunits</label>
+         <input-type>inline-group</input-type>
+         <hint>Enter the names of the orgunit of this item.</hint>
          <required></required>
        </field>
      </row>

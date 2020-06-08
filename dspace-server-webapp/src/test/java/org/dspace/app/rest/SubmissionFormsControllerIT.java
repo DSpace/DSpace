@@ -58,13 +58,13 @@ public class SubmissionFormsControllerIT extends AbstractControllerIntegrationTe
                    .andExpect(content().contentType(contentType))
                    //The configuration file for the test env includes 3 forms
                    .andExpect(jsonPath("$.page.size", is(20)))
-                   .andExpect(jsonPath("$.page.totalElements", equalTo(15)))
+                   .andExpect(jsonPath("$.page.totalElements", equalTo(17)))
                    .andExpect(jsonPath("$.page.totalPages", equalTo(1)))
                    .andExpect(jsonPath("$.page.number", is(0)))
                    .andExpect(
                        jsonPath("$._links.self.href", Matchers.startsWith(REST_SERVER_URL + "config/submissionforms")))
                    //The array of submissionforms should have a size of 3
-                   .andExpect(jsonPath("$._embedded.submissionforms", hasSize(equalTo(15))))
+                   .andExpect(jsonPath("$._embedded.submissionforms", hasSize(equalTo(17))))
         ;
     }
 
@@ -75,12 +75,12 @@ public class SubmissionFormsControllerIT extends AbstractControllerIntegrationTe
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
                 .andExpect(jsonPath("$.page.size", is(20)))
-                .andExpect(jsonPath("$.page.totalElements", equalTo(15)))
+                .andExpect(jsonPath("$.page.totalElements", equalTo(17)))
                 .andExpect(jsonPath("$.page.totalPages", equalTo(1)))
                 .andExpect(jsonPath("$.page.number", is(0)))
                 .andExpect(jsonPath("$._links.self.href", Matchers.startsWith(REST_SERVER_URL
                            + "config/submissionforms")))
-                .andExpect(jsonPath("$._embedded.submissionforms", hasSize(equalTo(15))));
+                .andExpect(jsonPath("$._embedded.submissionforms", hasSize(equalTo(17))));
     }
 
     @Test

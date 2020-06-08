@@ -10,6 +10,7 @@ package org.dspace.app.util;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.logging.log4j.Logger;
 import org.dspace.core.Utils;
 
 /**
@@ -29,6 +30,10 @@ public class DCInputSet {
      */
     private DCInput[][] inputs = null;
 
+    private DCInputsReader inputReader;
+
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(DCInputSet.class);
+
     /**
      * constructor
      *
@@ -36,8 +41,11 @@ public class DCInputSet {
      * @param mandatoryFlags
      * @param rows           the rows
      * @param listMap        map
+     * @throws DCInputsReaderException
      */
-    public DCInputSet(String formName, List<List<Map<String, String>>> rows, Map<String, List<String>> listMap) {
+    public DCInputSet(String formName, List<List<Map<String, String>>> rows, Map<String, List<String>> listMap)
+        throws DCInputsReaderException {
+        inputReader = new DCInputsReader();
         this.formName = formName;
         this.inputs = new DCInput[rows.size()][];
         for (int i = 0; i < inputs.length; i++) {
@@ -117,6 +125,17 @@ public class DCInputSet {
                         if (fullName.equals(fieldName)) {
                             return true;
                         }
+                    }
+                } else if (field.getInputType().equals("group") || field.getInputType().equals("inline-group")) {
+                    String formName = getFormName() + "-" + Utils.standardize(field.getSchema(),
+                                                          field.getElement(), field.getQualifier(), "-");
+                    try {
+                        DCInputSet inputConfig = inputReader.getInputsByFormName(formName);
+                        if (inputConfig.isFieldPresent(fieldName)) {
+                            return true;
+                        }
+                    } catch (DCInputsReaderException e) {
+                        log.error(e.getMessage(), e);
                     }
                 } else {
                     String fullName = field.getFieldName();
