@@ -1,3 +1,10 @@
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
+ *
+ * http://www.dspace.org/license/
+ */
 package org.dspace.app.rest.security;
 
 import java.util.List;
@@ -28,13 +35,14 @@ public class WebSecurityExpressionEvaluator {
         this.securityExpressionHandlers = securityExpressionHandlers;
     }
 
-    public boolean evaluate(String securityExpression, HttpServletRequest request, HttpServletResponse response) {
+    public boolean evaluate(String securityExpression, HttpServletRequest request, HttpServletResponse response,
+                            String id) {
         SecurityExpressionHandler handler = getFilterSecurityHandler();
 
         Expression expression = handler.getExpressionParser().parseExpression(securityExpression);
 
         EvaluationContext evaluationContext = createEvaluationContext(handler, request, response);
-
+        evaluationContext.setVariable("id", id);
         return ExpressionUtils.evaluateAsBoolean(expression, evaluationContext);
     }
 
