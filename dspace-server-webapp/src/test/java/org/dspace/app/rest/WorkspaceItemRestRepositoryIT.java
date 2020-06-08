@@ -3910,4 +3910,121 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                             .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
                             .andExpect(status().isUnprocessableEntity());
     }
+
+    @Test
+    public void patchAddMetadataToGroupTypeMetadataTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1, "123456789/traditional-cris")
+                                           .withName("Collection 1")
+                                           .build();
+
+        String authToken = getAuthToken(eperson.getEmail(), password);
+
+        WorkspaceItem witem = WorkspaceItemBuilder.createWorkspaceItem(context, col1)
+                                                  .withTitle("Test witem")
+                                                  .withIssueDate("2017-10-17")
+                                                  .withSubject("ExtraEntry")
+                                                  .build();
+
+        //disable file upload mandatory
+        configurationService.setProperty("webui.submit.upload.required", false);
+
+        context.restoreAuthSystemState();
+
+        List<Operation> list = new ArrayList<Operation>();
+        List<Map<String, String>> values = new ArrayList<Map<String, String>>();
+        Map<String, String> author = new HashMap<String, String>();
+        List<Map<String, String>> values2 = new ArrayList<Map<String, String>>();
+        Map<String, String> affiliation = new HashMap<String, String>();
+        author.put("value", "Mykhaylo Boychuk");
+        values.add(author);
+        affiliation.put("value", "4science");
+        values2.add(affiliation);
+        list.add(new AddOperation("/sections/traditionalpageone-cris/dc.contributor.author", values));
+        list.add(new AddOperation("/sections/traditionalpageone-cris/person.affiliation.name", values2));
+
+        String patchBody = getPatchContent(list);
+        getClient(authToken).perform(patch("/api/submission/workspaceitems/" + witem.getID())
+                .content(patchBody)
+                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                       .andExpect(status().isOk())
+                       .andExpect(jsonPath("$.sections.traditionalpageone-cris['dc.contributor.author'][0].value",
+                                        is("Mykhaylo Boychuk")))
+                       .andExpect(jsonPath("$.sections.traditionalpageone-cris['person.affiliation.name'][0].value",
+                                        is("4science")));
+
+        getClient(authToken).perform(get("/api/submission/workspaceitems/" + witem.getID()))
+                 .andExpect(status().isOk())
+                 .andExpect(jsonPath("$.errors").doesNotExist())
+                 .andExpect(jsonPath("$.sections.traditionalpageone-cris['dc.contributor.author'][0].value",
+                                  is("Mykhaylo Boychuk")))
+                 .andExpect(jsonPath("$.sections.traditionalpageone-cris['person.affiliation.name'][0].value",
+                                  is("4science")));
+    }
+
+    @Test
+    public void patchAddMetadataToInlineGroupTypeMetadataTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1, "123456789/traditional-cris")
+                                           .withName("Collection 1")
+                                           .build();
+
+        String authToken = getAuthToken(eperson.getEmail(), password);
+
+        WorkspaceItem witem = WorkspaceItemBuilder.createWorkspaceItem(context, col1)
+                                                  .withTitle("Test witem")
+                                                  .withIssueDate("2017-10-17")
+                                                  .withSubject("ExtraEntry")
+                                                  .build();
+
+        //disable file upload mandatory
+        configurationService.setProperty("webui.submit.upload.required", false);
+
+        context.restoreAuthSystemState();
+
+        List<Operation> list = new ArrayList<Operation>();
+        List<Map<String, String>> values = new ArrayList<Map<String, String>>();
+        Map<String, String> idName = new HashMap<String, String>();
+        List<Map<String, String>> values2 = new ArrayList<Map<String, String>>();
+        Map<String, String> identifier = new HashMap<String, String>();
+        idName.put("value", "test name");
+        values.add(idName);
+        identifier.put("value", "test id");
+        values2.add(identifier);
+        list.add(new AddOperation("/sections/traditionalpageone-cris/orgunit.identifier.name", values));
+        list.add(new AddOperation("/sections/traditionalpageone-cris/orgunit.identifier.id", values2));
+
+        String patchBody = getPatchContent(list);
+        getClient(authToken).perform(patch("/api/submission/workspaceitems/" + witem.getID())
+                .content(patchBody)
+                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                       .andExpect(status().isOk())
+                       .andExpect(jsonPath("$.sections.traditionalpageone-cris['orgunit.identifier.name'][0].value",
+                                        is("test name")))
+                       .andExpect(jsonPath("$.sections.traditionalpageone-cris['orgunit.identifier.id'][0].value",
+                                        is("test id")));
+
+        // verify that the patch changes have been persisted
+        getClient(authToken).perform(get("/api/submission/workspaceitems/" + witem.getID()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.errors").doesNotExist())
+            .andExpect(jsonPath("$.sections.traditionalpageone-cris['orgunit.identifier.name'][0].value",
+                             is("test name")))
+            .andExpect(jsonPath("$.sections.traditionalpageone-cris['orgunit.identifier.id'][0].value",
+                             is("test id")));
+    }
 }
