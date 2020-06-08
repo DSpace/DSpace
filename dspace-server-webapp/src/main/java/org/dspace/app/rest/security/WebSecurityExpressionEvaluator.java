@@ -47,7 +47,8 @@ public class WebSecurityExpressionEvaluator {
     }
 
     @SuppressWarnings("unchecked")
-    private EvaluationContext createEvaluationContext(SecurityExpressionHandler handler, HttpServletRequest request, HttpServletResponse response) {
+    private EvaluationContext createEvaluationContext(SecurityExpressionHandler handler, HttpServletRequest request,
+                                                      HttpServletResponse response) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         FilterInvocation filterInvocation = new FilterInvocation(request, response, EMPTY_CHAIN);
 
@@ -56,9 +57,13 @@ public class WebSecurityExpressionEvaluator {
 
     private SecurityExpressionHandler getFilterSecurityHandler() {
         return securityExpressionHandlers.stream()
-                                         .filter(handler -> FilterInvocation.class.equals(GenericTypeResolver
-                                                                                              .resolveTypeArgument(handler.getClass(), SecurityExpressionHandler.class)))
+                                         .filter(handler ->
+                                                     FilterInvocation.class.equals(
+                                                         GenericTypeResolver.resolveTypeArgument(handler.getClass(),
+                                                                                     SecurityExpressionHandler.class)))
                                          .findAny()
-                                         .orElseThrow(() -> new IllegalStateException("No filter invocation security expression handler has been found! Handlers: " + securityExpressionHandlers.size()));
+                                         .orElseThrow(() -> new IllegalStateException("No filter invocation security" +
+                                          " expression handler has been found! Handlers: " +
+                                            securityExpressionHandlers.size()));
     }
 }
