@@ -621,6 +621,10 @@ public class AuthorizeUtil {
         throws SQLException {
         if (DSpaceServicesFactory.getInstance().getConfigurationService()
                                  .getBooleanProperty("user.registration", true)) {
+            // This allowSetPassword is currently the only mthod that would return true only when it's
+            // actually expected to be returning true.
+            // For example the LDAP canSelfRegister will return true due to auto-register, while that
+            // does not imply a new user can register explicitly
             return AuthenticateServiceFactory.getInstance().getAuthenticationService()
                                              .allowSetPassword(context, request, null);
         }

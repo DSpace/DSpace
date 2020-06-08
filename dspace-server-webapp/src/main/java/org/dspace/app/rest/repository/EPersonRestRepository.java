@@ -42,8 +42,8 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.hateoas.Link;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
@@ -186,6 +186,9 @@ public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, E
         context.restoreAuthSystemState();
         // Restoring authorisation state right after the creation call
         accountService.deleteToken(context, token);
+        if (context.getCurrentUser() == null) {
+            context.setCurrentUser(ePerson);
+        }
         return converter.toRest(ePerson, utils.obtainProjection());
     }
 

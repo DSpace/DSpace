@@ -8,7 +8,6 @@
 package org.dspace.app.rest.security;
 
 import java.io.Serializable;
-import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
 
@@ -21,7 +20,6 @@ import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
-import org.dspace.eperson.service.EPersonService;
 import org.dspace.services.RequestService;
 import org.dspace.services.model.Request;
 import org.slf4j.Logger;
@@ -45,9 +43,6 @@ public class EPersonRestPermissionEvaluatorPlugin extends RestObjectPermissionEv
     @Autowired
     private RequestService requestService;
 
-    @Autowired
-    private EPersonService ePersonService;
-
     @Override
     public boolean hasDSpacePermission(Authentication authentication, Serializable targetId,
                                  String targetType, DSpaceRestPermission permission) {
@@ -67,22 +62,18 @@ public class EPersonRestPermissionEvaluatorPlugin extends RestObjectPermissionEv
 
         EPerson ePerson = null;
 
-        try {
-            ePerson = ePersonService.findByEmail(context, (String) authentication.getPrincipal());
-            UUID dsoId = UUID.fromString(targetId.toString());
+        ePerson = context.getCurrentUser();
+        UUID dsoId = UUID.fromString(targetId.toString());
 
-            // anonymous user
-            if (ePerson == null) {
-                return false;
-            }
-
-            if (dsoId.equals(ePerson.getID())) {
-                return true;
-            }
-
-        } catch (SQLException e) {
-            log.error(e.getMessage(), e);
+        // anonymous user
+        if (ePerson == null) {
+            return false;
         }
+
+        if (dsoId.equals(ePerson.getID())) {
+            return true;
+        }
+
 
         return false;
     }
