@@ -55,7 +55,7 @@ public class WorkflowDefinitionStepsLinkRepository extends AbstractDSpaceRestRep
         try {
             List<Step> steps = xmlWorkflowFactory.getWorkflowByName(workflowName).getSteps();
             Pageable pageable = optionalPageable != null ? optionalPageable : PageRequest.of(0, 20);
-            return converter.toRestPage(utils.getPage(steps, pageable), projection);
+            return converter.toRestPage(steps, pageable, projection);
         } catch (WorkflowConfigurationException e) {
             throw new ResourceNotFoundException("No workflow with name " + workflowName + " is configured");
         }

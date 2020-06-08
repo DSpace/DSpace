@@ -20,7 +20,10 @@ import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
+import org.dspace.content.WorkspaceItem;
+import org.dspace.content.service.InstallItemService;
 import org.dspace.content.service.ItemService;
+import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.versioning.Version;
 import org.dspace.versioning.service.VersioningService;
@@ -42,6 +45,12 @@ public class VersionRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     @Autowired
     private ConfigurationService configurationService;
+
+    @Autowired
+    private InstallItemService installItemService;
+
+    @Autowired
+    private WorkspaceItemService workspaceItemService;
 
     @Before
     public void setup() {
@@ -166,6 +175,10 @@ public class VersionRestRepositoryIT extends AbstractControllerIntegrationTest {
     @Test
     public void versionForItemTest() throws Exception {
 
+        context.turnOffAuthorisationSystem();
+        WorkspaceItem workspaceItem = workspaceItemService.findByItem(context, version.getItem());
+        installItemService.installItem(context, workspaceItem);
+        context.restoreAuthSystemState();
         getClient().perform(get("/api/core/items/" + version.getItem().getID() + "/version"))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$", Matchers.is(VersionMatcher.matchEntry(version))));

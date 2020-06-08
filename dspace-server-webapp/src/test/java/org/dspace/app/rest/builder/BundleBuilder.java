@@ -7,9 +7,11 @@
  */
 package org.dspace.app.rest.builder;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
@@ -51,7 +53,15 @@ public class BundleBuilder extends AbstractDSpaceObjectBuilder<Bundle>  {
     }
 
     public void cleanup() throws Exception {
-        delete(bundle);
+        try (Context c = new Context()) {
+            c.turnOffAuthorisationSystem();
+            // Ensure object and any related objects are reloaded before checking to see what needs cleanup
+            bundle = c.reloadEntity(bundle);
+            if (bundle != null) {
+                delete(c, bundle);
+                c.complete();
+            }
+        }
     }
 
     protected DSpaceObjectService<Bundle> getService() {
@@ -66,5 +76,21 @@ public class BundleBuilder extends AbstractDSpaceObjectBuilder<Bundle>  {
         }
 
         return bundle;
+    }
+
+    public static void deleteBundle(UUID uuid) throws SQLException, IOException {
+        try (Context c = new Context()) {
+            c.turnOffAuthorisationSystem();
+            Bundle bundle = bundleService.find(c, uuid);
+            if (bundle != null) {
+                try {
+                    bundleService.delete(c, bundle);
+                } catch (AuthorizeException e) {
+                    // cannot occur, just wrap it to make the compiler happy
+                    throw new RuntimeException(e);
+                }
+            }
+            c.complete();
+        }
     }
 }

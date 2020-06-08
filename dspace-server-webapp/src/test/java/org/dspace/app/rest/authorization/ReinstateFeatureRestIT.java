@@ -17,10 +17,10 @@ import org.dspace.app.rest.builder.CommunityBuilder;
 import org.dspace.app.rest.builder.ItemBuilder;
 import org.dspace.app.rest.builder.WorkflowItemBuilder;
 import org.dspace.app.rest.builder.WorkspaceItemBuilder;
-import org.dspace.app.rest.converter.ConverterService;
+import org.dspace.app.rest.converter.ItemConverter;
 import org.dspace.app.rest.matcher.AuthorizationMatcher;
 import org.dspace.app.rest.model.ItemRest;
-import org.dspace.app.rest.projection.DefaultProjection;
+import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.app.rest.utils.Utils;
 import org.dspace.content.Collection;
@@ -46,7 +46,7 @@ public class ReinstateFeatureRestIT extends AbstractControllerIntegrationTest {
     private AuthorizationFeatureService authorizationFeatureService;
 
     @Autowired
-    private ConverterService converterService;
+    private ItemConverter itemConverter;
 
     @Autowired
     private ConfigurationService configurationService;
@@ -71,7 +71,7 @@ public class ReinstateFeatureRestIT extends AbstractControllerIntegrationTest {
         Item item = ItemBuilder.createItem(context, col).withTitle("Withdrawn item").withdrawn().build();
         context.restoreAuthSystemState();
 
-        ItemRest itemRest = converterService.toRest(item, converterService.getProjection(DefaultProjection.NAME));
+        ItemRest itemRest = itemConverter.convert(item, Projection.DEFAULT);
         String itemUri = utils.linkToSingleResource(itemRest, "self").getHref();
         Authorization authAdminWithdraw = new Authorization(admin, reinstateFeature, itemRest);
 
@@ -100,7 +100,7 @@ public class ReinstateFeatureRestIT extends AbstractControllerIntegrationTest {
         Item item = ItemBuilder.createItem(context, col).withTitle("Withdrawn item").withdrawn().build();
         context.restoreAuthSystemState();
 
-        ItemRest itemRest = converterService.toRest(item, converterService.getProjection(DefaultProjection.NAME));
+        ItemRest itemRest = itemConverter.convert(item, Projection.DEFAULT);
         String itemUri = utils.linkToSingleResource(itemRest, "self").getHref();
         Authorization authAdminWithdraw = new Authorization(eperson, reinstateFeature, itemRest);
 
@@ -159,7 +159,7 @@ public class ReinstateFeatureRestIT extends AbstractControllerIntegrationTest {
         Item item = ItemBuilder.createItem(context, col).withTitle("Withdrawn item").withdrawn().build();
         context.restoreAuthSystemState();
 
-        ItemRest itemRest = converterService.toRest(item, converterService.getProjection(DefaultProjection.NAME));
+        ItemRest itemRest = itemConverter.convert(item, Projection.DEFAULT);
         String itemUri = utils.linkToSingleResource(itemRest, "self").getHref();
         Authorization authAdminWithdraw = new Authorization(eperson, reinstateFeature, itemRest);
 
@@ -197,7 +197,7 @@ public class ReinstateFeatureRestIT extends AbstractControllerIntegrationTest {
         Item item = ItemBuilder.createItem(context, col).withTitle("Withdrawn item").withdrawn().build();
         context.restoreAuthSystemState();
 
-        ItemRest itemRest = converterService.toRest(item, converterService.getProjection(DefaultProjection.NAME));
+        ItemRest itemRest = itemConverter.convert(item, Projection.DEFAULT);
         String itemUri = utils.linkToSingleResource(itemRest, "self").getHref();
         Authorization authEpersonWithdraw = new Authorization(eperson, reinstateFeature, itemRest);
         Authorization authAnonymousWithdraw = new Authorization(null, reinstateFeature, itemRest);
@@ -236,14 +236,11 @@ public class ReinstateFeatureRestIT extends AbstractControllerIntegrationTest {
         WorkflowItem wfItem = WorkflowItemBuilder.createWorkflowItem(context, col).withTitle("A workflow item").build();
         context.restoreAuthSystemState();
 
-        ItemRest archivedItemRest = converterService.toRest(archivedItem,
-                converterService.getProjection(DefaultProjection.NAME));
+        ItemRest archivedItemRest = itemConverter.convert(archivedItem, Projection.DEFAULT);
         String archivedItemUri = utils.linkToSingleResource(archivedItemRest, "self").getHref();
-        ItemRest wsItemRest = converterService.toRest(wsItem.getItem(),
-                converterService.getProjection(DefaultProjection.NAME));
+        ItemRest wsItemRest = itemConverter.convert(wsItem.getItem(), Projection.DEFAULT);
         String wsItemUri = utils.linkToSingleResource(wsItemRest, "self").getHref();
-        ItemRest wfItemRest = converterService.toRest(wfItem.getItem(),
-                converterService.getProjection(DefaultProjection.NAME));
+        ItemRest wfItemRest = itemConverter.convert(wfItem.getItem(), Projection.DEFAULT);
         String wfItemUri = utils.linkToSingleResource(wfItemRest, "self").getHref();
 
         Authorization authWithdrawnItem = new Authorization(admin, reinstateFeature, archivedItemRest);

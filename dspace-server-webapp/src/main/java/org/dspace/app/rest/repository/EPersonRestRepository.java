@@ -9,6 +9,7 @@ package org.dspace.app.rest.repository;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
@@ -16,6 +17,7 @@ import javax.servlet.http.HttpServletRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
+import org.dspace.app.rest.DiscoverableEndpointsService;
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.authorization.AuthorizationFeatureService;
@@ -36,10 +38,12 @@ import org.dspace.eperson.RegistrationData;
 import org.dspace.eperson.service.AccountService;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.eperson.service.RegistrationDataService;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.hateoas.Link;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
@@ -51,12 +55,16 @@ import org.springframework.stereotype.Component;
  */
 
 @Component(EPersonRest.CATEGORY + "." + EPersonRest.NAME)
-public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, EPersonRest> {
+public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, EPersonRest>
+                                   implements InitializingBean {
 
     private static final Logger log = Logger.getLogger(EPersonRestRepository.class);
 
     @Autowired
     AuthorizeService authorizeService;
+
+    @Autowired
+    DiscoverableEndpointsService discoverableEndpointsService;
 
     @Autowired
     private AccountService accountService;
@@ -318,5 +326,11 @@ public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, E
     @Override
     public Class<EPersonRest> getDomainClass() {
         return EPersonRest.class;
+    }
+
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        discoverableEndpointsService.register(this, Arrays.asList(
+                new Link("/api/" + EPersonRest.CATEGORY + "/registrations", EPersonRest.NAME + "-registration")));
     }
 }
