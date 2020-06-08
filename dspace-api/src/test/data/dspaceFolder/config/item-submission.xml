@@ -21,6 +21,7 @@
         <name-map collection-handle="123456789/publication-1" submission-name="publication"/>
         <name-map collection-handle="123456789/language-test-1" submission-name="languagetestprocess"/>
         <name-map collection-handle="123456789/patent-test" submission-name="patent"/>
+        <name-map collection-handle="123456789/traditional-cris" submission-name="traditional-cris"/>
     </submission-map>
 
 
@@ -55,6 +56,11 @@
             <scope visibility="hidden" visibilityOutside="hidden">submission</scope>
         </step>
         <step id="traditionalpageone" mandatory="true">
+            <heading>submit.progressbar.describe.stepone</heading>
+            <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
+            <type>submission-form</type>
+        </step>
+        <step id="traditionalpageone-cris" mandatory="true">
             <heading>submit.progressbar.describe.stepone</heading>
             <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
             <type>submission-form</type>
@@ -193,6 +199,30 @@
 
             <!--Step will be to Describe the item. -->
             <step id="traditionalpageone"/>
+            <step id="traditionalpagetwo"/>
+
+            <!--Step will be to Upload the item -->
+            <step id="upload"/>
+            <!-- <step id="upload-with-embargo"/> -->
+            <step id="detect-duplicate"/>
+
+            <!--Step will be to Sign off on the License -->
+            <step id="license"/>
+            <!-- <step id="creative-commons"/> -->
+            <!-- <step id="verify"/> -->
+        </submission-process>
+
+        <!--This "traditional" process defines the DEFAULT item submission process -->
+        <submission-process name="traditional-cris">
+
+            <!--Uncommment to display the SAMPLE step as your first step -->
+            <!--<step id="sample"/> -->
+
+            <step id="collection"/>
+            <step id="extraction" />
+
+            <!--Step will be to Describe the item. -->
+            <step id="traditionalpageone-cris"/>
             <step id="traditionalpagetwo"/>
 
             <!--Step will be to Upload the item -->
