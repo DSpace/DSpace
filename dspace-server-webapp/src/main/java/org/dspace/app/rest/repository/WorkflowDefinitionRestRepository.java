@@ -61,7 +61,7 @@ public class WorkflowDefinitionRestRepository extends DSpaceRestRepository<Workf
     @PreAuthorize("hasAuthority('AUTHENTICATED')")
     public Page<WorkflowDefinitionRest> findAll(Context context, Pageable pageable) {
         List<Workflow> workflows = xmlWorkflowFactory.getAllConfiguredWorkflows();
-        return converter.toRestPage(utils.getPage(workflows, pageable), utils.obtainProjection());
+        return converter.toRestPage(workflows, pageable, utils.obtainProjection());
     }
 
     /**

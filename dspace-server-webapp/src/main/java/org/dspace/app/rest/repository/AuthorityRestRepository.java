@@ -8,19 +8,24 @@
 package org.dspace.app.rest.repository;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
+import org.dspace.app.rest.DiscoverableEndpointsService;
 import org.dspace.app.rest.model.AuthorityRest;
+import org.dspace.app.rest.model.AuthorizationRest;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.utils.AuthorityUtils;
 import org.dspace.content.authority.ChoiceAuthority;
 import org.dspace.content.authority.service.ChoiceAuthorityService;
 import org.dspace.core.Context;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.hateoas.Link;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
@@ -30,13 +35,17 @@ import org.springframework.stereotype.Component;
  * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  */
 @Component(AuthorityRest.CATEGORY + "." + AuthorityRest.NAME)
-public class AuthorityRestRepository extends DSpaceRestRepository<AuthorityRest, String> {
+public class AuthorityRestRepository extends DSpaceRestRepository<AuthorityRest, String>
+                                     implements InitializingBean {
 
     @Autowired
     private ChoiceAuthorityService cas;
 
     @Autowired
     private AuthorityUtils authorityUtils;
+
+    @Autowired
+    DiscoverableEndpointsService discoverableEndpointsService;
 
     @PreAuthorize("hasAuthority('AUTHENTICATED')")
     @Override
@@ -62,5 +71,12 @@ public class AuthorityRestRepository extends DSpaceRestRepository<AuthorityRest,
     @Override
     public Class<AuthorityRest> getDomainClass() {
         return AuthorityRest.class;
+    }
+
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        discoverableEndpointsService.register(this, Arrays.asList(
+                new Link("/api/" + AuthorizationRest.CATEGORY + "/" + AuthorizationRest.NAME + "/search",
+                        AuthorizationRest.NAME + "-search")));
     }
 }

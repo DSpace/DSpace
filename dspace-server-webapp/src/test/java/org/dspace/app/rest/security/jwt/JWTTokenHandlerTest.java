@@ -135,4 +135,17 @@ public class JWTTokenHandlerTest {
         assertEquals(null, parsed);
     }
 
+    @Test
+    public void testInvalidatedToken() throws Exception {
+        Date previous = new Date(System.currentTimeMillis() - 10000000000L);
+        // create a new token
+        String token = jwtTokenHandler
+            .createTokenForEPerson(context, new MockHttpServletRequest(), previous, new ArrayList<>());
+        // immediately invalidate it
+        jwtTokenHandler.invalidateToken(token, new MockHttpServletRequest(), context);
+        // Check if it is still valid by trying to parse the EPerson from it (should return null)
+        EPerson parsed = jwtTokenHandler.parseEPersonFromToken(token, httpServletRequest, context);
+        assertEquals(null, parsed);
+    }
+
 }
