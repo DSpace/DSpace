@@ -107,10 +107,12 @@ public class ConverterService {
         DSpaceConverter<M, R> converter = requireConverter(modelObject.getClass());
         R restObject = converter.convert(transformedModel, projection);
         if (restObject instanceof BaseObjectRest) {
-            String preAuthorizeValue = getPreAuthorizeAnnotationForBaseObject((BaseObjectRest) restObject);
+            BaseObjectRest baseObjectRest = (BaseObjectRest) restObject;
+            String preAuthorizeValue = getPreAuthorizeAnnotationForBaseObject(baseObjectRest);
             if (!webSecurityExpressionEvaluator
                 .evaluate(preAuthorizeValue, requestService.getCurrentRequest().getHttpServletRequest(),
-                          requestService.getCurrentRequest().getHttpServletResponse())) {
+                          requestService.getCurrentRequest().getHttpServletResponse(),
+                          String.valueOf(baseObjectRest.getId()))) {
                 log.info("Access denied on " + restObject.getClass());
                 return null;
             }
