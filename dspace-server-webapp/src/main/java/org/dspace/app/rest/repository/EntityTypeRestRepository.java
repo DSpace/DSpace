@@ -82,7 +82,7 @@ public class EntityTypeRestRepository extends DSpaceRestRepository<EntityTypeRes
                             throw new RuntimeException(e.getMessage(), e);
                         }
                     }).filter(x -> x != null).collect(Collectors.toList());
-            return converter.toRestPage(utils.getPage(entityTypes, pageable), utils.obtainProjection());
+            return converter.toRestPage(entityTypes, pageable, utils.obtainProjection());
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
