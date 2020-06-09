@@ -22,6 +22,17 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.FilterInvocation;
 import org.springframework.stereotype.Component;
 
+/**
+ * This class will contain the logic to allow us to evaluate an expression given through a String.
+ * This will be used by the {@link org.dspace.app.rest.converter.ConverterService} for parsing
+ * the {@link org.springframework.security.access.prepost.PreAuthorize} annotations used on the findOne
+ * methods of RestRepositories. A String will be given to the evaluate method and that String will then
+ * be parsed and a boolean will be returned based on the condition in the String.
+ * For example: "hasPermission(#id, 'ITEM', 'READ')" is such a String
+ * This will be evaluated and if the current user has the permission to read an item with the given id,
+ * a true will be returned, if not it'll be false.
+ * This works on all the methods in {@link org.springframework.security.access.expression.SecurityExpressionRoot}
+ */
 @Component
 public class WebSecurityExpressionEvaluator {
 
@@ -31,10 +42,25 @@ public class WebSecurityExpressionEvaluator {
 
     private final List<SecurityExpressionHandler> securityExpressionHandlers;
 
+    /**
+     * Constructor for this class that sets all the {@link SecurityExpressionHandler} objects in a list
+     * @param securityExpressionHandlers    The {@link SecurityExpressionHandler} for this class
+     */
     public WebSecurityExpressionEvaluator(List<SecurityExpressionHandler> securityExpressionHandlers) {
         this.securityExpressionHandlers = securityExpressionHandlers;
     }
 
+    /**
+     * This method will have to be used to evaluate the String given. It'll parse the String and resolve
+     * it to a method in {@link org.springframework.security.access.expression.SecurityExpressionRoot}
+     * and evaluate it to then return a boolean
+     * @param securityExpression    The String that resembles the expression that has to be parsed
+     * @param request               The current request
+     * @param response              The current response
+     * @param id                    The id for the Object that is the subject of the permission
+     * @return                      A boolean indicating whether the currentUser adheres to the
+     *                              permissions in the securityExpression String or not
+     */
     public boolean evaluate(String securityExpression, HttpServletRequest request, HttpServletResponse response,
                             String id) {
         SecurityExpressionHandler handler = getFilterSecurityHandler();

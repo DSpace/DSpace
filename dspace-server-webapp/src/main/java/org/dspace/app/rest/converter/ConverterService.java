@@ -108,12 +108,16 @@ public class ConverterService {
         R restObject = converter.convert(transformedModel, projection);
         if (restObject instanceof BaseObjectRest) {
             BaseObjectRest baseObjectRest = (BaseObjectRest) restObject;
+            // This section will verify whether the current user has permissions to retrieve the
+            // rest object. It'll only return the REST object if the permission is granted.
+            // If permission isn't granted, it'll return null
             String preAuthorizeValue = getPreAuthorizeAnnotationForBaseObject(baseObjectRest);
             if (!webSecurityExpressionEvaluator
                 .evaluate(preAuthorizeValue, requestService.getCurrentRequest().getHttpServletRequest(),
                           requestService.getCurrentRequest().getHttpServletResponse(),
                           String.valueOf(baseObjectRest.getId()))) {
-                log.info("Access denied on " + restObject.getClass());
+                log.debug("Access denied on " + restObject.getClass() + " with id: " +
+                              ((BaseObjectRest) restObject).getId());
                 return null;
             }
         }
