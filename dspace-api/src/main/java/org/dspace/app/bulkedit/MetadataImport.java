@@ -178,12 +178,8 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
         }
         // Create a context
         Context c = null;
-        try {
-            c = new Context();
-            c.turnOffAuthorisationSystem();
-        } catch (Exception e) {
-            throw new ParseException("Unable to create a new DSpace Context: " + e.getMessage());
-        }
+        c = new Context();
+        c.turnOffAuthorisationSystem();
 
         // Find the EPerson, assign to context
         try {

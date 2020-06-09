@@ -8,14 +8,19 @@
 package org.dspace.app.rest.repository;
 
 import java.sql.SQLException;
+import java.util.List;
 import javax.annotation.Nullable;
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.dspace.app.rest.model.BitstreamRest;
 import org.dspace.app.rest.model.ProcessFileWrapperRest;
 import org.dspace.app.rest.model.ProcessRest;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.authorize.AuthorizeException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
@@ -28,6 +33,8 @@ import org.springframework.stereotype.Component;
 @Component(ProcessRest.CATEGORY + "." + ProcessRest.NAME + "." + ProcessRest.FILES)
 public class ProcessFilesLinkRepository extends AbstractDSpaceRestRepository implements LinkRestRepository {
 
+    private static final Logger log = LogManager.getLogger();
+
     @Autowired
     private ProcessRestRepository processRestRepository;
 
@@ -38,7 +45,7 @@ public class ProcessFilesLinkRepository extends AbstractDSpaceRestRepository imp
      * @param processId         The processId for the Process to use
      * @param optionalPageable  Pageable if applicable
      * @param projection        Projection if applicable
-     * @return                  A {@link ProcessFileWrapperRest} object filled with the bitstreams from the process
+     * @return A {@link ProcessFileWrapperRest} object filled with the bitstreams from the process
      * @throws SQLException         If something goes wrong
      * @throws AuthorizeException   If something goes wrong
      */
@@ -54,5 +61,22 @@ public class ProcessFilesLinkRepository extends AbstractDSpaceRestRepository imp
         processFileWrapperRest.setProcessId(processId);
 
         return processFileWrapperRest;
+    }
+
+    @PreAuthorize("hasPermission(#processId, 'PROCESS', 'READ')")
+    public Page<BitstreamRest> getResource(HttpServletRequest request, String processId, String fileType,
+                                           Pageable pageable, Projection projection)
+        throws SQLException, AuthorizeException {
+        if (log.isTraceEnabled()) {
+            log.trace("Retrieving Files with type " + fileType + " from Process with ID: " + processId);
+        }
+
+        List<BitstreamRest> bitstreamRests = processRestRepository
+            .getProcessBitstreamsByType(Integer.parseInt(processId), fileType);
+
+        Page<BitstreamRest> page = utils.getPage(bitstreamRests, pageable);
+
+
+        return page;
     }
 }

@@ -16,6 +16,7 @@ import org.dspace.app.rest.model.BitstreamRest;
 import org.dspace.app.rest.model.MetadataValueRest;
 import org.dspace.app.rest.model.ProcessFileWrapperRest;
 import org.dspace.app.rest.utils.Utils;
+import org.dspace.scripts.Process;
 
 /**
  * This is the Resource object for the {@link ProcessFileWrapperRest}
@@ -35,7 +36,8 @@ public class ProcessFileWrapperResource extends HALResource<ProcessFileWrapperRe
         if (content != null) {
             HashMap<String, List<BitstreamResource>> bitstreamResourceMap = new HashMap<>();
             for (BitstreamRest bitstreamRest : content.getBitstreams()) {
-                List<MetadataValueRest> fileType = bitstreamRest.getMetadata().getMap().get("dspace.process.type");
+                List<MetadataValueRest> fileType = bitstreamRest.getMetadata().getMap()
+                                                                .get(Process.BITSTREAM_TYPE_METADATAFIELD);
                 if (fileType != null && !fileType.isEmpty()) {
                     bitstreamResourceMap
                         .computeIfAbsent(fileType.get(0).getValue(), k -> new ArrayList<>())

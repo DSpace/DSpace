@@ -22,6 +22,9 @@ import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.scripts.handler.DSpaceRunnableHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 
+/**
+ * Implementation of {@link MetadataDSpaceCsvExportService}
+ */
 public class MetadataDSpaceCsvExportServiceImpl implements MetadataDSpaceCsvExportService {
 
     @Autowired

@@ -197,7 +197,8 @@ public class ProcessServiceImpl implements ProcessService {
         } else {
             List<Bitstream> filteredBitstreams = new ArrayList<>();
             for (Bitstream bitstream : allBitstreams) {
-                if (StringUtils.equals(bitstreamService.getMetadata(bitstream, "dspace.process.type"), type)) {
+                if (StringUtils.equals(bitstreamService.getMetadata(bitstream, Process.BITSTREAM_TYPE_METADATAFIELD),
+                                       type)) {
                     filteredBitstreams.add(bitstream);
                 }
             }

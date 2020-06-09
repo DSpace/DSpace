@@ -49,6 +49,7 @@ public class MetadataExportTest extends AbstractIntegrationTest {
         Item item = wi.getItem();
         itemService.addMetadata(context, item, "dc", "contributor", "author", null, "Donald, Smith");
         item = installItemService.installItem(context, wi);
+        context.restoreAuthSystemState();
         String fileLocation = configurationService.getProperty("dspace.dir") + testProps.get("test.exportcsv")
                                                                                         .toString();
 
@@ -61,5 +62,10 @@ public class MetadataExportTest extends AbstractIntegrationTest {
         assertTrue(fileContent.contains("Donald, Smith"));
         assertTrue(fileContent.contains(String.valueOf(item.getID())));
 
+        context.turnOffAuthorisationSystem();
+        itemService.delete(context, itemService.find(context, item.getID()));
+        collectionService.delete(context, collectionService.find(context, collection.getID()));
+        communityService.delete(context, communityService.find(context, community.getID()));
+        context.restoreAuthSystemState();
     }
 }

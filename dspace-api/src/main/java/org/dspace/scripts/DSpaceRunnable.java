@@ -22,6 +22,13 @@ import org.dspace.eperson.EPerson;
 import org.dspace.scripts.configuration.ScriptConfiguration;
 import org.dspace.scripts.handler.DSpaceRunnableHandler;
 
+/**
+ * This is the class that should be extended for each Script. This class will contain the logic needed to run and it'll
+ * fetch the information that it needs from the {@link ScriptConfiguration} provided through the diamond operators.
+ * This will be the dspaceRunnableClass for the {@link ScriptConfiguration} beans. Specifically created for each
+ * script
+ * @param <T>
+ */
 public abstract class DSpaceRunnable<T extends ScriptConfiguration> implements Runnable {
 
     /**
