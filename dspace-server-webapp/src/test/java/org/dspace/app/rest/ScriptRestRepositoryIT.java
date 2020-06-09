@@ -7,10 +7,10 @@
  */
 package org.dspace.app.rest;
 
+import static com.jayway.jsonpath.JsonPath.read;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.is;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.fileUpload;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -22,15 +22,15 @@ import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import org.apache.commons.collections4.CollectionUtils;
 import org.dspace.app.rest.builder.CollectionBuilder;
 import org.dspace.app.rest.builder.CommunityBuilder;
 import org.dspace.app.rest.builder.ItemBuilder;
+import org.dspace.app.rest.builder.ProcessBuilder;
 import org.dspace.app.rest.converter.DSpaceRunnableParameterConverter;
 import org.dspace.app.rest.matcher.PageMatcher;
 import org.dspace.app.rest.matcher.ProcessMatcher;
@@ -53,7 +53,6 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.test.web.servlet.MvcResult;
 
 public class ScriptRestRepositoryIT extends AbstractControllerIntegrationTest {
 
@@ -177,22 +176,22 @@ public class ScriptRestRepositoryIT extends AbstractControllerIntegrationTest {
 
 
         String token = getAuthToken(admin.getEmail(), password);
+        AtomicReference<Integer> idRef = new AtomicReference<>();
 
-        MvcResult mvcResult = getClient(token)
-            .perform(post("/api/system/scripts/mock-script/processes").contentType("multipart/form-data"))
-            .andExpect(status().isAccepted())
-            .andExpect(jsonPath("$", is(
-                ProcessMatcher.matchProcess("mock-script",
-                                            String.valueOf(admin.getID()), new LinkedList<>(),
-                                            ProcessStatus.FAILED)))).andReturn();
+        try {
+            getClient(token)
+                .perform(post("/api/system/scripts/mock-script/processes").contentType("multipart/form-data"))
+                .andExpect(status().isAccepted())
+                .andExpect(jsonPath("$", is(
+                    ProcessMatcher.matchProcess("mock-script",
+                                                String.valueOf(admin.getID()), new LinkedList<>(),
+                                                ProcessStatus.FAILED))))
+                .andDo(result -> idRef
+                    .set(read(result.getResponse().getContentAsString(), "$.processId")));
+        } finally {
+            ProcessBuilder.deleteProcess(idRef.get());
+        }
 
-        ObjectMapper mapper = new ObjectMapper();
-
-        String content = mvcResult.getResponse().getContentAsString();
-        Map<String, Object> map = mapper.readValue(content, Map.class);
-        Integer processId = Integer.valueOf(String.valueOf(map.get("processId")));
-
-        getClient(token).perform(delete("/api/system/processes/" + processId));
 
     }
 
@@ -221,22 +220,23 @@ public class ScriptRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         String token = getAuthToken(admin.getEmail(), password);
 
-        MvcResult mvcResult = getClient(token)
-            .perform(post("/api/system/scripts/mock-script/processes").contentType("multipart/form-data")
-                                                                      .param("properties",
-                                                                             new Gson().toJson(list)))
-            .andExpect(status().isAccepted())
-            .andExpect(jsonPath("$", is(
-                ProcessMatcher.matchProcess("mock-script",
-                                            String.valueOf(admin.getID()), parameters,
-                                            ProcessStatus.FAILED)))).andReturn();
-        ObjectMapper mapper = new ObjectMapper();
+        AtomicReference<Integer> idRef = new AtomicReference<>();
 
-        String content = mvcResult.getResponse().getContentAsString();
-        Map<String, Object> map = mapper.readValue(content, Map.class);
-        Integer processId = Integer.valueOf(String.valueOf(map.get("processId")));
-
-        getClient(token).perform(delete("/api/system/processes/" + processId));
+        try {
+            getClient(token)
+                .perform(post("/api/system/scripts/mock-script/processes").contentType("multipart/form-data")
+                                                                          .param("properties",
+                                                                                 new Gson().toJson(list)))
+                .andExpect(status().isAccepted())
+                .andExpect(jsonPath("$", is(
+                    ProcessMatcher.matchProcess("mock-script",
+                                                String.valueOf(admin.getID()), parameters,
+                                                ProcessStatus.FAILED))))
+                .andDo(result -> idRef
+                    .set(read(result.getResponse().getContentAsString(), "$.processId")));
+        } finally {
+            ProcessBuilder.deleteProcess(idRef.get());
+        }
     }
 
     @Test
@@ -266,25 +266,24 @@ public class ScriptRestRepositoryIT extends AbstractControllerIntegrationTest {
                                                        ProcessStatus.RUNNING,
                                                        ProcessStatus.COMPLETED));
 
-        MvcResult mvcResult = getClient(token)
-            .perform(post("/api/system/scripts/mock-script/processes").contentType("multipart/form-data")
-                                                                      .param("properties",
-                                                                             new Gson().toJson(list)))
-            .andExpect(status().isAccepted())
-            .andExpect(jsonPath("$", is(
-                ProcessMatcher.matchProcess("mock-script",
-                                            String.valueOf(admin.getID()),
-                                            parameters,
-                                            acceptableProcessStatuses)))).andReturn();
+        AtomicReference<Integer> idRef = new AtomicReference<>();
 
-        ObjectMapper mapper = new ObjectMapper();
-
-        String content = mvcResult.getResponse().getContentAsString();
-        Map<String, Object> map = mapper.readValue(content, Map.class);
-        Integer processId = Integer.valueOf(String.valueOf(map.get("processId")));
-
-        getClient(token).perform(delete("/api/system/processes/" + processId));
-
+        try {
+            getClient(token)
+                .perform(post("/api/system/scripts/mock-script/processes").contentType("multipart/form-data")
+                                                                          .param("properties",
+                                                                                 new Gson().toJson(list)))
+                .andExpect(status().isAccepted())
+                .andExpect(jsonPath("$", is(
+                    ProcessMatcher.matchProcess("mock-script",
+                                                String.valueOf(admin.getID()),
+                                                parameters,
+                                                acceptableProcessStatuses))))
+                .andDo(result -> idRef
+                    .set(read(result.getResponse().getContentAsString(), "$.processId")));
+        } finally {
+            ProcessBuilder.deleteProcess(idRef.get());
+        }
     }
 
     @Test
@@ -339,25 +338,24 @@ public class ScriptRestRepositoryIT extends AbstractControllerIntegrationTest {
                                                        ProcessStatus.RUNNING,
                                                        ProcessStatus.COMPLETED));
 
-        MvcResult mvcResult = getClient(token)
-            .perform(fileUpload("/api/system/scripts/mock-script/processes").file(bitstreamFile)
-                                                                            .param("properties",
-                                                                                   new Gson().toJson(list)))
-            .andExpect(status().isAccepted())
-            .andExpect(jsonPath("$", is(
-                ProcessMatcher.matchProcess("mock-script",
-                                            String.valueOf(admin.getID()),
-                                            parameters,
-                                            acceptableProcessStatuses)))).andReturn();
+        AtomicReference<Integer> idRef = new AtomicReference<>();
 
-        ObjectMapper mapper = new ObjectMapper();
-
-        String content = mvcResult.getResponse().getContentAsString();
-        Map<String, Object> map = mapper.readValue(content, Map.class);
-        Integer processId = Integer.valueOf(String.valueOf(map.get("processId")));
-
-        getClient(token).perform(delete("/api/system/processes/" + processId));
-
+        try {
+            getClient(token)
+                .perform(fileUpload("/api/system/scripts/mock-script/processes").file(bitstreamFile)
+                                                                                .param("properties",
+                                                                                       new Gson().toJson(list)))
+                .andExpect(status().isAccepted())
+                .andExpect(jsonPath("$", is(
+                    ProcessMatcher.matchProcess("mock-script",
+                                                String.valueOf(admin.getID()),
+                                                parameters,
+                                                acceptableProcessStatuses))))
+                .andDo(result -> idRef
+                    .set(read(result.getResponse().getContentAsString(), "$.processId")));
+        } finally {
+            ProcessBuilder.deleteProcess(idRef.get());
+        }
     }
 
 

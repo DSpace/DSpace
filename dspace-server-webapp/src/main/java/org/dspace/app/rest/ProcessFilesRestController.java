@@ -7,11 +7,7 @@
  */
 package org.dspace.app.rest;
 
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
-
 import java.sql.SQLException;
-import java.util.List;
-import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -24,12 +20,6 @@ import org.dspace.app.rest.repository.ProcessRestRepository;
 import org.dspace.app.rest.utils.Utils;
 import org.dspace.authorize.AuthorizeException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PagedResourcesAssembler;
-import org.springframework.hateoas.Link;
-import org.springframework.hateoas.PagedModel;
-import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -37,7 +27,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/" + ProcessRest.CATEGORY + "/" + ProcessRest.PLURAL_NAME + "/{processId}/files")
+@RequestMapping("/api/" + ProcessRest.CATEGORY + "/" + ProcessRest.PLURAL_NAME +
+    "/{processId}/files/name/{fileName:.+}")
 public class ProcessFilesRestController {
 
     private static final Logger log = LogManager.getLogger();
@@ -54,34 +45,7 @@ public class ProcessFilesRestController {
     @Autowired
     ProcessResourceHalLinkFactory processResourceHalLinkFactory;
 
-    @RequestMapping(method = RequestMethod.GET, value = "/{fileType}")
-    @PreAuthorize("hasPermission(#processId, 'PROCESS', 'READ')")
-    public PagedModel<BitstreamResource> listFilesWithTypeFromProcess(
-        @PathVariable(name = "processId") Integer processId,
-        @PathVariable(name = "fileType") String fileType,
-        Pageable pageable, PagedResourcesAssembler assembler) throws SQLException, AuthorizeException {
-
-        if (log.isTraceEnabled()) {
-            log.trace("Retrieving Files with type " + fileType + " from Process with ID: " + processId);
-        }
-
-        List<BitstreamResource> bitstreamResources = processRestRepository
-            .getProcessBitstreamsByType(processId, fileType).stream()
-            .map(bitstreamRest -> new BitstreamResource(bitstreamRest, utils))
-            .collect(Collectors.toList());
-
-        Page<BitstreamResource> page = utils.getPage(bitstreamResources, pageable);
-
-        Link link = WebMvcLinkBuilder.linkTo(
-            methodOn(this.getClass()).listFilesWithTypeFromProcess(processId, fileType, pageable, assembler))
-            .withSelfRel();
-        PagedModel<BitstreamResource> result = assembler.toModel(page, link);
-
-        return result;
-    }
-
-
-    @RequestMapping(method = RequestMethod.GET, value = "/name/{fileName:.+}")
+    @RequestMapping(method = RequestMethod.GET)
     @PreAuthorize("hasPermission(#processId, 'PROCESS', 'READ')")
     public BitstreamResource getBitstreamByName(@PathVariable(name = "processId") Integer processId,
                                                 @PathVariable(name = "fileName") String fileName)

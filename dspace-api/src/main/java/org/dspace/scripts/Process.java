@@ -80,6 +80,8 @@ public class Process implements ReloadableEntity<Integer> {
     @Temporal(TemporalType.TIMESTAMP)
     private Date creationTime;
 
+    public static final String BITSTREAM_TYPE_METADATAFIELD = "dspace.process.type";
+
     protected Process() {
     }
 

@@ -14,6 +14,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
  * The ProcessFileWrapper REST Resource
+ * This class will provide a way to show the processId alongside a list of embedded Bitstreams for that process
+ * if that Projection should be chosen
  *
  */
 public class ProcessFileWrapperRest implements RestModel {
