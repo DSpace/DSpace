@@ -16,6 +16,7 @@ import org.dspace.app.rest.model.AccessConditionOptionRest;
 import org.dspace.app.rest.model.SubmissionUploadRest;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.utils.DateMathParser;
+import org.dspace.app.rest.utils.Utils;
 import org.dspace.app.util.SubmissionConfig;
 import org.dspace.app.util.SubmissionConfigReader;
 import org.dspace.app.util.SubmissionConfigReaderException;
@@ -28,7 +29,6 @@ import org.dspace.submit.model.UploadConfiguration;
 import org.dspace.submit.model.UploadConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
@@ -49,6 +49,9 @@ public class SubmissionUploadRestRepository extends DSpaceRestRepository<Submiss
 
     @Autowired
     private SubmissionFormRestRepository submissionFormRestRepository;
+
+    @Autowired
+    private Utils utils;
 
     @Autowired
     private UploadConfigurationService uploadConfigurationService;
@@ -78,8 +81,7 @@ public class SubmissionUploadRestRepository extends DSpaceRestRepository<Submiss
     @Override
     public Page<SubmissionUploadRest> findAll(Context context, Pageable pageable) {
         List<SubmissionConfig> subConfs = new ArrayList<SubmissionConfig>();
-        subConfs = submissionConfigReader.getAllSubmissionConfigs(pageable.getPageSize(),
-                Math.toIntExact(pageable.getOffset()));
+        subConfs = submissionConfigReader.getAllSubmissionConfigs(Integer.MAX_VALUE, 0);
         Projection projection = utils.obtainProjection();
         List<SubmissionUploadRest> results = new ArrayList<>();
         for (SubmissionConfig config : subConfs) {
@@ -97,7 +99,8 @@ public class SubmissionUploadRestRepository extends DSpaceRestRepository<Submiss
                 }
             }
         }
-        return new PageImpl<SubmissionUploadRest>(results, pageable, results.size());
+
+        return utils.getPage(results, pageable);
     }
 
     @Override

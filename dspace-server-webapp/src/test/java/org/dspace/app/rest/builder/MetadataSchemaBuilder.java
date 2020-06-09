@@ -38,6 +38,7 @@ public class MetadataSchemaBuilder extends AbstractBuilder<MetadataSchema, Metad
     public void cleanup() throws Exception {
         try (Context c = new Context()) {
             c.turnOffAuthorisationSystem();
+            // Ensure object and any related objects are reloaded before checking to see what needs cleanup
             metadataSchema = c.reloadEntity(metadataSchema);
             if (metadataSchema != null) {
                 delete(c, metadataSchema);

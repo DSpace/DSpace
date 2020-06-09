@@ -86,7 +86,7 @@ public class DedupEventConsumer implements Consumer {
         // transform the event to be a Modify on the owning Item.
         // It could be a new bitstream in the TEXT bundle which
         // would change the index.
-        if (st == Constants.BUNDLE) {
+        if (st == Constants.BUNDLE && subject != null) {
             subject = ((Bundle) subject).getItems().get(0);
         }
 

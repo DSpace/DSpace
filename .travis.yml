@@ -23,6 +23,8 @@ before_install:
   # Remove outdated settings.xml from Travis builds. Workaround for https://github.com/travis-ci/travis-ci/issues/4629
   - rm ~/.m2/settings.xml
   - sed -i 's/^submission\.lookup\.ads\.apikey.*/submission.lookup.ads.apikey='$ADS_API_KEY'/g' dspace-api/src/test/data/dspaceFolder/config/local.cfg
+  - sed -i 's/^submission\.lookup\.epo\.consumerKey.*/submission.lookup.epo.consumerKey='$EPO_API_KEY'/g' dspace-api/src/test/data/dspaceFolder/config/local.cfg
+  - sed -i 's/^submission\.lookup\.epo\.consumerSecretKey.*/submission.lookup.epo.consumerSecretKey='$EPO_API_KEY_SECRET'/g' dspace-api/src/test/data/dspaceFolder/config/local.cfg
   - ./dspace-api/src/test/data/dspaceFolder/bin/install_grobid.sh
 
 # Skip install stage, as we'll do it below

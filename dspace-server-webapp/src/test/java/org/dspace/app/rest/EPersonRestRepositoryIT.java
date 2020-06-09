@@ -1539,7 +1539,6 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         String token = getAuthToken(admin.getEmail(), password);
 
-        context.restoreAuthSystemState();
 
         List<Operation> ops = new ArrayList<Operation>();
         ReplaceOperation replaceOperation0 = new ReplaceOperation("/canLogin", true);

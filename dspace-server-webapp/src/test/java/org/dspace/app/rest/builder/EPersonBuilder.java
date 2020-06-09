@@ -30,6 +30,7 @@ public class EPersonBuilder extends AbstractDSpaceObjectBuilder<EPerson> {
     public void cleanup() throws Exception {
        try (Context c = new Context()) {
             c.turnOffAuthorisationSystem();
+            // Ensure object and any related objects are reloaded before checking to see what needs cleanup
             ePerson = c.reloadEntity(ePerson);
             if (ePerson != null) {
                 delete(c, ePerson);

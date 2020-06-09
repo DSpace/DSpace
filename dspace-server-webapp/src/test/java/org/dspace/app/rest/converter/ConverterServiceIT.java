@@ -31,11 +31,16 @@ import org.dspace.app.rest.model.hateoas.MockObjectResource;
 import org.dspace.app.rest.projection.MockProjection;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
+import org.dspace.core.Context;
+import org.dspace.services.RequestService;
+import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.Link;
+import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.mock.web.MockHttpServletResponse;
 
 /**
  * Tests functionality of {@link ConverterService}.
@@ -57,6 +62,21 @@ public class ConverterServiceIT extends AbstractControllerIntegrationTest {
     @Mock
     private Object mockEmbeddedResource;
 
+    @Autowired
+    private RequestService requestService;
+
+    @Before
+    public void setup() {
+        // We're mocking a request here because we've started using the Context in the ConverterService#toRest
+        // method by invoking the DSpacePermissionEvaluator. This will traverse the RestPermissionEvaluatorPlugins
+        // and thus also invoke the AdminRestPermissionEvaluator which will try to retrieve the Context from a
+        // Request. This Request isn't available through tests on itself and thus we have to mock it here to avoid
+        // the PermissionEvaluator from crashing because of this.
+        MockHttpServletRequest mockHttpServletRequest = new MockHttpServletRequest();
+        mockHttpServletRequest.setAttribute("dspace.context", new Context());
+        MockHttpServletResponse mockHttpServletResponse = new MockHttpServletResponse();
+        requestService.startRequest(mockHttpServletRequest, mockHttpServletResponse);
+    }
     /**
      * When calling {@code toRest} with an object for which an appropriate {@link DSpaceConverter} can't be found,
      * it should throw an {@link IllegalArgumentException}.

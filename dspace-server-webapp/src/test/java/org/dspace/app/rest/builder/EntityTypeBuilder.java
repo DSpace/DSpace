@@ -36,6 +36,7 @@ public class EntityTypeBuilder extends AbstractBuilder<EntityType, EntityTypeSer
     public void cleanup() throws Exception {
         try (Context c = new Context()) {
             c.turnOffAuthorisationSystem();
+            // Ensure object and any related objects are reloaded before checking to see what needs cleanup
             entityType = c.reloadEntity(entityType);
             if (entityType != null) {
                 delete(entityType);
