@@ -41,8 +41,6 @@ public class MetadataImportTest extends AbstractIntegrationTest {
         context.restoreAuthSystemState();
 
         String fileLocation = new File(testProps.get("test.importcsv").toString()).getAbsolutePath();
-//        String fileLocation = configurationService.getProperty("dspace.dir") + testProps.get("test.importcsv")
-//                                                                                        .toString();
         String[] args = new String[] {"metadata-import", "-f", fileLocation, "-e", eperson.getEmail(), "-s"};
         TestDSpaceRunnableHandler testDSpaceRunnableHandler = new TestDSpaceRunnableHandler();
 
