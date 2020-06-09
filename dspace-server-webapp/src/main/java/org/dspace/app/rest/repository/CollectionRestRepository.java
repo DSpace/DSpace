@@ -13,6 +13,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.SortedMap;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
 
@@ -42,10 +43,14 @@ import org.dspace.content.Bitstream;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
+import org.dspace.content.MetadataField;
+import org.dspace.content.MetadataValue;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
 import org.dspace.content.service.ItemService;
+import org.dspace.content.service.MetadataFieldService;
+import org.dspace.content.service.MetadataValueService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.discovery.DiscoverQuery;
@@ -115,6 +120,15 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
     @Autowired
     SearchService searchService;
 
+    @Autowired
+    MetadataFieldService metadataFieldService;
+
+    @Autowired
+    MetadataValueService metadataValueService;
+
+    @Autowired
+    CollectionService collectionService;
+
     public CollectionRestRepository(CollectionService dsoService) {
         super(dsoService);
     }
@@ -175,6 +189,53 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
                         + " not found");
             }
             List<Collection> collections = cs.findAuthorized(context, com, Constants.ADD);
+            return converter.toRestPage(collections, pageable, utils.obtainProjection());
+        } catch (SQLException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+    }
+
+    @SearchRestMethod(name = "findAuthorizedByCommunityAndMetadata")
+    public Page<CollectionRest> findAuthorizedByCommunityAndMetadata(
+        @Parameter(value = "uuid", required = true) UUID communityUuid,
+        @Parameter(value = "metadata", required = true) String metadata,
+        @Parameter(value = "metadatavalue") String metadataValue,
+        Pageable pageable) {
+        try {
+            Context context = obtainContext();
+            MetadataField metadataField = this.metadataFieldService.findByString(context,
+                metadata,
+                '.');
+            if (metadataField == null) {
+                throw new ResourceNotFoundException(
+                        "MetadataField " + metadata + " does not found");
+            }
+            Community com = communityService.find(context, communityUuid);
+            if (com == null) {
+                throw new ResourceNotFoundException(
+                    CommunityRest.CATEGORY + "." + CommunityRest.NAME + " with id: " + communityUuid
+                        + " not found");
+            }
+            List<Collection> collections = cs.findAuthorized(context, com, Constants.ADD);
+
+            collections = collections.stream().filter(collection -> {
+                try {
+                    List<MetadataValue> metadataValues = collection.getMetadata();
+                    if (StringUtils.isNotBlank(metadataValue)) {
+                        return metadataValues.stream().map(x -> x.getValue()).anyMatch(x -> metadataValue.equals(x));
+                    } else {
+                        MetadataValue value = metadataValues.stream().
+                                filter(x -> x.getMetadataField().toString().equals(metadata.replaceAll("\\.", "_")))
+                                .findFirst()
+                                .orElse(null);
+                        return value != null;
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    return false;
+
+                }
+            }).collect(Collectors.toList());
             return converter.toRestPage(collections, pageable, utils.obtainProjection());
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
@@ -295,7 +356,9 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
      * @param context
      * @param collection The collection on which to install the logo
      * @param uploadfile The new logo
+     *
      * @return The created bitstream containing the new logo
+     *
      * @throws IOException
      * @throws AuthorizeException
      * @throws SQLException
@@ -319,7 +382,9 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
      * @param context
      * @param collection    The collection for which to make the item
      * @param inputItemRest The new item
+     *
      * @return The created TemplateItem
+     *
      * @throws SQLException
      * @throws AuthorizeException
      */
@@ -344,7 +409,9 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
      * This method looks up the template Item associated with a Collection
      *
      * @param collection The Collection for which to find the template
+     *
      * @return The template Item from the Collection
+     *
      * @throws SQLException
      */
     public TemplateItemRest getTemplateItem(Collection collection) throws SQLException {

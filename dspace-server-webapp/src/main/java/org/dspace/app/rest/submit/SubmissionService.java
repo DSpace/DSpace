@@ -33,9 +33,11 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Collection;
+import org.dspace.content.EntityType;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.content.service.CollectionService;
+import org.dspace.content.service.EntityTypeService;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.Constants;
@@ -80,7 +82,8 @@ public class SubmissionService {
     private ConverterService converter;
     @Autowired
     private org.dspace.app.rest.utils.Utils utils;
-
+    @Autowired
+    private EntityTypeService entityTypeService;
     /**
      * Create a workspaceitem using the information in the request
      *
@@ -96,27 +99,36 @@ public class SubmissionService {
         WorkspaceItem wsi = null;
         Collection collection = null;
         String collectionUUID = request.getHttpServletRequest().getParameter("owningCollection");
+        String entityType = request.getHttpServletRequest().getParameter("entityType");
 
         if (StringUtils.isBlank(collectionUUID)) {
             collectionUUID = configurationService.getProperty("submission.default.collection");
         }
-
+        if (StringUtils.isBlank(entityType) && !StringUtils.isNotBlank(collectionUUID)) {
+            entityType = configurationService.getProperty("submission.default.entitytype");
+        }
+        if (StringUtils.isNotBlank(entityType) && getEntityType(context, entityType) == null) {
+            throw new UnprocessableEntityException("Entity type is not valid");
+        }
         try {
             if (StringUtils.isNotBlank(collectionUUID)) {
                 collection = collectionService.find(context, UUID.fromString(collectionUUID));
-            } else {
-                final List<Collection> findAuthorizedOptimized = collectionService.findAuthorizedOptimized(context,
-                        Constants.ADD);
-                if (findAuthorizedOptimized != null && findAuthorizedOptimized.size() > 0) {
-                    collection = findAuthorizedOptimized.get(0);
-                } else {
-                    throw new RESTAuthorizationException("No collection suitable for submission for the current user");
-                }
+            } else if (StringUtils.isNotBlank(entityType))  {
+                final String type = entityType;
+                collection = collectionService.findAuthorizedOptimized(context,Constants.ADD).stream()
+                        .filter(coll ->
+                                StringUtils.isBlank(type) ? true : type.equalsIgnoreCase(coll.getRelationshipType()))
+                        .findFirst().orElse(null);
             }
 
             if (collection == null) {
-                throw new RESTAuthorizationException("collectionUUID=" + collectionUUID + " not found");
+                throw new RESTAuthorizationException("No collection suitable for submission for the current user");
             }
+
+            if (StringUtils.isNotEmpty(entityType) && !collection.getRelationshipType().equalsIgnoreCase(entityType)) {
+                throw new UnprocessableEntityException("Collection relationship type does not match with entity type");
+            }
+
             wsi = workspaceItemService.create(context, collection, true);
         } catch (SQLException e) {
             // wrap in a runtime exception as we cannot change the method signature
@@ -126,6 +138,11 @@ public class SubmissionService {
         }
 
         return wsi;
+    }
+
+    private EntityType getEntityType(Context context, String entityType) throws SQLException {
+        return entityTypeService.findByEntityType(context, entityType);
+
     }
 
     public void saveWorkspaceItem(Context context, WorkspaceItem wsi) {
