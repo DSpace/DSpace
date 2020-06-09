@@ -32,11 +32,13 @@ import org.dspace.core.Utils;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.submit.AbstractProcessingStep;
 import org.dspace.submit.listener.MetadataListener;
+import org.dspace.submit.listener.MetadataListenerConstrain;
 import org.dspace.submit.lookup.SubmissionLookupDataLoader;
 
 //FIXME move to the ExtractionStep
 /**
  * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
+ * @author Giuseppe Digilio (giuseppe dot digilio at 4science dot it)
  */
 public class MetadataStep extends AbstractProcessingStep {
     /**
@@ -72,9 +74,18 @@ public class MetadataStep extends AbstractProcessingStep {
     public void doPostProcessing(Context context, InProgressSubmission wsi) {
         external:
         for (String metadata : metadataMap.keySet()) {
-            String[] tokenized = Utils.tokenize(metadata);
-            List<MetadataValue> currents = itemService.getMetadata(wsi.getItem(), tokenized[0], tokenized[1],
-                                                                    tokenized[2], Item.ANY);
+            List<MetadataValue> currents = new ArrayList<MetadataValue>();
+            if (hasConstrain(metadata)) {
+                // Retrieve current metadata only whether constrain is valid, otherwise skip it
+                if (isConstrainValid(metadata, wsi.getItem())) {
+                    currents = getCurrentConstrainMetadata(metadata, wsi.getItem());
+                }
+            } else {
+                String[] tokenized = Utils.tokenize(metadata);
+                currents = itemService.getMetadata(wsi.getItem(), tokenized[0], tokenized[1],
+                        tokenized[2], Item.ANY);
+            }
+
             if (currents != null && !currents.isEmpty()) {
                 List<MetadataValue> olds = metadataMap.get(metadata);
                 if (olds.isEmpty()) {
@@ -86,8 +97,15 @@ public class MetadataStep extends AbstractProcessingStep {
 
                     boolean found = false;
                     for (MetadataValue old : olds) {
+                        // checks if metadata has been already processed
                         if (old.getValue().equals(current.getValue())) {
-                            found = true;
+                            if (hasConstrain(metadata)) {
+                                // if has constrain checks if related constrain metadata has been already processed
+                                found = checkRelatedConstrainMetadataHasBeenProcessed(metadata,
+                                        wsi.getItem());
+                            } else {
+                                found = true;
+                            }
                         }
                     }
                     if (!found) {
@@ -111,6 +129,76 @@ public class MetadataStep extends AbstractProcessingStep {
                 }
             }
         }
+    }
+
+    protected boolean checkRelatedConstrainMetadataHasBeenProcessed(String metadata, Item item) {
+        boolean constrainFound = false;
+        MetadataListenerConstrain listenerConstrain = getListenerConstrainService();
+
+        if (listenerConstrain != null) {
+            String constrainMetadata = listenerConstrain.getConstrainMetadataName(metadata);
+            if (constrainMetadata != null) {
+                String[] tokenized = Utils.tokenize(constrainMetadata);
+                List<MetadataValue> currents = itemService.getMetadata(item, tokenized[0], tokenized[1],
+                        tokenized[2], Item.ANY);
+                for (MetadataValue current : currents) {
+                    List<MetadataValue> constrainOlds = metadataMap.get(constrainMetadata);
+                    if (!constrainOlds.isEmpty()) {
+                        for (MetadataValue constrainOld : constrainOlds) {
+                            if (constrainOld.getValue().equals(current.getValue())) {
+                                constrainFound = true;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return constrainFound;
+    }
+
+    protected List<MetadataValue> getCurrentConstrainMetadata(String metadata, Item item) {
+        MetadataListenerConstrain listenerConstrain = getListenerConstrainService();
+        List<MetadataValue> metadataList = new ArrayList<MetadataValue>();
+
+        if (listenerConstrain != null) {
+            metadataList = listenerConstrain.getCurrentConstrainMetadata(metadata, item, metadataMap);
+        }
+
+        return metadataList;
+    }
+
+    protected boolean hasConstrain(String metadata) {
+        boolean hasConstrain = false;
+        MetadataListenerConstrain listenerConstrain = getListenerConstrainService();
+
+        if (listenerConstrain != null) {
+            hasConstrain = listenerConstrain.hasConstrain(metadata);
+        }
+
+        return hasConstrain;
+    }
+
+    protected boolean isConstrainValid(String metadata, Item item) {
+        boolean isValid = true;
+        MetadataListenerConstrain listenerConstrain = getListenerConstrainService();
+
+        if (listenerConstrain != null) {
+            isValid = listenerConstrain.isConstrainValid(metadata, item, metadataMap);
+        }
+
+        return isValid;
+    }
+
+    protected MetadataListenerConstrain getListenerConstrainService() {
+        MetadataListenerConstrain listenerConstrain = null;
+        if (DSpaceServicesFactory.getInstance().getServiceManager().isServiceExists("lookupListenerConstrain")) {
+            listenerConstrain = DSpaceServicesFactory.getInstance().getServiceManager()
+                    .getServiceByName("lookupListenerConstrain", MetadataListenerConstrain.class);
+        }
+
+        return listenerConstrain;
     }
 
     protected void enrichItem(Context context, List<Record> rset, Item item) throws SQLException, AuthorizeException {

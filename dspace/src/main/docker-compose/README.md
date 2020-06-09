@@ -18,7 +18,7 @@
   - Sets the environment used across containers run with docker-compose
 - docker-compose-angular.yml
   - Docker compose file that will start a published DSpace angular container that interacts with the branch.
-- environment.dev.js
+- environment.dev.ts
   - Default angular environment when testing DSpace-angular from this repo
 
 ## To refresh / pull DSpace images from Dockerhub

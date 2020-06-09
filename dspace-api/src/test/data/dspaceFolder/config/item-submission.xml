@@ -20,6 +20,8 @@
         <name-map collection-handle="default" submission-name="traditional"/>
         <name-map collection-handle="123456789/publication-1" submission-name="publication"/>
         <name-map collection-handle="123456789/language-test-1" submission-name="languagetestprocess"/>
+        <name-map collection-handle="123456789/patent-test" submission-name="patent"/>
+        <name-map collection-handle="123456789/traditional-cris" submission-name="traditional-cris"/>
     </submission-map>
 
 
@@ -58,6 +60,11 @@
             <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
             <type>submission-form</type>
         </step>
+        <step id="traditionalpageone-cris" mandatory="true">
+            <heading>submit.progressbar.describe.stepone</heading>
+            <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
+            <type>submission-form</type>
+        </step>
         <step id="traditionalpagetwo" mandatory="true">
             <heading>submit.progressbar.describe.steptwo</heading>
             <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
@@ -74,12 +81,12 @@
             <type>license</type>
             <scope visibilityOutside="read-only">submission</scope>
         </step>
-		<step id="extraction">
-			<heading></heading>
-			<processing-class>org.dspace.app.rest.submit.step.ExtractMetadataStep</processing-class>
-			<type>utils</type>
-			<scope visibility="hidden" visibilityOutside="hidden">submission</scope>
-		</step>
+        <step id="extraction">
+            <heading></heading>
+            <processing-class>org.dspace.app.rest.submit.step.ExtractMetadataStep</processing-class>
+            <type>utils</type>
+            <scope visibility="hidden" visibilityOutside="hidden">submission</scope>
+        </step>
         <!-- Step Upload Item with Embargo Features to enable this step, please
             make sure to comment-out the previous step "UploadStep" <step id="upload-with-embargo">
             <heading>submit.progressbar.upload</heading> <processing-class>org.dspace.submit.step.UploadWithEmbargoStep</processing-class>
@@ -110,6 +117,24 @@
             <scope visibility="read-only">submission</scope> </step> <step mandatory="false">
             <heading>fake.workflow.readonly</heading> <processing-class>org.dspace.submit.step.SampleStep</processing-class>
             <type>sample</type> <scope visibility="read-only">workflow</scope> </step> -->
+
+        <!-- patent steps [START] -->
+        <step id="patent" mandatory="true">
+            <heading>submit.progressbar.describe.patent</heading>
+            <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
+            <type>submission-form</type>
+        </step>
+        <step id="patent_indexing" mandatory="true">
+            <heading>submit.progressbar.describe.patent_indexing</heading>
+            <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
+            <type>submission-form</type>
+        </step>
+        <step id="patent_references" mandatory="true">
+            <heading>submit.progressbar.describe.patent_references</heading>
+            <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
+            <type>submission-form</type>
+        </step>
+        <!-- publication steps [END]   -->
 
         <!-- This is the Sample Step which utilizes the JSPSampleStep class -->
         <step id="sample">
@@ -187,6 +212,30 @@
             <!-- <step id="verify"/> -->
         </submission-process>
 
+        <!--This "traditional" process defines the DEFAULT item submission process -->
+        <submission-process name="traditional-cris">
+
+            <!--Uncommment to display the SAMPLE step as your first step -->
+            <!--<step id="sample"/> -->
+
+            <step id="collection"/>
+            <step id="extraction" />
+
+            <!--Step will be to Describe the item. -->
+            <step id="traditionalpageone-cris"/>
+            <step id="traditionalpagetwo"/>
+
+            <!--Step will be to Upload the item -->
+            <step id="upload"/>
+            <!-- <step id="upload-with-embargo"/> -->
+            <step id="detect-duplicate"/>
+
+            <!--Step will be to Sign off on the License -->
+            <step id="license"/>
+            <!-- <step id="creative-commons"/> -->
+            <!-- <step id="verify"/> -->
+        </submission-process>
+
 	    <submission-process name="publication">
 	      <step id="collection" />
 	      <step id="extraction" />
@@ -202,6 +251,16 @@
             <step id="collection"/>
             <step id="languagetest"/>
         </submission-process>
+        <!-- patent, used by some collection like 123456789/1001 -->
+        <submission-process name="patent">
+            <step id="collection" />
+            <step id="patent" />
+            <step id="patent_indexing" />
+            <step id="patent_references" />
+            <step id="upload" />
+            <step id="license" />
+        </submission-process>
+
     </submission-definitions>
 
 </item-submission>

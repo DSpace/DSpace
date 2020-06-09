@@ -7,6 +7,8 @@
  */
 package org.dspace.app.rest;
 
+import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -103,11 +105,16 @@ public class AuthorityEntryLinkRepositoryIT extends AbstractControllerIntegratio
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.page.size", is(10)))
             .andExpect(jsonPath("$.page.totalElements", is(5)))
-            .andExpect(jsonPath("$._embedded.entries[0].value", is("Smith, Donald")))
-            .andExpect(jsonPath("$._embedded.entries[1].value", is("Smith, Maria")))
-            .andExpect(jsonPath("$._embedded.entries[2].value", is("Smith, Joe")))
-            .andExpect(jsonPath("$._embedded.entries[3].value", is("Smith, Jack")))
-            .andExpect(jsonPath("$._embedded.entries[4].value", is("Smith, J.")));
+            .andExpect(jsonPath("$._embedded.entries",
+                    containsInAnyOrder(
+                            hasJsonPath("$.value", is("Smith, Donald")),
+                            hasJsonPath("$.value", is("Smith, Maria")),
+                            hasJsonPath("$.value", is("Smith, Joe")),
+                            hasJsonPath("$.value", is("Smith, Jack")),
+                            hasJsonPath("$.value", is("Smith, J."))
+                    )
+                )
+            );
 
         getClient(token).perform(get("/api/integration/authorities/AuthorAuthority/entries")
             .param("query", "Smith, J")
@@ -118,9 +125,14 @@ public class AuthorityEntryLinkRepositoryIT extends AbstractControllerIntegratio
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.page.size", is(10)))
             .andExpect(jsonPath("$.page.totalElements", is(3)))
-            .andExpect(jsonPath("$._embedded.entries[0].value", is("Smith, J.")))
-            .andExpect(jsonPath("$._embedded.entries[1].value", is("Smith, Joe")))
-            .andExpect(jsonPath("$._embedded.entries[2].value", is("Smith, Jack")));
+            .andExpect(jsonPath("$._embedded.entries",
+                    containsInAnyOrder(
+                            hasJsonPath("$.value", is("Smith, J.")),
+                            hasJsonPath("$.value", is("Smith, Joe")),
+                            hasJsonPath("$.value", is("Smith, Jack"))
+                    )
+                )
+            );
 
         getClient(token).perform(get("/api/integration/authorities/AuthorAuthority/entries")
             .param("query", "Smith, J.")
@@ -142,8 +154,13 @@ public class AuthorityEntryLinkRepositoryIT extends AbstractControllerIntegratio
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.page.size", is(10)))
             .andExpect(jsonPath("$.page.totalElements", is(2)))
-            .andExpect(jsonPath("$._embedded.entries[0].value", is("Smith, Donald")))
-            .andExpect(jsonPath("$._embedded.entries[1].value", is("Foe, Donald")));
+            .andExpect(jsonPath("$._embedded.entries",
+                    containsInAnyOrder(
+                            hasJsonPath("$.value", is("Smith, Donald")),
+                            hasJsonPath("$.value", is("Foe, Donald"))
+                    )
+                )
+            );
     }
 
     @Test
@@ -256,11 +273,15 @@ public class AuthorityEntryLinkRepositoryIT extends AbstractControllerIntegratio
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.page.size", is(10)))
             .andExpect(jsonPath("$.page.totalElements", is(4)))
-            .andExpect(jsonPath("$._embedded.entries[0].value", is("Science Technological journal")))
-            .andExpect(jsonPath("$._embedded.entries[1].value", is("Bioresource technology journal")))
-            .andExpect(jsonPath("$._embedded.entries[2].value", is("Journal of High Energy Astrophysics")))
-            .andExpect(jsonPath("$._embedded.entries[3].value",
-                    is("Nuclear Energy-journal Of The British Nuclear Energy Society")));
+            .andExpect(jsonPath("$._embedded.entries",
+                    containsInAnyOrder(
+                            hasJsonPath("$.value", is("Science Technological journal")),
+                            hasJsonPath("$.value", is("Bioresource technology journal")),
+                            hasJsonPath("$.value", is("Journal of High Energy Astrophysics")),
+                            hasJsonPath("$.value", is("Nuclear Energy-journal Of The British Nuclear Energy Society"))
+                    )
+                )
+            );
 
         getClient(token).perform(get("/api/integration/authorities/JournalAuthority/entries")
             .param("query", "science")
@@ -271,13 +292,18 @@ public class AuthorityEntryLinkRepositoryIT extends AbstractControllerIntegratio
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.page.size", is(10)))
             .andExpect(jsonPath("$.page.totalElements", is(7)))
-            .andExpect(jsonPath("$._embedded.entries[0].value", is("Science China-Earth Sciences")))
-            .andExpect(jsonPath("$._embedded.entries[1].value", is("Science")))
-            .andExpect(jsonPath("$._embedded.entries[2].value", is("Annals of science")))
-            .andExpect(jsonPath("$._embedded.entries[3].value", is("Management science")))
-            .andExpect(jsonPath("$._embedded.entries[4].value", is("Service Science")))
-            .andExpect(jsonPath("$._embedded.entries[5].value", is("Ocean Science")))
-            .andExpect(jsonPath("$._embedded.entries[6].value", is("Science Technological journal")));
+            .andExpect(jsonPath("$._embedded.entries",
+                    containsInAnyOrder(
+                            hasJsonPath("$.value", is("Science China-Earth Sciences")),
+                            hasJsonPath("$.value", is("Science")),
+                            hasJsonPath("$.value", is("Annals of science")),
+                            hasJsonPath("$.value", is("Management science")),
+                            hasJsonPath("$.value", is("Service Science")),
+                            hasJsonPath("$.value", is("Ocean Science")),
+                            hasJsonPath("$.value", is("Science Technological journal"))
+                    )
+                )
+            );
 
         getClient(token).perform(get("/api/integration/authorities/JournalAuthority/entries")
             .param("query", "Annals of science")

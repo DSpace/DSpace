@@ -39,6 +39,7 @@ public class MetadataFieldBuilder extends AbstractBuilder<MetadataField, Metadat
     public void cleanup() throws Exception {
         try (Context c = new Context()) {
             c.turnOffAuthorisationSystem();
+            // Ensure object and any related objects are reloaded before checking to see what needs cleanup
             metadataField = c.reloadEntity(metadataField);
             if (metadataField != null) {
                 delete(c, metadataField);

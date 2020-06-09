@@ -86,6 +86,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.Link;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -692,7 +693,13 @@ public class Utils {
                 Object linkedObject = method.invoke(linkRepository, null, contentId, null, projection);
                 resource.embedResource(rel, wrapForEmbedding(resource, linkedObject, link, oldLinks));
             } catch (InvocationTargetException e) {
-                if (e.getTargetException() instanceof RuntimeException) {
+                // This will be thrown from the LinkRepository if a Resource has been requested that'll try to embed
+                // something that we don't have READ rights to. It'll then throw an AccessDeniedException from that
+                // linkRepository and we want to catch it here since we don't want our entire request to fail if a
+                // subresource of the requested resource is not available to be embedded. Instead we'll log it here
+                if (e.getTargetException() instanceof AccessDeniedException) {
+                    log.warn("Tried fetching resource: " + linkRest.name() + " for DSpaceObject with ID: " + contentId);
+                } else if (e.getTargetException() instanceof RuntimeException) {
                     throw (RuntimeException) e.getTargetException();
                 } else {
                     throw new RuntimeException(e);

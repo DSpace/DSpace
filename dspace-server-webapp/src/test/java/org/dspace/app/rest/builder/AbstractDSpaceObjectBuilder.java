@@ -51,7 +51,7 @@ public abstract class AbstractDSpaceObjectBuilder<T extends DSpaceObject>
 
     protected <B> B handleException(final Exception e) {
         log.error(e.getMessage(), e);
-        return null;
+        throw new RuntimeException(e);
     }
 
 
@@ -232,20 +232,6 @@ public abstract class AbstractDSpaceObjectBuilder<T extends DSpaceObject>
     }
 
     public abstract T build() throws SQLException, AuthorizeException;
-
-//    public void delete(T dso) throws Exception {
-//
-//        try (Context c = new Context()) {
-//            c.turnOffAuthorisationSystem();
-//            T attachedDso = c.reloadEntity(dso);
-//            if (attachedDso != null) {
-//                getService().delete(c, attachedDso);
-//            }
-//            c.complete();
-//        }
-//
-//        indexingService.commit();
-//    }
 
     public void delete(Context c, T dso) throws Exception {
        if (dso != null) {
