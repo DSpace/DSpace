@@ -7,8 +7,10 @@
  */
 package org.dspace.layout;
 
+import java.util.HashSet;
 import java.util.Set;
 import javax.persistence.Cacheable;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -71,12 +73,12 @@ public class CrisLayoutBox implements ReloadableEntity<Integer> {
         inverseJoinColumns = {@JoinColumn(name = "cris_layout_field_id")}
     )
     private Set<CrisLayoutField> layoutFields;
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinTable(
-        name = "cris_layout_tab2box",
-        joinColumns = {@JoinColumn(name = "cris_layout_box_id")},
-        inverseJoinColumns = {@JoinColumn(name = "cris_layout_tab_id")}
-    )
+            name = "cris_layout_tab2box",
+            joinColumns = {@JoinColumn(name = "cris_layout_box_id")},
+            inverseJoinColumns = {@JoinColumn(name = "cris_layout_tab_id")}
+        )
     private Set<CrisLayoutTab> tabs;
     @Column(name = "clear")
     private Boolean clear;
@@ -229,4 +231,56 @@ public class CrisLayoutBox implements ReloadableEntity<Integer> {
     public void setClear(Boolean clear) {
         this.clear = clear;
     }
+
+    public void addTab(CrisLayoutTab tab) {
+        if (this.tabs == null) {
+            this.tabs = new HashSet<>();
+        }
+        this.tabs.add(tab);
+    }
+
+    public void removeTab(CrisLayoutTab tab) {
+        if (this.tabs != null && !this.tabs.isEmpty()) {
+            this.tabs.remove(tab);
+        }
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((id == null) ? 0 : id.hashCode());
+        result = prime * result + ((shortname == null) ? 0 : shortname.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        CrisLayoutBox other = (CrisLayoutBox) obj;
+        if (id == null) {
+            if (other.id != null) {
+                return false;
+            }
+        } else if (!id.equals(other.id)) {
+            return false;
+        }
+        if (shortname == null) {
+            if (other.shortname != null) {
+                return false;
+            }
+        } else if (!shortname.equals(other.shortname)) {
+            return false;
+        }
+        return true;
+    }
+
 }

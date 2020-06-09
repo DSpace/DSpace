@@ -7,7 +7,9 @@
  */
 package org.dspace.app.rest.builder;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -102,14 +104,14 @@ public class CrisLayoutTabBuilder extends AbstractBuilder<CrisLayoutTab, CrisLay
         return this;
     }
 
-    public CrisLayoutTabBuilder withBoxes(Set<CrisLayoutBox> boxes) {
+    public CrisLayoutTabBuilder withBoxes(List<CrisLayoutBox> boxes) {
         this.tab.setBoxes(boxes);
         return this;
     }
 
     public CrisLayoutTabBuilder addBox(CrisLayoutBox box) {
         if (this.tab.getBoxes() == null) {
-            this.tab.setBoxes(new HashSet<>());
+            this.tab.setBoxes(new ArrayList<>());
         }
         this.tab.getBoxes().add(box);
         return this;

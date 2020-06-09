@@ -11,7 +11,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
 import org.apache.commons.collections.CollectionUtils;
@@ -182,7 +181,7 @@ public class CrisLayoutTabServiceImpl implements CrisLayoutTabService {
             List<MetadataValue> itemMetadata = item.getMetadata();
             if (itemMetadata != null && !itemMetadata.isEmpty() ) {
                 for (CrisLayoutTab tab: tabs) {
-                    Set<CrisLayoutBox> boxes = tab.getBoxes();
+                    List<CrisLayoutBox> boxes = tab.getBoxes();
                     if (boxes != null && !boxes.isEmpty()) {
                         for (CrisLayoutBox box: boxes) {
                             if (boxService.hasContent(box, itemMetadata)) {
@@ -195,6 +194,15 @@ public class CrisLayoutTabServiceImpl implements CrisLayoutTabService {
             }
         }
         return resTabs;
+    }
+
+    /* (non-Javadoc)
+     * @see org.dspace.layout.service.CrisLayoutTabService#removeBoxRelationship
+     * (org.dspace.core.Context, java.lang.Integer, java.lang.Integer)
+     */
+    @Override
+    public void removeBoxRelationship(Context context, Integer tabId, Integer boxId) throws SQLException {
+        dao.removeBoxRelationship(context, tabId, boxId);
     }
 
 }

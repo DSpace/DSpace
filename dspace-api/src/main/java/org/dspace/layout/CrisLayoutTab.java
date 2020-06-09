@@ -7,8 +7,11 @@
  */
 package org.dspace.layout;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import javax.persistence.Cacheable;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -56,13 +59,13 @@ public class CrisLayoutTab implements ReloadableEntity<Integer> {
         inverseJoinColumns = {@JoinColumn(name = "authorized_field_id")}
     )
     private Set<MetadataField> metadataSecurityFields;
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinTable(
         name = "cris_layout_tab2box",
         joinColumns = {@JoinColumn(name = "cris_layout_tab_id")},
         inverseJoinColumns = {@JoinColumn(name = "cris_layout_box_id")}
     )
-    private Set<CrisLayoutBox> boxes;
+    private List<CrisLayoutBox> boxes;
 
     public Integer getID() {
         return id;
@@ -148,12 +151,71 @@ public class CrisLayoutTab implements ReloadableEntity<Integer> {
         this.metadataSecurityFields = metadataFields;
     }
 
-    public Set<CrisLayoutBox> getBoxes() {
+    public List<CrisLayoutBox> getBoxes() {
         return boxes;
     }
 
-    public void setBoxes(Set<CrisLayoutBox> boxes) {
+    public void setBoxes(List<CrisLayoutBox> boxes) {
         this.boxes = boxes;
     }
 
+    public void removeBox(CrisLayoutBox box) {
+        if (this.boxes != null && !this.boxes.isEmpty()) {
+            this.boxes.remove(box);
+        }
+    }
+
+    public void removeBox(Integer boxIdx) {
+        if (this.boxes != null && !this.boxes.isEmpty()) {
+            CrisLayoutBox box = this.boxes.get(boxIdx);
+            if (box != null) {
+                removeBox(box);
+            }
+        }
+    }
+
+    public void addBox(CrisLayoutBox box) {
+        if (this.boxes == null) {
+            this.boxes = new ArrayList<>();
+        }
+        this.boxes.add(box);
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((id == null) ? 0 : id.hashCode());
+        result = prime * result + ((shortName == null) ? 0 : shortName.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        CrisLayoutTab other = (CrisLayoutTab) obj;
+        if (id == null) {
+            if (other.id != null) {
+                return false;
+            }
+        } else if (!id.equals(other.id)) {
+            return false;
+        }
+        if (shortName == null) {
+            if (other.shortName != null) {
+                return false;
+            }
+        } else if (!shortName.equals(other.shortName)) {
+            return false;
+        }
+        return true;
+    }
 }

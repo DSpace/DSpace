@@ -193,9 +193,13 @@ public class CrisLayoutTabRepository extends DSpaceRestRepository<CrisLayoutTabR
     }
 
     @Override
+    @PreAuthorize("hasAuthority('ADMIN')")
     protected void delete(Context context, Integer id) throws AuthorizeException {
         try {
             CrisLayoutTab tab = service.find(context, id);
+            if (tab == null) {
+                throw new ResourceNotFoundException("CrisLayoutTab with id: " + id + " not found");
+            }
             service.delete(context, tab);
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);

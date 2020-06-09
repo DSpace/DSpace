@@ -7,20 +7,27 @@
  */
 package org.dspace.app.rest.repository;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
+import javax.servlet.http.HttpServletRequest;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
+import org.dspace.app.rest.converter.CrisLayoutBoxConverter;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
+import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.CrisLayoutBoxRest;
+import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
 import org.dspace.layout.CrisLayoutBox;
 import org.dspace.layout.service.CrisLayoutBoxService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
@@ -36,6 +43,9 @@ public class CrisLayoutBoxRepository extends DSpaceRestRepository<CrisLayoutBoxR
 
     @Autowired
     private CrisLayoutBoxService service;
+
+    @Autowired
+    private CrisLayoutBoxConverter boxConverter;
 
     @Override
     public CrisLayoutBox findDomainObjectByPk(Context context, Integer id) throws SQLException {
@@ -103,6 +113,41 @@ public class CrisLayoutBoxRepository extends DSpaceRestRepository<CrisLayoutBoxR
             throw new RuntimeException(e.getMessage(), e);
         }
         return converter.toRestPage(boxList, pageable, totalRow, utils.obtainProjection());
+    }
+
+    @Override
+    @PreAuthorize("hasAuthority('ADMIN')")
+    protected CrisLayoutBoxRest createAndReturn(Context context) {
+        HttpServletRequest req = getRequestService().getCurrentRequest().getHttpServletRequest();
+        ObjectMapper mapper = new ObjectMapper();
+        CrisLayoutBoxRest boxRest = null;
+        try {
+            boxRest = mapper.readValue(req.getInputStream(), CrisLayoutBoxRest.class);
+        } catch (IOException e1) {
+            throw new UnprocessableEntityException("error parsing the body... maybe this is not the right error code");
+        }
+
+        CrisLayoutBox box = boxConverter.toModel(context, boxRest);
+        try {
+            service.create(context, box);
+        } catch (SQLException | AuthorizeException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+        return converter.toRest(box, utils.obtainProjection());
+    }
+
+    @Override
+    @PreAuthorize("hasAuthority('ADMIN')")
+    protected void delete(Context context, Integer id) throws AuthorizeException {
+        try {
+            CrisLayoutBox box = service.find(context, id);
+            if (box == null) {
+                throw new ResourceNotFoundException("CrisLayoutBox with id: " + id + " not found");
+            }
+            service.delete(context, box);
+        } catch (SQLException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
     }
 
     @Override

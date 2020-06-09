@@ -7,6 +7,10 @@
  */
 package org.dspace.app.rest.model;
 
+import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
 import org.dspace.app.rest.RestResourceController;
@@ -41,6 +45,7 @@ public class CrisLayoutTabRest extends BaseObjectRest<Integer> {
     private String entityType;
     private Integer priority;
     private Integer security;
+    private List<CrisLayoutBoxRest> boxes;
 
     /* (non-Javadoc)
      * @see org.dspace.app.rest.model.RestModel#getType()
@@ -134,6 +139,21 @@ public class CrisLayoutTabRest extends BaseObjectRest<Integer> {
      */
     public void setSecurity(Integer security) {
         this.security = security;
+    }
+
+    /**
+     * @return the boxes
+     */
+    @JsonInclude(Include.NON_NULL)
+    public List<CrisLayoutBoxRest> getBoxes() {
+        return boxes;
+    }
+
+    /**
+     * @param boxes the boxes to set
+     */
+    public void setBoxes(List<CrisLayoutBoxRest> boxes) {
+        this.boxes = boxes;
     }
 
 }

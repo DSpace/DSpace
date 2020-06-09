@@ -8,12 +8,16 @@
 package org.dspace.app.rest.converter;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
+import org.dspace.app.rest.model.CrisLayoutBoxRest;
 import org.dspace.app.rest.model.CrisLayoutTabRest;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.content.EntityType;
 import org.dspace.content.service.EntityTypeService;
 import org.dspace.core.Context;
+import org.dspace.layout.CrisLayoutBox;
 import org.dspace.layout.CrisLayoutTab;
 import org.dspace.layout.LayoutSecurity;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +34,9 @@ public class CrisLayoutTabConverter implements DSpaceConverter<CrisLayoutTab, Cr
 
     @Autowired
     private EntityTypeService eService;
+
+    @Autowired
+    private CrisLayoutBoxConverter boxConverter;
 
     /* (non-Javadoc)
      * @see org.dspace.app.rest.converter.DSpaceConverter#convert
@@ -68,6 +75,13 @@ public class CrisLayoutTabConverter implements DSpaceConverter<CrisLayoutTab, Cr
         tab.setSecurity(LayoutSecurity.valueOf(rest.getSecurity()));
         tab.setShortName(rest.getShortname());
         tab.setEntity(eType);
+        if (rest.getBoxes() != null && rest.getBoxes().size() > 0) {
+            List<CrisLayoutBox> boxes = new ArrayList<>();
+            for (CrisLayoutBoxRest boxRest: rest.getBoxes()) {
+                boxes.add( boxConverter.toModel(context, boxRest) );
+            }
+            tab.setBoxes(boxes);
+        }
         return tab;
     }
 }

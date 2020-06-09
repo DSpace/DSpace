@@ -7,9 +7,16 @@
  */
 package org.dspace.app.rest.converter;
 
+import java.sql.SQLException;
+
 import org.dspace.app.rest.model.CrisLayoutBoxRest;
 import org.dspace.app.rest.projection.Projection;
+import org.dspace.content.EntityType;
+import org.dspace.content.service.EntityTypeService;
+import org.dspace.core.Context;
 import org.dspace.layout.CrisLayoutBox;
+import org.dspace.layout.LayoutSecurity;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -20,6 +27,9 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class CrisLayoutBoxConverter implements DSpaceConverter<CrisLayoutBox, CrisLayoutBoxRest> {
+
+    @Autowired
+    private EntityTypeService eService;
 
     /* (non-Javadoc)
      * @see org.dspace.app.rest.converter.DSpaceConverter#convert
@@ -50,4 +60,25 @@ public class CrisLayoutBoxConverter implements DSpaceConverter<CrisLayoutBox, Cr
         return CrisLayoutBox.class;
     }
 
+    public CrisLayoutBox toModel(Context context, CrisLayoutBoxRest rest) {
+        EntityType eType = null;
+        try {
+            eType = eService.findByEntityType(context, rest.getEntityType());
+        } catch (SQLException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+        CrisLayoutBox box = new CrisLayoutBox();
+        box.setEntitytype(eType);
+        box.setType(rest.getBoxType());
+        box.setCollapsed(rest.getCollapsed());
+        box.setHeader(rest.getHeader());
+        box.setId(rest.getId());
+        box.setMinor(rest.getMinor());
+        box.setPriority(rest.getPriority());
+        box.setSecurity(LayoutSecurity.valueOf(rest.getSecurity()));
+        box.setShortname(rest.getShortname());
+        box.setStyle(rest.getStyle());
+        box.setClear(rest.getClear());
+        return box;
+    }
 }
