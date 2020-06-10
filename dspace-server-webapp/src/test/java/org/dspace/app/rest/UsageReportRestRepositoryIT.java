@@ -56,7 +56,7 @@ public class UsageReportRestRepositoryIT extends AbstractControllerIntegrationTe
     private Community communityVisited;
     private Collection collectionNotVisited;
     private Collection collectionVisited;
-    private Item itemNotVisited;
+    private Item itemNotVisitedWithBitstreams;
     private Item itemVisited;
     private Bitstream bitstreamNotVisited;
     private Bitstream bitstreamVisited;
@@ -64,6 +64,7 @@ public class UsageReportRestRepositoryIT extends AbstractControllerIntegrationTe
 
     private static final String TOTAL_VISITS_REPORT_ID = "TotalVisits";
     private static final String TOTAL_VISITS_PER_MONTH_REPORT_ID = "TotalVisitsPerMonth";
+    private static final String TOTAL_DOWNLOADS_REPORT_ID = "TotalDownloads";
 
     @BeforeClass
     public static void clearStatistics() throws Exception {
@@ -85,9 +86,11 @@ public class UsageReportRestRepositoryIT extends AbstractControllerIntegrationTe
         collectionNotVisited = createCollection(context, community).build();
         collectionVisited = createCollection(context, community).build();
         itemVisited = createItem(context, collectionNotVisited).build();
-        itemNotVisited = createItem(context, collectionNotVisited).build();
-        bitstreamNotVisited = createBitstream(context, itemNotVisited, toInputStream("test", UTF_8)).build();
-        bitstreamVisited = createBitstream(context, itemNotVisited, toInputStream("test", UTF_8)).build();
+        itemNotVisitedWithBitstreams = createItem(context, collectionNotVisited).build();
+        bitstreamNotVisited = createBitstream(context,
+            itemNotVisitedWithBitstreams, toInputStream("test", UTF_8)).build();
+        bitstreamVisited = createBitstream(context, itemNotVisitedWithBitstreams, toInputStream("test", UTF_8))
+            .withName("Bitstream").build();
 
         loggedInToken = getAuthToken(eperson.getEmail(), password);
 
@@ -120,7 +123,7 @@ public class UsageReportRestRepositoryIT extends AbstractControllerIntegrationTe
 
     @Test
     public void usagereports_NonExistentUUID_Exception() throws Exception {
-        getClient().perform(get("/api/statistics/usagereports/" + UUID.randomUUID() + "_TotalVisits"))
+        getClient().perform(get("/api/statistics/usagereports/" + UUID.randomUUID() + "_" + TOTAL_VISITS_REPORT_ID))
                    .andExpect(status().is(HttpStatus.BAD_REQUEST.value()));
     }
 
@@ -279,17 +282,17 @@ public class UsageReportRestRepositoryIT extends AbstractControllerIntegrationTe
         UsageReportPointDsoTotalVisitsRest expectedPoint = new UsageReportPointDsoTotalVisitsRest();
         expectedPoint.addValue("views", 0);
         expectedPoint.setType("item");
-        expectedPoint.setId(itemNotVisited.getID().toString());
+        expectedPoint.setId(itemNotVisitedWithBitstreams.getID().toString());
 
         // And request that item's TotalVisits stat report
         getClient().perform(
-            get("/api/statistics/usagereports/" + itemNotVisited.getID() + "_" + TOTAL_VISITS_REPORT_ID))
+            get("/api/statistics/usagereports/" + itemNotVisitedWithBitstreams.getID() + "_" + TOTAL_VISITS_REPORT_ID))
                    //** THEN **
                    .andExpect(status().isOk())
 
                    .andExpect(jsonPath("$", Matchers.is(
                        UsageReportMatcher
-                           .matchUsageReport(itemNotVisited.getID() + "_" + TOTAL_VISITS_REPORT_ID,
+                           .matchUsageReport(itemNotVisitedWithBitstreams.getID() + "_" + TOTAL_VISITS_REPORT_ID,
                                TOTAL_VISITS_REPORT_ID, Arrays.asList(expectedPoint))))
                              );
     }
@@ -364,25 +367,9 @@ public class UsageReportRestRepositoryIT extends AbstractControllerIntegrationTe
             .contentType(contentType))
                                 .andExpect(status().isCreated());
 
-        // Create expected points from -6 months to now, with a view in current month
-        List<UsageReportPointRest> expectedPoints = new ArrayList<>();
-        int nrOfMonthsBack = 6;
-        Calendar cal = Calendar.getInstance();
-        for (int i = 0; i <= nrOfMonthsBack; i++) {
-            UsageReportPointDateRest expectedPoint = new UsageReportPointDateRest();
-            if (i > 0) {
-                expectedPoint.addValue("views", 0);
-            } else {
-                expectedPoint.addValue("views", 1);
-            }
-            String month = cal.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.getDefault());
-            expectedPoint.setId(month + " " + cal.get(Calendar.YEAR));
+        List<UsageReportPointRest> expectedPoints = this.getListOfVisitsPerMonthsPoints(1);
 
-            expectedPoints.add(expectedPoint);
-            cal.add(Calendar.MONTH, -1);
-        }
-
-        // And request that collection's TotalVisits stat report
+        // And request that item's TotalVisitsPerMonth stat report
         getClient().perform(
             get("/api/statistics/usagereports/" + itemVisited.getID() + "_" + TOTAL_VISITS_PER_MONTH_REPORT_ID))
                    //** THEN **
@@ -394,9 +381,28 @@ public class UsageReportRestRepositoryIT extends AbstractControllerIntegrationTe
     }
 
     @Test
+    public void totalVisitsPerMonthReport_Item_NotVisited() throws Exception {
+        //** WHEN **
+        //Item is not visited
+        List<UsageReportPointRest> expectedPoints = this.getListOfVisitsPerMonthsPoints(0);
+
+        // And request that item's TotalVisitsPerMonth stat report
+        getClient().perform(
+            get("/api/statistics/usagereports/" + itemNotVisitedWithBitstreams.getID() + "_" +
+                TOTAL_VISITS_PER_MONTH_REPORT_ID))
+                   //** THEN **
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$", Matchers.is(
+                       UsageReportMatcher
+                           .matchUsageReport(
+                               itemNotVisitedWithBitstreams.getID() + "_" + TOTAL_VISITS_PER_MONTH_REPORT_ID,
+                               TOTAL_VISITS_PER_MONTH_REPORT_ID, expectedPoints))));
+    }
+
+    @Test
     public void totalVisitsPerMonthReport_Collection_Visited() throws Exception {
         //** WHEN **
-        //We visit an Item
+        //We visit a Collection twice
         ViewEventRest viewEventRest = new ViewEventRest();
         viewEventRest.setTargetType("collection");
         viewEventRest.setTargetId(collectionVisited.getID());
@@ -408,25 +414,14 @@ public class UsageReportRestRepositoryIT extends AbstractControllerIntegrationTe
             .contentType(contentType))
                                 .andExpect(status().isCreated());
 
-        // Create expected points from -6 months to now, with a view in current month
-        List<UsageReportPointRest> expectedPoints = new ArrayList<>();
-        int nrOfMonthsBack = 6;
-        Calendar cal = Calendar.getInstance();
-        for (int i = 0; i <= nrOfMonthsBack; i++) {
-            UsageReportPointDateRest expectedPoint = new UsageReportPointDateRest();
-            if (i > 0) {
-                expectedPoint.addValue("views", 0);
-            } else {
-                expectedPoint.addValue("views", 1);
-            }
-            String month = cal.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.getDefault());
-            expectedPoint.setId(month + " " + cal.get(Calendar.YEAR));
+        getClient(loggedInToken).perform(post("/api/statistics/viewevents")
+            .content(mapper.writeValueAsBytes(viewEventRest))
+            .contentType(contentType))
+                                .andExpect(status().isCreated());
 
-            expectedPoints.add(expectedPoint);
-            cal.add(Calendar.MONTH, -1);
-        }
+        List<UsageReportPointRest> expectedPoints = this.getListOfVisitsPerMonthsPoints(2);
 
-        // And request that collection's TotalVisits stat report
+        // And request that collection's TotalVisitsPerMonth stat report
         getClient().perform(
             get("/api/statistics/usagereports/" + collectionVisited.getID() + "_" + TOTAL_VISITS_PER_MONTH_REPORT_ID))
                    //** THEN **
@@ -435,5 +430,113 @@ public class UsageReportRestRepositoryIT extends AbstractControllerIntegrationTe
                        UsageReportMatcher
                            .matchUsageReport(collectionVisited.getID() + "_" + TOTAL_VISITS_PER_MONTH_REPORT_ID,
                                TOTAL_VISITS_PER_MONTH_REPORT_ID, expectedPoints))));
+    }
+
+    @Test
+    public void TotalDownloadsReport_Bitstream() throws Exception {
+        //** WHEN **
+        //We visit a Bitstream
+        ViewEventRest viewEventRest = new ViewEventRest();
+        viewEventRest.setTargetType("bitstream");
+        viewEventRest.setTargetId(bitstreamVisited.getID());
+
+        ObjectMapper mapper = new ObjectMapper();
+
+        getClient(loggedInToken).perform(post("/api/statistics/viewevents")
+            .content(mapper.writeValueAsBytes(viewEventRest))
+            .contentType(contentType))
+                                .andExpect(status().isCreated());
+
+        UsageReportPointDsoTotalVisitsRest expectedPoint = new UsageReportPointDsoTotalVisitsRest();
+        expectedPoint.addValue("views", 1);
+        expectedPoint.setType("bitstream");
+        expectedPoint.setId(bitstreamVisited.getID().toString());
+
+        // And request that bitstreams's TotalDownloads stat report
+        getClient().perform(
+            get("/api/statistics/usagereports/" + bitstreamVisited.getID() + "_" + TOTAL_DOWNLOADS_REPORT_ID))
+                   //** THEN **
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$", Matchers.is(
+                       UsageReportMatcher
+                           .matchUsageReport(bitstreamVisited.getID() + "_" + TOTAL_DOWNLOADS_REPORT_ID,
+                               TOTAL_DOWNLOADS_REPORT_ID, Arrays.asList(expectedPoint)))));
+    }
+
+    @Test
+    public void TotalDownloadsReport_Item() throws Exception {
+        //** WHEN **
+        //We visit an Item's bitstream
+        ViewEventRest viewEventRest = new ViewEventRest();
+        viewEventRest.setTargetType("bitstream");
+        viewEventRest.setTargetId(bitstreamVisited.getID());
+
+        ObjectMapper mapper = new ObjectMapper();
+
+        getClient(loggedInToken).perform(post("/api/statistics/viewevents")
+            .content(mapper.writeValueAsBytes(viewEventRest))
+            .contentType(contentType))
+                                .andExpect(status().isCreated());
+
+        UsageReportPointDsoTotalVisitsRest expectedPoint = new UsageReportPointDsoTotalVisitsRest();
+        expectedPoint.addValue("views", 1);
+        expectedPoint.setType("bitstream");
+        expectedPoint.setId("Bitstream");
+
+
+        // And request that item's TotalDownloads stat report
+        getClient().perform(
+            get("/api/statistics/usagereports/" + itemNotVisitedWithBitstreams.getID() + "_" +
+                TOTAL_DOWNLOADS_REPORT_ID))
+                   //** THEN **
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$", Matchers.is(
+                       UsageReportMatcher
+                           .matchUsageReport(itemNotVisitedWithBitstreams.getID() + "_" + TOTAL_DOWNLOADS_REPORT_ID,
+                               TOTAL_DOWNLOADS_REPORT_ID, Arrays.asList(expectedPoint)))));
+    }
+
+    @Test
+    public void TotalDownloadsReport_Item_NotVisited() throws Exception {
+        //** WHEN **
+        // You don't visit an item's bitstreams
+        // And request that item's TotalDownloads stat report
+        getClient().perform(
+            get("/api/statistics/usagereports/" + itemNotVisitedWithBitstreams.getID() + "_" +
+                TOTAL_DOWNLOADS_REPORT_ID))
+                   //** THEN **
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$", Matchers.is(
+                       UsageReportMatcher
+                           .matchUsageReport(itemNotVisitedWithBitstreams.getID() + "_" + TOTAL_DOWNLOADS_REPORT_ID,
+                               TOTAL_DOWNLOADS_REPORT_ID, new ArrayList<>()))));
+    }
+
+    @Test
+    public void TotalDownloadsReport_NotSupportedDSO_Collection() throws Exception {
+        getClient()
+            .perform(get("/api/statistics/usagereports/" + collectionVisited.getID() + "_" + TOTAL_DOWNLOADS_REPORT_ID))
+            .andExpect(status().is(HttpStatus.BAD_REQUEST.value()));
+    }
+
+    // Create expected points from -6 months to now, with a view in current month
+    private List<UsageReportPointRest> getListOfVisitsPerMonthsPoints(int viewsLastMonth) {
+        List<UsageReportPointRest> expectedPoints = new ArrayList<>();
+        int nrOfMonthsBack = 6;
+        Calendar cal = Calendar.getInstance();
+        for (int i = 0; i <= nrOfMonthsBack; i++) {
+            UsageReportPointDateRest expectedPoint = new UsageReportPointDateRest();
+            if (i > 0) {
+                expectedPoint.addValue("views", 0);
+            } else {
+                expectedPoint.addValue("views", viewsLastMonth);
+            }
+            String month = cal.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.getDefault());
+            expectedPoint.setId(month + " " + cal.get(Calendar.YEAR));
+
+            expectedPoints.add(expectedPoint);
+            cal.add(Calendar.MONTH, -1);
+        }
+        return expectedPoints;
     }
 }
