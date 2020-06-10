@@ -57,7 +57,6 @@ public class BitstreamFormatRestRepository extends DSpaceRestRepository<Bitstrea
     }
 
     @Override
-    @PreAuthorize("permitAll()")
     public Page<BitstreamFormatRest> findAll(Context context, Pageable pageable) {
         try {
             List<BitstreamFormat> bit = bitstreamFormatService.findAll(context);
