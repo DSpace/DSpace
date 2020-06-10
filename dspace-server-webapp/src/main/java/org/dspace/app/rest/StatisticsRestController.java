@@ -132,9 +132,7 @@ public class StatisticsRestController implements InitializingBean {
                                                "1911e8a4-6939-490c-b58b-a5d70f8d91fb_TopCountries");
         }
         UUID uuidObject = UUID.fromString(StringUtils.substringBefore(uuidObjectReportId, "_"));
-        // TODO check if valid object uuid
         String reportId = StringUtils.substringAfter(uuidObjectReportId, "_");
-        // TODO check if valid report id
         Context context = ContextUtil.obtainContext(request);
 
         UsageReportRest usageReportRest = usageReportRestRepository.createUsageReport(context, uuidObject, reportId);
