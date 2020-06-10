@@ -16,18 +16,17 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.util.Date;
 import java.util.UUID;
 
-import org.apache.solr.client.solrj.SolrQuery;
-import org.apache.solr.client.solrj.response.QueryResponse;
-import org.dspace.app.rest.matcher.AuthorityEntryMatcher;
+import org.dspace.app.rest.builder.CollectionBuilder;
+import org.dspace.app.rest.matcher.VocabularyMatcher;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.authority.PersonAuthorityValue;
 import org.dspace.authority.factory.AuthorityServiceFactory;
+import org.dspace.content.Collection;
 import org.dspace.content.authority.service.ChoiceAuthorityService;
 import org.dspace.core.service.PluginService;
 import org.dspace.services.ConfigurationService;
 import org.hamcrest.Matchers;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -94,23 +93,136 @@ public class AuthorityRestRepositoryIT extends AbstractControllerIntegrationTest
     }
 
     @Test
+    public void findAllTest() throws Exception {
+        String token = getAuthToken(admin.getEmail(), password);
+        getClient(token).perform(get("/api/integration/vocabularies"))
+                 .andExpect(status().isOk())
+                 .andExpect(jsonPath("$._embedded.vocabularies", Matchers.containsInAnyOrder(
+                     VocabularyMatcher.matchProperties("srsc", "srsc", false, true),
+                     VocabularyMatcher.matchProperties("common_types", "common_types", true, false),
+                     VocabularyMatcher.matchProperties("common_iso_languages", "common_iso_languages", true , false)
+                 )))
+        .andExpect(jsonPath("$._links.self.href",
+            Matchers.containsString("api/integration/vocabularies")))
+        .andExpect(jsonPath("$.page.totalElements", is(3)));
+    }
+
+    @Test
+    public void findOneSRSC_Test() throws Exception {
+        String token = getAuthToken(admin.getEmail(), password);
+        getClient(token).perform(get("/api/integration/vocabularies/srsc"))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$", Matchers.contains(
+                                   VocabularyMatcher.matchProperties("srsc", "srsc", false, true)
+                                   )))
+                        .andExpect(jsonPath("$.page.totalElements", Matchers.is(1)));
+    }
+
+    @Test
+    public void findOneCommonTypesTest() throws Exception {
+        String token = getAuthToken(admin.getEmail(), password);
+        getClient(token).perform(get("/api/integration/vocabularies/common_types"))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$", Matchers.contains(
+                                VocabularyMatcher.matchProperties("common_types", "common_types", true, false)
+                                )))
+                        .andExpect(jsonPath("$.page.totalElements", Matchers.is(1)));
+    }
+
+    @Test
     public void correctSrscQueryTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        Collection collection = CollectionBuilder.createCollection(context, parentCommunity)
+                                                 .withName("Test collection")
+                                                 .build();
+        context.restoreAuthSystemState();
+
         String token = getAuthToken(admin.getEmail(), password);
         getClient(token).perform(
-            get("/api/integration/authorities/srsc/entries")
+            get("/api/integration/vocabularies/srsc/entries")
                 .param("metadata", "dc.subject")
+                .param("collection", collection.getID().toString())
                 .param("query", "Research")
-                .param("size", "1000"))
-                    .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.page.totalElements", Matchers.is(26)));
+                .param("size", "2"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$._embedded.vocabularyEntries", Matchers.containsInAnyOrder(
+                   VocabularyMatcher.matchVocabularyEntry("Family research",
+                         "Research Subject Categories::SOCIAL SCIENCES::Social sciences::Social work::Family research",
+                         "vocabularyEntry"),
+                   VocabularyMatcher.matchVocabularyEntry("Youth research",
+                         "Research Subject Categories::SOCIAL SCIENCES::Social sciences::Social work::Youth research",
+                         "vocabularyEntry")
+                   )))
+                .andExpect(jsonPath("$.page.totalElements", Matchers.is(26)))
+                .andExpect(jsonPath("$.page.totalPages", Matchers.is(13)))
+                .andExpect(jsonPath("$.page.size", Matchers.is(2)));
+    }
+
+    @Test
+    public void controlledVocabularyEntriesWrongCollectionUUIDTest() throws Exception {
+        String token = getAuthToken(admin.getEmail(), password);
+        getClient(token).perform(get("/api/integration/vocabularies/srsc/entries")
+                .param("metadata", "dc.subject")
+                .param("collection", UUID.randomUUID().toString())
+                .param("query", "Research"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void controlledVocabularyEntriesMissingCollectionUUID_Test() throws Exception {
+        String token = getAuthToken(admin.getEmail(), password);
+        getClient(token).perform(get("/api/integration/vocabularies/srsc/entries")
+                .param("metadata", "dc.subject")
+                .param("query", "Research"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void controlledVocabularyEntriesWrongMetadataTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        Collection collection = CollectionBuilder.createCollection(context, parentCommunity)
+                                                 .withName("Test collection")
+                                                 .build();
+        context.restoreAuthSystemState();
+        String token = getAuthToken(admin.getEmail(), password);
+        getClient(token).perform(get("/api/integration/vocabularies/srsc/entries")
+                .param("metadata", "dc.subject")
+                .param("collection", collection.getID().toString())
+                .param("query", "Research"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void notScrollableVocabularyRequiredQueryTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        Collection collection = CollectionBuilder.createCollection(context, parentCommunity)
+                                                 .withName("Test collection")
+                                                 .build();
+        context.restoreAuthSystemState();
+        String token = getAuthToken(admin.getEmail(), password);
+        getClient(token).perform(get("/api/integration/vocabularies/srsc/entries")
+                .param("metadata", "dc.not.existing")
+                .param("collection", collection.getID().toString()))
+                .andExpect(status().isUnprocessableEntity());
     }
 
     @Test
     public void noResultsSrscQueryTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        Collection collection = CollectionBuilder.createCollection(context, parentCommunity)
+                                                 .withName("Test collection")
+                                                 .build();
+        context.restoreAuthSystemState();
+
         String token = getAuthToken(admin.getEmail(), password);
         getClient(token).perform(
-            get("/api/integration/authorities/srsc/entries")
+            get("/api/integration/vocabularies/srsc/entries")
                 .param("metadata", "dc.subject")
+                .param("collection", collection.getID().toString())
                 .param("query", "Research2")
                 .param("size", "1000"))
                         .andExpect(status().isOk())
@@ -118,27 +230,67 @@ public class AuthorityRestRepositoryIT extends AbstractControllerIntegrationTest
     }
 
     @Test
-    @Ignore
-    /**
-     * This functionality is currently broken, it returns all 22 values
-     */
-    public void correctCommonTypesTest() throws Exception {
+    public void vocabularyEntriesCommon_typesTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        Collection collection = CollectionBuilder.createCollection(context, parentCommunity)
+                                                 .withName("Test collection")
+                                                 .build();
+        context.restoreAuthSystemState();
+
         String token = getAuthToken(admin.getEmail(), password);
-        getClient(token).perform(
-            get("/api/integration/authorities/common_types/entries")
+        getClient(token).perform(get("/api/integration/vocabularies/common_types/entries")
                 .param("metadata", "dc.type")
+                .param("collection", collection.getID().toString())
+                .param("size", "2"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$._embedded.vocabularyEntries", Matchers.containsInAnyOrder(
+                           VocabularyMatcher.matchVocabularyEntry("Animation", "Animation", "vocabularyEntry"),
+                           VocabularyMatcher.matchVocabularyEntry("Article", "Article", "vocabularyEntry")
+                           )))
+                .andExpect(jsonPath("$.page.totalElements", Matchers.is(22)))
+                .andExpect(jsonPath("$.page.totalPages", Matchers.is(11)))
+                .andExpect(jsonPath("$.page.size", Matchers.is(2)));
+    }
+
+    @Test
+    public void vocabularyEntriesCommon_typesWithQueryTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        Collection collection = CollectionBuilder.createCollection(context, parentCommunity)
+                                                 .withName("Test collection")
+                                                 .build();
+        context.restoreAuthSystemState();
+
+        String token = getAuthToken(admin.getEmail(), password);
+        getClient(token).perform(get("/api/integration/vocabularies/common_types/entries")
+                .param("metadata", "dc.type")
+                .param("collection", collection.getID().toString())
                 .param("query", "Book")
-                .param("size", "1000"))
-                        .andExpect(status().isOk())
-                        .andExpect(jsonPath("$.page.totalElements", Matchers.is(2)));
+                .param("size", "2"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$._embedded.vocabularyEntries", Matchers.containsInAnyOrder(
+                        VocabularyMatcher.matchVocabularyEntry("Book", "Book", "vocabularyEntry"),
+                        VocabularyMatcher.matchVocabularyEntry("Book chapter", "Book chapter", "vocabularySuggestion")
+                        )))
+                .andExpect(jsonPath("$.page.totalElements", Matchers.is(2)))
+                .andExpect(jsonPath("$.page.totalPages", Matchers.is(1)))
+                .andExpect(jsonPath("$.page.size", Matchers.is(2)));
     }
 
     @Test
     public void correctSolrQueryTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        Collection collection = CollectionBuilder.createCollection(context, parentCommunity)
+                                                 .withName("Test collection")
+                                                 .build();
+        context.restoreAuthSystemState();
         String token = getAuthToken(admin.getEmail(), password);
         getClient(token).perform(
-                get("/api/integration/authorities/SolrAuthorAuthority/entries")
+                get("/api/integration/vocabularies/SolrAuthorAuthority/entries")
                         .param("metadata", "dc.contributor.author")
+                        .param("collection", collection.getID().toString())
                         .param("query", "Shirasaka")
                         .param("size", "1000"))
                 .andExpect(status().isOk())
@@ -147,10 +299,17 @@ public class AuthorityRestRepositoryIT extends AbstractControllerIntegrationTest
 
     @Test
     public void noResultsSolrQueryTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        Collection collection = CollectionBuilder.createCollection(context, parentCommunity)
+                                                 .withName("Test collection")
+                                                 .build();
+        context.restoreAuthSystemState();
         String token = getAuthToken(admin.getEmail(), password);
         getClient(token).perform(
-                get("/api/integration/authorities/SolrAuthorAuthority/entries")
+                get("/api/integration/vocabularies/SolrAuthorAuthority/entries")
                         .param("metadata", "dc.contributor.author")
+                        .param("collection", collection.getID().toString())
                         .param("query", "Smith")
                         .param("size", "1000"))
                 .andExpect(status().isOk())
@@ -158,43 +317,64 @@ public class AuthorityRestRepositoryIT extends AbstractControllerIntegrationTest
     }
 
     @Test
-    public void retrieveSrscValueTest() throws Exception {
-        String token = getAuthToken(admin.getEmail(), password);
+    public void findByMetadataAndCollectionTest() throws Exception {
+        context.turnOffAuthorisationSystem();
 
-        // When full projection is requested, response should include expected properties, links, and embeds.
-        getClient(token).perform(
-                get("/api/integration/authorities/srsc/entryValues/SCB1922").param("projection", "full"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$", AuthorityEntryMatcher.matchFullEmbeds()))
-                .andExpect(jsonPath("$.page.totalElements", Matchers.is(1)));
+        Collection collection = CollectionBuilder.createCollection(context, parentCommunity)
+                                                 .withName("Test collection")
+                                                 .build();
+        context.restoreAuthSystemState();
+        String token = getAuthToken(admin.getEmail(), password);
+        getClient(token).perform(get("/api/integration/vocabularies/search/byMetadataAndCollection")
+                        .param("metadata", "dc.type")
+                        .param("collection", collection.getID().toString()))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$", Matchers.contains(
+                                VocabularyMatcher.matchProperties("common_types", "common_types", true, false)
+                                )))
+                        .andExpect(jsonPath("$.page.totalElements", Matchers.is(1)));
     }
 
     @Test
-    public void noResultsSrscValueTest() throws Exception {
+    public void findByMetadataAndCollectionUnprocessableEntityTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        Collection collection = CollectionBuilder.createCollection(context, parentCommunity)
+                                                 .withName("Test collection")
+                                                 .build();
+        context.restoreAuthSystemState();
+
         String token = getAuthToken(admin.getEmail(), password);
-        getClient(token).perform(
-                get("/api/integration/authorities/srsc/entryValues/DOESNTEXIST"))
-                .andExpect(status().isNotFound());
+        getClient(token).perform(get("/api/integration/vocabularies/search/byMetadataAndCollection")
+                        .param("metadata", "dc.not.exist")
+                        .param("collection", collection.getID().toString()))
+                        .andExpect(status().isUnprocessableEntity());
+
+        getClient(token).perform(get("/api/integration/vocabularies/search/byMetadataAndCollection")
+                .param("metadata", "dc.type")
+                .param("collection", UUID.randomUUID().toString()))
+                .andExpect(status().isUnprocessableEntity());
     }
 
     @Test
-    public void retrieveCommonTypesValueTest() throws Exception {
-        String token = getAuthToken(admin.getEmail(), password);
-        getClient(token).perform(
-                get("/api/integration/authorities/common_types/entryValues/Book").param("projection", "full"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.page.totalElements", Matchers.is(1)))
-        ;
+    public void findByMetadataAndCollectionBadRequestTest() throws Exception {
+        context.turnOffAuthorisationSystem();
 
-    }
+        Collection collection = CollectionBuilder.createCollection(context, parentCommunity)
+                                                 .withName("Test collection")
+                                                 .build();
+        context.restoreAuthSystemState();
 
-    @Test
-    public void retrieveCommonTypesWithSpaceValueTest() throws Exception {
         String token = getAuthToken(admin.getEmail(), password);
-        getClient(token).perform(
-                get("/api/integration/authorities/common_types/entryValues/Learning+Object"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.page.totalElements", Matchers.is(1)));
+        //missing metadata
+        getClient(token).perform(get("/api/integration/vocabularies/search/byMetadataAndCollection")
+                        .param("collection", collection.getID().toString()))
+                        .andExpect(status().isBadRequest());
+
+        //missing collection
+        getClient(token).perform(get("/api/integration/vocabularies/search/byMetadataAndCollection")
+                .param("metadata", "dc.type"))
+                .andExpect(status().isUnprocessableEntity());
     }
 
     @Test
@@ -208,26 +388,5 @@ public class AuthorityRestRepositoryIT extends AbstractControllerIntegrationTest
                                 hasJsonPath("$.authorization-search.href",
                                          is("http://localhost/api/authz/authorization/search"))
                         )));
-    }
-
-    @Test
-    public void retrieveSolrValueTest() throws Exception {
-        String token = getAuthToken(admin.getEmail(), password);
-
-        SolrQuery query = new SolrQuery();
-        query.setQuery("*:*");
-        QueryResponse queryResponse = AuthorityServiceFactory.getInstance().getAuthoritySearchService().search(query);
-        String id = String.valueOf(queryResponse.getResults().get(0).getFieldValue("id"));
-
-        getClient(token).perform(
-                get("/api/integration/authorities/SolrAuthorAuthority/entryValues/" + id))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.page.totalElements", Matchers.is(1)));
-    }
-
-    @Override
-    public void destroy() throws Exception {
-        AuthorityServiceFactory.getInstance().getAuthorityIndexingService().cleanIndex();
-        super.destroy();
     }
 }
