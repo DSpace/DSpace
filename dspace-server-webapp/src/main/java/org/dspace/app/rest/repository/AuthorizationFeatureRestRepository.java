@@ -42,13 +42,13 @@ public class AuthorizationFeatureRestRepository extends DSpaceRestRepository<Aut
         return AuthorizationFeatureRest.class;
     }
 
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("permitAll()")
     @Override
     public Page<AuthorizationFeatureRest> findAll(Context context, Pageable pageable) {
         return converter.toRestPage(authorizationFeatureService.findAll(), pageable, utils.obtainProjection());
     }
 
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("permitAll()")
     @Override
     public AuthorizationFeatureRest findOne(Context context, String id) {
         AuthorizationFeature authzFeature = authorizationFeatureService.find(id);
@@ -58,7 +58,7 @@ public class AuthorizationFeatureRestRepository extends DSpaceRestRepository<Aut
         return null;
     }
 
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("permitAll()")
     @SearchRestMethod(name = "resourcetype")
     public Page<AuthorizationFeatureRest> findByResourceType(@Parameter(value = "type", required = true) String type,
             Pageable pageable) {
