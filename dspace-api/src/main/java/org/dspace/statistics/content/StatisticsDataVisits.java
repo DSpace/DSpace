@@ -284,7 +284,8 @@ public class StatisticsDataVisits extends StatisticsData {
 
             ObjectCount[] topCounts1 = null;
 //            if (firsDataset.getQueries().size() == 1) {
-            topCounts1 = queryFacetField(firsDataset, firsDataset.getQueries().get(0).getQuery(), filterQuery, facetMinCount);
+            topCounts1 =
+                queryFacetField(firsDataset, firsDataset.getQueries().get(0).getQuery(), filterQuery, facetMinCount);
 //            } else {
 //                TODO: do this
 //            }
