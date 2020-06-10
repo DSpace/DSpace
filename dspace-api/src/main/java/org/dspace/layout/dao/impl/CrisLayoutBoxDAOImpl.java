@@ -15,6 +15,7 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Join;
 import javax.persistence.criteria.JoinType;
+import javax.persistence.criteria.ListJoin;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import javax.persistence.criteria.SetJoin;
@@ -62,7 +63,7 @@ public class CrisLayoutBoxDAOImpl extends AbstractHibernateDAO<CrisLayoutBox> im
         CriteriaQuery<CrisLayoutBox> q = cb.createQuery(CrisLayoutBox.class);
         Root<CrisLayoutTab> tabRoot = q.from(CrisLayoutTab.class);
         q.where(cb.equal(tabRoot.get(CrisLayoutTab_.id), tabId));
-        SetJoin<CrisLayoutTab, CrisLayoutBox> tabs = tabRoot.join(CrisLayoutTab_.boxes);
+        ListJoin<CrisLayoutTab, CrisLayoutBox> tabs = tabRoot.join(CrisLayoutTab_.boxes);
         CriteriaQuery<CrisLayoutBox> cqBoxes = q.select(tabs);
         cqBoxes.orderBy(cb.asc(tabs.get(CrisLayoutBox_.PRIORITY)));
         TypedQuery<CrisLayoutBox> query = getHibernateSession(context).createQuery(cqBoxes);
@@ -83,7 +84,7 @@ public class CrisLayoutBoxDAOImpl extends AbstractHibernateDAO<CrisLayoutBox> im
         CriteriaQuery<Long> q = cb.createQuery(Long.class);
         Root<CrisLayoutTab> tabRoot = q.from(CrisLayoutTab.class);
         q.where(cb.equal(tabRoot.get(CrisLayoutTab_.id), tabId));
-        SetJoin<CrisLayoutTab, CrisLayoutBox> tabs = tabRoot.join(CrisLayoutTab_.boxes);
+        ListJoin<CrisLayoutTab, CrisLayoutBox> tabs = tabRoot.join(CrisLayoutTab_.boxes);
         CriteriaQuery<Long> cqBoxes = q.select(cb.count(tabs));
         return getHibernateSession(context).createQuery(cqBoxes).getSingleResult();
     }

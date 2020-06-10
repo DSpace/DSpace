@@ -97,12 +97,4 @@ public interface CrisLayoutTabDAO extends GenericDAO<CrisLayoutTab> {
      */
     public List<CrisLayoutTab> findByItem(Context context, UUID intemUUid) throws SQLException;
 
-    /**
-     * Remove tab2box relationship
-     * @param context The relevant DSpace Context
-     * @param tabId
-     * @param boxId
-     * @throws SQLException
-     */
-    public void removeBoxRelationship(Context context, int tabId, int boxId) throws SQLException;
 }

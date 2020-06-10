@@ -10,7 +10,6 @@ package org.dspace.layout.dao.impl;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
-import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -122,16 +121,4 @@ public class CrisLayoutTabDAOImpl extends AbstractHibernateDAO<CrisLayoutTab> im
         return null;
     }
 
-    /* (non-Javadoc)
-     * @see org.dspace.layout.dao.CrisLayoutTabDAO#removeBoxRelationship(int, int)
-     */
-    @Override
-    public void removeBoxRelationship(Context context, int tabId, int boxId) throws SQLException {
-        Query q = getHibernateSession(context)
-                .createNativeQuery("DELETE FROM cris_layout_tab2box tb WHERE "
-                        + "tb.cris_layout_tab_id = ? AND tb.cris_layout_box_id = ?");
-        q.setParameter(1, tabId);
-        q.setParameter(2, boxId);
-        q.executeUpdate();
-    }
 }

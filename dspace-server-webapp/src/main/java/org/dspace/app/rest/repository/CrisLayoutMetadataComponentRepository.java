@@ -18,6 +18,7 @@ import org.dspace.layout.service.CrisLayoutBoxService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
 /**
@@ -58,6 +59,7 @@ public class CrisLayoutMetadataComponentRepository
      * @see org.dspace.app.rest.repository.DSpaceRestRepository#findOne(org.dspace.core.Context, java.io.Serializable)
      */
     @Override
+    @PreAuthorize("permitAll")
     public CrisLayoutMetadataComponentRest findOne(Context context, String shortname) {
         CrisLayoutMetadataComponentRest values = null;
         try {

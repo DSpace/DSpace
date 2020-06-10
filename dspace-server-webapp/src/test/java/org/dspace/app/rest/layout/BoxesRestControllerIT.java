@@ -7,11 +7,17 @@
  */
 package org.dspace.app.rest.layout;
 
+import static com.jayway.jsonpath.JsonPath.read;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.util.concurrent.atomic.AtomicReference;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.dspace.app.rest.builder.CollectionBuilder;
 import org.dspace.app.rest.builder.CommunityBuilder;
 import org.dspace.app.rest.builder.CrisLayoutBoxBuilder;
@@ -21,6 +27,7 @@ import org.dspace.app.rest.builder.EntityTypeBuilder;
 import org.dspace.app.rest.builder.ItemBuilder;
 import org.dspace.app.rest.matcher.CrisLayoutBoxMatcher;
 import org.dspace.app.rest.matcher.CrisLayoutFieldMatcher;
+import org.dspace.app.rest.model.CrisLayoutBoxRest;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
@@ -479,5 +486,110 @@ public class BoxesRestControllerIT extends AbstractControllerIntegrationTest {
             .andExpect(jsonPath("$.rows[0].fields.length()", Matchers.is(2)))
             .andExpect(jsonPath("$.rows[1].fields.length()", Matchers.is(3)))
             .andExpect(jsonPath("$.rows[2].fields.length()", Matchers.is(1)));
+    }
+
+    /**
+     * Test for endpoint POST /api/layout/boxes, Its create a new boxes
+     * This endpoint is reserved to system administrators
+     * @throws Exception
+     */
+    @Test
+    public void createBox() throws Exception {
+        context.turnOffAuthorisationSystem();
+        AtomicReference<Integer> idRef = new AtomicReference<Integer>();
+        try {
+            // Create entity type
+            EntityType eTypePer = EntityTypeBuilder.createEntityTypeBuilder(context, "Person").build();
+            context.restoreAuthSystemState();
+
+            CrisLayoutBoxRest rest = new CrisLayoutBoxRest();
+            rest.setEntityType(eTypePer.getLabel());
+            rest.setBoxType("box-type");
+            rest.setClear(false);
+            rest.setCollapsed(false);
+            rest.setHeader("box-header");
+            rest.setMinor(false);
+            rest.setPriority(0);
+            rest.setSecurity(0);
+            rest.setShortname("shortname-box");
+            rest.setStyle("style-box");
+
+            ObjectMapper mapper = new ObjectMapper();
+            // Test without authentication
+            getClient()
+                    .perform(post("/api/layout/boxes")
+                            .content(mapper.writeValueAsBytes(rest))
+                            .contentType(contentType))
+                    .andExpect(status().isUnauthorized());
+            // Test with a non admin user
+            String token = getAuthToken(eperson.getEmail(), password);
+            getClient(token)
+                .perform(post("/api/layout/boxes")
+                        .content(mapper.writeValueAsBytes(rest))
+                        .contentType(contentType))
+                .andExpect(status().isForbidden());
+            // Test with admin user
+            String tokenAdmin = getAuthToken(admin.getEmail(), password);
+            getClient(tokenAdmin)
+                .perform(post("/api/layout/boxes")
+                        .content(mapper.writeValueAsBytes(rest))
+                        .contentType(contentType))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$", Matchers.is(
+                        CrisLayoutBoxMatcher.matchRest(rest))))
+                .andDo(result -> idRef.set(read(result.getResponse().getContentAsString(), "$.id")));
+
+            getClient().perform(get("/api/layout/boxes/" + idRef.get()))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$", Matchers.is(
+                        CrisLayoutBoxMatcher.matchRest(rest))));
+        } finally {
+            CrisLayoutBoxBuilder.delete(idRef.get());
+        }
+    }
+
+    /**
+     * Test for endpoint DELETE /api/layout/boxes/<:id>, Its delete a box
+     * This endpoint is reserved to system administrators
+     * @throws Exception
+     */
+    @Test
+    public void deleteBox() throws Exception {
+        context.turnOffAuthorisationSystem();
+        // Create entity type Publication
+        EntityType eType = EntityTypeBuilder.createEntityTypeBuilder(context, "Publication").build();
+        // Create box
+        CrisLayoutBox box = CrisLayoutBoxBuilder.createBuilder(context, eType, true, 0, true)
+                .withShortname("Box shortname 1")
+                .withSecurity(LayoutSecurity.PUBLIC)
+                .build();
+        context.restoreAuthSystemState();
+
+        getClient().perform(
+                get("/api/layout/boxes/" + box.getID())
+        ).andExpect(status().isOk())
+        .andExpect(content().contentType(contentType));
+
+        // Delete with anonymous user
+        getClient().perform(
+                delete("/api/layout/boxes/" + box.getID())
+        ).andExpect(status().isUnauthorized());
+
+        // Delete with non admin user
+        String token = getAuthToken(eperson.getEmail(), password);
+        getClient(token).perform(
+                delete("/api/layout/boxes/" + box.getID())
+        ).andExpect(status().isForbidden());
+
+        // delete with admin
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        getClient(tokenAdmin).perform(
+                delete("/api/layout/boxes/" + box.getID())
+        ).andExpect(status().isNoContent());
+
+        getClient(tokenAdmin).perform(
+                get("/api/layout/boxes/" + box.getID())
+        ).andExpect(status().isNotFound());
     }
 }

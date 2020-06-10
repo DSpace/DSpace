@@ -131,13 +131,4 @@ public interface CrisLayoutTabService extends DSpaceCRUDService<CrisLayoutTab> {
      * @throws SQLException An exception that provides information on a database errors.
      */
     public List<CrisLayoutTab> findByItem(Context context, String itemUuid) throws SQLException;
-
-    /**
-     * Remove the boxes relationship
-     * @param context context The relevant DSpace Context
-     * @param tabId tab id
-     * @param boxId box id
-     * @throws SQLException An exception that provides information on a database errors.
-     */
-    public void removeBoxRelationship(Context context, Integer tabId, Integer boxId) throws SQLException;
 }

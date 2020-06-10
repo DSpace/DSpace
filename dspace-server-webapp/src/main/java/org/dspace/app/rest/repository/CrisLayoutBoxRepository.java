@@ -58,6 +58,7 @@ public class CrisLayoutBoxRepository extends DSpaceRestRepository<CrisLayoutBoxR
     }
 
     @Override
+    @PreAuthorize("permitAll")
     public CrisLayoutBoxRest findOne(Context context, Integer id) {
         CrisLayoutBox box = null;
         try {

@@ -10,7 +10,6 @@ package org.dspace.layout;
 import java.util.HashSet;
 import java.util.Set;
 import javax.persistence.Cacheable;
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -73,7 +72,7 @@ public class CrisLayoutBox implements ReloadableEntity<Integer> {
         inverseJoinColumns = {@JoinColumn(name = "cris_layout_field_id")}
     )
     private Set<CrisLayoutField> layoutFields;
-    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "cris_layout_tab2box",
             joinColumns = {@JoinColumn(name = "cris_layout_box_id")},

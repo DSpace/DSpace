@@ -9,7 +9,6 @@ package org.dspace.layout.service.impl;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -73,19 +72,19 @@ public class CrisLayoutTabServiceImpl implements CrisLayoutTabService {
     }
 
     @Override
-    public void update(Context context, CrisLayoutTab tabList) throws SQLException, AuthorizeException {
-        update(context,Collections.singletonList(tabList));
-    }
-
-    @Override
-    public void update(Context context, List<CrisLayoutTab> tabList) throws SQLException, AuthorizeException {
+    public void update(Context context, CrisLayoutTab tab) throws SQLException, AuthorizeException {
         if (!authorizeService.isAdmin(context)) {
             throw new AuthorizeException(
                 "You must be an admin to update a Tab");
         }
+        dao.save(context, tab);
+    }
+
+    @Override
+    public void update(Context context, List<CrisLayoutTab> tabList) throws SQLException, AuthorizeException {
         if (CollectionUtils.isNotEmpty(tabList)) {
             for (CrisLayoutTab tab: tabList) {
-                dao.save(context, tab);
+                update(context, tab);
             }
         }
     }
@@ -194,15 +193,6 @@ public class CrisLayoutTabServiceImpl implements CrisLayoutTabService {
             }
         }
         return resTabs;
-    }
-
-    /* (non-Javadoc)
-     * @see org.dspace.layout.service.CrisLayoutTabService#removeBoxRelationship
-     * (org.dspace.core.Context, java.lang.Integer, java.lang.Integer)
-     */
-    @Override
-    public void removeBoxRelationship(Context context, Integer tabId, Integer boxId) throws SQLException {
-        dao.removeBoxRelationship(context, tabId, boxId);
     }
 
 }

@@ -7,11 +7,21 @@
  */
 package org.dspace.app.rest.layout;
 
+import static com.jayway.jsonpath.JsonPath.read;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
+import javax.ws.rs.core.MediaType;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.dspace.app.rest.builder.CollectionBuilder;
 import org.dspace.app.rest.builder.CommunityBuilder;
 import org.dspace.app.rest.builder.CrisLayoutBoxBuilder;
@@ -19,8 +29,14 @@ import org.dspace.app.rest.builder.CrisLayoutFieldBuilder;
 import org.dspace.app.rest.builder.CrisLayoutTabBuilder;
 import org.dspace.app.rest.builder.EntityTypeBuilder;
 import org.dspace.app.rest.builder.ItemBuilder;
+import org.dspace.app.rest.converter.CrisLayoutBoxConverter;
 import org.dspace.app.rest.matcher.CrisLayoutBoxMatcher;
 import org.dspace.app.rest.matcher.CrisLayoutTabMatcher;
+import org.dspace.app.rest.model.CrisLayoutBoxRest;
+import org.dspace.app.rest.model.CrisLayoutTabRest;
+import org.dspace.app.rest.model.patch.AddOperation;
+import org.dspace.app.rest.model.patch.Operation;
+import org.dspace.app.rest.model.patch.RemoveOperation;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
@@ -52,6 +68,8 @@ public class TabsRestControllerIT extends AbstractControllerIntegrationTest {
     @Autowired
     private MetadataFieldService mfss;
 
+    @Autowired
+    private CrisLayoutBoxConverter boxConverter;
     /**
      * Test for endopint /api/layout/tabs/<ID>. It returns a determinate tab
      * identified by its ID
@@ -391,4 +409,254 @@ public class TabsRestControllerIT extends AbstractControllerIntegrationTest {
                     CrisLayoutTabMatcher.matchTab(tabThree))));
     }
 
+    /**
+     * Test for endpoint POST /api/layout/tabs, Its create a new tab
+     * This endpoint is reserved to system administrators
+     * @throws Exception
+     */
+    @Test
+    public void createTab() throws Exception {
+        context.turnOffAuthorisationSystem();
+        AtomicReference<Integer> idRef = new AtomicReference<Integer>();
+        try {
+            // Create entity type
+            EntityType eTypePer = EntityTypeBuilder.createEntityTypeBuilder(context, "Person").build();
+            context.restoreAuthSystemState();
+
+            CrisLayoutTabRest rest = new CrisLayoutTabRest();
+            rest.setPriority(0);
+            rest.setSecurity(0);
+            rest.setShortname("short-name");
+            rest.setHeader("header");
+            rest.setEntityType(eTypePer.getLabel());
+
+            ObjectMapper mapper = new ObjectMapper();
+            // Test without authentication
+            getClient()
+                    .perform(post("/api/layout/tabs")
+                            .content(mapper.writeValueAsBytes(rest))
+                            .contentType(contentType))
+                    .andExpect(status().isUnauthorized());
+            // Test with a non admin user
+            String token = getAuthToken(eperson.getEmail(), password);
+            getClient(token)
+                .perform(post("/api/layout/tabs")
+                        .content(mapper.writeValueAsBytes(rest))
+                        .contentType(contentType))
+                .andExpect(status().isForbidden());
+            // Test with admin user
+            String tokenAdmin = getAuthToken(admin.getEmail(), password);
+            getClient(tokenAdmin)
+                .perform(post("/api/layout/tabs")
+                        .content(mapper.writeValueAsBytes(rest))
+                        .contentType(contentType))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$", Matchers.is(
+                    CrisLayoutTabMatcher.matchRest(rest))))
+                .andDo(result -> idRef.set(read(result.getResponse().getContentAsString(), "$.id")));
+
+            // Get created tab by id from REST service and check its response
+            getClient().perform(get("/api/layout/tabs/" + idRef.get()))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$", Matchers.is(
+                        CrisLayoutTabMatcher.matchRest(rest))));
+        } finally {
+            CrisLayoutTabBuilder.delete(idRef.get());
+        }
+    }
+
+    /**
+     * Test for endpoint DELETE /api/layout/tabs/<:id>, Its delete a tab
+     * This endpoint is reserved to system administrators
+     * @throws Exception
+     */
+    @Test
+    public void deleteTab() throws Exception {
+        context.turnOffAuthorisationSystem();
+        // Create entity type Publication
+        EntityType eType = EntityTypeBuilder.createEntityTypeBuilder(context, "Publication").build();
+        // Create new Tab for Person Entity
+        CrisLayoutTab tab = CrisLayoutTabBuilder.createTab(context, eType, 0)
+                .withShortName("New Person Tab")
+                .withSecurity(LayoutSecurity.PUBLIC)
+                .withHeader("New Person Tab header")
+                .build();
+        context.restoreAuthSystemState();
+
+        getClient().perform(
+                get("/api/layout/tabs/" + tab.getID())
+        ).andExpect(status().isOk())
+        .andExpect(content().contentType(contentType));
+
+        // Delete with anonymous user
+        getClient().perform(
+                delete("/api/layout/tabs/" + tab.getID())
+        ).andExpect(status().isUnauthorized());
+
+        // Delete with non admin user
+        String token = getAuthToken(eperson.getEmail(), password);
+        getClient(token).perform(
+                delete("/api/layout/tabs/" + tab.getID())
+        ).andExpect(status().isForbidden());
+
+        // delete with admin
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        getClient(tokenAdmin).perform(
+                delete("/api/layout/tabs/" + tab.getID())
+        ).andExpect(status().isNoContent());
+
+        getClient(tokenAdmin).perform(
+                get("/api/layout/tabs/" + tab.getID())
+        ).andExpect(status().isNotFound());
+    }
+
+    /**
+     * Test for endpoint PATCH /api/layout/tabs/<:id>
+     * 
+     * Example: <code>
+     * curl -X PATCH http://${dspace.server.url}/api/layout/tabs/<:id> -H "
+     * Content-Type: application/json" -d '[{ "op": "remove", "path": "
+     * /boxes/<:index>"]'
+     * </code>
+     */
+    @Test
+    public void removeBox() throws Exception {
+        context.turnOffAuthorisationSystem();
+        // Create new EntityType Person
+        EntityType eType = EntityTypeBuilder.createEntityTypeBuilder(context, "Person").build();
+        // Create new Boxes
+        CrisLayoutBox boxOne = CrisLayoutBoxBuilder.createBuilder(context, eType, false, 0, false)
+                .withHeader("First New Box Header")
+                .withSecurity(LayoutSecurity.PUBLIC)
+                .withShortname("Shortname for new first box")
+                .withStyle("STYLE")
+                .build();
+        CrisLayoutBox boxTwo = CrisLayoutBoxBuilder.createBuilder(context, eType, false, 1, false)
+                .withHeader("Second New Box Header")
+                .withSecurity(LayoutSecurity.PUBLIC)
+                .withShortname("Shortname for new second box")
+                .withStyle("STYLE")
+                .build();
+        // Create new Tab for Person Entity with two boxes
+        CrisLayoutTab tab = CrisLayoutTabBuilder.createTab(context, eType, 0)
+                .withShortName("New Tab shortname")
+                .withSecurity(LayoutSecurity.PUBLIC)
+                .withHeader("New Tab header")
+                .addBox(boxOne)
+                .addBox(boxTwo)
+                .build();
+        context.restoreAuthSystemState();
+
+        // get boxes
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        getClient(tokenAdmin).perform(get("/api/layout/tabs/" + tab.getID() + "/boxes"))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(contentType))
+            .andExpect(jsonPath("$._embedded.boxes", Matchers.not(Matchers.empty())))
+            .andExpect(jsonPath("$.page.totalElements", Matchers.is(2)));
+
+        List<Operation> ops = new ArrayList<Operation>();
+        RemoveOperation removeOperation = new RemoveOperation("/boxes/0");
+        ops.add(removeOperation);
+        String patchBody = getPatchContent(ops);
+
+        getClient().perform(patch("/api/layout/tabs/" + tab.getID())
+            .content(patchBody)
+            .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+            .andExpect(status().isUnauthorized());
+
+        String token = getAuthToken(eperson.getEmail(), password);
+        getClient(token).perform(patch("/api/layout/tabs/" + tab.getID())
+                .content(patchBody)
+                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                .andExpect(status().isForbidden());
+
+        getClient(tokenAdmin).perform(patch("/api/layout/tabs/" + tab.getID())
+                .content(patchBody)
+                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                .andExpect(status().isOk());
+
+        getClient(tokenAdmin).perform(get("/api/layout/tabs/" + tab.getID() + "/boxes"))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(contentType))
+            .andExpect(jsonPath("$._embedded.boxes", Matchers.not(Matchers.empty())))
+            .andExpect(jsonPath("$.page.totalElements", Matchers.is(1)));
+    }
+
+    /**
+     * Test for endpoint PATCH /api/layout/tabs/<:id>
+     * 
+     * Example: <code>
+     * curl -X PATCH http://${dspace.server.url}/api/layout/tabs/<:id> -H "
+     * Content-Type: application/json" -d '[{ "op": "add", "path": "
+     * /boxes/", "value": [{ ... box_object ... }]]'
+     * </code>
+     */
+    @Test
+    public void addBox() throws Exception {
+        context.turnOffAuthorisationSystem();
+        // Create new EntityType Person
+        EntityType eType = EntityTypeBuilder.createEntityTypeBuilder(context, "Person").build();
+        // Create new Boxes
+        CrisLayoutBox boxOne = CrisLayoutBoxBuilder.createBuilder(context, eType, false, 0, false)
+                .withHeader("First New Box Header")
+                .withSecurity(LayoutSecurity.PUBLIC)
+                .withShortname("Shortname for new first box")
+                .withStyle("STYLE")
+                .build();
+        CrisLayoutBox boxTwo = CrisLayoutBoxBuilder.createBuilder(context, eType, false, 1, false)
+                .withHeader("Second New Box Header")
+                .withSecurity(LayoutSecurity.PUBLIC)
+                .withShortname("Shortname for new second box")
+                .withStyle("STYLE")
+                .build();
+        // Create new Tab for Person Entity with two boxes
+        CrisLayoutTab tab = CrisLayoutTabBuilder.createTab(context, eType, 0)
+                .withShortName("New Tab shortname")
+                .withSecurity(LayoutSecurity.PUBLIC)
+                .withHeader("New Tab header")
+                .build();
+        context.restoreAuthSystemState();
+
+        // No boxes at this time
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        getClient(tokenAdmin).perform(get("/api/layout/tabs/" + tab.getID() + "/boxes"))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(contentType))
+            .andExpect(jsonPath("$._embedded.boxes", Matchers.is(Matchers.empty())));
+
+        List<Operation> ops = new ArrayList<Operation>();
+        List<CrisLayoutBoxRest> boxes = new ArrayList<>();
+        CrisLayoutBoxRest restBoxOne = boxConverter.convert(boxOne, null);
+        CrisLayoutBoxRest restBoxTwo = boxConverter.convert(boxTwo, null);
+        boxes.add(restBoxOne);
+        boxes.add(restBoxTwo);
+        AddOperation addOperation = new AddOperation("/boxes", boxes);
+        ops.add(addOperation);
+        String patchBody = getPatchContent(ops);
+
+        getClient().perform(patch("/api/layout/tabs/" + tab.getID())
+            .content(patchBody)
+            .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isUnauthorized());
+
+        String token = getAuthToken(eperson.getEmail(), password);
+        getClient(token).perform(patch("/api/layout/tabs/" + tab.getID())
+                .content(patchBody)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden());
+
+        getClient(tokenAdmin).perform(patch("/api/layout/tabs/" + tab.getID())
+                .content(patchBody)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+        // After patch the tab should be two box associated
+        getClient(tokenAdmin).perform(get("/api/layout/tabs/" + tab.getID() + "/boxes"))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(contentType))
+            .andExpect(jsonPath("$._embedded.boxes", Matchers.not(Matchers.empty())))
+            .andExpect(jsonPath("$.page.totalElements", Matchers.is(2)));
+    }
 }

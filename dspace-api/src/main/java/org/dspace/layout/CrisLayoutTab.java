@@ -22,6 +22,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.OrderBy;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
@@ -59,12 +60,13 @@ public class CrisLayoutTab implements ReloadableEntity<Integer> {
         inverseJoinColumns = {@JoinColumn(name = "authorized_field_id")}
     )
     private Set<MetadataField> metadataSecurityFields;
-    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST})
     @JoinTable(
         name = "cris_layout_tab2box",
         joinColumns = {@JoinColumn(name = "cris_layout_tab_id")},
         inverseJoinColumns = {@JoinColumn(name = "cris_layout_box_id")}
     )
+    @OrderBy(value = "priority")
     private List<CrisLayoutBox> boxes;
 
     public Integer getID() {

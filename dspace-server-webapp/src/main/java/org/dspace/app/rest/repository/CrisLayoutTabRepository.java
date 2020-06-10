@@ -58,6 +58,7 @@ public class CrisLayoutTabRepository extends DSpaceRestRepository<CrisLayoutTabR
      * @see org.dspace.app.rest.repository.DSpaceRestRepository#findOne(org.dspace.core.Context, java.io.Serializable)
      */
     @Override
+    @PreAuthorize("permitAll")
     public CrisLayoutTabRest findOne(Context context, Integer id) {
         CrisLayoutTab tab = null;
         try {
@@ -172,10 +173,10 @@ public class CrisLayoutTabRepository extends DSpaceRestRepository<CrisLayoutTabR
 
     @Override
     @PreAuthorize("hasAuthority('ADMIN')")
-    public CrisLayoutTabRest patch(
-            HttpServletRequest request, String apiCategory, String model, Integer id, Patch patch)
+    public void patch(
+            Context context, HttpServletRequest request, String apiCategory, String model, Integer id,
+            Patch patch)
             throws UnprocessableEntityException, DSpaceBadRequestException {
-        Context context = obtainContext();
         CrisLayoutTab tab = null;
         try {
             tab = service.find(context, id);
@@ -189,7 +190,6 @@ public class CrisLayoutTabRepository extends DSpaceRestRepository<CrisLayoutTabR
         } catch (AuthorizeException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-        return converter.toRest(tab, utils.obtainProjection());
     }
 
     @Override

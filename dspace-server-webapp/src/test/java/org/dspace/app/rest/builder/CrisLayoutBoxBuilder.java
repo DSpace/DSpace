@@ -7,6 +7,7 @@
  */
 package org.dspace.app.rest.builder;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.Set;
@@ -16,6 +17,7 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.EntityType;
 import org.dspace.content.MetadataField;
 import org.dspace.core.Context;
+import org.dspace.discovery.SearchServiceException;
 import org.dspace.layout.CrisLayoutBox;
 import org.dspace.layout.CrisLayoutField;
 import org.dspace.layout.LayoutSecurity;
@@ -83,6 +85,23 @@ public class CrisLayoutBoxBuilder extends AbstractBuilder<CrisLayoutBox, CrisLay
             c.complete();
         }
 
+        indexingService.commit();
+    }
+
+    public static void delete(Integer id)
+            throws SQLException, IOException, SearchServiceException {
+        try (Context c = new Context()) {
+            c.turnOffAuthorisationSystem();
+            CrisLayoutBox box = crisLayoutBoxService.find(c, id);
+            if (box != null) {
+                try {
+                    crisLayoutBoxService.delete(c, box);
+                } catch (AuthorizeException e) {
+                    throw new RuntimeException(e.getMessage(), e);
+                }
+            }
+            c.complete();
+        }
         indexingService.commit();
     }
 
