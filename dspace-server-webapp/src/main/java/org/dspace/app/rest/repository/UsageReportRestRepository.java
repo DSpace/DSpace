@@ -146,11 +146,6 @@ public class UsageReportRestRepository extends AbstractDSpaceRestRepository {
         }
 
         if (dso instanceof org.dspace.content.Item) {
-            // Make sure our item has at least one bitstream
-            org.dspace.content.Item item = (org.dspace.content.Item) dso;
-//            if (itemService.hasUploadedFiles(item)) {
-//            }
-
             Dataset dataset = this.getDSOStatsDataset(context, dso, 1, Constants.BITSTREAM);
 
             UsageReportRest usageReportRest = new UsageReportRest();
