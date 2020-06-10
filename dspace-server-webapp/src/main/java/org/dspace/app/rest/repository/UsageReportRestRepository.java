@@ -15,7 +15,6 @@ import java.util.UUID;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
-import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.model.UsageReportPointCityRest;
 import org.dspace.app.rest.model.UsageReportPointCountryRest;
 import org.dspace.app.rest.model.UsageReportPointDateRest;
@@ -23,6 +22,8 @@ import org.dspace.app.rest.model.UsageReportPointDsoTotalVisitsRest;
 import org.dspace.app.rest.model.UsageReportRest;
 import org.dspace.app.rest.utils.DSpaceObjectUtils;
 import org.dspace.content.DSpaceObject;
+import org.dspace.content.service.ItemService;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.statistics.Dataset;
 import org.dspace.statistics.content.DatasetDSpaceObjectGenerator;
@@ -44,6 +45,8 @@ public class UsageReportRestRepository extends AbstractDSpaceRestRepository {
 
     @Autowired
     private DSpaceObjectUtils dspaceObjectUtil;
+    @Autowired
+    private ItemService itemService;
 
     /**
      * TODO
@@ -60,6 +63,9 @@ public class UsageReportRestRepository extends AbstractDSpaceRestRepository {
         throws ParseException, SolrServerException, IOException {
         try {
             DSpaceObject dso = dspaceObjectUtil.findDSpaceObject(context, uuid);
+            if (dso == null) {
+                throw new IllegalArgumentException("No DSO found with this UUID: " + uuid);
+            }
             UsageReportRest usageReportRest;
             switch (reportId) {
                 case "TotalVisits":
@@ -71,7 +77,9 @@ public class UsageReportRestRepository extends AbstractDSpaceRestRepository {
                     usageReportRest.setReportType("TotalVisitsPerMonth");
                     break;
                 case "TotalDownloads":
-                    throw new RepositoryMethodNotImplementedException("TODO", "TotalDownloads");
+                    usageReportRest = resolveTotalDownloads(context, dso);
+                    usageReportRest.setReportType("TotalDownloads");
+                    break;
                 case "TopCountries":
                     usageReportRest = resolveTopCountries(context, dso);
                     usageReportRest.setReportType("TopCountries");
@@ -93,20 +101,19 @@ public class UsageReportRestRepository extends AbstractDSpaceRestRepository {
 
     private UsageReportRest resolveTotalVisits(Context context, DSpaceObject dso)
         throws SQLException, IOException, ParseException, SolrServerException {
-        StatisticsListing statListing = new StatisticsListing(new StatisticsDataVisits(dso));
-        DatasetDSpaceObjectGenerator dsoAxis = new DatasetDSpaceObjectGenerator();
-        dsoAxis.addDsoChild(dso.getType(), 10, false, -1);
-        statListing.addDatasetGenerator(dsoAxis);
-        Dataset dataset = statListing.getDataset(context);
+        Dataset dataset = this.getDSOStatsDataset(context, dso, 0, dso.getType());
 
         UsageReportRest usageReportRest = new UsageReportRest();
-        for (int i = 0; i < dataset.getColLabels().size(); i++) {
-            UsageReportPointDsoTotalVisitsRest totalVisitPoint = new UsageReportPointDsoTotalVisitsRest();
-            totalVisitPoint.setType(StringUtils.substringAfterLast(dso.getClass().getName().toLowerCase(), "."));
-            totalVisitPoint.setId(dso.getID().toString());
-            totalVisitPoint.addValue("views", Integer.valueOf(dataset.getMatrix()[0][i]));
-            usageReportRest.addPoint(totalVisitPoint);
+        UsageReportPointDsoTotalVisitsRest totalVisitPoint = new UsageReportPointDsoTotalVisitsRest();
+        totalVisitPoint.setType(StringUtils.substringAfterLast(dso.getClass().getName().toLowerCase(), "."));
+        totalVisitPoint.setId(dso.getID().toString());
+        if (dataset.getColLabels().size() > 0) {
+            totalVisitPoint.addValue("views", Integer.valueOf(dataset.getMatrix()[0][0]));
+        } else {
+            totalVisitPoint.addValue("views", 0);
         }
+
+        usageReportRest.addPoint(totalVisitPoint);
         return usageReportRest;
     }
 
@@ -120,7 +127,7 @@ public class UsageReportRestRepository extends AbstractDSpaceRestRepository {
         DatasetDSpaceObjectGenerator dsoAxis = new DatasetDSpaceObjectGenerator();
         dsoAxis.addDsoChild(dso.getType(), 10, false, -1);
         statisticsTable.addDatasetGenerator(dsoAxis);
-        Dataset dataset = statisticsTable.getDataset(context);
+        Dataset dataset = statisticsTable.getDataset(context, 0);
 
         UsageReportRest usageReportRest = new UsageReportRest();
         for (int i = 0; i < dataset.getColLabels().size(); i++) {
@@ -132,9 +139,36 @@ public class UsageReportRestRepository extends AbstractDSpaceRestRepository {
         return usageReportRest;
     }
 
+    private UsageReportRest resolveTotalDownloads(Context context, DSpaceObject dso)
+        throws SQLException, SolrServerException, ParseException, IOException {
+        if (dso instanceof org.dspace.content.Bitstream) {
+            return this.resolveTotalVisits(context, dso);
+        }
+
+        if (dso instanceof org.dspace.content.Item) {
+            // Make sure our item has at least one bitstream
+            org.dspace.content.Item item = (org.dspace.content.Item) dso;
+//            if (itemService.hasUploadedFiles(item)) {
+//            }
+
+            Dataset dataset = this.getDSOStatsDataset(context, dso, 1, Constants.BITSTREAM);
+
+            UsageReportRest usageReportRest = new UsageReportRest();
+            for (int i = 0; i < dataset.getColLabels().size(); i++) {
+                UsageReportPointDsoTotalVisitsRest totalDownloadsPoint = new UsageReportPointDsoTotalVisitsRest();
+                totalDownloadsPoint.setType("bitstream");
+                totalDownloadsPoint.setId(dataset.getColLabels().get(i));
+                totalDownloadsPoint.addValue("views", Integer.valueOf(dataset.getMatrix()[0][i]));
+                usageReportRest.addPoint(totalDownloadsPoint);
+            }
+            return usageReportRest;
+        }
+        throw new IllegalArgumentException("TotalDownloads report only available for items and bitstreams");
+    }
+
     private UsageReportRest resolveTopCountries(Context context, DSpaceObject dso)
         throws SQLException, IOException, ParseException, SolrServerException {
-        Dataset dataset = this.getTypeStatsDataset(context, dso, "countryCode");
+        Dataset dataset = this.getTypeStatsDataset(context, dso, "countryCode", 1);
 
         UsageReportRest usageReportRest = new UsageReportRest();
         for (int i = 0; i < dataset.getColLabels().size(); i++) {
@@ -148,7 +182,7 @@ public class UsageReportRestRepository extends AbstractDSpaceRestRepository {
 
     private UsageReportRest resolveTopCities(Context context, DSpaceObject dso)
         throws SQLException, IOException, ParseException, SolrServerException {
-        Dataset dataset = this.getTypeStatsDataset(context, dso, "city");
+        Dataset dataset = this.getTypeStatsDataset(context, dso, "city", 1);
 
         UsageReportRest usageReportRest = new UsageReportRest();
         for (int i = 0; i < dataset.getColLabels().size(); i++) {
@@ -160,7 +194,16 @@ public class UsageReportRestRepository extends AbstractDSpaceRestRepository {
         return usageReportRest;
     }
 
-    private Dataset getTypeStatsDataset(Context context, DSpaceObject dso, String typeAxisString)
+    private Dataset getDSOStatsDataset(Context context, DSpaceObject dso, int facetMinCount, int dsoType)
+        throws SQLException, IOException, ParseException, SolrServerException {
+        StatisticsListing statsList = new StatisticsListing(new StatisticsDataVisits(dso));
+        DatasetDSpaceObjectGenerator dsoAxis = new DatasetDSpaceObjectGenerator();
+        dsoAxis.addDsoChild(dsoType, 10, false, -1);
+        statsList.addDatasetGenerator(dsoAxis);
+        return statsList.getDataset(context, facetMinCount);
+    }
+
+    private Dataset getTypeStatsDataset(Context context, DSpaceObject dso, String typeAxisString, int facetMinCount)
         throws SQLException, IOException, ParseException, SolrServerException {
         StatisticsListing statListing = new StatisticsListing(new StatisticsDataVisits(dso));
         DatasetTypeGenerator typeAxis = new DatasetTypeGenerator();
@@ -168,6 +211,6 @@ public class UsageReportRestRepository extends AbstractDSpaceRestRepository {
         // TODO make max nr of top countries/cities a request para? Must be set
         typeAxis.setMax(100);
         statListing.addDatasetGenerator(typeAxis);
-        return statListing.getDataset(context);
+        return statListing.getDataset(context, facetMinCount);
     }
 }

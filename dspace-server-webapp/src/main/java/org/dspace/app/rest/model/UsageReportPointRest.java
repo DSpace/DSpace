@@ -7,6 +7,9 @@
  */
 package org.dspace.app.rest.model;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.dspace.app.rest.StatisticsRestController;
 
 /**
@@ -17,6 +20,8 @@ import org.dspace.app.rest.StatisticsRestController;
 public class UsageReportPointRest extends BaseObjectRest<String> {
     public static final String NAME = "point";
     public static final String CATEGORY = RestModel.STATISTICS;
+    protected String id;
+    private Map<String, Integer> values;
 
     public String getCategory() {
         return CATEGORY;
@@ -28,5 +33,28 @@ public class UsageReportPointRest extends BaseObjectRest<String> {
 
     public String getType() {
         return NAME;
+    }
+
+    public Map<String, Integer> getValues() {
+        return values;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public void addValue(String key, Integer value) {
+        if (values == null) {
+            values = new HashMap<>();
+        }
+        values.put(key, value);
+    }
+
+    public void setValues(Map<String, Integer> values) {
+        this.values = values;
     }
 }

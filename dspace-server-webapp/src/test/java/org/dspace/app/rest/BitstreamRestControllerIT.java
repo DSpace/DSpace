@@ -729,7 +729,7 @@ public class BitstreamRestControllerIT extends AbstractControllerIntegrationTest
 
         // Find all hits/views of bitstream
         ObjectCount objectCount = solrLoggerService.queryTotal("type:" + Constants.BITSTREAM +
-                                                               " AND id:" + bitstream.getID(), null);
+                                                               " AND id:" + bitstream.getID(), null, 1);
         assertEquals(expectedNumberOfStatsRecords, objectCount.getCount());
     }
 

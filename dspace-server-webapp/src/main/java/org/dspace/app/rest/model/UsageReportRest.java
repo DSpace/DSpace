@@ -47,6 +47,9 @@ public class UsageReportRest extends BaseObjectRest<String> {
     }
 
     public List<UsageReportPointRest> getPoints() {
+        if (points == null) {
+            points = new ArrayList<>();
+        }
         return points;
     }
 
