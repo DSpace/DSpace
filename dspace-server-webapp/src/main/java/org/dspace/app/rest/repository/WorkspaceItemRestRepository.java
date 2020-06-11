@@ -331,8 +331,7 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
                     }
 
                 } catch (UnprocessableEntityException e) {
-                    log.error(e.getMessage(), e);
-                    throw new UnprocessableEntityException("Error processing the patch request", e);
+                    throw e;
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
                     throw new PatchException("Error processing the patch request", e);

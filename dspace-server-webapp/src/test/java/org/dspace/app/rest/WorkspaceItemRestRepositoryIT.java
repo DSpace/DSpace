@@ -3245,6 +3245,11 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                  .content(patchBody)
                  .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
                  .andExpect(status().isUnprocessableEntity());
+
+        getClient(authToken).perform(get("/api/submission/workspaceitems/" + witem.getID()))
+                 .andExpect(status().isOk())
+                 .andExpect(jsonPath("$.sections.traditionalpageone['dc.title']").doesNotExist());
+
     }
 
     @Test
@@ -3330,6 +3335,10 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                  .content(patchBody)
                  .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
                  .andExpect(status().isUnprocessableEntity());
+
+        getClient(authToken).perform(get("/api/submission/workspaceitems/" + witem.getID()))
+                 .andExpect(status().isOk())
+                 .andExpect(jsonPath("$.sections.traditionalpageone['dc.title']").doesNotExist());
     }
 
     @Test
@@ -3506,7 +3515,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
     }
 
     @Test
-    public void patchUploadWrongPathTest() throws Exception {
+    public void patchUploadNotConfiguredMetadataTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
         parentCommunity = CommunityBuilder.createCommunity(context)
@@ -3523,7 +3532,6 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
 
         WorkspaceItem witem = WorkspaceItemBuilder.createWorkspaceItem(context, col1)
                 .withTitle("Test WorkspaceItem")
-                .withIssueDate("2017-10-17")
                 .withFulltext("simple-article.pdf", "/local/path/simple-article.pdf", pdf)
                 .build();
 
@@ -3541,6 +3549,11 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                             .content(patchBody)
                             .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
                             .andExpect(status().isUnprocessableEntity());
+
+        getClient(authToken).perform(get("/api/submission/workspaceitems/" + witem.getID()))
+                 .andExpect(status().isOk())
+                 .andExpect(jsonPath("$.sections.bitstream-metadata['dc.date.issued']").doesNotExist())
+                 .andExpect(jsonPath("$.sections.traditionalpageone['dc.date.issued']").doesNotExist());
     }
 
     @Test
@@ -3713,5 +3726,43 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                  .andExpect(status().isOk())
                  .andExpect(jsonPath("$.sections.traditionalpagetwo['dc.subject']").doesNotExist())
                  .andExpect(jsonPath("$.sections.traditionalpagetwo['dc.description.abstract']").doesNotExist());
+    }
+
+    @Test
+    public void patchDeleteMetadataThatNotExistTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                         .withName("Parent Community")
+                         .build();
+
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                          .withName("Sub Community")
+                          .build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, child1)
+                         .withName("Collection 1")
+                         .build();
+
+        WorkspaceItem witem = WorkspaceItemBuilder.createWorkspaceItem(context, col1)
+                             .withIssueDate("2020-04-21")
+                             .withSubject("ExtraEntry")
+                             .build();
+
+        //disable file upload mandatory
+        configurationService.setProperty("webui.submit.upload.required", false);
+
+        context.restoreAuthSystemState();
+
+        String authToken = getAuthToken(eperson.getEmail(), password);
+
+        List<Operation> operations = new ArrayList<Operation>();
+        operations.add(new RemoveOperation("/sections/traditionalpageone/dc.not.existing/0"));
+
+        String patchBody = getPatchContent(operations);
+        getClient(authToken).perform(patch("/api/submission/workspaceitems/" + witem.getID())
+                 .content(patchBody)
+                 .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                 .andExpect(status().isUnprocessableEntity());
     }
 }
