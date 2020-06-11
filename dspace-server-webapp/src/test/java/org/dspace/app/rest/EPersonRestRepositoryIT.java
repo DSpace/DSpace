@@ -1865,10 +1865,9 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
         String patchBody = getPatchContent(ops);
         accountService.sendRegistrationInfo(context, ePerson.getEmail());
         String tokenForEPerson = registrationDataService.findByEmail(context, ePerson.getEmail()).getToken();
-        String token = getAuthToken(admin.getEmail(), password);
         PasswordHash oldPassword = ePersonService.getPasswordHash(ePerson);
         // updates password
-        getClient(token).perform(patch("/api/eperson/epersons/" + ePerson.getID())
+        getClient().perform(patch("/api/eperson/epersons/" + ePerson.getID())
                                      .content(patchBody)
                                      .contentType(MediaType.APPLICATION_JSON_PATCH_JSON)
                                      .param("token", tokenForEPerson))
@@ -1902,14 +1901,13 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
         String patchBody = getPatchContent(ops);
         accountService.sendRegistrationInfo(context, ePerson.getEmail());
         String tokenForEPerson = registrationDataService.findByEmail(context, ePerson.getEmail()).getToken();
-        String token = getAuthToken(eperson.getEmail(), password);
         PasswordHash oldPassword = ePersonService.getPasswordHash(ePerson);
         // updates password
-        getClient(token).perform(patch("/api/eperson/epersons/" + ePerson.getID())
+        getClient().perform(patch("/api/eperson/epersons/" + ePerson.getID())
                                      .content(patchBody)
                                      .contentType(MediaType.APPLICATION_JSON_PATCH_JSON)
                                      .param("token", "RandomToken"))
-                        .andExpect(status().isForbidden());
+                        .andExpect(status().isUnauthorized());
 
         PasswordHash newPasswordHash = ePersonService.getPasswordHash(ePerson);
         assertEquals(oldPassword.getHashString(),newPasswordHash.getHashString());
@@ -1951,14 +1949,13 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
         String tokenForEPerson = registrationDataService.findByEmail(context, ePerson.getEmail()).getToken();
         String tokenForEPersonTwo = registrationDataService.findByEmail(context, ePersonTwo.getEmail()).getToken();
 
-        String token = getAuthToken(eperson.getEmail(), password);
         PasswordHash oldPassword = ePersonService.getPasswordHash(ePerson);
         // updates password
-        getClient(token).perform(patch("/api/eperson/epersons/" + ePerson.getID())
+        getClient().perform(patch("/api/eperson/epersons/" + ePerson.getID())
                                      .content(patchBody)
                                      .contentType(MediaType.APPLICATION_JSON_PATCH_JSON)
                                      .param("token", tokenForEPersonTwo))
-                        .andExpect(status().isForbidden());
+                        .andExpect(status().isUnauthorized());
 
         PasswordHash newPasswordHash = ePersonService.getPasswordHash(ePerson);
         assertEquals(oldPassword.getHashString(),newPasswordHash.getHashString());
@@ -1991,14 +1988,13 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
         String patchBody = getPatchContent(ops);
         accountService.sendRegistrationInfo(context, ePerson.getEmail());
         String tokenForEPerson = registrationDataService.findByEmail(context, ePerson.getEmail()).getToken();
-        String token = getAuthToken(eperson.getEmail(), password);
         PasswordHash oldPassword = ePersonService.getPasswordHash(ePerson);
         // updates password
-        getClient(token).perform(patch("/api/eperson/epersons/" + ePerson.getID())
+        getClient().perform(patch("/api/eperson/epersons/" + ePerson.getID())
                                      .content(patchBody)
                                      .contentType(MediaType.APPLICATION_JSON_PATCH_JSON)
                                      .param("token", tokenForEPerson))
-                        .andExpect(status().isForbidden());
+                        .andExpect(status().isUnauthorized());
 
         PasswordHash newPasswordHash = ePersonService.getPasswordHash(ePerson);
         assertEquals(oldPassword.getHashString(),newPasswordHash.getHashString());
@@ -2041,14 +2037,13 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
         String patchBody = getPatchContent(ops);
         accountService.sendRegistrationInfo(context, ePerson.getEmail());
         String newRegisterToken = registrationDataService.findByEmail(context, newRegisterEmail).getToken();
-        String token = getAuthToken(eperson.getEmail(), password);
         PasswordHash oldPassword = ePersonService.getPasswordHash(ePerson);
         // updates password
-        getClient(token).perform(patch("/api/eperson/epersons/" + ePerson.getID())
+        getClient().perform(patch("/api/eperson/epersons/" + ePerson.getID())
                                      .content(patchBody)
                                      .contentType(MediaType.APPLICATION_JSON_PATCH_JSON)
                                      .param("token", newRegisterToken))
-                        .andExpect(status().isForbidden());
+                        .andExpect(status().isUnauthorized());
 
         PasswordHash newPasswordHash = ePersonService.getPasswordHash(ePerson);
         assertTrue(StringUtils.equalsIgnoreCase(oldPassword.getHashString(),newPasswordHash.getHashString()));
