@@ -28,13 +28,27 @@ public class UsageReportMatcher {
     private UsageReportMatcher() {
     }
 
+    /**
+     * Matcher for the usage report on just id and report-type
+     *
+     * @param id         Id to match if of json of UsageReport
+     * @param reportType ReportType to match if of json of UsageReport
+     * @return The matcher
+     */
     private static Matcher<? super Object> matchUsageReport(String id, String reportType) {
         return allOf(
             hasJsonPath("$.id", is(id)),
-            hasJsonPath("$.report-type", is(reportType))
-                    );
+            hasJsonPath("$.report-type", is(reportType)));
     }
 
+    /**
+     * Matcher for the usage report including the {@link UsageReportPointRest} points
+     *
+     * @param id         Id to match if of json of UsageReport
+     * @param reportType ReportType to match if of json of UsageReport
+     * @param points     List of points to match to the json of UsageReport's list of points
+     * @return The matcher
+     */
     public static Matcher<? super Object> matchUsageReport(String id, String reportType,
                                                            List<UsageReportPointRest> points) {
         return allOf(
