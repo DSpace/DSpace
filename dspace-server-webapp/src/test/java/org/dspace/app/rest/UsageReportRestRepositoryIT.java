@@ -14,6 +14,11 @@ import static org.dspace.app.rest.builder.CollectionBuilder.createCollection;
 import static org.dspace.app.rest.builder.CommunityBuilder.createCommunity;
 import static org.dspace.app.rest.builder.CommunityBuilder.createSubCommunity;
 import static org.dspace.app.rest.builder.ItemBuilder.createItem;
+import static org.dspace.app.rest.repository.UsageReportRestRepository.TOP_CITIES_REPORT_ID;
+import static org.dspace.app.rest.repository.UsageReportRestRepository.TOP_COUNTRIES_REPORT_ID;
+import static org.dspace.app.rest.repository.UsageReportRestRepository.TOTAL_DOWNLOADS_REPORT_ID;
+import static org.dspace.app.rest.repository.UsageReportRestRepository.TOTAL_VISITS_PER_MONTH_REPORT_ID;
+import static org.dspace.app.rest.repository.UsageReportRestRepository.TOTAL_VISITS_REPORT_ID;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -74,12 +79,6 @@ public class UsageReportRestRepositoryIT extends AbstractControllerIntegrationTe
     private String loggedInToken;
     private String adminToken;
 
-    private static final String TOTAL_VISITS_REPORT_ID = "TotalVisits";
-    private static final String TOTAL_VISITS_PER_MONTH_REPORT_ID = "TotalVisitsPerMonth";
-    private static final String TOTAL_DOWNLOADS_REPORT_ID = "TotalDownloads";
-    private static final String TOP_COUNTRIES_REPORT_ID = "TopCountries";
-    private static final String TOP_CITIES_REPORT_ID = "TopCities";
-
     @BeforeClass
     public static void clearStatistics() throws Exception {
         // To ensure these tests start "fresh", clear out any existing statistics data.
@@ -126,20 +125,21 @@ public class UsageReportRestRepositoryIT extends AbstractControllerIntegrationTe
 
     @Test
     public void usagereports_nonValidUUIDpart_Exception() throws Exception {
-        getClient().perform(get("/api/statistics/usagereports/notAnUUID_TotalVisits"))
+        getClient().perform(get("/api/statistics/usagereports/notAnUUID" + "_" + TOTAL_VISITS_REPORT_ID))
                    .andExpect(status().is(HttpStatus.BAD_REQUEST.value()));
     }
 
     @Test
     public void usagereports_nonValidReportIDpart_Exception() throws Exception {
-        getClient().perform(get("/api/statistics/usagereports/" + UUID.randomUUID() + "_NotValidReport"))
-                   .andExpect(status().is(HttpStatus.BAD_REQUEST.value()));
+        getClient().perform(get("/api/statistics/usagereports/" + itemNotVisitedWithBitstreams.getID() +
+                                "_NotValidReport"))
+                   .andExpect(status().is(HttpStatus.NOT_FOUND.value()));
     }
 
     @Test
     public void usagereports_NonExistentUUID_Exception() throws Exception {
         getClient().perform(get("/api/statistics/usagereports/" + UUID.randomUUID() + "_" + TOTAL_VISITS_REPORT_ID))
-                   .andExpect(status().is(HttpStatus.BAD_REQUEST.value()));
+                   .andExpect(status().is(HttpStatus.NOT_FOUND.value()));
     }
 
     @Test

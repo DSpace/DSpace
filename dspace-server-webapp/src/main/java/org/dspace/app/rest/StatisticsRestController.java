@@ -8,8 +8,10 @@
 package org.dspace.app.rest;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.text.ParseException;
 import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 
@@ -33,6 +35,8 @@ import org.dspace.app.rest.utils.Utils;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.rest.webmvc.ControllerUtils;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.PagedModel;
@@ -44,6 +48,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -139,9 +144,20 @@ public class StatisticsRestController implements InitializingBean {
         Context context = ContextUtil.obtainContext(request);
 
         UsageReportRest usageReportRest = usageReportRestRepository.createUsageReport(context, uuidObject, reportId);
-        usageReportRest.setId(uuidObjectReportId);
 
         return usageReportRest;
+    }
+
+    @RequestMapping(method = RequestMethod.GET, value = "/usagereports/search/object")
+    @PreAuthorize("hasPermission(#uri, 'usagereportsearch', 'READ')")
+    public Page<UsageReportRest> searchUsageReports(HttpServletRequest request,
+                                                    @RequestParam(name = "uri", required = true) String uri,
+                                                    Pageable pageable)
+        throws SQLException, IOException, ParseException, SolrServerException {
+        UUID uuid = UUID.fromString(StringUtils.substringAfterLast(uri, "/"));
+        Context context = ContextUtil.obtainContext(request);
+        List<UsageReportRest> usageReportsOfItem = usageReportRestRepository.getUsageReportsOfDSO(context, uuid);
+        return converter.toRestPage(usageReportsOfItem, pageable, utils.obtainProjection());
     }
 
 }
