@@ -3765,4 +3765,42 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                  .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
                  .andExpect(status().isUnprocessableEntity());
     }
+
+    @Test
+    public void patchDeleteMetadataWrongSectionTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                         .withName("Parent Community")
+                         .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                          .withName("Sub Community")
+                          .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1)
+                         .withName("Collection 1")
+                         .build();
+        WorkspaceItem witem = WorkspaceItemBuilder.createWorkspaceItem(context, col1)
+                             .withTitle("Test title")
+                             .withIssueDate("2019-04-25")
+                             .withSubject("ExtraEntry")
+                             .build();
+        //disable file upload mandatory
+        configurationService.setProperty("webui.submit.upload.required", false);
+        context.restoreAuthSystemState();
+
+        String authToken = getAuthToken(eperson.getEmail(), password);
+        List<Operation> operations = new ArrayList<Operation>();
+        operations.add(new RemoveOperation("/sections/traditionalpagetwo/dc.title/0"));
+        String patchBody = getPatchContent(operations);
+
+        getClient(authToken).perform(patch("/api/submission/workspaceitems/" + witem.getID())
+                 .content(patchBody)
+                 .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                 .andExpect(status().isUnprocessableEntity());
+
+        getClient(authToken).perform(get("/api/submission/workspaceitems/" + witem.getID()))
+                 .andExpect(status().isOk())
+                 .andExpect(jsonPath("$",
+                         Matchers.is(WorkspaceItemMatcher.matchItemWithTitleAndDateIssuedAndSubject(witem,
+                                 "Test title", "2019-04-25", "ExtraEntry"))));
+    }
 }
