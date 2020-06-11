@@ -924,12 +924,11 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
         int offset, int limit) throws SQLException, SearchServiceException {
 
         List<Collection> collections = new ArrayList<Collection>();
-        StringBuilder query = new StringBuilder();
         DiscoverQuery discoverQuery = new DiscoverQuery();
         discoverQuery.setDSpaceObjectFilter(IndexableCollection.TYPE);
         discoverQuery.setStart(offset);
         discoverQuery.setMaxResults(limit);
-        DiscoverResult resp = resultSolrQuery(context, query, discoverQuery,community, q);
+        DiscoverResult resp = retrieveAuthorizedCollections(context, discoverQuery,community, q);
         for (IndexableObject solrCollections : resp.getIndexableObjects()) {
             Collection c = ((IndexableCollection) solrCollections).getIndexedObject();
             collections.add(c);
@@ -941,27 +940,24 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
     public int countAuthorizedCollectionsInSOLR(String q, Context context, Community community)
         throws SQLException, SearchServiceException {
 
-        StringBuilder query = new StringBuilder();
         DiscoverQuery discoverQuery = new DiscoverQuery();
+        discoverQuery.setMaxResults(0);
         discoverQuery.setDSpaceObjectFilter(IndexableCollection.TYPE);
-        DiscoverResult resp = resultSolrQuery(context, query, discoverQuery,community,q);
+        DiscoverResult resp = retrieveAuthorizedCollections(context, discoverQuery,community,q);
         return (int)resp.getTotalSearchResults();
     }
 
-    private DiscoverResult resultSolrQuery(Context context, StringBuilder query, DiscoverQuery discoverQuery,
-                                   Community community, String q) throws SQLException, SearchServiceException {
+    private DiscoverResult retrieveAuthorizedCollections(Context context, DiscoverQuery discoverQuery,
+            Community community, String q) throws SQLException, SearchServiceException {
 
+        StringBuilder query = new StringBuilder();
         EPerson currentUser = context.getCurrentUser();
         if (!authorizeService.isAdmin(context)) {
-            Group anonymousGroup = groupService.findByName(context, Group.ANONYMOUS);
-            String anonGroupId = "";
-            if (anonymousGroup != null) {
-                anonGroupId = anonymousGroup.getID().toString();
-            }
-            query.append("submit:(g").append(anonGroupId);
+            String userId = "";
             if (currentUser != null) {
-                query.append(" OR e").append(currentUser.getID());
+                userId = currentUser.getID().toString();
             }
+            query.append("submit:(e").append(userId);
             Set<Group> groups = groupService.allMemberGroupsSet(context, currentUser);
             for (Group group : groups) {
                 query.append(" OR g").append(group.getID());
