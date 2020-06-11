@@ -10,7 +10,9 @@ package org.dspace.app.rest.security;
 import java.io.Serializable;
 import java.util.List;
 import java.util.UUID;
+import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.rest.model.patch.Patch;
 import org.dspace.app.rest.repository.patch.operation.DSpaceObjectMetadataPatchUtils;
@@ -82,6 +84,17 @@ public class EPersonRestPermissionEvaluatorPlugin extends RestObjectPermissionEv
     public boolean hasPatchPermission(Authentication authentication, Serializable targetId, String targetType,
                                       Patch patch) {
 
+        List<Operation> operations = patch.getOperations();
+        // If it's a password replace action, we can allow anon through provided that there's a token present
+        Request currentRequest = requestService.getCurrentRequest();
+        if (currentRequest != null) {
+            HttpServletRequest httpServletRequest = currentRequest.getHttpServletRequest();
+            if (operations.size() > 0 && StringUtils.equalsIgnoreCase(operations.get(0).getOp(), "replace")
+                && StringUtils.equalsIgnoreCase(operations.get(0).getPath(), "/password")
+                && StringUtils.isNotBlank(httpServletRequest.getParameter("token"))) {
+                return true;
+            }
+        }
         /**
          * First verify that the user has write permission on the eperson.
          */
@@ -89,7 +102,6 @@ public class EPersonRestPermissionEvaluatorPlugin extends RestObjectPermissionEv
             return false;
         }
 
-        List<Operation> operations = patch.getOperations();
 
         /**
          * The entire Patch request should be denied if it contains operations that are

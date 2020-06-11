@@ -84,6 +84,7 @@ public class EPersonPasswordReplaceOperation<R> extends PatchOperation<R> {
                 throw new AccessDeniedException("The token in the parameter belongs to a different EPerson" +
                                                     " than the uri indicates");
             }
+            context.setCurrentUser(ePersonFromToken);
             accountService.deleteToken(context, token);
         } catch (SQLException | AuthorizeException e) {
             log.error("Failed to verify or delete the token for an EPerson patch", e);
