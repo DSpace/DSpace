@@ -22,7 +22,6 @@ import org.dspace.app.rest.model.UsageReportPointDsoTotalVisitsRest;
 import org.dspace.app.rest.model.UsageReportRest;
 import org.dspace.app.rest.utils.DSpaceObjectUtils;
 import org.dspace.content.DSpaceObject;
-import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.statistics.Dataset;
@@ -45,19 +44,15 @@ public class UsageReportRestRepository extends AbstractDSpaceRestRepository {
 
     @Autowired
     private DSpaceObjectUtils dspaceObjectUtil;
-    @Autowired
-    private ItemService itemService;
 
     /**
-     * TODO
+     * Creates the stat different stat usage report based on the report id.
+     * If the report id or the object uuid is invalid, an exception is thrown.
      *
-     * @param context
-     * @param uuid
-     * @param reportId
-     * @return
-     * @throws ParseException
-     * @throws SolrServerException
-     * @throws IOException
+     * @param context  DSpace context
+     * @param uuid     DSpace object UUID we want a stat usage report on
+     * @param reportId Type of usage report requested
+     * @return Rest object containing the stat usage report, see {@link UsageReportRest}
      */
     public UsageReportRest createUsageReport(Context context, UUID uuid, String reportId)
         throws ParseException, SolrServerException, IOException {
@@ -99,6 +94,14 @@ public class UsageReportRestRepository extends AbstractDSpaceRestRepository {
         }
     }
 
+    /**
+     * Create a stat usage report for the amount of TotalVisit on a DSO, containing one point with the amount of
+     * views on the DSO in. If there are no views on the DSO this point contains views=0.
+     *
+     * @param context DSpace context
+     * @param dso     DSO we want usage report with TotalVisits on the DSO
+     * @return Rest object containing the TotalVisits usage report of the given DSO
+     */
     private UsageReportRest resolveTotalVisits(Context context, DSpaceObject dso)
         throws SQLException, IOException, ParseException, SolrServerException {
         Dataset dataset = this.getDSOStatsDataset(context, dso, 0, dso.getType());
@@ -117,6 +120,15 @@ public class UsageReportRestRepository extends AbstractDSpaceRestRepository {
         return usageReportRest;
     }
 
+    /**
+     * Create a stat usage report for the amount of TotalVisitPerMonth on a DSO, containing one point for each month
+     * with the views on that DSO in that month with the range -6 months to now. If there are no views on the DSO
+     * in a month, the point on that month contains views=0.
+     *
+     * @param context DSpace context
+     * @param dso     DSO we want usage report with TotalVisitsPerMonth to the DSO
+     * @return Rest object containing the TotalVisits usage report on the given DSO
+     */
     private UsageReportRest resolveTotalVisitsPerMonth(Context context, DSpaceObject dso)
         throws SQLException, IOException, ParseException, SolrServerException {
         StatisticsTable statisticsTable = new StatisticsTable(new StatisticsDataVisits(dso));
@@ -139,6 +151,19 @@ public class UsageReportRestRepository extends AbstractDSpaceRestRepository {
         return usageReportRest;
     }
 
+    /**
+     * Create a stat usage report for the amount of TotalDownloads on the files of an Item or of a Bitstream,
+     * containing a point for each bitstream of the item that has been visited at least once or one point for the
+     * bitstream containing the amount of times that bitstream has been visited (even if 0)
+     * If the item has no bitstreams, or no bitstreams that have ever been downloaded/visited, then it contains an
+     * empty list of points=[]
+     * If the given UUID is for DSO that is neither a Bitstream nor an Item, an exception is thrown.
+     *
+     * @param context DSpace context
+     * @param dso     Item/Bitstream we want usage report on with TotalDownloads of the Item's bitstreams or of the
+     *                bitstream itself
+     * @return Rest object containing the TotalDownloads usage report on the given Item/Bitstream
+     */
     private UsageReportRest resolveTotalDownloads(Context context, DSpaceObject dso)
         throws SQLException, SolrServerException, ParseException, IOException {
         if (dso instanceof org.dspace.content.Bitstream) {
@@ -161,6 +186,16 @@ public class UsageReportRestRepository extends AbstractDSpaceRestRepository {
         throw new IllegalArgumentException("TotalDownloads report only available for items and bitstreams");
     }
 
+    /**
+     * Create a stat usage report for the TopCountries that have visited the given DSO. If there have been no visits, or
+     * no visits with a valid Geolite determined country (based on IP), this report contains an empty list of points=[].
+     * The list of points is limited to the top 100 countries, and each point contains the country name, its iso code
+     * and the amount of views on the given DSO from that country.
+     *
+     * @param context DSpace context
+     * @param dso     DSO we want usage report of the TopCountries on the given DSO
+     * @return Rest object containing the TopCountries usage report on the given DSO
+     */
     private UsageReportRest resolveTopCountries(Context context, DSpaceObject dso)
         throws SQLException, IOException, ParseException, SolrServerException {
         Dataset dataset = this.getTypeStatsDataset(context, dso, "countryCode", 1);
@@ -175,6 +210,16 @@ public class UsageReportRestRepository extends AbstractDSpaceRestRepository {
         return usageReportRest;
     }
 
+    /**
+     * Create a stat usage report for the TopCities that have visited the given DSO. If there have been no visits, or
+     * no visits with a valid Geolite determined city (based on IP), this report contains an empty list of points=[].
+     * The list of points is limited to the top 100 cities, and each point contains the city name and the amount of
+     * views on the given DSO from that city.
+     *
+     * @param context DSpace context
+     * @param dso     DSO we want usage report of the TopCities on the given DSO
+     * @return Rest object containing the TopCities usage report on the given DSO
+     */
     private UsageReportRest resolveTopCities(Context context, DSpaceObject dso)
         throws SQLException, IOException, ParseException, SolrServerException {
         Dataset dataset = this.getTypeStatsDataset(context, dso, "city", 1);
@@ -189,6 +234,16 @@ public class UsageReportRestRepository extends AbstractDSpaceRestRepository {
         return usageReportRest;
     }
 
+    /**
+     * Retrieves the stats dataset of a given DSO, of given type, with a given facetMinCount limit (usually either 0
+     * or 1, 0 if we want a data point even though the facet data point has 0 matching results).
+     *
+     * @param context       DSpace context
+     * @param dso           DSO we want the stats dataset of
+     * @param facetMinCount Minimum amount of results on a facet data point for it to be added to dataset
+     * @param dsoType       Type of DSO we want the stats dataset of
+     * @return Stats dataset with the given filters.
+     */
     private Dataset getDSOStatsDataset(Context context, DSpaceObject dso, int facetMinCount, int dsoType)
         throws SQLException, IOException, ParseException, SolrServerException {
         StatisticsListing statsList = new StatisticsListing(new StatisticsDataVisits(dso));
@@ -198,6 +253,18 @@ public class UsageReportRestRepository extends AbstractDSpaceRestRepository {
         return statsList.getDataset(context, facetMinCount);
     }
 
+    /**
+     * Retrieves the stats dataset of a given dso, with a given axisType (example countryCode, city), which
+     * corresponds to a solr field, and a given facetMinCount limit (usually either 0 or 1, 0 if we want a data point
+     * even though the facet data point has 0 matching results).
+     *
+     * @param context        DSpace context
+     * @param dso            DSO we want the stats dataset of
+     * @param typeAxisString String of the type we want on the axis of the dataset (corresponds to solr field),
+     *                       examples: countryCode, city
+     * @param facetMinCount  Minimum amount of results on a facet data point for it to be added to dataset
+     * @return Stats dataset with the given type on the axis, of the given DSO and with given facetMinCount
+     */
     private Dataset getTypeStatsDataset(Context context, DSpaceObject dso, String typeAxisString, int facetMinCount)
         throws SQLException, IOException, ParseException, SolrServerException {
         StatisticsListing statListing = new StatisticsListing(new StatisticsDataVisits(dso));

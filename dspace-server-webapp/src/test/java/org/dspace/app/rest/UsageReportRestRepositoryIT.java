@@ -519,7 +519,7 @@ public class UsageReportRestRepositoryIT extends AbstractControllerIntegrationTe
             .andExpect(status().is(HttpStatus.BAD_REQUEST.value()));
     }
 
-    // Create expected points from -6 months to now, with a view in current month
+    // Create expected points from -6 months to now, with given number of views in current month
     private List<UsageReportPointRest> getListOfVisitsPerMonthsPoints(int viewsLastMonth) {
         List<UsageReportPointRest> expectedPoints = new ArrayList<>();
         int nrOfMonthsBack = 6;

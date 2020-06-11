@@ -120,12 +120,13 @@ public class StatisticsRestController implements InitializingBean {
 
     @RequestMapping(method = RequestMethod.GET, value = "/usagereports")
     public PagedModel<SearchEventResource> getUsageReports() {
-        throw new RepositoryMethodNotImplementedException("No implementation found; Method not allowed!", "getUsageReports");
+        throw new RepositoryMethodNotImplementedException("No implementation found; Method not allowed!",
+            "getUsageReports");
     }
 
     @RequestMapping(method = RequestMethod.GET, value = "/usagereports/{uuid_id}")
     public UsageReportRest getUsageReport(@PathVariable(name = "uuid_id") String uuidObjectReportId,
-                                              HttpServletRequest request)
+                                          HttpServletRequest request)
         throws ParseException, SolrServerException, IOException {
         if (StringUtils.countMatches(uuidObjectReportId, "_") != 1) {
             throw new IllegalArgumentException("Must end in objectUUID_reportId, example: " +
