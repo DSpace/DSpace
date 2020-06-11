@@ -10,6 +10,8 @@ package org.dspace.app.rest.repository;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
@@ -21,9 +23,13 @@ import org.dspace.app.rest.model.UsageReportPointDateRest;
 import org.dspace.app.rest.model.UsageReportPointDsoTotalVisitsRest;
 import org.dspace.app.rest.model.UsageReportRest;
 import org.dspace.app.rest.utils.DSpaceObjectUtils;
+import org.dspace.content.Bitstream;
 import org.dspace.content.DSpaceObject;
+import org.dspace.content.Item;
+import org.dspace.content.Site;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.handle.service.HandleService;
 import org.dspace.statistics.Dataset;
 import org.dspace.statistics.content.DatasetDSpaceObjectGenerator;
 import org.dspace.statistics.content.DatasetTimeGenerator;
@@ -32,6 +38,7 @@ import org.dspace.statistics.content.StatisticsDataVisits;
 import org.dspace.statistics.content.StatisticsListing;
 import org.dspace.statistics.content.StatisticsTable;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.stereotype.Component;
 
 /**
@@ -44,6 +51,41 @@ public class UsageReportRestRepository extends AbstractDSpaceRestRepository {
 
     @Autowired
     private DSpaceObjectUtils dspaceObjectUtil;
+    @Autowired
+    protected HandleService handleService;
+
+    public static final String TOTAL_VISITS_REPORT_ID = "TotalVisits";
+    public static final String TOTAL_VISITS_PER_MONTH_REPORT_ID = "TotalVisitsPerMonth";
+    public static final String TOTAL_DOWNLOADS_REPORT_ID = "TotalDownloads";
+    public static final String TOP_COUNTRIES_REPORT_ID = "TopCountries";
+    public static final String TOP_CITIES_REPORT_ID = "TopCities";
+
+    /**
+     * Get list of usage reports that are applicable to the DSO (of given UUID)
+     *
+     * @param context DSpace context
+     * @param uuid    UUID of DSO we want all available usage reports of
+     * @return List of usage reports, applicable to the given DSO
+     */
+    public List<UsageReportRest> getUsageReportsOfDSO(Context context, UUID uuid)
+        throws SQLException, ParseException, SolrServerException, IOException {
+        List<UsageReportRest> usageReports = new ArrayList<>();
+        DSpaceObject dso = dspaceObjectUtil.findDSpaceObject(context, uuid);
+        if (dso instanceof Site) {
+            UsageReportRest globalUsageStats = this.resolveGlobalUsageReport(context);
+            globalUsageStats.setId(uuid.toString() + "_" + TOTAL_VISITS_REPORT_ID);
+            usageReports.add(globalUsageStats);
+        } else {
+            usageReports.add(this.createUsageReport(context, uuid, TOTAL_VISITS_REPORT_ID));
+            usageReports.add(this.createUsageReport(context, uuid, TOTAL_VISITS_PER_MONTH_REPORT_ID));
+            usageReports.add(this.createUsageReport(context, uuid, TOP_COUNTRIES_REPORT_ID));
+            usageReports.add(this.createUsageReport(context, uuid, TOP_CITIES_REPORT_ID));
+        }
+        if (dso instanceof Item || dso instanceof Bitstream) {
+            usageReports.add(this.createUsageReport(context, uuid, TOTAL_DOWNLOADS_REPORT_ID));
+        }
+        return usageReports;
+    }
 
     /**
      * Creates the stat different stat usage report based on the report id.
@@ -60,35 +102,71 @@ public class UsageReportRestRepository extends AbstractDSpaceRestRepository {
             DSpaceObject dso = dspaceObjectUtil.findDSpaceObject(context, uuid);
             UsageReportRest usageReportRest;
             switch (reportId) {
-                case "TotalVisits":
+                case TOTAL_VISITS_REPORT_ID:
                     usageReportRest = resolveTotalVisits(context, dso);
-                    usageReportRest.setReportType("TotalVisits");
+                    usageReportRest.setReportType(TOTAL_VISITS_REPORT_ID);
                     break;
-                case "TotalVisitsPerMonth":
+                case TOTAL_VISITS_PER_MONTH_REPORT_ID:
                     usageReportRest = resolveTotalVisitsPerMonth(context, dso);
-                    usageReportRest.setReportType("TotalVisitsPerMonth");
+                    usageReportRest.setReportType(TOTAL_VISITS_PER_MONTH_REPORT_ID);
                     break;
-                case "TotalDownloads":
+                case TOTAL_DOWNLOADS_REPORT_ID:
                     usageReportRest = resolveTotalDownloads(context, dso);
-                    usageReportRest.setReportType("TotalDownloads");
+                    usageReportRest.setReportType(TOTAL_DOWNLOADS_REPORT_ID);
                     break;
-                case "TopCountries":
+                case TOP_COUNTRIES_REPORT_ID:
                     usageReportRest = resolveTopCountries(context, dso);
-                    usageReportRest.setReportType("TopCountries");
+                    usageReportRest.setReportType(TOP_COUNTRIES_REPORT_ID);
                     break;
-                case "TopCities":
+                case TOP_CITIES_REPORT_ID:
                     usageReportRest = resolveTopCities(context, dso);
-                    usageReportRest.setReportType("TopCities");
+                    usageReportRest.setReportType(TOP_CITIES_REPORT_ID);
                     break;
                 default:
-                    throw new DSpaceBadRequestException("The given report id can't be resolved: " + reportId + "; " +
+                    throw new ResourceNotFoundException("The given report id can't be resolved: " + reportId + "; " +
                                                         "available reports: TotalVisits, TotalVisitsPerMonth, " +
                                                         "TotalDownloads, TopCountries, TopCities");
             }
+            usageReportRest.setId(uuid + "_" + reportId);
             return usageReportRest;
         } catch (SQLException e) {
             throw new DSpaceBadRequestException("The given object uuid can't be resolved to an object: " + uuid);
         }
+    }
+
+    /**
+     * Create stat usage report of the items most popular over entire site
+     *
+     * @param context DSpace context
+     * @return Usage report with top most popular items
+     */
+    private UsageReportRest resolveGlobalUsageReport(Context context)
+        throws SQLException, IOException, ParseException, SolrServerException {
+        StatisticsListing statListing = new StatisticsListing(
+            new StatisticsDataVisits());
+
+        // Adding a new generator for our top 10 items without a name length delimiter
+        DatasetDSpaceObjectGenerator dsoAxis = new DatasetDSpaceObjectGenerator();
+        // TODO make max nr of top items (views wise)? Must be set
+        dsoAxis.addDsoChild(Constants.ITEM, 10, false, -1);
+        statListing.addDatasetGenerator(dsoAxis);
+
+        Dataset dataset = statListing.getDataset(context, 1);
+
+        UsageReportRest usageReportRest = new UsageReportRest();
+        for (int i = 0; i < dataset.getColLabels().size(); i++) {
+            UsageReportPointDsoTotalVisitsRest totalVisitPoint = new UsageReportPointDsoTotalVisitsRest();
+            totalVisitPoint.setType("item");
+            totalVisitPoint.setLabel(dataset.getColLabels().get(i));
+            String urlOfItem = dataset.getColLabelsAttrs().get(i).get("url");
+            DSpaceObject dso = handleService.resolveToObject(context, StringUtils.substringAfterLast(urlOfItem,
+                "handle/"));
+            totalVisitPoint.setId(dso != null ? dso.getID().toString() : urlOfItem);
+            totalVisitPoint.addValue("views", Integer.valueOf(dataset.getMatrix()[0][i]));
+            usageReportRest.addPoint(totalVisitPoint);
+        }
+        usageReportRest.setReportType(TOTAL_VISITS_REPORT_ID);
+        return usageReportRest;
     }
 
     /**
@@ -101,15 +179,17 @@ public class UsageReportRestRepository extends AbstractDSpaceRestRepository {
      */
     private UsageReportRest resolveTotalVisits(Context context, DSpaceObject dso)
         throws SQLException, IOException, ParseException, SolrServerException {
-        Dataset dataset = this.getDSOStatsDataset(context, dso, 0, dso.getType());
+        Dataset dataset = this.getDSOStatsDataset(context, dso, 1, dso.getType());
 
         UsageReportRest usageReportRest = new UsageReportRest();
         UsageReportPointDsoTotalVisitsRest totalVisitPoint = new UsageReportPointDsoTotalVisitsRest();
         totalVisitPoint.setType(StringUtils.substringAfterLast(dso.getClass().getName().toLowerCase(), "."));
         totalVisitPoint.setId(dso.getID().toString());
         if (dataset.getColLabels().size() > 0) {
+            totalVisitPoint.setLabel(dataset.getColLabels().get(0));
             totalVisitPoint.addValue("views", Integer.valueOf(dataset.getMatrix()[0][0]));
         } else {
+            totalVisitPoint.setLabel(dso.getName());
             totalVisitPoint.addValue("views", 0);
         }
 

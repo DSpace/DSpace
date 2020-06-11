@@ -23,6 +23,7 @@ import org.dspace.services.model.Request;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
@@ -48,21 +49,26 @@ public class UsageReportRestPermissionEvaluatorPlugin extends RestObjectPermissi
     @Override
     public boolean hasDSpacePermission(Authentication authentication, Serializable targetId, String targetType,
                                        DSpaceRestPermission restPermission) {
+        Request request = requestService.getCurrentRequest();
+        Context context = ContextUtil.obtainContext(request.getServletRequest());
+        UUID uuidObject = null;
         if (StringUtils.equalsIgnoreCase(UsageReportRest.NAME, targetType)) {
-            UUID uuidObject = UUID.fromString(StringUtils.substringBefore(targetId.toString(), "_"));
-            Request request = requestService.getCurrentRequest();
-            Context context = ContextUtil.obtainContext(request.getServletRequest());
-            try {
-                DSpaceObject dso = dspaceObjectUtil.findDSpaceObject(context, uuidObject);
-                if (dso == null) {
-                    throw new IllegalArgumentException("No DSO found with this UUID: " + uuidObject);
-                }
-                return authorizeService.authorizeActionBoolean(context, dso, restPermission.getDspaceApiActionId());
-            } catch (SQLException e) {
-                log.error(e.getMessage(), e);
-            }
+            // Get uuid from uuidDSO_reportId pathParam
+            uuidObject = UUID.fromString(StringUtils.substringBefore(targetId.toString(), "_"));
+        } else if (StringUtils.equalsIgnoreCase(UsageReportRest.NAME + "search", targetType)) {
+            // Get uuid from url (selfLink of dso) queryParam
+            uuidObject = UUID.fromString(StringUtils.substringAfterLast(targetId.toString(), "/"));
         } else {
             return false;
+        }
+        try {
+            DSpaceObject dso = dspaceObjectUtil.findDSpaceObject(context, uuidObject);
+            if (dso == null) {
+                throw new ResourceNotFoundException("No DSO found with this UUID: " + uuidObject);
+            }
+            return authorizeService.authorizeActionBoolean(context, dso, restPermission.getDspaceApiActionId());
+        } catch (SQLException e) {
+            log.error(e.getMessage(), e);
         }
         return true;
     }
