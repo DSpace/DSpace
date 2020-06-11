@@ -43,6 +43,7 @@ import org.dspace.app.rest.builder.CommunityBuilder;
 import org.dspace.app.rest.builder.EPersonBuilder;
 import org.dspace.app.rest.builder.GroupBuilder;
 import org.dspace.app.rest.builder.ItemBuilder;
+import org.dspace.app.rest.jackson.IgnoreJacksonWriteOnlyAccess;
 import org.dspace.app.rest.matcher.EPersonMatcher;
 import org.dspace.app.rest.matcher.GroupMatcher;
 import org.dspace.app.rest.matcher.HalMatcher;
@@ -2127,18 +2128,25 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                    .andExpect(status().isCreated());
         String newRegisterToken = registrationDataService.findByEmail(context, newRegisterEmail).getToken();
 
-        // We need to create this json manually to support actually setting the password to a value.
-        // When using the mapper to write an EPersonRest object to JSON to pass it along, the password gets lost
-        String json = "{\"metadata\":{\"eperson.firstname\":[{\"value\":\"John\"}]," +
-            "\"eperson.lastname\":[{\"value\":\"Doe\"}]},\"email\":\"" + newRegisterEmail +
-            "\",\"password\":\"somePassword\",\"type\":\"eperson\"}";
-
+        EPersonRest ePersonRest = new EPersonRest();
+        MetadataRest metadataRest = new MetadataRest();
+        ePersonRest.setEmail(newRegisterEmail);
+        ePersonRest.setCanLogIn(true);
+        MetadataValueRest surname = new MetadataValueRest();
+        surname.setValue("Doe");
+        metadataRest.put("eperson.lastname", surname);
+        MetadataValueRest firstname = new MetadataValueRest();
+        firstname.setValue("John");
+        metadataRest.put("eperson.firstname", firstname);
+        ePersonRest.setMetadata(metadataRest);
+        ePersonRest.setPassword("somePassword");
         AtomicReference<UUID> idRef = new AtomicReference<UUID>();
 
+        mapper.setAnnotationIntrospector(new IgnoreJacksonWriteOnlyAccess());
         try {
             getClient().perform(post("/api/eperson/epersons")
                                                                .param("token", newRegisterToken)
-                                                               .content(json)
+                                                               .content(mapper.writeValueAsBytes(ePersonRest))
                                                                .contentType(MediaType.APPLICATION_JSON))
                                                   .andExpect(status().isCreated())
                                                   .andExpect(jsonPath("$", Matchers.allOf(
@@ -2182,18 +2190,28 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                    .andExpect(status().isCreated());
         String newRegisterToken = registrationDataService.findByEmail(context, newRegisterEmail).getToken();
 
-        // We need to create this json manually to support actually setting the password to a value.
-        // When using the mapper to write an EPersonRest object to JSON to pass it along, the password gets lost
-        String json = "{\"metadata\":{\"eperson.firstname\":[{\"value\":\"John\"}]," +
-            "\"eperson.lastname\":[{\"value\":\"Doe\"}]},\"selfRegistered\":true,\"email\":\"" + newRegisterEmail +
-            "\",\"password\":\"somePassword\",\"type\":\"eperson\"}";
-
+        EPersonRest ePersonRest = new EPersonRest();
+        MetadataRest metadataRest = new MetadataRest();
+        ePersonRest.setEmail(newRegisterEmail);
+        ePersonRest.setCanLogIn(true);
+        MetadataValueRest surname = new MetadataValueRest();
+        surname.setValue("Doe");
+        metadataRest.put("eperson.lastname", surname);
+        MetadataValueRest firstname = new MetadataValueRest();
+        firstname.setValue("John");
+        metadataRest.put("eperson.firstname", firstname);
+        ePersonRest.setMetadata(metadataRest);
+        ePersonRest.setPassword("somePassword");
+        ePersonRest.setSelfRegistered(true);
         AtomicReference<UUID> idRef = new AtomicReference<UUID>();
+
+        mapper.setAnnotationIntrospector(new IgnoreJacksonWriteOnlyAccess());
+
 
         try {
             getClient().perform(post("/api/eperson/epersons")
                                                                .param("token", newRegisterToken)
-                                                               .content(json)
+                                                               .content(mapper.writeValueAsBytes(ePersonRest))
                                                                .contentType(MediaType.APPLICATION_JSON))
                                                   .andExpect(status().isCreated())
                                                   .andExpect(jsonPath("$", Matchers.allOf(
@@ -2250,15 +2268,25 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                    .andExpect(status().isCreated());
         String newRegisterTokenTwo = registrationDataService.findByEmail(context, newRegisterEmailTwo).getToken();
 
-        // We need to create this json manually to support actually setting the password to a value.
-        // When using the mapper to write an EPersonRest object to JSON to pass it along, the password gets lost
-        String json = "{\"metadata\":{\"eperson.firstname\":[{\"value\":\"John\"}]," +
-            "\"eperson.lastname\":[{\"value\":\"Doe\"}]},\"email\":\"" + newRegisterEmailTwo +
-            "\",\"password\":\"somePassword\",\"type\":\"eperson\"}";
+
+        EPersonRest ePersonRest = new EPersonRest();
+        MetadataRest metadataRest = new MetadataRest();
+        ePersonRest.setEmail(newRegisterEmailTwo);
+        ePersonRest.setCanLogIn(true);
+        MetadataValueRest surname = new MetadataValueRest();
+        surname.setValue("Doe");
+        metadataRest.put("eperson.lastname", surname);
+        MetadataValueRest firstname = new MetadataValueRest();
+        firstname.setValue("John");
+        metadataRest.put("eperson.firstname", firstname);
+        ePersonRest.setMetadata(metadataRest);
+        ePersonRest.setPassword("somePassword");
+
+        mapper.setAnnotationIntrospector(new IgnoreJacksonWriteOnlyAccess());
 
         getClient().perform(post("/api/eperson/epersons")
                                                            .param("token", newRegisterToken)
-                                                           .content(json)
+                                                           .content(mapper.writeValueAsBytes(ePersonRest))
                                                            .contentType(MediaType.APPLICATION_JSON))
                                               .andExpect(status().isBadRequest());
 
@@ -2287,15 +2315,25 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                    .andExpect(status().isCreated());
         String newRegisterToken = registrationDataService.findByEmail(context, newRegisterEmail).getToken();
 
-        // We need to create this json manually to support actually setting the password to a value.
-        // When using the mapper to write an EPersonRest object to JSON to pass it along, the password gets lost
-        String json = "{\"metadata\":{\"eperson.firstname\":[{\"value\":\"John\"}]," +
-            "\"eperson.lastname\":[{\"value\":\"Doe\"}]},\"email\":\"" + newRegisterEmail +
-            "\",\"password\":\"somePassword\",\"type\":\"eperson\"}";
+
+        EPersonRest ePersonRest = new EPersonRest();
+        MetadataRest metadataRest = new MetadataRest();
+        ePersonRest.setEmail(newRegisterEmail);
+        ePersonRest.setCanLogIn(true);
+        MetadataValueRest surname = new MetadataValueRest();
+        surname.setValue("Doe");
+        metadataRest.put("eperson.lastname", surname);
+        MetadataValueRest firstname = new MetadataValueRest();
+        firstname.setValue("John");
+        metadataRest.put("eperson.firstname", firstname);
+        ePersonRest.setMetadata(metadataRest);
+        ePersonRest.setPassword("somePassword");
+
+        mapper.setAnnotationIntrospector(new IgnoreJacksonWriteOnlyAccess());
 
         getClient().perform(post("/api/eperson/epersons")
                                      .param("token", "randomToken")
-                                     .content(json)
+                                     .content(mapper.writeValueAsBytes(ePersonRest))
                                      .contentType(MediaType.APPLICATION_JSON))
                         .andExpect(status().isBadRequest());
 
@@ -2322,15 +2360,26 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                    .andExpect(status().isCreated());
         String newRegisterToken = registrationDataService.findByEmail(context, newRegisterEmail).getToken();
 
-        // We need to create this json manually to support actually setting the password to a value.
-        // When using the mapper to write an EPersonRest object to JSON to pass it along, the password gets lost
-        String json = "{\"metadata\":{\"eperson.firstname\":[{\"value\":\"John\"}]," +
-            "\"eperson.lastname\":[{\"value\":\"Doe\"}]},\"selfRegistered\":false,\"email\":\"" + newRegisterEmail +
-            "\",\"password\":\"somePassword\",\"type\":\"eperson\"}";
+
+        EPersonRest ePersonRest = new EPersonRest();
+        MetadataRest metadataRest = new MetadataRest();
+        ePersonRest.setEmail(newRegisterEmail);
+        ePersonRest.setCanLogIn(true);
+        MetadataValueRest surname = new MetadataValueRest();
+        surname.setValue("Doe");
+        metadataRest.put("eperson.lastname", surname);
+        MetadataValueRest firstname = new MetadataValueRest();
+        firstname.setValue("John");
+        metadataRest.put("eperson.firstname", firstname);
+        ePersonRest.setMetadata(metadataRest);
+        ePersonRest.setPassword("somePassword");
+        ePersonRest.setSelfRegistered(false);
+
+        mapper.setAnnotationIntrospector(new IgnoreJacksonWriteOnlyAccess());
 
         getClient().perform(post("/api/eperson/epersons")
                                                            .param("token", newRegisterToken)
-                                                           .content(json)
+                                                           .content(mapper.writeValueAsBytes(ePersonRest))
                                                            .contentType(MediaType.APPLICATION_JSON))
                                               .andExpect(status().isBadRequest());
 
@@ -2357,14 +2406,23 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                    .andExpect(status().isCreated());
         String newRegisterToken = registrationDataService.findByEmail(context, newRegisterEmail).getToken();
 
-        // We need to create this json manually to support actually setting the password to a value.
-        // When using the mapper to write an EPersonRest object to JSON to pass it along, the password gets lost
-        String json = "{\"metadata\":{\"eperson.firstname\":[{\"value\":\"John\"}]},\"selfRegistered\":true," +
-            "\"email\":\"" + newRegisterEmail + "\",\"password\":\"somePassword\",\"type\":\"eperson\"}";
+
+        EPersonRest ePersonRest = new EPersonRest();
+        MetadataRest metadataRest = new MetadataRest();
+        ePersonRest.setEmail(newRegisterEmail);
+        ePersonRest.setCanLogIn(true);
+        MetadataValueRest firstname = new MetadataValueRest();
+        firstname.setValue("John");
+        metadataRest.put("eperson.firstname", firstname);
+        ePersonRest.setMetadata(metadataRest);
+        ePersonRest.setPassword("somePassword");
+        ePersonRest.setSelfRegistered(true);
+
+        mapper.setAnnotationIntrospector(new IgnoreJacksonWriteOnlyAccess());
 
         getClient().perform(post("/api/eperson/epersons")
                                      .param("token", newRegisterToken)
-                                     .content(json)
+                                     .content(mapper.writeValueAsBytes(ePersonRest))
                                      .contentType(MediaType.APPLICATION_JSON))
                         .andExpect(status().isBadRequest());
 
@@ -2391,14 +2449,23 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                    .andExpect(status().isCreated());
         String newRegisterToken = registrationDataService.findByEmail(context, newRegisterEmail).getToken();
 
-        // We need to create this json manually to support actually setting the password to a value.
-        // When using the mapper to write an EPersonRest object to JSON to pass it along, the password gets lost
-        String json = "{\"metadata\":{\"eperson.lastname\":[{\"value\":\"Doe\"}]},\"selfRegistered\":true," +
-            "\"email\":\"" + newRegisterEmail + "\",\"password\":\"somePassword\",\"type\":\"eperson\"}";
+
+        EPersonRest ePersonRest = new EPersonRest();
+        MetadataRest metadataRest = new MetadataRest();
+        ePersonRest.setEmail(newRegisterEmail);
+        ePersonRest.setCanLogIn(true);
+        MetadataValueRest surname = new MetadataValueRest();
+        surname.setValue("Doe");
+        metadataRest.put("eperson.lastname", surname);
+        ePersonRest.setMetadata(metadataRest);
+        ePersonRest.setPassword("somePassword");
+        ePersonRest.setSelfRegistered(true);
+
+        mapper.setAnnotationIntrospector(new IgnoreJacksonWriteOnlyAccess());
 
         getClient().perform(post("/api/eperson/epersons")
                                      .param("token", newRegisterToken)
-                                     .content(json)
+                                     .content(mapper.writeValueAsBytes(ePersonRest))
                                      .contentType(MediaType.APPLICATION_JSON))
                         .andExpect(status().isBadRequest());
 
@@ -2425,15 +2492,24 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                    .andExpect(status().isCreated());
         String newRegisterToken = registrationDataService.findByEmail(context, newRegisterEmail).getToken();
 
-        // We need to create this json manually to support actually setting the password to a value.
-        // When using the mapper to write an EPersonRest object to JSON to pass it along, the password gets lost
-        String json = "{\"metadata\":{\"eperson.firstname\":[{\"value\":\"John\"}]," +
-            "\"eperson.lastname\":[{\"value\":\"Doe\"}]}," +
-            "\"type\":\"eperson\"}";
+
+        EPersonRest ePersonRest = new EPersonRest();
+        MetadataRest metadataRest = new MetadataRest();
+        ePersonRest.setEmail(newRegisterEmail);
+        ePersonRest.setCanLogIn(true);
+        MetadataValueRest surname = new MetadataValueRest();
+        surname.setValue("Doe");
+        metadataRest.put("eperson.lastname", surname);
+        MetadataValueRest firstname = new MetadataValueRest();
+        firstname.setValue("John");
+        metadataRest.put("eperson.firstname", firstname);
+        ePersonRest.setMetadata(metadataRest);
+
+        mapper.setAnnotationIntrospector(new IgnoreJacksonWriteOnlyAccess());
 
         getClient().perform(post("/api/eperson/epersons")
                                      .param("token", newRegisterToken)
-                                     .content(json)
+                                     .content(mapper.writeValueAsBytes(ePersonRest))
                                      .contentType(MediaType.APPLICATION_JSON))
                         .andExpect(status().isBadRequest());
 
@@ -2461,15 +2537,25 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                    .andExpect(status().isCreated());
         String forgotPasswordToken = registrationDataService.findByEmail(context, eperson.getEmail()).getToken();
 
-        // We need to create this json manually to support actually setting the password to a value.
-        // When using the mapper to write an EPersonRest object to JSON to pass it along, the password gets lost
-        String json = "{\"metadata\":{\"eperson.firstname\":[{\"value\":\"John\"}]," +
-            "\"eperson.lastname\":[{\"value\":\"Doe\"}]},\"selfRegistered\":true,\"password\":\"somePassword\"," +
-            "\"type\":\"eperson\"}";
+
+        EPersonRest ePersonRest = new EPersonRest();
+        MetadataRest metadataRest = new MetadataRest();
+        ePersonRest.setCanLogIn(true);
+        MetadataValueRest surname = new MetadataValueRest();
+        surname.setValue("Doe");
+        metadataRest.put("eperson.lastname", surname);
+        MetadataValueRest firstname = new MetadataValueRest();
+        firstname.setValue("John");
+        metadataRest.put("eperson.firstname", firstname);
+        ePersonRest.setMetadata(metadataRest);
+        ePersonRest.setPassword("somePassword");
+        ePersonRest.setSelfRegistered(true);
+
+        mapper.setAnnotationIntrospector(new IgnoreJacksonWriteOnlyAccess());
 
         getClient().perform(post("/api/eperson/epersons")
                                      .param("token", forgotPasswordToken)
-                                     .content(json)
+                                     .content(mapper.writeValueAsBytes(ePersonRest))
                                      .contentType(MediaType.APPLICATION_JSON))
                         .andExpect(status().isBadRequest());
 
@@ -2497,18 +2583,28 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                    .andExpect(status().isCreated());
         String newRegisterToken = registrationDataService.findByEmail(context, newRegisterEmail).getToken();
 
-        // We need to create this json manually to support actually setting the password to a value.
-        // When using the mapper to write an EPersonRest object to JSON to pass it along, the password gets lost
-        String json = "{\"metadata\":{\"eperson.firstname\":[{\"value\":\"John\"}]," +
-            "\"eperson.lastname\":[{\"value\":\"Doe\"}]},\"email\":\"" + newRegisterEmail +
-            "\",\"password\":\"somePassword\",\"type\":\"eperson\"}";
+
+        EPersonRest ePersonRest = new EPersonRest();
+        MetadataRest metadataRest = new MetadataRest();
+        ePersonRest.setEmail(newRegisterEmail);
+        ePersonRest.setCanLogIn(true);
+        MetadataValueRest surname = new MetadataValueRest();
+        surname.setValue("Doe");
+        metadataRest.put("eperson.lastname", surname);
+        MetadataValueRest firstname = new MetadataValueRest();
+        firstname.setValue("John");
+        metadataRest.put("eperson.firstname", firstname);
+        ePersonRest.setMetadata(metadataRest);
+        ePersonRest.setPassword("somePassword");
+
+        mapper.setAnnotationIntrospector(new IgnoreJacksonWriteOnlyAccess());
 
         AtomicReference<UUID> idRef = new AtomicReference<UUID>();
 
         try {
             getClient().perform(post("/api/eperson/epersons")
                                                                .param("token", newRegisterToken)
-                                                               .content(json)
+                                                               .content(mapper.writeValueAsBytes(ePersonRest))
                                                                .contentType(MediaType.APPLICATION_JSON))
                                                   .andExpect(status().isCreated())
                                                   .andExpect(jsonPath("$", Matchers.allOf(
