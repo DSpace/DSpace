@@ -30,6 +30,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.dspace.app.rest.builder.CollectionBuilder;
 import org.dspace.app.rest.builder.CommunityBuilder;
 import org.dspace.app.rest.builder.EPersonBuilder;
+import org.dspace.app.rest.builder.GroupBuilder;
 import org.dspace.app.rest.builder.ResourcePolicyBuilder;
 import org.dspace.app.rest.converter.CollectionConverter;
 import org.dspace.app.rest.matcher.CollectionMatcher;
@@ -49,6 +50,8 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.core.Constants;
 import org.dspace.eperson.EPerson;
+import org.dspace.eperson.Group;
+import org.dspace.eperson.service.GroupService;
 import org.hamcrest.Matchers;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,6 +67,9 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
 
     @Autowired
     ResourcePolicyService resoucePolicyService;
+
+    @Autowired
+    GroupService groupService;
 
     @Test
     public void findAllTest() throws Exception {
@@ -479,6 +485,11 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
     public void findAuthorizedCollectionsTest() throws Exception {
 
         context.turnOffAuthorisationSystem();
+        EPerson eperson2 = EPersonBuilder.createEPerson(context)
+                                         .withEmail("eperson2@example.com")
+                                         .withPassword(password)
+                                         .build();
+
         parentCommunity = CommunityBuilder.createCommunity(context)
                                           .withName("Parent Community")
                                           .build();
@@ -500,9 +511,17 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                                            .withSubmitterGroup(eperson)
                                            .build();
 
+        Group ChildGroupOfSubmitterGroup = GroupBuilder.createGroup(context)
+                                                       .withName("Child group of submitters")
+                                                       .withParent(col1.getSubmitters())
+                                                       .addMember(eperson2)
+                                                       .build();
+
         context.restoreAuthSystemState();
 
         String tokenEPerson = getAuthToken(eperson.getEmail(), password);
+        String tokenEPerson2 = getAuthToken(eperson2.getEmail(), password);
+
         getClient(tokenEPerson).perform(get("/api/core/collections/search/findAuthorized"))
                  .andExpect(status().isOk())
                  .andExpect(content().contentType(contentType))
@@ -511,6 +530,14 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                          CollectionMatcher.matchProperties(col3.getName(), col3.getID(), col3.getHandle())
                          )))
                  .andExpect(jsonPath("$.page.totalElements", is(2)));
+
+        getClient(tokenEPerson2).perform(get("/api/core/collections/search/findAuthorized"))
+                 .andExpect(status().isOk())
+                 .andExpect(content().contentType(contentType))
+                 .andExpect(jsonPath("$._embedded.collections", Matchers.contains(
+                            CollectionMatcher.matchProperties(col1.getName(), col1.getID(), col1.getHandle())
+                            )))
+                 .andExpect(jsonPath("$.page.totalElements", is(1)));
 
         String tokenAdmin = getAuthToken(admin.getEmail(), password);
         getClient(tokenAdmin).perform(get("/api/core/collections/search/findAuthorized"))
