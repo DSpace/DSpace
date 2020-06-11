@@ -27,6 +27,8 @@ import java.util.Locale;
 import java.util.UUID;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.dspace.app.rest.builder.EPersonBuilder;
+import org.dspace.app.rest.builder.ResourcePolicyBuilder;
 import org.dspace.app.rest.matcher.UsageReportMatcher;
 import org.dspace.app.rest.model.UsageReportPointCityRest;
 import org.dspace.app.rest.model.UsageReportPointCountryRest;
@@ -36,15 +38,19 @@ import org.dspace.app.rest.model.UsageReportPointRest;
 import org.dspace.app.rest.model.ViewEventRest;
 import org.dspace.app.rest.repository.UsageReportRestRepository;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
+import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
+import org.dspace.core.Constants;
+import org.dspace.eperson.EPerson;
 import org.dspace.statistics.factory.StatisticsServiceFactory;
 import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 
 /**
@@ -53,6 +59,8 @@ import org.springframework.http.HttpStatus;
  * @author Maria Verdonck (Atmire) on 10/06/2020
  */
 public class UsageReportRestRepositoryIT extends AbstractControllerIntegrationTest {
+    @Autowired
+    protected AuthorizeService authorizeService;
 
     private Community communityNotVisited;
     private Community communityVisited;
@@ -62,7 +70,9 @@ public class UsageReportRestRepositoryIT extends AbstractControllerIntegrationTe
     private Item itemVisited;
     private Bitstream bitstreamNotVisited;
     private Bitstream bitstreamVisited;
+
     private String loggedInToken;
+    private String adminToken;
 
     private static final String TOTAL_VISITS_REPORT_ID = "TotalVisits";
     private static final String TOTAL_VISITS_PER_MONTH_REPORT_ID = "TotalVisitsPerMonth";
@@ -97,6 +107,7 @@ public class UsageReportRestRepositoryIT extends AbstractControllerIntegrationTe
             .withName("Bitstream").build();
 
         loggedInToken = getAuthToken(eperson.getEmail(), password);
+        adminToken = getAuthToken(admin.getEmail(), password);
 
         context.restoreAuthSystemState();
     }
@@ -129,6 +140,67 @@ public class UsageReportRestRepositoryIT extends AbstractControllerIntegrationTe
     public void usagereports_NonExistentUUID_Exception() throws Exception {
         getClient().perform(get("/api/statistics/usagereports/" + UUID.randomUUID() + "_" + TOTAL_VISITS_REPORT_ID))
                    .andExpect(status().is(HttpStatus.BAD_REQUEST.value()));
+    }
+
+    @Test
+    public void usagereport_onlyAdminReadRights() throws Exception {
+        // ** WHEN **
+        authorizeService.removeAllPolicies(context, itemNotVisitedWithBitstreams);
+        // We request a dso's TotalVisits usage stat report as anon but dso has no read policy for anon
+        getClient().perform(
+            get("/api/statistics/usagereports/" + itemNotVisitedWithBitstreams.getID() + "_" + TOTAL_VISITS_REPORT_ID))
+                   // ** THEN **
+                   .andExpect(status().isUnauthorized());
+        // We request a dso's TotalVisits usage stat report as admin
+        getClient(adminToken).perform(
+            get("/api/statistics/usagereports/" + itemNotVisitedWithBitstreams.getID() + "_" + TOTAL_VISITS_REPORT_ID))
+                             // ** THEN **
+                             .andExpect(status().isOk());
+    }
+
+    @Test
+    public void usagereport_onlyAdminReadRights_unvalidToken() throws Exception {
+        // ** WHEN **
+        authorizeService.removeAllPolicies(context, itemNotVisitedWithBitstreams);
+        // We request a dso's TotalVisits usage stat report with unvalid token
+        getClient("unvalidToken").perform(
+            get("/api/statistics/usagereports/" + itemNotVisitedWithBitstreams.getID() + "_" + TOTAL_VISITS_REPORT_ID))
+                                 // ** THEN **
+                                 .andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void usagereport_loggedInUserReadRights() throws Exception {
+        // ** WHEN **
+        context.turnOffAuthorisationSystem();
+        authorizeService.removeAllPolicies(context, itemNotVisitedWithBitstreams);
+        ResourcePolicyBuilder.createResourcePolicy(context)
+                             .withDspaceObject(itemNotVisitedWithBitstreams)
+                             .withAction(Constants.READ)
+                             .withUser(eperson).build();
+
+        EPerson eperson1 = EPersonBuilder.createEPerson(context)
+                                         .withEmail("eperson1@mail.com")
+                                         .withPassword(password)
+                                         .build();
+        context.restoreAuthSystemState();
+        String anotherLoggedInUserToken = getAuthToken(eperson1.getEmail(), password);
+        // We request a dso's TotalVisits usage stat report as anon but dso has no read policy for anon
+        getClient().perform(
+            get("/api/statistics/usagereports/" + itemNotVisitedWithBitstreams.getID() + "_" + TOTAL_VISITS_REPORT_ID))
+                   // ** THEN **
+                   .andExpect(status().isUnauthorized());
+        // We request a dso's TotalVisits usage stat report as logged in eperson and has read policy for this user
+        getClient(loggedInToken).perform(
+            get("/api/statistics/usagereports/" + itemNotVisitedWithBitstreams.getID() + "_" + TOTAL_VISITS_REPORT_ID))
+                                // ** THEN **
+                                .andExpect(status().isOk());
+        // We request a dso's TotalVisits usage stat report as another logged in eperson and has no read policy for
+        // this user
+        getClient(anotherLoggedInUserToken).perform(
+            get("/api/statistics/usagereports/" + itemNotVisitedWithBitstreams.getID() + "_" + TOTAL_VISITS_REPORT_ID))
+                                           // ** THEN **
+                                           .andExpect(status().isForbidden());
     }
 
     @Test

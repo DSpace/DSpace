@@ -58,9 +58,6 @@ public class UsageReportRestRepository extends AbstractDSpaceRestRepository {
         throws ParseException, SolrServerException, IOException {
         try {
             DSpaceObject dso = dspaceObjectUtil.findDSpaceObject(context, uuid);
-            if (dso == null) {
-                throw new IllegalArgumentException("No DSO found with this UUID: " + uuid);
-            }
             UsageReportRest usageReportRest;
             switch (reportId) {
                 case "TotalVisits":

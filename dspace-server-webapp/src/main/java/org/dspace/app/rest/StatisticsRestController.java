@@ -40,6 +40,7 @@ import org.springframework.hateoas.RepresentationModel;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -125,6 +126,7 @@ public class StatisticsRestController implements InitializingBean {
     }
 
     @RequestMapping(method = RequestMethod.GET, value = "/usagereports/{uuid_id}")
+    @PreAuthorize("hasPermission(#uuidObjectReportId, 'usagereport', 'READ')")
     public UsageReportRest getUsageReport(@PathVariable(name = "uuid_id") String uuidObjectReportId,
                                           HttpServletRequest request)
         throws ParseException, SolrServerException, IOException {
