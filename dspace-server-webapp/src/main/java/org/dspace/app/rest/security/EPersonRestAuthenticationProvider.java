@@ -144,11 +144,11 @@ public class EPersonRestAuthenticationProvider implements AuthenticationProvider
         if (eperson != null) {
             boolean isAdmin = false;
             boolean isCommunityAdmin = false;
-            boolean isColectionAdmin = false;
+            boolean isCollectionAdmin = false;
             try {
                 isAdmin = authorizeService.isAdmin(context, eperson);
                 isCommunityAdmin = authorizeService.isCommunityAdmin(context, eperson);
-                isColectionAdmin = authorizeService.isCollectionAdmin(context, eperson);
+                isCollectionAdmin = authorizeService.isCollectionAdmin(context, eperson);
             } catch (SQLException e) {
                 log.error("SQL error while checking for admin rights", e);
             }
@@ -156,7 +156,7 @@ public class EPersonRestAuthenticationProvider implements AuthenticationProvider
             if (isAdmin) {
                 authorities.add(new SimpleGrantedAuthority(ADMIN_GRANT));
             } else if ((isCommunityAdmin && AuthorizeUtil.canCommunityAdminManageAccounts())
-                       || (isColectionAdmin && AuthorizeUtil.canCollectionAdminManageAccounts())) {
+                       || (isCollectionAdmin && AuthorizeUtil.canCollectionAdminManageAccounts())) {
                 authorities.add(new SimpleGrantedAuthority(ACCOUNT_ADMIN_GRANT));
             }
 
