@@ -9,7 +9,7 @@
          [dspace.dir]/config/spring/api/core-hibernate.xml
         -->
 
-        <property name="hibernate.hbm2ddl.auto">validate</property>
+        <property name="hibernate.hbm2ddl.auto">none</property>
         <property name="hibernate.hbm2ddl.import_files_sql_extractor">org.hibernate.tool.hbm2ddl.SingleLineSqlCommandExtractor</property>
         <property name="hibernate.connection.autocommit">false</property>
         <property name="hibernate.jdbc.batch_size">20</property>
@@ -90,6 +90,12 @@
 		<mapping class="org.dspace.batch.ImpBitstreamMetadatavalue"/>
 		<mapping class="org.dspace.batch.ImpMetadatavalue"/>
 		<mapping class="org.dspace.batch.ImpRecordToItem"/>
+		
+		<!-- Configurable Layout -->
+		<mapping class="org.dspace.layout.CrisLayoutTab" />
+		<mapping class="org.dspace.layout.CrisLayoutBox" />
+		<mapping class="org.dspace.layout.CrisLayoutField" />
+		<mapping class="org.dspace.layout.CrisLayoutFieldBitstream" />
 
     </session-factory>
 </hibernate-configuration>

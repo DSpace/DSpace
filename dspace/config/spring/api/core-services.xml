@@ -134,5 +134,11 @@
     <bean class="org.dspace.batch.ImpRecordToItemServiceImpl"/>
     <bean class="org.dspace.batch.ImpBitstreamMetadatavalueServiceImpl"/>
     <bean class="org.dspace.batch.ImpWorkflowNStateServiceImpl"/>
+    
+    <!-- Configurable layout services -->
+    <bean class="org.dspace.layout.service.impl.CrisLayoutTabServiceImpl"/>
+    <bean class="org.dspace.layout.service.impl.CrisLayoutBoxServiceImpl"/>
+    <bean class="org.dspace.layout.service.impl.CrisLayoutFieldServiceImpl"/>
+    <bean class="org.dspace.layout.service.impl.CrisLayoutFieldBitstreamServiceImpl"/>
 </beans>
 

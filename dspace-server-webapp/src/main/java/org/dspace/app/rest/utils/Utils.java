@@ -50,6 +50,7 @@ import org.dspace.app.rest.exception.RepositoryNotFoundException;
 import org.dspace.app.rest.model.AuthorityRest;
 import org.dspace.app.rest.model.BaseObjectRest;
 import org.dspace.app.rest.model.CommunityRest;
+import org.dspace.app.rest.model.CrisLayoutBoxRest;
 import org.dspace.app.rest.model.LinkRest;
 import org.dspace.app.rest.model.LinksRest;
 import org.dspace.app.rest.model.ProcessRest;
@@ -287,6 +288,9 @@ public class Utils {
         }
         if (StringUtils.equals(modelPlural, "versionhistories")) {
             return VersionHistoryRest.NAME;
+        }
+        if (StringUtils.equals(modelPlural, "boxes")) {
+            return CrisLayoutBoxRest.NAME;
         }
         return modelPlural.replaceAll("s$", "");
     }

@@ -18,6 +18,8 @@ import org.dspace.app.rest.builder.BitstreamFormatBuilder;
 import org.dspace.app.rest.builder.ClaimedTaskBuilder;
 import org.dspace.app.rest.builder.CollectionBuilder;
 import org.dspace.app.rest.builder.CommunityBuilder;
+import org.dspace.app.rest.builder.CrisLayoutBoxBuilder;
+import org.dspace.app.rest.builder.CrisLayoutTabBuilder;
 import org.dspace.app.rest.builder.EPersonBuilder;
 import org.dspace.app.rest.builder.EntityTypeBuilder;
 import org.dspace.app.rest.builder.GroupBuilder;
@@ -45,6 +47,10 @@ public class AbstractBuilderCleanupUtil {
      * Constructor that will initialize the Map with a predefined order for deletion
      */
     public AbstractBuilderCleanupUtil() {
+        //map.put(CrisLayoutBitstreamBuilder.class.getName(), new LinkedList<>());
+        //map.put(CrisLayoutFieldBuilder.class.getName(), new LinkedList<>());
+        map.put(CrisLayoutBoxBuilder.class.getName(), new LinkedList<>());
+        map.put(CrisLayoutTabBuilder.class.getName(), new LinkedList<>());
         map.put(RelationshipBuilder.class.getName(), new LinkedList<>());
         map.put(RelationshipTypeBuilder.class.getName(), new LinkedList<>());
         map.put(EntityTypeBuilder.class.getName(), new LinkedList<>());
