@@ -28,6 +28,8 @@ public interface RestAuthenticationService {
     void addAuthenticationDataForUser(HttpServletRequest request, HttpServletResponse response,
                                       DSpaceAuthentication authentication, boolean addCookie) throws IOException;
 
+    String getShortLivedAuthenticationToken(Context context, HttpServletRequest request);
+
     EPerson getAuthenticatedEPerson(HttpServletRequest request, Context context);
 
     boolean hasAuthenticationData(HttpServletRequest request);

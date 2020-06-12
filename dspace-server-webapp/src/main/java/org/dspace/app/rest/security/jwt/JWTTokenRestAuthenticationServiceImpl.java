@@ -49,7 +49,10 @@ public class JWTTokenRestAuthenticationServiceImpl implements RestAuthentication
     private static final String AUTHORIZATION_TYPE = "Bearer";
 
     @Autowired
-    private JWTTokenHandler jwtTokenHandler;
+    private SessionJWTTokenHandler sessionJWTTokenHandler;
+
+    @Autowired
+    private ShortLivedJWTTokenHandler shortLivedJWTTokenHandler;
 
     @Autowired
     private EPersonService ePersonService;
@@ -71,7 +74,7 @@ public class JWTTokenRestAuthenticationServiceImpl implements RestAuthentication
 
             List<Group> groups = authenticationService.getSpecialGroups(context, request);
 
-            String token = jwtTokenHandler.createTokenForEPerson(context, request,
+            String token = sessionJWTTokenHandler.createTokenForEPerson(context, request,
                                                                  authentication.getPreviousLoginDate(), groups);
 
             addTokenToResponse(response, token, addCookie);
@@ -84,11 +87,34 @@ public class JWTTokenRestAuthenticationServiceImpl implements RestAuthentication
         }
     }
 
+    /**
+     * Create a short-lived token for bitstream downloads
+     * @param context   The context for which to create the token
+     * @param request   The request for which to create the token
+     * @return The token with a short lifespan
+     */
+    @Override
+    public String getShortLivedAuthenticationToken(Context context, HttpServletRequest request) {
+        String token = null;
+        try {
+            List<Group> groups = authenticationService.getSpecialGroups(context, request);
+            token = shortLivedJWTTokenHandler.createTokenForEPerson(context, request, null, groups);
+            context.commit();
+            return token;
+        } catch (JOSEException e) {
+            log.error("JOSE Exception", e);
+        } catch (SQLException e) {
+            log.error("SQL error when adding authentication", e);
+        }
+
+        return token;
+    }
+
     @Override
     public EPerson getAuthenticatedEPerson(HttpServletRequest request, Context context) {
         String token = getToken(request);
         try {
-            EPerson ePerson = jwtTokenHandler.parseEPersonFromToken(token, request, context);
+            EPerson ePerson = sessionJWTTokenHandler.parseEPersonFromToken(token, request, context);
             return ePerson;
         } catch (JOSEException e) {
             log.error("Jose error", e);
@@ -111,7 +137,7 @@ public class JWTTokenRestAuthenticationServiceImpl implements RestAuthentication
                                              Context context) throws Exception {
         String token = getToken(request);
         invalidateAuthenticationCookie(response);
-        jwtTokenHandler.invalidateToken(token, request, context);
+        sessionJWTTokenHandler.invalidateToken(token, request, context);
     }
 
     @Override
