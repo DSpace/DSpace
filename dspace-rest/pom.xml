@@ -19,7 +19,7 @@
     <properties>
         <!-- This is the path to the root [dspace-src] directory. -->
         <root.basedir>${basedir}/..</root.basedir>
-        <spring-security.version>5.3.1.RELEASE</spring-security.version>
+        <spring-security.version>5.3.3.RELEASE</spring-security.version>
     </properties>
     <build>
         <plugins>
