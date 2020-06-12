@@ -38,7 +38,7 @@ public class ImpRecordDAOImpl extends AbstractHibernateDAO<ImpRecord> implements
     public int countNewImpRecords(Context context, ImpRecord impRecord) throws SQLException {
         Query query = createQuery(context,
                 "SELECT count(r) FROM ImpRecord r WHERE r.impRecordId = :impRecordId AND r.lastModified IS NULL "
-                        + "ORDER BY r.impId");
+                        + "GROUP BY r.impId " + "ORDER BY r.impId");
         query.setParameter("impRecordId", impRecord.getImpRecordId());
 
         query.setHint("org.hibernate.cacheable", Boolean.TRUE);
