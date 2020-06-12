@@ -48,7 +48,7 @@ public class EPersonRestAuthenticationProvider implements AuthenticationProvider
 
     private static final Logger log = LoggerFactory.getLogger(EPersonRestAuthenticationProvider.class);
 
-    public static final String ACCOUNT_ADMIN_GRANT = "ACCOUNT_ADMIN";
+    public static final String MANAGE_ACCESS_GROUP = "MANAGE_ACCESS_GROUP";
 
     @Autowired
     private AuthenticationService authenticationService;
@@ -157,7 +157,7 @@ public class EPersonRestAuthenticationProvider implements AuthenticationProvider
                 authorities.add(new SimpleGrantedAuthority(ADMIN_GRANT));
             } else if ((isCommunityAdmin && AuthorizeUtil.canCommunityAdminManageAccounts())
                        || (isCollectionAdmin && AuthorizeUtil.canCollectionAdminManageAccounts())) {
-                authorities.add(new SimpleGrantedAuthority(ACCOUNT_ADMIN_GRANT));
+                authorities.add(new SimpleGrantedAuthority(MANAGE_ACCESS_GROUP));
             }
 
             authorities.add(new SimpleGrantedAuthority(AUTHENTICATED_GRANT));
