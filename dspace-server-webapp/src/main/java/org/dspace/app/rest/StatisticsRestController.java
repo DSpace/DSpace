@@ -25,6 +25,7 @@ import org.dspace.app.rest.model.StatisticsSupportRest;
 import org.dspace.app.rest.model.UsageReportRest;
 import org.dspace.app.rest.model.hateoas.SearchEventResource;
 import org.dspace.app.rest.model.hateoas.StatisticsSupportResource;
+import org.dspace.app.rest.model.hateoas.UsageReportResource;
 import org.dspace.app.rest.model.hateoas.ViewEventResource;
 import org.dspace.app.rest.repository.SearchEventRestRepository;
 import org.dspace.app.rest.repository.StatisticsRestRepository;
@@ -38,6 +39,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.rest.webmvc.ControllerUtils;
+import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.hateoas.RepresentationModel;
@@ -150,14 +152,22 @@ public class StatisticsRestController implements InitializingBean {
 
     @RequestMapping(method = RequestMethod.GET, value = "/usagereports/search/object")
     @PreAuthorize("hasPermission(#uri, 'usagereportsearch', 'READ')")
-    public Page<UsageReportRest> searchUsageReports(HttpServletRequest request,
+    public PagedModel<UsageReportResource> searchUsageReports(HttpServletRequest request,
                                                     @RequestParam(name = "uri", required = true) String uri,
-                                                    Pageable pageable)
+                                                    Pageable pageable,
+                                                    PagedResourcesAssembler assembler)
         throws SQLException, IOException, ParseException, SolrServerException {
         UUID uuid = UUID.fromString(StringUtils.substringAfterLast(uri, "/"));
         Context context = ContextUtil.obtainContext(request);
         List<UsageReportRest> usageReportsOfItem = usageReportRestRepository.getUsageReportsOfDSO(context, uuid);
-        return converter.toRestPage(usageReportsOfItem, pageable, utils.obtainProjection());
+        Page<UsageReportRest> usageReportsRestPage = converter.toRestPage(usageReportsOfItem, pageable,
+            utils.obtainProjection());
+
+        Page<UsageReportResource> usageReportsRestPageResources = usageReportsRestPage
+            .map(usageReportRest -> new UsageReportResource(usageReportRest, utils));
+        usageReportsRestPageResources.forEach(halLinkService::addLinks);
+        PagedModel<UsageReportResource> result = assembler.toModel(usageReportsRestPageResources);
+        return result;
     }
 
 }
