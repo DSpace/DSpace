@@ -46,17 +46,16 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.keygen.BytesKeyGenerator;
 import org.springframework.security.crypto.keygen.KeyGenerators;
-import org.springframework.stereotype.Component;
 
 /**
  * Class responsible for creating and parsing JSON Web Tokens (JWTs), supports both JWS and JWE
- * https://jwt.io/
+ * https://jwt.io/ . This abstract class needs to be extended with a class providing the
+ * configuration keys for the particular type of token.
  *
  * @author Frederic Van Reet (frederic dot vanreet at atmire dot com)
  * @author Tom Desair (tom dot desair at atmire dot com)
  */
-@Component
-public class JWTTokenHandler implements InitializingBean {
+public abstract class JWTTokenHandler implements InitializingBean {
 
     private static final int MAX_CLOCK_SKEW_SECONDS = 60;
     private static final Logger log = LoggerFactory.getLogger(JWTTokenHandler.class);
@@ -86,14 +85,56 @@ public class JWTTokenHandler implements InitializingBean {
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        this.jwtKey = getSecret("jwt.token.secret");
-        this.encryptionKey = getSecret("jwt.encryption.secret").getBytes();
+        this.jwtKey =
+            getSecret(getTokenSecretConfigurationKey());
+        this.encryptionKey =
+            getSecret(getEncryptionSecretConfigurationKey()).getBytes();
 
-        this.expirationTime = configurationService.getLongProperty("jwt.token.expiration", 30) * 60 * 1000;
-        this.includeIP = configurationService.getBooleanProperty("jwt.token.include.ip", true);
-        this.encryptionEnabled = configurationService.getBooleanProperty("jwt.encryption.enabled", false);
-        this.compressionEnabled = configurationService.getBooleanProperty("jwt.compression.enabled", false);
+        this.expirationTime =
+            configurationService.getLongProperty(getTokenExpirationConfigurationKey(), 30);
+        this.includeIP =
+            configurationService.getBooleanProperty(getTokenIncludeIPConfigurationKey(), true);
+        this.encryptionEnabled =
+            configurationService.getBooleanProperty(getEncryptionEnabledConfigurationKey(), false);
+        this.compressionEnabled =
+            configurationService.getBooleanProperty(getCompressionEnabledConfigurationKey(), false);
     }
+
+    /**
+     * Get the configuration property key for the token secret.
+     * @return the configuration property key
+     */
+    protected abstract String getTokenSecretConfigurationKey();
+
+    /**
+     * Get the configuration property key for the encryption secret.
+     * @return the configuration property key
+     */
+    protected abstract String getEncryptionSecretConfigurationKey();
+
+    /**
+     * Get the configuration property key for the expiration time.
+     * @return the configuration property key
+     */
+    protected abstract String getTokenExpirationConfigurationKey();
+
+    /**
+     * Get the configuration property key for the include ip.
+     * @return the configuration property key
+     */
+    protected abstract String getTokenIncludeIPConfigurationKey();
+
+    /**
+     * Get the configuration property key for the encryption enable setting.
+     * @return the configuration property key
+     */
+    protected abstract String getEncryptionEnabledConfigurationKey();
+
+    /**
+     * Get the configuration property key for the compression enable setting.
+     * @return the configuration property key
+     */
+    protected abstract String getCompressionEnabledConfigurationKey();
 
     /**
      * Retrieve EPerson from a JSON Web Token (JWT)

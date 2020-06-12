@@ -11,6 +11,7 @@ import static java.lang.Thread.sleep;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.endsWith;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.startsWith;
 import static org.junit.Assert.assertNotEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -30,6 +31,7 @@ import org.dspace.app.rest.matcher.HalMatcher;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.eperson.Group;
 import org.dspace.services.ConfigurationService;
+import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -756,5 +758,20 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
                 .param("password", password))
             .andExpect(status().isUnauthorized());
 
+    }
+
+    @Test
+    public void testShortLivedToken() throws Exception {
+        String token = getAuthToken(eperson.getEmail(), password);
+        getClient(token).perform(post("/api/authn/shortlivedtokens"))
+            .andExpect(jsonPath("$.token", notNullValue()))
+            .andExpect(jsonPath("$.type", is("shortlivedtoken")))
+            .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/authn/shortlivedtokens")));
+    }
+
+    @Test
+    public void testShortLivedTokenNotAuthenticated() throws Exception {
+        getClient().perform(post("/api/authn/shortlivedtokens"))
+            .andExpect(status().isUnauthorized());
     }
 }
