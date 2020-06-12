@@ -8,13 +8,17 @@
 package org.dspace.app.rest.converter;
 
 import java.sql.SQLException;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.dspace.app.rest.model.CrisLayoutBoxRest;
+import org.dspace.app.rest.model.CrisLayoutFieldRest;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.content.EntityType;
 import org.dspace.content.service.EntityTypeService;
 import org.dspace.core.Context;
 import org.dspace.layout.CrisLayoutBox;
+import org.dspace.layout.CrisLayoutField;
 import org.dspace.layout.LayoutSecurity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -31,6 +35,8 @@ public class CrisLayoutBoxConverter implements DSpaceConverter<CrisLayoutBox, Cr
     @Autowired
     private EntityTypeService eService;
 
+    @Autowired
+    private CrisLayoutFieldConverter fieldConverter;
     /* (non-Javadoc)
      * @see org.dspace.app.rest.converter.DSpaceConverter#convert
      * (java.lang.Object, org.dspace.app.rest.projection.Projection)
@@ -79,6 +85,13 @@ public class CrisLayoutBoxConverter implements DSpaceConverter<CrisLayoutBox, Cr
         box.setShortname(rest.getShortname());
         box.setStyle(rest.getStyle());
         box.setClear(rest.getClear());
+        if (rest.getFields() != null && !rest.getFields().isEmpty()) {
+            Set<CrisLayoutField> fields = new HashSet<>();
+            for (CrisLayoutFieldRest fieldRest: rest.getFields()) {
+                fields.add(fieldConverter.toModel(context, fieldRest));
+            }
+            box.setLayoutFields(fields);
+        }
         return box;
     }
 }

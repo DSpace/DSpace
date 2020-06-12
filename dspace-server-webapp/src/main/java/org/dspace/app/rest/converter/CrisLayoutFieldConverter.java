@@ -9,6 +9,7 @@ package org.dspace.app.rest.converter;
 
 import org.dspace.app.rest.model.CrisLayoutFieldRest;
 import org.dspace.app.rest.projection.Projection;
+import org.dspace.core.Context;
 import org.dspace.layout.CrisLayoutField;
 import org.springframework.stereotype.Component;
 
@@ -39,4 +40,16 @@ public class CrisLayoutFieldConverter implements DSpaceConverter<CrisLayoutField
         return CrisLayoutField.class;
     }
 
+    public CrisLayoutField toModel(Context context, CrisLayoutFieldRest rest) {
+        CrisLayoutField field = new CrisLayoutField();
+        field.setId(rest.getId());
+        field.setBundle(rest.getBundle());
+        field.setLabel(rest.getLabel());
+        field.setPriority(rest.getPriority());
+        field.setRendering(rest.getRendering());
+        field.setRow(rest.getRow());
+        field.setStyle(rest.getStyle());
+        field.setType(rest.getType());
+        return field;
+    }
 }
