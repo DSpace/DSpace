@@ -433,6 +433,7 @@ public class AuthorizeServiceImpl implements AuthorizeService {
         return isCommunityAdmin(c, e);
     }
 
+    @Override
     public boolean isCommunityAdmin(Context c, EPerson e) throws SQLException {
         if (e != null) {
             List<ResourcePolicy> policies = resourcePolicyService.find(c, e,
@@ -452,6 +453,7 @@ public class AuthorizeServiceImpl implements AuthorizeService {
         return isCollectionAdmin(c, e);
     }
 
+    @Override
     public boolean isCollectionAdmin(Context c, EPerson e) throws SQLException {
         if (e != null) {
             List<ResourcePolicy> policies = resourcePolicyService.find(c, e,
