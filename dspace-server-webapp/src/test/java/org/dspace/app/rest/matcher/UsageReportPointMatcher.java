@@ -35,6 +35,7 @@ public class UsageReportPointMatcher {
     public static Matcher<? super Object> matchUsageReportPoint(String id, String type, int views) {
         return allOf(
             hasJsonPath("$.id", is(id)),
+            hasJsonPath("$.type", is(type)),
             hasJsonPath("$.values.views", is(views))
                     );
     }

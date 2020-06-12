@@ -1561,7 +1561,8 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
      * initialization at the same time.
      */
     protected synchronized void initSolrYearCores() {
-        if (statisticYearCoresInit || !(solr instanceof HttpSolrClient)) {
+        if (statisticYearCoresInit || !(solr instanceof HttpSolrClient) || !configurationService.getBooleanProperty(
+            "usage-statistics.shardedByYear", false)) {
             return;
         }
 
