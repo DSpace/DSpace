@@ -2819,10 +2819,9 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
                         .andExpect(jsonPath("$._embedded.epersons", Matchers.hasItem(
                             EPersonMatcher.matchEPersonOnEmail(ePerson.getEmail())
                         )));
-        context.turnOffAuthorisationSystem();
+
         configurationService.setProperty("core.authorization.community-admin.collection.admin-group", false);
         configurationService.setProperty("core.authorization.collection-admin.admin-group", false);
-        context.restoreAuthSystemState();
 
         getClient(token).perform(delete("/api/eperson/groups/" + adminGroup.getID() + "/epersons/" + ePerson.getID()))
                         .andExpect(status().isForbidden());
@@ -2833,12 +2832,6 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
                         .andExpect(jsonPath("$._embedded.epersons", Matchers.hasItem(
                             EPersonMatcher.matchEPersonOnEmail(ePerson.getEmail())
                         )));
-
-        context.turnOffAuthorisationSystem();
-        configurationService.setProperty("core.authorization.community-admin.collection.admin-group", true);
-        configurationService.setProperty("core.authorization.collection-admin.admin-group", true);
-        context.restoreAuthSystemState();
-
     }
 
     @Test
@@ -2868,12 +2861,6 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
                         .andExpect(jsonPath("$._embedded.subgroups", Matchers.not(Matchers.hasItem(
                             GroupMatcher.matchGroupWithName(group.getName())
                         ))));
-
-        context.turnOffAuthorisationSystem();
-        configurationService.setProperty("core.authorization.community-admin.collection.admin-group", true);
-        configurationService.setProperty("core.authorization.collection-admin.admin-group", true);
-        context.restoreAuthSystemState();
-
     }
 
     @Test
@@ -2900,10 +2887,8 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
                             GroupMatcher.matchGroupWithName(group.getName())
                         )));
 
-        context.turnOffAuthorisationSystem();
         configurationService.setProperty("core.authorization.community-admin.collection.admin-group", false);
         configurationService.setProperty("core.authorization.collection-admin.admin-group", false);
-        context.restoreAuthSystemState();
 
         getClient(token).perform(delete("/api/eperson/groups/" + adminGroup.getID() + "/subgroups/" + group.getID()))
                         .andExpect(status().isForbidden());
@@ -2914,11 +2899,6 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
                         .andExpect(jsonPath("$._embedded.subgroups", Matchers.hasItem(
                             GroupMatcher.matchGroupWithName(group.getName())
                         )));
-
-        context.turnOffAuthorisationSystem();
-        configurationService.setProperty("core.authorization.community-admin.collection.admin-group", true);
-        configurationService.setProperty("core.authorization.collection-admin.admin-group", true);
-        context.restoreAuthSystemState();
     }
 
 }
