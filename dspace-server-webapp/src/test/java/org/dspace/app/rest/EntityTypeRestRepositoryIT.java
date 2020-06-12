@@ -14,10 +14,15 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import org.dspace.app.rest.builder.CollectionBuilder;
+import org.dspace.app.rest.builder.CommunityBuilder;
+import org.dspace.app.rest.builder.EntityTypeBuilder;
 import org.dspace.app.rest.matcher.EntityTypeMatcher;
 import org.dspace.app.rest.test.AbstractEntityIntegrationTest;
+import org.dspace.content.Collection;
 import org.dspace.content.EntityType;
 import org.dspace.content.service.EntityTypeService;
+import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -26,6 +31,52 @@ public class EntityTypeRestRepositoryIT extends AbstractEntityIntegrationTest {
 
     @Autowired
     private EntityTypeService entityTypeService;
+    private EntityType publicationType;
+    private EntityType journalType;
+    private EntityType journalIssueType;
+    private EntityType orgUnitType;
+    private EntityType dataPackageType;
+    private EntityType personType;
+    private EntityType journalVolumeType;
+    private EntityType projectType;
+
+    @Before
+    @Override
+    public void setUp() throws Exception {
+        super.setUp();
+        context.turnOffAuthorisationSystem();
+
+        publicationType = entityTypeService.findByEntityType(context, "Publication");
+        if (publicationType == null) {
+            publicationType = EntityTypeBuilder.createEntityTypeBuilder(context, "Publication").build();
+        }
+        journalType = entityTypeService.findByEntityType(context, "Journal");
+        if (journalType == null) {
+            journalType = EntityTypeBuilder.createEntityTypeBuilder(context, "Journal").build();
+        }
+        personType = entityTypeService.findByEntityType(context, "Person");
+        if (personType == null) {
+            personType = EntityTypeBuilder.createEntityTypeBuilder(context, "Person").build();
+        }
+        projectType = entityTypeService.findByEntityType(context, "Project");
+        if (projectType == null) {
+            projectType = EntityTypeBuilder.createEntityTypeBuilder(context, "Project").build();
+        }
+        journalVolumeType = entityTypeService.findByEntityType(context, "JournalVolume");
+        if (journalVolumeType == null) {
+            journalVolumeType = EntityTypeBuilder.createEntityTypeBuilder(context, "JournalVolume").build();
+        }
+        journalIssueType = entityTypeService.findByEntityType(context, "JournalIssue");
+        if (journalIssueType == null) {
+            journalIssueType = EntityTypeBuilder.createEntityTypeBuilder(context, "JournalIssue").build();
+        }
+        orgUnitType = entityTypeService.findByEntityType(context, "OrgUnit");
+        if (orgUnitType == null) {
+            orgUnitType = EntityTypeBuilder.createEntityTypeBuilder(context, "OrgUnit").build();
+        }
+
+        context.restoreAuthSystemState();
+    }
 
     @Test
     public void getAllEntityTypeEndpoint() throws Exception {
@@ -107,5 +158,56 @@ public class EntityTypeRestRepositoryIT extends AbstractEntityIntegrationTest {
     public void retrieveOneEntityTypeThatDoesNotExist() throws Exception {
         getClient().perform(get("/api/core/entitytypes/" + 5555))
                    .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void findAllByAuthorizedCollection() throws Exception {
+        try {
+            context.turnOffAuthorisationSystem();
+
+            //** GIVEN **
+            //1. A community-collection structure with one parent community with sub-community and one collection.
+            parentCommunity = CommunityBuilder.createCommunity(context)
+                .withName("Parent Community")
+                .build();
+            Collection col1 =
+                CollectionBuilder.createCollection(context, parentCommunity)
+                        .withRelationshipType("JournalIssue")
+                        .withSubmitterGroup(eperson)
+                        .withName("Collection 1")
+                        .build();
+            Collection col2 = CollectionBuilder.createCollection(context, parentCommunity)
+                    .withRelationshipType("Publication")
+                    .withSubmitterGroup(eperson)
+                     .withName("Collection 2")
+                    .build();
+            Collection col3 = CollectionBuilder.createCollection(context, parentCommunity)
+                    .withRelationshipType("Project")
+                    .withSubmitterGroup(eperson)
+                    .withName("Collection 3")
+                    .build();
+            Collection col4 = CollectionBuilder.createCollection(context, parentCommunity)
+                    .withRelationshipType("Journal")
+                    .withSubmitterGroup(eperson)
+                    .withName("Collection 4")
+                    .build();
+
+            context.restoreAuthSystemState();
+
+
+            context.setCurrentUser(eperson);
+            String token = getAuthToken(eperson.getEmail(), password);
+            getClient(token).perform(get("/api/core/entitytypes/search/findAllByAuthorizedCollection"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$._embedded.entitytypes", containsInAnyOrder(
+                    EntityTypeMatcher
+                        .matchEntityTypeEntry(entityTypeService.findByEntityType(context, "JournalIssue")),
+                    EntityTypeMatcher.matchEntityTypeEntry(entityTypeService.findByEntityType(context, "Publication")),
+                    EntityTypeMatcher.matchEntityTypeEntry(entityTypeService.findByEntityType(context, "Project")),
+                    EntityTypeMatcher.matchEntityTypeEntry(entityTypeService.findByEntityType(context, "Journal"))
+                )));
+        } finally {
+            CommunityBuilder.deleteCommunity(parentCommunity.getID());
+        }
     }
 }

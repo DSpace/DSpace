@@ -12,7 +12,10 @@ import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadata;
 import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadataDoesNotExist;
 import static org.dspace.core.Constants.WRITE;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -23,6 +26,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -30,6 +35,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.dspace.app.rest.builder.CollectionBuilder;
 import org.dspace.app.rest.builder.CommunityBuilder;
 import org.dspace.app.rest.builder.EPersonBuilder;
+import org.dspace.app.rest.builder.EntityTypeBuilder;
 import org.dspace.app.rest.builder.ResourcePolicyBuilder;
 import org.dspace.app.rest.converter.CollectionConverter;
 import org.dspace.app.rest.matcher.CollectionMatcher;
@@ -47,12 +53,20 @@ import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.authorize.service.ResourcePolicyService;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
+import org.dspace.content.EntityType;
+import org.dspace.content.MetadataValue;
+import org.dspace.content.service.EntityTypeService;
+import org.dspace.content.service.MetadataFieldService;
+import org.dspace.content.service.MetadataSchemaService;
+import org.dspace.content.service.MetadataValueService;
 import org.dspace.core.Constants;
 import org.dspace.eperson.EPerson;
 import org.hamcrest.Matchers;
+import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+
 
 public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTest {
 
@@ -65,6 +79,37 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
     @Autowired
     ResourcePolicyService resoucePolicyService;
 
+    @Autowired
+    MetadataValueService metadataValueService;
+    @Autowired
+    MetadataSchemaService metadataSchemaService;
+    @Autowired
+    MetadataFieldService metadataFieldService;
+    @Autowired
+    EntityTypeService entityTypeService;
+    private EntityType publicationType;
+    private EntityType journalType;
+    private EntityType orgUnitType;
+    @Before
+    @Override
+    public void setUp() throws Exception {
+        super.setUp();
+        context.turnOffAuthorisationSystem();
+
+        publicationType = entityTypeService.findByEntityType(context, "Publication");
+        if (publicationType == null) {
+            publicationType = EntityTypeBuilder.createEntityTypeBuilder(context, "Publication").build();
+        }
+        journalType = entityTypeService.findByEntityType(context, "Journal");
+        if (journalType == null) {
+            journalType = EntityTypeBuilder.createEntityTypeBuilder(context, "Journal").build();
+        }
+        orgUnitType = entityTypeService.findByEntityType(context, "OrgUnit");
+        if (orgUnitType == null) {
+            orgUnitType = EntityTypeBuilder.createEntityTypeBuilder(context, "OrgUnit").build();
+        }
+        context.restoreAuthSystemState();
+    }
     @Test
     public void findAllTest() throws Exception {
 
@@ -505,6 +550,144 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                    .andExpect(jsonPath("$._embedded").doesNotExist());
     }
 
+    @Test
+    public void findAuthorizedCollectionByCommunityAndMetadata() throws Exception {
+        String entityType = "OrgUnit";
+        Set<MetadataValue> metadataValueSet = new HashSet();
+        try {
+            //We turn off the authorization system in order to create the structure as defined below
+            context.turnOffAuthorisationSystem();
+            //** GIVEN **
+            //1. A community-collection structure with one parent community with sub-community and one collection.
+            parentCommunity = CommunityBuilder.createCommunity(context)
+                .withName("Parent Community")
+                .build();
+
+            Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                    .withRelationshipType(entityType)
+                    .withName("Collection 1")
+                    .withSubmitterGroup(eperson)
+                    .build();
+
+            context.setCurrentUser(eperson);
+            authorizeService.addPolicy(context, parentCommunity, Constants.ADD, eperson);
+            context.restoreAuthSystemState();
+
+            String token = getAuthToken(eperson.getEmail(), password);
+
+            getClient(token).perform(get("/api/core/collections/search/findAuthorizedByCommunityAndMetadata")
+                .param("uuid", parentCommunity.getID().toString())
+                .param("metadata", "relationship.type")
+                .param("metadataValue", entityType))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$.page.totalElements", equalTo(1)))
+                .andExpect(jsonPath("$._embedded.collections[0].metadata['relationship.type'][0].value",
+                    equalTo(entityType)));
+        } finally {
+
+        }
+    }
+
+    @Test
+    public void findAuthorizedCollectionsByCommunityAndMetadata() throws Exception {
+        String entityType = "Journal";
+        Set<MetadataValue> metadataValueSet = new HashSet();
+        try {
+            //We turn off the authorization system in order to create the structure as defined below
+            context.turnOffAuthorisationSystem();
+            //** GIVEN **
+            //1. A community-collection structure with one parent community with sub-community and one collection.
+            parentCommunity = CommunityBuilder.createCommunity(context)
+                .withName("Parent Community")
+                .build();
+
+            Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                    .withRelationshipType(entityType)
+                    .withName("Collection 1")
+                    .withSubmitterGroup(eperson)
+                    .build();
+            Collection col2 = CollectionBuilder.createCollection(context, parentCommunity)
+                    .withRelationshipType(entityType)
+                    .withName("Collection 2")
+                    .withSubmitterGroup(eperson)
+                    .build();
+
+            context.setCurrentUser(eperson);
+            authorizeService.addPolicy(context, parentCommunity, Constants.ADD, eperson);
+
+            context.restoreAuthSystemState();
+
+            String token = getAuthToken(eperson.getEmail(), password);
+
+            getClient(token).perform(get("/api/core/collections/search/findAuthorizedByCommunityAndMetadata")
+                .param("uuid", parentCommunity.getID().toString())
+                .param("metadata", "relationship.type")
+                .param("metadataValue", entityType))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$.page.totalElements", equalTo(2)))
+                .andExpect(jsonPath("$._embedded.collections", containsInAnyOrder(
+                    CollectionMatcher.matchCollection(col1),
+                    CollectionMatcher.matchCollection(col2))));
+
+        } finally {
+
+        }
+    }
+
+    @Test
+    public void findAuthorizedAllCollectionsByCommunityAndMetadata() throws Exception {
+        String entityType = "Journal";
+        String entityType2 = "Publication";
+        String entityType3 = "JournaIssued";
+        Set<MetadataValue> metadataValueSet = new HashSet();
+        try {
+            //We turn off the authorization system in order to create the structure as defined below
+            context.turnOffAuthorisationSystem();
+            //** GIVEN **
+            //1. A community-collection structure with one parent community with sub-community and one collection.
+            parentCommunity = CommunityBuilder.createCommunity(context)
+                .withName("Parent Community")
+                .build();
+
+            Collection col1 =
+                CollectionBuilder.createCollection(context, parentCommunity).withRelationshipType(entityType)
+                        .withName("Collection 1").withSubmitterGroup(eperson).build();
+            Collection col2 =
+                CollectionBuilder.createCollection(context, parentCommunity).withRelationshipType(entityType2)
+                        .withName("Collection 2").withSubmitterGroup(eperson).build();
+            Collection col3 =
+                    CollectionBuilder.createCollection(context, parentCommunity).withRelationshipType(entityType)
+                            .withName("Collection 3").withSubmitterGroup(eperson).build();
+            Collection colWithoutMetadata =
+                CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 4").
+                        withSubmitterGroup(eperson).build();
+
+            context.setCurrentUser(eperson);
+            authorizeService.addPolicy(context, parentCommunity, Constants.ADD, eperson);
+
+            context.restoreAuthSystemState();
+
+            String token = getAuthToken(eperson.getEmail(), password);
+
+            getClient(token).perform(get("/api/core/collections/search/findAuthorizedByCommunityAndMetadata")
+                .param("uuid", parentCommunity.getID().toString())
+                .param("metadata", "relationship.type"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$.page.totalElements", equalTo(3)))
+                .andExpect(jsonPath("$._embedded.collections", containsInAnyOrder(
+                    CollectionMatcher.matchCollection(col1),
+                    CollectionMatcher.matchCollection(col2),
+                    CollectionMatcher.matchCollection(col3))))
+                .andExpect(jsonPath("$._embedded.collections",
+                    not(contains(CollectionMatcher.matchCollection(colWithoutMetadata)))));
+
+        } finally {
+
+        }
+    }
     @Test
     public void findAuthorizedByCommunityWithoutUUIDTest() throws Exception {
         getClient().perform(get("/api/core/collections/search/findAuthorizedByCommunity"))

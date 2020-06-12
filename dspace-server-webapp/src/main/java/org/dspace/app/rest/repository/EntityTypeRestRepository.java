@@ -9,10 +9,16 @@ package org.dspace.app.rest.repository;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
+import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.model.EntityTypeRest;
+import org.dspace.content.Collection;
 import org.dspace.content.EntityType;
+import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.EntityTypeService;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -29,6 +35,8 @@ public class EntityTypeRestRepository extends DSpaceRestRepository<EntityTypeRes
 
     @Autowired
     private EntityTypeService entityTypeService;
+    @Autowired
+    private CollectionService collectionService;
 
     @PreAuthorize("permitAll()")
     public EntityTypeRest findOne(Context context, Integer integer) {
@@ -54,5 +62,29 @@ public class EntityTypeRestRepository extends DSpaceRestRepository<EntityTypeRes
 
     public Class<EntityTypeRest> getDomainClass() {
         return EntityTypeRest.class;
+    }
+
+    @SearchRestMethod(name = "findAllByAuthorizedCollection")
+    public Page<EntityTypeRest> findAllByAuthorizedCollection(Pageable pageable) {
+        try {
+            Context context = obtainContext();
+            List<Collection> collections = collectionService.findAuthorized(context, null, Constants.ADD);
+
+            List<EntityType> entityTypes =
+                collections.stream().map(type -> type.getRelationshipType()).distinct()
+                    .map(type -> {
+                        if (StringUtils.isBlank(type)) {
+                            return null;
+                        }
+                        try {
+                            return entityTypeService.findByEntityType(context, type);
+                        } catch (SQLException e) {
+                            throw new RuntimeException(e.getMessage(), e);
+                        }
+                    }).filter(x -> x != null).collect(Collectors.toList());
+            return converter.toRestPage(entityTypes, pageable, utils.obtainProjection());
+        } catch (SQLException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
     }
 }

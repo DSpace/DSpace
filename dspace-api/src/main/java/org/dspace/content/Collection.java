@@ -121,6 +121,12 @@ public class Collection extends DSpaceObject implements DSpaceObjectLegacySuppor
         return value == null ? "" : value;
     }
 
+    public String getRelationshipType() {
+        String value = getCollectionService()
+            .getMetadataFirstValue(this, MetadataSchemaEnum.RELATIONSHIP.getName(), "type", null, Item.ANY);
+        return value == null ? "" : value;
+    }
+
     /**
      * Get the logo for the collection. <code>null</code> is returned if the
      * collection does not have a logo.

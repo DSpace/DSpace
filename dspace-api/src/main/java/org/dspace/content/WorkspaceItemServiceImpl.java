@@ -12,6 +12,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.util.DCInputsReaderException;
@@ -22,6 +23,8 @@ import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.dao.WorkspaceItemDAO;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.ItemService;
+import org.dspace.content.service.MetadataFieldService;
+import org.dspace.content.service.MetadataValueService;
 import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -54,7 +57,10 @@ public class WorkspaceItemServiceImpl implements WorkspaceItemService {
     protected ItemService itemService;
     @Autowired(required = true)
     protected WorkflowService workflowService;
-
+    @Autowired
+    private MetadataFieldService metadataFieldService;
+    @Autowired
+    private MetadataValueService metadataValueService;
 
     protected WorkspaceItemServiceImpl() {
 
@@ -106,7 +112,18 @@ public class WorkspaceItemServiceImpl implements WorkspaceItemService {
         // delete permission
         authorizeService
             .addPolicy(context, item, Constants.DELETE, item.getSubmitter(), ResourcePolicy.TYPE_SUBMISSION);
+        Optional<MetadataValue> optionalType =
+            collection.getMetadata().stream().filter(x -> x.getMetadataField().toString('.')
+                .equalsIgnoreCase(MetadataSchemaEnum.RELATIONSHIP.getName() + ".type")).findFirst();
+        if (optionalType.isPresent()) {
+            MetadataValue original = optionalType.get();
+            MetadataField metadataField = original.getMetadataField();
+            MetadataSchema metadataSchema = metadataField.getMetadataSchema();
+            itemService.addMetadata(context, item, metadataSchema.getName(), metadataField.getElement(),
+                metadataField.getQualifier(), original.getLanguage(),
+                original.getValue());
 
+        }
 
         // Copy template if appropriate
         Item templateItem = collection.getTemplateItem();
