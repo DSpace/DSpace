@@ -49,6 +49,7 @@ public class AuthorityVocabularyEntryIT extends AbstractControllerIntegrationTes
     @Test
     public void srscSearchTopTest() throws Exception {
         String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        String tokenEPerson = getAuthToken(eperson.getEmail(), password);
         getClient(tokenAdmin).perform(get("/api/integration/vocabularyEntryDetails/search/top")
           .param("vocabulary", "srsc"))
           .andExpect(status().isOk())
@@ -67,13 +68,31 @@ public class AuthorityVocabularyEntryIT extends AbstractControllerIntegrationTes
           AuthorityEntryMatcher.matchAuthority("srsc:SCB22", "INTERDISCIPLINARY RESEARCH AREAS")
           )))
           .andExpect(jsonPath("$.page.totalElements", Matchers.is(12)));
+
+        getClient(tokenEPerson).perform(get("/api/integration/vocabularyEntryDetails/search/top")
+         .param("vocabulary", "srsc"))
+         .andExpect(status().isOk())
+         .andExpect(jsonPath("$", Matchers.containsInAnyOrder(
+          AuthorityEntryMatcher.matchAuthority("srsc:SCB11", "HUMANITIES and RELIGION"),
+          AuthorityEntryMatcher.matchAuthority("srsc:SCB12", "LAW/JURISPRUDENCE"),
+          AuthorityEntryMatcher.matchAuthority("srsc:SCB13", "SOCIAL SCIENCES"),
+          AuthorityEntryMatcher.matchAuthority("srsc:SCB14", "MATHEMATICS"),
+          AuthorityEntryMatcher.matchAuthority("srsc:SCB15", "NATURAL SCIENCES"),
+          AuthorityEntryMatcher.matchAuthority("srsc:SCB16", "TECHNOLOGY"),
+          AuthorityEntryMatcher.matchAuthority("srsc:SCB17", "FORESTRY, AGRICULTURAL SCIENCES and LANDSCAPE PLANNING"),
+          AuthorityEntryMatcher.matchAuthority("srsc:SCB18", "MEDICINE"),
+          AuthorityEntryMatcher.matchAuthority("srsc:SCB19", "ODONTOLOGY"),
+          AuthorityEntryMatcher.matchAuthority("srsc:SCB20", "PHARMACY"),
+          AuthorityEntryMatcher.matchAuthority("srsc:SCB21", "VETERINARY MEDICINE"),
+          AuthorityEntryMatcher.matchAuthority("srsc:SCB22", "INTERDISCIPLINARY RESEARCH AREAS")
+          )))
+         .andExpect(jsonPath("$.page.totalElements", Matchers.is(12)));
     }
 
     @Test
     public void srscSearchFirstLevel_MATHEMATICS_Test() throws Exception {
         String tokenAdmin = getAuthToken(admin.getEmail(), password);
-        getClient(tokenAdmin).perform(get("/api/integration/vocabularyEntryDetails/search/top")
-                 .param("vocabulary", "SCB14"))
+        getClient(tokenAdmin).perform(get("/api/integration/vocabularyEntryDetails/" + "srsc:SCB14" + "/children"))
                  .andExpect(status().isOk())
                  .andExpect(jsonPath("$", Matchers.containsInAnyOrder(
                    AuthorityEntryMatcher.matchAuthority("srsc:SCB1401", "Algebra, geometry and mathematical analysis"),
@@ -155,4 +174,89 @@ public class AuthorityVocabularyEntryIT extends AbstractControllerIntegrationTes
                 .andExpect(status().isOk());
     }
 
+    @Test
+    public void srscSearchByParentFirstLevelPaginationTest() throws Exception {
+        String token = getAuthToken(eperson.getEmail(), password);
+        // first page
+        getClient(token).perform(get("/api/integration/vocabularyEntryDetails/" + "srsc:SCB14" + "/children")
+                 .param("page", "0")
+                 .param("size", "2"))
+                 .andExpect(status().isOk())
+                 .andExpect(jsonPath("$._embedded.authorityEntries", Matchers.containsInAnyOrder(
+                     AuthorityEntryMatcher.matchAuthority("SCB1401", "Algebra, geometry and mathematical analysis"),
+                     AuthorityEntryMatcher.matchAuthority("SCB1402", "Applied mathematics")
+                     )))
+                 .andExpect(jsonPath("$.page.totalElements", is(3)))
+                 .andExpect(jsonPath("$.page.totalPages", is(2)))
+                 .andExpect(jsonPath("$.page.number", is(0)));
+
+        // second page
+        getClient(token).perform(get("/api/integration/vocabularyEntryDetails/" + "srsc:SCB14" + "/children")
+                .param("page", "1")
+                .param("size", "2"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$._embedded.authorityEntries", Matchers.contains(
+                    AuthorityEntryMatcher.matchAuthority("SCB1409", "Other mathematics")
+                    )))
+                .andExpect(jsonPath("$.page.totalElements", is(3)))
+                .andExpect(jsonPath("$.page.totalPages", is(2)))
+                .andExpect(jsonPath("$.page.number", is(1)));
+    }
+
+    @Test
+    public void srscSearchByParentSecondLevel_Applied_mathematics_Test() throws Exception {
+        String token = getAuthToken(eperson.getEmail(), password);
+        getClient(token).perform(get("/api/integration/vocabularyEntryDetails/" + "srsc:SCB1402" + "/children"))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$._embedded.authorityEntries", Matchers.containsInAnyOrder(
+                                     AuthorityEntryMatcher.matchAuthority("VR140202", "Numerical analysis"),
+                                     AuthorityEntryMatcher.matchAuthority("VR140203", "Mathematical statistics"),
+                                     AuthorityEntryMatcher.matchAuthority("VR140204", "Optimization, systems theory"),
+                                     AuthorityEntryMatcher.matchAuthority("VR140205", "Theoretical computer science")
+                                     )))
+                             .andExpect(jsonPath("$.page.totalElements", Matchers.is(4)));
+    }
+
+    @Test
+    public void srscSearchByParentEmptyTest() throws Exception {
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        getClient(tokenAdmin).perform(get("/api/integration/vocabularyEntryDetails/" + "srsc:VR140202" + "/children"))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$.page.totalElements", Matchers.is(0)));
+    }
+
+    @Test
+    public void srscSearchByParentWrongIdTest() throws Exception {
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        getClient(tokenAdmin).perform(get("/api/integration/vocabularyEntryDetails/"
+                                                          + UUID.randomUUID() + "/children"))
+                             .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void srscSearchTopUnauthorizedTest() throws Exception {
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        getClient(tokenAdmin).perform(get("/api/integration/vocabularyEntryDetails/search/top")
+          .param("vocabulary", "srsc"))
+          .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    public void srscSearchParentByChildrenTest() throws Exception {
+        String tokenEperson = getAuthToken(eperson.getEmail(), password);
+        getClient(tokenEperson).perform(get("/api/integration/vocabularyEntryDetails/" + "srsc:VR140202" + "/children"))
+                 .andExpect(status().isOk())
+                 .andExpect(jsonPath("$._embedded.authorityEntries", Matchers.contains(
+                            AuthorityEntryMatcher.matchAuthority("SCB1402", "Applied mathematics")
+                            )))
+                 .andExpect(jsonPath("$.page.totalElements", Matchers.is(1)));
+    }
+
+    @Test
+    public void srscSearchParentByChildrenRootTest() throws Exception {
+        String tokenEperson = getAuthToken(eperson.getEmail(), password);
+        getClient(tokenEperson).perform(get("/api/integration/vocabularyEntryDetails/" + "srsc:SCB11" + "/children"))
+                 .andExpect(status().isOk())
+                 .andExpect(jsonPath("$.page.totalElements", Matchers.is(0)));
+    }
 }
