@@ -17,7 +17,7 @@ import org.dspace.app.rest.utils.Utils;
  * @author Maria Verdonck (Atmire) on 08/06/2020
  */
 @RelNameDSpaceResource(UsageReportRest.NAME)
-public class UsageReportResource extends DSpaceResource<UsageReportRest>{
+public class UsageReportResource extends DSpaceResource<UsageReportRest> {
     public UsageReportResource(UsageReportRest content, Utils utils) {
         super(content, utils);
     }
