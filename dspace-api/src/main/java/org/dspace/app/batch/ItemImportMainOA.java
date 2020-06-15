@@ -45,13 +45,14 @@ import org.dspace.batch.service.ImpServiceFactory;
 import org.dspace.content.MetadataField;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.MetadataFieldService;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.Email;
 import org.dspace.core.I18nUtil;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 public class ItemImportMainOA {
 
@@ -60,6 +61,8 @@ public class ItemImportMainOA {
 
     /** Email buffer **/
     private static final String BATCH_USER = "batchjob@%";
+
+    private ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
 
     public static void main(String[] argv) {
         Context context = null;
@@ -195,14 +198,13 @@ public class ItemImportMainOA {
                 }
             }
 
-            System.out.println(ConfigurationManager.getProperty("dspace.name"));
+            System.out.println(configurationService.getProperty("dspace.name"));
 
             if (commandOptions.getSilent()) {
                 powerOffLog();
             }
 
-            AtomicInteger count = new AtomicInteger(1);
-
+            AtomicInteger count = new AtomicInteger(0);
             AtomicInteger row_discarded = new AtomicInteger(0);
 
             int numOfThread = 0;
@@ -225,12 +227,13 @@ public class ItemImportMainOA {
                 powerOnLog();
             }
 
-            header += "Righe scartate " + row_discarded.intValue() + " su un totale di " + (count.intValue() - 1)
-                    + " \n";
+            String countDone = "Rows done " + count.intValue() + " on a total of " + impRecords.size();
+            String countDiscarded = "Rows discarded " + row_discarded.intValue() + " on a total of "
+                    + impRecords.size();
+            header += countDone + " \n" + countDiscarded + " \n";
 
-            recordEvent(commandOptions, sb,
-                    "Righe scartate " + row_discarded.intValue() + " su un totale di " + (count.intValue() - 1));
-            recordEvent(commandOptions, sb, "TERMINATA PROCEDURA " + new Date());
+            recordEvent(commandOptions, sb, countDone + " \n" + countDiscarded + " \n");
+            recordEvent(commandOptions, sb, "DONE " + new Date());
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             throw new RuntimeException(e.getMessage(), e);
@@ -242,8 +245,8 @@ public class ItemImportMainOA {
                     email = Email.getEmail(I18nUtil.getEmailFilename(I18nUtil.getDefaultLocale(), "log_item_import"));
                     email.addArgument(header);
                     email.addArgument(sb);
-                    String recipient = ConfigurationManager.getProperty("batch.recipient");
-                    String customerRecipient = ConfigurationManager.getProperty("batch.customer.recipient");
+                    String recipient = configurationService.getProperty("batch.recipient");
+                    String customerRecipient = configurationService.getProperty("batch.customer.recipient");
 
                     if (StringUtils.isNotEmpty(customerRecipient)) {
                         email.addRecipient(customerRecipient);
@@ -252,7 +255,7 @@ public class ItemImportMainOA {
                     if (StringUtils.isNotEmpty(recipient)) {
                         email.addRecipient(recipient);
                     } else {
-                        String alert = ConfigurationManager.getProperty("alert.recipient");
+                        String alert = configurationService.getProperty("alert.recipient");
                         if (StringUtils.isNotEmpty(alert)) {
                             email.addRecipient(alert);
                         }
@@ -357,14 +360,14 @@ public class ItemImportMainOA {
 
         sourceref = row_data.getImpSourceref();
 
-        if (!operation.equals("")) {
+        if (operation != null && !operation.equals("")) {
 
             if (epersonId != null && collectionId != null) {
 
                 EPerson ep = getEPersonService().find(subcontext, epersonId);
 
                 if (ep == null) {
-                    recordEvent(commandOptions, sb, "Errore, eperson non trovato: " + epersonId, true);
+                    recordEvent(commandOptions, sb, "Error, eperson not found: " + epersonId, true);
                 } else {
                     ImpRecordToItem record_item = getImpRecordToItemService().findByPK(subcontext, record_id);
                     if (record_item != null && StringUtils.equals(sourceref, record_item.getImpSourceref())) {
@@ -436,18 +439,22 @@ public class ItemImportMainOA {
                     row_discarded.incrementAndGet();
                 }
 
-                recordEvent(commandOptions, sb, "Record id --> " + record_id + " importato: " + log_error_or_not,
-                        false);
+                recordEvent(commandOptions, sb, "ID: " + imp_id + " Record id: " + record_id +
+                        " imported: " + log_error_or_not, false);
                 count.incrementAndGet();
 
             } else {
                 recordEvent(commandOptions, sb,
-                        "Errore durante il caricamento del record: " + record_id + ". Eperson o Collection mancanti.",
+                        "Error while loading entry with id: " + imp_id + " record: " + record_id +
+                        ". Eperson or Collection missing.",
                         true);
+                row_discarded.incrementAndGet();
             }
         } else {
             recordEvent(commandOptions, sb,
-                    "Errore durante il caricamento del record: " + record_id + ". Nessuna Operation definita.", true);
+                    "Error while loading entry with id: " + imp_id + " record: " + record_id +
+                    ". No operation defined.", true);
+            row_discarded.incrementAndGet();
         }
     }
 
@@ -500,7 +507,7 @@ public class ItemImportMainOA {
     }
 
     private int getNumberOfThread(CommandLine line) {
-        int numThreads = ConfigurationManager.getIntProperty("batch.framework.itemimport.threads", 0);
+        int numThreads = configurationService.getIntProperty("batch.framework.itemimport.threads", 0);
         if (line.hasOption("t")) {
             numThreads = Integer.parseInt(line.getOptionValue('t', "0"));
         }
