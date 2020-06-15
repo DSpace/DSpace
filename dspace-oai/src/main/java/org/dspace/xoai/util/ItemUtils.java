@@ -13,6 +13,8 @@ import com.lyncode.xoai.util.Base64Utils;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.factory.AuthorizeServiceFactory;
+import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.*;
 import org.dspace.content.authority.Choices;
 import org.dspace.core.ConfigurationManager;
@@ -49,6 +51,9 @@ public class ItemUtils
 
     private static final BitstreamService bitstreamService
             = ContentServiceFactory.getInstance().getBitstreamService();
+
+    private static final AuthorizeService authorizeService
+            = AuthorizeServiceFactory.getInstance().getAuthorizeService();
 
     private static Element getElement(List<Element> list, String name)
     {
@@ -292,20 +297,23 @@ public class ItemUtils
                 if (!licBits.isEmpty())
                 {
                     Bitstream licBit = licBits.get(0);
-                    InputStream in;
-                    try
+                    if (authorizeService.authorizeActionBoolean(context, licBit, Constants.READ))
                     {
-                        in = bitstreamService.retrieve(context, licBit);
-                        ByteArrayOutputStream out = new ByteArrayOutputStream();
-                        Utils.bufferedCopy(in, out);
-                        license.getField().add(
-                                createValue("bin",
-                                        Base64Utils.encode(out.toString())));
-                        metadata.getElement().add(license);
-                    }
-                    catch (AuthorizeException | IOException | SQLException e)
+                        InputStream in;
+                        try {
+                            in = bitstreamService.retrieve(context, licBit);
+                            ByteArrayOutputStream out = new ByteArrayOutputStream();
+                            Utils.bufferedCopy(in, out);
+                            license.getField().add(
+                                    createValue("bin",
+                                            Base64Utils.encode(out.toString())));
+                            metadata.getElement().add(license);
+                        } catch (AuthorizeException | IOException | SQLException e) {
+                            log.warn(e.getMessage(), e);
+                        }
+                    } else
                     {
-                        log.warn(e.getMessage(), e);
+                        log.info("Missing READ rights for license bitstream. Did not include license bitstream for item: " + item.getID() + ".");
                     }
 
                 }
