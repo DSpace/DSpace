@@ -157,15 +157,21 @@ public interface ProcessService {
     public Bitstream getBitstreamByName(Context context, Process process, String bitstreamName);
 
     /**
-     * This method will return all the Bitstreams for a given process if the type is defined as null. If type is
-     * different than null, the bitstreams with metadata process.type equal to the given type from that process
-     * are returned
+     * This method will return the Bitstream for a given process with a given type
      * @param context   The relevant DSpace context
      * @param process   The process that holds the Bitstreams to be searched in
      * @param type      The type that the Bitstream must have
-     * @return          The list of Bitstreams of the given type for the given Process
+     * @return          The Bitstream of the given type for the given Process
      */
-    public List<Bitstream> getBitstreams(Context context, Process process, String type);
+    public Bitstream getBitstream(Context context, Process process, String type);
+
+    /**
+     * This method will return all the Bitstreams for a given process
+     * @param context   The relevant DSpace context
+     * @param process   The process that holds the Bitstreams to be searched in
+     * @return          The list of Bitstreams
+     */
+    public List<Bitstream> getBitstreams(Context context, Process process);
 
     /**
      * Returns the total amount of Process objects in the dataase

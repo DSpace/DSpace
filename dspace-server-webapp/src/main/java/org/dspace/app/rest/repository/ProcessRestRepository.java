@@ -9,7 +9,6 @@ package org.dspace.app.rest.repository;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -17,7 +16,6 @@ import org.apache.log4j.Logger;
 import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.model.BitstreamRest;
-import org.dspace.app.rest.model.ProcessFileWrapperRest;
 import org.dspace.app.rest.model.ProcessRest;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.authorize.AuthorizeException;
@@ -81,92 +79,49 @@ public class ProcessRestRepository extends DSpaceRestRepository<ProcessRest, Int
     }
 
     /**
-     * Calls on the getProcessBitstreamsByType method to retrieve all the Bitstreams of this process
+     * Calls on the getBitstreams method to retrieve all the Bitstreams of this process
      * @param processId The processId of the Process to retrieve the Bitstreams for
      * @return          The list of Bitstreams of the given Process
      * @throws SQLException If something goes wrong
      * @throws AuthorizeException If something goes wrong
      */
     public List<BitstreamRest> getProcessBitstreams(Integer processId) throws SQLException, AuthorizeException {
-        return getProcessBitstreamsByType(processId, null);
+        Context context = obtainContext();
+        Process process = getProcess(processId, context);
+        List<Bitstream> bitstreams = processService.getBitstreams(context, process);
+        return bitstreams.stream()
+                  .map(bitstream -> (BitstreamRest) converterService.toRest(bitstream, Projection.DEFAULT))
+                  .collect(Collectors.toList());
+    }
+
+    private Process getProcess(Integer processId, Context context) throws SQLException, AuthorizeException {
+        Process process = processService.find(context, processId);
+        if (process == null) {
+            throw new ResourceNotFoundException("Process with id " + processId + " was not found");
+        }
+        if ((context.getCurrentUser() == null) || (!context.getCurrentUser()
+                                                           .equals(process.getEPerson()) && !authorizeService
+            .isAdmin(context))) {
+            throw new AuthorizeException("The current user is not eligible to view the process with id: " + processId);
+        }
+        return process;
     }
 
     /**
-     * Creates a ProcessFileWrapperRest object for the given ProcessId by setting the ProcessId on this object
-     * and getting the Bitstreams for this project and setting this on the REST object
-     * @param processId     The given ProcessId
-     * @return              The ProcessFileWrapperRest object with the ProcessId and the list of bitstreams filled in
-     * @throws SQLException If something goes wrong
-     * @throws AuthorizeException   If something goes wrong
-     */
-    public ProcessFileWrapperRest getProcessFileWrapperRest(Integer processId) throws SQLException, AuthorizeException {
-        ProcessFileWrapperRest processFileWrapperRest = new ProcessFileWrapperRest();
-        processFileWrapperRest.setBitstreams(getProcessBitstreams(processId));
-        processFileWrapperRest.setProcessId(processId);
-
-        return processFileWrapperRest;
-    }
-
-    /**
-     * Retrieves the Bitstreams in the given Process of a given type
+     * Retrieves the Bitstream in the given Process of a given type
      * @param processId The processId of the Process to be used
      * @param type      The type of bitstreams to be returned, if null it'll return all the bitstreams
-     * @return          The list of bitstreams for the given parameters
+     * @return          The bitstream for the given parameters
      * @throws SQLException If something goes wrong
      * @throws AuthorizeException If something goes wrong
      */
-    public List<BitstreamRest> getProcessBitstreamsByType(Integer processId, String type)
+    public BitstreamRest getProcessBitstreamByType(Integer processId, String type)
         throws SQLException, AuthorizeException {
         Context context = obtainContext();
-        Process process = processService.find(context, processId);
-        if (process == null) {
-            throw new ResourceNotFoundException("Process with id " + processId + " was not found");
-        }
-        if ((context.getCurrentUser() == null) || (!context.getCurrentUser()
-                                                           .equals(process.getEPerson()) && !authorizeService
-            .isAdmin(context))) {
-            throw new AuthorizeException("The current user is not eligible to view the process with id: " + processId);
-        }
-        List<Bitstream> bitstreams = processService.getBitstreams(context, process, type);
+        Process process = getProcess(processId, context);
+        Bitstream bitstream = processService.getBitstream(context, process, type);
 
-        if (bitstreams == null) {
-            return Collections.emptyList();
-        }
-
-        return bitstreams.stream()
-                         .map(bitstream -> (BitstreamRest) converterService.toRest(bitstream, Projection.DEFAULT))
-                         .collect(Collectors.toList());
-
-    }
-
-    /**
-     * Retrieves the Bitstream from a Process with the given ProcessId that has the given name
-     * @param processId The processId of the Process that we'll search its Bitstreams for the name
-     * @param name  The name that the bitstream needs to have to be returned
-     * @return      The bitstream that's linked to the given Process with the given name
-     * @throws SQLException If something goes wrong
-     * @throws AuthorizeException If something goes wrong
-     */
-    public BitstreamRest getProcessBitstreamByName(Integer processId, String name)
-        throws SQLException, AuthorizeException {
-        Context context = obtainContext();
-        Process process = processService.find(context, processId);
-        if (process == null) {
-            throw new ResourceNotFoundException("Process with id " + processId + " was not found");
-        }
-        if ((context.getCurrentUser() == null) || (!context.getCurrentUser()
-                                                           .equals(process.getEPerson()) && !authorizeService
-            .isAdmin(context))) {
-            throw new AuthorizeException("The current user is not eligible to view the process with id: " + processId);
-        }
-        Bitstream bitstream = processService.getBitstreamByName(context, process, name);
-
-        if (bitstream == null) {
-            throw new ResourceNotFoundException(
-                "Bitstream with name " + name + " and process id " + processId + " was not found");
-        }
-
-        return converterService.toRest(bitstream, Projection.DEFAULT);
+        return converterService.toRest(bitstream, utils.obtainProjection());
     }
 
     @Override
