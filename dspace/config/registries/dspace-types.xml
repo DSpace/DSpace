@@ -12,7 +12,7 @@
     <dc-type>
         <schema>dspace</schema>
         <element>process</element>
-        <qualifier>type</qualifier>
+        <qualifier>filetype</qualifier>
         <scope_note></scope_note>
     </dc-type>
 

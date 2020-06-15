@@ -23,10 +23,12 @@ import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Bitstream;
+import org.dspace.content.MetadataField;
 import org.dspace.content.ProcessStatus;
 import org.dspace.content.dao.ProcessDAO;
 import org.dspace.content.service.BitstreamFormatService;
 import org.dspace.content.service.BitstreamService;
+import org.dspace.content.service.MetadataFieldService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
@@ -52,6 +54,9 @@ public class ProcessServiceImpl implements ProcessService {
 
     @Autowired
     private AuthorizeService authorizeService;
+
+    @Autowired
+    private MetadataFieldService metadataFieldService;
 
     @Override
     public Process create(Context context, EPerson ePerson, String scriptName,
@@ -134,9 +139,15 @@ public class ProcessServiceImpl implements ProcessService {
     public void appendFile(Context context, Process process, InputStream is, String type, String fileName)
         throws IOException, SQLException, AuthorizeException {
         Bitstream bitstream = bitstreamService.create(context, is);
+        if (getBitstream(context, process, type) != null) {
+            throw new IllegalArgumentException("Cannot create another file of type: " + type + " for this process" +
+                                                   " with id: " + process.getID());
+        }
         bitstream.setName(context, fileName);
         bitstreamService.setFormat(context, bitstream, bitstreamFormatService.guessFormat(context, bitstream));
-        bitstreamService.addMetadata(context, bitstream, "dspace", "process", "type", null, type);
+        MetadataField dspaceProcessFileTypeField = metadataFieldService
+            .findByString(context, Process.BITSTREAM_TYPE_METADATAFIELD, '.');
+        bitstreamService.addMetadata(context, bitstream, dspaceProcessFileTypeField, null, type);
         authorizeService.addPolicy(context, bitstream, Constants.READ, context.getCurrentUser());
         authorizeService.addPolicy(context, bitstream, Constants.WRITE, context.getCurrentUser());
         authorizeService.addPolicy(context, bitstream, Constants.DELETE, context.getCurrentUser());
@@ -179,7 +190,7 @@ public class ProcessServiceImpl implements ProcessService {
 
     @Override
     public Bitstream getBitstreamByName(Context context, Process process, String bitstreamName) {
-        for (Bitstream bitstream : getBitstreams(context, process, null)) {
+        for (Bitstream bitstream : getBitstreams(context, process)) {
             if (StringUtils.equals(bitstream.getName(), bitstreamName)) {
                 return bitstream;
             }
@@ -189,21 +200,25 @@ public class ProcessServiceImpl implements ProcessService {
     }
 
     @Override
-    public List<Bitstream> getBitstreams(Context context, Process process, String type) {
+    public Bitstream getBitstream(Context context, Process process, String type) {
         List<Bitstream> allBitstreams = process.getBitstreams();
 
         if (type == null) {
-            return allBitstreams;
+            return null;
         } else {
-            List<Bitstream> filteredBitstreams = new ArrayList<>();
             for (Bitstream bitstream : allBitstreams) {
                 if (StringUtils.equals(bitstreamService.getMetadata(bitstream, Process.BITSTREAM_TYPE_METADATAFIELD),
                                        type)) {
-                    filteredBitstreams.add(bitstream);
+                    return bitstream;
                 }
             }
-            return filteredBitstreams;
         }
+        return null;
+    }
+
+    @Override
+    public List<Bitstream> getBitstreams(Context context, Process process) {
+        return process.getBitstreams();
     }
 
     public int countTotal(Context context) throws SQLException {
