@@ -23,7 +23,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.dspace.authorize.AuthorizeConfiguration;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.ResourcePolicy;
 import org.dspace.authorize.service.AuthorizeService;
+import org.dspace.authorize.service.ResourcePolicyService;
 import org.dspace.content.Collection;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.DSpaceObjectServiceImpl;
@@ -76,6 +78,8 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
 
     @Autowired(required = true)
     protected AuthorizeService authorizeService;
+    @Autowired(required = true)
+    protected ResourcePolicyService resourcePolicyService;
 
     protected GroupServiceImpl() {
         super();
@@ -652,6 +656,23 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
                                 return collection;
                             } else {
                                 return collectionService.getParentObject(context, collection);
+                            }
+                        }
+                    } else {
+                        if (AuthorizeConfiguration.canCollectionAdminManagePolicies()
+                            || AuthorizeConfiguration.canCommunityAdminManagePolicies()
+                            || AuthorizeConfiguration.canCommunityAdminManageCollectionWorkflows()) {
+                            List<Group> groups = new ArrayList<Group>();
+                            groups.add(group);
+                            List<ResourcePolicy> policies = resourcePolicyService.find(context, null, groups,
+                                                            Constants.DEFAULT_ITEM_READ, Constants.COLLECTION);
+                            if (policies.size() > 0) {
+                                return policies.get(0).getdSpaceObject();
+                            }
+                            policies = resourcePolicyService.find(context, null, groups,
+                                                             Constants.DEFAULT_BITSTREAM_READ, Constants.COLLECTION);
+                            if (policies.size() > 0) {
+                                return policies.get(0).getdSpaceObject();
                             }
                         }
                     }
