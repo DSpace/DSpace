@@ -149,12 +149,12 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService 
     }
 
     @Override
-    public String getLabel(MetadataValue metadataValue, String locale) {
-        return getLabel(metadataValue.getMetadataField().toString(), metadataValue.getAuthority(), locale);
+    public String getLabel(MetadataValue metadataValue, Collection collection, String locale) {
+        return getLabel(metadataValue.getMetadataField().toString(), collection, metadataValue.getAuthority(), locale);
     }
 
     @Override
-    public String getLabel(String fieldKey, String authKey, String locale) {
+    public String getLabel(String fieldKey, Collection collection, String authKey, String locale) {
         ChoiceAuthority ma = getChoiceAuthorityMap().get(fieldKey);
         if (ma == null) {
             throw new IllegalArgumentException("No choices plugin was configured for  field \"" + fieldKey + "\".");
@@ -163,7 +163,7 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService 
     }
 
     @Override
-    public boolean isChoicesConfigured(String fieldKey) {
+    public boolean isChoicesConfigured(String fieldKey, Collection collection) {
         return getChoiceAuthorityMap().containsKey(fieldKey);
     }
 
@@ -178,7 +178,7 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService 
     }
 
     @Override
-    public List<String> getVariants(MetadataValue metadataValue) {
+    public List<String> getVariants(MetadataValue metadataValue, Collection collection) {
         ChoiceAuthority ma = getChoiceAuthorityMap().get(metadataValue.getMetadataField().toString());
         if (ma instanceof AuthorityVariantsSupport) {
             AuthorityVariantsSupport avs = (AuthorityVariantsSupport) ma;
@@ -189,7 +189,7 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService 
 
 
     @Override
-    public String getChoiceAuthorityName(String schema, String element, String qualifier) {
+    public String getChoiceAuthorityName(String schema, String element, String qualifier, Collection collection) {
         String makeFieldKey = makeFieldKey(schema, element, qualifier);
         if (getChoiceAuthorityMap().containsKey(makeFieldKey)) {
             for (String key : this.authorities.keySet()) {
@@ -368,26 +368,6 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService 
         }
 
         return closed;
-    }
-
-    @Override
-    public String getChoiceMetadatabyAuthorityName(String name) {
-        if (authorities.isEmpty()) {
-            loadChoiceAuthorityConfigurations();
-        }
-        if (authorities.containsKey(name)) {
-            return authorities.get(name);
-        }
-        return null;
-    }
-
-    @Override
-    public Choice getChoice(String fieldKey, String authKey, String locale) {
-        ChoiceAuthority ma = getChoiceAuthorityMap().get(fieldKey);
-        if (ma == null) {
-            throw new IllegalArgumentException("No choices plugin was configured for  field \"" + fieldKey + "\".");
-        }
-        return ma.getChoice(fieldKey, authKey, locale);
     }
 
     @Override

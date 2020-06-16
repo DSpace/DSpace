@@ -7,7 +7,7 @@
  */
 package org.dspace.app.rest.converter;
 
-import org.dspace.app.rest.model.AuthorityRest;
+import org.dspace.app.rest.model.VocabularyRest;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.utils.AuthorityUtils;
 import org.dspace.content.authority.ChoiceAuthority;
@@ -23,15 +23,15 @@ import org.springframework.stereotype.Component;
  * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  */
 @Component
-public class AuthorityRestConverter implements DSpaceConverter<ChoiceAuthority, AuthorityRest> {
+public class AuthorityRestConverter implements DSpaceConverter<ChoiceAuthority, VocabularyRest> {
 
     @Override
-    public AuthorityRest convert(ChoiceAuthority step, Projection projection) {
-        AuthorityRest authorityRest = new AuthorityRest();
+    public VocabularyRest convert(ChoiceAuthority authority, Projection projection) {
+        VocabularyRest authorityRest = new VocabularyRest();
         authorityRest.setProjection(projection);
-        authorityRest.setHierarchical(step.isHierarchical());
-        authorityRest.setScrollable(step.isScrollable());
-        authorityRest.setIdentifier(step.hasIdentifier());
+        authorityRest.setHierarchical(authority.isHierarchical());
+        authorityRest.setScrollable(authority.isScrollable());
+        authorityRest.setPreloadLevel(authority.getPreloadLevel());
         return authorityRest;
     }
 

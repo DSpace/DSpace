@@ -7,7 +7,7 @@
  */
 package org.dspace.app.rest.model.hateoas;
 
-import org.dspace.app.rest.model.AuthorityRest;
+import org.dspace.app.rest.model.VocabularyRest;
 import org.dspace.app.rest.model.hateoas.annotations.RelNameDSpaceResource;
 import org.dspace.app.rest.utils.Utils;
 
@@ -17,13 +17,10 @@ import org.dspace.app.rest.utils.Utils;
  *
  * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  */
-@RelNameDSpaceResource(AuthorityRest.NAME)
-public class AuthorityResource extends DSpaceResource<AuthorityRest> {
-    public AuthorityResource(AuthorityRest sd, Utils utils) {
+@RelNameDSpaceResource(VocabularyRest.NAME)
+public class AuthorityResource extends DSpaceResource<VocabularyRest> {
+    public AuthorityResource(VocabularyRest sd, Utils utils) {
         super(sd, utils);
-        if (sd.hasIdentifier()) {
-            add(utils.linkToSubResource(sd, AuthorityRest.ENTRY));
-        }
-        add(utils.linkToSubResource(sd, AuthorityRest.ENTRIES));
+        add(utils.linkToSubResource(sd, VocabularyRest.ENTRIES));
     }
 }

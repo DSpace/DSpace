@@ -7,7 +7,7 @@
  */
 package org.dspace.app.rest.converter;
 
-import org.dspace.app.rest.model.AuthorityEntryRest;
+import org.dspace.app.rest.model.VocabularyEntryDetailsRest;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.utils.AuthorityUtils;
 import org.dspace.content.authority.Choice;
@@ -22,11 +22,11 @@ import org.springframework.stereotype.Component;
  * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  */
 @Component
-public class AuthorityEntryRestConverter implements DSpaceConverter<Choice, AuthorityEntryRest> {
+public class AuthorityEntryRestConverter implements DSpaceConverter<Choice, VocabularyEntryDetailsRest> {
 
     @Override
-    public AuthorityEntryRest convert(Choice choice, Projection projection) {
-        AuthorityEntryRest entry = new AuthorityEntryRest();
+    public VocabularyEntryDetailsRest convert(Choice choice, Projection projection) {
+        VocabularyEntryDetailsRest entry = new VocabularyEntryDetailsRest();
         entry.setProjection(projection);
         entry.setValue(choice.value);
         entry.setDisplay(choice.label);
