@@ -43,6 +43,7 @@ public class ProcessBuilder extends AbstractBuilder<Process, ProcessService> {
         return this;
     }
 
+    @Override
     public void cleanup() throws Exception {
         try (Context c = new Context()) {
             c.turnOffAuthorisationSystem();

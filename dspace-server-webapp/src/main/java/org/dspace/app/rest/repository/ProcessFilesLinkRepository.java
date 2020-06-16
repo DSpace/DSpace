@@ -73,7 +73,7 @@ public class ProcessFilesLinkRepository extends AbstractDSpaceRestRepository imp
      * @throws AuthorizeException   If something goes wrong
      */
     @PreAuthorize("hasPermission(#processId, 'PROCESS', 'READ')")
-    public BitstreamRest getFileFromProcessByType(HttpServletRequest request, String processId, String fileType,
+    public BitstreamRest getResource(HttpServletRequest request, String processId, String fileType,
                                            Pageable pageable, Projection projection)
         throws SQLException, AuthorizeException {
         if (log.isTraceEnabled()) {
