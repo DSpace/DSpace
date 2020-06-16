@@ -21,6 +21,8 @@ jdk:
 
 before_install:
   # Remove outdated settings.xml from Travis builds. Workaround for https://github.com/travis-ci/travis-ci/issues/4629
+  - sed -i 's/^orcid\.clientid.*/orcid.clientid='$ORCID_CLIENTID'/g' dspace-api/src/test/data/dspaceFolder/config/local.cfg
+  - sed -i 's/^orcid\.clientsecret.*/orcid.clientsecret='$ORCID_CLIENTSECRET'/g' dspace-api/src/test/data/dspaceFolder/config/local.cfg
   - rm ~/.m2/settings.xml
 
 # Skip install stage, as we'll do it below
