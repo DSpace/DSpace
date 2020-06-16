@@ -23,11 +23,14 @@ public class AuthorityVocabularyEntryIT extends AbstractControllerIntegrationTes
 
     @Test
     public void findOneTest() throws Exception {
+        String idAuthority = "srsc:SCB110";
         String token = getAuthToken(eperson.getEmail(), password);
-        getClient(token).perform(get("/api/integration/vocabularyEntryDetails/" + "SCB110"))
+        getClient(token).perform(get("/api/submission/vocabularyEntryDetails/" + idAuthority))
                         .andExpect(status().isOk())
                         .andExpect(jsonPath("$.id", is("srsc:SCB110")))
-                        .andExpect(jsonPath("$.value", is("Religion/Theology")))
+                        .andExpect(jsonPath("$.value",
+                                         is("Research Subject Categories::HUMANITIES and RELIGION::Religion/Theology")))
+                        .andExpect(jsonPath("$.display", is("Religion/Theology")))
                         .andExpect(jsonPath("$.selectable", is(true)))
                         .andExpect(jsonPath("$.otherInformation.id", is("SCB110")))
                         .andExpect(jsonPath("$.otherInformation.note", is("Religionsvetenskap/Teologi")))
@@ -37,12 +40,13 @@ public class AuthorityVocabularyEntryIT extends AbstractControllerIntegrationTes
     @Test
     public void findOneBadRequestTest() throws Exception {
         String token = getAuthToken(eperson.getEmail(), password);
-        getClient(token).perform(get("/api/integration/vocabularyEntryDetails/" + UUID.randomUUID().toString()))
+        getClient(token).perform(get("/api/submission/vocabularyEntryDetails/" + UUID.randomUUID().toString()))
                         .andExpect(status().isBadRequest());
     }
 
     public void findOneUnauthorizedTest() throws Exception {
-        getClient().perform(get("/api/integration/vocabularyEntryDetails/" + "SCB110"))
+        String idAuthority = "srsc:SCB110";
+        getClient().perform(get("/api/submission/vocabularyEntryDetails/" + idAuthority))
                    .andExpect(status().isUnauthorized());
     }
 
@@ -50,7 +54,7 @@ public class AuthorityVocabularyEntryIT extends AbstractControllerIntegrationTes
     public void srscSearchTopTest() throws Exception {
         String tokenAdmin = getAuthToken(admin.getEmail(), password);
         String tokenEPerson = getAuthToken(eperson.getEmail(), password);
-        getClient(tokenAdmin).perform(get("/api/integration/vocabularyEntryDetails/search/top")
+        getClient(tokenAdmin).perform(get("/api/submission/vocabularyEntryDetails/search/top")
           .param("vocabulary", "srsc"))
           .andExpect(status().isOk())
           .andExpect(jsonPath("$", Matchers.containsInAnyOrder(
@@ -69,7 +73,7 @@ public class AuthorityVocabularyEntryIT extends AbstractControllerIntegrationTes
           )))
           .andExpect(jsonPath("$.page.totalElements", Matchers.is(12)));
 
-        getClient(tokenEPerson).perform(get("/api/integration/vocabularyEntryDetails/search/top")
+        getClient(tokenEPerson).perform(get("/api/submission/vocabularyEntryDetails/search/top")
          .param("vocabulary", "srsc"))
          .andExpect(status().isOk())
          .andExpect(jsonPath("$", Matchers.containsInAnyOrder(
@@ -92,7 +96,7 @@ public class AuthorityVocabularyEntryIT extends AbstractControllerIntegrationTes
     @Test
     public void srscSearchFirstLevel_MATHEMATICS_Test() throws Exception {
         String tokenAdmin = getAuthToken(admin.getEmail(), password);
-        getClient(tokenAdmin).perform(get("/api/integration/vocabularyEntryDetails/" + "srsc:SCB14" + "/children"))
+        getClient(tokenAdmin).perform(get("/api/submission/vocabularyEntryDetails/" + "srsc:SCB14" + "/children"))
                  .andExpect(status().isOk())
                  .andExpect(jsonPath("$", Matchers.containsInAnyOrder(
                    AuthorityEntryMatcher.matchAuthority("srsc:SCB1401", "Algebra, geometry and mathematical analysis"),
@@ -105,7 +109,7 @@ public class AuthorityVocabularyEntryIT extends AbstractControllerIntegrationTes
     @Test
     public void srscSearchTopPaginationTest() throws Exception {
         String tokenAdmin = getAuthToken(admin.getEmail(), password);
-        getClient(tokenAdmin).perform(get("/api/integration/vocabularyEntryDetails/search/top")
+        getClient(tokenAdmin).perform(get("/api/submission/vocabularyEntryDetails/search/top")
                              .param("vocabulary", "srsc")
                              .param("page", "0")
                              .param("size", "5"))
@@ -122,7 +126,7 @@ public class AuthorityVocabularyEntryIT extends AbstractControllerIntegrationTes
           .andExpect(jsonPath("$.page.number", is(0)));
 
         //second page
-        getClient(tokenAdmin).perform(get("/api/integration/authorities/srsc/entries/search/top")
+        getClient(tokenAdmin).perform(get("/api/submission/authorities/srsc/entries/search/top")
                  .param("page", "1")
                  .param("size", "5"))
            .andExpect(status().isOk())
@@ -138,7 +142,7 @@ public class AuthorityVocabularyEntryIT extends AbstractControllerIntegrationTes
            .andExpect(jsonPath("$.page.number", is(1)));
 
         // third page
-        getClient(tokenAdmin).perform(get("/api/integration/authorities/srsc/entries/search/top")
+        getClient(tokenAdmin).perform(get("/api/submission/authorities/srsc/entries/search/top")
                  .param("page", "2")
                  .param("size", "5"))
            .andExpect(status().isOk())
@@ -154,22 +158,22 @@ public class AuthorityVocabularyEntryIT extends AbstractControllerIntegrationTes
     @Test
     public void searchTopBadRequestTest() throws Exception {
         String tokenAdmin = getAuthToken(admin.getEmail(), password);
-        getClient(tokenAdmin).perform(get("/api/integration/vocabularyEntryDetails/search/top")
+        getClient(tokenAdmin).perform(get("/api/submission/vocabularyEntryDetails/search/top")
                              .param("vocabulary", UUID.randomUUID().toString()))
                              .andExpect(status().isBadRequest());
     }
 
     @Test
     public void searchTopUnauthorizedTest() throws Exception {
-        getClient().perform(get("/api/integration/vocabularyEntryDetails/search/top")
-                   .param("vocabulary", "srsc"))
+        getClient().perform(get("/api/submission/vocabularyEntryDetails/search/top")
+                   .param("vocabulary", "srsc:SCB16"))
                    .andExpect(status().isUnauthorized());
     }
 
     @Test
     public void retrieveSrscValueTest() throws Exception {
         String token = getAuthToken(admin.getEmail(), password);
-        getClient(token).perform(get("/api/integration/vocabularyEntryDetails/" + "SCB1922")
+        getClient(token).perform(get("/api/submission/vocabularyEntryDetails/" + "SCB1922")
                 .param("projection", "full"))
                 .andExpect(status().isOk());
     }
@@ -178,7 +182,7 @@ public class AuthorityVocabularyEntryIT extends AbstractControllerIntegrationTes
     public void srscSearchByParentFirstLevelPaginationTest() throws Exception {
         String token = getAuthToken(eperson.getEmail(), password);
         // first page
-        getClient(token).perform(get("/api/integration/vocabularyEntryDetails/" + "srsc:SCB14" + "/children")
+        getClient(token).perform(get("/api/submission/vocabularyEntryDetails/" + "srsc:SCB14" + "/children")
                  .param("page", "0")
                  .param("size", "2"))
                  .andExpect(status().isOk())
@@ -191,7 +195,7 @@ public class AuthorityVocabularyEntryIT extends AbstractControllerIntegrationTes
                  .andExpect(jsonPath("$.page.number", is(0)));
 
         // second page
-        getClient(token).perform(get("/api/integration/vocabularyEntryDetails/" + "srsc:SCB14" + "/children")
+        getClient(token).perform(get("/api/submission/vocabularyEntryDetails/" + "srsc:SCB14" + "/children")
                 .param("page", "1")
                 .param("size", "2"))
                 .andExpect(status().isOk())
@@ -206,7 +210,7 @@ public class AuthorityVocabularyEntryIT extends AbstractControllerIntegrationTes
     @Test
     public void srscSearchByParentSecondLevel_Applied_mathematics_Test() throws Exception {
         String token = getAuthToken(eperson.getEmail(), password);
-        getClient(token).perform(get("/api/integration/vocabularyEntryDetails/" + "srsc:SCB1402" + "/children"))
+        getClient(token).perform(get("/api/submission/vocabularyEntryDetails/" + "srsc:SCB1402" + "/children"))
                              .andExpect(status().isOk())
                              .andExpect(jsonPath("$._embedded.authorityEntries", Matchers.containsInAnyOrder(
                                      AuthorityEntryMatcher.matchAuthority("VR140202", "Numerical analysis"),
@@ -220,7 +224,7 @@ public class AuthorityVocabularyEntryIT extends AbstractControllerIntegrationTes
     @Test
     public void srscSearchByParentEmptyTest() throws Exception {
         String tokenAdmin = getAuthToken(admin.getEmail(), password);
-        getClient(tokenAdmin).perform(get("/api/integration/vocabularyEntryDetails/" + "srsc:VR140202" + "/children"))
+        getClient(tokenAdmin).perform(get("/api/submission/vocabularyEntryDetails/" + "srsc:VR140202" + "/children"))
                              .andExpect(status().isOk())
                              .andExpect(jsonPath("$.page.totalElements", Matchers.is(0)));
     }
@@ -228,7 +232,7 @@ public class AuthorityVocabularyEntryIT extends AbstractControllerIntegrationTes
     @Test
     public void srscSearchByParentWrongIdTest() throws Exception {
         String tokenAdmin = getAuthToken(admin.getEmail(), password);
-        getClient(tokenAdmin).perform(get("/api/integration/vocabularyEntryDetails/"
+        getClient(tokenAdmin).perform(get("/api/submission/vocabularyEntryDetails/"
                                                           + UUID.randomUUID() + "/children"))
                              .andExpect(status().isBadRequest());
     }
@@ -236,7 +240,7 @@ public class AuthorityVocabularyEntryIT extends AbstractControllerIntegrationTes
     @Test
     public void srscSearchTopUnauthorizedTest() throws Exception {
         String tokenAdmin = getAuthToken(admin.getEmail(), password);
-        getClient(tokenAdmin).perform(get("/api/integration/vocabularyEntryDetails/search/top")
+        getClient(tokenAdmin).perform(get("/api/submission/vocabularyEntryDetails/search/top")
           .param("vocabulary", "srsc"))
           .andExpect(status().isUnauthorized());
     }
@@ -244,7 +248,7 @@ public class AuthorityVocabularyEntryIT extends AbstractControllerIntegrationTes
     @Test
     public void srscSearchParentByChildrenTest() throws Exception {
         String tokenEperson = getAuthToken(eperson.getEmail(), password);
-        getClient(tokenEperson).perform(get("/api/integration/vocabularyEntryDetails/" + "srsc:VR140202" + "/children"))
+        getClient(tokenEperson).perform(get("/api/submission/vocabularyEntryDetails/" + "srsc:VR140202" + "/children"))
                  .andExpect(status().isOk())
                  .andExpect(jsonPath("$._embedded.authorityEntries", Matchers.contains(
                             AuthorityEntryMatcher.matchAuthority("SCB1402", "Applied mathematics")
@@ -255,7 +259,7 @@ public class AuthorityVocabularyEntryIT extends AbstractControllerIntegrationTes
     @Test
     public void srscSearchParentByChildrenRootTest() throws Exception {
         String tokenEperson = getAuthToken(eperson.getEmail(), password);
-        getClient(tokenEperson).perform(get("/api/integration/vocabularyEntryDetails/" + "srsc:SCB11" + "/children"))
+        getClient(tokenEperson).perform(get("/api/submission/vocabularyEntryDetails/" + "srsc:SCB11" + "/children"))
                  .andExpect(status().isOk())
                  .andExpect(jsonPath("$.page.totalElements", Matchers.is(0)));
     }

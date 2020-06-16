@@ -95,7 +95,7 @@ public class AuthorityRestRepositoryIT extends AbstractControllerIntegrationTest
     @Test
     public void findAllTest() throws Exception {
         String token = getAuthToken(admin.getEmail(), password);
-        getClient(token).perform(get("/api/integration/vocabularies"))
+        getClient(token).perform(get("/api/submission/vocabularies"))
                  .andExpect(status().isOk())
                  .andExpect(jsonPath("$._embedded.vocabularies", Matchers.containsInAnyOrder(
                      VocabularyMatcher.matchProperties("srsc", "srsc", false, true),
@@ -103,14 +103,14 @@ public class AuthorityRestRepositoryIT extends AbstractControllerIntegrationTest
                      VocabularyMatcher.matchProperties("common_iso_languages", "common_iso_languages", true , false)
                  )))
         .andExpect(jsonPath("$._links.self.href",
-            Matchers.containsString("api/integration/vocabularies")))
+            Matchers.containsString("api/submission/vocabularies")))
         .andExpect(jsonPath("$.page.totalElements", is(3)));
     }
 
     @Test
     public void findOneSRSC_Test() throws Exception {
         String token = getAuthToken(admin.getEmail(), password);
-        getClient(token).perform(get("/api/integration/vocabularies/srsc"))
+        getClient(token).perform(get("/api/submission/vocabularies/srsc"))
                         .andExpect(status().isOk())
                         .andExpect(jsonPath("$", Matchers.contains(
                                    VocabularyMatcher.matchProperties("srsc", "srsc", false, true)
@@ -121,7 +121,7 @@ public class AuthorityRestRepositoryIT extends AbstractControllerIntegrationTest
     @Test
     public void findOneCommonTypesTest() throws Exception {
         String token = getAuthToken(admin.getEmail(), password);
-        getClient(token).perform(get("/api/integration/vocabularies/common_types"))
+        getClient(token).perform(get("/api/submission/vocabularies/common_types"))
                         .andExpect(status().isOk())
                         .andExpect(jsonPath("$", Matchers.contains(
                                 VocabularyMatcher.matchProperties("common_types", "common_types", true, false)
@@ -140,7 +140,7 @@ public class AuthorityRestRepositoryIT extends AbstractControllerIntegrationTest
 
         String token = getAuthToken(admin.getEmail(), password);
         getClient(token).perform(
-            get("/api/integration/vocabularies/srsc/entries")
+            get("/api/submission/vocabularies/srsc/entries")
                 .param("metadata", "dc.subject")
                 .param("collection", collection.getID().toString())
                 .param("query", "Research")
@@ -162,7 +162,7 @@ public class AuthorityRestRepositoryIT extends AbstractControllerIntegrationTest
     @Test
     public void controlledVocabularyEntriesWrongCollectionUUIDTest() throws Exception {
         String token = getAuthToken(admin.getEmail(), password);
-        getClient(token).perform(get("/api/integration/vocabularies/srsc/entries")
+        getClient(token).perform(get("/api/submission/vocabularies/srsc/entries")
                 .param("metadata", "dc.subject")
                 .param("collection", UUID.randomUUID().toString())
                 .param("query", "Research"))
@@ -172,7 +172,7 @@ public class AuthorityRestRepositoryIT extends AbstractControllerIntegrationTest
     @Test
     public void controlledVocabularyEntriesMissingCollectionUUID_Test() throws Exception {
         String token = getAuthToken(admin.getEmail(), password);
-        getClient(token).perform(get("/api/integration/vocabularies/srsc/entries")
+        getClient(token).perform(get("/api/submission/vocabularies/srsc/entries")
                 .param("metadata", "dc.subject")
                 .param("query", "Research"))
                 .andExpect(status().isBadRequest());
@@ -187,7 +187,7 @@ public class AuthorityRestRepositoryIT extends AbstractControllerIntegrationTest
                                                  .build();
         context.restoreAuthSystemState();
         String token = getAuthToken(admin.getEmail(), password);
-        getClient(token).perform(get("/api/integration/vocabularies/srsc/entries")
+        getClient(token).perform(get("/api/submission/vocabularies/srsc/entries")
                 .param("metadata", "dc.subject")
                 .param("collection", collection.getID().toString())
                 .param("query", "Research"))
@@ -203,7 +203,7 @@ public class AuthorityRestRepositoryIT extends AbstractControllerIntegrationTest
                                                  .build();
         context.restoreAuthSystemState();
         String token = getAuthToken(admin.getEmail(), password);
-        getClient(token).perform(get("/api/integration/vocabularies/srsc/entries")
+        getClient(token).perform(get("/api/submission/vocabularies/srsc/entries")
                 .param("metadata", "dc.not.existing")
                 .param("collection", collection.getID().toString()))
                 .andExpect(status().isUnprocessableEntity());
@@ -220,7 +220,7 @@ public class AuthorityRestRepositoryIT extends AbstractControllerIntegrationTest
 
         String token = getAuthToken(admin.getEmail(), password);
         getClient(token).perform(
-            get("/api/integration/vocabularies/srsc/entries")
+            get("/api/submission/vocabularies/srsc/entries")
                 .param("metadata", "dc.subject")
                 .param("collection", collection.getID().toString())
                 .param("query", "Research2")
@@ -239,7 +239,7 @@ public class AuthorityRestRepositoryIT extends AbstractControllerIntegrationTest
         context.restoreAuthSystemState();
 
         String token = getAuthToken(admin.getEmail(), password);
-        getClient(token).perform(get("/api/integration/vocabularies/common_types/entries")
+        getClient(token).perform(get("/api/submission/vocabularies/common_types/entries")
                 .param("metadata", "dc.type")
                 .param("collection", collection.getID().toString())
                 .param("size", "2"))
@@ -263,7 +263,7 @@ public class AuthorityRestRepositoryIT extends AbstractControllerIntegrationTest
         context.restoreAuthSystemState();
 
         String token = getAuthToken(admin.getEmail(), password);
-        getClient(token).perform(get("/api/integration/vocabularies/common_types/entries")
+        getClient(token).perform(get("/api/submission/vocabularies/common_types/entries")
                 .param("metadata", "dc.type")
                 .param("collection", collection.getID().toString())
                 .param("query", "Book")
@@ -288,7 +288,7 @@ public class AuthorityRestRepositoryIT extends AbstractControllerIntegrationTest
         context.restoreAuthSystemState();
         String token = getAuthToken(admin.getEmail(), password);
         getClient(token).perform(
-                get("/api/integration/vocabularies/SolrAuthorAuthority/entries")
+                get("/api/submission/vocabularies/SolrAuthorAuthority/entries")
                         .param("metadata", "dc.contributor.author")
                         .param("collection", collection.getID().toString())
                         .param("query", "Shirasaka")
@@ -307,7 +307,7 @@ public class AuthorityRestRepositoryIT extends AbstractControllerIntegrationTest
         context.restoreAuthSystemState();
         String token = getAuthToken(admin.getEmail(), password);
         getClient(token).perform(
-                get("/api/integration/vocabularies/SolrAuthorAuthority/entries")
+                get("/api/submission/vocabularies/SolrAuthorAuthority/entries")
                         .param("metadata", "dc.contributor.author")
                         .param("collection", collection.getID().toString())
                         .param("query", "Smith")
@@ -325,7 +325,7 @@ public class AuthorityRestRepositoryIT extends AbstractControllerIntegrationTest
                                                  .build();
         context.restoreAuthSystemState();
         String token = getAuthToken(admin.getEmail(), password);
-        getClient(token).perform(get("/api/integration/vocabularies/search/byMetadataAndCollection")
+        getClient(token).perform(get("/api/submission/vocabularies/search/byMetadataAndCollection")
                         .param("metadata", "dc.type")
                         .param("collection", collection.getID().toString()))
                         .andExpect(status().isOk())
@@ -345,12 +345,12 @@ public class AuthorityRestRepositoryIT extends AbstractControllerIntegrationTest
         context.restoreAuthSystemState();
 
         String token = getAuthToken(admin.getEmail(), password);
-        getClient(token).perform(get("/api/integration/vocabularies/search/byMetadataAndCollection")
+        getClient(token).perform(get("/api/submission/vocabularies/search/byMetadataAndCollection")
                         .param("metadata", "dc.not.exist")
                         .param("collection", collection.getID().toString()))
                         .andExpect(status().isUnprocessableEntity());
 
-        getClient(token).perform(get("/api/integration/vocabularies/search/byMetadataAndCollection")
+        getClient(token).perform(get("/api/submission/vocabularies/search/byMetadataAndCollection")
                 .param("metadata", "dc.type")
                 .param("collection", UUID.randomUUID().toString()))
                 .andExpect(status().isUnprocessableEntity());
@@ -367,12 +367,12 @@ public class AuthorityRestRepositoryIT extends AbstractControllerIntegrationTest
 
         String token = getAuthToken(admin.getEmail(), password);
         //missing metadata
-        getClient(token).perform(get("/api/integration/vocabularies/search/byMetadataAndCollection")
+        getClient(token).perform(get("/api/submission/vocabularies/search/byMetadataAndCollection")
                         .param("collection", collection.getID().toString()))
                         .andExpect(status().isBadRequest());
 
         //missing collection
-        getClient(token).perform(get("/api/integration/vocabularies/search/byMetadataAndCollection")
+        getClient(token).perform(get("/api/submission/vocabularies/search/byMetadataAndCollection")
                 .param("metadata", "dc.type"))
                 .andExpect(status().isUnprocessableEntity());
     }
