@@ -15,8 +15,10 @@ import javax.annotation.Nullable;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
-import org.dspace.app.rest.model.AuthorityEntryRest;
-import org.dspace.app.rest.model.AuthorityRest;
+import org.dspace.app.rest.exception.UnprocessableEntityException;
+import org.dspace.app.rest.model.VocabularyEntryDetailsRest;
+import org.dspace.app.rest.model.VocabularyEntryRest;
+import org.dspace.app.rest.model.VocabularyRest;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.utils.AuthorityUtils;
 import org.dspace.content.Collection;
@@ -37,8 +39,8 @@ import org.springframework.stereotype.Component;
  *
  * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  */
-@Component(AuthorityRest.CATEGORY + "." + AuthorityRest.NAME + "." + AuthorityRest.ENTRIES)
-public class AuthorityEntryLinkRepository extends AbstractDSpaceRestRepository
+@Component(VocabularyRest.CATEGORY + "." + VocabularyRest.NAME + "." + VocabularyRest.ENTRIES)
+public class VocabularyEntryLinkRepository extends AbstractDSpaceRestRepository
     implements LinkRestRepository {
 
     @Autowired
@@ -51,31 +53,37 @@ public class AuthorityEntryLinkRepository extends AbstractDSpaceRestRepository
     private AuthorityUtils authorityUtils;
 
     @PreAuthorize("hasAuthority('AUTHENTICATED')")
-    public Page<AuthorityEntryRest> query(@Nullable HttpServletRequest request, String name,
+    public Page<VocabularyEntryRest> filter(@Nullable HttpServletRequest request, String name,
                                           @Nullable Pageable optionalPageable, Projection projection) {
         Context context = obtainContext();
-        String query = request == null ? null : request.getParameter("query");
+        String filter = request == null ? null : request.getParameter("filter");
         String metadata = request == null ? null : request.getParameter("metadata");
         String uuidCollectìon = request == null ? null : request.getParameter("uuid");
+
         Collection collection = null;
         if (StringUtils.isNotBlank(uuidCollectìon)) {
             try {
                 collection = cs.find(context, UUID.fromString(uuidCollectìon));
             } catch (SQLException e) {
-                throw new RuntimeException(e);
+                throw new UnprocessableEntityException(uuidCollectìon + " is not a valid collection");
             }
         }
-        List<AuthorityEntryRest> results = new ArrayList<>();
+
+        // validate the parameters
+        String[] tokens = org.dspace.core.Utils.tokenize(metadata);
+        String vocName = cas.getChoiceAuthorityName(tokens[0], tokens[1], tokens[2], collection);
+        if (!StringUtils.equals(name, vocName)) {
+            throw new UnprocessableEntityException("The vocabulary " + name + " is not allowed for the metadata "
+                    + metadata + " and collection " + uuidCollectìon);
+        }
+
         Pageable pageable = utils.getPageable(optionalPageable);
-        if (StringUtils.isNotBlank(metadata)) {
-            String[] tokens = org.dspace.core.Utils.tokenize(metadata);
-            String fieldKey = org.dspace.core.Utils.standardize(tokens[0], tokens[1], tokens[2], "_");
-            Choices choices = cas.getMatches(fieldKey, query, collection, Math.toIntExact(pageable.getOffset()),
-                    pageable.getPageSize(),
-                                             context.getCurrentLocale().toString());
-            for (Choice value : choices.values) {
-                results.add(authorityUtils.convertEntry(value, name, projection));
-            }
+        List<VocabularyEntryRest> results = new ArrayList<>();
+        String fieldKey = org.dspace.core.Utils.standardize(tokens[0], tokens[1], tokens[2], "_");
+        Choices choices = cas.getMatches(fieldKey, filter, collection, Math.toIntExact(pageable.getOffset()),
+                pageable.getPageSize(), context.getCurrentLocale().toString());
+        for (Choice value : choices.values) {
+            results.add(authorityUtils.convertEntry(value, name, projection));
         }
         return new PageImpl<>(results, pageable, results.size());
     }

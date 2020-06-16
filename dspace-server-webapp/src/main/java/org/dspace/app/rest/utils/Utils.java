@@ -47,7 +47,7 @@ import org.apache.log4j.Logger;
 import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.exception.PaginationException;
 import org.dspace.app.rest.exception.RepositoryNotFoundException;
-import org.dspace.app.rest.model.AuthorityRest;
+import org.dspace.app.rest.model.VocabularyRest;
 import org.dspace.app.rest.model.BaseObjectRest;
 import org.dspace.app.rest.model.CommunityRest;
 import org.dspace.app.rest.model.LinkRest;
@@ -254,7 +254,7 @@ public class Utils {
             return CommunityRest.NAME;
         }
         if (modelPlural.equals("authorities")) {
-            return AuthorityRest.NAME;
+            return VocabularyRest.NAME;
         }
         if (modelPlural.equals("resourcepolicies")) {
             return ResourcePolicyRest.NAME;

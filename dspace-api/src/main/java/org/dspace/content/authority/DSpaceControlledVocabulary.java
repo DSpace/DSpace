@@ -211,39 +211,6 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Choic
         return true;
     }
 
-    @Override
-    public Choice getChoice(String fieldKey, String authKey, String locale) {
-        init();
-        log.debug("Getting matches for '" + authKey + "'");
-        String xpathExpression = String.format(idTemplate, authKey);
-        XPath xpath = XPathFactory.newInstance().newXPath();
-        try {
-            Node node = (Node) xpath.evaluate(xpathExpression, vocabulary, XPathConstants.NODE);
-            if (node != null) {
-                String[] authorities = new String[1];
-                String[] values = new String[1];
-                String[] labels = new String[1];
-                String[] parent = new String[1];
-                String[] note = new String[1];
-                readNode(authorities, values, labels, parent, note, 0, node);
-
-                if (values.length > 0) {
-                    Choice choice = new Choice(authorities[0], values[0], labels[0]);
-                    if (StringUtils.isNotBlank(parent[0])) {
-                        choice.extras.put("parent", parent[0]);
-                    }
-                    if (StringUtils.isNotBlank(note[0])) {
-                        choice.extras.put("note", note[0]);
-                    }
-                    return choice;
-                }
-            }
-        } catch (XPathExpressionException e) {
-            log.warn(e.getMessage(), e);
-        }
-        return null;
-    }
-
     private void readNode(String[] authorities, String[] values, String[] labels, String[] parent, String[] notes,
                           int i, Node node) {
         String hierarchy = this.buildString(node);

@@ -82,16 +82,7 @@ public interface ChoiceAuthority {
         return false;
     }
 
-    default boolean hasIdentifier() {
-        return true;
+    default Integer getPreloadLevel() {
+        return isHierarchical() ? 0 : null;
     }
-
-    default public Choice getChoice(String fieldKey, String authKey, String locale) {
-        Choice result = new Choice();
-        result.authority = authKey;
-        result.label = getLabel(fieldKey, authKey, locale);
-        result.value = getLabel(fieldKey, authKey, locale);
-        return result;
-    }
-
 }

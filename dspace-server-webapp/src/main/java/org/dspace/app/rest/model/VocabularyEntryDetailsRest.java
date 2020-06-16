@@ -13,19 +13,19 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.dspace.app.rest.RestResourceController;
 
 /**
- * The Authority Entry REST Resource
+ * The Vocabulary Entry Details REST Resource
  *
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
-public class AuthorityEntryRest extends RestAddressableModel {
-    public static final String NAME = "authorityEntry";
+public class VocabularyEntryDetailsRest extends RestAddressableModel {
+    public static final String NAME = "vocabularyDetailEntry";
     private String id;
     private String display;
     private String value;
     private Map<String, String> otherInformation;
 
     @JsonIgnore
-    private String authorityName;
+    private String vocabularyName;
 
     public String getId() {
         return id;
@@ -63,22 +63,22 @@ public class AuthorityEntryRest extends RestAddressableModel {
         return NAME;
     }
 
-    public String getAuthorityName() {
-        return authorityName;
+    public String getVocabularyName() {
+        return vocabularyName;
     }
 
-    public void setAuthorityName(String authorityName) {
-        this.authorityName = authorityName;
+    public void setVocabularyName(String vocabularyName) {
+        this.vocabularyName = vocabularyName;
     }
 
     @Override
     public String getCategory() {
-        return AuthorityRest.CATEGORY;
+        return VocabularyRest.CATEGORY;
     }
 
     @Override
     public String getType() {
-        return AuthorityRest.NAME;
+        return VocabularyRest.NAME;
     }
 
     @Override
