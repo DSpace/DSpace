@@ -56,7 +56,7 @@ public class OrcidExternalSourcesIT extends AbstractControllerIntegrationTest {
     @Test
     public void findOneExternalSourcesExistingSourcesWithentryValueTest() throws Exception {
         String entry = "0000-0002-9029-1854";
-        getClient().perform(get("/api/integration/externalsources/orcidV2/entryValues/" + entry))
+        getClient().perform(get("/api/integration/externalsources/orcid/entryValues/" + entry))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$", Matchers.allOf(
                            hasJsonPath("$.id", is(entry)),
