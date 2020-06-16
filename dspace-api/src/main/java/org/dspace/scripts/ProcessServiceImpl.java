@@ -206,10 +206,12 @@ public class ProcessServiceImpl implements ProcessService {
         if (type == null) {
             return null;
         } else {
-            for (Bitstream bitstream : allBitstreams) {
-                if (StringUtils.equals(bitstreamService.getMetadata(bitstream, Process.BITSTREAM_TYPE_METADATAFIELD),
-                                       type)) {
-                    return bitstream;
+            if (allBitstreams != null) {
+                for (Bitstream bitstream : allBitstreams) {
+                    if (StringUtils.equals(bitstreamService.getMetadata(bitstream,
+                                                                        Process.BITSTREAM_TYPE_METADATAFIELD), type)) {
+                        return bitstream;
+                    }
                 }
             }
         }
