@@ -103,7 +103,7 @@ public class OrcidV3AuthorDataProvider implements ExternalDataProvider {
     }
 
     /**
-     * Makes an instance of the Orcidv2 class based on the provided parameters.
+     * Makes an instance of the Orcidv3 class based on the provided parameters.
      * This constructor is called through the spring bean initialization
      */
     private OrcidV3AuthorDataProvider(String url) {
