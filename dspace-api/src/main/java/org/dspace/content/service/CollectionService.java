@@ -358,6 +358,10 @@ public interface CollectionService
         throws SQLException, AuthorizeException;
 
     /**
+     * Returns Collections for which the current user has 'submit' privileges.
+     * NOTE: for better performance, this method retrieves its results from an
+     *       index (cache) and does not query the database directly.
+     *       This means that results may be stale or outdated until DS-4524 is resolved"
      * 
      * @param q                limit the returned collection to those with metadata values matching the query terms.
      *                         The terms are used to make also a prefix query on SOLR so it can be used to implement
@@ -370,10 +374,14 @@ public interface CollectionService
      * @throws SQLException              if something goes wrong
      * @throws SearchServiceException    if search error
      */
-    public List<Collection> findAuthorizedCollectionsInSOLR(String q, Context context, Community community,
+    public List<Collection> findCollectionsWithSubmit(String q, Context context, Community community,
         int offset, int limit) throws SQLException, SearchServiceException;
 
     /**
+     * Counts the number of Collection for which the current user has 'submit' privileges.
+     * NOTE: for better performance, this method retrieves its results from an index (cache)
+     *       and does not query the database directly.
+     *       This means that results may be stale or outdated until DS-4524 is resolved."
      * 
      * @param q                limit the returned collection to those with metadata values matching the query terms.
      *                         The terms are used to make also a prefix query on SOLR so it can be used to implement
@@ -384,6 +392,6 @@ public interface CollectionService
      * @throws SQLException              if something goes wrong
      * @throws SearchServiceException    if search error
      */
-    public int countAuthorizedCollectionsInSOLR(String q, Context context, Community community)
+    public int countCollectionsWithSubmit(String q, Context context, Community community)
         throws SQLException, SearchServiceException;
 }

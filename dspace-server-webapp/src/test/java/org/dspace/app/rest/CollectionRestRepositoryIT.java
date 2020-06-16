@@ -472,7 +472,7 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
 
         context.restoreAuthSystemState();
 
-        getClient().perform(get("/api/core/collections/search/findAuthorized"))
+        getClient().perform(get("/api/core/collections/search/findSubmitAuthorized"))
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$.page.totalElements", is(0)))
@@ -522,7 +522,7 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
         String tokenEPerson = getAuthToken(eperson.getEmail(), password);
         String tokenEPerson2 = getAuthToken(eperson2.getEmail(), password);
 
-        getClient(tokenEPerson).perform(get("/api/core/collections/search/findAuthorized"))
+        getClient(tokenEPerson).perform(get("/api/core/collections/search/findSubmitAuthorized"))
                  .andExpect(status().isOk())
                  .andExpect(content().contentType(contentType))
                  .andExpect(jsonPath("$._embedded.collections", Matchers.containsInAnyOrder(
@@ -531,7 +531,7 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                          )))
                  .andExpect(jsonPath("$.page.totalElements", is(2)));
 
-        getClient(tokenEPerson2).perform(get("/api/core/collections/search/findAuthorized"))
+        getClient(tokenEPerson2).perform(get("/api/core/collections/search/findSubmitAuthorized"))
                  .andExpect(status().isOk())
                  .andExpect(content().contentType(contentType))
                  .andExpect(jsonPath("$._embedded.collections", Matchers.contains(
@@ -540,7 +540,7 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                  .andExpect(jsonPath("$.page.totalElements", is(1)));
 
         String tokenAdmin = getAuthToken(admin.getEmail(), password);
-        getClient(tokenAdmin).perform(get("/api/core/collections/search/findAuthorized"))
+        getClient(tokenAdmin).perform(get("/api/core/collections/search/findSubmitAuthorized"))
                  .andExpect(status().isOk())
                  .andExpect(content().contentType(contentType))
                  .andExpect(jsonPath("$._embedded.collections", Matchers.containsInAnyOrder(
@@ -588,7 +588,7 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
         context.restoreAuthSystemState();
 
         String tokenEPerson = getAuthToken(eperson.getEmail(), password);
-        getClient(tokenEPerson).perform(get("/api/core/collections/search/findAuthorized")
+        getClient(tokenEPerson).perform(get("/api/core/collections/search/findSubmitAuthorized")
                  .param("query", "collection"))
                  .andExpect(status().isOk())
                  .andExpect(jsonPath("$._embedded.collections", Matchers.containsInAnyOrder(
@@ -597,7 +597,7 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                          )))
                  .andExpect(jsonPath("$.page.totalElements", is(2)));
 
-        getClient(tokenEPerson).perform(get("/api/core/collections/search/findAuthorized")
+        getClient(tokenEPerson).perform(get("/api/core/collections/search/findSubmitAuthorized")
                  .param("query", "COLLECTION"))
                  .andExpect(status().isOk())
                  .andExpect(jsonPath("$._embedded.collections", Matchers.containsInAnyOrder(
@@ -606,18 +606,18 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                         )))
                  .andExpect(jsonPath("$.page.totalElements", is(2)));
 
-        getClient(tokenEPerson).perform(get("/api/core/collections/search/findAuthorized")
+        getClient(tokenEPerson).perform(get("/api/core/collections/search/findSubmitAuthorized")
                  .param("query", "test"))
                  .andExpect(status().isOk())
                  .andExpect(jsonPath("$.page.totalElements", is(0)));
 
-        getClient(tokenEPerson).perform(get("/api/core/collections/search/findAuthorized")
+        getClient(tokenEPerson).perform(get("/api/core/collections/search/findSubmitAuthorized")
                 .param("query", "auto"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.page.totalElements", is(0)));
 
         String tokenEPerson2 = getAuthToken(eperson2.getEmail(), password);
-        getClient(tokenEPerson2).perform(get("/api/core/collections/search/findAuthorized")
+        getClient(tokenEPerson2).perform(get("/api/core/collections/search/findSubmitAuthorized")
                 .param("query", "auto"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$._embedded.collections", Matchers.contains(
@@ -625,13 +625,13 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                            )))
                 .andExpect(jsonPath("$.page.totalElements", is(1)));
 
-        getClient(tokenEPerson2).perform(get("/api/core/collections/search/findAuthorized")
+        getClient(tokenEPerson2).perform(get("/api/core/collections/search/findSubmitAuthorized")
                  .param("query", "testing auto"))
                  .andExpect(status().isOk())
                  .andExpect(jsonPath("$.page.totalElements", is(0)));
 
         String tokenAdmin = getAuthToken(admin.getEmail(), password);
-        getClient(tokenAdmin).perform(get("/api/core/collections/search/findAuthorized")
+        getClient(tokenAdmin).perform(get("/api/core/collections/search/findSubmitAuthorized")
                  .param("query", "sample"))
                  .andExpect(status().isOk())
                  .andExpect(jsonPath("$._embedded.collections", Matchers.containsInAnyOrder(
@@ -640,7 +640,7 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                            )))
                  .andExpect(jsonPath("$.page.totalElements", is(2)));
 
-        getClient(tokenAdmin).perform(get("/api/core/collections/search/findAuthorized")
+        getClient(tokenAdmin).perform(get("/api/core/collections/search/findSubmitAuthorized")
                 .param("query", "items sample"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$._embedded.collections", Matchers.contains(
@@ -648,7 +648,7 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                            )))
                 .andExpect(jsonPath("$.page.totalElements", is(1)));
 
-        getClient(tokenAdmin).perform(get("/api/core/collections/search/findAuthorized")
+        getClient(tokenAdmin).perform(get("/api/core/collections/search/findSubmitAuthorized")
                  .param("query", "test"))
                  .andExpect(status().isOk())
                  .andExpect(jsonPath("$._embedded.collections", Matchers.containsInAnyOrder(
@@ -689,7 +689,7 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
         context.restoreAuthSystemState();
 
         String tokenAdminParentCom = getAuthToken(eperson.getEmail(), password);
-        getClient(tokenAdminParentCom).perform(get("/api/core/collections/search/findAuthorizedByCommunity")
+        getClient(tokenAdminParentCom).perform(get("/api/core/collections/search/findSubmitAuthorizedByCommunity")
                  .param("uuid", parentCommunity.getID().toString())
                  .param("query", "sample"))
                  .andExpect(status().isOk())
@@ -700,7 +700,7 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                          )))
                  .andExpect(jsonPath("$.page.totalElements", is(2)));
 
-        getClient(tokenAdminParentCom).perform(get("/api/core/collections/search/findAuthorizedByCommunity")
+        getClient(tokenAdminParentCom).perform(get("/api/core/collections/search/findSubmitAuthorizedByCommunity")
                 .param("uuid", child2.getID().toString())
                 .param("query", "sample"))
                 .andExpect(status().isOk())
@@ -732,7 +732,7 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
 
         context.restoreAuthSystemState();
 
-        getClient().perform(get("/api/core/collections/search/findAuthorizedByCommunity")
+        getClient().perform(get("/api/core/collections/search/findSubmitAuthorizedByCommunity")
                                 .param("uuid", parentCommunity.getID().toString()))
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
@@ -763,7 +763,7 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
         context.restoreAuthSystemState();
 
         String tokenAdminParentCom = getAuthToken(adminParentCom.getEmail(), password);
-        getClient(tokenAdminParentCom).perform(get("/api/core/collections/search/findAuthorizedByCommunity")
+        getClient(tokenAdminParentCom).perform(get("/api/core/collections/search/findSubmitAuthorizedByCommunity")
                  .param("uuid", parentCommunity.getID().toString()))
                  .andExpect(status().isOk())
                  .andExpect(content().contentType(contentType))
@@ -774,7 +774,7 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                          )))
                  .andExpect(jsonPath("$.page.totalElements", is(3)));
 
-        getClient(tokenAdminParentCom).perform(get("/api/core/collections/search/findAuthorizedByCommunity")
+        getClient(tokenAdminParentCom).perform(get("/api/core/collections/search/findSubmitAuthorizedByCommunity")
                  .param("uuid", child1.getID().toString()))
                  .andExpect(status().isOk())
                  .andExpect(content().contentType(contentType))
@@ -784,7 +784,7 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                  .andExpect(jsonPath("$.page.totalElements", is(1)));
 
         String tokenAdmin = getAuthToken(admin.getEmail(), password);
-        getClient(tokenAdmin).perform(get("/api/core/collections/search/findAuthorizedByCommunity")
+        getClient(tokenAdmin).perform(get("/api/core/collections/search/findSubmitAuthorizedByCommunity")
                  .param("uuid", parentCommunity.getID().toString()))
                  .andExpect(status().isOk())
                  .andExpect(content().contentType(contentType))
@@ -798,13 +798,13 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
 
     @Test
     public void findAuthorizedByCommunityWithoutUUIDTest() throws Exception {
-        getClient().perform(get("/api/core/collections/search/findAuthorizedByCommunity"))
+        getClient().perform(get("/api/core/collections/search/findSubmitAuthorizedByCommunity"))
                    .andExpect(status().isBadRequest());
     }
 
     @Test
     public void findAuthorizedByCommunityWithUnexistentUUIDTest() throws Exception {
-        getClient().perform(get("/api/core/collections/search/findAuthorizedByCommunity")
+        getClient().perform(get("/api/core/collections/search/findSubmitAuthorizedByCommunity")
                                 .param("uuid", UUID.randomUUID().toString()))
                    .andExpect(status().isNotFound());
     }
