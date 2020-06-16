@@ -163,8 +163,8 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
         }
     }
 
-    @SearchRestMethod(name = "findAuthorizedByCommunity")
-    public Page<CollectionRest> findAuthorizedByCommunity(
+    @SearchRestMethod(name = "findSubmitAuthorizedByCommunity")
+    public Page<CollectionRest> findSubmitAuthorizedByCommunity(
         @Parameter(value = "uuid", required = true) UUID communityUuid, Pageable pageable,
         @Parameter(value = "query") String q) {
         try {
@@ -175,25 +175,25 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
                     CommunityRest.CATEGORY + "." + CommunityRest.NAME + " with id: " + communityUuid
                         + " not found");
             }
-            List<Collection> collections = cs.findAuthorizedCollectionsInSOLR(q, context, com,
+            List<Collection> collections = cs.findCollectionsWithSubmit(q, context, com,
                                               Math.toIntExact(pageable.getOffset()),
                                               Math.toIntExact(pageable.getOffset() + pageable.getPageSize()));
-            int tot = cs.countAuthorizedCollectionsInSOLR(q, context, com);
+            int tot = cs.countCollectionsWithSubmit(q, context, com);
             return converter.toRestPage(collections, pageable, tot , utils.obtainProjection());
         } catch (SQLException | SearchServiceException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
     }
 
-    @SearchRestMethod(name = "findAuthorized")
-    public Page<CollectionRest> findAuthorized(@Parameter(value = "query") String q,
+    @SearchRestMethod(name = "findSubmitAuthorized")
+    public Page<CollectionRest> findSubmitAuthorized(@Parameter(value = "query") String q,
                                                 Pageable pageable) throws SearchServiceException {
         try {
             Context context = obtainContext();
-            List<Collection> collections = cs.findAuthorizedCollectionsInSOLR(q, context, null,
+            List<Collection> collections = cs.findCollectionsWithSubmit(q, context, null,
                                               Math.toIntExact(pageable.getOffset()),
                                               Math.toIntExact(pageable.getOffset() + pageable.getPageSize()));
-            int tot = cs.countAuthorizedCollectionsInSOLR(q, context, null);
+            int tot = cs.countCollectionsWithSubmit(q, context, null);
             return converter.toRestPage(collections, pageable, tot, utils.obtainProjection());
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);

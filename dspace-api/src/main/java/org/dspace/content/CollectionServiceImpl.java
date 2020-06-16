@@ -920,7 +920,7 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
     }
 
     @Override
-    public List<Collection> findAuthorizedCollectionsInSOLR(String q, Context context, Community community,
+    public List<Collection> findCollectionsWithSubmit(String q, Context context, Community community,
         int offset, int limit) throws SQLException, SearchServiceException {
 
         List<Collection> collections = new ArrayList<Collection>();
@@ -928,7 +928,7 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
         discoverQuery.setDSpaceObjectFilter(IndexableCollection.TYPE);
         discoverQuery.setStart(offset);
         discoverQuery.setMaxResults(limit);
-        DiscoverResult resp = retrieveAuthorizedCollections(context, discoverQuery,community, q);
+        DiscoverResult resp = retrieveCollectionsWithSubmit(context, discoverQuery,community, q);
         for (IndexableObject solrCollections : resp.getIndexableObjects()) {
             Collection c = ((IndexableCollection) solrCollections).getIndexedObject();
             collections.add(c);
@@ -937,17 +937,32 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
     }
 
     @Override
-    public int countAuthorizedCollectionsInSOLR(String q, Context context, Community community)
+    public int countCollectionsWithSubmit(String q, Context context, Community community)
         throws SQLException, SearchServiceException {
 
         DiscoverQuery discoverQuery = new DiscoverQuery();
         discoverQuery.setMaxResults(0);
         discoverQuery.setDSpaceObjectFilter(IndexableCollection.TYPE);
-        DiscoverResult resp = retrieveAuthorizedCollections(context, discoverQuery,community,q);
+        DiscoverResult resp = retrieveCollectionsWithSubmit(context, discoverQuery,community,q);
         return (int)resp.getTotalSearchResults();
     }
 
-    private DiscoverResult retrieveAuthorizedCollections(Context context, DiscoverQuery discoverQuery,
+    /**
+     * Finds all Indexed Collections where the current user has submit rights. If the user is an Admin,
+     * this is all Indexed Collections. Otherwise, it includes those collections where
+     * an indexed "submit" policy lists either the eperson or one of the eperson's groups
+     * 
+     * @param context                    DSpace context
+     * @param discoverQuery
+     * @param community                  parent community, could be null
+     * @param q                          limit the returned collection to those with metadata values matching the query
+     *                                   terms. The terms are used to make also a prefix query on SOLR
+     *                                   so it can be used to implement an autosuggest feature over the collection name
+     * @return                           discovery search result objects
+     * @throws SQLException              if something goes wrong
+     * @throws SearchServiceException    if search error
+     */
+    private DiscoverResult retrieveCollectionsWithSubmit(Context context, DiscoverQuery discoverQuery,
             Community community, String q) throws SQLException, SearchServiceException {
 
         StringBuilder query = new StringBuilder();
