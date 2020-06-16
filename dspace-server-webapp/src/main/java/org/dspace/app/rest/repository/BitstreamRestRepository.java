@@ -71,7 +71,7 @@ public class BitstreamRestRepository extends DSpaceObjectRestRepository<Bitstrea
     }
 
     @Override
-    @PreAuthorize("hasPermission(#uuid, 'BITSTREAM', 'METADATA_READ')")
+    @PreAuthorize("hasPermission(#id, 'BITSTREAM', 'METADATA_READ')")
     public BitstreamRest findOne(Context context, UUID id) {
         Bitstream bit = null;
         try {
