@@ -188,7 +188,7 @@ public class SHERPAv2JournalDataProvider implements ExternalDataProvider {
             get = constructHttpGet(query, start, limit);
             HttpClient hc = new DefaultHttpClient();
             HttpResponse response = hc.execute(get);
-            if (response.getStatusLine().getStatusCode() == 200) {
+            if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
                 // Get response input stream and parse JSON into new SHERPAResponse object
                 InputStream content = null;
                 try {
@@ -287,7 +287,7 @@ public class SHERPAv2JournalDataProvider implements ExternalDataProvider {
             get = constructHttpGet(query);
             HttpClient hc = new DefaultHttpClient();
             HttpResponse response = hc.execute(get);
-            if (response.getStatusLine().getStatusCode() == 200) {
+            if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
                 // Read response and parse as SHERPAResponse object
                 InputStream content = null;
                 try {
