@@ -7,6 +7,17 @@
  */
 package org.dspace.app.sherpa.v2;
 
+/**
+ * Plain java representation of a SHERPA System Metadata object, based on SHERPA API v2 responses.
+ *
+ * This data is included in both journal deposit policy and publisher searches and contains basic metadata
+ * about the SHERPA record and API response, eg. creation and modification dates, internal IDs, permissions, etc.
+ *
+ * @see SHERPAResponse
+ * @see SHERPAPublisherResponse
+ *
+ * @author Kim Shepherd
+ */
 public class SHERPASystemMetadata {
 
     private int id;

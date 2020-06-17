@@ -10,6 +10,18 @@ package org.dspace.app.sherpa.v2;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Plain java representation of a SHERPA Publisher Policy object, based on SHERPA API v2 responses.
+ *
+ * In a SHERPA search for deposit policies, each journal contains one or more publisher policies
+ * Each publisher policies contains a list of different article versions (eg. submitted, accepted, published)
+ * which hold the data about what can be done with each version.
+ * This class also holds copyright URLs and other policy URLs, as well as some helper information for display
+ * of overall policies in UI (as per legacy SHERPA data)
+ *
+ * @see SHERPAJournal
+ * @see SHERPAPermittedVersion
+ */
 public class SHERPAPublisherPolicy {
 
     private int id;

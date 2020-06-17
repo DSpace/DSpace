@@ -9,6 +9,22 @@ package org.dspace.app.sherpa.v2;
 
 import java.util.List;
 
+/**
+ * Plain java representation of a SHERPA Permitted Version object, based on SHERPA API v2 responses.
+ *
+ * In a SHERPA search for journal deposit policies, this data is contained within a publisher policy.
+ * Each permitted version is for a particular article version (eg. submitted, accepted, published) and contains
+ *
+ * A list of general conditions / terms for deposit of this version of work
+ * A list of allowed locations (eg. institutional repository, personal homepage, non-commercial repository)
+ * A list of prerequisite conditions for deposit (eg. attribution, linking to published version)
+ * A list of required licences for the deposited work (eg. CC-BY-NC)
+ * Embargo requirements, if any
+ *
+ * This class also has some helper data for labels, which can be used with i18n when displaying policy information
+ *
+ * @see SHERPAPublisherPolicy
+ */
 public class SHERPAPermittedVersion {
 
     // Version (submitted, accepted, published)

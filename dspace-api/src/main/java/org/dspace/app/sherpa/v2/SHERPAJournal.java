@@ -9,6 +9,18 @@ package org.dspace.app.sherpa.v2;
 
 import java.util.List;
 
+/**
+ * Plain java representation of a SHERPA Journal object, based on SHERPA API v2 responses.
+ *
+ * In a SHERPA search for journal deposit policies, this is generally structured
+ * as a list in the SHERPAResponse object.
+ * Each journal contains a list of publisher data and list of publishing policies as well as basic metadata
+ * about the journal such as ISSNs, titles, whether it appears in DOAJ, primary publisher, etc.
+ * @see SHERPAResponse
+ * @see org.dspace.external.provider.impl.SHERPAv2JournalDataProvider
+ *
+ * @author Kim Shepherd
+ */
 public class SHERPAJournal {
 
     private List<String> titles;
