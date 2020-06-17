@@ -47,6 +47,7 @@ public class JWTTokenRestAuthenticationServiceImpl implements RestAuthentication
     private static final String AUTHORIZATION_COOKIE = "Authorization-cookie";
     private static final String AUTHORIZATION_HEADER = "Authorization";
     private static final String AUTHORIZATION_TYPE = "Bearer";
+    private static final String AUTHORIZATION_TOKEN_PARAMETER = "token";
 
     @Autowired
     private SessionJWTTokenHandler sessionJWTTokenHandler;
@@ -112,9 +113,15 @@ public class JWTTokenRestAuthenticationServiceImpl implements RestAuthentication
 
     @Override
     public EPerson getAuthenticatedEPerson(HttpServletRequest request, Context context) {
-        String token = getToken(request);
         try {
-            EPerson ePerson = sessionJWTTokenHandler.parseEPersonFromToken(token, request, context);
+            String token = getSessionToken(request);
+            EPerson ePerson = null;
+            if (token == null) {
+                token = getShortLivedToken(request);
+                ePerson = shortLivedJWTTokenHandler.parseEPersonFromToken(token, request, context);
+            } else {
+                ePerson = sessionJWTTokenHandler.parseEPersonFromToken(token, request, context);
+            }
             return ePerson;
         } catch (JOSEException e) {
             log.error("Jose error", e);
@@ -129,13 +136,14 @@ public class JWTTokenRestAuthenticationServiceImpl implements RestAuthentication
     @Override
     public boolean hasAuthenticationData(HttpServletRequest request) {
         return StringUtils.isNotBlank(request.getHeader(AUTHORIZATION_HEADER))
-                || StringUtils.isNotBlank(getAuthorizationCookie(request));
+                || StringUtils.isNotBlank(getAuthorizationCookie(request))
+                || StringUtils.isNotBlank(request.getParameter(AUTHORIZATION_TOKEN_PARAMETER));
     }
 
     @Override
     public void invalidateAuthenticationData(HttpServletRequest request, HttpServletResponse response,
                                              Context context) throws Exception {
-        String token = getToken(request);
+        String token = getSessionToken(request);
         invalidateAuthenticationCookie(response);
         sessionJWTTokenHandler.invalidateToken(token, request, context);
     }
@@ -192,7 +200,7 @@ public class JWTTokenRestAuthenticationServiceImpl implements RestAuthentication
         response.setHeader(AUTHORIZATION_HEADER, String.format("%s %s", AUTHORIZATION_TYPE, token));
     }
 
-    private String getToken(HttpServletRequest request) {
+    private String getSessionToken(HttpServletRequest request) {
         String tokenValue = null;
         String authHeader = request.getHeader(AUTHORIZATION_HEADER);
         String authCookie = getAuthorizationCookie(request);
@@ -200,6 +208,15 @@ public class JWTTokenRestAuthenticationServiceImpl implements RestAuthentication
             tokenValue = authHeader.replace(AUTHORIZATION_TYPE, "").trim();
         } else if (StringUtils.isNotBlank(authCookie)) {
             tokenValue = authCookie;
+        }
+
+        return tokenValue;
+    }
+
+    private String getShortLivedToken(HttpServletRequest request) {
+        String tokenValue = null;
+        if (StringUtils.isNotBlank(request.getParameter(AUTHORIZATION_TOKEN_PARAMETER))) {
+            tokenValue = request.getParameter(AUTHORIZATION_TOKEN_PARAMETER);
         }
 
         return tokenValue;

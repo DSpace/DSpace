@@ -42,7 +42,6 @@ import org.dspace.service.ClientInfoService;
 import org.dspace.services.ConfigurationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.keygen.BytesKeyGenerator;
 import org.springframework.security.crypto.keygen.KeyGenerators;
@@ -55,7 +54,7 @@ import org.springframework.security.crypto.keygen.KeyGenerators;
  * @author Frederic Van Reet (frederic dot vanreet at atmire dot com)
  * @author Tom Desair (tom dot desair at atmire dot com)
  */
-public abstract class JWTTokenHandler implements InitializingBean {
+public abstract class JWTTokenHandler {
 
     private static final int MAX_CLOCK_SKEW_SECONDS = 60;
     private static final Logger log = LoggerFactory.getLogger(JWTTokenHandler.class);
@@ -75,30 +74,8 @@ public abstract class JWTTokenHandler implements InitializingBean {
     @Autowired
     private ClientInfoService clientInfoService;
 
-    private String jwtKey;
-    private long expirationTime;
-    private boolean includeIP;
-    private boolean encryptionEnabled;
-    private boolean compressionEnabled;
-    private byte[] encryptionKey;
-
-
-    @Override
-    public void afterPropertiesSet() throws Exception {
-        this.jwtKey =
-            getSecret(getTokenSecretConfigurationKey());
-        this.encryptionKey =
-            getSecret(getEncryptionSecretConfigurationKey()).getBytes();
-
-        this.expirationTime =
-            configurationService.getLongProperty(getTokenExpirationConfigurationKey(), 30);
-        this.includeIP =
-            configurationService.getBooleanProperty(getTokenIncludeIPConfigurationKey(), true);
-        this.encryptionEnabled =
-            configurationService.getBooleanProperty(getEncryptionEnabledConfigurationKey(), false);
-        this.compressionEnabled =
-            configurationService.getBooleanProperty(getCompressionEnabledConfigurationKey(), false);
-    }
+    private String generatedJwtKey;
+    private String generatedEncryptionKey;
 
     /**
      * Get the configuration property key for the token secret.
@@ -225,17 +202,54 @@ public abstract class JWTTokenHandler implements InitializingBean {
         }
     }
 
-    public long getExpirationPeriod() {
-        return expirationTime;
+    /**
+     * Retrieve the token secret key from configuration. If not specified, generate and cache a random 32 byte key
+     * @return configuration value or random 32 byte key
+     */
+    public String getJwtKey() {
+        String secret = configurationService.getProperty(getTokenSecretConfigurationKey());
+
+        if (StringUtils.isBlank(secret)) {
+            if (StringUtils.isBlank(generatedJwtKey)) {
+                generatedJwtKey = generateRandomKey();
+            }
+            secret = generatedJwtKey;
+        }
+
+        return secret;
     }
 
+    public boolean getIncludeIP() {
+        return configurationService.getBooleanProperty(getTokenIncludeIPConfigurationKey(), true);
+    }
+
+    public long getExpirationPeriod() {
+        return configurationService.getLongProperty(getTokenExpirationConfigurationKey(), 30);
+    }
 
     public boolean isEncryptionEnabled() {
-        return encryptionEnabled;
+        return configurationService.getBooleanProperty(getEncryptionEnabledConfigurationKey(), false);
     }
 
+    public boolean getCompressionEnabled() {
+        return configurationService.getBooleanProperty(getCompressionEnabledConfigurationKey(), false);
+    }
+
+    /**
+     * Retrieve the encryption secret key from configuration. If not specified, generate and cache a random 32 byte key
+     * @return configuration value or random 32 byte key
+     */
     public byte[] getEncryptionKey() {
-        return encryptionKey;
+        String secretString = configurationService.getProperty(getEncryptionSecretConfigurationKey());
+
+        if (StringUtils.isBlank(secretString)) {
+            if (StringUtils.isBlank(generatedEncryptionKey)) {
+                generatedEncryptionKey = generateRandomKey();
+            }
+            secretString = generatedEncryptionKey;
+        }
+
+        return secretString.getBytes();
     }
 
     private JWEObject encryptJWT(SignedJWT signedJWT) throws JOSEException {
@@ -261,7 +275,7 @@ public abstract class JWTTokenHandler implements InitializingBean {
      * @return true if valid, false otherwise
      * @throws JOSEException
      */
-    private boolean isValidToken(HttpServletRequest request, SignedJWT signedJWT, JWTClaimsSet jwtClaimsSet,
+    protected boolean isValidToken(HttpServletRequest request, SignedJWT signedJWT, JWTClaimsSet jwtClaimsSet,
                                  EPerson ePerson) throws JOSEException {
         if (ePerson == null || StringUtils.isBlank(ePerson.getSessionSalt())) {
             return false;
@@ -351,7 +365,7 @@ public abstract class JWTTokenHandler implements InitializingBean {
 
     //This method makes compression configurable
     private JWEHeader.Builder compression(JWEHeader.Builder builder) {
-        if (compressionEnabled) {
+        if (getCompressionEnabled()) {
             return builder.compressionAlgorithm(CompressionAlgorithm.DEF);
         }
         return builder;
@@ -367,12 +381,12 @@ public abstract class JWTTokenHandler implements InitializingBean {
      * @param ePerson
      * @return
      */
-    private String buildSigningKey(HttpServletRequest request, EPerson ePerson) {
+    protected String buildSigningKey(HttpServletRequest request, EPerson ePerson) {
         String ipAddress = "";
-        if (includeIP) {
+        if (getIncludeIP()) {
             ipAddress = getIpAddress(request);
         }
-        return jwtKey + ePerson.getSessionSalt() + ipAddress;
+        return getJwtKey() + ePerson.getSessionSalt() + ipAddress;
     }
 
     private String getIpAddress(HttpServletRequest request) {
@@ -399,7 +413,7 @@ public abstract class JWTTokenHandler implements InitializingBean {
             //This allows a user to login on multiple devices/browsers at the same time.
             if (StringUtils.isBlank(ePerson.getSessionSalt())
                 || previousLoginDate == null
-                || (ePerson.getLastActive().getTime() - previousLoginDate.getTime() > expirationTime)) {
+                || (ePerson.getLastActive().getTime() - previousLoginDate.getTime() > getExpirationPeriod())) {
 
                 ePerson.setSessionSalt(generateRandomKey());
                 ePersonService.update(context, ePerson);
@@ -410,21 +424,6 @@ public abstract class JWTTokenHandler implements InitializingBean {
         }
 
         return ePerson;
-    }
-
-    /**
-     * Retrieve the given secret key from configuration. If not specified, generate a random 32 byte key
-     * @param property configuration property to check for
-     * @return configuration value or random 32 byte key
-     */
-    private String getSecret(String property) {
-        String secret = configurationService.getProperty(property);
-
-        if (StringUtils.isBlank(secret)) {
-            secret = generateRandomKey();
-        }
-
-        return secret;
     }
 
     /**
