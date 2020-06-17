@@ -22,7 +22,9 @@ import org.json.JSONTokener;
 /**
  * Model class for the SHERPAv2 API (JSON) response for a publisher search
  * The structure and approached used is quite different to the simple v1 API used previously
- * 
+ *
+ * @see SHERPAPublisher
+ *
  * @author Kim Shepherd
  * 
  */
