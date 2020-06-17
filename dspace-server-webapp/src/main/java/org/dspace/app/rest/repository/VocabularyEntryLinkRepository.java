@@ -16,7 +16,6 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
-import org.dspace.app.rest.model.VocabularyEntryDetailsRest;
 import org.dspace.app.rest.model.VocabularyEntryRest;
 import org.dspace.app.rest.model.VocabularyRest;
 import org.dspace.app.rest.projection.Projection;

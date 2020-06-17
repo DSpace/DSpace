@@ -23,7 +23,7 @@ import org.springframework.stereotype.Component;
  * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  */
 @Component
-public class AuthorityRestConverter implements DSpaceConverter<ChoiceAuthority, VocabularyRest> {
+public class VocabularyRestConverter implements DSpaceConverter<ChoiceAuthority, VocabularyRest> {
 
     @Override
     public VocabularyRest convert(ChoiceAuthority authority, Projection projection) {
