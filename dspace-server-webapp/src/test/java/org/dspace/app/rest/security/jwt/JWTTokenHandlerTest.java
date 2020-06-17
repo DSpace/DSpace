@@ -24,6 +24,7 @@ import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.service.ClientInfoService;
+import org.dspace.services.ConfigurationService;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -47,6 +48,9 @@ public class JWTTokenHandlerTest {
     @InjectMocks
     @Spy
     SessionJWTTokenHandler sessionJWTTokenHandler;
+
+    @Mock
+    private ConfigurationService configurationService;
 
     @Mock
     private Context context;
@@ -99,7 +103,7 @@ public class JWTTokenHandlerTest {
         when(sessionJWTTokenHandler.isEncryptionEnabled()).thenReturn(true);
         Date previous = new Date(System.currentTimeMillis() - 10000000000L);
         StringKeyGenerator keyGenerator = KeyGenerators.string();
-        when(sessionJWTTokenHandler.getEncryptionKey()).thenReturn(keyGenerator.generateKey().getBytes());
+        when(configurationService.getProperty("jwt.session.encryption.secret")).thenReturn(keyGenerator.generateKey());
         String token = sessionJWTTokenHandler
             .createTokenForEPerson(context, new MockHttpServletRequest(), previous, new ArrayList<>());
         SignedJWT signedJWT = SignedJWT.parse(token);
@@ -108,7 +112,7 @@ public class JWTTokenHandlerTest {
     //temporary set a negative expiration time so the token is invalid immediately
     @Test
     public void testExpiredToken() throws Exception {
-        when(sessionJWTTokenHandler.getExpirationPeriod()).thenReturn(-99999999L);
+        when(configurationService.getLongProperty("jwt.session.token.expiration", 30)).thenReturn(-99999999L);
         when(ePersonClaimProvider.getEPerson(any(Context.class), any(JWTClaimsSet.class))).thenReturn(ePerson);
         Date previous = new Date(new Date().getTime() - 10000000000L);
         String token = sessionJWTTokenHandler

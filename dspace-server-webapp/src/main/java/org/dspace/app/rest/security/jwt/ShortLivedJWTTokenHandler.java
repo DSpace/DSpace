@@ -7,6 +7,17 @@
  */
 package org.dspace.app.rest.security.jwt;
 
+import java.util.Date;
+import javax.servlet.http.HttpServletRequest;
+
+import com.nimbusds.jose.JOSEException;
+import com.nimbusds.jose.JWSVerifier;
+import com.nimbusds.jose.crypto.MACVerifier;
+import com.nimbusds.jwt.JWTClaimsSet;
+import com.nimbusds.jwt.SignedJWT;
+import com.nimbusds.jwt.util.DateUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.dspace.eperson.EPerson;
 import org.springframework.stereotype.Component;
 
 /**
@@ -15,6 +26,35 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class ShortLivedJWTTokenHandler extends JWTTokenHandler {
+
+    /**
+     * Determine if current JWT is valid for the given EPerson object.
+     * To be valid, current JWT *must* have been signed by the EPerson and not be expired.
+     * If EPerson is null or does not have a known active session, false is returned immediately.
+     * @param request current request
+     * @param signedJWT current signed JWT
+     * @param jwtClaimsSet claims set of current JWT
+     * @param ePerson EPerson parsed from current signed JWT
+     * @return true if valid, false otherwise
+     * @throws JOSEException
+     */
+    @Override
+    protected boolean isValidToken(HttpServletRequest request, SignedJWT signedJWT, JWTClaimsSet jwtClaimsSet,
+                                 EPerson ePerson) throws JOSEException {
+        if (ePerson == null || StringUtils.isBlank(ePerson.getSessionSalt())) {
+            return false;
+        } else {
+            JWSVerifier verifier = new MACVerifier(buildSigningKey(request, ePerson));
+
+            //If token is valid and not expired return eperson in token
+            Date expirationTime = jwtClaimsSet.getExpirationTime();
+            return signedJWT.verify(verifier)
+                && expirationTime != null
+                //Ensure expiration timestamp is after the current time, with a minute of acceptable clock skew.
+                && DateUtils.isAfter(expirationTime, new Date(), 0);
+        }
+    }
+
     @Override
     protected String getTokenSecretConfigurationKey() {
         return "jwt.shortLived.token.secret";
