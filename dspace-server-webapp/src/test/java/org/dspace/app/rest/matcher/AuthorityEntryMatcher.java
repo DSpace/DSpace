@@ -51,4 +51,12 @@ public class AuthorityEntryMatcher {
                 "authorityEntries"
         );
     }
+
+    public static Matcher<? super Object> matchAuthority(String id, String value) {
+        return allOf(
+                hasJsonPath("$.id", is(id)),
+                hasJsonPath("$.value", is(value)),
+                hasJsonPath("$.type", is("vocabularyEntryDetail"))
+                 );
+    }
 }
