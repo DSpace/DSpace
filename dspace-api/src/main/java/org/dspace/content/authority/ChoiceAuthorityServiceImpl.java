@@ -7,7 +7,9 @@
  */
 package org.dspace.content.authority;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -19,6 +21,9 @@ import org.dspace.app.util.DCInput;
 import org.dspace.app.util.DCInputSet;
 import org.dspace.app.util.DCInputsReader;
 import org.dspace.app.util.DCInputsReaderException;
+import org.dspace.app.util.SubmissionConfig;
+import org.dspace.app.util.SubmissionConfigReader;
+import org.dspace.app.util.SubmissionConfigReaderException;
 import org.dspace.content.Collection;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.authority.service.ChoiceAuthorityService;
@@ -54,14 +59,25 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService 
     // map of field key to authority plugin
     protected Map<String, ChoiceAuthority> controller = new HashMap<String, ChoiceAuthority>();
 
+    // map of field key, form definition to authority plugin
+    protected Map<String, Map<String, ChoiceAuthority>> controllerFormDefinitions =
+            new HashMap<String, Map<String, ChoiceAuthority>>();
+
     // map of field key to presentation type
     protected Map<String, String> presentation = new HashMap<String, String>();
 
     // map of field key to closed value
     protected Map<String, Boolean> closed = new HashMap<String, Boolean>();
 
-    // map of authority name to field key
-    protected Map<String, String> authorities = new HashMap<String, String>();
+    // flag to track the initialization status of the service
+    private boolean initialized = false;
+
+    // map of authority name to field keys (the same authority can be configured over multiple metadata)
+    protected Map<String, List<String>> authorities = new HashMap<String, List<String>>();
+
+    // map of authority name to form definition and field keys
+    protected Map<String, Map<String, List<String>>> authoritiesFormDefinitions =
+            new HashMap<String, Map<String, List<String>>>();
 
     @Autowired(required = true)
     protected ConfigurationService configurationService;
@@ -96,10 +112,18 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService 
 
     @Override
     public Set<String> getChoiceAuthoritiesNames() {
-        if (authorities.keySet().isEmpty()) {
+        init();
+        Set<String> authoritiesNames = new HashSet<String>();
+        authoritiesNames.addAll(authorities.keySet());
+        authoritiesNames.addAll(authoritiesFormDefinitions.keySet());
+        return authoritiesNames;
+    }
+
+    private synchronized void init() {
+        if (!initialized) {
             loadChoiceAuthorityConfigurations();
+            initialized = true;
         }
-        return authorities.keySet();
     }
 
     @Override
@@ -112,23 +136,24 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService 
     @Override
     public Choices getMatches(String fieldKey, String query, Collection collection,
                               int start, int limit, String locale) {
-        ChoiceAuthority ma = getChoiceAuthorityMap().get(fieldKey);
+        ChoiceAuthority ma = getAuthorityByFieldKeyCollection(fieldKey, collection);
         if (ma == null) {
             throw new IllegalArgumentException(
                 "No choices plugin was configured for  field \"" + fieldKey
-                    + "\".");
+                    + "\", collection=" + collection.getID().toString() + ".");
         }
         return ma.getMatches(fieldKey, query, collection, start, limit, locale);
     }
 
+
     @Override
     public Choices getMatches(String fieldKey, String query, Collection collection, int start, int limit, String locale,
                               boolean externalInput) {
-        ChoiceAuthority ma = getChoiceAuthorityMap().get(fieldKey);
+        ChoiceAuthority ma = getAuthorityByFieldKeyCollection(fieldKey, collection);
         if (ma == null) {
             throw new IllegalArgumentException(
                 "No choices plugin was configured for  field \"" + fieldKey
-                    + "\".");
+                    + "\", collection=" + collection.getID().toString() + ".");
         }
         if (externalInput && ma instanceof SolrAuthority) {
             ((SolrAuthority) ma).addExternalResultsInNextMatches();
@@ -139,11 +164,11 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService 
     @Override
     public Choices getBestMatch(String fieldKey, String query, Collection collection,
                                 String locale) {
-        ChoiceAuthority ma = getChoiceAuthorityMap().get(fieldKey);
+        ChoiceAuthority ma = getAuthorityByFieldKeyCollection(fieldKey, collection);
         if (ma == null) {
             throw new IllegalArgumentException(
                 "No choices plugin was configured for  field \"" + fieldKey
-                    + "\".");
+                    + "\", collection=" + collection.getID().toString() + ".");
         }
         return ma.getBestMatch(fieldKey, query, collection, locale);
     }
@@ -155,16 +180,18 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService 
 
     @Override
     public String getLabel(String fieldKey, Collection collection, String authKey, String locale) {
-        ChoiceAuthority ma = getChoiceAuthorityMap().get(fieldKey);
+        ChoiceAuthority ma = getAuthorityByFieldKeyCollection(fieldKey, collection);
         if (ma == null) {
-            throw new IllegalArgumentException("No choices plugin was configured for  field \"" + fieldKey + "\".");
+            throw new IllegalArgumentException(
+                "No choices plugin was configured for  field \"" + fieldKey
+                    + "\", collection=" + collection.getID().toString() + ".");
         }
         return ma.getLabel(fieldKey, authKey, locale);
     }
 
     @Override
     public boolean isChoicesConfigured(String fieldKey, Collection collection) {
-        return getChoiceAuthorityMap().containsKey(fieldKey);
+        return getAuthorityByFieldKeyCollection(fieldKey, collection) != null;
     }
 
     @Override
@@ -179,7 +206,13 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService 
 
     @Override
     public List<String> getVariants(MetadataValue metadataValue, Collection collection) {
-        ChoiceAuthority ma = getChoiceAuthorityMap().get(metadataValue.getMetadataField().toString());
+        String fieldKey = metadataValue.getMetadataField().toString();
+        ChoiceAuthority ma = getAuthorityByFieldKeyCollection(fieldKey, collection);
+        if (ma == null) {
+            throw new IllegalArgumentException(
+                "No choices plugin was configured for  field \"" + fieldKey
+                    + "\", collection=" + collection.getID().toString() + ".");
+        }
         if (ma instanceof AuthorityVariantsSupport) {
             AuthorityVariantsSupport avs = (AuthorityVariantsSupport) ma;
             return avs.getVariants(metadataValue.getAuthority(), metadataValue.getLanguage());
@@ -190,41 +223,23 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService 
 
     @Override
     public String getChoiceAuthorityName(String schema, String element, String qualifier, Collection collection) {
-        String makeFieldKey = makeFieldKey(schema, element, qualifier);
-        if (getChoiceAuthorityMap().containsKey(makeFieldKey)) {
-            for (String key : this.authorities.keySet()) {
-                if (this.authorities.get(key).equals(makeFieldKey)) {
-                    return key;
-                }
-            }
-        }
-        return configurationService.getProperty(
-            CHOICES_PLUGIN_PREFIX + schema + "." + element + (qualifier != null ? "." + qualifier : ""));
+        //FIXME AB iterate over authorities and authoritiesFormDefinitions to identify the match if any in the map values
+        return null;
     }
 
     protected String makeFieldKey(String schema, String element, String qualifier) {
         return Utils.standardize(schema, element, qualifier, "_");
     }
 
-    /**
-     * Return map of key to ChoiceAuthority plugin
-     *
-     * @return
-     */
-    private Map<String, ChoiceAuthority> getChoiceAuthorityMap() {
-        // If empty, load from configuration
-        if (controller.isEmpty()) {
-            loadChoiceAuthorityConfigurations();
-        }
-
-        return controller;
-    }
-
     @Override
     public void clearCache() {
         controller.clear();
         authorities.clear();
+        controllerFormDefinitions.clear();
+        authoritiesFormDefinitions.clear();
+        initialized = false;
     }
+
     private void loadChoiceAuthorityConfigurations() {
         // Get all configuration keys starting with a given prefix
         List<String> propKeys = configurationService.getPropertyKeys(CHOICES_PLUGIN_PREFIX);
@@ -249,17 +264,16 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService 
                     "Skipping invalid configuration for " + key + " because named plugin not found: " + authorityName);
                 continue;
             }
-            if (!authorities.containsKey(authorityName)) {
-                controller.put(fkey, ma);
-                authorities.put(authorityName, fkey);
-            } else {
-                log.warn(
-                    "Skipping invalid configuration for " + key + " because plugin is alredy in use: " +
-                        authorityName + " used by " + authorities
-                        .get(authorityName));
-                continue;
-            }
 
+            controller.put(fkey, ma);
+            List<String> fkeys;
+            if (!authorities.containsKey(authorityName)) {
+                fkeys = authorities.get(authorityName);
+            } else {
+                fkeys = new ArrayList<String>();
+            }
+            fkeys.add(fkey);
+            authorities.put(authorityName, fkeys);
             log.debug("Choice Control: For field=" + fkey + ", Plugin=" + ma);
         }
         autoRegisterChoiceAuthorityFromInputReader();
@@ -267,50 +281,72 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService 
 
     private void autoRegisterChoiceAuthorityFromInputReader() {
         try {
+            SubmissionConfigReader itemSubmissionConfigReader = new SubmissionConfigReader();
+            List<SubmissionConfig> submissionConfigs = itemSubmissionConfigReader
+                    .getAllSubmissionConfigs(Integer.MAX_VALUE, 0);
             DCInputsReader dcInputsReader = new DCInputsReader();
-            for (DCInputSet dcinputSet : dcInputsReader.getAllInputs(Integer.MAX_VALUE, 0)) {
-                DCInput[][] dcinputs = dcinputSet.getFields();
-                for (DCInput[] dcrows : dcinputs) {
-                    for (DCInput dcinput : dcrows) {
-                        if (StringUtils.isNotBlank(dcinput.getPairsType())
-                            || StringUtils.isNotBlank(dcinput.getVocabulary())) {
-                            String authorityName = dcinput.getPairsType();
-                            if (StringUtils.isBlank(authorityName)) {
-                                authorityName = dcinput.getVocabulary();
-                            }
-                            if (!StringUtils.equals(dcinput.getInputType(), "qualdrop_value")) {
-                                String fieldKey = makeFieldKey(dcinput.getSchema(), dcinput.getElement(),
-                                                               dcinput.getQualifier());
-                                ChoiceAuthority ca = controller.get(authorityName);
-                                if (ca == null) {
-                                    InputFormSelfRegisterWrapperAuthority ifa = new
-                                        InputFormSelfRegisterWrapperAuthority();
-                                    if (controller.containsKey(fieldKey)) {
-                                        ifa = (InputFormSelfRegisterWrapperAuthority) controller.get(fieldKey);
+
+            for (SubmissionConfig subCfg : submissionConfigs) {
+                String submissionName = subCfg.getSubmissionName();
+                List<DCInputSet> inputsBySubmissionName = dcInputsReader.getInputsBySubmissionName(submissionName);
+                for (DCInputSet dcinputSet : inputsBySubmissionName) {
+                    DCInput[][] dcinputs = dcinputSet.getFields();
+                    for (DCInput[] dcrows : dcinputs) {
+                        for (DCInput dcinput : dcrows) {
+                            if (StringUtils.isNotBlank(dcinput.getPairsType())
+                                || StringUtils.isNotBlank(dcinput.getVocabulary())) {
+                                String authorityName = dcinput.getPairsType();
+                                if (StringUtils.isBlank(authorityName)) {
+                                    authorityName = dcinput.getVocabulary();
+                                }
+                                if (!StringUtils.equals(dcinput.getInputType(), "qualdrop_value")) {
+                                    String fieldKey = makeFieldKey(dcinput.getSchema(), dcinput.getElement(),
+                                                                   dcinput.getQualifier());
+                                    ChoiceAuthority ca = controller.get(authorityName);
+                                    if (ca == null) {
+                                        ca = (ChoiceAuthority) pluginService
+                                            .getNamedPlugin(ChoiceAuthority.class, authorityName);
+                                        if (ca == null) {
+                                            throw new IllegalStateException("Invalid configuration for " + fieldKey
+                                                    + " in submission definition " + submissionName
+                                                    + ", form definition " + dcinputSet.getFormName()
+                                                    + " no named plugin found: " + authorityName);
+                                        }
                                     }
 
-                                    ChoiceAuthority ma = (ChoiceAuthority) pluginService
-                                        .getNamedPlugin(ChoiceAuthority.class, authorityName);
-                                    if (ma == null) {
-                                        log.warn("Skipping invalid configuration for " + fieldKey
-                                                     + " because named plugin not found: " + authorityName);
-                                        continue;
+                                    Map<String, ChoiceAuthority> definition2authority;
+                                    if (controllerFormDefinitions.containsKey(fieldKey)) {
+                                        definition2authority = controllerFormDefinitions.get(fieldKey);
                                     }
-                                    ifa.getDelegates().put(dcinputSet.getFormName(), ma);
-                                    controller.put(fieldKey, ifa);
-                                }
+                                    else {
+                                        definition2authority = new HashMap<String, ChoiceAuthority>();
+                                    }
+                                    definition2authority.put(submissionName, ca);
+                                    controllerFormDefinitions.put(fieldKey, definition2authority);
 
-                                if (!authorities.containsKey(authorityName)) {
-                                    authorities.put(authorityName, fieldKey);
-                                }
+                                    Map<String, List<String>> authorityName2definitions;
+                                    if (authoritiesFormDefinitions.containsKey(authorityName)) {
+                                        authorityName2definitions = authoritiesFormDefinitions.get(authorityName);
+                                    } else {
+                                        authorityName2definitions = new HashMap<String, List<String>>();
+                                    }
 
+                                    List<String> fields;
+                                    if (authorityName2definitions.containsKey(submissionName)) {
+                                        fields = authorityName2definitions.get(submissionName);
+                                    } else {
+                                        fields = new ArrayList<String>();
+                                    }
+                                    authorityName2definitions.put(submissionName, fields);
+                                    authoritiesFormDefinitions.put(fieldKey, authorityName2definitions);
+                                }
                             }
                         }
                     }
                 }
             }
-        } catch (DCInputsReaderException e) {
-            throw new IllegalStateException(e.getMessage(), e);
+        } catch (SubmissionConfigReaderException | DCInputsReaderException e) {
+            throw new IllegalStateException(e);
         }
     }
 
@@ -378,6 +414,22 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService 
             throw new IllegalArgumentException(
                 "No choices plugin was configured for authorityName \"" + authorityName
                     + "\".");
+        }
+        return ma;
+    }
+
+    private ChoiceAuthority getAuthorityByFieldKeyCollection(String fieldKey, Collection collection) {
+        init();
+        ChoiceAuthority ma = controller.get(fieldKey);
+        if (ma == null) {
+            SubmissionConfigReader configReader;
+            try {
+                configReader = new SubmissionConfigReader();
+                SubmissionConfig submissionName = configReader.getSubmissionConfigByCollection(collection.getHandle());
+                ma = controllerFormDefinitions.get(submissionName.getSubmissionName()).get(fieldKey);
+            } catch (SubmissionConfigReaderException e) {
+                throw new IllegalStateException(e);
+            }
         }
         return ma;
     }
