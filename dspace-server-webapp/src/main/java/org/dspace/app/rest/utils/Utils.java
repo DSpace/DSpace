@@ -47,7 +47,6 @@ import org.apache.log4j.Logger;
 import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.exception.PaginationException;
 import org.dspace.app.rest.exception.RepositoryNotFoundException;
-import org.dspace.app.rest.model.VocabularyRest;
 import org.dspace.app.rest.model.BaseObjectRest;
 import org.dspace.app.rest.model.CommunityRest;
 import org.dspace.app.rest.model.LinkRest;
@@ -58,6 +57,7 @@ import org.dspace.app.rest.model.ResourcePolicyRest;
 import org.dspace.app.rest.model.RestAddressableModel;
 import org.dspace.app.rest.model.RestModel;
 import org.dspace.app.rest.model.VersionHistoryRest;
+import org.dspace.app.rest.model.VocabularyRest;
 import org.dspace.app.rest.model.hateoas.EmbeddedPage;
 import org.dspace.app.rest.model.hateoas.HALResource;
 import org.dspace.app.rest.projection.CompositeProjection;
@@ -267,6 +267,9 @@ public class Utils {
         }
         if (StringUtils.equals(modelPlural, "properties")) {
             return PropertyRest.NAME;
+        }
+        if (StringUtils.equals(modelPlural, "vocabularies")) {
+            return VocabularyRest.NAME;
         }
         return modelPlural.replaceAll("s$", "");
     }

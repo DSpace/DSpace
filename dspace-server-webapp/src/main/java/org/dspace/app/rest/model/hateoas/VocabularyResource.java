@@ -18,8 +18,8 @@ import org.dspace.app.rest.utils.Utils;
  * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  */
 @RelNameDSpaceResource(VocabularyRest.NAME)
-public class AuthorityResource extends DSpaceResource<VocabularyRest> {
-    public AuthorityResource(VocabularyRest sd, Utils utils) {
+public class VocabularyResource extends DSpaceResource<VocabularyRest> {
+    public VocabularyResource(VocabularyRest sd, Utils utils) {
         super(sd, utils);
         add(utils.linkToSubResource(sd, VocabularyRest.ENTRIES));
     }

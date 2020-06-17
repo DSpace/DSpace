@@ -17,10 +17,10 @@ import org.dspace.app.rest.model.hateoas.annotations.RelNameDSpaceResource;
  * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  */
 @RelNameDSpaceResource(VocabularyEntryDetailsRest.NAME)
-public class AuthorityEntryResource extends HALResource<VocabularyEntryDetailsRest> {
+public class VocabularyEntryDetailsResource extends HALResource<VocabularyEntryDetailsRest> {
 
 
-    public AuthorityEntryResource(VocabularyEntryDetailsRest entry) {
+    public VocabularyEntryDetailsResource(VocabularyEntryDetailsRest entry) {
         super(entry);
     }
 }

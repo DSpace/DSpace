@@ -19,7 +19,7 @@ import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.hamcrest.Matchers;
 import org.junit.Test;
 
-public class AuthorityVocabularyEntryIT extends AbstractControllerIntegrationTest {
+public class VocabularyEntryDetailsIT extends AbstractControllerIntegrationTest {
 
     @Test
     public void findOneTest() throws Exception {
