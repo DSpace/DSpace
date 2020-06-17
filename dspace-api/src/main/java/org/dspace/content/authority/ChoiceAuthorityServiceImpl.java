@@ -223,7 +223,7 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService 
 
     @Override
     public String getChoiceAuthorityName(String schema, String element, String qualifier, Collection collection) {
-        //FIXME AB iterate over authorities and authoritiesFormDefinitions to identify the match if any in the map values
+      //FIXME AB iterate over authorities and authoritiesFormDefinitions to identify the match if any in the map values
         return null;
     }
 
@@ -267,7 +267,7 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService 
 
             controller.put(fkey, ma);
             List<String> fkeys;
-            if (!authorities.containsKey(authorityName)) {
+            if (authorities.containsKey(authorityName)) {
                 fkeys = authorities.get(authorityName);
             } else {
                 fkeys = new ArrayList<String>();
@@ -317,8 +317,7 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService 
                                     Map<String, ChoiceAuthority> definition2authority;
                                     if (controllerFormDefinitions.containsKey(fieldKey)) {
                                         definition2authority = controllerFormDefinitions.get(fieldKey);
-                                    }
-                                    else {
+                                    } else {
                                         definition2authority = new HashMap<String, ChoiceAuthority>();
                                     }
                                     definition2authority.put(submissionName, ca);
