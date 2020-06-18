@@ -8,6 +8,7 @@
 package org.dspace.app.rest.repository;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -16,10 +17,6 @@ import org.dspace.app.rest.model.AccessConditionOptionRest;
 import org.dspace.app.rest.model.SubmissionUploadRest;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.utils.DateMathParser;
-import org.dspace.app.util.SubmissionConfig;
-import org.dspace.app.util.SubmissionConfigReader;
-import org.dspace.app.util.SubmissionConfigReaderException;
-import org.dspace.app.util.SubmissionStepConfig;
 import org.dspace.core.Context;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.service.GroupService;
@@ -28,7 +25,6 @@ import org.dspace.submit.model.UploadConfiguration;
 import org.dspace.submit.model.UploadConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
@@ -45,8 +41,6 @@ public class SubmissionUploadRestRepository extends DSpaceRestRepository<Submiss
     private static final Logger log = org.apache.logging.log4j.LogManager
             .getLogger(SubmissionUploadRestRepository.class);
 
-    private SubmissionConfigReader submissionConfigReader;
-
     @Autowired
     private SubmissionFormRestRepository submissionFormRestRepository;
 
@@ -57,10 +51,6 @@ public class SubmissionUploadRestRepository extends DSpaceRestRepository<Submiss
     GroupService groupService;
 
     DateMathParser dateMathParser = new DateMathParser();
-
-    public SubmissionUploadRestRepository() throws SubmissionConfigReaderException {
-        submissionConfigReader = new SubmissionConfigReader();
-    }
 
     @PreAuthorize("hasAuthority('AUTHENTICATED')")
     @Override
@@ -77,27 +67,21 @@ public class SubmissionUploadRestRepository extends DSpaceRestRepository<Submiss
     @PreAuthorize("hasAuthority('AUTHENTICATED')")
     @Override
     public Page<SubmissionUploadRest> findAll(Context context, Pageable pageable) {
-        List<SubmissionConfig> subConfs = new ArrayList<SubmissionConfig>();
-        subConfs = submissionConfigReader.getAllSubmissionConfigs(pageable.getPageSize(),
-                Math.toIntExact(pageable.getOffset()));
+        Collection<UploadConfiguration> uploadConfigs = uploadConfigurationService.getMap().values();
         Projection projection = utils.obtainProjection();
         List<SubmissionUploadRest> results = new ArrayList<>();
-        for (SubmissionConfig config : subConfs) {
-            for (int i = 0; i < config.getNumberOfSteps(); i++) {
-                SubmissionStepConfig step = config.getStep(i);
-                if (SubmissionStepConfig.UPLOAD_STEP_NAME.equals(step.getType())) {
-                    UploadConfiguration uploadConfig = uploadConfigurationService.getMap().get(step.getId());
-                    if (uploadConfig != null) {
-                        try {
-                            results.add(convert(context, uploadConfig, projection));
-                        } catch (Exception e) {
-                            log.error(e.getMessage(), e);
-                        }
-                    }
+        List<String> configNames = new ArrayList<String>();
+        for (UploadConfiguration uploadConfig : uploadConfigs) {
+            if (!configNames.contains(uploadConfig.getName())) {
+                configNames.add(uploadConfig.getName());
+                try {
+                    results.add(convert(context, uploadConfig, projection));
+                } catch (Exception e) {
+                    log.error(e.getMessage(), e);
                 }
             }
         }
-        return new PageImpl<SubmissionUploadRest>(results, pageable, results.size());
+        return utils.getPage(results, pageable);
     }
 
     @Override
