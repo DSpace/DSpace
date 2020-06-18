@@ -233,6 +233,7 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService 
 
     @Override
     public String getChoiceAuthorityName(String schema, String element, String qualifier, Collection collection) {
+        init();
         String fieldKey = makeFieldKey(schema, element, qualifier);
         // check if there is an authority configured for the metadata valid for all the collections
         if (controller.containsKey(fieldKey)) {
@@ -371,6 +372,7 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService 
                                     } else {
                                         fields = new ArrayList<String>();
                                     }
+                                    fields.add(fieldKey);
                                     authorityName2definitions.put(submissionName, fields);
                                     authoritiesFormDefinitions.put(authorityName, authorityName2definitions);
                                 }
