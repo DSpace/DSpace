@@ -17,6 +17,7 @@ import java.util.Date;
 import java.util.UUID;
 
 import org.dspace.app.rest.builder.CollectionBuilder;
+import org.dspace.app.rest.builder.CommunityBuilder;
 import org.dspace.app.rest.matcher.VocabularyMatcher;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.authority.PersonAuthorityValue;
@@ -69,6 +70,10 @@ public class VocabularyRestRepositoryIT extends AbstractControllerIntegrationTes
         pluginService.clearNamedPluginClasses();
         cas.clearCache();
 
+        context.turnOffAuthorisationSystem();
+        parentCommunity = CommunityBuilder.createCommunity(context).withName("A parent community for all our test")
+                .build();
+        context.restoreAuthSystemState();
         PersonAuthorityValue person1 = new PersonAuthorityValue();
         person1.setId(String.valueOf(UUID.randomUUID()));
         person1.setLastName("Shirasaka");
@@ -165,7 +170,7 @@ public class VocabularyRestRepositoryIT extends AbstractControllerIntegrationTes
                 .param("metadata", "dc.subject")
                 .param("collection", UUID.randomUUID().toString())
                 .param("query", "Research"))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isUnprocessableEntity());
     }
 
     @Test
@@ -337,7 +342,6 @@ public class VocabularyRestRepositoryIT extends AbstractControllerIntegrationTes
     @Test
     public void findByMetadataAndCollectionUnprocessableEntityTest() throws Exception {
         context.turnOffAuthorisationSystem();
-
         Collection collection = CollectionBuilder.createCollection(context, parentCommunity)
                                                  .withName("Test collection")
                                                  .build();
