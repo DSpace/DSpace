@@ -12,6 +12,10 @@ import java.util.List;
 
 import org.dspace.app.rest.RestResourceController;
 
+/**
+ * This class provides a way to list the filetypes present in a given Process by showing them as a list of Strings
+ * It'll be used by {@link org.dspace.app.rest.repository.ProcessFileTypesLinkRepository}
+ */
 public class ProcessFileTypesRest extends BaseObjectRest<String> {
 
     public static final String NAME = "filetypes";
@@ -36,6 +40,10 @@ public class ProcessFileTypesRest extends BaseObjectRest<String> {
         this.values = values;
     }
 
+    /**
+     * Adds a value to the list of FileType Strings
+     * @param value The value to be added
+     */
     public void addValue(String value) {
         if (values == null) {
             values = new LinkedList<>();
