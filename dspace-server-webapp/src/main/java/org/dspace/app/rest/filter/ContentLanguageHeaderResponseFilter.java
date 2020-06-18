@@ -22,7 +22,9 @@ import org.springframework.stereotype.Component;
 
 /**
  * This filter assures that when the dspace instance supports multiple languages
- * they are noted in the Content-Language Header of the response
+ * they are noted in the Content-Language Header of the response. Where
+ * appropriate the single endpoint can set the Content-Language header directly
+ * to note that the response is specific for a language
  * 
  * @author Mykhaylo Boychuk (at 4science.it)
  */
@@ -36,20 +38,17 @@ public class ContentLanguageHeaderResponseFilter implements Filter {
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
         throws IOException, ServletException {
-        chain.doFilter(request, response);
-
         HttpServletResponse httpServletResponse = (HttpServletResponse) response;
-        if (!httpServletResponse.containsHeader("Content-Language")) {
-            Locale[] locales = I18nUtil.getSupportedLocales();
-            StringBuilder locsStr = new StringBuilder();
-            for (Locale locale : locales) {
-                if (locsStr.length() > 0) {
-                    locsStr.append(",");
-                }
-                locsStr.append(locale.getLanguage());
+        Locale[] locales = I18nUtil.getSupportedLocales();
+        StringBuilder locsStr = new StringBuilder();
+        for (Locale locale : locales) {
+            if (locsStr.length() > 0) {
+                locsStr.append(",");
             }
-            httpServletResponse.setHeader("Content-Language", locsStr.toString());
+            locsStr.append(locale.getLanguage());
         }
+        httpServletResponse.setHeader("Content-Language", locsStr.toString());
+        chain.doFilter(request, response);
     }
 
     @Override
