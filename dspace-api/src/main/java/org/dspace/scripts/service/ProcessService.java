@@ -181,4 +181,6 @@ public interface ProcessService {
      */
     int countTotal(Context context) throws SQLException;
 
+    public List<String> getFileTypesForProcessBitstreams(Context context, Process process);
+
 }

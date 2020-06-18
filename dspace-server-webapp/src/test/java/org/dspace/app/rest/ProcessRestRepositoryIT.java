@@ -16,11 +16,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.Random;
 
 import org.apache.commons.codec.CharEncoding;
 import org.apache.commons.io.IOUtils;
 import org.dspace.app.rest.builder.ProcessBuilder;
 import org.dspace.app.rest.matcher.PageMatcher;
+import org.dspace.app.rest.matcher.ProcessFileTypesMatcher;
 import org.dspace.app.rest.matcher.ProcessMatcher;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.content.Bitstream;
@@ -217,9 +220,9 @@ public class ProcessRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         getClient(token).perform(get("/api/system/processes/" + process.getID() + "/files"))
                         .andExpect(status().isOk())
-                        .andExpect(jsonPath("$._embedded.inputfile[0].name", is("test.csv")))
-                        .andExpect(jsonPath("$._embedded.inputfile[0].uuid", is(bitstream.getID().toString())))
-                        .andExpect(jsonPath("$._embedded.inputfile[0].metadata['dspace.process.filetype']" +
+                        .andExpect(jsonPath("$._embedded.files[0].name", is("test.csv")))
+                        .andExpect(jsonPath("$._embedded.files[0].uuid", is(bitstream.getID().toString())))
+                        .andExpect(jsonPath("$._embedded.files[0].metadata['dspace.process.filetype']" +
                                                 "[0].value", is("inputfile")));
 
     }
@@ -241,6 +244,73 @@ public class ProcessRestRepositoryIT extends AbstractControllerIntegrationTest {
                         .andExpect(jsonPath("$._embedded.bitstreams[0].uuid", is(bitstream.getID().toString())))
                         .andExpect(jsonPath("$._embedded.bitstreams[0].metadata['dspace.process.filetype']" +
                                                 "[0].value", is("inputfile")));
+
+    }
+
+    @Test
+    public void getProcessFilesTypes() throws Exception {
+        try (InputStream is = IOUtils.toInputStream("Test File For Process", CharEncoding.UTF_8)) {
+            processService.appendFile(context, process, is, "inputfile", "test.csv");
+        }
+
+        List<String> fileTypesToCheck = new LinkedList<>();
+        fileTypesToCheck.add("inputfile");
+
+        String token = getAuthToken(admin.getEmail(), password);
+
+        getClient(token).perform(get("/api/system/processes/" + process.getID() + "/filetypes"))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$", ProcessFileTypesMatcher
+                            .matchProcessFileTypes("filetypes-" + process.getID(), fileTypesToCheck)));
+
+
+    }
+
+    @Test
+    public void getProcessFilesTypesForbidden() throws Exception {
+        try (InputStream is = IOUtils.toInputStream("Test File For Process", CharEncoding.UTF_8)) {
+            processService.appendFile(context, process, is, "inputfile", "test.csv");
+        }
+
+        List<String> fileTypesToCheck = new LinkedList<>();
+        fileTypesToCheck.add("inputfile");
+
+        String token = getAuthToken(eperson.getEmail(), password);
+
+        getClient(token).perform(get("/api/system/processes/" + process.getID() + "/filetypes"))
+                        .andExpect(status().isForbidden());
+
+
+    }
+
+    @Test
+    public void getProcessFilesTypesUnAuthorized() throws Exception {
+        try (InputStream is = IOUtils.toInputStream("Test File For Process", CharEncoding.UTF_8)) {
+            processService.appendFile(context, process, is, "inputfile", "test.csv");
+        }
+
+        List<String> fileTypesToCheck = new LinkedList<>();
+        fileTypesToCheck.add("inputfile");
+
+        getClient().perform(get("/api/system/processes/" + process.getID() + "/filetypes"))
+                   .andExpect(status().isUnauthorized());
+
+    }
+
+    @Test
+    public void getProcessFilesTypesRandomProcessId() throws Exception {
+        try (InputStream is = IOUtils.toInputStream("Test File For Process", CharEncoding.UTF_8)) {
+            processService.appendFile(context, process, is, "inputfile", "test.csv");
+        }
+
+        List<String> fileTypesToCheck = new LinkedList<>();
+        fileTypesToCheck.add("inputfile");
+
+        String token = getAuthToken(admin.getEmail(), password);
+
+        getClient(token).perform(get("/api/system/processes/" + new Random() + "/filetypes"))
+                        .andExpect(status().isNotFound());
+
 
     }
 

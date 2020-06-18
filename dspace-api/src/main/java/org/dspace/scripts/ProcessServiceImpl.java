@@ -14,7 +14,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.apache.commons.collections4.ListUtils;
@@ -23,7 +25,9 @@ import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Bitstream;
+import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
+import org.dspace.content.MetadataValue;
 import org.dspace.content.ProcessStatus;
 import org.dspace.content.dao.ProcessDAO;
 import org.dspace.content.service.BitstreamFormatService;
@@ -225,6 +229,20 @@ public class ProcessServiceImpl implements ProcessService {
 
     public int countTotal(Context context) throws SQLException {
         return processDAO.countRows(context);
+    }
+
+    @Override
+    public List<String> getFileTypesForProcessBitstreams(Context context, Process process) {
+        List<Bitstream> list = getBitstreams(context, process);
+        Set<String> fileTypesSet = new HashSet<>();
+        for (Bitstream bitstream : list) {
+            List<MetadataValue> metadata = bitstreamService.getMetadata(bitstream,
+                                                                        Process.BITSTREAM_TYPE_METADATAFIELD, Item.ANY);
+            if (metadata != null && !metadata.isEmpty()) {
+                fileTypesSet.add(metadata.get(0).getValue());
+            }
+        }
+        return new ArrayList<>(fileTypesSet);
     }
 
 }
