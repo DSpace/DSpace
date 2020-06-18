@@ -10,7 +10,6 @@ package org.dspace.app.rest.model;
 import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import org.dspace.app.rest.RestResourceController;
 
 /**
  * An entry in a Vocabulary
@@ -23,7 +22,7 @@ public class VocabularyEntryRest {
     private String display;
     private String value;
     private Map<String, String> otherInformation;
-    
+
     /**
      * The Vocabulary Entry Details resource if available related to this entry
      */

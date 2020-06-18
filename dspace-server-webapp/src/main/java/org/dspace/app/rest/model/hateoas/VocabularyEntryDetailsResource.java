@@ -11,14 +11,13 @@ import org.dspace.app.rest.model.VocabularyEntryDetailsRest;
 import org.dspace.app.rest.model.hateoas.annotations.RelNameDSpaceResource;
 
 /**
- * Authority Rest HAL Resource. The HAL Resource wraps the REST Resource adding
+ * Vocabulary Entry Details Rest HAL Resource. The HAL Resource wraps the REST Resource adding
  * support for the links and embedded resources
  *
  * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  */
 @RelNameDSpaceResource(VocabularyEntryDetailsRest.NAME)
 public class VocabularyEntryDetailsResource extends HALResource<VocabularyEntryDetailsRest> {
-
 
     public VocabularyEntryDetailsResource(VocabularyEntryDetailsRest entry) {
         super(entry);

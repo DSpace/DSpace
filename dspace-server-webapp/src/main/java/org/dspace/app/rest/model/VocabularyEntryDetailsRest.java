@@ -18,7 +18,7 @@ import org.dspace.app.rest.RestResourceController;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 public class VocabularyEntryDetailsRest extends RestAddressableModel {
-    public static final String NAME = "vocabularyDetailEntry";
+    public static final String NAME = "vocabularyEntryDetail";
     private String id;
     private String display;
     private String value;
@@ -78,7 +78,7 @@ public class VocabularyEntryDetailsRest extends RestAddressableModel {
 
     @Override
     public String getType() {
-        return VocabularyRest.NAME;
+        return VocabularyEntryDetailsRest.NAME;
     }
 
     @Override
