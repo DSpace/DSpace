@@ -67,12 +67,23 @@ public interface ChoiceAuthority {
      * This may get called many times while populating a Web page so it should
      * be implemented as efficiently as possible.
      *
-     * @param field  being matched for
      * @param key    authority key known to this authority.
      * @param locale explicit localization key if available, or null
      * @return descriptive label - should always return something, never null.
      */
-    public String getLabel(String field, String key, String locale);
+    public String getLabel(String key, String locale);
+
+    /**
+     * Get the canonical value to store for a key in the authority. Can be localized
+     * given the implicit or explicit locale specification.
+     *
+     * @param key    authority key known to this authority.
+     * @param locale explicit localization key if available, or null
+     * @return value to store - should always return something, never null.
+     */
+    default String getValue(String key, String locale) {
+        return getLabel(key, locale);
+    }
 
     default boolean isHierarchical() {
         return false;
@@ -84,5 +95,13 @@ public interface ChoiceAuthority {
 
     default Integer getPreloadLevel() {
         return isHierarchical() ? 0 : null;
+    }
+
+    default public Choice getChoice(String authKey, String locale) {
+        Choice result = new Choice();
+        result.authority = authKey;
+        result.label = getLabel(authKey, locale);
+        result.value = getValue(authKey, locale);
+        return result;
     }
 }

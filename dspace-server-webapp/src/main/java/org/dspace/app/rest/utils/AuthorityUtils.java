@@ -66,9 +66,10 @@ public class AuthorityUtils {
     public VocabularyEntryDetailsRest convertEntryDetails(Choice choice, String authorityName, Projection projection) {
         VocabularyEntryDetailsRest entry = converter.toRest(choice, projection);
         entry.setVocabularyName(authorityName);
+        entry.setId(authorityName + ":" + entry.getId());
         return entry;
     }
-    
+
     public VocabularyEntryRest convertEntry(Choice choice, String authorityName, Projection projection) {
         VocabularyEntryRest entry = new VocabularyEntryRest();
         entry.setDisplay(choice.label);

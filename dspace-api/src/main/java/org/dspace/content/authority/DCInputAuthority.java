@@ -131,7 +131,7 @@ public class DCInputAuthority extends SelfNamedPlugin implements ChoiceAuthority
     }
 
     @Override
-    public String getLabel(String field, String key, String locale) {
+    public String getLabel(String key, String locale) {
         init();
         int pos = -1;
         for (int i = 0; i < values.length; i++) {
