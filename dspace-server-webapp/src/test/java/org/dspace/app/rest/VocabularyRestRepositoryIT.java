@@ -147,7 +147,7 @@ public class VocabularyRestRepositoryIT extends AbstractControllerIntegrationTes
             get("/api/submission/vocabularies/srsc/entries")
                 .param("metadata", "dc.subject")
                 .param("collection", collection.getID().toString())
-                .param("query", "Research")
+                .param("filter", "Research")
                 .param("size", "2"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$._embedded.vocabularyEntries", Matchers.containsInAnyOrder(
@@ -169,7 +169,7 @@ public class VocabularyRestRepositoryIT extends AbstractControllerIntegrationTes
         getClient(token).perform(get("/api/submission/vocabularies/srsc/entries")
                 .param("metadata", "dc.subject")
                 .param("collection", UUID.randomUUID().toString())
-                .param("query", "Research"))
+                .param("filter", "Research"))
                 .andExpect(status().isUnprocessableEntity());
     }
 
@@ -178,7 +178,7 @@ public class VocabularyRestRepositoryIT extends AbstractControllerIntegrationTes
         String token = getAuthToken(admin.getEmail(), password);
         getClient(token).perform(get("/api/submission/vocabularies/srsc/entries")
                 .param("metadata", "dc.subject")
-                .param("query", "Research"))
+                .param("filter", "Research"))
                 .andExpect(status().isBadRequest());
     }
 
@@ -192,10 +192,10 @@ public class VocabularyRestRepositoryIT extends AbstractControllerIntegrationTes
         context.restoreAuthSystemState();
         String token = getAuthToken(admin.getEmail(), password);
         getClient(token).perform(get("/api/submission/vocabularies/srsc/entries")
-                .param("metadata", "dc.subject")
+                .param("metadata", "dc.type")
                 .param("collection", collection.getID().toString())
-                .param("query", "Research"))
-                .andExpect(status().isBadRequest());
+                .param("filter", "Research"))
+                .andExpect(status().isUnprocessableEntity());
     }
 
     @Test
@@ -227,7 +227,7 @@ public class VocabularyRestRepositoryIT extends AbstractControllerIntegrationTes
             get("/api/submission/vocabularies/srsc/entries")
                 .param("metadata", "dc.subject")
                 .param("collection", collection.getID().toString())
-                .param("query", "Research2")
+                .param("filter", "Research2")
                 .param("size", "1000"))
                         .andExpect(status().isOk())
                         .andExpect(jsonPath("$.page.totalElements", Matchers.is(0)));
@@ -270,7 +270,7 @@ public class VocabularyRestRepositoryIT extends AbstractControllerIntegrationTes
         getClient(token).perform(get("/api/submission/vocabularies/common_types/entries")
                 .param("metadata", "dc.type")
                 .param("collection", collection.getID().toString())
-                .param("query", "Book")
+                .param("filter", "Book")
                 .param("size", "2"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$._embedded.vocabularyEntries", Matchers.containsInAnyOrder(
@@ -295,7 +295,7 @@ public class VocabularyRestRepositoryIT extends AbstractControllerIntegrationTes
                 get("/api/submission/vocabularies/SolrAuthorAuthority/entries")
                         .param("metadata", "dc.contributor.author")
                         .param("collection", collection.getID().toString())
-                        .param("query", "Shirasaka")
+                        .param("filter", "Shirasaka")
                         .param("size", "1000"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.page.totalElements", Matchers.is(1)));
@@ -314,7 +314,7 @@ public class VocabularyRestRepositoryIT extends AbstractControllerIntegrationTes
                 get("/api/submission/vocabularies/SolrAuthorAuthority/entries")
                         .param("metadata", "dc.contributor.author")
                         .param("collection", collection.getID().toString())
-                        .param("query", "Smith")
+                        .param("filter", "Smith")
                         .param("size", "1000"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.page.totalElements", Matchers.is(0)));
@@ -378,18 +378,5 @@ public class VocabularyRestRepositoryIT extends AbstractControllerIntegrationTes
         getClient(token).perform(get("/api/submission/vocabularies/search/byMetadataAndCollection")
                 .param("metadata", "dc.type"))
                 .andExpect(status().isUnprocessableEntity());
-    }
-
-    @Test
-    public void discoverableNestedLinkTest() throws Exception {
-        String token = getAuthToken(eperson.getEmail(), password);
-        getClient(token).perform(get("/api"))
-                        .andExpect(status().isOk())
-                        .andExpect(jsonPath("$._links",Matchers.allOf(
-                                hasJsonPath("$.authorizations.href",
-                                         is("http://localhost/api/authz/authorizations")),
-                                hasJsonPath("$.authorization-search.href",
-                                         is("http://localhost/api/authz/authorization/search"))
-                        )));
     }
 }
