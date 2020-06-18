@@ -805,11 +805,6 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
      * 
      * @throws Exception
      */
-    // This test currently doesn't work as expected since the AuthorizationFeatureRestRepository#findOne method
-    // is only exposed to admins. Currently we're performing checks on the individual REST objects with its findOne
-    // Permission constraints, which is ADMIN in this case. Seeing as we're trying to retrieve it with a normal
-    // EPerson token in the second test, this will fail.
-    @Ignore
     public void findByObjectAndFeatureTest() throws Exception {
         context.turnOffAuthorisationSystem();
         Community com = CommunityBuilder.createCommunity(context).withName("A test community").build();
