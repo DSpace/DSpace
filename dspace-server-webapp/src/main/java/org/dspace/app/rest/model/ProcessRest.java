@@ -25,6 +25,10 @@ import org.dspace.scripts.Process;
         name = ProcessRest.FILES,
         method = "getFilesFromProcess"
     ),
+    @LinkRest(
+        name = ProcessRest.FILE_TYPES,
+        method = "getFileTypesFromProcess"
+    )
 })
 public class ProcessRest extends BaseObjectRest<Integer> {
     public static final String NAME = "process";
@@ -32,6 +36,7 @@ public class ProcessRest extends BaseObjectRest<Integer> {
     public static final String CATEGORY = RestAddressableModel.SYSTEM;
 
     public static final String FILES = "files";
+    public static final String FILE_TYPES = "filetypes";
     public String getCategory() {
         return CATEGORY;
     }
