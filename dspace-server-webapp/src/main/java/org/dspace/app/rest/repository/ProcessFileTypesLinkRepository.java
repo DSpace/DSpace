@@ -25,15 +25,28 @@ import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
+/**
+ * This LinkRepository will deal with calls to the /filetypes endpoint of a given Process.
+ * It'll retrieve all the bitstreams for the given Process and return a {@link ProcessFileTypesRest} object that holds
+ * a list of Strings where each String represents a unique fileType of the Bitstreams for that Process
+ */
 @Component(ProcessRest.CATEGORY + "." + ProcessRest.NAME + "." + ProcessRest.FILE_TYPES)
 public class ProcessFileTypesLinkRepository extends AbstractDSpaceRestRepository implements LinkRestRepository {
 
     @Autowired
     private ProcessService processService;
 
-    @Autowired
-    private ProcessRestRepository processRestRepository;
-
+    /**
+     * This will be the admin only endpoint that returns the {@link ProcessFileTypesRest} constructed with the values
+     * found in the Bitstreams of the Process with the given ProcessId
+     * @param request           The relevant request
+     * @param processId         The processId of the Process to be used
+     * @param optionalPageable  Paging if applicable
+     * @param projection        The current projection
+     * @return                  The {@link ProcessFileTypesRest} created from the Bitstreams of the given Process
+     * @throws SQLException         If something goes wrong
+     * @throws AuthorizeException   If something goes wrong
+     */
     @PreAuthorize("hasAuthority('ADMIN')")
     public ProcessFileTypesRest getFileTypesFromProcess(@Nullable HttpServletRequest request,
                                                         Integer processId,

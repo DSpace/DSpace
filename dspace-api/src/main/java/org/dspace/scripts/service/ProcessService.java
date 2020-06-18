@@ -181,6 +181,12 @@ public interface ProcessService {
      */
     int countTotal(Context context) throws SQLException;
 
+    /**
+     * This will return a list of Strings where each String represents the type of a Bitstream in the Process given
+     * @param context   The DSpace context
+     * @param process   The Process object that we'll use to find the bitstreams
+     * @return          A list of Strings where each String represents a fileType that is in the Process
+     */
     public List<String> getFileTypesForProcessBitstreams(Context context, Process process);
 
 }
