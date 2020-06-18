@@ -65,7 +65,7 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Choic
 
     protected String vocabularyName = null;
     protected InputSource vocabulary = null;
-    protected Boolean suggestHierarchy = true;
+    protected Boolean suggestHierarchy = false;
     protected Boolean storeHierarchy = true;
     protected String hierarchyDelimiter = "::";
 
@@ -194,13 +194,26 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Choic
     }
 
     @Override
-    public String getLabel(String field, String key, String locale) {
+    public String getLabel(String key, String locale) {
+        return getLabel(key, this.suggestHierarchy);
+    }
+
+    @Override
+    public String getValue(String key, String locale) {
+        return getLabel(key, this.storeHierarchy);
+    }
+
+    private String getLabel(String key, boolean useHierarchy) {
         init();
         String xpathExpression = String.format(idTemplate, key);
         XPath xpath = XPathFactory.newInstance().newXPath();
         try {
             Node node = (Node) xpath.evaluate(xpathExpression, vocabulary, XPathConstants.NODE);
-            return node.getAttributes().getNamedItem("label").getNodeValue();
+            if (useHierarchy) {
+                return this.buildString(node);
+            } else {
+                return node.getAttributes().getNamedItem("label").getNodeValue();
+            }
         } catch (XPathExpressionException e) {
             return ("");
         }
