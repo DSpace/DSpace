@@ -34,7 +34,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * This class handles all Authority related IT. It alters some config to run the tests, but it gets cleared again
  * after every test
  */
-public class AuthorityRestRepositoryIT extends AbstractControllerIntegrationTest {
+public class VocabularyRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     @Autowired
     ConfigurationService configurationService;
@@ -100,11 +100,12 @@ public class AuthorityRestRepositoryIT extends AbstractControllerIntegrationTest
                  .andExpect(jsonPath("$._embedded.vocabularies", Matchers.containsInAnyOrder(
                      VocabularyMatcher.matchProperties("srsc", "srsc", false, true),
                      VocabularyMatcher.matchProperties("common_types", "common_types", true, false),
-                     VocabularyMatcher.matchProperties("common_iso_languages", "common_iso_languages", true , false)
+                     VocabularyMatcher.matchProperties("common_iso_languages", "common_iso_languages", true , false),
+                     VocabularyMatcher.matchProperties("SolrAuthorAuthority", "SolrAuthorAuthority", false , false)
                  )))
         .andExpect(jsonPath("$._links.self.href",
             Matchers.containsString("api/submission/vocabularies")))
-        .andExpect(jsonPath("$.page.totalElements", is(3)));
+        .andExpect(jsonPath("$.page.totalElements", is(4)));
     }
 
     @Test
@@ -112,10 +113,9 @@ public class AuthorityRestRepositoryIT extends AbstractControllerIntegrationTest
         String token = getAuthToken(admin.getEmail(), password);
         getClient(token).perform(get("/api/submission/vocabularies/srsc"))
                         .andExpect(status().isOk())
-                        .andExpect(jsonPath("$", Matchers.contains(
-                                   VocabularyMatcher.matchProperties("srsc", "srsc", false, true)
-                                   )))
-                        .andExpect(jsonPath("$.page.totalElements", Matchers.is(1)));
+                        .andExpect(jsonPath("$", is(
+                            VocabularyMatcher.matchProperties("srsc", "srsc", false, true)
+                        )));
     }
 
     @Test
@@ -123,10 +123,9 @@ public class AuthorityRestRepositoryIT extends AbstractControllerIntegrationTest
         String token = getAuthToken(admin.getEmail(), password);
         getClient(token).perform(get("/api/submission/vocabularies/common_types"))
                         .andExpect(status().isOk())
-                        .andExpect(jsonPath("$", Matchers.contains(
-                                VocabularyMatcher.matchProperties("common_types", "common_types", true, false)
-                                )))
-                        .andExpect(jsonPath("$.page.totalElements", Matchers.is(1)));
+                        .andExpect(jsonPath("$", is(
+                            VocabularyMatcher.matchProperties("common_types", "common_types", true, false)
+                        )));
     }
 
     @Test
