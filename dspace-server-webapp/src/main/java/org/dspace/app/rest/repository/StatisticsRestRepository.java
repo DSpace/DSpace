@@ -70,8 +70,7 @@ public class StatisticsRestRepository extends DSpaceRestRepository<UsageReportRe
 
     @Override
     public Page<UsageReportRest> findAll(Context context, Pageable pageable) {
-        throw new RepositoryMethodNotImplementedException("No implementation found; Method not allowed!",
-            "getUsageReports");
+        throw new RepositoryMethodNotImplementedException("No implementation found; Method not allowed!", "findAll");
     }
 
     @Override
