@@ -7,7 +7,6 @@
  */
 package org.dspace.app.rest;
 
-import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -333,10 +332,9 @@ public class VocabularyRestRepositoryIT extends AbstractControllerIntegrationTes
                         .param("metadata", "dc.type")
                         .param("collection", collection.getID().toString()))
                         .andExpect(status().isOk())
-                        .andExpect(jsonPath("$", Matchers.contains(
-                                VocabularyMatcher.matchProperties("common_types", "common_types", true, false)
-                                )))
-                        .andExpect(jsonPath("$.page.totalElements", Matchers.is(1)));
+                        .andExpect(jsonPath("$", is(
+                            VocabularyMatcher.matchProperties("common_types", "common_types", true, false)
+                        )));
     }
 
     @Test
@@ -377,6 +375,6 @@ public class VocabularyRestRepositoryIT extends AbstractControllerIntegrationTes
         //missing collection
         getClient(token).perform(get("/api/submission/vocabularies/search/byMetadataAndCollection")
                 .param("metadata", "dc.type"))
-                .andExpect(status().isUnprocessableEntity());
+                .andExpect(status().isBadRequest());
     }
 }
