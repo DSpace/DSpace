@@ -57,7 +57,11 @@ public class VocabularyEntryLinkRepository extends AbstractDSpaceRestRepository
         Context context = obtainContext();
         String filter = request == null ? null : request.getParameter("filter");
         String metadata = request == null ? null : request.getParameter("metadata");
-        String uuidCollectìon = request == null ? null : request.getParameter("uuid");
+        String uuidCollectìon = request == null ? null : request.getParameter("collection");
+
+        if (StringUtils.isEmpty(metadata) || StringUtils.isEmpty(uuidCollectìon)) {
+            throw new IllegalArgumentException("the metadata and collection parameters are both required");
+        }
 
         Collection collection = null;
         if (StringUtils.isNotBlank(uuidCollectìon)) {
