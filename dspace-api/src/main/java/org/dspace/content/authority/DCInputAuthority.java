@@ -146,4 +146,9 @@ public class DCInputAuthority extends SelfNamedPlugin implements ChoiceAuthority
             return "UNKNOWN KEY " + key;
         }
     }
+
+    @Override
+    public boolean isScrollable() {
+        return true;
+    }
 }

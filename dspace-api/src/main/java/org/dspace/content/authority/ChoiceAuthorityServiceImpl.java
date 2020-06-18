@@ -337,7 +337,7 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService 
                                         fields = new ArrayList<String>();
                                     }
                                     authorityName2definitions.put(submissionName, fields);
-                                    authoritiesFormDefinitions.put(fieldKey, authorityName2definitions);
+                                    authoritiesFormDefinitions.put(authorityName, authorityName2definitions);
                                 }
                             }
                         }
