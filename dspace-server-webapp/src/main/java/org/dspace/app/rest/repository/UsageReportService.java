@@ -22,7 +22,10 @@ import org.dspace.app.rest.model.UsageReportPointCountryRest;
 import org.dspace.app.rest.model.UsageReportPointDateRest;
 import org.dspace.app.rest.model.UsageReportPointDsoTotalVisitsRest;
 import org.dspace.app.rest.model.UsageReportRest;
+import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.app.rest.utils.DSpaceObjectUtils;
+import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Bitstream;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
@@ -30,6 +33,7 @@ import org.dspace.content.Site;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.handle.service.HandleService;
+import org.dspace.services.model.Request;
 import org.dspace.statistics.Dataset;
 import org.dspace.statistics.content.DatasetDSpaceObjectGenerator;
 import org.dspace.statistics.content.DatasetTimeGenerator;
@@ -37,28 +41,68 @@ import org.dspace.statistics.content.DatasetTypeGenerator;
 import org.dspace.statistics.content.StatisticsDataVisits;
 import org.dspace.statistics.content.StatisticsListing;
 import org.dspace.statistics.content.StatisticsTable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.stereotype.Component;
 
 /**
- * This is the REST repository dealing with the {@link UsageReportRest} logic
+ * This is the Service dealing with the {@link UsageReportRest} logic
  *
  * @author Maria Verdonck (Atmire) on 08/06/2020
  */
-@Component(UsageReportRest.CATEGORY + "." + UsageReportRest.NAME)
-public class UsageReportRestRepository extends AbstractDSpaceRestRepository {
+@Component
+public class UsageReportService extends AbstractDSpaceRestRepository {
 
+    private static final Logger log = LoggerFactory.getLogger(UsageReportService.class);
+
+    @Autowired
+    private AuthorizeService authorizeService;
     @Autowired
     private DSpaceObjectUtils dspaceObjectUtil;
     @Autowired
-    protected HandleService handleService;
+    private HandleService handleService;
 
     public static final String TOTAL_VISITS_REPORT_ID = "TotalVisits";
     public static final String TOTAL_VISITS_PER_MONTH_REPORT_ID = "TotalVisitsPerMonth";
     public static final String TOTAL_DOWNLOADS_REPORT_ID = "TotalDownloads";
     public static final String TOP_COUNTRIES_REPORT_ID = "TopCountries";
     public static final String TOP_CITIES_REPORT_ID = "TopCities";
+
+    /**
+     * Responsible for checking whether or not the user has used a valid request (valid UUID in /usagereports/{
+     * UUID_ReportID} or in /usagereports/search/object?uri={uri-ending-in/UUID} and whether or not the used has the
+     * given (READ) rights on the corresponding DSO.
+     *
+     * @param targetType usagereport or usagereportsearch, so we know how to extract the UUID
+     * @param targetId   string to extract uuid from
+     * @param action     type of access rights (READ)
+     * @throws AuthorizeException if user does not have given rights on dso whose uuid is extracted from the targetID
+     */
+    public void checkForPermissionAndValidRequest(String targetType, String targetId, int action)
+        throws AuthorizeException {
+        Request request = requestService.getCurrentRequest();
+        Context context = ContextUtil.obtainContext(request.getServletRequest());
+        UUID uuidObject = null;
+        if (StringUtils.equalsIgnoreCase(UsageReportRest.NAME, targetType)) {
+            // Get uuid from uuidDSO_reportId pathParam
+            uuidObject = UUID.fromString(StringUtils.substringBefore(targetId, "_"));
+        } else if (StringUtils.equalsIgnoreCase(UsageReportRest.NAME + "search", targetType)) {
+            // Get uuid from url (selfLink of dso) queryParam
+            uuidObject = UUID.fromString(StringUtils.substringAfterLast(targetId, "/"));
+        }
+        try {
+            DSpaceObject dso = dspaceObjectUtil.findDSpaceObject(context, uuidObject);
+            if (dso == null) {
+                throw new ResourceNotFoundException("No DSO found with this UUID: " + uuidObject);
+            }
+            authorizeService.authorizeAction(context, dso, action);
+        } catch (SQLException e) {
+            log.error(e.getMessage(), e);
+        }
+
+    }
 
     /**
      * Get list of usage reports that are applicable to the DSO (of given UUID)
