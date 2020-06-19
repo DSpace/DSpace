@@ -7,6 +7,7 @@
  */
 package org.dspace.app.rest.submit.factory.impl;
 
+import org.apache.commons.lang3.StringUtils;
 import org.dspace.content.InProgressSubmission;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
@@ -44,7 +45,15 @@ public class CCLicenseRemovePatchOperation extends RemovePatchOperation<String> 
     void remove(Context context, Request currentRequest, InProgressSubmission source, String path, Object value)
             throws Exception {
         Item item = source.getItem();
-        creativeCommonsService.removeLicense(context, item);
+
+
+        if (StringUtils.isNotBlank(creativeCommonsService.getLicenseName(item))) {
+            creativeCommonsService.removeLicense(context, item);
+        } else {
+            throw new IllegalArgumentException("No CC license can be removed since none is present on submission: "
+                                                       + source.getID());
+        }
+
     }
 
 }

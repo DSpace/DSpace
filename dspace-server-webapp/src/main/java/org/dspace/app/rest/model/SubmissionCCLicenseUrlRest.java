@@ -9,7 +9,7 @@ package org.dspace.app.rest.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.dspace.app.rest.SubmissionCCLicenseSearchController;
+import org.dspace.app.rest.RestResourceController;
 
 /**
  * This class is the REST representation of the CCLicense URL String object and acts as a data object
@@ -17,6 +17,9 @@ import org.dspace.app.rest.SubmissionCCLicenseSearchController;
  */
 public class SubmissionCCLicenseUrlRest extends BaseObjectRest<String> {
     public static final String NAME = "submissioncclicenseUrl";
+    public static final String PLURAL = "submissioncclicenseUrls";
+    public static final String CATEGORY = RestAddressableModel.CONFIGURATION;
+
 
     private String url;
 
@@ -46,12 +49,12 @@ public class SubmissionCCLicenseUrlRest extends BaseObjectRest<String> {
 
     @Override
     public String getCategory() {
-        return SubmissionCCLicenseRest.CATEGORY;
+        return SubmissionCCLicenseUrlRest.CATEGORY;
     }
 
     @Override
     @JsonIgnore
     public Class getController() {
-        return SubmissionCCLicenseSearchController.class;
+        return RestResourceController.class;
     }
 }

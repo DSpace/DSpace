@@ -17,14 +17,14 @@ import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.junit.Test;
 
 /**
- * Class to the methods from the SubmissionCCLicenseSearchController
+ * Class to the methods from the SubmissionCCLicenseUrlRepository
  * Since the CC Licenses and the corresponding URIs are obtained from the CC License API, a mock service has been
  * implemented.
  * This mock service will return a fixed set of CC Licenses using a similar structure to the ones obtained from the
  * CC License API.
  * Refer to {@link org.dspace.license.MockCCLicenseConnectorServiceImpl} for more information
  */
-public class SubmissionCCLicenseSearchControllerIT extends AbstractControllerIntegrationTest {
+public class SubmissionCCLicenseUrlRepositoryIT extends AbstractControllerIntegrationTest {
 
 
     @Test
@@ -32,28 +32,28 @@ public class SubmissionCCLicenseSearchControllerIT extends AbstractControllerInt
         String epersonToken = getAuthToken(eperson.getEmail(), password);
 
         getClient(epersonToken).perform(get(
-                "/api/config/submissioncclicenses/search/rightsByQuestions?license=license2&answer_license2-field0" +
+                "/api/config/submissioncclicenseUrls/search/rightsByQuestions?license=license2&answer_license2-field0" +
                         "=license2-field0-enum1"))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$.url", is("mock-license-uri")))
                    .andExpect(jsonPath("$.type", is("submissioncclicenseUrl")))
                    .andExpect(jsonPath("$._links.self.href",
-                                       is("http://localhost/api/config/submissioncclicenses/search/rightsByQuestions" +
+                                       is("http://localhost/api/config/submissioncclicenseUrls/search/rightsByQuestions" +
                                                   "?license=license2" +
                                                   "&answer_license2-field0=license2-field0-enum1")));
     }
 
     @Test
-    public void searchRightsByQuestionsTestLicenseWithoutFields() throws Exception {
+    public void searchRightsByQuestionsTestLicenseForLicenseWithoutQuestions() throws Exception {
         String epersonToken = getAuthToken(eperson.getEmail(), password);
 
         getClient(epersonToken)
-                .perform(get("/api/config/submissioncclicenses/search/rightsByQuestions?license=license3"))
+                .perform(get("/api/config/submissioncclicenseUrls/search/rightsByQuestions?license=license3"))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$.url", is("mock-license-uri")))
                    .andExpect(jsonPath("$.type", is("submissioncclicenseUrl")))
                    .andExpect(jsonPath("$._links.self.href",
-                                       is("http://localhost/api/config/submissioncclicenses/search/rightsByQuestions" +
+                                       is("http://localhost/api/config/submissioncclicenseUrls/search/rightsByQuestions" +
                                                   "?license=license3")));
     }
 
@@ -62,7 +62,7 @@ public class SubmissionCCLicenseSearchControllerIT extends AbstractControllerInt
         String epersonToken = getAuthToken(eperson.getEmail(), password);
 
         getClient(epersonToken).perform(get(
-                "/api/config/submissioncclicenses/search/rightsByQuestions?license=nonexisting-license" +
+                "/api/config/submissioncclicenseUrls/search/rightsByQuestions?license=nonexisting-license" +
                         "&answer_license2-field0=license2-field0-enum1"))
                    .andExpect(status().isNotFound());
     }
@@ -72,7 +72,7 @@ public class SubmissionCCLicenseSearchControllerIT extends AbstractControllerInt
         String epersonToken = getAuthToken(eperson.getEmail(), password);
 
         getClient(epersonToken).perform(get(
-                "/api/config/submissioncclicenses/search/rightsByQuestions?license=license1&answer_license1field0" +
+                "/api/config/submissioncclicenseUrls/search/rightsByQuestions?license=license1&answer_license1field0" +
                         "=license1field0enum1"))
                    .andExpect(status().isBadRequest());
     }
@@ -82,7 +82,7 @@ public class SubmissionCCLicenseSearchControllerIT extends AbstractControllerInt
         String epersonToken = getAuthToken(eperson.getEmail(), password);
 
         getClient(epersonToken).perform(get(
-                "/api/config/submissioncclicenses/search/rightsByQuestions?license=license2" +
+                "/api/config/submissioncclicenseUrls/search/rightsByQuestions?license=license2" +
                         "&answer_license2field0=license2field0enum1&answer_nonexisting=test"))
                    .andExpect(status().isBadRequest());
     }
@@ -91,7 +91,7 @@ public class SubmissionCCLicenseSearchControllerIT extends AbstractControllerInt
     public void searchRightsByQuestionsAdditionalUnAuthorized() throws Exception {
 
         getClient().perform(get(
-                "/api/config/submissioncclicenses/search/rightsByQuestions?license=license2&answer_license2-field0" +
+                "/api/config/submissioncclicenseUrls/search/rightsByQuestions?license=license2&answer_license2-field0" +
                         "=license2-field0-enum1"))
                                .andExpect(status().isUnauthorized());
 
