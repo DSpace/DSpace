@@ -224,7 +224,7 @@ public abstract class JWTTokenHandler {
     }
 
     public long getExpirationPeriod() {
-        return configurationService.getLongProperty(getTokenExpirationConfigurationKey(), 30);
+        return configurationService.getLongProperty(getTokenExpirationConfigurationKey(), 1800000);
     }
 
     public boolean isEncryptionEnabled() {

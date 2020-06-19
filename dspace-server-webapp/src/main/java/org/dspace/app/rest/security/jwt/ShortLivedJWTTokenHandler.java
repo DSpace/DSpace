@@ -22,7 +22,7 @@ import org.springframework.stereotype.Component;
 
 /**
  * Class responsible for creating and parsing JSON Web Tokens (JWTs) used for bitstream
- * dowloads, supports both JWS and JWE https://jwt.io/ .
+ * downloads among other things, supports both JWS and JWE https://jwt.io/ .
  */
 @Component
 public class ShortLivedJWTTokenHandler extends JWTTokenHandler {

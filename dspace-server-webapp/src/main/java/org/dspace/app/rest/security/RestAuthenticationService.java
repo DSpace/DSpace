@@ -11,6 +11,7 @@ import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.dspace.app.rest.model.wrapper.AuthenticationToken;
 import org.dspace.authenticate.service.AuthenticationService;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
@@ -28,7 +29,7 @@ public interface RestAuthenticationService {
     void addAuthenticationDataForUser(HttpServletRequest request, HttpServletResponse response,
                                       DSpaceAuthentication authentication, boolean addCookie) throws IOException;
 
-    String getShortLivedAuthenticationToken(Context context, HttpServletRequest request);
+    AuthenticationToken getShortLivedAuthenticationToken(Context context, HttpServletRequest request);
 
     EPerson getAuthenticatedEPerson(HttpServletRequest request, Context context);
 
