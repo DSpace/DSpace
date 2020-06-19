@@ -463,7 +463,7 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService 
             try {
                 configReader = new SubmissionConfigReader();
                 SubmissionConfig submissionName = configReader.getSubmissionConfigByCollection(collection.getHandle());
-                ma = controllerFormDefinitions.get(submissionName.getSubmissionName()).get(fieldKey);
+                ma = controllerFormDefinitions.get(fieldKey).get(submissionName.getSubmissionName());
             } catch (SubmissionConfigReaderException e) {
                 // the system is in an illegal state as the submission definition is not valid
                 throw new IllegalStateException(e);
