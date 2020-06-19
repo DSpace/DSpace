@@ -29,6 +29,12 @@ public interface RestAuthenticationService {
     void addAuthenticationDataForUser(HttpServletRequest request, HttpServletResponse response,
                                       DSpaceAuthentication authentication, boolean addCookie) throws IOException;
 
+    /**
+     * Retrieve a short lived authentication token, this can be used (among other things) for file downloads
+     * @param context the DSpace context
+     * @param request The current client request
+     * @return An AuthenticationToken that contains a string with the token
+     */
     AuthenticationToken getShortLivedAuthenticationToken(Context context, HttpServletRequest request);
 
     EPerson getAuthenticatedEPerson(HttpServletRequest request, Context context);

@@ -50,7 +50,7 @@ public class ShortLivedJWTTokenHandler extends JWTTokenHandler {
             Date expirationTime = jwtClaimsSet.getExpirationTime();
             return signedJWT.verify(verifier)
                 && expirationTime != null
-                //Ensure expiration timestamp is after the current time, with a minute of acceptable clock skew.
+                //Ensure expiration timestamp is after the current time
                 && DateUtils.isAfter(expirationTime, new Date(), 0);
         }
     }
