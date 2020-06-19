@@ -791,7 +791,7 @@ public class RestResourceController implements InitializingBean {
             Method linkMethod = utils.requireMethod(linkRepository.getClass(), linkRest.method());
             try {
                 if (Page.class.isAssignableFrom(linkMethod.getReturnType())) {
-                    Page<? extends RestModel> pageResult = (Page<? extends RestAddressableModel>) linkMethod
+                    Page<? extends RestModel> pageResult = (Page<? extends RestModel>) linkMethod
                             .invoke(linkRepository, request, uuid, page, utils.obtainProjection());
 
                     if (pageResult == null) {
@@ -815,8 +815,8 @@ public class RestResourceController implements InitializingBean {
                     return new EntityModel(new EmbeddedPage(link.getHref(),
                             pageResult.map(converter::toResource), null, subpath));
                 } else {
-                    RestModel object = (RestModel) linkMethod.invoke(linkRepository, request, uuid, page,
-                            utils.obtainProjection());
+                    RestModel object = (RestModel) linkMethod.invoke(linkRepository, request,
+                            uuid, page, utils.obtainProjection());
                     if (object == null) {
                         response.setStatus(HttpServletResponse.SC_NO_CONTENT);
                         return null;
@@ -838,7 +838,7 @@ public class RestResourceController implements InitializingBean {
                 throw new RuntimeException(e);
             }
         }
-        RestAddressableModel modelObject = repository.findById(uuid).orElse(null);
+        RestModel modelObject = repository.findById(uuid).orElse(null);
 
         if (modelObject == null) {
             throw new ResourceNotFoundException(apiCategory + "." + model + " with id: " + uuid + " not found");
