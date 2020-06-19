@@ -18,6 +18,7 @@ import org.dspace.app.rest.model.patch.Patch;
 import org.dspace.app.rest.repository.patch.operation.DSpaceObjectMetadataPatchUtils;
 import org.dspace.app.rest.repository.patch.operation.EPersonPasswordReplaceOperation;
 import org.dspace.app.rest.utils.ContextUtil;
+import org.dspace.app.util.AuthorizeUtil;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -70,9 +71,13 @@ public class EPersonRestPermissionEvaluatorPlugin extends RestObjectPermissionEv
         // anonymous user
         if (ePerson == null) {
             return false;
-        }
-
-        if (dsoId.equals(ePerson.getID())) {
+            } else if (dsoId.equals(ePerson.getID())) {
+                return true;
+            } else if (authorizeService.isCommunityAdmin(context, ePerson)
+                       && AuthorizeUtil.canCommunityAdminManageAccounts()) {
+                return true;
+            } else if (authorizeService.isCollectionAdmin(context, ePerson)
+                       && AuthorizeUtil.canCollectionAdminManageAccounts()) {
             return true;
         }
 
