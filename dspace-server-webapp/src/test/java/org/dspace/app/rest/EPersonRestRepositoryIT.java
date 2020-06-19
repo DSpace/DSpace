@@ -2071,18 +2071,25 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                    .andExpect(status().isCreated());
         String newRegisterToken = registrationDataService.findByEmail(context, newRegisterEmail).getToken();
 
-        // We need to create this json manually to support actually setting the password to a value.
-        // When using the mapper to write an EPersonRest object to JSON to pass it along, the password gets lost
-        String json = "{\"metadata\":{\"eperson.firstname\":[{\"value\":\"John\"}]," +
-            "\"eperson.lastname\":[{\"value\":\"Doe\"}]},\"password\":\"somePassword\"," +
-            "\"type\":\"eperson\"}";
-
+        EPersonRest ePersonRest = new EPersonRest();
+        MetadataRest metadataRest = new MetadataRest();
+        ePersonRest.setCanLogIn(true);
+        MetadataValueRest surname = new MetadataValueRest();
+        surname.setValue("Doe");
+        metadataRest.put("eperson.lastname", surname);
+        MetadataValueRest firstname = new MetadataValueRest();
+        firstname.setValue("John");
+        metadataRest.put("eperson.firstname", firstname);
+        ePersonRest.setMetadata(metadataRest);
+        ePersonRest.setPassword("somePassword");
         AtomicReference<UUID> idRef = new AtomicReference<UUID>();
+
+        mapper.setAnnotationIntrospector(new IgnoreJacksonWriteOnlyAccess());
 
         try {
             getClient().perform(post("/api/eperson/epersons")
                                     .param("token", newRegisterToken)
-                                    .content(json)
+                                    .content(mapper.writeValueAsBytes(ePersonRest))
                                     .contentType(MediaType.APPLICATION_JSON))
                                       .andExpect(status().isCreated())
                                       .andExpect(jsonPath("$", Matchers.allOf(
@@ -2232,9 +2239,6 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
             EPerson createdEPerson = ePersonService.find(context, UUID.fromString(epersonUuid));
             assertTrue(ePersonService.checkPassword(context, createdEPerson, "somePassword"));
             assertNull(registrationDataService.findByToken(context, newRegisterToken));
-
-            context.turnOffAuthorisationSystem();
-            context.restoreAuthSystemState();
 
             context.turnOffAuthorisationSystem();
             registrationDataService.deleteByToken(context, newRegisterToken);

@@ -76,18 +76,13 @@ public class EPersonRegistrationFeatureIT extends AbstractControllerIntegrationT
         SiteRest SiteRest = siteConverter.convert(site, Projection.DEFAULT);
         String siteUri = utils.linkToSingleResource(SiteRest, "self").getHref();
 
-        context.turnOffAuthorisationSystem();
         configurationService.setProperty("user.registration", false);
-        context.restoreAuthSystemState();
 
         getClient().perform(get("/api/authz/authorizations/search/objectAndFeature")
                                           .param("uri", siteUri)
                                           .param("feature", epersonRegistrationFeature.getName()))
                              .andExpect(status().isNoContent());
 
-        context.turnOffAuthorisationSystem();
-        configurationService.setProperty("user.registration", true);
-        context.restoreAuthSystemState();
     }
 
 
@@ -104,10 +99,8 @@ public class EPersonRegistrationFeatureIT extends AbstractControllerIntegrationT
                                           .param("feature", epersonRegistrationFeature.getName()))
                              .andExpect(status().isOk());
 
-        context.turnOffAuthorisationSystem();
         //Enable Shibboleth and password login
         configurationService.setProperty("plugin.sequence.org.dspace.authenticate.AuthenticationMethod", SHIB_ONLY);
-        context.restoreAuthSystemState();
 
         getClient().perform(get("/api/authz/authorizations/search/objectAndFeature")
                                           .param("uri", siteUri)
