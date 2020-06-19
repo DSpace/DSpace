@@ -597,8 +597,11 @@ public class AuthorizeUtil {
                 authorizeManageAdminGroup(context, collection);
                 return;
             }
-
-
+            // if we reach this point, it means that the group is related
+            // to a collection but as it is not the submitters, nor the administrators,
+            // nor a workflow groups it must be a default item/bitstream groups
+            authorizeManageDefaultReadGroup(context, collection);
+            return;
         }
         if (parentObject.getType() == Constants.COMMUNITY) {
             Community community = (Community) parentObject;
@@ -651,5 +654,39 @@ public class AuthorizeUtil {
             log.error("Something went wrong trying to retrieve EPerson for email: " + email, e);
         }
         return false;
+    }
+
+    /**
+     * This method checks if the community Admin can manage accounts
+     *
+     * @return true if is able
+     */
+    public static boolean canCommunityAdminManageAccounts() {
+        boolean isAble = false;
+        if (AuthorizeConfiguration.canCommunityAdminManagePolicies()
+            || AuthorizeConfiguration.canCommunityAdminManageAdminGroup()
+            || AuthorizeConfiguration.canCommunityAdminManageCollectionPolicies()
+            || AuthorizeConfiguration.canCommunityAdminManageCollectionSubmitters()
+            || AuthorizeConfiguration.canCommunityAdminManageCollectionWorkflows()
+            || AuthorizeConfiguration.canCommunityAdminManageCollectionAdminGroup()) {
+            isAble = true;
+        }
+        return isAble;
+    }
+
+    /**
+     * This method checks if the Collection Admin can manage accounts
+     *
+     * @return true if is able
+     */
+    public static boolean canCollectionAdminManageAccounts() {
+        boolean isAble = false;
+        if (AuthorizeConfiguration.canCollectionAdminManagePolicies()
+            || AuthorizeConfiguration.canCollectionAdminManageSubmitters()
+            || AuthorizeConfiguration.canCollectionAdminManageWorkflows()
+            || AuthorizeConfiguration.canCollectionAdminManageAdminGroup()) {
+            isAble = true;
+        }
+        return isAble;
     }
 }

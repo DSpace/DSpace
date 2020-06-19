@@ -24,8 +24,8 @@ public class RootConverter {
     public RootRest convert() {
         RootRest rootRest = new RootRest();
         rootRest.setDspaceName(configurationService.getProperty("dspace.name"));
-        rootRest.setDspaceURL(configurationService.getProperty("dspace.ui.url"));
-        rootRest.setDspaceRest(configurationService.getProperty("dspace.server.url"));
+        rootRest.setDspaceUI(configurationService.getProperty("dspace.ui.url"));
+        rootRest.setDspaceServer(configurationService.getProperty("dspace.server.url"));
         return rootRest;
     }
 }
