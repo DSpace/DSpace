@@ -12,19 +12,16 @@ import static org.junit.Assert.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.List;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.model.RegistrationRest;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.eperson.RegistrationData;
 import org.dspace.eperson.dao.RegistrationDataDAO;
 import org.dspace.services.ConfigurationService;
-import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -35,19 +32,6 @@ public class RegistrationRestControllerIT extends AbstractControllerIntegrationT
 
     @Autowired
     private ConfigurationService configurationService;
-
-
-    @Before
-    public void setup() throws SQLException {
-        CollectionUtils.emptyIfNull(registrationDataDAO.findAll(context, RegistrationData.class)).stream()
-                       .forEach(registrationData -> {
-                           try {
-                               registrationDataDAO.delete(context, registrationData);
-                           } catch (SQLException e) {
-                               throw new RuntimeException(e);
-                           }
-                       });
-    }
 
     @Test
     public void registrationFlowTest() throws Exception {
@@ -119,5 +103,6 @@ public class RegistrationRestControllerIT extends AbstractControllerIntegrationT
             RegistrationData registrationData = iterator.next();
             registrationDataDAO.delete(context, registrationData);
         }
+        context.complete();
     }
 }
