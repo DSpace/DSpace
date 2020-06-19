@@ -7,15 +7,24 @@
  */
 package org.dspace.app.rest.repository;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
+import org.dspace.app.rest.Parameter;
+import org.dspace.app.rest.SearchRestMethod;
+import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.VocabularyRest;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.utils.AuthorityUtils;
+import org.dspace.content.Collection;
+import org.dspace.content.MetadataField;
 import org.dspace.content.authority.ChoiceAuthority;
 import org.dspace.content.authority.service.ChoiceAuthorityService;
+import org.dspace.content.service.CollectionService;
+import org.dspace.content.service.MetadataFieldService;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -38,6 +47,12 @@ public class VocabularyRestRepository extends DSpaceRestRepository<VocabularyRes
     @Autowired
     private AuthorityUtils authorityUtils;
 
+    @Autowired
+    private CollectionService collectionService;
+
+    @Autowired
+    private MetadataFieldService metadataFieldService;
+
     @PreAuthorize("hasAuthority('AUTHENTICATED')")
     @Override
     public VocabularyRest findOne(Context context, String name) {
@@ -57,6 +72,39 @@ public class VocabularyRestRepository extends DSpaceRestRepository<VocabularyRes
             results.add(result);
         }
         return utils.getPage(results, pageable);
+    }
+
+    @PreAuthorize("hasAuthority('AUTHENTICATED')")
+    @SearchRestMethod(name = "byMetadataAndCollection")
+    public VocabularyRest findByMetadataAndCollection(
+           @Parameter(value = "metadata", required = true) String metadataField,
+           @Parameter(value = "collection", required = true) UUID collectionUuid) {
+
+        Collection collection = null;
+        MetadataField metadata = null;
+        String[] tokens = org.dspace.core.Utils.tokenize(metadataField);
+
+        try {
+            collection = collectionService.find(obtainContext(), collectionUuid);
+        } catch (SQLException e) {
+            throw new UnprocessableEntityException(collectionUuid + " is not a valid collection");
+        }
+        try {
+            metadata = metadataFieldService.findByElement(obtainContext(), tokens[0], tokens[1], tokens[2]);
+        } catch (SQLException e) {
+            throw new UnprocessableEntityException(metadataField + " is not a valid metadata");
+        }
+
+        if (metadata == null) {
+            throw new UnprocessableEntityException(metadataField + " is not a valid metadata");
+        }
+        if (collection == null) {
+            throw new UnprocessableEntityException(collectionUuid + " is not a valid collection");
+        }
+
+        String authorityName = cas.getChoiceAuthorityName(tokens[0], tokens[1], tokens[2], collection);
+        ChoiceAuthority source = cas.getChoiceAuthorityByAuthorityName(authorityName);
+        return authorityUtils.convertAuthority(source, authorityName, utils.obtainProjection());
     }
 
     @Override
