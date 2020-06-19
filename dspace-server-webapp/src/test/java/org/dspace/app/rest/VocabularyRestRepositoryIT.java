@@ -157,8 +157,8 @@ public class VocabularyRestRepositoryIT extends AbstractControllerIntegrationTes
                          "Research Subject Categories::SOCIAL SCIENCES::Social sciences::Social work::Youth research",
                          "vocabularyEntry")
                    )))
-                .andExpect(jsonPath("$.page.totalElements", Matchers.is(26)))
-                .andExpect(jsonPath("$.page.totalPages", Matchers.is(13)))
+                .andExpect(jsonPath("$.page.totalElements", Matchers.is(2)))
+                .andExpect(jsonPath("$.page.totalPages", Matchers.is(1)))
                 .andExpect(jsonPath("$.page.size", Matchers.is(2)));
     }
 
@@ -274,7 +274,7 @@ public class VocabularyRestRepositoryIT extends AbstractControllerIntegrationTes
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$._embedded.vocabularyEntries", Matchers.containsInAnyOrder(
                         VocabularyMatcher.matchVocabularyEntry("Book", "Book", "vocabularyEntry"),
-                        VocabularyMatcher.matchVocabularyEntry("Book chapter", "Book chapter", "vocabularySuggestion")
+                        VocabularyMatcher.matchVocabularyEntry("Book chapter", "Book chapter", "vocabularyEntry")
                         )))
                 .andExpect(jsonPath("$.page.totalElements", Matchers.is(2)))
                 .andExpect(jsonPath("$.page.totalPages", Matchers.is(1)))
