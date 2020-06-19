@@ -130,7 +130,6 @@ public class CCLicenseRemovePatchOperationIT extends AbstractControllerIntegrati
         getClient(epersonToken).perform(patch("/api/submission/workspaceitems/" + workspaceItem.getID())
                                                 .content(removePatch)
                                                 .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
-                               .andExpect(status().isOk())
-                               .andExpect(jsonPath("$.sections", not(hasJsonPath("cclicense"))));
+                               .andExpect(status().isInternalServerError());
     }
 }

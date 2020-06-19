@@ -14,28 +14,28 @@ import javax.servlet.ServletRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
-import org.dspace.app.rest.model.SubmissionCCLicenseRest;
+import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.model.SubmissionCCLicenseUrlRest;
-import org.dspace.app.rest.model.hateoas.SubmissionCCLicenseUrlResource;
+import org.dspace.app.rest.repository.DSpaceRestRepository;
 import org.dspace.app.rest.utils.Utils;
+import org.dspace.core.Context;
 import org.dspace.license.service.CreativeCommonsService;
 import org.dspace.services.RequestService;
 import org.dspace.utils.DSpace;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.stereotype.Component;
 
 /**
- * This controller is responsible for searching the CC License URI
+ * This Repository is responsible for handling the CC License URIs.
+ * It only supports a search method
  */
-@RestController
-@RequestMapping("/api/" + SubmissionCCLicenseRest.CATEGORY + "/" + SubmissionCCLicenseRest.PLURAL + "/search" +
-        "/rightsByQuestions")
-@PreAuthorize("hasAuthority('AUTHENTICATED')")
-public class SubmissionCCLicenseSearchController {
+
+@Component(SubmissionCCLicenseUrlRest.CATEGORY + "." + SubmissionCCLicenseUrlRest.NAME)
+public class SubmissionCCLicenseUrlRepository extends DSpaceRestRepository<SubmissionCCLicenseUrlRest, String> {
 
     @Autowired
     protected Utils utils;
@@ -52,10 +52,11 @@ public class SubmissionCCLicenseSearchController {
      * Retrieves the CC License URI based on the license ID and answers in the field questions, provided as parameters
      * to this request
      *
-     * @return the CC License URI as a SubmissionCCLicenseUrlResource
+     * @return the CC License URI as a SubmissionCCLicenseUrlRest
      */
-    @RequestMapping(method = RequestMethod.GET)
-    public SubmissionCCLicenseUrlResource findByRightsByQuestions() {
+    @PreAuthorize("hasAuthority('AUTHENTICATED')")
+    @SearchRestMethod(name = "rightsByQuestions")
+    public SubmissionCCLicenseUrlRest findByRightsByQuestions() {
         ServletRequest servletRequest = requestService.getCurrentRequest()
                                                       .getServletRequest();
         Map<String, String[]> requestParameterMap = servletRequest
@@ -66,6 +67,9 @@ public class SubmissionCCLicenseSearchController {
             throw new DSpaceBadRequestException(
                     "A \"license\" parameter needs to be provided.");
         }
+
+        // Loop through parameters to find answer parameters, adding them to the parameterMap. Zero or more answers
+        // may exist, as some CC licenses do not require answers
         for (String parameter : requestParameterMap.keySet()) {
             if (StringUtils.startsWith(parameter, "answer_")) {
                 String field = StringUtils.substringAfter(parameter, "answer_");
@@ -93,8 +97,25 @@ public class SubmissionCCLicenseSearchController {
             throw new ResourceNotFoundException("No CC License URI could be found for ID: " + licenseId);
         }
 
-        SubmissionCCLicenseUrlRest submissionCCLicenseUrlRest = converter.toRest(licenseUri, utils.obtainProjection());
-        return converter.toResource(submissionCCLicenseUrlRest);
+        return converter.toRest(licenseUri, utils.obtainProjection());
 
+    }
+
+    /**
+     * The findOne method is not supported in this repository
+     */
+    public SubmissionCCLicenseUrlRest findOne(final Context context, final String s) {
+        throw new RepositoryMethodNotImplementedException(SubmissionCCLicenseUrlRest.NAME, "findOne");
+    }
+
+    /**
+     * The findAll method is not supported in this repository
+     */
+    public Page<SubmissionCCLicenseUrlRest> findAll(final Context context, final Pageable pageable) {
+        throw new RepositoryMethodNotImplementedException(SubmissionCCLicenseUrlRest.NAME, "findAll");
+    }
+
+    public Class<SubmissionCCLicenseUrlRest> getDomainClass() {
+        return SubmissionCCLicenseUrlRest.class;
     }
 }
