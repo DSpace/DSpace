@@ -7,6 +7,8 @@
  */
 package org.dspace.app.rest.repository;
 
+import java.sql.SQLException;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -89,20 +91,31 @@ public class SubmissionUploadRestRepository extends DSpaceRestRepository<Submiss
         return SubmissionUploadRest.class;
     }
 
-    private SubmissionUploadRest convert(Context context, UploadConfiguration config, Projection projection)
-            throws Exception {
+    private SubmissionUploadRest convert(Context context, UploadConfiguration config, Projection projection) {
         SubmissionUploadRest result = new SubmissionUploadRest();
         result.setProjection(projection);
         for (AccessConditionOption option : config.getOptions()) {
             AccessConditionOptionRest optionRest = new AccessConditionOptionRest();
             if (option.getGroupName() != null) {
-                Group group = groupService.findByName(context, option.getGroupName());
+                Group group;
+                try {
+                    group = groupService.findByName(context, option.getGroupName());
+                } catch (SQLException e) {
+                    throw new IllegalStateException("Wrong group name configuration for the access condition "
+                            + "option named " + option.getName());
+                }
                 if (group != null) {
                     optionRest.setGroupUUID(group.getID());
                 }
             }
             if (option.getSelectGroupName() != null) {
-                Group group = groupService.findByName(context, option.getSelectGroupName());
+                Group group;
+                try {
+                    group = groupService.findByName(context, option.getSelectGroupName());
+                } catch (SQLException e) {
+                    throw new IllegalStateException("Wrong select group name configuration for the access condition "
+                            + "option named " + option.getName());
+                }
                 if (group != null) {
                     optionRest.setSelectGroupUUID(group.getID());
                 }
@@ -110,10 +123,20 @@ public class SubmissionUploadRestRepository extends DSpaceRestRepository<Submiss
             optionRest.setHasStartDate(option.getHasStartDate());
             optionRest.setHasEndDate(option.getHasEndDate());
             if (StringUtils.isNotBlank(option.getStartDateLimit())) {
-                optionRest.setMaxStartDate(dateMathParser.parseMath(option.getStartDateLimit()));
+                try {
+                    optionRest.setMaxStartDate(dateMathParser.parseMath(option.getStartDateLimit()));
+                } catch (ParseException e) {
+                    throw new IllegalStateException("Wrong start date limit configuration for the access condition "
+                            + "option named  " + option.getName());
+                }
             }
             if (StringUtils.isNotBlank(option.getEndDateLimit())) {
-                optionRest.setMaxEndDate(dateMathParser.parseMath(option.getEndDateLimit()));
+                try {
+                    optionRest.setMaxEndDate(dateMathParser.parseMath(option.getEndDateLimit()));
+                } catch (ParseException e) {
+                    throw new IllegalStateException("Wrong end date limit configuration for the access condition "
+                            + "option named  " + option.getName());
+                }
             }
             optionRest.setName(option.getName());
             result.getAccessConditionOptions().add(optionRest);
