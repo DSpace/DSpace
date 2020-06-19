@@ -16,7 +16,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  *
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
-public class VocabularyEntryRest {
+public class VocabularyEntryRest implements RestModel {
     public static final String NAME = "vocabularyEntry";
     private String authority;
     private String display;
@@ -67,5 +67,10 @@ public class VocabularyEntryRest {
 
     public VocabularyEntryDetailsRest getVocabularyEntryDetailsRest() {
         return vocabularyEntryDetailsRest;
+    }
+
+    @Override
+    public String getType() {
+        return VocabularyEntryRest.NAME;
     }
 }
