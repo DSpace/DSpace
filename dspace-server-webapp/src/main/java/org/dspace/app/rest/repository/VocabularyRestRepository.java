@@ -86,13 +86,10 @@ public class VocabularyRestRepository extends DSpaceRestRepository<VocabularyRes
 
         try {
             collection = collectionService.find(obtainContext(), collectionUuid);
-        } catch (SQLException e) {
-            throw new UnprocessableEntityException(collectionUuid + " is not a valid collection");
-        }
-        try {
             metadata = metadataFieldService.findByElement(obtainContext(), tokens[0], tokens[1], tokens[2]);
         } catch (SQLException e) {
-            throw new UnprocessableEntityException(metadataField + " is not a valid metadata");
+            throw new RuntimeException(
+                    "A database error occurs retrieving the metadata and/or the collection information", e);
         }
 
         if (metadata == null) {
