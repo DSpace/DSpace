@@ -22,6 +22,7 @@ import org.dspace.app.rest.model.EPersonRest;
 import org.dspace.app.rest.model.hateoas.AuthenticationStatusResource;
 import org.dspace.app.rest.model.hateoas.AuthenticationTokenResource;
 import org.dspace.app.rest.model.hateoas.AuthnResource;
+import org.dspace.app.rest.model.wrapper.AuthenticationToken;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.security.RestAuthenticationService;
 import org.dspace.app.rest.utils.ContextUtil;
@@ -122,7 +123,7 @@ public class AuthenticationRestController implements InitializingBean {
     }
 
     /**
-     * This method will generate a short lived token to be used for bitstream downloads.
+     * This method will generate a short lived token to be used for bitstream downloads among other things.
      *
      * curl -v -X POST https://{dspace-server.url}/api/authn/shortlivedtokens -H "Authorization: Bearer eyJhbG...COdbo"
      *
@@ -139,9 +140,9 @@ public class AuthenticationRestController implements InitializingBean {
     @RequestMapping(value = "/shortlivedtokens", method = RequestMethod.POST)
     public AuthenticationTokenResource shortLivedLogin(HttpServletRequest request) {
         Projection projection = utils.obtainProjection();
-        String shortLivedToken =
+        AuthenticationToken shortLivedToken =
             restAuthenticationService.getShortLivedAuthenticationToken(ContextUtil.obtainContext(request), request);
-        AuthenticationTokenRest authenticationTokenRest =  converter.toRest(shortLivedToken, projection);
+        AuthenticationTokenRest authenticationTokenRest = converter.toRest(shortLivedToken, projection);
         return converter.toResource(authenticationTokenRest);
     }
 

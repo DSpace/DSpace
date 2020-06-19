@@ -18,6 +18,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.nimbusds.jose.JOSEException;
 import org.apache.commons.lang3.StringUtils;
+import org.dspace.app.rest.model.wrapper.AuthenticationToken;
 import org.dspace.app.rest.security.DSpaceAuthentication;
 import org.dspace.app.rest.security.RestAuthenticationService;
 import org.dspace.app.rest.utils.ContextUtil;
@@ -89,26 +90,26 @@ public class JWTTokenRestAuthenticationServiceImpl implements RestAuthentication
     }
 
     /**
-     * Create a short-lived token for bitstream downloads
+     * Create a short-lived token for bitstream downloads among other things
      * @param context   The context for which to create the token
      * @param request   The request for which to create the token
      * @return The token with a short lifespan
      */
     @Override
-    public String getShortLivedAuthenticationToken(Context context, HttpServletRequest request) {
-        String token = null;
+    public AuthenticationToken getShortLivedAuthenticationToken(Context context, HttpServletRequest request) {
         try {
+            String token;
             List<Group> groups = authenticationService.getSpecialGroups(context, request);
             token = shortLivedJWTTokenHandler.createTokenForEPerson(context, request, null, groups);
             context.commit();
-            return token;
+            return new AuthenticationToken(token);
         } catch (JOSEException e) {
             log.error("JOSE Exception", e);
         } catch (SQLException e) {
             log.error("SQL error when adding authentication", e);
         }
 
-        return token;
+        return null;
     }
 
     @Override
