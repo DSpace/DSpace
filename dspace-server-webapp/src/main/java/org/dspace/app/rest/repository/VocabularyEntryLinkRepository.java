@@ -86,7 +86,9 @@ public class VocabularyEntryLinkRepository extends AbstractDSpaceRestRepository
         Choices choices = cas.getMatches(fieldKey, filter, collection, Math.toIntExact(pageable.getOffset()),
                 pageable.getPageSize(), context.getCurrentLocale().toString());
         for (Choice value : choices.values) {
-            results.add(authorityUtils.convertEntry(value, name, projection));
+            if (value != null) {
+                results.add(authorityUtils.convertEntry(value, name, projection));
+            }
         }
         return new PageImpl<>(results, pageable, results.size());
     }

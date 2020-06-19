@@ -13,6 +13,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.util.DCInputsReader;
 import org.dspace.app.util.DCInputsReaderException;
@@ -107,14 +108,18 @@ public class DCInputAuthority extends SelfNamedPlugin implements ChoiceAuthority
         init();
 
         int dflt = -1;
+        int index = 0;
         Choice v[] = new Choice[values.length];
         for (int i = 0; i < values.length; ++i) {
-            v[i] = new Choice(values[i], values[i], labels[i]);
+            if (query == null || StringUtils.containsIgnoreCase(values[i], query)) {
+                v[index] = new Choice(values[i], values[i], labels[i]);
+                index++;
+            }
             if (values[i].equalsIgnoreCase(query)) {
                 dflt = i;
             }
         }
-        return new Choices(v, 0, v.length, Choices.CF_AMBIGUOUS, false, dflt);
+        return new Choices(v, 0, index, Choices.CF_AMBIGUOUS, false, dflt);
     }
 
     @Override
