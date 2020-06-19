@@ -19,7 +19,20 @@ import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.hamcrest.Matchers;
 import org.junit.Test;
 
+/**
+ * 
+ * 
+ * @author Mykhaylo Boychuk (4science.it)
+ */
 public class VocabularyEntryDetailsIT extends AbstractControllerIntegrationTest {
+
+    @Test
+    public void findAllTest() throws Exception {
+        String authToken = getAuthToken(admin.getEmail(), password);
+        getClient(authToken).perform(get("/api/submission/vocabularyEntryDetails"))
+                            .andExpect(status()
+                            .isMethodNotAllowed());
+    }
 
     @Test
     public void findOneTest() throws Exception {
@@ -37,6 +50,7 @@ public class VocabularyEntryDetailsIT extends AbstractControllerIntegrationTest 
                         .andExpect(jsonPath("$.otherInformation.parent", is("HUMANITIES and RELIGION")));
     }
 
+    @Test
     public void findOneUnauthorizedTest() throws Exception {
         String idAuthority = "srsc:SCB110";
         getClient().perform(get("/api/submission/vocabularyEntryDetails/" + idAuthority))
