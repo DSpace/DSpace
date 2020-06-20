@@ -30,5 +30,11 @@
         <property name="url" value="${lcname.url}"/>
         <property name="sourceIdentifier" value="lcname"/>
     </bean>
+
+    <bean class="org.dspace.external.provider.impl.LiveImportDataProvider">
+        <property name="metadataSource" ref="PubmedImportService"/>
+        <property name="sourceIdentifier" value="pubmed"/>
+        <property name="recordIdMetadata" value="dc.identifier.other"/>
+    </bean>
 </beans>
 
