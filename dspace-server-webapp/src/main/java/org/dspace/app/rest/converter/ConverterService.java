@@ -149,12 +149,27 @@ public class ConverterService {
         DSpaceRestRepository repositoryToUse = utils
             .getResourceRepositoryByCategoryAndModel(baseObjectRest.getCategory(), baseObjectRest.getType());
         Annotation preAuthorize = null;
+        int maxDepth = 0;
         for (Method m : repositoryToUse.getClass().getMethods()) {
             if (StringUtils.equalsIgnoreCase(m.getName(), "findOne")) {
-                preAuthorize = AnnotationUtils.findAnnotation(m, PreAuthorize.class);
+                int depth = howManySuperclass(m.getDeclaringClass());
+                if (depth > maxDepth) {
+                    preAuthorize = AnnotationUtils.findAnnotation(m, PreAuthorize.class);
+                    maxDepth = depth;
+                }
             }
         }
         return preAuthorize;
+    }
+
+    private int howManySuperclass(Class<?> declaringClass) {
+        Class curr = declaringClass;
+        int count = 0;
+        while (curr != Object.class) {
+            curr = curr.getSuperclass();
+            count++;
+        }
+        return count;
     }
 
     private Annotation getDefaultFindOnePreAuthorize() {
