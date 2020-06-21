@@ -30,6 +30,7 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.sherpa.v2.SHERPAPublisher;
 import org.dspace.app.sherpa.v2.SHERPAPublisherResponse;
+import org.dspace.app.sherpa.v2.SHERPAUtils;
 import org.dspace.content.dto.MetadataValueDTO;
 import org.dspace.external.model.ExternalDataObject;
 import org.dspace.external.provider.ExternalDataProvider;
@@ -91,6 +92,10 @@ public class SHERPAv2PublisherDataProvider implements ExternalDataProvider {
         SHERPAPublisherResponse sherpaResponse = null;
         int timeout = 5000;
         URIBuilder uriBuilder = null;
+
+        // Escape the given ID / title query
+        id = SHERPAUtils.escapeQuery(id);
+
         try {
             // Construct URI for an exact match on journal title
             uriBuilder = new URIBuilder(url);
@@ -221,6 +226,9 @@ public class SHERPAv2PublisherDataProvider implements ExternalDataProvider {
      * @throws URISyntaxException
      */
     private HttpGet constructHttpGet(String query, int start, int limit) throws URISyntaxException {
+        // Escape query string
+        query = SHERPAUtils.escapeQuery(query);
+
         // Build URL based on search query
         URIBuilder uriBuilder = new URIBuilder(url);
         uriBuilder.addParameter("item-type", "publisher");
