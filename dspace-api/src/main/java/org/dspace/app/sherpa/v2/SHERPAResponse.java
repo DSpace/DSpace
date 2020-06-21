@@ -17,7 +17,6 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
-import org.dspace.core.I18nUtil;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -386,22 +385,14 @@ public class SHERPAResponse {
         // submitted = preprint
         // accepted = postprint
         // published = pdfversion
+        // These strings can be used to construct i18n messages.
         String articleVersion = "unknown";
-        String versionLabel = "Unknown";
 
         if (permitted.has("article_version")) {
             JSONArray versions = permitted.getJSONArray("article_version");
             articleVersion = versions.getString(0);
             permittedVersion.setArticleVersion(articleVersion);
             log.debug("Added allowed version: " + articleVersion + " to list");
-        }
-
-        if ("submitted".equals(articleVersion)) {
-            versionLabel = I18nUtil.getMessage("jsp.sherpa.submitted-version-label");
-        } else if ("accepted".equals(articleVersion)) {
-            versionLabel = I18nUtil.getMessage("jsp.sherpa.accepted-version-label");
-        } else if ("published".equals(articleVersion)) {
-            versionLabel = I18nUtil.getMessage("jsp.sherpa.published-version-label");
         }
 
         // These are now child arrays, in old API they were explicit like
@@ -414,8 +405,6 @@ public class SHERPAResponse {
             }
             permittedVersion.setConditions(conditionList);
         }
-
-        permittedVersion.setArticleVersionLabel(versionLabel);
 
         // Any prerequisites for this option (eg required by funder)
         List<String> prerequisites = new ArrayList<>();
