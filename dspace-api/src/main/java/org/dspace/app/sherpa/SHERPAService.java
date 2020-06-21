@@ -21,6 +21,7 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.sherpa.v2.SHERPAResponse;
+import org.dspace.app.sherpa.v2.SHERPAUtils;
 import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -77,6 +78,9 @@ public class SHERPAService {
 
             try {
                 Thread.sleep(sleepBetweenTimeouts);
+
+                // Sanitise query string
+                query = SHERPAUtils.sanitiseQuery(query);
 
                 URIBuilder uriBuilder = new URIBuilder(endpoint);
 
