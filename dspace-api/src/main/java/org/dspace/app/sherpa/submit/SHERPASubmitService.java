@@ -51,7 +51,8 @@ public class SHERPASubmitService {
                 SHERPAResponse response = sherpaService.searchByJournalISSN(issn);
                 if (response.isError()) {
                     // Continue with loop
-                    log.warn("Failed to look up SHERPA ROMeO result for ISSN: " + issn);
+                    log.warn("Failed to look up SHERPA ROMeO result for ISSN: " + issn
+                        + ": " + response.getMessage());
                 }
                 // Store this response, even if it has an error (useful for UI reporting)
                 responses.add(response);

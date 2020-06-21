@@ -9,7 +9,9 @@ package org.dspace.app.sherpa;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -107,6 +109,8 @@ public class SHERPAService {
                 if (statusCode != HttpStatus.SC_OK) {
                     sherpaResponse = new SHERPAResponse("SHERPA/RoMEO return not OK status: "
                                                             + statusCode);
+                    String errorBody = IOUtils.toString(response.getEntity().getContent(), StandardCharsets.UTF_8);
+                    log.error("Error from SHERPA HTTP request: " + errorBody);
                 }
 
                 HttpEntity responseBody = response.getEntity();

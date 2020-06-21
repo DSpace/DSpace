@@ -10,12 +10,14 @@ package org.dspace.external.provider.impl;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -118,6 +120,8 @@ public class SHERPAv2JournalDataProvider implements ExternalDataProvider {
             if (statusCode != HttpStatus.SC_OK) {
                 sherpaResponse = new SHERPAResponse("SHERPA/RoMEO return not OK status: "
                                                         + statusCode);
+                String errorBody = IOUtils.toString(response.getEntity().getContent(), StandardCharsets.UTF_8);
+                log.error("Error from SHERPA HTTP request: " + errorBody);
             }
 
             HttpEntity responseBody = response.getEntity();
@@ -222,6 +226,9 @@ public class SHERPAv2JournalDataProvider implements ExternalDataProvider {
                         content.close();
                     }
                 }
+            } else {
+                String errorBody = IOUtils.toString(response.getEntity().getContent(), StandardCharsets.UTF_8);
+                log.error("Error from SHERPA HTTP request: " + errorBody);
             }
         } catch (IOException | URISyntaxException e) {
             log.error("SHERPA/RoMEO query failed: ", e);
@@ -319,6 +326,9 @@ public class SHERPAv2JournalDataProvider implements ExternalDataProvider {
                         content.close();
                     }
                 }
+            } else {
+                String errorBody = IOUtils.toString(response.getEntity().getContent(), StandardCharsets.UTF_8);
+                log.error("Error from SHERPA HTTP request: " + errorBody);
             }
         } catch (IOException | URISyntaxException e) {
             log.error("SHERPA/RoMEO query failed: ", e);
