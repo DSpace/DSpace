@@ -33,6 +33,7 @@ import org.dspace.app.sherpa.v2.SHERPAResponse;
 import org.dspace.content.dto.MetadataValueDTO;
 import org.dspace.external.model.ExternalDataObject;
 import org.dspace.external.provider.ExternalDataProvider;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
  * This class is the implementation of the ExternalDataProvider interface that will deal with SherpaJournal External
@@ -68,6 +69,11 @@ public class SHERPAv2JournalDataProvider implements ExternalDataProvider {
             .disableAutomaticRetries()
             .setMaxConnTotal(5)
             .build();
+
+        // Initialise API key and base URL from configuration service
+        apiKey = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("sherpa.romeo.apikey");
+        url = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("sherpa.romeo.url",
+            "https://v2.sherpa.ac.uk/cgi/retrieve");
     }
 
     /**
@@ -324,35 +330,4 @@ public class SHERPAv2JournalDataProvider implements ExternalDataProvider {
         this.sourceIdentifier = sourceIdentifier;
     }
 
-    /**
-     * Generic getter for the url
-     * @return the url value of this SherpaJournalDataProvider
-     */
-    public String getUrl() {
-        return url;
-    }
-
-    /**
-     * Generic setter for the url
-     * @param url   The url to be set on this SHERPAv2JournalDataProvider
-     */
-    public void setUrl(String url) {
-        this.url = url;
-    }
-
-    /**
-     * Generic getter for the apiKey
-     * @return the apiKey value of this SHERPAv2JournalDataProvider
-     */
-    public String getApiKey() {
-        return apiKey;
-    }
-
-    /**
-     * Generic setter for the apiKey
-     * @param apiKey   The apiKey to be set on this SHERPAv2JournalDataProvider
-     */
-    public void setApiKey(String apiKey) {
-        this.apiKey = apiKey;
-    }
 }
