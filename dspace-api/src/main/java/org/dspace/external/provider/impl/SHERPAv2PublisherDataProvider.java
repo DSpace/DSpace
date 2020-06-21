@@ -93,8 +93,8 @@ public class SHERPAv2PublisherDataProvider implements ExternalDataProvider {
         int timeout = 5000;
         URIBuilder uriBuilder = null;
 
-        // Escape the given ID / title query
-        id = SHERPAUtils.escapeQuery(id);
+        // Sanitise the given ID / title query
+        id = SHERPAUtils.sanitiseQuery(id);
 
         try {
             // Construct URI for an exact match on journal title
@@ -226,8 +226,8 @@ public class SHERPAv2PublisherDataProvider implements ExternalDataProvider {
      * @throws URISyntaxException
      */
     private HttpGet constructHttpGet(String query, int start, int limit) throws URISyntaxException {
-        // Escape query string
-        query = SHERPAUtils.escapeQuery(query);
+        // Sanitise the query string
+        query = SHERPAUtils.sanitiseQuery(query);
 
         // Build URL based on search query
         URIBuilder uriBuilder = new URIBuilder(url);
