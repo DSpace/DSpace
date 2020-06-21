@@ -216,6 +216,7 @@ public class SHERPAv2JournalDataProvider implements ExternalDataProvider {
                     }
                 } catch (IOException e) {
                     log.error("Error parsing SHERPA response input stream: " + e.getMessage());
+                    throw new IOException(e);
                 } finally {
                     if (content != null) {
                         content.close();
@@ -312,6 +313,7 @@ public class SHERPAv2JournalDataProvider implements ExternalDataProvider {
                     }
                 } catch (IOException e) {
                     log.error("Error reading input stream for SHERPAResponse: " + e.getMessage());
+                    throw new IOException(e);
                 } finally {
                     if (content != null) {
                         content.close();
