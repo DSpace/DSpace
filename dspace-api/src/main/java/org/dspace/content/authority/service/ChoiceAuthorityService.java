@@ -171,4 +171,13 @@ public interface ChoiceAuthorityService {
      */
     public void clearCache();
 
+    /**
+     * Should we store the authority key (if any) for such field key and collection?
+     * 
+     * @param fieldKey   single string identifying metadata field
+     * @param collection Collection owner of Item or where the item is submitted to
+     * @return true if the configuration allows to store the authority value
+     */
+    public boolean storeAuthority(String fieldKey, Collection collection);
+
 }

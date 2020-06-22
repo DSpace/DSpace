@@ -85,10 +85,9 @@ public class VocabularyEntryLinkRepository extends AbstractDSpaceRestRepository
         String fieldKey = org.dspace.core.Utils.standardize(tokens[0], tokens[1], tokens[2], "_");
         Choices choices = cas.getMatches(fieldKey, filter, collection, Math.toIntExact(pageable.getOffset()),
                 pageable.getPageSize(), context.getCurrentLocale().toString());
+        boolean storeAuthority = cas.storeAuthority(fieldKey, collection);
         for (Choice value : choices.values) {
-            if (value != null) {
-                results.add(authorityUtils.convertEntry(value, name, projection));
-            }
+            results.add(authorityUtils.convertEntry(value, name, storeAuthority, projection));
         }
         return new PageImpl<>(results, pageable, results.size());
     }

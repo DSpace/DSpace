@@ -471,4 +471,10 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService 
         }
         return ma;
     }
+
+    @Override
+    public boolean storeAuthority(String fieldKey, Collection collection) {
+        // currently only named authority can eventually provide real authority
+        return controller.containsKey(fieldKey);
+    }
 }
