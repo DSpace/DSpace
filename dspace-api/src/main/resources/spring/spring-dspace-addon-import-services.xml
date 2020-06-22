@@ -21,7 +21,12 @@
 
     <bean id="importService" class="org.dspace.importer.external.service.ImportService" scope="singleton"
           lazy-init="false" autowire="byType" destroy-method="destroy">
-
+        <property name="importSources">
+            <list>
+                <ref bean="PubmedImportService"></ref>
+                <ref bean="BibtexImportService"></ref>
+            </list>
+         </property>
     </bean>
 
     <!--If multiple importServices have been configured here but only one is to be used during the lookup step (StartSubmissionLookupStep),
@@ -36,11 +41,24 @@
           class="org.dspace.importer.external.pubmed.service.PubmedImportMetadataSourceServiceImpl" scope="singleton">
         <property name="metadataFieldMapping" ref="PubmedMetadataFieldMapping"/>
         <property name="baseAddress" value="https://eutils.ncbi.nlm.nih.gov/entrez/eutils/"/>
-
     </bean>
+
+
     <bean id="PubmedMetadataFieldMapping"
           class="org.dspace.importer.external.pubmed.metadatamapping.PubmedFieldMapping">
     </bean>
+
+    <bean id="BibtexImportService"
+          class="org.dspace.importer.external.bibtex.service.BibtexImportMetadataSourceServiceImpl" scope="singleton">
+        <!-- <property name="metadataFieldMapping" ref="BibtexMetadataFieldMapping"/>  -->
+    </bean>
+
+<!--
+    <bean id="BibtexMetadataFieldMapping"
+          class="org.dspace.importer.external.bibtex.service.BibtexFieldMapping">
+    </bean>
+ -->
+
 
     <!-- Metadatafield used to check against if it's already imported or not during the JSONLookupSearcher-->
     <bean id="lookupID" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">

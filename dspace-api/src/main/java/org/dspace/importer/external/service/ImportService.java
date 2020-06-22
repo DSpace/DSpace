@@ -8,6 +8,7 @@
 
 package org.dspace.importer.external.service;
 
+import java.io.InputStream;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -19,10 +20,15 @@ import org.apache.logging.log4j.Logger;
 import org.dspace.content.Item;
 import org.dspace.importer.external.datamodel.ImportRecord;
 import org.dspace.importer.external.datamodel.Query;
+import org.dspace.importer.external.exception.FileMultipleOccurencesException;
+import org.dspace.importer.external.exception.FileSourceException;
 import org.dspace.importer.external.exception.MetadataSourceException;
+import org.dspace.importer.external.service.components.AbstractPlainMetadataSource;
 import org.dspace.importer.external.service.components.Destroyable;
 import org.dspace.importer.external.service.components.MetadataSource;
+import org.dspace.importer.external.service.components.QuerySource;
 import org.springframework.beans.factory.annotation.Autowired;
+
 
 /**
  * Main entry point for the import framework.
@@ -32,8 +38,10 @@ import org.springframework.beans.factory.annotation.Autowired;
  * importer implementation you want to use.
  *
  * @author Roeland Dillen (roeland at atmire dot com)
+ * @author Pasquale Cavallo (pasquale.cavallo@4science.it)
  */
 public class ImportService implements Destroyable {
+
     private HashMap<String, MetadataSource> importSources = new HashMap<>();
 
     Logger log = org.apache.logging.log4j.LogManager.getLogger(ImportService.class);
@@ -101,11 +109,11 @@ public class ImportService implements Destroyable {
     public Collection<ImportRecord> findMatchingRecords(String uri, Item item) throws MetadataSourceException {
         try {
             List<ImportRecord> recordList = new LinkedList<ImportRecord>();
-
             for (MetadataSource metadataSource : matchingImports(uri)) {
-                recordList.addAll(metadataSource.findMatchingRecords(item));
+                if (metadataSource instanceof QuerySource) {
+                    recordList.addAll(((QuerySource)metadataSource).findMatchingRecords(item));
+                }
             }
-
             return recordList;
         } catch (Exception e) {
             throw new MetadataSourceException(e);
@@ -125,9 +133,10 @@ public class ImportService implements Destroyable {
         try {
             List<ImportRecord> recordList = new LinkedList<ImportRecord>();
             for (MetadataSource metadataSource : matchingImports(uri)) {
-                recordList.addAll(metadataSource.findMatchingRecords(query));
+                if (metadataSource instanceof QuerySource) {
+                    recordList.addAll(((QuerySource)metadataSource).findMatchingRecords(query));
+                }
             }
-
             return recordList;
         } catch (Exception e) {
             throw new MetadataSourceException(e);
@@ -145,8 +154,10 @@ public class ImportService implements Destroyable {
     public int getNbRecords(String uri, String query) throws MetadataSourceException {
         try {
             int total = 0;
-            for (MetadataSource MetadataSource : matchingImports(uri)) {
-                total += MetadataSource.getNbRecords(query);
+            for (MetadataSource metadataSource : matchingImports(uri)) {
+                if (metadataSource instanceof QuerySource) {
+                    total += ((QuerySource)metadataSource).getNbRecords(query);
+                }
             }
             return total;
         } catch (Exception e) {
@@ -165,8 +176,10 @@ public class ImportService implements Destroyable {
     public int getNbRecords(String uri, Query query) throws MetadataSourceException {
         try {
             int total = 0;
-            for (MetadataSource MetadataSource : matchingImports(uri)) {
-                total += MetadataSource.getNbRecords(query);
+            for (MetadataSource metadataSource : matchingImports(uri)) {
+                if (metadataSource instanceof QuerySource) {
+                    total += ((QuerySource)metadataSource).getNbRecords(query);
+                }
             }
             return total;
         } catch (Exception e) {
@@ -189,7 +202,9 @@ public class ImportService implements Destroyable {
         try {
             List<ImportRecord> recordList = new LinkedList<>();
             for (MetadataSource metadataSource : matchingImports(uri)) {
-                recordList.addAll(metadataSource.getRecords(query, start, count));
+                if (metadataSource instanceof QuerySource) {
+                    recordList.addAll(((QuerySource)metadataSource).getRecords(query, start, count));
+                }
             }
             return recordList;
         } catch (Exception e) {
@@ -209,7 +224,9 @@ public class ImportService implements Destroyable {
         try {
             List<ImportRecord> recordList = new LinkedList<>();
             for (MetadataSource metadataSource : matchingImports(uri)) {
-                recordList.addAll(metadataSource.getRecords(query));
+                if (metadataSource instanceof QuerySource) {
+                    recordList.addAll(((QuerySource)metadataSource).getRecords(query));
+                }
             }
             return recordList;
         } catch (Exception e) {
@@ -229,10 +246,12 @@ public class ImportService implements Destroyable {
     public ImportRecord getRecord(String uri, String id) throws MetadataSourceException {
         try {
             for (MetadataSource metadataSource : matchingImports(uri)) {
-                if (metadataSource.getRecord(id) != null) {
-                    return metadataSource.getRecord(id);
+                if (metadataSource instanceof QuerySource) {
+                    QuerySource querySource = (QuerySource)metadataSource;
+                    if (querySource.getRecord(id) != null) {
+                        return querySource.getRecord(id);
+                    }
                 }
-
             }
             return null;
         } catch (Exception e) {
@@ -252,10 +271,12 @@ public class ImportService implements Destroyable {
     public ImportRecord getRecord(String uri, Query query) throws MetadataSourceException {
         try {
             for (MetadataSource metadataSource : matchingImports(uri)) {
-                if (metadataSource.getRecord(query) != null) {
-                    return metadataSource.getRecord(query);
+                if (metadataSource instanceof QuerySource) {
+                    QuerySource querySource = (QuerySource)metadataSource;
+                    if (querySource.getRecord(query) != null) {
+                        return querySource.getRecord(query);
+                    }
                 }
-
             }
             return null;
         } catch (Exception e) {
@@ -270,6 +291,34 @@ public class ImportService implements Destroyable {
      */
     public Collection<String> getImportUrls() {
         return importSources.keySet();
+    }
+
+    /*
+     * Get a collection of record from InputStream,
+     * The first match will be return.
+     * This method doesn't close the InputStream.
+     * 
+     * @param fileInputStream the input stream to the resource
+     * @return a single record contains the metadatum
+     * @throws FileMultipleOccurencesException if more than one entry is found
+     */
+    public ImportRecord getRecord(InputStream fileInputStream) throws FileMultipleOccurencesException {
+        ImportRecord importRecords = null;
+        for (MetadataSource metadataSource : importSources.values()) {
+            if (metadataSource instanceof AbstractPlainMetadataSource) {
+                AbstractPlainMetadataSource fileSource = (AbstractPlainMetadataSource)metadataSource;
+                try {
+                    importRecords = fileSource.getRecord(fileInputStream);
+                    break;
+                } catch (FileSourceException e) {
+                    log.debug(fileSource.getImportSource() + " isn't a valid parser for file");
+                } catch (FileMultipleOccurencesException e) {
+                    log.debug("File contains multiple metadata, return with error");
+                    throw e;
+                }
+            }
+        }
+        return importRecords;
     }
 
     /**
