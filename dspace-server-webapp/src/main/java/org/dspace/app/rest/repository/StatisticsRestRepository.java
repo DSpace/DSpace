@@ -49,8 +49,7 @@ public class StatisticsRestRepository extends DSpaceRestRepository<UsageReportRe
         } catch (ParseException | SolrServerException | IOException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-
-        return usageReportRest;
+        return converter.toRest(usageReportRest, utils.obtainProjection());
     }
 
     @PreAuthorize("hasPermission(#uri, 'usagereportsearch', 'READ')")
