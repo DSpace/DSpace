@@ -150,15 +150,13 @@ public class VocabularyRestRepositoryIT extends AbstractControllerIntegrationTes
                 .param("size", "2"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$._embedded.entries", Matchers.containsInAnyOrder(
-                   VocabularyMatcher.matchVocabularyEntry("Family research",
-                         "Research Subject Categories::SOCIAL SCIENCES::Social sciences::Social work::Family research",
-                         "vocabularyEntry"),
-                   VocabularyMatcher.matchVocabularyEntry("Youth research",
-                         "Research Subject Categories::SOCIAL SCIENCES::Social sciences::Social work::Youth research",
-                         "vocabularyEntry")
-                   )))
-                .andExpect(jsonPath("$.page.totalElements", Matchers.is(2)))
-                .andExpect(jsonPath("$.page.totalPages", Matchers.is(1)))
+                        VocabularyMatcher.matchVocabularyEntry("Research Subject Categories",
+                          "Research Subject Categories", "vocabularyEntry"),
+                        VocabularyMatcher.matchVocabularyEntry("Family research",
+                          "Research Subject Categories::SOCIAL SCIENCES::Social sciences::Social work::Family research",
+                          "vocabularyEntry"))))
+                .andExpect(jsonPath("$.page.totalElements", Matchers.is(26)))
+                .andExpect(jsonPath("$.page.totalPages", Matchers.is(13)))
                 .andExpect(jsonPath("$.page.size", Matchers.is(2)));
     }
 
@@ -233,7 +231,7 @@ public class VocabularyRestRepositoryIT extends AbstractControllerIntegrationTes
     }
 
     @Test
-    public void vocabularyEntriesCommon_typesTest() throws Exception {
+    public void vocabularyEntriesCommonTypesWithPaginationTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
         Collection collection = CollectionBuilder.createCollection(context, parentCommunity)
@@ -242,19 +240,34 @@ public class VocabularyRestRepositoryIT extends AbstractControllerIntegrationTes
         context.restoreAuthSystemState();
 
         String token = getAuthToken(admin.getEmail(), password);
-        getClient(token).perform(get("/api/submission/vocabularies/common_types/entries")
-                .param("metadata", "dc.type")
-                .param("collection", collection.getID().toString())
-                .param("size", "2"))
+        getClient(token)
+                .perform(get("/api/submission/vocabularies/common_types/entries").param("metadata", "dc.type")
+                        .param("collection", collection.getID().toString()).param("size", "2"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$._embedded.entries", Matchers.containsInAnyOrder(
-                           VocabularyMatcher.matchVocabularyEntry("Animation", "Animation", "vocabularyEntry"),
-                           VocabularyMatcher.matchVocabularyEntry("Article", "Article", "vocabularyEntry")
-                           )))
+                        VocabularyMatcher.matchVocabularyEntry("Animation", "Animation", "vocabularyEntry"),
+                        VocabularyMatcher.matchVocabularyEntry("Article", "Article", "vocabularyEntry")
+                        )))
                 .andExpect(jsonPath("$._embedded.entries[*].authority").doesNotExist())
                 .andExpect(jsonPath("$.page.totalElements", Matchers.is(22)))
                 .andExpect(jsonPath("$.page.totalPages", Matchers.is(11)))
                 .andExpect(jsonPath("$.page.size", Matchers.is(2)));
+
+        //second page
+        getClient(token).perform(get("/api/submission/vocabularies/common_types/entries")
+                .param("metadata", "dc.type")
+                .param("collection", collection.getID().toString())
+                .param("size", "2")
+                .param("page", "1"))
+                 .andExpect(status().isOk())
+                 .andExpect(jsonPath("$._embedded.entries", Matchers.containsInAnyOrder(
+                         VocabularyMatcher.matchVocabularyEntry("Book", "Book", "vocabularyEntry"),
+                         VocabularyMatcher.matchVocabularyEntry("Book chapter", "Book chapter", "vocabularyEntry")
+                         )))
+                 .andExpect(jsonPath("$._embedded.entries[*].authority").doesNotExist())
+                 .andExpect(jsonPath("$.page.totalElements", Matchers.is(22)))
+                 .andExpect(jsonPath("$.page.totalPages", Matchers.is(11)))
+                 .andExpect(jsonPath("$.page.size", Matchers.is(2)));
     }
 
     @Test
@@ -298,6 +311,10 @@ public class VocabularyRestRepositoryIT extends AbstractControllerIntegrationTes
                         .param("filter", "Shirasaka")
                         .param("size", "1000"))
                 .andExpect(status().isOk())
+                .andExpect(jsonPath("$._embedded.entries", Matchers.contains(
+                    VocabularyMatcher.matchVocabularyEntry("Shirasaka, Seiko", "Shirasaka, Seiko", "vocabularyEntry")
+                    )))
+                .andExpect(jsonPath("$._embedded.entries[0].authority").isNotEmpty())
                 .andExpect(jsonPath("$.page.totalElements", Matchers.is(1)));
     }
 
