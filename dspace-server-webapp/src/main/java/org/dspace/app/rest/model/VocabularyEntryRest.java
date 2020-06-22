@@ -10,6 +10,8 @@ package org.dspace.app.rest.model;
 import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
 /**
  * An entry in a Vocabulary
@@ -18,6 +20,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  */
 public class VocabularyEntryRest implements RestModel {
     public static final String NAME = "vocabularyEntry";
+
+    @JsonInclude(Include.NON_NULL)
     private String authority;
     private String display;
     private String value;

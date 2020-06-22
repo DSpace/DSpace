@@ -152,14 +152,16 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Choic
         }
         XPath xpath = XPathFactory.newInstance().newXPath();
         Choice[] choices;
+        int total = 0;
         try {
             NodeList results = (NodeList) xpath.evaluate(xpathExpression, vocabulary, XPathConstants.NODESET);
+            total = results.getLength();
             String[] authorities = new String[results.getLength()];
             String[] values = new String[results.getLength()];
             String[] labels = new String[results.getLength()];
             String[] parent = new String[results.getLength()];
             String[] notes = new String[results.getLength()];
-            for (int i = 0; i < results.getLength(); i++) {
+            for (int i = 0; i < total; i++) {
                 Node node = results.item(i);
                 readNode(authorities, values, labels, parent, notes, i, node);
             }
@@ -183,7 +185,7 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Choic
         } catch (XPathExpressionException e) {
             choices = new Choice[0];
         }
-        return new Choices(choices, 0, choices.length, Choices.CF_AMBIGUOUS, false);
+        return new Choices(choices, start, total, Choices.CF_AMBIGUOUS, false);
     }
 
     @Override
