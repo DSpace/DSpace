@@ -108,18 +108,17 @@ public class DCInputAuthority extends SelfNamedPlugin implements ChoiceAuthority
         init();
 
         int dflt = -1;
-        int index = 0;
-        Choice v[] = new Choice[values.length];
+        List<Choice> v = new ArrayList<Choice>();
         for (int i = 0; i < values.length; ++i) {
             if (query == null || StringUtils.containsIgnoreCase(values[i], query)) {
-                v[index] = new Choice(values[i], values[i], labels[i]);
-                index++;
+                v.add(new Choice(null, values[i], labels[i]));
             }
             if (values[i].equalsIgnoreCase(query)) {
                 dflt = i;
             }
         }
-        return new Choices(v, 0, index, Choices.CF_AMBIGUOUS, false, dflt);
+        Choice[] vArray = new Choice[v.size()];
+        return new Choices(v.toArray(vArray), 0, v.size(), Choices.CF_AMBIGUOUS, false, dflt);
     }
 
     @Override

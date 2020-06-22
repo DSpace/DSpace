@@ -18,8 +18,6 @@ import java.util.Map;
  * @see Choices
  */
 public class Choice {
-    public boolean storeAuthority = true;
-
     /**
      * Authority key for this value
      */

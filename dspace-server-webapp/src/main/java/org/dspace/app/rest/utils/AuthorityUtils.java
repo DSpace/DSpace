@@ -7,6 +7,7 @@
  */
 package org.dspace.app.rest.utils;
 
+import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.model.VocabularyEntryDetailsRest;
 import org.dspace.app.rest.model.VocabularyEntryRest;
@@ -70,13 +71,16 @@ public class AuthorityUtils {
         return entry;
     }
 
-    public VocabularyEntryRest convertEntry(Choice choice, String authorityName, Projection projection) {
+    public VocabularyEntryRest convertEntry(Choice choice, String authorityName, boolean storeAuthority,
+            Projection projection) {
         VocabularyEntryRest entry = new VocabularyEntryRest();
         entry.setDisplay(choice.label);
         entry.setValue(choice.value);
         entry.setOtherInformation(choice.extras);
-        entry.setAuthority(choice.authority);
-        if (choice.storeAuthority) {
+        if (storeAuthority) {
+            entry.setAuthority(choice.authority);
+        }
+        if (StringUtils.isNotBlank(choice.authority)) {
             entry.setVocabularyEntryDetailsRest(converter.toRest(choice, projection));
         }
         return entry;
