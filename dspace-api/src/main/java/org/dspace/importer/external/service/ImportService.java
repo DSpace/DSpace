@@ -23,8 +23,8 @@ import org.dspace.importer.external.datamodel.Query;
 import org.dspace.importer.external.exception.FileMultipleOccurencesException;
 import org.dspace.importer.external.exception.FileSourceException;
 import org.dspace.importer.external.exception.MetadataSourceException;
-import org.dspace.importer.external.service.components.AbstractPlainMetadataSource;
 import org.dspace.importer.external.service.components.Destroyable;
+import org.dspace.importer.external.service.components.FileSource;
 import org.dspace.importer.external.service.components.MetadataSource;
 import org.dspace.importer.external.service.components.QuerySource;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -305,13 +305,13 @@ public class ImportService implements Destroyable {
     public ImportRecord getRecord(InputStream fileInputStream) throws FileMultipleOccurencesException {
         ImportRecord importRecords = null;
         for (MetadataSource metadataSource : importSources.values()) {
-            if (metadataSource instanceof AbstractPlainMetadataSource) {
-                AbstractPlainMetadataSource fileSource = (AbstractPlainMetadataSource)metadataSource;
+            if (metadataSource instanceof FileSource) {
+                FileSource fileSource = (FileSource)metadataSource;
                 try {
                     importRecords = fileSource.getRecord(fileInputStream);
                     break;
                 } catch (FileSourceException e) {
-                    log.debug(fileSource.getImportSource() + " isn't a valid parser for file");
+                    log.debug(metadataSource.getImportSource() + " isn't a valid parser for file");
                 } catch (FileMultipleOccurencesException e) {
                     log.debug("File contains multiple metadata, return with error");
                     throw e;
