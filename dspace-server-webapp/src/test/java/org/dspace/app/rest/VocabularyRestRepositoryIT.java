@@ -149,7 +149,7 @@ public class VocabularyRestRepositoryIT extends AbstractControllerIntegrationTes
                 .param("filter", "Research")
                 .param("size", "2"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$._embedded.vocabularyEntries", Matchers.containsInAnyOrder(
+                .andExpect(jsonPath("$._embedded.entries", Matchers.containsInAnyOrder(
                    VocabularyMatcher.matchVocabularyEntry("Family research",
                          "Research Subject Categories::SOCIAL SCIENCES::Social sciences::Social work::Family research",
                          "vocabularyEntry"),
@@ -247,10 +247,11 @@ public class VocabularyRestRepositoryIT extends AbstractControllerIntegrationTes
                 .param("collection", collection.getID().toString())
                 .param("size", "2"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$._embedded.vocabularyEntries", Matchers.containsInAnyOrder(
+                .andExpect(jsonPath("$._embedded.entries", Matchers.containsInAnyOrder(
                            VocabularyMatcher.matchVocabularyEntry("Animation", "Animation", "vocabularyEntry"),
                            VocabularyMatcher.matchVocabularyEntry("Article", "Article", "vocabularyEntry")
                            )))
+                .andExpect(jsonPath("$._embedded.entries[*].authority").doesNotExist())
                 .andExpect(jsonPath("$.page.totalElements", Matchers.is(22)))
                 .andExpect(jsonPath("$.page.totalPages", Matchers.is(11)))
                 .andExpect(jsonPath("$.page.size", Matchers.is(2)));
@@ -272,7 +273,7 @@ public class VocabularyRestRepositoryIT extends AbstractControllerIntegrationTes
                 .param("filter", "Book")
                 .param("size", "2"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$._embedded.vocabularyEntries", Matchers.containsInAnyOrder(
+                .andExpect(jsonPath("$._embedded.entries", Matchers.containsInAnyOrder(
                         VocabularyMatcher.matchVocabularyEntry("Book", "Book", "vocabularyEntry"),
                         VocabularyMatcher.matchVocabularyEntry("Book chapter", "Book chapter", "vocabularyEntry")
                         )))
