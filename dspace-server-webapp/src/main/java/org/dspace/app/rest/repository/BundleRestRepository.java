@@ -74,11 +74,11 @@ public class BundleRestRepository extends DSpaceObjectRestRepository<Bundle, Bun
         this.bundleService = dsoService;
     }
 
-    @PreAuthorize("hasPermission(#uuid, 'BUNDLE', 'READ')")
-    public BundleRest findOne(Context context, UUID uuid) {
+    @PreAuthorize("hasPermission(#id, 'BUNDLE', 'READ')")
+    public BundleRest findOne(Context context, UUID id) {
         Bundle bundle = null;
         try {
-            bundle = bundleService.find(context, uuid);
+            bundle = bundleService.find(context, id);
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }

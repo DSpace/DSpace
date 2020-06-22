@@ -131,7 +131,7 @@ public class GroupRestRepository extends DSpaceObjectRestRepository<Group, Group
      * @param pageable contains the pagination information
      * @return a Page of GroupRest instances matching the user query
      */
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN') || hasAuthority('MANAGE_ACCESS_GROUP')")
     @SearchRestMethod(name = "byMetadata")
     public Page<GroupRest> findByMetadata(@Parameter(value = "query", required = true) String query,
                                           Pageable pageable) {

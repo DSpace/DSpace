@@ -258,7 +258,7 @@ public class SubmissionFormsControllerIT extends AbstractControllerIntegrationTe
                          + " Як що вмiст вайлу не є текстовим, наприклад є фотографiєю, тодi вибрати (N/A)",
                            "dc.language.iso"))));
 
-                 resetPropertyFile();
+                 resetLocalesConfiguration();
     }
 
     @Test
@@ -331,7 +331,7 @@ public class SubmissionFormsControllerIT extends AbstractControllerIntegrationTe
                          + " Як що вмiст вайлу не є текстовим, наприклад є фотографiєю, тодi вибрати (N/A)",
                            "dc.language.iso"))));
 
-                 resetPropertyFile();
+                 resetLocalesConfiguration();
     }
 
     @Test
@@ -377,7 +377,7 @@ public class SubmissionFormsControllerIT extends AbstractControllerIntegrationTe
                          + " Se il contenuto non ha davvero una lingua"
                          + " (ad esempio, se è un set di dati o un'immagine) selezionare (N/A)", "dc.language.iso"))));
 
-                 resetPropertyFile();
+                 resetLocalesConfiguration();
     }
 
     @Test
@@ -408,10 +408,11 @@ public class SubmissionFormsControllerIT extends AbstractControllerIntegrationTe
                             "\u00C8 necessario inserire un titolo principale per questo item", false,
                             "Inserisci titolo principale di questo item", "dc.title"))));
 
-                  resetPropertyFile();
+                  resetLocalesConfiguration();
     }
 
-    private void resetPropertyFile() throws DCInputsReaderException {
+    private void resetLocalesConfiguration() throws DCInputsReaderException {
+        configurationService.setProperty("default.locale","en");
         configurationService.setProperty("webui.supported.locales",null);
         submissionFormRestRepository.reload();
     }
