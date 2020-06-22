@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Random;
 
 import org.apache.commons.codec.CharEncoding;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.IOUtils;
 import org.dspace.app.rest.builder.ProcessBuilder;
 import org.dspace.app.rest.matcher.PageMatcher;
@@ -52,7 +53,7 @@ public class ProcessRestRepositoryIT extends AbstractControllerIntegrationTest {
         CollectionUtils.emptyIfNull(processService.findAll(context)).stream().forEach(process -> {
             try {
                 processService.delete(context, process);
-            } catch (SQLException e) {
+            } catch (Exception e) {
                 throw new RuntimeException(e);
             }
         });
