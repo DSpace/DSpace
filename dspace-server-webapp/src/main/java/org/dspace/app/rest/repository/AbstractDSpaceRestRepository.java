@@ -7,9 +7,11 @@
  */
 package org.dspace.app.rest.repository;
 
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.List;
 import java.util.Locale;
 
-import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.app.rest.utils.Utils;
@@ -42,6 +44,7 @@ public abstract class AbstractDSpaceRestRepository {
         context = ContextUtil.obtainContext(currentRequest.getServletRequest());
         Locale currentLocale = getLocal(context, currentRequest);
         context.setCurrentLocale(currentLocale);
+        context.setClientLocales(getLocalesFromRequest(currentRequest));
         return context;
     }
 
@@ -58,14 +61,25 @@ public abstract class AbstractDSpaceRestRepository {
                 userLocale = new Locale(userLanguage);
             }
         }
-        String locale = request.getHttpServletRequest().getHeader("Accept-Language");
-        if (StringUtils.isNotBlank(locale)) {
-            userLocale = new Locale(locale);
+        Enumeration<Locale> locales = request.getHttpServletRequest().getLocales();
+        if (locales != null) {
+            userLocale = locales.nextElement();
         }
         if (userLocale == null) {
             return I18nUtil.getDefaultLocale();
         }
         supportedLocale = I18nUtil.getSupportedLocale(userLocale);
         return supportedLocale;
+    }
+
+    private List<Locale> getLocalesFromRequest(Request request) {
+        List<Locale> locales = new ArrayList<>();
+        Enumeration<Locale> reqLocales = request.getHttpServletRequest().getLocales();
+        if (reqLocales != null) {
+            while (reqLocales.hasMoreElements()) {
+                locales.add(reqLocales.nextElement());
+            }
+        }
+        return locales;
     }
 }
