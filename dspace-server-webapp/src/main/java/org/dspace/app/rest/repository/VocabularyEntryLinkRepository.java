@@ -89,6 +89,6 @@ public class VocabularyEntryLinkRepository extends AbstractDSpaceRestRepository
         for (Choice value : choices.values) {
             results.add(authorityUtils.convertEntry(value, name, storeAuthority, projection));
         }
-        return new PageImpl<>(results, pageable, results.size());
+        return new PageImpl<>(results, pageable, choices.total);
     }
 }
