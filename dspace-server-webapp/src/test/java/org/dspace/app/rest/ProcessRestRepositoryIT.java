@@ -43,6 +43,13 @@ public class ProcessRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     @Before
     public void setup() throws SQLException {
+        CollectionUtils.emptyIfNull(processService.findAll(context)).stream().forEach(process -> {
+            try {
+                processService.delete(context, process);
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        });
         parameters.add(new DSpaceCommandLineParameter("-r", "test"));
         parameters.add(new DSpaceCommandLineParameter("-i", null));
 
