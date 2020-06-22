@@ -29,6 +29,7 @@ import org.dspace.importer.external.datamodel.ImportRecord;
 import org.dspace.importer.external.datamodel.Query;
 import org.dspace.importer.external.exception.MetadataSourceException;
 import org.dspace.importer.external.service.AbstractImportMetadataSourceService;
+import org.dspace.importer.external.service.components.QuerySource;
 import org.jaxen.JaxenException;
 
 /**
@@ -36,7 +37,9 @@ import org.jaxen.JaxenException;
  *
  * @author Roeland Dillen (roeland at atmire dot com)
  */
-public class PubmedImportMetadataSourceServiceImpl extends AbstractImportMetadataSourceService<OMElement> {
+public class PubmedImportMetadataSourceServiceImpl extends AbstractImportMetadataSourceService<OMElement>
+    implements QuerySource {
+
     private String baseAddress;
 
     private WebTarget pubmedWebTarget;

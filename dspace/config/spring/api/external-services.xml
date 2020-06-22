@@ -20,10 +20,13 @@
         <property name="apiKey" value="${sherpa.romeo.apikey}"/>
 
     </bean>
-    <bean class="org.dspace.external.provider.impl.OrcidV2AuthorDataProvider" init-method="init">
+    <bean class="org.dspace.external.provider.impl.OrcidV3AuthorDataProvider" init-method="init">
         <constructor-arg value="${orcid.api.url}"/>
-        <property name="sourceIdentifier" value="orcidV2"/>
+        <property name="sourceIdentifier" value="orcid"/>
         <property name="orcidUrl" value="${orcid.url}" />
+        <property name="clientId" value="${orcid.clientid}" />
+        <property name="clientSecret" value="${orcid.clientsecret}" />
+        <property name="OAUTHUrl" value="${orcid.oauth.url}" />
     </bean>
 
     <bean class="org.dspace.external.provider.impl.LCNameDataProvider">
