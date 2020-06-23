@@ -16,6 +16,7 @@ import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.model.SubmissionCCLicenseUrlRest;
+import org.dspace.app.rest.model.wrapper.SubmissionCCLicenseUrl;
 import org.dspace.app.rest.repository.DSpaceRestRepository;
 import org.dspace.app.rest.utils.Utils;
 import org.dspace.core.Context;
@@ -93,11 +94,12 @@ public class SubmissionCCLicenseUrlRepository extends DSpaceRestRepository<Submi
 
         String licenseUri = creativeCommonsService.retrieveLicenseUri(licenseId, fullParamMap);
 
+        SubmissionCCLicenseUrl submissionCCLicenseUrl = new SubmissionCCLicenseUrl(licenseUri, licenseUri);
         if (StringUtils.isBlank(licenseUri)) {
             throw new ResourceNotFoundException("No CC License URI could be found for ID: " + licenseId);
         }
 
-        return converter.toRest(licenseUri, utils.obtainProjection());
+        return converter.toRest(submissionCCLicenseUrl, utils.obtainProjection());
 
     }
 

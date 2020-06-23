@@ -8,6 +8,7 @@
 package org.dspace.app.rest.converter;
 
 import org.dspace.app.rest.model.SubmissionCCLicenseUrlRest;
+import org.dspace.app.rest.model.wrapper.SubmissionCCLicenseUrl;
 import org.dspace.app.rest.projection.Projection;
 import org.springframework.stereotype.Component;
 
@@ -17,26 +18,26 @@ import org.springframework.stereotype.Component;
  * representation SubmissionCCLicenseUrlRest and vice versa
  */
 @Component
-public class SubmissionCCLicenseUrlConverter implements DSpaceConverter<String, SubmissionCCLicenseUrlRest> {
+public class SubmissionCCLicenseUrlConverter implements DSpaceConverter<SubmissionCCLicenseUrl, SubmissionCCLicenseUrlRest> {
 
     /**
      * Convert a Submission CC License Url String to its REST representation
-     * @param modelObject   - the CC License Url String to convert
+     * @param modelObject   - the CC License Url object to convert
      * @param projection    - the projection
      * @return the corresponding SubmissionCCLicenseUrlRest object
      */
     @Override
-    public SubmissionCCLicenseUrlRest convert(final String modelObject, final Projection projection) {
+    public SubmissionCCLicenseUrlRest convert(SubmissionCCLicenseUrl modelObject, Projection projection) {
         SubmissionCCLicenseUrlRest submissionCCLicenseUrlRest = new SubmissionCCLicenseUrlRest();
-        submissionCCLicenseUrlRest.setUrl(modelObject);
-        submissionCCLicenseUrlRest.setId(modelObject);
+        submissionCCLicenseUrlRest.setUrl(modelObject.getUrl());
+        submissionCCLicenseUrlRest.setId(modelObject.getId());
 
         return submissionCCLicenseUrlRest;
     }
 
     @Override
-    public Class<String> getModelClass() {
-        return String.class;
+    public Class<SubmissionCCLicenseUrl> getModelClass() {
+        return SubmissionCCLicenseUrl.class;
     }
 
 }
