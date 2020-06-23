@@ -18,9 +18,9 @@ import org.hamcrest.Matcher;
 /**
  * This matcher has been created so that we can use a predefined Matcher class to verify Authority Entries
  */
-public class AuthorityEntryMatcher {
+public class VocabularyEntryDedailsMatcher {
 
-    private AuthorityEntryMatcher() {
+    private VocabularyEntryDedailsMatcher() {
     }
 
     public static Matcher<? super Object> matchAuthorityEntry(String id, String display, String value) {
