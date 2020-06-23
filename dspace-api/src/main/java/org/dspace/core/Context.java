@@ -69,13 +69,6 @@ public class Context implements AutoCloseable {
     private Locale currentLocale;
 
     /**
-     * List of locale object indicating the locales that are
-     * acceptable to the client based on the Accept-Language header.
-     * The Locales are in decreasing order starting with the preferred locale.
-     */
-    private List<Locale> clientLocales;
-
-    /**
      * Extra log info
      */
     private String extraLogInfo;
@@ -882,21 +875,6 @@ public class Context implements AutoCloseable {
      */
     private void reloadContextBoundEntities() throws SQLException {
         currentUser = reloadEntity(currentUser);
-    }
-
-    /**
-     * Returns a list of locale object indicating the locales that are
-     * acceptable to the client based on the Accept-Language header.
-     * The Locales are in decreasing order starting with the preferred locale.
-     * @return List<Locale>
-     */
-    public List<Locale> getClientLocales() {
-        return clientLocales;
-    }
-
-
-    public void setClientLocales(List<Locale> clientLocales) {
-        this.clientLocales = clientLocales;
     }
 
 }
