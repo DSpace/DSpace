@@ -871,7 +871,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
      *
      * @throws Exception
      */
-    public void createSingleWorkspaceItemFromFileTest() throws Exception {
+    public void createSingleWorkspaceItemFromFileWithOneEntryTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
         //** GIVEN **
@@ -900,24 +900,27 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         String authToken = getAuthToken(eperson.getEmail(), password);
         // bulk create workspaceitems in the default collection (col1)
         getClient(authToken).perform(fileUpload("/api/submission/workspaceitems")
-                    .file(bibtexFile))
+                    .file(bibtexFile).param("owningCollection", col1.getID().toString()))
                 // bulk create should return 200, 201 (created) is better for single resource
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$._embedded.workspaceitems[0].sections.traditionalpageone['dc.title'][0].value",
                         is("My Article")))
                 .andExpect(
                         jsonPath("$._embedded.workspaceitems[0]._embedded.collection.id", is(col1.getID().toString())))
-                        jsonPath("$._embedded.workspaceitems[*]._embedded.upload").doesNotExist());
+                .andExpect(
+                        jsonPath("$._embedded.workspaceitems[*]._embedded.upload").doesNotExist())
+        ;
 
         // bulk create workspaceitems explicitly in the col2
         getClient(authToken).perform(fileUpload("/api/submission/workspaceitems")
                     .file(bibtexFile)
-                    .param("collection", col2.getID().toString()))
+                    .param("owningCollection", col2.getID().toString()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$._embedded.workspaceitems[0].sections.traditionalpageone['dc.title'][0].value",
                         is("My Article")))
                 .andExpect(
                         jsonPath("$._embedded.workspaceitems[0]._embedded.collection.id", is(col2.getID().toString())))
+                .andExpect(
                         jsonPath("$._embedded.workspaceitems[*]._embedded.upload").doesNotExist());
 
         bibtex.close();
@@ -930,7 +933,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
      * 
      * @throws Exception
      */
-    public void createMultipleWorkspaceItemsFromFileTest() throws Exception {
+    public void createSingleWorkspaceItemsFromSingleFileWithMultipleEntriesTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
         //** GIVEN **
@@ -1009,31 +1012,25 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                 .andExpect(
                         jsonPath(
                         "$._embedded.workspaceitems[0].sections.traditionalpageone['dc.identifier.other'][0].value",
-                        is(15117179)))
+                        is("15117179")))
                 .andExpect(jsonPath("$._embedded.workspaceitems[0].sections.traditionalpageone"
                         + "['dc.contributor.author'][0].value",
-                        is("Astorga-Wells, J")))
-                .andExpect(
-                        jsonPath("$._embedded.workspaceitems[0].sections.traditionalpageone['dc.date.issued'][0].value",
-                        is("2004-05-01")));
+                        is("Astorga-Wells, Juan")));
 
         // bulk create workspaceitems explicitly in the col2
         getClient(authToken).perform(fileUpload("/api/submission/workspaceitems")
                     .file(pubmedFile)
-                    .param("collection", col2.getID().toString()))
+                    .param("owningCollection", col2.getID().toString()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.workspaceitems[0].sections.traditionalpageone['dc.title'][0].value",
                 is("Multistep microreactions with proteins using electrocapture technology.")))
             .andExpect(
                 jsonPath(
                 "$._embedded.workspaceitems[0].sections.traditionalpageone['dc.identifier.other'][0].value",
-                is(15117179)))
+                is("15117179")))
             .andExpect(jsonPath("$._embedded.workspaceitems[0].sections.traditionalpageone"
                 + "['dc.contributor.author'][0].value",
-                is("Astorga-Wells, J")))
-            .andExpect(
-                jsonPath("$._embedded.workspaceitems[0].sections.traditionalpageone['dc.date.issued'][0].value",
-                is("2004-05-01")));
+                is("Astorga-Wells, Juan")));
 
         xmlIS.close();
     }
@@ -1147,7 +1144,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
 
         // create an empty workspaceitem explicitly in the col1, check validation on creation
         getClient(authToken).perform(post("/api/submission/workspaceitems")
-                    .param("collection", col1.getID().toString())
+                    .param("owningCollection", col1.getID().toString())
                     .contentType(org.springframework.http.MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated())
                 // title and dateissued are required in the first panel

@@ -8,6 +8,9 @@
 
 package org.dspace.importer.external.service;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.Collections;
@@ -302,20 +305,22 @@ public class ImportService implements Destroyable {
      * @return a single record contains the metadatum
      * @throws FileMultipleOccurencesException if more than one entry is found
      */
-    public ImportRecord getRecord(InputStream fileInputStream) throws FileMultipleOccurencesException {
+    public ImportRecord getRecord(File file) throws FileMultipleOccurencesException, FileSourceException {
         ImportRecord importRecords = null;
         for (MetadataSource metadataSource : importSources.values()) {
-            if (metadataSource instanceof FileSource) {
-                FileSource fileSource = (FileSource)metadataSource;
-                try {
+            try (InputStream fileInputStream = new FileInputStream(file)) {
+                if (metadataSource instanceof FileSource) {
+                    FileSource fileSource = (FileSource)metadataSource;
                     importRecords = fileSource.getRecord(fileInputStream);
                     break;
-                } catch (FileSourceException e) {
-                    log.debug(metadataSource.getImportSource() + " isn't a valid parser for file");
-                } catch (FileMultipleOccurencesException e) {
-                    log.debug("File contains multiple metadata, return with error");
-                    throw e;
                 }
+            } catch (FileSourceException e) {
+                log.debug(metadataSource.getImportSource() + " isn't a valid parser for file");
+            } catch (FileMultipleOccurencesException e) {
+                log.debug("File contains multiple metadata, return with error");
+                throw e;
+            } catch (IOException e1) {
+                throw new FileSourceException("File cannot be read, may be null");
             }
         }
         return importRecords;

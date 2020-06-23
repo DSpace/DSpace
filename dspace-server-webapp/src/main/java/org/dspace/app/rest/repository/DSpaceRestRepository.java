@@ -486,7 +486,7 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
      * @throws RepositoryMethodNotImplementedException
      */
     protected Iterable<T> upload(Context context, HttpServletRequest request,
-            MultipartFile uploadfile)
+            MultipartFile ... uploadfile)
         throws SQLException, FileNotFoundException, IOException, AuthorizeException {
         throw new RepositoryMethodNotImplementedException("No implementation found; Method not allowed!", "");
     }
