@@ -18,7 +18,8 @@ import org.springframework.stereotype.Component;
  * representation SubmissionCCLicenseUrlRest and vice versa
  */
 @Component
-public class SubmissionCCLicenseUrlConverter implements DSpaceConverter<SubmissionCCLicenseUrl, SubmissionCCLicenseUrlRest> {
+public class SubmissionCCLicenseUrlConverter
+    implements DSpaceConverter<SubmissionCCLicenseUrl, SubmissionCCLicenseUrlRest> {
 
     /**
      * Convert a Submission CC License Url String to its REST representation
