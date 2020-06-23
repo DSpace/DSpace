@@ -7,6 +7,9 @@
  */
 package org.dspace.content.authority;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.dspace.content.Collection;
 
 /**
@@ -85,6 +88,10 @@ public interface ChoiceAuthority {
         return getLabel(key, locale);
     }
 
+    default Map<String, String> getExtra(String key, String locale) {
+        return new HashMap<String, String>();
+    }
+
     default boolean isHierarchical() {
         return false;
     }
@@ -102,6 +109,7 @@ public interface ChoiceAuthority {
         result.authority = authKey;
         result.label = getLabel(authKey, locale);
         result.value = getValue(authKey, locale);
+        result.extras.putAll(getExtra(authKey, locale));
         return result;
     }
 }
