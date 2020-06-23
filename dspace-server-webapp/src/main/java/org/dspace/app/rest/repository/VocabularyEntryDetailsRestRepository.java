@@ -7,7 +7,13 @@
  */
 package org.dspace.app.rest.repository;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.commons.lang3.StringUtils;
+import org.dspace.app.rest.Parameter;
+import org.dspace.app.rest.SearchRestMethod;
+import org.dspace.app.rest.exception.PaginationException;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.model.ResourcePolicyRest;
 import org.dspace.app.rest.model.VocabularyEntryDetailsRest;
@@ -15,10 +21,12 @@ import org.dspace.app.rest.model.VocabularyRest;
 import org.dspace.app.rest.utils.AuthorityUtils;
 import org.dspace.content.authority.Choice;
 import org.dspace.content.authority.ChoiceAuthority;
+import org.dspace.content.authority.Choices;
 import org.dspace.content.authority.service.ChoiceAuthorityService;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
@@ -54,7 +62,33 @@ public class VocabularyEntryDetailsRestRepository extends DSpaceRestRepository<V
         String vocabularyId = parts[1];
         ChoiceAuthority source = cas.getChoiceAuthorityByAuthorityName(vocabularyName);
         Choice choice = source.getChoice(vocabularyId, context.getCurrentLocale().toString());
-        return authorityUtils.convertEntryDetails(choice, vocabularyName, utils.obtainProjection());
+        return authorityUtils.convertEntryDetails(choice, vocabularyName, source.isHierarchical(),
+                utils.obtainProjection());
+    }
+
+    @SearchRestMethod(name = "top")
+    @PreAuthorize("hasAuthority('AUTHENTICATED')")
+    public Page<VocabularyEntryDetailsRest> findAllTop(@Parameter(value = "vocabulary", required = true)
+           String vocabularyId, Pageable pageable) {
+        Context context = obtainContext();
+        List<VocabularyEntryDetailsRest> results = new ArrayList<VocabularyEntryDetailsRest>();
+        ChoiceAuthority source = cas.getChoiceAuthorityByAuthorityName(vocabularyId);
+        if (source.isHierarchical()) {
+            Choices choices = cas.getTopChoices(vocabularyId, (int)pageable.getOffset(), pageable.getPageSize(),
+                    context.getCurrentLocale().toString());
+            for (Choice value : choices.values) {
+                results.add(authorityUtils.convertEntryDetails(value, vocabularyId, source.isHierarchical(),
+                        utils.obtainProjection()));
+            }
+        }
+        Page<VocabularyEntryDetailsRest> resources;
+        try {
+            resources = utils.getPage(results, pageable);
+        } catch (PaginationException pe) {
+            resources = new PageImpl<VocabularyEntryDetailsRest>(new ArrayList<VocabularyEntryDetailsRest>(), pageable,
+                    pe.getTotal());
+        }
+        return resources;
     }
 
     @Override
