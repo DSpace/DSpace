@@ -17,12 +17,21 @@ import org.dspace.app.rest.RestResourceController;
  *
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
+@LinksRest(links = {
+        @LinkRest(name = VocabularyEntryDetailsRest.PARENT, method = "getParent"),
+        @LinkRest(name = VocabularyEntryDetailsRest.CHILDREN, method = "getChildren")
+        })
 public class VocabularyEntryDetailsRest extends RestAddressableModel {
     public static final String NAME = "vocabularyEntryDetail";
+    public static final String PARENT = "parent";
+    public static final String CHILDREN = "children";
     private String id;
     private String display;
     private String value;
     private Map<String, String> otherInformation;
+    private boolean selectable;
+    @JsonIgnore
+    private boolean isInHierarchicalVocabulary = false;
 
     @JsonIgnore
     private String vocabularyName;
@@ -86,4 +95,19 @@ public class VocabularyEntryDetailsRest extends RestAddressableModel {
         return RestResourceController.class;
     }
 
+    public Boolean isSelectable() {
+        return selectable;
+    }
+
+    public void setSelectable(Boolean selectable) {
+        this.selectable = selectable;
+    }
+
+    public void setInHierarchicalVocabulary(boolean isInHierarchicalVocabulary) {
+        this.isInHierarchicalVocabulary = isInHierarchicalVocabulary;
+    }
+
+    public boolean isInHierarchicalVocabulary() {
+        return isInHierarchicalVocabulary;
+    }
 }
