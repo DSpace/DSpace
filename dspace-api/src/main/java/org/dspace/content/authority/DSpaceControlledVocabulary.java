@@ -10,7 +10,9 @@ package org.dspace.content.authority;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
@@ -190,19 +192,9 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Hiera
             }
             if (resultCount > 0) {
                 for (int i = 0; i < resultCount; i++) {
-                    Choice choice = new Choice(authorities[start + i], values[start + i], labels[start + i],
+                    Choice choice = new Choice(authorities[start + i], labels[start + i], values[start + i],
                                                selectable[start + i]);
-                    if (StringUtils.isNotBlank(parent[i])) {
-                        choice.extras.put("parent", parent[i]);
-                    }
-                    if (StringUtils.isNotBlank(notes[i])) {
-                        choice.extras.put("note", notes[i]);
-                    }
-                    if (children[i].size() > 0) {
-                        choice.extras.put("hasChildren", "true");
-                    } else {
-                        choice.extras.put("hasChildren", "false");
-                    }
+                    choice.extras = addOtherInformation(parent[i], notes[i], children[i], authorities[i]);
                     choices.add(choice);
                 }
             }
@@ -210,6 +202,24 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Hiera
             log.warn(e.getMessage(), e);
         }
         return new Choices(choices.toArray(new Choice[choices.size()]), start, total, Choices.CF_AMBIGUOUS, false);
+    }
+
+    private Map<String, String> addOtherInformation(String parentCurr, String noteCurr,
+            ArrayList<String> childrenCurr, String authorityCurr) {
+        Map<String, String> extras = new HashMap<String, String>();
+        if (StringUtils.isNotBlank(parentCurr)) {
+            extras.put("parent", parentCurr);
+        }
+        if (StringUtils.isNotBlank(noteCurr)) {
+            extras.put("note", noteCurr);
+        }
+        if (childrenCurr.size() > 0) {
+            extras.put("hasChildren", "true");
+        } else {
+            extras.put("hasChildren", "false");
+        }
+        extras.put("id", authorityCurr);
+        return extras;
     }
 
     @Override
@@ -296,7 +306,7 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Hiera
                     if (parentN != null) {
                         Node parentIdAttr = parentN.getAttributes().getNamedItem("id");
                         if (null != parentIdAttr && !parentIdAttr.getNodeValue().equals(rootNodeId)) {
-                            parent[i] = hierarchy + hierarchyDelimiter + parentIdAttr.getNodeValue();
+                            parent[i] = buildString(parentN);
                         }
                     }
                 }
@@ -368,6 +378,31 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Hiera
         String xpathExpression = String.format(idTemplate, parentId);
         List<Choice> choices = getChoicesByXpath(xpathExpression);
         return new Choices(choices.toArray(new Choice[choices.size()]), 0, choices.size(), Choices.CF_AMBIGUOUS, false);
+    }
+
+    @Override
+    public Choice getParentChoice(String authorityName, String parentId, int start, int limit, String locale) {
+        init();
+        String xpathExpression = String.format(idTemplate, parentId);
+        Choice choice = getParent(xpathExpression);
+        return choice;
+    }
+
+    private Choice getParent(String xpathExpression) {
+        Choice choice = null;
+        XPath xpath = XPathFactory.newInstance().newXPath();
+        try {
+            Node node = (Node) xpath.evaluate(xpathExpression, vocabulary, XPathConstants.NODE);
+            if (node != null) {
+                Node parent = node.getParentNode().getParentNode();
+                if (null != parent) {
+                    choice = createChoiceFromNode(parent);
+                }
+            }
+        } catch (XPathExpressionException e) {
+            log.warn(e.getMessage(), e);
+        }
+        return choice;
     }
 
     @Override

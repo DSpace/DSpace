@@ -511,4 +511,10 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService 
         HierarchicalAuthority ma = (HierarchicalAuthority) getChoiceAuthorityByAuthorityName(authorityName);
         return ma.getTopChoices(authorityName, start, limit, locale);
     }
+
+    @Override
+    public Choice getParentChoice(String authorityName, String vocabularyId, int start, int limit, String locale) {
+        HierarchicalAuthority ma = (HierarchicalAuthority) getChoiceAuthorityByAuthorityName(authorityName);
+        return ma.getParentChoice(authorityName, vocabularyId, start, limit, locale);
+    }
 }

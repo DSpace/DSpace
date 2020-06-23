@@ -12,6 +12,7 @@ import java.util.Set;
 
 import org.dspace.content.Collection;
 import org.dspace.content.MetadataValue;
+import org.dspace.content.authority.Choice;
 import org.dspace.content.authority.ChoiceAuthority;
 import org.dspace.content.authority.Choices;
 
@@ -206,4 +207,14 @@ public interface ChoiceAuthorityService {
      */
     public Choices getTopChoices(String authorityName, int start, int limit, String locale);
 
+    /**
+     *
+     * @param authorityName authority name
+     * @param vocabularyId  child id
+     * @param start         choice at which to start, 0 is first.
+     * @param limit         maximum number of choices to return, 0 for no limit.
+     * @param locale        explicit localization key if available, or null
+     * @return a Choice object (never null).
+     */
+    public Choice getParentChoice(String authorityName, String vocabularyId, int start, int limit, String locale);
 }
