@@ -32,6 +32,7 @@ import org.springframework.web.context.request.RequestContextListener;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 /**
@@ -147,6 +148,18 @@ public class Application extends SpringBootServletInitializer {
                             .exposedHeaders("Access-Control-Allow-Origin", "Access-Control-Allow-Credentials",
                                             "Authorization");
                 }
+            }
+
+            /**
+             * Add a new ResourceHandler to allow us to use WebJars.org to pull in web dependencies
+             * dynamically for HAL Browser, and access them off the /webjars path.
+             * @param registry ResourceHandlerRegistry
+             */
+            @Override
+            public void addResourceHandlers(ResourceHandlerRegistry registry) {
+                registry
+                    .addResourceHandler("/webjars/**")
+                    .addResourceLocations("/webjars/");
             }
 
             @Override

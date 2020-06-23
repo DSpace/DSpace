@@ -14,7 +14,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
@@ -30,17 +29,18 @@ import org.dspace.discovery.indexobject.factory.IndexFactory;
 import org.dspace.discovery.indexobject.factory.IndexObjectFactoryFactory;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.scripts.DSpaceRunnable;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.dspace.services.factory.DSpaceServicesFactory;
+import org.dspace.utils.DSpace;
 
 /**
  * Class used to reindex dspace communities/collections/items into discovery
  */
-public class IndexClient extends DSpaceRunnable {
+public class IndexClient extends DSpaceRunnable<IndexDiscoveryScriptConfiguration> {
 
     private Context context;
-
-    @Autowired
-    private IndexingService indexer;
+    private IndexingService indexer = DSpaceServicesFactory.getInstance().getServiceManager()
+                                               .getServiceByName(IndexingService.class.getName(),
+                                                                 IndexingService.class);
 
     private IndexClientOptions indexClientOptions;
 
@@ -144,6 +144,12 @@ public class IndexClient extends DSpaceRunnable {
         handler.logInfo("Done with indexing");
     }
 
+    @Override
+    public IndexDiscoveryScriptConfiguration getScriptConfiguration() {
+        return new DSpace().getServiceManager().getServiceByName("index-discovery",
+                                                                 IndexDiscoveryScriptConfiguration.class);
+    }
+
     public void setup() throws ParseException {
         try {
             context = new Context(Context.Mode.READ_ONLY);
@@ -151,18 +157,8 @@ public class IndexClient extends DSpaceRunnable {
         } catch (Exception e) {
             throw new ParseException("Unable to create a new DSpace Context: " + e.getMessage());
         }
-
         indexClientOptions = IndexClientOptions.getIndexClientOption(commandLine);
     }
-
-    /**
-     * Constructor for this class. This will ensure that the Options are created and set appropriately.
-     */
-    private IndexClient() {
-        Options options = IndexClientOptions.constructOptions();
-        this.options = options;
-    }
-
     /**
      * Indexes the given object and all children, if applicable.
      *

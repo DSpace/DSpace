@@ -8,14 +8,10 @@
 package org.dspace.app.bulkedit;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.io.Serializable;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -27,6 +23,7 @@ import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.authority.AuthorityValue;
 import org.dspace.authority.factory.AuthorityServiceFactory;
@@ -141,18 +138,18 @@ public class DSpaceCSV implements Serializable {
     /**
      * Create a new instance, reading the lines in from file
      *
-     * @param f The file to read from
+     * @param inputStream the inputstream to read from
      * @param c The DSpace Context
      * @throws Exception thrown if there is an error reading or processing the file
      */
-    public DSpaceCSV(File f, Context c) throws Exception {
+    public DSpaceCSV(InputStream inputStream, Context c) throws Exception {
         // Initialise the class
         init();
 
         // Open the CSV file
         BufferedReader input = null;
         try {
-            input = new BufferedReader(new InputStreamReader(new FileInputStream(f), "UTF-8"));
+            input = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
 
             // Read the heading line
             String head = input.readLine();
@@ -623,21 +620,15 @@ public class DSpaceCSV implements Serializable {
     }
 
     /**
-     * Save the CSV file to the given filename
-     *
-     * @param filename The filename to save the CSV file to
-     * @throws IOException Thrown if an error occurs when writing the file
+     * Creates and returns an InputStream from the CSV Lines in this DSpaceCSV
+     * @return  The InputStream created from the CSVLines in this DSpaceCSV
      */
-    public final void save(String filename) throws IOException {
-        // Save the file
-        BufferedWriter out = new BufferedWriter(
-            new OutputStreamWriter(
-                new FileOutputStream(filename), "UTF-8"));
+    public InputStream getInputStream() {
+        StringBuilder stringBuilder = new StringBuilder();
         for (String csvLine : getCSVLinesAsStringArray()) {
-            out.write(csvLine + "\n");
+            stringBuilder.append(csvLine + "\n");
         }
-        out.flush();
-        out.close();
+        return IOUtils.toInputStream(stringBuilder.toString(), StandardCharsets.UTF_8);
     }
 
     /**

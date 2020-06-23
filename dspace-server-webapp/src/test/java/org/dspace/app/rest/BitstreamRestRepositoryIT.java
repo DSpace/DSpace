@@ -39,7 +39,6 @@ import org.dspace.content.Community;
 import org.dspace.content.Item;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.eperson.EPerson;
-import org.hamcrest.Matchers;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -99,99 +98,8 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
 
         String token = getAuthToken(admin.getEmail(), password);
 
-        getClient(token).perform(get("/api/core/bitstreams/")
-                   .param("projection", "full"))
-                   .andExpect(status().isOk())
-                   .andExpect(content().contentType(contentType))
-                   .andExpect(jsonPath("$._embedded.bitstreams", Matchers.containsInAnyOrder(
-                       BitstreamMatcher.matchBitstreamEntry(bitstream),
-                       BitstreamMatcher.matchBitstreamEntry(bitstream1)
-                   )));
-    }
-
-    @Test
-    public void findAllPaginationTest() throws Exception {
-        //We turn off the authorization system in order to create the structure as defined below
-        context.turnOffAuthorisationSystem();
-
-        //** GIVEN **
-        //1. A community-collection structure with one parent community with sub-community and one collection.
-        parentCommunity = CommunityBuilder.createCommunity(context)
-                                          .withName("Parent Community")
-                                          .build();
-        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
-                                           .withName("Sub Community")
-                                           .build();
-        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
-
-        //2. One public items that is readable by Anonymous
-        Item publicItem1 = ItemBuilder.createItem(context, col1)
-                                      .withTitle("Test")
-                                      .withIssueDate("2010-10-17")
-                                      .withAuthor("Smith, Donald")
-                                      .withSubject("ExtraEntry")
-                                      .build();
-
-        String bitstreamContent = "ThisIsSomeDummyText";
-        //Add a bitstream to an item
-        Bitstream bitstream = null;
-        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
-            bitstream = BitstreamBuilder.
-                                            createBitstream(context, publicItem1, is)
-                                        .withName("Bitstream")
-                                        .withDescription("descr")
-                                        .withMimeType("text/plain")
-                                        .build();
-        }
-
-        //Add a bitstream to an item
-        Bitstream bitstream1 = null;
-        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
-            bitstream1 = BitstreamBuilder.
-                                             createBitstream(context, publicItem1, is)
-                                         .withName("Bitstream1")
-                                         .withDescription("desscrip1")
-                                         .withMimeType("text/plain")
-                                         .build();
-        }
-
-        context.restoreAuthSystemState();
-
-        String token = getAuthToken(admin.getEmail(), password);
-
-        getClient(token).perform(get("/api/core/bitstreams/")
-                   .param("size", "1")
-                   .param("projection", "full"))
-                   .andExpect(status().isOk())
-                   .andExpect(content().contentType(contentType))
-                   .andExpect(jsonPath("$._embedded.bitstreams", Matchers.contains(
-                       BitstreamMatcher.matchBitstreamEntry(bitstream))
-                   ))
-                   .andExpect(jsonPath("$._embedded.bitstreams", Matchers.not(
-                       Matchers.contains(
-                           BitstreamMatcher.matchBitstreamEntry(bitstream1))
-                                       )
-                   ))
-
-        ;
-
-        getClient(token).perform(get("/api/core/bitstreams/")
-                                .param("size", "1")
-                                .param("page", "1")
-                                .param("projection", "full"))
-                   .andExpect(status().isOk())
-                   .andExpect(content().contentType(contentType))
-                   .andExpect(jsonPath("$._embedded.bitstreams", Matchers.contains(
-                       BitstreamMatcher.matchBitstreamEntry(bitstream1)
-                   )))
-                   .andExpect(jsonPath("$._embedded.bitstreams", Matchers.not(
-                       Matchers.contains(
-                           BitstreamMatcher.matchBitstreamEntry(bitstream)
-                       )
-                   )));
-
-        getClient().perform(get("/api/core/bitstreams/"))
-                .andExpect(status().isUnauthorized());
+        getClient(token).perform(get("/api/core/bitstreams/"))
+                   .andExpect(status().isMethodNotAllowed());
     }
 
     //TODO Re-enable test after https://jira.duraspace.org/browse/DS-3774 is fixed
