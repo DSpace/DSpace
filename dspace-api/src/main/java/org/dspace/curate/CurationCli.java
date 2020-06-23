@@ -8,21 +8,21 @@
 package org.dspace.curate;
 
 import java.io.BufferedReader;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintStream;
 import java.io.Writer;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.Options;
-import org.apache.commons.cli.PosixParser;
+import org.apache.commons.cli.ParseException;
 import org.apache.commons.io.output.NullOutputStream;
+import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.core.Context;
 import org.dspace.core.factory.CoreServiceFactory;
@@ -30,183 +30,93 @@ import org.dspace.curate.factory.CurateServiceFactory;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
+import org.dspace.scripts.DSpaceRunnable;
+import org.dspace.utils.DSpace;
 
 /**
  * CurationCli provides command-line access to Curation tools and processes.
  *
  * @author richardrodgers
  */
-public class CurationCli {
+public class CurationCli extends DSpaceRunnable<CurationScriptConfiguration> {
+
+    private EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
+
+    private Context context;
+    private CurationClientOptions curationClientOptions;
+
+    private String scope;
+    private String reporter;
+    private Map<String, String> parameters;
+    private boolean verbose;
+
+    @Override
+    public void internalRun() throws Exception {
+        if (curationClientOptions == CurationClientOptions.HELP) {
+            printHelp();
+            return;
+        }
+
+        if (!this.initLineOptionsAndCheckIfValid()) {
+            return;
+        }
+
+        Curator curator = initCurator();
+
+        // load curation tasks
+        if (curationClientOptions == CurationClientOptions.TASK) {
+            long start = System.currentTimeMillis();
+            if (!handleCurationTaskAndReturnSuccess(curator)) {
+                return;
+            }
+            this.endScript(start);
+        }
+
+        // process task queue
+        if (curationClientOptions == CurationClientOptions.QUEUE) {
+            // process the task queue
+            TaskQueue queue = (TaskQueue) CoreServiceFactory.getInstance().getPluginService()
+                                                            .getSinglePlugin(TaskQueue.class);
+            if (queue == null) {
+                super.handler.logError("No implementation configured for queue");
+                throw new UnsupportedOperationException("No queue service available");
+            }
+            long timeRun = this.runQueue(queue, curator);
+            this.endScript(timeRun);
+        }
+    }
 
     /**
-     * Default constructor
+     * Does the curation task (-t) or the task in the given file (-T).
+     * Returns false if required option -i is missing.
+     *
+     * @return False if there are missing/invalid command line options (-i); otherwise true
      */
-    private CurationCli() { }
-
-    public static void main(String[] args) throws Exception {
-        // create an options object and populate it
-        CommandLineParser parser = new PosixParser();
-
-        Options options = new Options();
-
-        options.addOption("t", "task", true,
-                          "curation task name");
-        options.addOption("T", "taskfile", true,
-                          "file containing curation task names");
-        options.addOption("i", "id", true,
-                          "Id (handle) of object to perform task on, or 'all' to perform on whole repository");
-        options.addOption("p", "parameter", true,
-                          "a task parameter 'NAME=VALUE'");
-        options.addOption("q", "queue", true,
-                          "name of task queue to process");
-        options.addOption("e", "eperson", true,
-                          "email address of curating eperson");
-        options.addOption("r", "reporter", true,
-                "relative or absolute path to the desired report file.  "
-                        + "Use '-' to report to console.  "
-                        + "If absent, no reporting");
-        options.addOption("s", "scope", true,
-                          "transaction scope to impose: use 'object', 'curation', or 'open'. If absent, 'open' " +
-                              "applies");
-        options.addOption("v", "verbose", false,
-                          "report activity to stdout");
-        options.addOption("h", "help", false, "help");
-
-        CommandLine line = parser.parse(options, args);
-
-        String taskName = null;
-        String taskFileName = null;
-        String idName = null;
-        String taskQueueName = null;
-        String ePersonName = null;
-        String reporterName = null;
-        String scope = null;
-        boolean verbose = false;
-        final Map<String, String> parameters = new HashMap<>();
-
-        if (line.hasOption('h')) {
-            HelpFormatter help = new HelpFormatter();
-            help.printHelp("CurationCli\n", options);
-            System.out
-                .println("\nwhole repo: CurationCli -t estimate -i all");
-            System.out
-                .println("single item: CurationCli -t generate -i itemId");
-            System.out
-                .println("task queue: CurationCli -q monthly");
-            System.exit(0);
+    private boolean handleCurationTaskAndReturnSuccess(Curator curator) throws IOException, SQLException {
+        if (!commandLine.hasOption('i')) {
+            super.handler.logWarning("Id must be specified: a handle, 'all', or a task queue (-h for help)");
+            return false;
         }
-
-        if (line.hasOption('t')) { // task
-            taskName = line.getOptionValue('t');
-        }
-
-        if (line.hasOption('T')) { // task file
-            taskFileName = line.getOptionValue('T');
-        }
-
-        if (line.hasOption('i')) { // id
-            idName = line.getOptionValue('i');
-        }
-
-        if (line.hasOption('q')) { // task queue
-            taskQueueName = line.getOptionValue('q');
-        }
-
-        if (line.hasOption('e')) { // eperson
-            ePersonName = line.getOptionValue('e');
-        }
-
-        if (line.hasOption('p')) { // parameter
-            for (String parameter : line.getOptionValues('p')) {
-                String[] parts = parameter.split("=", 2);
-                String name = parts[0].trim();
-                String value;
-                if (parts.length > 1) {
-                    value = parts[1].trim();
-                } else {
-                    value = "true";
-                }
-                parameters.put(name, value);
-            }
-        }
-        if (line.hasOption('r')) { // report file
-            reporterName = line.getOptionValue('r');
-        }
-
-
-        if (line.hasOption('s')) { // transaction scope
-            scope = line.getOptionValue('s');
-        }
-
-        if (line.hasOption('v')) { // verbose
-            verbose = true;
-        }
-
-        // now validate the args
-        if (idName == null && taskQueueName == null) {
-            System.out.println("Id must be specified: a handle, 'all', or a task queue (-h for help)");
-            System.exit(1);
-        }
-
-        if (taskName == null && taskFileName == null && taskQueueName == null) {
-            System.out.println("A curation task or queue must be specified (-h for help)");
-            System.exit(1);
-        }
-
-        if (scope != null && Curator.TxScope.valueOf(scope.toUpperCase()) == null) {
-            System.out.println("Bad transaction scope '" + scope + "': only 'object', 'curation' or 'open' recognized");
-            System.exit(1);
-        }
-        EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
-
-        Context c = new Context(Context.Mode.BATCH_EDIT);
-        if (ePersonName != null) {
-            EPerson ePerson = ePersonService.findByEmail(c, ePersonName);
-            if (ePerson == null) {
-                System.out.println("EPerson not found: " + ePersonName);
-                System.exit(1);
-            }
-            c.setCurrentUser(ePerson);
-        } else {
-            c.turnOffAuthorisationSystem();
-        }
-
-        Curator curator = new Curator();
-        OutputStream reporter;
-        if (null == reporterName) {
-            reporter = new NullOutputStream();
-        } else if ("-".equals(reporterName)) {
-            reporter = System.out;
-        } else {
-            reporter = new PrintStream(reporterName);
-        }
-        Writer reportWriter = new OutputStreamWriter(reporter);
-        curator.setReporter(reportWriter);
-
-        if (scope != null) {
-            Curator.TxScope txScope = Curator.TxScope.valueOf(scope.toUpperCase());
-            curator.setTransactionScope(txScope);
-        }
-        curator.addParameters(parameters);
-        // we are operating in batch mode, if anyone cares.
-        curator.setInvoked(Curator.Invoked.BATCH);
-        // load curation tasks
-        if (taskName != null) {
+        String idName = this.commandLine.getOptionValue('i');
+        String taskName;
+        if (commandLine.hasOption('t')) {
+            taskName = commandLine.getOptionValue('t');
             if (verbose) {
-                System.out.println("Adding task: " + taskName);
+                handler.logInfo("Adding task: " + taskName);
             }
             curator.addTask(taskName);
             if (verbose && !curator.hasTask(taskName)) {
-                System.out.println("Task: " + taskName + " not resolved");
+                handler.logInfo("Task: " + taskName + " not resolved");
             }
-        } else if (taskQueueName == null) {
+        } else if (commandLine.hasOption('T')) {
             // load taskFile
+            String taskFileName = commandLine.getOptionValue('T');
             BufferedReader reader = null;
             try {
                 reader = new BufferedReader(new FileReader(taskFileName));
                 while ((taskName = reader.readLine()) != null) {
                     if (verbose) {
-                        System.out.println("Adding task: " + taskName);
+                        super.handler.logInfo("Adding task: " + taskName);
                     }
                     curator.addTask(taskName);
                 }
@@ -217,59 +127,180 @@ public class CurationCli {
             }
         }
         // run tasks against object
-        long start = System.currentTimeMillis();
         if (verbose) {
-            System.out.println("Starting curation");
-        }
-        if (idName != null) {
-            if (verbose) {
-                System.out.println("Curating id: " + idName);
-            }
+            super.handler.logInfo("Starting curation");
+            super.handler.logInfo("Curating id: " + idName);
             if ("all".equals(idName)) {
                 // run on whole Site
-                curator.curate(c, ContentServiceFactory.getInstance().getSiteService().findSite(c).getHandle());
+                curator.curate(context,
+                    ContentServiceFactory.getInstance().getSiteService().findSite(context).getHandle());
             } else {
-                curator.curate(c, idName);
+                curator.curate(context, idName);
             }
-        } else {
-            // process the task queue
-            TaskQueue queue = (TaskQueue) CoreServiceFactory.getInstance().getPluginService()
-                                                            .getSinglePlugin(TaskQueue.class);
-            if (queue == null) {
-                System.out.println("No implementation configured for queue");
-                throw new UnsupportedOperationException("No queue service available");
-            }
-            // use current time as our reader 'ticket'
-            long ticket = System.currentTimeMillis();
-            Iterator<TaskQueueEntry> entryIter = queue.dequeue(taskQueueName, ticket).iterator();
-            while (entryIter.hasNext()) {
-                TaskQueueEntry entry = entryIter.next();
-                if (verbose) {
-                    System.out.println("Curating id: " + entry.getObjectId());
-                }
-                curator.clear();
-                // does entry relate to a DSO or workflow object?
-                if (entry.getObjectId().indexOf("/") > 0) {
-                    for (String task : entry.getTaskNames()) {
-                        curator.addTask(task);
-                    }
-                    curator.curate(c, entry.getObjectId());
-                } else {
-                    // make eperson who queued task the effective user
-                    EPerson agent = ePersonService.findByEmail(c, entry.getEpersonId());
-                    if (agent != null) {
-                        c.setCurrentUser(agent);
-                    }
-                    CurateServiceFactory.getInstance().getWorkflowCuratorService()
-                                        .curate(curator, c, entry.getObjectId());
-                }
-            }
-            queue.release(taskQueueName, ticket, true);
         }
-        c.complete();
+        return true;
+    }
+
+    /**
+     * Runs task queue (-q set)
+     *
+     * @param queue   The task cueue
+     * @param curator The curator
+     * @return Time when queue started
+     */
+    private long runQueue(TaskQueue queue, Curator curator) throws SQLException, AuthorizeException, IOException {
+        String taskQueueName = this.commandLine.getOptionValue('q');
+        // use current time as our reader 'ticket'
+        long ticket = System.currentTimeMillis();
+        Iterator<TaskQueueEntry> entryIter = queue.dequeue(taskQueueName, ticket).iterator();
+        while (entryIter.hasNext()) {
+            TaskQueueEntry entry = entryIter.next();
+            if (verbose) {
+                super.handler.logInfo("Curating id: " + entry.getObjectId());
+            }
+            curator.clear();
+            // does entry relate to a DSO or workflow object?
+            if (entry.getObjectId().indexOf('/') > 0) {
+                for (String task : entry.getTaskNames()) {
+                    curator.addTask(task);
+                }
+                curator.curate(context, entry.getObjectId());
+            } else {
+                // make eperson who queued task the effective user
+                EPerson agent = ePersonService.findByEmail(context, entry.getEpersonId());
+                if (agent != null) {
+                    context.setCurrentUser(agent);
+                }
+                CurateServiceFactory.getInstance().getWorkflowCuratorService()
+                                    .curate(curator, context, entry.getObjectId());
+            }
+        }
+        queue.release(taskQueueName, ticket, true);
+        return ticket;
+    }
+
+    /**
+     * End of curation script; logs script time if -v verbose is set
+     *
+     * @param timeRun Time script was started
+     * @throws SQLException If DSpace contextx can't complete
+     */
+    private void endScript(long timeRun) throws SQLException {
+        context.complete();
         if (verbose) {
-            long elapsed = System.currentTimeMillis() - start;
-            System.out.println("Ending curation. Elapsed time: " + elapsed);
+            long elapsed = System.currentTimeMillis() - timeRun;
+            this.handler.logInfo("Ending curation. Elapsed time: " + elapsed);
         }
+    }
+
+    /**
+     * Fills in some optional command line options; to be used by curator. And check if no required options are
+     * missing; or if they have an invalid value. If they are missing/invalid it returns false; otherwise true
+     *
+     * @return False if there are missing required options or invalid values for options.
+     */
+    private boolean initLineOptionsAndCheckIfValid() {
+        // report file
+        if (this.commandLine.hasOption('r')) {
+            this.reporter = this.commandLine.getOptionValue('r');
+        }
+
+        // parameters
+        this.parameters = new HashMap<>();
+        if (this.commandLine.hasOption('p')) {
+            for (String parameter : this.commandLine.getOptionValues('p')) {
+                String[] parts = parameter.split("=", 2);
+                String name = parts[0].trim();
+                String value;
+                if (parts.length > 1) {
+                    value = parts[1].trim();
+                } else {
+                    value = "true";
+                }
+                this.parameters.put(name, value);
+            }
+        }
+
+        // verbose
+        verbose = false;
+        if (commandLine.hasOption('v')) {
+            verbose = true;
+        }
+
+        // scope
+        if (this.commandLine.getOptionValue('s') != null) {
+            this.scope = this.commandLine.getOptionValue('s');
+            if (this.scope != null && Curator.TxScope.valueOf(this.scope.toUpperCase()) == null) {
+                this.handler.logError("Bad transaction scope '" + this.scope + "': only 'object', 'curation' or " +
+                                      "'open' recognized");
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Initialize the curator with command line variables
+     *
+     * @return Initialised curator
+     * @throws FileNotFoundException If file of command line variable -r reporter is not found
+     */
+    private Curator initCurator() throws FileNotFoundException {
+        Curator curator = new Curator();
+        OutputStream reporterStream;
+        if (null == this.reporter) {
+            reporterStream = new NullOutputStream();
+        } else if ("-".equals(this.reporter)) {
+            reporterStream = System.out;
+        } else {
+            reporterStream = new PrintStream(this.reporter);
+        }
+        Writer reportWriter = new OutputStreamWriter(reporterStream);
+        curator.setReporter(reportWriter);
+
+        if (this.scope != null) {
+            Curator.TxScope txScope = Curator.TxScope.valueOf(this.scope.toUpperCase());
+            curator.setTransactionScope(txScope);
+        }
+
+        curator.addParameters(parameters);
+        // we are operating in batch mode, if anyone cares.
+        curator.setInvoked(Curator.Invoked.BATCH);
+        return curator;
+    }
+
+    @Override
+    public void printHelp() {
+        super.printHelp();
+        super.handler.logInfo("\nwhole repo: CurationCli -t estimate -i all");
+        super.handler.logInfo("single item: CurationCli -t generate -i itemId");
+        super.handler.logInfo("task queue: CurationCli -q monthly");
+    }
+
+    @Override
+    public CurationScriptConfiguration getScriptConfiguration() {
+        return new DSpace().getServiceManager().getServiceByName("curation", CurationScriptConfiguration.class);
+    }
+
+    @Override
+    public void setup() throws ParseException {
+        try {
+            this.context = new Context(Context.Mode.BATCH_EDIT);
+            if (this.commandLine.hasOption('e')) {
+                String ePersonEmail = this.commandLine.getOptionValue('e');
+                EPerson ePerson = ePersonService.findByEmail(this.context, ePersonEmail);
+                if (ePerson == null) {
+                    super.handler.logError("EPerson not found: " + ePersonEmail);
+                    throw new ParseException("EPerson not found: " + ePersonEmail);
+                }
+                this.context.setCurrentUser(ePerson);
+            } else {
+                this.context.turnOffAuthorisationSystem();
+            }
+        } catch (Exception e) {
+            throw new ParseException("Unable to create a new DSpace Context: " + e.getMessage());
+        }
+        this.curationClientOptions = CurationClientOptions.getClientOption(commandLine);
     }
 }
