@@ -172,6 +172,21 @@
                     </execution>
                 </executions>
             </plugin>
+            <!-- Verify OS license headers for all source code files -->
+            <plugin>
+                <groupId>com.mycila</groupId>
+                <artifactId>license-maven-plugin</artifactId>
+                <configuration>
+                    <excludes>
+                        <exclude>**/src/test/resources/**</exclude>
+                        <exclude>**/src/test/data/**</exclude>
+                        <!--Skip license check of third party files included/customized from HAL Browser -->
+                        <exclude>src/main/webapp/index.html</exclude>
+                        <exclude>src/main/webapp/login.html</exclude>
+                        <exclude>src/main/webapp/js/hal/**</exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 
@@ -241,6 +256,23 @@
             <artifactId>spring-data-rest-hal-browser</artifactId>
             <version>${spring-hal-browser.version}</version>
         </dependency>
+
+        <!-- WebJars dependencies used to update/enhance the default HAL Browser -->
+        <!-- Pull in current version of JQuery via WebJars
+             Made available at: webjars/jquery/dist/jquery.min.js -->
+        <dependency>
+            <groupId>org.webjars.bowergithub.jquery</groupId>
+            <artifactId>jquery-dist</artifactId>
+            <version>3.5.1</version>
+        </dependency>
+        <!-- Pull in current version of Toastr (toastrjs.com) via WebJars
+             Made available at: webjars/toastr/build/toastr.min.js -->
+        <dependency>
+            <groupId>org.webjars.bowergithub.codeseven</groupId>
+            <artifactId>toastr</artifactId>
+            <version>2.1.4</version>
+        </dependency>
+
 
         <!-- Add in Spring Security for AuthN and AuthZ -->
         <dependency>
