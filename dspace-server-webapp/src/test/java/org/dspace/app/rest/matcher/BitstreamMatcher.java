@@ -116,7 +116,7 @@ public class BitstreamMatcher {
         );
     }
 
-    private static Matcher<? super Object> matchProperties(Bitstream bitstream) {
+    public static Matcher<? super Object> matchProperties(Bitstream bitstream) {
         try {
             return allOf(
                     hasJsonPath("$.uuid", is(bitstream.getID().toString())),
