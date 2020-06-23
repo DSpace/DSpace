@@ -403,7 +403,7 @@ public abstract class JWTTokenHandler {
      * @return EPerson object of current user, with an updated session salt
      * @throws SQLException
      */
-    private EPerson updateSessionSalt(final Context context, final Date previousLoginDate) throws SQLException {
+    protected EPerson updateSessionSalt(final Context context, final Date previousLoginDate) throws SQLException {
         EPerson ePerson;
 
         try {

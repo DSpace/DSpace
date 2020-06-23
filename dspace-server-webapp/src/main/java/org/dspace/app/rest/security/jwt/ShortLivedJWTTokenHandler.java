@@ -17,6 +17,7 @@ import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 import com.nimbusds.jwt.util.DateUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.springframework.stereotype.Component;
 
@@ -53,6 +54,17 @@ public class ShortLivedJWTTokenHandler extends JWTTokenHandler {
                 //Ensure expiration timestamp is after the current time
                 && DateUtils.isAfter(expirationTime, new Date(), 0);
         }
+    }
+
+    /**
+     * The session salt doesn't need to be updated for short lived tokens.
+     * @param context current DSpace Context
+     * @param previousLoginDate date of last login (prior to this one)
+     * @return EPerson object of current user, with an updated session salt
+     */
+    @Override
+    protected EPerson updateSessionSalt(final Context context, final Date previousLoginDate) {
+        return context.getCurrentUser();
     }
 
     @Override
