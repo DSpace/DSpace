@@ -106,6 +106,7 @@ public class SubmissionCCLicenseUrlRepository extends DSpaceRestRepository<Submi
     /**
      * The findOne method is not supported in this repository
      */
+    @PreAuthorize("permitAll()")
     public SubmissionCCLicenseUrlRest findOne(final Context context, final String s) {
         throw new RepositoryMethodNotImplementedException(SubmissionCCLicenseUrlRest.NAME, "findOne");
     }
