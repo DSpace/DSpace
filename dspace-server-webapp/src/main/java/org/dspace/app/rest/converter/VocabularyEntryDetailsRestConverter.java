@@ -32,6 +32,7 @@ public class VocabularyEntryDetailsRestConverter implements DSpaceConverter<Choi
         entry.setDisplay(choice.label);
         entry.setId(choice.authority);
         entry.setOtherInformation(choice.extras);
+        entry.setSelectable(choice.selectable);
         return entry;
     }
 

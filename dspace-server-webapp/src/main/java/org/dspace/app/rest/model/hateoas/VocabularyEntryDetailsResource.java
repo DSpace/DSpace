@@ -9,6 +9,7 @@ package org.dspace.app.rest.model.hateoas;
 
 import org.dspace.app.rest.model.VocabularyEntryDetailsRest;
 import org.dspace.app.rest.model.hateoas.annotations.RelNameDSpaceResource;
+import org.dspace.app.rest.utils.Utils;
 
 /**
  * Vocabulary Entry Details Rest HAL Resource. The HAL Resource wraps the REST Resource adding
@@ -17,9 +18,13 @@ import org.dspace.app.rest.model.hateoas.annotations.RelNameDSpaceResource;
  * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  */
 @RelNameDSpaceResource(VocabularyEntryDetailsRest.NAME)
-public class VocabularyEntryDetailsResource extends HALResource<VocabularyEntryDetailsRest> {
+public class VocabularyEntryDetailsResource extends DSpaceResource<VocabularyEntryDetailsRest> {
 
-    public VocabularyEntryDetailsResource(VocabularyEntryDetailsRest entry) {
-        super(entry);
+    public VocabularyEntryDetailsResource(VocabularyEntryDetailsRest entry, Utils utils) {
+        super(entry, utils);
+        if (entry.isInHierarchicalVocabulary()) {
+            add(utils.linkToSubResource(entry, VocabularyEntryDetailsRest.PARENT));
+            add(utils.linkToSubResource(entry, VocabularyEntryDetailsRest.CHILDREN));
+        }
     }
 }

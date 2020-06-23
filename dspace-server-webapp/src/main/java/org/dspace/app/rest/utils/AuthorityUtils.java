@@ -64,10 +64,12 @@ public class AuthorityUtils {
      * @param projection the name of the projection to use, or {@code null}.
      * @return
      */
-    public VocabularyEntryDetailsRest convertEntryDetails(Choice choice, String authorityName, Projection projection) {
+    public VocabularyEntryDetailsRest convertEntryDetails(Choice choice, String authorityName,
+           boolean isHierarchical, Projection projection) {
         VocabularyEntryDetailsRest entry = converter.toRest(choice, projection);
         entry.setVocabularyName(authorityName);
         entry.setId(authorityName + ":" + entry.getId());
+        entry.setInHierarchicalVocabulary(isHierarchical);
         return entry;
     }
 
