@@ -13,6 +13,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.HashMap;
@@ -41,6 +42,9 @@ import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.Link;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 /**
  * Tests functionality of {@link ConverterService}.
@@ -76,6 +80,11 @@ public class ConverterServiceIT extends AbstractControllerIntegrationTest {
         mockHttpServletRequest.setAttribute("dspace.context", new Context());
         MockHttpServletResponse mockHttpServletResponse = new MockHttpServletResponse();
         requestService.startRequest(mockHttpServletRequest, mockHttpServletResponse);
+        Authentication authentication = mock(Authentication.class);
+        SecurityContext securityContext = mock(SecurityContext.class);
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        SecurityContextHolder.setContext(securityContext);
+        when(SecurityContextHolder.getContext().getAuthentication().getPrincipal()).thenReturn(eperson);
     }
     /**
      * When calling {@code toRest} with an object for which an appropriate {@link DSpaceConverter} can't be found,
@@ -103,6 +112,10 @@ public class ConverterServiceIT extends AbstractControllerIntegrationTest {
 
     /**
      * When calling {@code toRest} with the default projection, the converter should run and no changes should be made.
+     * This converter.toRest will now also check permissions through the PreAuthorize annotation on the
+     * Repository's findOne method. Therefor a repository has been added for this MockObjectRest namely
+     * {@link org.dspace.app.rest.repository.MockObjectRestRepository} and added PreAuthorize annotations
+     * on the methods of this Repository
      */
     @Test
     public void toRestWithDefaultProjection() {

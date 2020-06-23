@@ -7,9 +7,14 @@
  */
 package org.dspace.scripts.handler;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.sql.SQLException;
+import java.util.Optional;
 
 import org.apache.commons.cli.Options;
+import org.dspace.authorize.AuthorizeException;
+import org.dspace.core.Context;
 
 /**
  * This is an interface meant to be implemented by any DSpaceRunnableHandler to specify specific execution methods
@@ -78,4 +83,28 @@ public interface DSpaceRunnableHandler {
      * @param name      The name of the script
      */
     public void printHelp(Options options, String name);
+
+    /**
+     * This method will grab the InputStream for the file defined by the given file name. The exact implementation will
+     * differ based on whether it's a REST call or CommandLine call. The REST Call will look for Bitstreams in the
+     * Database whereas the CommandLine call will look on the filesystem
+     * @param context       The relevant DSpace context
+     * @param fileName      The filename for the file that holds the InputStream
+     * @return              The InputStream for the file defined by the given file name
+     * @throws IOException  If something goes wrong
+     * @throws AuthorizeException   If something goes wrong
+     */
+    public Optional<InputStream> getFileStream(Context context, String fileName) throws IOException, AuthorizeException;
+
+    /**
+     * This method will write the InputStream to either a file on the filesystem or a bitstream in the database
+     * depending on whether it's coming from a CommandLine call or REST call respectively
+     * @param context       The relevant DSpace context
+     * @param fileName      The filename
+     * @param inputStream   The inputstream to be written
+     * @param type          The type of the file
+     * @throws IOException  If something goes wrong
+     */
+    public void writeFilestream(Context context, String fileName, InputStream inputStream, String type)
+        throws IOException, SQLException, AuthorizeException;
 }
