@@ -15,14 +15,17 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Date;
+import javax.servlet.http.HttpServletRequest;
 
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
+import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.mock.web.MockHttpServletRequest;
@@ -37,6 +40,17 @@ public class ShortLivedJWTTokenHandlerTest extends JWTTokenHandlerTest {
     @InjectMocks
     @Spy
     private ShortLivedJWTTokenHandler shortLivedJWTTokenHandler;
+
+    @Before
+    @Override
+    public void setUp() throws Exception {
+        when(ePerson.getSessionSalt()).thenReturn("01234567890123456789012345678901");
+        when(context.getCurrentUser()).thenReturn(ePerson);
+        when(clientInfoService.getClientIp(any())).thenReturn("123.123.123.123");
+        when(ePersonClaimProvider.getKey()).thenReturn("eid");
+        when(ePersonClaimProvider.getValue(any(), Mockito.any(HttpServletRequest.class))).thenReturn("epersonID");
+        jwtClaimProviders.add(ePersonClaimProvider);
+    }
 
     @Test
     public void testJWTNoEncryption() throws Exception {
