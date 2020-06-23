@@ -401,7 +401,7 @@ public class PubmedImportMetadataSourceServiceImpl extends AbstractImportMetadat
     @Override
     public List<ImportRecord> getRecords(InputStream inputStream) throws FileSourceException {
         String xml = null;
-        try (Reader reader = new InputStreamReader(inputStream)) {
+        try (Reader reader = new InputStreamReader(inputStream, "UTF-8")) {
             xml = CharStreams.toString(reader);
             return parseXMLString(xml);
         } catch (IOException e) {
