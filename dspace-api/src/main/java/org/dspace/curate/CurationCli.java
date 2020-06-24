@@ -145,7 +145,7 @@ public class CurationCli extends DSpaceRunnable<CurationScriptConfiguration> {
     /**
      * Runs task queue (-q set)
      *
-     * @param queue   The task cueue
+     * @param queue   The task queue
      * @param curator The curator
      * @return Time when queue started
      */
