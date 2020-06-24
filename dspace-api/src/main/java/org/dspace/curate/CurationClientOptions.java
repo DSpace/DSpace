@@ -38,7 +38,7 @@ public enum CurationClientOptions {
         } else if (commandLine.hasOption("q")) {
             return CurationClientOptions.QUEUE;
         }
-        return CurationClientOptions.HELP;
+        return null;
     }
 
     protected static Options constructOptions() {
@@ -62,7 +62,7 @@ public enum CurationClientOptions {
         return options;
     }
 
-    private static String[] getTaskOptions() {
+    public static String[] getTaskOptions() {
         ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
         return configurationService.getArrayProperty("plugin.named.org.dspace.curate.CurationTask");
     }

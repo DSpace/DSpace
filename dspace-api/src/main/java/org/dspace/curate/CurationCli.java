@@ -8,6 +8,7 @@
 package org.dspace.curate;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
@@ -16,11 +17,11 @@ import java.io.OutputStreamWriter;
 import java.io.PrintStream;
 import java.io.Writer;
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import org.apache.commons.cli.ParseException;
 import org.apache.commons.io.output.NullOutputStream;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.factory.ContentServiceFactory;
@@ -45,6 +46,10 @@ public class CurationCli extends DSpaceRunnable<CurationScriptConfiguration> {
     private Context context;
     private CurationClientOptions curationClientOptions;
 
+    private String task;
+    private String taskFile;
+    private String id;
+    private String queue;
     private String scope;
     private String reporter;
     private Map<String, String> parameters;
@@ -57,18 +62,12 @@ public class CurationCli extends DSpaceRunnable<CurationScriptConfiguration> {
             return;
         }
 
-        if (!this.initLineOptionsAndCheckIfValid()) {
-            return;
-        }
-
         Curator curator = initCurator();
 
         // load curation tasks
         if (curationClientOptions == CurationClientOptions.TASK) {
             long start = System.currentTimeMillis();
-            if (!handleCurationTaskAndReturnSuccess(curator)) {
-                return;
-            }
+            handleCurationTask(curator);
             this.endScript(start);
         }
 
@@ -88,33 +87,25 @@ public class CurationCli extends DSpaceRunnable<CurationScriptConfiguration> {
 
     /**
      * Does the curation task (-t) or the task in the given file (-T).
-     * Returns false if required option -i is missing.
-     *
-     * @return False if there are missing/invalid command line options (-i); otherwise true
+     * Checks:
+     * - if required option -i is missing.
+     * - if option -t has a valid task option
      */
-    private boolean handleCurationTaskAndReturnSuccess(Curator curator) throws IOException, SQLException {
-        if (!commandLine.hasOption('i')) {
-            super.handler.logWarning("Id must be specified: a handle, 'all', or no -i and a -T task queue (-h for " +
-                                     "help)");
-            return false;
-        }
-        String idName = this.commandLine.getOptionValue('i');
+    private void handleCurationTask(Curator curator) throws IOException, SQLException {
         String taskName;
         if (commandLine.hasOption('t')) {
-            taskName = commandLine.getOptionValue('t');
             if (verbose) {
-                handler.logInfo("Adding task: " + taskName);
+                handler.logInfo("Adding task: " + this.task);
             }
-            curator.addTask(taskName);
-            if (verbose && !curator.hasTask(taskName)) {
-                handler.logInfo("Task: " + taskName + " not resolved");
+            curator.addTask(this.task);
+            if (verbose && !curator.hasTask(this.task)) {
+                handler.logInfo("Task: " + this.task + " not resolved");
             }
         } else if (commandLine.hasOption('T')) {
             // load taskFile
-            String taskFileName = commandLine.getOptionValue('T');
             BufferedReader reader = null;
             try {
-                reader = new BufferedReader(new FileReader(taskFileName));
+                reader = new BufferedReader(new FileReader(this.taskFile));
                 while ((taskName = reader.readLine()) != null) {
                     if (verbose) {
                         super.handler.logInfo("Adding task: " + taskName);
@@ -130,16 +121,15 @@ public class CurationCli extends DSpaceRunnable<CurationScriptConfiguration> {
         // run tasks against object
         if (verbose) {
             super.handler.logInfo("Starting curation");
-            super.handler.logInfo("Curating id: " + idName);
+            super.handler.logInfo("Curating id: " + this.id);
         }
-        if ("all".equals(idName)) {
+        if ("all".equals(this.id)) {
             // run on whole Site
             curator.curate(context,
                 ContentServiceFactory.getInstance().getSiteService().findSite(context).getHandle());
         } else {
-            curator.curate(context, idName);
+            curator.curate(context, this.id);
         }
-        return true;
     }
 
     /**
@@ -150,10 +140,9 @@ public class CurationCli extends DSpaceRunnable<CurationScriptConfiguration> {
      * @return Time when queue started
      */
     private long runQueue(TaskQueue queue, Curator curator) throws SQLException, AuthorizeException, IOException {
-        String taskQueueName = this.commandLine.getOptionValue('q');
         // use current time as our reader 'ticket'
         long ticket = System.currentTimeMillis();
-        Iterator<TaskQueueEntry> entryIter = queue.dequeue(taskQueueName, ticket).iterator();
+        Iterator<TaskQueueEntry> entryIter = queue.dequeue(this.queue, ticket).iterator();
         while (entryIter.hasNext()) {
             TaskQueueEntry entry = entryIter.next();
             if (verbose) {
@@ -176,7 +165,7 @@ public class CurationCli extends DSpaceRunnable<CurationScriptConfiguration> {
                                     .curate(curator, context, entry.getObjectId());
             }
         }
-        queue.release(taskQueueName, ticket, true);
+        queue.release(this.queue, ticket, true);
         return ticket;
     }
 
@@ -192,53 +181,6 @@ public class CurationCli extends DSpaceRunnable<CurationScriptConfiguration> {
             long elapsed = System.currentTimeMillis() - timeRun;
             this.handler.logInfo("Ending curation. Elapsed time: " + elapsed);
         }
-    }
-
-    /**
-     * Fills in some optional command line options; to be used by curator. And check if no required options are
-     * missing; or if they have an invalid value. If they are missing/invalid it returns false; otherwise true
-     *
-     * @return False if there are missing required options or invalid values for options.
-     */
-    private boolean initLineOptionsAndCheckIfValid() {
-        // report file
-        if (this.commandLine.hasOption('r')) {
-            this.reporter = this.commandLine.getOptionValue('r');
-        }
-
-        // parameters
-        this.parameters = new HashMap<>();
-        if (this.commandLine.hasOption('p')) {
-            for (String parameter : this.commandLine.getOptionValues('p')) {
-                String[] parts = parameter.split("=", 2);
-                String name = parts[0].trim();
-                String value;
-                if (parts.length > 1) {
-                    value = parts[1].trim();
-                } else {
-                    value = "true";
-                }
-                this.parameters.put(name, value);
-            }
-        }
-
-        // verbose
-        verbose = false;
-        if (commandLine.hasOption('v')) {
-            verbose = true;
-        }
-
-        // scope
-        if (this.commandLine.getOptionValue('s') != null) {
-            this.scope = this.commandLine.getOptionValue('s');
-            if (this.scope != null && Curator.TxScope.valueOf(this.scope.toUpperCase()) == null) {
-                this.handler.logError("Bad transaction scope '" + this.scope + "': only 'object', 'curation' or " +
-                                      "'open' recognized");
-                return false;
-            }
-        }
-
-        return true;
     }
 
     /**
@@ -285,23 +227,116 @@ public class CurationCli extends DSpaceRunnable<CurationScriptConfiguration> {
     }
 
     @Override
-    public void setup() throws ParseException {
-        try {
+    public void setup() {
+        if (this.commandLine.hasOption('e')) {
+            String ePersonEmail = this.commandLine.getOptionValue('e');
             this.context = new Context(Context.Mode.BATCH_EDIT);
-            if (this.commandLine.hasOption('e')) {
-                String ePersonEmail = this.commandLine.getOptionValue('e');
+            try {
                 EPerson ePerson = ePersonService.findByEmail(this.context, ePersonEmail);
                 if (ePerson == null) {
                     super.handler.logError("EPerson not found: " + ePersonEmail);
-                    throw new ParseException("EPerson not found: " + ePersonEmail);
+                    throw new IllegalArgumentException("Unable to find a user with email: " + ePersonEmail);
                 }
                 this.context.setCurrentUser(ePerson);
-            } else {
-                throw new IllegalArgumentException("Needs an -e to set eperson (admin)");
+            } catch (SQLException e) {
+                throw new IllegalArgumentException("SQLException trying to find user with email: " + ePersonEmail);
             }
-        } catch (Exception e) {
-            throw new ParseException("Unable to create a new DSpace Context: " + e.getMessage());
+        } else {
+            throw new IllegalArgumentException("Needs an -e to set eperson (admin)");
         }
         this.curationClientOptions = CurationClientOptions.getClientOption(commandLine);
+
+        if (this.curationClientOptions != null) {
+            this.initGeneralLineOptionsAndCheckIfValid();
+            if (curationClientOptions == CurationClientOptions.TASK) {
+                this.initTaskLineOptionsAndCheckIfValid();
+            } else if (curationClientOptions == CurationClientOptions.QUEUE) {
+                this.queue = this.commandLine.getOptionValue('q');
+            }
+        } else {
+            throw new IllegalArgumentException("[--help || --task|--taskfile <> -identifier <> || -queue <> ] must be" +
+                                               " specified");
+        }
+    }
+
+    /**
+     * Fills in some optional command line options.
+     * Checks if there are missing required options or invalid values for options.
+     */
+    private void initGeneralLineOptionsAndCheckIfValid() {
+        // report file
+        if (this.commandLine.hasOption('r')) {
+            this.reporter = this.commandLine.getOptionValue('r');
+        }
+
+        // parameters
+        this.parameters = new HashMap<>();
+        if (this.commandLine.hasOption('p')) {
+            for (String parameter : this.commandLine.getOptionValues('p')) {
+                String[] parts = parameter.split("=", 2);
+                String name = parts[0].trim();
+                String value;
+                if (parts.length > 1) {
+                    value = parts[1].trim();
+                } else {
+                    value = "true";
+                }
+                this.parameters.put(name, value);
+            }
+        }
+
+        // verbose
+        verbose = false;
+        if (commandLine.hasOption('v')) {
+            verbose = true;
+        }
+
+        // scope
+        if (this.commandLine.getOptionValue('s') != null) {
+            this.scope = this.commandLine.getOptionValue('s');
+            if (this.scope != null && Curator.TxScope.valueOf(this.scope.toUpperCase()) == null) {
+                this.handler.logError("Bad transaction scope '" + this.scope + "': only 'object', 'curation' or " +
+                                      "'open' recognized");
+                throw new IllegalArgumentException(
+                    "Bad transaction scope '" + this.scope + "': only 'object', 'curation' or " +
+                    "'open' recognized");
+            }
+        }
+    }
+
+    /**
+     * Fills in required command line options for the task or taskFile option.
+     * Checks if there are is a missing required -i option.
+     * Checks if -t task has a valid task option.
+     * Checks if -T taskfile is a valid file.
+     */
+    private void initTaskLineOptionsAndCheckIfValid() {
+        // task or taskFile
+        if (this.commandLine.hasOption('t')) {
+            this.task = this.commandLine.getOptionValue('t');
+            if (!Arrays.asList(CurationClientOptions.getTaskOptions()).contains(this.task)) {
+                super.handler
+                    .logError("-t task must be one of: " + Arrays.toString(CurationClientOptions.getTaskOptions()));
+                throw new IllegalArgumentException(
+                    "-t task must be one of: " + Arrays.toString(CurationClientOptions.getTaskOptions()));
+            }
+        } else if (this.commandLine.hasOption('T')) {
+            this.taskFile = this.commandLine.getOptionValue('T');
+            if (!(new File(this.taskFile).isFile())) {
+                super.handler
+                    .logError("-T taskFile must be valid file: " + this.taskFile);
+                throw new IllegalArgumentException("-T taskFile must be valid file: " + this.taskFile);
+            }
+        }
+
+        if (this.commandLine.hasOption('i')) {
+            this.id = this.commandLine.getOptionValue('i');
+        } else {
+            super.handler.logError("Id must be specified: a handle, 'all', or no -i and a -q task queue (-h for " +
+                                   "help)");
+            throw new IllegalArgumentException(
+                "Id must be specified: a handle, 'all', or no -i and a -q task queue (-h for " +
+                "help)");
+        }
     }
 }
