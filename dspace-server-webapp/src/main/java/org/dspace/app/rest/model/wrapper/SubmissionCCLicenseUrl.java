@@ -7,11 +7,28 @@
  */
 package org.dspace.app.rest.model.wrapper;
 
+/**
+ * This class represents a model implementation for {@link org.dspace.app.rest.model.SubmissionCCLicenseUrlRest}
+ * This will simply store a url and an id. it'll be used to create an object with these variables out of information
+ * that came from the back-end. This object will then be used in the
+ * {@link org.dspace.app.rest.converter.SubmissionCCLicenseUrlConverter} to turn it into its REST object
+ */
 public class SubmissionCCLicenseUrl {
 
+    /**
+     * The url for ths object
+     */
     private String url;
+    /**
+     * The id for this object
+     */
     private String id;
 
+    /**
+     * Default constructor with two parameters, url and id
+     * @param url   The url of this object
+     * @param id    The id of this object
+     */
     public SubmissionCCLicenseUrl(String url, String id) {
         this.url = url;
         this.id = id;
