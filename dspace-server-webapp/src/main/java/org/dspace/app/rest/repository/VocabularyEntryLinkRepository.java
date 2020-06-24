@@ -14,6 +14,7 @@ import java.util.UUID;
 import javax.annotation.Nullable;
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.VocabularyEntryRest;
@@ -55,12 +56,18 @@ public class VocabularyEntryLinkRepository extends AbstractDSpaceRestRepository
     public Page<VocabularyEntryRest> filter(@Nullable HttpServletRequest request, String name,
                                           @Nullable Pageable optionalPageable, Projection projection) {
         Context context = obtainContext();
+        String exact = request == null ? null : request.getParameter("exact");
         String filter = request == null ? null : request.getParameter("filter");
+        String entryID = request == null ? null : request.getParameter("entryID");
         String metadata = request == null ? null : request.getParameter("metadata");
         String uuidCollectìon = request == null ? null : request.getParameter("collection");
 
         if (StringUtils.isEmpty(metadata) || StringUtils.isEmpty(uuidCollectìon)) {
             throw new IllegalArgumentException("the metadata and collection parameters are both required");
+        }
+
+        if (StringUtils.isNotBlank(filter) && StringUtils.isNotBlank(entryID)) {
+            throw new IllegalArgumentException("required only one of the parameters: filter or entryID");
         }
 
         Collection collection = null;
@@ -79,12 +86,17 @@ public class VocabularyEntryLinkRepository extends AbstractDSpaceRestRepository
             throw new UnprocessableEntityException("The vocabulary " + name + " is not allowed for the metadata "
                     + metadata + " and collection " + uuidCollectìon);
         }
-
         Pageable pageable = utils.getPageable(optionalPageable);
         List<VocabularyEntryRest> results = new ArrayList<>();
         String fieldKey = org.dspace.core.Utils.standardize(tokens[0], tokens[1], tokens[2], "_");
-        Choices choices = cas.getMatches(fieldKey, filter, collection, Math.toIntExact(pageable.getOffset()),
-                pageable.getPageSize(), context.getCurrentLocale().toString());
+
+        Choices choices = null;
+        if (BooleanUtils.toBoolean(exact)) {
+            choices = cas.getBestMatch(fieldKey, filter, collection, context.getCurrentLocale().toString());
+        } else {
+            choices = cas.getMatches(fieldKey, filter, collection, Math.toIntExact(pageable.getOffset()),
+                          pageable.getPageSize(), context.getCurrentLocale().toString());
+        }
         boolean storeAuthority = cas.storeAuthority(fieldKey, collection);
         for (Choice value : choices.values) {
             results.add(authorityUtils.convertEntry(value, name, storeAuthority, projection));
