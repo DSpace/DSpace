@@ -19,9 +19,10 @@ import org.dspace.importer.external.service.components.dto.PlainMetadataKeyValue
 import org.dspace.importer.external.service.components.dto.PlainMetadataSourceDto;
 
 /**
- * Metadata contributor that takes an PlainMetadataSourceDto instance and turns it into a metadatum
+ * Metadata contributor that takes an PlainMetadataSourceDto instance and turns it into a
+ * collection of metadatum
  *
- * @author Roeland Dillen (roeland at atmire dot com)
+ * @author Pasquale Cavallo (pasquale.cavallo at 4science dot it)
  */
 public class SimpleMetadataContributor implements MetadataContributor<PlainMetadataSourceDto> {
 
@@ -57,25 +58,21 @@ public class SimpleMetadataContributor implements MetadataContributor<PlainMetad
      * In case of success, new metadatum is constructer (using field elements and PlainMetadataSourceDto value)
      * and added to the list.
      *
-     * @param t A class to retrieve metadata and key to match from.
+     * @param t A class to retrieve metadata and key to match from. t and contained list "metadata" MUST be not null.
      * @return a collection of import records. Only the identifier of the found records may be put in the record.
      */
     @Override
     public Collection<MetadatumDTO> contributeMetadata(PlainMetadataSourceDto t) {
         List<MetadatumDTO> values = new LinkedList<>();
-        try {
-            for (PlainMetadataKeyValueItem metadatum : t.getMetadata()) {
-                if (metadatum.getKey().equals(key)) {
-                    MetadatumDTO dcValue = new MetadatumDTO();
-                    dcValue.setValue(metadatum.getValue());
-                    dcValue.setElement(field.getElement());
-                    dcValue.setQualifier(field.getQualifier());
-                    dcValue.setSchema(field.getSchema());
-                    values.add(dcValue);
-                }
+        for (PlainMetadataKeyValueItem metadatum : t.getMetadata()) {
+            if (key.equals(metadatum.getKey())) {
+                MetadatumDTO dcValue = new MetadatumDTO();
+                dcValue.setValue(metadatum.getValue());
+                dcValue.setElement(field.getElement());
+                dcValue.setQualifier(field.getQualifier());
+                dcValue.setSchema(field.getSchema());
+                values.add(dcValue);
             }
-        } catch (Exception e) {
-            throw new RuntimeException(e);
         }
         return values;
     }

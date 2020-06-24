@@ -28,7 +28,8 @@ import org.springframework.beans.factory.annotation.Required;
  *
  * @author Roeland Dillen (roeland at atmire dot com)
  */
-public abstract class AbstractImportMetadataSourceService<RecordType> extends AbstractRemoteMetadataSource {
+public abstract class AbstractImportMetadataSourceService<RecordType> extends AbstractRemoteMetadataSource
+    implements MetadataSource {
     private GenerateQueryService generateQueryForItem = null;
     private MetadataFieldMapping<RecordType, MetadataContributor<RecordType>> metadataFieldMapping;
 

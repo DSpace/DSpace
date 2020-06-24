@@ -53,13 +53,6 @@
         <!-- <property name="metadataFieldMapping" ref="BibtexMetadataFieldMapping"/>  -->
     </bean>
 
-<!--
-    <bean id="BibtexMetadataFieldMapping"
-          class="org.dspace.importer.external.bibtex.service.BibtexFieldMapping">
-    </bean>
- -->
-
-
     <!-- Metadatafield used to check against if it's already imported or not during the JSONLookupSearcher-->
     <bean id="lookupID" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
         <constructor-arg value="dc.identifier.other"/>

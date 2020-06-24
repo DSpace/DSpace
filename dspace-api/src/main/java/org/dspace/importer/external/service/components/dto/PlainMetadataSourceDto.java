@@ -21,10 +21,16 @@ public class PlainMetadataSourceDto {
 
     private List<PlainMetadataKeyValueItem> metadata;
 
+    /*
+     * Method used to get the Metadata list
+     */
     public List<PlainMetadataKeyValueItem> getMetadata() {
         return metadata;
     }
 
+    /*
+     * Method used to set the metadata list
+     */
     public void setMetadata(List<PlainMetadataKeyValueItem> metadata) {
         this.metadata = metadata;
     }
