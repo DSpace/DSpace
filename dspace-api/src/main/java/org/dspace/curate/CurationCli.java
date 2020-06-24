@@ -94,7 +94,8 @@ public class CurationCli extends DSpaceRunnable<CurationScriptConfiguration> {
      */
     private boolean handleCurationTaskAndReturnSuccess(Curator curator) throws IOException, SQLException {
         if (!commandLine.hasOption('i')) {
-            super.handler.logWarning("Id must be specified: a handle, 'all', or a task queue (-h for help)");
+            super.handler.logWarning("Id must be specified: a handle, 'all', or no -i and a -T task queue (-h for " +
+                                     "help)");
             return false;
         }
         String idName = this.commandLine.getOptionValue('i');
@@ -130,13 +131,13 @@ public class CurationCli extends DSpaceRunnable<CurationScriptConfiguration> {
         if (verbose) {
             super.handler.logInfo("Starting curation");
             super.handler.logInfo("Curating id: " + idName);
-            if ("all".equals(idName)) {
-                // run on whole Site
-                curator.curate(context,
-                    ContentServiceFactory.getInstance().getSiteService().findSite(context).getHandle());
-            } else {
-                curator.curate(context, idName);
-            }
+        }
+        if ("all".equals(idName)) {
+            // run on whole Site
+            curator.curate(context,
+                ContentServiceFactory.getInstance().getSiteService().findSite(context).getHandle());
+        } else {
+            curator.curate(context, idName);
         }
         return true;
     }
@@ -280,7 +281,7 @@ public class CurationCli extends DSpaceRunnable<CurationScriptConfiguration> {
 
     @Override
     public CurationScriptConfiguration getScriptConfiguration() {
-        return new DSpace().getServiceManager().getServiceByName("curation", CurationScriptConfiguration.class);
+        return new DSpace().getServiceManager().getServiceByName("curate", CurationScriptConfiguration.class);
     }
 
     @Override
@@ -296,7 +297,7 @@ public class CurationCli extends DSpaceRunnable<CurationScriptConfiguration> {
                 }
                 this.context.setCurrentUser(ePerson);
             } else {
-                this.context.turnOffAuthorisationSystem();
+                throw new IllegalArgumentException("Needs an -e to set eperson (admin)");
             }
         } catch (Exception e) {
             throw new ParseException("Unable to create a new DSpace Context: " + e.getMessage());
