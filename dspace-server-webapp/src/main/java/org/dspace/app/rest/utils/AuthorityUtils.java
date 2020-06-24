@@ -66,6 +66,9 @@ public class AuthorityUtils {
      */
     public VocabularyEntryDetailsRest convertEntryDetails(Choice choice, String authorityName,
            boolean isHierarchical, Projection projection) {
+        if (choice == null) {
+            return null;
+        }
         VocabularyEntryDetailsRest entry = converter.toRest(choice, projection);
         entry.setVocabularyName(authorityName);
         entry.setId(authorityName + ":" + entry.getId());
@@ -75,6 +78,9 @@ public class AuthorityUtils {
 
     public VocabularyEntryRest convertEntry(Choice choice, String authorityName, boolean storeAuthority,
             Projection projection) {
+        if (choice == null) {
+            return null;
+        }
         VocabularyEntryRest entry = new VocabularyEntryRest();
         entry.setDisplay(choice.label);
         entry.setValue(choice.value);

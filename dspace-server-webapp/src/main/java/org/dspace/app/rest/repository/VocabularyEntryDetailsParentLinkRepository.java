@@ -42,7 +42,7 @@ public class VocabularyEntryDetailsParentLinkRepository extends AbstractDSpaceRe
 
     @PreAuthorize("hasAuthority('AUTHENTICATED')")
     public VocabularyEntryDetailsRest getParent(@Nullable HttpServletRequest request, String name,
-                                          @Nullable Pageable pageable, Projection projection) {
+            @Nullable Pageable pageable, Projection projection) {
         Context context = obtainContext();
         String[] parts = StringUtils.split(name, ":", 2);
         if (parts.length != 2) {
@@ -54,8 +54,7 @@ public class VocabularyEntryDetailsParentLinkRepository extends AbstractDSpaceRe
         ChoiceAuthority authority = choiceAuthorityService.getChoiceAuthorityByAuthorityName(vocabularyName);
         Choice choice = null;
         if (StringUtils.isNotBlank(id) && authority.isHierarchical()) {
-            choice = choiceAuthorityService.getParentChoice(vocabularyName, id, (int) pageable.getOffset(),
-                                             pageable.getPageSize(), context.getCurrentLocale().toString());
+            choice = choiceAuthorityService.getParentChoice(vocabularyName, id, context.getCurrentLocale().toString());
         } else {
             throw new NotFoundException();
         }

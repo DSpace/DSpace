@@ -458,7 +458,7 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService 
     private ChoiceAuthority getAuthorityByFieldKeyCollection(String fieldKey, Collection collection) {
         init();
         ChoiceAuthority ma = controller.get(fieldKey);
-        if (ma == null) {
+        if (ma == null && collection != null) {
             SubmissionConfigReader configReader;
             try {
                 configReader = new SubmissionConfigReader();
@@ -513,8 +513,8 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService 
     }
 
     @Override
-    public Choice getParentChoice(String authorityName, String vocabularyId, int start, int limit, String locale) {
+    public Choice getParentChoice(String authorityName, String vocabularyId, String locale) {
         HierarchicalAuthority ma = (HierarchicalAuthority) getChoiceAuthorityByAuthorityName(authorityName);
-        return ma.getParentChoice(authorityName, vocabularyId, start, limit, locale);
+        return ma.getParentChoice(authorityName, vocabularyId, locale);
     }
 }

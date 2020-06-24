@@ -13,7 +13,7 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
-import org.dspace.app.rest.exception.PaginationException;
+import org.dspace.app.rest.exception.LinkNotFoundException;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.model.ResourcePolicyRest;
 import org.dspace.app.rest.model.VocabularyEntryDetailsRest;
@@ -80,15 +80,11 @@ public class VocabularyEntryDetailsRestRepository extends DSpaceRestRepository<V
                 results.add(authorityUtils.convertEntryDetails(value, vocabularyId, source.isHierarchical(),
                         utils.obtainProjection()));
             }
+            Page<VocabularyEntryDetailsRest> resources = new PageImpl<VocabularyEntryDetailsRest>(results, pageable,
+                    choices.total);
+            return resources;
         }
-        Page<VocabularyEntryDetailsRest> resources;
-        try {
-            resources = utils.getPage(results, pageable);
-        } catch (PaginationException pe) {
-            resources = new PageImpl<VocabularyEntryDetailsRest>(new ArrayList<VocabularyEntryDetailsRest>(), pageable,
-                    pe.getTotal());
-        }
-        return resources;
+        throw new LinkNotFoundException(VocabularyRest.CATEGORY, VocabularyEntryDetailsRest.NAME, vocabularyId);
     }
 
     @Override
