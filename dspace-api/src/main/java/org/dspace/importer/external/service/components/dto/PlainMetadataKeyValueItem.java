@@ -12,24 +12,37 @@ package org.dspace.importer.external.service.components.dto;
  *
  * @author Pasquale Cavallo (pasquale.cavallo at 4science dot it)
  */
-
 public class PlainMetadataKeyValueItem {
 
     private String key;
     private String value;
 
+    /*
+     * In a key-value items, like PlainMetadata, this method get the item's key
+     */
     public String getKey() {
         return key;
     }
 
+    /*
+     * In a key-value items, like PlainMetadata, this method set the item's key.
+     * Never set or leave this field to null
+     * 
+     */
     public void setKey(String key) {
         this.key = key;
     }
 
+    /*
+     * In key-value items, like PlainMetadata, this method get the item's value
+     */
     public String getValue() {
         return value;
     }
 
+    /*
+     * In key-value items, like PlainMetadata, this method set the item's value
+     */
     public void setValue(String value) {
         this.value = value;
     }

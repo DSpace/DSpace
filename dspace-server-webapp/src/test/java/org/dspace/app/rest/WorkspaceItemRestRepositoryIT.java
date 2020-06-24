@@ -900,7 +900,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         String authToken = getAuthToken(eperson.getEmail(), password);
         // bulk create workspaceitems in the default collection (col1)
         getClient(authToken).perform(fileUpload("/api/submission/workspaceitems")
-                    .file(bibtexFile).param("owningCollection", col1.getID().toString()))
+                    .file(bibtexFile).param("projection", "full"))
                 // bulk create should return 200, 201 (created) is better for single resource
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$._embedded.workspaceitems[0].sections.traditionalpageone['dc.title'][0].value",
