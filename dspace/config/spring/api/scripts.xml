@@ -19,7 +19,7 @@
         <property name="dspaceRunnableClass" value="org.dspace.app.bulkedit.MetadataExport"/>
     </bean>
 
-    <bean id="curation" class="org.dspace.curate.CurationScriptConfiguration">
+    <bean id="curate" class="org.dspace.curate.CurationScriptConfiguration">
         <property name="description" value="Curation tasks"/>
         <property name="dspaceRunnableClass" value="org.dspace.curate.CurationCli"/>
     </bean>
