@@ -395,4 +395,61 @@ public class VocabularyRestRepositoryIT extends AbstractControllerIntegrationTes
                 .param("metadata", "dc.type"))
                 .andExpect(status().isBadRequest());
     }
+
+    @Test
+    public void linkedEntitiesWithExactParamTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        Collection collection = CollectionBuilder.createCollection(context, parentCommunity)
+                                                 .withName("Test collection")
+                                                 .build();
+        context.restoreAuthSystemState();
+
+        String token = getAuthToken(eperson.getEmail(), password);
+        getClient(token).perform(get("/api/submission/vocabularies/common_types/entries")
+                .param("metadata", "dc.type")
+                .param("collection", collection.getID().toString())
+                .param("filter", "Animation")
+                .param("exact", "true"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$._embedded.entries", Matchers.contains(
+                    VocabularyMatcher.matchVocabularyEntry("Animation", "Animation", "vocabularyEntry")
+                    )))
+                .andExpect(jsonPath("$.page.totalElements", Matchers.is(1)));
+    }
+
+    @Test
+    public void linkedEntitiesWrongMetataForAuthorityTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        Collection collection = CollectionBuilder.createCollection(context, parentCommunity)
+                                                 .withName("Test collection")
+                                                 .build();
+        context.restoreAuthSystemState();
+
+        String token = getAuthToken(eperson.getEmail(), password);
+        getClient(token).perform(get("/api/submission/vocabularies/srsc/entries")
+                        .param("metadata", "dc.type")
+                        .param("collection", collection.getID().toString())
+                        .param("filter", "Animation"))
+                        .andExpect(status().isUnprocessableEntity());
+    }
+
+    @Test
+    public void linkedEntitiesWithFilterAndEntryIdTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        Collection collection = CollectionBuilder.createCollection(context, parentCommunity)
+                                                 .withName("Test collection")
+                                                 .build();
+        context.restoreAuthSystemState();
+
+        String token = getAuthToken(eperson.getEmail(), password);
+        getClient(token).perform(get("/api/submission/vocabularies/srsc/entries")
+                        .param("metadata", "dc.subject")
+                        .param("collection", collection.getID().toString())
+                        .param("filter", "Research")
+                        .param("entryID", "VR131402"))
+                        .andExpect(status().isBadRequest());
+    }
 }
