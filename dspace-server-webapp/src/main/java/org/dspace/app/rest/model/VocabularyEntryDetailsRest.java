@@ -31,7 +31,7 @@ public class VocabularyEntryDetailsRest extends RestAddressableModel {
     private Map<String, String> otherInformation;
     private boolean selectable;
     @JsonIgnore
-    private boolean isInHierarchicalVocabulary = false;
+    private boolean inHierarchicalVocabulary = false;
 
     @JsonIgnore
     private String vocabularyName;
@@ -104,10 +104,10 @@ public class VocabularyEntryDetailsRest extends RestAddressableModel {
     }
 
     public void setInHierarchicalVocabulary(boolean isInHierarchicalVocabulary) {
-        this.isInHierarchicalVocabulary = isInHierarchicalVocabulary;
+        this.inHierarchicalVocabulary = isInHierarchicalVocabulary;
     }
 
     public boolean isInHierarchicalVocabulary() {
-        return isInHierarchicalVocabulary;
+        return inHierarchicalVocabulary;
     }
 }

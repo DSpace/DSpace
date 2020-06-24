@@ -65,12 +65,10 @@ public interface HierarchicalAuthority extends ChoiceAuthority {
      *
      * @param authorityName  authority name
      * @param vocabularyId   user's value to match
-     * @param start          choice at which to start, 0 is first.
-     * @param limit          maximum number of choices to return, 0 for no limit.
      * @param locale         explicit localization key if available, or null
-     * @return a Choice object (never null).
+     * @return a Choice object
      */
-    public Choice getParentChoice(String authorityName, String vocabularyId, int start, int limit, String locale);
+    public Choice getParentChoice(String authorityName, String vocabularyId, String locale);
 
     public Integer getPreloadLevel();
 

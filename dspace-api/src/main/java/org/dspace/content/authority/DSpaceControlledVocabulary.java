@@ -62,6 +62,7 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Hiera
     protected static String xpathTemplate = "//node[contains(translate(@label,'ABCDEFGHIJKLMNOPQRSTUVWXYZ'," +
         "'abcdefghijklmnopqrstuvwxyz'),'%s')]";
     protected static String idTemplate = "//node[@id = '%s']";
+    protected static String labelTemplate = "//node[@label = '%s']";
     protected static String idParentTemplate = "//node[@id = '%s']/parent::isComposedBy";
     protected static String rootTemplate = "/node";
     protected static String pluginNames[] = null;
@@ -168,44 +169,122 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Hiera
             xpathExpression += String.format(xpathTemplate, textHierarchy[i].replaceAll("'", "&apos;").toLowerCase());
         }
         XPath xpath = XPathFactory.newInstance().newXPath();
-        List<Choice> choices = new ArrayList<Choice>();
         int total = 0;
+        List<Choice> choices = new ArrayList<Choice>();
         try {
             NodeList results = (NodeList) xpath.evaluate(xpathExpression, vocabulary, XPathConstants.NODESET);
             total = results.getLength();
-            String[] authorities = new String[results.getLength()];
-            String[] values = new String[results.getLength()];
-            String[] labels = new String[results.getLength()];
-            String[] parent = new String[results.getLength()];
-            Boolean[] selectable = new Boolean[results.getLength()];
-            ArrayList<String>[] children = new ArrayList[results.getLength()];
-            String[] notes = new String[results.getLength()];
-            for (int i = 0; i < total; i++) {
-                Node node = results.item(i);
-                children[i] = new ArrayList<String>();
-                readNode(authorities, values, labels, parent,children[i], notes, selectable, i, node);
-            }
-            int resultCount = labels.length - start;
-            // limit = 0 means no limit
-            if ((limit > 0) && (resultCount > limit)) {
-                resultCount = limit;
-            }
-            if (resultCount > 0) {
-                for (int i = 0; i < resultCount; i++) {
-                    Choice choice = new Choice(authorities[start + i], labels[start + i], values[start + i],
-                                               selectable[start + i]);
-                    choice.extras = addOtherInformation(parent[i], notes[i], children[i], authorities[i]);
-                    choices.add(choice);
-                }
-            }
+            choices = getChoicesFromNodeList(results, start, limit);
         } catch (XPathExpressionException e) {
             log.warn(e.getMessage(), e);
+            return new Choices(true);
         }
-        return new Choices(choices.toArray(new Choice[choices.size()]), start, total, Choices.CF_AMBIGUOUS, false);
+        return new Choices(choices.toArray(new Choice[choices.size()]), start, total, Choices.CF_AMBIGUOUS,
+                total > start + limit);
+    }
+
+    @Override
+    public Choices getBestMatch(String field, String text, Collection collection, String locale) {
+        init();
+        log.debug("Getting best matches for '" + text + "'");
+        String xpathExpression = "";
+        String[] textHierarchy = text.split(hierarchyDelimiter, -1);
+        for (int i = 0; i < textHierarchy.length; i++) {
+            xpathExpression += String.format(labelTemplate, textHierarchy[i].replaceAll("'", "&apos;").toLowerCase());
+        }
+        XPath xpath = XPathFactory.newInstance().newXPath();
+        List<Choice> choices = new ArrayList<Choice>();
+        try {
+            NodeList results = (NodeList) xpath.evaluate(xpathExpression, vocabulary, XPathConstants.NODESET);
+            choices = getChoicesFromNodeList(results, 0, 1);
+        } catch (XPathExpressionException e) {
+            log.warn(e.getMessage(), e);
+            return new Choices(true);
+        }
+        return new Choices(choices.toArray(new Choice[choices.size()]), 0, choices.size(), Choices.CF_AMBIGUOUS, false);
+    }
+
+    @Override
+    public String getLabel(String key, String locale) {
+        return getNodeLabel(key, this.suggestHierarchy);
+    }
+
+    @Override
+    public String getValue(String key, String locale) {
+        return getNodeLabel(key, this.storeHierarchy);
+    }
+
+    @Override
+    public Choice getChoice(String authKey, String locale) {
+        Node node;
+        try {
+            node = getNode(authKey);
+        } catch (XPathExpressionException e) {
+            return null;
+        }
+        return createChoiceFromNode(node);
+    }
+
+    @Override
+    public boolean isHierarchical() {
+        return true;
+    }
+
+    @Override
+    public Choices getTopChoices(String authorityName, int start, int limit, String locale) {
+        init();
+        String xpathExpression = rootTemplate;
+        return getChoicesByXpath(xpathExpression, start, limit);
+    }
+
+    @Override
+    public Choices getChoicesByParent(String authorityName, String parentId, int start, int limit, String locale) {
+        init();
+        String xpathExpression = String.format(idTemplate, parentId);
+        return getChoicesByXpath(xpathExpression, start, limit);
+    }
+
+    @Override
+    public Choice getParentChoice(String authorityName, String parentId, String locale) {
+        init();
+        String xpathExpression = String.format(idTemplate, parentId);
+        Choice choice = getParent(xpathExpression);
+        return choice;
+    }
+
+    @Override
+    public Integer getPreloadLevel() {
+        return preloadLevel;
+    }
+
+    private Node getNode(String key) throws XPathExpressionException {
+        init();
+        String xpathExpression = String.format(idTemplate, key);
+        XPath xpath = XPathFactory.newInstance().newXPath();
+        Node node = (Node) xpath.evaluate(xpathExpression, vocabulary, XPathConstants.NODE);
+        return node;
+    }
+
+    private List<Choice> getChoicesFromNodeList(NodeList results, int start, int limit) {
+        List<Choice> choices = new ArrayList<Choice>();
+        for (int i = 0; i < results.getLength(); i++) {
+            if (i < start) {
+                continue;
+            }
+            if (choices.size() == limit) {
+                break;
+            }
+            Node node = results.item(i);
+            Choice choice = new Choice(getAuthority(node), getLabel(node), getValue(node),
+                    isSelectable(node));
+            choice.extras = addOtherInformation(getParent(node), getNote(node), getChildren(node), getAuthority(node));
+            choices.add(choice);
+        }
+        return choices;
     }
 
     private Map<String, String> addOtherInformation(String parentCurr, String noteCurr,
-            ArrayList<String> childrenCurr, String authorityCurr) {
+            List<String> childrenCurr, String authorityCurr) {
         Map<String, String> extras = new HashMap<String, String>();
         if (StringUtils.isNotBlank(parentCurr)) {
             extras.put("parent", parentCurr);
@@ -222,29 +301,9 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Hiera
         return extras;
     }
 
-    @Override
-    public Choices getBestMatch(String field, String text, Collection collection, String locale) {
-        init();
-        log.debug("Getting best match for '" + text + "'");
-        return getMatches(field, text, collection, 0, 2, locale);
-    }
-
-    @Override
-    public String getLabel(String key, String locale) {
-        return getLabel(key, this.suggestHierarchy);
-    }
-
-    @Override
-    public String getValue(String key, String locale) {
-        return getLabel(key, this.storeHierarchy);
-    }
-
-    private String getLabel(String key, boolean useHierarchy) {
-        init();
-        String xpathExpression = String.format(idTemplate, key);
-        XPath xpath = XPathFactory.newInstance().newXPath();
+    private String getNodeLabel(String key, boolean useHierarchy) {
         try {
-            Node node = (Node) xpath.evaluate(xpathExpression, vocabulary, XPathConstants.NODE);
+            Node node = getNode(key);
             if (useHierarchy) {
                 return this.buildString(node);
             } else {
@@ -255,25 +314,40 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Hiera
         }
     }
 
-    @Override
-    public boolean isHierarchical() {
-        return true;
-    }
-
-    private void readNode(String[] authorities, String[] values, String[] labels, String[] parent,
-            List<String> children, String[] notes, Boolean[] selectable, int i, Node node) {
+    private String getLabel(Node node) {
         String hierarchy = this.buildString(node);
         if (this.suggestHierarchy) {
-            labels[i] = hierarchy;
+            return hierarchy;
         } else {
-            labels[i] = node.getAttributes().getNamedItem("label").getNodeValue();
+            return node.getAttributes().getNamedItem("label").getNodeValue();
         }
-        if (this.storeHierarchy) {
-            values[i] = hierarchy;
-        } else {
-            values[i] = node.getAttributes().getNamedItem("label").getNodeValue();
-        }
+    }
 
+    private String getValue(Node node) {
+        String hierarchy = this.buildString(node);
+        if (this.storeHierarchy) {
+            return hierarchy;
+        } else {
+            return node.getAttributes().getNamedItem("label").getNodeValue();
+        }
+    }
+
+    private String getNote(Node node) {
+        NodeList childNodes = node.getChildNodes();
+        for (int ci = 0; ci < childNodes.getLength(); ci++) {
+            Node firstChild = childNodes.item(ci);
+            if (firstChild != null && "hasNote".equals(firstChild.getNodeName())) {
+                String nodeValue = firstChild.getTextContent();
+                if (StringUtils.isNotBlank(nodeValue)) {
+                    return nodeValue;
+                }
+            }
+        }
+        return null;
+    }
+
+    private List<String> getChildren(Node node) {
+        List<String> children = new ArrayList<String>();
         NodeList childNodes = node.getChildNodes();
         for (int ci = 0; ci < childNodes.getLength(); ci++) {
             Node firstChild = childNodes.item(ci);
@@ -290,102 +364,80 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Hiera
                 break;
             }
         }
+        return children;
+    }
+
+    private boolean isSelectable(Node node) {
         Node selectableAttr = node.getAttributes().getNamedItem("selectable");
         if (null != selectableAttr) {
-            selectable[i] = Boolean.valueOf(selectableAttr.getNodeValue());
+            return Boolean.valueOf(selectableAttr.getNodeValue());
         } else { // Default is true
-            selectable[i] = true;
+            return true;
         }
-        Node idAttr = node.getAttributes().getNamedItem("id");
-        if (null != idAttr) { // 'id' is optional
-            authorities[i] = idAttr.getNodeValue();
-            if (isHierarchical()) {
-                Node parentN = node.getParentNode();
-                if (parentN != null) {
-                    parentN = parentN.getParentNode();
-                    if (parentN != null) {
-                        Node parentIdAttr = parentN.getAttributes().getNamedItem("id");
-                        if (null != parentIdAttr && !parentIdAttr.getNodeValue().equals(rootNodeId)) {
-                            parent[i] = buildString(parentN);
-                        }
-                    }
+    }
+
+    private String getParent(Node node) {
+        Node parentN = node.getParentNode();
+        if (parentN != null) {
+            parentN = parentN.getParentNode();
+            if (parentN != null) {
+                Node parentIdAttr = parentN.getAttributes().getNamedItem("id");
+                if (null != parentIdAttr && !parentIdAttr.getNodeValue().equals(rootNodeId)) {
+                    return buildString(parentN);
                 }
             }
+        }
+        return null;
+    }
+
+    private String getAuthority(Node node) {
+        Node idAttr = node.getAttributes().getNamedItem("id");
+        if (null != idAttr) { // 'id' is optional
+            return idAttr.getNodeValue();
         } else {
-            authorities[i] = null;
-            parent[i] = null;
+            return null;
         }
     }
 
-    @Override
-    public Choices getTopChoices(String authorityName, int start, int limit, String locale) {
-        init();
-        String xpathExpression = rootTemplate;
-        List<Choice> choices = getChoicesByXpath(xpathExpression);
-        return new Choices(choices.toArray(new Choice[choices.size()]), 0, choices.size(), Choices.CF_AMBIGUOUS, false);
-    }
-
-    private List<Choice> getChoicesByXpath(String xpathExpression) {
+    private Choices getChoicesByXpath(String xpathExpression, int start, int limit) {
         List<Choice> choices = new ArrayList<Choice>();
         XPath xpath = XPathFactory.newInstance().newXPath();
         try {
             Node parentNode = (Node) xpath.evaluate(xpathExpression, vocabulary, XPathConstants.NODE);
+            int count = 0;
             if (parentNode != null) {
                 NodeList childNodes = (NodeList) xpath.evaluate(".//isComposedBy", parentNode, XPathConstants.NODE);
                 if (null != childNodes) {
                     for (int i = 0; i < childNodes.getLength(); i++) {
                         Node childNode = childNodes.item(i);
                         if (childNode != null && "node".equals(childNode.getNodeName())) {
+                            if (count < start || choices.size() >= limit) {
+                                count++;
+                                continue;
+                            }
+                            count++;
                             choices.add(createChoiceFromNode(childNode));
                         }
                     }
                 }
+                return new Choices(choices.toArray(new Choice[choices.size()]), start, count,
+                        Choices.CF_AMBIGUOUS, false);
             }
         } catch (XPathExpressionException e) {
             log.warn(e.getMessage(), e);
+            return new Choices(true);
         }
-        return choices;
+        return new Choices(false);
     }
 
     private Choice createChoiceFromNode(Node node) {
         if (node != null) {
-            String[] authorities = new String[1];
-            String[] values = new String[1];
-            String[] labels = new String[1];
-            String[] parent = new String[1];
-            String[] note = new String[1];
-            Boolean[] selectable = new Boolean[1];
-            List<String> children = new ArrayList<String>();
-            readNode(authorities, values, labels, parent, children, note, selectable, 0, node);
-
-            if (values.length > 0) {
-                Choice choice = new Choice(authorities[0], values[0], labels[0], selectable[0]);
-                if (StringUtils.isNotBlank(parent[0])) {
-                    choice.extras.put("parent", parent[0]);
-                }
-                if (StringUtils.isNotBlank(note[0])) {
-                    choice.extras.put("note", note[0]);
-                }
-                return choice;
-            }
+            Choice choice = new Choice(getAuthority(node), getLabel(node), getValue(node),
+                    isSelectable(node));
+            choice.extras = addOtherInformation(getParent(node), getNote(node),getChildren(node), getAuthority(node));
+            return choice;
         }
-        return new Choice("", "", "");
-    }
-
-    @Override
-    public Choices getChoicesByParent(String authorityName, String parentId, int start, int limit, String locale) {
-        init();
-        String xpathExpression = String.format(idTemplate, parentId);
-        List<Choice> choices = getChoicesByXpath(xpathExpression);
-        return new Choices(choices.toArray(new Choice[choices.size()]), 0, choices.size(), Choices.CF_AMBIGUOUS, false);
-    }
-
-    @Override
-    public Choice getParentChoice(String authorityName, String parentId, int start, int limit, String locale) {
-        init();
-        String xpathExpression = String.format(idTemplate, parentId);
-        Choice choice = getParent(xpathExpression);
-        return choice;
+        return null;
     }
 
     private Choice getParent(String xpathExpression) {
@@ -403,11 +455,6 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Hiera
             log.warn(e.getMessage(), e);
         }
         return choice;
-    }
-
-    @Override
-    public Integer getPreloadLevel() {
-        return preloadLevel;
     }
 
 }

@@ -11,10 +11,9 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Nullable;
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.NotFoundException;
 
 import org.apache.commons.lang3.StringUtils;
-import org.dspace.app.rest.exception.PaginationException;
+import org.dspace.app.rest.exception.LinkNotFoundException;
 import org.dspace.app.rest.model.VocabularyEntryDetailsRest;
 import org.dspace.app.rest.model.VocabularyRest;
 import org.dspace.app.rest.projection.Projection;
@@ -67,17 +66,12 @@ public class VocabularyEntryDetailsChildrenLinkRepository extends AbstractDSpace
                 results.add(authorityUtils.convertEntryDetails(value, vocabularyName, authority.isHierarchical(),
                         utils.obtainProjection()));
             }
+            Page<VocabularyEntryDetailsRest> resources = new PageImpl<VocabularyEntryDetailsRest>(results, pageable,
+                    choices.total);
+            return resources;
         } else {
-            throw new NotFoundException();
+            throw new LinkNotFoundException(VocabularyRest.CATEGORY, VocabularyEntryDetailsRest.NAME, name);
         }
-        Page<VocabularyEntryDetailsRest> resources;
-        try {
-            resources = utils.getPage(results, pageable);
-        } catch (PaginationException pe) {
-            resources = new PageImpl<VocabularyEntryDetailsRest>(new ArrayList<VocabularyEntryDetailsRest>(), pageable,
-                            pe.getTotal());
-        }
-        return resources;
     }
 }
 
