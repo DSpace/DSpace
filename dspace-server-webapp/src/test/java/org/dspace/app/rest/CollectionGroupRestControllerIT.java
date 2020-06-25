@@ -1111,7 +1111,6 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
     }
 
-
     @Test
     public void postCollectionDefaultItemReadGroupCreateDefaultItemReadGroupSuccessParentCommunityAdmin()
         throws Exception {
@@ -1599,7 +1598,6 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
                             jsonPath("$", GroupMatcher.matchGroupEntry(anon.getID(), anon.getName())));
 
     }
-
 
     @Test
     public void postCollectionDefaultBitstreamReadGroupCreateDefaultBitstreamReadGroupSuccessParentCommunityAdmin()
