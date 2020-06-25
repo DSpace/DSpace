@@ -103,7 +103,7 @@ public class BitstreamMetadataValueAddPatchOperation extends MetadataValueAddPat
     protected BitstreamService getDSpaceObjectService() {
         return bitstreamService;
     }
-    
+
     public void setBitstreamMetadataValuePathUtils(BitstreamMetadataValuePathUtils bitstreamMetadataValuePathUtils) {
         this.bitstreamMetadataValuePathUtils = bitstreamMetadataValuePathUtils;
     }
