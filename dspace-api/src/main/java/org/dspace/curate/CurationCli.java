@@ -17,13 +17,13 @@ import java.io.OutputStreamWriter;
 import java.io.PrintStream;
 import java.io.Writer;
 import java.sql.SQLException;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
 import org.apache.commons.io.output.NullOutputStream;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.content.DSpaceObject;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.core.Context;
 import org.dspace.core.factory.CoreServiceFactory;
@@ -31,6 +31,8 @@ import org.dspace.curate.factory.CurateServiceFactory;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
+import org.dspace.handle.factory.HandleServiceFactory;
+import org.dspace.handle.service.HandleService;
 import org.dspace.scripts.DSpaceRunnable;
 import org.dspace.utils.DSpace;
 
@@ -74,13 +76,13 @@ public class CurationCli extends DSpaceRunnable<CurationScriptConfiguration> {
         // process task queue
         if (curationClientOptions == CurationClientOptions.QUEUE) {
             // process the task queue
-            TaskQueue queue = (TaskQueue) CoreServiceFactory.getInstance().getPluginService()
+            TaskQueue taskQueue = (TaskQueue) CoreServiceFactory.getInstance().getPluginService()
                                                             .getSinglePlugin(TaskQueue.class);
-            if (queue == null) {
+            if (taskQueue == null) {
                 super.handler.logError("No implementation configured for queue");
                 throw new UnsupportedOperationException("No queue service available");
             }
-            long timeRun = this.runQueue(queue, curator);
+            long timeRun = this.runQueue(taskQueue, curator);
             this.endScript(timeRun);
         }
     }
@@ -151,8 +153,8 @@ public class CurationCli extends DSpaceRunnable<CurationScriptConfiguration> {
             curator.clear();
             // does entry relate to a DSO or workflow object?
             if (entry.getObjectId().indexOf('/') > 0) {
-                for (String task : entry.getTaskNames()) {
-                    curator.addTask(task);
+                for (String taskName : entry.getTaskNames()) {
+                    curator.addTask(taskName);
                 }
                 curator.curate(context, entry.getObjectId());
             } else {
@@ -306,7 +308,7 @@ public class CurationCli extends DSpaceRunnable<CurationScriptConfiguration> {
 
     /**
      * Fills in required command line options for the task or taskFile option.
-     * Checks if there are is a missing required -i option.
+     * Checks if there are is a missing required -i option and if -i is either 'all' or a valid dso handle.
      * Checks if -t task has a valid task option.
      * Checks if -T taskfile is a valid file.
      */
@@ -314,11 +316,11 @@ public class CurationCli extends DSpaceRunnable<CurationScriptConfiguration> {
         // task or taskFile
         if (this.commandLine.hasOption('t')) {
             this.task = this.commandLine.getOptionValue('t');
-            if (!Arrays.asList(CurationClientOptions.getTaskOptions()).contains(this.task)) {
+            if (!CurationClientOptions.getTaskOptions().contains(this.task)) {
                 super.handler
-                    .logError("-t task must be one of: " + Arrays.toString(CurationClientOptions.getTaskOptions()));
+                    .logError("-t task must be one of: " + CurationClientOptions.getTaskOptions());
                 throw new IllegalArgumentException(
-                    "-t task must be one of: " + Arrays.toString(CurationClientOptions.getTaskOptions()));
+                    "-t task must be one of: " + CurationClientOptions.getTaskOptions());
             }
         } else if (this.commandLine.hasOption('T')) {
             this.taskFile = this.commandLine.getOptionValue('T');
@@ -330,7 +332,25 @@ public class CurationCli extends DSpaceRunnable<CurationScriptConfiguration> {
         }
 
         if (this.commandLine.hasOption('i')) {
-            this.id = this.commandLine.getOptionValue('i');
+            this.id = this.commandLine.getOptionValue('i').toLowerCase();
+            if (!this.id.equalsIgnoreCase("all")) {
+                HandleService handleService = HandleServiceFactory.getInstance().getHandleService();
+                DSpaceObject dso;
+                try {
+                    dso = handleService.resolveToObject(this.context, id);
+                } catch (SQLException e) {
+                    super.handler.logError("SQLException trying to resolve handle " + id + " to a valid dso");
+                    throw new IllegalArgumentException(
+                        "SQLException trying to resolve handle " + id + " to a valid dso");
+                }
+                if (dso == null) {
+                    super.handler.logError("Id must be specified: a valid dso handle or 'all'; " + this.id + " could " +
+                                           "not be resolved to valid dso handle");
+                    throw new IllegalArgumentException(
+                        "Id must be specified: a valid dso handle or 'all'; " + this.id + " could " +
+                        "not be resolved to valid dso handle");
+                }
+            }
         } else {
             super.handler.logError("Id must be specified: a handle, 'all', or no -i and a -q task queue (-h for " +
                                    "help)");

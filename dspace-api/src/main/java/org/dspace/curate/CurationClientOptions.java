@@ -7,10 +7,12 @@
  */
 package org.dspace.curate;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Options;
+import org.apache.commons.lang3.StringUtils;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 
@@ -23,6 +25,8 @@ public enum CurationClientOptions {
     TASK,
     QUEUE,
     HELP;
+
+    private static List<String> taskOptions;
 
     /**
      * This method resolves the CommandLine parameters to figure out which action the curation script should perform
@@ -44,7 +48,7 @@ public enum CurationClientOptions {
     protected static Options constructOptions() {
         Options options = new Options();
 
-        options.addOption("t", "task", true, "curation task name; options: " + Arrays.toString(getTaskOptions()));
+        options.addOption("t", "task", true, "curation task name; options: " + getTaskOptions());
         options.addOption("T", "taskfile", true, "file containing curation task names");
         options.addOption("i", "id", true,
             "Id (handle) of object to perform task on, or 'all' to perform on whole repository");
@@ -62,8 +66,20 @@ public enum CurationClientOptions {
         return options;
     }
 
-    public static String[] getTaskOptions() {
-        ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
-        return configurationService.getArrayProperty("plugin.named.org.dspace.curate.CurationTask");
+    /**
+     * Creates list of the taskOptions' keys from the configs of plugin.named.org.dspace.curate.CurationTask
+     *
+     * @return List of the taskOptions' keys from the configs of plugin.named.org.dspace.curate.CurationTask
+     */
+    public static List<String> getTaskOptions() {
+        if (taskOptions == null) {
+            ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
+            String[] taskConfigs = configurationService.getArrayProperty("plugin.named.org.dspace.curate.CurationTask");
+            taskOptions = new ArrayList<>();
+            for (String taskConfig : taskConfigs) {
+                taskOptions.add(StringUtils.substringAfterLast(taskConfig, "=").trim());
+            }
+        }
+        return taskOptions;
     }
 }
