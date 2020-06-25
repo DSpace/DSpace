@@ -160,7 +160,7 @@ public class SubmissionFormsControllerIT extends AbstractControllerIntegrationTe
                                         null, true,
                                 "Select the type(s) of content of the item. To select more than one value in the " +
                                 "list, you may have to hold down the \"CTRL\" or \"Shift\" key.",
-                                "dc.type")
+                                null, "dc.type", "common_types")
                             )))
         ;
     }
