@@ -21,6 +21,7 @@ public class UsageReportPointRest extends BaseObjectRest<String> {
     public static final String NAME = "point";
     public static final String CATEGORY = RestModel.STATISTICS;
     protected String id;
+    protected String label;
     private Map<String, Integer> values;
 
     public String getCategory() {
@@ -56,5 +57,13 @@ public class UsageReportPointRest extends BaseObjectRest<String> {
 
     public void setValues(Map<String, Integer> values) {
         this.values = values;
+    }
+
+    public String getLabel() {
+        return label;
+    }
+
+    public void setLabel(String label) {
+        this.label = label;
     }
 }

@@ -20,4 +20,10 @@ public class UsageReportPointDateRest extends UsageReportPointRest {
     public String getType() {
         return NAME;
     }
+
+    @Override
+    public void setId(String id) {
+        super.id = id;
+        super.label = id;
+    }
 }
