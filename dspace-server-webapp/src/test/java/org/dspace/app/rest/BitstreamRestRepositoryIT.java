@@ -33,13 +33,14 @@ import org.dspace.app.rest.matcher.BitstreamMatcher;
 import org.dspace.app.rest.matcher.HalMatcher;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.app.rest.test.MetadataPatchSuite;
+import org.dspace.authorize.service.ResourcePolicyService;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
 import org.dspace.content.service.BitstreamService;
+import org.dspace.core.Constants;
 import org.dspace.eperson.EPerson;
-import org.hamcrest.Matchers;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,6 +49,9 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
 
     @Autowired
     private BitstreamService bitstreamService;
+
+    @Autowired
+    private ResourcePolicyService resourcePolicyService;
 
     @Test
     public void findAllTest() throws Exception {
@@ -99,99 +103,8 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
 
         String token = getAuthToken(admin.getEmail(), password);
 
-        getClient(token).perform(get("/api/core/bitstreams/")
-                   .param("projection", "full"))
-                   .andExpect(status().isOk())
-                   .andExpect(content().contentType(contentType))
-                   .andExpect(jsonPath("$._embedded.bitstreams", Matchers.containsInAnyOrder(
-                       BitstreamMatcher.matchBitstreamEntry(bitstream),
-                       BitstreamMatcher.matchBitstreamEntry(bitstream1)
-                   )));
-    }
-
-    @Test
-    public void findAllPaginationTest() throws Exception {
-        //We turn off the authorization system in order to create the structure as defined below
-        context.turnOffAuthorisationSystem();
-
-        //** GIVEN **
-        //1. A community-collection structure with one parent community with sub-community and one collection.
-        parentCommunity = CommunityBuilder.createCommunity(context)
-                                          .withName("Parent Community")
-                                          .build();
-        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
-                                           .withName("Sub Community")
-                                           .build();
-        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
-
-        //2. One public items that is readable by Anonymous
-        Item publicItem1 = ItemBuilder.createItem(context, col1)
-                                      .withTitle("Test")
-                                      .withIssueDate("2010-10-17")
-                                      .withAuthor("Smith, Donald")
-                                      .withSubject("ExtraEntry")
-                                      .build();
-
-        String bitstreamContent = "ThisIsSomeDummyText";
-        //Add a bitstream to an item
-        Bitstream bitstream = null;
-        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
-            bitstream = BitstreamBuilder.
-                                            createBitstream(context, publicItem1, is)
-                                        .withName("Bitstream")
-                                        .withDescription("descr")
-                                        .withMimeType("text/plain")
-                                        .build();
-        }
-
-        //Add a bitstream to an item
-        Bitstream bitstream1 = null;
-        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
-            bitstream1 = BitstreamBuilder.
-                                             createBitstream(context, publicItem1, is)
-                                         .withName("Bitstream1")
-                                         .withDescription("desscrip1")
-                                         .withMimeType("text/plain")
-                                         .build();
-        }
-
-        context.restoreAuthSystemState();
-
-        String token = getAuthToken(admin.getEmail(), password);
-
-        getClient(token).perform(get("/api/core/bitstreams/")
-                   .param("size", "1")
-                   .param("projection", "full"))
-                   .andExpect(status().isOk())
-                   .andExpect(content().contentType(contentType))
-                   .andExpect(jsonPath("$._embedded.bitstreams", Matchers.contains(
-                       BitstreamMatcher.matchBitstreamEntry(bitstream))
-                   ))
-                   .andExpect(jsonPath("$._embedded.bitstreams", Matchers.not(
-                       Matchers.contains(
-                           BitstreamMatcher.matchBitstreamEntry(bitstream1))
-                                       )
-                   ))
-
-        ;
-
-        getClient(token).perform(get("/api/core/bitstreams/")
-                                .param("size", "1")
-                                .param("page", "1")
-                                .param("projection", "full"))
-                   .andExpect(status().isOk())
-                   .andExpect(content().contentType(contentType))
-                   .andExpect(jsonPath("$._embedded.bitstreams", Matchers.contains(
-                       BitstreamMatcher.matchBitstreamEntry(bitstream1)
-                   )))
-                   .andExpect(jsonPath("$._embedded.bitstreams", Matchers.not(
-                       Matchers.contains(
-                           BitstreamMatcher.matchBitstreamEntry(bitstream)
-                       )
-                   )));
-
-        getClient().perform(get("/api/core/bitstreams/"))
-                .andExpect(status().isUnauthorized());
+        getClient(token).perform(get("/api/core/bitstreams/"))
+                   .andExpect(status().isMethodNotAllowed());
     }
 
     //TODO Re-enable test after https://jira.duraspace.org/browse/DS-3774 is fixed
@@ -320,6 +233,352 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
                 .andExpect(jsonPath("$", HalMatcher.matchNoEmbeds()))
         ;
 
+    }
+
+    @Test
+    public void findOneBitstreamTest_EmbargoedBitstream_Anon() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withName("Collection 1")
+                                           .build();
+
+        // a public item with an embargoed bitstream
+        String bitstreamContent = "Embargoed!";
+
+        Item publicItem1;
+        Bitstream bitstream;
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, org.apache.commons.lang3.CharEncoding.UTF_8)) {
+
+            publicItem1 = ItemBuilder.createItem(context, col1)
+                                     .withTitle("Public item 1")
+                                     .withIssueDate("2017-10-17")
+                                     .withAuthor("Smith, Donald")
+                                     .build();
+
+            bitstream = BitstreamBuilder
+                .createBitstream(context, publicItem1, is)
+                .withName("Test Embargoed Bitstream")
+                .withDescription("This bitstream is embargoed")
+                .withMimeType("text/plain")
+                .withEmbargoPeriod("3 months")
+                .build();
+        }
+        context.restoreAuthSystemState();
+
+        // Bitstream metadata should still be accessible by anonymous request
+        getClient().perform(get("/api/core/bitstreams/" + bitstream.getID()))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$", BitstreamMatcher.matchProperties(bitstream)))
+                   .andExpect(jsonPath("$", HalMatcher.matchNoEmbeds()))
+                   .andExpect(jsonPath("$", BitstreamMatcher.matchLinks(bitstream.getID())))
+        ;
+
+        // Also accessible as embedded object by anonymous request
+        getClient().perform(get("/api/core/items/" + publicItem1.getID() + "?embed=bundles/bitstreams"))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$._embedded.bundles._embedded.bundles[0]._embedded.bitstreams._embedded" +
+                                       ".bitstreams[0]", BitstreamMatcher.matchProperties(bitstream)))
+        ;
+    }
+
+    @Test
+    public void findOneBitstreamTest_NoReadPolicyOnBitstream_Anon() throws Exception {
+        //We turn off the authorization system in order to create the structure as defined below
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and one collection.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+
+        //2. One public items that is readable by Anonymous
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
+                                      .withTitle("Test")
+                                      .withIssueDate("2010-10-17")
+                                      .withAuthor("Smith, Donald")
+                                      .withSubject("ExtraEntry")
+                                      .build();
+
+        String bitstreamContent = "ThisIsSomeDummyText";
+
+        //Add a bitstream to an item
+        Bitstream bitstream = null;
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+            bitstream = BitstreamBuilder.
+                                            createBitstream(context, publicItem1, is)
+                                        .withName("Bitstream")
+                                        .withDescription("Description")
+                                        .withMimeType("text/plain")
+                                        .build();
+        }
+
+        // Remove all READ policies on bitstream
+        resourcePolicyService.removePolicies(context, bitstream, Constants.READ);
+
+        context.restoreAuthSystemState();
+
+        // Bitstream metadata should still be accessible by anonymous request
+        getClient().perform(get("/api/core/bitstreams/" + bitstream.getID()))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$", BitstreamMatcher.matchProperties(bitstream)))
+                   .andExpect(jsonPath("$", HalMatcher.matchNoEmbeds()))
+                   .andExpect(jsonPath("$", BitstreamMatcher.matchLinks(bitstream.getID())))
+        ;
+
+        // Also accessible as embedded object by anonymous request
+        getClient().perform(get("/api/core/items/" + publicItem1.getID() + "?embed=bundles/bitstreams"))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$._embedded.bundles._embedded.bundles[0]._embedded.bitstreams._embedded" +
+                                       ".bitstreams[0]", BitstreamMatcher.matchProperties(bitstream)))
+        ;
+    }
+
+    @Test
+    public void findOneBitstreamTest_EmbargoedBitstream_NoREADRightsOnBundle() throws Exception {
+        context.turnOffAuthorisationSystem();
+        context.setCurrentUser(eperson);
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withName("Collection 1")
+                                           .build();
+
+        // a public item with an embargoed bitstream
+        String bitstreamContent = "Embargoed!";
+
+        Item publicItem1;
+        Bitstream bitstream;
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, org.apache.commons.lang3.CharEncoding.UTF_8)) {
+
+            publicItem1 = ItemBuilder.createItem(context, col1)
+                                     .withTitle("Public item 1")
+                                     .withIssueDate("2017-10-17")
+                                     .withAuthor("Smith, Donald")
+                                     .build();
+
+            bitstream = BitstreamBuilder
+                .createBitstream(context, publicItem1, is)
+                .withName("Test Embargoed Bitstream")
+                .withDescription("This bitstream is embargoed")
+                .withMimeType("text/plain")
+                .withEmbargoPeriod("3 months")
+                .build();
+        }
+
+        // Remove read policies on bundle of bitstream
+        resourcePolicyService.removePolicies(context, bitstream.getBundles().get(0), Constants.READ);
+
+        context.restoreAuthSystemState();
+
+        // Bitstream metadata should not be accessible by anonymous request
+        getClient().perform(get("/api/core/bitstreams/" + bitstream.getID()))
+                   .andExpect(status().isUnauthorized())
+        ;
+
+        // Bitstream metadata should not be accessible by submitter
+        String submitterToken = getAuthToken(context.getCurrentUser().getEmail(), password);
+        getClient(submitterToken).perform(get("/api/core/bitstreams/" + bitstream.getID()))
+                                 .andExpect(status().isForbidden())
+        ;
+
+        // Bitstream metadata should be accessible by admin
+        String adminToken = getAuthToken(admin.getEmail(), password);
+        getClient(adminToken).perform(get("/api/core/bitstreams/" + bitstream.getID()))
+                             .andExpect(status().isOk())
+        ;
+    }
+
+    @Test
+    public void findOneBitstreamTest_EmbargoedBitstream_ePersonREADRightsOnBundle() throws Exception {
+        context.turnOffAuthorisationSystem();
+        context.setCurrentUser(eperson);
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withName("Collection 1")
+                                           .build();
+
+        // a public item with an embargoed bitstream
+        String bitstreamContent = "Embargoed!";
+
+        Item publicItem1;
+        Bitstream bitstream;
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, org.apache.commons.lang3.CharEncoding.UTF_8)) {
+
+            publicItem1 = ItemBuilder.createItem(context, col1)
+                                     .withTitle("Public item 1")
+                                     .withIssueDate("2017-10-17")
+                                     .withAuthor("Smith, Donald")
+                                     .build();
+
+            bitstream = BitstreamBuilder
+                .createBitstream(context, publicItem1, is)
+                .withName("Test Embargoed Bitstream")
+                .withDescription("This bitstream is embargoed")
+                .withMimeType("text/plain")
+                .withEmbargoPeriod("3 months")
+                .build();
+        }
+
+        // Replace anon read policy on bundle of bitstream with ePerson READ policy
+        resourcePolicyService.removePolicies(context, bitstream.getBundles().get(0), Constants.READ);
+        ResourcePolicyBuilder.createResourcePolicy(context).withUser(eperson)
+                             .withAction(Constants.READ)
+                             .withDspaceObject(bitstream.getBundles().get(0)).build();
+
+        context.restoreAuthSystemState();
+
+        // Bitstream metadata should not be accessible by anonymous request
+        getClient().perform(get("/api/core/bitstreams/" + bitstream.getID()))
+                   .andExpect(status().isUnauthorized())
+        ;
+
+        // Bitstream metadata should be accessible by eperson
+        String submitterToken = getAuthToken(context.getCurrentUser().getEmail(), password);
+        getClient(submitterToken).perform(get("/api/core/bitstreams/" + bitstream.getID()))
+                                 .andExpect(status().isOk())
+        ;
+
+        // Bitstream metadata should be accessible by admin
+        String adminToken = getAuthToken(admin.getEmail(), password);
+        getClient(adminToken).perform(get("/api/core/bitstreams/" + bitstream.getID()))
+                             .andExpect(status().isOk())
+        ;
+    }
+
+    @Test
+    public void findOneBitstreamTest_EmbargoedBitstream_NoREADRightsOnItem() throws Exception {
+        context.turnOffAuthorisationSystem();
+        context.setCurrentUser(eperson);
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withName("Collection 1")
+                                           .build();
+
+        // a public item with an embargoed bitstream
+        String bitstreamContent = "Embargoed!";
+
+        Item publicItem1;
+        Bitstream bitstream;
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, org.apache.commons.lang3.CharEncoding.UTF_8)) {
+
+            publicItem1 = ItemBuilder.createItem(context, col1)
+                                     .withTitle("Public item 1")
+                                     .withIssueDate("2017-10-17")
+                                     .withAuthor("Smith, Donald")
+                                     .build();
+
+            bitstream = BitstreamBuilder
+                .createBitstream(context, publicItem1, is)
+                .withName("Test Embargoed Bitstream")
+                .withDescription("This bitstream is embargoed")
+                .withMimeType("text/plain")
+                .withEmbargoPeriod("3 months")
+                .build();
+        }
+
+        // Remove read policies on item of bitstream
+        resourcePolicyService.removePolicies(context, publicItem1, Constants.READ);
+
+        context.restoreAuthSystemState();
+
+        // Bitstream metadata should not be accessible by anonymous request
+        getClient().perform(get("/api/core/bitstreams/" + bitstream.getID()))
+                   .andExpect(status().isUnauthorized())
+        ;
+
+        // Bitstream metadata should not be accessible by submitter
+        String submitterToken = getAuthToken(context.getCurrentUser().getEmail(), password);
+        getClient(submitterToken).perform(get("/api/core/bitstreams/" + bitstream.getID()))
+                                 .andExpect(status().isForbidden())
+        ;
+
+        // Bitstream metadata should be accessible by admin
+        String adminToken = getAuthToken(admin.getEmail(), password);
+        getClient(adminToken).perform(get("/api/core/bitstreams/" + bitstream.getID()))
+                             .andExpect(status().isOk())
+        ;
+    }
+
+    @Test
+    public void findOneBitstreamTest_EmbargoedBitstream_ePersonREADRightsOnItem() throws Exception {
+        context.turnOffAuthorisationSystem();
+        context.setCurrentUser(eperson);
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withName("Collection 1")
+                                           .build();
+
+        // a public item with an embargoed bitstream
+        String bitstreamContent = "Embargoed!";
+
+        Item publicItem1;
+        Bitstream bitstream;
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, org.apache.commons.lang3.CharEncoding.UTF_8)) {
+
+            publicItem1 = ItemBuilder.createItem(context, col1)
+                                     .withTitle("Public item 1")
+                                     .withIssueDate("2017-10-17")
+                                     .withAuthor("Smith, Donald")
+                                     .build();
+
+            bitstream = BitstreamBuilder
+                .createBitstream(context, publicItem1, is)
+                .withName("Test Embargoed Bitstream")
+                .withDescription("This bitstream is embargoed")
+                .withMimeType("text/plain")
+                .withEmbargoPeriod("3 months")
+                .build();
+        }
+
+        // Replace anon read policy on item of bitstream with ePerson READ policy
+        resourcePolicyService.removePolicies(context, publicItem1, Constants.READ);
+        ResourcePolicyBuilder.createResourcePolicy(context).withUser(eperson)
+                             .withAction(Constants.READ)
+                             .withDspaceObject(publicItem1).build();
+
+        context.restoreAuthSystemState();
+
+        // Bitstream metadata should not be accessible by anonymous request
+        getClient().perform(get("/api/core/bitstreams/" + bitstream.getID()))
+                   .andExpect(status().isUnauthorized())
+        ;
+
+        // Bitstream metadata should be accessible by eperson
+        String submitterToken = getAuthToken(context.getCurrentUser().getEmail(), password);
+        getClient(submitterToken).perform(get("/api/core/bitstreams/" + bitstream.getID()))
+                                 .andExpect(status().isOk())
+        ;
+
+        // Bitstream metadata should be accessible by admin
+        String adminToken = getAuthToken(admin.getEmail(), password);
+        getClient(adminToken).perform(get("/api/core/bitstreams/" + bitstream.getID()))
+                             .andExpect(status().isOk())
+        ;
     }
 
     @Test

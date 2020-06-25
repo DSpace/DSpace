@@ -1800,4 +1800,21 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
                                                                  "Workflow Item 3", "2016-02-13")))
                         .andExpect(jsonPath("$._embedded.step", WorkflowStepMatcher.matchWorkflowStepEntry(step)));
     }
+
+    @Test
+    public void discoverableNestedLinkTest() throws Exception {
+        String token = getAuthToken(eperson.getEmail(), password);
+        getClient(token).perform(get("/api"))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$._links",Matchers.allOf(
+                                hasJsonPath("$.claimedtasks.href",
+                                         is("http://localhost/api/workflow/claimedtasks")),
+                                hasJsonPath("$.claimedtask-search.href",
+                                         is("http://localhost/api/workflow/claimedtask/search")),
+                                hasJsonPath("$.pooltasks.href",
+                                         is("http://localhost/api/workflow/pooltasks")),
+                                hasJsonPath("$.pooltask-search.href",
+                                         is("http://localhost/api/workflow/pooltask/search"))
+                        )));
+    }
 }
