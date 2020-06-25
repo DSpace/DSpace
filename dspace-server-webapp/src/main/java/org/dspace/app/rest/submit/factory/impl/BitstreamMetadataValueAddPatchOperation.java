@@ -40,7 +40,7 @@ public class BitstreamMetadataValueAddPatchOperation extends MetadataValueAddPat
     @Autowired
     ItemService itemService;
 
-    @Autowired
+    // this is wired in the pring-dspace-core-services.xml
     BitstreamMetadataValuePathUtils bitstreamMetadataValuePathUtils;
 
     @Override
@@ -102,5 +102,9 @@ public class BitstreamMetadataValueAddPatchOperation extends MetadataValueAddPat
     @Override
     protected BitstreamService getDSpaceObjectService() {
         return bitstreamService;
+    }
+    
+    public void setBitstreamMetadataValuePathUtils(BitstreamMetadataValuePathUtils bitstreamMetadataValuePathUtils) {
+        this.bitstreamMetadataValuePathUtils = bitstreamMetadataValuePathUtils;
     }
 }

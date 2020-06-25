@@ -36,7 +36,7 @@ public class BitstreamMetadataValueRemovePatchOperation extends MetadataValueRem
     @Autowired
     ItemService itemService;
 
-    @Autowired
+    // this is wired in the pring-dspace-core-services.xml
     BitstreamMetadataValuePathUtils bitstreamMetadataValuePathUtils;
 
     @Override
@@ -73,4 +73,7 @@ public class BitstreamMetadataValueRemovePatchOperation extends MetadataValueRem
         return bitstreamService;
     }
 
+    public void setBitstreamMetadataValuePathUtils(BitstreamMetadataValuePathUtils bitstreamMetadataValuePathUtils) {
+        this.bitstreamMetadataValuePathUtils = bitstreamMetadataValuePathUtils;
+    }
 }
