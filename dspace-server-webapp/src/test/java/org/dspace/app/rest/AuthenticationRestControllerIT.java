@@ -13,6 +13,7 @@ import static org.hamcrest.Matchers.endsWith;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.startsWith;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -779,10 +780,16 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
     @Test
     public void testShortLivedToken() throws Exception {
         String token = getAuthToken(eperson.getEmail(), password);
+
+        // Verify the main session salt doesn't change
+        String salt = eperson.getSessionSalt();
+
         getClient(token).perform(post("/api/authn/shortlivedtokens"))
             .andExpect(jsonPath("$.token", notNullValue()))
             .andExpect(jsonPath("$.type", is("shortlivedtoken")))
             .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/authn/shortlivedtokens")));
+
+        assertEquals(salt, eperson.getSessionSalt());
     }
 
     @Test
