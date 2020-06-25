@@ -7,6 +7,7 @@
  */
 package org.dspace.app.rest;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import javax.servlet.ServletRequest;
@@ -23,10 +24,12 @@ import org.dspace.core.Context;
 import org.dspace.license.service.CreativeCommonsService;
 import org.dspace.services.RequestService;
 import org.dspace.utils.DSpace;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
+import org.springframework.hateoas.Link;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
@@ -36,7 +39,8 @@ import org.springframework.stereotype.Component;
  */
 
 @Component(SubmissionCCLicenseUrlRest.CATEGORY + "." + SubmissionCCLicenseUrlRest.NAME)
-public class SubmissionCCLicenseUrlRepository extends DSpaceRestRepository<SubmissionCCLicenseUrlRest, String> {
+public class SubmissionCCLicenseUrlRepository extends DSpaceRestRepository<SubmissionCCLicenseUrlRest, String>
+                                              implements InitializingBean {
 
     @Autowired
     protected Utils utils;
@@ -48,6 +52,9 @@ public class SubmissionCCLicenseUrlRepository extends DSpaceRestRepository<Submi
     protected ConverterService converter;
 
     protected RequestService requestService = new DSpace().getRequestService();
+
+    @Autowired
+    DiscoverableEndpointsService discoverableEndpointsService;
 
     /**
      * Retrieves the CC License URI based on the license ID and answers in the field questions, provided as parameters
@@ -121,4 +128,12 @@ public class SubmissionCCLicenseUrlRepository extends DSpaceRestRepository<Submi
     public Class<SubmissionCCLicenseUrlRest> getDomainClass() {
         return SubmissionCCLicenseUrlRest.class;
     }
+
+    @Override
+    public void afterPropertiesSet() {
+        discoverableEndpointsService.register(this, Arrays.asList(
+                new Link("/api/" + SubmissionCCLicenseUrlRest.CATEGORY + "/" + SubmissionCCLicenseUrlRest.NAME + "/search",
+                        SubmissionCCLicenseUrlRest.NAME + "-search")));
+    }
+
 }
