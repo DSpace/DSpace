@@ -412,6 +412,7 @@ public class SubmissionFormsControllerIT extends AbstractControllerIntegrationTe
     }
 
     private void resetPropertyFile() throws DCInputsReaderException {
+        configurationService.setProperty("default.locale","en");
         configurationService.setProperty("webui.supported.locales",null);
         submissionFormRestRepository.reload();
     }

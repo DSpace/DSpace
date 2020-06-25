@@ -8,7 +8,6 @@
 package org.dspace.discovery;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -31,6 +30,7 @@ import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -123,6 +123,7 @@ public class DiscoveryIT extends AbstractIntegrationTest {
         super.destroy();
     }
 
+    @Ignore
     @Test
     public void deleteWorkspaceItemSolrRecordAfterDeletionFromDbTest() throws Exception {
         context.turnOffAuthorisationSystem();
@@ -139,6 +140,7 @@ public class DiscoveryIT extends AbstractIntegrationTest {
         context.restoreAuthSystemState();
     }
 
+    @Ignore
     @Test
     public void assertSolrSearchCoreIsMock() {
         assertTrue(searchService.getSolrSearchCore() instanceof MockSolrSearchCore);
