@@ -366,8 +366,12 @@ public class RelationshipServiceImpl implements RelationshipService {
         // authorization system here so that this failure doesn't happen when the items need to be update
         context.turnOffAuthorisationSystem();
         try {
-            updateItem(context, relationship.getLeftItem());
-            updateItem(context, relationship.getRightItem());
+            if (!relationship.getLeftItem().isMetadataModified()) {
+                updateItem(context, relationship.getLeftItem());
+            }
+            if (!relationship.getRightItem().isMetadataModified()) {
+                updateItem(context, relationship.getRightItem());
+            }
             //TODO: more items may need updates due to virtual metadata impacting items indirectly
             //TODO: this does not handle updates to item metadata which impacts the other item's virtual metadata
         } catch (AuthorizeException e) {
