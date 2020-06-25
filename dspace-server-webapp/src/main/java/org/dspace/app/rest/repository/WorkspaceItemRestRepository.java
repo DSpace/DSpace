@@ -348,7 +348,7 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
 
     @Override
     public Iterable<WorkspaceItemRest> upload(Context context, HttpServletRequest request,
-            MultipartFile... uploadfiles)
+            List<MultipartFile> uploadfiles)
         throws SQLException, FileNotFoundException, IOException, AuthorizeException {
         List<WorkspaceItemRest> results = new ArrayList<>();
 
@@ -375,6 +375,7 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
                         records = new ArrayList<>();
                     }
                     records.add(importService.getRecord(file));
+                    break;
                 } finally {
                     file.delete();
                 }
@@ -394,6 +395,7 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
         if (result != null && !result.isEmpty()) {
             for (WorkspaceItem wi : result) {
                 List<ErrorRest> errors = new ArrayList<ErrorRest>();
+                wi.setMultipleFiles(uploadfiles.size() > 1);
                 //load bitstream into bundle ORIGINAL only if there is one result (approximately this is the
                 // right behaviour for pdf file but not for other bibliographic format e.g. bibtex)
                 if (result.size() == 1) {

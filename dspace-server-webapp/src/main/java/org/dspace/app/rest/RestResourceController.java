@@ -616,7 +616,7 @@ public class RestResourceController implements InitializingBean {
             HttpServletRequest request,
             @PathVariable String apiCategory,
             @PathVariable String model,
-            @RequestParam("file") MultipartFile uploadfile)
+            @RequestParam("file") List<MultipartFile> uploadfile)
         throws SQLException, FileNotFoundException, IOException, AuthorizeException {
 
         checkModelPluralForm(apiCategory, model);
