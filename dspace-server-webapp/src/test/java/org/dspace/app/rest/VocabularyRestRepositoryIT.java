@@ -26,6 +26,7 @@ import org.dspace.content.authority.service.ChoiceAuthorityService;
 import org.dspace.core.service.PluginService;
 import org.dspace.services.ConfigurationService;
 import org.hamcrest.Matchers;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -94,6 +95,15 @@ public class VocabularyRestRepositoryIT extends AbstractControllerIntegrationTes
         AuthorityServiceFactory.getInstance().getAuthorityIndexingService().indexContent(person2);
 
         AuthorityServiceFactory.getInstance().getAuthorityIndexingService().commit();
+    }
+
+    @Override
+    @After
+    // We need to cleanup the authorities cache once than the configuration has been restored
+    public void destroy() throws Exception {
+        super.destroy();
+        pluginService.clearNamedPluginClasses();
+        cas.clearCache();
     }
 
     @Test
