@@ -307,6 +307,7 @@ public class RelationshipServiceImpl implements RelationshipService {
                     authorizeService.authorizeActionBoolean(context, relationship.getRightItem(), Constants.WRITE)) {
                     if (isRelationshipValidToCreate(context, relationship)) {
                         relationshipDAO.save(context, relationship);
+                        updateItemsInRelationship(context, relationship);
                     }
                 } else {
                     throw new AuthorizeException("You do not have write rights on this relationship's items");
@@ -336,6 +337,7 @@ public class RelationshipServiceImpl implements RelationshipService {
                 authorizeService.authorizeActionBoolean(context, relationship.getRightItem(), Constants.WRITE)) {
                 relationshipDAO.delete(context, relationship);
                 updatePlaceInRelationship(context, relationship);
+                updateItemsInRelationship(context, relationship);
             } else {
                 throw new AuthorizeException(
                     "You do not have write rights on this relationship's items");
@@ -344,6 +346,34 @@ public class RelationshipServiceImpl implements RelationshipService {
         } else {
             throw new IllegalArgumentException("The relationship given was not valid");
         }
+    }
+
+
+    /**
+     * Utility method to ensure discovery is updated for the 2 items
+     * This method is used when creating, modifying or deleting a relationship
+     * The virtual metadata of the 2 items may need to be updated, so they should be re-indexed
+     *
+     * @param context           The relevant DSpace context
+     * @param relationship      The relationship which has been created, updated or deleted
+     * @throws SQLException     If something goes wrong
+     */
+    private void updateItemsInRelationship(Context context, Relationship relationship) throws SQLException {
+        // Since this call is performed after creating, updating or deleting the relationships, the permissions have
+        // already been verified. The following updateItem calls can however call the
+        // ItemService.update() functions which would fail if the user doesn't have permission on both items.
+        // Since we allow this edits to happen under these circumstances, we need to turn off the
+        // authorization system here so that this failure doesn't happen when the items need to be update
+        context.turnOffAuthorisationSystem();
+        try {
+            updateItem(context, relationship.getLeftItem());
+            updateItem(context, relationship.getRightItem());
+            //TODO: more items may need updates due to virtual metadata impacting items indirectly
+            //TODO: this does not handle updates to item metadata which impacts the other item's virtual metadata
+        } catch (AuthorizeException e) {
+            log.error("Authorization Exception while authorization has been disabled", e);
+        }
+        context.restoreAuthSystemState();
     }
 
     /**
