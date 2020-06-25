@@ -16,7 +16,6 @@ package org.dspace.app.rest.model;
 public class UsageReportPointDsoTotalVisitsRest extends UsageReportPointRest {
 
     private String type;
-    private String label;
 
     @Override
     public String getType() {
@@ -25,13 +24,5 @@ public class UsageReportPointDsoTotalVisitsRest extends UsageReportPointRest {
 
     public void setType(String type) {
         this.type = type;
-    }
-
-    public String getLabel() {
-        return label;
-    }
-
-    public void setLabel(String label) {
-        this.label = label;
     }
 }

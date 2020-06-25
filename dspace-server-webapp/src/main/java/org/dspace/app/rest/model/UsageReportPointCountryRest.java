@@ -18,20 +18,16 @@ import org.dspace.statistics.util.LocationUtils;
 public class UsageReportPointCountryRest extends UsageReportPointRest {
     public static final String NAME = "country";
 
-    private String label;
-    public String getLabel() {
-        return label;
-    }
-
+    @Override
     public void setLabel(String label) {
-        this.label = label;
+        super.label = label;
         super.id = LocationUtils.getCountryCode(label);
     }
 
     @Override
     public void setId(String id) {
         super.id = id;
-        this.label = LocationUtils.getCountryName(id);
+        super.label = LocationUtils.getCountryName(id);
     }
 
     @Override

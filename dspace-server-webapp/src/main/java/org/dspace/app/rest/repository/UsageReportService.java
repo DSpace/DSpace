@@ -67,6 +67,8 @@ public class UsageReportService extends AbstractDSpaceRestRepository {
     public static final String TOP_COUNTRIES_REPORT_ID = "TopCountries";
     public static final String TOP_CITIES_REPORT_ID = "TopCities";
 
+    public static final String SITE_WIDE_USAGE_REPORT_LABEL = "All of DSpace";
+
     /**
      * Get list of usage reports that are applicable to the DSO (of given UUID)
      *
@@ -164,7 +166,7 @@ public class UsageReportService extends AbstractDSpaceRestRepository {
         for (int i = 0; i < dataset.getColLabels().size(); i++) {
             UsageReportPointDsoTotalVisitsRest totalVisitPoint = new UsageReportPointDsoTotalVisitsRest();
             totalVisitPoint.setType("item");
-            totalVisitPoint.setLabel(dataset.getColLabels().get(i));
+            totalVisitPoint.setLabel(SITE_WIDE_USAGE_REPORT_LABEL);
             String urlOfItem = dataset.getColLabelsAttrs().get(i).get("url");
             DSpaceObject dso = handleService.resolveToObject(context, StringUtils.substringAfterLast(urlOfItem,
                 "handle/"));
@@ -193,7 +195,7 @@ public class UsageReportService extends AbstractDSpaceRestRepository {
         totalVisitPoint.setType(StringUtils.substringAfterLast(dso.getClass().getName().toLowerCase(), "."));
         totalVisitPoint.setId(dso.getID().toString());
         if (dataset.getColLabels().size() > 0) {
-            totalVisitPoint.setLabel(dataset.getColLabels().get(0));
+            totalVisitPoint.setLabel(dso.getName());
             totalVisitPoint.addValue("views", Integer.valueOf(dataset.getMatrix()[0][0]));
         } else {
             totalVisitPoint.setLabel(dso.getName());
