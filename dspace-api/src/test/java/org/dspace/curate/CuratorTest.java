@@ -8,23 +8,42 @@
 package org.dspace.curate;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import org.dspace.AbstractUnitTest;
 import org.dspace.content.DSpaceObject;
+import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.SiteService;
+import org.dspace.ctask.general.NoOpCurationTask;
 import org.dspace.services.ConfigurationService;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Spy;
+import org.mockito.junit.MockitoJUnitRunner;
 
 /**
  *
  * @author mhwood
  */
-public class CuratorTest
-        extends AbstractUnitTest {
+@RunWith(MockitoJUnitRunner.class)
+public class CuratorTest extends AbstractUnitTest {
+
+    @InjectMocks
+    private Curator curator;
+
+    @Mock
+    NoOpCurationTask noOpCurationTask;
+
+    @Spy
+    TaskResolver taskResolver;
+
     private static final SiteService SITE_SERVICE = ContentServiceFactory.getInstance().getSiteService();
 
     static final String RUN_PARAMETER_NAME = "runParameter";
@@ -44,8 +63,7 @@ public class CuratorTest
      * @throws java.lang.Exception passed through.
      */
     @Test
-    public void testCurate_DSpaceObject()
-            throws Exception {
+    public void testCurate_DSpaceObject() throws Exception {
         System.out.println("curate");
 
         final String TASK_NAME = "dummyTask";
@@ -79,5 +97,20 @@ public class CuratorTest
                 Curator.CURATE_SUCCESS, instance.getStatus(TASK_NAME));
         assertEquals("Wrong run parameter", RUN_PARAMETER_VALUE, runParameter);
         assertEquals("Wrong task property", TASK_PROPERTY_VALUE, taskProperty);
+    }
+
+    @Test
+    public void testCurate_NoOpTask() throws Exception {
+        StringBuilder reporterOutput = new StringBuilder();
+        curator.setReporter(reporterOutput); // Send any report to our StringBuilder.
+
+        curator.addTask("noop");
+        Item item = mock(Item.class);
+        when(item.getType()).thenReturn(2);
+        when(item.getHandle()).thenReturn("testHandle");
+        curator.curate(context, item);
+
+        assertEquals(Curator.CURATE_SUCCESS, curator.getStatus("noop"));
+        assertEquals(reporterOutput.toString(), "No operation performed on testHandle");
     }
 }

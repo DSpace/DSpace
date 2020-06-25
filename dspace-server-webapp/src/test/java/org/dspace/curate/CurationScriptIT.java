@@ -1,5 +1,6 @@
 package org.dspace.curate;
 
+import static org.hamcrest.Matchers.containsStringIgnoringCase;
 import static org.hamcrest.Matchers.is;
 import static com.jayway.jsonpath.JsonPath.read;
 import static org.hamcrest.Matchers.containsString;
@@ -8,7 +9,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.io.File;
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
@@ -87,7 +87,7 @@ public class CurationScriptIT extends AbstractControllerIntegrationTest {
             // Illegal Argument Exception
             .andExpect(status().isBadRequest())
             // Contains the valid options
-            .andExpect(status().reason(containsString(Arrays.toString(CurationClientOptions.getTaskOptions()))));
+            .andExpect(status().reason(containsString(CurationClientOptions.getTaskOptions().toString())));
     }
 
     @Test
@@ -114,7 +114,7 @@ public class CurationScriptIT extends AbstractControllerIntegrationTest {
         LinkedList<DSpaceCommandLineParameter> parameters = new LinkedList<>();
 
         parameters.add(new DSpaceCommandLineParameter("-i", publicItem1.getHandle()));
-        parameters.add(new DSpaceCommandLineParameter("-t", CurationClientOptions.getTaskOptions()[0]));
+        parameters.add(new DSpaceCommandLineParameter("-t", CurationClientOptions.getTaskOptions().get(0)));
 
         List<ParameterValueRest> list = parameters.stream()
                                                   .map(dSpaceCommandLineParameter -> dSpaceRunnableParameterConverter
@@ -159,7 +159,7 @@ public class CurationScriptIT extends AbstractControllerIntegrationTest {
 
         parameters.add(new DSpaceCommandLineParameter("-e", "nonExistentEmail@test.com"));
         parameters.add(new DSpaceCommandLineParameter("-i", publicItem1.getHandle()));
-        parameters.add(new DSpaceCommandLineParameter("-t", CurationClientOptions.getTaskOptions()[0]));
+        parameters.add(new DSpaceCommandLineParameter("-t", CurationClientOptions.getTaskOptions().get(0)));
 
         List<ParameterValueRest> list = parameters.stream()
                                                   .map(dSpaceCommandLineParameter -> dSpaceRunnableParameterConverter
@@ -186,7 +186,7 @@ public class CurationScriptIT extends AbstractControllerIntegrationTest {
         LinkedList<DSpaceCommandLineParameter> parameters = new LinkedList<>();
 
         parameters.add(new DSpaceCommandLineParameter("-e", admin.getEmail()));
-        parameters.add(new DSpaceCommandLineParameter("-t", CurationClientOptions.getTaskOptions()[0]));
+        parameters.add(new DSpaceCommandLineParameter("-t", CurationClientOptions.getTaskOptions().get(0)));
 
         List<ParameterValueRest> list = parameters.stream()
                                                   .map(dSpaceCommandLineParameter -> dSpaceRunnableParameterConverter
@@ -202,6 +202,32 @@ public class CurationScriptIT extends AbstractControllerIntegrationTest {
             .andExpect(status().isBadRequest())
             // Contains handle
             .andExpect(status().reason(containsString("handle")));
+    }
+
+    @Test
+    public void curateScript_invalidHandle() throws Exception {
+        String token = getAuthToken(admin.getEmail(), password);
+
+        LinkedList<DSpaceCommandLineParameter> parameters = new LinkedList<>();
+
+        parameters.add(new DSpaceCommandLineParameter("-i", "invalidhandle"));
+        parameters.add(new DSpaceCommandLineParameter("-e", admin.getEmail()));
+        parameters.add(new DSpaceCommandLineParameter("-t", CurationClientOptions.getTaskOptions().get(0)));
+
+        List<ParameterValueRest> list = parameters.stream()
+                                                  .map(dSpaceCommandLineParameter -> dSpaceRunnableParameterConverter
+                                                      .convert(dSpaceCommandLineParameter, Projection.DEFAULT))
+                                                  .collect(Collectors.toList());
+
+        // Request with missing required -i <handle>
+        getClient(token)
+            .perform(post(CURATE_SCRIPT_ENDPOINT).contentType("multipart/form-data")
+                                                 .param("properties",
+                                                     new Gson().toJson(list)))
+            // Illegal Argument Exception
+            .andExpect(status().isBadRequest())
+            // Contains invalidHandle
+            .andExpect(status().reason(containsStringIgnoringCase("invalidhandle")));
     }
 
     @Test
@@ -324,7 +350,7 @@ public class CurationScriptIT extends AbstractControllerIntegrationTest {
 
         parameters.add(new DSpaceCommandLineParameter("-e", admin.getEmail()));
         parameters.add(new DSpaceCommandLineParameter("-i", publicItem1.getHandle()));
-        parameters.add(new DSpaceCommandLineParameter("-t", CurationClientOptions.getTaskOptions()[0]));
+        parameters.add(new DSpaceCommandLineParameter("-t", CurationClientOptions.getTaskOptions().get(0)));
 
         List<ParameterValueRest> list = parameters.stream()
                                                   .map(dSpaceCommandLineParameter -> dSpaceRunnableParameterConverter
