@@ -90,6 +90,7 @@ public class RelationshipServiceImpl implements RelationshipService {
                 Relationship relationshipToReturn = relationshipDAO.create(context, relationship);
                 updatePlaceInRelationship(context, relationshipToReturn);
                 update(context, relationshipToReturn);
+                updateItemsInRelationship(context, relationship);
                 return relationshipToReturn;
             } else {
                 throw new AuthorizeException(
@@ -307,7 +308,6 @@ public class RelationshipServiceImpl implements RelationshipService {
                     authorizeService.authorizeActionBoolean(context, relationship.getRightItem(), Constants.WRITE)) {
                     if (isRelationshipValidToCreate(context, relationship)) {
                         relationshipDAO.save(context, relationship);
-                        updateItemsInRelationship(context, relationship);
                     }
                 } else {
                     throw new AuthorizeException("You do not have write rights on this relationship's items");
