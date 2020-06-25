@@ -9,6 +9,7 @@ package org.dspace.app.rest.submit.factory.impl;
 
 import java.util.List;
 
+import org.dspace.app.rest.utils.BitstreamMetadataValuePathUtils;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.InProgressSubmission;
@@ -35,12 +36,17 @@ public class BitstreamMetadataValueRemovePatchOperation extends MetadataValueRem
     @Autowired
     ItemService itemService;
 
+    // this is wired in the pring-dspace-core-services.xml
+    BitstreamMetadataValuePathUtils bitstreamMetadataValuePathUtils;
+
     @Override
     void remove(Context context, Request currentRequest, InProgressSubmission source, String path, Object value)
         throws Exception {
         //"path": "/sections/upload/files/0/metadata/dc.title/2"
         //"abspath": "/files/0/metadata/dc.title/2"
-        String[] split = getAbsolutePath(path).split("/");
+        String absolutePath = getAbsolutePath(path);
+        String[] split = absolutePath.split("/");
+        bitstreamMetadataValuePathUtils.validate(absolutePath);
         Item item = source.getItem();
         List<Bundle> bundle = itemService.getBundles(item, Constants.CONTENT_BUNDLE_NAME);
         ;
@@ -67,4 +73,7 @@ public class BitstreamMetadataValueRemovePatchOperation extends MetadataValueRem
         return bitstreamService;
     }
 
+    public void setBitstreamMetadataValuePathUtils(BitstreamMetadataValuePathUtils bitstreamMetadataValuePathUtils) {
+        this.bitstreamMetadataValuePathUtils = bitstreamMetadataValuePathUtils;
+    }
 }
