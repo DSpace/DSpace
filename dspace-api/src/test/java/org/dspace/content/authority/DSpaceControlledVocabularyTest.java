@@ -78,7 +78,7 @@ public class DSpaceControlledVocabularyTest extends AbstractDSpaceTest {
         String text = "north 40";
         Collection collection = null;
         int start = 0;
-        int limit = 0;
+        int limit = 10;
         String locale = null;
         // This "farm" Controlled Vocab is included in TestEnvironment data
         // (under /src/test/data/dspaceFolder/) and it should be auto-loaded
