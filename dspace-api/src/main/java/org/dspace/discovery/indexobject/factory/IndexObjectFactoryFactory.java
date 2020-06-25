@@ -68,7 +68,7 @@ public abstract class IndexObjectFactoryFactory {
      */
     public IndexFactory getIndexFactoryByType(String indexableFactoryType) {
         for (IndexFactory indexableObjectFactory : getIndexFactories()) {
-            if (indexableObjectFactory.getType().equals(indexableFactoryType)) {
+            if (StringUtils.equalsIgnoreCase(indexableObjectFactory.getType(), (indexableFactoryType))) {
                 return indexableObjectFactory;
             }
         }
