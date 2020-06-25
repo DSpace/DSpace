@@ -65,7 +65,10 @@ public class ProcessMatcher {
                 list.stream().map(dSpaceCommandLineParameter -> ParameterValueMatcher
                     .matchParameterValue(dSpaceCommandLineParameter.getName(), dSpaceCommandLineParameter.getValue()))
                     .collect(Collectors.toList())
-            ))
+            )),
+            hasJsonPath("$._links.script.href", Matchers.containsString(name)),
+            hasJsonPath("$._links.files.href", Matchers.containsString("files")),
+            hasJsonPath("$._links.self.href", Matchers.containsString("api/system/processes"))
         );
     }
 
