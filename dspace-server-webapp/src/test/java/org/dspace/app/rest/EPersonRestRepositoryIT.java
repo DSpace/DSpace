@@ -25,6 +25,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
@@ -48,15 +49,20 @@ import org.dspace.app.rest.model.patch.ReplaceOperation;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.app.rest.test.MetadataPatchSuite;
 import org.dspace.content.Collection;
+import org.dspace.content.Community;
 import org.dspace.content.Item;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
+import org.dspace.services.ConfigurationService;
 import org.hamcrest.Matchers;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 
 public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
 
+    @Autowired
+    private ConfigurationService configurationService;
 
     @Test
     public void createTest() throws Exception {
@@ -1785,6 +1791,167 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                                             GroupMatcher.matchGroupWithName(parentGroup2.getName()))))
                             );
 
+    }
+
+    @Test
+    public void findByMetadataByCommAdminAndByColAdminTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        EPerson adminChild1 = EPersonBuilder.createEPerson(context)
+                .withNameInMetadata("Oliver", "Rossi")
+                .withEmail("adminChild1@example.com")
+                .withPassword(password)
+                .build();
+        EPerson adminCol1 = EPersonBuilder.createEPerson(context)
+                .withNameInMetadata("James", "Rossi")
+                .withEmail("adminCol1@example.com")
+                .withPassword(password)
+                .build();
+        EPerson colSubmitter = EPersonBuilder.createEPerson(context)
+                .withNameInMetadata("Carl", "Rossi")
+                .withEmail("colSubmitter@example.com")
+                .withPassword(password)
+                .build();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .withAdminGroup(eperson)
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .withAdminGroup(adminChild1)
+                                           .build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, child1)
+                                           .withName("Collection 1")
+                                           .withAdminGroup(adminCol1)
+                                           .withSubmitterGroup(colSubmitter)
+                                           .build();
+
+        context.restoreAuthSystemState();
+
+        String tokenAdminComm = getAuthToken(adminChild1.getEmail(), password);
+        String tokenAdminCol = getAuthToken(adminCol1.getEmail(), password);
+        String tokencolSubmitter = getAuthToken(colSubmitter.getEmail(), password);
+
+        getClient(tokenAdminComm).perform(get("/api/eperson/epersons/search/byMetadata")
+                 .param("query", "Rossi"))
+                 .andExpect(status().isOk())
+                 .andExpect(content().contentType(contentType))
+                 .andExpect(jsonPath("$._embedded.epersons", Matchers.containsInAnyOrder(
+                            EPersonMatcher.matchEPersonEntry(adminChild1),
+                            EPersonMatcher.matchEPersonEntry(adminCol1),
+                            EPersonMatcher.matchEPersonEntry(colSubmitter)
+                            )))
+                 .andExpect(jsonPath("$.page.totalElements", is(3)));
+
+        getClient(tokenAdminCol).perform(get("/api/eperson/epersons/search/byMetadata")
+                 .param("query", "Rossi"))
+                 .andExpect(status().isOk())
+                 .andExpect(content().contentType(contentType))
+                 .andExpect(jsonPath("$._embedded.epersons", Matchers.containsInAnyOrder(
+                            EPersonMatcher.matchEPersonEntry(adminChild1),
+                            EPersonMatcher.matchEPersonEntry(adminCol1),
+                            EPersonMatcher.matchEPersonEntry(colSubmitter)
+                            )))
+                 .andExpect(jsonPath("$.page.totalElements", is(3)));
+
+        getClient(tokencolSubmitter).perform(get("/api/eperson/epersons/search/byMetadata")
+                .param("query", "Rossi"))
+        .andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void findByMetadataByCommAdminAndByColAdminWithoutAuthorizationsTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        List<String> confPropsCollectionAdmins = new LinkedList<>();
+        confPropsCollectionAdmins.add("core.authorization.collection-admin.policies");
+        confPropsCollectionAdmins.add("core.authorization.collection-admin.workflows");
+        confPropsCollectionAdmins.add("core.authorization.collection-admin.submitters");
+        confPropsCollectionAdmins.add("core.authorization.collection-admin.admin-group");
+
+        List<String> confPropsCommunityAdmins = new LinkedList<>();
+        confPropsCommunityAdmins.add("core.authorization.community-admin.policies");
+        confPropsCommunityAdmins.add("core.authorization.community-admin.admin-group");
+        confPropsCommunityAdmins.add("core.authorization.community-admin.collection.policies");
+        confPropsCommunityAdmins.add("core.authorization.community-admin.collection.workflows");
+        confPropsCommunityAdmins.add("core.authorization.community-admin.collection.submitters");
+        confPropsCommunityAdmins.add("core.authorization.community-admin.collection.admin-group");
+
+        EPerson adminChild1 = EPersonBuilder.createEPerson(context)
+                .withNameInMetadata("Oliver", "Rossi")
+                .withEmail("adminChild1@example.com")
+                .withPassword(password)
+                .build();
+        EPerson adminCol = EPersonBuilder.createEPerson(context)
+                .withNameInMetadata("James", "Rossi")
+                .withEmail("adminCol1@example.com")
+                .withPassword(password)
+                .build();
+        EPerson col1Submitter = EPersonBuilder.createEPerson(context)
+                .withNameInMetadata("Carl", "Rossi")
+                .withEmail("col1Submitter@example.com")
+                .withPassword(password)
+                .build();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .withAdminGroup(eperson)
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .withAdminGroup(adminChild1)
+                                           .build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, child1)
+                                           .withName("Collection 1")
+                                           .withAdminGroup(adminCol)
+                                           .withSubmitterGroup(col1Submitter)
+                                           .build();
+
+        context.restoreAuthSystemState();
+
+        String tokenAdminCol = getAuthToken(adminCol.getEmail(), password);
+        String tokenAdminComm = getAuthToken(adminChild1.getEmail(), password);
+
+        for (String prop : confPropsCollectionAdmins) {
+            getClient(tokenAdminCol).perform(get("/api/eperson/epersons/search/byMetadata")
+                    .param("query", "Rossi"))
+                    .andExpect(status().isOk())
+                    .andExpect(content().contentType(contentType))
+                    .andExpect(jsonPath("$._embedded.epersons", Matchers.containsInAnyOrder(
+                               EPersonMatcher.matchEPersonEntry(adminChild1),
+                               EPersonMatcher.matchEPersonEntry(adminCol),
+                               EPersonMatcher.matchEPersonEntry(col1Submitter)
+                               )))
+                    .andExpect(jsonPath("$.page.totalElements", is(3)));
+
+            configurationService.setProperty(prop, false);
+        }
+
+        getClient(tokenAdminCol).perform(get("/api/eperson/epersons/search/byMetadata")
+                .param("query", "Rossi"))
+                .andExpect(status().isForbidden());
+
+        for (String prop : confPropsCommunityAdmins) {
+            getClient(tokenAdminComm).perform(get("/api/eperson/epersons/search/byMetadata")
+                    .param("query", "Rossi"))
+                    .andExpect(status().isOk())
+                    .andExpect(content().contentType(contentType))
+                    .andExpect(jsonPath("$._embedded.epersons", Matchers.containsInAnyOrder(
+                               EPersonMatcher.matchEPersonEntry(adminChild1),
+                               EPersonMatcher.matchEPersonEntry(adminCol),
+                               EPersonMatcher.matchEPersonEntry(col1Submitter)
+                               )))
+                    .andExpect(jsonPath("$.page.totalElements", is(3)));
+
+            configurationService.setProperty(prop, false);
+        }
+
+        getClient(tokenAdminComm).perform(get("/api/eperson/epersons/search/byMetadata")
+                .param("query", "Rossi"))
+                .andExpect(status().isForbidden());
     }
 
     @Test
