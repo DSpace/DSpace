@@ -374,8 +374,11 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
                     if (records == null) {
                         records = new ArrayList<>();
                     }
-                    records.add(importService.getRecord(file));
-                    break;
+                    ImportRecord record = importService.getRecord(file);
+                    if (record != null) {
+                        records.add(record);
+                        break;
+                    }
                 } finally {
                     file.delete();
                 }
