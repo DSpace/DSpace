@@ -25,7 +25,9 @@
                         </entry>
                         <entry key="bitstreammetadata">
                             <bean
-                                    class="org.dspace.app.rest.submit.factory.impl.BitstreamMetadataValueMovePatchOperation"/>
+                                    class="org.dspace.app.rest.submit.factory.impl.BitstreamMetadataValueMovePatchOperation">
+                                <property name="bitstreamMetadataValuePathUtils" ref="org.dspace.app.rest.utils.BitstreamMetadataValuePathUtils" />
+                            </bean>
                         </entry>
                         <entry key="bitstreammove">
                             <bean
@@ -42,7 +44,9 @@
                         </entry>
                         <entry key="bitstreammetadata">
                             <bean
-                                    class="org.dspace.app.rest.submit.factory.impl.BitstreamMetadataValueAddPatchOperation"/>
+                                    class="org.dspace.app.rest.submit.factory.impl.BitstreamMetadataValueAddPatchOperation">
+                                <property name="bitstreamMetadataValuePathUtils" ref="org.dspace.app.rest.utils.BitstreamMetadataValuePathUtils" />
+                            </bean>
                         </entry>
                         <entry key="granted">
                             <bean
@@ -59,11 +63,13 @@
                         <!-- WARNING do not change "key" it match with Java code (TODO dynamic discover from PATCH operation); -->
                         <entry key="itemmetadata">
                             <bean
-                                    class="org.dspace.app.rest.submit.factory.impl.ItemMetadataValueRemovePatchOperation"/>
+                                    class="org.dspace.app.rest.submit.factory.impl.ItemMetadataValueRemovePatchOperation" />
                         </entry>
                         <entry key="bitstreammetadata">
                             <bean
-                                    class="org.dspace.app.rest.submit.factory.impl.BitstreamMetadataValueRemovePatchOperation"/>
+                                    class="org.dspace.app.rest.submit.factory.impl.BitstreamMetadataValueRemovePatchOperation">
+                                <property name="bitstreamMetadataValuePathUtils" ref="org.dspace.app.rest.utils.BitstreamMetadataValuePathUtils" />
+                            </bean>
                         </entry>
                         <entry key="granted">
                             <bean
@@ -71,7 +77,7 @@
                         </entry>
                         <entry key="bitstreamremove">
                             <bean
-                                    class="org.dspace.app.rest.submit.factory.impl.BitstreamRemovePatchOperation"/>
+                                    class="org.dspace.app.rest.submit.factory.impl.BitstreamRemovePatchOperation" />
                         </entry>
                         <entry key="accessConditions">
                             <bean
@@ -88,7 +94,9 @@
                         </entry>
                         <entry key="bitstreammetadata">
                             <bean
-                                    class="org.dspace.app.rest.submit.factory.impl.BitstreamMetadataValueReplacePatchOperation"/>
+                                    class="org.dspace.app.rest.submit.factory.impl.BitstreamMetadataValueReplacePatchOperation">
+                                <property name="bitstreamMetadataValuePathUtils" ref="org.dspace.app.rest.utils.BitstreamMetadataValuePathUtils" />
+                            </bean>
                         </entry>
                         <entry key="granted">
                             <bean
@@ -108,5 +116,5 @@
         </property>
     </bean>
 
-    <bean class="org.dspace.app.rest.utils.BitstreamMetadataValuePathUtils"/>
+    <bean id="org.dspace.app.rest.utils.BitstreamMetadataValuePathUtils" class="org.dspace.app.rest.utils.BitstreamMetadataValuePathUtils"/>
 </beans>
