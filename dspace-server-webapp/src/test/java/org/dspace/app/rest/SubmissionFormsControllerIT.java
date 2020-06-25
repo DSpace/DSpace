@@ -140,6 +140,32 @@ public class SubmissionFormsControllerIT extends AbstractControllerIntegrationTe
     }
 
     @Test
+    public void findFieldWithValuePairsConfig() throws Exception {
+        String token = getAuthToken(admin.getEmail(), password);
+
+        getClient(token).perform(get("/api/config/submissionforms/traditionalpageone"))
+                        //The status has to be 200 OK
+                        .andExpect(status().isOk())
+                        //We expect the content type to be "application/hal+json;charset=UTF-8"
+                        .andExpect(content().contentType(contentType))
+                        //Check that the JSON root matches the expected "traditionalpageone" input forms
+                        .andExpect(jsonPath("$.id", is("traditionalpageone")))
+                        .andExpect(jsonPath("$.name", is("traditionalpageone")))
+                        .andExpect(jsonPath("$.type", is("submissionform")))
+                        .andExpect(jsonPath("$._links.self.href", Matchers
+                            .startsWith(REST_SERVER_URL + "config/submissionforms/traditionalpageone")))
+                        // our test configuration include the dc.type field with a value pair in the 8th row
+                        .andExpect(jsonPath("$.rows[7].fields", contains(
+                                SubmissionFormFieldMatcher.matchFormFieldDefinition("dropdown", "Type",
+                                        null, true,
+                                "Select the type(s) of content of the item. To select more than one value in the " +
+                                "list, you may have to hold down the \"CTRL\" or \"Shift\" key.",
+                                "dc.type")
+                            )))
+        ;
+    }
+
+    @Test
     public void findOpenRelationshipConfig() throws Exception {
         String token = getAuthToken(admin.getEmail(), password);
 
