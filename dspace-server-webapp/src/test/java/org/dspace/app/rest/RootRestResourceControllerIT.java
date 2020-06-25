@@ -49,7 +49,8 @@ public class RootRestResourceControllerIT extends AbstractControllerIntegrationT
                    //We expect the content type to be "application/hal+json;charset=UTF-8"
                    .andExpect(content().contentType(contentType))
                    //Check that all required root links are present and that they are absolute
-                   .andExpect(jsonPath("$._links.authorities.href", startsWith(BASE_REST_SERVER_URL)))
+                   .andExpect(jsonPath("$._links.vocabularies.href", startsWith(BASE_REST_SERVER_URL)))
+                   .andExpect(jsonPath("$._links.vocabularyEntryDetails.href", startsWith(BASE_REST_SERVER_URL)))
                    .andExpect(jsonPath("$._links.bitstreamformats.href", startsWith(BASE_REST_SERVER_URL)))
                    .andExpect(jsonPath("$._links.bitstreams.href", startsWith(BASE_REST_SERVER_URL)))
                    .andExpect(jsonPath("$._links.browses.href", startsWith(BASE_REST_SERVER_URL)))
