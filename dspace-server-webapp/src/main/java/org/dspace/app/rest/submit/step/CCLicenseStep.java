@@ -51,8 +51,8 @@ public class CCLicenseStep extends org.dspace.submit.step.CCLicenseStep implemen
      * @throws Exception
      */
     @Override
-    public void doPatchProcessing(Context context, Request currentRequest, InProgressSubmission source, Operation op)
-            throws Exception {
+    public void doPatchProcessing(Context context, Request currentRequest, InProgressSubmission source, Operation op,
+            SubmissionStepConfig stepConf) throws Exception {
 
         if (op.getPath().endsWith(CCLICENSE_STEP_OPERATION_ENTRY)) {
 
