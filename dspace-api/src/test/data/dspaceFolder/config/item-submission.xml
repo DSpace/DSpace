@@ -22,7 +22,6 @@
         <name-map collection-handle="123456789/language-test-1" submission-name="languagetestprocess"/>
         <name-map collection-handle="123456789/patent-test" submission-name="patent"/>
         <name-map collection-handle="123456789/traditional-cris" submission-name="traditional-cris"/>
-        <name-map collection-handle="123456789/language-test-1" submission-name="languagetestprocess"/>
     </submission-map>
 
 
@@ -165,13 +164,6 @@
 	      <type>submission-form</type>
 	    </step>
 
-
-        <step id="languagetest" mandatory="true">
-            <heading>submit.progressbar.describe.stepone</heading>
-            <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
-            <type>submission-form</type>
-        </step>
-
         <step id="languagetest" mandatory="true">
             <heading>submit.progressbar.describe.stepone</heading>
             <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
@@ -254,10 +246,6 @@
 	      <step id="license" />
 	    </submission-process>
 
-        <submission-process name="languagetestprocess">
-            <step id="collection"/>
-            <step id="languagetest"/>
-        </submission-process>
         <!-- patent, used by some collection like 123456789/1001 -->
         <submission-process name="patent">
             <step id="collection" />
