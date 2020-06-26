@@ -15,7 +15,7 @@ import org.dspace.app.rest.RestResourceController;
  */
 public class AuthenticationTokenRest extends RestAddressableModel {
     public static final String NAME = "shortlivedtoken";
-    public static final String CATEGORY = "authn";
+    public static final String CATEGORY = RestAddressableModel.AUTHENTICATION;
 
     private String token;
 

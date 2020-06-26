@@ -138,7 +138,7 @@ public class AuthenticationRestController implements InitializingBean {
      */
     @PreAuthorize("hasAuthority('AUTHENTICATED')")
     @RequestMapping(value = "/shortlivedtokens", method = RequestMethod.POST)
-    public AuthenticationTokenResource shortLivedLogin(HttpServletRequest request) {
+    public AuthenticationTokenResource shortLivedToken(HttpServletRequest request) {
         Projection projection = utils.obtainProjection();
         AuthenticationToken shortLivedToken =
             restAuthenticationService.getShortLivedAuthenticationToken(ContextUtil.obtainContext(request), request);
