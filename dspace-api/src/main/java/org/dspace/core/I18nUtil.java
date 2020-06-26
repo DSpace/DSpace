@@ -407,4 +407,23 @@ public class I18nUtil {
         }
         return resultList.toArray(new Locale[resultList.size()]);
     }
+
+    /**
+     * Check if the input locale is in the list of supported locales
+     * @param locale
+     * @return true if locale is supported, false otherwise
+     */
+    public static boolean isSupportedLocale(Locale locale) {
+        boolean isSupported = false;
+        Locale[] supportedLocales = getSupportedLocales();
+        if (supportedLocales != null) {
+            for (Locale sLocale: supportedLocales) {
+                if (locale.getLanguage().equals(sLocale.getLanguage()) ) {
+                    isSupported = true;
+                    break;
+                }
+            }
+        }
+        return isSupported;
+    }
 }
