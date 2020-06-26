@@ -116,7 +116,7 @@ public class StructBuilderIT
             "</import_structure>\n";
 
     private static final String IMPORT_DOCUMENT_WITH_PARENT =
-        "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+            "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
             "<import_structure>\n" +
             "  <community>\n" +
             "    <name>Parent Community 0</name>\n" +
@@ -238,7 +238,7 @@ public class StructBuilderIT
 
         // Run the method under test and collect its output.
         ByteArrayOutputStream outputDocument
-            = new ByteArrayOutputStream(IMPORT_DOCUMENT.length() * 2 * 2);
+            = new ByteArrayOutputStream(IMPORT_DOCUMENT_WITH_PARENT.length() * 2 * 2);
         byte[] inputBytes = IMPORT_DOCUMENT.getBytes(StandardCharsets.UTF_8);
         context.turnOffAuthorisationSystem();
         try (InputStream input = new ByteArrayInputStream(inputBytes)) {
