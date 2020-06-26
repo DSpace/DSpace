@@ -14,34 +14,34 @@ import org.springframework.stereotype.Component;
  * https://jwt.io/
  */
 @Component
-public class SessionJWTTokenHandler extends JWTTokenHandler {
+public class LoginJWTTokenHandler extends JWTTokenHandler {
     @Override
     protected String getTokenSecretConfigurationKey() {
-        return "jwt.session.token.secret";
+        return "jwt.login.token.secret";
     }
 
     @Override
     protected String getEncryptionSecretConfigurationKey() {
-        return "jwt.session.encryption.secret";
+        return "jwt.login.encryption.secret";
     }
 
     @Override
     protected String getTokenExpirationConfigurationKey() {
-        return "jwt.session.token.expiration";
+        return "jwt.login.token.expiration";
     }
 
     @Override
     protected String getTokenIncludeIPConfigurationKey() {
-        return "jwt.session.token.include.ip";
+        return "jwt.login.token.include.ip";
     }
 
     @Override
     protected String getEncryptionEnabledConfigurationKey() {
-        return "jwt.session.encryption.enabled";
+        return "jwt.login.encryption.enabled";
     }
 
     @Override
     protected String getCompressionEnabledConfigurationKey() {
-        return "jwt.session.compression.enabled";
+        return "jwt.login.compression.enabled";
     }
 }
