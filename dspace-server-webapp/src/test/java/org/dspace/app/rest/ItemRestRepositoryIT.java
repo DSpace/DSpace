@@ -2717,38 +2717,41 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
             .createCollection(context, parentCommunity).withName("Collection 1").build();
 
         Item author1 = ItemBuilder.createItem(context, col1)
-                             .withTitle("Author1")
-                             .withIssueDate("2017-10-17")
-                             .withAuthor("Smith, Donald")
-                             .withPersonIdentifierLastName("Smith")
-                             .withPersonIdentifierFirstName("Donald")
-                             .withRelationshipType("Person")
-                             .build();
+                                  .withTitle("Author1")
+                                  .withIssueDate("2017-10-17")
+                                  .withAuthor("Smith, Donald")
+                                  .withPersonIdentifierLastName("Smith")
+                                  .withPersonIdentifierFirstName("Donald")
+                                  .withRelationshipType("Person")
+                                  .build();
 
         Item author2 = ItemBuilder.createItem(context, col1)
-                             .withTitle("Author2")
-                             .withIssueDate("2016-02-13")
-                             .withAuthor("Smith, Maria")
-                             .withRelationshipType("Person")
-                             .build();
+                                  .withTitle("Author2")
+                                  .withIssueDate("2016-02-13")
+                                  .withAuthor("Smith, Maria")
+                                  .withRelationshipType("Person")
+                                  .build();
 
         Item publication1 = ItemBuilder.createItem(context, col1)
-                                  .withTitle("Publication1")
-                                  .withAuthor("Testy, TEst")
-                                  .withIssueDate("2015-01-01")
-                                  .withRelationshipType("Publication")
-                                  .build();
+                                       .withTitle("Publication1")
+                                       .withAuthor("Testy, TEst")
+                                       .withIssueDate("2015-01-01")
+                                       .withRelationshipType("Publication")
+                                       .build();
 
         EntityType publication = EntityTypeBuilder.createEntityTypeBuilder(context, "Publication").build();
         EntityType person = EntityTypeBuilder.createEntityTypeBuilder(context, "Person").build();
 
 
-        RelationshipType isAuthorOfPublication = RelationshipTypeBuilder.createRelationshipTypeBuilder(context, publication, person, "isAuthorOfPublication",
-                                                                                                  "isPublicationOfAuthor", 2, null, 0,
-                                                                                                  null).withCopyToLeft(false).withCopyToRight(true).build();
+        RelationshipType isAuthorOfPublication = RelationshipTypeBuilder
+            .createRelationshipTypeBuilder(context, publication, person, "isAuthorOfPublication",
+                                           "isPublicationOfAuthor", 2, null, 0,
+                                           null).withCopyToLeft(false).withCopyToRight(true).build();
 
-        Relationship relationship1 = RelationshipBuilder.createRelationshipBuilder(context, publication1, author1, isAuthorOfPublication).build();
-        Relationship relationship2 = RelationshipBuilder.createRelationshipBuilder(context, publication1, author2, isAuthorOfPublication).build();
+        Relationship relationship1 = RelationshipBuilder
+            .createRelationshipBuilder(context, publication1, author1, isAuthorOfPublication).build();
+        Relationship relationship2 = RelationshipBuilder
+            .createRelationshipBuilder(context, publication1, author2, isAuthorOfPublication).build();
 
         context.restoreAuthSystemState();
 
@@ -2759,8 +2762,8 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         //Delete public item
         getClient(token).perform(delete("/api/core/items/" + publication1.getID()))
                         .andExpect(status().is(204));
-
-
+        getClient(token).perform(get("/api/core/items/" + publication1.getID()))
+                        .andExpect(status().is(404));
 
     }
 
@@ -2801,12 +2804,15 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         EntityType person = EntityTypeBuilder.createEntityTypeBuilder(context, "Person").build();
 
 
-        RelationshipType isAuthorOfPublication = RelationshipTypeBuilder.createRelationshipTypeBuilder(context, publication, person, "isAuthorOfPublication",
-                                                                                                       "isPublicationOfAuthor", 2, null, 0,
-                                                                                                       null).withCopyToLeft(false).withCopyToRight(true).build();
+        RelationshipType isAuthorOfPublication = RelationshipTypeBuilder
+            .createRelationshipTypeBuilder(context, publication, person, "isAuthorOfPublication",
+                                           "isPublicationOfAuthor", 2, null, 0,
+                                           null).withCopyToLeft(false).withCopyToRight(true).build();
 
-        Relationship relationship1 = RelationshipBuilder.createRelationshipBuilder(context, workspaceItem.getItem(), author1, isAuthorOfPublication).build();
-        Relationship relationship2 = RelationshipBuilder.createRelationshipBuilder(context, workspaceItem.getItem(), author2, isAuthorOfPublication).build();
+        Relationship relationship1 = RelationshipBuilder
+            .createRelationshipBuilder(context, workspaceItem.getItem(), author1, isAuthorOfPublication).build();
+        Relationship relationship2 = RelationshipBuilder
+            .createRelationshipBuilder(context, workspaceItem.getItem(), author2, isAuthorOfPublication).build();
 
         context.restoreAuthSystemState();
 
@@ -2818,6 +2824,8 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         //Delete the workspaceitem
         getClient(token).perform(delete("/api/submission/workspaceitems/" + workspaceItem.getID()))
                         .andExpect(status().is(204));
+        getClient(token).perform(get("/api/submission/workspaceitems/" + workspaceItem.getID()))
+                        .andExpect(status().is(404));
 
     }
 

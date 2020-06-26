@@ -679,7 +679,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
 
         // Remove relationships
         for (Relationship relationship : relationshipService.findByItem(context, item)) {
-            relationshipService.delete(context, relationship, false, false);
+            relationshipService.forceDelete(context, relationship, false, false);
         }
 
         // Remove bundles
