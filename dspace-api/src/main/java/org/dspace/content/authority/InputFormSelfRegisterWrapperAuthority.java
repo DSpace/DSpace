@@ -55,7 +55,6 @@ public class InputFormSelfRegisterWrapperAuthority implements ChoiceAuthority {
         return getMatches(null, field, query, collection, start, limit, locale);
     }
 
-    @Override
     public Choices getMatches(String authorityName, String field, String query, Collection collection,
             int start, int limit, String locale) {
         String formName;
@@ -120,12 +119,12 @@ public class InputFormSelfRegisterWrapperAuthority implements ChoiceAuthority {
     }
 
     @Override
-    public String getLabel(String field, String key, String locale) {
+    public String getLabel(String key, String locale) {
         // TODO we need to manage REALLY the authority
         // WRONG BEHAVIOUR: now in each delegates can exists the same key with
         // different value
         for (ChoiceAuthority delegate : delegates.values()) {
-            String label = delegate.getLabel(field, key, locale);
+            String label = delegate.getLabel(key, locale);
             if (StringUtils.isNotBlank(label) && !label.startsWith("UNKNOWN KEY ")) {
                 return label;
             }
@@ -155,16 +154,16 @@ public class InputFormSelfRegisterWrapperAuthority implements ChoiceAuthority {
         return false;
     }
 
-    @Override
-    public boolean hasIdentifier() {
-        // TODO we need to manage REALLY the authority
-        // WRONG BEHAVIOUR: now in each delegates can exists the same key with
-        // different value
-        for (ChoiceAuthority delegate : delegates.values()) {
-            return delegate.hasIdentifier();
-        }
-        return false;
-    }
+//    @Override
+//    public boolean hasIdentifier() {
+//        // TODO we need to manage REALLY the authority
+//        // WRONG BEHAVIOUR: now in each delegates can exists the same key with
+//        // different value
+//        for (ChoiceAuthority delegate : delegates.values()) {
+//            return delegate.hasIdentifier();
+//        }
+//        return false;
+//    }
 
     public Map<String, ChoiceAuthority> getDelegates() {
         return delegates;

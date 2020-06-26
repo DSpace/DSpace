@@ -9,11 +9,8 @@ package org.dspace.content.authority;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Locale;
-import java.util.Map;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -21,8 +18,6 @@ import org.apache.logging.log4j.Logger;
 import org.dspace.app.util.DCInputsReader;
 import org.dspace.app.util.DCInputsReaderException;
 import org.dspace.content.Collection;
-import org.dspace.core.Context;
-import org.dspace.core.I18nUtil;
 import org.dspace.core.SelfNamedPlugin;
 
 /**
@@ -50,18 +45,14 @@ import org.dspace.core.SelfNamedPlugin;
 public class DCInputAuthority extends SelfNamedPlugin implements ChoiceAuthority {
     private static Logger log = org.apache.logging.log4j.LogManager.getLogger(DCInputAuthority.class);
 
-    private Map<String, String[]> values = null;
-    private Map<String, String[]> labels = null;
+    private String values[] = null;
+    private String labels[] = null;
 
-    private static Map<Locale, DCInputsReader> dcis = null;
+    private static DCInputsReader dci = null;
     private static String pluginNames[] = null;
 
     public DCInputAuthority() {
         super();
-    }
-
-    public static void reset() {
-        pluginNames = null;
     }
 
     public static String[] getPluginNames() {
@@ -73,18 +64,16 @@ public class DCInputAuthority extends SelfNamedPlugin implements ChoiceAuthority
     }
 
     private static synchronized void initPluginNames() {
-        Locale[] locales = I18nUtil.getSupportedLocales();
         if (pluginNames == null) {
             try {
-                dcis = new HashMap<Locale, DCInputsReader>();
-                for (Locale locale : locales) {
-                    dcis.put(locale, new DCInputsReader(I18nUtil.getInputFormsFileName(locale)));
+                if (dci == null) {
+                    dci = new DCInputsReader();
                 }
             } catch (DCInputsReaderException e) {
                 log.error("Failed reading DCInputs initialization: ", e);
             }
             List<String> names = new ArrayList<String>();
-            Iterator pi = dcis.get(locales[0]).getPairsNameIterator();
+            Iterator pi = dci.getPairsNameIterator();
             while (pi.hasNext()) {
                 names.add((String) pi.next());
             }
@@ -97,27 +86,19 @@ public class DCInputAuthority extends SelfNamedPlugin implements ChoiceAuthority
     // once-only load of values and labels
     private void init() {
         if (values == null) {
-            values = new HashMap<String, String[]>();
-            labels = new HashMap<String, String[]>();
             String pname = this.getPluginInstanceName();
-            for (Locale l : dcis.keySet()) {
-                DCInputsReader dci = dcis.get(l);
-                List<String> pairs = dci.getPairs(pname);
-                if (pairs != null) {
-                    String[] valuesLocale = new String[pairs.size() / 2];
-                    String[]labelsLocale = new String[pairs.size() / 2];
-                    for (int i = 0; i < pairs.size(); i += 2) {
-                        labelsLocale[i / 2] = pairs.get(i);
-                        valuesLocale[i / 2] = pairs.get(i + 1);
-                    }
-                    values.put(l.getLanguage(), valuesLocale);
-                    labels.put(l.getLanguage(), labelsLocale);
-                    log.debug("Found pairs for name=" + pname + ",locale=" + l);
-                } else {
-                    log.error("Failed to find any pairs for name=" + pname, new IllegalStateException());
+            List<String> pairs = dci.getPairs(pname);
+            if (pairs != null) {
+                values = new String[pairs.size() / 2];
+                labels = new String[pairs.size() / 2];
+                for (int i = 0; i < pairs.size(); i += 2) {
+                    labels[i / 2] = pairs.get(i);
+                    values[i / 2] = pairs.get(i + 1);
                 }
+                log.debug("Found pairs for name=" + pname);
+            } else {
+                log.error("Failed to find any pairs for name=" + pname, new IllegalStateException());
             }
-
         }
     }
 
@@ -125,35 +106,32 @@ public class DCInputAuthority extends SelfNamedPlugin implements ChoiceAuthority
     @Override
     public Choices getMatches(String field, String query, Collection collection, int start, int limit, String locale) {
         init();
-        Locale currentLocale = I18nUtil.getSupportedLocale(locale);
-        String[] valuesLocale = values.get(currentLocale.getLanguage());
-        String[] labelsLocale = labels.get(currentLocale.getLanguage());
+
         int dflt = -1;
-        Choice v[] = new Choice[valuesLocale.length];
-        for (int i = 0; i < valuesLocale.length; ++i) {
-            v[i] = new Choice(valuesLocale[i], valuesLocale[i], labelsLocale[i]);
-            if (valuesLocale[i].equalsIgnoreCase(query)) {
-                dflt = i;
+        int found = 0;
+        List<Choice> v = new ArrayList<Choice>();
+        for (int i = 0; i < values.length; ++i) {
+            if (query == null || StringUtils.containsIgnoreCase(values[i], query)) {
+                if (found >= start && v.size() < limit) {
+                    v.add(new Choice(null, values[i], labels[i]));
+                    if (values[i].equalsIgnoreCase(query)) {
+                        dflt = i;
+                    }
+                }
+                found++;
             }
         }
-        return new Choices(v, 0, v.length, Choices.CF_AMBIGUOUS, false, dflt);
+        Choice[] vArray = new Choice[v.size()];
+        return new Choices(v.toArray(vArray), start, found, Choices.CF_AMBIGUOUS, false, dflt);
     }
 
     @Override
     public Choices getBestMatch(String field, String text, Collection collection, String locale) {
         init();
-
-        // Get default if locale is empty
-        if (StringUtils.isBlank(locale)) {
-            locale = getDefaultLocale();
-        }
-
-        String[] valuesLocale = values.get(locale);
-        String[] labelsLocale = labels.get(locale);
-        for (int i = 0; i < valuesLocale.length; ++i) {
-            if (text.equalsIgnoreCase(valuesLocale[i])) {
+        for (int i = 0; i < values.length; ++i) {
+            if (text.equalsIgnoreCase(values[i])) {
                 Choice v[] = new Choice[1];
-                v[0] = new Choice(String.valueOf(i), valuesLocale[i], labelsLocale[i]);
+                v[0] = new Choice(String.valueOf(i), values[i], labels[i]);
                 return new Choices(v, 0, v.length, Choices.CF_UNCERTAIN, false, 0);
             }
         }
@@ -161,32 +139,24 @@ public class DCInputAuthority extends SelfNamedPlugin implements ChoiceAuthority
     }
 
     @Override
-    public String getLabel(String field, String key, String locale) {
+    public String getLabel(String key, String locale) {
         init();
-
-        // Get default if locale is empty
-        if (StringUtils.isBlank(locale)) {
-            locale = getDefaultLocale();
-        }
-
-        String[] valuesLocale = values.get(locale);
-        String[] labelsLocale = labels.get(locale);
         int pos = -1;
-        for (int i = 0; i < valuesLocale.length; i++) {
-            if (valuesLocale[i].equals(key)) {
+        for (int i = 0; i < values.length; i++) {
+            if (values[i].equals(key)) {
                 pos = i;
                 break;
             }
         }
         if (pos != -1) {
-            return labelsLocale[pos];
+            return labels[pos];
         } else {
             return "UNKNOWN KEY " + key;
         }
     }
 
-    protected String getDefaultLocale() {
-        Context context = new Context();
-        return context.getCurrentLocale().getLanguage();
+    @Override
+    public boolean isScrollable() {
+        return true;
     }
 }

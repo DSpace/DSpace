@@ -113,7 +113,7 @@ public class ItemAuthority implements ChoiceAuthority {
     }
 
     @Override
-    public String getLabel(String field, String key, String locale) {
+    public String getLabel(String key, String locale) {
         String title = key;
         if (key != null) {
             Context context = null;

@@ -13,20 +13,28 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.dspace.app.rest.RestResourceController;
 
 /**
- * The Authority Entry REST Resource
+ * The Vocabulary Entry Details REST Resource
  *
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
-public class AuthorityEntryRest extends RestAddressableModel {
-    public static final String NAME = "authorityEntry";
+@LinksRest(links = {
+        @LinkRest(name = VocabularyEntryDetailsRest.PARENT, method = "getParent"),
+        @LinkRest(name = VocabularyEntryDetailsRest.CHILDREN, method = "getChildren")
+        })
+public class VocabularyEntryDetailsRest extends RestAddressableModel {
+    public static final String NAME = "vocabularyEntryDetail";
+    public static final String PARENT = "parent";
+    public static final String CHILDREN = "children";
     private String id;
     private String display;
     private String value;
-    private Boolean selectable;
     private Map<String, String> otherInformation;
+    private boolean selectable;
+    @JsonIgnore
+    private boolean inHierarchicalVocabulary = false;
 
     @JsonIgnore
-    private String authorityName;
+    private String vocabularyName;
 
     public String getId() {
         return id;
@@ -60,6 +68,33 @@ public class AuthorityEntryRest extends RestAddressableModel {
         this.value = value;
     }
 
+    public static String getName() {
+        return NAME;
+    }
+
+    public String getVocabularyName() {
+        return vocabularyName;
+    }
+
+    public void setVocabularyName(String vocabularyName) {
+        this.vocabularyName = vocabularyName;
+    }
+
+    @Override
+    public String getCategory() {
+        return VocabularyRest.CATEGORY;
+    }
+
+    @Override
+    public String getType() {
+        return VocabularyEntryDetailsRest.NAME;
+    }
+
+    @Override
+    public Class getController() {
+        return RestResourceController.class;
+    }
+
     public Boolean isSelectable() {
         return selectable;
     }
@@ -68,31 +103,11 @@ public class AuthorityEntryRest extends RestAddressableModel {
         this.selectable = selectable;
     }
 
-    public static String getName() {
-        return NAME;
+    public void setInHierarchicalVocabulary(boolean isInHierarchicalVocabulary) {
+        this.inHierarchicalVocabulary = isInHierarchicalVocabulary;
     }
 
-    public String getAuthorityName() {
-        return authorityName;
+    public boolean isInHierarchicalVocabulary() {
+        return inHierarchicalVocabulary;
     }
-
-    public void setAuthorityName(String authorityName) {
-        this.authorityName = authorityName;
-    }
-
-    @Override
-    public String getCategory() {
-        return AuthorityRest.CATEGORY;
-    }
-
-    @Override
-    public String getType() {
-        return AuthorityEntryRest.NAME;
-    }
-
-    @Override
-    public Class getController() {
-        return RestResourceController.class;
-    }
-
 }

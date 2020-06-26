@@ -10,33 +10,26 @@ package org.dspace.app.rest.model;
 import org.dspace.app.rest.RestResourceController;
 
 /**
- * The authority REST resource
+ * The vocabulary REST resource
  *
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 @LinksRest(links = {
-    @LinkRest(name = AuthorityRest.ENTRIES,
-            method = "query"
+    @LinkRest(name = VocabularyRest.ENTRIES,
+            method = "filter"
     ),
-    @LinkRest(
-            name = AuthorityRest.ENTRY,
-            method = "getResource"
-    )
 })
-public class AuthorityRest extends BaseObjectRest<String> {
+public class VocabularyRest extends BaseObjectRest<String> {
 
-    public static final String NAME = "authority";
-    public static final String CATEGORY = RestAddressableModel.INTEGRATION;
+    public static final String NAME = "vocabulary";
+    public static final String CATEGORY = RestAddressableModel.SUBMISSION;
     public static final String ENTRIES = "entries";
-    public static final String ENTRY = "entryValues";
 
     private String name;
 
     private boolean scrollable;
 
     private boolean hierarchical;
-
-    private boolean identifier;
 
     private Integer preloadLevel;
 
@@ -69,6 +62,14 @@ public class AuthorityRest extends BaseObjectRest<String> {
         this.hierarchical = hierarchical;
     }
 
+    public Integer getPreloadLevel() {
+        return preloadLevel;
+    }
+
+    public void setPreloadLevel(Integer preloadLevel) {
+        this.preloadLevel = preloadLevel;
+    }
+
     @Override
     public String getType() {
         return NAME;
@@ -82,21 +83,5 @@ public class AuthorityRest extends BaseObjectRest<String> {
     @Override
     public String getCategory() {
         return CATEGORY;
-    }
-
-    public boolean hasIdentifier() {
-        return identifier;
-    }
-
-    public void setIdentifier(boolean identifier) {
-        this.identifier = identifier;
-    }
-
-    public Integer getPreloadLevel() {
-        return preloadLevel;
-    }
-
-    public void setPreloadLevel(Integer preloadLevel) {
-        this.preloadLevel = preloadLevel;
     }
 }
