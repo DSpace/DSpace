@@ -36,8 +36,8 @@ public class CollectionStep extends org.dspace.submit.step.SelectCollectionStep 
     }
 
     @Override
-    public void doPatchProcessing(Context context, Request currentRequest, InProgressSubmission source, Operation op)
-        throws Exception {
+    public void doPatchProcessing(Context context, Request currentRequest, InProgressSubmission source, Operation op,
+                                  SubmissionStepConfig stepConf) throws Exception {
 
         PatchOperation<String> patchOperation = new PatchOperationFactory()
             .instanceOf(COLLECTION_STEP_OPERATION_ENTRY, op.getOp());
