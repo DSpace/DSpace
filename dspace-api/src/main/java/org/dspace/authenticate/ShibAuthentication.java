@@ -89,6 +89,11 @@ public class ShibAuthentication implements AuthenticationMethod {
      **/
     protected final int METADATA_MAX_SIZE = 1024;
 
+    /**
+     * Shibboleth logout action
+     **/
+    public static final String SHIBBOLETH_LOGOUT_ACTION = "logout";
+
     protected EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
     protected GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
     protected MetadataFieldService metadataFieldService = ContentServiceFactory.getInstance().getMetadataFieldService();
@@ -529,6 +534,45 @@ public class ShibAuthentication implements AuthenticationMethod {
     @Override
     public String getName() {
         return "shibboleth";
+    }
+
+    @Override
+    public String logoutPageURL(Context context, HttpServletRequest request, HttpServletResponse response) {
+        String shibURL = getShibLogoutURL(request);
+
+        if (shibURL != null) {
+            log.debug("Session will be redirected to: " + shibURL);
+
+            return response.encodeRedirectURL(shibURL);
+        }
+
+        return null;
+    }
+
+    /**
+     * This method will validate the request and return the proper 'return' URL if valid
+     * @param request
+     * @return The URL from a 'return' argument or null
+     * @throws ShibAuthenticationException
+     */
+    public static String getURLFromLogoutActionRequest(HttpServletRequest request) throws ShibAuthenticationException {
+        String returnURL = null;
+        // verify if we have shibboleth parameters (action and return)
+        String action = request.getParameter("action");
+        String shibLogoutURL = request.getParameter("return");
+
+        // is shibboleth action for logout?
+        if (ShibAuthentication.SHIBBOLETH_LOGOUT_ACTION.equals(action) && StringUtils.isNotBlank(shibLogoutURL)) {
+            // for security issues we still need to validate return param
+            ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
+            String serverUrl = Utils.getBaseUrl(configurationService.getProperty("dspace.server.url"));
+            serverUrl = getSecureURL(serverUrl, request);
+            if (!shibLogoutURL.startsWith(serverUrl)) {
+                throw new ShibAuthenticationException("Invalid 'return' param");
+            }
+            returnURL = shibLogoutURL;
+        }
+        return returnURL;
     }
 
     /**
@@ -1246,9 +1290,13 @@ public class ShibAuthentication implements AuthenticationMethod {
         return valueList;
     }
 
-    private String getShibURL(HttpServletRequest request) {
-        String shibURL = configurationService.getProperty("authentication-shibboleth.lazysession.loginurl",
-                "/Shibboleth.sso/Login");
+    /**
+     * It will validate the secureness of an URL against the configurations
+     * @param request
+     * @return fully-qualified URL
+     */
+    private static String getSecureURL(String shibURL, HttpServletRequest request) {
+        ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
         boolean forceHTTPS =
                 configurationService.getBooleanProperty("authentication-shibboleth.lazysession.secure", true);
 
@@ -1261,8 +1309,28 @@ public class ShibAuthentication implements AuthenticationMethod {
             }
         }
         return shibURL;
+    }
 
+    private String getShibURL(HttpServletRequest request) {
+        String shibURL = configurationService.getProperty("authentication-shibboleth.lazysession.loginurl",
+                "/Shibboleth.sso/Login");
+        return getSecureURL(shibURL,request);
+    }
+
+    /**
+     * It returns, if available, the logout URL from the configuration service
+     * @param request
+     * @return fully-qualified URL or null
+     */
+    private String getShibLogoutURL(HttpServletRequest request) {
+        String shibURL = configurationService.getProperty("authentication-shibboleth.lazysession.logouturl",
+                null);
+
+        // Shibboleth url must be absolute
+        if (shibURL != null) {
+            return getSecureURL(shibURL,request);
+        }
+        return shibURL;
     }
 
 }
-

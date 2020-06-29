@@ -696,4 +696,9 @@ public class LDAPAuthentication
             }
         }
     }
+
+    @Override
+    public String logoutPageURL(Context context, HttpServletRequest request, HttpServletResponse response) {
+        return null;
+    }
 }

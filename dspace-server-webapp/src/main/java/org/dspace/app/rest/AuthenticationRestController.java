@@ -124,9 +124,11 @@ public class AuthenticationRestController implements InitializingBean {
         return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).body("Only POST is allowed for login requests.");
     }
 
-    @RequestMapping(value = "/logout", method = {RequestMethod.GET, RequestMethod.POST})
-    public ResponseEntity logout() {
-        //This is handled by org.dspace.app.rest.security.CustomLogoutHandler
+    @RequestMapping(value = "/logout", method = { RequestMethod.GET, RequestMethod.POST })
+    public ResponseEntity logout(@RequestParam(name = "action", required = false) String action,
+            @RequestParam(name = "return", required = false) String returnUrl) {
+        // This is handled by org.dspace.app.rest.security.CustomLogoutHandler
+        // and by org.dspace.app.rest.security.CustomLogoutSuccessHandler
         return ResponseEntity.noContent().build();
     }
 

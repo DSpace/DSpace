@@ -13,7 +13,6 @@ import org.springframework.boot.autoconfigure.security.SecurityProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -21,7 +20,6 @@ import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
@@ -52,6 +50,9 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     @Autowired
     private CustomLogoutHandler customLogoutHandler;
+
+    @Autowired
+    private CustomLogoutSuccessHandler customLogoutSuccessHandler;
 
     @Override
     public void configure(WebSecurity webSecurity) throws Exception {
@@ -88,8 +89,11 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .addLogoutHandler(customLogoutHandler)
                 //Configure the logout entry point
                 .logoutRequestMatcher(new AntPathRequestMatcher("/api/authn/logout"))
-                //When logout is successful, return OK (204) status
-                .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler(HttpStatus.NO_CONTENT))
+                // Attach an handler for successful logout
+                // this it will control the return code and a Logout page
+                // When logout is successful and no redirect page it returns OK (204) status
+                // useful, for instance for shibboleth
+                .logoutSuccessHandler(customLogoutSuccessHandler)
                 //Everyone can call this endpoint
                 .permitAll()
             .and()
