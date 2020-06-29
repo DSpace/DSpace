@@ -7,9 +7,11 @@
  */
 package org.dspace.app.rest.builder;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 
+import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.ProcessStatus;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
@@ -41,6 +43,7 @@ public class ProcessBuilder extends AbstractBuilder<Process, ProcessService> {
         return this;
     }
 
+    @Override
     public void cleanup() throws Exception {
         try (Context c = new Context()) {
             c.turnOffAuthorisationSystem();
@@ -73,6 +76,22 @@ public class ProcessBuilder extends AbstractBuilder<Process, ProcessService> {
     public void delete(Context c, Process dso) throws Exception {
         if (dso != null) {
             getService().delete(c, dso);
+        }
+    }
+
+    public static void deleteProcess(Integer integer) throws SQLException, IOException {
+        try (Context c = new Context()) {
+            c.turnOffAuthorisationSystem();
+            Process process = processService.find(c, integer);
+            if (process != null) {
+                try {
+                    processService.delete(c, process);
+                } catch (AuthorizeException e) {
+                    // cannot occur, just wrap it to make the compiler happy
+                    throw new RuntimeException(e);
+                }
+            }
+            c.complete();
         }
     }
 }
