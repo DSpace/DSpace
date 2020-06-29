@@ -26,14 +26,14 @@ public class ParameterRest {
     private String type;
 
     /**
-     * The long name of the parameter
-     */
-    private String nameLong;
-
-    /**
      * Boolean indicating whether the parameter is mandatory or not
      */
     private boolean mandatory;
+
+    /**
+     * The long name of the parameter
+     */
+    private String nameLong;
 
     public String getName() {
         return name;
