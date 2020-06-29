@@ -29,7 +29,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Test suite for the Authorization Feature endpoint
- * 
+ *
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  *
  */
@@ -50,10 +50,10 @@ public class AuthorizationFeatureRestRepositoryIT extends AbstractControllerInte
 
         // verify that only the admin can access the endpoint (see subsequent call in the method)
         getClient(adminToken).perform(get("/api/authz/features")).andExpect(status().isOk())
-                .andExpect(jsonPath("$._embedded.features", Matchers.hasSize(is(expReturn))))
-                .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/authz/features")))
-                .andExpect(jsonPath("$.page.size", is(20)))
-                .andExpect(jsonPath("$.page.totalElements", is(featuresNum)));
+                             .andExpect(jsonPath("$._embedded.features", Matchers.hasSize(is(expReturn))))
+                             .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/authz/features")))
+                             .andExpect(jsonPath("$.page.size", is(20)))
+                             .andExpect(jsonPath("$.page.totalElements", is(featuresNum)));
         // verify that anonymous user cannot access
         getClient().perform(get("/api/authz/features")).andExpect(status().isUnauthorized());
         // verify that normal user cannot access
@@ -78,21 +78,21 @@ public class AuthorizationFeatureRestRepositoryIT extends AbstractControllerInte
             AtomicReference<String> idRef = new AtomicReference<String>();
 
             getClient(adminToken)
-                    .perform(get("/api/authz/features").param("page", String.valueOf(page)).param("size", "1"))
-                    .andExpect(status().isOk()).andExpect(jsonPath("$._embedded.features", Matchers.hasSize(is(1))))
-                    .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/authz/features")))
-                    .andExpect(
-                            (page == 0) ? jsonPath("$._links.prev.href").doesNotExist()
-                                    : jsonPath("$._links.prev.href", Matchers.containsString("/api/authz/features")))
-                    .andExpect((page == featuresNum - 1)
-                            ? jsonPath("$._links.next.href").doesNotExist()
-                            : jsonPath("$._links.next.href", Matchers.containsString("/api/authz/features")))
-                    .andExpect(jsonPath("$._links.first.href", Matchers.containsString("/api/authz/features")))
-                    .andExpect(jsonPath("$._links.last.href", Matchers.containsString("/api/authz/features")))
-                    .andExpect(jsonPath("$.page.size", is(1)))
-                    .andExpect(jsonPath("$.page.totalElements", is(Integer.valueOf(featuresNum))))
-                    .andDo(result -> idRef
-                            .set(read(result.getResponse().getContentAsString(), "$._embedded.features[0].id")));
+                .perform(get("/api/authz/features").param("page", String.valueOf(page)).param("size", "1"))
+                .andExpect(status().isOk()).andExpect(jsonPath("$._embedded.features", Matchers.hasSize(is(1))))
+                .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/authz/features")))
+                .andExpect(
+                    (page == 0) ? jsonPath("$._links.prev.href").doesNotExist()
+                        : jsonPath("$._links.prev.href", Matchers.containsString("/api/authz/features")))
+                .andExpect((page == featuresNum - 1)
+                               ? jsonPath("$._links.next.href").doesNotExist()
+                               : jsonPath("$._links.next.href", Matchers.containsString("/api/authz/features")))
+                .andExpect(jsonPath("$._links.first.href", Matchers.containsString("/api/authz/features")))
+                .andExpect(jsonPath("$._links.last.href", Matchers.containsString("/api/authz/features")))
+                .andExpect(jsonPath("$.page.size", is(1)))
+                .andExpect(jsonPath("$.page.totalElements", is(Integer.valueOf(featuresNum))))
+                .andDo(result -> idRef
+                    .set(read(result.getResponse().getContentAsString(), "$._embedded.features[0].id")));
 
             if (idRef.get() == null || featureIDs.contains(idRef.get())) {
                 fail("Duplicate feature " + idRef.get() + " returned at page " + page);
@@ -108,30 +108,17 @@ public class AuthorizationFeatureRestRepositoryIT extends AbstractControllerInte
      * @throws Exception
      */
     public void findOneTest() throws Exception {
-        String adminToken = getAuthToken(admin.getEmail(), password);
-        // verify that only the admin can access the endpoint (see subsequent call in the method)
-        getClient(adminToken).perform(get("/api/authz/features/withdrawItem")).andExpect(status().isOk())
-                .andExpect(jsonPath("$.id", is("withdrawItem")))
-                .andExpect(jsonPath("$.description", Matchers.any(String.class)))
-                .andExpect(jsonPath("$.resourcetypes", Matchers.contains("core.item")))
-                .andExpect(jsonPath("$.type", is("feature")));
-        // verify that anonymous user cannot access
-        getClient().perform(get("/api/authz/features/withdrawItem")).andExpect(status().isUnauthorized());
-        // verify that normal user cannot access
-        String epersonAuthToken = getAuthToken(eperson.getEmail(), password);
-        getClient(epersonAuthToken).perform(get("/api/authz/features/withdrawItem")).andExpect(status().isForbidden());
+        getClient().perform(get("/api/authz/features/withdrawItem")).andExpect(status().isOk())
+                   .andExpect(jsonPath("$.id", is("withdrawItem")))
+                   .andExpect(jsonPath("$.description", Matchers.any(String.class)))
+                   .andExpect(jsonPath("$.resourcetypes", Matchers.contains("core.item")))
+                   .andExpect(jsonPath("$.type", is("feature")));
     }
 
     @Test
     public void findOneNotFoundTest() throws Exception {
-        String adminToken = getAuthToken(admin.getEmail(), password);
-        // verify that only the admin can access the endpoint and get the not found response code
-        // (see subsequent calls in the method for unauthorized and forbidden attempts)
-        getClient(adminToken).perform(get("/api/authz/features/not-existing-feature")).andExpect(status().isNotFound());
-        // verify that anonymous user cannot access, without information disclosure
-        getClient().perform(get("/api/authz/features/not-existing-feature")).andExpect(status().isUnauthorized());
-        // verify that normal user cannot access, without information disclosure
-        getClient(adminToken).perform(get("/api/authz/features/1")).andExpect(status().isNotFound());
+        getClient().perform(get("/api/authz/features/not-existing-feature")).andExpect(status().isNotFound());
+
     }
 
     @Test
@@ -146,27 +133,28 @@ public class AuthorizationFeatureRestRepositoryIT extends AbstractControllerInte
         for (String type : alwaysTrueFeature.getSupportedTypes()) {
             // verify that only the admin can access the endpoint (see subsequent call in the method)
             getClient(adminToken).perform(get("/api/authz/features/search/resourcetype").param("type", type))
-                    .andExpect(status().isOk())
-                    .andExpect(jsonPath("$",
-                                    JsonPathMatchers.hasJsonPath("$._embedded.features",
-                                            Matchers.everyItem(
-                                                    JsonPathMatchers.hasJsonPath("$.resourcetypes",
-                                                            Matchers.hasItem(is(type))))
-                                    )))
-                    .andExpect(
-                            jsonPath("$._links.self.href",
-                                    Matchers.containsString("/api/authz/features/search/resourcetype")));
+                                 .andExpect(status().isOk())
+                                 .andExpect(jsonPath("$",
+                                                     JsonPathMatchers.hasJsonPath("$._embedded.features",
+                                                                                  Matchers.everyItem(
+                                                                                      JsonPathMatchers.hasJsonPath(
+                                                                                          "$.resourcetypes",
+                                                                                          Matchers.hasItem(is(type))))
+                                                     )))
+                                 .andExpect(
+                                     jsonPath("$._links.self.href",
+                                              Matchers.containsString("/api/authz/features/search/resourcetype")));
         }
         // verify that the right response code is returned also for not existing types
         getClient(adminToken).perform(get("/api/authz/features/search/resourcetype").param("type", "NOT-EXISTING"))
-                .andExpect(status().isOk()).andExpect(jsonPath("$.page.totalElements", is(0)));
+                             .andExpect(status().isOk()).andExpect(jsonPath("$.page.totalElements", is(0)));
         // verify that anonymous user cannot access, without information disclosure
         getClient().perform(get("/api/authz/features/search/resourcetype").param("type", "core.item"))
-                .andExpect(status().isUnauthorized());
+                   .andExpect(status().isUnauthorized());
         // verify that normal user cannot access, without information disclosure
         String epersonAuthToken = getAuthToken(eperson.getEmail(), password);
         getClient(epersonAuthToken).perform(get("/api/authz/features/search/resourcetype").param("type", "core.item"))
-                .andExpect(status().isForbidden());
+                                   .andExpect(status().isForbidden());
 
     }
 
