@@ -239,7 +239,7 @@ public class StructBuilderIT
         // Run the method under test and collect its output.
         ByteArrayOutputStream outputDocument
             = new ByteArrayOutputStream(IMPORT_DOCUMENT_WITH_PARENT.length() * 2 * 2);
-        byte[] inputBytes = IMPORT_DOCUMENT.getBytes(StandardCharsets.UTF_8);
+        byte[] inputBytes = IMPORT_DOCUMENT_WITH_PARENT.getBytes(StandardCharsets.UTF_8);
         context.turnOffAuthorisationSystem();
         try (InputStream input = new ByteArrayInputStream(inputBytes)) {
             StructBuilder.importStructure(context, input, outputDocument, parent);
