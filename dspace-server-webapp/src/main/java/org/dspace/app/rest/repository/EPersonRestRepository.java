@@ -199,7 +199,7 @@ public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, E
             List<MetadataValueRest> epersonLastName = metadataRest.getMap().get("eperson.lastname");
             if (epersonFirstName == null || epersonLastName == null ||
                 epersonFirstName.isEmpty() || epersonLastName.isEmpty()) {
-                throw new DSpaceBadRequestException("The eperson.firstname and eperson.lastname values need to be " +
+                throw new UnprocessableEntityException("The eperson.firstname and eperson.lastname values need to be " +
                                                     "filled in");
             }
         }
