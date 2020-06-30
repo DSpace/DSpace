@@ -9,6 +9,7 @@ package org.dspace.content;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -101,7 +102,7 @@ public class MetadataDSpaceCsvExportServiceImpl implements MetadataDSpaceCsvExpo
         throws SQLException {
         // Add all the collections
         List<Collection> collections = community.getCollections();
-        Iterator<Item> result = null;
+        Iterator<Item> result = Collections.<Item>emptyIterator();
         for (Collection collection : collections) {
             Iterator<Item> items = itemService.findByCollection(context, collection);
             result = addItemsToResult(result, items);
