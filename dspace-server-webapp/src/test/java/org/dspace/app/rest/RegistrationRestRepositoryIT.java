@@ -16,6 +16,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.util.Iterator;
 import java.util.List;
+import javax.servlet.http.HttpServletResponse;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
@@ -43,25 +44,28 @@ public class RegistrationRestRepositoryIT extends AbstractControllerIntegrationT
         createTokenForEmail(email);
         RegistrationData registrationData = registrationDataDAO.findByEmail(context, email);
 
-        getClient().perform(get("/api/eperson/registrations/search/findByToken")
-                                .param("token", registrationData.getToken()))
-                   .andExpect(status().isOk())
-                   .andExpect(
-                       jsonPath("$", Matchers.is(RegistrationMatcher.matchRegistration(email, eperson.getID()))));
+        try {
+            getClient().perform(get("/api/eperson/registrations/search/findByToken")
+                                    .param("token", registrationData.getToken()))
+                       .andExpect(status().isOk())
+                       .andExpect(
+                           jsonPath("$", Matchers.is(RegistrationMatcher.matchRegistration(email, eperson.getID()))));
 
-        registrationDataDAO.delete(context, registrationData);
+            registrationDataDAO.delete(context, registrationData);
 
-        email = "newUser@testnewuser.com";
-        createTokenForEmail(email);
-        registrationData = registrationDataDAO.findByEmail(context, email);
+            email = "newUser@testnewuser.com";
+            createTokenForEmail(email);
+            registrationData = registrationDataDAO.findByEmail(context, email);
 
-        getClient().perform(get("/api/eperson/registrations/search/findByToken")
-                                .param("token", registrationData.getToken()))
-                   .andExpect(status().isOk())
-                   .andExpect(
-                       jsonPath("$", Matchers.is(RegistrationMatcher.matchRegistration(email, null))));
+            getClient().perform(get("/api/eperson/registrations/search/findByToken")
+                                    .param("token", registrationData.getToken()))
+                       .andExpect(status().isOk())
+                       .andExpect(
+                           jsonPath("$", Matchers.is(RegistrationMatcher.matchRegistration(email, null))));
+        } finally {
+            registrationDataDAO.delete(context, registrationData);
+        }
 
-        registrationDataDAO.delete(context, registrationData);
 
     }
 
@@ -71,13 +75,16 @@ public class RegistrationRestRepositoryIT extends AbstractControllerIntegrationT
         createTokenForEmail(email);
         RegistrationData registrationData = registrationDataDAO.findByEmail(context, email);
 
-        getClient().perform(get("/api/eperson/registrations/search/findByToken")
-                                .param("token", registrationData.getToken()))
-                   .andExpect(status().isOk())
-                   .andExpect(
-                       jsonPath("$", Matchers.is(RegistrationMatcher.matchRegistration(email, null))));
+        try {
+            getClient().perform(get("/api/eperson/registrations/search/findByToken")
+                                    .param("token", registrationData.getToken()))
+                       .andExpect(status().isOk())
+                       .andExpect(
+                           jsonPath("$", Matchers.is(RegistrationMatcher.matchRegistration(email, null))));
+        } finally {
+            registrationDataDAO.delete(context, registrationData);
+        }
 
-        registrationDataDAO.delete(context, registrationData);
     }
 
     @Test
@@ -106,41 +113,44 @@ public class RegistrationRestRepositoryIT extends AbstractControllerIntegrationT
         ObjectMapper mapper = new ObjectMapper();
         RegistrationRest registrationRest = new RegistrationRest();
         registrationRest.setEmail(eperson.getEmail());
-        getClient().perform(post("/api/eperson/registrations")
-                                .content(mapper.writeValueAsBytes(registrationRest))
-                                .contentType(contentType))
-                   .andExpect(status().isCreated());
-        registrationDataList = registrationDataDAO.findAll(context, RegistrationData.class);
-        assertEquals(1, registrationDataList.size());
-        assertTrue(StringUtils.equalsIgnoreCase(registrationDataList.get(0).getEmail(), eperson.getEmail()));
 
-        String newEmail = "newEPersonTest@gmail.com";
-        registrationRest.setEmail(newEmail);
-        getClient().perform(post("/api/eperson/registrations")
-                                .content(mapper.writeValueAsBytes(registrationRest))
-                                .contentType(contentType))
-                   .andExpect(status().isCreated());
-        registrationDataList = registrationDataDAO.findAll(context, RegistrationData.class);
-        assertTrue(registrationDataList.size() == 2);
-        assertTrue(StringUtils.equalsIgnoreCase(registrationDataList.get(0).getEmail(), newEmail) ||
-                       StringUtils.equalsIgnoreCase(registrationDataList.get(1).getEmail(), newEmail));
-        configurationService.setProperty("user.registration", false);
+        try {
+            getClient().perform(post("/api/eperson/registrations")
+                                    .content(mapper.writeValueAsBytes(registrationRest))
+                                    .contentType(contentType))
+                       .andExpect(status().isCreated());
+            registrationDataList = registrationDataDAO.findAll(context, RegistrationData.class);
+            assertEquals(1, registrationDataList.size());
+            assertTrue(StringUtils.equalsIgnoreCase(registrationDataList.get(0).getEmail(), eperson.getEmail()));
 
-        newEmail = "newEPersonTestTwo@gmail.com";
-        registrationRest.setEmail(newEmail);
-        getClient().perform(post("/api/eperson/registrations")
-                                .content(mapper.writeValueAsBytes(registrationRest))
-                                .contentType(contentType))
-                   .andExpect(status().is(401));
+            String newEmail = "newEPersonTest@gmail.com";
+            registrationRest.setEmail(newEmail);
+            getClient().perform(post("/api/eperson/registrations")
+                                    .content(mapper.writeValueAsBytes(registrationRest))
+                                    .contentType(contentType))
+                       .andExpect(status().isCreated());
+            registrationDataList = registrationDataDAO.findAll(context, RegistrationData.class);
+            assertTrue(registrationDataList.size() == 2);
+            assertTrue(StringUtils.equalsIgnoreCase(registrationDataList.get(0).getEmail(), newEmail) ||
+                           StringUtils.equalsIgnoreCase(registrationDataList.get(1).getEmail(), newEmail));
+            configurationService.setProperty("user.registration", false);
 
-        assertEquals(2, registrationDataList.size());
-        assertTrue(!StringUtils.equalsIgnoreCase(registrationDataList.get(0).getEmail(), newEmail) &&
-                       !StringUtils.equalsIgnoreCase(registrationDataList.get(1).getEmail(), newEmail));
+            newEmail = "newEPersonTestTwo@gmail.com";
+            registrationRest.setEmail(newEmail);
+            getClient().perform(post("/api/eperson/registrations")
+                                    .content(mapper.writeValueAsBytes(registrationRest))
+                                    .contentType(contentType))
+                       .andExpect(status().is(HttpServletResponse.SC_UNAUTHORIZED));
 
-        Iterator<RegistrationData> iterator = registrationDataList.iterator();
-        while (iterator.hasNext()) {
-            RegistrationData registrationData = iterator.next();
-            registrationDataDAO.delete(context, registrationData);
+            assertEquals(2, registrationDataList.size());
+            assertTrue(!StringUtils.equalsIgnoreCase(registrationDataList.get(0).getEmail(), newEmail) &&
+                           !StringUtils.equalsIgnoreCase(registrationDataList.get(1).getEmail(), newEmail));
+        } finally {
+            Iterator<RegistrationData> iterator = registrationDataList.iterator();
+            while (iterator.hasNext()) {
+                RegistrationData registrationData = iterator.next();
+                registrationDataDAO.delete(context, registrationData);
+            }
         }
     }
 
@@ -149,22 +159,25 @@ public class RegistrationRestRepositoryIT extends AbstractControllerIntegrationT
         configurationService.setProperty("user.registration", false);
 
         List<RegistrationData> registrationDataList = registrationDataDAO.findAll(context, RegistrationData.class);
-        assertEquals(0, registrationDataList.size());
+        try {
+            assertEquals(0, registrationDataList.size());
 
-        ObjectMapper mapper = new ObjectMapper();
-        RegistrationRest registrationRest = new RegistrationRest();
-        registrationRest.setEmail(eperson.getEmail());
-        getClient().perform(post("/api/eperson/registrations")
-                                .content(mapper.writeValueAsBytes(registrationRest))
-                                .contentType(contentType))
-                   .andExpect(status().isCreated());
-        registrationDataList = registrationDataDAO.findAll(context, RegistrationData.class);
-        assertEquals(1, registrationDataList.size());
-        assertTrue(StringUtils.equalsIgnoreCase(registrationDataList.get(0).getEmail(), eperson.getEmail()));
-        Iterator<RegistrationData> iterator = registrationDataList.iterator();
-        while (iterator.hasNext()) {
-            RegistrationData registrationData = iterator.next();
-            registrationDataDAO.delete(context, registrationData);
+            ObjectMapper mapper = new ObjectMapper();
+            RegistrationRest registrationRest = new RegistrationRest();
+            registrationRest.setEmail(eperson.getEmail());
+            getClient().perform(post("/api/eperson/registrations")
+                                    .content(mapper.writeValueAsBytes(registrationRest))
+                                    .contentType(contentType))
+                       .andExpect(status().isCreated());
+            registrationDataList = registrationDataDAO.findAll(context, RegistrationData.class);
+            assertEquals(1, registrationDataList.size());
+            assertTrue(StringUtils.equalsIgnoreCase(registrationDataList.get(0).getEmail(), eperson.getEmail()));
+        } finally {
+            Iterator<RegistrationData> iterator = registrationDataList.iterator();
+            while (iterator.hasNext()) {
+                RegistrationData registrationData = iterator.next();
+                registrationDataDAO.delete(context, registrationData);
+            }
         }
     }
 

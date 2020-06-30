@@ -2044,22 +2044,24 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
         accountService.sendRegistrationInfo(context, ePerson.getEmail());
         String newRegisterToken = registrationDataService.findByEmail(context, newRegisterEmail).getToken();
         PasswordHash oldPassword = ePersonService.getPasswordHash(ePerson);
-        // updates password
-        getClient().perform(patch("/api/eperson/epersons/" + ePerson.getID())
-                                     .content(patchBody)
-                                     .contentType(MediaType.APPLICATION_JSON_PATCH_JSON)
-                                     .param("token", newRegisterToken))
-                        .andExpect(status().isUnauthorized());
+        try {
+            // updates password
+            getClient().perform(patch("/api/eperson/epersons/" + ePerson.getID())
+                                         .content(patchBody)
+                                         .contentType(MediaType.APPLICATION_JSON_PATCH_JSON)
+                                         .param("token", newRegisterToken))
+                            .andExpect(status().isUnauthorized());
 
-        PasswordHash newPasswordHash = ePersonService.getPasswordHash(ePerson);
-        assertTrue(StringUtils.equalsIgnoreCase(oldPassword.getHashString(),newPasswordHash.getHashString()));
-        assertFalse(registrationDataService.findByEmail(context, ePerson.getEmail()) == null);
-        assertFalse(registrationDataService.findByEmail(context, newRegisterEmail) == null);
-
-        context.turnOffAuthorisationSystem();
-        registrationDataService.delete(context, registrationDataService.findByEmail(context, ePerson.getEmail()));
-        registrationDataService.deleteByToken(context, newRegisterToken);
-        context.restoreAuthSystemState();
+            PasswordHash newPasswordHash = ePersonService.getPasswordHash(ePerson);
+            assertTrue(StringUtils.equalsIgnoreCase(oldPassword.getHashString(),newPasswordHash.getHashString()));
+            assertFalse(registrationDataService.findByEmail(context, ePerson.getEmail()) == null);
+            assertFalse(registrationDataService.findByEmail(context, newRegisterEmail) == null);
+        } finally {
+            context.turnOffAuthorisationSystem();
+            registrationDataService.delete(context, registrationDataService.findByEmail(context, ePerson.getEmail()));
+            registrationDataService.deleteByToken(context, newRegisterToken);
+            context.restoreAuthSystemState();
+        }
     }
 
     @Test
@@ -2118,10 +2120,10 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
 
             assertNull(registrationDataService.findByToken(context, newRegisterToken));
 
+        } finally {
             context.turnOffAuthorisationSystem();
             registrationDataService.deleteByToken(context, newRegisterToken);
             context.restoreAuthSystemState();
-        } finally {
             EPersonBuilder.deleteEPerson(idRef.get());
         }
     }
@@ -2179,10 +2181,10 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
             assertTrue(ePersonService.checkPassword(context, createdEPerson, "somePassword"));
             assertNull(registrationDataService.findByToken(context, newRegisterToken));
 
+        } finally {
             context.turnOffAuthorisationSystem();
             registrationDataService.deleteByToken(context, newRegisterToken);
             context.restoreAuthSystemState();
-        } finally {
             EPersonBuilder.deleteEPerson(idRef.get());
         }
 
@@ -2245,10 +2247,10 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
             assertTrue(ePersonService.checkPassword(context, createdEPerson, "somePassword"));
             assertNull(registrationDataService.findByToken(context, newRegisterToken));
 
+        } finally {
             context.turnOffAuthorisationSystem();
             registrationDataService.deleteByToken(context, newRegisterToken);
             context.restoreAuthSystemState();
-        } finally {
             EPersonBuilder.deleteEPerson(idRef.get());
         }
 
@@ -2293,21 +2295,24 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         mapper.setAnnotationIntrospector(new IgnoreJacksonWriteOnlyAccess());
 
-        getClient().perform(post("/api/eperson/epersons")
-                                                           .param("token", newRegisterToken)
-                                                           .content(mapper.writeValueAsBytes(ePersonRest))
-                                                           .contentType(MediaType.APPLICATION_JSON))
-                                              .andExpect(status().isBadRequest());
+        try {
+            getClient().perform(post("/api/eperson/epersons")
+                                                               .param("token", newRegisterToken)
+                                                               .content(mapper.writeValueAsBytes(ePersonRest))
+                                                               .contentType(MediaType.APPLICATION_JSON))
+                                                  .andExpect(status().isBadRequest());
 
-        EPerson createdEPerson = ePersonService.findByEmail(context, newRegisterEmailTwo);
-        assertNull(createdEPerson);
-        assertNotNull(registrationDataService.findByToken(context, newRegisterToken));
-        assertNotNull(registrationDataService.findByToken(context, newRegisterTokenTwo));
+            EPerson createdEPerson = ePersonService.findByEmail(context, newRegisterEmailTwo);
+            assertNull(createdEPerson);
+            assertNotNull(registrationDataService.findByToken(context, newRegisterToken));
+            assertNotNull(registrationDataService.findByToken(context, newRegisterTokenTwo));
+        } finally {
+            context.turnOffAuthorisationSystem();
+            registrationDataService.deleteByToken(context, newRegisterToken);
+            registrationDataService.deleteByToken(context, newRegisterTokenTwo);
+            context.restoreAuthSystemState();
 
-        context.turnOffAuthorisationSystem();
-        registrationDataService.deleteByToken(context, newRegisterToken);
-        registrationDataService.deleteByToken(context, newRegisterTokenTwo);
-        context.restoreAuthSystemState();
+        }
     }
 
     @Test
@@ -2340,19 +2345,22 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         mapper.setAnnotationIntrospector(new IgnoreJacksonWriteOnlyAccess());
 
-        getClient().perform(post("/api/eperson/epersons")
-                                     .param("token", "randomToken")
-                                     .content(mapper.writeValueAsBytes(ePersonRest))
-                                     .contentType(MediaType.APPLICATION_JSON))
-                        .andExpect(status().isBadRequest());
+        try {
+            getClient().perform(post("/api/eperson/epersons")
+                                         .param("token", "randomToken")
+                                         .content(mapper.writeValueAsBytes(ePersonRest))
+                                         .contentType(MediaType.APPLICATION_JSON))
+                            .andExpect(status().isBadRequest());
 
-        EPerson createdEPerson = ePersonService.findByEmail(context, newRegisterEmail);
-        assertNull(createdEPerson);
-        assertNotNull(registrationDataService.findByToken(context, newRegisterToken));
+            EPerson createdEPerson = ePersonService.findByEmail(context, newRegisterEmail);
+            assertNull(createdEPerson);
+            assertNotNull(registrationDataService.findByToken(context, newRegisterToken));
+        } finally {
+            context.turnOffAuthorisationSystem();
+            registrationDataService.deleteByToken(context, newRegisterToken);
+            context.restoreAuthSystemState();
+        }
 
-        context.turnOffAuthorisationSystem();
-        registrationDataService.deleteByToken(context, newRegisterToken);
-        context.restoreAuthSystemState();
     }
 
     @Test
@@ -2386,19 +2394,22 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         mapper.setAnnotationIntrospector(new IgnoreJacksonWriteOnlyAccess());
 
-        getClient().perform(post("/api/eperson/epersons")
-                                                           .param("token", newRegisterToken)
-                                                           .content(mapper.writeValueAsBytes(ePersonRest))
-                                                           .contentType(MediaType.APPLICATION_JSON))
-                                              .andExpect(status().isBadRequest());
+        try {
+            getClient().perform(post("/api/eperson/epersons")
+                                                               .param("token", newRegisterToken)
+                                                               .content(mapper.writeValueAsBytes(ePersonRest))
+                                                               .contentType(MediaType.APPLICATION_JSON))
+                                                  .andExpect(status().isBadRequest());
 
-        EPerson createdEPerson = ePersonService.findByEmail(context, newRegisterEmail);
-        assertNull(createdEPerson);
-        assertNotNull(registrationDataService.findByToken(context, newRegisterToken));
+            EPerson createdEPerson = ePersonService.findByEmail(context, newRegisterEmail);
+            assertNull(createdEPerson);
+            assertNotNull(registrationDataService.findByToken(context, newRegisterToken));
+        } finally {
+            context.turnOffAuthorisationSystem();
+            registrationDataService.deleteByToken(context, newRegisterToken);
+            context.restoreAuthSystemState();
+        }
 
-        context.turnOffAuthorisationSystem();
-        registrationDataService.deleteByToken(context, newRegisterToken);
-        context.restoreAuthSystemState();
     }
 
     @Test
@@ -2429,19 +2440,22 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         mapper.setAnnotationIntrospector(new IgnoreJacksonWriteOnlyAccess());
 
-        getClient().perform(post("/api/eperson/epersons")
-                                     .param("token", newRegisterToken)
-                                     .content(mapper.writeValueAsBytes(ePersonRest))
-                                     .contentType(MediaType.APPLICATION_JSON))
-                        .andExpect(status().isBadRequest());
+        try {
+            getClient().perform(post("/api/eperson/epersons")
+                                         .param("token", newRegisterToken)
+                                         .content(mapper.writeValueAsBytes(ePersonRest))
+                                         .contentType(MediaType.APPLICATION_JSON))
+                            .andExpect(status().isUnprocessableEntity());
 
-        EPerson createdEPerson = ePersonService.findByEmail(context, newRegisterEmail);
-        assertNull(createdEPerson);
-        assertNotNull(registrationDataService.findByToken(context, newRegisterToken));
+            EPerson createdEPerson = ePersonService.findByEmail(context, newRegisterEmail);
+            assertNull(createdEPerson);
+            assertNotNull(registrationDataService.findByToken(context, newRegisterToken));
+        } finally {
+            context.turnOffAuthorisationSystem();
+            registrationDataService.deleteByToken(context, newRegisterToken);
+            context.restoreAuthSystemState();
+        }
 
-        context.turnOffAuthorisationSystem();
-        registrationDataService.deleteByToken(context, newRegisterToken);
-        context.restoreAuthSystemState();
     }
 
     @Test
@@ -2472,19 +2486,22 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         mapper.setAnnotationIntrospector(new IgnoreJacksonWriteOnlyAccess());
 
-        getClient().perform(post("/api/eperson/epersons")
-                                     .param("token", newRegisterToken)
-                                     .content(mapper.writeValueAsBytes(ePersonRest))
-                                     .contentType(MediaType.APPLICATION_JSON))
-                        .andExpect(status().isBadRequest());
+        try {
+            getClient().perform(post("/api/eperson/epersons")
+                                         .param("token", newRegisterToken)
+                                         .content(mapper.writeValueAsBytes(ePersonRest))
+                                         .contentType(MediaType.APPLICATION_JSON))
+                            .andExpect(status().isUnprocessableEntity());
 
-        EPerson createdEPerson = ePersonService.findByEmail(context, newRegisterEmail);
-        assertNull(createdEPerson);
-        assertNotNull(registrationDataService.findByToken(context, newRegisterToken));
+            EPerson createdEPerson = ePersonService.findByEmail(context, newRegisterEmail);
+            assertNull(createdEPerson);
+            assertNotNull(registrationDataService.findByToken(context, newRegisterToken));
+        } finally {
+            context.turnOffAuthorisationSystem();
+            registrationDataService.deleteByToken(context, newRegisterToken);
+            context.restoreAuthSystemState();
+        }
 
-        context.turnOffAuthorisationSystem();
-        registrationDataService.deleteByToken(context, newRegisterToken);
-        context.restoreAuthSystemState();
     }
 
     @Test
@@ -2516,19 +2533,21 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         mapper.setAnnotationIntrospector(new IgnoreJacksonWriteOnlyAccess());
 
-        getClient().perform(post("/api/eperson/epersons")
-                                     .param("token", newRegisterToken)
-                                     .content(mapper.writeValueAsBytes(ePersonRest))
-                                     .contentType(MediaType.APPLICATION_JSON))
-                        .andExpect(status().isBadRequest());
+        try {
+            getClient().perform(post("/api/eperson/epersons")
+                                         .param("token", newRegisterToken)
+                                         .content(mapper.writeValueAsBytes(ePersonRest))
+                                         .contentType(MediaType.APPLICATION_JSON))
+                            .andExpect(status().isBadRequest());
 
-        EPerson createdEPerson = ePersonService.findByEmail(context, newRegisterEmail);
-        assertNull(createdEPerson);
-        assertNotNull(registrationDataService.findByToken(context, newRegisterToken));
-
-        context.turnOffAuthorisationSystem();
-        registrationDataService.deleteByToken(context, newRegisterToken);
-        context.restoreAuthSystemState();
+            EPerson createdEPerson = ePersonService.findByEmail(context, newRegisterEmail);
+            assertNull(createdEPerson);
+            assertNotNull(registrationDataService.findByToken(context, newRegisterToken));
+        } finally {
+            context.turnOffAuthorisationSystem();
+            registrationDataService.deleteByToken(context, newRegisterToken);
+            context.restoreAuthSystemState();
+        }
 
     }
 
@@ -2562,19 +2581,22 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         mapper.setAnnotationIntrospector(new IgnoreJacksonWriteOnlyAccess());
 
-        getClient().perform(post("/api/eperson/epersons")
-                                     .param("token", forgotPasswordToken)
-                                     .content(mapper.writeValueAsBytes(ePersonRest))
-                                     .contentType(MediaType.APPLICATION_JSON))
-                        .andExpect(status().isBadRequest());
+        try {
+            getClient().perform(post("/api/eperson/epersons")
+                                         .param("token", forgotPasswordToken)
+                                         .content(mapper.writeValueAsBytes(ePersonRest))
+                                         .contentType(MediaType.APPLICATION_JSON))
+                            .andExpect(status().isBadRequest());
 
-        EPerson createdEPerson = ePersonService.findByEmail(context, newEmail);
-        assertNull(createdEPerson);
-        assertNotNull(registrationDataService.findByToken(context, forgotPasswordToken));
+            EPerson createdEPerson = ePersonService.findByEmail(context, newEmail);
+            assertNull(createdEPerson);
+            assertNotNull(registrationDataService.findByToken(context, forgotPasswordToken));
+        } finally {
+            context.turnOffAuthorisationSystem();
+            registrationDataService.deleteByToken(context, forgotPasswordToken);
+            context.restoreAuthSystemState();
+        }
 
-        context.turnOffAuthorisationSystem();
-        registrationDataService.deleteByToken(context, forgotPasswordToken);
-        context.restoreAuthSystemState();
 
     }
 
@@ -2633,11 +2655,10 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
             EPerson createdEPerson = ePersonService.find(context, UUID.fromString(epersonUuid));
             assertTrue(ePersonService.checkPassword(context, createdEPerson, "somePassword"));
             assertNull(registrationDataService.findByToken(context, newRegisterToken));
-
+        } finally {
             context.turnOffAuthorisationSystem();
             registrationDataService.deleteByToken(context, newRegisterToken);
             context.restoreAuthSystemState();
-        } finally {
             EPersonBuilder.deleteEPerson(idRef.get());
         }
     }
