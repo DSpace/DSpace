@@ -855,6 +855,25 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
             .andExpect(jsonPath("$.authenticated", is(true)));
     }
 
+    // TODO: fix the exception. For now we want to verify a short lived token can't be used to login
+    @Test(expected = Exception.class)
+    public void testLoginWithShortLivedToken() throws Exception {
+        String shortLivedToken = getShortLivedToken(eperson);
+
+        getClient().perform(post("/api/authn/login?token=" + shortLivedToken))
+            .andExpect(status().isInternalServerError());
+        // TODO: This internal server error needs to be fixed. This should actually produce a forbidden status
+        //.andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void testGenerateShortLivedTokenWithShortLivedToken() throws Exception {
+        String shortLivedToken = getShortLivedToken(eperson);
+
+        getClient().perform(post("/api/authn/shortlivedtokens?token=" + shortLivedToken))
+            .andExpect(status().isForbidden());
+    }
+
     private String getShortLivedToken(EPerson requestUser) throws Exception {
         ObjectMapper mapper = new ObjectMapper();
 

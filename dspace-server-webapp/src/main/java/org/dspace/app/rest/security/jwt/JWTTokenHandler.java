@@ -43,6 +43,7 @@ import org.dspace.services.ConfigurationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.crypto.keygen.BytesKeyGenerator;
 import org.springframework.security.crypto.keygen.KeyGenerators;
 
@@ -57,6 +58,8 @@ import org.springframework.security.crypto.keygen.KeyGenerators;
 public abstract class JWTTokenHandler {
 
     private static final int MAX_CLOCK_SKEW_SECONDS = 60;
+    private static final String AUTHORIZATION_TOKEN_PARAMETER = "token";
+
     private static final Logger log = LoggerFactory.getLogger(JWTTokenHandler.class);
 
     @Autowired
@@ -164,6 +167,11 @@ public abstract class JWTTokenHandler {
      */
     public String createTokenForEPerson(Context context, HttpServletRequest request, Date previousLoginDate,
                                         List<Group> groups) throws JOSEException, SQLException {
+
+        // Verify that the user isn't trying to use a short lived token to generate another token
+        if (StringUtils.isNotBlank(request.getParameter(AUTHORIZATION_TOKEN_PARAMETER))) {
+            throw new AccessDeniedException("Short lived tokens can't be used to generate other tokens");
+        }
 
         // Update the saved session salt for the currently logged in user, returning the user object
         EPerson ePerson = updateSessionSalt(context, previousLoginDate);
