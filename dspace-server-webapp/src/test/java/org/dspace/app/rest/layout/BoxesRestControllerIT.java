@@ -42,6 +42,7 @@ import org.dspace.layout.CrisLayoutField;
 import org.dspace.layout.CrisLayoutTab;
 import org.dspace.layout.LayoutSecurity;
 import org.hamcrest.Matchers;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -109,6 +110,7 @@ public class BoxesRestControllerIT extends AbstractControllerIntegrationTest {
      * It returns all the fields included in the box.
      * @throws Exception
      */
+    @Ignore
     @Test
     public void getBoxFields() throws Exception {
         context.turnOffAuthorisationSystem();

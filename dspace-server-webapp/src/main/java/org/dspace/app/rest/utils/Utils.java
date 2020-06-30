@@ -296,6 +296,9 @@ public class Utils {
         if (StringUtils.equals(modelPlural, "vocabularies")) {
             return VocabularyRest.NAME;
         }
+        if (StringUtils.equals(modelPlural, "boxes")) {
+            return CrisLayoutBoxRest.NAME;
+        }
         return modelPlural.replaceAll("s$", "");
     }
 
