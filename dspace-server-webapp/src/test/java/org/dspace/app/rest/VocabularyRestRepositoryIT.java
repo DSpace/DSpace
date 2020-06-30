@@ -115,11 +115,13 @@ public class VocabularyRestRepositoryIT extends AbstractControllerIntegrationTes
                      VocabularyMatcher.matchProperties("srsc", "srsc", false, true),
                      VocabularyMatcher.matchProperties("common_types", "common_types", true, false),
                      VocabularyMatcher.matchProperties("common_iso_languages", "common_iso_languages", true , false),
-                     VocabularyMatcher.matchProperties("SolrAuthorAuthority", "SolrAuthorAuthority", false , false)
+                     VocabularyMatcher.matchProperties("SolrAuthorAuthority", "SolrAuthorAuthority", false , false),
+                     VocabularyMatcher.matchProperties("patent_types", "patent_types", true , false),
+                     VocabularyMatcher.matchProperties("types", "types", false , true)
                  )))
         .andExpect(jsonPath("$._links.self.href",
             Matchers.containsString("api/submission/vocabularies")))
-        .andExpect(jsonPath("$.page.totalElements", is(4)));
+        .andExpect(jsonPath("$.page.totalElements", is(6)));
     }
 
     @Test
