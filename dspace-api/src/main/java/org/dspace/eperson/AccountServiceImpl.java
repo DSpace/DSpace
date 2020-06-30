@@ -12,6 +12,7 @@ import java.sql.SQLException;
 import java.util.Locale;
 import javax.mail.MessagingException;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.ConfigurationManager;
@@ -22,6 +23,7 @@ import org.dspace.core.Utils;
 import org.dspace.eperson.service.AccountService;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.eperson.service.RegistrationDataService;
+import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -47,6 +49,8 @@ public class AccountServiceImpl implements AccountService {
     protected EPersonService ePersonService;
     @Autowired(required = true)
     protected RegistrationDataService registrationDataService;
+    @Autowired
+    private ConfigurationService configurationService;
 
     protected AccountServiceImpl() {
 
@@ -67,6 +71,9 @@ public class AccountServiceImpl implements AccountService {
     public void sendRegistrationInfo(Context context, String email)
         throws SQLException, IOException, MessagingException,
         AuthorizeException {
+        if (!configurationService.getBooleanProperty("user.registration", true)) {
+            throw new IllegalStateException("The user.registration parameter was set to false");
+        }
         sendInfo(context, email, true, true);
     }
 
@@ -155,6 +162,14 @@ public class AccountServiceImpl implements AccountService {
         registrationDataService.deleteByToken(context, token);
     }
 
+    @Override
+    public boolean verifyPasswordStructure(String password) {
+        if (StringUtils.length(password) < 6) {
+            return false;
+        }
+        return true;
+    }
+
     /**
      * THIS IS AN INTERNAL METHOD. THE SEND PARAMETER ALLOWS IT TO BE USED FOR
      * TESTING PURPOSES.
@@ -233,8 +248,8 @@ public class AccountServiceImpl implements AccountService {
         //  Note change from "key=" to "token="
         String specialLink = new StringBuffer().append(base).append(
             base.endsWith("/") ? "" : "/").append(
-            isRegister ? "register" : "forgot").append("?")
-                                               .append("token=").append(rd.getToken())
+            isRegister ? "register" : "forgot").append("/")
+                                               .append(rd.getToken())
                                                .toString();
         Locale locale = context.getCurrentLocale();
         Email bean = Email.getEmail(I18nUtil.getEmailFilename(locale, isRegister ? "register"
