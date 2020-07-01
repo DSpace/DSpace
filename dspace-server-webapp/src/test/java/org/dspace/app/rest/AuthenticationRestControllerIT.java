@@ -804,7 +804,7 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
         Bitstream bitstream = createPrivateBitstream();
         String shortLivedToken = getShortLivedToken(eperson);
 
-        getClient().perform(get("/api/core/bitstreams/" + bitstream.getID() + "/content?token=" + shortLivedToken))
+        getClient().perform(get("/api/core/bitstreams/" + bitstream.getID() + "/content?authentication-token=" + shortLivedToken))
             .andExpect(status().isOk());
     }
 
@@ -821,7 +821,7 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
         context.restoreAuthSystemState();
 
         String shortLivedToken = getShortLivedToken(testEPerson);
-        getClient().perform(get("/api/core/bitstreams/" + bitstream.getID() + "/content?token=" + shortLivedToken))
+        getClient().perform(get("/api/core/bitstreams/" + bitstream.getID() + "/content?authentication-token=" + shortLivedToken))
             .andExpect(status().isForbidden());
     }
 
@@ -830,7 +830,7 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
         Bitstream bitstream = createPrivateBitstream();
 
         String loginToken = getAuthToken(eperson.getEmail(), password);
-        getClient().perform(get("/api/core/bitstreams/" + bitstream.getID() + "/content?token=" + loginToken))
+        getClient().perform(get("/api/core/bitstreams/" + bitstream.getID() + "/content?authentication-token=" + loginToken))
             .andExpect(status().isForbidden());
     }
 
@@ -840,7 +840,7 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
         configurationService.setProperty("jwt.shortLived.token.expiration", "1");
         String shortLivedToken = getShortLivedToken(eperson);
         Thread.sleep(1);
-        getClient().perform(get("/api/core/bitstreams/" + bitstream.getID() + "/content?token=" + shortLivedToken))
+        getClient().perform(get("/api/core/bitstreams/" + bitstream.getID() + "/content?authentication-token=" + shortLivedToken))
             .andExpect(status().isForbidden());
     }
 
@@ -860,7 +860,7 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
     public void testLoginWithShortLivedToken() throws Exception {
         String shortLivedToken = getShortLivedToken(eperson);
 
-        getClient().perform(post("/api/authn/login?token=" + shortLivedToken))
+        getClient().perform(post("/api/authn/login?authentication-token=" + shortLivedToken))
             .andExpect(status().isInternalServerError());
         // TODO: This internal server error needs to be fixed. This should actually produce a forbidden status
         //.andExpect(status().isForbidden());
@@ -870,7 +870,7 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
     public void testGenerateShortLivedTokenWithShortLivedToken() throws Exception {
         String shortLivedToken = getShortLivedToken(eperson);
 
-        getClient().perform(post("/api/authn/shortlivedtokens?token=" + shortLivedToken))
+        getClient().perform(post("/api/authn/shortlivedtokens?authentication-token=" + shortLivedToken))
             .andExpect(status().isForbidden());
     }
 
