@@ -10,14 +10,12 @@ package org.dspace.app.rest.test;
 import org.dspace.app.rest.builder.EntityTypeBuilder;
 import org.dspace.app.rest.builder.RelationshipTypeBuilder;
 import org.dspace.content.EntityType;
-import org.dspace.content.service.EntityTypeService;
 import org.junit.Before;
-import org.springframework.beans.factory.annotation.Autowired;
 
+/**
+ * An AbstractControllerIntegrationTest which pre-creates Entities & Relationships for ITs that need them.
+ */
 public class AbstractEntityIntegrationTest extends AbstractControllerIntegrationTest {
-
-    @Autowired
-    private EntityTypeService entityTypeService;
 
     /**
      * This method will call the setUp method from AbstractControllerIntegrationTest.
@@ -40,13 +38,10 @@ public class AbstractEntityIntegrationTest extends AbstractControllerIntegration
     public void setUp() throws Exception {
         super.setUp();
 
-        if (entityTypeService.findAll(context).size() > 0) {
-            //Don't initialize the setup more than once
-            return;
-        }
-
         context.turnOffAuthorisationSystem();
 
+        // Create all Entities/Relationships using Builders.
+        // That way they are cleaned up automatically after tests finish.
         EntityType publication = EntityTypeBuilder.createEntityTypeBuilder(context, "Publication").build();
         EntityType person = EntityTypeBuilder.createEntityTypeBuilder(context, "Person").build();
         EntityType project = EntityTypeBuilder.createEntityTypeBuilder(context, "Project").build();

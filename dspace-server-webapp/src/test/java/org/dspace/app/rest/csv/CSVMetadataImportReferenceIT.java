@@ -41,6 +41,7 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
+ * ITs to test creation of Entity Relationships via CSV Metadata import
  * Created by: Andrew Wood
  * Date: 26 Jul 2019
  */
