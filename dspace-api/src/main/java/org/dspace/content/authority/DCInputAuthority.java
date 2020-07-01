@@ -10,10 +10,12 @@ package org.dspace.content.authority;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -83,12 +85,13 @@ public class DCInputAuthority extends SelfNamedPlugin implements ChoiceAuthority
             } catch (DCInputsReaderException e) {
                 log.error("Failed reading DCInputs initialization: ", e);
             }
-            List<String> names = new ArrayList<String>();
-            Iterator pi = dcis.get(locales[0]).getPairsNameIterator();
-            while (pi.hasNext()) {
-                names.add((String) pi.next());
+            Set<String> names = new HashSet<String>();
+            for (Locale l : locales) {
+                Iterator pi = dcis.get(l).getPairsNameIterator();
+                while (pi.hasNext()) {
+                    names.add((String) pi.next());
+                }
             }
-
             pluginNames = names.toArray(new String[names.size()]);
             log.debug("Got plugin names = " + Arrays.deepToString(pluginNames));
         }
