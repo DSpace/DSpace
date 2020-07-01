@@ -417,6 +417,11 @@ public class SubmissionFormsControllerIT extends AbstractControllerIntegrationTe
         configurationService.setProperty("webui.supported.locales",supportedLanguage);
         submissionFormRestRepository.reload();
 
+        EPerson eperson = EPersonBuilder.createEPerson(context)
+                .withEmail("epersonIT@example.com")
+                .withPassword(password)
+                .build();
+
         context.restoreAuthSystemState();
 
         String tokenEperson = getAuthToken(eperson.getEmail(), password);
@@ -430,7 +435,7 @@ public class SubmissionFormsControllerIT extends AbstractControllerIntegrationTe
                             .startsWith(REST_SERVER_URL + "config/submissionforms/languagetest")))
                  .andExpect(jsonPath("$.rows[0].fields", contains(SubmissionFormFieldMatcher
                     .matchFormFieldDefinition("lookup-name", "Autore", "\u00C8 richiesto almeno un autore", true,
-                                              "Aggiungi un autore", "dc.contributor.author"))))
+                                              "Aggiungi un autore", null, "dc.contributor.author", "AuthorAuthority"))))
                  .andExpect(jsonPath("$.rows[1].fields", contains(SubmissionFormFieldMatcher
                             .matchFormFieldDefinition("onebox", "Titolo",
                             "\u00C8 necessario inserire un titolo principale per questo item", false,
