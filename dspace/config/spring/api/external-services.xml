@@ -31,10 +31,17 @@
         <property name="sourceIdentifier" value="lcname"/>
     </bean>
 
-    <bean class="org.dspace.external.provider.impl.LiveImportDataProvider">
+    <bean id="pubmedLiveImportDataProvider" class="org.dspace.external.provider.impl.LiveImportDataProvider">
         <property name="metadataSource" ref="PubmedImportService"/>
         <property name="sourceIdentifier" value="pubmed"/>
         <property name="recordIdMetadata" value="dc.identifier.other"/>
     </bean>
+
+    <bean id="arxivLiveImportDataProvider" class="org.dspace.external.provider.impl.LiveImportDataProvider">
+        <property name="metadataSource" ref="ArXivImportService"/>
+        <property name="sourceIdentifier" value="arxiv"/>
+        <property name="recordIdMetadata" value="dc.identifier.other"/>
+    </bean>
+
 </beans>
 

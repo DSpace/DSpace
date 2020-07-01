@@ -19,10 +19,6 @@
 
     <context:annotation-config/> <!-- allows us to use spring annotations in beans -->
 
-    <bean id="importService" class="org.dspace.importer.external.service.ImportService" scope="singleton"
-          lazy-init="false" autowire="byType" destroy-method="destroy">
-
-    </bean>
 
     <!--If multiple importServices have been configured here but only one is to be used during the lookup step (StartSubmissionLookupStep),
         this can be accomplished by specifying the property "publication-lookup.url" to the baseAddress of the required importService
@@ -32,10 +28,27 @@
         Omitting this property will default to searching over all configured ImportService implementations
     -->
 
+    <bean id="importService" class="org.dspace.importer.external.service.ImportService" scope="singleton"
+          lazy-init="false" autowire="byType" destroy-method="destroy">
+
+    </bean>
+
+    <bean id="ArXivImportService"
+          class="org.dspace.importer.external.arxiv.service.ArXivImportMetadataSourceServiceImpl" scope="singleton">
+        <property name="metadataFieldMapping" ref="ArXivMetadataFieldMapping"/>
+        <property name="generateQueryForItem" ref="arXivQueryService"></property>
+        <!-- <property name="baseAddress" value="https://eutils.ncbi.nlm.nih.gov/entrez/eutils/"/>  -->
+    </bean>
+    <bean id="ArXivMetadataFieldMapping"
+          class="org.dspace.importer.external.arxiv.metadatamapping.ArXivFieldMapping">
+    </bean>
+
+
     <bean id="PubmedImportService"
           class="org.dspace.importer.external.pubmed.service.PubmedImportMetadataSourceServiceImpl" scope="singleton">
         <property name="metadataFieldMapping" ref="PubmedMetadataFieldMapping"/>
         <property name="baseAddress" value="https://eutils.ncbi.nlm.nih.gov/entrez/eutils/"/>
+        <property name="generateQueryForItem" ref="pubmedService"></property>
 
     </bean>
     <bean id="PubmedMetadataFieldMapping"
