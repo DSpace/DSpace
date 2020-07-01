@@ -8,12 +8,10 @@
 package org.dspace.app.rest.builder;
 
 import java.sql.SQLException;
-import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.EntityType;
-import org.dspace.content.Relationship;
 import org.dspace.content.RelationshipType;
 import org.dspace.content.service.RelationshipTypeService;
 import org.dspace.core.Context;
@@ -41,11 +39,6 @@ public class RelationshipTypeBuilder extends AbstractBuilder<RelationshipType, R
             c.turnOffAuthorisationSystem();
             // Ensure object and any related objects are reloaded before checking to see what needs cleanup
             relationshipType = c.reloadEntity(relationshipType);
-            List<Relationship> byRelationshipType = relationshipService
-                .findByRelationshipType(c, relationshipType);
-            for (Relationship relationship : byRelationshipType) {
-                relationshipService.delete(c, relationship);
-            }
             if (relationshipType != null) {
                 delete(c, relationshipType);
             }
