@@ -37,6 +37,11 @@ public class CurationScriptConfiguration<T extends CurationCli> extends ScriptCo
         this.dspaceRunnableClass = dspaceRunnableClass;
     }
 
+    /**
+     * Only admin can run Curation script via the scripts and processes endpoints.
+     * @param context   The relevant DSpace context
+     * @return  True if currentUser is admin, otherwise false
+     */
     @Override
     public boolean isAllowedToExecute(Context context) {
         try {
