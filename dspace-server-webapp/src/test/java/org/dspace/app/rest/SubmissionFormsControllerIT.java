@@ -58,13 +58,13 @@ public class SubmissionFormsControllerIT extends AbstractControllerIntegrationTe
                    .andExpect(content().contentType(contentType))
                    //The configuration file for the test env includes 3 forms
                    .andExpect(jsonPath("$.page.size", is(20)))
-                   .andExpect(jsonPath("$.page.totalElements", equalTo(17)))
+                   .andExpect(jsonPath("$.page.totalElements", equalTo(18)))
                    .andExpect(jsonPath("$.page.totalPages", equalTo(1)))
                    .andExpect(jsonPath("$.page.number", is(0)))
                    .andExpect(
                        jsonPath("$._links.self.href", Matchers.startsWith(REST_SERVER_URL + "config/submissionforms")))
                    //The array of submissionforms should have a size of 3
-                   .andExpect(jsonPath("$._embedded.submissionforms", hasSize(equalTo(17))))
+                   .andExpect(jsonPath("$._embedded.submissionforms", hasSize(equalTo(18))))
         ;
     }
 
@@ -75,12 +75,12 @@ public class SubmissionFormsControllerIT extends AbstractControllerIntegrationTe
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
                 .andExpect(jsonPath("$.page.size", is(20)))
-                .andExpect(jsonPath("$.page.totalElements", equalTo(17)))
+                .andExpect(jsonPath("$.page.totalElements", equalTo(18)))
                 .andExpect(jsonPath("$.page.totalPages", equalTo(1)))
                 .andExpect(jsonPath("$.page.number", is(0)))
                 .andExpect(jsonPath("$._links.self.href", Matchers.startsWith(REST_SERVER_URL
                            + "config/submissionforms")))
-                .andExpect(jsonPath("$._embedded.submissionforms", hasSize(equalTo(17))));
+                .andExpect(jsonPath("$._embedded.submissionforms", hasSize(equalTo(18))));
     }
 
     @Test
@@ -106,7 +106,7 @@ public class SubmissionFormsControllerIT extends AbstractControllerIntegrationTe
                    // check the first two rows
                    .andExpect(jsonPath("$.rows[0].fields", contains(
                         SubmissionFormFieldMatcher.matchFormFieldDefinition("lookup-name", "Author",
-                        null, true, "Add an author", "dc.contributor.author"))))
+                        null, true, "Add an author", null, "dc.contributor.author", "AuthorAuthority"))))
                    .andExpect(jsonPath("$.rows[1].fields", contains(
                         SubmissionFormFieldMatcher.matchFormFieldDefinition("onebox", "Title",
                                 "You must enter a main title for this item.", false,
@@ -137,7 +137,7 @@ public class SubmissionFormsControllerIT extends AbstractControllerIntegrationTe
                        .startsWith(REST_SERVER_URL + "config/submissionforms/traditionalpageone")))
                    .andExpect(jsonPath("$.rows[0].fields", contains(
                         SubmissionFormFieldMatcher.matchFormFieldDefinition("lookup-name", "Author",
-                          null, true,"Add an author", "dc.contributor.author"))))
+                          null, true,"Add an author", null, "dc.contributor.author", "AuthorAuthority"))))
                    .andExpect(jsonPath("$.rows[1].fields", contains(
                         SubmissionFormFieldMatcher.matchFormFieldDefinition("onebox", "Title",
                                 "You must enter a main title for this item.", false,
@@ -195,10 +195,9 @@ public class SubmissionFormsControllerIT extends AbstractControllerIntegrationTe
                             .startsWith(REST_SERVER_URL + "config/submissionforms/traditionalpageone")))
                         // check the first two rows
                         .andExpect(jsonPath("$.rows[0].fields", contains(
-                            SubmissionFormFieldMatcher.matchFormOpenRelationshipFieldDefinition("lookup-name",
-                        "Author", null, true,"Add an author",
-                    "dc.contributor.author", "isAuthorOfPublication", null,
-            "person", true))))
+                            SubmissionFormFieldMatcher.matchFormFieldDefinition("lookup-name",
+                        "Author", null, true,"Add an author", null,
+                        "dc.contributor.author", "AuthorAuthority"))))
         ;
     }
 
@@ -228,7 +227,7 @@ public class SubmissionFormsControllerIT extends AbstractControllerIntegrationTe
     @Test
     public void languageSupportTest() throws Exception {
         context.turnOffAuthorisationSystem();
-        String[] supportedLanguage = {"it","uk"};
+        String[] supportedLanguage = {"it","uk","en"};
         configurationService.setProperty("webui.supported.locales",supportedLanguage);
         submissionFormRestRepository.reload();
 
@@ -249,8 +248,8 @@ public class SubmissionFormsControllerIT extends AbstractControllerIntegrationTe
                  .andExpect(jsonPath("$._links.self.href", Matchers
                             .startsWith(REST_SERVER_URL + "config/submissionforms/languagetest")))
                  .andExpect(jsonPath("$.rows[0].fields", contains(SubmissionFormFieldMatcher
-                            .matchFormFieldDefinition("name", "Autore", "\u00C8" + " richiesto almeno un autore", true,
-                                                      "Aggiungi un autore", "dc.contributor.author"))))
+                     .matchFormFieldDefinition("lookup-name", "Autore", "\u00C8" + " richiesto almeno un autore", true,
+                                             "Aggiungi un autore", null, "dc.contributor.author", "AuthorAuthority"))))
                  .andExpect(jsonPath("$.rows[1].fields", contains(SubmissionFormFieldMatcher
                             .matchFormFieldDefinition("onebox", "Titolo",
                             "\u00C8" + " necessario inserire un titolo principale per questo item", false,
@@ -260,7 +259,8 @@ public class SubmissionFormsControllerIT extends AbstractControllerIntegrationTe
                             "Selezionare la lingua del contenuto principale dell'item."
                           + " Se la lingua non compare nell'elenco, selezionare (Altro)."
                           + " Se il contenuto non ha davvero una lingua"
-                          + " (ad esempio, se è un set di dati o un'immagine) selezionare (N/A)", "dc.language.iso"))));
+                          + " (ad esempio, se è un set di dati o un'immagine) selezionare (N/A)", null,
+                            "dc.language.iso", "common_iso_languages"))));
 
         // user select ukranian language
         getClient(tokenEperson).perform(get("/api/config/submissionforms/languagetest").locale(uk))
@@ -272,8 +272,8 @@ public class SubmissionFormsControllerIT extends AbstractControllerIntegrationTe
                  .andExpect(jsonPath("$._links.self.href", Matchers
                            .startsWith(REST_SERVER_URL + "config/submissionforms/languagetest")))
                  .andExpect(jsonPath("$.rows[0].fields", contains(SubmissionFormFieldMatcher
-                           .matchFormFieldDefinition("name", "Автор", "Потрібно ввести хочаб одного автора!",
-                                               true, "Додати автора", "dc.contributor.author"))))
+                           .matchFormFieldDefinition("lookup-name", "Автор", "Потрібно ввести хочаб одного автора!",
+                                            true, "Додати автора", null, "dc.contributor.author", "AuthorAuthority"))))
                  .andExpect(jsonPath("$.rows[1].fields", contains(SubmissionFormFieldMatcher
                            .matchFormFieldDefinition("onebox", "Заголовок",
                            "Заговолок файла обов'язковий !", false,
@@ -281,8 +281,8 @@ public class SubmissionFormsControllerIT extends AbstractControllerIntegrationTe
                  .andExpect(jsonPath("$.rows[2].fields", contains(SubmissionFormFieldMatcher
                            .matchFormFieldDefinition("dropdown", "Мова", null, false,
                            "Виберiть мову головного змiсту файлу, як що мови немає у списку, вибрати (Iнша)."
-                         + " Як що вмiст вайлу не є текстовим, наприклад є фотографiєю, тодi вибрати (N/A)",
-                           "dc.language.iso"))));
+                         + " Як що вмiст вайлу не є текстовим, наприклад є фотографiєю, тодi вибрати (N/A)", null,
+                           "dc.language.iso", "common_iso_languages"))));
 
                  resetLocalesConfiguration();
     }
@@ -291,7 +291,7 @@ public class SubmissionFormsControllerIT extends AbstractControllerIntegrationTe
     public void preferLanguageTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
-        String[] supportedLanguage = {"it","uk"};
+        String[] supportedLanguage = {"it","uk","en"};
         configurationService.setProperty("webui.supported.locales",supportedLanguage);
         submissionFormRestRepository.reload();
 
@@ -322,8 +322,8 @@ public class SubmissionFormsControllerIT extends AbstractControllerIntegrationTe
                  .andExpect(jsonPath("$._links.self.href", Matchers
                             .startsWith(REST_SERVER_URL + "config/submissionforms/languagetest")))
                  .andExpect(jsonPath("$.rows[0].fields", contains(SubmissionFormFieldMatcher
-                            .matchFormFieldDefinition("name", "Autore", "\u00C8" + " richiesto almeno un autore", true,
-                                                      "Aggiungi un autore", "dc.contributor.author"))))
+                    .matchFormFieldDefinition("lookup-name", "Autore", "\u00C8" + " richiesto almeno un autore", true,
+                                             "Aggiungi un autore", null, "dc.contributor.author", "AuthorAuthority"))))
                  .andExpect(jsonPath("$.rows[1].fields", contains(SubmissionFormFieldMatcher
                             .matchFormFieldDefinition("onebox", "Titolo",
                             "\u00C8" + " necessario inserire un titolo principale per questo item", false,
@@ -333,7 +333,8 @@ public class SubmissionFormsControllerIT extends AbstractControllerIntegrationTe
                             "Selezionare la lingua del contenuto principale dell'item."
                           + " Se la lingua non compare nell'elenco, selezionare (Altro)."
                           + " Se il contenuto non ha davvero una lingua"
-                          + " (ad esempio, se è un set di dati o un'immagine) selezionare (N/A)", "dc.language.iso"))));
+                          + " (ad esempio, se è un set di dati o un'immagine) selezionare (N/A)",
+                               null, "dc.language.iso", "common_iso_languages"))));
 
         // user with ukranian prefer language
         getClient(tokenEpersonUK).perform(get("/api/config/submissionforms/languagetest"))
@@ -345,8 +346,8 @@ public class SubmissionFormsControllerIT extends AbstractControllerIntegrationTe
                  .andExpect(jsonPath("$._links.self.href", Matchers
                            .startsWith(REST_SERVER_URL + "config/submissionforms/languagetest")))
                  .andExpect(jsonPath("$.rows[0].fields", contains(SubmissionFormFieldMatcher
-                           .matchFormFieldDefinition("name", "Автор", "Потрібно ввести хочаб одного автора!",
-                                               true, "Додати автора", "dc.contributor.author"))))
+                           .matchFormFieldDefinition("lookup-name", "Автор", "Потрібно ввести хочаб одного автора!",
+                                           true, "Додати автора", null, "dc.contributor.author", "AuthorAuthority"))))
                  .andExpect(jsonPath("$.rows[1].fields", contains(SubmissionFormFieldMatcher
                            .matchFormFieldDefinition("onebox", "Заголовок",
                            "Заговолок файла обов'язковий !", false,
@@ -354,8 +355,8 @@ public class SubmissionFormsControllerIT extends AbstractControllerIntegrationTe
                  .andExpect(jsonPath("$.rows[2].fields", contains(SubmissionFormFieldMatcher
                            .matchFormFieldDefinition("dropdown", "Мова", null, false,
                            "Виберiть мову головного змiсту файлу, як що мови немає у списку, вибрати (Iнша)."
-                         + " Як що вмiст вайлу не є текстовим, наприклад є фотографiєю, тодi вибрати (N/A)",
-                           "dc.language.iso"))));
+                         + " Як що вмiст вайлу не є текстовим, наприклад є фотографiєю, тодi вибрати (N/A)", null,
+                           "dc.language.iso", "common_iso_languages"))));
 
                  resetLocalesConfiguration();
     }
@@ -364,7 +365,7 @@ public class SubmissionFormsControllerIT extends AbstractControllerIntegrationTe
     public void userChoiceAnotherLanguageTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
-        String[] supportedLanguage = {"it","uk"};
+        String[] supportedLanguage = {"it","uk","en"};
         configurationService.setProperty("webui.supported.locales",supportedLanguage);
         submissionFormRestRepository.reload();
 
@@ -390,8 +391,8 @@ public class SubmissionFormsControllerIT extends AbstractControllerIntegrationTe
                  .andExpect(jsonPath("$._links.self.href", Matchers
                            .startsWith(REST_SERVER_URL + "config/submissionforms/languagetest")))
                  .andExpect(jsonPath("$.rows[0].fields", contains(SubmissionFormFieldMatcher
-                           .matchFormFieldDefinition("name", "Autore", "\u00C8" + " richiesto almeno un autore", true,
-                                                     "Aggiungi un autore", "dc.contributor.author"))))
+                    .matchFormFieldDefinition("lookup-name", "Autore", "\u00C8" + " richiesto almeno un autore", true,
+                                             "Aggiungi un autore", null, "dc.contributor.author", "AuthorAuthority"))))
                  .andExpect(jsonPath("$.rows[1].fields", contains(SubmissionFormFieldMatcher
                            .matchFormFieldDefinition("onebox", "Titolo",
                            "\u00C8" + " necessario inserire un titolo principale per questo item", false,
@@ -401,7 +402,8 @@ public class SubmissionFormsControllerIT extends AbstractControllerIntegrationTe
                            "Selezionare la lingua del contenuto principale dell'item."
                          + " Se la lingua non compare nell'elenco, selezionare (Altro)."
                          + " Se il contenuto non ha davvero una lingua"
-                         + " (ad esempio, se è un set di dati o un'immagine) selezionare (N/A)", "dc.language.iso"))));
+                         + " (ad esempio, se è un set di dati o un'immagine) selezionare (N/A)", null,
+                           "dc.language.iso", "common_iso_languages"))));
 
                  resetLocalesConfiguration();
     }
@@ -410,7 +412,7 @@ public class SubmissionFormsControllerIT extends AbstractControllerIntegrationTe
     public void defaultLanguageTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
-        String[] supportedLanguage = {"it","uk"};
+        String[] supportedLanguage = {"it","uk","en"};
         configurationService.setProperty("default.locale","it");
         configurationService.setProperty("webui.supported.locales",supportedLanguage);
         submissionFormRestRepository.reload();
@@ -427,8 +429,8 @@ public class SubmissionFormsControllerIT extends AbstractControllerIntegrationTe
                  .andExpect(jsonPath("$._links.self.href", Matchers
                             .startsWith(REST_SERVER_URL + "config/submissionforms/languagetest")))
                  .andExpect(jsonPath("$.rows[0].fields", contains(SubmissionFormFieldMatcher
-                            .matchFormFieldDefinition("name", "Autore", "\u00C8 richiesto almeno un autore", true,
-                                                      "Aggiungi un autore", "dc.contributor.author"))))
+                    .matchFormFieldDefinition("lookup-name", "Autore", "\u00C8 richiesto almeno un autore", true,
+                                              "Aggiungi un autore", "dc.contributor.author"))))
                  .andExpect(jsonPath("$.rows[1].fields", contains(SubmissionFormFieldMatcher
                             .matchFormFieldDefinition("onebox", "Titolo",
                             "\u00C8 necessario inserire un titolo principale per questo item", false,
