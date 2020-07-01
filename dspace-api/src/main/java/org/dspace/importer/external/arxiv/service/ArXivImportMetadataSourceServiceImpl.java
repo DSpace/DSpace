@@ -7,30 +7,23 @@
  */
 package org.dspace.importer.external.arxiv.service;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
 import java.io.StringReader;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.Callable;
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.Invocation;
+import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMXMLBuilderFactory;
 import org.apache.axiom.om.OMXMLParserWrapper;
 import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.HttpException;
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
-import org.apache.http.StatusLine;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.utils.URIBuilder;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.params.CoreConnectionPNames;
-import org.apache.http.params.HttpParams;
 import org.dspace.content.Item;
 import org.dspace.importer.external.datamodel.ImportRecord;
 import org.dspace.importer.external.datamodel.Query;
@@ -39,17 +32,8 @@ import org.dspace.importer.external.service.AbstractImportMetadataSourceService;
 import org.jaxen.JaxenException;
 
 public class ArXivImportMetadataSourceServiceImpl extends AbstractImportMetadataSourceService<OMElement> {
-    private int timeout = 1000;
 
-    /**
-     * How long to wait for a connection to be established.
-     *
-     * @param timeout milliseconds
-     */
-    public void setTimeout(int timeout) {
-        this.timeout = timeout;
-    }
-
+    private WebTarget webTarget;
 
     @Override
     public Collection<ImportRecord> getRecords(String query, int start, int count) throws MetadataSourceException {
@@ -95,7 +79,8 @@ public class ArXivImportMetadataSourceServiceImpl extends AbstractImportMetadata
 
     @Override
     public void init() throws Exception {
-
+        Client client = ClientBuilder.newClient();
+        webTarget = client.target("http://export.arxiv.org/api/query");
     }
 
 
@@ -115,7 +100,7 @@ public class ArXivImportMetadataSourceServiceImpl extends AbstractImportMetadata
 
     @Override
     public Collection<ImportRecord> findMatchingRecords(Query query) throws MetadataSourceException {
-        return null;
+        return retry(new FindMatchingRecordCallable(query));
     }
 
     private class SearchByQueryCallable implements Callable<List<ImportRecord>> {
@@ -140,62 +125,19 @@ public class ArXivImportMetadataSourceServiceImpl extends AbstractImportMetadata
             String queryString = query.getParameterAsClass("query", String.class);
             Integer start = query.getParameterAsClass("start", Integer.class);
             Integer maxResult = query.getParameterAsClass("count", Integer.class);
-
-            HttpGet method = null;
-            try {
-                HttpClient client = new DefaultHttpClient();
-                HttpParams params = client.getParams();
-                params.setIntParameter(CoreConnectionPNames.CONNECTION_TIMEOUT, timeout);
-
-                try {
-                    URIBuilder uriBuilder = new URIBuilder("http://export.arxiv.org/api/query");
-                    uriBuilder.addParameter("search_query", queryString);
-                    if (maxResult != null) {
-                        uriBuilder.addParameter("max_results", String.valueOf(maxResult));
-                    }
-                    if (start != null) {
-                        uriBuilder.addParameter("start", String.valueOf(start));
-                    }
-                    method = new HttpGet(uriBuilder.build());
-                } catch (URISyntaxException ex) {
-                    throw new HttpException(ex.getMessage());
-                }
-
-                // Execute the method.
-                HttpResponse response = client.execute(method);
-                StatusLine responseStatus = response.getStatusLine();
-                int statusCode = responseStatus.getStatusCode();
-
-                if (statusCode != HttpStatus.SC_OK) {
-                    if (statusCode == HttpStatus.SC_BAD_REQUEST) {
-                        throw new RuntimeException("arXiv query is not valid");
-                    } else {
-                        throw new RuntimeException("Http call failed: "
-                                                       + responseStatus);
-                    }
-                }
-
-                try {
-                    InputStreamReader isReader = new InputStreamReader(response.getEntity().getContent());
-                    BufferedReader reader = new BufferedReader(isReader);
-                    StringBuilder sb = new StringBuilder();
-                    String str;
-                    while ((str = reader.readLine()) != null) {
-                        sb.append(str);
-                    }
-                    System.out.println("XML: " + sb.toString());
-                    List<OMElement> omElements = splitToRecords(sb.toString());
-                    for (OMElement record : omElements) {
-                        results.add(transformSourceRecords(record));
-                    }
-                } catch (Exception e) {
-                    throw new RuntimeException(
-                         "ArXiv identifier is not valid or not exist");
-                }
-            } finally {
-                if (method != null) {
-                    method.releaseConnection();
-                }
+            WebTarget local = webTarget.queryParam("search_query", queryString);
+            if (maxResult != null) {
+                local = local.queryParam("max_results", String.valueOf(maxResult));
+            }
+            if (start != null) {
+                local = local.queryParam("start", String.valueOf(start));
+            }
+            Invocation.Builder invocationBuilder = local.request(MediaType.TEXT_PLAIN_TYPE);
+            Response response = invocationBuilder.get();
+            String responseString = response.readEntity(String.class);
+            List<OMElement> omElements = splitToRecords(responseString);
+            for (OMElement record : omElements) {
+                results.add(transformSourceRecords(record));
             }
             return results;
         }
@@ -217,78 +159,64 @@ public class ArXivImportMetadataSourceServiceImpl extends AbstractImportMetadata
         public List<ImportRecord> call() throws Exception {
             List<ImportRecord> results = new ArrayList<ImportRecord>();
             String arxivid = query.getParameterAsClass("id", String.class);
-            HttpGet method = null;
-            try {
-                HttpClient client = new DefaultHttpClient();
-                HttpParams params = client.getParams();
-                params.setIntParameter(CoreConnectionPNames.CONNECTION_TIMEOUT, timeout);
-                try {
-                    URIBuilder uriBuilder = new URIBuilder("http://export.arxiv.org/api/query");
-                    if (StringUtils.isNotBlank(arxivid)) {
-                        arxivid = arxivid.trim();
-                        if (arxivid.startsWith("http://arxiv.org/abs/")) {
-                            arxivid = arxivid.substring("http://arxiv.org/abs/".length());
-                        } else if (arxivid.toLowerCase().startsWith("arxiv:")) {
-                            arxivid = arxivid.substring("arxiv:".length());
-                        }
-                        uriBuilder.addParameter("id_list", arxivid);
-                        method = new HttpGet(uriBuilder.build());
-                    }
-                } catch (URISyntaxException ex) {
-                    throw new HttpException(ex.getMessage());
+            if (StringUtils.isNotBlank(arxivid)) {
+                arxivid = arxivid.trim();
+                if (arxivid.startsWith("http://arxiv.org/abs/")) {
+                    arxivid = arxivid.substring("http://arxiv.org/abs/".length());
+                } else if (arxivid.toLowerCase().startsWith("arxiv:")) {
+                    arxivid = arxivid.substring("arxiv:".length());
                 }
-
-                // Execute the method.
-                HttpResponse response = client.execute(method);
-                StatusLine responseStatus = response.getStatusLine();
-                int statusCode = responseStatus.getStatusCode();
-                if (statusCode != HttpStatus.SC_OK) {
-                    if (statusCode == HttpStatus.SC_BAD_REQUEST) {
-                        throw new RuntimeException("arXiv query is not valid");
-                    } else {
-                        throw new RuntimeException("Http call failed: "
-                                                     + responseStatus);
-                    }
-                }
-                try {
-                    InputStreamReader isReader = new InputStreamReader(response.getEntity().getContent());
-                    BufferedReader reader = new BufferedReader(isReader);
-                    StringBuffer sb = new StringBuffer();
-                    String str;
-                    while ((str = reader.readLine()) != null) {
-                        sb.append(str);
-                    }
-                    List<OMElement> omElements = splitToRecords(sb.toString());
-                    for (OMElement record : omElements) {
-                        results.add(transformSourceRecords(record));
-                    }
-                } catch (Exception e) {
-                    throw new RuntimeException(
-                       "ArXiv identifier is not valid or not exist");
-                }
-            } finally {
-                if (method != null) {
-                    method.releaseConnection();
-                }
+            }
+            WebTarget local = webTarget.queryParam("id_list", arxivid);
+            Invocation.Builder invocationBuilder = local.request(MediaType.TEXT_PLAIN_TYPE);
+            Response response = invocationBuilder.get();
+            String responseString = response.readEntity(String.class);
+            List<OMElement> omElements = splitToRecords(responseString);
+            for (OMElement record : omElements) {
+                results.add(transformSourceRecords(record));
             }
             return results;
         }
     }
 
     private class FindMatchingRecordCallable implements Callable<List<ImportRecord>> {
+
         private Query query;
 
-        private FindMatchingRecordCallable(Item item) throws MetadataSourceException {
-            query = getGenerateQueryForItem().generateQueryForItem(item);
-        }
-
-        public FindMatchingRecordCallable(Query q) {
+        private FindMatchingRecordCallable(Query q) {
             query = q;
         }
 
         @Override
         public List<ImportRecord> call() throws Exception {
-            return null;
+            String queryString = getQuery(this.query);
+            List<ImportRecord> results = new ArrayList<ImportRecord>();
+            WebTarget local = webTarget.queryParam("search_query", queryString);
+            Invocation.Builder invocationBuilder = local.request(MediaType.TEXT_PLAIN_TYPE);
+            Response response = invocationBuilder.get();
+            String responseString = response.readEntity(String.class);
+            List<OMElement> omElements = splitToRecords(responseString);
+            for (OMElement record : omElements) {
+                results.add(transformSourceRecords(record));
+            }
+            return results;
+        }
+
+        private String getQuery(Query query) {
+            String title = query.getParameterAsClass("title", String.class);
+            String author = query.getParameterAsClass("author", String.class);
+            StringBuffer queryString = new StringBuffer();
+            if (StringUtils.isNotBlank(title)) {
+                queryString.append("ti:\"").append(title).append("\"");
+            }
+            if (StringUtils.isNotBlank(author)) {
+                // [FAU]
+                if (queryString.length() > 0) {
+                    queryString.append(" AND ");
+                }
+                queryString.append("au:\"").append(author).append("\"");
+            }
+            return queryString.toString();
         }
     }
 
@@ -305,6 +233,5 @@ public class ArXivImportMetadataSourceServiceImpl extends AbstractImportMetadata
             return null;
         }
     }
-
 
 }

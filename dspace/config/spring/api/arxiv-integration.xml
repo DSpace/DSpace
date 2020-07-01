@@ -30,55 +30,55 @@
 
     <bean id="arxivCategoryContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
         <property name="field" ref="arxiv.category"/>
-        <property name="query" value="category"/>
-        <property name="prefixToNamespaceMapping" ref="prefixToNamespaceMapping"/>
+        <property name="query" value="ns:category"/>
+        <property name="prefixToNamespaceMapping" ref="arxivBasePrefixToNamespaceMapping"/>
     </bean>
     <bean id="arxivJournalContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
         <property name="field" ref="arxiv.journal"/>
-        <property name="query" value="journal_ref"/>
-        <property name="prefixToNamespaceMapping" ref="prefixToNamespaceMapping"/>
+        <property name="query" value="ns:journal_ref"/>
+        <property name="prefixToNamespaceMapping" ref="arxivBasePrefixToNamespaceMapping"/>
     </bean>
 
     <bean id="arxivDoiContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
         <property name="field" ref="arxiv.doi"/>
-        <property name="query" value="id"/>
-        <property name="prefixToNamespaceMapping" ref="prefixToNamespaceMapping"/>
+        <property name="query" value="ns:id"/>
+        <property name="prefixToNamespaceMapping" ref="arxivBasePrefixToNamespaceMapping"/>
     </bean>
 
     <bean id="arxivAuthorContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
         <property name="field" ref="arxiv.author"/>
-        <property name="query" value="author/name"/>
-        <property name="prefixToNamespaceMapping" ref="prefixToNamespaceMapping"/>
+        <property name="query" value="ns:author/name"/>
+        <property name="prefixToNamespaceMapping" ref="arxivBasePrefixToNamespaceMapping"/>
     </bean>
 
     <bean id="arxivPublishedContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
         <property name="field" ref="arxiv.published"/>
-        <property name="query" value="published"/>
-        <property name="prefixToNamespaceMapping" ref="prefixToNamespaceMapping"/>
+        <property name="query" value="ns:published"/>
+        <property name="prefixToNamespaceMapping" ref="arxivBasePrefixToNamespaceMapping"/>
     </bean>
 
     <bean id="arxivArticleTitleContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
         <property name="field" ref="arxiv.articleTitle"/>
-        <property name="query" value="title"/>
-        <property name="prefixToNamespaceMapping" ref="prefixToNamespaceMapping"/>
+        <property name="query" value="ns:title"/>
+        <property name="prefixToNamespaceMapping" ref="arxivBasePrefixToNamespaceMapping"/>
     </bean>
 
     <bean id="arxivSummaryContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
         <property name="field" ref="arxiv.summary"/>
-        <property name="query" value="summary"/>
-        <property name="prefixToNamespaceMapping" ref="prefixToNamespaceMapping"/>
+        <property name="query" value="ns:summary"/>
+        <property name="prefixToNamespaceMapping" ref="arxivBasePrefixToNamespaceMapping"/>
     </bean>
     
     <bean id="arxivIdContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
         <property name="field" ref="arxiv.id"/>
-        <property name="query" value="id"/>
-        <property name="prefixToNamespaceMapping" ref="prefixToNamespaceMapping"/>
+        <property name="query" value="ns:id"/>
+        <property name="prefixToNamespaceMapping" ref="arxivBasePrefixToNamespaceMapping"/>
     </bean>
 
     <bean id="arxivPrimaryCategoryContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
         <property name="field" ref="arxiv.primaryCategory"/>
-        <property name="query" value="primary_category"/>
-        <property name="prefixToNamespaceMapping" ref="prefixToNamespaceMapping"/>
+        <property name="query" value="arxiv:primary_category"/>
+        <property name="prefixToNamespaceMapping" ref="arxivArxivPrefixToNamespaceMapping"/>
     </bean>
 
     <bean id="arxiv.category" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
@@ -118,8 +118,15 @@
     </bean>
 
 
-    <util:map id="prefixToNamespaceMapping">
-    	<entry key="ns" value="http://www.w3.org/2005/Atom" />
+    <util:map id="arxivBasePrefixToNamespaceMapping" map-class="java.util.HashMap"
+        key-type="java.lang.String" value-type="java.lang.String">
+    	<entry key="http://www.w3.org/2005/Atom" value="ns" />
+    </util:map>
+
+
+    <util:map id="arxivArxivPrefixToNamespaceMapping" map-class="java.util.HashMap"
+        key-type="java.lang.String" value-type="java.lang.String">
+    	<entry key="http://arxiv.org/schemas/atom" value="arxiv" />
     </util:map>
 
 
