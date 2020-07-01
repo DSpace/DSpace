@@ -15,7 +15,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.io.File;
-import java.util.Iterator;
 import java.util.List;
 
 import org.dspace.app.rest.matcher.RelationshipTypeMatcher;

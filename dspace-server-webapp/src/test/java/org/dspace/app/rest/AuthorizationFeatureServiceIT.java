@@ -27,18 +27,10 @@ import org.dspace.app.rest.model.CollectionRest;
 import org.dspace.app.rest.model.SiteRest;
 import org.dspace.app.rest.projection.DefaultProjection;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
-import org.dspace.app.rest.test.AbstractIntegrationTestWithDatabase;
-import org.dspace.app.rest.utils.DSpaceConfigurationInitializer;
-import org.dspace.app.rest.utils.DSpaceKernelInitializer;
 import org.dspace.content.Site;
 import org.dspace.content.service.SiteService;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.test.context.web.WebAppConfiguration;
 
 /**
  * Test for the Authorization Feature Service
