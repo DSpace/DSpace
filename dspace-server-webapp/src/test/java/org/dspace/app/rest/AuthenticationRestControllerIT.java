@@ -11,7 +11,9 @@ import static java.lang.Thread.sleep;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.endsWith;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.startsWith;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -20,20 +22,38 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.io.InputStream;
 import java.util.Base64;
+import java.util.Map;
 import javax.servlet.http.Cookie;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.codec.CharEncoding;
+import org.apache.commons.io.IOUtils;
+import org.dspace.app.rest.builder.BitstreamBuilder;
+import org.dspace.app.rest.builder.BundleBuilder;
+import org.dspace.app.rest.builder.CollectionBuilder;
+import org.dspace.app.rest.builder.CommunityBuilder;
+import org.dspace.app.rest.builder.EPersonBuilder;
 import org.dspace.app.rest.builder.GroupBuilder;
+import org.dspace.app.rest.builder.ItemBuilder;
 import org.dspace.app.rest.matcher.AuthenticationStatusMatcher;
 import org.dspace.app.rest.matcher.EPersonMatcher;
 import org.dspace.app.rest.matcher.HalMatcher;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
+import org.dspace.content.Bitstream;
+import org.dspace.content.Bundle;
+import org.dspace.content.Collection;
+import org.dspace.content.Item;
+import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.services.ConfigurationService;
+import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 
 /**
@@ -757,4 +777,162 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
             .andExpect(status().isUnauthorized());
 
     }
+
+    @Test
+    public void testShortLivedToken() throws Exception {
+        String token = getAuthToken(eperson.getEmail(), password);
+
+        // Verify the main session salt doesn't change
+        String salt = eperson.getSessionSalt();
+
+        getClient(token).perform(post("/api/authn/shortlivedtokens"))
+            .andExpect(jsonPath("$.token", notNullValue()))
+            .andExpect(jsonPath("$.type", is("shortlivedtoken")))
+            .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/authn/shortlivedtokens")));
+
+        assertEquals(salt, eperson.getSessionSalt());
+    }
+
+    @Test
+    public void testShortLivedTokenNotAuthenticated() throws Exception {
+        getClient().perform(post("/api/authn/shortlivedtokens"))
+            .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    public void testShortLivedTokenToDowloadBitstream() throws Exception {
+        Bitstream bitstream = createPrivateBitstream();
+        String shortLivedToken = getShortLivedToken(eperson);
+
+        getClient().perform(get("/api/core/bitstreams/" + bitstream.getID()
+                + "/content?authentication-token=" + shortLivedToken))
+            .andExpect(status().isOk());
+    }
+
+    @Test
+    public void testShortLivedTokenToDowloadBitstreamUnauthorized() throws Exception {
+        Bitstream bitstream = createPrivateBitstream();
+
+        context.turnOffAuthorisationSystem();
+        EPerson testEPerson = EPersonBuilder.createEPerson(context)
+            .withNameInMetadata("John", "Doe")
+            .withEmail("UnauthorizedUser@example.com")
+            .withPassword(password)
+            .build();
+        context.restoreAuthSystemState();
+
+        String shortLivedToken = getShortLivedToken(testEPerson);
+        getClient().perform(get("/api/core/bitstreams/" + bitstream.getID()
+                + "/content?authentication-token=" + shortLivedToken))
+            .andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void testLoginTokenToDowloadBitstream() throws Exception {
+        Bitstream bitstream = createPrivateBitstream();
+
+        String loginToken = getAuthToken(eperson.getEmail(), password);
+        getClient().perform(get("/api/core/bitstreams/" + bitstream.getID()
+                + "/content?authentication-token=" + loginToken))
+            .andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void testExpiredShortLivedTokenToDowloadBitstream() throws Exception {
+        Bitstream bitstream = createPrivateBitstream();
+        configurationService.setProperty("jwt.shortLived.token.expiration", "1");
+        String shortLivedToken = getShortLivedToken(eperson);
+        Thread.sleep(1);
+        getClient().perform(get("/api/core/bitstreams/" + bitstream.getID()
+                + "/content?authentication-token=" + shortLivedToken))
+            .andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void testShortLivedAndLoginTokenSeparation() throws Exception {
+        configurationService.setProperty("jwt.shortLived.token.expiration", "1");
+
+        String token = getAuthToken(eperson.getEmail(), password);
+        Thread.sleep(2);
+        getClient(token).perform(get("/api/authn/status").param("projection", "full"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.authenticated", is(true)));
+    }
+
+    // TODO: fix the exception. For now we want to verify a short lived token can't be used to login
+    @Test(expected = Exception.class)
+    public void testLoginWithShortLivedToken() throws Exception {
+        String shortLivedToken = getShortLivedToken(eperson);
+
+        getClient().perform(post("/api/authn/login?authentication-token=" + shortLivedToken))
+            .andExpect(status().isInternalServerError());
+        // TODO: This internal server error needs to be fixed. This should actually produce a forbidden status
+        //.andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void testGenerateShortLivedTokenWithShortLivedToken() throws Exception {
+        String shortLivedToken = getShortLivedToken(eperson);
+
+        getClient().perform(post("/api/authn/shortlivedtokens?authentication-token=" + shortLivedToken))
+            .andExpect(status().isForbidden());
+    }
+
+    private String getShortLivedToken(EPerson requestUser) throws Exception {
+        ObjectMapper mapper = new ObjectMapper();
+
+        String token = getAuthToken(requestUser.getEmail(), password);
+        MvcResult mvcResult = getClient(token).perform(post("/api/authn/shortlivedtokens"))
+            .andReturn();
+
+        String content = mvcResult.getResponse().getContentAsString();
+        Map<String,Object> map = mapper.readValue(content, Map.class);
+        return String.valueOf(map.get("token"));
+    }
+
+    private Bitstream createPrivateBitstream() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and one collection.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+            .withName("Parent Community")
+            .build();
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1").build();
+
+        //2. One public items that is readable by Anonymous
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
+            .withTitle("Test")
+            .withIssueDate("2010-10-17")
+            .withAuthor("Smith, Donald")
+            .withSubject("ExtraEntry")
+            .build();
+
+        Bundle bundle1 = BundleBuilder.createBundle(context, publicItem1)
+            .withName("TEST BUNDLE")
+            .build();
+
+        //2. An item restricted to a specific internal group
+        Group staffGroup = GroupBuilder.createGroup(context)
+            .withName("Staff")
+            .addMember(eperson)
+            .build();
+
+        String bitstreamContent = "ThisIsSomeDummyText";
+        Bitstream bitstream = null;
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+            bitstream = BitstreamBuilder.
+                createBitstream(context, bundle1, is)
+                .withName("Bitstream")
+                .withDescription("description")
+                .withMimeType("text/plain")
+                .withReaderGroup(staffGroup)
+                .build();
+        }
+
+        context.restoreAuthSystemState();
+
+        return bitstream;
+    }
 }
+
