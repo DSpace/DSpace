@@ -227,7 +227,7 @@ public class SubmissionFormsControllerIT extends AbstractControllerIntegrationTe
     @Test
     public void languageSupportTest() throws Exception {
         context.turnOffAuthorisationSystem();
-        String[] supportedLanguage = {"it","uk","en"};
+        String[] supportedLanguage = {"it","uk"};
         configurationService.setProperty("webui.supported.locales",supportedLanguage);
         submissionFormRestRepository.reload();
 
@@ -291,7 +291,7 @@ public class SubmissionFormsControllerIT extends AbstractControllerIntegrationTe
     public void preferLanguageTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
-        String[] supportedLanguage = {"it","uk","en"};
+        String[] supportedLanguage = {"it","uk"};
         configurationService.setProperty("webui.supported.locales",supportedLanguage);
         submissionFormRestRepository.reload();
 
@@ -365,7 +365,7 @@ public class SubmissionFormsControllerIT extends AbstractControllerIntegrationTe
     public void userChoiceAnotherLanguageTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
-        String[] supportedLanguage = {"it","uk","en"};
+        String[] supportedLanguage = {"it","uk"};
         configurationService.setProperty("webui.supported.locales",supportedLanguage);
         submissionFormRestRepository.reload();
 
@@ -412,7 +412,7 @@ public class SubmissionFormsControllerIT extends AbstractControllerIntegrationTe
     public void defaultLanguageTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
-        String[] supportedLanguage = {"it","uk","en"};
+        String[] supportedLanguage = {"it","uk"};
         configurationService.setProperty("default.locale","it");
         configurationService.setProperty("webui.supported.locales",supportedLanguage);
         submissionFormRestRepository.reload();
