@@ -76,21 +76,26 @@ public class DCInputAuthority extends SelfNamedPlugin implements ChoiceAuthority
 
     private static synchronized void initPluginNames() {
         Locale[] locales = I18nUtil.getSupportedLocales();
+        Set<String> names = new HashSet<String>();
         if (pluginNames == null) {
             try {
                 dcis = new HashMap<Locale, DCInputsReader>();
                 for (Locale locale : locales) {
                     dcis.put(locale, new DCInputsReader(I18nUtil.getInputFormsFileName(locale)));
                 }
-            } catch (DCInputsReaderException e) {
-                log.error("Failed reading DCInputs initialization: ", e);
-            }
-            Set<String> names = new HashSet<String>();
-            for (Locale l : locales) {
-                Iterator pi = dcis.get(l).getPairsNameIterator();
+                for (Locale l : locales) {
+                    Iterator pi = dcis.get(l).getPairsNameIterator();
+                    while (pi.hasNext()) {
+                        names.add((String) pi.next());
+                    }
+                }
+                DCInputsReader dcirDefault = new DCInputsReader();
+                Iterator pi = dcirDefault.getPairsNameIterator();
                 while (pi.hasNext()) {
                     names.add((String) pi.next());
                 }
+            } catch (DCInputsReaderException e) {
+                log.error("Failed reading DCInputs initialization: ", e);
             }
             pluginNames = names.toArray(new String[names.size()]);
             log.debug("Got plugin names = " + Arrays.deepToString(pluginNames));
