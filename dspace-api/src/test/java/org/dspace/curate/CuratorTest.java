@@ -19,6 +19,7 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.SiteService;
+import org.dspace.core.factory.CoreServiceFactory;
 import org.dspace.ctask.general.NoOpCurationTask;
 import org.dspace.services.ConfigurationService;
 import org.junit.Test;
@@ -29,7 +30,6 @@ import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 
 /**
- *
  * @author mhwood
  */
 @RunWith(MockitoJUnitRunner.class)
@@ -51,15 +51,20 @@ public class CuratorTest extends AbstractUnitTest {
     static final String TASK_PROPERTY_NAME = "taskProperty";
     static final String TASK_PROPERTY_VALUE = "a property";
 
-    /** Value of a known runtime parameter, if any. */
+    /**
+     * Value of a known runtime parameter, if any.
+     */
     static String runParameter;
 
-    /** Value of a known task property, if any. */
+    /**
+     * Value of a known task property, if any.
+     */
     static String taskProperty;
 
     /**
      * Test of curate method, of class Curator.
      * Currently this just tests task properties and run parameters.
+     *
      * @throws java.lang.Exception passed through.
      */
     @Test
@@ -71,7 +76,7 @@ public class CuratorTest extends AbstractUnitTest {
         // Configure the task to be run.
         ConfigurationService cfg = kernelImpl.getConfigurationService();
         cfg.setProperty("plugin.named.org.dspace.curate.CurationTask",
-                DummyTask.class.getName() + " = " + TASK_NAME);
+            DummyTask.class.getName() + " = " + TASK_NAME);
         cfg.setProperty(TASK_NAME + '.' + TASK_PROPERTY_NAME, TASK_PROPERTY_VALUE);
 
         // Get and configure a Curator.
@@ -90,27 +95,37 @@ public class CuratorTest extends AbstractUnitTest {
 
         // Check the result.
         System.out.format("Task %s result was '%s'%n",
-                TASK_NAME, instance.getResult(TASK_NAME));
+            TASK_NAME, instance.getResult(TASK_NAME));
         System.out.format("Task %s status was %d%n",
-                TASK_NAME, instance.getStatus(TASK_NAME));
+            TASK_NAME, instance.getStatus(TASK_NAME));
         assertEquals("Unexpected task status",
-                Curator.CURATE_SUCCESS, instance.getStatus(TASK_NAME));
+            Curator.CURATE_SUCCESS, instance.getStatus(TASK_NAME));
         assertEquals("Wrong run parameter", RUN_PARAMETER_VALUE, runParameter);
         assertEquals("Wrong task property", TASK_PROPERTY_VALUE, taskProperty);
     }
 
     @Test
     public void testCurate_NoOpTask() throws Exception {
+
+        CoreServiceFactory.getInstance().getPluginService().clearNamedPluginClasses();
+
+        final String TASK_NAME = "noop";
+
+        // Configure the noop task to be run.
+        ConfigurationService cfg = kernelImpl.getConfigurationService();
+        cfg.setProperty("plugin.named.org.dspace.curate.CurationTask",
+            NoOpCurationTask.class.getName() + " = " + TASK_NAME);
+
         StringBuilder reporterOutput = new StringBuilder();
         curator.setReporter(reporterOutput); // Send any report to our StringBuilder.
 
-        curator.addTask("noop");
+        curator.addTask(TASK_NAME);
         Item item = mock(Item.class);
         when(item.getType()).thenReturn(2);
         when(item.getHandle()).thenReturn("testHandle");
         curator.curate(context, item);
 
-        assertEquals(Curator.CURATE_SUCCESS, curator.getStatus("noop"));
+        assertEquals(Curator.CURATE_SUCCESS, curator.getStatus(TASK_NAME));
         assertEquals(reporterOutput.toString(), "No operation performed on testHandle");
     }
 }
