@@ -41,12 +41,12 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
-import org.dspace.content.ItemServiceImpl;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.content.service.BitstreamFormatService;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.CollectionService;
+import org.dspace.content.service.ItemService;
 import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -87,7 +87,7 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
     WorkspaceItemService wis;
 
     @Autowired
-    ItemServiceImpl itemService;
+    ItemService itemService;
 
     @Autowired
     BitstreamService bitstreamService;
@@ -366,14 +366,11 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
         SubmissionConfig submissionConfig =
             submissionConfigReader.getSubmissionConfigByCollection(collection.getHandle());
         List<WorkspaceItem> result = null;
-        List<ImportRecord> records = null;
+        List<ImportRecord> records = new ArrayList<>();
         try {
             for (MultipartFile mpFile : uploadfiles) {
                 File file = Utils.getFile(mpFile, "upload-loader", "filedataloader");
                 try {
-                    if (records == null) {
-                        records = new ArrayList<>();
-                    }
                     ImportRecord record = importService.getRecord(file);
                     if (record != null) {
                         records.add(record);
@@ -395,7 +392,7 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
         result.add(source);
 
         //perform upload of bitstream if there is exact one result and convert workspaceitem to entity rest
-        if (result != null && !result.isEmpty()) {
+        if (!result.isEmpty()) {
             for (WorkspaceItem wi : result) {
                 List<ErrorRest> errors = new ArrayList<ErrorRest>();
                 wi.setMultipleFiles(uploadfiles.size() > 1);
