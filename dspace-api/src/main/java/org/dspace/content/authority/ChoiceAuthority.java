@@ -88,18 +88,45 @@ public interface ChoiceAuthority {
         return getLabel(key, locale);
     }
 
+    /**
+     * Get a map of additional information related to the specified key in the
+     * authority.
+     * 
+     * @param key    the key of the entry
+     * @param locale explicit localization key if available, or null
+     * @return a map of additional information related to the key
+     */
     default Map<String, String> getExtra(String key, String locale) {
         return new HashMap<String, String>();
     }
 
+    /**
+     * Return true for hierarchical authorities
+     * 
+     * @return <code>true</code> if hierarchical, default <code>false</code>
+     */
     default boolean isHierarchical() {
         return false;
     }
 
+    /**
+     * Scrollable authorities allows the scroll of the entries without applying
+     * filter/query to the
+     * {@link #getMatches(String, String, Collection, int, int, String)}
+     * 
+     * @return <code>true</code> if scrollable, default <code>false</code>
+     */
     default boolean isScrollable() {
         return false;
     }
 
+    /**
+     * Hierarchical authority can provide an hint for the UI about how many levels
+     * preload to improve the UX. It provides a valid default for hierarchical
+     * authorities
+     * 
+     * @return <code>0</code> if hierarchical, null otherwise
+     */
     default Integer getPreloadLevel() {
         return isHierarchical() ? 0 : null;
     }

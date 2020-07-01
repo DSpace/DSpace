@@ -34,7 +34,10 @@ public class Choice {
     public String value = null;
 
     /**
-     * A boolean representing if choice entry value can selected
+     * A boolean representing if choice entry value can selected (usually true).
+     * Hierarchical authority can flag some choice as not selectable to force the
+     * use to choice a more detailed terms in the tree, such a leaf or a deeper
+     * branch
      */
     public boolean selectable = true;
 
