@@ -190,7 +190,7 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Hiera
         String xpathExpression = "";
         String[] textHierarchy = text.split(hierarchyDelimiter, -1);
         for (int i = 0; i < textHierarchy.length; i++) {
-            xpathExpression += String.format(labelTemplate, textHierarchy[i].replaceAll("'", "&apos;").toLowerCase());
+            xpathExpression += String.format(labelTemplate, textHierarchy[i].replaceAll("'", "&apos;"));
         }
         XPath xpath = XPathFactory.newInstance().newXPath();
         List<Choice> choices = new ArrayList<Choice>();
