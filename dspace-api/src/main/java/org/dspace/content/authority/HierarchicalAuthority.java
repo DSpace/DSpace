@@ -70,8 +70,13 @@ public interface HierarchicalAuthority extends ChoiceAuthority {
      */
     public Choice getParentChoice(String authorityName, String vocabularyId, String locale);
 
+    /**
+     * Provides an hint for the UI to preload some levels to improve the UX. It
+     * usually mean that these preloaded level will be shown expanded by default
+     */
     public Integer getPreloadLevel();
 
+    @Override
     default boolean isHierarchical() {
         return true;
     }
