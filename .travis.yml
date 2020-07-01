@@ -1,5 +1,5 @@
 language: java
-sudo: false
+os: linux
 dist: trusty
 
 env:
@@ -7,17 +7,8 @@ env:
   - MAVEN_OPTS=-Xmx1024M
 
 jdk:
-  # DS-3384 Oracle JDK has DocLint enabled by default.
-  # Let's use this to catch any newly introduced DocLint issues.
-  - oraclejdk11
-
-## Should we run into any problems with oraclejdk8 on Travis, we may try the following workaround.
-## https://docs.travis-ci.com/user/languages/java#Testing-Against-Multiple-JDKs
-## https://github.com/travis-ci/travis-ci/issues/3259#issuecomment-130860338
-#addons:
-#  apt:
-#    packages:
-#      - oracle-java8-installer
+  # Java 11 (NOTE: OracleJDK no longer well supported as Oracle requires account signup to download)
+  - openjdk11
 
 before_install:
   # Remove outdated settings.xml from Travis builds. Workaround for https://github.com/travis-ci/travis-ci/issues/4629
