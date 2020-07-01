@@ -1,6 +1,6 @@
 language: java
 os: linux
-dist: trusty
+dist: xenial
 
 env:
   # Give Maven 1GB of memory to work with
