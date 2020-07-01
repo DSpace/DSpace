@@ -804,7 +804,8 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
         Bitstream bitstream = createPrivateBitstream();
         String shortLivedToken = getShortLivedToken(eperson);
 
-        getClient().perform(get("/api/core/bitstreams/" + bitstream.getID() + "/content?authentication-token=" + shortLivedToken))
+        getClient().perform(get("/api/core/bitstreams/" + bitstream.getID()
+                + "/content?authentication-token=" + shortLivedToken))
             .andExpect(status().isOk());
     }
 
@@ -821,7 +822,8 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
         context.restoreAuthSystemState();
 
         String shortLivedToken = getShortLivedToken(testEPerson);
-        getClient().perform(get("/api/core/bitstreams/" + bitstream.getID() + "/content?authentication-token=" + shortLivedToken))
+        getClient().perform(get("/api/core/bitstreams/" + bitstream.getID()
+                + "/content?authentication-token=" + shortLivedToken))
             .andExpect(status().isForbidden());
     }
 
@@ -830,7 +832,8 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
         Bitstream bitstream = createPrivateBitstream();
 
         String loginToken = getAuthToken(eperson.getEmail(), password);
-        getClient().perform(get("/api/core/bitstreams/" + bitstream.getID() + "/content?authentication-token=" + loginToken))
+        getClient().perform(get("/api/core/bitstreams/" + bitstream.getID()
+                + "/content?authentication-token=" + loginToken))
             .andExpect(status().isForbidden());
     }
 
@@ -840,7 +843,8 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
         configurationService.setProperty("jwt.shortLived.token.expiration", "1");
         String shortLivedToken = getShortLivedToken(eperson);
         Thread.sleep(1);
-        getClient().perform(get("/api/core/bitstreams/" + bitstream.getID() + "/content?authentication-token=" + shortLivedToken))
+        getClient().perform(get("/api/core/bitstreams/" + bitstream.getID()
+                + "/content?authentication-token=" + shortLivedToken))
             .andExpect(status().isForbidden());
     }
 
