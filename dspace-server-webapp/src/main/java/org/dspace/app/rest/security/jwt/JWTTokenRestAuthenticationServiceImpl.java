@@ -48,7 +48,7 @@ public class JWTTokenRestAuthenticationServiceImpl implements RestAuthentication
     private static final String AUTHORIZATION_COOKIE = "Authorization-cookie";
     private static final String AUTHORIZATION_HEADER = "Authorization";
     private static final String AUTHORIZATION_TYPE = "Bearer";
-    private static final String AUTHORIZATION_TOKEN_PARAMETER = "token";
+    private static final String AUTHORIZATION_TOKEN_PARAMETER = "authentication-token";
 
     @Autowired
     private LoginJWTTokenHandler loginJWTTokenHandler;

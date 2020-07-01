@@ -58,7 +58,7 @@ import org.springframework.security.crypto.keygen.KeyGenerators;
 public abstract class JWTTokenHandler {
 
     private static final int MAX_CLOCK_SKEW_SECONDS = 60;
-    private static final String AUTHORIZATION_TOKEN_PARAMETER = "token";
+    private static final String AUTHORIZATION_TOKEN_PARAMETER = "authentication-token";
 
     private static final Logger log = LoggerFactory.getLogger(JWTTokenHandler.class);
 
