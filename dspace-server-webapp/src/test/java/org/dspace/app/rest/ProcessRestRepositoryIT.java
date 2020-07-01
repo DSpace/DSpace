@@ -321,9 +321,4 @@ public class ProcessRestRepositoryIT extends AbstractControllerIntegrationTest {
 
 
     }
-
-    @After
-    public void destroy() throws Exception {
-        super.destroy();
-    }
 }
