@@ -61,13 +61,14 @@ import org.dspace.eperson.service.GroupService;
 import org.dspace.services.ConfigurationService;
 import org.hamcrest.Matchers;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @author Jonas Van Goolen - (jonas@atmire.com)
  */
-
+@Ignore
 public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     @Autowired
