@@ -156,7 +156,7 @@ public interface ChoiceAuthority extends NameAwarePlugin {
      * @return <code>true</code> if the authority provided in any choice of this
      *         authority should be stored in the metadata value
      */
-    default public boolean storeAuthority() {
+    default public boolean storeAuthorityInMetadata() {
         return true;
     }
 }

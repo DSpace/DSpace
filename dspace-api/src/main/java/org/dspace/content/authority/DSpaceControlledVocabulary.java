@@ -79,7 +79,7 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Hiera
     }
 
     @Override
-    public boolean storeAuthority() {
+    public boolean storeAuthorityInMetadata() {
         // For backward compatibility controlled vocabularies don't store the node id in
         // the metadatavalue
         return false;
