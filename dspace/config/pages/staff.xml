@@ -17,7 +17,7 @@ xmlns:i18n="http://apache.org/cocoon/i18n/2.1" version="1.1">
 	<h1>Dirección PREBI-SEDICI</h1>
 	<ul>
 		<li>
-			<a href="http://sedici.unlp.edu.ar/discover?filtertype=author&filter_relational_operator=authority&filter=http://voc.sedici.unlp.edu.ar/node/55359" title="Marisa R. De Giusti">Marisa R. De Giusti</a> &lt;marisa.degiusti @ sedici.unlp.edu.ar&gt;
+			<a href="http://sedici.unlp.edu.ar/discover?filtertype=author&amp;filter_relational_operator=authority&amp;filter=http://voc.sedici.unlp.edu.ar/node/55359" title="Marisa R. De Giusti">Marisa R. De Giusti</a> &lt;marisa.degiusti @ sedici.unlp.edu.ar&gt;
 		</li>
 	</ul>
 	<h1>Equipo de Catalogación</h1>
