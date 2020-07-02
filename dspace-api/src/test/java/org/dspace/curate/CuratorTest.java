@@ -23,26 +23,11 @@ import org.dspace.core.factory.CoreServiceFactory;
 import org.dspace.ctask.general.NoOpCurationTask;
 import org.dspace.services.ConfigurationService;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Spy;
-import org.mockito.junit.MockitoJUnitRunner;
 
 /**
  * @author mhwood
  */
-@RunWith(MockitoJUnitRunner.class)
 public class CuratorTest extends AbstractUnitTest {
-
-    @InjectMocks
-    private Curator curator;
-
-    @Mock
-    NoOpCurationTask noOpCurationTask;
-
-    @Spy
-    TaskResolver taskResolver;
 
     private static final SiteService SITE_SERVICE = ContentServiceFactory.getInstance().getSiteService();
 
@@ -115,6 +100,9 @@ public class CuratorTest extends AbstractUnitTest {
         ConfigurationService cfg = kernelImpl.getConfigurationService();
         cfg.setProperty("plugin.named.org.dspace.curate.CurationTask",
             NoOpCurationTask.class.getName() + " = " + TASK_NAME);
+
+        // Get and configure a Curator.
+        Curator curator = new Curator();
 
         StringBuilder reporterOutput = new StringBuilder();
         curator.setReporter(reporterOutput); // Send any report to our StringBuilder.
