@@ -24,6 +24,13 @@ import org.dspace.importer.external.metadatamapping.contributor.MetadataContribu
 import org.jaxen.JaxenException;
 import org.springframework.beans.factory.annotation.Required;
 
+/**
+ * Arxiv specific implementation of {@link MetadataContributor}
+ * Responsible for generating the ArXiv Id from the retrieved item.
+ * 
+ * @author Pasquale Cavallo (pasquale.cavallo at 4science dot it)
+ *
+ */
 public class ArXivIdMetadataContributor implements MetadataContributor<OMElement> {
     private MetadataFieldConfig field;
 
