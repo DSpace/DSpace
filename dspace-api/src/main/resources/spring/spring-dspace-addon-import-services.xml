@@ -36,7 +36,6 @@
     <bean id="ArXivImportService"
           class="org.dspace.importer.external.arxiv.service.ArXivImportMetadataSourceServiceImpl" scope="singleton">
         <property name="metadataFieldMapping" ref="ArXivMetadataFieldMapping"/>
-        <property name="generateQueryForItem" ref="arXivQueryService"></property>
         <property name="baseAddress" value="http://export.arxiv.org/api/query"/>
     </bean>
     <bean id="ArXivMetadataFieldMapping"
