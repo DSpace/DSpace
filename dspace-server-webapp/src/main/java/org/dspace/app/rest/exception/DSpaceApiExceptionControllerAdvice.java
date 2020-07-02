@@ -16,6 +16,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.dspace.app.rest.security.RestAuthenticationService;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.importer.external.exception.ExternalProviderMethodNotImplementedException;
 import org.springframework.beans.TypeMismatchException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.AnnotationUtils;
@@ -38,12 +39,20 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
  * @author Tom Desair (tom dot desair at atmire dot com)
  * @author Frederic Van Reet (frederic dot vanreet at atmire dot com)
  * @author Andrea Bollini (andrea.bollini at 4science.it)
+ * @author Pasquale Cavallo (pasquale.cavallo at 4science dot it)
+ * 
  */
 @ControllerAdvice
 public class DSpaceApiExceptionControllerAdvice extends ResponseEntityExceptionHandler {
 
     @Autowired
     private RestAuthenticationService restAuthenticationService;
+
+    @ExceptionHandler(ExternalProviderMethodNotImplementedException.class)
+    protected void externalResourceMethodNotImplementedException(HttpServletRequest request,
+        HttpServletResponse response, ExternalProviderMethodNotImplementedException ex) throws IOException {
+        sendErrorResponse(request, response, ex, ex.getMessage(), HttpServletResponse.SC_NOT_IMPLEMENTED);
+    }
 
     @ExceptionHandler({AuthorizeException.class, RESTAuthorizationException.class, AccessDeniedException.class})
     protected void handleAuthorizeException(HttpServletRequest request, HttpServletResponse response, Exception ex)

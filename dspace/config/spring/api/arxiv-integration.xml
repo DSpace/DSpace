@@ -101,9 +101,6 @@
         <constructor-arg value="dc.contributor.author"/>
     </bean>
 
-
-
-
     <util:map id="arxivBasePrefixToNamespaceMapping" map-class="java.util.HashMap"
         key-type="java.lang.String" value-type="java.lang.String">
     	<entry key="http://www.w3.org/2005/Atom" value="ns" />
@@ -118,11 +115,5 @@
     <bean class="java.lang.Integer" id="maxRetry">
         <constructor-arg value="3"/>
     </bean>
-
-    <bean class="org.dspace.importer.external.arxiv.metadatamapping.transform.GenerateArXivQueryService" id="arXivQueryService">
-        <description>Defines how an org.dspace.content.Item is mapped to a query in scopus. Please note that exactly one of
-            these must be present. If multiple are present the result is undefined.
-        </description>
-    </bean>    
 
 </beans>
