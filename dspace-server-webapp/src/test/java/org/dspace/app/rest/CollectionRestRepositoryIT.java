@@ -786,7 +786,7 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
     }
 
     @Test
-    public void findAuthorizedCollectionByCommunityAndMetadata() throws Exception {
+    public void findAuthorizedCollectionAndMetadata() throws Exception {
         String entityType = "OrgUnit";
         Set<MetadataValue> metadataValueSet = new HashSet();
         try {
@@ -810,8 +810,7 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
 
             String token = getAuthToken(eperson.getEmail(), password);
 
-            getClient(token).perform(get("/api/core/collections/search/findAuthorizedByCommunityAndMetadata")
-                .param("uuid", parentCommunity.getID().toString())
+            getClient(token).perform(get("/api/core/collections/search/findSubmitAuthorizedAndMetadata")
                 .param("metadata", "relationship.type")
                 .param("metadataValue", entityType))
                 .andExpect(status().isOk())
@@ -825,7 +824,7 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
     }
 
     @Test
-    public void findAuthorizedCollectionsByCommunityAndMetadata() throws Exception {
+    public void findAuthorizedCollectionsAndMetadata() throws Exception {
         String entityType = "Journal";
         Set<MetadataValue> metadataValueSet = new HashSet();
         try {
@@ -855,8 +854,7 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
 
             String token = getAuthToken(eperson.getEmail(), password);
 
-            getClient(token).perform(get("/api/core/collections/search/findAuthorizedByCommunityAndMetadata")
-                .param("uuid", parentCommunity.getID().toString())
+            getClient(token).perform(get("/api/core/collections/search/findSubmitAuthorizedAndMetadata")
                 .param("metadata", "relationship.type")
                 .param("metadataValue", entityType))
                 .andExpect(status().isOk())
@@ -872,7 +870,7 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
     }
 
     @Test
-    public void findAuthorizedAllCollectionsByCommunityAndMetadata() throws Exception {
+    public void findAuthorizedAllCollectionsAndMetadata() throws Exception {
         String entityType = "Journal";
         String entityType2 = "Publication";
         String entityType3 = "JournaIssued";
@@ -906,8 +904,7 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
 
             String token = getAuthToken(eperson.getEmail(), password);
 
-            getClient(token).perform(get("/api/core/collections/search/findAuthorizedByCommunityAndMetadata")
-                .param("uuid", parentCommunity.getID().toString())
+            getClient(token).perform(get("/api/core/collections/search/findSubmitAuthorizedAndMetadata")
                 .param("metadata", "relationship.type"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
