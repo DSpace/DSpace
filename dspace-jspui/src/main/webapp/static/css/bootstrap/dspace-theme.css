@@ -112,3 +112,19 @@ span.batchimport-error-caused {
 	word-break:       break-all;
 	word-wrap:        break-word;
 }
+
+.discovery-search-form {
+	margin-left: 0px;
+}
+
+.discovery-result-pagination {
+	margin-left: 0px;
+}
+
+.discovery-result-results {
+	margin-left: 0px;
+}
+
+.form-control {
+  height: auto !important;
+}

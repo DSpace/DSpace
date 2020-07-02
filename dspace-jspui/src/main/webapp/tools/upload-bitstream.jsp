@@ -54,7 +54,7 @@
         <input type="hidden" name="item_id" value="<%= item.getID() %>"/>
 		<br/>
         <!-- <p align="center"><input type="submit" name="submit" value="Upload"></p> -->
-		<div class="container row col-md-offset-5"><input class="btn btn-success col-md-4" type="submit" name="submit" value="<fmt:message key="jsp.tools.upload-bitstream.upload"/>" /></div>
+		<div class="row col-md-offset-5"><input class="btn btn-success col-md-4" type="submit" name="submit" value="<fmt:message key="jsp.tools.upload-bitstream.upload"/>" /></div>
     </form>
     
 </dspace:layout>

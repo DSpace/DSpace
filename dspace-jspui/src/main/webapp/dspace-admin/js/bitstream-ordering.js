@@ -13,12 +13,12 @@
         var downArrows = bitstreamTable.find('input[name^="submit_order_"][name$="_down"]');
 
 
-        upArrows.click(function(event) {
+        upArrows.on("click",function(event) {
             moveRow($(this), true);
             return false;
         });
 
-        downArrows.click(function(event){
+        downArrows.on("click", function(event){
             moveRow($(this), false);
             return false;
         });

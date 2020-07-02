@@ -452,7 +452,10 @@ function DSpaceChoicesSelectOnChange ()
         details[i].style.display = 'none';
     }
 	
-    document.getElementById("detail"+select.selectedIndex).show();
+    var detailSelected = document.getElementById("detail"+select.selectedIndex);
+    if(typeof detailSelected !== 'undefined' && detailSelected !== null) {
+    	detailSelected.show();	
+    }
     document.getElementById("aspect_general_ChoiceLookup_detailed_info").show();
       
 }
