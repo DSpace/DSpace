@@ -110,7 +110,7 @@ public class GroupEditServlet extends DSpaceServlet
                     memberIdentifiers.add(member.getID());
                 }
 
-                List<Group> membergroups = group.getMemberGroups();
+                List<Group> membergroups = new ArrayList<>(group.getMemberGroups());
 
                 if (eperson_ids != null)
                 {
