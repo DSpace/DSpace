@@ -174,10 +174,10 @@ public class ArXivIdMetadataContributor implements MetadataContributor<OMElement
     private void parseValue(List<MetadatumDTO> dtos) {
         if (dtos != null) {
             for (MetadatumDTO dto : dtos) {
-                if (dto != null && dto.getValue() != null) {
-                    int startIndex = dto.getValue().lastIndexOf('/');
+                if (dto != null && dto.getValue() != null && dto.getValue().contains("/")) {
+                    int startIndex = dto.getValue().lastIndexOf('/') + 1;
                     int endIndex = dto.getValue().length();
-                    String id = dto.getValue().substring(startIndex + 1, endIndex);
+                    String id = dto.getValue().substring(startIndex, endIndex);
                     dto.setValue(id);
                 }
             }
