@@ -7,10 +7,10 @@
  */
 package org.dspace.curate;
 
-import static org.hamcrest.Matchers.containsStringIgnoringCase;
-import static org.hamcrest.Matchers.is;
 import static com.jayway.jsonpath.JsonPath.read;
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.containsStringIgnoringCase;
+import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -42,6 +42,8 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
+ * IT for {@link CurationCli}
+ *
  * @author Maria Verdonck (Atmire) on 24/06/2020
  */
 public class CurationScriptIT extends AbstractControllerIntegrationTest {
@@ -435,6 +437,5 @@ public class CurationScriptIT extends AbstractControllerIntegrationTest {
             ProcessBuilder.deleteProcess(idRef.get());
         }
     }
-
 
 }
