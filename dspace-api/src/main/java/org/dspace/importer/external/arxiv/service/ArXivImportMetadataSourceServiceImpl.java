@@ -31,77 +31,184 @@ import org.dspace.importer.external.exception.MetadataSourceException;
 import org.dspace.importer.external.service.AbstractImportMetadataSourceService;
 import org.jaxen.JaxenException;
 
+/**
+ * Implements a data source for querying ArXiv
+ * 
+ * @author Pasquale Cavallo (pasquale.cavallo at 4Science dot it)
+ *
+ */
 public class ArXivImportMetadataSourceServiceImpl extends AbstractImportMetadataSourceService<OMElement> {
 
     private WebTarget webTarget;
+    private String baseAddress;
 
+    /**
+     * Find the number of records matching a string query. Supports pagination
+     *
+     * @param query a query string to base the search on.
+     * @param start offset to start at
+     * @param count number of records to retrieve.
+     * @return a set of records. Fully transformed.
+     * @throws MetadataSourceException if the underlying methods throw any exception.
+     */
     @Override
     public Collection<ImportRecord> getRecords(String query, int start, int count) throws MetadataSourceException {
         return retry(new SearchByQueryCallable(query, count, start));
     }
 
+    /**
+     * Find records based on a object query.
+     *
+     * @param query a query object to base the search on.
+     * @return a set of records. Fully transformed.
+     * @throws MetadataSourceException if the underlying methods throw any exception.
+     */
     @Override
     public Collection<ImportRecord> getRecords(Query query) throws MetadataSourceException {
         return retry(new SearchByQueryCallable(query));
     }
 
+    /**
+     * Find the number of records matching a query;
+     *
+     * @param query a query object to base the search on.
+     * @return the sum of the matching records over this import source
+     * @throws MetadataSourceException if the underlying methods throw any exception.
+     */
     @Override
     public int getNbRecords(String query) throws MetadataSourceException {
-        List<ImportRecord> records = retry(new SearchByQueryCallable(query, null, null));
-        return records != null ? records.size() : 0;
+        return retry(new CountByQueryCallable(query));
     }
 
+
+    /**
+     * Find the number of records matching a query;
+     *
+     * @param query a query string to base the search on.
+     * @return the sum of the matching records over this import source
+     * @throws MetadataSourceException if the underlying methods throw any exception.
+     */
     @Override
     public int getNbRecords(Query query) throws MetadataSourceException {
-        List<ImportRecord> records = retry(new SearchByQueryCallable(query));
-        return records != null ? records.size() : 0;
+        return retry(new CountByQueryCallable(query));
     }
 
+    /**
+     * Get a single record from the source by id
+     *
+     * @param id id of the record in ArXiv
+     * @return the first matching record
+     * @throws MetadataSourceException if the underlying methods throw any exception.
+     */
 
     @Override
     public ImportRecord getRecord(String id) throws MetadataSourceException {
         List<ImportRecord> records = retry(new SearchByIdCallable(id));
-        if (records != null && records.size() > 1) {
-            throw new MetadataSourceException("More than one result found");
-        }
-        return records == null ? null : records.get(0);
+        return records == null || records.isEmpty() ? null : records.get(0);
     }
 
+    /**
+     * Get a single record from the source.
+     *
+     * @param query a query matching a single record
+     * @return the first matching record
+     * @throws MetadataSourceException if the underlying methods throw any exception.
+     */
     @Override
     public ImportRecord getRecord(Query query) throws MetadataSourceException {
         List<ImportRecord> records = retry(new SearchByIdCallable(query));
-        if (records != null && records.size() > 1) {
-            throw new MetadataSourceException("More than one result found");
-        }
-        return records == null ? null : records.get(0);
+        return records == null || records.isEmpty() ? null : records.get(0);
     }
 
-
+    /**
+     * Initialize the class
+     *
+     * @throws Exception on generic exception
+     */
     @Override
     public void init() throws Exception {
         Client client = ClientBuilder.newClient();
-        webTarget = client.target("http://export.arxiv.org/api/query");
+        webTarget = client.target(baseAddress);
     }
 
-
-
-
-
-
+    /**
+     * The string that identifies this import implementation. Preferable a URI
+     *
+     * @return the identifying uri
+     */
     @Override
     public String getImportSource() {
         return "arxiv";
     }
 
+    /**
+     * NOT IMPLEMENTED: Finds records based on an item
+     *
+     * @param item an item to base the search on
+     * @return a collection of import records. Only the identifier of the found records may be put in the record.
+     * @throws MetadataSourceException if the underlying methods throw any exception.
+     */
     @Override
     public Collection<ImportRecord> findMatchingRecords(Item item) throws MetadataSourceException {
         throw new RuntimeException();
     }
 
+    /**
+     * Finds records based on query object.
+     * Supports search by title and/or author
+     *
+     * @param query a query object to base the search on.
+     * @return a collection of import records.
+     * @throws MetadataSourceException if the underlying methods throw any exception.
+     */
     @Override
     public Collection<ImportRecord> findMatchingRecords(Query query) throws MetadataSourceException {
         return retry(new FindMatchingRecordCallable(query));
     }
+
+    private class CountByQueryCallable implements Callable<Integer> {
+        private Query query;
+
+
+        private CountByQueryCallable(String queryString) {
+            query = new Query();
+            query.addParameter("query", queryString);
+        }
+
+        private CountByQueryCallable(Query query) {
+            this.query = query;
+        }
+
+
+        @Override
+        public Integer call() throws Exception {
+            String queryString = query.getParameterAsClass("query", String.class);
+            Integer start = query.getParameterAsClass("start", Integer.class);
+            Integer maxResult = query.getParameterAsClass("count", Integer.class);
+            WebTarget local = webTarget.queryParam("search_query", queryString);
+            if (maxResult != null) {
+                local = local.queryParam("max_results", String.valueOf(maxResult));
+            }
+            if (start != null) {
+                local = local.queryParam("start", String.valueOf(start));
+            }
+            Invocation.Builder invocationBuilder = local.request(MediaType.TEXT_PLAIN_TYPE);
+            Response response = invocationBuilder.get();
+            String responseString = response.readEntity(String.class);
+            OMXMLParserWrapper records = OMXMLBuilderFactory.createOMBuilder(new StringReader(responseString));
+            OMElement element = records.getDocumentElement();
+            AXIOMXPath xpath = null;
+            try {
+                xpath = new AXIOMXPath("opensearch:totalResults");
+                xpath.addNamespace("opensearch", "http://a9.com/-/spec/opensearch/1.1/");
+                OMElement count = (OMElement) xpath.selectSingleNode(element);
+                return Integer.parseInt(count.getText());
+            } catch (JaxenException e) {
+                return null;
+            }
+        }
+    }
+
 
     private class SearchByQueryCallable implements Callable<List<ImportRecord>> {
         private Query query;
@@ -220,7 +327,7 @@ public class ArXivImportMetadataSourceServiceImpl extends AbstractImportMetadata
         }
     }
 
-    private static List<OMElement> splitToRecords(String recordsSrc) {
+    private List<OMElement> splitToRecords(String recordsSrc) {
         OMXMLParserWrapper records = OMXMLBuilderFactory.createOMBuilder(new StringReader(recordsSrc));
         OMElement element = records.getDocumentElement();
         AXIOMXPath xpath = null;
@@ -232,6 +339,24 @@ public class ArXivImportMetadataSourceServiceImpl extends AbstractImportMetadata
         } catch (JaxenException e) {
             return null;
         }
+    }
+
+    /**
+     * Return the baseAddress set to this object
+     *
+     * @return The String object that represents the baseAddress of this object
+     */
+    public String getBaseAddress() {
+        return baseAddress;
+    }
+
+    /**
+     * Set the baseAddress to this object
+     *
+     * @param baseAddress The String object that represents the baseAddress of this object
+     */
+    public void setBaseAddress(String baseAddress) {
+        this.baseAddress = baseAddress;
     }
 
 }
