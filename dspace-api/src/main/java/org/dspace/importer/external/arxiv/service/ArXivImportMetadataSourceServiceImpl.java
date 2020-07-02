@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.Callable;
+import javax.el.MethodNotFoundException;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Invocation;
@@ -27,7 +28,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.dspace.content.Item;
 import org.dspace.importer.external.datamodel.ImportRecord;
 import org.dspace.importer.external.datamodel.Query;
-import org.dspace.importer.external.exception.ExternalProviderMethodNotImplementedException;
 import org.dspace.importer.external.exception.MetadataSourceException;
 import org.dspace.importer.external.service.AbstractImportMetadataSourceService;
 import org.jaxen.JaxenException;
@@ -143,15 +143,12 @@ public class ArXivImportMetadataSourceServiceImpl extends AbstractImportMetadata
     }
 
     /**
-     * NOT IMPLEMENTED: Finds records based on an item
-     *
-     * @param item an item to base the search on
-     * @return a collection of import records. Only the identifier of the found records may be put in the record.
-     * @throws MetadataSourceException if the underlying methods throw any exception.
+     * Expect this method will be not used and erased from the interface soon
      */
     @Override
     public Collection<ImportRecord> findMatchingRecords(Item item) throws MetadataSourceException {
-        throw new ExternalProviderMethodNotImplementedException("This method is not implemented for ArXiv");
+        // FIXME: we need this method?
+        throw new MethodNotFoundException("This method is not implemented for ArXiv");
     }
 
     /**
