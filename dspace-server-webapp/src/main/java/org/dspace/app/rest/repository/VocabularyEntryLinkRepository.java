@@ -88,7 +88,7 @@ public class VocabularyEntryLinkRepository extends AbstractDSpaceRestRepository
             choices = ca.getMatches(filter, Math.toIntExact(pageable.getOffset()),
                           pageable.getPageSize(), context.getCurrentLocale().toString());
         }
-        boolean storeAuthority = ca.storeAuthority();
+        boolean storeAuthority = ca.storeAuthorityInMetadata();
         for (Choice value : choices.values) {
             results.add(authorityUtils.convertEntry(value, name, storeAuthority, projection));
         }
