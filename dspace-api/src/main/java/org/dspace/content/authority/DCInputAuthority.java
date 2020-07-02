@@ -17,7 +17,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.util.DCInputsReader;
 import org.dspace.app.util.DCInputsReaderException;
-import org.dspace.content.Collection;
 import org.dspace.core.SelfNamedPlugin;
 
 /**
@@ -55,6 +54,12 @@ public class DCInputAuthority extends SelfNamedPlugin implements ChoiceAuthority
         super();
     }
 
+    @Override
+    public boolean storeAuthority() {
+        // For backward compatibility value pairs don't store authority in
+        // the metadatavalue
+        return false;
+    }
     public static String[] getPluginNames() {
         if (pluginNames == null) {
             initPluginNames();
@@ -104,7 +109,7 @@ public class DCInputAuthority extends SelfNamedPlugin implements ChoiceAuthority
 
 
     @Override
-    public Choices getMatches(String field, String query, Collection collection, int start, int limit, String locale) {
+    public Choices getMatches(String query, int start, int limit, String locale) {
         init();
 
         int dflt = -1;
@@ -126,7 +131,7 @@ public class DCInputAuthority extends SelfNamedPlugin implements ChoiceAuthority
     }
 
     @Override
-    public Choices getBestMatch(String field, String text, Collection collection, String locale) {
+    public Choices getBestMatch(String text, String locale) {
         init();
         for (int i = 0; i < values.length; ++i) {
             if (text.equalsIgnoreCase(values[i])) {
