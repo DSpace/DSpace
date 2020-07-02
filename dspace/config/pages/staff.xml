@@ -17,7 +17,7 @@ xmlns:i18n="http://apache.org/cocoon/i18n/2.1" version="1.1">
 	<h1>Dirección PREBI-SEDICI</h1>
 	<ul>
 		<li>
-			<a href="http://prebi.unlp.edu.ar/wp-content/uploads/2007/12/Marisa-De-Giusti-CV-270611.pdf" title="Marisa R. De Giusti">Marisa R. De Giusti</a> &lt;marisa.degiusti @ sedici.unlp.edu.ar&gt;
+			<a href="http://sedici.unlp.edu.ar/discover?filtertype=author&filter_relational_operator=authority&filter=http://voc.sedici.unlp.edu.ar/node/55359" title="Marisa R. De Giusti">Marisa R. De Giusti</a> &lt;marisa.degiusti @ sedici.unlp.edu.ar&gt;
 		</li>
 	</ul>
 	<h1>Equipo de Catalogación</h1>
@@ -26,13 +26,14 @@ xmlns:i18n="http://apache.org/cocoon/i18n/2.1" version="1.1">
 		<li>Bernarda Malpere &lt;bernarda @ sedici.unlp.edu.ar&gt;</li>
 		<li>Carlos Nusch &lt;carlosnusch @ prebi.unlp.edu.ar&gt;</li>
 		<li>Silvia Peloche &lt;silvia @ sedici.unlp.edu.ar&gt;</li>
+		<li>Victoria Rozemblum &lt;vicorozemblum @ sedici.unlp.edu.ar&gt;</li>
 	</ul>
 
 	<h1>Equipo de Digitalización</h1>
 	<ul>
 		<li>Esteban Fernández &lt;estebancfernandez @ prebi.unlp.edu.ar&gt;</li>
 		<li>Lorenzo Calamante &lt;lorenzo.calamante @ sedici.unlp.edu.ar&gt;</li>
-		<li>Pablo Mendez Moura &lt;estebancfernandez @ prebi.unlp.edu.ar&gt;</li>
+		<li>Mariano Ezequiel Villalba &lt;villalba.mariano @ prebi.unlp.edu.ar&gt;</li>
 	</ul>
 		
 	<h1>Diseño gráfico</h1>
