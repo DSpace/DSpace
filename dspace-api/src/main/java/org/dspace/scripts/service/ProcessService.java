@@ -7,9 +7,13 @@
  */
 package org.dspace.scripts.service;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.List;
 
+import org.dspace.authorize.AuthorizeException;
+import org.dspace.content.Bitstream;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.scripts.DSpaceCommandLineParameter;
@@ -105,12 +109,27 @@ public interface ProcessService {
     public void complete(Context context, Process process) throws SQLException;
 
     /**
+     * The method will create a bitstream from the given inputstream with the given type as metadata and given name
+     * as name and attach it to the given process
+     * @param context       The relevant DSpace context
+     * @param process       The process for which the bitstream will be made
+     * @param is            The inputstream for the bitstream
+     * @param type          The type of the bitstream
+     * @param fileName      The name of the bitstream
+     * @throws IOException  If something goes wrong
+     * @throws SQLException If something goes wrong
+     * @throws AuthorizeException   If something goes wrong
+     */
+    public void appendFile(Context context, Process process, InputStream is, String type, String fileName)
+        throws IOException, SQLException, AuthorizeException;
+
+    /**
      * This method will delete the given Process object from the database
      * @param context   The relevant DSpace context
      * @param process   The Process object to be deleted
      * @throws SQLException If something goes wrong
      */
-    public void delete(Context context, Process process) throws SQLException;
+    public void delete(Context context, Process process) throws SQLException, IOException, AuthorizeException;
 
     /**
      * This method will be used to update the given Process object in the database
@@ -129,11 +148,45 @@ public interface ProcessService {
     public List<DSpaceCommandLineParameter> getParameters(Process process);
 
     /**
+     * This method will return the Bitstream that matches the given name for the given Process
+     * @param context           The relevant DSpace context
+     * @param process           The process that should hold the requested Bitstream
+     * @param bitstreamName     The name of the requested Bitstream
+     * @return                  The Bitstream from the given Process that matches the given bitstream name
+     */
+    public Bitstream getBitstreamByName(Context context, Process process, String bitstreamName);
+
+    /**
+     * This method will return the Bitstream for a given process with a given type
+     * @param context   The relevant DSpace context
+     * @param process   The process that holds the Bitstreams to be searched in
+     * @param type      The type that the Bitstream must have
+     * @return          The Bitstream of the given type for the given Process
+     */
+    public Bitstream getBitstream(Context context, Process process, String type);
+
+    /**
+     * This method will return all the Bitstreams for a given process
+     * @param context   The relevant DSpace context
+     * @param process   The process that holds the Bitstreams to be searched in
+     * @return          The list of Bitstreams
+     */
+    public List<Bitstream> getBitstreams(Context context, Process process);
+
+    /**
      * Returns the total amount of Process objects in the dataase
      * @param context   The relevant DSpace context
      * @return          An integer that describes the amount of Process objects in the database
      * @throws SQLException If something goes wrong
      */
     int countTotal(Context context) throws SQLException;
+
+    /**
+     * This will return a list of Strings where each String represents the type of a Bitstream in the Process given
+     * @param context   The DSpace context
+     * @param process   The Process object that we'll use to find the bitstreams
+     * @return          A list of Strings where each String represents a fileType that is in the Process
+     */
+    public List<String> getFileTypesForProcessBitstreams(Context context, Process process);
 
 }

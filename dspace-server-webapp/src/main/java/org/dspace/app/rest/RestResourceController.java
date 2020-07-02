@@ -342,7 +342,15 @@ public class RestResourceController implements InitializingBean {
         return findRelEntryInternal(request, response, apiCategory, model, id, rel, relid, page, assembler);
     }
 
-
+    @RequestMapping(method = RequestMethod.GET, value = REGEX_REQUESTMAPPING_IDENTIFIER_AS_DIGIT +
+        "/{rel}/{relid}")
+    public RepresentationModel findRel(HttpServletRequest request, HttpServletResponse response,
+                                       @PathVariable String apiCategory,
+                                       @PathVariable String model, @PathVariable Integer id, @PathVariable String rel,
+                                       @PathVariable String relid,
+                                       Pageable page, PagedResourcesAssembler assembler) throws Throwable {
+        return findRelEntryInternal(request, response, apiCategory, model, id.toString(), rel, relid, page, assembler);
+    }
     /**
      * Execute a POST request;
      *
