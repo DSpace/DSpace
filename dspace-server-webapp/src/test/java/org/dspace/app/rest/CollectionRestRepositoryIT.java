@@ -1980,18 +1980,18 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                 .andExpect(jsonPath("$._embedded.collections",
                         not(contains(CollectionMatcher.matchCollection(colWithoutMetadata)))));
 
-//        getClient(token).perform(get("/api/core/collections/search/findSubmitAuthorizedByCommunityAndMetadata")
-//                        .param("uuid", parentCommunity.getID().toString())
-//                        .param("metadata", "relationship.type")
-//                        .param("query", "publication"))
-//                .andExpect(status().isOk()).andExpect(content().contentType(contentType))
-//                .andExpect(jsonPath("$.page.totalElements", equalTo(2)))
-//                .andExpect(jsonPath("$._embedded.collections", containsInAnyOrder(
-//                                CollectionMatcher.matchCollection(col2),
-//                                CollectionMatcher.matchCollection(col3))))
-//                .andExpect(jsonPath("$._embedded.collections", not(containsInAnyOrder(
-//                                CollectionMatcher.matchCollection(col1),
-//                                CollectionMatcher.matchCollection(colWithoutMetadata))
-//                                )));
+        getClient(token).perform(get("/api/core/collections/search/findSubmitAuthorizedByCommunityAndMetadata")
+                        .param("uuid", parentCommunity.getID().toString())
+                        .param("metadata", "relationship.type")
+                        .param("query", "publication"))
+                .andExpect(status().isOk()).andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$.page.totalElements", equalTo(2)))
+                .andExpect(jsonPath("$._embedded.collections", containsInAnyOrder(
+                                CollectionMatcher.matchCollection(col2),
+                                CollectionMatcher.matchCollection(col3))))
+                .andExpect(jsonPath("$._embedded.collections", not(containsInAnyOrder(
+                                CollectionMatcher.matchCollection(col1),
+                                CollectionMatcher.matchCollection(colWithoutMetadata))
+                                )));
     }
 }
