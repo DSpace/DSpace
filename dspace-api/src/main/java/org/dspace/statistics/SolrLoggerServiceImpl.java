@@ -772,83 +772,40 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
         }
     }
 
-
     @Override
-    public void markRobotsByIP() {
-        for (String ip : SpiderDetector.getSpiderIpAddresses()) {
-
-            try {
-
-                /* Result Process to alter record to be identified as a bot */
-                ResultProcessor processor = new ResultProcessor() {
-                    @Override
-                    public void process(SolrInputDocument doc) throws IOException, SolrServerException {
-                        doc.removeField("isBot");
-                        doc.addField("isBot", true);
-                        solr.add(doc);
-                        log.info("Marked " + doc.getFieldValue("ip") + " as bot");
-                    }
-                };
-
-                /* query for ip, exclude results previously set as bots. */
-                processor.execute("ip:" + ip + "* AND -isBot:true");
-
-                solr.commit();
-
-            } catch (Exception e) {
-                log.error(e.getMessage(), e);
-            }
-
-
-        }
-
-    }
-
-    @Override
-    public void markRobotByUserAgent(String agent) {
-        try {
-
-            /* Result Process to alter record to be identified as a bot */
-            ResultProcessor processor = new ResultProcessor() {
-                @Override
-                public void process(SolrInputDocument doc) throws IOException, SolrServerException {
+    public void markRobots() {
+        ResultProcessor processor = new ResultProcessor() {
+            @Override
+            public void process(SolrInputDocument doc)
+                    throws IOException, SolrServerException {
+                String clientIP = (String) doc.getField("ip").getValue();
+                String hostname = (String) doc.getField("dns").getValue();
+                String agent = (String) doc.getField("userAgent").getValue();
+                if (SpiderDetector.isSpider(clientIP, null, hostname, agent)) {
                     doc.removeField("isBot");
                     doc.addField("isBot", true);
                     solr.add(doc);
+                    log.info("Marked {} / {} / {} as a robot in record {}.",
+                            clientIP, hostname, agent,
+                            doc.getField("uid").getValue());
                 }
-            };
+            }
+        };
 
-            /* query for ip, exclude results previously set as bots. */
-            processor.execute("userAgent:" + agent + " AND -isBot:true");
-
+        try {
+            processor.execute("-isBot:true");
             solr.commit();
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
+        } catch (SolrServerException | IOException ex) {
+            log.error("Failed while marking robot accesses.", ex);
         }
     }
 
     @Override
-    public void deleteRobotsByIsBotFlag() {
+    public void deleteRobots() {
         try {
             solr.deleteByQuery("isBot:true");
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-        }
-    }
-
-    @Override
-    public void deleteIP(String ip) {
-        try {
-            solr.deleteByQuery("ip:" + ip + "*");
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-        }
-    }
-
-    @Override
-    public void deleteRobotsByIP() {
-        for (String ip : SpiderDetector.getSpiderIpAddresses()) {
-            deleteIP(ip);
+        } catch (IOException | SolrServerException e) {
+            log.error("Failed while deleting robot accesses.", e);
         }
     }
 
@@ -1117,7 +1074,7 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
                 String facetQuery = facetQueries.get(i);
                 solrQuery.addFacetQuery(facetQuery);
             }
-            if (0 < facetQueries.size()) {
+            if (!facetQueries.isEmpty()) {
                 solrQuery.setFacet(true);
             }
         }
@@ -1135,12 +1092,6 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
         // performance and ensure the search result ordering will
         // not be influenced
 
-        // Choose to filter by the Legacy spider IP list (may get too long to properly filter all IP's
-        if (defaultFilterQueries && configurationService.getBooleanProperty(
-                "solr-statistics.query.filter.spiderIp", false)) {
-            solrQuery.addFilterQuery(getIgnoreSpiderIPs());
-        }
-
         // Choose to filter by isBot field, may be overriden in future
         // to allow views on stats based on bots.
         if (defaultFilterQueries && configurationService.getBooleanProperty(
@@ -1156,7 +1107,7 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
         if (defaultFilterQueries && bundles != null && bundles.length > 0) {
 
             /**
-             * The code below creates a query that will allow only records which do not have a bundlename
+             * The code below creates a query that will allow only records which do not have a bundle name
              * (items, collections, ...) or bitstreams that have a configured bundle name
              */
             StringBuilder bundleQuery = new StringBuilder();
@@ -1702,6 +1653,7 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
         statisticYearCoresInit = true;
     }
 
+    @Override
     public Object anonymizeIp(String ip) throws UnknownHostException {
         InetAddress address = InetAddress.getByName(ip);
         if (address instanceof Inet4Address) {
