@@ -34,13 +34,14 @@ import org.dspace.usage.UsageWorkflowEvent;
 public interface SolrLoggerService {
 
     /**
-     * Old post method, use the new postview method instead !
+     * Old post method, use the new postView method instead!
      *
      * @param dspaceObject the object used.
      * @param request      the current request context.
      * @param currentUser  the current session's user.
      * @deprecated
      */
+    @Deprecated
     public void post(DSpaceObject dspaceObject, HttpServletRequest request,
                      EPerson currentUser);
 
@@ -95,15 +96,18 @@ public interface SolrLoggerService {
                                                 List oldFieldVals, String field)
         throws IOException;
 
-    public void markRobotsByIP();
+    /**
+     * Scan the entire 'statistics' collection for documents that should be
+     * marked 'isBot:true' according to
+     * {@link org.dspace.statistics.util.SpiderDetector#isSpider(java.lang.String,
+     * java.lang.String, java.lang.String, java.lang.String)}.
+     */
+    public void markRobots();
 
-    public void markRobotByUserAgent(String agent);
-
-    public void deleteRobotsByIsBotFlag();
-
-    public void deleteIP(String ip);
-
-    public void deleteRobotsByIP();
+    /**
+     * Delete all 'statistics' documents having 'isBot:true'.
+     */
+    public void deleteRobots();
 
     /*
      * update(String query, boolean addField, String fieldName, Object
