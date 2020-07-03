@@ -52,7 +52,6 @@ import org.dspace.xmlworkflow.storedcomponents.ClaimedTask;
 import org.dspace.xmlworkflow.storedcomponents.PoolTask;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 import org.hamcrest.Matchers;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -64,7 +63,6 @@ import org.springframework.mock.web.MockMultipartFile;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  * @author Maria Verdonck (Atmire) on 10/02/2020
  */
-@Ignore
 public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
 
     @Autowired
