@@ -61,7 +61,7 @@ public class DSpaceApiExceptionControllerAdvice extends ResponseEntityExceptionH
     @ExceptionHandler({IllegalArgumentException.class, MultipartException.class})
     protected void handleWrongRequestException(HttpServletRequest request, HttpServletResponse response,
                                                   Exception ex) throws IOException {
-        sendErrorResponse(request, response, ex, "Bad or invalid request", HttpServletResponse.SC_BAD_REQUEST);
+        sendErrorResponse(request, response, ex, "Request is invalid or incorrect", HttpServletResponse.SC_BAD_REQUEST);
     }
 
     @ExceptionHandler(SQLException.class)
@@ -82,7 +82,8 @@ public class DSpaceApiExceptionControllerAdvice extends ResponseEntityExceptionH
     @ExceptionHandler(MethodNotAllowedException.class)
     protected void methodNotAllowedException(HttpServletRequest request, HttpServletResponse response,
                                                   Exception ex) throws IOException {
-        sendErrorResponse(request, response, ex, "Method is not allowed or supported", HttpServletResponse.SC_METHOD_NOT_ALLOWED);
+        sendErrorResponse(request, response, ex, "Method is not allowed or supported",
+                          HttpServletResponse.SC_METHOD_NOT_ALLOWED);
     }
 
     @ExceptionHandler( {UnprocessableEntityException.class})
@@ -100,7 +101,7 @@ public class DSpaceApiExceptionControllerAdvice extends ResponseEntityExceptionH
         throws IOException {
         // we want the 400 status for missing parameters, see https://jira.lyrasis.org/browse/DS-4428
         sendErrorResponse(request, response, null,
-                          "Required parameters are invalid",
+                          "A required parameter is invalid",
                           HttpStatus.BAD_REQUEST.value());
     }
 
@@ -109,7 +110,7 @@ public class DSpaceApiExceptionControllerAdvice extends ResponseEntityExceptionH
         throws IOException {
         // we want the 400 status for missing parameters, see https://jira.lyrasis.org/browse/DS-4428
         sendErrorResponse(request, response, null,
-                          "Required parameters are missing",
+                          "A required parameter is missing",
                           HttpStatus.BAD_REQUEST.value());
     }
 
@@ -139,7 +140,7 @@ public class DSpaceApiExceptionControllerAdvice extends ResponseEntityExceptionH
         } else {
             returnCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
         }
-        sendErrorResponse(request, response, ex, "An Exception has occurred", returnCode);
+        sendErrorResponse(request, response, ex, "An exception has occurred", returnCode);
 
     }
 
@@ -150,7 +151,7 @@ public class DSpaceApiExceptionControllerAdvice extends ResponseEntityExceptionH
         request.setAttribute(EXCEPTION_ATTRIBUTE, ex);
 
         //Log the full error and status code
-        log.error(message + " (status={})", statusCode, ex);
+        log.error("{} (status:{})", message, statusCode, ex);
 
         //Exception properties will be set by org.springframework.boot.web.support.ErrorPageFilter
         response.sendError(statusCode, message);
