@@ -55,7 +55,6 @@ import org.dspace.eperson.EPerson;
 import org.hamcrest.Matchers;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -64,7 +63,6 @@ import org.springframework.test.web.servlet.MvcResult;
 /**
  * Integration Tests against the /api/core/communities endpoint (including any subpaths)
  */
-@Ignore
 public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     @Autowired

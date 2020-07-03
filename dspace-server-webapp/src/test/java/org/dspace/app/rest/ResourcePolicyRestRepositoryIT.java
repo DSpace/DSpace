@@ -62,7 +62,6 @@ import org.springframework.beans.factory.annotation.Autowired;
  *
  * @author Mykhaylo Boychuk - 4Science
  */
-@Ignore
 public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     @Autowired

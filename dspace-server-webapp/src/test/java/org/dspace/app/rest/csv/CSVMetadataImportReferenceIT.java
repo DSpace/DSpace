@@ -36,7 +36,6 @@ import org.dspace.content.service.MetadataFieldService;
 import org.dspace.content.service.MetadataValueService;
 import org.dspace.content.service.RelationshipService;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -44,7 +43,6 @@ import org.springframework.beans.factory.annotation.Autowired;
  * Created by: Andrew Wood
  * Date: 26 Jul 2019
  */
-@Ignore
 public class CSVMetadataImportReferenceIT extends AbstractEntityIntegrationTest {
 
     //Common collection to utilize for test

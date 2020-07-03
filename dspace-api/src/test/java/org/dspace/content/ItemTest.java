@@ -49,7 +49,6 @@ import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.test.util.ReflectionTestUtils;
 
@@ -58,7 +57,6 @@ import org.springframework.test.util.ReflectionTestUtils;
  *
  * @author pvillega
  */
-@Ignore
 public class ItemTest extends AbstractDSpaceObjectTest {
 
     /**

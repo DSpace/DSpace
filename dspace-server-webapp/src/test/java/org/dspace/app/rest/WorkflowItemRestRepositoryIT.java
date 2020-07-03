@@ -68,7 +68,6 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  *
  */
-@Ignore
 public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     @Autowired
