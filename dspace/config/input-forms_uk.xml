@@ -148,6 +148,16 @@
                         Якщо зміст матеріалу насправді не містить мову (наприклад, якщо це набір даних чи зображення), будь ласка, вибирайте 'Невизначено'.</hint>
                     <required></required>
                 </field>
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>rights</dc-element>
+                    <dc-qualifier>uri</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Ліцензія</label>
+                    <input-type value-pairs-name="license">dropdown</input-type>
+                    <hint></hint>
+                    <required></required>
+                </field>
             </page>
 
             <page number="2">
@@ -230,6 +240,52 @@
     <!-- stores the associated stored-values in the database.                  -->
 
     <form-value-pairs>
+        <value-pairs value-pairs-name="license" dc-term="license">
+            <pair>
+                <displayed-value>Creative Commons Зазначення Авторства 4.0 Міжнародна</displayed-value>
+                <stored-value>ccby4</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Creative Commons Із Зазначенням Авторства - Поширення На Тих Самих Умовах 4.0 Міжнародна</displayed-value>
+                <stored-value>ccbysa4</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Creative Commons Із Зазначенням Авторства - Без Похідних 4.0 Міжнародна</displayed-value>
+                <stored-value>ccbynd4</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Creative Commons Із Зазначенням Авторства - Некомерційна 4.0 Міжнародна</displayed-value>
+                <stored-value>ccbync4</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Creative Commons Із Зазначенням Авторства - Некомерційна - Поширення На Тих Самих Умовах 4.0 Міжнародна</displayed-value>
+                <stored-value>ccbyncsa4</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Creative Commons Із Зазначенням Авторства - Некомерційна - Без Похідних 4.0 Міжнародна</displayed-value>
+                <stored-value>ccbyncnd4</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Creative Commons Передання до Суспільного Надбання</displayed-value>
+                <stored-value>cc0</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Авторське право</displayed-value>
+                <stored-value>inc10</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Авторське право - Дозволено використання в освітніх умовах</displayed-value>
+                <stored-value>incedu10</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Авторське право - Дозволено некомерційне використання</displayed-value>
+                <stored-value>incnc10</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Авторське право - Власник прав не визначений</displayed-value>
+                <stored-value>incru10</stored-value>
+            </pair>
+        </value-pairs>
         <value-pairs value-pairs-name="common_identifiers" dc-term="identifier">
             <pair>
                 <displayed-value>ISSN</displayed-value>
@@ -506,7 +562,52 @@
                 <stored-value>other</stored-value>
             </pair>
         </value-pairs>
-
+        <value-pairs value-pairs-name="rights_links_localization" dc-term="rights_links_localization">
+            <pair>
+                <displayed-value>&lt;a href="https://creativecommons.org/licenses/by/4.0/deed.uk"&gt;Creative Commons Зазначення Авторства 4.0 Міжнародна&lt;/a&gt;</displayed-value>
+                <stored-value>ccby4</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>&lt;a href="https://creativecommons.org/licenses/by-sa/4.0/deed.uk"&gt;Creative Commons Із Зазначенням Авторства - Поширення На Тих Самих Умовах 4.0 Міжнародн&lt;/a&gt;</displayed-value>
+                <stored-value>ccbysa4</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>&lt;a href="https://creativecommons.org/licenses/by-nd/4.0/deed.uk"&gt;Creative Commons Із Зазначенням Авторства - Без Похідних 4.0 Міжнародна&lt;/a&gt;</displayed-value>
+                <stored-value>ccbynd4</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>&lt;a href="https://creativecommons.org/licenses/by-nc/4.0/deed.uk"&gt;Creative Commons Із Зазначенням Авторства - Некомерційна 4.0 Міжнародна&lt;/a&gt;</displayed-value>
+                <stored-value>ccbync4</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>&lt;a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.uk"&gt;Creative Commons Із Зазначенням Авторства - Некомерційна - Поширення На Тих Самих Умовах 4.0 Міжнародна&lt;/a&gt;</displayed-value>
+                <stored-value>ccbyncsa4</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>&lt;a href="https://creativecommons.org/licenses/by-nc-nd/4.0/deed.uk"&gt;Creative Commons Із Зазначенням Авторства - Некомерційна - Без Похідних 4.0 Міжнародна&lt;/a&gt;</displayed-value>
+                <stored-value>ccbyncnd4</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>&lt;a href="https://creativecommons.org/publicdomain/zero/1.0/deed.uk"&gt;Creative Commons Передання до Суспільного Надбання&lt;/a&gt;</displayed-value>
+                <stored-value>cc0</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>&lt;a href="http://rightsstatements.org/vocab/InC/1.0/"&gt;Авторське право&lt;/a&gt;</displayed-value>
+                <stored-value>inc10</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>&lt;a href="http://rightsstatements.org/vocab/InC-EDU/1.0/"&gt;Авторське право - Дозволено використання в освітніх умовах&lt;/a&gt;</displayed-value>
+                <stored-value>incedu10</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>&lt;a href="http://rightsstatements.org/vocab/InC-NC/1.0/"&gt;Авторське право - Дозволено некомерційне використання&lt;/a&gt;</displayed-value>
+                <stored-value>incnc10</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>&lt;a href="http://rightsstatements.org/vocab/InC-RUU/1.0/"&gt;Авторське право - Власник прав не визначений&lt;/a&gt;</displayed-value>
+                <stored-value>incru10</stored-value>
+            </pair>
+        </value-pairs>
     </form-value-pairs>
 
 </input-forms>

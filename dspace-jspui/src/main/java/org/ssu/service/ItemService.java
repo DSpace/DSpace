@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.ssu.entity.AuthorLocalization;
 import org.ssu.entity.response.ItemResponse;
 import org.ssu.repository.MetadatavalueRepository;
+import org.ssu.service.localization.LicenseLinkLocalization;
 import org.ssu.service.localization.TypeLocalization;
 import org.ssu.service.statistics.EssuirStatistics;
 
@@ -35,6 +36,8 @@ public class ItemService {
     private EssuirStatistics essuirStatistics;
     @Resource
     private TypeLocalization typeLocalization;
+    @Resource
+    private LicenseLinkLocalization licenseLinkLocalization;
     @Resource
     private MetadatavalueRepository metadatavalueRepository;
 
@@ -119,6 +122,15 @@ public class ItemService {
                 .sorted(Comparator.comparingInt(MetadataValue::getPlace))
                 .map(MetadataValue::getValue)
                 .collect(Collectors.toList());
+    }
+
+    public String getRightsForItem(Item item, Locale locale) {
+        return itemService.getMetadata(item, MetadataSchema.DC_SCHEMA, "rights", "uri", Item.ANY)
+                .stream()
+                .findFirst()
+                .map(MetadataValue::getValue)
+                .map(type -> licenseLinkLocalization.getLicenseLink(type, locale))
+                .orElse("");
     }
 
     public List<String> getAbstractsForItem(Item item) {

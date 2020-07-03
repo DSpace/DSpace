@@ -118,4 +118,14 @@
             UPDATE chair SET chair_name = 'Кафедра теоретичної та прикладної хімії' WHERE chair_id = 20;
         </sql>
     </changeSet>
+
+    <changeSet author="Igor Marchenko" id="120">
+        <insert tableName="metadatafieldregistry">
+            <column name="metadata_field_id" value="136"/>
+            <column name="metadata_schema_id" value="3"/>
+            <column name="element" value="rights"/>
+            <column name="qualifier" value="uri"/>
+            <column name="scope_note" value="Orcid for user"/>
+        </insert>
+    </changeSet>
 </databaseChangeLog>

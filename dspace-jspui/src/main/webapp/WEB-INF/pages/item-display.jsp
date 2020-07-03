@@ -130,6 +130,10 @@
         </tr>
 
         <tr>
+            <td><fmt:message key="jsp.submit.progressbar.license"/></td>
+            <td>${rights}</td>
+        </tr>
+        <tr>
             <td><fmt:message key="metadata.dc.identifier.citation"/></td>
             <td>${citation}</td>
         </tr>

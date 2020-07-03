@@ -162,6 +162,16 @@ it, please enter the types and the actual numbers or codes.</hint>
          <hint>Select the language of the main content of the item.  If the language does not appear in the list, please select 'Other'.  If the content does not really have a language (for example, if it is a dataset or an image) please select 'N/A'.</hint>
          <required></required>
        </field>
+       <field>
+         <dc-schema>dc</dc-schema>
+         <dc-element>rights</dc-element>
+         <dc-qualifier>uri</dc-qualifier>
+         <repeatable>false</repeatable>
+         <label>License</label>
+         <input-type value-pairs-name="license">dropdown</input-type>
+         <hint></hint>
+         <required></required>
+       </field>
      </page>
 
      <page number="2">
@@ -244,6 +254,53 @@ it, please enter the types and the actual numbers or codes.</hint>
  <!-- stores the associated stored-values in the database.                  -->
 
  <form-value-pairs>
+   <value-pairs value-pairs-name="license" dc-term="license">
+     <pair>
+       <displayed-value>Creative Commons Attribution 4.0 International License</displayed-value>
+       <stored-value>ccby4</stored-value>
+     </pair>
+     <pair>
+       <displayed-value>Creative Commons Attribution-ShareAlike 4.0 International</displayed-value>
+       <stored-value>ccbysa4</stored-value>
+     </pair>
+     <pair>
+       <displayed-value>Creative Commons Attribution - NoDerivatives 4.0 International</displayed-value>
+       <stored-value>ccbynd4</stored-value>
+     </pair>
+     <pair>
+       <displayed-value>Creative Commons Attribution - NonCommercial 4.0 International</displayed-value>
+       <stored-value>ccbync4</stored-value>
+     </pair>
+     <pair>
+       <displayed-value>Creative Commons Attribution - NonCommercial - ShareAlike 4.0 International</displayed-value>
+       <stored-value>ccbyncsa4</stored-value>
+     </pair>
+     <pair>
+       <displayed-value>Creative Commons Attribution - NonCommercial - NoDerivatives 4.0 International</displayed-value>
+       <stored-value>ccbyncnd4</stored-value>
+     </pair>
+     <pair>
+       <displayed-value>Creative Commons Public Domain Dedication</displayed-value>
+       <stored-value>cc0</stored-value>
+     </pair>
+     <pair>
+       <displayed-value>In Copyright</displayed-value>
+       <stored-value>inc10</stored-value>
+     </pair>
+     <pair>
+       <displayed-value>In Copyright - Educational Use Permitted</displayed-value>
+       <stored-value>incedu10</stored-value>
+     </pair>
+     <pair>
+       <displayed-value>In Copyright - Non-Commercial Use Permitted</displayed-value>
+       <stored-value>incnc10</stored-value>
+     </pair>
+     <pair>
+       <displayed-value>In Copyright - Rights-Holder(s) Unlocatable or Unidentifiable</displayed-value>
+       <stored-value>incru10</stored-value>
+     </pair>
+   </value-pairs>
+
    <value-pairs value-pairs-name="common_identifiers" dc-term="identifier">
      <pair>
        <displayed-value>ISSN</displayed-value>
@@ -420,6 +477,52 @@ it, please enter the types and the actual numbers or codes.</hint>
      </pair>
    </value-pairs>
 
+   <value-pairs value-pairs-name="rights_links_localization" dc-term="rights_links_localization">
+     <pair>
+       <displayed-value>&lt;a href="https://creativecommons.org/licenses/by/4.0/deed.en	"&gt;Creative Commons Attribution 4.0 International License&lt;/a&gt;</displayed-value>
+       <stored-value>ccby4</stored-value>
+     </pair>
+     <pair>
+       <displayed-value>&lt;a href="https://creativecommons.org/licenses/by-sa/4.0/"&gt;Creative Creative Commons Attribution-ShareAlike 4.0 International&lt;/a&gt;</displayed-value>
+       <stored-value>ccbysa4</stored-value>
+     </pair>
+     <pair>
+       <displayed-value>&lt;a href="https://creativecommons.org/licenses/by-nd/4.0/"&gt;Creative Commons Attribution - NoDerivatives 4.0 International&lt;/a&gt;</displayed-value>
+       <stored-value>ccbynd4</stored-value>
+     </pair>
+     <pair>
+       <displayed-value>&lt;a href="https://creativecommons.org/licenses/by-nc/4.0/"&gt;Creative Commons Attribution - NonCommercial 4.0 International&lt;/a&gt;</displayed-value>
+       <stored-value>ccbync4</stored-value>
+     </pair>
+     <pair>
+       <displayed-value>&lt;a href="https://creativecommons.org/licenses/by-nc-sa/4.0/"&gt;Creative Commons Attribution - NonCommercial - ShareAlike 4.0 International&lt;/a&gt;</displayed-value>
+       <stored-value>ccbyncsa4</stored-value>
+     </pair>
+     <pair>
+       <displayed-value>&lt;a href="https://creativecommons.org/licenses/by-nc-nd/4.0/"&gt;Creative Commons Attribution - NonCommercial - NoDerivatives 4.0 International&lt;/a&gt;</displayed-value>
+       <stored-value>ccbyncnd4</stored-value>
+     </pair>
+     <pair>
+       <displayed-value>&lt;a href="https://creativecommons.org/publicdomain/zero/1.0/"&gt;Creative Commons Public Domain Dedication&lt;/a&gt;</displayed-value>
+       <stored-value>cc0</stored-value>
+     </pair>
+     <pair>
+       <displayed-value>&lt;a href="http://rightsstatements.org/vocab/InC/1.0/"&gt;In Copyright&lt;/a&gt;</displayed-value>
+       <stored-value>inc10</stored-value>
+     </pair>
+     <pair>
+       <displayed-value>&lt;a href="http://rightsstatements.org/vocab/InC-EDU/1.0/"&gt;In Copyright - Educational Use Permitted&lt;/a&gt;</displayed-value>
+       <stored-value>incedu10</stored-value>
+     </pair>
+     <pair>
+       <displayed-value>&lt;a href="http://rightsstatements.org/vocab/InC-NC/1.0/"&gt;In Copyright - Non-Commercial Use Permitted&lt;/a&gt;</displayed-value>
+       <stored-value>incnc10</stored-value>
+     </pair>
+     <pair>
+       <displayed-value>&lt;a href="http://rightsstatements.org/vocab/InC-RUU/1.0/"&gt;In Copyright - Rights-Holder(s) Unlocatable or Unidentifiable&lt;/a&gt;</displayed-value>
+       <stored-value>incru10</stored-value>
+     </pair>
+   </value-pairs>
  </form-value-pairs>
 
 </input-forms>

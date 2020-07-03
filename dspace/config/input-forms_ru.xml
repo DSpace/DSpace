@@ -148,6 +148,16 @@
                         Если содержание материала на самом деле не содержит текстовую информацию (это например изображение), пожалуйста выбирайте, 'Неопределено'.</hint>
                     <required></required>
                 </field>
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>rights</dc-element>
+                    <dc-qualifier>uri</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Лицензия</label>
+                    <input-type value-pairs-name="license">dropdown</input-type>
+                    <hint></hint>
+                    <required></required>
+                </field>
             </page>
 
             <page number="2">
@@ -230,6 +240,52 @@
     <!-- stores the associated stored-values in the database.                  -->
 
     <form-value-pairs>
+        <value-pairs value-pairs-name="license" dc-term="license">
+            <pair>
+                <displayed-value>Creative Commons Атрибуция 4.0 Всемирная</displayed-value>
+                <stored-value>ccby4</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Creative Commons Атрибуция - Сохранение Условий 4.0 Всемирная</displayed-value>
+                <stored-value>ccbysa4</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Creative Commons Атрибуция - Без Производных 4.0 Всемирная</displayed-value>
+                <stored-value>ccbynd4</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Creative Commons Атрибуция - Некоммерческая 4.0 Всемирная</displayed-value>
+                <stored-value>ccbync4</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Creative Commons Атрибуция - Некоммерческая - СохранениеУсловий 4.0 Всемирная</displayed-value>
+                <stored-value>ccbyncsa4</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Creative Commons Атрибуция - Некоммерческая - Без Производных 4.0 Всемирная</displayed-value>
+                <stored-value>ccbyncnd4</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Creative Commons Передача в общественное достояние</displayed-value>
+                <stored-value>cc0</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Авторское право</displayed-value>
+                <stored-value>inc10</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Авторское право - Разрешено использование в образовательных целях</displayed-value>
+                <stored-value>incedu10</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Авторское право - Разрешено некоммерческое использование</displayed-value>
+                <stored-value>incnc10</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Авторское право - Владелец прав не определен</displayed-value>
+                <stored-value>incru10</stored-value>
+            </pair>
+        </value-pairs>
         <value-pairs value-pairs-name="common_identifiers" dc-term="identifier">
             <pair>
                 <displayed-value>ISSN</displayed-value>
@@ -451,7 +507,52 @@
                 <stored-value>other</stored-value>
             </pair>
         </value-pairs>
-
+        <value-pairs value-pairs-name="rights_links_localization" dc-term="rights_links_localization">
+            <pair>
+                <displayed-value>&lt;a href="https://creativecommons.org/licenses/by/4.0/deed.ru	"&gt;Creative Commons Атрибуция 4.0 Всемирная&lt;/a&gt;</displayed-value>
+                <stored-value>ccby4</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>&lt;a href="https://creativecommons.org/licenses/by-sa/4.0/deed.ru"&gt;Creative Commons Атрибуция - Сохранение Условий 4.0 Всемирная&lt;/a&gt;</displayed-value>
+                <stored-value>ccbysa4</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>&lt;a href="https://creativecommons.org/licenses/by-nd/4.0/deed.ru"&gt;Creative Commons Атрибуция - Без Производных 4.0 Всемирная&lt;/a&gt;</displayed-value>
+                <stored-value>ccbynd4</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>&lt;a href="https://creativecommons.org/licenses/by-nc/4.0/deed.ru"&gt;Creative Commons Атрибуция - Некоммерческая 4.0 Всемирная&lt;/a&gt;</displayed-value>
+                <stored-value>ccbync4</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>&lt;a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.ru"&gt;Creative Commons Атрибуция - Некоммерческая - СохранениеУсловий 4.0 Всемирная&lt;/a&gt;</displayed-value>
+                <stored-value>ccbyncsa4</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>&lt;a href="https://creativecommons.org/licenses/by-nc-nd/4.0/deed.ru"&gt;Creative Commons Атрибуция - Некоммерческая - Без Производных 4.0 Всемирная&lt;/a&gt;</displayed-value>
+                <stored-value>ccbyncnd4</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>&lt;a href="https://creativecommons.org/publicdomain/zero/1.0/deed.ru"&gt;Creative Commons Передача в общественное достояние&lt;/a&gt;</displayed-value>
+                <stored-value>cc0</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>&lt;a href="http://rightsstatements.org/vocab/InC/1.0/"&gt;Авторское право&lt;/a&gt;</displayed-value>
+                <stored-value>inc10</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>&lt;a href="http://rightsstatements.org/vocab/InC-EDU/1.0/"&gt;Авторское право - Разрешено использование в образовательных целях&lt;/a&gt;</displayed-value>
+                <stored-value>incedu10</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>&lt;a href="http://rightsstatements.org/vocab/InC-NC/1.0/"&gt;Авторское право - Разрешено некоммерческое использование&lt;/a&gt;</displayed-value>
+                <stored-value>incnc10</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>&lt;a href="http://rightsstatements.org/vocab/InC-RUU/1.0/"&gt;Авторское право - Владелец прав не определен&lt;/a&gt;</displayed-value>
+                <stored-value>incru10</stored-value>
+            </pair>
+        </value-pairs>
     </form-value-pairs>
 
 </input-forms>
