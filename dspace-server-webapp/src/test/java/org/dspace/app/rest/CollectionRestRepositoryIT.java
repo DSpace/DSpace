@@ -856,7 +856,7 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
 
             getClient(token).perform(get("/api/core/collections/search/findSubmitAuthorizedAndMetadata")
                 .param("metadata", "relationship.type")
-                .param("metadataValue", entityType))
+                .param("metadatavalue", entityType))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
                 .andExpect(jsonPath("$.page.totalElements", equalTo(2)))
@@ -1934,5 +1934,64 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                         )))
                 .andExpect(jsonPath("$.metadata.['dc.description.provenance']").doesNotExist());
 
+    }
+
+    @Test
+    public void findSubmitAuthorizedAllCollectionsByCommunityWithQueryTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        String entityType = "Journal";
+        String entityType2 = "Publication";
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                           .withName("Parent Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withRelationshipType(entityType)
+                                           .withName("Test Collection 1")
+                                           .withSubmitterGroup(eperson)
+                                           .build();
+        Collection col2 = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withRelationshipType(entityType)
+                                           .withName("Publication Collection 2")
+                                           .withSubmitterGroup(eperson)
+                                           .build();
+        Collection col3 = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withRelationshipType(entityType2)
+                                           .withName("Publication Collection 3")
+                                           .withSubmitterGroup(eperson)
+                                           .build();
+        Collection colWithoutMetadata = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withName(" Test Collection 4")
+                                           .withSubmitterGroup(eperson)
+                                           .build();
+
+        context.restoreAuthSystemState();
+
+        String token = getAuthToken(eperson.getEmail(), password);
+
+        getClient(token).perform(get("/api/core/collections/search/findSubmitAuthorizedByCommunityAndMetadata")
+                        .param("uuid", parentCommunity.getID().toString())
+                        .param("metadata", "relationship.type")
+                        .param("metadatavalue", entityType)
+                        .param("query", "test"))
+                .andExpect(status().isOk()).andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$.page.totalElements", equalTo(1)))
+                .andExpect(jsonPath("$._embedded.collections", contains(CollectionMatcher.matchCollection(col1))))
+                .andExpect(jsonPath("$._embedded.collections",
+                        not(contains(CollectionMatcher.matchCollection(colWithoutMetadata)))));
+
+//        getClient(token).perform(get("/api/core/collections/search/findSubmitAuthorizedByCommunityAndMetadata")
+//                        .param("uuid", parentCommunity.getID().toString())
+//                        .param("metadata", "relationship.type")
+//                        .param("query", "publication"))
+//                .andExpect(status().isOk()).andExpect(content().contentType(contentType))
+//                .andExpect(jsonPath("$.page.totalElements", equalTo(2)))
+//                .andExpect(jsonPath("$._embedded.collections", containsInAnyOrder(
+//                                CollectionMatcher.matchCollection(col2),
+//                                CollectionMatcher.matchCollection(col3))))
+//                .andExpect(jsonPath("$._embedded.collections", not(containsInAnyOrder(
+//                                CollectionMatcher.matchCollection(col1),
+//                                CollectionMatcher.matchCollection(colWithoutMetadata))
+//                                )));
     }
 }

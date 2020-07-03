@@ -921,14 +921,15 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
 
     @Override
     public List<Collection> findCollectionsWithSubmit(String q, Context context, Community community,
-        int offset, int limit) throws SQLException, SearchServiceException {
+        String metadata, String metadataValue, int offset, int limit) throws SQLException, SearchServiceException {
 
         List<Collection> collections = new ArrayList<Collection>();
         DiscoverQuery discoverQuery = new DiscoverQuery();
         discoverQuery.setDSpaceObjectFilter(IndexableCollection.TYPE);
         discoverQuery.setStart(offset);
         discoverQuery.setMaxResults(limit);
-        DiscoverResult resp = retrieveCollectionsWithSubmit(context, discoverQuery,community, q);
+        DiscoverResult resp = retrieveCollectionsWithSubmit(context, discoverQuery,
+                                             metadata, metadataValue, community, q);
         for (IndexableObject solrCollections : resp.getIndexableObjects()) {
             Collection c = ((IndexableCollection) solrCollections).getIndexedObject();
             collections.add(c);
@@ -943,7 +944,7 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
         DiscoverQuery discoverQuery = new DiscoverQuery();
         discoverQuery.setMaxResults(0);
         discoverQuery.setDSpaceObjectFilter(IndexableCollection.TYPE);
-        DiscoverResult resp = retrieveCollectionsWithSubmit(context, discoverQuery,community,q);
+        DiscoverResult resp = retrieveCollectionsWithSubmit(context, discoverQuery, null, null, community, q);
         return (int)resp.getTotalSearchResults();
     }
 
@@ -963,7 +964,8 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
      * @throws SearchServiceException    if search error
      */
     private DiscoverResult retrieveCollectionsWithSubmit(Context context, DiscoverQuery discoverQuery,
-            Community community, String q) throws SQLException, SearchServiceException {
+        String metadata, String metadataValue, Community community, String q)
+        throws SQLException, SearchServiceException {
 
         StringBuilder query = new StringBuilder();
         EPerson currentUser = context.getCurrentUser();
@@ -973,6 +975,9 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
                 userId = currentUser.getID().toString();
             }
             query.append("submit:(e").append(userId);
+            if (StringUtils.isNotBlank(metadata)) {
+                query.append(" OR ").append(metadata);
+            }
             Set<Group> groups = groupService.allMemberGroupsSet(context, currentUser);
             for (Group group : groups) {
                 query.append(" OR g").append(group.getID());
@@ -980,8 +985,20 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
             query.append(")");
             discoverQuery.addFilterQueries(query.toString());
         }
+        StringBuilder buildFilter = new StringBuilder();
         if (community != null) {
-            discoverQuery.addFilterQueries("location.comm:" + community.getID().toString());
+            buildFilter.append("location.comm:").append(community.getID().toString());
+        }
+        if (StringUtils.isNotBlank(metadata)) {
+            if (buildFilter.length() > 0) {
+                buildFilter.append(" AND ");
+            }
+            buildFilter.append(metadata).append(":");
+            if (StringUtils.isNotBlank(metadataValue)) {
+                buildFilter.append("\"").append(metadataValue).append("\"");
+            } else {
+                buildFilter.append("*");
+            }
         }
         if (StringUtils.isNotBlank(q)) {
             StringBuilder buildQuery = new StringBuilder();
@@ -989,6 +1006,7 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
             buildQuery.append(escapedQuery).append(" OR ").append(escapedQuery).append("*");
             discoverQuery.setQuery(buildQuery.toString());
         }
+        discoverQuery.addFilterQueries(buildFilter.toString());
         DiscoverResult resp = searchService.search(context, discoverQuery);
         return resp;
     }

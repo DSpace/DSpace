@@ -375,7 +375,7 @@ public interface CollectionService
      * @throws SearchServiceException    if search error
      */
     public List<Collection> findCollectionsWithSubmit(String q, Context context, Community community,
-        int offset, int limit) throws SQLException, SearchServiceException;
+        String metadata, String metadataValue,int offset, int limit) throws SQLException, SearchServiceException;
 
     /**
      * Counts the number of Collection for which the current user has 'submit' privileges.

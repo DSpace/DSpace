@@ -103,6 +103,7 @@ public class CollectionIndexFactoryImpl extends DSpaceObjectIndexFactoryImpl<Ind
         String rights = collectionService.getMetadata(collection, "copyright_text");
         String rights_license = collectionService.getMetadata(collection, "license");
         String title = collectionService.getMetadata(collection, "name");
+        String relation = collectionService.getMetadata(collection, "relationship");
 
         List<String> toIgnoreMetadataFields = SearchUtils.getIgnoredMetadataFields(collection.getType());
         addContainerMetadataField(doc, highlightedMetadataFields, toIgnoreMetadataFields, "dc.description",
@@ -116,7 +117,8 @@ public class CollectionIndexFactoryImpl extends DSpaceObjectIndexFactoryImpl<Ind
         addContainerMetadataField(doc, highlightedMetadataFields, toIgnoreMetadataFields, "dc.rights.license",
                                   rights_license);
         addContainerMetadataField(doc, highlightedMetadataFields, toIgnoreMetadataFields, "dc.title", title);
-
+        addContainerMetadataField(doc, highlightedMetadataFields, toIgnoreMetadataFields,
+                                                                              "relationship.type", relation);
         return doc;
     }
 
