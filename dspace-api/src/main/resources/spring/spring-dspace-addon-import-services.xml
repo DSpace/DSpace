@@ -71,6 +71,12 @@
           <property name="metadataFieldMap" ref="tsvMetadataFieldMap" />
     </bean>
 
+    <bean id="EndnoteImportService"
+          class="org.dspace.importer.external.endnote.service.EndnoteImportMetadataSourceServiceImpl" scope="singleton">
+          <property name="metadataFieldMap" ref="endnoteMetadataFieldMap"></property>
+    </bean>
+
+
     <!-- Metadatafield used to check against if it's already imported or not during the JSONLookupSearcher-->
     <bean id="lookupID" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
         <constructor-arg value="dc.identifier.other"/>

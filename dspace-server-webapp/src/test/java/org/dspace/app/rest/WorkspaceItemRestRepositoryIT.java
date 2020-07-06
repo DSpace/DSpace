@@ -871,7 +871,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
      *
      * @throws Exception
      */
-    public void createSingleWorkspaceItemFromFileWithOneEntryTest() throws Exception {
+    public void createSingleWorkspaceItemFromBibtexFileWithOneEntryTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
         //** GIVEN **
@@ -938,7 +938,170 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         bibtex.close();
     }
 
+    @Test
+    /**
+     * Test the creation of workspaceitems POSTing to the resource collection endpoint a csv file
+     *
+     * @throws Exception
+     */
+    public void createSingleWorkspaceItemFromCSVWithOneEntryTest() throws Exception {
+        context.turnOffAuthorisationSystem();
 
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and two collections.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1)
+                                           .withName("Collection 1")
+                                           .withSubmitterGroup(eperson)
+                                           .build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1)
+                                           .withName("Collection 2")
+                                           .withSubmitterGroup(eperson)
+                                           .build();
+
+        InputStream csv = getClass().getResourceAsStream("csv-test.csv");
+        final MockMultipartFile csvFile = new MockMultipartFile("file", "/local/path/csv-test.csv",
+            "text/csv", csv);
+
+        context.restoreAuthSystemState();
+
+        String authToken = getAuthToken(eperson.getEmail(), password);
+        // bulk create workspaceitems in the default collection (col1)
+        getClient(authToken).perform(fileUpload("/api/submission/workspaceitems")
+                    .file(csvFile))
+                // bulk create should return 200, 201 (created) is better for single resource
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$._embedded.workspaceitems[0].sections.traditionalpageone['dc.title'][0].value",
+                        is("My Article")))
+                .andExpect(jsonPath("$._embedded.workspaceitems[0].sections.traditionalpageone['dc.author'][0].value",
+                        is("Nobody")))
+                .andExpect(jsonPath("$._embedded.workspaceitems[0].sections.traditionalpageone"
+                        + "['dc.date.issued'][0].value",
+                        is("2006")))
+                .andExpect(jsonPath("$._embedded.workspaceitems[0].sections.traditionalpageone['dc.source'][0].value",
+                        is("My Journal")))
+                .andExpect(jsonPath("$._embedded.workspaceitems[0].sections.traditionalpageone"
+                        + "['dc.identifier.issn'][0].value",
+                        is("Mock ISSN")))
+                .andExpect(jsonPath("$._embedded.workspaceitems[0].sections.traditionalpageone['dc.type'][0].value",
+                        is("Mock subtype")))
+                .andExpect(
+                        jsonPath("$._embedded.workspaceitems[0]._embedded.collection.id", is(col1.getID().toString())))
+                .andExpect(jsonPath("$._embedded.workspaceitems[0].sections.upload.files[0]"
+                     + ".metadata['dc.source'][0].value",
+                        is("/local/path/csv-test.csv")))
+                .andExpect(jsonPath("$._embedded.workspaceitems[0].sections.upload.files[0]"
+                     + ".metadata['dc.title'][0].value",
+                        is("csv-test.csv")))
+                .andExpect(
+                        jsonPath("$._embedded.workspaceitems[*]._embedded.upload").doesNotExist());
+        ;
+
+        // bulk create workspaceitems explicitly in the col2
+        getClient(authToken).perform(fileUpload("/api/submission/workspaceitems")
+                    .file(csvFile)
+                    .param("owningCollection", col2.getID().toString()))
+                    .andExpect(status().isOk())
+                 .andExpect(jsonPath("$._embedded.workspaceitems[0].sections.traditionalpageone"
+                     + "['dc.title'][0].value",
+                     is("My Article")))
+                 .andExpect(jsonPath("$._embedded.workspaceitems[0].sections.traditionalpageone['dc.author'][0].value",
+                     is("Nobody")))
+                 .andExpect(jsonPath("$._embedded.workspaceitems[0].sections.traditionalpageone"
+                     + "['dc.date.issued'][0].value",
+                     is("2006")))
+                 .andExpect(jsonPath("$._embedded.workspaceitems[0].sections.traditionalpageone['dc.source'][0].value",
+                     is("My Journal")))
+                 .andExpect(jsonPath("$._embedded.workspaceitems[0].sections.traditionalpageone"
+                     + "['dc.identifier.issn'][0].value",
+                     is("Mock ISSN")))
+                 .andExpect(jsonPath("$._embedded.workspaceitems[0].sections.traditionalpageone['dc.type'][0].value",
+                     is("Mock subtype")))
+                 .andExpect(
+                        jsonPath("$._embedded.workspaceitems[0]._embedded.collection.id", is(col2.getID().toString())))
+                 .andExpect(jsonPath("$._embedded.workspaceitems[0].sections.upload.files[0]"
+                     + ".metadata['dc.source'][0].value",
+                        is("/local/path/csv-test.csv")))
+                 .andExpect(jsonPath("$._embedded.workspaceitems[0].sections.upload"
+                     + ".files[0].metadata['dc.title'][0].value",
+                        is("csv-test.csv")))
+                 .andExpect(
+                     jsonPath("$._embedded.workspaceitems[*]._embedded.upload").doesNotExist());
+        csv.close();
+    }
+
+    @Test
+    /**
+     * Test the creation of workspaceitems POSTing to the resource collection endpoint a csv file
+     * with some missing data
+     *
+     * @throws Exception
+     */
+    public void createSingleWorkspaceItemFromCSVWithOneEntryAndMissingDataTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and two collections.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1)
+                                           .withName("Collection 1")
+                                           .withSubmitterGroup(eperson)
+                                           .build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1)
+                                           .withName("Collection 2")
+                                           .withSubmitterGroup(eperson)
+                                           .build();
+
+        InputStream csv = getClass().getResourceAsStream("bibtex-test.bib");
+        final MockMultipartFile csvFile = new MockMultipartFile("file", "/local/path/csv-missing-field-test.csv",
+            "text/csv", csv);
+
+        context.restoreAuthSystemState();
+
+        String authToken = getAuthToken(eperson.getEmail(), password);
+
+        // bulk create workspaceitems in the default collection (col1)
+        getClient(authToken).perform(fileUpload("/api/submission/workspaceitems")
+                .file(csvFile))
+            // bulk create should return 200, 201 (created) is better for single resource
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$._embedded.workspaceitems[0].sections.traditionalpageone['dc.title'][0].value",
+                    is("My Article")))
+            .andExpect(jsonPath("$._embedded.workspaceitems[0].sections.traditionalpageone['dc.author'][0].value",
+                    is("Nobody")))
+            .andExpect(jsonPath("$._embedded.workspaceitems[0].sections.traditionalpageone"
+                    + "['dc.date.issued'][0].value").doesNotExist())
+            .andExpect(jsonPath("$._embedded.workspaceitems[0].sections.traditionalpageone['dc.source'][0].value",
+                    is("My Journal")))
+            .andExpect(jsonPath("$._embedded.workspaceitems[0].sections.traditionalpageone"
+                    + "['dc.identifier.issn'][0].value",
+                    is("Mock ISSN")))
+            .andExpect(jsonPath("$._embedded.workspaceitems[0].sections.traditionalpageone['dc.type'][0].value"
+                    ).doesNotExist())
+            .andExpect(
+                    jsonPath("$._embedded.workspaceitems[0]._embedded.collection.id", is(col1.getID().toString())))
+            .andExpect(jsonPath("$._embedded.workspaceitems[0].sections.upload.files[0]"
+                 + ".metadata['dc.source'][0].value",
+                    is("/local/path/csv-missing-field-test.csv")))
+            .andExpect(jsonPath("$._embedded.workspaceitems[0].sections.upload.files[0]"
+                 + ".metadata['dc.title'][0].value",
+                    is("csv-missing-field-test.csv")))
+            .andExpect(
+                    jsonPath("$._embedded.workspaceitems[*]._embedded.upload").doesNotExist());
+    ;
+
+            csv.close();
+    }
 
     @Test
     /**
