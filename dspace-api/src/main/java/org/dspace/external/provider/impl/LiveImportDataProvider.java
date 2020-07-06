@@ -47,18 +47,34 @@ public class LiveImportDataProvider implements ExternalDataProvider {
         return sourceIdentifier;
     }
 
+    /**
+     * This method set the SourceIdentifier for the ExternalDataProvider
+     * @param sourceIdentifier   The UNIQUE sourceIdentifier to be set on any LiveImport data provider
+     */
     public void setSourceIdentifier(String sourceIdentifier) {
         this.sourceIdentifier = sourceIdentifier;
     }
 
+    /**
+     * This method set the MetadataSource for the ExternalDataProvider
+     * @param metadataSource {@link org.dspace.importer.external.service.components.MetadataSource} implementation used to process the input data
+     */
     public void setMetadataSource(MetadataSource metadataSource) {
         this.metadataSource = metadataSource;
     }
 
+    /**
+     * This method set dublin core identifier to use as metadata id
+     * @param recordIdMetadata dublin core identifier to use as metadata id
+     */
     public void setRecordIdMetadata(String recordIdMetadata) {
         this.recordIdMetadata = recordIdMetadata;
     }
 
+    /**
+     * This method set the dublin core identifier to display the title
+     * @param displayMetadata metadata to use as title
+     */
     public void setDisplayMetadata(String displayMetadata) {
         this.displayMetadata = displayMetadata;
     }
