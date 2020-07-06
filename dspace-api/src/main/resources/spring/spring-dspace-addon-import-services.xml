@@ -23,8 +23,11 @@
           lazy-init="false" autowire="byType" destroy-method="destroy">
         <property name="importSources">
             <list>
-                <ref bean="PubmedImportService"></ref>
-                <ref bean="BibtexImportService"></ref>
+                <ref bean="PubmedImportService" />
+                <ref bean="BibtexImportService" />
+                <ref bean="RisImportService" />
+                <ref bean="CsvImportService" />
+                <ref bean="TsvImportService" />
             </list>
          </property>
     </bean>
@@ -48,9 +51,24 @@
           class="org.dspace.importer.external.pubmed.metadatamapping.PubmedFieldMapping">
     </bean>
 
+    <bean id="RisImportService"
+          class="org.dspace.importer.external.ris.service.RisImportMetadataSourceServiceImpl" scope="singleton">
+    </bean>
+
     <bean id="BibtexImportService"
           class="org.dspace.importer.external.bibtex.service.BibtexImportMetadataSourceServiceImpl" scope="singleton">
-        <!-- <property name="metadataFieldMapping" ref="BibtexMetadataFieldMapping"/>  -->
+    </bean>
+
+    <bean id="CsvImportService"
+          class="org.dspace.importer.external.csv.service.CharacterSeparatedImportMetadataSourceServiceImpl" scope="singleton">
+          <property name="metadataFieldMap" ref="csvMetadataFieldMap"></property>
+    </bean>
+
+    <bean id="TsvImportService"
+          class="org.dspace.importer.external.csv.service.CharacterSeparatedImportMetadataSourceServiceImpl" scope="singleton">
+          <property name="importSource" value="TsvMetadataSource" />
+          <property name="separator" value="\t" />
+          <property name="metadataFieldMap" ref="tsvMetadataFieldMap" />
     </bean>
 
     <!-- Metadatafield used to check against if it's already imported or not during the JSONLookupSearcher-->
