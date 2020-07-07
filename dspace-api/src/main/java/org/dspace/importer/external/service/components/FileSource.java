@@ -22,6 +22,8 @@ import org.dspace.importer.external.exception.FileSourceException;
  */
 public interface FileSource extends MetadataSource {
 
+    public List<String> getSupportedExtensions();
+
     /**
      * Return a list of ImportRecord constructed from input file.
      *
@@ -43,4 +45,23 @@ public interface FileSource extends MetadataSource {
     public ImportRecord getRecord(InputStream inputStream)
         throws FileSourceException, FileMultipleOccurencesException;
 
+
+    /**
+     * This method is used to decide if the FileSource manage the file format
+     * 
+     * @param originalName the file file original name
+     * @return true if the FileSource can parse the file, false otherwise
+     */
+    public default boolean isValidSourceForFile(String originalName) {
+        List<String> extensions = getSupportedExtensions();
+        if (extensions == null || extensions.isEmpty()) {
+            return false;
+        }
+        if (originalName != null && originalName.contains(".")) {
+            String extension = originalName.substring(originalName.lastIndexOf('.') + 1,
+                originalName.length());
+            return getSupportedExtensions().contains(extension);
+        }
+        return false;
+    }
 }

@@ -380,11 +380,14 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
             for (MultipartFile mpFile : uploadfiles) {
                 File file = Utils.getFile(mpFile, "upload-loader", "filedataloader");
                 try {
-                    ImportRecord record = importService.getRecord(file);
+                    ImportRecord record = importService.getRecord(file, mpFile.getOriginalFilename());
                     if (record != null) {
                         records.add(record);
                         break;
                     }
+                } catch (Exception e) {
+                    log.error("Error processing data", e);
+                    throw e;
                 } finally {
                     file.delete();
                 }
