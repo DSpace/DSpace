@@ -76,8 +76,7 @@ public class ItemAuthority implements ChoiceAuthority {
         DiscoverQuery discoverQuery = new DiscoverQuery();
         discoverQuery.setDSpaceObjectFilter(Item.class.getSimpleName());
 
-        String relationshipType = ConfigurationManager.getProperty("cris", "ItemAuthority."
-                + field + ".relationshipType");
+        String relationshipType = getRelationshipType(field);
         if (StringUtils.isNotBlank(relationshipType)) {
             String filter = "relationship.type:" + relationshipType;
             discoverQuery.addFilterQueries(filter);
@@ -129,5 +128,28 @@ public class ItemAuthority implements ChoiceAuthority {
             }
         }
         return title;
+    }
+
+    @Override
+    public String getLinkedItemType(String field) {
+        String relationshipType = getRelationshipType(field);
+        if (relationshipType == null) {
+            return null;
+        }
+
+        switch (relationshipType) {
+            case "orgunit":
+                return "OrgUnit";
+            case "dataset":
+                return "DataSet";
+            default:
+                return StringUtils.capitalize(relationshipType);
+        }
+
+    }
+
+    @SuppressWarnings("deprecation")
+    private String getRelationshipType ( String field ) {
+        return ConfigurationManager.getProperty("cris", "ItemAuthority." + field + ".relationshipType");
     }
 }

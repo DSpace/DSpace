@@ -420,4 +420,13 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService 
         return ma.getTopChoices(authorityName, start, limit, locale);
     }
 
+    @Override
+    public String getLinkedItemType(String fieldKey) {
+        ChoiceAuthority ma = getChoiceAuthorityMap().get(fieldKey);
+        if (ma == null) {
+            throw new IllegalArgumentException("No choices plugin was configured for  field \"" + fieldKey + "\".");
+        }
+        return ma.getLinkedItemType(fieldKey);
+    }
+
 }
