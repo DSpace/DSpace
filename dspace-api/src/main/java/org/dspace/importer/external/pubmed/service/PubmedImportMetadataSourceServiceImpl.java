@@ -52,6 +52,17 @@ public class PubmedImportMetadataSourceServiceImpl extends AbstractImportMetadat
 
     private WebTarget pubmedWebTarget;
 
+    private List<String> supportedExtensions;
+
+    public void setSupportedExtensions(List<String> supportedExtensions) {
+        this.supportedExtensions = supportedExtensions;
+    }
+
+    @Override
+    public List<String> getSupportedExtensions() {
+        return supportedExtensions;
+    }
+
     /**
      * Find the number of records matching a query;
      *
@@ -429,5 +440,6 @@ public class PubmedImportMetadataSourceServiceImpl extends AbstractImportMetadat
         }
         return records;
     }
+
 
 }

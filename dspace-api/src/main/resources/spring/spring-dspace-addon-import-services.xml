@@ -44,6 +44,11 @@
           class="org.dspace.importer.external.pubmed.service.PubmedImportMetadataSourceServiceImpl" scope="singleton">
         <property name="metadataFieldMapping" ref="PubmedMetadataFieldMapping"/>
         <property name="baseAddress" value="https://eutils.ncbi.nlm.nih.gov/entrez/eutils/"/>
+        <property name="supportedExtensions">
+               <list>
+                     <value>xml</value>
+               </list>
+          </property>
     </bean>
 
 
@@ -53,27 +58,56 @@
 
     <bean id="RisImportService"
           class="org.dspace.importer.external.ris.service.RisImportMetadataSourceServiceImpl" scope="singleton">
+          <property name="supportedExtensions">
+               <list>
+                     <value>ris</value>
+               </list>
+          </property>
     </bean>
 
     <bean id="BibtexImportService"
           class="org.dspace.importer.external.bibtex.service.BibtexImportMetadataSourceServiceImpl" scope="singleton">
+          <property name="supportedExtensions">
+               <list>
+                     <value>bib</value>
+                     <value>bibtex</value>
+               </list>
+          </property>
     </bean>
 
     <bean id="CsvImportService"
           class="org.dspace.importer.external.csv.service.CharacterSeparatedImportMetadataSourceServiceImpl" scope="singleton">
           <property name="metadataFieldMap" ref="csvMetadataFieldMap"></property>
+          <property name="skipLines" value="1" />
+          <property name="supportedExtensions">
+               <list>
+                     <value>csv</value>
+               </list>
+          </property>
     </bean>
 
     <bean id="TsvImportService"
           class="org.dspace.importer.external.csv.service.CharacterSeparatedImportMetadataSourceServiceImpl" scope="singleton">
           <property name="importSource" value="TsvMetadataSource" />
-          <property name="separator" value="\t" />
+          <property name="separator" value="9" />
+          <property name="skipLines" value="1" />
           <property name="metadataFieldMap" ref="tsvMetadataFieldMap" />
+          <property name="supportedExtensions">
+               <list>
+                     <value>tsv</value>
+               </list>
+          </property>
     </bean>
 
     <bean id="EndnoteImportService"
           class="org.dspace.importer.external.endnote.service.EndnoteImportMetadataSourceServiceImpl" scope="singleton">
           <property name="metadataFieldMap" ref="endnoteMetadataFieldMap"></property>
+          <property name="supportedExtensions">
+               <list>
+                     <value>enl</value>
+                     <value>enw</value>
+               </list>
+          </property>
     </bean>
 
 

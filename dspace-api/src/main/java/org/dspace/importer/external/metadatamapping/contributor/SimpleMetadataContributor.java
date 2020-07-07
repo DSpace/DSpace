@@ -91,4 +91,11 @@ public class SimpleMetadataContributor implements MetadataContributor<PlainMetad
         this.key = key;
     }
 
+    public String getKey() {
+        return key;
+    }
+
+    public MetadataFieldConfig getField() {
+        return field;
+    }
 }

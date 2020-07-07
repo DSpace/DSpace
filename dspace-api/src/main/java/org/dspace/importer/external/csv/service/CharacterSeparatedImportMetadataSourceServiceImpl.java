@@ -27,14 +27,24 @@ import org.dspace.importer.external.service.components.dto.PlainMetadataSourceDt
 
 public class CharacterSeparatedImportMetadataSourceServiceImpl extends AbstractPlainMetadataSource {
 
-    private String separator = ",";
+    private char separator = ',';
 
-    private String escapeCharacter = "\"";
+    private char escapeCharacter = '"';
+
+    private Integer skipLines = 1;
 
     private String importSource = "CsvMetadataSource";
 
-    public void setSeparator(String separator) {
-        this.separator = separator;
+    public void setSkipLines(Integer skipLines) {
+        this.skipLines = skipLines;
+    }
+
+    public Integer getSkipLines() {
+        return skipLines;
+    }
+
+    public void setSeparator(int separator) {
+        this.separator = (char)separator;
     }
 
     @Override
@@ -46,32 +56,36 @@ public class CharacterSeparatedImportMetadataSourceServiceImpl extends AbstractP
         this.importSource = importSource;
     }
 
-    public void setEscapeCharacter(String escapeCharacter) {
-        this.escapeCharacter = escapeCharacter;
+    public void setEscapeCharacter(int escapeCharacter) {
+        this.escapeCharacter = (char)escapeCharacter;
     }
 
     @Override
     protected List<PlainMetadataSourceDto> readData(InputStream inputStream) throws FileSourceException {
         List<PlainMetadataSourceDto> plainMetadataList = new ArrayList<>();
         try (CSVReader csvReader = new CSVReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8),
-            separator.charAt(0), escapeCharacter.charAt(0));) {
+            separator, escapeCharacter);) {
             List<String[]> lines = csvReader.readAll();
-            for (String [] items : lines) {
+            int listSize = lines == null ? 0 : lines.size();
+            int count = skipLines;
+            while (count < listSize) {
+                String [] items = lines.get(count);
                 List<PlainMetadataKeyValueItem> keyValueList = new ArrayList<>();
                 if (items != null) {
                     int size = items.length;
-                    int count = 0;
-                    while (count < size) {
+                    int index = 0;
+                    while (index < size) {
                         PlainMetadataKeyValueItem keyValueItem = new PlainMetadataKeyValueItem();
-                        keyValueItem.setKey(String.valueOf(count));
-                        keyValueItem.setValue(items[count]);
+                        keyValueItem.setKey(String.valueOf(index));
+                        keyValueItem.setValue(items[index]);
                         keyValueList.add(keyValueItem);
-                        count++;
+                        index++;
                     }
                     PlainMetadataSourceDto dto = new PlainMetadataSourceDto();
                     dto.setMetadata(keyValueList);
                     plainMetadataList.add(dto);
                 }
+                count++;
             }
         } catch (IOException e) {
             throw new FileSourceException("Error reading file", e);
