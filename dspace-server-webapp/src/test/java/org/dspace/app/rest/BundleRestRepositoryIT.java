@@ -37,6 +37,7 @@ import org.dspace.app.rest.builder.ResourcePolicyBuilder;
 import org.dspace.app.rest.matcher.BitstreamMatcher;
 import org.dspace.app.rest.matcher.BundleMatcher;
 import org.dspace.app.rest.matcher.HalMatcher;
+import org.dspace.app.rest.matcher.ItemMatcher;
 import org.dspace.app.rest.matcher.MetadataMatcher;
 import org.dspace.app.rest.model.BundleRest;
 import org.dspace.app.rest.model.MetadataRest;
@@ -634,6 +635,22 @@ public class BundleRestRepositoryIT extends AbstractControllerIntegrationTest {
         // Verify the bundle is still here
         getClient().perform(get("/api/core/bundles/" + bundle1.getID()))
                 .andExpect(status().isOk());
+    }
+
+    @Test
+    public void getEmbeddedItemForBundle() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        bundle1 = BundleBuilder.createBundle(context, item)
+                .withName("testname")
+                .build();
+
+        context.restoreAuthSystemState();
+
+        getClient().perform(get("/api/core/bundles/" + bundle1.getID() + "?embed=item"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$._embedded.item", ItemMatcher.matchItemWithTitleAndDateIssued(item, "Public item 1", "2017-10-17")));
     }
 
 }
