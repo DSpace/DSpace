@@ -20,11 +20,18 @@ import org.dspace.importer.external.exception.FileSourceException;
 import org.dspace.importer.external.metadatamapping.MetadataFieldConfig;
 import org.dspace.importer.external.metadatamapping.contributor.MetadataContributor;
 import org.dspace.importer.external.service.components.AbstractPlainMetadataSource;
+import org.dspace.importer.external.service.components.MetadataSource;
 import org.dspace.importer.external.service.components.dto.PlainMetadataKeyValueItem;
 import org.dspace.importer.external.service.components.dto.PlainMetadataSourceDto;
 
 
-
+/**
+ * This class is an implementation of {@link MetadataSource} which extends {@link AbstractPlainMetadataSource}
+ * in order to parse "character separated" files like csv, tsv, etc using the Live Import framework.
+ * 
+ * @author Pasquale Cavallo
+ *
+ */
 public class CharacterSeparatedImportMetadataSourceServiceImpl extends AbstractPlainMetadataSource {
 
     private char separator = ',';
@@ -35,14 +42,30 @@ public class CharacterSeparatedImportMetadataSourceServiceImpl extends AbstractP
 
     private String importSource = "CsvMetadataSource";
 
+    /**
+     * Set the number of lines to skip at the start of the file. This method is suitable,
+     * for example, to skip file headers.
+     * 
+     * @param skipLines number of the line at the start of the file to skip.
+     */
     public void setSkipLines(Integer skipLines) {
         this.skipLines = skipLines;
     }
 
+    /**
+     * 
+     * @return the number of the lines to skip
+     */
     public Integer getSkipLines() {
         return skipLines;
     }
 
+    /**
+     * Method to inject the separator
+     * This must be the ASCII integer
+     * related to the char.
+     * In example, 9 for tab, 44 for comma
+     */
     public void setSeparator(int separator) {
         this.separator = (char)separator;
     }
@@ -52,10 +75,19 @@ public class CharacterSeparatedImportMetadataSourceServiceImpl extends AbstractP
         return importSource;
     }
 
+    /**
+     * Method to set the name of the source
+     */
     public void setImportSource(String importSource) {
         this.importSource = importSource;
     }
 
+    /**
+     * Method to inject the escape character. This must be the ASCII integer
+     * related to the char.
+     * In example, 9 for tab, 44 for comma
+     * 
+     */
     public void setEscapeCharacter(int escapeCharacter) {
         this.escapeCharacter = (char)escapeCharacter;
     }
