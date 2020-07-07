@@ -242,6 +242,18 @@
     <form-value-pairs>
         <value-pairs value-pairs-name="license" dc-term="license">
             <pair>
+                <displayed-value>Авторське право не оцінено</displayed-value>
+                <stored-value>cne</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Авторське право не відомо</displayed-value>
+                <stored-value>nkc</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>Авторське право не визначено</displayed-value>
+                <stored-value>cu</stored-value>
+            </pair>
+            <pair>
                 <displayed-value>Creative Commons Зазначення Авторства 4.0 Міжнародна</displayed-value>
                 <stored-value>ccby4</stored-value>
             </pair>
@@ -563,6 +575,18 @@
             </pair>
         </value-pairs>
         <value-pairs value-pairs-name="rights_links_localization" dc-term="rights_links_localization">
+            <pair>
+                <displayed-value>&lt;a href="http://rightsstatements.org/vocab/CNE/1.0/"&gt;Авторське право не оцінено&lt;/a&gt;</displayed-value>
+                <stored-value>cne</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>&lt;a href="http://rightsstatements.org/vocab/NKC/1.0/"&gt;Авторське право не відомо&lt;/a&gt;</displayed-value>
+                <stored-value>nkc</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>&lt;a href="https://rightsstatements.org/page/UND/1.0/?language=en"&gt;Авторське право не визначено&lt;/a&gt;</displayed-value>
+                <stored-value>cu</stored-value>
+            </pair>
             <pair>
                 <displayed-value>&lt;a href="https://creativecommons.org/licenses/by/4.0/deed.uk"&gt;Creative Commons Зазначення Авторства 4.0 Міжнародна&lt;/a&gt;</displayed-value>
                 <stored-value>ccby4</stored-value>
