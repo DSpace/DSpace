@@ -10,6 +10,7 @@ package org.dspace.app.rest.converter;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.model.ScopeEnum;
@@ -24,9 +25,13 @@ import org.dspace.app.rest.model.submit.SelectableRelationship;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.repository.SubmissionFormRestRepository;
 import org.dspace.app.rest.utils.AuthorityUtils;
+import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.app.util.DCInput;
 import org.dspace.app.util.DCInputSet;
+import org.dspace.core.Context;
+import org.dspace.core.Utils;
 import org.dspace.services.RequestService;
+import org.dspace.services.model.Request;
 import org.dspace.submit.model.LanguageFormField;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -132,6 +137,29 @@ public class SubmissionFormConverter implements DSpaceConverter<DCInputSet, Subm
                 } else {
                     inputRest.setType(inputType);
                 }
+
+                Context context = null;
+                Request currentRequest = requestService.getCurrentRequest();
+                if (currentRequest != null) {
+                    HttpServletRequest request = currentRequest.getHttpServletRequest();
+                    context = ContextUtil.obtainContext(request);
+                } else {
+                    context = new Context();
+                }
+
+                if (StringUtils.equalsIgnoreCase(dcinput.getInputType(), "group") ||
+                        StringUtils.equalsIgnoreCase(dcinput.getInputType(), "inline-group")) {
+                    inputField.setRows(submissionFormRestRepository.findOne(context, formName + "-" + Utils
+                        .standardize(dcinput.getSchema(), dcinput.getElement(), dcinput.getQualifier(), "-")));
+                } else if (authorityUtils.isChoice(dcinput.getSchema(), dcinput.getElement(), dcinput.getQualifier())) {
+                    inputRest.setType(getPresentation(dcinput.getSchema(), dcinput.getElement(),
+                                                      dcinput.getQualifier(), inputType));
+                    selMd.setControlledVocabulary(getAuthorityName(dcinput.getSchema(), dcinput.getElement(),
+                                                        dcinput.getQualifier(), dcinput.getPairsType(),
+                                                        dcinput.getVocabulary()));
+                    selMd.setClosed(isClosed(dcinput.getSchema(), dcinput.getElement(),
+                            dcinput.getQualifier(), null, dcinput.getVocabulary()));
+                }
                 selMd.setMetadata(org.dspace.core.Utils
                     .standardize(dcinput.getSchema(), dcinput.getElement(), dcinput.getQualifier(), "."));
                 selectableMetadata.add(selMd);
@@ -158,6 +186,7 @@ public class SubmissionFormConverter implements DSpaceConverter<DCInputSet, Subm
         inputField.setInput(inputRest);
         if (dcinput.isMetadataField()) {
             inputField.setSelectableMetadata(selectableMetadata);
+            inputField.setTypeBind(dcinput.getTypeBindList());
         }
         if (dcinput.isRelationshipField()) {
             selectableRelationship = getSelectableRelationships(dcinput);
