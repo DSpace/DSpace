@@ -35,6 +35,11 @@ public abstract class AbstractPlainMetadataSource
 
     private List<String> supportedExtensions;
 
+    /**
+     * Set the file extensions supported by the implementation of this abstract
+     * 
+     * @param supportedExtensionsthe file extensions (xml,txt,...) supported by the specific implementation
+     */
     public void setSupportedExtensions(List<String> supportedExtensions) {
         this.supportedExtensions = supportedExtensions;
     }

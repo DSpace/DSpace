@@ -22,6 +22,9 @@ import org.dspace.importer.external.exception.FileSourceException;
  */
 public interface FileSource extends MetadataSource {
 
+    /**
+     * Get the file extensions (xml, csv, txt, ...) supported by the FileSource
+     */
     public List<String> getSupportedExtensions();
 
     /**

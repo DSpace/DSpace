@@ -44,6 +44,7 @@ import org.jaxen.JaxenException;
  * Implements a data source for querying PubMed Central
  *
  * @author Roeland Dillen (roeland at atmire dot com)
+ * @author Pasquale Cavallo (pasquale.cavallo at 4science dot it)
  */
 public class PubmedImportMetadataSourceServiceImpl extends AbstractImportMetadataSourceService<OMElement>
     implements QuerySource, FileSource {
@@ -54,6 +55,11 @@ public class PubmedImportMetadataSourceServiceImpl extends AbstractImportMetadat
 
     private List<String> supportedExtensions;
 
+    /**
+     * Set the file extensions supported by this metadata service
+     * 
+     * @param supportedExtensionsthe file extensions (xml,txt,...) supported by this service
+     */
     public void setSupportedExtensions(List<String> supportedExtensions) {
         this.supportedExtensions = supportedExtensions;
     }
