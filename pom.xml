@@ -36,7 +36,7 @@
         <jaxb-api.version>2.3.1</jaxb-api.version>
         <jaxb-runtime.version>2.3.1</jaxb-runtime.version>
         <!-- NOTE: Jetty needed for Handle Server & tests. Should be synced with version provided by solr-cell -->
-        <jetty.version>9.4.8.v20171121</jetty.version>
+        <jetty.version>9.4.15.v20190215</jetty.version>
         <log4j.version>2.11.2</log4j.version>
         <pdfbox-version>2.0.15</pdfbox-version>
         <poi-version>3.17</poi-version>
@@ -1236,9 +1236,14 @@
                 </exclusions>
             </dependency>
             <dependency>
-                <groupId>org.dspace</groupId>
+                <groupId>net.handle</groupId>
                 <artifactId>handle</artifactId>
-                <version>9.1.0.v20190416</version>
+                <version>9.3.0-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>net.cnri</groupId>
+                <artifactId>cnri-servlet-container</artifactId>
+                <version>3.0.0-SNAPSHOT</version>
             </dependency>
             <!-- Jetty is needed to run Handle Server (and tests in some modules) -->
             <dependency>
@@ -1590,7 +1595,7 @@
             <dependency>
                 <groupId>com.google.code.gson</groupId>
                 <artifactId>gson</artifactId>
-                <version>2.6.1</version>
+                <version>2.8.6</version>
                 <scope>compile</scope>
             </dependency>
             <!-- Google Analytics -->
@@ -1841,6 +1846,10 @@
             <snapshots>
                 <enabled>true</enabled>
             </snapshots>
+        </repository>
+        <repository>
+            <id>handle.net</id>
+            <url>https://handle.net/maven</url>
         </repository>
         <!-- For Solr 7.x, as the solr-parent POM has an old URL for this maven-restlet repository.
              The URL is corrected (to the below value) as of Solr 8.3.x, but has not yet been backported to 7.x.
