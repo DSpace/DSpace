@@ -654,7 +654,9 @@ public class BundleRestRepositoryIT extends AbstractControllerIntegrationTest {
         getClient().perform(get("/api/core/bundles/" + bundle1.getID() + "?embed=item"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
-                .andExpect(jsonPath("$._embedded.item", ItemMatcher.matchItemWithTitleAndDateIssued(item, "Public item 1", "2017-10-17")));
+                .andExpect(jsonPath("$._embedded.item",
+                        ItemMatcher.matchItemWithTitleAndDateIssued(item, "Public item 1", "2017-10-17")
+                ));
     }
 
     @Test
@@ -679,7 +681,9 @@ public class BundleRestRepositoryIT extends AbstractControllerIntegrationTest {
         getClient().perform(get("/api/core/bundles/" + bundle1.getID() + "/item"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
-                .andExpect(jsonPath("$", ItemMatcher.matchItemWithTitleAndDateIssued(item, "Public item 1", "2017-10-17")));
+                .andExpect(jsonPath("$",
+                        ItemMatcher.matchItemWithTitleAndDateIssued(item, "Public item 1", "2017-10-17")
+                ));
     }
 
 }
