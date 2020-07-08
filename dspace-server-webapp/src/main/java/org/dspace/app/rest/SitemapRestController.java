@@ -19,9 +19,9 @@ import javax.servlet.http.HttpServletResponse;
 import javassist.NotFoundException;
 import org.apache.catalina.connector.ClientAbortException;
 import org.apache.logging.log4j.Logger;
-import org.dspace.app.rest.model.RestModel;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.app.rest.utils.MultipartFileSender;
+import org.dspace.app.sitemap.GenerateSitemaps;
 import org.dspace.core.Context;
 import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,7 +44,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Maria Verdonck (Atmire) on 08/07/2020
  */
 @RestController
-@RequestMapping("/api/" + RestModel.DISCOVER + "/sitemaps")
+@RequestMapping(GenerateSitemaps.SITEMAPS_ENDPOINT)
 public class SitemapRestController {
 
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(SitemapRestController.class);
@@ -81,7 +81,7 @@ public class SitemapRestController {
                     } else {
                         throw new NotFoundException(
                             "Directory with name " + name + " in " + sitemapOutputDir.getAbsolutePath() +
-                            " found, but no file");
+                            " found, but no file.");
                     }
                 }
             }

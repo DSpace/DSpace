@@ -61,6 +61,8 @@ public class GenerateSitemaps {
     private static final ConfigurationService configurationService =
         DSpaceServicesFactory.getInstance().getConfigurationService();
 
+    public static final String SITEMAPS_ENDPOINT = "/api/discover/sitemaps";
+
     /**
      * Default constructor
      */
@@ -152,12 +154,9 @@ public class GenerateSitemaps {
      */
     public static void generateSitemaps(boolean makeHTMLMap,
                                         boolean makeSitemapOrg) throws SQLException, IOException {
-        String sitemapStem = configurationService.getProperty("dspace.ui.url")
-            + "/sitemap";
-        String htmlMapStem = configurationService.getProperty("dspace.ui.url")
-            + "/htmlmap";
-        String handleURLStem = configurationService.getProperty("dspace.ui.url")
-            + "/handle/";
+        String sitemapStem = configurationService.getProperty("dspace.server.url")
+            + SITEMAPS_ENDPOINT + "/sitemap";
+        String uiURLStem = configurationService.getProperty("dspace.ui.url");
 
         File outputDir = new File(configurationService.getProperty("sitemap.dir"));
         if (!outputDir.exists() && !outputDir.mkdir()) {
@@ -168,13 +167,11 @@ public class GenerateSitemaps {
         AbstractGenerator sitemapsOrg = null;
 
         if (makeHTMLMap) {
-            html = new HTMLSitemapGenerator(outputDir, htmlMapStem + "?map=",
-                                            null);
+            html = new HTMLSitemapGenerator(outputDir, sitemapStem, ".html");
         }
 
         if (makeSitemapOrg) {
-            sitemapsOrg = new SitemapsOrgGenerator(outputDir, sitemapStem
-                + "?map=", null);
+            sitemapsOrg = new SitemapsOrgGenerator(outputDir, sitemapStem, ".xml");
         }
 
         Context c = new Context(Context.Mode.READ_ONLY);
@@ -182,7 +179,7 @@ public class GenerateSitemaps {
         List<Community> comms = communityService.findAll(c);
 
         for (Community comm : comms) {
-            String url = handleURLStem + comm.getHandle();
+            String url = uiURLStem + "/communities/" + comm.getID();
 
             if (makeHTMLMap) {
                 html.addURL(url, null);
@@ -197,7 +194,7 @@ public class GenerateSitemaps {
         List<Collection> colls = collectionService.findAll(c);
 
         for (Collection coll : colls) {
-            String url = handleURLStem + coll.getHandle();
+            String url = uiURLStem + "/collections/" + coll.getID();
 
             if (makeHTMLMap) {
                 html.addURL(url, null);
@@ -214,7 +211,7 @@ public class GenerateSitemaps {
 
         while (allItems.hasNext()) {
             Item i = allItems.next();
-            String url = handleURLStem + i.getHandle();
+            String url = uiURLStem + "/items/" + i.getID();
             Date lastMod = i.getLastModified();
 
             if (makeHTMLMap) {
