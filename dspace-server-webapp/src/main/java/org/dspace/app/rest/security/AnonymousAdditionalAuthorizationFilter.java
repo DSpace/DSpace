@@ -29,7 +29,7 @@ import org.springframework.security.web.authentication.www.BasicAuthenticationFi
  * can implicitly have and adds those
  * This will allow us to for example set a specific Group to a specific IP so that any request from that
  * IP is always treated as being a part of the configured group.
- * The configuration for the authentication through ip can be fined in authentication-ip.cfg
+ * The configuration for the authentication through ip can be found in authentication-ip.cfg
  * This can be enabled by uncommenting the IPAuhentication plugin in authentication.cfg
  */
 public class AnonymousAdditionalAuthorizationFilter extends BasicAuthenticationFilter {
