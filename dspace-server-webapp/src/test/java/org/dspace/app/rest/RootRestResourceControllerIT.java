@@ -14,8 +14,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
+import org.dspace.services.ConfigurationService;
 import org.hamcrest.Matchers;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Integration test for the {@link RootRestResourceController}
@@ -25,6 +27,9 @@ import org.junit.Test;
  */
 public class RootRestResourceControllerIT extends AbstractControllerIntegrationTest {
 
+    @Autowired
+    ConfigurationService configurationService;
+
     @Test
     public void serverPropertiesTest() throws Exception {
       //When we call the root endpoint
@@ -33,7 +38,7 @@ public class RootRestResourceControllerIT extends AbstractControllerIntegrationT
                    .andExpect(status().isOk())
                    //We expect the content type to be "application/hal+json;charset=UTF-8"
                    .andExpect(content().contentType(contentType))
-                   .andExpect(jsonPath("$.dspaceURL", Matchers.is("http://localhost:3000")))
+                   .andExpect(jsonPath("$.dspaceURL", Matchers.is(configurationService.getProperty("dspace.ui.url"))))
                    .andExpect(jsonPath("$.dspaceName", Matchers.is("DSpace at My University")))
                    .andExpect(jsonPath("$.dspaceRest", Matchers.is(BASE_REST_SERVER_URL)))
                    .andExpect(jsonPath("$.type", Matchers.is("root")));
