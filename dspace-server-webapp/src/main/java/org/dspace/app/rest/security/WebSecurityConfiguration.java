@@ -107,7 +107,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
                 //Everyone can call GET on the status endpoint
                 .antMatchers(HttpMethod.GET, "/api/authn/status").permitAll()
             .and()
-            .addFilterBefore(new IPAuthenticationFilter(authenticationManager(), authenticationService),
+            .addFilterBefore(new AnonymousAdditionalAuthorizationFilter(authenticationManager(), authenticationService),
                              StatelessAuthenticationFilter.class)
             //Add a filter before our login endpoints to do the authentication based on the data in the HTTP request
             .addFilterBefore(new StatelessLoginFilter("/api/authn/login", authenticationManager(),
