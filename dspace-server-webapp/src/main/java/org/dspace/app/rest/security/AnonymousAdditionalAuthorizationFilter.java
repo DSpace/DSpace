@@ -25,14 +25,16 @@ import org.springframework.security.web.authentication.www.BasicAuthenticationFi
 
 /**
  * This is a Filter class that'll fetch special groups from the {@link AuthenticationService} and set these in the
- * current DSpace Context. This will allow us to set a specific Group to a specific IP so that any request from that
+ * current DSpace Context. It'll do extra processing on anonymous requests to see which authorizations they
+ * can implicitly have and adds those
+ * This will allow us to for example set a specific Group to a specific IP so that any request from that
  * IP is always treated as being a part of the configured group.
  * The configuration for the authentication through ip can be fined in authentication-ip.cfg
  * This can be enabled by uncommenting the IPAuhentication plugin in authentication.cfg
  */
-public class IPAuthenticationFilter extends BasicAuthenticationFilter {
+public class AnonymousAdditionalAuthorizationFilter extends BasicAuthenticationFilter {
 
-    private static final Logger log = Logger.getLogger(IPAuthenticationFilter.class);
+    private static final Logger log = Logger.getLogger(AnonymousAdditionalAuthorizationFilter.class);
 
     private AuthenticationService authenticationService;
 
@@ -41,8 +43,8 @@ public class IPAuthenticationFilter extends BasicAuthenticationFilter {
      * @param authenticationManager The relevant AuthenticationManager
      * @param authenticationService The autowired AuthenticationService
      */
-    public IPAuthenticationFilter(AuthenticationManager authenticationManager,
-                                  AuthenticationService authenticationService) {
+    public AnonymousAdditionalAuthorizationFilter(AuthenticationManager authenticationManager,
+                                                  AuthenticationService authenticationService) {
         super(authenticationManager);
         this.authenticationService = authenticationService;
     }
