@@ -24,6 +24,7 @@ import java.util.UUID;
 import org.apache.commons.codec.CharEncoding;
 import org.apache.commons.io.IOUtils;
 import org.dspace.app.rest.builder.BitstreamBuilder;
+import org.dspace.app.rest.builder.BundleBuilder;
 import org.dspace.app.rest.builder.CollectionBuilder;
 import org.dspace.app.rest.builder.CommunityBuilder;
 import org.dspace.app.rest.builder.ItemBuilder;
@@ -1195,6 +1196,83 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
                                 bundle.getType()
                         )
                 ));
+    }
+
+    @Test
+    public void linksToFirstBundleWhenMultipleBundles() throws Exception {
+        //We turn off the authorization system in order to create the structure as defined below
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and one collection.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                .withName("Parent Community")
+                .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                .withName("Sub Community")
+                .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+
+        //2. One public items that is readable by Anonymous
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
+                .withTitle("Test")
+                .withIssueDate("2010-10-17")
+                .withAuthor("Smith, Donald")
+                .withSubject("ExtraEntry")
+                .build();
+
+        String bitstreamContent = "ThisIsSomeDummyText";
+
+        //Add a bitstream to an item
+        Bitstream bitstream = null;
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+            bitstream = BitstreamBuilder.
+                    createBitstream(context, publicItem1, is)
+                    .withName("Bitstream")
+                    .withDescription("Description")
+                    .withMimeType("text/plain")
+                    .build();
+        }
+
+        Bundle secondBundle = BundleBuilder.createBundle(context, publicItem1)
+                .withName("second bundle")
+                .withBitstream(bitstream).build();
+
+        Bundle bundle = bitstream.getBundles().get(0);
+
+        //Get bundle should contain the first bundle in the list
+        getClient().perform(get("/api/core/bitstreams/" + bitstream.getID() + "/bundle"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$",
+                        BundleMatcher.matchProperties(
+                            bundle.getName(),
+                            bundle.getID(),
+                            bundle.getHandle(),
+                            bundle.getType()
+                    )
+                ));
+    }
+
+    @Test
+    public void linksToEmptyWhenNoBundle() throws Exception {
+        // We turn off the authorization system in order to create the structure as defined below
+        context.turnOffAuthorisationSystem();
+
+        // ** GIVEN **
+        // 1. A community with a logo
+        parentCommunity = CommunityBuilder.createCommunity(context).withName("Community").withLogo("logo_community")
+                .build();
+
+        // 2. A collection with a logo
+        Collection col = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection")
+                .withLogo("logo_collection").build();
+
+        Bitstream bitstream = parentCommunity.getLogo();
+
+        //Get bundle should contain an empty response
+        getClient().perform(get("/api/core/bitstreams/" + bitstream.getID() + "/bundle"))
+                .andExpect(status().isNoContent());
     }
 
 }

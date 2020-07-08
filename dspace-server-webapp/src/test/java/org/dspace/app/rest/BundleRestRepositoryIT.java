@@ -51,6 +51,7 @@ import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
+import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.eperson.EPerson;
 import org.hamcrest.Matchers;
@@ -63,6 +64,9 @@ public class BundleRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     @Autowired
     ResourcePolicyService resourcePolicyService;
+
+    @Autowired
+    ItemService itemService;
 
     private Collection collection;
     private Item item;
@@ -651,6 +655,31 @@ public class BundleRestRepositoryIT extends AbstractControllerIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
                 .andExpect(jsonPath("$._embedded.item", ItemMatcher.matchItemWithTitleAndDateIssued(item, "Public item 1", "2017-10-17")));
+    }
+
+    @Test
+    public void linksToFirstItemWhenMultipleItems() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        bundle1 = BundleBuilder.createBundle(context, item)
+                .withName("testname")
+                .build();
+
+        Item item2 = ItemBuilder.createItem(context, collection)
+                .withTitle("Public item 2")
+                .withIssueDate("2020-07-08")
+                .withAuthor("Smith, Donald").withAuthor("Doe, John")
+                .withSubject("SecondEntry")
+                .build();
+
+        itemService.addBundle(context, item2, bundle1);
+
+        context.restoreAuthSystemState();
+
+        getClient().perform(get("/api/core/bundles/" + bundle1.getID() + "/item"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$", ItemMatcher.matchItemWithTitleAndDateIssued(item, "Public item 1", "2017-10-17")));
     }
 
 }
