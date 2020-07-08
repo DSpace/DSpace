@@ -25,6 +25,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+/**
+ * Testing class for the {@link org.dspace.app.rest.security.AnonymousAdditionalAuthorizationFilter} filter
+ */
 public class AnonymousAdditionalAuthorizationFilterIT extends AbstractControllerIntegrationTest {
 
     @Autowired
@@ -74,13 +77,16 @@ public class AnonymousAdditionalAuthorizationFilterIT extends AbstractController
     public void verifyIPAuthentication() throws Exception {
         configurationService.setProperty("plugin.sequence.org.dspace.authenticate.AuthenticationMethod", IP);
 
+        // Make sure that the item is not accessible for anonymous
         getClient().perform(get("/api/core/items/" + publicItem1.getID()))
                    .andExpect(status().isUnauthorized());
 
+        // Test that we can access the item using the IP that's configured for the Staff group
         getClient().perform(get("/api/core/items/" + publicItem1.getID())
                                 .header("X-Forwarded-For", "5.5.5.5"))
                    .andExpect(status().isOk());
 
+        // Test that we can't access the item using the IP that's configured for the Students group
         getClient().perform(get("/api/core/items/" + publicItem1.getID())
                                 .header("X-FORWARDED-FOR", "6.6.6.6"))
                    .andExpect(status().isUnauthorized());
@@ -92,22 +98,28 @@ public class AnonymousAdditionalAuthorizationFilterIT extends AbstractController
 
         groupService.addMember(context, staff, eperson);
 
+        // Make sure that the item is not accessible for anonymous
         getClient().perform(get("/api/core/items/" + publicItem1.getID()))
                    .andExpect(status().isUnauthorized());
 
+        // Test that we can access the item using the IP that's configured for the Staff group
         getClient().perform(get("/api/core/items/" + publicItem1.getID())
                                 .header("X-Forwarded-For", "5.5.5.5"))
                    .andExpect(status().isOk());
 
+        // Test that we can't access the item using the IP that's configured for the Students group
         getClient().perform(get("/api/core/items/" + publicItem1.getID())
                                 .header("X-Forwarded-For", "6.6.6.6"))
                    .andExpect(status().isUnauthorized());
 
         String token = getAuthToken(eperson.getEmail(), password);
 
+        // Test that the user in the Staff group can access the Item with the normal password authentication
         getClient(token).perform(get("/api/core/items/" + publicItem1.getID()))
                         .andExpect(status().isOk());
 
+        // Test that the user in the Staff group can access the Item with the normal password authentication even
+        // when it's IP is configured to be part of the students group
         getClient(getAuthTokenWithXForwardedForHeader(eperson.getEmail(), password, "6.6.6.6"))
             .perform(get("/api/core/items/" + publicItem1.getID())
                          .header("X-Forwarded-For", "6.6.6.6"))
@@ -120,22 +132,30 @@ public class AnonymousAdditionalAuthorizationFilterIT extends AbstractController
 
         groupService.addMember(context, staff, eperson);
 
+        // Make sure that the item is not accessible for anonymous
         getClient().perform(get("/api/core/items/" + publicItem1.getID()))
                    .andExpect(status().isUnauthorized());
 
+        // Test that the Item can't be accessed with the IP for the Staff group if the config is turned off and only
+        // allows password authentication
         getClient().perform(get("/api/core/items/" + publicItem1.getID())
                                 .header("X-Forwarded-For", "5.5.5.5"))
                    .andExpect(status().isUnauthorized());
 
+        // Test that the Item can't be accessed with the IP for the Students group if the config is turned off and only
+        // allows password authentication
         getClient().perform(get("/api/core/items/" + publicItem1.getID())
                                 .header("X-Forwarded-For", "6.6.6.6"))
                    .andExpect(status().isUnauthorized());
 
         String token = getAuthToken(eperson.getEmail(), password);
 
+        // Test that the Item is accessible for a user in the Staff group by password login
         getClient(token).perform(get("/api/core/items/" + publicItem1.getID()))
                         .andExpect(status().isOk());
 
+        // Test that the Item is accessible for a user in the Staff group by password Login when the request
+        // is coming from the IP that's configured to be for the Student group
         getClient(getAuthTokenWithXForwardedForHeader(eperson.getEmail(), password, "6.6.6.6"))
             .perform(get("/api/core/items/" + publicItem1.getID())
                          .header("X-Forwarded-For", "6.6.6.6"))
