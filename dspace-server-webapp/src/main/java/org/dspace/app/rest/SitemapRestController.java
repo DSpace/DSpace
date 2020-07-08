@@ -16,15 +16,15 @@ import java.sql.SQLException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import javassist.NotFoundException;
 import org.apache.catalina.connector.ClientAbortException;
 import org.apache.logging.log4j.Logger;
+import org.dspace.app.rest.model.RestModel;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.app.rest.utils.MultipartFileSender;
-import org.dspace.app.sitemap.GenerateSitemaps;
 import org.dspace.core.Context;
 import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -44,7 +44,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Maria Verdonck (Atmire) on 08/07/2020
  */
 @RestController
-@RequestMapping(GenerateSitemaps.SITEMAPS_ENDPOINT)
+@RequestMapping("/api/" + RestModel.DISCOVER + "/sitemaps")
 public class SitemapRestController {
 
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(SitemapRestController.class);
@@ -61,13 +61,12 @@ public class SitemapRestController {
      * @param name     the name of the requested sitemap file
      * @param response the HTTP response
      * @param request  the HTTP request
-     * @throws NotFoundException if no matching sitemap file can be found
-     * @throws SQLException      if db error while completing DSpace context
-     * @throws IOException       if IO error surrounding sitemap file
+     * @throws SQLException if db error while completing DSpace context
+     * @throws IOException  if IO error surrounding sitemap file
      */
     @RequestMapping(method = {RequestMethod.GET, RequestMethod.HEAD}, value = "/{name}")
     public void retrieve(@PathVariable String name, HttpServletResponse response,
-        HttpServletRequest request) throws NotFoundException, IOException, SQLException {
+        HttpServletRequest request) throws IOException, SQLException {
         // Find sitemap with given name in dspace/sitemaps
         File foundSitemapFile = null;
         File sitemapOutputDir = new File(configurationService.getProperty("sitemap.dir"));
@@ -79,18 +78,20 @@ public class SitemapRestController {
                     if (sitemapFile.isFile()) {
                         foundSitemapFile = sitemapFile;
                     } else {
-                        throw new NotFoundException(
+                        throw new ResourceNotFoundException(
                             "Directory with name " + name + " in " + sitemapOutputDir.getAbsolutePath() +
                             " found, but no file.");
                     }
                 }
             }
         } else {
-            throw new NotFoundException("Sitemap directory in " + sitemapOutputDir.getAbsolutePath() + " does not " +
-                                        "exist, either sitemaps have not been generated, or are located elsewhere.");
+            throw new ResourceNotFoundException(
+                "Sitemap directory in " + sitemapOutputDir.getAbsolutePath() + " does not " +
+                "exist, either sitemaps have not been generated (./dspace generate-sitemaps)," +
+                " or are located elsewhere (config used: sitemap.dir).");
         }
         if (foundSitemapFile == null) {
-            throw new NotFoundException(
+            throw new ResourceNotFoundException(
                 "Could not find sitemap file with name " + name + " in " + sitemapOutputDir.getAbsolutePath());
         } else {
             // return found sitemap file

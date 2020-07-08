@@ -12,7 +12,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
+import org.dspace.services.ConfigurationService;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Integration test that cover ShibbolethRestController
@@ -21,13 +23,16 @@ import org.junit.Test;
  */
 public class ShibbolethRestControllerIT extends AbstractControllerIntegrationTest {
 
+    @Autowired
+    ConfigurationService configurationService;
+
     @Test
     public void testRedirectToDefaultDspaceUrl() throws Exception {
         String token = getAuthToken(eperson.getEmail(), password);
 
         getClient(token).perform(get("/api/authn/shibboleth"))
                 .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("http://localhost:3000"));
+                .andExpect(redirectedUrl(configurationService.getProperty("dspace.ui.url")));
     }
 
     @Test
