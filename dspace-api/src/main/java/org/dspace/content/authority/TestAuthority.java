@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
-import org.dspace.content.Collection;
 
 /**
  * This is a *very* stupid test fixture for authority control with AuthorityVariantsSupport.
@@ -19,6 +18,7 @@ import org.dspace.content.Collection;
  * @author Andrea Bollini (CILEA)
  */
 public class TestAuthority implements ChoiceAuthority, AuthorityVariantsSupport {
+    private String pluginInstanceName;
 
     @Override
     public List<String> getVariants(String key, String locale) {
@@ -33,8 +33,7 @@ public class TestAuthority implements ChoiceAuthority, AuthorityVariantsSupport 
     }
 
     @Override
-    public Choices getMatches(String field, String text, Collection collection,
-                              int start, int limit, String locale) {
+    public Choices getMatches(String text, int start, int limit, String locale) {
         Choices choices = new Choices(false);
         if (StringUtils.isNotBlank(text)) {
 
@@ -52,8 +51,7 @@ public class TestAuthority implements ChoiceAuthority, AuthorityVariantsSupport 
     }
 
     @Override
-    public Choices getBestMatch(String field, String text, Collection collection,
-                                String locale) {
+    public Choices getBestMatch(String text, String locale) {
         Choices choices = new Choices(false);
         if (StringUtils.isNotBlank(text)) {
 
@@ -75,5 +73,15 @@ public class TestAuthority implements ChoiceAuthority, AuthorityVariantsSupport 
             return key.replaceAll("authority", "label");
         }
         return "Unknown";
+    }
+
+    @Override
+    public String getPluginInstanceName() {
+        return pluginInstanceName;
+    }
+
+    @Override
+    public void setPluginInstanceName(String name) {
+        this.pluginInstanceName = name;
     }
 }
