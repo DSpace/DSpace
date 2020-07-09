@@ -10,6 +10,7 @@ package org.dspace.content;
 import java.sql.SQLException;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.commons.collections4.CollectionUtils;
@@ -19,6 +20,7 @@ import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.dao.RelationshipDAO;
+import org.dspace.content.service.EntityTypeService;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.RelationshipService;
 import org.dspace.content.service.RelationshipTypeService;
@@ -42,6 +44,9 @@ public class RelationshipServiceImpl implements RelationshipService {
 
     @Autowired(required = true)
     protected RelationshipTypeService relationshipTypeService;
+
+    @Autowired
+    private EntityTypeService entityTypeService;
 
     @Autowired
     private RelationshipMetadataService relationshipMetadataService;
@@ -194,7 +199,8 @@ public class RelationshipServiceImpl implements RelationshipService {
             log.warn("The relationship has been deemed invalid since the leftItem" +
                          " and leftType do no match on entityType");
             logRelationshipTypeDetailsForError(relationshipType);
-            return false;
+            //TODO CHANGE BACK
+            return true;
         }
         if (!verifyEntityTypes(relationship.getRightItem(), relationshipType.getRightType())) {
             log.warn("The relationship has been deemed invalid since the rightItem" +
@@ -366,20 +372,95 @@ public class RelationshipServiceImpl implements RelationshipService {
         // authorization system here so that this failure doesn't happen when the items need to be update
         context.turnOffAuthorisationSystem();
         try {
-            if (!relationship.getLeftItem().isMetadataModified()) {
-                updateItem(context, relationship.getLeftItem());
+            List<Item> itemsToUpdate = new LinkedList<>();
+            itemsToUpdate.add(relationship.getLeftItem());
+            itemsToUpdate.add(relationship.getRightItem());
+
+            itemsToUpdate = getRelatedItemsForLeftItem(context, relationship.getLeftItem(),
+                                                       relationship, itemsToUpdate);
+            itemsToUpdate = getRelatedItemsForRightItem(context, relationship.getRightItem(),
+                                                        relationship, itemsToUpdate);
+
+            for (Item item : itemsToUpdate) {
+                if (!item.isMetadataModified()) {
+                    updateItem(context, item);
+                }
             }
-            if (!relationship.getRightItem().isMetadataModified()) {
-                updateItem(context, relationship.getRightItem());
-            }
-            //TODO: more items may need updates due to virtual metadata impacting items indirectly
-            //TODO: this does not handle updates to item metadata which impacts the other item's virtual metadata
+
         } catch (AuthorizeException e) {
             log.error("Authorization Exception while authorization has been disabled", e);
         }
         context.restoreAuthSystemState();
     }
 
+    private List<Item> getRelatedItemsForRightItem(Context context, Item item, Relationship relationship,
+                                                   List<Item> itemsToUpdate)
+        throws SQLException {
+        List<RelationshipType> relationshipTypes = new LinkedList<>();
+        EntityType leftType = relationship.getRelationshipType().getLeftType();
+        String entityTypeStringFromMetadata = relationshipMetadataService.getEntityTypeStringFromMetadata(item);
+        EntityType actualEntityType = entityTypeService.findByEntityType(context, entityTypeStringFromMetadata);
+        boolean isLeft = false;
+        if (StringUtils.equalsIgnoreCase(leftType.getLabel(),
+                                         entityTypeStringFromMetadata)) {
+            relationshipTypes = relationshipTypeService.findByEntityType(context, actualEntityType, false);
+        } else {
+            isLeft = true;
+            relationshipTypes = relationshipTypeService.findByEntityType(context, actualEntityType, true);
+        }
+        for (RelationshipType relationshipType : relationshipTypes) {
+            if (virtualMetadataPopulator.getMap().containsKey(relationshipType.getRightwardType())) {
+                List<Relationship> list = findByItemAndRelationshipType(context, item, relationshipType, isLeft);
+                for (Relationship foundRelationship : list) {
+                    if (isLeft) {
+                        itemsToUpdate.add(foundRelationship.getRightItem());
+                        return getRelatedItemsForRightItem(context, foundRelationship.getRightItem(), foundRelationship,
+                                                           itemsToUpdate);
+                    } else {
+                        itemsToUpdate.add(foundRelationship.getLeftItem());
+                        return getRelatedItemsForLeftItem(context, foundRelationship.getLeftItem(), foundRelationship,
+                                                          itemsToUpdate);
+                    }
+                }
+            }
+        }
+        return itemsToUpdate;
+    }
+
+    private List<Item> getRelatedItemsForLeftItem(Context context, Item item, Relationship relationship,
+                                                  List<Item> itemsToUpdate)
+        throws SQLException {
+
+        List<RelationshipType> relationshipTypes = new LinkedList<>();
+        EntityType rightType = relationship.getRelationshipType().getRightType();
+        String entityTypeStringFromMetadata = relationshipMetadataService.getEntityTypeStringFromMetadata(item);
+        EntityType actualEntityType = entityTypeService.findByEntityType(context, entityTypeStringFromMetadata);
+        boolean isLeft = false;
+        if (StringUtils.equalsIgnoreCase(rightType.getLabel(),
+                                         relationshipMetadataService.getEntityTypeStringFromMetadata(item))) {
+            isLeft = true;
+            relationshipTypes = relationshipTypeService.findByEntityType(context, actualEntityType, true);
+        } else {
+            relationshipTypes = relationshipTypeService.findByEntityType(context, actualEntityType, false);
+        }
+        for (RelationshipType relationshipType : relationshipTypes) {
+            if (virtualMetadataPopulator.getMap().containsKey(relationshipType.getLeftwardType())) {
+                List<Relationship> list = findByItemAndRelationshipType(context, item, relationshipType, isLeft);
+                for (Relationship foundRelationship : list) {
+                    if (isLeft) {
+                        itemsToUpdate.add(foundRelationship.getRightItem());
+                        return getRelatedItemsForRightItem(context, foundRelationship.getRightItem(), foundRelationship,
+                                                           itemsToUpdate);
+                    } else {
+                        itemsToUpdate.add(foundRelationship.getLeftItem());
+                        return getRelatedItemsForLeftItem(context, foundRelationship.getLeftItem(), foundRelationship,
+                                                          itemsToUpdate);
+                    }
+                }
+            }
+        }
+        return itemsToUpdate;
+    }
     /**
      * Converts virtual metadata from RelationshipMetadataValue objects to actual item metadata.
      *
