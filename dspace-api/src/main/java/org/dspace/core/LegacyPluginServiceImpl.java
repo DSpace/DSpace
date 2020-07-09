@@ -345,8 +345,8 @@ public class LegacyPluginServiceImpl implements PluginService {
                               " for interface=" + iname +
                               " pluginName=" + name);
                 Object result = pluginClass.newInstance();
-                if (result instanceof SelfNamedPlugin) {
-                    ((SelfNamedPlugin) result).setPluginInstanceName(name);
+                if (result instanceof NameAwarePlugin) {
+                    ((NameAwarePlugin) result).setPluginInstanceName(name);
                 }
                 return result;
             }

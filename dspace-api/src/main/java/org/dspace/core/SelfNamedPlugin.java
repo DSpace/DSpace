@@ -28,7 +28,7 @@ package org.dspace.core;
  * @version $Revision$
  * @see org.dspace.core.service.PluginService
  */
-public abstract class SelfNamedPlugin {
+public abstract class SelfNamedPlugin implements NameAwarePlugin {
     // the specific alias used to find the class that created this instance.
     private String myName = null;
 
@@ -52,30 +52,13 @@ public abstract class SelfNamedPlugin {
         return null;
     }
 
-    /**
-     * Get an instance's particular name.
-     * Returns the name by which the class was chosen when
-     * this instance was created.  Only works for instances created
-     * by <code>PluginService</code>, or if someone remembers to call <code>setPluginName.</code>
-     * <p>
-     * Useful when the implementation class wants to be configured differently
-     * when it is invoked under different names.
-     *
-     * @return name or null if not available.
-     */
+    @Override
     public String getPluginInstanceName() {
         return myName;
     }
 
-    /**
-     * Set the name under which this plugin was instantiated.
-     * Not to be invoked by application code, it is
-     * called automatically by <code>PluginService.getNamedPlugin()</code>
-     * when the plugin is instantiated.
-     *
-     * @param name -- name used to select this class.
-     */
-    protected void setPluginInstanceName(String name) {
+    @Override
+    public void setPluginInstanceName(String name) {
         myName = name;
     }
 }

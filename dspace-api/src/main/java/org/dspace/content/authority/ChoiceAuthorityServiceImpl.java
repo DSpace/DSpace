@@ -88,9 +88,9 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService 
     @Autowired(required = true)
     protected PluginService pluginService;
 
-    private final String CHOICES_PLUGIN_PREFIX = "choices.plugin.";
-    private final String CHOICES_PRESENTATION_PREFIX = "choices.presentation.";
-    private final String CHOICES_CLOSED_PREFIX = "choices.closed.";
+    final static String CHOICES_PLUGIN_PREFIX = "choices.plugin.";
+    final static String CHOICES_PRESENTATION_PREFIX = "choices.presentation.";
+    final static String CHOICES_CLOSED_PREFIX = "choices.closed.";
 
     protected ChoiceAuthorityServiceImpl() {
     }
@@ -152,7 +152,7 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService 
                 "No choices plugin was configured for  field \"" + fieldKey
                     + "\", collection=" + collection.getID().toString() + ".");
         }
-        return ma.getMatches(fieldKey, query, collection, start, limit, locale);
+        return ma.getMatches(query, start, limit, locale);
     }
 
 
@@ -168,7 +168,7 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService 
         if (externalInput && ma instanceof SolrAuthority) {
             ((SolrAuthority) ma).addExternalResultsInNextMatches();
         }
-        return ma.getMatches(fieldKey, query, collection, start, limit, locale);
+        return ma.getMatches(query, start, limit, locale);
     }
 
     @Override
@@ -180,7 +180,7 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService 
                 "No choices plugin was configured for  field \"" + fieldKey
                     + "\", collection=" + collection.getID().toString() + ".");
         }
-        return ma.getBestMatch(fieldKey, query, collection, locale);
+        return ma.getBestMatch(query, locale);
     }
 
     @Override
