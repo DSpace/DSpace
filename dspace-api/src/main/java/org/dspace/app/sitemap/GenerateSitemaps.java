@@ -143,6 +143,16 @@ public class GenerateSitemaps {
     }
 
     /**
+     * Runs generate-sitemaps without any params for the scheduler (task-scheduler.xml).
+     *
+     * @throws SQLException if a database error occurs.
+     * @throws IOException  if IO error occurs.
+     */
+    public static void generateSitemapsScheduled() throws IOException, SQLException {
+        generateSitemaps(true, true);
+    }
+
+    /**
      * Generate sitemap.org protocol and/or basic HTML sitemaps.
      *
      * @param makeHTMLMap    if {@code true}, generate an HTML sitemap.
@@ -152,8 +162,7 @@ public class GenerateSitemaps {
      * @throws IOException  if IO error
      *                      if IO error occurs.
      */
-    public static void generateSitemaps(boolean makeHTMLMap,
-                                        boolean makeSitemapOrg) throws SQLException, IOException {
+    public static void generateSitemaps(boolean makeHTMLMap, boolean makeSitemapOrg) throws SQLException, IOException {
         String sitemapStem = configurationService.getProperty("dspace.server.url")
             + SITEMAPS_ENDPOINT + "/sitemap";
         String uiURLStem = configurationService.getProperty("dspace.ui.url");
