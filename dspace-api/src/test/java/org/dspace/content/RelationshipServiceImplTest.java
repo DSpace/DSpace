@@ -17,7 +17,9 @@ import java.util.List;
 
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.dao.RelationshipDAO;
+import org.dspace.content.service.EntityTypeService;
 import org.dspace.content.service.ItemService;
+import org.dspace.content.service.RelationshipTypeService;
 import org.dspace.content.virtual.VirtualMetadataPopulator;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -55,6 +57,15 @@ public class RelationshipServiceImplTest {
 
     @Mock
     private VirtualMetadataPopulator virtualMetadataPopulator;
+
+    @Mock
+    private RelationshipTypeService relationshipTypeService;
+
+    @Mock
+    private RelationshipMetadataService relationshipMetadataService;
+
+    @Mock
+    private EntityTypeService entityTypeService;
 
     @Before
     public void init() {
