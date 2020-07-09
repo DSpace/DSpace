@@ -64,33 +64,29 @@ public class EventServiceImpl implements EventService {
 
     private void initPool() {
 
-        if (dispatcherPool == null) {
+        // TODO EVENT Some of these pool configuration
+        // parameters can live in dspace.cfg or a
+        // separate configuration file
 
-            // TODO EVENT Some of these pool configuration
-            // parameters can live in dspace.cfg or a
-            // separate configuration file
+        // TODO EVENT Eviction parameters should be set
 
-            // TODO EVENT Eviction parameters should be set
+        poolConfig = new GenericKeyedObjectPoolConfig();
+        poolConfig.setMaxTotalPerKey(100);
+        poolConfig.setMaxIdlePerKey(5);
+        poolConfig.setMaxTotal(100);
 
-            poolConfig = new GenericKeyedObjectPoolConfig();
-            poolConfig.setMaxTotalPerKey(100);
-            poolConfig.setMaxIdlePerKey(5);
-            poolConfig.setMaxTotal(100);
-
-            try {
-                dispatcherFactory = new DispatcherPoolFactory();
+        try {
+            dispatcherFactory = new DispatcherPoolFactory();
 
 
-                dispatcherPool = PoolUtils
+            dispatcherPool = PoolUtils
                     .synchronizedPool(new GenericKeyedObjectPool(
-                        dispatcherFactory, poolConfig));
+                            dispatcherFactory, poolConfig));
 
-                enumerateConsumers();
+            enumerateConsumers();
 
-            } catch (Exception e) {
-                log.error("Could not initialize EventService dispatcher pool", e);
-            }
-
+        } catch (Exception e) {
+            log.error("Could not initialize EventService dispatcher pool", e);
         }
     }
 
@@ -126,6 +122,11 @@ public class EventServiceImpl implements EventService {
         Integer index = (Integer) consumerIndicies.get(consumerClass);
         return index != null ? index.intValue() : -1;
 
+    }
+
+    @Override
+    public void reloadConfiguration() {
+        initPool();
     }
 
     protected void enumerateConsumers() {

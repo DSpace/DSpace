@@ -126,14 +126,4 @@ public interface ChoiceAuthority {
         return getMatches(field, text, collection, start, limit, locale);
     }
 
-    /**
-     * Get the linked item type starting from the metadata field.
-     *
-     * @param field single string identifying metadata field
-     * @return the relationshipType as a String
-     */
-    default public String getLinkedItemType(String field) {
-        return null;
-    }
-
 }

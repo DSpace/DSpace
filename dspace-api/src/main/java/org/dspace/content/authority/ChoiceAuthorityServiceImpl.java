@@ -421,12 +421,15 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService 
     }
 
     @Override
-    public String getLinkedItemType(String fieldKey) {
+    public String getRelationshipType(String fieldKey) {
         ChoiceAuthority ma = getChoiceAuthorityMap().get(fieldKey);
         if (ma == null) {
             throw new IllegalArgumentException("No choices plugin was configured for  field \"" + fieldKey + "\".");
         }
-        return ma.getLinkedItemType(fieldKey);
+        if (ma instanceof LinkableEntityAuthority) {
+            return ((LinkableEntityAuthority) ma).getLinkedEntityType(fieldKey);
+        }
+        return null;
     }
 
 }

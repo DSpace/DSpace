@@ -218,11 +218,11 @@ public interface ChoiceAuthorityService {
     public void clearCache();
 
     /**
-     * Get the linked item type starting from the metadata field.
+     * Get the relationship type starting from the metadata field.
      *
      * @param field single string identifying metadata field
      * @return the relationshipType as a String
      */
-    String getLinkedItemType(String fieldKey);
+    String getRelationshipType(String fieldKey);
 
 }

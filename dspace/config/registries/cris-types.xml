@@ -6,7 +6,7 @@
 
     <dc-schema>
         <name>cris</name>
-        <namespace>http://dspace.org/cris</namespace>
+        <namespace>https://www.4science.it/dspace-cris/</namespace>
     </dc-schema>
 
     <dc-type>

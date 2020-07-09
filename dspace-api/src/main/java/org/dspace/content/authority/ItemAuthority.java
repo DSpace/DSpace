@@ -40,7 +40,7 @@ import org.dspace.utils.DSpace;
  * @author Giusdeppe Digilio
  * @version $Revision $
  */
-public class ItemAuthority implements ChoiceAuthority {
+public class ItemAuthority implements ChoiceAuthority, LinkableEntityAuthority {
     private static final Logger log = Logger.getLogger(ItemAuthority.class);
 
     private DSpace dspace = new DSpace();
@@ -131,7 +131,7 @@ public class ItemAuthority implements ChoiceAuthority {
     }
 
     @Override
-    public String getLinkedItemType(String field) {
+    public String getLinkedEntityType(String field) {
         String relationshipType = getRelationshipType(field);
         if (relationshipType == null) {
             return null;
