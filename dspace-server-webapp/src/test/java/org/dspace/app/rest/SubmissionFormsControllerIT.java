@@ -444,6 +444,58 @@ public class SubmissionFormsControllerIT extends AbstractControllerIntegrationTe
                   resetLocalesConfiguration();
     }
 
+    @Test
+    public void findPublicationFormTest() throws Exception {
+        String token = getAuthToken(admin.getEmail(), password);
+        getClient(token).perform(get("/api/config/submissionforms/publication"))
+                        .andExpect(status().isOk())
+                        .andExpect(content().contentType(contentType))
+                        .andExpect(jsonPath("$.id", is("publication")))
+                        .andExpect(jsonPath("$.name", is("publication")))
+                        .andExpect(jsonPath("$.type", is("submissionform")))
+                        .andExpect(jsonPath("$.rows[1].fields", contains(SubmissionFormFieldMatcher
+                            .matchFormFieldDefinition("onebox", "Title", "You must enter a main title for this item.",
+                                               false, "Enter the main title of the item.", null, "dc.title", null))))
+                        .andExpect(jsonPath("$.rows[2].fields", contains(SubmissionFormFieldMatcher
+                            .matchFormFieldDefinition("onebox", "Other Titles", null, true,
+                                        "If the item has any alternative titles, please enter them here.", null,
+                                        "dc.title.alternative", null))))
+                        .andExpect(jsonPath("$.rows[3].fields", contains(SubmissionFormFieldMatcher
+                                .matchFormFieldDefinition("date", "Date of Issue", "You must enter at least the year.",
+                                        false, "Please give the date of previous publication or public distribution.\n"
+                                    + "                        You can leave out the day and/or month if they aren't\n"
+                                              + "                        applicable.", null, "dc.date.issued", null))))
+                        .andExpect(jsonPath("$.rows[4].fields", contains(SubmissionFormFieldMatcher
+                                .matchFormFieldDefinition("group", "Authors", null, true,
+                                                          "Enter the names of the authors of this item.", null,
+                                                          "dc.contributor.author", "AuthorAuthority"))))
+                        .andExpect(jsonPath("$.rows[4].fields[0].rows[0].fields", contains(SubmissionFormFieldMatcher
+                              .matchFormFieldDefinition("lookup-name", "Author", "You must enter at least the author.",
+                                            false, "Enter the names of the authors of this item in the form Lastname,"
+                                         + " Firstname [i.e. Smith, Josh or Smith, J].", null, "dc.contributor.author",
+                                           "AuthorAuthority"))))
+                        .andExpect(jsonPath("$.rows[4].fields[0].rows[1].fields", contains(SubmissionFormFieldMatcher
+                                .matchFormFieldDefinition("onebox", "Affiliation", null, false,
+                                            "Enter the affiliation of the author as stated on the publication.",
+                                             null, "local.contributor.affiliation", null))))
+                        .andExpect(jsonPath("$.rows[5].fields", contains(SubmissionFormFieldMatcher
+                                .matchFormFieldDefinition("group", "Editors", null, true,
+                                                          "The editors of this publication.", null,
+                                                          "dc.contributor.editor", "AuthorAuthority"))))
+                        .andExpect(jsonPath("$.rows[5].fields[0].rows[0].fields", contains(SubmissionFormFieldMatcher
+                              .matchFormFieldDefinition("lookup-name", "Editor", "You must enter at least the author.",
+                                            false, "The editors of this publication.", null, "dc.contributor.editor",
+                                           "AuthorAuthority"))))
+                        .andExpect(jsonPath("$.rows[5].fields[0].rows[1].fields", contains(SubmissionFormFieldMatcher
+                                .matchFormFieldDefinition("onebox", "Affiliation", null, false,
+                                            "Enter the affiliation of the editor as stated on the publication.",
+                                             null, "dc.contributor.editoraffiliation", null))))
+                        .andExpect(jsonPath("$.rows[6].fields", contains(SubmissionFormFieldMatcher
+                               .matchFormFieldDefinition("onebox", "Type", "You must select a publication type", false,
+                                                         "Select the type of content of the item.", null,
+                                                         "dc.type", "types"))));
+    }
+
     private void resetLocalesConfiguration() throws DCInputsReaderException {
         configurationService.setProperty("default.locale","en");
         configurationService.setProperty("webui.supported.locales",null);
