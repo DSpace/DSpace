@@ -137,7 +137,7 @@
 			</list>
 		</property>
 	</bean>
-		
+
 	<!-- Remove the last dot in the specified field keys -->
 	<bean name="removeLastDot" class="org.dspace.submit.lookup.RemoveLastDotModifier">
 	    <constructor-arg value="removeLastDot Modifier"/>
@@ -332,6 +332,7 @@
 			value="http://ebooks.serrelib.gr/serrelib-oai/request" />
 	</bean>
 
+
 	<!-- CrossRef Data Loaders -->
 	<bean id="crossRefOnlineDataLoader" class="org.dspace.submit.lookup.CrossRefOnlineDataLoader">
 		<property name="searchProvider" value="false" />
@@ -427,8 +428,8 @@
 	<bean id="scopusOnlineDataLoader" class="org.dspace.submit.lookup.ScopusOnlineDataLoader" scope="prototype">
 		<property name="searchProvider" value="false" />
 		<property name="fieldMap" ref="scopusInputMap" />
-	</bean>	
-	
+	</bean>
+
 	<alias name="scopusOnlineDataLoader"
 		alias="org.dspace.submit.lookup.ScopusOnlineDataLoader" />
 
@@ -453,7 +454,7 @@
                     <entry key="epage" value="lastpage" />
                     <entry key="description" value="abstract" />
                     <entry key="scopusKeywords" value="keywords" />
-                    <entry key="articlenumber" value="articlenumber" />                    
+                    <entry key="articlenumber" value="articlenumber" />
                     <entry key="authors" value="authors" />
 					<entry key="authorUrl" value="authorUrl" />
 					<entry key="authorScopusid" value="authorScopusID" />
@@ -465,8 +466,8 @@
 	<!-- SCOPUS scival Data Loaders -->
 	<bean id="scivalOnlineDataLoader" class="org.dspace.submit.lookup.SciValOnlineDataLoader" scope="prototype">
 		<property name="searchProvider" value="false" />
-		<!-- Uncomment the following line if you want to define the max results 
-			returned by the Scopus free text (by author, title) search. Default value 
+		<!-- Uncomment the following line if you want to define the max results
+			returned by the Scopus free text (by author, title) search. Default value
 			is 10 -->
 		<!-- <property name="maxResults" value="10" /> -->
 		<property name="fieldMap" ref="scivalInputMap" />
@@ -539,8 +540,8 @@
 	<bean id="wosOnlineDataLoader" class="org.dspace.submit.lookup.WOSOnlineDataLoader"
 		scope="prototype">
 		<property name="searchProvider" value="false" />
-		<!-- Uncomment the following line if you want to define the max results 
-			returned by the WOS free text (by author, title) search. Default value 
+		<!-- Uncomment the following line if you want to define the max results
+			returned by the WOS free text (by author, title) search. Default value
 			is 10 -->
 		<!-- <property name="maxResults" value="10" /> -->
 		<property name="fieldMap" ref="wosInputMap" />
@@ -610,7 +611,7 @@
 	</bean>
 
 	<!-- Grobid -->
-	
+
 	<bean id="grobidDataLoader" class="org.dspace.submit.extraction.GrobidFileDataLoader">
 		<property name="url" value="${metadata.extraction.grobid.url}"/>
 		<property name="fieldMap">
@@ -654,7 +655,6 @@
 				<entry value="chairs" key="dc.contributor.other" />
 				<entry value="abstract" key="dc.description.abstract" />
 				<entry value="allkeywords" key="dc.subject" />
-				<entry value="arxivCategory" key="dc.subject" />
 				<entry value="doi" key="dc.identifier" />
 				<entry value="publisher" key="dc.publisher" />
 				<entry value="patentno" key="dc.identifier.patentno" />
@@ -669,7 +669,6 @@
 				<entry value="note" key="" />
 				<entry value="fulltextUrl" key="" />
 				<entry value="authorsWithAffiliation" key="" />
-				<entry value="pubmedID" key="" />
 				<entry value="publicationStatus" key="" />
 				<entry value="jeissn" key="" />
 				<entry value="volume" key="" />

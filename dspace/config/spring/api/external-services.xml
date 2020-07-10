@@ -42,14 +42,13 @@
         <property name="sourceIdentifier" value="arxiv"/>
         <property name="recordIdMetadata" value="dc.identifier.other"/>
     </bean>
-    
-    
+
     <bean id="scopusLiveImportDataProvider" class="org.dspace.external.provider.impl.LiveImportDataProvider">
         <property name="metadataSource" ref="ScopusImportService"/>
         <property name="sourceIdentifier" value="scopus"/>
         <property name="recordIdMetadata" value="dc.identifier.other"/>
     </bean>
-    
+
     <bean id="epoLiveImportDataProvider" class="org.dspace.external.provider.impl.LiveImportDataProvider">
         <property name="metadataSource" ref="EpoImportService"/>
         <property name="sourceIdentifier" value="epo"/>

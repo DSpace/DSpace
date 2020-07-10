@@ -33,23 +33,6 @@
 
     </bean>
 
-    <bean id="EpoImportService"
-          class="org.dspace.importer.external.epo.service.EpoImportMetadataSourceServiceImpl" scope="singleton">
-        <property name="metadataFieldMapping" ref="epoMetadataFieldMapping"/>
-    </bean>
-    <bean id="epoMetadataFieldMapping"
-          class="org.dspace.importer.external.scopus.service.ScopusFieldMapping">
-    </bean>
-
-
-    <bean id="ScopusImportService"
-          class="org.dspace.importer.external.scopus.service.ScopusImportMetadataSourceServiceImpl" scope="singleton">
-        <property name="metadataFieldMapping" ref="scopusMetadataFieldMapping"/>
-    </bean>
-    <bean id="scopusMetadataFieldMapping"
-          class="org.dspace.importer.external.scopus.service.ScopusFieldMapping">
-    </bean>
-
     <bean id="ArXivImportService"
           class="org.dspace.importer.external.arxiv.service.ArXivImportMetadataSourceServiceImpl" scope="singleton">
         <property name="metadataFieldMapping" ref="ArXivMetadataFieldMapping"/>
@@ -71,6 +54,23 @@
           class="org.dspace.importer.external.pubmed.metadatamapping.PubmedFieldMapping">
     </bean>
 
+
+    <bean id="EpoImportService"
+          class="org.dspace.importer.external.epo.service.EpoImportMetadataSourceServiceImpl" scope="singleton">
+        <property name="metadataFieldMapping" ref="epoMetadataFieldMapping"/>
+    </bean>
+    <bean id="epoMetadataFieldMapping"
+          class="org.dspace.importer.external.scopus.service.ScopusFieldMapping">
+    </bean>
+
+
+    <bean id="ScopusImportService"
+          class="org.dspace.importer.external.scopus.service.ScopusImportMetadataSourceServiceImpl" scope="singleton">
+        <property name="metadataFieldMapping" ref="scopusMetadataFieldMapping"/>
+    </bean>
+    <bean id="scopusMetadataFieldMapping"
+          class="org.dspace.importer.external.scopus.service.ScopusFieldMapping">
+    </bean>
     <!-- Metadatafield used to check against if it's already imported or not during the JSONLookupSearcher-->
     <bean id="lookupID" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
         <constructor-arg value="dc.identifier.other"/>
