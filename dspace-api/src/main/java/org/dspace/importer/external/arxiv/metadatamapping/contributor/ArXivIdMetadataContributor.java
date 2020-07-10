@@ -5,7 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.importer.external.metadatamapping.contributor;
+package org.dspace.importer.external.arxiv.metadatamapping.contributor;
 
 import java.util.Collection;
 import java.util.LinkedList;
@@ -20,16 +20,19 @@ import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.dspace.importer.external.metadatamapping.MetadataFieldConfig;
 import org.dspace.importer.external.metadatamapping.MetadataFieldMapping;
 import org.dspace.importer.external.metadatamapping.MetadatumDTO;
+import org.dspace.importer.external.metadatamapping.contributor.MetadataContributor;
 import org.jaxen.JaxenException;
 import org.springframework.beans.factory.annotation.Required;
 
 /**
- * Metadata contributor that takes an axiom OMElement and turns it into a metadatum
+ * Arxiv specific implementation of {@link MetadataContributor}
+ * Responsible for generating the ArXiv Id from the retrieved item.
+ * 
+ * @author Pasquale Cavallo (pasquale.cavallo at 4science dot it)
  *
- * @author Roeland Dillen (roeland at atmire dot com)
  */
-public class SimpleXpathMetadatumContributor implements MetadataContributor<OMElement> {
-    protected MetadataFieldConfig field;
+public class ArXivIdMetadataContributor implements MetadataContributor<OMElement> {
+    private MetadataFieldConfig field;
 
     /**
      * Return prefixToNamespaceMapping
@@ -40,7 +43,7 @@ public class SimpleXpathMetadatumContributor implements MetadataContributor<OMEl
         return prefixToNamespaceMapping;
     }
 
-    protected MetadataFieldMapping<OMElement, MetadataContributor<OMElement>> metadataFieldMapping;
+    private MetadataFieldMapping<OMElement, MetadataContributor<OMElement>> metadataFieldMapping;
 
     /**
      * Return metadataFieldMapping
@@ -52,7 +55,7 @@ public class SimpleXpathMetadatumContributor implements MetadataContributor<OMEl
     }
 
     /**
-     * Set the metadataFieldMapping of this SimpleXpathMetadatumContributor
+     * Set the metadataFieldMapping of this ArXivIdMetadataContributor
      *
      * @param metadataFieldMapping the new mapping.
      */
@@ -71,17 +74,17 @@ public class SimpleXpathMetadatumContributor implements MetadataContributor<OMEl
         this.prefixToNamespaceMapping = prefixToNamespaceMapping;
     }
 
-    protected Map<String, String> prefixToNamespaceMapping;
+    private Map<String, String> prefixToNamespaceMapping;
 
     /**
-     * Initialize SimpleXpathMetadatumContributor with a query, prefixToNamespaceMapping and MetadataFieldConfig
+     * Initialize ArXivIdMetadataContributor with a query, prefixToNamespaceMapping and MetadataFieldConfig
      *
      * @param query                    query string
      * @param prefixToNamespaceMapping metadata prefix to namespace mapping
      * @param field
      * <a href="https://github.com/DSpace/DSpace/tree/master/dspace-api/src/main/java/org/dspace/importer/external#metadata-mapping-">MetadataFieldConfig</a>
      */
-    public SimpleXpathMetadatumContributor(String query, Map<String, String> prefixToNamespaceMapping,
+    public ArXivIdMetadataContributor(String query, Map<String, String> prefixToNamespaceMapping,
                                            MetadataFieldConfig field) {
         this.query = query;
         this.prefixToNamespaceMapping = prefixToNamespaceMapping;
@@ -89,13 +92,13 @@ public class SimpleXpathMetadatumContributor implements MetadataContributor<OMEl
     }
 
     /**
-     * Empty constructor for SimpleXpathMetadatumContributor
+     * Empty constructor for ArXivIdMetadataContributor
      */
-    public SimpleXpathMetadatumContributor() {
+    public ArXivIdMetadataContributor() {
 
     }
 
-    protected String query;
+    private String query;
 
     /**
      * Return the MetadataFieldConfig used while retrieving MetadatumDTO
@@ -160,11 +163,25 @@ public class SimpleXpathMetadatumContributor implements MetadataContributor<OMEl
                     System.err.println("node of type: " + el.getClass());
                 }
             }
+            parseValue(values);
             return values;
         } catch (JaxenException e) {
             System.err.println(query);
             throw new RuntimeException(e);
         }
-
     }
+
+    private void parseValue(List<MetadatumDTO> dtos) {
+        if (dtos != null) {
+            for (MetadatumDTO dto : dtos) {
+                if (dto != null && dto.getValue() != null && dto.getValue().contains("/")) {
+                    int startIndex = dto.getValue().lastIndexOf('/') + 1;
+                    int endIndex = dto.getValue().length();
+                    String id = dto.getValue().substring(startIndex, endIndex);
+                    dto.setValue(id);
+                }
+            }
+        }
+    }
+
 }
