@@ -673,7 +673,7 @@ public class StatisticsDataVisits extends StatisticsData {
 
                 case Constants.ITEM:
                     Item item = itemService.findByIdOrLegacyId(context, dsoId);
-                    if (item == null) {
+                    if (item == null || item.getHandle() == null) {
                         break;
                     }
 
@@ -682,7 +682,7 @@ public class StatisticsDataVisits extends StatisticsData {
 
                 case Constants.COLLECTION:
                     Collection coll = collectionService.findByIdOrLegacyId(context, dsoId);
-                    if (coll == null) {
+                    if (coll == null || coll.getHandle() == null) {
                         break;
                     }
 
@@ -691,7 +691,7 @@ public class StatisticsDataVisits extends StatisticsData {
 
                 case Constants.COMMUNITY:
                     Community comm = communityService.findByIdOrLegacyId(context, dsoId);
-                    if (comm == null) {
+                    if (comm == null || comm.getHandle() == null) {
                         break;
                     }
 
