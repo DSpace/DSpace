@@ -23,7 +23,6 @@ import org.dspace.app.rest.model.UsageReportPointDateRest;
 import org.dspace.app.rest.model.UsageReportPointDsoTotalVisitsRest;
 import org.dspace.app.rest.model.UsageReportRest;
 import org.dspace.app.rest.utils.DSpaceObjectUtils;
-import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Bitstream;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
@@ -38,8 +37,6 @@ import org.dspace.statistics.content.DatasetTypeGenerator;
 import org.dspace.statistics.content.StatisticsDataVisits;
 import org.dspace.statistics.content.StatisticsListing;
 import org.dspace.statistics.content.StatisticsTable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.stereotype.Component;
@@ -52,10 +49,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class UsageReportService extends AbstractDSpaceRestRepository {
 
-    private static final Logger log = LoggerFactory.getLogger(UsageReportService.class);
-
-    @Autowired
-    private AuthorizeService authorizeService;
     @Autowired
     private DSpaceObjectUtils dspaceObjectUtil;
     @Autowired
@@ -66,8 +59,6 @@ public class UsageReportService extends AbstractDSpaceRestRepository {
     public static final String TOTAL_DOWNLOADS_REPORT_ID = "TotalDownloads";
     public static final String TOP_COUNTRIES_REPORT_ID = "TopCountries";
     public static final String TOP_CITIES_REPORT_ID = "TopCities";
-
-    public static final String SITE_WIDE_USAGE_REPORT_LABEL = "All of DSpace";
 
     /**
      * Get list of usage reports that are applicable to the DSO (of given UUID)
@@ -166,13 +157,13 @@ public class UsageReportService extends AbstractDSpaceRestRepository {
         for (int i = 0; i < dataset.getColLabels().size(); i++) {
             UsageReportPointDsoTotalVisitsRest totalVisitPoint = new UsageReportPointDsoTotalVisitsRest();
             totalVisitPoint.setType("item");
-            totalVisitPoint.setLabel(SITE_WIDE_USAGE_REPORT_LABEL);
             String urlOfItem = dataset.getColLabelsAttrs().get(i).get("url");
             if (urlOfItem != null) {
                 String handle = StringUtils.substringAfterLast(urlOfItem, "handle/");
                 if (handle != null) {
                     DSpaceObject dso = handleService.resolveToObject(context, handle);
                     totalVisitPoint.setId(dso != null ? dso.getID().toString() : urlOfItem);
+                    totalVisitPoint.setLabel(dso != null ? dso.getName() : urlOfItem);
                     totalVisitPoint.addValue("views", Integer.valueOf(dataset.getMatrix()[0][i]));
                     usageReportRest.addPoint(totalVisitPoint);
                 }
