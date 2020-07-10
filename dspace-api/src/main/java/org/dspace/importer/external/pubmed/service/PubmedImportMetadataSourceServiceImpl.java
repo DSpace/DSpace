@@ -8,6 +8,10 @@
 
 package org.dspace.importer.external.pubmed.service;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.io.StringReader;
 import java.util.Collection;
 import java.util.LinkedList;
@@ -20,6 +24,7 @@ import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import com.google.common.io.CharStreams;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMXMLBuilderFactory;
 import org.apache.axiom.om.OMXMLParserWrapper;
@@ -27,8 +32,12 @@ import org.apache.axiom.om.xpath.AXIOMXPath;
 import org.dspace.content.Item;
 import org.dspace.importer.external.datamodel.ImportRecord;
 import org.dspace.importer.external.datamodel.Query;
+import org.dspace.importer.external.exception.FileMultipleOccurencesException;
+import org.dspace.importer.external.exception.FileSourceException;
 import org.dspace.importer.external.exception.MetadataSourceException;
 import org.dspace.importer.external.service.AbstractImportMetadataSourceService;
+import org.dspace.importer.external.service.components.FileSource;
+import org.dspace.importer.external.service.components.QuerySource;
 import org.jaxen.JaxenException;
 
 /**
@@ -36,7 +45,9 @@ import org.jaxen.JaxenException;
  *
  * @author Roeland Dillen (roeland at atmire dot com)
  */
-public class PubmedImportMetadataSourceServiceImpl extends AbstractImportMetadataSourceService<OMElement> {
+public class PubmedImportMetadataSourceServiceImpl extends AbstractImportMetadataSourceService<OMElement>
+    implements QuerySource, FileSource {
+
     private String baseAddress;
 
     private WebTarget pubmedWebTarget;
@@ -357,7 +368,6 @@ public class PubmedImportMetadataSourceServiceImpl extends AbstractImportMetadat
 
         @Override
         public Collection<ImportRecord> call() throws Exception {
-            List<ImportRecord> records = new LinkedList<ImportRecord>();
 
             WebTarget getRecordIdsTarget = pubmedWebTarget
                 .queryParam("term", query.getParameterAsClass("term", String.class));
@@ -382,13 +392,42 @@ public class PubmedImportMetadataSourceServiceImpl extends AbstractImportMetadat
             invocationBuilder = getRecordsTarget.request(MediaType.TEXT_PLAIN_TYPE);
             response = invocationBuilder.get();
 
-            List<OMElement> omElements = splitToRecords(response.readEntity(String.class));
-
-            for (OMElement record : omElements) {
-                records.add(transformSourceRecords(record));
-            }
-
-            return records;
+            String xml = response.readEntity(String.class);
+            return parseXMLString(xml);
         }
     }
+
+
+    @Override
+    public List<ImportRecord> getRecords(InputStream inputStream) throws FileSourceException {
+        String xml = null;
+        try (Reader reader = new InputStreamReader(inputStream, "UTF-8")) {
+            xml = CharStreams.toString(reader);
+            return parseXMLString(xml);
+        } catch (IOException e) {
+            throw new FileSourceException ("Cannot read XML from InputStream", e);
+        }
+    }
+
+    @Override
+    public ImportRecord getRecord(InputStream inputStream) throws FileSourceException, FileMultipleOccurencesException {
+        List<ImportRecord> importRecord = getRecords(inputStream);
+        if (importRecord == null || importRecord.isEmpty()) {
+            throw new FileSourceException("Cannot find (valid) record in File");
+        } else if (importRecord.size() > 1) {
+            throw new FileMultipleOccurencesException("File contains more than one entry");
+        } else {
+            return importRecord.get(0);
+        }
+    }
+
+    private List<ImportRecord> parseXMLString(String xml) {
+        List<ImportRecord> records = new LinkedList<ImportRecord>();
+        List<OMElement> omElements = splitToRecords(xml);
+        for (OMElement record : omElements) {
+            records.add(transformSourceRecords(record));
+        }
+        return records;
+    }
+
 }
