@@ -170,6 +170,35 @@ public class ItemAuthorityTest extends AbstractControllerIntegrationTest {
                        .andExpect(jsonPath("$.page.totalElements", Matchers.is(3)));
     }
 
+    @Test
+    public void singleItemAuthorityWithoutOrgUnitTest() throws Exception {
+       context.turnOffAuthorisationSystem();
+
+       parentCommunity = CommunityBuilder.createCommunity(context).build();
+       Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                          .withName("Test collection")
+                                          .build();
+
+       Item author_1 = ItemBuilder.createItem(context, col1)
+                                  .withTitle("Author 1")
+                                  .withRelationshipType("person")
+                                  .build();
+
+       context.restoreAuthSystemState();
+
+       String token = getAuthToken(eperson.getEmail(), password);
+       getClient(token).perform(get("/api/submission/vocabularies/AuthorAuthority/entries")
+                       .param("metadata", "dc.contributor.author")
+                       .param("collection", col1.getID().toString())
+                       .param("filter", "author"))
+                       .andExpect(status().isOk())
+                       .andExpect(jsonPath("$._embedded.entries", Matchers.contains(
+                              ItemAuthorityMatcher.matchItemAuthorityWithOtherInformations(author_1.getID().toString(),
+                             "Author 1", "Author 1","vocabularyEntry","contributor_department","")
+                              )))
+                       .andExpect(jsonPath("$.page.totalElements", Matchers.is(1)));
+    }
+
     @Override
     @After
     // We need to cleanup the authorities cache once than the configuration has been restored
