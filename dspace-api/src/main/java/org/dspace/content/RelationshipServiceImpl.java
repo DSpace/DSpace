@@ -27,6 +27,7 @@ import org.dspace.content.service.RelationshipTypeService;
 import org.dspace.content.virtual.VirtualMetadataPopulator;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class RelationshipServiceImpl implements RelationshipService {
@@ -44,6 +45,9 @@ public class RelationshipServiceImpl implements RelationshipService {
 
     @Autowired(required = true)
     protected RelationshipTypeService relationshipTypeService;
+
+    @Autowired
+    private ConfigurationService configurationService;
 
     @Autowired
     private EntityTypeService entityTypeService;
@@ -199,8 +203,7 @@ public class RelationshipServiceImpl implements RelationshipService {
             log.warn("The relationship has been deemed invalid since the leftItem" +
                          " and leftType do no match on entityType");
             logRelationshipTypeDetailsForError(relationshipType);
-            //TODO CHANGE BACK
-            return true;
+            return false;
         }
         if (!verifyEntityTypes(relationship.getRightItem(), relationshipType.getRightType())) {
             log.warn("The relationship has been deemed invalid since the rightItem" +
@@ -372,14 +375,15 @@ public class RelationshipServiceImpl implements RelationshipService {
         // authorization system here so that this failure doesn't happen when the items need to be update
         context.turnOffAuthorisationSystem();
         try {
+            int max = configurationService.getIntProperty("relationship.update.relateditems.max", 5);
             List<Item> itemsToUpdate = new LinkedList<>();
             itemsToUpdate.add(relationship.getLeftItem());
             itemsToUpdate.add(relationship.getRightItem());
 
             itemsToUpdate = getRelatedItemsForLeftItem(context, relationship.getLeftItem(),
-                                                       relationship, itemsToUpdate);
+                                                       relationship, itemsToUpdate, max);
             itemsToUpdate = getRelatedItemsForRightItem(context, relationship.getRightItem(),
-                                                        relationship, itemsToUpdate);
+                                                        relationship, itemsToUpdate, max);
 
             for (Item item : itemsToUpdate) {
                 if (!item.isMetadataModified()) {
@@ -394,8 +398,11 @@ public class RelationshipServiceImpl implements RelationshipService {
     }
 
     private List<Item> getRelatedItemsForRightItem(Context context, Item item, Relationship relationship,
-                                                   List<Item> itemsToUpdate)
+                                                   List<Item> itemsToUpdate, int max)
         throws SQLException {
+        if (itemsToUpdate.size() >= max) {
+            return itemsToUpdate;
+        }
         List<RelationshipType> relationshipTypes = new LinkedList<>();
         EntityType leftType = relationship.getRelationshipType().getLeftType();
         String entityTypeStringFromMetadata = relationshipMetadataService.getEntityTypeStringFromMetadata(item);
@@ -415,11 +422,11 @@ public class RelationshipServiceImpl implements RelationshipService {
                     if (isLeft) {
                         itemsToUpdate.add(foundRelationship.getRightItem());
                         return getRelatedItemsForRightItem(context, foundRelationship.getRightItem(), foundRelationship,
-                                                           itemsToUpdate);
+                                                           itemsToUpdate, max);
                     } else {
                         itemsToUpdate.add(foundRelationship.getLeftItem());
                         return getRelatedItemsForLeftItem(context, foundRelationship.getLeftItem(), foundRelationship,
-                                                          itemsToUpdate);
+                                                          itemsToUpdate, max);
                     }
                 }
             }
@@ -428,9 +435,11 @@ public class RelationshipServiceImpl implements RelationshipService {
     }
 
     private List<Item> getRelatedItemsForLeftItem(Context context, Item item, Relationship relationship,
-                                                  List<Item> itemsToUpdate)
+                                                  List<Item> itemsToUpdate, int max)
         throws SQLException {
-
+        if (itemsToUpdate.size() >= max) {
+            return itemsToUpdate;
+        }
         List<RelationshipType> relationshipTypes = new LinkedList<>();
         EntityType rightType = relationship.getRelationshipType().getRightType();
         String entityTypeStringFromMetadata = relationshipMetadataService.getEntityTypeStringFromMetadata(item);
@@ -450,11 +459,11 @@ public class RelationshipServiceImpl implements RelationshipService {
                     if (isLeft) {
                         itemsToUpdate.add(foundRelationship.getRightItem());
                         return getRelatedItemsForRightItem(context, foundRelationship.getRightItem(), foundRelationship,
-                                                           itemsToUpdate);
+                                                           itemsToUpdate, max);
                     } else {
                         itemsToUpdate.add(foundRelationship.getLeftItem());
                         return getRelatedItemsForLeftItem(context, foundRelationship.getLeftItem(), foundRelationship,
-                                                          itemsToUpdate);
+                                                          itemsToUpdate, max);
                     }
                 }
             }
