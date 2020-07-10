@@ -35,13 +35,14 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.DefaultProxyRoutePlanner;
 import org.apache.log4j.Logger;
 import org.dspace.content.Item;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.importer.external.datamodel.ImportRecord;
 import org.dspace.importer.external.datamodel.Query;
 import org.dspace.importer.external.exception.MetadataSourceException;
 import org.dspace.importer.external.service.AbstractImportMetadataSourceService;
+import org.dspace.services.ConfigurationService;
 import org.dspace.submit.lookup.SubmissionLookupService;
 import org.jaxen.JaxenException;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Implements a data source for querying Scopus
@@ -51,6 +52,9 @@ import org.jaxen.JaxenException;
  */
 
 public class ScopusImportMetadataSourceServiceImpl extends AbstractImportMetadataSourceService<OMElement> {
+
+    @Autowired
+    private ConfigurationService configurationService;
 
     private int timeout = 1000;
 
@@ -148,12 +152,12 @@ public class ScopusImportMetadataSourceServiceImpl extends AbstractImportMetadat
         @Override
         public Integer call() throws Exception {
             List<ImportRecord> results = new ArrayList<>();
-            String proxyHost = ConfigurationManager.getProperty("http.proxy.host");
-            String proxyPort = ConfigurationManager.getProperty("http.proxy.port");
-            String apiKey = ConfigurationManager.getProperty("submission.lookup.scopus.apikey");
-            if (!apiKey.equals("") && apiKey != null) {
-                if (!ConfigurationManager.getBooleanProperty(SubmissionLookupService.CFG_MODULE,
-                        "remoteservice.demo")) {
+            String proxyHost = configurationService.getProperty("http.proxy.host");
+            String proxyPort = configurationService.getProperty("http.proxy.port");
+            String apiKey = configurationService.getProperty("submission.lookup.scopus.apikey");
+            if (apiKey != null && !apiKey.equals("")) {
+                if (!configurationService.getBooleanProperty(SubmissionLookupService.CFG_MODULE +
+                        ".remoteservice.demo")) {
                     HttpGet method = null;
                     try {
                         HttpClientBuilder hcBuilder = HttpClients.custom();
@@ -221,12 +225,12 @@ public class ScopusImportMetadataSourceServiceImpl extends AbstractImportMetadat
         public List<ImportRecord> call() throws Exception {
             List<ImportRecord> results = new ArrayList<>();
             String queryString = "DOI(" + doi + ")";
-            String proxyHost = ConfigurationManager.getProperty("http.proxy.host");
-            String proxyPort = ConfigurationManager.getProperty("http.proxy.port");
-            String apiKey = ConfigurationManager.getProperty("submission.lookup.scopus.apikey");
-            if (!apiKey.equals("") && apiKey != null) {
-                if (!ConfigurationManager.getBooleanProperty(SubmissionLookupService.CFG_MODULE,
-                        "remoteservice.demo")) {
+            String proxyHost = configurationService.getProperty("http.proxy.host");
+            String proxyPort = configurationService.getProperty("http.proxy.port");
+            String apiKey = configurationService.getProperty("submission.lookup.scopus.apikey");
+            if (apiKey != null && !apiKey.equals("")) {
+                if (!configurationService.getBooleanProperty(SubmissionLookupService.CFG_MODULE +
+                        ".remoteservice.demo")) {
                     HttpGet method = null;
                     try {
                         HttpClientBuilder hcBuilder = HttpClients.custom();
@@ -319,12 +323,13 @@ public class ScopusImportMetadataSourceServiceImpl extends AbstractImportMetadat
             }
             queryString = query.toString();
 
-            String proxyHost = ConfigurationManager.getProperty("http.proxy.host");
-            String proxyPort = ConfigurationManager.getProperty("http.proxy.port");
-            String apiKey = ConfigurationManager.getProperty("submission.lookup.scopus.apikey");
-            if (!apiKey.equals("") && apiKey != null) {
-                if (!ConfigurationManager.getBooleanProperty(SubmissionLookupService.CFG_MODULE,
-                        "remoteservice.demo")) {
+            String proxyHost = configurationService.getProperty("http.proxy.host");
+            String proxyPort = configurationService.getProperty("http.proxy.port");
+            String apiKey = configurationService.getProperty("submission.lookup.scopus.apikey");
+
+            if (apiKey != null && !apiKey.equals("")) {
+                if (!configurationService.getBooleanProperty(SubmissionLookupService.CFG_MODULE +
+                        ".remoteservice.demo")) {
                     HttpGet method = null;
                     try {
                         HttpClientBuilder hcBuilder = HttpClients.custom();
@@ -397,12 +402,13 @@ public class ScopusImportMetadataSourceServiceImpl extends AbstractImportMetadat
             List<ImportRecord> results = new ArrayList<>();
             String queryString = query.getParameterAsClass("query", String.class);
             Integer start = query.getParameterAsClass("start", Integer.class);
-            String proxyHost = ConfigurationManager.getProperty("http.proxy.host");
-            String proxyPort = ConfigurationManager.getProperty("http.proxy.port");
-            String apiKey = ConfigurationManager.getProperty("submission.lookup.scopus.apikey");
-            if (!apiKey.equals("") && apiKey != null) {
-                if (!ConfigurationManager.getBooleanProperty(SubmissionLookupService.CFG_MODULE,
-                        "remoteservice.demo")) {
+            String proxyHost = configurationService.getProperty("http.proxy.host");
+            String proxyPort = configurationService.getProperty("http.proxy.port");
+            String apiKey = configurationService.getProperty("submission.lookup.scopus.apikey");
+
+            if (apiKey != null && !apiKey.equals("")) {
+                if (!configurationService.getBooleanProperty(SubmissionLookupService.CFG_MODULE +
+                        ".remoteservice.demo")) {
                     HttpGet method = null;
                     try {
                         HttpClientBuilder hcBuilder = HttpClients.custom();
