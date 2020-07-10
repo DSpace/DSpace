@@ -15,13 +15,14 @@ import org.dspace.app.rest.RestResourceController;
  * @author Danilo Di Nuzzo (danilo.dinuzzo at 4science.it)
  *
  */
-public class CrisLayoutFieldRest extends BaseObjectRest<Integer> {
+public class CrisLayoutFieldRest implements RestModel {
 
     public static final String NAME = "field";
     public static final String CATEGORY = RestAddressableModel.LAYOUT;
 
     private static final long serialVersionUID = 5591380126666737586L;
 
+    private Integer id;
     private String bundle;
     private String rendering;
     private Integer row;
@@ -34,12 +35,10 @@ public class CrisLayoutFieldRest extends BaseObjectRest<Integer> {
         return NAME;
     }
 
-    @Override
     public String getCategory() {
         return CATEGORY;
     }
 
-    @Override
     public Class<RestResourceController> getController() {
         return RestResourceController.class;
     }
@@ -90,6 +89,14 @@ public class CrisLayoutFieldRest extends BaseObjectRest<Integer> {
 
     public void setStyle(String style) {
         this.style = style;
+    }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
     }
 
 }

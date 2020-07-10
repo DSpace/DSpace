@@ -38,6 +38,7 @@ public class EntityTypeRestRepository extends DSpaceRestRepository<EntityTypeRes
     @Autowired
     private CollectionService collectionService;
 
+    @Override
     @PreAuthorize("permitAll()")
     public EntityTypeRest findOne(Context context, Integer integer) {
         try {
@@ -51,6 +52,7 @@ public class EntityTypeRestRepository extends DSpaceRestRepository<EntityTypeRes
         }
     }
 
+    @Override
     public Page<EntityTypeRest> findAll(Context context, Pageable pageable) {
         try {
             List<EntityType> entityTypes = entityTypeService.findAll(context);
@@ -60,6 +62,7 @@ public class EntityTypeRestRepository extends DSpaceRestRepository<EntityTypeRes
         }
     }
 
+    @Override
     public Class<EntityTypeRest> getDomainClass() {
         return EntityTypeRest.class;
     }

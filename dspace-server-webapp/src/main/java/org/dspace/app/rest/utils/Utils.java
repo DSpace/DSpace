@@ -47,17 +47,18 @@ import org.apache.log4j.Logger;
 import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.exception.PaginationException;
 import org.dspace.app.rest.exception.RepositoryNotFoundException;
-import org.dspace.app.rest.model.AuthorityRest;
 import org.dspace.app.rest.model.BaseObjectRest;
 import org.dspace.app.rest.model.CommunityRest;
 import org.dspace.app.rest.model.CrisLayoutBoxRest;
 import org.dspace.app.rest.model.LinkRest;
 import org.dspace.app.rest.model.LinksRest;
 import org.dspace.app.rest.model.ProcessRest;
+import org.dspace.app.rest.model.PropertyRest;
 import org.dspace.app.rest.model.ResourcePolicyRest;
 import org.dspace.app.rest.model.RestAddressableModel;
 import org.dspace.app.rest.model.RestModel;
 import org.dspace.app.rest.model.VersionHistoryRest;
+import org.dspace.app.rest.model.VocabularyRest;
 import org.dspace.app.rest.model.hateoas.EmbeddedPage;
 import org.dspace.app.rest.model.hateoas.HALResource;
 import org.dspace.app.rest.projection.CompositeProjection;
@@ -278,7 +279,7 @@ public class Utils {
             return CommunityRest.NAME;
         }
         if (modelPlural.equals("authorities")) {
-            return AuthorityRest.NAME;
+            return VocabularyRest.NAME;
         }
         if (modelPlural.equals("resourcepolicies")) {
             return ResourcePolicyRest.NAME;
@@ -288,6 +289,12 @@ public class Utils {
         }
         if (StringUtils.equals(modelPlural, "versionhistories")) {
             return VersionHistoryRest.NAME;
+        }
+        if (StringUtils.equals(modelPlural, "properties")) {
+            return PropertyRest.NAME;
+        }
+        if (StringUtils.equals(modelPlural, "vocabularies")) {
+            return VocabularyRest.NAME;
         }
         if (StringUtils.equals(modelPlural, "boxes")) {
             return CrisLayoutBoxRest.NAME;

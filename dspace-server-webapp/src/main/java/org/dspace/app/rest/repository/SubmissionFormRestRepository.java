@@ -47,10 +47,8 @@ public class SubmissionFormRestRepository extends DSpaceRestRepository<Submissio
     public SubmissionFormRest findOne(Context context, String submitName)  {
         try {
             Locale currentLocale = context.getCurrentLocale();
-            DCInputsReader inputReader;
-            if (currentLocale != null) {
-                inputReader = inputReaders.get(currentLocale);
-            } else {
+            DCInputsReader inputReader = inputReaders.get(currentLocale);
+            if (inputReader == null) {
                 inputReader = defaultInputReader;
             }
             DCInputSet subConfs = inputReader.getInputsByFormName(submitName);

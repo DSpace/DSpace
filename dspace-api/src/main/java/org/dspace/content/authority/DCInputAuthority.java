@@ -10,10 +10,12 @@ package org.dspace.content.authority;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -74,21 +76,27 @@ public class DCInputAuthority extends SelfNamedPlugin implements ChoiceAuthority
 
     private static synchronized void initPluginNames() {
         Locale[] locales = I18nUtil.getSupportedLocales();
+        Set<String> names = new HashSet<String>();
         if (pluginNames == null) {
             try {
                 dcis = new HashMap<Locale, DCInputsReader>();
                 for (Locale locale : locales) {
                     dcis.put(locale, new DCInputsReader(I18nUtil.getInputFormsFileName(locale)));
                 }
+                for (Locale l : locales) {
+                    Iterator pi = dcis.get(l).getPairsNameIterator();
+                    while (pi.hasNext()) {
+                        names.add((String) pi.next());
+                    }
+                }
+                DCInputsReader dcirDefault = new DCInputsReader();
+                Iterator pi = dcirDefault.getPairsNameIterator();
+                while (pi.hasNext()) {
+                    names.add((String) pi.next());
+                }
             } catch (DCInputsReaderException e) {
                 log.error("Failed reading DCInputs initialization: ", e);
             }
-            List<String> names = new ArrayList<String>();
-            Iterator pi = dcis.get(locales[0]).getPairsNameIterator();
-            while (pi.hasNext()) {
-                names.add((String) pi.next());
-            }
-
             pluginNames = names.toArray(new String[names.size()]);
             log.debug("Got plugin names = " + Arrays.deepToString(pluginNames));
         }
@@ -129,27 +137,29 @@ public class DCInputAuthority extends SelfNamedPlugin implements ChoiceAuthority
         String[] valuesLocale = values.get(currentLocale.getLanguage());
         String[] labelsLocale = labels.get(currentLocale.getLanguage());
         int dflt = -1;
-        Choice v[] = new Choice[valuesLocale.length];
+        int found = 0;
+        List<Choice> v = new ArrayList<Choice>();
         for (int i = 0; i < valuesLocale.length; ++i) {
-            v[i] = new Choice(valuesLocale[i], valuesLocale[i], labelsLocale[i]);
-            if (valuesLocale[i].equalsIgnoreCase(query)) {
-                dflt = i;
+            if (query == null || StringUtils.containsIgnoreCase(valuesLocale[i], query)) {
+                if (found >= start && v.size() < limit) {
+                    v.add(new Choice(null, valuesLocale[i], labelsLocale[i]));
+                    if (valuesLocale[i].equalsIgnoreCase(query)) {
+                        dflt = i;
+                    }
+                }
+                found++;
             }
         }
-        return new Choices(v, 0, v.length, Choices.CF_AMBIGUOUS, false, dflt);
+        Choice[] vArray = new Choice[v.size()];
+        return new Choices(v.toArray(vArray), start, found, Choices.CF_AMBIGUOUS, false, dflt);
     }
 
     @Override
     public Choices getBestMatch(String field, String text, Collection collection, String locale) {
         init();
-
-        // Get default if locale is empty
-        if (StringUtils.isBlank(locale)) {
-            locale = getDefaultLocale();
-        }
-
-        String[] valuesLocale = values.get(locale);
-        String[] labelsLocale = labels.get(locale);
+        Locale currentLocale = I18nUtil.getSupportedLocale(locale);
+        String[] valuesLocale = values.get(currentLocale.getLanguage());
+        String[] labelsLocale = labels.get(currentLocale.getLanguage());
         for (int i = 0; i < valuesLocale.length; ++i) {
             if (text.equalsIgnoreCase(valuesLocale[i])) {
                 Choice v[] = new Choice[1];
@@ -161,7 +171,7 @@ public class DCInputAuthority extends SelfNamedPlugin implements ChoiceAuthority
     }
 
     @Override
-    public String getLabel(String field, String key, String locale) {
+    public String getLabel(String key, String locale) {
         init();
 
         // Get default if locale is empty
@@ -169,11 +179,10 @@ public class DCInputAuthority extends SelfNamedPlugin implements ChoiceAuthority
             locale = getDefaultLocale();
         }
 
-        String[] valuesLocale = values.get(locale);
         String[] labelsLocale = labels.get(locale);
         int pos = -1;
-        for (int i = 0; i < valuesLocale.length; i++) {
-            if (valuesLocale[i].equals(key)) {
+        for (int i = 0; i < labelsLocale.length; i++) {
+            if (labelsLocale[i].equals(key)) {
                 pos = i;
                 break;
             }
@@ -188,5 +197,10 @@ public class DCInputAuthority extends SelfNamedPlugin implements ChoiceAuthority
     protected String getDefaultLocale() {
         Context context = new Context();
         return context.getCurrentLocale().getLanguage();
+    }
+
+    @Override
+    public boolean isScrollable() {
+        return true;
     }
 }

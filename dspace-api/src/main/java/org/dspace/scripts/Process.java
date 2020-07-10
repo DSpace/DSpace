@@ -8,6 +8,7 @@
 package org.dspace.scripts;
 
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -79,6 +80,8 @@ public class Process implements ReloadableEntity<Integer> {
     @Column(name = "creation_time", nullable = false)
     @Temporal(TemporalType.TIMESTAMP)
     private Date creationTime;
+
+    public static final String BITSTREAM_TYPE_METADATAFIELD = "dspace.process.filetype";
 
     protected Process() {
     }
@@ -174,6 +177,9 @@ public class Process implements ReloadableEntity<Integer> {
      * @return  The Bitstreams that are used or created by the process
      */
     public List<Bitstream> getBitstreams() {
+        if (bitstreams == null) {
+            bitstreams = new LinkedList<>();
+        }
         return bitstreams;
     }
 

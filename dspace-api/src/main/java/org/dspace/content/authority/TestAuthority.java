@@ -70,7 +70,7 @@ public class TestAuthority implements ChoiceAuthority, AuthorityVariantsSupport 
     }
 
     @Override
-    public String getLabel(String field, String key, String locale) {
+    public String getLabel(String key, String locale) {
         if (StringUtils.isNotBlank(key)) {
             return key.replaceAll("authority", "label");
         }
