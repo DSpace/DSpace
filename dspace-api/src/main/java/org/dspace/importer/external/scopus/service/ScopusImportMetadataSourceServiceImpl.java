@@ -39,6 +39,7 @@ import org.dspace.importer.external.datamodel.ImportRecord;
 import org.dspace.importer.external.datamodel.Query;
 import org.dspace.importer.external.exception.MetadataSourceException;
 import org.dspace.importer.external.service.AbstractImportMetadataSourceService;
+import org.dspace.importer.external.service.components.QuerySource;
 import org.dspace.services.ConfigurationService;
 import org.dspace.submit.lookup.SubmissionLookupService;
 import org.jaxen.JaxenException;
@@ -51,7 +52,8 @@ import org.springframework.beans.factory.annotation.Autowired;
  *
  */
 
-public class ScopusImportMetadataSourceServiceImpl extends AbstractImportMetadataSourceService<OMElement> {
+public class ScopusImportMetadataSourceServiceImpl extends AbstractImportMetadataSourceService<OMElement>
+    implements QuerySource {
 
     @Autowired
     private ConfigurationService configurationService;
