@@ -128,19 +128,21 @@ public class LiveImportDataProvider implements ExternalDataProvider {
      */
     private ExternalDataObject getExternalDataObject(ImportRecord record) {
         ExternalDataObject externalDataObject = new ExternalDataObject(sourceIdentifier);
-        String id = getFirstValue(record, recordIdMetadata);
-        String display = getFirstValue(record, displayMetadata);
-        externalDataObject.setId(id);
-        externalDataObject.setDisplayValue(display);
-        externalDataObject.setValue(display);
-        for (MetadatumDTO dto : record.getValueList()) {
-            // FIXME it would be useful to remove MetadatumDTO in favor of MetadataValueDTO
-            MetadataValueDTO mvDTO = new MetadataValueDTO();
-            mvDTO.setSchema(dto.getSchema());
-            mvDTO.setElement(dto.getElement());
-            mvDTO.setQualifier(dto.getQualifier());
-            mvDTO.setValue(dto.getValue());
-            externalDataObject.addMetadata(mvDTO);
+        if (record != null) {
+            String id = getFirstValue(record, recordIdMetadata);
+            String display = getFirstValue(record, displayMetadata);
+            externalDataObject.setId(id);
+            externalDataObject.setDisplayValue(display);
+            externalDataObject.setValue(display);
+            for (MetadatumDTO dto : record.getValueList()) {
+                // FIXME it would be useful to remove MetadatumDTO in favor of MetadataValueDTO
+                MetadataValueDTO mvDTO = new MetadataValueDTO();
+                mvDTO.setSchema(dto.getSchema());
+                mvDTO.setElement(dto.getElement());
+                mvDTO.setQualifier(dto.getQualifier());
+                mvDTO.setValue(dto.getValue());
+                externalDataObject.addMetadata(mvDTO);
+            }
         }
         return externalDataObject;
     }
