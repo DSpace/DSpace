@@ -168,11 +168,15 @@ public class UsageReportService extends AbstractDSpaceRestRepository {
             totalVisitPoint.setType("item");
             totalVisitPoint.setLabel(SITE_WIDE_USAGE_REPORT_LABEL);
             String urlOfItem = dataset.getColLabelsAttrs().get(i).get("url");
-            DSpaceObject dso = handleService.resolveToObject(context, StringUtils.substringAfterLast(urlOfItem,
-                "handle/"));
-            totalVisitPoint.setId(dso != null ? dso.getID().toString() : urlOfItem);
-            totalVisitPoint.addValue("views", Integer.valueOf(dataset.getMatrix()[0][i]));
-            usageReportRest.addPoint(totalVisitPoint);
+            if (urlOfItem != null) {
+                String handle = StringUtils.substringAfterLast(urlOfItem, "handle/");
+                if (handle != null) {
+                    DSpaceObject dso = handleService.resolveToObject(context, handle);
+                    totalVisitPoint.setId(dso != null ? dso.getID().toString() : urlOfItem);
+                    totalVisitPoint.addValue("views", Integer.valueOf(dataset.getMatrix()[0][i]));
+                    usageReportRest.addPoint(totalVisitPoint);
+                }
+            }
         }
         usageReportRest.setReportType(TOTAL_VISITS_REPORT_ID);
         return usageReportRest;
