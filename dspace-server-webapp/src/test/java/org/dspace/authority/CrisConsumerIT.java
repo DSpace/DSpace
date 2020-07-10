@@ -54,6 +54,7 @@ import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.xmlworkflow.storedcomponents.PoolTask;
 import org.dspace.xmlworkflow.storedcomponents.service.PoolTaskService;
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,6 +70,8 @@ import org.springframework.test.web.servlet.MvcResult;
  *
  */
 public class CrisConsumerIT extends AbstractControllerIntegrationTest {
+
+    private static String[] consumers;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -96,11 +99,20 @@ public class CrisConsumerIT extends AbstractControllerIntegrationTest {
     @BeforeClass
     public static void initCrisConsumer() {
         ConfigurationService configService = DSpaceServicesFactory.getInstance().getConfigurationService();
-        String[] consumers = configService.getArrayProperty("event.dispatcher.default.consumers");
-        String newConsumers = String.join(",", consumers) + ",crisorcid";
+        consumers = configService.getArrayProperty("event.dispatcher.default.consumers");
+        String newConsumers = consumers.length > 0 ? String.join(",", consumers) + ",crisconsumer" : "crisconsumer";
         configService.setProperty("event.dispatcher.default.consumers", newConsumers);
         EventService eventService = EventServiceFactory.getInstance().getEventService();
         eventService.reloadConfiguration();
+    }
+
+    /**
+     * Reset the event.dispatcher.default.consumers property value.
+     */
+    @AfterClass
+    public static void resetDefaultConsumers() {
+        ConfigurationService configService = DSpaceServicesFactory.getInstance().getConfigurationService();
+        configService.setProperty("event.dispatcher.default.consumers", consumers);
     }
 
     @Override
@@ -170,6 +182,7 @@ public class CrisConsumerIT extends AbstractControllerIntegrationTest {
                 .withIssueDate("2017-10-17")
                 .withFulltext("simple-article.pdf", "/local/path/simple-article.pdf", pdf)
                 .withAuthor("Mario Rossi")
+                .withAuthorAffilitation("4Science")
                 .withEditor("Mario Rossi")
                 .grantLicense()
                 .build();
@@ -207,6 +220,9 @@ public class CrisConsumerIT extends AbstractControllerIntegrationTest {
 
         MetadataValueRest relationshipType = findSingleMetadata(relatedItem, "relationship.type");
         assertThat("The relationship.type should be Person", relationshipType.getValue(), equalTo("Person"));
+
+        MetadataValueRest affiliation = findSingleMetadata(relatedItem, "oairecerif.author.affiliation");
+        assertThat("The dc.contributor.affiliation should be 4Science", affiliation.getValue(), equalTo("4Science"));
 
         // verify that the authors collections is the Person collection
         CollectionRest collection = getOwnCollectionViaRestByItemId(authToken, UUID.fromString(relatedItem.getId()));
@@ -269,6 +285,7 @@ public class CrisConsumerIT extends AbstractControllerIntegrationTest {
 
         context.turnOffAuthorisationSystem();
         Collection projectCollection = createCollection("Collection of projects", "Project", parentCommunity);
+        createCollection("Collection of persons", "Person", subCommunity);
         context.restoreAuthSystemState();
 
         String authToken = getAuthToken(submitter.getEmail(), password);
@@ -279,6 +296,8 @@ public class CrisConsumerIT extends AbstractControllerIntegrationTest {
                 .withTitle("Submission Item")
                 .withIssueDate("2017-10-17")
                 .withProject("My project")
+                .withAuthor("Mario Rossi")
+                .withAuthorAffilitation("4Science")
                 .withFulltext("text.txt", "/local/path/text.txt", firstFullText)
                 .build();
 
@@ -290,6 +309,8 @@ public class CrisConsumerIT extends AbstractControllerIntegrationTest {
                 .withTitle("Another Submission Item")
                 .withIssueDate("2017-10-18")
                 .withProject("My project")
+                .withAuthor("Mario Rossi")
+                .withAuthorAffilitation("My Org")
                 .withFulltext("text-2.txt", "/local/path/text-2.txt", secondFullText)
                 .build();
 
@@ -309,6 +330,23 @@ public class CrisConsumerIT extends AbstractControllerIntegrationTest {
 
         assertThat("The project authority of the two items should be the same",
                 firstProjectAuthority, equalTo(secondProjectAuthority));
+
+        MetadataValueRest firstAuthor = findSingleMetadata(firstItem, "dc.contributor.author");
+        String firstAuthorAuthority = firstAuthor.getAuthority();
+        assertThat("The author should have the authority set", firstAuthorAuthority, notNullValue());
+
+        MetadataValueRest secondAuthor = findSingleMetadata(secondItem, "dc.contributor.author");
+        String secondAuthorAuthority = secondAuthor.getAuthority();
+        assertThat("The author should have the authority set", secondAuthorAuthority, notNullValue());
+
+        assertThat("The author authority of the two items should be the same",
+                firstAuthorAuthority, equalTo(secondAuthorAuthority));
+
+        // search the related author item
+        ItemRest authorItem = getItemViaRestByID(authToken, UUID.fromString(firstAuthorAuthority));
+
+        String affiliation = findSingleMetadata(authorItem, "oairecerif.author.affiliation").getValue();
+        assertThat("The oairecerif.author.affiliation should be My Org", affiliation, equalTo("My Org"));
 
         // verify that the project collections is the Project collection
         CollectionRest firstCol = getOwnCollectionViaRestByItemId(authToken, fromString(firstProjectAuthority));
@@ -562,6 +600,64 @@ public class CrisConsumerIT extends AbstractControllerIntegrationTest {
         relationshipType = findSingleMetadata(projectItem, "relationship.type");
         assertThat("The relationship.type should be Person", relationshipType.getValue(), equalTo("Project"));
 
+    }
+
+    /**
+     * Test an item submission with many authors and affiliations metadata.
+     *
+     * @throws Exception
+     */
+    @Test
+    public void testItemWithManyAuthorsSubmission() throws Exception {
+        InputStream pdf = simpleArticle.getInputStream();
+
+        WorkspaceItem wsitem = WorkspaceItemBuilder.createWorkspaceItem(context, publicationCollection)
+                .withTitle("Submission Item")
+                .withIssueDate("2017-10-17")
+                .withFulltext("simple-article.pdf", "/local/path/simple-article.pdf", pdf)
+                .withAuthor("Mario Rossi")
+                .withAuthorAffilitation("4Science")
+                .withAuthor("Luigi Rossi")
+                .withAuthorAffilitation("My org")
+                .grantLicense()
+                .build();
+
+        context.turnOffAuthorisationSystem();
+        createCollection("Collection of persons", "Person", subCommunity);
+        context.restoreAuthSystemState();
+
+        String authToken = getAuthToken(submitter.getEmail(), password);
+
+        submitItemViaRest(authToken, wsitem.getID());
+
+        // verify the dc.contributor.author and dc.contributor.editor authority value
+        ItemRest item = getItemViaRestByID(authToken, wsitem.getItem().getID());
+
+        List<MetadataValueRest> authors = item.getMetadata().getMap().get("dc.contributor.author");
+        for (MetadataValueRest author : authors) {
+
+            String authorAuthority = author.getAuthority();
+            assertThat("The author should have the authority set", authorAuthority, notNullValue());
+            assertThat("The author should have an ACCEPTED confidence", author.getConfidence(), equalTo(CF_ACCEPTED));
+
+            // search the related person item
+            ItemRest relatedItem = getItemViaRestByID(authToken, UUID.fromString(authorAuthority));
+            assertThat("The related item should be archived", relatedItem.getInArchive(), is(true));
+
+            String expectedName = author.getPlace() == 0 ? "Mario Rossi" : "Luigi Rossi";
+            MetadataValueRest crisSourceId = findSingleMetadata(relatedItem, "cris.sourceId");
+            assertThat("cris.sourceId value and author md5 hash should be equals", crisSourceId.getValue(),
+                    equalTo(generateMd5Hash(expectedName)));
+
+            MetadataValueRest relationshipType = findSingleMetadata(relatedItem, "relationship.type");
+            assertThat("The relationship.type should be Person", relationshipType.getValue(), equalTo("Person"));
+
+            String expectedAffiliation = author.getPlace() == 0 ? "4Science" : "My org";
+            MetadataValueRest affiliation = findSingleMetadata(relatedItem, "oairecerif.author.affiliation");
+            assertThat("The dc.contributor.affiliation should be " + expectedAffiliation, affiliation.getValue(),
+                    equalTo(expectedAffiliation));
+
+        }
     }
 
     private ItemRest getItemViaRestByID(String authToken, UUID id) throws Exception {

@@ -14,7 +14,7 @@ package org.dspace.content;
  * These MetadataSchema objects are simply required.
  */
 public enum MetadataSchemaEnum {
-    DC("dc"), RELATION("relation"), RELATIONSHIP("relationship");
+    DC("dc"), RELATION("relation"), RELATIONSHIP("relationship"), CRIS("cris"), OAIRECERIF("oairecerif");
 
     /**
      * The String representation of the MetadataSchemaEnum

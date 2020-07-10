@@ -8,6 +8,9 @@
 
 package org.dspace.authority;
 
+import static org.dspace.content.MetadataSchemaEnum.CRIS;
+import static org.dspace.content.MetadataSchemaEnum.RELATION;
+
 import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -17,7 +20,11 @@ import java.util.UUID;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.dspace.authority.factory.AuthorityServiceFactory;
+import org.dspace.authority.filler.AuthorityImportFiller;
+import org.dspace.authority.filler.AuthorityImportFillerHolder;
 import org.dspace.authority.service.AuthorityValueService;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
@@ -50,6 +57,8 @@ import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
  */
 public class CrisConsumer implements Consumer {
 
+    public static final String SOURCE_INTERNAL = "INTERNAL-SUBMISSION";
+
     private final static String NO_RELATIONSHIP_TYPE_FOUND_MSG = "No relationship.type found for field {}";
 
     private final static String ITEM_CREATION_MSG = "Creation of item with relationship.type = {} related to item {}";
@@ -57,7 +66,7 @@ public class CrisConsumer implements Consumer {
     private final static String NO_COLLECTION_FOUND_MSG = "No collection found with relationship.type = {} "
             + "for item = {}. No related item will be created.";
 
-    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(CrisConsumer.class);
+    private static Logger log = LogManager.getLogger(CrisConsumer.class);
 
     private Set<Item> itemsAlreadyProcessed = new HashSet<Item>();
 
@@ -73,6 +82,8 @@ public class CrisConsumer implements Consumer {
 
     private ConfigurationService configurationService;
 
+    private AuthorityImportFillerHolder authorityImportFillerHolder;
+
     @Override
     @SuppressWarnings("unchecked")
     public void initialize() throws Exception {
@@ -82,6 +93,7 @@ public class CrisConsumer implements Consumer {
         installItemService = ContentServiceFactory.getInstance().getInstallItemService();
         configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
         workflowService = WorkflowServiceFactory.getInstance().getWorkflowService();
+        authorityImportFillerHolder = AuthorityServiceFactory.getInstance().getAuthorityImportFillerHolder();
     }
 
     @Override
@@ -134,15 +146,26 @@ public class CrisConsumer implements Consumer {
             String crisSourceId = generateCrisSourceId(metadata);
 
             Item relatedItem = findRelatedItemByCrisSourceId(context, crisSourceId, relationshipType);
-            if (relatedItem == null) {
+            boolean relatedItemAlreadyPresent = relatedItem != null;
+
+            if (!relatedItemAlreadyPresent) {
+
                 Collection collection = retrieveCollectionByRelationshipType(item, relationshipType);
                 if (collection == null) {
                     log.warn(NO_COLLECTION_FOUND_MSG, relationshipType, item.getID());
                     continue;
                 }
                 collection = context.reloadEntity(collection);
+
                 log.debug(ITEM_CREATION_MSG, relationshipType, item.getID());
                 relatedItem = buildRelatedItem(context, item, collection, metadata, relationshipType, crisSourceId);
+
+            }
+
+            String authorityType = calculateAuthorityType(authority);
+            AuthorityImportFiller filler = authorityImportFillerHolder.getFiller(authorityType);
+            if (filler != null && (!relatedItemAlreadyPresent || filler.allowsUpdate(context, metadata, relatedItem))) {
+                filler.fillItem(context, metadata, relatedItem);
             }
 
             metadata.setAuthority(relatedItem.getID().toString());
@@ -159,10 +182,10 @@ public class CrisConsumer implements Consumer {
     private Item findRelatedItemByCrisSourceId(Context context, String crisSourceId,
             String relationshipType) throws Exception {
 
-        Iterator<Item> iterator = itemService.findByMetadataField(context, "cris", "sourceId", null, crisSourceId);
+        Iterator<Item> items = itemService.findByMetadataField(context, CRIS.getName(), "sourceId", null, crisSourceId);
 
-        while (iterator.hasNext()) {
-            Item item = iterator.next();
+        while (items.hasNext()) {
+            Item item = items.next();
             if (hasRelationshipTypeMetadataEqualsTo(item, relationshipType)) {
                 return item;
             }
@@ -190,9 +213,9 @@ public class CrisConsumer implements Consumer {
         Item relatedItem = workspaceItem.getItem();
         relatedItem.setOwningCollection(collection);
         relatedItem.setSubmitter(item.getSubmitter());
-        itemService.addMetadata(context, relatedItem, "cris", "sourceId", null, null, crisSourceId);
+        itemService.addMetadata(context, relatedItem, CRIS.getName(), "sourceId", null, Item.ANY, crisSourceId);
         if (!hasRelationshipTypeMetadataEqualsTo(relatedItem, relationshipType)) {
-            itemService.addMetadata(context, relatedItem, "relationship", "type", null, null, relationshipType);
+            itemService.addMetadata(context, relatedItem, RELATION.getName(), "type", null, Item.ANY, relationshipType);
         }
 
         if (isSubmissionEnabled(metadata)) {
@@ -204,11 +227,7 @@ public class CrisConsumer implements Consumer {
 
     private Collection retrieveCollectionByRelationshipType(Item item, String relationshipType) throws SQLException {
         Collection ownCollection = item.getOwningCollection();
-        Collection collection = retrieveCollectionByRelationshipType(ownCollection.getCommunities(), relationshipType);
-        if (collection == null) {
-            log.warn("No collection found with relationship.type = {} for item = {}", relationshipType, item.getID());
-        }
-        return collection;
+        return retrieveCollectionByRelationshipType(ownCollection.getCommunities(), relationshipType);
     }
 
     private Collection retrieveCollectionByRelationshipType(List<Community> communities, String relationshipType) {
@@ -270,6 +289,16 @@ public class CrisConsumer implements Consumer {
         } else {
             return configurationService.getBooleanProperty(property, true);
         }
+    }
+
+    private String calculateAuthorityType(String authority ) {
+        if (StringUtils.isNotBlank(authority) && authority.startsWith(AuthorityValueService.GENERATE)) {
+            String[] split = StringUtils.split(authority, AuthorityValueService.SPLIT);
+            if (split.length > 1) {
+                return split[1];
+            }
+        }
+        return SOURCE_INTERNAL;
     }
 
 }

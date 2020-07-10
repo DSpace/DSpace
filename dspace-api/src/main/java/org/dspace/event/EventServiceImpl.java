@@ -64,29 +64,33 @@ public class EventServiceImpl implements EventService {
 
     private void initPool() {
 
-        // TODO EVENT Some of these pool configuration
-        // parameters can live in dspace.cfg or a
-        // separate configuration file
+        if (dispatcherPool == null) {
 
-        // TODO EVENT Eviction parameters should be set
+            // TODO EVENT Some of these pool configuration
+            // parameters can live in dspace.cfg or a
+            // separate configuration file
 
-        poolConfig = new GenericKeyedObjectPoolConfig();
-        poolConfig.setMaxTotalPerKey(100);
-        poolConfig.setMaxIdlePerKey(5);
-        poolConfig.setMaxTotal(100);
+            // TODO EVENT Eviction parameters should be set
 
-        try {
-            dispatcherFactory = new DispatcherPoolFactory();
+            poolConfig = new GenericKeyedObjectPoolConfig();
+            poolConfig.setMaxTotalPerKey(100);
+            poolConfig.setMaxIdlePerKey(5);
+            poolConfig.setMaxTotal(100);
+
+            try {
+                dispatcherFactory = new DispatcherPoolFactory();
 
 
-            dispatcherPool = PoolUtils
+                dispatcherPool = PoolUtils
                     .synchronizedPool(new GenericKeyedObjectPool(
-                            dispatcherFactory, poolConfig));
+                        dispatcherFactory, poolConfig));
 
-            enumerateConsumers();
+                enumerateConsumers();
 
-        } catch (Exception e) {
-            log.error("Could not initialize EventService dispatcher pool", e);
+            } catch (Exception e) {
+                log.error("Could not initialize EventService dispatcher pool", e);
+            }
+
         }
     }
 
@@ -126,6 +130,7 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public void reloadConfiguration() {
+        dispatcherPool = null;
         initPool();
     }
 

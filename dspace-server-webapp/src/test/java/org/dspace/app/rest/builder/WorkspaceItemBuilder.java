@@ -159,6 +159,10 @@ public class WorkspaceItemBuilder extends AbstractBuilder<WorkspaceItem, Workspa
         return addMetadataValue(MetadataSchemaEnum.DC.getName(), "contributor", "author", authorName);
     }
 
+    public WorkspaceItemBuilder withAuthorAffilitation(final String affilation) {
+        return addMetadataValue(MetadataSchemaEnum.OAIRECERIF.getName(), "author", "affiliation", affilation);
+    }
+
     public WorkspaceItemBuilder withEditor(final String editorName) {
         return addMetadataValue(MetadataSchemaEnum.DC.getName(), "contributor", "editor", editorName);
     }

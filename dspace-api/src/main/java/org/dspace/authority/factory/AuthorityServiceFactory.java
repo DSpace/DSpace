@@ -11,6 +11,7 @@ import java.util.List;
 
 import org.dspace.authority.AuthoritySearchService;
 import org.dspace.authority.AuthorityTypes;
+import org.dspace.authority.filler.AuthorityImportFillerHolder;
 import org.dspace.authority.indexer.AuthorityIndexerInterface;
 import org.dspace.authority.indexer.AuthorityIndexingService;
 import org.dspace.authority.service.AuthorityService;
@@ -35,8 +36,9 @@ public abstract class AuthorityServiceFactory {
 
     public abstract AuthorityService getAuthorityService();
 
-
     public abstract List<AuthorityIndexerInterface> getAuthorityIndexers();
+
+    public abstract AuthorityImportFillerHolder getAuthorityImportFillerHolder();
 
     public static AuthorityServiceFactory getInstance() {
         return DSpaceServicesFactory.getInstance().getServiceManager()
