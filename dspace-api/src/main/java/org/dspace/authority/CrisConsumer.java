@@ -133,7 +133,7 @@ public class CrisConsumer implements Consumer {
 
             String fieldKey = getFieldKey(metadata);
 
-            if (!choiceAuthorityService.isChoicesConfigured(fieldKey)) {
+            if (!choiceAuthorityService.isChoicesConfigured(fieldKey, null)) {
                 continue;
             }
 

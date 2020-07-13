@@ -119,29 +119,6 @@ public class DescribeStep extends org.dspace.submit.step.DescribeStep implements
         }
     }
 
-    private List<String> getInputFieldsName(DCInputSet inputConfig, String configId) throws DCInputsReaderException {
-        List<String> fieldsName = new ArrayList<String>();
-        for (DCInput[] row : inputConfig.getFields()) {
-            for (DCInput input : row) {
-                if (input.isQualdropValue()) {
-                    for (Object qualifier : input.getPairs()) {
-                        fieldsName.add(input.getFieldName() + "." + (String) qualifier);
-                    }
-                } else if (StringUtils.equalsIgnoreCase(input.getInputType(), "group") ||
-                        StringUtils.equalsIgnoreCase(input.getInputType(), "inline-group")) {
-                    log.info("Called child form:" + configId + "-" +
-                        Utils.standardize(input.getSchema(), input.getElement(), input.getQualifier(), "-"));
-                    DCInputSet inputConfigChild = inputReader.getInputsByFormName(configId + "-" + Utils
-                        .standardize(input.getSchema(), input.getElement(), input.getQualifier(), "-"));
-                    fieldsName.addAll(getInputFieldsName(inputConfigChild, configId));
-                } else {
-                    fieldsName.add(input.getFieldName());
-                }
-            }
-        }
-        return fieldsName;
-    }
-
     @Override
     public void doPatchProcessing(Context context, Request currentRequest, InProgressSubmission source, Operation op,
                                   SubmissionStepConfig stepConf) throws Exception {
@@ -172,5 +149,27 @@ public class DescribeStep extends org.dspace.submit.step.DescribeStep implements
         }
     }
 
+    private List<String> getInputFieldsName(DCInputSet inputConfig, String configId) throws DCInputsReaderException {
+        List<String> fieldsName = new ArrayList<String>();
+        for (DCInput[] row : inputConfig.getFields()) {
+            for (DCInput input : row) {
+                if (input.isQualdropValue()) {
+                    for (Object qualifier : input.getPairs()) {
+                        fieldsName.add(input.getFieldName() + "." + (String) qualifier);
+                    }
+                } else if (StringUtils.equalsIgnoreCase(input.getInputType(), "group") ||
+                        StringUtils.equalsIgnoreCase(input.getInputType(), "inline-group")) {
+                    log.info("Called child form:" + configId + "-" +
+                        Utils.standardize(input.getSchema(), input.getElement(), input.getQualifier(), "-"));
+                    DCInputSet inputConfigChild = inputReader.getInputsByFormName(configId + "-" + Utils
+                        .standardize(input.getSchema(), input.getElement(), input.getQualifier(), "-"));
+                    fieldsName.addAll(getInputFieldsName(inputConfigChild, configId));
+                } else {
+                    fieldsName.add(input.getFieldName());
+                }
+            }
+        }
+        return fieldsName;
+    }
 }
 

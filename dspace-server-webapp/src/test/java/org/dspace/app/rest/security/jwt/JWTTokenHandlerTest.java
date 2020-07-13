@@ -24,6 +24,7 @@ import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.service.ClientInfoService;
+import org.dspace.services.ConfigurationService;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -46,28 +47,31 @@ public class JWTTokenHandlerTest {
 
     @InjectMocks
     @Spy
-    JWTTokenHandler jwtTokenHandler;
+    private LoginJWTTokenHandler loginJWTTokenHandler;
 
     @Mock
-    private Context context;
+    protected ConfigurationService configurationService;
 
     @Mock
-    private EPerson ePerson;
+    protected Context context;
 
     @Mock
-    private HttpServletRequest httpServletRequest;
+    protected EPerson ePerson;
 
     @Mock
-    private EPersonService ePersonService;
+    protected HttpServletRequest httpServletRequest;
 
     @Mock
-    private EPersonClaimProvider ePersonClaimProvider;
+    protected EPersonService ePersonService;
 
     @Mock
-    private ClientInfoService clientInfoService;
+    protected EPersonClaimProvider ePersonClaimProvider;
+
+    @Mock
+    protected ClientInfoService clientInfoService;
 
     @Spy
-    private List<JWTClaimProvider> jwtClaimProviders = new ArrayList<>();
+    protected List<JWTClaimProvider> jwtClaimProviders = new ArrayList<>();
 
     @Before
     public void setUp() throws Exception {
@@ -87,7 +91,7 @@ public class JWTTokenHandlerTest {
     @Test
     public void testJWTNoEncryption() throws Exception {
         Date previous = new Date(System.currentTimeMillis() - 10000000000L);
-        String token = jwtTokenHandler
+        String token = loginJWTTokenHandler
             .createTokenForEPerson(context, new MockHttpServletRequest(), previous, new ArrayList<>());
         SignedJWT signedJWT = SignedJWT.parse(token);
         String personId = (String) signedJWT.getJWTClaimsSet().getClaim(EPersonClaimProvider.EPERSON_ID);
@@ -96,11 +100,11 @@ public class JWTTokenHandlerTest {
 
     @Test(expected = ParseException.class)
     public void testJWTEncrypted() throws Exception {
-        when(jwtTokenHandler.isEncryptionEnabled()).thenReturn(true);
+        when(loginJWTTokenHandler.isEncryptionEnabled()).thenReturn(true);
         Date previous = new Date(System.currentTimeMillis() - 10000000000L);
         StringKeyGenerator keyGenerator = KeyGenerators.string();
-        when(jwtTokenHandler.getEncryptionKey()).thenReturn(keyGenerator.generateKey().getBytes());
-        String token = jwtTokenHandler
+        when(configurationService.getProperty("jwt.login.encryption.secret")).thenReturn(keyGenerator.generateKey());
+        String token = loginJWTTokenHandler
             .createTokenForEPerson(context, new MockHttpServletRequest(), previous, new ArrayList<>());
         SignedJWT signedJWT = SignedJWT.parse(token);
     }
@@ -108,12 +112,12 @@ public class JWTTokenHandlerTest {
     //temporary set a negative expiration time so the token is invalid immediately
     @Test
     public void testExpiredToken() throws Exception {
-        when(jwtTokenHandler.getExpirationPeriod()).thenReturn(-99999999L);
+        when(configurationService.getLongProperty("jwt.login.token.expiration", 1800000)).thenReturn(-99999999L);
         when(ePersonClaimProvider.getEPerson(any(Context.class), any(JWTClaimsSet.class))).thenReturn(ePerson);
         Date previous = new Date(new Date().getTime() - 10000000000L);
-        String token = jwtTokenHandler
+        String token = loginJWTTokenHandler
             .createTokenForEPerson(context, new MockHttpServletRequest(), previous, new ArrayList<>());
-        EPerson parsed = jwtTokenHandler.parseEPersonFromToken(token, httpServletRequest, context);
+        EPerson parsed = loginJWTTokenHandler.parseEPersonFromToken(token, httpServletRequest, context);
         assertEquals(null, parsed);
 
     }
@@ -121,17 +125,17 @@ public class JWTTokenHandlerTest {
     //Try if we can change the expiration date
     @Test
     public void testTokenTampering() throws Exception {
-        when(jwtTokenHandler.getExpirationPeriod()).thenReturn(-99999999L);
+        when(loginJWTTokenHandler.getExpirationPeriod()).thenReturn(-99999999L);
         when(ePersonClaimProvider.getEPerson(any(Context.class), any(JWTClaimsSet.class))).thenReturn(ePerson);
         Date previous = new Date(new Date().getTime() - 10000000000L);
-        String token = jwtTokenHandler
+        String token = loginJWTTokenHandler
             .createTokenForEPerson(context, new MockHttpServletRequest(), previous, new ArrayList<>());
         JWTClaimsSet jwtClaimsSet = new JWTClaimsSet.Builder().claim("eid", "epersonID").expirationTime(
             new Date(System.currentTimeMillis() + 99999999)).build();
         String tamperedPayload = new String(Base64.getUrlEncoder().encode(jwtClaimsSet.toString().getBytes()));
         String[] splitToken = token.split("\\.");
         String tamperedToken = splitToken[0] + "." + tamperedPayload + "." + splitToken[2];
-        EPerson parsed = jwtTokenHandler.parseEPersonFromToken(tamperedToken, httpServletRequest, context);
+        EPerson parsed = loginJWTTokenHandler.parseEPersonFromToken(tamperedToken, httpServletRequest, context);
         assertEquals(null, parsed);
     }
 
@@ -139,12 +143,12 @@ public class JWTTokenHandlerTest {
     public void testInvalidatedToken() throws Exception {
         Date previous = new Date(System.currentTimeMillis() - 10000000000L);
         // create a new token
-        String token = jwtTokenHandler
+        String token = loginJWTTokenHandler
             .createTokenForEPerson(context, new MockHttpServletRequest(), previous, new ArrayList<>());
         // immediately invalidate it
-        jwtTokenHandler.invalidateToken(token, new MockHttpServletRequest(), context);
+        loginJWTTokenHandler.invalidateToken(token, new MockHttpServletRequest(), context);
         // Check if it is still valid by trying to parse the EPerson from it (should return null)
-        EPerson parsed = jwtTokenHandler.parseEPersonFromToken(token, httpServletRequest, context);
+        EPerson parsed = loginJWTTokenHandler.parseEPersonFromToken(token, httpServletRequest, context);
         assertEquals(null, parsed);
     }
 

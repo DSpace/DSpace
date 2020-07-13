@@ -16,10 +16,6 @@ import java.util.List;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 
-import gr.ekt.bte.core.TransformationEngine;
-import gr.ekt.bte.core.TransformationSpec;
-import gr.ekt.bte.exceptions.BadTransformationSpec;
-import gr.ekt.bte.exceptions.MalformedSourceException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.Parameter;
@@ -46,6 +42,7 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
+import org.dspace.content.MetadataValue;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.content.service.BitstreamFormatService;
 import org.dspace.content.service.BitstreamService;
@@ -57,14 +54,12 @@ import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.EPersonServiceImpl;
 import org.dspace.event.Event;
+import org.dspace.importer.external.datamodel.ImportRecord;
+import org.dspace.importer.external.exception.FileMultipleOccurencesException;
+import org.dspace.importer.external.metadatamapping.MetadatumDTO;
+import org.dspace.importer.external.service.ImportService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.submit.AbstractProcessingStep;
-import org.dspace.submit.lookup.DSpaceWorkspaceItemOutputGenerator;
-import org.dspace.submit.lookup.MultipleSubmissionLookupDataLoader;
-import org.dspace.submit.lookup.SubmissionItemDataLoader;
-import org.dspace.submit.lookup.SubmissionLookupOutputGenerator;
-import org.dspace.submit.lookup.SubmissionLookupService;
-import org.dspace.submit.util.ItemSubmissionLookupDTO;
 import org.dspace.util.UUIDUtils;
 import org.dspace.versioning.ItemCorrectionService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -76,10 +71,12 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
+
 /**
  * This is the repository responsible to manage WorkspaceItem Rest object
  *
  * @author Andrea Bollini (andrea.bollini at 4science.it)
+ * @author Pasquale Cavallo (pasquale.cavallo at 4science.it)
  */
 @Component(WorkspaceItemRest.CATEGORY + "." + WorkspaceItemRest.NAME)
 public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceItemRest, Integer>
@@ -117,13 +114,13 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
     EPersonServiceImpl epersonService;
 
     @Autowired
-    SubmissionLookupService submissionLookupService;
-
-    @Autowired
     CollectionService collectionService;
 
     @Autowired
     AuthorizeService authorizeService;
+
+    @Autowired
+    ImportService importService;
 
     @Autowired
     private UriListHandlerService uriListHandlerService;
@@ -366,8 +363,7 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
                     }
 
                 } catch (UnprocessableEntityException e) {
-                    log.error(e.getMessage(), e);
-                    throw new UnprocessableEntityException("Error processing the patch request", e);
+                    throw e;
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
                     throw new PatchException("Error processing the patch request", e);
@@ -396,147 +392,87 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
 
     @Override
     public Iterable<WorkspaceItemRest> upload(Context context, HttpServletRequest request,
-            MultipartFile uploadfile)
+            List<MultipartFile> uploadfiles)
         throws SQLException, FileNotFoundException, IOException, AuthorizeException {
-        File file = Utils.getFile(uploadfile, "upload-loader", "filedataloader");
         List<WorkspaceItemRest> results = new ArrayList<>();
 
+        String uuid = request.getParameter("owningCollection");
+        if (StringUtils.isBlank(uuid)) {
+            uuid = configurationService.getProperty("submission.default.collection");
+        }
+        Collection collection = null;
+        if (StringUtils.isNotBlank(uuid)) {
+            collection = collectionService.find(context, UUID.fromString(uuid));
+        } else {
+            collection = collectionService.findAuthorizedOptimized(context, Constants.ADD).get(0);
+        }
+
+        SubmissionConfig submissionConfig =
+            submissionConfigReader.getSubmissionConfigByCollection(collection.getHandle());
+        List<WorkspaceItem> result = null;
+        List<ImportRecord> records = new ArrayList<>();
         try {
-            String uuid = request.getParameter("collection");
-            if (StringUtils.isBlank(uuid)) {
-                uuid = configurationService.getProperty("submission.default.collection");
-            }
-
-            Collection collection = null;
-            if (StringUtils.isNotBlank(uuid)) {
-                collection = collectionService.find(context, UUID.fromString(uuid));
-            } else {
-                collection = collectionService.findAuthorizedOptimized(context, Constants.ADD).get(0);
-            }
-
-            SubmissionConfig submissionConfig =
-                submissionConfigReader.getSubmissionConfigByCollection(collection.getHandle());
-
-
-            List<ItemSubmissionLookupDTO> tmpResult = new ArrayList<ItemSubmissionLookupDTO>();
-
-            TransformationEngine transformationEngine1 = submissionLookupService.getPhase1TransformationEngine();
-            TransformationSpec spec = new TransformationSpec();
-            // FIXME this is mostly due to the need to test. The BTE framework has an assert statement that check if the
-            // number of found record is less than the requested and treat 0 as is, instead, the implementation assume
-            // 0=unlimited this lead to test failure.
-            // It is unclear if BTE really respect values other than 0/MAX allowing us to put a protection against heavy
-            // load
-            spec.setNumberOfRecords(Integer.MAX_VALUE);
-            if (transformationEngine1 != null) {
-                MultipleSubmissionLookupDataLoader dataLoader =
-                    (MultipleSubmissionLookupDataLoader) transformationEngine1.getDataLoader();
-
-                List<String> fileDataLoaders = submissionLookupService.getFileProviders();
-                for (String fileDataLoader : fileDataLoaders) {
-                    dataLoader.setFile(file.getAbsolutePath(), fileDataLoader);
-
-                    try {
-                        SubmissionLookupOutputGenerator outputGenerator =
-                            (SubmissionLookupOutputGenerator) transformationEngine1.getOutputGenerator();
-                        outputGenerator.setDtoList(new ArrayList<ItemSubmissionLookupDTO>());
-                        log.debug("BTE transformation is about to start!");
-                        transformationEngine1.transform(spec);
-                        log.debug("BTE transformation finished!");
-                        tmpResult.addAll(outputGenerator.getDtoList());
-                        if (!tmpResult.isEmpty()) {
-                            //exit with the results founded on the first data provided
-                            break;
-                        }
-                    } catch (BadTransformationSpec e1) {
-                        log.error(e1.getMessage(), e1);
-                    } catch (MalformedSourceException e1) {
-                        log.error(e1.getMessage(), e1);
+            for (MultipartFile mpFile : uploadfiles) {
+                File file = Utils.getFile(mpFile, "upload-loader", "filedataloader");
+                try {
+                    ImportRecord record = importService.getRecord(file);
+                    if (record != null) {
+                        records.add(record);
+                        break;
                     }
+                } finally {
+                    file.delete();
                 }
             }
+        } catch (FileMultipleOccurencesException e) {
+            throw new UnprocessableEntityException("Too many entries in file");
+        } catch (Exception e) {
+            log.error("Error importing metadata", e);
+        }
+        WorkspaceItem source = submissionService.
+            createWorkspaceItem(context, getRequestService().getCurrentRequest());
+        merge(context, records, source);
+        result = new ArrayList<>();
+        result.add(source);
 
-            List<WorkspaceItem> result = null;
-
-            //try to ingest workspaceitems
-            if (!tmpResult.isEmpty()) {
-                TransformationEngine transformationEngine2 = submissionLookupService.getPhase2TransformationEngine();
-                if (transformationEngine2 != null) {
-                    SubmissionItemDataLoader dataLoader =
-                        (SubmissionItemDataLoader) transformationEngine2.getDataLoader();
-                    dataLoader.setDtoList(tmpResult);
-                    // dataLoader.setProviders()
-
-                    DSpaceWorkspaceItemOutputGenerator outputGenerator =
-                        (DSpaceWorkspaceItemOutputGenerator) transformationEngine2.getOutputGenerator();
-                    outputGenerator.setCollection(collection);
-                    outputGenerator.setContext(context);
-                    outputGenerator.setFormName(submissionConfig.getSubmissionName());
-                    outputGenerator.setDto(tmpResult.get(0));
-
-                    try {
-                        transformationEngine2.transform(spec);
-                        result = outputGenerator.getWitems();
-                    } catch (BadTransformationSpec e1) {
-                        e1.printStackTrace();
-                    } catch (MalformedSourceException e1) {
-                        e1.printStackTrace();
-                    }
-                }
-            }
-
-            //we have to create the workspaceitem to push the file also if nothing found before
-            if (result == null) {
-                WorkspaceItem source =
-                    submissionService.createWorkspaceItem(context, getRequestService().getCurrentRequest());
-                result = new ArrayList<>();
-                result.add(source);
-            }
-
-            //perform upload of bitstream if there is exact one result and convert workspaceitem to entity rest
-            if (result != null && !result.isEmpty()) {
-                for (WorkspaceItem wi : result) {
-
-                    List<ErrorRest> errors = new ArrayList<ErrorRest>();
-
-                    //load bitstream into bundle ORIGINAL only if there is one result (approximately this is the
-                    // right behaviour for pdf file but not for other bibliographic format e.g. bibtex)
-                    if (result.size() == 1) {
-
-                        for (int i = 0; i < submissionConfig.getNumberOfSteps(); i++) {
-                            SubmissionStepConfig stepConfig = submissionConfig.getStep(i);
-
-                            ClassLoader loader = this.getClass().getClassLoader();
-                            Class stepClass;
-                            try {
-                                stepClass = loader.loadClass(stepConfig.getProcessingClassName());
-
-                                Object stepInstance = stepClass.newInstance();
-                                if (UploadableStep.class.isAssignableFrom(stepClass)) {
-                                    UploadableStep uploadableStep = (UploadableStep) stepInstance;
-                                    ErrorRest err = uploadableStep.upload(context, submissionService, stepConfig, wi,
-                                            uploadfile);
+        //perform upload of bitstream if there is exact one result and convert workspaceitem to entity rest
+        if (!result.isEmpty()) {
+            for (WorkspaceItem wi : result) {
+                List<ErrorRest> errors = new ArrayList<ErrorRest>();
+                wi.setMultipleFiles(uploadfiles.size() > 1);
+                //load bitstream into bundle ORIGINAL only if there is one result (approximately this is the
+                // right behaviour for pdf file but not for other bibliographic format e.g. bibtex)
+                if (result.size() == 1) {
+                    for (int i = 0; i < submissionConfig.getNumberOfSteps(); i++) {
+                        SubmissionStepConfig stepConfig = submissionConfig.getStep(i);
+                        ClassLoader loader = this.getClass().getClassLoader();
+                        Class stepClass;
+                        try {
+                            stepClass = loader.loadClass(stepConfig.getProcessingClassName());
+                            Object stepInstance = stepClass.newInstance();
+                            if (UploadableStep.class.isAssignableFrom(stepClass)) {
+                                UploadableStep uploadableStep = (UploadableStep) stepInstance;
+                                for (MultipartFile mpFile : uploadfiles) {
+                                    ErrorRest err = uploadableStep.upload(context,
+                                        submissionService, stepConfig, wi, mpFile);
                                     if (err != null) {
                                         errors.add(err);
                                     }
                                 }
-
-                            } catch (Exception e) {
-                                log.error(e.getMessage(), e);
                             }
+                        } catch (Exception e) {
+                            log.error(e.getMessage(), e);
                         }
                     }
-                    WorkspaceItemRest wsi = converter.toRest(wi, utils.obtainProjection());
-                    if (result.size() == 1) {
-                        if (!errors.isEmpty()) {
-                            wsi.getErrors().addAll(errors);
-                        }
-                    }
-                    results.add(wsi);
                 }
+                WorkspaceItemRest wsi = converter.toRest(wi, utils.obtainProjection());
+                if (result.size() == 1) {
+                    if (!errors.isEmpty()) {
+                        wsi.getErrors().addAll(errors);
+                    }
+                }
+                results.add(wsi);
             }
-        } finally {
-            file.delete();
         }
         return results;
     }
@@ -586,5 +522,25 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
     @Override
     public Class<Integer> getPKClass() {
         return Integer.class;
+    }
+
+    private void merge(Context context, List<ImportRecord> records, WorkspaceItem item) throws SQLException {
+        for (MetadataValue metadataValue : itemService.getMetadata(
+            item.getItem(), Item.ANY, Item.ANY, Item.ANY, Item.ANY)) {
+            itemService.clearMetadata(context, item.getItem(),
+                metadataValue.getMetadataField().getMetadataSchema().getNamespace(),
+                metadataValue.getMetadataField().getElement(),
+                metadataValue.getMetadataField().getQualifier(),
+                metadataValue.getLanguage());
+        }
+        for (ImportRecord record : records) {
+            if (record != null && record.getValueList() != null) {
+                for (MetadatumDTO metadataValue : record.getValueList()) {
+                    itemService.addMetadata(context, item.getItem(), metadataValue.getSchema(),
+                        metadataValue.getElement(), metadataValue.getQualifier(), null,
+                        metadataValue.getValue());
+                }
+            }
+        }
     }
 }

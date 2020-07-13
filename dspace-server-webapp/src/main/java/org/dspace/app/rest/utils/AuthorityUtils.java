@@ -7,9 +7,11 @@
  */
 package org.dspace.app.rest.utils;
 
+import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.converter.ConverterService;
-import org.dspace.app.rest.model.AuthorityEntryRest;
-import org.dspace.app.rest.model.AuthorityRest;
+import org.dspace.app.rest.model.VocabularyEntryDetailsRest;
+import org.dspace.app.rest.model.VocabularyEntryRest;
+import org.dspace.app.rest.model.VocabularyRest;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.content.authority.Choice;
 import org.dspace.content.authority.ChoiceAuthority;
@@ -41,11 +43,11 @@ public class AuthorityUtils {
 
 
     public boolean isChoice(String schema, String element, String qualifier) {
-        return cas.isChoicesConfigured(org.dspace.core.Utils.standardize(schema, element, qualifier, "_"));
+        return cas.isChoicesConfigured(org.dspace.core.Utils.standardize(schema, element, qualifier, "_"), null);
     }
 
     public String getAuthorityName(String schema, String element, String qualifier) {
-        return cas.getChoiceAuthorityName(schema, element, qualifier);
+        return cas.getChoiceAuthorityName(schema, element, qualifier, null);
     }
 
     public boolean isClosed(String schema, String element, String qualifier) {
@@ -64,9 +66,33 @@ public class AuthorityUtils {
      * @param projection the name of the projection to use, or {@code null}.
      * @return
      */
-    public AuthorityEntryRest convertEntry(Choice choice, String authorityName, Projection projection) {
-        AuthorityEntryRest entry = converter.toRest(choice, projection);
-        entry.setAuthorityName(authorityName);
+    public VocabularyEntryDetailsRest convertEntryDetails(Choice choice, String authorityName,
+           boolean isHierarchical, Projection projection) {
+        if (choice == null) {
+            return null;
+        }
+        VocabularyEntryDetailsRest entry = converter.toRest(choice, projection);
+        entry.setVocabularyName(authorityName);
+        entry.setId(authorityName + ":" + entry.getId());
+        entry.setInHierarchicalVocabulary(isHierarchical);
+        return entry;
+    }
+
+    public VocabularyEntryRest convertEntry(Choice choice, String authorityName, boolean storeAuthority,
+            Projection projection) {
+        if (choice == null) {
+            return null;
+        }
+        VocabularyEntryRest entry = new VocabularyEntryRest();
+        entry.setDisplay(choice.label);
+        entry.setValue(choice.value);
+        entry.setOtherInformation(choice.extras);
+        if (storeAuthority) {
+            entry.setAuthority(choice.authority);
+        }
+        if (StringUtils.isNotBlank(choice.authority)) {
+            entry.setVocabularyEntryDetailsRest(converter.toRest(choice, projection));
+        }
         return entry;
     }
 
@@ -78,8 +104,8 @@ public class AuthorityUtils {
      * @param projection the projecton to use.
      * @return
      */
-    public AuthorityRest convertAuthority(ChoiceAuthority source, String authorityName, Projection projection) {
-        AuthorityRest result = converter.toRest(source, projection);
+    public VocabularyRest convertAuthority(ChoiceAuthority source, String authorityName, Projection projection) {
+        VocabularyRest result = converter.toRest(source, projection);
         result.setName(authorityName);
         return result;
     }

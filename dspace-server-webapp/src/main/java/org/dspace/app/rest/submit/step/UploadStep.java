@@ -24,9 +24,6 @@ import org.dspace.app.rest.submit.UploadableStep;
 import org.dspace.app.rest.submit.factory.PatchOperationFactory;
 import org.dspace.app.rest.submit.factory.impl.PatchOperation;
 import org.dspace.app.rest.utils.Utils;
-import org.dspace.app.util.DCInputSet;
-import org.dspace.app.util.DCInputsReader;
-import org.dspace.app.util.DCInputsReaderException;
 import org.dspace.app.util.SubmissionStepConfig;
 import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
@@ -51,11 +48,6 @@ public class UploadStep extends org.dspace.submit.step.UploadStep
 
     public static final String UPLOAD_STEP_METADATA_SECTION = "bitstream-metadata";
 
-    private DCInputsReader inputReader;
-
-    public UploadStep() throws DCInputsReaderException {
-        inputReader = new DCInputsReader();
-    }
     @Override
     public DataUpload getData(SubmissionService submissionService, InProgressSubmission obj,
                               SubmissionStepConfig config) throws Exception {
@@ -75,7 +67,7 @@ public class UploadStep extends org.dspace.submit.step.UploadStep
     public void doPatchProcessing(Context context, Request currentRequest, InProgressSubmission source, Operation op,
                                   SubmissionStepConfig stepConf) throws Exception {
 
-        String instance = "";
+        String instance = null;
         if ("remove".equals(op.getOp())) {
             if (op.getPath().contains(UPLOAD_STEP_METADATA_PATH)) {
                 instance = UPLOAD_STEP_METADATA_OPERATION_ENTRY;
@@ -93,33 +85,16 @@ public class UploadStep extends org.dspace.submit.step.UploadStep
         } else {
             if (op.getPath().contains(UPLOAD_STEP_ACCESSCONDITIONS_OPERATION_ENTRY)) {
                 instance = UPLOAD_STEP_ACCESSCONDITIONS_OPERATION_ENTRY;
-            } else {
+            } else if (op.getPath().contains(UPLOAD_STEP_METADATA_PATH)) {
                 instance = UPLOAD_STEP_METADATA_OPERATION_ENTRY;
             }
         }
+        if (instance == null) {
+            throw new UnprocessableEntityException("The path " + op.getPath() + " is not supported by the operation "
+                                                                              + op.getOp());
+        }
         PatchOperation<?> patchOperation = new PatchOperationFactory().instanceOf(instance, op.getOp());
-        if (instance.equals(AbstractRestProcessingStep.UPLOAD_STEP_METADATA_OPERATION_ENTRY)) {
-            DCInputSet inputConfig = inputReader.getInputsByFormName(UploadStep.UPLOAD_STEP_METADATA_SECTION);
-            String[] split = patchOperation.getAbsolutePath(op.getPath()).split("/");
-            String metadata = findMetadata(split);
-            if (inputConfig.isFieldPresent(metadata)) {
-                patchOperation.perform(context, currentRequest, source, op);
-            } else {
-                throw new UnprocessableEntityException("The attribute " + metadata + " does not present in section "
-                                                                        + UploadStep.UPLOAD_STEP_METADATA_SECTION);
-            }
-        } else {
-            patchOperation.perform(context, currentRequest, source, op);
-        }
-    }
-
-    private String findMetadata(String[] metadata) {
-        for (String s : metadata) {
-            if (s.contains("dc.")) {
-                return s;
-            }
-        }
-        return null;
+        patchOperation.perform(context, currentRequest, source, op);
     }
 
     @Override

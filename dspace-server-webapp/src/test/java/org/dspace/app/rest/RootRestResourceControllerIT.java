@@ -33,9 +33,9 @@ public class RootRestResourceControllerIT extends AbstractControllerIntegrationT
                    .andExpect(status().isOk())
                    //We expect the content type to be "application/hal+json;charset=UTF-8"
                    .andExpect(content().contentType(contentType))
-                   .andExpect(jsonPath("$.dspaceURL", Matchers.is("http://localhost:4000")))
+                   .andExpect(jsonPath("$.dspaceUI", Matchers.is("http://localhost:4000")))
                    .andExpect(jsonPath("$.dspaceName", Matchers.is("DSpace at My University")))
-                   .andExpect(jsonPath("$.dspaceRest", Matchers.is(BASE_REST_SERVER_URL)))
+                   .andExpect(jsonPath("$.dspaceServer", Matchers.is(BASE_REST_SERVER_URL)))
                    .andExpect(jsonPath("$.type", Matchers.is("root")));
     }
 
@@ -49,7 +49,8 @@ public class RootRestResourceControllerIT extends AbstractControllerIntegrationT
                    //We expect the content type to be "application/hal+json;charset=UTF-8"
                    .andExpect(content().contentType(contentType))
                    //Check that all required root links are present and that they are absolute
-                   .andExpect(jsonPath("$._links.authorities.href", startsWith(BASE_REST_SERVER_URL)))
+                   .andExpect(jsonPath("$._links.vocabularies.href", startsWith(BASE_REST_SERVER_URL)))
+                   .andExpect(jsonPath("$._links.vocabularyEntryDetails.href", startsWith(BASE_REST_SERVER_URL)))
                    .andExpect(jsonPath("$._links.bitstreamformats.href", startsWith(BASE_REST_SERVER_URL)))
                    .andExpect(jsonPath("$._links.bitstreams.href", startsWith(BASE_REST_SERVER_URL)))
                    .andExpect(jsonPath("$._links.browses.href", startsWith(BASE_REST_SERVER_URL)))

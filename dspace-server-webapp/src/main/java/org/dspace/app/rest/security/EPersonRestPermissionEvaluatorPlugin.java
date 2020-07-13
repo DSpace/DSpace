@@ -11,17 +11,19 @@ import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
+import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.rest.model.patch.Patch;
 import org.dspace.app.rest.repository.patch.operation.DSpaceObjectMetadataPatchUtils;
 import org.dspace.app.rest.repository.patch.operation.EPersonPasswordReplaceOperation;
 import org.dspace.app.rest.utils.ContextUtil;
+import org.dspace.app.util.AuthorizeUtil;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
-import org.dspace.eperson.service.EPersonService;
 import org.dspace.services.RequestService;
 import org.dspace.services.model.Request;
 import org.slf4j.Logger;
@@ -45,9 +47,6 @@ public class EPersonRestPermissionEvaluatorPlugin extends RestObjectPermissionEv
     @Autowired
     private RequestService requestService;
 
-    @Autowired
-    private EPersonService ePersonService;
-
     @Override
     public boolean hasDSpacePermission(Authentication authentication, Serializable targetId,
                                  String targetType, DSpaceRestPermission permission) {
@@ -67,22 +66,26 @@ public class EPersonRestPermissionEvaluatorPlugin extends RestObjectPermissionEv
 
         EPerson ePerson = null;
 
-        try {
-            ePerson = ePersonService.findByEmail(context, (String) authentication.getPrincipal());
-            UUID dsoId = UUID.fromString(targetId.toString());
+        ePerson = context.getCurrentUser();
+        UUID dsoId = UUID.fromString(targetId.toString());
 
-            // anonymous user
+        // anonymous user
+        try {
             if (ePerson == null) {
                 return false;
-            }
-
-            if (dsoId.equals(ePerson.getID())) {
+            } else if (dsoId.equals(ePerson.getID())) {
+                return true;
+            } else if (authorizeService.isCommunityAdmin(context, ePerson)
+                && AuthorizeUtil.canCommunityAdminManageAccounts()) {
+                return true;
+            } else if (authorizeService.isCollectionAdmin(context, ePerson)
+                && AuthorizeUtil.canCollectionAdminManageAccounts()) {
                 return true;
             }
-
         } catch (SQLException e) {
             log.error(e.getMessage(), e);
         }
+
 
         return false;
     }
@@ -91,6 +94,17 @@ public class EPersonRestPermissionEvaluatorPlugin extends RestObjectPermissionEv
     public boolean hasPatchPermission(Authentication authentication, Serializable targetId, String targetType,
                                       Patch patch) {
 
+        List<Operation> operations = patch.getOperations();
+        // If it's a password replace action, we can allow anon through provided that there's a token present
+        Request currentRequest = requestService.getCurrentRequest();
+        if (currentRequest != null) {
+            HttpServletRequest httpServletRequest = currentRequest.getHttpServletRequest();
+            if (operations.size() > 0 && StringUtils.equalsIgnoreCase(operations.get(0).getOp(), "replace")
+                && StringUtils.equalsIgnoreCase(operations.get(0).getPath(), "/password")
+                && StringUtils.isNotBlank(httpServletRequest.getParameter("token"))) {
+                return true;
+            }
+        }
         /**
          * First verify that the user has write permission on the eperson.
          */
@@ -98,7 +112,6 @@ public class EPersonRestPermissionEvaluatorPlugin extends RestObjectPermissionEv
             return false;
         }
 
-        List<Operation> operations = patch.getOperations();
 
         /**
          * The entire Patch request should be denied if it contains operations that are
