@@ -12,6 +12,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
@@ -29,6 +30,7 @@ import org.dspace.discovery.DiscoverResult;
 import org.dspace.discovery.IndexableObject;
 import org.dspace.discovery.SearchService;
 import org.dspace.discovery.SearchServiceException;
+import org.dspace.util.ItemAuthorityUtils;
 import org.dspace.util.UUIDUtils;
 import org.dspace.utils.DSpace;
 
@@ -98,12 +100,14 @@ public class ItemAuthority implements ChoiceAuthority {
             Iterator<IndexableObject> dsoIterator = resultSearch.getIndexableObjects().iterator();
             while (dsoIterator.hasNext()) {
                 DSpaceObject dso = (DSpaceObject) dsoIterator.next().getIndexedObject();
-                choiceList.add(new Choice(dso.getID().toString(), dso.getName(), dso.getName()));
+                Item item = (Item) dso;
+                Map<String, String> extras = ItemAuthorityUtils.buildExtra(item);
+                choiceList.add(new Choice(item.getID().toString(), item.getName(),
+                                                           dso.getName(), extras));
             }
-
             Choice[] results = new Choice[choiceList.size()];
             results = choiceList.toArray(results);
-            return new Choices(results, 0, (int) resultSearch.getTotalSearchResults(), Choices.CF_AMBIGUOUS,
+            return new Choices(results, start, (int) resultSearch.getTotalSearchResults(), Choices.CF_AMBIGUOUS,
                                resultSearch.getTotalSearchResults() > (start + limit), 0);
 
         } catch (SearchServiceException e) {
@@ -113,12 +117,10 @@ public class ItemAuthority implements ChoiceAuthority {
     }
 
     @Override
-    public String getLabel(String field, String key, String locale) {
+    public String getLabel(String key, String locale) {
         String title = key;
         if (key != null) {
-            Context context = null;
-            try {
-                context = new Context();
+            try (Context context = new Context()) {
                 DSpaceObject dso = itemService.find(context, UUIDUtils.fromString(key));
                 if (dso != null) {
                     title = dso.getName();

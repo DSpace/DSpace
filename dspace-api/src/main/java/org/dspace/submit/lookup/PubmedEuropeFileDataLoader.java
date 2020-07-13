@@ -91,7 +91,7 @@ public class PubmedEuropeFileDataLoader extends FileDataLoader {
             for (Element xmlArticle : pubArticles) {
                 Record record = null;
                 try {
-                    record = PubmedUtils.convertPubmedDomToRecord(xmlArticle);
+                    record = PubmedEuropeUtils.convertPubmedEuropeDomToRecord(xmlArticle);
                     recordSet.addRecord(convertFields(record));
                 } catch (Exception e) {
                     throw new RuntimeException(e.getMessage(), e);

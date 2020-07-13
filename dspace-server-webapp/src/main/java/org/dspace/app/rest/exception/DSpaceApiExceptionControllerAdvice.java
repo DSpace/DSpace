@@ -29,6 +29,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.multipart.MultipartException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 /**
@@ -37,6 +38,8 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
  * @author Tom Desair (tom dot desair at atmire dot com)
  * @author Frederic Van Reet (frederic dot vanreet at atmire dot com)
  * @author Andrea Bollini (andrea.bollini at 4science.it)
+ * @author Pasquale Cavallo (pasquale.cavallo at 4science dot it)
+ * 
  */
 @ControllerAdvice
 public class DSpaceApiExceptionControllerAdvice extends ResponseEntityExceptionHandler {
@@ -54,8 +57,8 @@ public class DSpaceApiExceptionControllerAdvice extends ResponseEntityExceptionH
         }
     }
 
-    @ExceptionHandler(IllegalArgumentException.class)
-    protected void handleIllegalArgumentException(HttpServletRequest request, HttpServletResponse response,
+    @ExceptionHandler({IllegalArgumentException.class, MultipartException.class})
+    protected void handleWrongRequestException(HttpServletRequest request, HttpServletResponse response,
                                                   Exception ex) throws IOException {
         sendErrorResponse(request, response, ex, ex.getMessage(), HttpServletResponse.SC_BAD_REQUEST);
     }

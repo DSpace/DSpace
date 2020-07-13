@@ -61,7 +61,7 @@ public class LicenseStep extends org.dspace.submit.step.LicenseStep implements A
             patchOperation.perform(context, currentRequest, source, op);
 
         } else {
-            throw new UnprocessableEntityException("This path : " + op.getPath() + " can not to be replaced");
+            throw new UnprocessableEntityException("The path " + op.getPath() + " cannot be patched");
         }
     }
 }

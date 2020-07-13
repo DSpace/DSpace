@@ -30,5 +30,30 @@
         <property name="url" value="${lcname.url}"/>
         <property name="sourceIdentifier" value="lcname"/>
     </bean>
+
+    <bean id="pubmedLiveImportDataProvider" class="org.dspace.external.provider.impl.LiveImportDataProvider">
+        <property name="metadataSource" ref="PubmedImportService"/>
+        <property name="sourceIdentifier" value="pubmed"/>
+        <property name="recordIdMetadata" value="dc.identifier.other"/>
+    </bean>
+
+    <bean id="arxivLiveImportDataProvider" class="org.dspace.external.provider.impl.LiveImportDataProvider">
+        <property name="metadataSource" ref="ArXivImportService"/>
+        <property name="sourceIdentifier" value="arxiv"/>
+        <property name="recordIdMetadata" value="dc.identifier.other"/>
+    </bean>
+
+    <bean id="scopusLiveImportDataProvider" class="org.dspace.external.provider.impl.LiveImportDataProvider">
+        <property name="metadataSource" ref="ScopusImportService"/>
+        <property name="sourceIdentifier" value="scopus"/>
+        <property name="recordIdMetadata" value="dc.identifier.other"/>
+    </bean>
+
+    <bean id="epoLiveImportDataProvider" class="org.dspace.external.provider.impl.LiveImportDataProvider">
+        <property name="metadataSource" ref="EpoImportService"/>
+        <property name="sourceIdentifier" value="epo"/>
+        <property name="recordIdMetadata" value="dc.identifier.other"/>
+    </bean>
+
 </beans>
 

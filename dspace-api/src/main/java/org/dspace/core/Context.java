@@ -876,4 +876,5 @@ public class Context implements AutoCloseable {
     private void reloadContextBoundEntities() throws SQLException {
         currentUser = reloadEntity(currentUser);
     }
+
 }

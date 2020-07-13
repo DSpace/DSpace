@@ -67,6 +67,11 @@ public class GroupBuilder extends AbstractDSpaceObjectBuilder<Group> {
 
     @Override
     public Group build() {
+        try {
+            groupService.update(context, group);
+        } catch (Exception e) {
+            return handleException(e);
+        }
         return group;
     }
 

@@ -9,7 +9,6 @@ package org.dspace.app.rest.model.hateoas;
 
 import org.dspace.app.rest.model.CrisLayoutFieldRest;
 import org.dspace.app.rest.model.hateoas.annotations.RelNameDSpaceResource;
-import org.dspace.app.rest.utils.Utils;
 
 /**
  * CrisLayoutField Rest HAL Resource. The HAL Resource wraps the REST Resource
@@ -19,10 +18,10 @@ import org.dspace.app.rest.utils.Utils;
  *
  */
 @RelNameDSpaceResource(CrisLayoutFieldRest.NAME)
-public class CrisLayoutFieldResource extends DSpaceResource<CrisLayoutFieldRest> {
+public class CrisLayoutFieldResource extends HALResource<CrisLayoutFieldRest> {
 
-    public CrisLayoutFieldResource(CrisLayoutFieldRest data, Utils utils) {
-        super(data, utils);
+    public CrisLayoutFieldResource(CrisLayoutFieldRest data) {
+        super(data);
     }
 
 }

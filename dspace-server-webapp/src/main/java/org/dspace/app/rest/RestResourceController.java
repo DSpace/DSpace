@@ -149,7 +149,7 @@ public class RestResourceController implements InitializingBean {
      * @return single DSpaceResource
      */
     @RequestMapping(method = RequestMethod.GET, value = REGEX_REQUESTMAPPING_IDENTIFIER_AS_DIGIT)
-    public DSpaceResource<RestAddressableModel> findOne(@PathVariable String apiCategory, @PathVariable String model,
+    public HALResource<RestAddressableModel> findOne(@PathVariable String apiCategory, @PathVariable String model,
                                                         @PathVariable Integer id) {
         return findOneInternal(apiCategory, model, id);
     }
@@ -180,7 +180,7 @@ public class RestResourceController implements InitializingBean {
      * @return single DSpaceResource
      */
     @RequestMapping(method = RequestMethod.GET, value = REGEX_REQUESTMAPPING_IDENTIFIER_AS_STRING_VERSION_STRONG)
-    public DSpaceResource<RestAddressableModel> findOne(@PathVariable String apiCategory, @PathVariable String model,
+    public HALResource<RestAddressableModel> findOne(@PathVariable String apiCategory, @PathVariable String model,
                                                         @PathVariable String id) {
         return findOneInternal(apiCategory, model, id);
     }
@@ -200,7 +200,7 @@ public class RestResourceController implements InitializingBean {
      * @return single DSpaceResource
      */
     @RequestMapping(method = RequestMethod.GET, value = REGEX_REQUESTMAPPING_IDENTIFIER_AS_UUID)
-    public DSpaceResource<RestAddressableModel> findOne(@PathVariable String apiCategory, @PathVariable String model,
+    public HALResource<RestAddressableModel> findOne(@PathVariable String apiCategory, @PathVariable String model,
                                                         @PathVariable UUID uuid) {
         return findOneInternal(apiCategory, model, uuid);
     }
@@ -213,7 +213,7 @@ public class RestResourceController implements InitializingBean {
      * @param id Identifier from request
      * @return single DSpaceResource
      */
-    private <ID extends Serializable> DSpaceResource<RestAddressableModel> findOneInternal(String apiCategory,
+    private <ID extends Serializable> HALResource<RestAddressableModel> findOneInternal(String apiCategory,
                                                                                            String model, ID id) {
         DSpaceRestRepository<RestAddressableModel, ID> repository = utils.getResourceRepository(apiCategory, model);
         Optional<RestAddressableModel> modelObject = Optional.empty();
@@ -342,7 +342,15 @@ public class RestResourceController implements InitializingBean {
         return findRelEntryInternal(request, response, apiCategory, model, id, rel, relid, page, assembler);
     }
 
-
+    @RequestMapping(method = RequestMethod.GET, value = REGEX_REQUESTMAPPING_IDENTIFIER_AS_DIGIT +
+        "/{rel}/{relid}")
+    public RepresentationModel findRel(HttpServletRequest request, HttpServletResponse response,
+                                       @PathVariable String apiCategory,
+                                       @PathVariable String model, @PathVariable Integer id, @PathVariable String rel,
+                                       @PathVariable String relid,
+                                       Pageable page, PagedResourcesAssembler assembler) throws Throwable {
+        return findRelEntryInternal(request, response, apiCategory, model, id.toString(), rel, relid, page, assembler);
+    }
     /**
      * Execute a POST request;
      *
@@ -616,7 +624,7 @@ public class RestResourceController implements InitializingBean {
             HttpServletRequest request,
             @PathVariable String apiCategory,
             @PathVariable String model,
-            @RequestParam("file") MultipartFile uploadfile)
+            @RequestParam("file") List<MultipartFile> uploadfile)
         throws SQLException, FileNotFoundException, IOException, AuthorizeException {
 
         checkModelPluralForm(apiCategory, model);
@@ -789,62 +797,56 @@ public class RestResourceController implements InitializingBean {
         if (linkRest != null) {
             LinkRestRepository linkRepository = utils.getLinkResourceRepository(apiCategory, model, linkRest.name());
             Method linkMethod = utils.requireMethod(linkRepository.getClass(), linkRest.method());
-            if (linkMethod == null) {
-                // TODO custom exception
-                throw new RuntimeException(
-                        "Method for relation " + subpath + " not found: " + linkRest.name() + ":" + linkRest.method());
-            } else {
-                try {
-                    if (Page.class.isAssignableFrom(linkMethod.getReturnType())) {
-                        Page<? extends RestModel> pageResult = (Page<? extends RestAddressableModel>) linkMethod
-                                .invoke(linkRepository, request, uuid, page, utils.obtainProjection());
+            try {
+                if (Page.class.isAssignableFrom(linkMethod.getReturnType())) {
+                    Page<? extends RestModel> pageResult = (Page<? extends RestModel>) linkMethod.invoke(linkRepository,
+                            request, uuid, page, utils.obtainProjection());
 
-                        if (pageResult == null) {
-                            // Link repositories may throw an exception or return an empty page,
-                            // but must never return null for a paged subresource.
-                            log.error("Paged subresource link repository " + linkRepository.getClass()
-                                    + " incorrectly returned null for request with id " + uuid);
-                            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                            return null;
-                        }
+                    if (pageResult == null) {
+                        // Link repositories may throw an exception or return an empty page,
+                        // but must never return null for a paged subresource.
+                        log.error("Paged subresource link repository " + linkRepository.getClass()
+                                + " incorrectly returned null for request with id " + uuid);
+                        response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                        return null;
+                    }
 
-                        Link link = null;
-                        String querystring = request.getQueryString();
-                        if (querystring != null && querystring.length() > 0) {
-                            link = linkTo(this.getClass(), apiCategory, model).slash(uuid)
+                    Link link = null;
+                    String querystring = request.getQueryString();
+                    if (querystring != null && querystring.length() > 0) {
+                        link = linkTo(this.getClass(), apiCategory, model).slash(uuid)
                                 .slash(subpath + '?' + querystring).withSelfRel();
-                        } else {
-                            link = linkTo(this.getClass(), apiCategory, model).slash(uuid).slash(subpath).withSelfRel();
-                        }
+                    } else {
+                        link = linkTo(this.getClass(), apiCategory, model).slash(uuid).slash(subpath).withSelfRel();
+                    }
 
-                        return new EntityModel(new EmbeddedPage(link.getHref(),
-                            pageResult.map(converter::toResource), null, subpath));
+                    return new EntityModel(
+                            new EmbeddedPage(link.getHref(), pageResult.map(converter::toResource), null, subpath));
+                } else {
+                    RestModel object = (RestModel) linkMethod.invoke(linkRepository, request, uuid, page,
+                            utils.obtainProjection());
+                    if (object == null) {
+                        response.setStatus(HttpServletResponse.SC_NO_CONTENT);
+                        return null;
                     } else {
-                        RestModel object = (RestModel) linkMethod.invoke(linkRepository, request, uuid, page,
-                                utils.obtainProjection());
-                        if (object == null) {
-                            response.setStatus(HttpServletResponse.SC_NO_CONTENT);
-                            return null;
-                        } else {
-                            Link link = linkTo(this.getClass(), apiCategory, model).slash(uuid).slash(subpath)
-                                    .withSelfRel();
-                            HALResource tmpresult = converter.toResource(object);
-                            tmpresult.add(link);
-                            return tmpresult;
-                        }
+                        Link link = linkTo(this.getClass(), apiCategory, model).slash(uuid).slash(subpath)
+                                .withSelfRel();
+                        HALResource tmpresult = converter.toResource(object);
+                        tmpresult.add(link);
+                        return tmpresult;
                     }
-                } catch (InvocationTargetException e) {
-                    if (e.getTargetException() instanceof RuntimeException) {
-                        throw (RuntimeException) e.getTargetException();
-                    } else {
-                        throw new RuntimeException(e);
-                    }
-                } catch (IllegalAccessException e) {
+                }
+            } catch (InvocationTargetException e) {
+                if (e.getTargetException() instanceof RuntimeException) {
+                    throw (RuntimeException) e.getTargetException();
+                } else {
                     throw new RuntimeException(e);
                 }
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException(e);
             }
         }
-        RestAddressableModel modelObject = repository.findById(uuid).orElse(null);
+        RestModel modelObject = repository.findById(uuid).orElse(null);
 
         if (modelObject == null) {
             throw new ResourceNotFoundException(apiCategory + "." + model + " with id: " + uuid + " not found");

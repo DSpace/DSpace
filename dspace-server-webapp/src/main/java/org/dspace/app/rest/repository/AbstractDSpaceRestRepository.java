@@ -7,10 +7,11 @@
  */
 package org.dspace.app.rest.repository;
 
+import java.util.List;
 import java.util.Locale;
+import java.util.Locale.LanguageRange;
 
 import org.apache.commons.lang3.StringUtils;
-import org.dspace.app.rest.RestRepository;
 import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.app.rest.utils.Utils;
@@ -27,7 +28,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  *
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
-public abstract class AbstractDSpaceRestRepository implements RestRepository {
+public abstract class AbstractDSpaceRestRepository {
 
     @Autowired
     protected Utils utils;
@@ -59,9 +60,20 @@ public abstract class AbstractDSpaceRestRepository implements RestRepository {
                 userLocale = new Locale(userLanguage);
             }
         }
+        // Locale requested from client
         String locale = request.getHttpServletRequest().getHeader("Accept-Language");
         if (StringUtils.isNotBlank(locale)) {
-            userLocale = new Locale(locale);
+            final List<LanguageRange> ranges = Locale.LanguageRange.parse(locale);
+            if (ranges != null && !ranges.isEmpty()) {
+                for (LanguageRange range: ranges) {
+                    final String localeString = range.getRange();
+                    final Locale l = Locale.forLanguageTag(localeString);
+                    if (I18nUtil.isSupportedLocale(l)) {
+                        userLocale = l;
+                        break;
+                    }
+                }
+            }
         }
         if (userLocale == null) {
             return I18nUtil.getDefaultLocale();
@@ -69,4 +81,5 @@ public abstract class AbstractDSpaceRestRepository implements RestRepository {
         supportedLocale = I18nUtil.getSupportedLocale(userLocale);
         return supportedLocale;
     }
+
 }

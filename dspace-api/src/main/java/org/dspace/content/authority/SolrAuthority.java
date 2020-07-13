@@ -207,7 +207,7 @@ public class SolrAuthority implements ChoiceAuthority {
     }
 
     @Override
-    public String getLabel(String field, String key, String locale) {
+    public String getLabel(String key, String locale) {
         try {
             if (log.isDebugEnabled()) {
                 log.debug("requesting label for key " + key + " using locale " + locale);

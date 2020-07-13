@@ -160,20 +160,6 @@
         </step>
     </command>
     <command>
-        <name>metadata-export</name>
-        <description>Export metadata for batch editing</description>
-        <step>
-            <class>org.dspace.app.bulkedit.MetadataExport</class>
-        </step>
-    </command>
-    <command>
-        <name>metadata-import</name>
-        <description>Import metadata after batch editing</description>
-        <step>
-            <class>org.dspace.app.bulkedit.MetadataImport</class>
-        </step>
-    </command>
-    <command>
         <name>migrate-embargo</name>
         <description>Embargo manager tool used to migrate old version of Embargo to the new one included in dspace3</description>
         <step>
