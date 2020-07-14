@@ -89,7 +89,11 @@ public class ItemSimpleAuthorityMetadataGenerator implements ItemAuthorityExtraM
     protected void buildSingleExtraByRP(Item item, Map<String, String> extras) {
         List<MetadataValue> metadataValues =  itemService.getMetadata(item,
                                                   getSchema(), getElement(), getQualifier(), Item.ANY);
-        buildSingleExtraByMetadata(metadataValues.get(0), extras);
+        if (metadataValues.isEmpty()) {
+            buildSingleExtraByMetadata(null, extras);
+        } else {
+            buildSingleExtraByMetadata(metadataValues.get(0), extras);
+        }
     }
 
     public String getRelatedInputformMetadata() {

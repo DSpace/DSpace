@@ -17,14 +17,12 @@
                 <entry key="dc.identifier.patentnumber" value="publicationnumber"/>
                 <entry key="dc.identifier.applicationnumber" value="applicationnumber"/>
                 <entry key="dc.date.filled" value="applicationdate"/>
-	        </map>            
+	        </map>
         </property>
         <property name="dataloadersMap">
 	        <map>
-                <entry key="pubmed" value-ref="pubmedOnlineDataLoader"/>
                 <entry key="adsbibcode" value-ref="adsOnlineDataLoader"/>
 	            <entry key="crossref" value-ref="crossRefOnlineDataLoader"/>
-	            <entry key="arxiv" value-ref="arXivOnlineDataLoader"/>
 	            <entry key="cinii" value-ref="ciniiOnlineDataLoader"/>
  	            <entry key="wos" value-ref="wosOnlineDataLoader"/>
 	            <entry key="scopus" value-ref="scopusOnlineDataLoader"/>
@@ -38,8 +36,9 @@
 	<bean id="lookupListenerConstrain" class="org.dspace.submit.listener.MetadataListenerConstrain">
 		<property name="metadata">
 	        <map>
-                <entry key="dc.identifier.applicationnumber" value="dc.date.filled"/>         
-	        </map>            
+                <entry key="dc.identifier.applicationnumber" value="dc.date.filled"/>
+	        </map>
         </property>
 	</bean>
+	
  </beans>

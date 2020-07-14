@@ -21,7 +21,12 @@
 
     <bean id="importService" class="org.dspace.importer.external.service.ImportService" scope="singleton"
           lazy-init="false" autowire="byType" destroy-method="destroy">
-
+        <property name="importSources">
+            <list>
+                <ref bean="PubmedImportService"></ref>
+                <ref bean="BibtexImportService"></ref>
+            </list>
+         </property>
     </bean>
 
     <!--If multiple importServices have been configured here but only one is to be used during the lookup step (StartSubmissionLookupStep),
@@ -32,16 +37,51 @@
         Omitting this property will default to searching over all configured ImportService implementations
     -->
 
+    <bean id="ArXivImportService"
+          class="org.dspace.importer.external.arxiv.service.ArXivImportMetadataSourceServiceImpl" scope="singleton">
+        <property name="metadataFieldMapping" ref="ArXivMetadataFieldMapping"/>
+        <property name="baseAddress" value="http://export.arxiv.org/api/query"/>
+    </bean>
+    <bean id="ArXivMetadataFieldMapping"
+          class="org.dspace.importer.external.arxiv.metadatamapping.ArXivFieldMapping">
+    </bean>
+
+
     <bean id="PubmedImportService"
           class="org.dspace.importer.external.pubmed.service.PubmedImportMetadataSourceServiceImpl" scope="singleton">
         <property name="metadataFieldMapping" ref="PubmedMetadataFieldMapping"/>
         <property name="baseAddress" value="https://eutils.ncbi.nlm.nih.gov/entrez/eutils/"/>
+        <property name="generateQueryForItem" ref="pubmedService"></property>
 
     </bean>
+
+
     <bean id="PubmedMetadataFieldMapping"
           class="org.dspace.importer.external.pubmed.metadatamapping.PubmedFieldMapping">
     </bean>
 
+    <bean id="BibtexImportService"
+          class="org.dspace.importer.external.bibtex.service.BibtexImportMetadataSourceServiceImpl" scope="singleton">
+        <!-- <property name="metadataFieldMapping" ref="BibtexMetadataFieldMapping"/>  -->
+    </bean>
+
+
+    <bean id="EpoImportService"
+          class="org.dspace.importer.external.epo.service.EpoImportMetadataSourceServiceImpl" scope="singleton">
+        <property name="metadataFieldMapping" ref="epoMetadataFieldMapping"/>
+    </bean>
+    <bean id="epoMetadataFieldMapping"
+          class="org.dspace.importer.external.scopus.service.ScopusFieldMapping">
+    </bean>
+
+
+    <bean id="ScopusImportService"
+          class="org.dspace.importer.external.scopus.service.ScopusImportMetadataSourceServiceImpl" scope="singleton">
+        <property name="metadataFieldMapping" ref="scopusMetadataFieldMapping"/>
+    </bean>
+    <bean id="scopusMetadataFieldMapping"
+          class="org.dspace.importer.external.scopus.service.ScopusFieldMapping">
+    </bean>
     <!-- Metadatafield used to check against if it's already imported or not during the JSONLookupSearcher-->
     <bean id="lookupID" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
         <constructor-arg value="dc.identifier.other"/>

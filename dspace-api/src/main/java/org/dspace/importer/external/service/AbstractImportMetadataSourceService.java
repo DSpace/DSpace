@@ -16,7 +16,6 @@ import org.dspace.importer.external.metadatamapping.contributor.MetadataContribu
 import org.dspace.importer.external.metadatamapping.transform.GenerateQueryService;
 import org.dspace.importer.external.service.components.AbstractRemoteMetadataSource;
 import org.dspace.importer.external.service.components.MetadataSource;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Required;
 
 /**
@@ -49,7 +48,6 @@ public abstract class AbstractImportMetadataSourceService<RecordType> extends Ab
      *
      * @param generateQueryForItem the query generator to be used.
      */
-    @Autowired
     public void setGenerateQueryForItem(GenerateQueryService generateQueryForItem) {
         this.generateQueryForItem = generateQueryForItem;
     }
