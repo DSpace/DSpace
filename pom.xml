@@ -1716,7 +1716,7 @@
     <licenses>
         <license>
             <name>DuraSpace BSD License</name>
-            <url>https://raw.github.com/DSpace/DSpace/master/LICENSE</url>
+            <url>https://raw.github.com/DSpace/DSpace/main/LICENSE</url>
             <distribution>repo</distribution>
             <comments>
                A BSD 3-Clause license for the DSpace codebase.
