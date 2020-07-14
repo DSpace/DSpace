@@ -9,6 +9,7 @@ package org.dspace.handle.service;
 
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
+import org.dspace.handle.Handle;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -188,6 +189,17 @@ public interface HandleService {
      * @return configured prefix or "123456789"
      */
     public String getPrefix();
+
+    /**
+     * Returns a list of handles of items that have been deleted.
+     *
+     * @param context
+     *            DSpace context
+     * @return The handle for object, or null if the object has no handle.
+     * @exception SQLException
+     *                If a database error occurs
+     */
+    public List<Handle> getDeletedItemHandles(Context context) throws SQLException;
 
     public long countHandlesByPrefix(Context context, String prefix) throws SQLException;
 
