@@ -79,7 +79,7 @@ public class SimpleXpathMetadatumContributor implements MetadataContributor<OMEl
      * @param query                    query string
      * @param prefixToNamespaceMapping metadata prefix to namespace mapping
      * @param field
-     * <a href="https://github.com/DSpace/DSpace/tree/master/dspace-api/src/main/java/org/dspace/importer/external#metadata-mapping-">MetadataFieldConfig</a>
+     * <a href="https://github.com/DSpace/DSpace/tree/main/dspace-api/src/main/java/org/dspace/importer/external#metadata-mapping-">MetadataFieldConfig</a>
      */
     public SimpleXpathMetadatumContributor(String query, Map<String, String> prefixToNamespaceMapping,
                                            MetadataFieldConfig field) {
