@@ -56,7 +56,7 @@ We welcome contributions of any type. Here's a few basic guides that provide sug
 We also encourage GitHub Pull Requests (PRs) at any time. Please see our [Development with Git](https://wiki.lyrasis.org/display/DSPACE/Development+with+Git) guide for more info.
 
 In addition, a listing of all known contributors to DSpace software can be
-found online at: https://wiki.duraspace.org/display/DSPACE/DSpaceContributors
+found online at: https://wiki.lyrasis.org/display/DSPACE/DSpaceContributors
 
 ## Getting Help
 
@@ -77,7 +77,9 @@ install, upgrade, customize or host DSpace, then we recommend getting in touch w
 
 ## Issue Tracker
 
-The DSpace Issue Tracker can be found at: https://jira.duraspace.org/projects/DS/summary
+DSpace uses GitHub to track issues:
+* Backend (REST API) issues: https://github.com/DSpace/DSpace/issues
+* Frontend (User Interface) issues: https://github.com/DSpace/dspace-angular/issues
 
 ## Testing
 
