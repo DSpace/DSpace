@@ -481,11 +481,11 @@ public class SubmissionFormsControllerIT extends AbstractControllerIntegrationTe
                         .andExpect(jsonPath("$.rows[5].fields", contains(SubmissionFormFieldMatcher
                                 .matchFormFieldDefinition("group", "Editors", null, true,
                                                           "The editors of this publication.", null,
-                                                          "dc.contributor.editor", "AuthorAuthority"))))
+                                                          "dc.contributor.editor", "EditorAuthority"))))
                         .andExpect(jsonPath("$.rows[5].fields[0].rows[0].fields", contains(SubmissionFormFieldMatcher
                               .matchFormFieldDefinition("lookup-name", "Editor", "You must enter at least the author.",
                                             false, "The editors of this publication.", null, "dc.contributor.editor",
-                                           "AuthorAuthority"))))
+                                           "EditorAuthority"))))
                         .andExpect(jsonPath("$.rows[5].fields[0].rows[1].fields", contains(SubmissionFormFieldMatcher
                                 .matchFormFieldDefinition("onebox", "Affiliation", null, false,
                                             "Enter the affiliation of the editor as stated on the publication.",
