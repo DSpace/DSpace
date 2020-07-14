@@ -19,7 +19,6 @@ import org.apache.log4j.Logger;
 import org.dspace.content.Collection;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
-import org.dspace.content.MetadataValue;
 import org.dspace.content.authority.factory.ItemAuthorityServiceFactory;
 import org.dspace.content.authority.service.ItemAuthorityService;
 import org.dspace.content.factory.ContentServiceFactory;
@@ -132,15 +131,5 @@ public class ItemAuthority implements ChoiceAuthority {
             }
         }
         return title;
-    }
-
-    public MetadataValue getValue(Item item) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    public String getDisplayEntry(Item item, String locale) {
-        // TODO Auto-generated method stub
-        return null;
     }
 }
