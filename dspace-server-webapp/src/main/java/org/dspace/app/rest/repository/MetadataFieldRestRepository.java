@@ -9,9 +9,11 @@ package org.dspace.app.rest.repository;
 
 import static java.lang.Integer.parseInt;
 import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.dspace.app.rest.model.SearchConfigurationRest.Filter.OPERATOR_EQUALS;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import javax.servlet.http.HttpServletRequest;
@@ -19,6 +21,8 @@ import javax.servlet.http.HttpServletRequest;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
@@ -31,6 +35,12 @@ import org.dspace.content.NonUniqueMetadataException;
 import org.dspace.content.service.MetadataFieldService;
 import org.dspace.content.service.MetadataSchemaService;
 import org.dspace.core.Context;
+import org.dspace.discovery.DiscoverQuery;
+import org.dspace.discovery.DiscoverResult;
+import org.dspace.discovery.IndexableObject;
+import org.dspace.discovery.SearchService;
+import org.dspace.discovery.SearchServiceException;
+import org.dspace.discovery.indexobject.IndexableMetadataField;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -45,12 +55,19 @@ import org.springframework.stereotype.Component;
  */
 @Component(MetadataFieldRest.CATEGORY + "." + MetadataFieldRest.NAME)
 public class MetadataFieldRestRepository extends DSpaceRestRepository<MetadataFieldRest, Integer> {
+    /**
+     * log4j logger
+     */
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(MetadataFieldRestRepository.class);
 
     @Autowired
     MetadataFieldService metadataFieldService;
 
     @Autowired
     MetadataSchemaService metadataSchemaService;
+
+    @Autowired
+    private SearchService searchService;
 
     @Override
     @PreAuthorize("permitAll()")
@@ -91,6 +108,61 @@ public class MetadataFieldRestRepository extends DSpaceRestRepository<MetadataFi
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
+    }
+
+    /**
+     * Endpoint for the search in the {@link MetadataField} objects by various different params representing the
+     * field name. Query being a partial
+     *
+     * @param schemaName    an exact match of the prefix of the metadata schema (e.g. "dc", "dcterms", "eperson")
+     * @param elementName   an exact match of the field's element (e.g. "contributor", "title")
+     * @param qualifierName an exact match of the field's qualifier (e.g. "author", "alternative"
+     * @param query         part of the fully qualified field, should start with the start of the schema, element or
+     *                      qualifier (e.g. "dc.ti", "contributor", "auth", "contributor.ot")
+     * @param pageable      the pagination options
+     * @return List of {@link MetadataFieldRest} objects representing all {@link MetadataField} objects that match
+     * the given params
+     */
+    @SearchRestMethod(name = "byFieldName")
+    public Page<MetadataFieldRest> findByFieldName(@Parameter(value = "schema", required = false) String schemaName,
+        @Parameter(value = "element", required = false) String elementName,
+        @Parameter(value = "qualifier", required = false) String qualifierName,
+        @Parameter(value = "query", required = false) String query,
+        Pageable pageable) throws SQLException {
+        Context context = obtainContext();
+        List<String> filterQueries = new ArrayList<>();
+        if (StringUtils.isNotBlank(schemaName)) {
+            filterQueries.add(searchService.toFilterQuery(context, "schema", OPERATOR_EQUALS, schemaName).getFilterQuery());
+        }
+        if (StringUtils.isNotBlank(elementName)) {
+            filterQueries.add(searchService.toFilterQuery(context, "element", OPERATOR_EQUALS, elementName).getFilterQuery());
+        }
+        if (StringUtils.isNotBlank(qualifierName)) {
+            filterQueries.add(searchService.toFilterQuery(context, "qualifier", OPERATOR_EQUALS, qualifierName).getFilterQuery());
+        }
+        if (StringUtils.isNotBlank(query)) {
+            filterQueries.add(searchService.toFilterQuery(context, "fieldName", OPERATOR_EQUALS, query).getFilterQuery() + "*");
+        }
+
+        DiscoverResult searchResult = null;
+        DiscoverQuery discoverQuery = new DiscoverQuery();
+        discoverQuery.addFilterQueries(filterQueries.toArray(new String[filterQueries.size()]));
+
+        try {
+            searchResult = searchService.search(context, null, discoverQuery);
+        } catch (SearchServiceException e) {
+            log.error("Error while searching with Discovery", e);
+            throw new IllegalArgumentException("Error while searching with Discovery: " + e.getMessage());
+        }
+
+        List<MetadataField> matchingMetadataFields = new ArrayList<>();
+        for (IndexableObject object: searchResult.getIndexableObjects()) {
+            if (object instanceof IndexableMetadataField) {
+                matchingMetadataFields.add(((IndexableMetadataField) object).getIndexedObject());
+            }
+        }
+        // Correct conversion
+        return converter.toRestPage(matchingMetadataFields, pageable, utils.obtainProjection());
     }
 
     @Override
