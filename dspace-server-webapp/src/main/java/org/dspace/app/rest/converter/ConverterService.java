@@ -34,6 +34,7 @@ import org.dspace.app.rest.security.DSpacePermissionEvaluator;
 import org.dspace.app.rest.security.WebSecurityExpressionEvaluator;
 import org.dspace.app.rest.utils.Utils;
 import org.dspace.services.RequestService;
+import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider;
@@ -144,13 +145,13 @@ public class ConverterService {
         return null;
     }
 
-    private Annotation getAnnotationForRestObject(BaseObjectRest restObject) {
-        BaseObjectRest baseObjectRest = restObject;
-        DSpaceRestRepository repositoryToUse = utils
+    private Annotation getAnnotationForRestObject(BaseObjectRest<?> restObject) {
+        BaseObjectRest<?> baseObjectRest = restObject;
+        DSpaceRestRepository<?, ?> repositoryToUse = utils
             .getResourceRepositoryByCategoryAndModel(baseObjectRest.getCategory(), baseObjectRest.getType());
         Annotation preAuthorize = null;
         int maxDepth = 0;
-        for (Method m : repositoryToUse.getClass().getMethods()) {
+        for (Method m : AopUtils.getTargetClass(repositoryToUse).getMethods()) {
             if (StringUtils.equalsIgnoreCase(m.getName(), "findOne")) {
                 int depth = howManySuperclass(m.getDeclaringClass());
                 if (depth > maxDepth) {

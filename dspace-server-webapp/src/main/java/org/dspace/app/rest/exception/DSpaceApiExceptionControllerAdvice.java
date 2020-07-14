@@ -14,8 +14,14 @@ import java.sql.SQLException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.dspace.app.exception.ResourceConflictException;
+import org.dspace.app.rest.converter.ConverterService;
+import org.dspace.app.rest.model.RestModel;
 import org.dspace.app.rest.security.RestAuthenticationService;
+import org.dspace.app.rest.utils.Utils;
 import org.dspace.authorize.AuthorizeException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.TypeMismatchException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.AnnotationUtils;
@@ -44,8 +50,16 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 @ControllerAdvice
 public class DSpaceApiExceptionControllerAdvice extends ResponseEntityExceptionHandler {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(DSpaceApiExceptionControllerAdvice.class);
+
     @Autowired
     private RestAuthenticationService restAuthenticationService;
+
+    @Autowired
+    private ConverterService converterService;
+
+    @Autowired
+    private Utils utils;
 
     @ExceptionHandler({AuthorizeException.class, RESTAuthorizationException.class, AccessDeniedException.class})
     protected void handleAuthorizeException(HttpServletRequest request, HttpServletResponse response, Exception ex)
@@ -113,6 +127,12 @@ public class DSpaceApiExceptionControllerAdvice extends ResponseEntityExceptionH
                           HttpStatus.BAD_REQUEST.value());
     }
 
+    @ExceptionHandler(ResourceConflictException.class)
+    protected ResponseEntity<? extends RestModel> resourceConflictException(ResourceConflictException ex) {
+        RestModel resource = converterService.toRest(ex.getResource(), utils.obtainProjection());
+        return new ResponseEntity<RestModel>(resource, HttpStatus.CONFLICT);
+    }
+
     @Override
     protected ResponseEntity<Object> handleMissingServletRequestParameter(MissingServletRequestParameterException ex,
                                                                           HttpHeaders headers, HttpStatus status,
@@ -131,8 +151,10 @@ public class DSpaceApiExceptionControllerAdvice extends ResponseEntityExceptionH
     @ExceptionHandler(Exception.class)
     protected void handleGenericException(HttpServletRequest request, HttpServletResponse response, Exception ex)
         throws IOException {
-        ResponseStatus responseStatusAnnotation = AnnotationUtils.findAnnotation(ex.getClass(), ResponseStatus.class);
 
+        LOGGER.error("A Generic exception has occured:", ex);
+
+        ResponseStatus responseStatusAnnotation = AnnotationUtils.findAnnotation(ex.getClass(), ResponseStatus.class);
         int returnCode = 0;
         if (responseStatusAnnotation != null) {
             returnCode = responseStatusAnnotation.code().value();

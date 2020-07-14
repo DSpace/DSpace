@@ -557,11 +557,10 @@ public interface ItemService
      * @return an iterator over the items matching that authority value
      * @throws SQLException       if database error
      * @throws AuthorizeException if authorization error
-     * @throws IOException        if IO error
      */
     public Iterator<Item> findByAuthorityValue(Context context,
                                                String schema, String element, String qualifier, String value)
-        throws SQLException, AuthorizeException, IOException;
+        throws SQLException, AuthorizeException;
 
 
     public Iterator<Item> findByMetadataFieldAuthority(Context context, String mdString, String authority)

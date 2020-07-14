@@ -7,6 +7,9 @@
  */
 package org.dspace.app.rest.builder;
 
+import static org.dspace.content.MetadataSchemaEnum.CRIS;
+import static org.dspace.content.authority.Choices.CF_ACCEPTED;
+
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.UUID;
@@ -99,6 +102,10 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
 
     public ItemBuilder withProvenanceData(final String provenanceData) {
         return addMetadataValue(item, MetadataSchemaEnum.DC.getName(), "description", "provenance", provenanceData);
+    }
+
+    public ItemBuilder withCrisOwner(String value, String authority) {
+        return addMetadataValue(item, CRIS.getName(), "owner", null, null, value, authority, CF_ACCEPTED);
     }
 
     public ItemBuilder makeUnDiscoverable() {
