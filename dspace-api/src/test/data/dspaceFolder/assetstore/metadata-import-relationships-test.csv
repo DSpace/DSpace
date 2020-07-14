@@ -1,0 +1,2 @@
+id,collection,dc.date.accessioned,dc.date.available,dc.date.issued[],dc.description[],dc.title.alternative,person.birthDate,person.email,person.familyName,person.givenName,person.jobTitle,relationship.type[],relation.isPublicationOfAuthor
++,"123456789/2","2019-06-26T21:43:44Z","2019-06-26T21:43:44Z","","","","2019-06-26","nomail@email.com","Droogmans","Lieven","CEO", "Person",
