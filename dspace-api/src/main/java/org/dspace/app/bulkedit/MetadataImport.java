@@ -1688,13 +1688,11 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
                             // Add to errors if Realtionship.type cannot be derived.
                             Item originItem = null;
                             if (itemService.find(c, UUID.fromString(targetUUID)) != null) {
-                                originItem = itemService.find(c, UUID.fromString(originRefererUUID));
-                                List<MetadataValue> relTypes = itemService.
-                                                                              getMetadata(originItem, "relationship",
-                                                                                          "type", null, Item.ANY);
-                                String relTypeValue = null;
+                                List<String> relTypes = this.csv.getCSVLines().get(Integer.valueOf(originRow) - 1)
+                                                                .get("relationship.type[]");
                                 if (relTypes.size() > 0) {
-                                    relTypeValue = relTypes.get(0).getValue();
+                                    String relTypeValue = relTypes.get(0);
+                                    relTypeValue = StringUtils.remove(relTypeValue, "\"").trim();
                                     originType = entityTypeService.findByEntityType(c, relTypeValue).getLabel();
                                     validateTypesByTypeByTypeName(c, targetType, originType, typeName, originRow);
                                 } else {
