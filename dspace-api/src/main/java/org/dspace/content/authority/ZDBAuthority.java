@@ -19,11 +19,16 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.authority.AuthorityValue;
 import org.dspace.content.Collection;
+import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
+import org.dspace.content.authority.zdb.ZDBAuthorityValue;
 import org.dspace.content.authority.zdb.ZDBService;
 import org.dspace.core.I18nUtil;
 import org.dspace.utils.DSpace;
-
+/**
+ * 
+ * @author Mykhaylo Boychuk (4science.it)
+ */
 public abstract class ZDBAuthority extends ItemAuthority {
 
     private static final int DEFAULT_MAX_ROWS = 10;
@@ -35,7 +40,7 @@ public abstract class ZDBAuthority extends ItemAuthority {
     private static final String ZDB_IDENTIFIER_FIELD = "journalIssn";
     private static final String ZDB_RELATION_FIELD = "journalRelation";
     private static final String ZDB_TYPE_FIELD = "journalType";
-    private static final String JOURNALS_IDENTIFIER_FIELD = "crisjournals.journalsissn";
+    private static final String JOURNALS_IDENTIFIER_FIELD = "dc.identifier.issn";
     private static final String MESSAGE_IDENTIFIER_NOT_FOUND_KEY = "zdbauthority.identifier.notfound";
     private static final String MESSAGE_TYPE_KEY = "zdbauthority.type";
     private static final String MESSAGE_RELATION_KEY = "zdbauthority.relation";
@@ -126,22 +131,8 @@ public abstract class ZDBAuthority extends ItemAuthority {
 
     protected abstract String getZDBValue(String searchField, AuthorityValue val);
 
-    @Override
-    protected String getDisplayEntry(ResearchObject cris, String locale) {
-        return getIssn(cris, locale) + super.getDisplayEntry(cris, locale);
-    }
-
-    @Override
-    protected MetadataValue getValue(ResearchObject cris) {
-        String searchField = getDefaultField();
-        if (StringUtils.isNotBlank(searchField)) {
-            List<MetadataValue> mm = cris.getMetadataByMetadataString(searchField);
-            if (mm != null && mm.size() > 0) {
-                return mm.get(0);
-            }
-        }
-
-        return super.getValue(cris);
+    public String getDisplayEntry(Item item, String locale) {
+        return getIssn(item, locale) + super.getDisplayEntry(item, locale);
     }
 
     private String getIssn(AuthorityValue val, String locale) {
@@ -154,9 +145,9 @@ public abstract class ZDBAuthority extends ItemAuthority {
         return getIssnOrDefault(issn, locale);
     }
 
-    private String getIssn(ResearchObject cris, String locale) {
+    private String getIssn(Item item, String locale) {
         String issn = "";
-        List<MetadataValue> metadataValues = cris.getMetadataByMetadataString(JOURNALS_IDENTIFIER_FIELD);
+        List<MetadataValue> metadataValues = itemService.getMetadataByMetadataString(item, JOURNALS_IDENTIFIER_FIELD);
         if (metadataValues != null && metadataValues.size() > 0) {
             for (MetadataValue metadataValue : metadataValues) {
                 issn += metadataValue.getValue() + "|";

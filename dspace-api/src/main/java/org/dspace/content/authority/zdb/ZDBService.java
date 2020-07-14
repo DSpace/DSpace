@@ -8,9 +8,23 @@
 package org.dspace.content.authority.zdb;
 
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.List;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.http.HttpHost;
+import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
+import org.apache.http.StatusLine;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.conn.params.ConnRoutePNames;
+import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.log4j.Logger;
 import org.dspace.app.util.XMLUtils;
 import org.dspace.authority.AuthorityValue;
@@ -19,6 +33,10 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
+/**
+ * 
+ * @author Mykhaylo Boychuk (4science.it)
+ */
 public class ZDBService {
 
     private static Logger log = Logger.getLogger(ZDBService.class);
@@ -38,20 +56,22 @@ public class ZDBService {
 
         List<ZDBAuthorityValue> results = new ArrayList<ZDBAuthorityValue>();
 
-        GetMethod method = null;
+        HttpGet method = null;
+        HttpHost proxy = null;
         try {
 
-            method = new GetMethod(requestURL);
+            method = new HttpGet(requestURL);
 
-            HttpClient client = new HttpClient();
+            HttpClient client = new DefaultHttpClient();
             if (StringUtils.isNotBlank(proxyHost) && StringUtils.isNotBlank(proxyPort)) {
-                HostConfiguration hostCfg = client.getHostConfiguration();
-                hostCfg.setProxy(proxyHost, Integer.parseInt(proxyPort));
-                client.setHostConfiguration(hostCfg);
+                proxy = new HttpHost(proxyHost, Integer.parseInt(proxyPort), "http");
+                client.getParams().setParameter(ConnRoutePNames.DEFAULT_PROXY, proxy);
             }
 
             // Execute the method.
-            int statusCode = client.executeMethod(method);
+            HttpResponse response = client.execute(method);
+            StatusLine statusLine = response.getStatusLine();
+            int statusCode = statusLine.getStatusCode();
 
             if (statusCode != HttpStatus.SC_OK) {
                 throw new RuntimeException("WS call failed: " + statusCode);
@@ -65,9 +85,7 @@ public class ZDBService {
             try {
                 builder = factory.newDocumentBuilder();
 
-                InputStream responseBodyAsStream = method.getResponseBodyAsStream();
-
-                Document inDoc = builder.parse(responseBodyAsStream);
+                Document inDoc = builder.parse(response.getEntity().getContent());
 
                 Element xmlRoot = inDoc.getDocumentElement();
 
@@ -160,7 +178,7 @@ public class ZDBService {
         return null;
     }
 
-    public List<ZDBAuthorityValue> list(String query, int page, int pagesize) throws IOException {
+    public List<ZDBAuthorityValue> list(String field, String query, int page, int pagesize) throws IOException {
         if (query == null || query.isEmpty()) {
             throw new IllegalArgumentException();
         }
@@ -173,7 +191,7 @@ public class ZDBService {
         // searchURL += "&numberOfRecords=" + Integer.toString(pagesize);
         // }
 
-        queryURL += "&query=tit=" + URLEncoder.encode(query);
+        queryURL += "&query=" + field + "=" + URLEncoder.encode(query);
         return search(queryURL);
     }
 
