@@ -8,6 +8,7 @@
 package org.dspace.app.rest;
 
 import static com.jayway.jsonpath.JsonPath.read;
+import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
@@ -53,6 +54,9 @@ public class MetadatafieldRestRepositoryIT extends AbstractControllerIntegration
     private static final String SCOPE_NOTE_UPDATED = "test scope_note updated";
 
     private MetadataSchema metadataSchema;
+
+    private static final String METADATAFIELDS_ENDPOINT = "/api/core/metadatafields/";
+    private static final String SEARCH_BYFIELDNAME_ENDPOINT = METADATAFIELDS_ENDPOINT + "search/byFieldName";
 
     @Autowired
     private MetadataSchemaService metadataSchemaService;
@@ -166,6 +170,199 @@ public class MetadatafieldRestRepositoryIT extends AbstractControllerIntegration
 
         getClient().perform(get("/api/core/metadatafields/search/bySchema"))
                    .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void findByFieldName_schema() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        MetadataSchema schema = MetadataSchemaBuilder.createMetadataSchema(context, "ASchema",
+            "http://www.dspace.org/ns/aschema").build();
+
+        MetadataField metadataField = MetadataFieldBuilder
+            .createMetadataField(context, schema, "AnElement", "AQualifier", "AScopeNote").build();
+
+        context.restoreAuthSystemState();
+
+        super.runDSpaceScript("index-discovery", "-b");
+
+        getClient().perform(get(SEARCH_BYFIELDNAME_ENDPOINT)
+            .param("schema", schema.getName()))
+                   .andExpect(status().isOk())
+                   .andExpect(content().contentType(contentType))
+                   .andExpect(jsonPath("$._embedded.metadatafields", Matchers.hasItem(
+                       MetadataFieldMatcher.matchMetadataField(metadataField))
+                                      ))
+                   .andExpect(jsonPath("$.page.size", is(20)))
+                   .andExpect(jsonPath("$.page.totalElements", is(1)));
+    }
+
+    @Test
+    public void findByFieldName_element() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        MetadataSchema schema = MetadataSchemaBuilder.createMetadataSchema(context, "ASchema",
+            "http://www.dspace.org/ns/aschema").build();
+        MetadataSchema schema2 = MetadataSchemaBuilder.createMetadataSchema(context, "ASchema2",
+            "http://www.dspace.org/ns/aschema2").build();
+
+        MetadataField metadataField = MetadataFieldBuilder
+            .createMetadataField(context, schema, "AnElement", "AQualifier", "AScopeNote").build();
+
+        MetadataField metadataField2 = MetadataFieldBuilder
+            .createMetadataField(context, schema2, "AnElement", "AQualifier2", "AScopeNote2").build();
+
+        context.restoreAuthSystemState();
+
+        super.runDSpaceScript("index-discovery", "-b");
+
+        getClient().perform(get(SEARCH_BYFIELDNAME_ENDPOINT)
+            .param("element", "AnElement"))
+                   .andExpect(status().isOk())
+                   .andExpect(content().contentType(contentType))
+                   .andExpect(jsonPath("$._embedded.metadatafields", Matchers.hasItem(
+                       MetadataFieldMatcher.matchMetadataField(metadataField))
+                                      ))
+                   .andExpect(jsonPath("$._embedded.metadatafields", Matchers.hasItem(
+                       MetadataFieldMatcher.matchMetadataField(metadataField2))
+                                      ))
+                   .andExpect(jsonPath("$.page.size", is(20)))
+                   .andExpect(jsonPath("$.page.totalElements", is(2)));
+    }
+
+    @Test
+    public void findByFieldName_elementAndQualifier() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        MetadataSchema schema = MetadataSchemaBuilder.createMetadataSchema(context, "ASchema",
+            "http://www.dspace.org/ns/aschema").build();
+        MetadataSchema schema2 = MetadataSchemaBuilder.createMetadataSchema(context, "ASchema2",
+            "http://www.dspace.org/ns/aschema2").build();
+
+        MetadataField metadataField = MetadataFieldBuilder
+            .createMetadataField(context, schema, "AnElement1", "AQualifier", "AScopeNote").build();
+
+        MetadataField metadataField2 = MetadataFieldBuilder
+            .createMetadataField(context, schema2, "AnElement2", "AQualifier", "AScopeNote2").build();
+
+        MetadataField metadataField3 = MetadataFieldBuilder
+            .createMetadataField(context, schema, "AnElement2", "AQualifier", "AScopeNote2").build();
+
+        context.restoreAuthSystemState();
+
+        super.runDSpaceScript("index-discovery", "-b");
+
+        getClient().perform(get(SEARCH_BYFIELDNAME_ENDPOINT)
+            .param("element", "AnElement2")
+            .param("qualifier", "AQualifier"))
+                   .andExpect(status().isOk())
+                   .andExpect(content().contentType(contentType))
+                   .andExpect(jsonPath("$._embedded.metadatafields", Matchers.hasItem(
+                       MetadataFieldMatcher.matchMetadataField(metadataField2))
+                                      ))
+                   .andExpect(jsonPath("$._embedded.metadatafields", Matchers.hasItem(
+                       MetadataFieldMatcher.matchMetadataField(metadataField3))
+                                      ))
+                   .andExpect(jsonPath("$._embedded.metadatafields", Matchers.not(hasItem(
+                       MetadataFieldMatcher.matchMetadataField(metadataField))
+                                                                                 )))
+                   .andExpect(jsonPath("$.page.size", is(20)))
+                   .andExpect(jsonPath("$.page.totalElements", is(2)));
+    }
+
+    @Test
+    public void findByFieldName_schemaAndQualifier() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        MetadataSchema schema = MetadataSchemaBuilder.createMetadataSchema(context, "ASchema",
+            "http://www.dspace.org/ns/aschema").build();
+        MetadataSchema schema2 = MetadataSchemaBuilder.createMetadataSchema(context, "ASchema2",
+            "http://www.dspace.org/ns/aschema2").build();
+
+        MetadataField metadataField = MetadataFieldBuilder
+            .createMetadataField(context, schema, "AnElement1", "AQualifier", "AScopeNote").build();
+
+        MetadataField metadataField2 = MetadataFieldBuilder
+            .createMetadataField(context, schema2, "AnElement2", "AQualifier", "AScopeNote2").build();
+
+        MetadataField metadataField3 = MetadataFieldBuilder
+            .createMetadataField(context, schema, "AnElement3", "AQualifier", "AScopeNote3").build();
+
+        context.restoreAuthSystemState();
+
+        super.runDSpaceScript("index-discovery", "-b");
+
+        getClient().perform(get(SEARCH_BYFIELDNAME_ENDPOINT)
+            .param("schema", schema.getName())
+            .param("qualifier", "AQualifier"))
+                   .andExpect(status().isOk())
+                   .andExpect(content().contentType(contentType))
+                   .andExpect(jsonPath("$._embedded.metadatafields", Matchers.hasItem(
+                       MetadataFieldMatcher.matchMetadataField(metadataField))
+                                      ))
+                   .andExpect(jsonPath("$._embedded.metadatafields", Matchers.hasItem(
+                       MetadataFieldMatcher.matchMetadataField(metadataField3))
+                                      ))
+                   .andExpect(jsonPath("$._embedded.metadatafields", Matchers.not(hasItem(
+                       MetadataFieldMatcher.matchMetadataField(metadataField2))
+                                                                                 )))
+                   .andExpect(jsonPath("$.page.size", is(20)))
+                   .andExpect(jsonPath("$.page.totalElements", is(2)));
+    }
+
+    @Test
+    public void findByFieldName_query() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        MetadataSchema schema = MetadataSchemaBuilder.createMetadataSchema(context, "ASchema",
+            "http://www.dspace.org/ns/aschema").build();
+        MetadataSchema schema2 = MetadataSchemaBuilder.createMetadataSchema(context, "ASchema2",
+            "http://www.dspace.org/ns/aschema2").build();
+
+        MetadataField metadataField = MetadataFieldBuilder
+            .createMetadataField(context, schema, "AnElement1", "AQualifier", "AScopeNote").build();
+
+        MetadataField metadataField2 = MetadataFieldBuilder
+            .createMetadataField(context, schema2, "AnElement2", "AQualifier", "AScopeNote2").build();
+
+        MetadataField metadataField3 = MetadataFieldBuilder
+            .createMetadataField(context, schema, "AnElement3", "AQualifier", "AScopeNote2").build();
+
+        context.restoreAuthSystemState();
+
+        super.runDSpaceScript("index-discovery", "-b");
+
+        getClient().perform(get(SEARCH_BYFIELDNAME_ENDPOINT)
+            .param("query", schema.getName()))
+                   .andExpect(status().isOk())
+                   .andExpect(content().contentType(contentType))
+                   .andExpect(jsonPath("$._embedded.metadatafields", Matchers.hasItem(
+                       MetadataFieldMatcher.matchMetadataField(metadataField))
+                                      ))
+                   .andExpect(jsonPath("$._embedded.metadatafields", Matchers.hasItem(
+                       MetadataFieldMatcher.matchMetadataField(metadataField3))
+                                      ))
+                   .andExpect(jsonPath("$._embedded.metadatafields", Matchers.hasItem(
+                       MetadataFieldMatcher.matchMetadataField(metadataField2))
+                                      ))
+                   .andExpect(jsonPath("$.page.size", is(20)))
+                   .andExpect(jsonPath("$.page.totalElements", is(3)));
+
+        getClient().perform(get(SEARCH_BYFIELDNAME_ENDPOINT)
+            .param("query", schema.getName() + ".AnElement3"))
+                   .andExpect(status().isOk())
+                   .andExpect(content().contentType(contentType))
+                   .andExpect(jsonPath("$._embedded.metadatafields", Matchers.not(hasItem(
+                       MetadataFieldMatcher.matchMetadataField(metadataField))
+                                                                                 )))
+                   .andExpect(jsonPath("$._embedded.metadatafields", Matchers.hasItem(
+                       MetadataFieldMatcher.matchMetadataField(metadataField3))
+                                      ))
+                   .andExpect(jsonPath("$._embedded.metadatafields", Matchers.not(hasItem(
+                       MetadataFieldMatcher.matchMetadataField(metadataField2))
+                                                                                 )))
+                   .andExpect(jsonPath("$.page.size", is(20)))
+                   .andExpect(jsonPath("$.page.totalElements", is(1)));
     }
 
     @Test

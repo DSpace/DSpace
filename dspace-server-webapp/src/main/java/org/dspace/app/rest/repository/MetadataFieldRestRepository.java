@@ -96,7 +96,7 @@ public class MetadataFieldRestRepository extends DSpaceRestRepository<MetadataFi
 
     @SearchRestMethod(name = "bySchema")
     public Page<MetadataFieldRest> findBySchema(@Parameter(value = "schema", required = true) String schemaName,
-                                                Pageable pageable) {
+        Pageable pageable) {
         try {
             Context context = obtainContext();
             MetadataSchema schema = metadataSchemaService.find(context, schemaName);
@@ -132,16 +132,20 @@ public class MetadataFieldRestRepository extends DSpaceRestRepository<MetadataFi
         Context context = obtainContext();
         List<String> filterQueries = new ArrayList<>();
         if (StringUtils.isNotBlank(schemaName)) {
-            filterQueries.add(searchService.toFilterQuery(context, "schema", OPERATOR_EQUALS, schemaName).getFilterQuery());
+            filterQueries
+                .add(searchService.toFilterQuery(context, "schema", OPERATOR_EQUALS, schemaName).getFilterQuery());
         }
         if (StringUtils.isNotBlank(elementName)) {
-            filterQueries.add(searchService.toFilterQuery(context, "element", OPERATOR_EQUALS, elementName).getFilterQuery());
+            filterQueries
+                .add(searchService.toFilterQuery(context, "element", OPERATOR_EQUALS, elementName).getFilterQuery());
         }
         if (StringUtils.isNotBlank(qualifierName)) {
-            filterQueries.add(searchService.toFilterQuery(context, "qualifier", OPERATOR_EQUALS, qualifierName).getFilterQuery());
+            filterQueries.add(
+                searchService.toFilterQuery(context, "qualifier", OPERATOR_EQUALS, qualifierName).getFilterQuery());
         }
         if (StringUtils.isNotBlank(query)) {
-            filterQueries.add(searchService.toFilterQuery(context, "fieldName", OPERATOR_EQUALS, query).getFilterQuery() + "*");
+            filterQueries
+                .add(searchService.toFilterQuery(context, "fieldName", OPERATOR_EQUALS, query).getFilterQuery() + "*");
         }
 
         DiscoverResult searchResult = null;
@@ -156,7 +160,7 @@ public class MetadataFieldRestRepository extends DSpaceRestRepository<MetadataFi
         }
 
         List<MetadataField> matchingMetadataFields = new ArrayList<>();
-        for (IndexableObject object: searchResult.getIndexableObjects()) {
+        for (IndexableObject object : searchResult.getIndexableObjects()) {
             if (object instanceof IndexableMetadataField) {
                 matchingMetadataFields.add(((IndexableMetadataField) object).getIndexedObject());
             }
