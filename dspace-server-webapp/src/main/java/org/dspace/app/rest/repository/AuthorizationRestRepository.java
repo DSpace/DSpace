@@ -242,25 +242,27 @@ public class AuthorizationRestRepository extends DSpaceRestRepository<Authorizat
      */
     private EPerson getUserFromRequestParameter(Context context, UUID epersonUuid)
             throws AuthorizeException, SQLException {
+
         EPerson currUser = context.getCurrentUser();
-        EPerson user = currUser;
-        if (epersonUuid != null) {
+
+        if (epersonUuid == null) {
+            // no user is specified in the request parameters, check the permissions for the current user
+            return currUser;
+
+        } else {
+            // a user is specified in the request parameters
+
             if (currUser == null) {
                 throw new AuthorizeException("attempt to anonymously access the authorization of the eperson "
                         + epersonUuid);
-            } else {
-                // an user is specified in the request parameters
-                if (!authorizeService.isAdmin(context) && !epersonUuid.equals(currUser.getID())) {
-                    throw new AuthorizeException("attempt to access the authorization of the eperson " + epersonUuid
-                            + " only system administrators can see the authorization of other users");
-                }
-                user = epersonService.find(context, epersonUuid);
+
+            } else if (!authorizeService.isAdmin(context) && !epersonUuid.equals(currUser.getID())) {
+                throw new AuthorizeException("attempt to access the authorization of the eperson " + epersonUuid
+                        + " as a non-admin; only system administrators can see the authorization of other users");
             }
-        } else {
-            // the request asks to check the permission for the anonymous user
-            user = null;
+
+            return epersonService.find(context, epersonUuid);
         }
-        return user;
     }
 
     @Override
