@@ -29,6 +29,7 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
+ * This class handles ItemAuthority and ZDBAuthority related IT.
  * 
  * @author Mykhaylo Boychuk (4Science.it)
  */
@@ -197,6 +198,83 @@ public class ItemAuthorityTest extends AbstractControllerIntegrationTest {
                              "Author 1", "Author 1","vocabularyEntry","contributor_department","")
                               )))
                        .andExpect(jsonPath("$.page.totalElements", Matchers.is(1)));
+    }
+
+    @Test
+    public void zdbAuthorityTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        parentCommunity = CommunityBuilder.createCommunity(context).build();
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).build();
+        context.restoreAuthSystemState();
+        String token = getAuthToken(eperson.getEmail(), password);
+        getClient(token).perform(get("/api/submission/vocabularies/ZDBAuthority/entries")
+                        .param("metadata", "dc.identifier.issn")
+                        .param("collection", col1.getID().toString())
+                        .param("filter", "Acta AND Mathematica AND informatica"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$._embedded.entries",
+                        Matchers.containsInAnyOrder(
+                                ItemAuthorityMatcher.matchItemAuthorityWithTwoMetadataInOtherInformations(
+                                        "will be generated::zdb::1447228-4", "Acta mathematica et informatica",
+                                        "Acta mathematica et informatica", "vocabularyEntry", "relation_ispartof",
+                                        "Acta mathematica et informatica::will be generated::zdb::1447228-4",
+                                        "relation_issn",""),
+                                ItemAuthorityMatcher.matchItemAuthorityWithTwoMetadataInOtherInformations(
+                                        "will be generated::zdb::1194912-0",
+                                        "Acta mathematica Universitatis Ostraviensis",
+                                        "Acta mathematica Universitatis Ostraviensis", "vocabularyEntry",
+                                        "relation_ispartof",
+                                  "Acta mathematica Universitatis Ostraviensis::will be generated::zdb::1194912-0",
+                                  "relation_issn","1211-4774"),
+                                ItemAuthorityMatcher.matchItemAuthorityWithTwoMetadataInOtherInformations(
+                                        "will be generated::zdb::2618143-5",
+                                        "Acta mathematica Universitatis Ostraviensis",
+                                        "Acta mathematica Universitatis Ostraviensis", "vocabularyEntry",
+                                        "relation_ispartof",
+                                   "Acta mathematica Universitatis Ostraviensis::will be generated::zdb::2618143-5",
+                                   "relation_issn",""))))
+                .andExpect(jsonPath("$.page.totalElements", Matchers.is(3)));
+    }
+
+    @Test
+    public void zdbAuthorityEmptyQueryTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        parentCommunity = CommunityBuilder.createCommunity(context).build();
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).build();
+        context.restoreAuthSystemState();
+        String token = getAuthToken(eperson.getEmail(), password);
+        getClient(token).perform(get("/api/submission/vocabularies/ZDBAuthority/entries")
+                        .param("metadata", "dc.identifier.issn")
+                        .param("collection", col1.getID().toString())
+                        .param("filter", ""))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.page.totalElements", Matchers.is(0)));
+    }
+
+    @Test
+    public void zdbAuthorityMissingMetadataTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        parentCommunity = CommunityBuilder.createCommunity(context).build();
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).build();
+        context.restoreAuthSystemState();
+        String token = getAuthToken(eperson.getEmail(), password);
+        getClient(token).perform(get("/api/submission/vocabularies/ZDBAuthority/entries")
+                        .param("collection", col1.getID().toString())
+                        .param("filter", ""))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void zdbAuthorityUnauthorizedTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        parentCommunity = CommunityBuilder.createCommunity(context).build();
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).build();
+        context.restoreAuthSystemState();
+        getClient().perform(get("/api/submission/vocabularies/ZDBAuthority/entries")
+                        .param("metadata", "dc.identifier.issn")
+                        .param("collection", col1.getID().toString())
+                        .param("filter", "Mathematica AND informatica"))
+                .andExpect(status().isUnauthorized());
     }
 
     @Override

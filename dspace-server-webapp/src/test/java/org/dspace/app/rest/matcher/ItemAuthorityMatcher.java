@@ -14,6 +14,7 @@ import static org.hamcrest.Matchers.is;
 import org.hamcrest.Matcher;
 
 /**
+ * Utility class to construct a Matcher for ItemAuthority
  * 
  * @author Mykhaylo Boychuk (4Science.it)
  */
@@ -38,6 +39,21 @@ public class ItemAuthorityMatcher {
                 hasJsonPath("$.value", is(value)),
                 hasJsonPath("$.type", is(type)),
                 hasJsonPath("$.otherInformation.data-dc_" + otherInfMetadata, is(metadataValue))
+        );
+    }
+
+    public static Matcher<? super Object> matchItemAuthorityWithTwoMetadataInOtherInformations(String authority,
+            String display, String value, String type, String firstOtherMetadata, String firstOtherValue,
+            String secondOtherMetadata, String secondOtherValue) {
+        return allOf(
+                hasJsonPath("$.authority", is(authority)),
+                hasJsonPath("$.display", is(display)),
+                hasJsonPath("$.value", is(value)),
+                hasJsonPath("$.type", is(type)),
+                allOf (
+                      hasJsonPath("$.otherInformation.data-dc_" + firstOtherMetadata, is(firstOtherValue)),
+                      hasJsonPath("$.otherInformation.data-dc_" + secondOtherMetadata, is(secondOtherValue))
+                )
         );
     }
 }
