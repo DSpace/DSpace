@@ -25,5 +25,5 @@ jobs:
         PROJECT: DSpace Backlog
         COLUMN: Triage
         CHECK_ORG_PROJECT: true
-      # Ignore errors. It is possible the PR was created by someone who cannot be assigned
+      # Ignore errors.
       continue-on-error: true
