@@ -54,7 +54,7 @@
                 <xsl:text>ita</xsl:text>
             </xsl:when>
             <xsl:when test="$lc_value = 'ja'">
-                <xsl:text>jap</xsl:text>
+                <xsl:text>jpn</xsl:text>
             </xsl:when>
             <xsl:when test="$lc_value = 'zh'">
                 <xsl:text>zho</xsl:text>

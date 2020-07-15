@@ -29,6 +29,8 @@
 	class="org.dspace.xoai.app.PermissionElementAdditional"/>
 
 	<!-- Additional item.compile plugin to enrich field with information about Creative Commons License metadata -->
-	<bean id="CCElementAdditional"
-	class="org.dspace.xoai.app.CCElementAdditional"/>
+	<!-- For large repository the strategy used to retrieve Creative Commons information could be degraded the indexing performance.
+		Tested it on a repository of 163K items and the full reindex process takes 2 hours more - the full reindex process without this takes 1 hour. -->
+	<!-- <bean id="CCElementAdditional"
+	class="org.dspace.xoai.app.CCElementAdditional"/> -->
 </beans>
