@@ -307,6 +307,7 @@
                 <script type="text/x-mathjax-config">
                     MathJax.Hub.Config({
                       tex2jax: {
+                        inlineMath: [['$','$'], ['\\(','\\)']],
                         ignoreClass: "detail-field-data|detailtable|exception"
                       },
                       TeX: {
