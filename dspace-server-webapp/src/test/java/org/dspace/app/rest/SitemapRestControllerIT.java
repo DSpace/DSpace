@@ -15,7 +15,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import org.dspace.app.rest.model.RestModel;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
@@ -27,7 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.MvcResult;
 
 /**
- * Integration test to test the /api/discover/sitemaps/{name} endpoint, see {@link SitemapRestController}
+ * Integration test to test the /sitemaps/{name} endpoint, see {@link SitemapRestController}
  *
  * @author Maria Verdonck (Atmire) on 08/07/2020
  */
@@ -36,7 +35,7 @@ public class SitemapRestControllerIT extends AbstractControllerIntegrationTest {
     @Autowired
     ConfigurationService configurationService;
 
-    private final static String SITEMAPS_ENDPOINT = "/api/" + RestModel.DISCOVER + "/sitemaps";
+    private final static String SITEMAPS_ENDPOINT = "/sitemaps";
 
     private Item item1;
     private Item item2;
@@ -86,7 +85,7 @@ public class SitemapRestControllerIT extends AbstractControllerIntegrationTest {
                                       .andReturn();
 
         String response = result.getResponse().getContentAsString();
-        // contains a link to /api/discover/sitemaps/sitemap0.html
+        // contains a link to /sitemaps/sitemap0.html
         assertTrue(response.contains(SITEMAPS_ENDPOINT + "/sitemap0.html"));
     }
 
@@ -119,7 +118,7 @@ public class SitemapRestControllerIT extends AbstractControllerIntegrationTest {
                                       .andReturn();
 
         String response = result.getResponse().getContentAsString();
-        // contains a link to /api/discover/sitemaps/sitemap0.html
+        // contains a link to /sitemaps/sitemap0.html
         assertTrue(response.contains(SITEMAPS_ENDPOINT + "/sitemap0.xml"));
     }
 

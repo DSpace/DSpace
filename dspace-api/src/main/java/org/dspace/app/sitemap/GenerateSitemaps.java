@@ -61,7 +61,7 @@ public class GenerateSitemaps {
     private static final ConfigurationService configurationService =
         DSpaceServicesFactory.getInstance().getConfigurationService();
 
-    public static final String SITEMAPS_ENDPOINT = "/api/discover/sitemaps";
+    public static final String SITEMAPS_ENDPOINT = "/sitemaps";
 
     /**
      * Default constructor
