@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import org.apache.commons.lang3.ObjectUtils;
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.authorization.Authorization;
@@ -155,7 +156,7 @@ public class AuthorizationRestRepository extends DSpaceRestRepository<Authorizat
         EPerson currUser = context.getCurrentUser();
         // get the user specified in the requested parameters, can be null for anonymous
         EPerson user = getUserFromRequestParameter(context, epersonUuid);
-        if (currUser != user) {
+        if (ObjectUtils.notEqual(currUser, user)) {
             // Temporarily change the Context's current user in order to retrieve
             // authorizations based on that user
             context.switchContextUser(user);
@@ -173,7 +174,7 @@ public class AuthorizationRestRepository extends DSpaceRestRepository<Authorizat
             // restore the real current user
             context.restoreContextUser();
         }
-        return converter.toRestPage(utils.getPage(authorizations, pageable), utils.obtainProjection());
+        return converter.toRestPage(authorizations, pageable, utils.obtainProjection());
     }
 
     /**

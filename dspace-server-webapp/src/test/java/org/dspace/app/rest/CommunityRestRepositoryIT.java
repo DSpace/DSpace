@@ -33,7 +33,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.dspace.app.rest.builder.CollectionBuilder;
 import org.dspace.app.rest.builder.CommunityBuilder;
 import org.dspace.app.rest.builder.EPersonBuilder;
-import org.dspace.app.rest.converter.ConverterService;
+import org.dspace.app.rest.converter.CommunityConverter;
 import org.dspace.app.rest.matcher.CollectionMatcher;
 import org.dspace.app.rest.matcher.CommunityMatcher;
 import org.dspace.app.rest.matcher.HalMatcher;
@@ -66,7 +66,7 @@ import org.springframework.test.web.servlet.MvcResult;
 public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     @Autowired
-    ConverterService converter;
+    CommunityConverter communityConverter;
 
     @Autowired
     CommunityService communityService;
@@ -357,6 +357,7 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
                                            .withName("Sub Community")
                                            .build();
 
+        context.restoreAuthSystemState();
 
         getClient().perform(get("/api/core/communities").param("size", "2")
                                                         .param("embed", CommunityMatcher.getFullEmbedsParameters()))
@@ -429,6 +430,8 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
         context.turnOffAuthorisationSystem();
         parentCommunity = CommunityBuilder.createCommunity(context).withName("test").build();
 
+        context.restoreAuthSystemState();
+
         getClient().perform(get("/api/core/communities")
                       .param("embed", CommunityMatcher.getFullEmbedsParameters()))
                 .andExpect(status().isOk())
@@ -462,6 +465,8 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
         Community community3 = CommunityBuilder.createCommunity(context)
             .withName(orderedTitles.get(2))
             .build();
+
+        context.restoreAuthSystemState();
 
         ObjectMapper mapper = new ObjectMapper();
         MvcResult result = getClient().perform(get("/api/core/communities")).andReturn();
@@ -1329,6 +1334,8 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
                                            .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
 
+        context.restoreAuthSystemState();
+
         getClient().perform(get("/api/core/communities/" + parentCommunity.getID().toString())
                       .param("embed", CommunityMatcher.getFullEmbedsParameters()))
                    .andExpect(status().isOk())
@@ -1349,9 +1356,11 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
 
         String token = getAuthToken(admin.getEmail(), password);
 
+        context.turnOffAuthorisationSystem();
+
         ObjectMapper mapper = new ObjectMapper();
 
-        CommunityRest communityRest = converter.toRest(parentCommunity, Projection.DEFAULT);
+        CommunityRest communityRest = communityConverter.convert(parentCommunity, Projection.DEFAULT);
 
         communityRest.setMetadata(new MetadataRest()
                 .put("dc.title", new MetadataValueRest("Electronic theses and dissertations")));
@@ -1551,6 +1560,8 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
                                            .withName("Sub Community")
                                            .build();
 
+        context.restoreAuthSystemState();
+
         getClient().perform(get("/api/core/communities/" + parentCommunity.getID().toString())
                       .param("embed", CommunityMatcher.getFullEmbedsParameters()))
                    .andExpect(status().isOk())
@@ -1569,9 +1580,11 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
                    .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/core/communities")))
         ;
 
+        context.turnOffAuthorisationSystem();
+
         ObjectMapper mapper = new ObjectMapper();
 
-        CommunityRest communityRest = converter.toRest(parentCommunity, Projection.DEFAULT);
+        CommunityRest communityRest = communityConverter.convert(parentCommunity, Projection.DEFAULT);
 
         communityRest.setMetadata(new MetadataRest()
                 .put("dc.title", new MetadataValueRest("Electronic theses and dissertations")));

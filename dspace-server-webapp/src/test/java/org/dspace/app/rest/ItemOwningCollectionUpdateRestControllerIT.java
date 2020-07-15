@@ -52,7 +52,7 @@ public class ItemOwningCollectionUpdateRestControllerIT extends AbstractControll
                                       .withAuthor("Smith, Donald")
                                       .build();
 
-
+        context.restoreAuthSystemState();
         //When we call this owningCollection/move endpoint
         getClient().perform(
                 put("/api/core/items/" + publicItem1.getID() + "/owningCollection/")
@@ -85,6 +85,7 @@ public class ItemOwningCollectionUpdateRestControllerIT extends AbstractControll
                                       .withAuthor("Smith, Donald")
                                       .build();
 
+        context.restoreAuthSystemState();
         String token = getAuthToken(admin.getEmail(), password);
 
 
@@ -140,6 +141,7 @@ public class ItemOwningCollectionUpdateRestControllerIT extends AbstractControll
                                                   .withAction(Constants.ADD)
                                                   .withDspaceObject(col2).build();
 
+        context.restoreAuthSystemState();
         String token = getAuthToken(itemMoveEperson.getEmail(), "test");
 
         getClient(token)
@@ -186,7 +188,7 @@ public class ItemOwningCollectionUpdateRestControllerIT extends AbstractControll
                                                   .withAction(Constants.WRITE)
                                                   .withDspaceObject(publicItem1).build();
 
-
+        context.restoreAuthSystemState();
         String token = getAuthToken(itemMoveEperson.getEmail(), "test");
 
         getClient(token).perform(put("/api/core/items/" + publicItem1.getID() + "/owningCollection/")
@@ -227,7 +229,7 @@ public class ItemOwningCollectionUpdateRestControllerIT extends AbstractControll
                                                   .withAction(Constants.ADD)
                                                   .withDspaceObject(col2).build();
 
-
+        context.restoreAuthSystemState();
         String token = getAuthToken(itemMoveEperson.getEmail(), "test");
 
         getClient(token).perform(put("/api/core/items/" + publicItem1.getID() + "/owningCollection/")
@@ -268,7 +270,7 @@ public class ItemOwningCollectionUpdateRestControllerIT extends AbstractControll
                                                   .withAction(Constants.ADD)
                                                   .withDspaceObject(col2).build();
 
-
+        context.restoreAuthSystemState();
         String token = getAuthToken(itemMoveEperson.getEmail(), "test");
 
         getClient(token).perform(put("/api/core/items/" + publicItem1.getID() + "/owningCollection/")
