@@ -26,6 +26,14 @@
 					<xsl:value-of select="." />
 				</datacite:title>
 			</xsl:for-each>
+
+			<!-- dc.title.alternative -->
+			<xsl:for-each
+				select="doc:metadata/doc:element[@name='dc']/doc:element[@name='title']/doc:element[@name='alternative']/doc:element/doc:field[@name='value']">
+				<datacite:title titleType="AlternativeTitle">
+					<xsl:value-of select="." />
+				</datacite:title>
+			</xsl:for-each>
 			
             <!-- datacite:creator -->
             <xsl:apply-templates
@@ -39,19 +47,16 @@
 			</datacite:date>
 			
 			<!-- EMBARGO PERIOD DATES -->
-
 			<xsl:if test="contains(doc:metadata/doc:element[@name='others']/doc:field[@name='drm']/text(),'embargoed')">
-                <datacite:dates>
-                    <datacite:date>
-                    	<xsl:attribute name="Accepted"/>
-                        <xsl:value-of select="substring-after(doc:metadata/doc:element[@name='others']/doc:field[@name='drm']/text(),'|||')"/>
-                    </datacite:date>    
-                    <datacite:date>
-                    	<xsl:attribute name="Available"/>
-                        <xsl:value-of select="doc:metadata/doc:element[@name='dc']/doc:element[@name='date']/doc:element[@name='accessioned']/doc:element/doc:field[@name='value']/text()"/>
-                    </datacite:date>    
-                </datacite:dates>
-            </xsl:if>
+				<datacite:dates>
+					<datacite:date dateType="Accepted">
+						<xsl:value-of select="substring-before(doc:metadata/doc:element[@name='dc']/doc:element[@name='date']/doc:element[@name='accessioned']/doc:element/doc:field[@name='value']/text(), 'T')"/>
+					</datacite:date>
+					<datacite:date dateType="Available">
+						<xsl:value-of select="substring-after(doc:metadata/doc:element[@name='others']/doc:field[@name='drm']/text(),'|||')"/>
+					</datacite:date>
+				</datacite:dates>
+			</xsl:if>
 
 			<!-- RESOURCE IDENTIFIER - HANDLE -->
 			<datacite:identifier>
@@ -207,14 +212,23 @@
 				<xsl:if test="doc:field[@name='name']/text() = 'ORIGINAL'">
 					<xsl:for-each
 						select="doc:element[@name='bitstreams']/doc:element">
+						<xsl:variable name="accessRightsURI">
+							<xsl:call-template name="resolveRightsURI">
+								<xsl:with-param name="field"
+										select="doc:field[@name='drm']" />
+							</xsl:call-template>
+						</xsl:variable>
 						<oaire:file>
-							<xsl:attribute name="accessRightsURI">
-								<xsl:value-of select="doc:field[@name='drm']/text()"/>
-							</xsl:attribute>
+							<xsl:if test="$accessRightsURI">
+								<xsl:attribute name="accessRightsURI">
+									<xsl:value-of select="$accessRightsURI" />
+								</xsl:attribute>
+							</xsl:if>
 							<xsl:attribute name="mimeType">
 								<xsl:value-of
 									select="doc:field[@name='format']/text()"/>
 							</xsl:attribute>
+							<xsl:value-of select="doc:field[@name='url']"/>
 						</oaire:file>
 					</xsl:for-each>
 				</xsl:if>
@@ -281,7 +295,9 @@
 			<datacite:sizes>
 				<xsl:for-each
 					select="doc:element[@name='bitstreams']/doc:element[@name='bitstream']">
-		            <xsl:value-of select="concat(doc:field[@name='size'],' bytes')"/>
+					<datacite:size>
+						<xsl:value-of select="concat(doc:field[@name='size'],' bytes')"/>
+					</datacite:size>
 				</xsl:for-each>
 			</datacite:sizes>
 		</xsl:if>
@@ -349,7 +365,7 @@
 		</xsl:variable>
 		<datacite:rights>
 			<xsl:if test="$rightsURI">
-				<xsl:attribute name="uri">
+				<xsl:attribute name="rightsURI">
                 <xsl:value-of select="$rightsURI" />
             </xsl:attribute>
 			</xsl:if>

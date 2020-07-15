@@ -87,7 +87,7 @@ public class PermissionElementAdditional implements XOAIItemCompilePlugin {
 			if (bitstream == null) {
 				return value;
 			}
-			value = ItemUtils.getAccessRightsValue(AuthorizeManager.getPoliciesActionFilter(context, bitstream, Constants.READ));
+			value = ItemUtils.getAccessRightsValue(context, AuthorizeManager.getPoliciesActionFilter(context, bitstream, Constants.READ));
 		}
 		return value;
 	}
