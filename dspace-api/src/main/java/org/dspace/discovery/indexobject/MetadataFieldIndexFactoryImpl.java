@@ -20,6 +20,8 @@ import org.dspace.content.MetadataField;
 import org.dspace.content.service.MetadataFieldService;
 import org.dspace.core.Context;
 import org.dspace.discovery.indexobject.factory.MetadataFieldIndexFactory;
+import org.dspace.eperson.Group;
+import org.dspace.eperson.service.GroupService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -29,6 +31,9 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class MetadataFieldIndexFactoryImpl extends IndexFactoryImpl<IndexableMetadataField, MetadataField>
     implements MetadataFieldIndexFactory {
+
+    @Autowired
+    protected GroupService groupService;
 
     @Override
     public SolrInputDocument buildDocument(Context context, IndexableMetadataField indexableObject) throws SQLException,
@@ -46,6 +51,9 @@ public class MetadataFieldIndexFactoryImpl extends IndexFactoryImpl<IndexableMet
         String fieldName = metadataField.toString().replace('_', '.');
         addFacetIndex(doc, "fieldName", fieldName, fieldName);
         addNamedResourceTypeIndex(doc, indexableObject.getTypeText());
+        Group anonymousGroup = groupService.findByName(context, Group.ANONYMOUS);
+        // add read permission on doc for anonymous group
+        doc.addField("read", "g" + anonymousGroup.getID());
         return doc;
     }
 
