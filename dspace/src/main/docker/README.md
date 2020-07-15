@@ -27,7 +27,7 @@ This image deploys two DSpace webapps:
 docker build -t dspace/dspace:dspace-7_x-test -f Dockerfile.test .
 ```
 
-This image is built *automatically* after each commit is made to the `master` branch.
+This image is built *automatically* after each commit is made to the `main` branch.
 
 A corresponding image exists for DSpace 4-6.
 
@@ -46,7 +46,7 @@ This image deploys two DSpace webapps:
 docker build -t dspace/dspace:dspace-7_x -f Dockerfile .
 ```
 
-This image is built *automatically* after each commit is made to the `master` branch.
+This image is built *automatically* after each commit is made to the `main` branch.
 
 A corresponding image exists for DSpace 4-6.
 
@@ -62,7 +62,7 @@ This Dockerfile builds a DSpace 7 CLI image, which can be used to run commandlin
 docker build -t dspace/dspace-cli:dspace-7_x -f Dockerfile.cli .
 ```
 
-This image is built *automatically* after each commit is made to the master branch.
+This image is built *automatically* after each commit is made to the `main` branch.
 
 A corresponding image exists for DSpace 6.
 

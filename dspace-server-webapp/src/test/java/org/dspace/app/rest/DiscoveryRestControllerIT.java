@@ -142,6 +142,8 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 .withSubject("ExtraEntry")
                 .build();
 
+        context.restoreAuthSystemState();
+
         //** WHEN **
         //An anonymous user browses this endpoint to find the objects in the system and enters a size of 2
         getClient().perform(get("/api/discover/facets/author")
@@ -211,6 +213,8 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 .withAuthor("Smith, Maria").withAuthor("Doe, Jane").withAuthor("test,test")
                 .withAuthor("test2, test2").withAuthor("Maybe, Maybe")
                 .build();
+
+        context.restoreAuthSystemState();
 
         //** WHEN **
         //An anonymous user browses this endpoint to find the objects in the system and enters a size of 2
@@ -283,6 +287,8 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 .withSubject("AnotherTest").withSubject("TestingForMore")
                 .withSubject("ExtraEntry")
                 .build();
+
+        context.restoreAuthSystemState();
 
         //** WHEN **
         //An anonymous user browses this endpoint to find the authors by the facets and doesn't enter a size
@@ -357,6 +363,8 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 .withSubject("ExtraEntry")
                 .build();
 
+        context.restoreAuthSystemState();
+
         //** WHEN **
         //An anonymous user browses this endpoint to find the authors by the facet
         //The user enters a size of two and wants to see page 1, this is the second page.
@@ -429,6 +437,9 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 .withSubject("AnotherTest").withSubject("TestingForMore")
                 .withSubject("ExtraEntry")
                 .build();
+
+        context.restoreAuthSystemState();
+
         //** WHEN **
         //An anonymous user browses this endpoint to find the authors by the facet
         //The user enters a small query, namely the title has to contain 'test'
@@ -510,6 +521,9 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 .withSubject("AnotherTest").withSubject("TestingForMore")
                 .withSubject("ExtraEntry")
                 .build();
+
+        context.restoreAuthSystemState();
+
         //** WHEN **
         //An anonymous user browses this endpoint to find the dateIssued results by the facet
         getClient().perform(get("/api/discover/facets/dateIssued"))
@@ -577,6 +591,8 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 .withSubject("AnotherTest").withSubject("TestingForMore")
                 .withSubject("ExtraEntry")
                 .build();
+
+        context.restoreAuthSystemState();
 
         //** WHEN **
         //An anonymous user browses this endpoint to find the author results by the facet
@@ -710,6 +726,8 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 .withSubject("ExtraEntry")
                 .build();
 
+        context.restoreAuthSystemState();
+
         //** WHEN **
         //An anonymous user browses this endpoint to find the dateIssued results by the facet
         //And a size of 2
@@ -785,6 +803,9 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 .withSubject("AnotherTest").withSubject("TestingForMore")
                 .withSubject("ExtraEntry")
                 .build();
+
+        context.restoreAuthSystemState();
+
         //** WHEN **
         //An anonymous user browses this endpoint to find the dateIssued results by the facet
         //With a query stating that the title needs to contain 'test'
@@ -904,6 +925,8 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 .withSubject("ExtraEntry")
                 .build();
 
+        context.restoreAuthSystemState();
+
         //** WHEN **
         //An anonymous user browses this endpoint to find the objects in the system
         getClient().perform(get("/api/discover/search/objects"))
@@ -985,6 +1008,8 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 .withSubject("AnotherTest").withSubject("TestingForMore")
                 .withSubject("ExtraEntry")
                 .build();
+
+        context.restoreAuthSystemState();
 
         //** WHEN **
         //An anonymous user browses this endpoint to find the objects in the system
@@ -1076,6 +1101,8 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 .withSubject("ExtraEntry")
                 .build();
 
+        context.restoreAuthSystemState();
+
         //** WHEN **
         //An anonymous user browses this endpoint to find the the objects in the system
         getClient().perform(get("/api/discover/search/objects"))
@@ -1154,6 +1181,8 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 .withAuthor("Smith, Maria").withAuthor("Doe, Jane").withAuthor("test,test")
                 .withAuthor("test2, test2").withAuthor("Maybe, Maybe")
                 .build();
+
+        context.restoreAuthSystemState();
 
         //** WHEN **
         //An anonymous user browses this endpoint to find the the objects in the system
@@ -1235,6 +1264,9 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 .withSubject("AnotherTest").withSubject("TestingForMore")
                 .withSubject("ExtraEntry")
                 .build();
+
+        context.restoreAuthSystemState();
+
         //** WHEN **
         //An anonymous user browses this endpoint to find the the objects in the system
         //With a scope 'test'
@@ -1317,6 +1349,8 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 .withSubject("ExtraEntry")
                 .build();
 
+        context.restoreAuthSystemState();
+
         //** WHEN **
         //An anonymous user browses this endpoint to find the the objects in the system
         //With a dsoType 'item'
@@ -1392,6 +1426,8 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 .withSubject("AnotherTest").withSubject("TestingForMore")
                 .withSubject("ExtraEntry")
                 .build();
+
+        context.restoreAuthSystemState();
 
         //** WHEN **
         //An anonymous user browses this endpoint to find the the objects in the system
@@ -1537,6 +1573,8 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 .withSubject("ExtraEntry")
                 .build();
 
+        context.restoreAuthSystemState();
+
         //** WHEN **
         //An anonymous user browses this endpoint to find dateIssued facet values
         getClient().perform(get("/api/discover/facets/dateIssued"))
@@ -1610,6 +1648,8 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 .withSubject("d").withSubject("e").withSubject("f").withSubject("g")
                 .withSubject("h").withSubject("i").withSubject("j")
                 .build();
+
+        context.restoreAuthSystemState();
 
         //** WHEN **
         //An anonymous user browses this endpoint to find the the objects in the system
@@ -1701,6 +1741,8 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
 
         //Run the filter media to make the text in the bitstream searchable through the query
         runDSpaceScript("filter-media", "-f", "-i", publicItem1.getHandle());
+
+        context.restoreAuthSystemState();
 
         //** WHEN **
         //An anonymous user browses this endpoint to find the the objects in the system
@@ -1947,6 +1989,8 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 .withSubject("ExtraEntry")
                 .build();
 
+        context.restoreAuthSystemState();
+
         UUID scope = col2.getID();
         //** WHEN **
         //An anonymous user browses this endpoint to find the the objects in the system
@@ -2023,6 +2067,8 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 .withSubject("ExtraEntry")
                 .makeUnDiscoverable()
                 .build();
+
+        context.restoreAuthSystemState();
 
         UUID scope = col2.getID();
         //** WHEN **
@@ -2104,6 +2150,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 .withSubject("AnotherTest").withSubject("ExtraEntry")
                 .build();
 
+        context.restoreAuthSystemState();
 
         String query = "Public";
         //** WHEN **
@@ -2181,6 +2228,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 .makeUnDiscoverable()
                 .build();
 
+        context.restoreAuthSystemState();
 
         String query = "Public";
         //** WHEN **
@@ -2247,6 +2295,8 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 .withAuthor("test2, test2").withAuthor("Maybe, Maybe")
                 .withSubject("AnotherTest").withSubject("TestingForMore").withSubject("ExtraEntry")
                 .build();
+
+        context.restoreAuthSystemState();
 
         UUID scope = col2.getID();
         //** WHEN **
@@ -2320,6 +2370,8 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 .withAuthor("test2, test2").withAuthor("Maybe, Maybe")
                 .withSubject("AnotherTest").withSubject("TestingForMore").withSubject("ExtraEntry")
                 .build();
+
+        context.restoreAuthSystemState();
 
         UUID scope = col2.getID();
         //** WHEN **
@@ -2399,6 +2451,8 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 .withSubject("d").withSubject("e").withSubject("f").withSubject("g")
                 .withSubject("h").withSubject("i").withSubject("j")
                 .build();
+
+        context.restoreAuthSystemState();
 
         //** WHEN **
         //An anonymous user browses this endpoint to find the the objects in the system
@@ -2483,6 +2537,8 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 .withSubject("h").withSubject("i").withSubject("j")
                 .build();
 
+        context.restoreAuthSystemState();
+
         //** WHEN **
         //An anonymous user browses this endpoint to find the the objects in the system
         //With a size 2
@@ -2542,6 +2598,8 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 .withAuthor("test2, test2").withAuthor("Maybe, Maybe")
                 .withSubject("AnotherTest").withSubject("TestingForMore").withSubject("ExtraEntry")
                 .build();
+
+        context.restoreAuthSystemState();
 
         UUID scope = col2.getID();
         //** WHEN **
@@ -2615,6 +2673,8 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 .withSubject("AnotherTest").withSubject("TestingForMore").withSubject("ExtraEntry")
                 .build();
 
+        context.restoreAuthSystemState();
+
         UUID scope = col2.getID();
         //** WHEN **
         //An anonymous user browses this endpoint to find the the objects in the system
@@ -2687,6 +2747,8 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 .withAuthor("test2, test2").withAuthor("Maybe, Maybe")
                 .withSubject("AnotherTest").withSubject("TestingForMore").withSubject("ExtraEntry")
                 .build();
+
+        context.restoreAuthSystemState();
 
         UUID scope = col2.getID();
         //** WHEN **
@@ -2773,6 +2835,8 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
         //Run the filter media to make the text in the bitstream searchable through the query
         runDSpaceScript("filter-media", "-f", "-i", publicItem1.getHandle());
 
+        context.restoreAuthSystemState();
+
         //** WHEN **
         getClient().perform(get("/api/discover/search/objects")
                                 .param("query", "dc.date.issued:\"2010-02-13\""))
@@ -2855,6 +2919,9 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                                       .withSubject("AnotherTest").withSubject("TestingForMore")
                                       .withSubject("ExtraEntry")
                                       .build();
+
+        context.restoreAuthSystemState();
+
         //** WHEN **
         getClient().perform(get("/api/discover/search/objects")
                                 .param("query", "((dc.date.issued:2010 OR dc.date.issued:1990-02-13)" +
@@ -2923,6 +2990,9 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                                       .withSubject("AnotherTest").withSubject("TestingForMore")
                                       .withSubject("ExtraEntry")
                                       .build();
+
+        context.restoreAuthSystemState();
+
         getClient().perform(get("/api/discover/search/objects")
                                 .param("query", "\"Faithful Infidel: Exploring Conformity (2nd edition)\""))
 
@@ -2990,6 +3060,9 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                                       .withSubject("AnotherTest").withSubject("TestingForMore")
                                       .withSubject("ExtraEntry")
                                       .build();
+
+        context.restoreAuthSystemState();
+
         //** WHEN **
         getClient().perform(get("/api/discover/search/objects")
                                 .param("query", "OR"))
@@ -3077,6 +3150,8 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
 
         XmlWorkflowItem wfItem1Admin = WorkflowItemBuilder.createWorkflowItem(context, col2)
                 .withTitle("Admin Workflow Item 1").build();
+
+        context.restoreAuthSystemState();
 
         //** WHEN **
         // An anonymous user, the submitter and the admin that browse this endpoint to find the public objects in the
@@ -3866,6 +3941,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                                       .makeUnDiscoverable()
                                       .build();
 
+        context.restoreAuthSystemState();
 
         String query = "Test";
         //** WHEN **

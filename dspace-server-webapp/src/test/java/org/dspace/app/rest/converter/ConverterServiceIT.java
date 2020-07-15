@@ -13,6 +13,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.HashMap;
@@ -31,11 +32,19 @@ import org.dspace.app.rest.model.hateoas.MockObjectResource;
 import org.dspace.app.rest.projection.MockProjection;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
+import org.dspace.core.Context;
+import org.dspace.services.RequestService;
+import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.Link;
+import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 /**
  * Tests functionality of {@link ConverterService}.
@@ -57,6 +66,26 @@ public class ConverterServiceIT extends AbstractControllerIntegrationTest {
     @Mock
     private Object mockEmbeddedResource;
 
+    @Autowired
+    private RequestService requestService;
+
+    @Before
+    public void setup() {
+        // We're mocking a request here because we've started using the Context in the ConverterService#toRest
+        // method by invoking the DSpacePermissionEvaluator. This will traverse the RestPermissionEvaluatorPlugins
+        // and thus also invoke the AdminRestPermissionEvaluator which will try to retrieve the Context from a
+        // Request. This Request isn't available through tests on itself and thus we have to mock it here to avoid
+        // the PermissionEvaluator from crashing because of this.
+        MockHttpServletRequest mockHttpServletRequest = new MockHttpServletRequest();
+        mockHttpServletRequest.setAttribute("dspace.context", new Context());
+        MockHttpServletResponse mockHttpServletResponse = new MockHttpServletResponse();
+        requestService.startRequest(mockHttpServletRequest, mockHttpServletResponse);
+        Authentication authentication = mock(Authentication.class);
+        SecurityContext securityContext = mock(SecurityContext.class);
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        SecurityContextHolder.setContext(securityContext);
+        when(SecurityContextHolder.getContext().getAuthentication().getPrincipal()).thenReturn(eperson);
+    }
     /**
      * When calling {@code toRest} with an object for which an appropriate {@link DSpaceConverter} can't be found,
      * it should throw an {@link IllegalArgumentException}.
@@ -83,6 +112,10 @@ public class ConverterServiceIT extends AbstractControllerIntegrationTest {
 
     /**
      * When calling {@code toRest} with the default projection, the converter should run and no changes should be made.
+     * This converter.toRest will now also check permissions through the PreAuthorize annotation on the
+     * Repository's findOne method. Therefor a repository has been added for this MockObjectRest namely
+     * {@link org.dspace.app.rest.repository.MockObjectRestRepository} and added PreAuthorize annotations
+     * on the methods of this Repository
      */
     @Test
     public void toRestWithDefaultProjection() {

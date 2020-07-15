@@ -163,9 +163,10 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
         }
     }
 
-    @SearchRestMethod(name = "findAuthorizedByCommunity")
-    public Page<CollectionRest> findAuthorizedByCommunity(
-        @Parameter(value = "uuid", required = true) UUID communityUuid, Pageable pageable) {
+    @SearchRestMethod(name = "findSubmitAuthorizedByCommunity")
+    public Page<CollectionRest> findSubmitAuthorizedByCommunity(
+        @Parameter(value = "uuid", required = true) UUID communityUuid, Pageable pageable,
+        @Parameter(value = "query") String q) {
         try {
             Context context = obtainContext();
             Community com = communityService.find(context, communityUuid);
@@ -174,19 +175,26 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
                     CommunityRest.CATEGORY + "." + CommunityRest.NAME + " with id: " + communityUuid
                         + " not found");
             }
-            List<Collection> collections = cs.findAuthorized(context, com, Constants.ADD);
-            return converter.toRestPage(utils.getPage(collections, pageable), utils.obtainProjection());
-        } catch (SQLException e) {
+            List<Collection> collections = cs.findCollectionsWithSubmit(q, context, com,
+                                              Math.toIntExact(pageable.getOffset()),
+                                              Math.toIntExact(pageable.getOffset() + pageable.getPageSize()));
+            int tot = cs.countCollectionsWithSubmit(q, context, com);
+            return converter.toRestPage(collections, pageable, tot , utils.obtainProjection());
+        } catch (SQLException | SearchServiceException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
     }
 
-    @SearchRestMethod(name = "findAuthorized")
-    public Page<CollectionRest> findAuthorized(Pageable pageable) {
+    @SearchRestMethod(name = "findSubmitAuthorized")
+    public Page<CollectionRest> findSubmitAuthorized(@Parameter(value = "query") String q,
+                                                Pageable pageable) throws SearchServiceException {
         try {
             Context context = obtainContext();
-            List<Collection> collections = cs.findAuthorizedOptimized(context, Constants.ADD);
-            return converter.toRestPage(utils.getPage(collections, pageable), utils.obtainProjection());
+            List<Collection> collections = cs.findCollectionsWithSubmit(q, context, null,
+                                              Math.toIntExact(pageable.getOffset()),
+                                              Math.toIntExact(pageable.getOffset() + pageable.getPageSize()));
+            int tot = cs.countCollectionsWithSubmit(q, context, null);
+            return converter.toRestPage(collections, pageable, tot, utils.obtainProjection());
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }

@@ -16,10 +16,13 @@ import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.converter.EPersonConverter;
 import org.dspace.app.rest.link.HalLinkService;
 import org.dspace.app.rest.model.AuthenticationStatusRest;
+import org.dspace.app.rest.model.AuthenticationTokenRest;
 import org.dspace.app.rest.model.AuthnRest;
 import org.dspace.app.rest.model.EPersonRest;
 import org.dspace.app.rest.model.hateoas.AuthenticationStatusResource;
+import org.dspace.app.rest.model.hateoas.AuthenticationTokenResource;
 import org.dspace.app.rest.model.hateoas.AuthnResource;
+import org.dspace.app.rest.model.wrapper.AuthenticationToken;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.security.RestAuthenticationService;
 import org.dspace.app.rest.utils.ContextUtil;
@@ -32,6 +35,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.Link;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -116,6 +120,30 @@ public class AuthenticationRestController implements InitializingBean {
         return getLoginResponse(request,
                                 "Authentication failed for user " + user + ": The credentials you provided are not " +
                                     "valid.");
+    }
+
+    /**
+     * This method will generate a short lived token to be used for bitstream downloads among other things.
+     *
+     * curl -v -X POST https://{dspace-server.url}/api/authn/shortlivedtokens -H "Authorization: Bearer eyJhbG...COdbo"
+     *
+     * Example:
+     * <pre>
+     * {@code
+     * curl -v -X POST https://{dspace-server.url}/api/authn/shortlivedtokens -H "Authorization: Bearer eyJhbG...COdbo"
+     * }
+     * </pre>
+     * @param request The StandardMultipartHttpServletRequest
+     * @return        The created short lived token
+     */
+    @PreAuthorize("hasAuthority('AUTHENTICATED')")
+    @RequestMapping(value = "/shortlivedtokens", method = RequestMethod.POST)
+    public AuthenticationTokenResource shortLivedToken(HttpServletRequest request) {
+        Projection projection = utils.obtainProjection();
+        AuthenticationToken shortLivedToken =
+            restAuthenticationService.getShortLivedAuthenticationToken(ContextUtil.obtainContext(request), request);
+        AuthenticationTokenRest authenticationTokenRest = converter.toRest(shortLivedToken, projection);
+        return converter.toResource(authenticationTokenRest);
     }
 
     @RequestMapping(value = "/login", method = { RequestMethod.GET, RequestMethod.PUT, RequestMethod.PATCH,
