@@ -251,7 +251,7 @@ public class ItemUtils
                     String oname = bit.getSource();
                     String name = bit.getName();
                     String description = bit.getDescription();
-                    String drm = ItemUtils.getAccessRightsValue(authorizeService.getPoliciesActionFilter(context, bit,  Constants.READ));
+                    String drm = ItemUtils.getAccessRightsValue(context, authorizeService.getPoliciesActionFilter(context, bit,  Constants.READ));
                         
                     if (name != null)
                         bitstream.getField().add(
@@ -357,7 +357,8 @@ public class ItemUtils
 	 * @param rps
 	 * @return
 	 */
-	public static String getAccessRightsValue(List<ResourcePolicy> rps) {
+	public static String getAccessRightsValue(Context context, List<ResourcePolicy> rps)
+		throws SQLException {
 		Date now = new Date();
 		Date embargoEndDate = null;
 		boolean openAccess = false;
@@ -366,14 +367,14 @@ public class ItemUtils
 
 		if (rps != null) {
 			for (ResourcePolicy rp : rps) {
-				if (Group.ANONYMOUS.equals(rp.getGroup().getName())) {
+				if (rp.getGroup() != null && Group.ANONYMOUS.equals(rp.getGroup().getName())) {
 					if (resourcePolicyService.isDateValid(rp)) {
 						openAccess = true;
 					} else if (rp.getStartDate() != null && rp.getStartDate().after(now)) {
 						withEmbargo = true;
 						embargoEndDate = rp.getStartDate();
 					}
-				} else if (!Group.ADMIN.equals(rp.getGroup().getName())) {
+				} else if (rp.getGroup() != null && !Group.ADMIN.equals(rp.getGroup().getName())) {
 					if (resourcePolicyService.isDateValid(rp)) {
 						groupRestricted = true;
 					} else if (rp.getStartDate() == null || rp.getStartDate().after(now)) {
@@ -381,6 +382,7 @@ public class ItemUtils
 						embargoEndDate = rp.getStartDate();
 					}
 				}
+				context.uncacheEntity(rp);
 			}
 		}
 		String value = METADATA_ONLY_ACCESS;

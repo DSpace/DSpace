@@ -58,7 +58,9 @@ public class CCElementAdditional implements XOAIItemCompilePlugin {
 		} catch (SQLException | IOException | AuthorizeException e) {
 			log.error(e.getMessage(), e);
 		}
-		other.getField().add(ItemUtils.createValue("cc", ccLicense));
+		if (StringUtils.isNotBlank(ccLicense)) {
+			other.getField().add(ItemUtils.createValue("cc", ccLicense));
+		}
 		return metadata;
 	}
 
