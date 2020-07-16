@@ -22,7 +22,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.util.DCInputsReader;
 import org.dspace.app.util.DCInputsReaderException;
-import org.dspace.content.Collection;
 import org.dspace.core.Context;
 import org.dspace.core.I18nUtil;
 import org.dspace.core.SelfNamedPlugin;
