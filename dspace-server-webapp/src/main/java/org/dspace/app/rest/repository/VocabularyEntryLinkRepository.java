@@ -23,7 +23,6 @@ import org.dspace.content.authority.Choice;
 import org.dspace.content.authority.ChoiceAuthority;
 import org.dspace.content.authority.Choices;
 import org.dspace.content.authority.service.ChoiceAuthorityService;
-import org.dspace.content.service.CollectionService;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -46,9 +45,6 @@ public class VocabularyEntryLinkRepository extends AbstractDSpaceRestRepository
     private ChoiceAuthorityService cas;
 
     @Autowired
-    private CollectionService cs;
-
-    @Autowired
     private AuthorityUtils authorityUtils;
 
     @PreAuthorize("hasAuthority('AUTHENTICATED')")
@@ -63,14 +59,6 @@ public class VocabularyEntryLinkRepository extends AbstractDSpaceRestRepository
             throw new IllegalArgumentException("required only one of the parameters: filter or entryID");
         }
 
-        // validate the parameters
-        String[] tokens = org.dspace.core.Utils.tokenize(metadata);
-        String vocName = cas.getChoiceAuthorityName(tokens[0], tokens[1], tokens[2], collection);
-        if (!StringUtils.equals(name, vocName)) {
-            throw new UnprocessableEntityException("The vocabulary " + name + " is not allowed for the metadata "
-                    + metadata + " and collection " + uuidCollectìon);
-        }
-        checkIfScrollableAndFiltrNotBlank(filter, entryID, vocName);
         Pageable pageable = utils.getPageable(optionalPageable);
         List<VocabularyEntryRest> results = new ArrayList<>();
         ChoiceAuthority ca = cas.getChoiceAuthorityByAuthorityName(name);
@@ -101,18 +89,5 @@ public class VocabularyEntryLinkRepository extends AbstractDSpaceRestRepository
             results.add(authorityUtils.convertEntry(value, name, storeAuthority, projection));
         }
         return new PageImpl<>(results, pageable, choices.total);
-    }
-
-    private void checkIfScrollableAndFiltrNotBlank(String filter, String entryID, String authorityName) {
-        ChoiceAuthority ma = cas.getChoiceAuthorityByAuthorityName(authorityName);
-        if (ma == null) {
-            throw new IllegalArgumentException(
-                "No choices plugin was configured for authorityName \"" + authorityName
-                    + "\".");
-        }
-        if ((!ma.isScrollable() && StringUtils.isBlank(filter)) ||
-            (!ma.isScrollable() && StringUtils.isBlank(filter))) {
-            throw new UnprocessableEntityException("If the authority is not scrollable, the query is mandatory!");
-        }
     }
 }

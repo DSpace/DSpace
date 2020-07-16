@@ -12,7 +12,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.dspace.content.Collection;
 import org.dspace.core.Context;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.factory.EPersonServiceFactory;
@@ -28,12 +27,12 @@ public class GroupAuthority implements ChoiceAuthority {
     private GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
 
     @Override
-    public Choices getBestMatch(String field, String text, Collection collection, String locale) {
-        return getMatches(field, text, collection, 0, 2, locale);
+    public Choices getBestMatch(String text, String locale) {
+        return getMatches(text, 0, 2, locale);
     }
 
     @Override
-    public Choices getMatches(String field, String text, Collection collection, int start, int limit, String locale) {
+    public Choices getMatches(String text, int start, int limit, String locale) {
         Context context = null;
         if (limit <= 0) {
             limit = 20;
@@ -57,6 +56,18 @@ public class GroupAuthority implements ChoiceAuthority {
 
     @Override
     public String getLabel(String key, String locale) {
+        // TODO Auto-generated method stub
         return null;
+    }
+
+    @Override
+    public String getPluginInstanceName() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public void setPluginInstanceName(String name) {
+        // TODO Auto-generated method stub
     }
 }
