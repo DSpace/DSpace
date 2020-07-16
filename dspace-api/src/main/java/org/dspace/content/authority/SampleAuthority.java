@@ -7,13 +7,13 @@
  */
 package org.dspace.content.authority;
 
-import org.dspace.content.Collection;
-
 /**
  * This is a *very* stupid test fixture for authority control, and also
  * serves as a trivial example of an authority plugin implementation.
  */
 public class SampleAuthority implements ChoiceAuthority {
+    private String pluginInstanceName;
+
     protected static String values[] = {
         "sun",
         "mon",
@@ -35,7 +35,7 @@ public class SampleAuthority implements ChoiceAuthority {
     };
 
     @Override
-    public Choices getMatches(String field, String query, Collection collection, int start, int limit, String locale) {
+    public Choices getMatches(String query, int start, int limit, String locale) {
         int dflt = -1;
         Choice v[] = new Choice[values.length];
         for (int i = 0; i < values.length; ++i) {
@@ -48,7 +48,7 @@ public class SampleAuthority implements ChoiceAuthority {
     }
 
     @Override
-    public Choices getBestMatch(String field, String text, Collection collection, String locale) {
+    public Choices getBestMatch(String text, String locale) {
         for (int i = 0; i < values.length; ++i) {
             if (text.equalsIgnoreCase(values[i])) {
                 Choice v[] = new Choice[1];
@@ -62,5 +62,15 @@ public class SampleAuthority implements ChoiceAuthority {
     @Override
     public String getLabel(String key, String locale) {
         return labels[Integer.parseInt(key)];
+    }
+
+    @Override
+    public String getPluginInstanceName() {
+        return pluginInstanceName;
+    }
+
+    @Override
+    public void setPluginInstanceName(String name) {
+        this.pluginInstanceName = name;
     }
 }

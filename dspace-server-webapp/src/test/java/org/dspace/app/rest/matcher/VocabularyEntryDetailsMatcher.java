@@ -25,12 +25,12 @@ public class VocabularyEntryDetailsMatcher {
     public static Matcher<? super Object> matchAuthorityEntry(String id, String display, String value) {
         return allOf(
             matchProperties(id, display, value),
-            matchLinks());
+            matchLinks(id));
     }
 
-    public static Matcher<? super Object> matchLinks() {
+    public static Matcher<? super Object> matchLinks(String id) {
         return allOf(
-            hasJsonPath("$._links.self.href", containsString("api/submission/vocabularyEntryDetails/")));
+            hasJsonPath("$._links.self.href", containsString("api/submission/vocabularyEntryDetails/" + id)));
     }
 
     private static Matcher<? super Object> matchProperties(String id, String display, String value) {

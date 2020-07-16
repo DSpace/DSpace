@@ -21,7 +21,6 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 public class SubmissionFormInputTypeRest {
     private String type;
     private String regex;
-    private VocabularyRest authority;
 
     public String getType() {
         return type;
@@ -39,11 +38,4 @@ public class SubmissionFormInputTypeRest {
         this.regex = regex;
     }
 
-    public VocabularyRest getAuthority() {
-        return authority;
-    }
-
-    public void setAuthority(VocabularyRest authority) {
-        this.authority = authority;
-    }
 }

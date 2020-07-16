@@ -21,11 +21,10 @@ import org.dspace.app.rest.RestResourceController;
         @LinkRest(name = VocabularyEntryDetailsRest.PARENT, method = "getParent"),
         @LinkRest(name = VocabularyEntryDetailsRest.CHILDREN, method = "getChildren")
         })
-public class VocabularyEntryDetailsRest extends RestAddressableModel {
+public class VocabularyEntryDetailsRest extends BaseObjectRest<String> {
     public static final String NAME = "vocabularyEntryDetail";
     public static final String PARENT = "parent";
     public static final String CHILDREN = "children";
-    private String id;
     private String display;
     private String value;
     private Map<String, String> otherInformation;
@@ -35,14 +34,6 @@ public class VocabularyEntryDetailsRest extends RestAddressableModel {
 
     @JsonIgnore
     private String vocabularyName;
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
 
     public String getDisplay() {
         return display;
