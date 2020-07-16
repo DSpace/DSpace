@@ -207,11 +207,6 @@ public class ItemAuthorityTest extends AbstractControllerIntegrationTest {
     public void ePersonAuthorityTest() throws Exception {
        context.turnOffAuthorisationSystem();
 
-       parentCommunity = CommunityBuilder.createCommunity(context).build();
-       Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
-                                          .withName("Test collection")
-                                          .build();
-
        EPerson ePerson1 = EPersonBuilder.createEPerson(context)
                                         .withNameInMetadata("Andrea", "Bollini")
                                         .withEmail("Andrea.Bollini@example.com")
@@ -236,8 +231,6 @@ public class ItemAuthorityTest extends AbstractControllerIntegrationTest {
 
        String token = getAuthToken(eperson.getEmail(), password);
        getClient(token).perform(get("/api/submission/vocabularies/EPersonAuthority/entries")
-                       .param("metadata", "cris.policy.eperson")
-                       .param("collection", col1.getID().toString())
                        .param("filter", "Andrea"))
                        .andExpect(status().isOk())
                 .andExpect(jsonPath("$._embedded.entries", Matchers.containsInAnyOrder(
@@ -258,11 +251,6 @@ public class ItemAuthorityTest extends AbstractControllerIntegrationTest {
     public void ePersonAuthorityNoComparisonTest() throws Exception {
        context.turnOffAuthorisationSystem();
 
-       parentCommunity = CommunityBuilder.createCommunity(context).build();
-       Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
-                                          .withName("Test collection")
-                                          .build();
-
        EPerson ePerson1 = EPersonBuilder.createEPerson(context)
                                         .withNameInMetadata("Andrea", "Bollini")
                                         .withEmail("Andrea.Bollini@example.com")
@@ -277,8 +265,6 @@ public class ItemAuthorityTest extends AbstractControllerIntegrationTest {
 
        String token = getAuthToken(eperson.getEmail(), password);
        getClient(token).perform(get("/api/submission/vocabularies/EPersonAuthority/entries")
-                       .param("metadata", "cris.policy.eperson")
-                       .param("collection", col1.getID().toString())
                        .param("filter", "wrong text"))
                        .andExpect(status().isOk())
                 .andExpect(jsonPath("$.page.totalElements", Matchers.is(0)));
@@ -288,11 +274,6 @@ public class ItemAuthorityTest extends AbstractControllerIntegrationTest {
     public void ePersonAuthorityEmptyQueryTest() throws Exception {
        context.turnOffAuthorisationSystem();
 
-       parentCommunity = CommunityBuilder.createCommunity(context).build();
-       Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
-                                          .withName("Test collection")
-                                          .build();
-
        EPerson ePerson1 = EPersonBuilder.createEPerson(context)
                                         .withNameInMetadata("Andrea", "Bollini")
                                         .withEmail("Andrea.Bollini@example.com")
@@ -307,67 +288,21 @@ public class ItemAuthorityTest extends AbstractControllerIntegrationTest {
 
        String token = getAuthToken(eperson.getEmail(), password);
        getClient(token).perform(get("/api/submission/vocabularies/EPersonAuthority/entries")
-                       .param("metadata", "cris.policy.eperson")
-                       .param("collection", col1.getID().toString())
                        .param("filter", ""))
                        .andExpect(status().isUnprocessableEntity());
     }
 
     @Test
     public void ePersonAuthorityUnauthorizedTest() throws Exception {
-       context.turnOffAuthorisationSystem();
-
-       parentCommunity = CommunityBuilder.createCommunity(context).build();
-       Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
-                                          .withName("Test collection")
-                                          .build();
-
-       context.restoreAuthSystemState();
 
        getClient().perform(get("/api/submission/vocabularies/EPersonAuthority/entries")
-                  .param("metadata", "cris.policy.eperson")
-                  .param("collection", col1.getID().toString())
                   .param("filter", "wrong text"))
                   .andExpect(status().isUnauthorized());
     }
 
     @Test
-    public void ePersonAuthorityWrongMetadataTest() throws Exception {
-        context.turnOffAuthorisationSystem();
-
-        parentCommunity = CommunityBuilder.createCommunity(context).build();
-        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
-                                           .withName("Test collection")
-                                           .build();
-
-        EPerson ePerson1 = EPersonBuilder.createEPerson(context)
-                                         .withNameInMetadata("Andrea", "Bollini")
-                                         .withEmail("Andrea.Bollini@example.com")
-                                         .build();
-
-        EPerson ePerson2 = EPersonBuilder.createEPerson(context)
-                                         .withNameInMetadata("Mykhaylo", "Boychuk")
-                                         .withEmail("Mykhaylo.Boychuk@example.com")
-                                         .build();
-
-        context.restoreAuthSystemState();
-
-        String token = getAuthToken(eperson.getEmail(), password);
-        getClient(token).perform(get("/api/submission/vocabularies/EPersonAuthority/entries")
-                        .param("metadata", "wrong.metadata")
-                        .param("collection", col1.getID().toString())
-                        .param("filter", "Andrea"))
-                .andExpect(status().isUnprocessableEntity());
-    }
-
-    @Test
     public void groupAuthorityTest() throws Exception {
        context.turnOffAuthorisationSystem();
-
-       parentCommunity = CommunityBuilder.createCommunity(context).build();
-       Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
-                                          .withName("Test collection")
-                                          .build();
 
        Group simpleGroup = GroupBuilder.createGroup(context)
                                  .withName("Simple Group")
@@ -385,8 +320,6 @@ public class ItemAuthorityTest extends AbstractControllerIntegrationTest {
 
        String token = getAuthToken(eperson.getEmail(), password);
        getClient(token).perform(get("/api/submission/vocabularies/GroupAuthority/entries")
-                       .param("metadata", "cris.policy.group")
-                       .param("collection", col1.getID().toString())
                        .param("filter", "Group"))
                        .andExpect(status().isOk())
                        .andExpect(jsonPath("$._embedded.entries", Matchers.containsInAnyOrder(
@@ -404,11 +337,6 @@ public class ItemAuthorityTest extends AbstractControllerIntegrationTest {
     public void groupAuthorityEmptyQueryTest() throws Exception {
        context.turnOffAuthorisationSystem();
 
-       parentCommunity = CommunityBuilder.createCommunity(context).build();
-       Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
-                                          .withName("Test collection")
-                                          .build();
-
        Group simpleGroup = GroupBuilder.createGroup(context)
                                        .withName("Simple Group")
                                        .build();
@@ -421,26 +349,14 @@ public class ItemAuthorityTest extends AbstractControllerIntegrationTest {
 
        String token = getAuthToken(eperson.getEmail(), password);
        getClient(token).perform(get("/api/submission/vocabularies/GroupAuthority/entries")
-                       .param("metadata", "cris.policy.group")
-                       .param("collection", col1.getID().toString())
                        .param("filter", ""))
                        .andExpect(status().isUnprocessableEntity());
     }
 
     @Test
     public void groupAuthorityUnauthorizedTest() throws Exception {
-       context.turnOffAuthorisationSystem();
-
-       parentCommunity = CommunityBuilder.createCommunity(context).build();
-       Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
-                                          .withName("Test collection")
-                                          .build();
-
-       context.restoreAuthSystemState();
 
        getClient().perform(get("/api/submission/vocabularies/GroupAuthority/entries")
-                  .param("metadata", "cris.policy.group")
-                  .param("collection", col1.getID().toString())
                   .param("filter", "wrong text"))
                   .andExpect(status().isUnauthorized());
     }
