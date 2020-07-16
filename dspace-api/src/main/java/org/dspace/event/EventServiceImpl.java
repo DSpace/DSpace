@@ -128,6 +128,12 @@ public class EventServiceImpl implements EventService {
 
     }
 
+    @Override
+    public void reloadConfiguration() {
+        dispatcherPool = null;
+        initPool();
+    }
+
     protected void enumerateConsumers() {
         // Get all configs starting with CONSUMER_PFX
         List<String> propertyNames = configurationService.getPropertyKeys(CONSUMER_PFX);

@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd"
+	default-lazy-init="true">
+
+	<util:constant id="CrisConsumer-SOURCE_INTERNAL" static-field="org.dspace.authority.CrisConsumer.SOURCE_INTERNAL" />
+
+	<bean id="org.dspace.authority.filler.AuthorityImportFillerHolder" class="org.dspace.authority.filler.AuthorityImportFillerHolder">
+		<property name="fillers">
+			<map>
+				<entry key-ref="CrisConsumer-SOURCE_INTERNAL">
+					<bean class="org.dspace.authority.filler.ItemMetadataImportFiller" parent="fullItemMetadataConfiguration" />
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean class="org.dspace.authority.filler.ItemMetadataImportFiller" id="fullItemMetadataConfiguration" abstract="true">
+		<property name="itemService" ref="org.dspace.content.ItemServiceImpl" />
+		<property name="configurations">
+			<map>
+				<entry key="dc.contributor.author">
+					<bean class="org.dspace.authority.filler.MetadataConfiguration">
+						<property name="updateEnabled" value="true" />
+						<property name="mapping">
+							<map>
+								<entry key="oairecerif.author.affiliation">
+									<bean class="org.dspace.authority.filler.MetadataConfiguration.MappingDetails">
+										<property name="visibility" value="1" />
+									</bean>
+								</entry>
+							</map>
+						</property>
+					</bean>
+				</entry>
+				<entry key="dc.contributor.editor">
+					<bean class="org.dspace.authority.filler.MetadataConfiguration">
+						<property name="updateEnabled" value="true" />
+						<property name="mapping">
+							<map>
+								<entry key="oairecerif.editor.affiliation">
+									<bean class="org.dspace.authority.filler.MetadataConfiguration.MappingDetails">
+										<property name="visibility" value="1" />
+									</bean>
+								</entry>
+							</map>
+						</property>
+					</bean>
+				</entry>
+				<entry key="dc.relation.ispartof">
+					<bean class="org.dspace.authority.filler.MetadataConfiguration">
+						<property name="updateEnabled" value="true" />
+						<property name="mapping">
+							<map>
+								<entry key="dc.relation.issn">
+									<bean class="org.dspace.authority.filler.MetadataConfiguration.MappingDetails">
+										<property name="visibility" value="1" />
+									</bean>
+								</entry>
+							</map>
+						</property>
+					</bean>
+				</entry>
+				<entry key="dc.relation">
+					<bean class="org.dspace.authority.filler.MetadataConfiguration">
+						<property name="updateEnabled" value="true" />
+						<property name="mapping">
+							<map>
+								<entry key="oaire.awardNumber">
+									<bean class="org.dspace.authority.filler.MetadataConfiguration.MappingDetails">
+										<property name="visibility" value="1" />
+									</bean>
+								</entry>
+							</map>
+						</property>
+					</bean>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+</beans>
