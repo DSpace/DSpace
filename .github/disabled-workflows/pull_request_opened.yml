@@ -1,4 +1,6 @@
 # This workflow runs whenever a new pull request is created
+# TEMPORARILY DISABLED. Unfortunately this doesn't work for PRs created from forked repositories (which is how we tend to create PRs).
+# There is no known workaround yet. See https://github.community/t/how-to-use-github-token-for-prs-from-forks/16818
 name: Pull Request opened
 
 # Only run for newly opened PRs against the "main" branch
