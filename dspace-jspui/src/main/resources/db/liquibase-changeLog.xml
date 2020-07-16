@@ -128,4 +128,25 @@
             <column name="scope_note" value="Orcid for user"/>
         </insert>
     </changeSet>
+
+    <changeSet author="Igor Marchenko" id="21">
+        <sql>
+            UPDATE chair SET chair_name = 'Кафедра екології та природозахисних технологій' WHERE chair_id = 14;
+        </sql>
+        <sql>
+            UPDATE chair SET chair_name = 'Кафедра акушерства, гінекології та планування сім''ї' WHERE chair_id = 53;
+        </sql>
+        <sql>
+            UPDATE chair SET chair_name = 'Кафедра фундаментальної юриспруденції та конституційного права' WHERE chair_id = 10;
+        </sql>
+        <sql>
+            UPDATE chair SET chair_name = 'Кафедра внутрішньої медицини з центром респіраторної медицини' WHERE chair_id = 68;
+        </sql>
+        <sql>
+            INSERT INTO chair(chair_name, chair_id, uuid, faculty_id) VALUES ('Кафедра історії', 101, gen_random_uuid(), 2);
+        </sql>
+        <sql>
+            insert into dspaceobject(uuid) select uuid from chair where chair_id = 101;
+        </sql>
+    </changeSet>
 </databaseChangeLog>
