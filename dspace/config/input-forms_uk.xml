@@ -242,17 +242,17 @@
     <form-value-pairs>
         <value-pairs value-pairs-name="license" dc-term="license">
             <pair>
-                <displayed-value>Авторське право не оцінено</displayed-value>
+                <displayed-value>Copyright не зазначено</displayed-value>
                 <stored-value>cne</stored-value>
             </pair>
-            <pair>
-                <displayed-value>Авторське право не відомо</displayed-value>
-                <stored-value>nkc</stored-value>
-            </pair>
-            <pair>
-                <displayed-value>Авторське право не визначено</displayed-value>
-                <stored-value>cu</stored-value>
-            </pair>
+<!--            <pair>-->
+<!--                <displayed-value>Авторське право не відомо</displayed-value>-->
+<!--                <stored-value>nkc</stored-value>-->
+<!--            </pair>-->
+<!--            <pair>-->
+<!--                <displayed-value>Авторське право не визначено</displayed-value>-->
+<!--                <stored-value>cu</stored-value>-->
+<!--            </pair>-->
             <pair>
                 <displayed-value>Creative Commons Зазначення Авторства 4.0 Міжнародна</displayed-value>
                 <stored-value>ccby4</stored-value>
@@ -282,19 +282,19 @@
                 <stored-value>cc0</stored-value>
             </pair>
             <pair>
-                <displayed-value>Авторське право</displayed-value>
+                <displayed-value>Copyright</displayed-value>
                 <stored-value>inc10</stored-value>
             </pair>
             <pair>
-                <displayed-value>Авторське право - Дозволено використання в освітніх умовах</displayed-value>
+                <displayed-value>Copyright - Дозволено використання в освітніх умовах</displayed-value>
                 <stored-value>incedu10</stored-value>
             </pair>
             <pair>
-                <displayed-value>Авторське право - Дозволено некомерційне використання</displayed-value>
+                <displayed-value>Copyright - Дозволено некомерційне використання</displayed-value>
                 <stored-value>incnc10</stored-value>
             </pair>
             <pair>
-                <displayed-value>Авторське право - Власник прав не визначений</displayed-value>
+                <displayed-value>Copyright - Власник прав не визначений</displayed-value>
                 <stored-value>incru10</stored-value>
             </pair>
         </value-pairs>
@@ -579,14 +579,14 @@
                 <displayed-value>&lt;a href="http://rightsstatements.org/vocab/CNE/1.0/"&gt;Авторське право не оцінено&lt;/a&gt;</displayed-value>
                 <stored-value>cne</stored-value>
             </pair>
-            <pair>
-                <displayed-value>&lt;a href="http://rightsstatements.org/vocab/NKC/1.0/"&gt;Авторське право не відомо&lt;/a&gt;</displayed-value>
-                <stored-value>nkc</stored-value>
-            </pair>
-            <pair>
-                <displayed-value>&lt;a href="https://rightsstatements.org/page/UND/1.0/?language=en"&gt;Авторське право не визначено&lt;/a&gt;</displayed-value>
-                <stored-value>cu</stored-value>
-            </pair>
+<!--            <pair>-->
+<!--                <displayed-value>&lt;a href="http://rightsstatements.org/vocab/NKC/1.0/"&gt;Авторське право не відомо&lt;/a&gt;</displayed-value>-->
+<!--                <stored-value>nkc</stored-value>-->
+<!--            </pair>-->
+<!--            <pair>-->
+<!--                <displayed-value>&lt;a href="https://rightsstatements.org/page/UND/1.0/?language=en"&gt;Авторське право не визначено&lt;/a&gt;</displayed-value>-->
+<!--                <stored-value>cu</stored-value>-->
+<!--            </pair>-->
             <pair>
                 <displayed-value>&lt;a href="https://creativecommons.org/licenses/by/4.0/deed.uk"&gt;Creative Commons Зазначення Авторства 4.0 Міжнародна&lt;/a&gt;</displayed-value>
                 <stored-value>ccby4</stored-value>

@@ -259,14 +259,14 @@ it, please enter the types and the actual numbers or codes.</hint>
        <displayed-value>Copyright not evaluated</displayed-value>
        <stored-value>cne</stored-value>
      </pair>
-     <pair>
-       <displayed-value>No known copyright</displayed-value>
-       <stored-value>nkc</stored-value>
-     </pair>
-     <pair>
-       <displayed-value>Сopyright undetermined</displayed-value>
-       <stored-value>cu</stored-value>
-     </pair>
+<!--     <pair>-->
+<!--       <displayed-value>No known copyright</displayed-value>-->
+<!--       <stored-value>nkc</stored-value>-->
+<!--     </pair>-->
+<!--     <pair>-->
+<!--       <displayed-value>Сopyright undetermined</displayed-value>-->
+<!--       <stored-value>cu</stored-value>-->
+<!--     </pair>-->
      <pair>
        <displayed-value>Creative Commons Attribution 4.0 International License</displayed-value>
        <stored-value>ccby4</stored-value>
@@ -494,14 +494,14 @@ it, please enter the types and the actual numbers or codes.</hint>
        <displayed-value>&lt;a href="http://rightsstatements.org/vocab/CNE/1.0/"&gt;Copyright not evaluated&lt;/a&gt;</displayed-value>
        <stored-value>cne</stored-value>
      </pair>
-     <pair>
-       <displayed-value>&lt;a href="http://rightsstatements.org/vocab/NKC/1.0/"&gt;No known copyright&lt;/a&gt;</displayed-value>
-       <stored-value>nkc</stored-value>
-     </pair>
-     <pair>
-       <displayed-value>&lt;a href="https://rightsstatements.org/page/UND/1.0/?language=en"&gt;Сopyright undetermined&lt;/a&gt;</displayed-value>
-       <stored-value>cu</stored-value>
-     </pair>
+<!--     <pair>-->
+<!--       <displayed-value>&lt;a href="http://rightsstatements.org/vocab/NKC/1.0/"&gt;No known copyright&lt;/a&gt;</displayed-value>-->
+<!--       <stored-value>nkc</stored-value>-->
+<!--     </pair>-->
+<!--     <pair>-->
+<!--       <displayed-value>&lt;a href="https://rightsstatements.org/page/UND/1.0/?language=en"&gt;Сopyright undetermined&lt;/a&gt;</displayed-value>-->
+<!--       <stored-value>cu</stored-value>-->
+<!--     </pair>-->
      <pair>
        <displayed-value>&lt;a href="https://creativecommons.org/licenses/by/4.0/deed.en"&gt;Creative Commons Attribution 4.0 International License&lt;/a&gt;</displayed-value>
        <stored-value>ccby4</stored-value>
