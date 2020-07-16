@@ -243,6 +243,9 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
         // We will not verify that they are valid entries in the registry
         // until update() is called.
         for (int i = 0; i < values.size(); i++) {
+            if (StringUtils.isBlank(values.get(i))) {
+                continue;
+            }
 
             if (authorities != null && authorities.size() >= i) {
                 if (StringUtils.startsWith(authorities.get(i), Constants.VIRTUAL_AUTHORITY_PREFIX)) {
