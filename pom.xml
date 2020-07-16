@@ -4,7 +4,7 @@
     <groupId>org.dspace</groupId>
     <artifactId>dspace-parent</artifactId>
     <packaging>pom</packaging>
-    <version>7.0-beta3-SNAPSHOT</version>
+    <version>7.0-beta4-SNAPSHOT</version>
     <name>DSpace Parent Project</name>
     <description>
    	DSpace open source software is a turnkey institutional repository application.
@@ -848,14 +848,14 @@
                    <dependency>
                        <groupId>org.dspace</groupId>
                        <artifactId>dspace-rest</artifactId>
-                       <version>7.0-beta3-SNAPSHOT</version>
+                       <version>7.0-beta4-SNAPSHOT</version>
                        <type>jar</type>
                        <classifier>classes</classifier>
                    </dependency>
                    <dependency>
                        <groupId>org.dspace</groupId>
                        <artifactId>dspace-rest</artifactId>
-                       <version>7.0-beta3-SNAPSHOT</version>
+                       <version>7.0-beta4-SNAPSHOT</version>
                        <type>war</type>
                    </dependency>
                </dependencies>
@@ -1008,50 +1008,50 @@
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-api</artifactId>
-                <version>7.0-beta3-SNAPSHOT</version>
+                <version>7.0-beta4-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.dspace.modules</groupId>
                 <artifactId>additions</artifactId>
-                <version>7.0-beta3-SNAPSHOT</version>
+                <version>7.0-beta4-SNAPSHOT</version>
             </dependency>
 
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-sword</artifactId>
-                <version>7.0-beta3-SNAPSHOT</version>
+                <version>7.0-beta4-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-swordv2</artifactId>
-                <version>7.0-beta3-SNAPSHOT</version>
+                <version>7.0-beta4-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-oai</artifactId>
-                <version>7.0-beta3-SNAPSHOT</version>
+                <version>7.0-beta4-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-services</artifactId>
-                <version>7.0-beta3-SNAPSHOT</version>
+                <version>7.0-beta4-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-rdf</artifactId>
-                <version>7.0-beta3-SNAPSHOT</version>
+                <version>7.0-beta4-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-server-webapp</artifactId>
-                <version>7.0-beta3-SNAPSHOT</version>
+                <version>7.0-beta4-SNAPSHOT</version>
                 <type>jar</type>
                 <classifier>classes</classifier>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-server-webapp</artifactId>
-                <version>7.0-beta3-SNAPSHOT</version>
+                <version>7.0-beta4-SNAPSHOT</version>
                 <type>war</type>
             </dependency>
             <!-- DSpace API Localization Packages -->
@@ -1261,7 +1261,7 @@
             <dependency>
                 <groupId>commons-beanutils</groupId>
                 <artifactId>commons-beanutils</artifactId>
-                <version>1.9.3</version>
+                <version>1.9.4</version>
             </dependency>
             <dependency>
                 <groupId>commons-cli</groupId>
@@ -1716,7 +1716,7 @@
     <licenses>
         <license>
             <name>DuraSpace BSD License</name>
-            <url>https://raw.github.com/DSpace/DSpace/master/LICENSE</url>
+            <url>https://raw.github.com/DSpace/DSpace/main/LICENSE</url>
             <distribution>repo</distribution>
             <comments>
                A BSD 3-Clause license for the DSpace codebase.
