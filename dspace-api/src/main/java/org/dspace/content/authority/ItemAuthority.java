@@ -43,7 +43,7 @@ import org.dspace.utils.DSpace;
  * @author Giusdeppe Digilio
  * @version $Revision $
  */
-public class ItemAuthority implements ChoiceAuthority {
+public class ItemAuthority implements ChoiceAuthority, LinkableEntityAuthority {
     private static final Logger log = Logger.getLogger(ItemAuthority.class);
 
     /** the name assigned to the specific instance by the PluginService, @see {@link NameAwarePlugin} **/
@@ -90,8 +90,7 @@ public class ItemAuthority implements ChoiceAuthority {
         DiscoverQuery discoverQuery = new DiscoverQuery();
         discoverQuery.setDSpaceObjectFilter(Item.class.getSimpleName());
 
-        String relationshipType = configurationService.getProperty("cris.ItemAuthority."
-                + field + ".relationshipType");
+        String relationshipType = getRelationshipType(field);
         if (StringUtils.isNotBlank(relationshipType)) {
             String filter = "relationship.type:" + relationshipType;
             discoverQuery.addFilterQueries(filter);
@@ -132,7 +131,9 @@ public class ItemAuthority implements ChoiceAuthority {
     public String getLabel(String key, String locale) {
         String title = key;
         if (key != null) {
-            try (Context context = new Context()) {
+            Context context = null;
+            try {
+                context = new Context();
                 DSpaceObject dso = itemService.find(context, UUIDUtils.fromString(key));
                 if (dso != null) {
                     title = dso.getName();
@@ -146,6 +147,27 @@ public class ItemAuthority implements ChoiceAuthority {
     }
 
     @Override
+    public String getLinkedEntityType(String field) {
+        String relationshipType = getRelationshipType(field);
+        if (relationshipType == null) {
+            return null;
+        }
+
+        switch (relationshipType) {
+            case "orgunit":
+                return "OrgUnit";
+            case "dataset":
+                return "DataSet";
+            default:
+                return StringUtils.capitalize(relationshipType);
+        }
+
+    }
+
+    private String getRelationshipType ( String field ) {
+        return configurationService.getProperty("cris.ItemAuthority." + field + ".relationshipType");
+    }
+
     public void setPluginInstanceName(String name) {
         authorityName = name;
         for (Entry conf : configurationService.getProperties().entrySet()) {
