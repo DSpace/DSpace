@@ -10,12 +10,14 @@ package org.dspace.content.authority;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import org.apache.log4j.Logger;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
+import org.dspace.util.UUIDUtils;
 
 /**
  *
@@ -23,6 +25,12 @@ import org.dspace.eperson.service.EPersonService;
  */
 public class EPersonAuthority implements ChoiceAuthority {
     private static final Logger log = Logger.getLogger(EPersonAuthority.class);
+
+    /**
+     * the name assigned to the specific instance by the PluginService, @see
+     * {@link NameAwarePlugin}
+     **/
+    private String authorityName;
 
     private EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
 
@@ -56,18 +64,30 @@ public class EPersonAuthority implements ChoiceAuthority {
 
     @Override
     public String getLabel(String key, String locale) {
-        // TODO Auto-generated method stub
-        return null;
+
+        UUID uuid = UUIDUtils.fromString(key);
+        if (uuid == null) {
+            return null;
+        }
+
+        Context context = new Context();
+        try {
+            EPerson ePerson = ePersonService.find(context, uuid);
+            return ePerson != null ? ePerson.getName() : null;
+        } catch (SQLException e) {
+            log.error(e.getMessage(), e);
+            throw new RuntimeException(e.getMessage(), e);
+        }
+
     }
 
     @Override
     public String getPluginInstanceName() {
-        // TODO Auto-generated method stub
-        return null;
+        return authorityName;
     }
 
     @Override
     public void setPluginInstanceName(String name) {
-        // TODO Auto-generated method stub
+        this.authorityName = name;
     }
 }

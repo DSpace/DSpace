@@ -10,12 +10,14 @@ package org.dspace.content.authority;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import org.apache.log4j.Logger;
 import org.dspace.core.Context;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.GroupService;
+import org.dspace.util.UUIDUtils;
 
 /**
  *
@@ -23,6 +25,12 @@ import org.dspace.eperson.service.GroupService;
  */
 public class GroupAuthority implements ChoiceAuthority {
     private static final Logger log = Logger.getLogger(GroupAuthority.class);
+
+    /**
+     * the name assigned to the specific instance by the PluginService, @see
+     * {@link NameAwarePlugin}
+     **/
+    private String authorityName;
 
     private GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
 
@@ -56,18 +64,30 @@ public class GroupAuthority implements ChoiceAuthority {
 
     @Override
     public String getLabel(String key, String locale) {
-        // TODO Auto-generated method stub
-        return null;
+
+        UUID uuid = UUIDUtils.fromString(key);
+        if (uuid == null) {
+            return null;
+        }
+
+        Context context = new Context();
+        try {
+            Group group = groupService.find(context, uuid);
+            return group != null ? group.getName() : null;
+        } catch (SQLException e) {
+            log.error(e.getMessage(), e);
+            throw new RuntimeException(e.getMessage(), e);
+        }
+
     }
 
     @Override
     public String getPluginInstanceName() {
-        // TODO Auto-generated method stub
-        return null;
+        return authorityName;
     }
 
     @Override
     public void setPluginInstanceName(String name) {
-        // TODO Auto-generated method stub
+        this.authorityName = name;
     }
 }
