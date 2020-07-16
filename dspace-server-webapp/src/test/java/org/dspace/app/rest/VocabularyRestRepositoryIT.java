@@ -146,18 +146,9 @@ public class VocabularyRestRepositoryIT extends AbstractControllerIntegrationTes
 
     @Test
     public void correctSrscQueryTest() throws Exception {
-        context.turnOffAuthorisationSystem();
-
-        Collection collection = CollectionBuilder.createCollection(context, parentCommunity)
-                                                 .withName("Test collection")
-                                                 .build();
-        context.restoreAuthSystemState();
-
         String token = getAuthToken(admin.getEmail(), password);
         getClient(token).perform(
             get("/api/submission/vocabularies/srsc/entries")
-                .param("metadata", "dc.subject")
-                .param("collection", collection.getID().toString())
                 .param("filter", "Research")
                 .param("size", "2"))
                 .andExpect(status().isOk())
@@ -173,69 +164,18 @@ public class VocabularyRestRepositoryIT extends AbstractControllerIntegrationTes
     }
 
     @Test
-    public void controlledVocabularyEntriesWrongCollectionUUIDTest() throws Exception {
-        String token = getAuthToken(admin.getEmail(), password);
-        getClient(token).perform(get("/api/submission/vocabularies/srsc/entries")
-                .param("metadata", "dc.subject")
-                .param("collection", UUID.randomUUID().toString())
-                .param("filter", "Research"))
-                .andExpect(status().isUnprocessableEntity());
-    }
-
-    @Test
-    public void controlledVocabularyEntriesMissingCollectionUUID_Test() throws Exception {
-        String token = getAuthToken(admin.getEmail(), password);
-        getClient(token).perform(get("/api/submission/vocabularies/srsc/entries")
-                .param("metadata", "dc.subject")
-                .param("filter", "Research"))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    public void controlledVocabularyEntriesWrongMetadataTest() throws Exception {
-        context.turnOffAuthorisationSystem();
-
-        Collection collection = CollectionBuilder.createCollection(context, parentCommunity)
-                                                 .withName("Test collection")
-                                                 .build();
-        context.restoreAuthSystemState();
-        String token = getAuthToken(admin.getEmail(), password);
-        getClient(token).perform(get("/api/submission/vocabularies/srsc/entries")
-                .param("metadata", "dc.type")
-                .param("collection", collection.getID().toString())
-                .param("filter", "Research"))
-                .andExpect(status().isUnprocessableEntity());
-    }
-
-    @Test
     public void notScrollableVocabularyRequiredQueryTest() throws Exception {
-        context.turnOffAuthorisationSystem();
-
-        Collection collection = CollectionBuilder.createCollection(context, parentCommunity)
-                                                 .withName("Test collection")
-                                                 .build();
-        context.restoreAuthSystemState();
         String token = getAuthToken(admin.getEmail(), password);
-        getClient(token).perform(get("/api/submission/vocabularies/srsc/entries")
-                .param("metadata", "dc.not.existing")
-                .param("collection", collection.getID().toString()))
+        getClient(token).perform(get("/api/submission/vocabularies/srsc/entries"))
                 .andExpect(status().isUnprocessableEntity());
     }
 
     @Test
     public void noResultsSrscQueryTest() throws Exception {
-        context.turnOffAuthorisationSystem();
-
-        Collection collection = CollectionBuilder.createCollection(context, parentCommunity)
-                                                 .withName("Test collection")
-                                                 .build();
-        context.restoreAuthSystemState();
-
         String token = getAuthToken(admin.getEmail(), password);
         getClient(token).perform(
             get("/api/submission/vocabularies/srsc/entries")
                 .param("metadata", "dc.subject")
-                .param("collection", collection.getID().toString())
                 .param("filter", "Research2")
                 .param("size", "1000"))
                         .andExpect(status().isOk())
@@ -244,17 +184,9 @@ public class VocabularyRestRepositoryIT extends AbstractControllerIntegrationTes
 
     @Test
     public void vocabularyEntriesCommonTypesWithPaginationTest() throws Exception {
-        context.turnOffAuthorisationSystem();
-
-        Collection collection = CollectionBuilder.createCollection(context, parentCommunity)
-                                                 .withName("Test collection")
-                                                 .build();
-        context.restoreAuthSystemState();
-
         String token = getAuthToken(admin.getEmail(), password);
         getClient(token)
-                .perform(get("/api/submission/vocabularies/common_types/entries").param("metadata", "dc.type")
-                        .param("collection", collection.getID().toString()).param("size", "2"))
+                .perform(get("/api/submission/vocabularies/common_types/entries").param("size", "2"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$._embedded.entries", Matchers.containsInAnyOrder(
                         VocabularyMatcher.matchVocabularyEntry("Animation", "Animation", "vocabularyEntry"),
@@ -267,8 +199,6 @@ public class VocabularyRestRepositoryIT extends AbstractControllerIntegrationTes
 
         //second page
         getClient(token).perform(get("/api/submission/vocabularies/common_types/entries")
-                .param("metadata", "dc.type")
-                .param("collection", collection.getID().toString())
                 .param("size", "2")
                 .param("page", "1"))
                  .andExpect(status().isOk())
@@ -284,17 +214,8 @@ public class VocabularyRestRepositoryIT extends AbstractControllerIntegrationTes
 
     @Test
     public void vocabularyEntriesCommon_typesWithQueryTest() throws Exception {
-        context.turnOffAuthorisationSystem();
-
-        Collection collection = CollectionBuilder.createCollection(context, parentCommunity)
-                                                 .withName("Test collection")
-                                                 .build();
-        context.restoreAuthSystemState();
-
         String token = getAuthToken(admin.getEmail(), password);
         getClient(token).perform(get("/api/submission/vocabularies/common_types/entries")
-                .param("metadata", "dc.type")
-                .param("collection", collection.getID().toString())
                 .param("filter", "Book")
                 .param("size", "2"))
                 .andExpect(status().isOk())
@@ -309,17 +230,9 @@ public class VocabularyRestRepositoryIT extends AbstractControllerIntegrationTes
 
     @Test
     public void correctSolrQueryTest() throws Exception {
-        context.turnOffAuthorisationSystem();
-
-        Collection collection = CollectionBuilder.createCollection(context, parentCommunity)
-                                                 .withName("Test collection")
-                                                 .build();
-        context.restoreAuthSystemState();
         String token = getAuthToken(admin.getEmail(), password);
         getClient(token).perform(
                 get("/api/submission/vocabularies/SolrAuthorAuthority/entries")
-                        .param("metadata", "dc.contributor.author")
-                        .param("collection", collection.getID().toString())
                         .param("filter", "Shirasaka")
                         .param("size", "1000"))
                 .andExpect(status().isOk())
@@ -332,17 +245,9 @@ public class VocabularyRestRepositoryIT extends AbstractControllerIntegrationTes
 
     @Test
     public void noResultsSolrQueryTest() throws Exception {
-        context.turnOffAuthorisationSystem();
-
-        Collection collection = CollectionBuilder.createCollection(context, parentCommunity)
-                                                 .withName("Test collection")
-                                                 .build();
-        context.restoreAuthSystemState();
         String token = getAuthToken(admin.getEmail(), password);
         getClient(token).perform(
                 get("/api/submission/vocabularies/SolrAuthorAuthority/entries")
-                        .param("metadata", "dc.contributor.author")
-                        .param("collection", collection.getID().toString())
                         .param("filter", "Smith")
                         .param("size", "1000"))
                 .andExpect(status().isOk())
@@ -352,7 +257,6 @@ public class VocabularyRestRepositoryIT extends AbstractControllerIntegrationTes
     @Test
     public void findByMetadataAndCollectionTest() throws Exception {
         context.turnOffAuthorisationSystem();
-
         Collection collection = CollectionBuilder.createCollection(context, parentCommunity)
                                                  .withName("Test collection")
                                                  .build();
@@ -410,17 +314,8 @@ public class VocabularyRestRepositoryIT extends AbstractControllerIntegrationTes
 
     @Test
     public void linkedEntitiesWithExactParamTest() throws Exception {
-        context.turnOffAuthorisationSystem();
-
-        Collection collection = CollectionBuilder.createCollection(context, parentCommunity)
-                                                 .withName("Test collection")
-                                                 .build();
-        context.restoreAuthSystemState();
-
         String token = getAuthToken(eperson.getEmail(), password);
         getClient(token).perform(get("/api/submission/vocabularies/common_types/entries")
-                .param("metadata", "dc.type")
-                .param("collection", collection.getID().toString())
                 .param("filter", "Animation")
                 .param("exact", "true"))
                 .andExpect(status().isOk())
@@ -431,35 +326,9 @@ public class VocabularyRestRepositoryIT extends AbstractControllerIntegrationTes
     }
 
     @Test
-    public void linkedEntitiesWrongMetataForAuthorityTest() throws Exception {
-        context.turnOffAuthorisationSystem();
-
-        Collection collection = CollectionBuilder.createCollection(context, parentCommunity)
-                                                 .withName("Test collection")
-                                                 .build();
-        context.restoreAuthSystemState();
-
-        String token = getAuthToken(eperson.getEmail(), password);
-        getClient(token).perform(get("/api/submission/vocabularies/srsc/entries")
-                        .param("metadata", "dc.type")
-                        .param("collection", collection.getID().toString())
-                        .param("filter", "Animation"))
-                        .andExpect(status().isUnprocessableEntity());
-    }
-
-    @Test
     public void linkedEntitiesWithFilterAndEntryIdTest() throws Exception {
-        context.turnOffAuthorisationSystem();
-
-        Collection collection = CollectionBuilder.createCollection(context, parentCommunity)
-                                                 .withName("Test collection")
-                                                 .build();
-        context.restoreAuthSystemState();
-
         String token = getAuthToken(eperson.getEmail(), password);
         getClient(token).perform(get("/api/submission/vocabularies/srsc/entries")
-                        .param("metadata", "dc.subject")
-                        .param("collection", collection.getID().toString())
                         .param("filter", "Research")
                         .param("entryID", "VR131402"))
                         .andExpect(status().isBadRequest());

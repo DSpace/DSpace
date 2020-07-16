@@ -7,10 +7,8 @@
  */
 package org.dspace.app.rest.repository;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 import javax.annotation.Nullable;
 import javax.servlet.http.HttpServletRequest;
 
@@ -21,7 +19,6 @@ import org.dspace.app.rest.model.VocabularyEntryRest;
 import org.dspace.app.rest.model.VocabularyRest;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.utils.AuthorityUtils;
-import org.dspace.content.Collection;
 import org.dspace.content.authority.Choice;
 import org.dspace.content.authority.ChoiceAuthority;
 import org.dspace.content.authority.Choices;
@@ -32,6 +29,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
@@ -60,24 +58,9 @@ public class VocabularyEntryLinkRepository extends AbstractDSpaceRestRepository
         String exact = request == null ? null : request.getParameter("exact");
         String filter = request == null ? null : request.getParameter("filter");
         String entryID = request == null ? null : request.getParameter("entryID");
-        String metadata = request == null ? null : request.getParameter("metadata");
-        String uuidCollectìon = request == null ? null : request.getParameter("collection");
-
-        if (StringUtils.isEmpty(metadata) || StringUtils.isEmpty(uuidCollectìon)) {
-            throw new IllegalArgumentException("the metadata and collection parameters are both required");
-        }
 
         if (StringUtils.isNotBlank(filter) && StringUtils.isNotBlank(entryID)) {
             throw new IllegalArgumentException("required only one of the parameters: filter or entryID");
-        }
-
-        Collection collection = null;
-        if (StringUtils.isNotBlank(uuidCollectìon)) {
-            try {
-                collection = cs.find(context, UUID.fromString(uuidCollectìon));
-            } catch (SQLException e) {
-                throw new UnprocessableEntityException(uuidCollectìon + " is not a valid collection");
-            }
         }
 
         // validate the parameters
@@ -90,13 +73,19 @@ public class VocabularyEntryLinkRepository extends AbstractDSpaceRestRepository
         checkIfScrollableAndFiltrNotBlank(filter, entryID, vocName);
         Pageable pageable = utils.getPageable(optionalPageable);
         List<VocabularyEntryRest> results = new ArrayList<>();
-        String fieldKey = org.dspace.core.Utils.standardize(tokens[0], tokens[1], tokens[2], "_");
-
+        ChoiceAuthority ca = cas.getChoiceAuthorityByAuthorityName(name);
+        if (ca == null) {
+            throw new ResourceNotFoundException("the vocabulary named " + name + "doesn't exist");
+        }
+        if (!ca.isScrollable() && StringUtils.isBlank(filter) && StringUtils.isBlank(entryID)) {
+            throw new UnprocessableEntityException(
+                    "one of filter or entryID parameter is required for not scrollable vocabularies");
+        }
         Choices choices = null;
         if (BooleanUtils.toBoolean(exact)) {
-            choices = cas.getBestMatch(fieldKey, filter, collection, context.getCurrentLocale().toString());
+            choices = ca.getBestMatch(filter, context.getCurrentLocale().toString());
         } else if (StringUtils.isNotBlank(entryID)) {
-            Choice choice = cas.getChoiceAuthorityByAuthorityName(vocName).getChoice(entryID,
+            Choice choice = ca.getChoice(entryID,
                     context.getCurrentLocale().toString());
             if (choice != null) {
                 choices = new Choices(new Choice[] {choice}, 0, 1, Choices.CF_ACCEPTED, false);
@@ -104,10 +93,10 @@ public class VocabularyEntryLinkRepository extends AbstractDSpaceRestRepository
                 choices = new Choices(false);
             }
         } else {
-            choices = cas.getMatches(fieldKey, filter, collection, Math.toIntExact(pageable.getOffset()),
+            choices = ca.getMatches(filter, Math.toIntExact(pageable.getOffset()),
                           pageable.getPageSize(), context.getCurrentLocale().toString());
         }
-        boolean storeAuthority = cas.storeAuthority(fieldKey, collection);
+        boolean storeAuthority = ca.storeAuthorityInMetadata();
         for (Choice value : choices.values) {
             results.add(authorityUtils.convertEntry(value, name, storeAuthority, projection));
         }

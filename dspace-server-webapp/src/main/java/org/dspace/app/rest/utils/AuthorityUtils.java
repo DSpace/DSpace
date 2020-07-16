@@ -78,6 +78,18 @@ public class AuthorityUtils {
         return entry;
     }
 
+    /**
+     * This utility method is currently a workaround to enrich the REST object with
+     * information from the parent vocabulary that is not referenced by the Choice
+     * model
+     * 
+     * @param choice         the dspace-api choice to expose as vocabulary entry
+     * @param authorityName  the name of the vocabulary
+     * @param storeAuthority <code>true</code> if the entry id should be exposed as
+     *                       an authority for storing it in the metadatavalue
+     * @param projection     the rest projection to apply
+     * @return the vocabulary entry rest reppresentation of the provided choice
+     */
     public VocabularyEntryRest convertEntry(Choice choice, String authorityName, boolean storeAuthority,
             Projection projection) {
         if (choice == null) {

@@ -22,7 +22,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.util.DCInputsReader;
 import org.dspace.app.util.DCInputsReaderException;
-import org.dspace.content.Collection;
 import org.dspace.core.Context;
 import org.dspace.core.I18nUtil;
 import org.dspace.core.SelfNamedPlugin;
@@ -62,6 +61,12 @@ public class DCInputAuthority extends SelfNamedPlugin implements ChoiceAuthority
         super();
     }
 
+    @Override
+    public boolean storeAuthorityInMetadata() {
+        // For backward compatibility value pairs don't store authority in
+        // the metadatavalue
+        return false;
+    }
     public static void reset() {
         pluginNames = null;
     }
@@ -131,7 +136,7 @@ public class DCInputAuthority extends SelfNamedPlugin implements ChoiceAuthority
 
 
     @Override
-    public Choices getMatches(String field, String query, Collection collection, int start, int limit, String locale) {
+    public Choices getMatches(String query, int start, int limit, String locale) {
         init();
         Locale currentLocale = I18nUtil.getSupportedLocale(locale);
         String[] valuesLocale = values.get(currentLocale.getLanguage());
@@ -155,7 +160,7 @@ public class DCInputAuthority extends SelfNamedPlugin implements ChoiceAuthority
     }
 
     @Override
-    public Choices getBestMatch(String field, String text, Collection collection, String locale) {
+    public Choices getBestMatch(String text, String locale) {
         init();
         Locale currentLocale = I18nUtil.getSupportedLocale(locale);
         String[] valuesLocale = values.get(currentLocale.getLanguage());
