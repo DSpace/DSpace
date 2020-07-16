@@ -7,6 +7,7 @@
  */
 package org.dspace.app.rest;
 
+import static org.hamcrest.Matchers.endsWith;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -40,15 +41,18 @@ public class VocabularyEntryDetailsIT extends AbstractControllerIntegrationTest 
         String token = getAuthToken(eperson.getEmail(), password);
         getClient(token).perform(get("/api/submission/vocabularyEntryDetails/" + idAuthority))
                         .andExpect(status().isOk())
-                        .andExpect(jsonPath("$.id", is("srsc:SCB110")))
-                        .andExpect(jsonPath("$.value",
-                                         is("Research Subject Categories::HUMANITIES and RELIGION::Religion/Theology")))
-                        .andExpect(jsonPath("$.display", is("Religion/Theology")))
+                        .andExpect(jsonPath("$",
+                                VocabularyEntryDetailsMatcher.matchAuthorityEntry("srsc:SCB110", "Religion/Theology",
+                                        "Research Subject Categories::HUMANITIES and RELIGION::Religion/Theology")))
                         .andExpect(jsonPath("$.selectable", is(true)))
                         .andExpect(jsonPath("$.otherInformation.id", is("SCB110")))
                         .andExpect(jsonPath("$.otherInformation.note", is("Religionsvetenskap/Teologi")))
                         .andExpect(jsonPath("$.otherInformation.parent",
-                                is("Research Subject Categories::HUMANITIES and RELIGION")));
+                                is("Research Subject Categories::HUMANITIES and RELIGION")))
+                        .andExpect(jsonPath("$._links.parent.href",
+                                endsWith("api/submission/vocabularyEntryDetails/srsc:SCB110/parent")))
+                        .andExpect(jsonPath("$._links.children.href",
+                                endsWith("api/submission/vocabularyEntryDetails/srsc:SCB110/children")));
     }
 
     @Test

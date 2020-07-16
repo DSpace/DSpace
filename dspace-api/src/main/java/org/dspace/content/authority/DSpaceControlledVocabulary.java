@@ -21,7 +21,6 @@ import javax.xml.xpath.XPathFactory;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
-import org.dspace.content.Collection;
 import org.dspace.core.SelfNamedPlugin;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
@@ -77,6 +76,13 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Hiera
 
     public DSpaceControlledVocabulary() {
         super();
+    }
+
+    @Override
+    public boolean storeAuthorityInMetadata() {
+        // For backward compatibility controlled vocabularies don't store the node id in
+        // the metadatavalue
+        return false;
     }
 
     public static String[] getPluginNames() {
@@ -162,7 +168,7 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Hiera
     }
 
     @Override
-    public Choices getMatches(String field, String text, Collection collection, int start, int limit, String locale) {
+    public Choices getMatches(String text, int start, int limit, String locale) {
         init();
         log.debug("Getting matches for '" + text + "'");
         String xpathExpression = "";
@@ -186,13 +192,13 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Hiera
     }
 
     @Override
-    public Choices getBestMatch(String field, String text, Collection collection, String locale) {
+    public Choices getBestMatch(String text, String locale) {
         init();
         log.debug("Getting best matches for '" + text + "'");
         String xpathExpression = "";
         String[] textHierarchy = text.split(hierarchyDelimiter, -1);
         for (int i = 0; i < textHierarchy.length; i++) {
-            xpathExpression += String.format(labelTemplate, textHierarchy[i].replaceAll("'", "&apos;").toLowerCase());
+            xpathExpression += String.format(labelTemplate, textHierarchy[i].replaceAll("'", "&apos;"));
         }
         XPath xpath = XPathFactory.newInstance().newXPath();
         List<Choice> choices = new ArrayList<Choice>();

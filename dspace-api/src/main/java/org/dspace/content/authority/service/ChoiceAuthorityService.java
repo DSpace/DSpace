@@ -208,7 +208,9 @@ public interface ChoiceAuthorityService {
     public Choices getTopChoices(String authorityName, int start, int limit, String locale);
 
     /**
-     *
+     * Return the direct parent of an entry identified by its id in an hierarchical
+     * authority.
+     * 
      * @param authorityName authority name
      * @param vocabularyId  child id
      * @param locale        explicit localization key if available, or null
