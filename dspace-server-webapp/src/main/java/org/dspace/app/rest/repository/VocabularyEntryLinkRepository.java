@@ -23,6 +23,7 @@ import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.utils.AuthorityUtils;
 import org.dspace.content.Collection;
 import org.dspace.content.authority.Choice;
+import org.dspace.content.authority.ChoiceAuthority;
 import org.dspace.content.authority.Choices;
 import org.dspace.content.authority.service.ChoiceAuthorityService;
 import org.dspace.content.service.CollectionService;
@@ -86,6 +87,7 @@ public class VocabularyEntryLinkRepository extends AbstractDSpaceRestRepository
             throw new UnprocessableEntityException("The vocabulary " + name + " is not allowed for the metadata "
                     + metadata + " and collection " + uuidCollectìon);
         }
+        checkIfScrollableAndFiltrNotBlank(filter, entryID, vocName);
         Pageable pageable = utils.getPageable(optionalPageable);
         List<VocabularyEntryRest> results = new ArrayList<>();
         String fieldKey = org.dspace.core.Utils.standardize(tokens[0], tokens[1], tokens[2], "_");
@@ -110,5 +112,18 @@ public class VocabularyEntryLinkRepository extends AbstractDSpaceRestRepository
             results.add(authorityUtils.convertEntry(value, name, storeAuthority, projection));
         }
         return new PageImpl<>(results, pageable, choices.total);
+    }
+
+    private void checkIfScrollableAndFiltrNotBlank(String filter, String entryID, String authorityName) {
+        ChoiceAuthority ma = cas.getChoiceAuthorityByAuthorityName(authorityName);
+        if (ma == null) {
+            throw new IllegalArgumentException(
+                "No choices plugin was configured for authorityName \"" + authorityName
+                    + "\".");
+        }
+        if ((!ma.isScrollable() && StringUtils.isBlank(filter)) ||
+            (!ma.isScrollable() && StringUtils.isBlank(filter))) {
+            throw new UnprocessableEntityException("If the authority is not scrollable, the query is mandatory!");
+        }
     }
 }
