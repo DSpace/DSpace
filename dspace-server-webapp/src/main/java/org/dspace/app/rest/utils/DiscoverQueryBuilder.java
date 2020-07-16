@@ -7,6 +7,10 @@
  */
 package org.dspace.app.rest.utils;
 
+import static java.util.Collections.emptyList;
+import static java.util.Collections.singletonList;
+import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
+
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -71,8 +75,19 @@ public class DiscoverQueryBuilder implements InitializingBean {
                                     String dsoType, Pageable page)
         throws DSpaceBadRequestException {
 
+        List<String> dsoTypes = dsoType != null ? singletonList(dsoType) : emptyList();
+
+        return buildQuery(context, scope, discoveryConfiguration, query, searchFilters, dsoTypes, page);
+    }
+
+    public DiscoverQuery buildQuery(Context context, IndexableObject scope,
+                                    DiscoveryConfiguration discoveryConfiguration,
+                                    String query, List<SearchFilter> searchFilters,
+                                    List<String> dsoTypes, Pageable page)
+        throws DSpaceBadRequestException {
+
         DiscoverQuery queryArgs = buildCommonDiscoverQuery(context, discoveryConfiguration, query, searchFilters,
-                                                           dsoType);
+                dsoTypes);
 
         //When all search criteria are set, configure facet results
         addFaceting(context, scope, queryArgs, discoveryConfiguration);
@@ -104,8 +119,20 @@ public class DiscoverQueryBuilder implements InitializingBean {
                                          String dsoType, Pageable page, String facetName)
         throws DSpaceBadRequestException {
 
+        List<String> dsoTypes = dsoType != null ? singletonList(dsoType) : emptyList();
+
+        return buildFacetQuery(
+                context, scope, discoveryConfiguration, prefix, query, searchFilters, dsoTypes, page, facetName);
+    }
+
+    public DiscoverQuery buildFacetQuery(Context context, IndexableObject scope,
+                                         DiscoveryConfiguration discoveryConfiguration,
+                                         String prefix, String query, List<SearchFilter> searchFilters,
+                                         List<String> dsoTypes, Pageable page, String facetName)
+        throws DSpaceBadRequestException {
+
         DiscoverQuery queryArgs = buildCommonDiscoverQuery(context, discoveryConfiguration, query, searchFilters,
-                                                           dsoType);
+                                                           dsoTypes);
 
         //When all search criteria are set, configure facet results
         addFacetingForFacets(context, scope, prefix, queryArgs, discoveryConfiguration, facetName, page);
@@ -170,7 +197,7 @@ public class DiscoverQueryBuilder implements InitializingBean {
 
     private DiscoverQuery buildCommonDiscoverQuery(Context context, DiscoveryConfiguration discoveryConfiguration,
                                                    String query,
-                                                   List<SearchFilter> searchFilters, String dsoType)
+                                                   List<SearchFilter> searchFilters, List<String> dsoTypes)
         throws DSpaceBadRequestException {
         DiscoverQuery queryArgs = buildBaseQueryForConfiguration(discoveryConfiguration);
 
@@ -182,10 +209,13 @@ public class DiscoverQueryBuilder implements InitializingBean {
             queryArgs.setQuery(query);
         }
 
-        //Limit results to DSO type
-        if (StringUtils.isNotBlank(dsoType)) {
-            queryArgs.setDSpaceObjectFilter(getDsoType(dsoType));
+        //Limit results to DSO types
+        if (isNotEmpty(dsoTypes)) {
+            dsoTypes.stream()
+                    .map(this::getDsoType)
+                    .forEach(queryArgs::addDSpaceObjectFilter);
         }
+
         return queryArgs;
     }
 
