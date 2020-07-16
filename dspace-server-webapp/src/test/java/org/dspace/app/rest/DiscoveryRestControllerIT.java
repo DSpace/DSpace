@@ -1351,9 +1351,10 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
 
         context.restoreAuthSystemState();
 
-        //** WHEN **
-        //An anonymous user browses this endpoint to find the the objects in the system
-        //With a dsoType 'item'
+        // ** WHEN **
+        // An anonymous user browses this endpoint to find the the objects in the system
+
+        // With dsoType 'item'
         getClient().perform(get("/api/discover/search/objects")
                 .param("dsoType", "Item"))
 
@@ -1384,8 +1385,118 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                         FacetEntryMatcher.hasContentInOriginalBundleFacet(false)
                 )))
                 //There always needs to be a self link available
-                .andExpect(jsonPath("$._links.self.href", containsString("/api/discover/search/objects")))
-        ;
+                .andExpect(jsonPath("$._links.self.href", containsString("/api/discover/search/objects")));
+
+        // With dsoTypes 'community' and 'collection'
+        getClient().perform(get("/api/discover/search/objects")
+                .param("dsoType", "Community")
+                .param("dsoType", "Collection"))
+
+                //** THEN **
+                //The status has to be 200 OK
+                .andExpect(status().isOk())
+                //The type has to be 'discover'
+                .andExpect(jsonPath("$.type", is("discover")))
+                // The page element needs to look like this and only have four totalElements because we only want
+                // the communities and the collections (dsoType) and we only created two of both types
+                .andExpect(jsonPath("$._embedded.searchResult.page", is(
+                        PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 4)
+                )))
+                // Only the two communities and the two collections can be present in the embedded.objects section
+                // as that's what we specified in the dsoType parameter
+                .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.containsInAnyOrder(
+                        SearchResultMatcher.match("core", "community", "communities"),
+                        SearchResultMatcher.match("core", "community", "communities"),
+                        SearchResultMatcher.match("core", "collection", "collections"),
+                        SearchResultMatcher.match("core", "collection", "collections")
+                )))
+                //These facets have to show up in the embedded.facets section as well with the given hasMore
+                // property because we don't exceed their default limit for a hasMore true (the default is 10)
+                .andExpect(jsonPath("$._embedded.facets", Matchers.containsInAnyOrder(
+                        FacetEntryMatcher.authorFacet(false),
+                        FacetEntryMatcher.entityTypeFacet(false),
+                        FacetEntryMatcher.subjectFacet(false),
+                        FacetEntryMatcher.dateIssuedFacet(false),
+                        FacetEntryMatcher.hasContentInOriginalBundleFacet(false)
+                )))
+                //There always needs to be a self link available
+                .andExpect(jsonPath("$._links.self.href", containsString("/api/discover/search/objects")));
+
+        // With dsoTypes 'collection' and 'item'
+        getClient().perform(get("/api/discover/search/objects")
+                .param("dsoType", "Collection")
+                .param("dsoType", "Item"))
+
+                //** THEN **
+                //The status has to be 200 OK
+                .andExpect(status().isOk())
+                //The type has to be 'discover'
+                .andExpect(jsonPath("$.type", is("discover")))
+                // The page element needs to look like this and only have five totalElements because we only want
+                // the collections and the items (dsoType) and we only created two collections and three items
+                .andExpect(jsonPath("$._embedded.searchResult.page", is(
+                        PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 5)
+                )))
+                // Only the two collections and the three items can be present in the embedded.objects section
+                // as that's what we specified in the dsoType parameter
+                .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.containsInAnyOrder(
+                        SearchResultMatcher.match("core", "collection", "collections"),
+                        SearchResultMatcher.match("core", "collection", "collections"),
+                        SearchResultMatcher.match("core", "item", "items"),
+                        SearchResultMatcher.match("core", "item", "items"),
+                        SearchResultMatcher.match("core", "item", "items")
+                )))
+                //These facets have to show up in the embedded.facets section as well with the given hasMore
+                // property because we don't exceed their default limit for a hasMore true (the default is 10)
+                .andExpect(jsonPath("$._embedded.facets", Matchers.containsInAnyOrder(
+                        FacetEntryMatcher.authorFacet(false),
+                        FacetEntryMatcher.entityTypeFacet(false),
+                        FacetEntryMatcher.subjectFacet(false),
+                        FacetEntryMatcher.dateIssuedFacet(false),
+                        FacetEntryMatcher.hasContentInOriginalBundleFacet(false)
+                )))
+                //There always needs to be a self link available
+                .andExpect(jsonPath("$._links.self.href", containsString("/api/discover/search/objects")));
+
+        // With dsoTypes 'community', 'collection' and 'item'
+        getClient().perform(get("/api/discover/search/objects")
+                .param("dsoType", "Community")
+                .param("dsoType", "Collection")
+                .param("dsoType", "Item"))
+
+                //** THEN **
+                //The status has to be 200 OK
+                .andExpect(status().isOk())
+                //The type has to be 'discover'
+                .andExpect(jsonPath("$.type", is("discover")))
+                // The page element needs to look like this and have seven totalElements because we want
+                // the communities, the collections and the items (dsoType) and we created two communities,
+                // two collections and three items
+                .andExpect(jsonPath("$._embedded.searchResult.page", is(
+                        PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 7)
+                )))
+                // The two communities, the two collections and the three items can be present in the embedded.objects
+                // section as that's what we specified in the dsoType parameter
+                .andExpect(jsonPath("$._embedded.searchResult._embedded.objects", Matchers.containsInAnyOrder(
+                        SearchResultMatcher.match("core", "community", "communities"),
+                        SearchResultMatcher.match("core", "community", "communities"),
+                        SearchResultMatcher.match("core", "collection", "collections"),
+                        SearchResultMatcher.match("core", "collection", "collections"),
+                        SearchResultMatcher.match("core", "item", "items"),
+                        SearchResultMatcher.match("core", "item", "items"),
+                        SearchResultMatcher.match("core", "item", "items")
+                )))
+                //These facets have to show up in the embedded.facets section as well with the given hasMore
+                // property because we don't exceed their default limit for a hasMore true (the default is 10)
+                .andExpect(jsonPath("$._embedded.facets", Matchers.containsInAnyOrder(
+                        FacetEntryMatcher.authorFacet(false),
+                        FacetEntryMatcher.entityTypeFacet(false),
+                        FacetEntryMatcher.subjectFacet(false),
+                        FacetEntryMatcher.dateIssuedFacet(false),
+                        FacetEntryMatcher.hasContentInOriginalBundleFacet(false)
+                )))
+                //There always needs to be a self link available
+                .andExpect(jsonPath("$._links.self.href", containsString("/api/discover/search/objects")));
     }
 
     @Test
