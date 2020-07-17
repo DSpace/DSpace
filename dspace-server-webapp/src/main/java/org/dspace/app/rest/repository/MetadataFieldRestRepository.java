@@ -116,7 +116,7 @@ public class MetadataFieldRestRepository extends DSpaceRestRepository<MetadataFi
      *
      * @param schemaName    an exact match of the prefix of the metadata schema (e.g. "dc", "dcterms", "eperson")
      * @param elementName   an exact match of the field's element (e.g. "contributor", "title")
-     * @param qualifierName an exact match of the field's qualifier (e.g. "author", "alternative"
+     * @param qualifierName an exact match of the field's qualifier (e.g. "author", "alternative")
      * @param query         part of the fully qualified field, should start with the start of the schema, element or
      *                      qualifier (e.g. "dc.ti", "contributor", "auth", "contributor.ot")
      * @param pageable      the pagination options
@@ -131,6 +131,14 @@ public class MetadataFieldRestRepository extends DSpaceRestRepository<MetadataFi
         Pageable pageable) throws SQLException {
         Context context = obtainContext();
         List<String> filterQueries = new ArrayList<>();
+        if (StringUtils.isNotBlank(query)) {
+            if (query.split("\\.").length > 3) {
+                throw new IllegalArgumentException("Query param should not contain more than 2 dot (.) separators, " +
+                                                   "forming schema.element.qualifier metadata field name");
+            }
+            filterQueries
+                .add(searchService.toFilterQuery(context, "fieldName", OPERATOR_EQUALS, query).getFilterQuery() + "*");
+        }
         if (StringUtils.isNotBlank(schemaName)) {
             filterQueries
                 .add(searchService.toFilterQuery(context, "schema", OPERATOR_EQUALS, schemaName).getFilterQuery());
@@ -142,10 +150,6 @@ public class MetadataFieldRestRepository extends DSpaceRestRepository<MetadataFi
         if (StringUtils.isNotBlank(qualifierName)) {
             filterQueries.add(
                 searchService.toFilterQuery(context, "qualifier", OPERATOR_EQUALS, qualifierName).getFilterQuery());
-        }
-        if (StringUtils.isNotBlank(query)) {
-            filterQueries
-                .add(searchService.toFilterQuery(context, "fieldName", OPERATOR_EQUALS, query).getFilterQuery() + "*");
         }
 
         DiscoverResult searchResult = null;
