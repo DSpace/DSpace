@@ -9,7 +9,10 @@ package org.dspace.app.util;
 
 import java.sql.SQLException;
 import java.util.List;
+import javax.servlet.http.HttpServletRequest;
 
+import org.apache.logging.log4j.Logger;
+import org.dspace.authenticate.factory.AuthenticateServiceFactory;
 import org.dspace.authorize.AuthorizeConfiguration;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.ResourcePolicy;
@@ -26,9 +29,12 @@ import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.GroupService;
+import org.dspace.services.factory.DSpaceServicesFactory;
+import org.dspace.utils.DSpace;
 import org.dspace.xmlworkflow.factory.XmlWorkflowServiceFactory;
 import org.dspace.xmlworkflow.storedcomponents.CollectionRole;
 import org.dspace.xmlworkflow.storedcomponents.service.CollectionRoleService;
@@ -41,6 +47,7 @@ import org.dspace.xmlworkflow.storedcomponents.service.CollectionRoleService;
  */
 public class AuthorizeUtil {
 
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(AuthorizeUtil.class);
     /**
      * Default constructor
      */
@@ -606,8 +613,52 @@ public class AuthorizeUtil {
     }
 
     /**
+     * This method will return a boolean indicating whether the current user is allowed to register a new
+     * account or not
+     * @param context   The relevant DSpace context
+     * @param request   The current request
+     * @return          A boolean indicating whether the current user can register a new account or not
+     * @throws SQLException If something goes wrong
+     */
+    public static boolean authorizeNewAccountRegistration(Context context, HttpServletRequest request)
+        throws SQLException {
+        if (DSpaceServicesFactory.getInstance().getConfigurationService()
+                                 .getBooleanProperty("user.registration", true)) {
+            // This allowSetPassword is currently the only mthod that would return true only when it's
+            // actually expected to be returning true.
+            // For example the LDAP canSelfRegister will return true due to auto-register, while that
+            // does not imply a new user can register explicitly
+            return AuthenticateServiceFactory.getInstance().getAuthenticationService()
+                                             .allowSetPassword(context, request, null);
+        }
+        return false;
+    }
+
+    /**
+     * This method will return a boolean indicating whether it's allowed to update the password for the EPerson
+     * with the given email and canLogin property
+     * @param context   The relevant DSpace context
+     * @param email     The email to be checked
+     * @return          A boolean indicating if the password can be updated or not
+     */
+    public static boolean authorizeUpdatePassword(Context context, String email) {
+        try {
+            EPerson eperson = EPersonServiceFactory.getInstance().getEPersonService().findByEmail(context, email);
+            if (eperson != null && eperson.canLogIn()) {
+                HttpServletRequest request = new DSpace().getRequestService().getCurrentRequest()
+                                                         .getHttpServletRequest();
+                return AuthenticateServiceFactory.getInstance().getAuthenticationService()
+                                                 .allowSetPassword(context, request, null);
+            }
+        } catch (SQLException e) {
+            log.error("Something went wrong trying to retrieve EPerson for email: " + email, e);
+        }
+        return false;
+    }
+
+    /**
      * This method checks if the community Admin can manage accounts
-     * 
+     *
      * @return true if is able
      */
     public static boolean canCommunityAdminManageAccounts() {
@@ -625,7 +676,7 @@ public class AuthorizeUtil {
 
     /**
      * This method checks if the Collection Admin can manage accounts
-     * 
+     *
      * @return true if is able
      */
     public static boolean canCollectionAdminManageAccounts() {
