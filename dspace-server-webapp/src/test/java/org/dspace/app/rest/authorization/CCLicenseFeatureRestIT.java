@@ -7,6 +7,8 @@
  */
 package org.dspace.app.rest.authorization;
 
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -81,13 +83,14 @@ public class CCLicenseFeatureRestIT extends AbstractControllerIntegrationTest {
                     .andExpect(jsonPath("$",
                             Matchers.is(AuthorizationMatcher.matchAuthorization(authAdminCCLicense))));
 
-        getClient(adminToken).perform(get("/api/authz/authorizations/search/objectAndFeature")
+        getClient(adminToken).perform(get("/api/authz/authorizations/search/object")
                 .param("uri", itemUri)
                 .param("eperson", admin.getID().toString())
                 .param("feature", ccLicenseFeature.getName()))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$",
-                    Matchers.is(AuthorizationMatcher.matchAuthorization(authAdminCCLicense))));
+            .andExpect(jsonPath("$._embedded.authorizations", contains(
+                    Matchers.is(AuthorizationMatcher.matchAuthorization(authAdminCCLicense))))
+            );
     }
 
     @Test
@@ -110,13 +113,14 @@ public class CCLicenseFeatureRestIT extends AbstractControllerIntegrationTest {
                     .andExpect(jsonPath("$",
                             Matchers.is(AuthorizationMatcher.matchAuthorization(authAdminCCLicense))));
 
-        getClient(comAdminToken).perform(get("/api/authz/authorizations/search/objectAndFeature")
+        getClient(comAdminToken).perform(get("/api/authz/authorizations/search/object")
                 .param("uri", itemUri)
                 .param("eperson", eperson.getID().toString())
                 .param("feature", ccLicenseFeature.getName()))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$",
-                    Matchers.is(AuthorizationMatcher.matchAuthorization(authAdminCCLicense))));
+            .andExpect(jsonPath("$._embedded.authorizations", contains(
+                    Matchers.is(AuthorizationMatcher.matchAuthorization(authAdminCCLicense))))
+            );
 
         // verify that the property core.authorization.collection-admin.item-admin.cc-license = false is respected
         // the community admins should be still authorized
@@ -127,13 +131,14 @@ public class CCLicenseFeatureRestIT extends AbstractControllerIntegrationTest {
                 .andExpect(jsonPath("$",
                         Matchers.is(AuthorizationMatcher.matchAuthorization(authAdminCCLicense))));
 
-        getClient(comAdminToken).perform(get("/api/authz/authorizations/search/objectAndFeature")
+        getClient(comAdminToken).perform(get("/api/authz/authorizations/search/object")
             .param("uri", itemUri)
             .param("eperson", eperson.getID().toString())
             .param("feature", ccLicenseFeature.getName()))
         .andExpect(status().isOk())
-        .andExpect(jsonPath("$",
-                Matchers.is(AuthorizationMatcher.matchAuthorization(authAdminCCLicense))));
+        .andExpect(jsonPath("$._embedded.authorizations", contains(
+                Matchers.is(AuthorizationMatcher.matchAuthorization(authAdminCCLicense))))
+        );
 
         // now verify that the property core.authorization.community-admin.item-admin.cc-license = false is respected
         // and also community admins are blocked
@@ -143,11 +148,11 @@ public class CCLicenseFeatureRestIT extends AbstractControllerIntegrationTest {
         getClient(comAdminToken).perform(get("/api/authz/authorizations/" + authAdminCCLicense.getID()))
                     .andExpect(status().isNotFound());
 
-        getClient(comAdminToken).perform(get("/api/authz/authorizations/search/objectAndFeature")
+        getClient(comAdminToken).perform(get("/api/authz/authorizations/search/object")
                 .param("uri", itemUri)
                 .param("eperson", eperson.getID().toString())
                 .param("feature", ccLicenseFeature.getName()))
-            .andExpect(status().isNoContent());
+            .andExpect(jsonPath("$.page.totalElements", is(0)));
     }
 
     @Test
@@ -170,24 +175,25 @@ public class CCLicenseFeatureRestIT extends AbstractControllerIntegrationTest {
                     .andExpect(jsonPath("$",
                             Matchers.is(AuthorizationMatcher.matchAuthorization(authAdminCCLicense))));
 
-        getClient(colAdminToken).perform(get("/api/authz/authorizations/search/objectAndFeature")
+        getClient(colAdminToken).perform(get("/api/authz/authorizations/search/object")
                 .param("uri", itemUri)
                 .param("eperson", eperson.getID().toString())
                 .param("feature", ccLicenseFeature.getName()))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$",
-                    Matchers.is(AuthorizationMatcher.matchAuthorization(authAdminCCLicense))));
+            .andExpect(jsonPath("$._embedded.authorizations", contains(
+                    Matchers.is(AuthorizationMatcher.matchAuthorization(authAdminCCLicense))))
+            );
         // verify that the property core.authorization.collection-admin.item-admin.cc-license = false is respected
         configurationService.setProperty("core.authorization.item-admin.cc-license", false);
         configurationService.setProperty("core.authorization.collection-admin.item-admin.cc-license", false);
         getClient(colAdminToken).perform(get("/api/authz/authorizations/" + authAdminCCLicense.getID()))
                     .andExpect(status().isNotFound());
 
-        getClient(colAdminToken).perform(get("/api/authz/authorizations/search/objectAndFeature")
+        getClient(colAdminToken).perform(get("/api/authz/authorizations/search/object")
                 .param("uri", itemUri)
                 .param("eperson", eperson.getID().toString())
                 .param("feature", ccLicenseFeature.getName()))
-            .andExpect(status().isNoContent());
+            .andExpect(jsonPath("$.page.totalElements", is(0)));
     }
 
     @Test
@@ -211,23 +217,24 @@ public class CCLicenseFeatureRestIT extends AbstractControllerIntegrationTest {
                     .andExpect(jsonPath("$",
                             Matchers.is(AuthorizationMatcher.matchAuthorization(authAdminCCLicense))));
 
-        getClient(itemAdminToken).perform(get("/api/authz/authorizations/search/objectAndFeature")
+        getClient(itemAdminToken).perform(get("/api/authz/authorizations/search/object")
                 .param("uri", itemUri)
                 .param("eperson", eperson.getID().toString())
                 .param("feature", ccLicenseFeature.getName()))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$",
-                    Matchers.is(AuthorizationMatcher.matchAuthorization(authAdminCCLicense))));
+            .andExpect(jsonPath("$._embedded.authorizations", contains(
+                    Matchers.is(AuthorizationMatcher.matchAuthorization(authAdminCCLicense))))
+            );
         // verify that the property core.authorization.item-admin.cc-license = false is respected
         configurationService.setProperty("core.authorization.item-admin.cc-license", false);
         getClient(itemAdminToken).perform(get("/api/authz/authorizations/" + authAdminCCLicense.getID()))
                     .andExpect(status().isNotFound());
 
-        getClient(itemAdminToken).perform(get("/api/authz/authorizations/search/objectAndFeature")
+        getClient(itemAdminToken).perform(get("/api/authz/authorizations/search/object")
                 .param("uri", itemUri)
                 .param("eperson", eperson.getID().toString())
                 .param("feature", ccLicenseFeature.getName()))
-            .andExpect(status().isNoContent());
+            .andExpect(jsonPath("$.page.totalElements", is(0)));
     }
 
     @Test
@@ -248,19 +255,19 @@ public class CCLicenseFeatureRestIT extends AbstractControllerIntegrationTest {
         getClient(epersonToken).perform(get("/api/authz/authorizations/" + authEpersonCCLicense.getID()))
                     .andExpect(status().isNotFound());
 
-        getClient(epersonToken).perform(get("/api/authz/authorizations/search/objectAndFeature")
+        getClient(epersonToken).perform(get("/api/authz/authorizations/search/object")
                 .param("uri", itemUri)
                 .param("eperson", eperson.getID().toString())
                 .param("feature", ccLicenseFeature.getName()))
-            .andExpect(status().isNoContent());
+            .andExpect(jsonPath("$.page.totalElements", is(0)));
 
         // check the authorization for the anonymous user
         getClient().perform(get("/api/authz/authorizations/" + authAnonymousCCLicense.getID()))
                 .andExpect(status().isNotFound());
 
-        getClient().perform(get("/api/authz/authorizations/search/objectAndFeature")
+        getClient().perform(get("/api/authz/authorizations/search/object")
             .param("uri", itemUri)
             .param("feature", ccLicenseFeature.getName()))
-        .andExpect(status().isNoContent());
+        .andExpect(jsonPath("$.page.totalElements", is(0)));
     }
 }
