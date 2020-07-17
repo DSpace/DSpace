@@ -76,9 +76,9 @@
                 <!-- OpenAIRE4 guidelines - search for an OrgUnit that have a specific dc.type=FundingOrganization -->
                 <entry key="openAIREFundingAgency" value-ref="openAIREFundingAgency"/>
                 <!-- Related items -->
-                <entry key="relationAuthorPublications" value-ref="relationAuthorPublicationsConfiguration"/>
-                <entry key="relationOrgunitPersons" value-ref="relationOrgunitPersonsConfiguration"/>
-                <entry key="relationInvestigatorProjects" value-ref="relationInvestigatorProjectsConfiguration"/>
+                <entry key="relation.rp.researchoutputs" value-ref="relationAuthorPublicationsConfiguration"/>
+                <entry key="relation.ou.people" value-ref="relationOrgunitPersonsConfiguration"/>
+                <entry key="relation.rp.projects" value-ref="relationInvestigatorProjectsConfiguration"/>
             </map>
         </property>
         <property name="toIgnoreMetadataFields">

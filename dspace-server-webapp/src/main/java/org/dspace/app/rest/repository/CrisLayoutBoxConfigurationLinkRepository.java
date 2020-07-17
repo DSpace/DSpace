@@ -11,11 +11,12 @@ import java.sql.SQLException;
 import javax.annotation.Nullable;
 import javax.servlet.http.HttpServletRequest;
 
-import org.dspace.app.rest.converter.CrisLayoutMetadataComponentConverter;
 import org.dspace.app.rest.model.CrisLayoutBoxRest;
-import org.dspace.app.rest.model.CrisLayoutMetadataComponentRest;
+import org.dspace.app.rest.model.CrisLayoutSearchComponentRest;
 import org.dspace.app.rest.projection.Projection;
+import org.dspace.content.EntityType;
 import org.dspace.core.Context;
+import org.dspace.layout.CrisLayoutBox;
 import org.dspace.layout.factory.CrisLayoutServiceFactory;
 import org.dspace.layout.service.CrisLayoutBoxService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,22 +36,40 @@ public class CrisLayoutBoxConfigurationLinkRepository extends AbstractDSpaceRest
     @Autowired
     private CrisLayoutServiceFactory serviceFactory;
 
-    @Autowired
-    private CrisLayoutMetadataComponentConverter mcConverter;
-
-    public CrisLayoutMetadataComponentRest getConfiguration(
+    public CrisLayoutSearchComponentRest getConfiguration(
             @Nullable HttpServletRequest request,
             Integer boxId,
             @Nullable Pageable pageable,
             Projection projection) {
         Context context = obtainContext();
+        String boxConfigurationId = null;
         CrisLayoutBoxService service = serviceFactory.getBoxService();
-        CrisLayoutMetadataComponentRest values = null;
+        CrisLayoutSearchComponentRest rVal = null;
+
         try {
-            values = mcConverter.convert( service.find(context, boxId) );
+            CrisLayoutBox box = service.find(context, boxId);
+            if (box != null && box.getType() != null) {
+                rVal = new CrisLayoutSearchComponentRest();
+                rVal.setType(box.getType());
+                rVal.setId(box.getShortname());
+
+                boxConfigurationId = box.getType();
+                EntityType entity = box.getEntitytype();
+                if (entity.getLabel().equals("Person")) {
+                    boxConfigurationId += ".rp";
+                } else if (entity.getLabel().equals("Project")) {
+                    boxConfigurationId += ".pj";
+                } else if (entity.getLabel().equals("OrgUnit")) {
+                    boxConfigurationId += ".ou";
+                } else {
+                    boxConfigurationId += "." + entity.getLabel();
+                }
+                boxConfigurationId += "." + box.getShortname();
+                rVal.setConfiguration(boxConfigurationId);
+            }
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-        return values;
+        return rVal;
     }
 }
