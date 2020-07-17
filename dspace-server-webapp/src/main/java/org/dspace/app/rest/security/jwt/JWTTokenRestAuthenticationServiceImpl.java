@@ -18,6 +18,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.nimbusds.jose.JOSEException;
 import org.apache.commons.lang3.StringUtils;
+import org.dspace.app.rest.model.wrapper.AuthenticationToken;
 import org.dspace.app.rest.security.DSpaceAuthentication;
 import org.dspace.app.rest.security.RestAuthenticationService;
 import org.dspace.app.rest.utils.ContextUtil;
@@ -47,9 +48,13 @@ public class JWTTokenRestAuthenticationServiceImpl implements RestAuthentication
     private static final String AUTHORIZATION_COOKIE = "Authorization-cookie";
     private static final String AUTHORIZATION_HEADER = "Authorization";
     private static final String AUTHORIZATION_TYPE = "Bearer";
+    private static final String AUTHORIZATION_TOKEN_PARAMETER = "authentication-token";
 
     @Autowired
-    private JWTTokenHandler jwtTokenHandler;
+    private LoginJWTTokenHandler loginJWTTokenHandler;
+
+    @Autowired
+    private ShortLivedJWTTokenHandler shortLivedJWTTokenHandler;
 
     @Autowired
     private EPersonService ePersonService;
@@ -71,7 +76,7 @@ public class JWTTokenRestAuthenticationServiceImpl implements RestAuthentication
 
             List<Group> groups = authenticationService.getSpecialGroups(context, request);
 
-            String token = jwtTokenHandler.createTokenForEPerson(context, request,
+            String token = loginJWTTokenHandler.createTokenForEPerson(context, request,
                                                                  authentication.getPreviousLoginDate(), groups);
 
             addTokenToResponse(response, token, addCookie);
@@ -84,11 +89,40 @@ public class JWTTokenRestAuthenticationServiceImpl implements RestAuthentication
         }
     }
 
+    /**
+     * Create a short-lived token for bitstream downloads among other things
+     * @param context   The context for which to create the token
+     * @param request   The request for which to create the token
+     * @return The token with a short lifespan
+     */
+    @Override
+    public AuthenticationToken getShortLivedAuthenticationToken(Context context, HttpServletRequest request) {
+        try {
+            String token;
+            List<Group> groups = authenticationService.getSpecialGroups(context, request);
+            token = shortLivedJWTTokenHandler.createTokenForEPerson(context, request, null, groups);
+            context.commit();
+            return new AuthenticationToken(token);
+        } catch (JOSEException e) {
+            log.error("JOSE Exception", e);
+        } catch (SQLException e) {
+            log.error("SQL error when adding authentication", e);
+        }
+
+        return null;
+    }
+
     @Override
     public EPerson getAuthenticatedEPerson(HttpServletRequest request, Context context) {
-        String token = getToken(request);
         try {
-            EPerson ePerson = jwtTokenHandler.parseEPersonFromToken(token, request, context);
+            String token = getLoginToken(request);
+            EPerson ePerson = null;
+            if (token == null) {
+                token = getShortLivedToken(request);
+                ePerson = shortLivedJWTTokenHandler.parseEPersonFromToken(token, request, context);
+            } else {
+                ePerson = loginJWTTokenHandler.parseEPersonFromToken(token, request, context);
+            }
             return ePerson;
         } catch (JOSEException e) {
             log.error("Jose error", e);
@@ -103,15 +137,16 @@ public class JWTTokenRestAuthenticationServiceImpl implements RestAuthentication
     @Override
     public boolean hasAuthenticationData(HttpServletRequest request) {
         return StringUtils.isNotBlank(request.getHeader(AUTHORIZATION_HEADER))
-                || StringUtils.isNotBlank(getAuthorizationCookie(request));
+                || StringUtils.isNotBlank(getAuthorizationCookie(request))
+                || StringUtils.isNotBlank(request.getParameter(AUTHORIZATION_TOKEN_PARAMETER));
     }
 
     @Override
     public void invalidateAuthenticationData(HttpServletRequest request, HttpServletResponse response,
                                              Context context) throws Exception {
-        String token = getToken(request);
+        String token = getLoginToken(request);
         invalidateAuthenticationCookie(response);
-        jwtTokenHandler.invalidateToken(token, request, context);
+        loginJWTTokenHandler.invalidateToken(token, request, context);
     }
 
     @Override
@@ -166,7 +201,7 @@ public class JWTTokenRestAuthenticationServiceImpl implements RestAuthentication
         response.setHeader(AUTHORIZATION_HEADER, String.format("%s %s", AUTHORIZATION_TYPE, token));
     }
 
-    private String getToken(HttpServletRequest request) {
+    private String getLoginToken(HttpServletRequest request) {
         String tokenValue = null;
         String authHeader = request.getHeader(AUTHORIZATION_HEADER);
         String authCookie = getAuthorizationCookie(request);
@@ -174,6 +209,15 @@ public class JWTTokenRestAuthenticationServiceImpl implements RestAuthentication
             tokenValue = authHeader.replace(AUTHORIZATION_TYPE, "").trim();
         } else if (StringUtils.isNotBlank(authCookie)) {
             tokenValue = authCookie;
+        }
+
+        return tokenValue;
+    }
+
+    private String getShortLivedToken(HttpServletRequest request) {
+        String tokenValue = null;
+        if (StringUtils.isNotBlank(request.getParameter(AUTHORIZATION_TOKEN_PARAMETER))) {
+            tokenValue = request.getParameter(AUTHORIZATION_TOKEN_PARAMETER);
         }
 
         return tokenValue;
