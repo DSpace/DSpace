@@ -13,6 +13,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import org.dspace.app.rest.builder.CollectionBuilder;
 import org.dspace.app.rest.builder.CommunityBuilder;
+import org.dspace.app.rest.builder.EPersonBuilder;
+import org.dspace.app.rest.builder.GroupBuilder;
 import org.dspace.app.rest.builder.ItemBuilder;
 import org.dspace.app.rest.matcher.ItemAuthorityMatcher;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
@@ -22,6 +24,8 @@ import org.dspace.content.authority.Choices;
 import org.dspace.content.authority.service.ChoiceAuthorityService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.service.PluginService;
+import org.dspace.eperson.EPerson;
+import org.dspace.eperson.Group;
 import org.dspace.services.ConfigurationService;
 import org.hamcrest.Matchers;
 import org.junit.After;
@@ -197,6 +201,164 @@ public class ItemAuthorityTest extends AbstractControllerIntegrationTest {
                              "Author 1", "Author 1","vocabularyEntry","contributor_department","")
                               )))
                        .andExpect(jsonPath("$.page.totalElements", Matchers.is(1)));
+    }
+
+    @Test
+    public void ePersonAuthorityTest() throws Exception {
+       context.turnOffAuthorisationSystem();
+
+       EPerson ePerson1 = EPersonBuilder.createEPerson(context)
+                                        .withNameInMetadata("Andrea", "Bollini")
+                                        .withEmail("Andrea.Bollini@example.com")
+                                        .build();
+
+       EPerson ePerson2 = EPersonBuilder.createEPerson(context)
+                                        .withNameInMetadata("Mykhaylo", "Boychuk")
+                                        .withEmail("Mykhaylo.Boychuk@example.com")
+                                        .build();
+
+       EPerson ePerson3 = EPersonBuilder.createEPerson(context)
+                                        .withNameInMetadata("Luca", "Giamminonni")
+                                        .withEmail("Luca.Giamminonni@example.com")
+                                        .build();
+
+       EPerson ePerson4 = EPersonBuilder.createEPerson(context)
+                                        .withNameInMetadata("Andrea", "Pascarelli")
+                                        .withEmail("Andrea.Pascarelli@example.com")
+                                        .build();
+
+       context.restoreAuthSystemState();
+
+       String token = getAuthToken(eperson.getEmail(), password);
+       getClient(token).perform(get("/api/submission/vocabularies/EPersonAuthority/entries")
+                       .param("filter", "Andrea"))
+                       .andExpect(status().isOk())
+                .andExpect(jsonPath("$._embedded.entries", Matchers.containsInAnyOrder(
+                                ItemAuthorityMatcher.matchItemAuthorityProperties(ePerson1.getID().toString(),
+                                        ePerson1.getFullName(), ePerson1.getFullName(), "vocabularyEntry"),
+                                ItemAuthorityMatcher.matchItemAuthorityProperties(ePerson4.getID().toString(),
+                                        ePerson4.getFullName(), ePerson4.getFullName(), "vocabularyEntry"))))
+                .andExpect(jsonPath("$._embedded.entries", Matchers.not(
+                        ItemAuthorityMatcher.matchItemAuthorityProperties(ePerson2.getID().toString(),
+                                ePerson2.getFullName(), ePerson2.getFullName(), "vocabularyEntry"))))
+                .andExpect(jsonPath("$._embedded.entries", Matchers.not(
+                        ItemAuthorityMatcher.matchItemAuthorityProperties(ePerson3.getID().toString(),
+                                ePerson3.getFullName(), ePerson3.getFullName(), "vocabularyEntry"))))
+                .andExpect(jsonPath("$.page.totalElements", Matchers.is(2)));
+    }
+
+    @Test
+    public void ePersonAuthorityNoComparisonTest() throws Exception {
+       context.turnOffAuthorisationSystem();
+
+       EPerson ePerson1 = EPersonBuilder.createEPerson(context)
+                                        .withNameInMetadata("Andrea", "Bollini")
+                                        .withEmail("Andrea.Bollini@example.com")
+                                        .build();
+
+       EPerson ePerson2 = EPersonBuilder.createEPerson(context)
+                                        .withNameInMetadata("Mykhaylo", "Boychuk")
+                                        .withEmail("Mykhaylo.Boychuk@example.com")
+                                        .build();
+
+       context.restoreAuthSystemState();
+
+       String token = getAuthToken(eperson.getEmail(), password);
+       getClient(token).perform(get("/api/submission/vocabularies/EPersonAuthority/entries")
+                       .param("filter", "wrong text"))
+                       .andExpect(status().isOk())
+                .andExpect(jsonPath("$.page.totalElements", Matchers.is(0)));
+    }
+
+    @Test
+    public void ePersonAuthorityEmptyQueryTest() throws Exception {
+       context.turnOffAuthorisationSystem();
+
+       EPerson ePerson1 = EPersonBuilder.createEPerson(context)
+                                        .withNameInMetadata("Andrea", "Bollini")
+                                        .withEmail("Andrea.Bollini@example.com")
+                                        .build();
+
+       EPerson ePerson2 = EPersonBuilder.createEPerson(context)
+                                        .withNameInMetadata("Mykhaylo", "Boychuk")
+                                        .withEmail("Mykhaylo.Boychuk@example.com")
+                                        .build();
+
+       context.restoreAuthSystemState();
+
+       String token = getAuthToken(eperson.getEmail(), password);
+       getClient(token).perform(get("/api/submission/vocabularies/EPersonAuthority/entries")
+                       .param("filter", ""))
+                       .andExpect(status().isUnprocessableEntity());
+    }
+
+    @Test
+    public void ePersonAuthorityUnauthorizedTest() throws Exception {
+
+       getClient().perform(get("/api/submission/vocabularies/EPersonAuthority/entries")
+                  .param("filter", "wrong text"))
+                  .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    public void groupAuthorityTest() throws Exception {
+       context.turnOffAuthorisationSystem();
+
+       Group simpleGroup = GroupBuilder.createGroup(context)
+                                 .withName("Simple Group")
+                                 .build();
+
+       Group groupA = GroupBuilder.createGroup(context)
+                                  .withName("Group A")
+                                  .build();
+
+       Group admins = GroupBuilder.createGroup(context)
+                                  .withName("Admins")
+                                  .build();
+
+       context.restoreAuthSystemState();
+
+       String token = getAuthToken(eperson.getEmail(), password);
+       getClient(token).perform(get("/api/submission/vocabularies/GroupAuthority/entries")
+                       .param("filter", "Group"))
+                       .andExpect(status().isOk())
+                       .andExpect(jsonPath("$._embedded.entries", Matchers.containsInAnyOrder(
+                               ItemAuthorityMatcher.matchItemAuthorityProperties(simpleGroup.getID().toString(),
+                                       simpleGroup.getName(), simpleGroup.getName(), "vocabularyEntry"),
+                               ItemAuthorityMatcher.matchItemAuthorityProperties(groupA.getID().toString(),
+                                       groupA.getName(), groupA.getName(), "vocabularyEntry"))))
+                       .andExpect(jsonPath("$._embedded.entries", Matchers.not(ItemAuthorityMatcher
+                               .matchItemAuthorityProperties(admins.getID().toString(),admins.getName(),
+                                                             admins.getName(), "vocabularyEntry"))))
+                       .andExpect(jsonPath("$.page.totalElements", Matchers.is(2)));
+    }
+
+    @Test
+    public void groupAuthorityEmptyQueryTest() throws Exception {
+       context.turnOffAuthorisationSystem();
+
+       Group simpleGroup = GroupBuilder.createGroup(context)
+                                       .withName("Simple Group")
+                                       .build();
+
+       Group groupA = GroupBuilder.createGroup(context)
+                                  .withName("Group A")
+                                  .build();
+
+       context.restoreAuthSystemState();
+
+       String token = getAuthToken(eperson.getEmail(), password);
+       getClient(token).perform(get("/api/submission/vocabularies/GroupAuthority/entries")
+                       .param("filter", ""))
+                       .andExpect(status().isUnprocessableEntity());
+    }
+
+    @Test
+    public void groupAuthorityUnauthorizedTest() throws Exception {
+
+       getClient().perform(get("/api/submission/vocabularies/GroupAuthority/entries")
+                  .param("filter", "wrong text"))
+                  .andExpect(status().isUnauthorized());
     }
 
     @Override

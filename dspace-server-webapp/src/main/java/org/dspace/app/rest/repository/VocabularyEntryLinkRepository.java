@@ -23,7 +23,6 @@ import org.dspace.content.authority.Choice;
 import org.dspace.content.authority.ChoiceAuthority;
 import org.dspace.content.authority.Choices;
 import org.dspace.content.authority.service.ChoiceAuthorityService;
-import org.dspace.content.service.CollectionService;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -44,9 +43,6 @@ public class VocabularyEntryLinkRepository extends AbstractDSpaceRestRepository
 
     @Autowired
     private ChoiceAuthorityService cas;
-
-    @Autowired
-    private CollectionService cs;
 
     @Autowired
     private AuthorityUtils authorityUtils;

@@ -24,6 +24,7 @@ public class ItemAuthorityMatcher {
     public static Matcher<? super Object> matchItemAuthorityProperties(String authority, String display, String value,
             String type) {
         return allOf(
+                hasJsonPath("$.authority", is(authority)),
                 hasJsonPath("$.display", is(display)),
                 hasJsonPath("$.value", is(value)),
                 hasJsonPath("$.type", is(type))
