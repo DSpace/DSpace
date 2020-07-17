@@ -14,10 +14,12 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
+import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.discovery.IndexableObject;
 import org.dspace.discovery.indexobject.IndexableCollection;
 import org.dspace.discovery.indexobject.IndexableCommunity;
+import org.dspace.discovery.indexobject.IndexableItem;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -35,6 +37,9 @@ public class ScopeResolver {
     @Autowired
     CommunityService communityService;
 
+    @Autowired
+    ItemService itemService;
+
     public IndexableObject resolveScope(Context context, String scope) {
         IndexableObject scopeObj = null;
         if (StringUtils.isNotBlank(scope)) {
@@ -43,6 +48,9 @@ public class ScopeResolver {
                 scopeObj = new IndexableCommunity(communityService.find(context, uuid));
                 if (scopeObj.getIndexedObject() == null) {
                     scopeObj = new IndexableCollection(collectionService.find(context, uuid));
+                }
+                if (scopeObj.getIndexedObject() == null) {
+                    scopeObj = new IndexableItem(itemService.find(context, uuid));
                 }
             } catch (IllegalArgumentException ex) {
                 log.warn("The given scope string " + StringUtils.trimToEmpty(scope) + " is not a UUID", ex);

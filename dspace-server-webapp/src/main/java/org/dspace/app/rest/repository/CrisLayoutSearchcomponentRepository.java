@@ -8,46 +8,45 @@
 package org.dspace.app.rest.repository;
 
 import java.sql.SQLException;
-import javax.annotation.Nullable;
-import javax.servlet.http.HttpServletRequest;
 
-import org.dspace.app.rest.model.CrisLayoutBoxRest;
+import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.model.CrisLayoutSearchComponentRest;
-import org.dspace.app.rest.projection.Projection;
 import org.dspace.content.EntityType;
 import org.dspace.core.Context;
 import org.dspace.layout.CrisLayoutBox;
-import org.dspace.layout.factory.CrisLayoutServiceFactory;
 import org.dspace.layout.service.CrisLayoutBoxService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
 /**
- * Link repository for the configuration subresource of a specific box
- * 
  * @author Danilo Di Nuzzo (danilo.dinuzzo at 4science.it)
  *
  */
-@Component(CrisLayoutBoxRest.CATEGORY + "." + CrisLayoutBoxRest.NAME + "." + CrisLayoutBoxRest.CONFIGURATON)
-public class CrisLayoutBoxConfigurationLinkRepository extends AbstractDSpaceRestRepository
-    implements LinkRestRepository {
+@Component(CrisLayoutSearchComponentRest.CATEGORY + "." + CrisLayoutSearchComponentRest.NAME)
+public class CrisLayoutSearchcomponentRepository extends DSpaceRestRepository<CrisLayoutSearchComponentRest, String> {
 
     @Autowired
-    private CrisLayoutServiceFactory serviceFactory;
+    private CrisLayoutBoxService service;
 
-    public CrisLayoutSearchComponentRest getConfiguration(
-            @Nullable HttpServletRequest request,
-            Integer boxId,
-            @Nullable Pageable pageable,
-            Projection projection) {
-        Context context = obtainContext();
+    @Override
+    public Page<CrisLayoutSearchComponentRest> findAll(Context context, Pageable pageable) {
+        throw new RepositoryMethodNotImplementedException("No implementation found; Method not Implemented!", "");
+    }
+
+    /* (non-Javadoc)
+     * @see org.dspace.app.rest.repository.DSpaceRestRepository#findOne(org.dspace.core.Context, java.io.Serializable)
+     */
+    @Override
+    @PreAuthorize("permitAll")
+    public CrisLayoutSearchComponentRest findOne(Context context, String id) {
         String boxConfigurationId = null;
-        CrisLayoutBoxService service = serviceFactory.getBoxService();
         CrisLayoutSearchComponentRest rVal = null;
 
         try {
-            CrisLayoutBox box = service.find(context, boxId);
+            CrisLayoutBox box = service.findByShortname(context, id);
             if (box != null && box.getType() != null) {
                 rVal = new CrisLayoutSearchComponentRest();
                 rVal.setId(box.getShortname());
@@ -64,5 +63,13 @@ public class CrisLayoutBoxConfigurationLinkRepository extends AbstractDSpaceRest
             throw new RuntimeException(e.getMessage(), e);
         }
         return rVal;
+    }
+
+    /* (non-Javadoc)
+     * @see org.dspace.app.rest.repository.DSpaceRestRepository#getDomainClass()
+     */
+    @Override
+    public Class<CrisLayoutSearchComponentRest> getDomainClass() {
+        return CrisLayoutSearchComponentRest.class;
     }
 }
