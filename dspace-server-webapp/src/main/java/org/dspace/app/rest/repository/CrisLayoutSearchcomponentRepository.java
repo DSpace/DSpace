@@ -53,13 +53,7 @@ public class CrisLayoutSearchcomponentRepository extends DSpaceRestRepository<Cr
 
                 boxConfigurationId = box.getType();
                 EntityType entity = box.getEntitytype();
-                if (entity.getLabel().equals("Person")) {
-                    boxConfigurationId += ".rp";
-                } else if (entity.getLabel().equals("Project")) {
-                    boxConfigurationId += ".pj";
-                } else if (entity.getLabel().equals("OrgUnit")) {
-                    boxConfigurationId += ".ou";
-                } else {
+                if (entity != null) {
                     boxConfigurationId += "." + entity.getLabel();
                 }
                 boxConfigurationId += "." + box.getShortname();
