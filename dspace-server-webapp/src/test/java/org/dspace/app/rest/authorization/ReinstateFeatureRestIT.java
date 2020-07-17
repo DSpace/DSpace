@@ -7,6 +7,8 @@
  */
 package org.dspace.app.rest.authorization;
 
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -82,13 +84,14 @@ public class ReinstateFeatureRestIT extends AbstractControllerIntegrationTest {
                     .andExpect(jsonPath("$",
                             Matchers.is(AuthorizationMatcher.matchAuthorization(authAdminWithdraw))));
 
-        getClient(adminToken).perform(get("/api/authz/authorizations/search/objectAndFeature")
+        getClient(adminToken).perform(get("/api/authz/authorizations/search/object")
                 .param("uri", itemUri)
                 .param("eperson", admin.getID().toString())
                 .param("feature", reinstateFeature.getName()))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$",
-                    Matchers.is(AuthorizationMatcher.matchAuthorization(authAdminWithdraw))));
+            .andExpect(jsonPath("$._embedded.authorizations", contains(
+                    Matchers.is(AuthorizationMatcher.matchAuthorization(authAdminWithdraw))))
+            );
     }
 
     @Test
@@ -111,13 +114,14 @@ public class ReinstateFeatureRestIT extends AbstractControllerIntegrationTest {
                     .andExpect(jsonPath("$",
                             Matchers.is(AuthorizationMatcher.matchAuthorization(authAdminWithdraw))));
 
-        getClient(comAdminToken).perform(get("/api/authz/authorizations/search/objectAndFeature")
+        getClient(comAdminToken).perform(get("/api/authz/authorizations/search/object")
                 .param("uri", itemUri)
                 .param("eperson", eperson.getID().toString())
                 .param("feature", reinstateFeature.getName()))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$",
-                    Matchers.is(AuthorizationMatcher.matchAuthorization(authAdminWithdraw))));
+            .andExpect(jsonPath("$._embedded.authorizations", contains(
+                    Matchers.is(AuthorizationMatcher.matchAuthorization(authAdminWithdraw))))
+            );
 
         // verify that the property core.authorization.collection-admin.item.reinstatiate = false is respected
         // the community admins should be still authorized
@@ -127,13 +131,14 @@ public class ReinstateFeatureRestIT extends AbstractControllerIntegrationTest {
                 .andExpect(jsonPath("$",
                         Matchers.is(AuthorizationMatcher.matchAuthorization(authAdminWithdraw))));
 
-        getClient(comAdminToken).perform(get("/api/authz/authorizations/search/objectAndFeature")
+        getClient(comAdminToken).perform(get("/api/authz/authorizations/search/object")
             .param("uri", itemUri)
             .param("eperson", eperson.getID().toString())
             .param("feature", reinstateFeature.getName()))
         .andExpect(status().isOk())
-        .andExpect(jsonPath("$",
-                Matchers.is(AuthorizationMatcher.matchAuthorization(authAdminWithdraw))));
+        .andExpect(jsonPath("$._embedded.authorizations", contains(
+                Matchers.is(AuthorizationMatcher.matchAuthorization(authAdminWithdraw))))
+        );
 
         // now verify that the property core.authorization.community-admin.item.reinstatiate = false is respected
         // and also community admins are blocked
@@ -143,11 +148,11 @@ public class ReinstateFeatureRestIT extends AbstractControllerIntegrationTest {
         getClient(comAdminToken).perform(get("/api/authz/authorizations/" + authAdminWithdraw.getID()))
                     .andExpect(status().isNotFound());
 
-        getClient(comAdminToken).perform(get("/api/authz/authorizations/search/objectAndFeature")
+        getClient(comAdminToken).perform(get("/api/authz/authorizations/search/object")
                 .param("uri", itemUri)
                 .param("eperson", eperson.getID().toString())
                 .param("feature", reinstateFeature.getName()))
-            .andExpect(status().isNoContent());
+            .andExpect(jsonPath("$.page.totalElements", is(0)));
     }
 
     @Test
@@ -170,23 +175,24 @@ public class ReinstateFeatureRestIT extends AbstractControllerIntegrationTest {
                     .andExpect(jsonPath("$",
                             Matchers.is(AuthorizationMatcher.matchAuthorization(authAdminWithdraw))));
 
-        getClient(colAdminToken).perform(get("/api/authz/authorizations/search/objectAndFeature")
+        getClient(colAdminToken).perform(get("/api/authz/authorizations/search/object")
                 .param("uri", itemUri)
                 .param("eperson", eperson.getID().toString())
                 .param("feature", reinstateFeature.getName()))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$",
-                    Matchers.is(AuthorizationMatcher.matchAuthorization(authAdminWithdraw))));
+            .andExpect(jsonPath("$._embedded.authorizations", contains(
+                    Matchers.is(AuthorizationMatcher.matchAuthorization(authAdminWithdraw))))
+            );
         // verify that the property core.authorization.collection-admin.item.reinstatiate = false is respected
         configurationService.setProperty("core.authorization.collection-admin.item.reinstatiate", false);
         getClient(colAdminToken).perform(get("/api/authz/authorizations/" + authAdminWithdraw.getID()))
                     .andExpect(status().isNotFound());
 
-        getClient(colAdminToken).perform(get("/api/authz/authorizations/search/objectAndFeature")
+        getClient(colAdminToken).perform(get("/api/authz/authorizations/search/object")
                 .param("uri", itemUri)
                 .param("eperson", eperson.getID().toString())
                 .param("feature", reinstateFeature.getName()))
-            .andExpect(status().isNoContent());
+            .andExpect(jsonPath("$.page.totalElements", is(0)));
     }
 
     @Test
@@ -207,20 +213,20 @@ public class ReinstateFeatureRestIT extends AbstractControllerIntegrationTest {
         getClient(epersonToken).perform(get("/api/authz/authorizations/" + authEpersonWithdraw.getID()))
                     .andExpect(status().isNotFound());
 
-        getClient(epersonToken).perform(get("/api/authz/authorizations/search/objectAndFeature")
+        getClient(epersonToken).perform(get("/api/authz/authorizations/search/object")
                 .param("uri", itemUri)
                 .param("eperson", eperson.getID().toString())
                 .param("feature", reinstateFeature.getName()))
-            .andExpect(status().isNoContent());
+            .andExpect(jsonPath("$.page.totalElements", is(0)));
 
         // check the authorization for the anonymous user
         getClient().perform(get("/api/authz/authorizations/" + authAnonymousWithdraw.getID()))
                 .andExpect(status().isNotFound());
 
-        getClient().perform(get("/api/authz/authorizations/search/objectAndFeature")
+        getClient().perform(get("/api/authz/authorizations/search/object")
             .param("uri", itemUri)
             .param("feature", reinstateFeature.getName()))
-        .andExpect(status().isNoContent());
+        .andExpect(jsonPath("$.page.totalElements", is(0)));
     }
 
     @Test
@@ -251,28 +257,28 @@ public class ReinstateFeatureRestIT extends AbstractControllerIntegrationTest {
         getClient(adminToken).perform(get("/api/authz/authorizations/" + authWithdrawnItem.getID()))
                     .andExpect(status().isNotFound());
 
-        getClient(adminToken).perform(get("/api/authz/authorizations/search/objectAndFeature")
+        getClient(adminToken).perform(get("/api/authz/authorizations/search/object")
                 .param("uri", archivedItemUri)
                 .param("eperson", eperson.getID().toString())
                 .param("feature", reinstateFeature.getName()))
-            .andExpect(status().isNoContent());
+            .andExpect(jsonPath("$.page.totalElements", is(0)));
 
         getClient(adminToken).perform(get("/api/authz/authorizations/" + authWsItem.getID()))
             .andExpect(status().isNotFound());
 
-        getClient(adminToken).perform(get("/api/authz/authorizations/search/objectAndFeature")
+        getClient(adminToken).perform(get("/api/authz/authorizations/search/object")
                 .param("uri", wsItemUri)
                 .param("eperson", eperson.getID().toString())
                 .param("feature", reinstateFeature.getName()))
-            .andExpect(status().isNoContent());
+            .andExpect(jsonPath("$.page.totalElements", is(0)));
 
         getClient(adminToken).perform(get("/api/authz/authorizations/" + authWFItem.getID()))
             .andExpect(status().isNotFound());
 
-        getClient(adminToken).perform(get("/api/authz/authorizations/search/objectAndFeature")
+        getClient(adminToken).perform(get("/api/authz/authorizations/search/object")
                 .param("uri", wfItemUri)
                 .param("eperson", eperson.getID().toString())
                 .param("feature", reinstateFeature.getName()))
-            .andExpect(status().isNoContent());
+            .andExpect(jsonPath("$.page.totalElements", is(0)));
     }
 }
