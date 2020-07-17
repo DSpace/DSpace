@@ -22,14 +22,13 @@ public class CrisLayoutSearchComponentRest extends BaseObjectRest<String> {
 
     private String id;
     private String configuration;
-    private String type;
 
     /* (non-Javadoc)
      * @see org.dspace.app.rest.model.RestModel#getType()
      */
     @Override
     public String getType() {
-        return type;
+        return NAME;
     }
 
     /* (non-Javadoc)
@@ -62,9 +61,5 @@ public class CrisLayoutSearchComponentRest extends BaseObjectRest<String> {
 
     public void setConfiguration(String configuration) {
         this.configuration = configuration;
-    }
-
-    public void setType(String type) {
-        this.type = type;
     }
 }

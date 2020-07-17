@@ -971,13 +971,13 @@
         <!--Which sidebar facets are to be displayed-->
         <property name="sidebarFacets">
             <list>
-                <ref bean="searchFilterProjectInvestigator"/>
+                <ref bean="searchFilterEntityType" />
             </list>
         </property>
         <!--The search filters which can be used on the discovery search page-->
         <property name="searchFilters">
             <list>
-                <ref bean="searchFilterTitle" />
+                <ref bean="searchFilterEntityType" />
                 <ref bean="searchFilterProjectInvestigator"/>
             </list>
         </property>
