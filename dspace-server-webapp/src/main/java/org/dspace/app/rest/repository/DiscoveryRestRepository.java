@@ -102,7 +102,7 @@ public class DiscoveryRestRepository extends AbstractDSpaceRestRepository {
         boolean isRelatedItem = discoveryConfiguration != null &&
                 discoveryConfiguration instanceof DiscoveryRelatedItemConfiguration;
 
-        if (isRelatedItem) {
+        if (isRelatedItem && scopeObject != null) {
             ((DiscoveryRelatedItemConfiguration) discoveryConfiguration)
             .setFilterQueriesParameters(scopeObject.getID());
         }

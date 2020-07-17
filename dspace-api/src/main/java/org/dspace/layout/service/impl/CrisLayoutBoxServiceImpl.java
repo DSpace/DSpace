@@ -199,7 +199,13 @@ public class CrisLayoutBoxServiceImpl implements CrisLayoutBoxService {
     public boolean hasContent(CrisLayoutBox box, List<MetadataValue> values) {
         boolean found = false;
         Set<CrisLayoutField> boxFields = box.getLayoutFields();
-        if ( boxFields != null && !boxFields.isEmpty() ) {
+        // Check if the box type is relation
+        boolean isRelationBox = box.getType() != null ?
+                box.getType().equalsIgnoreCase("relation") : false;
+        if (isRelationBox) {
+            // The relation box has no associated content
+            found = true;
+        } else if ( boxFields != null && !boxFields.isEmpty() ) {
             for (MetadataValue value: values) {
                 for (CrisLayoutField field: boxFields) {
                     if (value.getMetadataField().equals(field.getMetadataField())) {
