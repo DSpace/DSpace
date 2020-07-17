@@ -129,7 +129,8 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService 
                 itemSubmissionConfigReader = new SubmissionConfigReader();
             } catch (SubmissionConfigReaderException e) {
                 // the system is in an illegal state as the submission definition is not valid
-                throw new IllegalStateException(e);
+                throw new IllegalStateException("Error reading the item submission configuration: " + e.getMessage(),
+                        e);
             }
             loadChoiceAuthorityConfigurations();
             initialized = true;
@@ -316,66 +317,54 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService 
         autoRegisterChoiceAuthorityFromInputReader();
     }
 
+    /**
+     * This method will register all the authorities that are required due to the
+     * submission forms configuration. This includes authorities for value pairs and
+     * xml vocabularies
+     */
     private void autoRegisterChoiceAuthorityFromInputReader() {
         try {
             List<SubmissionConfig> submissionConfigs = itemSubmissionConfigReader
                     .getAllSubmissionConfigs(Integer.MAX_VALUE, 0);
             DCInputsReader dcInputsReader = new DCInputsReader();
 
+            // loop over all the defined item submission configuration
             for (SubmissionConfig subCfg : submissionConfigs) {
                 String submissionName = subCfg.getSubmissionName();
                 List<DCInputSet> inputsBySubmissionName = dcInputsReader.getInputsBySubmissionName(submissionName);
+                // loop over the submission forms configuration eventually associated with the submission panel
                 for (DCInputSet dcinputSet : inputsBySubmissionName) {
                     DCInput[][] dcinputs = dcinputSet.getFields();
                     for (DCInput[] dcrows : dcinputs) {
                         for (DCInput dcinput : dcrows) {
+                            // for each input in the form check if it is associated with a real value pairs
+                            // or an xml vocabulary
+                            String authorityName = null;
                             if (StringUtils.isNotBlank(dcinput.getPairsType())
-                                || StringUtils.isNotBlank(dcinput.getVocabulary())) {
-                                String authorityName = dcinput.getPairsType();
-                                if (StringUtils.isBlank(authorityName)) {
-                                    authorityName = dcinput.getVocabulary();
-                                }
-                                if (!StringUtils.equals(dcinput.getInputType(), "qualdrop_value")) {
-                                    String fieldKey = makeFieldKey(dcinput.getSchema(), dcinput.getElement(),
-                                                                   dcinput.getQualifier());
-                                    ChoiceAuthority ca = controller.get(authorityName);
+                                    && !StringUtils.equals(dcinput.getInputType(), "qualdrop_value")) {
+                                authorityName = dcinput.getPairsType();
+                            } else if (StringUtils.isNotBlank(dcinput.getVocabulary())) {
+                                authorityName = dcinput.getVocabulary();
+                            }
+
+                            // do we have an authority?
+                            if (StringUtils.isNotBlank(authorityName)) {
+                                String fieldKey = makeFieldKey(dcinput.getSchema(), dcinput.getElement(),
+                                                               dcinput.getQualifier());
+                                ChoiceAuthority ca = controller.get(authorityName);
+                                if (ca == null) {
+                                    ca = (ChoiceAuthority) pluginService
+                                        .getNamedPlugin(ChoiceAuthority.class, authorityName);
                                     if (ca == null) {
-                                        ca = (ChoiceAuthority) pluginService
-                                            .getNamedPlugin(ChoiceAuthority.class, authorityName);
-                                        if (ca == null) {
-                                            throw new IllegalStateException("Invalid configuration for " + fieldKey
-                                                    + " in submission definition " + submissionName
-                                                    + ", form definition " + dcinputSet.getFormName()
-                                                    + " no named plugin found: " + authorityName);
-                                        }
+                                        throw new IllegalStateException("Invalid configuration for " + fieldKey
+                                                + " in submission definition " + submissionName
+                                                + ", form definition " + dcinputSet.getFormName()
+                                                + " no named plugin found: " + authorityName);
                                     }
-
-                                    Map<String, ChoiceAuthority> definition2authority;
-                                    if (controllerFormDefinitions.containsKey(fieldKey)) {
-                                        definition2authority = controllerFormDefinitions.get(fieldKey);
-                                    } else {
-                                        definition2authority = new HashMap<String, ChoiceAuthority>();
-                                    }
-                                    definition2authority.put(submissionName, ca);
-                                    controllerFormDefinitions.put(fieldKey, definition2authority);
-
-                                    Map<String, List<String>> authorityName2definitions;
-                                    if (authoritiesFormDefinitions.containsKey(authorityName)) {
-                                        authorityName2definitions = authoritiesFormDefinitions.get(authorityName);
-                                    } else {
-                                        authorityName2definitions = new HashMap<String, List<String>>();
-                                    }
-
-                                    List<String> fields;
-                                    if (authorityName2definitions.containsKey(submissionName)) {
-                                        fields = authorityName2definitions.get(submissionName);
-                                    } else {
-                                        fields = new ArrayList<String>();
-                                    }
-                                    fields.add(fieldKey);
-                                    authorityName2definitions.put(submissionName, fields);
-                                    authoritiesFormDefinitions.put(authorityName, authorityName2definitions);
                                 }
+
+                                addAuthorityToFormCacheMap(submissionName, fieldKey, ca);
+                                addFormDetailsToAuthorityCacheMap(submissionName, authorityName, fieldKey);
                             }
                         }
                     }
@@ -385,6 +374,52 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService 
             // the system is in an illegal state as the submission definition is not valid
             throw new IllegalStateException(e);
         }
+    }
+
+    /**
+     * Add the form/field to the cache map keeping track of which form/field are
+     * associated with the specific authority name
+     * 
+     * @param submissionName the form definition name
+     * @param authorityName  the name of the authority plugin
+     * @param fieldKey       the field key that use the authority
+     */
+    private void addFormDetailsToAuthorityCacheMap(String submissionName, String authorityName, String fieldKey) {
+        Map<String, List<String>> authorityName2definitions;
+        if (authoritiesFormDefinitions.containsKey(authorityName)) {
+            authorityName2definitions = authoritiesFormDefinitions.get(authorityName);
+        } else {
+            authorityName2definitions = new HashMap<String, List<String>>();
+        }
+
+        List<String> fields;
+        if (authorityName2definitions.containsKey(submissionName)) {
+            fields = authorityName2definitions.get(submissionName);
+        } else {
+            fields = new ArrayList<String>();
+        }
+        fields.add(fieldKey);
+        authorityName2definitions.put(submissionName, fields);
+        authoritiesFormDefinitions.put(authorityName, authorityName2definitions);
+    }
+
+    /**
+     * Add the authority plugin to the cache map keeping track of which authority is
+     * used by a specific form/field
+     * 
+     * @param submissionName the submission definition name
+     * @param fieldKey       the field key that require the authority
+     * @param ca             the authority plugin
+     */
+    private void addAuthorityToFormCacheMap(String submissionName, String fieldKey, ChoiceAuthority ca) {
+        Map<String, ChoiceAuthority> definition2authority;
+        if (controllerFormDefinitions.containsKey(fieldKey)) {
+            definition2authority = controllerFormDefinitions.get(fieldKey);
+        } else {
+            definition2authority = new HashMap<String, ChoiceAuthority>();
+        }
+        definition2authority.put(submissionName, ca);
+        controllerFormDefinitions.put(fieldKey, definition2authority);
     }
 
     /**
