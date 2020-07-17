@@ -14,7 +14,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.solr.common.SolrInputDocument;
 import org.dspace.content.MetadataField;
 import org.dspace.content.service.MetadataFieldService;
@@ -45,11 +45,15 @@ public class MetadataFieldIndexFactoryImpl extends IndexFactoryImpl<IndexableMet
         addFacetIndex(doc, "schema", metadataField.getMetadataSchema().getName(),
             metadataField.getMetadataSchema().getName());
         addFacetIndex(doc, "element", metadataField.getElement(), metadataField.getElement());
-        if (StringUtils.isNotBlank(metadataField.getQualifier())) {
-            addFacetIndex(doc, "qualifier", metadataField.getQualifier(), metadataField.getQualifier());
-        }
         String fieldName = metadataField.toString().replace('_', '.');
         addFacetIndex(doc, "fieldName", fieldName, fieldName);
+        if (StringUtils.isNotBlank(metadataField.getQualifier())) {
+            addFacetIndex(doc, "qualifier", metadataField.getQualifier(), metadataField.getQualifier());
+            addFacetIndex(doc, "fieldName", fieldName, metadataField.getElement() + "." + metadataField.getQualifier());
+            addFacetIndex(doc, "fieldName", metadataField.getQualifier(), metadataField.getQualifier());
+        } else {
+            addFacetIndex(doc, "fieldName", metadataField.getElement(), metadataField.getElement());
+        }
         addNamedResourceTypeIndex(doc, indexableObject.getTypeText());
         Group anonymousGroup = groupService.findByName(context, Group.ANONYMOUS);
         // add read permission on doc for anonymous group
