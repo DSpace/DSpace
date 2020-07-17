@@ -26,6 +26,7 @@ import org.dspace.content.Community;
 import org.dspace.content.EntityType;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
+import org.dspace.content.Relationship;
 import org.dspace.content.RelationshipType;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.content.factory.ContentServiceFactory;
@@ -39,6 +40,7 @@ import org.dspace.scripts.configuration.ScriptConfiguration;
 import org.dspace.scripts.factory.ScriptServiceFactory;
 import org.dspace.scripts.service.ScriptService;
 import org.junit.Rule;
+import org.dspace.content.service.RelationshipService;
 import org.dspace.content.service.RelationshipTypeService;
 import org.dspace.content.service.WorkspaceItemService;
 import org.junit.Before;
@@ -58,6 +60,8 @@ public class MetadataImportTest extends AbstractIntegrationTest {
     private EntityTypeService entityTypeService = ContentServiceFactory.getInstance().getEntityTypeService();
     private RelationshipTypeService relationshipTypeService = ContentServiceFactory.getInstance()
                                                                                    .getRelationshipTypeService();
+    private RelationshipService relationshipService = ContentServiceFactory.getInstance().getRelationshipService();
+
     Collection collection;
 
     @Rule
@@ -146,6 +150,67 @@ public class MetadataImportTest extends AbstractIntegrationTest {
 
         ScriptLauncher.handleScript(args, ScriptLauncher.getConfig(kernelImpl), testDSpaceRunnableHandler, kernelImpl);
         context.turnOffAuthorisationSystem();
+        relationshipTypeService.delete(context, relationshipTypeService.find(context, relationshipType.getID()));
+        entityTypeService.delete(context, entityTypeService.find(context, person.getID()));
+        entityTypeService.delete(context, entityTypeService.find(context, publication.getID()));
+        itemService.delete(context, itemService.find(context, item.getID()));
+        itemService.delete(context, itemService.find(context, item1.getID()));
+        Files.delete(Paths.get(testFileLocation));
+        context.commit();
+        context.restoreAuthSystemState();
+    }
+
+    @Test
+    public void relationshipMetadataImporAlreadyExistingItemTest() throws Exception {
+
+        String fileLocation = new File(testProps.get("test.importrelationshipexistingcsv").toString())
+            .getAbsolutePath();
+
+        context.turnOffAuthorisationSystem();
+
+
+        WorkspaceItem workspaceItem = workspaceItemService.create(context, collection, false);
+        Item item = installItemService.installItem(context, workspaceItem);
+        item.setSubmitter(context.getCurrentUser());
+        itemService.addMetadata(context, item, "relationship", "type", null, null, "Person");
+        itemService.update(context, item);
+        List<Relationship> relationshipList = relationshipService.findByItem(context, item);
+        assertEquals(0, relationshipList.size());
+
+        workspaceItem = workspaceItemService.create(context, collection, false);
+        Item item1 = installItemService.installItem(context, workspaceItem);
+        item1.setSubmitter(context.getCurrentUser());
+        itemService.addMetadata(context, item1, "relationship", "type", null, null, "Publication");
+        itemService.update(context, item1);
+
+        EntityType publication = entityTypeService.create(context, "Publication");
+        EntityType person = entityTypeService.create(context, "Person");
+        RelationshipType relationshipType = relationshipTypeService.create(context, publication, person,
+                                                                           "isAuthorOfPublication",
+                                                                           "isPublicationOfAuthor",
+                                                                           0, 10, 0, 10);
+        context.restoreAuthSystemState();
+
+        List<String> list = Files.readAllLines(Paths.get(fileLocation));
+        String lastLine = list.get(list.size() - 1);
+        list.remove(list.size() - 1);
+//        lastLine = lastLine + "\"" + item1.getID() + "\"";
+        lastLine = "\"" + item.getID() + "\"" + lastLine + "\"" + item1.getID() + "\"";
+        list.add(lastLine);
+        String testFileLocation = testProps.get("test.importrelationshipusedintestcsv").toString();
+        Files.write(Paths.get(testFileLocation), list);
+        String[] args = new String[] {"metadata-import", "-f", testFileLocation, "-e", eperson.getEmail(), "-s"};
+        TestDSpaceRunnableHandler testDSpaceRunnableHandler = new TestDSpaceRunnableHandler();
+
+        ScriptLauncher.handleScript(args, ScriptLauncher.getConfig(kernelImpl), testDSpaceRunnableHandler, kernelImpl);
+        context.turnOffAuthorisationSystem();
+        item = itemService.find(context, item.getID());
+        relationshipList = relationshipService.findByItem(context, item);
+        assertEquals(1, relationshipList.size());
+        relationshipService.delete(context, relationshipList.get(0));
+        relationshipTypeService.delete(context, relationshipTypeService.find(context, relationshipType.getID()));
+        entityTypeService.delete(context, entityTypeService.find(context, person.getID()));
+        entityTypeService.delete(context, entityTypeService.find(context, publication.getID()));
         itemService.delete(context, itemService.find(context, item.getID()));
         itemService.delete(context, itemService.find(context, item1.getID()));
         Files.delete(Paths.get(testFileLocation));
