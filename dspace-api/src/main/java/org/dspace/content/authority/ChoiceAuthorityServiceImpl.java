@@ -374,7 +374,8 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService 
             }
         } catch (DCInputsReaderException e) {
             // the system is in an illegal state as the submission definition is not valid
-            throw new IllegalStateException(e);
+            throw new IllegalStateException("Error reading the item submission configuration: " + e.getMessage(),
+                    e);
         }
     }
 
@@ -503,7 +504,8 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService 
                 ma = controllerFormDefinitions.get(fieldKey).get(submissionName.getSubmissionName());
             } catch (SubmissionConfigReaderException e) {
                 // the system is in an illegal state as the submission definition is not valid
-                throw new IllegalStateException(e);
+                throw new IllegalStateException("Error reading the item submission configuration: " + e.getMessage(),
+                        e);
             }
         }
         return ma;
