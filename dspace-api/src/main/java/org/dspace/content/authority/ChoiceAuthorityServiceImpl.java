@@ -272,6 +272,8 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService 
     public void clearCache() {
         controller.clear();
         authorities.clear();
+        presentation.clear();
+        closed.clear();
         controllerFormDefinitions.clear();
         authoritiesFormDefinitions.clear();
         itemSubmissionConfigReader = null;
