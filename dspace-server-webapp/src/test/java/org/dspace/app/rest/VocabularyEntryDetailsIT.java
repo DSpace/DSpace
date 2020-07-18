@@ -7,6 +7,7 @@
  */
 package org.dspace.app.rest;
 
+import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static org.hamcrest.Matchers.endsWith;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -27,6 +28,18 @@ import org.junit.Test;
  * @author Mykhaylo Boychuk (4science.it)
  */
 public class VocabularyEntryDetailsIT extends AbstractControllerIntegrationTest {
+    @Test
+    public void discoverableNestedLinkTest() throws Exception {
+        String token = getAuthToken(eperson.getEmail(), password);
+        getClient(token).perform(get("/api"))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$._links",Matchers.allOf(
+                                hasJsonPath("$.vocabularyEntryDetails.href",
+                                         is("http://localhost/api/submission/vocabularyEntryDetails")),
+                                hasJsonPath("$.vocabularyEntryDetails-search.href",
+                                         is("http://localhost/api/submission/vocabularyEntryDetails/search"))
+                        )));
+    }
 
     @Test
     public void findAllTest() throws Exception {
