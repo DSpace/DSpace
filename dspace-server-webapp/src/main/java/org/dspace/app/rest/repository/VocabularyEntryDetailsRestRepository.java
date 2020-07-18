@@ -12,6 +12,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+import org.atteo.evo.inflector.English;
 import org.dspace.app.rest.DiscoverableEndpointsService;
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
@@ -55,9 +56,10 @@ public class VocabularyEntryDetailsRestRepository extends DSpaceRestRepository<V
 
     @Override
     public void afterPropertiesSet() throws Exception {
+        String models = English.plural(VocabularyEntryDetailsRest.NAME);
         discoverableEndpointsService.register(this, Arrays.asList(
-                new Link("/api/" + VocabularyRest.CATEGORY + "/" + VocabularyEntryDetailsRest.NAME + "/search",
-                        VocabularyEntryDetailsRest.NAME + "-search")));
+                new Link("/api/" + VocabularyRest.CATEGORY + "/" + models + "/search",
+                        models + "-search")));
     }
 
     @PreAuthorize("hasAuthority('AUTHENTICATED')")
