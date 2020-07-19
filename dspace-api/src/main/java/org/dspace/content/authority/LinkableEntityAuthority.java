@@ -16,11 +16,10 @@ package org.dspace.content.authority;
 public interface LinkableEntityAuthority {
 
     /**
-     * Get the linked entity type starting from the metadata field.
+     * Get the linked entity type managed by the authority
      *
-     * @param field single string identifying metadata field
      * @return the linked entity type as a String
      */
-    public String getLinkedEntityType(String field);
+    public String getLinkedEntityType();
 
 }
