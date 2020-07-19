@@ -42,8 +42,8 @@
       </row>
       <row>
         <field>
-          <dc-schema>local</dc-schema>
-          <dc-element>contributor</dc-element>
+          <dc-schema>oairecerif</dc-schema>
+          <dc-element>author</dc-element>
           <dc-qualifier>affiliation</dc-qualifier>
           <label>Affiliation</label>
           <input-type>onebox</input-type>
@@ -68,9 +68,9 @@
       </row>
       <row>
         <field>
-          <dc-schema>dc</dc-schema>
-          <dc-element>contributor</dc-element>
-          <dc-qualifier>editoraffiliation</dc-qualifier>
+          <dc-schema>oairecerif</dc-schema>
+          <dc-element>editor</dc-element>
+          <dc-qualifier>affiliation</dc-qualifier>
           <label>Affiliation</label>
           <input-type>onebox</input-type>
           <repeatable>false</repeatable>

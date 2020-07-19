@@ -1841,8 +1841,8 @@
         <property name="indexFieldName" value="projectinvestigators" />
         <property name="metadataFields">
             <list>
+                <value>crispj.coordinator</value>
                 <value>crispj.investigator</value>
-                <value>crispj.coinvestigators</value>
             </list>
         </property>
         <property name="facetLimit" value="5"/>

@@ -13,7 +13,21 @@
         <schema>cris</schema>
         <element>sourceId</element>
         <qualifier></qualifier>
-        <scope_note></scope_note>
+        <scope_note>Used by the cris consumer to store the source that has originated the item</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>cris</schema>
+        <element>policy</element>
+        <qualifier>eperson</qualifier>
+        <scope_note>Default metadata for custom policies rule</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>cris</schema>
+        <element>policy</element>
+        <qualifier>group</qualifier>
+        <scope_note>Default metadata for custom policies rule</scope_note>
     </dc-type>
 
 </dspace-dc-types>
