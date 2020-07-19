@@ -366,4 +366,11 @@
             <class>org.dspace.app.util.InitializeEntities</class>
         </step>
     </command>
+        <command>
+        <name>initialize-only-entity-types</name>
+        <description>Initialize only the entity types as needed by DSpace-CRIS</description>
+        <step>
+            <class>org.dspace.app.util.InitializeEntityTypesOnly</class>
+        </step>
+    </command>
 </commands>

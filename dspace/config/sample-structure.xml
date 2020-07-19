@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<import_structure>
+	<community>
+		<name>CRIS</name>
+		<description />
+		<intro />
+		<copyright />
+		<sidebar />
+		<collection>
+			<name>Person</name>
+			<entity-type>Person</entity-type>
+			<description />
+			<intro />
+			<copyright />
+			<sidebar />
+			<license />
+			<provenance />
+		</collection>
+        <collection>
+            <name>Project</name>
+            <entity-type>Project</entity-type>
+            <description />
+            <intro />
+            <copyright />
+            <sidebar />
+            <license />
+            <provenance />
+        </collection>
+        <collection>
+            <name>OrgUnit</name>
+            <entity-type>OrgUnit</entity-type>
+            <description />
+            <intro />
+            <copyright />
+            <sidebar />
+            <license />
+            <provenance />
+        </collection>
+        <collection>
+            <name>Journal</name>
+            <entity-type>Journal</entity-type>
+            <description />
+            <intro />
+            <copyright />
+            <sidebar />
+            <license />
+            <provenance />
+        </collection>
+        <collection>
+            <name>Publication</name>
+            <entity-type>Publication</entity-type>
+            <description />
+            <intro />
+            <copyright />
+            <sidebar />
+            <license />
+            <provenance />
+        </collection>
+        <collection>
+            <name>Patent</name>
+            <entity-type>Patent</entity-type>
+            <description />
+            <intro />
+            <copyright />
+            <sidebar />
+            <license />
+            <provenance />
+        </collection>
+        <collection>
+            <name>Dataset</name>
+            <entity-type>Dataset</entity-type>
+            <description />
+            <intro />
+            <copyright />
+            <sidebar />
+            <license />
+            <provenance />
+        </collection>
+        <collection>
+            <name>Event</name>
+            <entity-type>Event</entity-type>
+            <description />
+            <intro />
+            <copyright />
+            <sidebar />
+            <license />
+            <provenance />
+        </collection>
+        <collection>
+            <name>Equipment</name>
+            <entity-type>Equipment</entity-type>
+            <description />
+            <intro />
+            <copyright />
+            <sidebar />
+            <license />
+            <provenance />
+        </collection>
+	</community>
+</import_structure>
+
+
+
+
+
+
+
