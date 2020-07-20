@@ -159,7 +159,7 @@ public class ImportService implements Destroyable {
             int total = 0;
             for (MetadataSource metadataSource : matchingImports(uri)) {
                 if (metadataSource instanceof QuerySource) {
-                    total += ((QuerySource)metadataSource).getNbRecords(query);
+                    total += ((QuerySource)metadataSource).getRecordsCount(query);
                 }
             }
             return total;
@@ -181,7 +181,7 @@ public class ImportService implements Destroyable {
             int total = 0;
             for (MetadataSource metadataSource : matchingImports(uri)) {
                 if (metadataSource instanceof QuerySource) {
-                    total += ((QuerySource)metadataSource).getNbRecords(query);
+                    total += ((QuerySource)metadataSource).getRecordsCount(query);
                 }
             }
             return total;
@@ -297,11 +297,10 @@ public class ImportService implements Destroyable {
     }
 
     /*
-     * Get a collection of record from InputStream,
+     * Get a collection of record from File,
      * The first match will be return.
-     * This method doesn't close the InputStream.
      * 
-     * @param fileInputStream the input stream to the resource
+     * @param file  The file from which will read records
      * @return a single record contains the metadatum
      * @throws FileMultipleOccurencesException if more than one entry is found
      */
