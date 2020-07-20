@@ -22,6 +22,8 @@ import org.dspace.importer.external.metadatamapping.MetadataFieldMapping;
 import org.dspace.importer.external.metadatamapping.MetadatumDTO;
 import org.dspace.importer.external.metadatamapping.contributor.MetadataContributor;
 import org.jaxen.JaxenException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Required;
 
 /**
@@ -33,6 +35,8 @@ import org.springframework.beans.factory.annotation.Required;
  */
 public class ArXivIdMetadataContributor implements MetadataContributor<OMElement> {
     private MetadataFieldConfig field;
+
+    private static final Logger log = LoggerFactory.getLogger(ArXivIdMetadataContributor.class);
 
     /**
      * Return prefixToNamespaceMapping
@@ -160,13 +164,13 @@ public class ArXivIdMetadataContributor implements MetadataContributor<OMElement
                 } else if (el instanceof OMText) {
                     values.add(metadataFieldMapping.toDCValue(field, ((OMText) el).getText()));
                 } else {
-                    System.err.println("node of type: " + el.getClass());
+                    log.error("node of type: " + el.getClass());
                 }
             }
             parseValue(values);
             return values;
         } catch (JaxenException e) {
-            System.err.println(query);
+            log.error(query);
             throw new RuntimeException(e);
         }
     }
