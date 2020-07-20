@@ -9,6 +9,8 @@ package org.dspace.authority.filler;
 
 import java.util.Map;
 
+import org.dspace.core.Utils;
+
 /**
  * Class that model an ItemMetadataImportFiller configuration related to a
  * specific metadata.
@@ -47,6 +49,11 @@ public class MetadataConfiguration {
 
         private boolean appendMode = false;
 
+        private String targetMetadata;
+        private String targetMetadataSchema;
+        private String targetMetadataElement;
+        private String targetMetadataQualifier;
+
         public boolean isAppendMode() {
             return appendMode;
         }
@@ -69,6 +76,30 @@ public class MetadataConfiguration {
 
         public void setVisibility(Integer visibility) {
             this.visibility = visibility;
+        }
+
+        public String getTargetMetadata() {
+            return targetMetadata;
+        }
+
+        public void setTargetMetadata(String targetMetadata) {
+            this.targetMetadata = targetMetadata;
+            String[] tokens = Utils.tokenize(targetMetadata);
+            this.targetMetadataSchema = tokens[0];
+            this.targetMetadataElement = tokens[1];
+            this.targetMetadataQualifier = tokens[2];
+        }
+
+        public String getTargetMetadataSchema() {
+            return targetMetadataSchema;
+        }
+
+        public String getTargetMetadataElement() {
+            return targetMetadataElement;
+        }
+
+        public String getTargetMetadataQualifier() {
+            return targetMetadataQualifier;
         }
     }
 

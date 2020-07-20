@@ -11,7 +11,6 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -75,61 +74,57 @@ public class ItemMetadataImportFiller implements AuthorityImportFiller {
             List<MetadataValue> metadataValuesToAdd = findMetadata(sourceItem, additionalMetadataField);
             if (mappingDetails.isUseAll()) {
                 addAllMetadata(context, mappingDetails, itemToFill, metadataValuesToAdd,
-                        additionalMetadataField, metadata);
+                        metadata);
             } else {
                 addSingleMetadataByPlace(context, mappingDetails, itemToFill, metadataValuesToAdd,
-                        additionalMetadataField, metadata);
+                        metadata);
             }
         }
 
     }
 
     private void addAllMetadata(Context context, MappingDetails mappingDetails, Item relatedItem,
-            List<MetadataValue> metadataValuesToAdd, String additionalMetadataField,
-            MetadataValue archivedItemMetadata) throws SQLException {
-
+            List<MetadataValue> metadataValuesToAdd, MetadataValue archivedItemMetadata) throws SQLException {
         if (!mappingDetails.isAppendMode()) {
-            removeOldMetadata(context, relatedItem, additionalMetadataField);
+            itemService.clearMetadata(context, relatedItem, mappingDetails.getTargetMetadataSchema(),
+                    mappingDetails.getTargetMetadataElement(), mappingDetails.getTargetMetadataQualifier(), Item.ANY);
         }
 
         for (MetadataValue metadataValueToAdd : metadataValuesToAdd) {
             String valueToAdd = metadataValueToAdd.getValue();
-            itemService.addMetadata(context, relatedItem, metadataValueToAdd.getMetadataField(), Item.ANY, valueToAdd);
+            itemService.addMetadata(context, relatedItem, mappingDetails.getTargetMetadataSchema(),
+                    mappingDetails.getTargetMetadataElement(), mappingDetails.getTargetMetadataQualifier(), null,
+                    valueToAdd, null, -1);
         }
 
     }
 
     private void addSingleMetadataByPlace(Context context, MappingDetails mappingDetails, Item relatedItem,
-            List<MetadataValue> metadataValuesToAdd, String additionalMetadataField,
-            MetadataValue sourceMetadata) throws SQLException {
+            List<MetadataValue> metadataValuesToAdd, MetadataValue sourceMetadata) throws SQLException {
 
         Item sourceItem = (Item) sourceMetadata.getDSpaceObject();
 
         int place = sourceMetadata.getPlace();
         if (metadataValuesToAdd.size() < (place + 1)) {
-            log.error(MISSING_METADATA_FOR_POSITION_MSG, additionalMetadataField, place, sourceItem.getID());
+            log.error(MISSING_METADATA_FOR_POSITION_MSG, mappingDetails.getTargetMetadata(), place, sourceItem.getID());
             return;
         }
 
         if (!mappingDetails.isAppendMode()) {
-            removeOldMetadata(context, relatedItem, additionalMetadataField);
+            itemService.clearMetadata(context, relatedItem, mappingDetails.getTargetMetadataSchema(),
+                    mappingDetails.getTargetMetadataElement(), mappingDetails.getTargetMetadataQualifier(), Item.ANY);
         }
 
         MetadataValue metadataValueToAdd = metadataValuesToAdd.get(place);
         String valueToAdd = metadataValueToAdd.getValue();
-        itemService.addMetadata(context, relatedItem, metadataValueToAdd.getMetadataField(), Item.ANY, valueToAdd);
+        itemService.addMetadata(context, relatedItem, mappingDetails.getTargetMetadataSchema(),
+                mappingDetails.getTargetMetadataElement(), mappingDetails.getTargetMetadataQualifier(), null,
+                valueToAdd, null, -1);
 
     }
 
     private List<MetadataValue> findMetadata(Item item, String metadataField) {
         return itemService.getMetadataByMetadataString(item, metadataField);
-    }
-
-    private void removeOldMetadata(Context context, Item item, String additionalMetadataField) throws SQLException {
-        List<MetadataValue> metadataValuesToRemove = findMetadata(item, additionalMetadataField);
-        if (CollectionUtils.isNotEmpty(metadataValuesToRemove)) {
-            itemService.removeMetadataValues(context, item, metadataValuesToRemove);
-        }
     }
 
     public void setAllowsUpdateByDefault(boolean allowsUpdateByDefault) {

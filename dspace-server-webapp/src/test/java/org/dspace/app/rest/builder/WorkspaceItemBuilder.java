@@ -128,7 +128,8 @@ public class WorkspaceItemBuilder extends AbstractBuilder<WorkspaceItem, Workspa
     protected WorkspaceItemBuilder addMetadataValue(final String schema,
             final String element, final String qualifier, final String value) {
         try {
-            itemService.addMetadata(context, workspaceItem.getItem(), schema, element, qualifier, Item.ANY, value);
+            itemService.addMetadata(context, workspaceItem.getItem(), schema, element, qualifier, Item.ANY,
+                    value, null, -1);
         } catch (Exception e) {
             return handleException(e);
         }

@@ -212,7 +212,8 @@ public class CrisConsumer implements Consumer {
         Item relatedItem = workspaceItem.getItem();
         relatedItem.setOwningCollection(collection);
         relatedItem.setSubmitter(item.getSubmitter());
-        itemService.addMetadata(context, relatedItem, CRIS.getName(), "sourceId", null, Item.ANY, crisSourceId);
+        itemService.addMetadata(context, relatedItem, CRIS.getName(), "sourceId", null, null, crisSourceId);
+        itemService.addMetadata(context, relatedItem, "dc", "title", null, null, metadata.getValue());
         if (!hasRelationshipTypeMetadataEqualsTo(relatedItem, relationshipType)) {
             log.error("Inconstent configuration the related item " + relatedItem.getID().toString() + ", created from "
                     + item.getID().toString() + " (" + metadata.getMetadataField().toString('.') + ")"
