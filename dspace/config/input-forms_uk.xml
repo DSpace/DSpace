@@ -576,7 +576,7 @@
         </value-pairs>
         <value-pairs value-pairs-name="rights_links_localization" dc-term="rights_links_localization">
             <pair>
-                <displayed-value>&lt;a href="http://rightsstatements.org/vocab/CNE/1.0/"&gt;Авторське право не оцінено&lt;/a&gt;</displayed-value>
+                <displayed-value>&lt;a href="http://rightsstatements.org/vocab/CNE/1.0/"&gt;Copyright не зазначено&lt;/a&gt;</displayed-value>
                 <stored-value>cne</stored-value>
             </pair>
 <!--            <pair>-->
@@ -616,19 +616,19 @@
                 <stored-value>cc0</stored-value>
             </pair>
             <pair>
-                <displayed-value>&lt;a href="http://rightsstatements.org/vocab/InC/1.0/"&gt;Авторське право&lt;/a&gt;</displayed-value>
+                <displayed-value>&lt;a href="http://rightsstatements.org/vocab/InC/1.0/"&gt;Copyright&lt;/a&gt;</displayed-value>
                 <stored-value>inc10</stored-value>
             </pair>
             <pair>
-                <displayed-value>&lt;a href="http://rightsstatements.org/vocab/InC-EDU/1.0/"&gt;Авторське право - Дозволено використання в освітніх умовах&lt;/a&gt;</displayed-value>
+                <displayed-value>&lt;a href="http://rightsstatements.org/vocab/InC-EDU/1.0/"&gt;Copyright - Дозволено використання в освітніх умовах&lt;/a&gt;</displayed-value>
                 <stored-value>incedu10</stored-value>
             </pair>
             <pair>
-                <displayed-value>&lt;a href="http://rightsstatements.org/vocab/InC-NC/1.0/"&gt;Авторське право - Дозволено некомерційне використання&lt;/a&gt;</displayed-value>
+                <displayed-value>&lt;a href="http://rightsstatements.org/vocab/InC-NC/1.0/"&gt;Copyright - Дозволено некомерційне використання&lt;/a&gt;</displayed-value>
                 <stored-value>incnc10</stored-value>
             </pair>
             <pair>
-                <displayed-value>&lt;a href="http://rightsstatements.org/vocab/InC-RUU/1.0/"&gt;Авторське право - Власник прав не визначений&lt;/a&gt;</displayed-value>
+                <displayed-value>&lt;a href="http://rightsstatements.org/vocab/InC-RUU/1.0/"&gt;Copyright - Власник прав не визначений&lt;/a&gt;</displayed-value>
                 <stored-value>incru10</stored-value>
             </pair>
         </value-pairs>
