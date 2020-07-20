@@ -17,6 +17,7 @@ import java.util.UUID;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.eperson.EPerson;
 import org.dspace.services.RequestService;
 import org.dspace.services.model.Request;
 import org.dspace.util.UUIDUtils;
@@ -57,7 +58,13 @@ public class ResearcherProfileRestPermissionEvaluatorPlugin extends RestObjectPe
 
         Request request = requestService.getCurrentRequest();
         Context context = ContextUtil.obtainContext(request.getServletRequest());
-        if (id.equals(context.getCurrentUser().getID())) {
+
+        EPerson currentUser = context.getCurrentUser();
+        if (currentUser == null) {
+            return false;
+        }
+
+        if (id.equals(currentUser.getID())) {
             return true;
         }
 

@@ -145,9 +145,9 @@ public class ConverterService {
         return null;
     }
 
-    private Annotation getAnnotationForRestObject(BaseObjectRest<?> restObject) {
-        BaseObjectRest<?> baseObjectRest = restObject;
-        DSpaceRestRepository<?, ?> repositoryToUse = utils
+    private Annotation getAnnotationForRestObject(BaseObjectRest restObject) {
+        BaseObjectRest baseObjectRest = restObject;
+        DSpaceRestRepository repositoryToUse = utils
             .getResourceRepositoryByCategoryAndModel(baseObjectRest.getCategory(), baseObjectRest.getType());
         Annotation preAuthorize = null;
         int maxDepth = 0;

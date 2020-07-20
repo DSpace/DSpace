@@ -13,6 +13,8 @@ import java.util.UUID;
 import org.dspace.app.profile.ResearcherProfile;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
+import org.dspace.discovery.SearchServiceException;
+import org.dspace.eperson.EPerson;
 
 /**
  * Service interface class for the {@link ResearcherProfile} object. The
@@ -36,15 +38,17 @@ public interface ResearcherProfileService {
     public ResearcherProfile findById(Context context, UUID id) throws SQLException, AuthorizeException;
 
     /**
-     * Create a new researcher profile with the given id and the given visibility.
+     * Create a new researcher profile for the given ePerson.
      *
      * @param context the relevant DSpace Context.
-     * @param id      the researcher profile id
+     * @param ePerson the ePerson
      * @return the created profile
      * @throws SQLException
      * @throws AuthorizeException
+     * @throws SearchServiceException
      */
-    public ResearcherProfile createAndReturn(Context context, UUID id) throws AuthorizeException, SQLException;
+    public ResearcherProfile createAndReturn(Context context, EPerson ePerson)
+        throws AuthorizeException, SQLException, SearchServiceException;
 
     /**
      * Removes the association between the researcher profile and eperson related to
@@ -56,4 +60,16 @@ public interface ResearcherProfileService {
      * @throws SQLException
      */
     public void deleteById(Context context, UUID id) throws SQLException, AuthorizeException;
+
+    /**
+     * Changes the visibility of the given profile using the given new visible value
+     *
+     * @param context the relevant DSpace Context.
+     * @param profile the researcher profile to update
+     * @param visible the visible value to set
+     * @throws SQLException
+     * @throws AuthorizeException
+     */
+    public void changeVisibility(Context context, ResearcherProfile profile, boolean visible)
+        throws AuthorizeException, SQLException;
 }

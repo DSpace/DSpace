@@ -15,14 +15,22 @@ import org.dspace.app.profile.ResearcherProfile;
 import org.dspace.app.profile.service.ResearcherProfileService;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
+import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.ResearcherProfileRest;
+import org.dspace.app.rest.model.patch.Patch;
+import org.dspace.app.rest.repository.patch.ResourcePatch;
 import org.dspace.app.rest.security.DSpacePermissionEvaluator;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
+import org.dspace.discovery.SearchServiceException;
+import org.dspace.eperson.EPerson;
+import org.dspace.eperson.service.EPersonService;
 import org.dspace.util.UUIDUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.rest.webmvc.ResourceNotFoundException;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -37,11 +45,20 @@ import org.springframework.stereotype.Component;
 @Component(ResearcherProfileRest.CATEGORY + "." + ResearcherProfileRest.NAME)
 public class ResearcherProfileRestRepository extends DSpaceRestRepository<ResearcherProfileRest, UUID> {
 
+    public static final String NO_VISIBILITY_CHANGE_MSG = "Refused to perform the Researcher Profile patch based "
+        + "on a token without changing the visibility";
+
     @Autowired
     private ResearcherProfileService researcherProfileService;
 
     @Autowired
     private DSpacePermissionEvaluator permissionEvaluator;
+
+    @Autowired
+    private EPersonService ePersonService;
+
+    @Autowired
+    private ResourcePatch<ResearcherProfile> resourcePatch;
 
     @Override
     @PreAuthorize("hasPermission(#id, 'PROFILE', 'READ')")
@@ -60,12 +77,24 @@ public class ResearcherProfileRestRepository extends DSpaceRestRepository<Resear
     @Override
     @PreAuthorize("isAuthenticated()")
     protected ResearcherProfileRest createAndReturn(Context context) throws AuthorizeException, SQLException {
+
         UUID id = getEPersonIdFromRequest(context);
-        if (!isAuthorized(id, "WRITE")) {
+        if (isNotAuthorized(id, "WRITE")) {
             throw new AuthorizeException("User unauthorized to create a new profile for user " + id);
         }
-        ResearcherProfile newProfile = researcherProfileService.createAndReturn(context, id);
-        return converter.toRest(newProfile, utils.obtainProjection());
+
+        EPerson ePerson = ePersonService.find(context, id);
+        if (ePerson == null) {
+            throw new UnprocessableEntityException("No EPerson exists with id: " + id);
+        }
+
+        try {
+            ResearcherProfile newProfile = researcherProfileService.createAndReturn(context, ePerson);
+            return converter.toRest(newProfile, utils.obtainProjection());
+        } catch (SearchServiceException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+
     }
 
     @Override
@@ -84,9 +113,33 @@ public class ResearcherProfileRestRepository extends DSpaceRestRepository<Resear
     }
 
     @Override
+    @PreAuthorize("hasPermission(#id, 'PROFILE', #patch)")
+    protected void patch(Context context, HttpServletRequest request, String apiCategory, String model,
+        UUID id, Patch patch) throws SQLException, AuthorizeException {
+
+        if (hasNotVisibilityChange(patch)) {
+            throw new AccessDeniedException(NO_VISIBILITY_CHANGE_MSG);
+        }
+
+        ResearcherProfile profile = researcherProfileService.findById(context, id);
+        if (profile == null) {
+            throw new ResourceNotFoundException(apiCategory + "." + model + " with id: " + id + " not found");
+        }
+
+        resourcePatch.patch(context, profile, patch.getOperations());
+
+    }
+
+    public boolean hasNotVisibilityChange(Patch patch) {
+        return patch.getOperations().stream()
+            .noneMatch(operation -> "/visible".equalsIgnoreCase(operation.getPath()));
+    }
+
+    @Override
     public Class<ResearcherProfileRest> getDomainClass() {
         return ResearcherProfileRest.class;
     }
+
 
     private UUID getEPersonIdFromRequest(Context context) {
         HttpServletRequest request = getRequestService().getCurrentRequest().getHttpServletRequest();
@@ -103,9 +156,9 @@ public class ResearcherProfileRestRepository extends DSpaceRestRepository<Resear
         return uuid;
     }
 
-    private boolean isAuthorized(UUID id, String permission) {
+    private boolean isNotAuthorized(UUID id, String permission) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        return permissionEvaluator.hasPermission(authentication, id, "PROFILE", permission);
+        return !permissionEvaluator.hasPermission(authentication, id, "PROFILE", permission);
     }
 
 }

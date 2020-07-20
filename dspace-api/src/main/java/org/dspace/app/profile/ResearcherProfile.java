@@ -30,7 +30,7 @@ public class ResearcherProfile {
     private final MetadataValue crisOwner;
 
     public ResearcherProfile(Item item) {
-        Assert.notNull(item, "A researcher profile requires an item to be created");
+        Assert.notNull(item, "A researcher profile requires an item");
         this.item = item;
         this.crisOwner = getCrisOwnerMetadata(item);
     }
@@ -45,7 +45,8 @@ public class ResearcherProfile {
 
     public boolean isVisible() {
         return item.getResourcePolicies().stream()
-            .anyMatch(policy -> READ == policy.getAction() && ANONYMOUS == policy.getGroup().getName());
+            .filter(policy -> policy.getGroup() != null)
+            .anyMatch(policy -> READ == policy.getAction() && ANONYMOUS.equals(policy.getGroup().getName()));
     }
 
     public Item getItem() {
@@ -54,7 +55,7 @@ public class ResearcherProfile {
 
     private MetadataValue getCrisOwnerMetadata(Item item) {
         return item.getMetadata().stream()
-            .filter(metadata -> "cris.owner".contentEquals(metadata.getMetadataField().toString('.')))
+            .filter(metadata -> "cris.owner".equals(metadata.getMetadataField().toString('.')))
             .findFirst()
             .orElseThrow(() -> new IllegalArgumentException("A profile item must have a cris.owner metadata"));
     }

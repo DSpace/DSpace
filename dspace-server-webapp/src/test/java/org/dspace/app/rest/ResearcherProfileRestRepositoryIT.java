@@ -7,20 +7,26 @@
  */
 package org.dspace.app.rest;
 
+import static java.util.Arrays.asList;
 import static org.dspace.app.rest.matcher.HalMatcher.matchLinks;
 import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadata;
 import static org.hamcrest.Matchers.is;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.util.List;
 import java.util.UUID;
 
 import org.dspace.app.rest.builder.CollectionBuilder;
 import org.dspace.app.rest.builder.CommunityBuilder;
 import org.dspace.app.rest.builder.EPersonBuilder;
 import org.dspace.app.rest.builder.ItemBuilder;
+import org.dspace.app.rest.model.patch.Operation;
+import org.dspace.app.rest.model.patch.ReplaceOperation;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.content.Collection;
 import org.dspace.eperson.EPerson;
@@ -213,19 +219,20 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
 
         getClient(authToken).perform(post("/api/cris/profiles/")
             .contentType(MediaType.APPLICATION_JSON_VALUE))
-            .andExpect(status().isCreated());
-
-        getClient(authToken).perform(get("/api/cris/profiles/{id}", id))
-            .andExpect(status().isOk())
+            .andExpect(status().isCreated())
             .andExpect(jsonPath("$.id", is(id.toString())))
             .andExpect(jsonPath("$.visible", is(false)))
             .andExpect(jsonPath("$.type", is("profile")))
             .andExpect(jsonPath("$", matchLinks("http://localhost/api/cris/profiles/" + id, "item", "eperson")));
 
+        getClient(authToken).perform(get("/api/cris/profiles/{id}", id))
+            .andExpect(status().isOk());
+
         getClient(authToken).perform(get("/api/cris/profiles/{id}/item", id))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.type", is("item")))
             .andExpect(jsonPath("$.metadata", matchMetadata("cris.owner", name, id.toString(), 0)))
+            .andExpect(jsonPath("$.metadata", matchMetadata("cris.sourceId", id, 0)))
             .andExpect(jsonPath("$.metadata", matchMetadata("relationship.type", "Person", 0)));
 
         getClient(authToken).perform(get("/api/cris/profiles/{id}/eperson", id))
@@ -243,14 +250,45 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
     @Test
     public void testCreateAndReturnWithAdmin() throws Exception {
 
+        String id = user.getID().toString();
+        String name = user.getName();
+
         configurationService.setProperty("researcher-profile.collection.uuid", null);
 
         String authToken = getAuthToken(admin.getEmail(), password);
 
         getClient(authToken).perform(post("/api/cris/profiles/")
-            .param("eperson", user.getID().toString())
+            .param("eperson", id)
             .contentType(MediaType.APPLICATION_JSON_VALUE))
-            .andExpect(status().isCreated());
+            .andExpect(status().isCreated())
+            .andExpect(jsonPath("$.id", is(id.toString())))
+            .andExpect(jsonPath("$.visible", is(false)))
+            .andExpect(jsonPath("$.type", is("profile")))
+            .andExpect(jsonPath("$", matchLinks("http://localhost/api/cris/profiles/" + id, "item", "eperson")));
+
+        getClient(authToken).perform(get("/api/cris/profiles/{id}", id))
+            .andExpect(status().isOk());
+
+        getClient(authToken).perform(get("/api/cris/profiles/{id}/item", id))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.type", is("item")))
+            .andExpect(jsonPath("$.metadata", matchMetadata("cris.owner", name, id.toString(), 0)))
+            .andExpect(jsonPath("$.metadata", matchMetadata("cris.sourceId", id, 0)))
+            .andExpect(jsonPath("$.metadata", matchMetadata("relationship.type", "Person", 0)));
+
+        getClient(authToken).perform(get("/api/cris/profiles/{id}/eperson", id))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.type", is("eperson")))
+            .andExpect(jsonPath("$.name", is(name)));
+
+        authToken = getAuthToken(user.getEmail(), password);
+
+        getClient(authToken).perform(get("/api/cris/profiles/{id}", id))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.id", is(id.toString())))
+            .andExpect(jsonPath("$.visible", is(false)))
+            .andExpect(jsonPath("$.type", is("profile")))
+            .andExpect(jsonPath("$", matchLinks("http://localhost/api/cris/profiles/" + id, "item", "eperson")));
     }
 
     /**
@@ -269,5 +307,325 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
             .contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(status().isForbidden());
 
+    }
+
+    /**
+     * Verify that a conflict occurs if an user that have already a profile call the
+     * createAndReturn endpoint.
+     *
+     * @throws Exception
+     */
+    @Test
+    public void testCreateAndReturnWithProfileAlreadyAssociated() throws Exception {
+
+        String id = user.getID().toString();
+        String authToken = getAuthToken(user.getEmail(), password);
+
+        getClient(authToken).perform(post("/api/cris/profiles/")
+            .contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(status().isCreated())
+            .andExpect(jsonPath("$.id", is(id.toString())))
+            .andExpect(jsonPath("$.visible", is(false)))
+            .andExpect(jsonPath("$.type", is("profile")));
+
+        getClient(authToken).perform(post("/api/cris/profiles/")
+            .contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(status().isConflict())
+            .andExpect(jsonPath("$.id", is(id.toString())))
+            .andExpect(jsonPath("$.visible", is(false)))
+            .andExpect(jsonPath("$.type", is("profile")));
+
+    }
+
+    /**
+     * Verify that an unprocessable entity status is back when the createAndReturn
+     * is called to create a profile for an unknown user.
+     *
+     * @throws Exception
+     */
+    @Test
+    public void testCreateAndReturnWithUnknownEPerson() throws Exception {
+
+        String unknownId = UUID.randomUUID().toString();
+        String authToken = getAuthToken(admin.getEmail(), password);
+
+        getClient(authToken).perform(post("/api/cris/profiles/")
+            .param("eperson", unknownId)
+            .contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(status().isUnprocessableEntity());
+    }
+
+    /**
+     * Verify that a user can delete his profile using the delete endpoint.
+     *
+     * @throws Exception
+     */
+    @Test
+    public void testDelete() throws Exception {
+
+        String id = user.getID().toString();
+        String authToken = getAuthToken(user.getEmail(), password);
+
+        getClient(authToken).perform(post("/api/cris/profiles/")
+            .contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(status().isCreated());
+
+        getClient(authToken).perform(get("/api/cris/profiles/{id}", id))
+            .andExpect(status().isOk());
+
+        getClient(authToken).perform(delete("/api/cris/profiles/{id}", id))
+            .andExpect(status().isNoContent());
+
+        getClient(authToken).perform(get("/api/cris/profiles/{id}", id))
+            .andExpect(status().isNotFound());
+
+    }
+
+    /**
+     * Verify that an admin can delete a profile of another user using the delete
+     * endpoint.
+     *
+     * @throws Exception
+     */
+    @Test
+    public void testDeleteWithAdmin() throws Exception {
+
+        String id = user.getID().toString();
+
+        String adminToken = getAuthToken(admin.getEmail(), password);
+        String userToken = getAuthToken(user.getEmail(), password);
+
+        getClient(userToken).perform(post("/api/cris/profiles/")
+            .contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(status().isCreated());
+
+        getClient(userToken).perform(get("/api/cris/profiles/{id}", id))
+            .andExpect(status().isOk());
+
+        getClient(adminToken).perform(delete("/api/cris/profiles/{id}", id))
+            .andExpect(status().isNoContent());
+
+        getClient(adminToken).perform(get("/api/cris/profiles/{id}", id))
+            .andExpect(status().isNotFound());
+
+        getClient(userToken).perform(get("/api/cris/profiles/{id}", id))
+            .andExpect(status().isNotFound());
+    }
+
+    /**
+     * Verify that an user can delete his profile using the delete endpoint even if
+     * was created by an admin.
+     *
+     * @throws Exception
+     */
+    @Test
+    public void testDeleteProfileCreatedByAnAdmin() throws Exception {
+
+        String id = user.getID().toString();
+
+        String adminToken = getAuthToken(admin.getEmail(), password);
+        String userToken = getAuthToken(user.getEmail(), password);
+
+        getClient(adminToken).perform(post("/api/cris/profiles/")
+            .param("eperson", id)
+            .contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(status().isCreated());
+
+        getClient(adminToken).perform(get("/api/cris/profiles/{id}", id))
+            .andExpect(status().isOk());
+
+        getClient(userToken).perform(delete("/api/cris/profiles/{id}", id))
+            .andExpect(status().isNoContent());
+
+        getClient(userToken).perform(get("/api/cris/profiles/{id}", id))
+            .andExpect(status().isNotFound());
+
+        getClient(adminToken).perform(get("/api/cris/profiles/{id}", id))
+            .andExpect(status().isNotFound());
+
+    }
+
+    /**
+     * Verify that a standard user can't call the delete endpoint to delete a
+     * researcher profile related to another user.
+     *
+     * @throws Exception
+     */
+    @Test
+    public void testDeleteWithoutOwnUser() throws Exception {
+
+        String id = user.getID().toString();
+
+        String userToken = getAuthToken(user.getEmail(), password);
+        String anotherUserToken = getAuthToken(anotherUser.getEmail(), password);
+
+        getClient(userToken).perform(post("/api/cris/profiles/")
+            .contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(status().isCreated());
+
+        getClient(userToken).perform(get("/api/cris/profiles/{id}", id))
+            .andExpect(status().isOk());
+
+        getClient(anotherUserToken).perform(delete("/api/cris/profiles/{id}", id))
+            .andExpect(status().isForbidden());
+
+        getClient(userToken).perform(get("/api/cris/profiles/{id}", id))
+            .andExpect(status().isOk());
+
+    }
+
+    /**
+     * Verify that an user can change the profile visibility using the patch endpoint.
+     *
+     * @throws Exception
+     */
+    @Test
+    public void testPatchToChangeVisibleAttribute() throws Exception {
+
+        String id = user.getID().toString();
+        String authToken = getAuthToken(user.getEmail(), password);
+
+        getClient(authToken).perform(post("/api/cris/profiles/")
+            .contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(status().isCreated())
+            .andExpect(jsonPath("$.visible", is(false)));
+
+        getClient(authToken).perform(get("/api/cris/profiles/{id}", id))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.visible", is(false)));
+
+        // change the visibility to true
+        List<Operation> operations = asList(new ReplaceOperation("/visible", true));
+
+        getClient(authToken).perform(patch("/api/cris/profiles/{id}", id)
+            .content(getPatchContent(operations))
+            .contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.visible", is(true)));
+
+        getClient(authToken).perform(get("/api/cris/profiles/{id}", id))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.visible", is(true)));
+
+        // change the visibility to false
+        operations = asList(new ReplaceOperation("/visible", false));
+
+        getClient(authToken).perform(patch("/api/cris/profiles/{id}", id)
+            .content(getPatchContent(operations))
+            .contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.visible", is(false)));
+
+        getClient(authToken).perform(get("/api/cris/profiles/{id}", id))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.visible", is(false)));
+
+    }
+
+    /**
+     * Verify that an user can not change the profile visibility of another user
+     * using the patch endpoint.
+     *
+     * @throws Exception
+     */
+    @Test
+    public void testPatchToChangeVisibleAttributeWithoutOwnUser() throws Exception {
+
+        String id = user.getID().toString();
+
+        String userToken = getAuthToken(user.getEmail(), password);
+        String anotherUserToken = getAuthToken(anotherUser.getEmail(), password);
+
+        getClient(userToken).perform(post("/api/cris/profiles/")
+            .contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(status().isCreated())
+            .andExpect(jsonPath("$.visible", is(false)));
+
+        getClient(userToken).perform(get("/api/cris/profiles/{id}", id))
+            .andExpect(status().isOk());
+
+        // try to change the visibility to true
+        List<Operation> operations = asList(new ReplaceOperation("/visible", true));
+
+        getClient(anotherUserToken).perform(patch("/api/cris/profiles/{id}", id)
+            .content(getPatchContent(operations))
+            .contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(status().isForbidden());
+
+        getClient(userToken).perform(get("/api/cris/profiles/{id}", id))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.visible", is(false)));
+    }
+
+    /**
+     * Verify that an admin can change the profile visibility of another user using
+     * the patch endpoint.
+     *
+     * @throws Exception
+     */
+    @Test
+    public void testPatchToChangeVisibleAttributeWithAdmin() throws Exception {
+
+        String id = user.getID().toString();
+
+        String adminToken = getAuthToken(admin.getEmail(), password);
+        String userToken = getAuthToken(user.getEmail(), password);
+
+        getClient(userToken).perform(post("/api/cris/profiles/")
+            .param("eperson", id)
+            .contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(status().isCreated());
+
+        getClient(userToken).perform(get("/api/cris/profiles/{id}", id))
+            .andExpect(status().isOk());
+
+        // change the visibility to true
+        List<Operation> operations = asList(new ReplaceOperation("/visible", true));
+
+        getClient(adminToken).perform(patch("/api/cris/profiles/{id}", id)
+            .content(getPatchContent(operations))
+            .contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.visible", is(true)));
+
+        getClient(userToken).perform(get("/api/cris/profiles/{id}", id))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.visible", is(true)));
+    }
+
+    /**
+     * Verify that an user can change the visibility of his profile using the patch
+     * endpoint even if was created by an admin.
+     *
+     * @throws Exception
+     */
+    @Test
+    public void testPatchToChangeVisibilityOfProfileCreatedByAnAdmin() throws Exception {
+
+        String id = user.getID().toString();
+
+        String adminToken = getAuthToken(admin.getEmail(), password);
+        String userToken = getAuthToken(user.getEmail(), password);
+
+        getClient(adminToken).perform(post("/api/cris/profiles/")
+            .param("eperson", id)
+            .contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(status().isCreated());
+
+        getClient(adminToken).perform(get("/api/cris/profiles/{id}", id))
+            .andExpect(status().isOk());
+
+        // change the visibility to true
+        List<Operation> operations = asList(new ReplaceOperation("/visible", true));
+
+        getClient(userToken).perform(patch("/api/cris/profiles/{id}", id)
+            .content(getPatchContent(operations))
+            .contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.visible", is(true)));
+
+        getClient(userToken).perform(get("/api/cris/profiles/{id}", id))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.visible", is(true)));
     }
 }

@@ -12,9 +12,12 @@ import java.util.UUID;
 import javax.annotation.Nullable;
 import javax.servlet.http.HttpServletRequest;
 
+import org.dspace.app.profile.ResearcherProfile;
+import org.dspace.app.profile.service.ResearcherProfileService;
 import org.dspace.app.rest.model.EPersonRest;
 import org.dspace.app.rest.model.ResearcherProfileRest;
 import org.dspace.app.rest.projection.Projection;
+import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.service.EPersonService;
@@ -37,6 +40,9 @@ public class ResearcherProfileEPersonLinkRepository extends AbstractDSpaceRestRe
     @Autowired
     private EPersonService ePersonService;
 
+    @Autowired
+    private ResearcherProfileService researcherProfileService;
+
     /**
      * Returns the ePerson related to the Research profile with the given UUID.
      *
@@ -53,13 +59,18 @@ public class ResearcherProfileEPersonLinkRepository extends AbstractDSpaceRestRe
         try {
             Context context = obtainContext();
 
+            ResearcherProfile profile = researcherProfileService.findById(context, id);
+            if (profile == null) {
+                throw new ResourceNotFoundException("No such profile with UUID: " + id);
+            }
+
             EPerson ePerson = ePersonService.find(context, id);
             if (ePerson == null) {
                 throw new ResourceNotFoundException("No such eperson related to a profile with EPerson UUID: " + id);
             }
 
             return converter.toRest(ePerson, projection);
-        } catch (SQLException e) {
+        } catch (SQLException | AuthorizeException e) {
             throw new RuntimeException(e);
         }
 

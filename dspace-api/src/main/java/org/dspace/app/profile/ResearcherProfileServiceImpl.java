@@ -7,28 +7,42 @@
  */
 package org.dspace.app.profile;
 
+import static org.dspace.content.authority.Choices.CF_ACCEPTED;
+import static org.dspace.core.Constants.READ;
+import static org.dspace.eperson.Group.ANONYMOUS;
+
 import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.dspace.app.exception.ResourceConflictException;
 import org.dspace.app.profile.service.ResearcherProfileService;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.WorkspaceItem;
-import org.dspace.content.authority.Choices;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.InstallItemService;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.Context;
+import org.dspace.discovery.DiscoverQuery;
+import org.dspace.discovery.DiscoverResult;
+import org.dspace.discovery.IndexableObject;
+import org.dspace.discovery.SearchService;
+import org.dspace.discovery.SearchServiceException;
+import org.dspace.discovery.indexobject.IndexableCollection;
 import org.dspace.eperson.EPerson;
-import org.dspace.eperson.service.EPersonService;
+import org.dspace.eperson.Group;
+import org.dspace.eperson.service.GroupService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.util.UUIDUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
 
@@ -39,6 +53,8 @@ import org.springframework.util.Assert;
  *
  */
 public class ResearcherProfileServiceImpl implements ResearcherProfileService {
+
+    private static Logger log = LoggerFactory.getLogger(ResearcherProfileServiceImpl.class);
 
     @Autowired
     private ItemService itemService;
@@ -56,7 +72,13 @@ public class ResearcherProfileServiceImpl implements ResearcherProfileService {
     private CollectionService collectionService;
 
     @Autowired
-    private EPersonService ePersonService;
+    private SearchService searchService;
+
+    @Autowired
+    private GroupService groupService;
+
+    @Autowired
+    private AuthorizeService authorizeService;
 
     @Override
     public ResearcherProfile findById(Context context, UUID id) throws SQLException, AuthorizeException {
@@ -71,10 +93,10 @@ public class ResearcherProfileServiceImpl implements ResearcherProfileService {
     }
 
     @Override
-    public ResearcherProfile createAndReturn(Context context, UUID id) throws AuthorizeException, SQLException {
-        Assert.notNull(id, "An id must be provided to find a researcher profile");
+    public ResearcherProfile createAndReturn(Context context, EPerson ePerson)
+        throws AuthorizeException, SQLException, SearchServiceException {
 
-        Item profileItem = findResearcherProfileItemById(context, id);
+        Item profileItem = findResearcherProfileItemById(context, ePerson.getID());
         if (profileItem != null) {
             ResearcherProfile profile = new ResearcherProfile(profileItem);
             throw new ResourceConflictException("A profile is already linked to the provided User", profile);
@@ -85,8 +107,40 @@ public class ResearcherProfileServiceImpl implements ResearcherProfileService {
             throw new IllegalStateException("No collection found for researcher profiles");
         }
 
-        Item item = createProfileItem(context, id, collection);
+        Item item = createProfileItem(context, ePerson, collection);
         return new ResearcherProfile(item);
+    }
+
+    @Override
+    public void deleteById(Context context, UUID id) throws SQLException, AuthorizeException {
+        Assert.notNull(id, "An id must be provided to find a researcher profile");
+
+        Item profileItem = findResearcherProfileItemById(context, id);
+        if (profileItem == null) {
+            return;
+        }
+
+        List<MetadataValue> metadata = itemService.getMetadata(profileItem, "cris", "owner", null, Item.ANY);
+        itemService.removeMetadataValues(context, profileItem, metadata);
+    }
+
+    @Override
+    public void changeVisibility(Context context, ResearcherProfile profile, boolean visible)
+        throws AuthorizeException, SQLException {
+
+        if (profile.isVisible() == visible) {
+            return;
+        }
+
+        Item item = profile.getItem();
+        Group anonymous = groupService.findByName(context, ANONYMOUS);
+
+        if (visible) {
+            authorizeService.addPolicy(context, item, READ, anonymous);
+        } else {
+            authorizeService.removeGroupPolicies(context, item, anonymous);
+        }
+
     }
 
     private Item findResearcherProfileItemById(Context context, UUID id) throws SQLException, AuthorizeException {
@@ -103,30 +157,51 @@ public class ResearcherProfileServiceImpl implements ResearcherProfileService {
         return null;
     }
 
-    private Collection findProfileCollection(Context context) throws SQLException {
+    @SuppressWarnings("rawtypes")
+    private Collection findProfileCollection(Context context) throws SQLException, SearchServiceException {
         UUID uuid = UUIDUtils.fromString(configurationService.getProperty("researcher-profile.collection.uuid"));
         if (uuid != null) {
             return collectionService.find(context, uuid);
         }
 
         String profileType = getProfileType();
-        // TODO
-        return null;
+
+        DiscoverQuery discoverQuery = new DiscoverQuery();
+        discoverQuery.setDSpaceObjectFilter(IndexableCollection.TYPE);
+        discoverQuery.addFilterQueries("relationship.type:" + profileType);
+
+        DiscoverResult discoverResult = searchService.search(context, discoverQuery);
+        List<IndexableObject> indexableObjects = discoverResult.getIndexableObjects();
+
+        if (CollectionUtils.isEmpty(indexableObjects)) {
+            return null;
+        }
+
+        if (indexableObjects.size() > 1) {
+            log.warn("Multiple " + profileType + " type collections were found during profile creation");
+            return null;
+        }
+
+        return (Collection) indexableObjects.get(0).getIndexedObject();
     }
 
-    private Item createProfileItem(Context context, UUID id, Collection collection)
+    private Item createProfileItem(Context context, EPerson ePerson, Collection collection)
         throws AuthorizeException, SQLException {
 
-        EPerson ePerson = ePersonService.find(context, id);
-        Assert.notNull(ePerson, "No EPerson found by id: " + id);
+        String id = ePerson.getID().toString();
 
         WorkspaceItem workspaceItem = workspaceItemService.create(context, collection, false);
         Item item = workspaceItem.getItem();
-        itemService.addMetadata(context, item, "cris", "sourceId", null, null, id.toString());
-        itemService.addMetadata(context, item, "cris", "owner", null, null,
-            ePerson.getFullName(), id.toString(), Choices.CF_ACCEPTED);
+        itemService.addMetadata(context, item, "cris", "sourceId", null, null, id);
+        itemService.addMetadata(context, item, "cris", "owner", null, null, ePerson.getFullName(), id, CF_ACCEPTED);
 
-        return installItemService.installItem(context, workspaceItem);
+        item = installItemService.installItem(context, workspaceItem);
+
+        Group anonymous = groupService.findByName(context, ANONYMOUS);
+        authorizeService.removeGroupPolicies(context, item, anonymous);
+        authorizeService.addPolicy(context, item, READ, ePerson);
+
+        return item;
     }
 
     private boolean hasRelationshipTypeMetadataEqualsTo(Item item, String relationshipType) {
@@ -138,19 +213,6 @@ public class ResearcherProfileServiceImpl implements ResearcherProfileService {
 
     private String getProfileType() {
         return configurationService.getProperty("researcher-profile.type", "Person");
-    }
-
-    @Override
-    public void deleteById(Context context, UUID id) throws SQLException, AuthorizeException {
-        Assert.notNull(id, "An id must be provided to find a researcher profile");
-
-        Item profileItem = findResearcherProfileItemById(context, id);
-        if (profileItem == null) {
-            return;
-        }
-
-        List<MetadataValue> metadata = itemService.getMetadata(profileItem, "cris", "owner", null, Item.ANY);
-        itemService.removeMetadataValues(context, profileItem, metadata);
     }
 
 }
