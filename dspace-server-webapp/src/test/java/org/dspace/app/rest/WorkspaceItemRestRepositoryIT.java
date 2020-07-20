@@ -898,10 +898,10 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         context.restoreAuthSystemState();
 
         String authToken = getAuthToken(eperson.getEmail(), password);
-        // bulk create workspaceitems in the default collection (col1)
+        // create workspaceitem in the default collection (col1)
         getClient(authToken).perform(fileUpload("/api/submission/workspaceitems")
                     .file(bibtexFile))
-                // bulk create should return 200, 201 (created) is better for single resource
+                // create should return 200, 201 (created) is better for single resource
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$._embedded.workspaceitems[0].sections.traditionalpageone['dc.title'][0].value",
                         is("My Article")))
@@ -917,7 +917,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                         jsonPath("$._embedded.workspaceitems[*]._embedded.upload").doesNotExist());
         ;
 
-        // bulk create workspaceitems explicitly in the col2
+        // create workspaceitem explicitly in the col2
         getClient(authToken).perform(fileUpload("/api/submission/workspaceitems")
                     .file(bibtexFile)
                     .param("owningCollection", col2.getID().toString()))
@@ -979,7 +979,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         // bulk create workspaceitems in the default collection (col1)
         getClient(authToken).perform(fileUpload("/api/submission/workspaceitems")
                     .file(bibtexFile).file(pubmedFile))
-                // bulk create should return 200, 201 (created) is better for single resource
+                // create should return 200, 201 (created) is better for single resource
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$._embedded.workspaceitems[0].sections.traditionalpageone['dc.title'][0].value",
                         is("My Article")))
@@ -1000,7 +1000,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                         + ".metadata['dc.title'][0].value",
                             is("pubmed-test.xml")));
 
-        // bulk create workspaceitems explicitly in the col2
+        // create workspaceitem explicitly in the col2
         getClient(authToken).perform(fileUpload("/api/submission/workspaceitems")
                     .file(bibtexFile).file(pubmedFile)
                     .param("owningCollection", col2.getID().toString()))
@@ -1062,10 +1062,11 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         context.restoreAuthSystemState();
 
         String authToken = getAuthToken(eperson.getEmail(), password);
-        // bulk create workspaceitems in the default collection (col1)
+        // create workspaceitem in the default collection (col1)
         getClient(authToken).perform(fileUpload("/api/submission/workspaceitems")
                     .file(bibtexFile))
-                // bulk create should return 200, 201 (created) is better for single resource
+                  // create should return return a 422 because we don't allow/support bibliographic files
+                 // that have multiple metadata records
                 .andExpect(status().is(422));
         bibtex.close();
     }
@@ -1103,7 +1104,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         context.restoreAuthSystemState();
 
         String authToken = getAuthToken(eperson.getEmail(), password);
-        // bulk create workspaceitems in the default collection (col1)
+        // create workspaceitem in the default collection (col1)
         getClient(authToken).perform(fileUpload("/api/submission/workspaceitems")
                     .file(pubmedFile))
                 // bulk create should return 200, 201 (created) is better for single resource
@@ -1124,7 +1125,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                     + ".metadata['dc.title'][0].value",
                         is("pubmed-test.xml")));
 
-        // bulk create workspaceitems explicitly in the col2
+        // create workspaceitem explicitly in the col2
         getClient(authToken).perform(fileUpload("/api/submission/workspaceitems")
                     .file(pubmedFile)
                     .param("owningCollection", col2.getID().toString()))
