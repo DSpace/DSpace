@@ -10,7 +10,7 @@ package org.dspace.authority;
 import static java.util.Arrays.asList;
 import static java.util.UUID.fromString;
 import static org.dspace.content.authority.Choices.CF_ACCEPTED;
-import static org.dspace.content.authority.Choices.CF_AMBIGUOUS;
+import static org.dspace.content.authority.Choices.CF_UNSET;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
@@ -214,6 +214,10 @@ public class CrisConsumerIT extends AbstractControllerIntegrationTest {
         ItemRest relatedItem = getItemViaRestByID(authToken, UUID.fromString(authorAuthority));
         assertThat("The related item should be archived", relatedItem.getInArchive(), is(true));
 
+        MetadataValueRest relatedItemtitle = findSingleMetadata(relatedItem, "dc.title");
+        assertThat("dc.title value of the related item should be equals to the text value of the original metadata",
+                relatedItemtitle.getValue(), equalTo("Mario Rossi"));
+
         MetadataValueRest crisSourceId = findSingleMetadata(relatedItem, "cris.sourceId");
         assertThat("cris.sourceId value and author md5 hash should be equals", crisSourceId.getValue(),
                 equalTo(generateMd5Hash("Mario Rossi")));
@@ -221,8 +225,8 @@ public class CrisConsumerIT extends AbstractControllerIntegrationTest {
         MetadataValueRest relationshipType = findSingleMetadata(relatedItem, "relationship.type");
         assertThat("The relationship.type should be Person", relationshipType.getValue(), equalTo("Person"));
 
-        MetadataValueRest affiliation = findSingleMetadata(relatedItem, "oairecerif.author.affiliation");
-        assertThat("The dc.contributor.affiliation should be 4Science", affiliation.getValue(), equalTo("4Science"));
+        MetadataValueRest affiliation = findSingleMetadata(relatedItem, "crisrp.dept");
+        assertThat("The crisrp.dept should be 4Science", affiliation.getValue(), equalTo("4Science"));
 
         // verify that the authors collections is the Person collection
         CollectionRest collection = getOwnCollectionViaRestByItemId(authToken, UUID.fromString(relatedItem.getId()));
@@ -303,7 +307,7 @@ public class CrisConsumerIT extends AbstractControllerIntegrationTest {
 
         submitItemViaRest(authToken, firstWsitem.getID());
 
-        InputStream secondFullText = new ByteArrayInputStream("First submission".getBytes());
+        InputStream secondFullText = new ByteArrayInputStream("Second submission".getBytes());
 
         WorkspaceItem secondWsitem = WorkspaceItemBuilder.createWorkspaceItem(context, publicationCollection)
                 .withTitle("Another Submission Item")
@@ -345,8 +349,8 @@ public class CrisConsumerIT extends AbstractControllerIntegrationTest {
         // search the related author item
         ItemRest authorItem = getItemViaRestByID(authToken, UUID.fromString(firstAuthorAuthority));
 
-        String affiliation = findSingleMetadata(authorItem, "oairecerif.author.affiliation").getValue();
-        assertThat("The oairecerif.author.affiliation should be My Org", affiliation, equalTo("My Org"));
+        String affiliation = findSingleMetadata(authorItem, "crisrp.dept").getValue();
+        assertThat("The crisrp.dept should be 4Science", affiliation, equalTo("4Science"));
 
         // verify that the project collections is the Project collection
         CollectionRest firstCol = getOwnCollectionViaRestByItemId(authToken, fromString(firstProjectAuthority));
@@ -453,6 +457,7 @@ public class CrisConsumerIT extends AbstractControllerIntegrationTest {
                 .build();
 
         context.turnOffAuthorisationSystem();
+        // create a Person collection in a separate repository branch so that it is not eligible as target
         Community unrelatedCommunity = CommunityBuilder.createCommunity(context)
                 .withName("Parent Community")
                 .build();
@@ -469,7 +474,7 @@ public class CrisConsumerIT extends AbstractControllerIntegrationTest {
         MetadataValueRest author = findSingleMetadata(item, "dc.contributor.author");
         String authorAuthority = author.getAuthority();
         assertThat("The author should not have the authority set", authorAuthority, nullValue());
-        assertThat("The author should have an CF_AMBIGUOUS confidence", author.getConfidence(), equalTo(CF_AMBIGUOUS));
+        assertThat("The author should have an CF_AMBIGUOUS confidence", author.getConfidence(), equalTo(CF_UNSET));
 
     }
 
@@ -504,7 +509,7 @@ public class CrisConsumerIT extends AbstractControllerIntegrationTest {
 
         submitItemViaRest(authToken, firstWsitem.getID());
 
-        InputStream secondFullText = new ByteArrayInputStream("First submission".getBytes());
+        InputStream secondFullText = new ByteArrayInputStream("Second submission".getBytes());
 
         WorkspaceItem secondWsitem = WorkspaceItemBuilder.createWorkspaceItem(context, publicationCollection)
                 .withTitle("Another Submission Item")
@@ -515,7 +520,7 @@ public class CrisConsumerIT extends AbstractControllerIntegrationTest {
 
         submitItemViaRest(authToken, secondWsitem.getID());
 
-        // verify the two dc.relation.project have the same authority value
+        // verify the two dc.relation.project have different authority values
         ItemRest firstItem = getItemViaRestByID(authToken, firstWsitem.getItem().getID());
         ItemRest secondItem = getItemViaRestByID(authToken, secondWsitem.getItem().getID());
 
@@ -653,8 +658,8 @@ public class CrisConsumerIT extends AbstractControllerIntegrationTest {
             assertThat("The relationship.type should be Person", relationshipType.getValue(), equalTo("Person"));
 
             String expectedAffiliation = author.getPlace() == 0 ? "4Science" : "My org";
-            MetadataValueRest affiliation = findSingleMetadata(relatedItem, "oairecerif.author.affiliation");
-            assertThat("The dc.contributor.affiliation should be " + expectedAffiliation, affiliation.getValue(),
+            MetadataValueRest affiliation = findSingleMetadata(relatedItem, "crisrp.dept");
+            assertThat("The crisrp.dept should be " + expectedAffiliation, affiliation.getValue(),
                     equalTo(expectedAffiliation));
 
         }

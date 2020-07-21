@@ -368,6 +368,8 @@ public interface CollectionService
      *                         an autosuggest feature over the collection name
      * @param context          DSpace Context
      * @param community        parent community
+     * @param metadata         metadata name used to filter the search
+     * @param metadataValue    metadata value used to filter the search
      * @param offset           the position of the first result to return
      * @param limit            paging limit
      * @return                 discovery search result objects
@@ -388,10 +390,13 @@ public interface CollectionService
      *                         an autosuggest feature over the collection name
      * @param context          DSpace Context
      * @param community        parent community
+     * @param metadata         metadata name used to filter the search
+     * @param metadataValue    metadata value used to filter the search
      * @return                 total collections found
      * @throws SQLException              if something goes wrong
      * @throws SearchServiceException    if search error
      */
-    public int countCollectionsWithSubmit(String q, Context context, Community community)
+    public int countCollectionsWithSubmit(String q, Context context, Community community, String metadata,
+            String metadataValue)
         throws SQLException, SearchServiceException;
 }

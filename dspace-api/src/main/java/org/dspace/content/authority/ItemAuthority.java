@@ -13,7 +13,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
@@ -49,12 +48,6 @@ public class ItemAuthority implements ChoiceAuthority, LinkableEntityAuthority {
     /** the name assigned to the specific instance by the PluginService, @see {@link NameAwarePlugin} **/
     private String authorityName;
 
-    /**
-     * the metadata managed by the plugin instance, derived from its authority name
-     * in the form schema_element_qualifier
-     */
-    private String field;
-
     private DSpace dspace = new DSpace();
 
     private ItemService itemService = ContentServiceFactory.getInstance().getItemService();
@@ -84,13 +77,13 @@ public class ItemAuthority implements ChoiceAuthority, LinkableEntityAuthority {
             limit = 20;
         }
 
-        ItemAuthorityService itemAuthorityService = itemAuthorityServiceFactory.getInstance(field);
+        String relationshipType = getLinkedEntityType();
+        ItemAuthorityService itemAuthorityService = itemAuthorityServiceFactory.getInstance(relationshipType);
         String luceneQuery = itemAuthorityService.getSolrQuery(text);
 
         DiscoverQuery discoverQuery = new DiscoverQuery();
         discoverQuery.setDSpaceObjectFilter(Item.class.getSimpleName());
 
-        String relationshipType = getRelationshipType(field);
         if (StringUtils.isNotBlank(relationshipType)) {
             String filter = "relationship.type:" + relationshipType;
             discoverQuery.addFilterQueries(filter);
@@ -147,38 +140,12 @@ public class ItemAuthority implements ChoiceAuthority, LinkableEntityAuthority {
     }
 
     @Override
-    public String getLinkedEntityType(String field) {
-        String relationshipType = getRelationshipType(field);
-        if (relationshipType == null) {
-            return null;
-        }
-
-        switch (relationshipType) {
-            case "orgunit":
-                return "OrgUnit";
-            case "dataset":
-                return "DataSet";
-            default:
-                return StringUtils.capitalize(relationshipType);
-        }
-
-    }
-
-    private String getRelationshipType ( String field ) {
-        return configurationService.getProperty("cris.ItemAuthority." + field + ".relationshipType");
+    public String getLinkedEntityType() {
+        return configurationService.getProperty("cris.ItemAuthority." + authorityName + ".relationshipType");
     }
 
     public void setPluginInstanceName(String name) {
         authorityName = name;
-        for (Entry conf : configurationService.getProperties().entrySet()) {
-            if (StringUtils.startsWith((String) conf.getKey(), ChoiceAuthorityServiceImpl.CHOICES_PLUGIN_PREFIX)
-                    && StringUtils.equals((String) conf.getValue(), authorityName)) {
-                field = ((String) conf.getKey()).substring(ChoiceAuthorityServiceImpl.CHOICES_PLUGIN_PREFIX.length())
-                        .replace(".", "_");
-                // exit the look immediately as we have found it
-                break;
-            }
-        }
     }
 
     @Override

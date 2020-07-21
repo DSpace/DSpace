@@ -23,12 +23,13 @@
 			<map>
 				<entry key="dc.contributor.author">
 					<bean class="org.dspace.authority.filler.MetadataConfiguration">
-						<property name="updateEnabled" value="true" />
+						<property name="updateEnabled" value="false" />
 						<property name="mapping">
 							<map>
 								<entry key="oairecerif.author.affiliation">
 									<bean class="org.dspace.authority.filler.MetadataConfiguration.MappingDetails">
 										<property name="visibility" value="1" />
+										<property name="targetMetadata" value="crisrp.dept" />
 									</bean>
 								</entry>
 							</map>
@@ -37,12 +38,13 @@
 				</entry>
 				<entry key="dc.contributor.editor">
 					<bean class="org.dspace.authority.filler.MetadataConfiguration">
-						<property name="updateEnabled" value="true" />
+						<property name="updateEnabled" value="false" />
 						<property name="mapping">
 							<map>
 								<entry key="oairecerif.editor.affiliation">
 									<bean class="org.dspace.authority.filler.MetadataConfiguration.MappingDetails">
 										<property name="visibility" value="1" />
+										<property name="targetMetadata" value="crisrp.dept" />
 									</bean>
 								</entry>
 							</map>
@@ -51,7 +53,7 @@
 				</entry>
 				<entry key="dc.relation.ispartof">
 					<bean class="org.dspace.authority.filler.MetadataConfiguration">
-						<property name="updateEnabled" value="true" />
+						<property name="updateEnabled" value="false" />
 						<property name="mapping">
 							<map>
 								<entry key="dc.relation.issn">
@@ -65,7 +67,7 @@
 				</entry>
 				<entry key="dc.relation">
 					<bean class="org.dspace.authority.filler.MetadataConfiguration">
-						<property name="updateEnabled" value="true" />
+						<property name="updateEnabled" value="false" />
 						<property name="mapping">
 							<map>
 								<entry key="oaire.awardNumber">

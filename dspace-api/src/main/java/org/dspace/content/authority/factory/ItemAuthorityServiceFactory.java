@@ -11,7 +11,6 @@ package org.dspace.content.authority.factory;
 import java.util.Map;
 
 import org.dspace.content.authority.service.ItemAuthorityService;
-import org.dspace.core.ConfigurationManager;
 
 /**
  * Factory implementation to get services for the content.authority package, use
@@ -33,13 +32,10 @@ public class ItemAuthorityServiceFactory {
         this.itemAthorityRelationshipTypeMap = itemAthorityRelationshipTypeMap;
     }
 
-    public ItemAuthorityService getInstance(String field) {
-        String relationshipType = ConfigurationManager.getProperty("cris", "ItemAuthority."
-            + field + ".relationshipType");
-
-        return (relationshipType != null
-                && itemAthorityRelationshipTypeMap.containsKey(relationshipType))
-                    ? itemAthorityRelationshipTypeMap.get(relationshipType) :
+    public ItemAuthorityService getInstance(String entityType) {
+        return (entityType != null
+                && itemAthorityRelationshipTypeMap.containsKey(entityType))
+                    ? itemAthorityRelationshipTypeMap.get(entityType) :
                         itemAthorityRelationshipTypeMap.get("default");
     }
 }

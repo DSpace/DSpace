@@ -190,7 +190,7 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
             List<Collection> collections = cs.findCollectionsWithSubmit(q, context, com, null, null,
                                               Math.toIntExact(pageable.getOffset()),
                                               Math.toIntExact(pageable.getOffset() + pageable.getPageSize()));
-            int tot = cs.countCollectionsWithSubmit(q, context, com);
+            int tot = cs.countCollectionsWithSubmit(q, context, com, null, null);
             return converter.toRestPage(collections, pageable, tot , utils.obtainProjection());
         } catch (SQLException | SearchServiceException e) {
             throw new RuntimeException(e.getMessage(), e);
@@ -205,7 +205,7 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
             List<Collection> collections = cs.findCollectionsWithSubmit(q, context, null, null, null,
                                               Math.toIntExact(pageable.getOffset()),
                                               Math.toIntExact(pageable.getOffset() + pageable.getPageSize()));
-            int tot = cs.countCollectionsWithSubmit(q, context, null);
+            int tot = cs.countCollectionsWithSubmit(q, context, null, null, null);
             return converter.toRestPage(collections, pageable, tot, utils.obtainProjection());
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
@@ -227,7 +227,8 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
             List<Collection> collections = cs.findCollectionsWithSubmit(q, context, null, metadata, metadataValue,
                                               Math.toIntExact(pageable.getOffset()),
                                               Math.toIntExact(pageable.getOffset() + pageable.getPageSize()));
-            return converter.toRestPage(collections, pageable, utils.obtainProjection());
+            int tot = cs.countCollectionsWithSubmit(q, context, null, metadata, metadataValue);
+            return converter.toRestPage(collections, pageable, tot, utils.obtainProjection());
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }

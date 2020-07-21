@@ -519,7 +519,7 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService 
             throw new IllegalArgumentException("No choices plugin was configured for  field \"" + fieldKey + "\".");
         }
         if (ma instanceof LinkableEntityAuthority) {
-            return ((LinkableEntityAuthority) ma).getLinkedEntityType(fieldKey);
+            return ((LinkableEntityAuthority) ma).getLinkedEntityType();
         }
         return null;
     }

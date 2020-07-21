@@ -34,6 +34,7 @@ import org.dspace.discovery.SearchService;
 import org.dspace.discovery.SearchServiceException;
 import org.dspace.discovery.configuration.DiscoveryConfiguration;
 import org.dspace.discovery.configuration.DiscoveryConfigurationService;
+import org.dspace.discovery.configuration.DiscoveryRelatedItemConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -98,13 +99,25 @@ public class DiscoveryRestRepository extends AbstractDSpaceRestRepository {
         DiscoveryConfiguration discoveryConfiguration = searchConfigurationService
             .getDiscoveryConfigurationByNameOrDso(configuration, scopeObject);
 
+        boolean isRelatedItem = discoveryConfiguration != null &&
+                discoveryConfiguration instanceof DiscoveryRelatedItemConfiguration;
+
+        if (isRelatedItem && scopeObject != null) {
+            ((DiscoveryRelatedItemConfiguration) discoveryConfiguration)
+            .setFilterQueriesParameters(scopeObject.getID());
+        }
+
         DiscoverResult searchResult = null;
         DiscoverQuery discoverQuery = null;
 
         try {
             discoverQuery = queryBuilder
                 .buildQuery(context, scopeObject, discoveryConfiguration, query, searchFilters, dsoType, page);
-            searchResult = searchService.search(context, scopeObject, discoverQuery);
+            if (isRelatedItem) {
+                searchResult = searchService.search(context, discoverQuery);
+            } else {
+                searchResult = searchService.search(context, scopeObject, discoverQuery);
+            }
 
         } catch (SearchServiceException e) {
             log.error("Error while searching with Discovery", e);
