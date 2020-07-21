@@ -938,13 +938,15 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
     }
 
     @Override
-    public int countCollectionsWithSubmit(String q, Context context, Community community)
+    public int countCollectionsWithSubmit(String q, Context context, Community community, String metadata,
+            String metadataValue)
         throws SQLException, SearchServiceException {
 
         DiscoverQuery discoverQuery = new DiscoverQuery();
         discoverQuery.setMaxResults(0);
         discoverQuery.setDSpaceObjectFilter(IndexableCollection.TYPE);
-        DiscoverResult resp = retrieveCollectionsWithSubmit(context, discoverQuery, null, null, community, q);
+        DiscoverResult resp = retrieveCollectionsWithSubmit(context, discoverQuery, metadata, metadataValue,
+                community, q);
         return (int)resp.getTotalSearchResults();
     }
 
