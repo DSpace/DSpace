@@ -51,6 +51,12 @@ public class RelationshipMetadataServiceImpl implements RelationshipMetadataServ
                     fullMetadataValueList
                         .addAll(findRelationshipMetadataValueForItemRelationship(context, item, entityType,
                                 relationship, enableVirtualMetadata));
+                    if (item.getID().equals(relationship.getLeftItem().getID())) {
+                        context.uncacheEntity(relationship.getRightItem());
+                    } else {
+                        context.uncacheEntity(relationship.getLeftItem());
+                    }
+                    context.uncacheEntity(relationship);
                 }
 
             }
