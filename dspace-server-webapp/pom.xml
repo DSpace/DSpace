@@ -309,6 +309,13 @@
 
         <dependency>
             <groupId>org.dspace</groupId>
+            <artifactId>dspace-api</artifactId>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.dspace</groupId>
             <artifactId>dspace-services</artifactId>
         </dependency>
 

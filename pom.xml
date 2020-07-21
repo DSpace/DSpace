@@ -1011,6 +1011,12 @@
                 <version>7.0-beta4-SNAPSHOT</version>
             </dependency>
             <dependency>
+                <groupId>org.dspace</groupId>
+                <artifactId>dspace-api</artifactId>
+                <type>test-jar</type>
+                <version>7.0-beta4-SNAPSHOT</version>
+            </dependency>
+            <dependency>
                 <groupId>org.dspace.modules</groupId>
                 <artifactId>additions</artifactId>
                 <version>7.0-beta4-SNAPSHOT</version>
