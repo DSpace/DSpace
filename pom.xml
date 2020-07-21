@@ -35,7 +35,7 @@
         <javax-annotation.version>1.3.2</javax-annotation.version>
         <jaxb-api.version>2.3.1</jaxb-api.version>
         <jaxb-runtime.version>2.3.1</jaxb-runtime.version>
-        <!-- NOTE: Jetty needed for Handle Server & tests. Should be synced with version provided by solr-cell -->
+        <!-- NOTE: Jetty needed for Handle Server & tests -->
         <jetty.version>9.4.15.v20190215</jetty.version>
         <log4j.version>2.11.2</log4j.version>
         <pdfbox-version>2.0.15</pdfbox-version>
@@ -1240,6 +1240,7 @@
                 <artifactId>handle</artifactId>
                 <version>9.3.0-SNAPSHOT</version>
             </dependency>
+            <!-- Required to run Handle Server -->
             <dependency>
                 <groupId>net.cnri</groupId>
                 <artifactId>cnri-servlet-container</artifactId>
@@ -1847,6 +1848,7 @@
                 <enabled>true</enabled>
             </snapshots>
         </repository>
+        <!-- For Handle Server -->
         <repository>
             <id>handle.net</id>
             <url>https://handle.net/maven</url>
