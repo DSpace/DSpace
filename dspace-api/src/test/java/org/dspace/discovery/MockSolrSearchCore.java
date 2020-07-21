@@ -22,4 +22,8 @@ public class MockSolrSearchCore extends SolrSearchCore implements InitializingBe
         solr = null;
     }
 
+    public void reset() {
+        // This method intentionally left blank.
+    }
+
 }

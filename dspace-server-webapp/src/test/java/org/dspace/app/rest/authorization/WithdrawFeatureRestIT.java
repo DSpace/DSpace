@@ -12,17 +12,17 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import org.dspace.app.rest.authorization.impl.WithdrawFeature;
-import org.dspace.app.rest.builder.CollectionBuilder;
-import org.dspace.app.rest.builder.CommunityBuilder;
-import org.dspace.app.rest.builder.ItemBuilder;
-import org.dspace.app.rest.builder.WorkflowItemBuilder;
-import org.dspace.app.rest.builder.WorkspaceItemBuilder;
 import org.dspace.app.rest.converter.ItemConverter;
 import org.dspace.app.rest.matcher.AuthorizationMatcher;
 import org.dspace.app.rest.model.ItemRest;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.app.rest.utils.Utils;
+import org.dspace.builder.CollectionBuilder;
+import org.dspace.builder.CommunityBuilder;
+import org.dspace.builder.ItemBuilder;
+import org.dspace.builder.WorkflowItemBuilder;
+import org.dspace.builder.WorkspaceItemBuilder;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
@@ -131,8 +131,8 @@ public class WithdrawFeatureRestIT extends AbstractControllerIntegrationTest {
             .param("uri", itemUri)
             .param("eperson", eperson.getID().toString())
             .param("feature", withdrawFeature.getName()))
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$",
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$",
                 Matchers.is(AuthorizationMatcher.matchAuthorization(authAdminWithdraw))));
 
         // now verify that the property core.authorization.community-admin.item.withdraw = false is respected
