@@ -1031,13 +1031,11 @@ prevent the generation of resource policy entry values with null dspace_object a
      * @throws AuthorizeException if authorization error
      *                            Exception indicating the current user of the context does not have permission
      *                            to perform a particular action.
-     * @throws IOException        if IO error
-     *                            A general class of exceptions produced by failed or interrupted I/O operations.
      */
     @Override
     public Iterator<Item> findByMetadataField(Context context,
                                               String schema, String element, String qualifier, String value)
-        throws SQLException, AuthorizeException, IOException {
+        throws SQLException, AuthorizeException {
         MetadataSchema mds = metadataSchemaService.find(context, schema);
         if (mds == null) {
             throw new IllegalArgumentException("No such metadata schema: " + schema);
@@ -1059,7 +1057,7 @@ prevent the generation of resource policy entry values with null dspace_object a
     public Iterator<Item> findByMetadataQuery(Context context, List<List<MetadataField>> listFieldList,
                                               List<String> query_op, List<String> query_val, List<UUID> collectionUuids,
                                               String regexClause, int offset, int limit)
-        throws SQLException, AuthorizeException, IOException {
+        throws SQLException, AuthorizeException {
         return itemDAO
             .findByMetadataQuery(context, listFieldList, query_op, query_val, collectionUuids, regexClause, offset,
                                  limit);

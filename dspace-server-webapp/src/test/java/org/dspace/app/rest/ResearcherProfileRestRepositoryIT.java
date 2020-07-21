@@ -11,6 +11,7 @@ import static java.util.Arrays.asList;
 import static org.dspace.app.rest.matcher.HalMatcher.matchLinks;
 import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadata;
 import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
@@ -18,13 +19,18 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.io.UnsupportedEncodingException;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
 
+import com.jayway.jsonpath.JsonPath;
 import org.dspace.app.rest.builder.CollectionBuilder;
 import org.dspace.app.rest.builder.CommunityBuilder;
 import org.dspace.app.rest.builder.EPersonBuilder;
 import org.dspace.app.rest.builder.ItemBuilder;
+import org.dspace.app.rest.model.MetadataValueRest;
+import org.dspace.app.rest.model.patch.AddOperation;
 import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.rest.model.patch.ReplaceOperation;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
@@ -34,6 +40,7 @@ import org.dspace.services.ConfigurationService;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MvcResult;
 
 /**
  * Integration tests for {@link ResearcherProfileRestRepository}.
@@ -627,5 +634,64 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
         getClient(userToken).perform(get("/api/cris/profiles/{id}", id))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.visible", is(true)));
+    }
+
+    /**
+     * Verify that after an user login an automatic claim between the logged eperson
+     * and possible profiles without eperson is done.
+     *
+     * @throws Exception
+     */
+    @Test
+    public void testAutomaticProfileClaimByEmail() throws Exception {
+
+        String id = user.getID().toString();
+
+        String adminToken = getAuthToken(admin.getEmail(), password);
+
+        // create and delete a profile
+        getClient(adminToken).perform(post("/api/cris/profiles/")
+            .param("eperson", id)
+            .contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(status().isCreated());
+
+        String firstItemId = getItemIdByProfileId(adminToken, id);
+
+        MetadataValueRest valueToAdd = new MetadataValueRest(user.getEmail());
+        List<Operation> operations = asList(new AddOperation("/metadata/crisrp.email", valueToAdd));
+
+        getClient(adminToken).perform(patch(BASE_REST_SERVER_URL + "/api/core/items/{id}", firstItemId)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(getPatchContent(operations)))
+            .andExpect(status().isOk());
+
+        getClient(adminToken).perform(delete("/api/cris/profiles/{id}", id))
+            .andExpect(status().isNoContent());
+
+        getClient(adminToken).perform(get("/api/cris/profiles/{id}", id))
+            .andExpect(status().isNotFound());
+
+        // the automatic claim is done after the user login
+        String userToken = getAuthToken(user.getEmail(), password);
+
+        getClient(userToken).perform(get("/api/cris/profiles/{id}", id))
+            .andExpect(status().isOk());
+
+        // the profile item should be the same
+        String secondItemId = getItemIdByProfileId(adminToken, id);
+        assertEquals("The item should be the same", firstItemId, secondItemId);
+
+    }
+
+    private String getItemIdByProfileId(String token, String id) throws SQLException, Exception {
+        MvcResult result = getClient(token).perform(get("/api/cris/profiles/{id}/item", id))
+            .andExpect(status().isOk())
+            .andReturn();
+
+        return readAttributeFromResponse(result, "$.id");
+    }
+
+    private <T> T readAttributeFromResponse(MvcResult result, String attribute) throws UnsupportedEncodingException {
+        return JsonPath.read(result.getResponse().getContentAsString(), attribute);
     }
 }
