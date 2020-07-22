@@ -1,3 +1,5 @@
+$! /bin/sh
+
 /opt/dist/tools/preload_tracer /opt/out/snapshot/workspace/apache-maven-3.6.0/bin/mvn clean package \
 	-f  pom.xml \
 	-B -V -e \
