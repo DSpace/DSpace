@@ -82,7 +82,9 @@ public class ScriptRestRepositoryIT extends AbstractControllerIntegrationTest {
                             ScriptMatcher.matchScript(scriptConfigurations.get(2).getName(),
                                                       scriptConfigurations.get(2).getDescription()),
                             ScriptMatcher.matchScript(scriptConfigurations.get(3).getName(),
-                                                      scriptConfigurations.get(3).getDescription())
+                                                      scriptConfigurations.get(3).getDescription()),
+                            ScriptMatcher.matchScript(scriptConfigurations.get(4).getName(),
+                                                      scriptConfigurations.get(4).getDescription())
                         )));
 
     }
