@@ -44,12 +44,4 @@ public abstract class HALResource<T> extends EntityModel<T> {
     public void setPageHeader(EmbeddedPageHeader page) {
         this.pageHeader = page;
     }
-
-    @Override
-    public EntityModel<T> add(Link link) {
-        if (!hasLink(link.getRel())) {
-            return super.add(link);
-        }
-        return this;
-    }
 }
