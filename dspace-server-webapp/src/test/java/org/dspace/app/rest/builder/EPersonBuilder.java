@@ -7,7 +7,9 @@
  */
 package org.dspace.app.rest.builder;
 
+import java.io.IOException;
 import java.sql.SQLException;
+import java.util.UUID;
 
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.service.DSpaceObjectService;
@@ -26,7 +28,15 @@ public class EPersonBuilder extends AbstractDSpaceObjectBuilder<EPerson> {
 
     @Override
     public void cleanup() throws Exception {
-        delete(ePerson);
+       try (Context c = new Context()) {
+            c.turnOffAuthorisationSystem();
+            // Ensure object and any related objects are reloaded before checking to see what needs cleanup
+            ePerson = c.reloadEntity(ePerson);
+            if (ePerson != null) {
+                delete(c, ePerson);
+                c.complete();
+            }
+       }
     }
 
     protected DSpaceObjectService<EPerson> getService() {
@@ -106,5 +116,21 @@ public class EPersonBuilder extends AbstractDSpaceObjectBuilder<EPerson> {
         ePerson.setCanLogIn(true);
         ePersonService.setPassword(ePerson, password);
         return this;
+    }
+
+    public static void deleteEPerson(UUID uuid) throws SQLException, IOException {
+        try (Context c = new Context()) {
+            c.turnOffAuthorisationSystem();
+            EPerson ePerson = ePersonService.find(c, uuid);
+            if (ePerson != null) {
+                try {
+                    ePersonService.delete(c, ePerson);
+                } catch (AuthorizeException e) {
+                    // cannot occur, just wrap it to make the compiler happy
+                    throw new RuntimeException(e);
+                }
+            }
+            c.complete();
+        }
     }
 }

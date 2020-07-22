@@ -52,7 +52,7 @@ public class ItemOwningCollectionUpdateRestControllerIT extends AbstractControll
                                       .withAuthor("Smith, Donald")
                                       .build();
 
-
+        context.restoreAuthSystemState();
         //When we call this owningCollection/move endpoint
         getClient().perform(
                 put("/api/core/items/" + publicItem1.getID() + "/owningCollection/")
@@ -85,6 +85,7 @@ public class ItemOwningCollectionUpdateRestControllerIT extends AbstractControll
                                       .withAuthor("Smith, Donald")
                                       .build();
 
+        context.restoreAuthSystemState();
         String token = getAuthToken(admin.getEmail(), password);
 
 
@@ -140,6 +141,7 @@ public class ItemOwningCollectionUpdateRestControllerIT extends AbstractControll
                                                   .withAction(Constants.ADD)
                                                   .withDspaceObject(col2).build();
 
+        context.restoreAuthSystemState();
         String token = getAuthToken(itemMoveEperson.getEmail(), "test");
 
         getClient(token)
@@ -186,7 +188,7 @@ public class ItemOwningCollectionUpdateRestControllerIT extends AbstractControll
                                                   .withAction(Constants.WRITE)
                                                   .withDspaceObject(publicItem1).build();
 
-
+        context.restoreAuthSystemState();
         String token = getAuthToken(itemMoveEperson.getEmail(), "test");
 
         getClient(token).perform(put("/api/core/items/" + publicItem1.getID() + "/owningCollection/")
@@ -227,7 +229,7 @@ public class ItemOwningCollectionUpdateRestControllerIT extends AbstractControll
                                                   .withAction(Constants.ADD)
                                                   .withDspaceObject(col2).build();
 
-
+        context.restoreAuthSystemState();
         String token = getAuthToken(itemMoveEperson.getEmail(), "test");
 
         getClient(token).perform(put("/api/core/items/" + publicItem1.getID() + "/owningCollection/")
@@ -268,7 +270,7 @@ public class ItemOwningCollectionUpdateRestControllerIT extends AbstractControll
                                                   .withAction(Constants.ADD)
                                                   .withDspaceObject(col2).build();
 
-
+        context.restoreAuthSystemState();
         String token = getAuthToken(itemMoveEperson.getEmail(), "test");
 
         getClient(token).perform(put("/api/core/items/" + publicItem1.getID() + "/owningCollection/")
@@ -282,5 +284,35 @@ public class ItemOwningCollectionUpdateRestControllerIT extends AbstractControll
                         .andExpect(status().isOk());
 
 
+    }
+
+    @Test
+    public void moveItemForbiddenTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                   .withName("Parent Community")
+                                   .build();
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                    .withName("Collection 1")
+                                    .build();
+        Collection col2 = CollectionBuilder.createCollection(context, parentCommunity)
+                                    .withName("Collection 2")
+                                    .build();
+
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
+                                    .withTitle("Public item 1")
+                                    .withIssueDate("2019-10-21")
+                                    .withAuthor("Smith, Donald")
+                                    .build();
+
+        context.restoreAuthSystemState();
+
+        String tokenEPerson = getAuthToken(eperson.getEmail(), password);
+
+        getClient(tokenEPerson).perform(put("/api/core/items/" + publicItem1.getID() + "/owningCollection/")
+                               .contentType(parseMediaType(TEXT_URI_LIST_VALUE))
+                               .content("https://localhost:8080/spring-rest/api/core/collections/" + col2.getID()))
+                               .andExpect(status().isForbidden());
     }
 }

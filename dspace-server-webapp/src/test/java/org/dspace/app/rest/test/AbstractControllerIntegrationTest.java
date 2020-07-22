@@ -11,7 +11,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 
-import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
@@ -58,7 +57,7 @@ import org.springframework.web.context.WebApplicationContext;
  * @author Tim Donohue
  * @see org.dspace.app.rest.test.AbstractWebClientIntegrationTest
  */
-// Run tests with JUnit 4 and Spring TestContext Framework
+// Run tests with JUnit and Spring TestContext Framework
 @RunWith(SpringRunner.class)
 // Specify main class to use to load Spring ApplicationContext
 // NOTE: By default, Spring caches and reuses ApplicationContext for each integration test (to speed up tests)
@@ -71,6 +70,7 @@ import org.springframework.web.context.WebApplicationContext;
 public class AbstractControllerIntegrationTest extends AbstractIntegrationTestWithDatabase {
 
     protected static final String AUTHORIZATION_HEADER = "Authorization";
+    protected static final String AUTHORIZATION_COOKIE = "Authorization-cookie";
 
     //The Authorization header contains a value like "Bearer TOKENVALUE". This constant string represents the part that
     //sits before the actual authentication token and can be used to easily compose or parse the Authorization header.
@@ -80,7 +80,7 @@ public class AbstractControllerIntegrationTest extends AbstractIntegrationTestWi
     public static final String BASE_REST_SERVER_URL = "http://localhost";
 
     protected MediaType contentType = new MediaType(MediaTypes.HAL_JSON.getType(),
-                                                    MediaTypes.HAL_JSON.getSubtype(), StandardCharsets.UTF_8);
+                                                    MediaTypes.HAL_JSON.getSubtype());
 
     protected MediaType textUriContentType = RestMediaTypes.TEXT_URI_LIST;
 
@@ -120,7 +120,7 @@ public class AbstractControllerIntegrationTest extends AbstractIntegrationTestWi
 
         if (StringUtils.isNotBlank(authToken)) {
             mockMvcBuilder.defaultRequest(
-                get("").header(AUTHORIZATION_HEADER, AUTHORIZATION_TYPE + authToken));
+                get("/").header(AUTHORIZATION_HEADER, AUTHORIZATION_TYPE + authToken));
         }
 
         return mockMvcBuilder
@@ -134,9 +134,26 @@ public class AbstractControllerIntegrationTest extends AbstractIntegrationTestWi
                           .andReturn().getResponse();
     }
 
+    public MockHttpServletResponse getAuthResponseWithXForwardedForHeader(String user, String password,
+                                                                          String xForwardedFor) throws Exception {
+        return getClient().perform(post("/api/authn/login")
+                                       .param("user", user)
+                                       .param("password", password)
+                                       .header("X-Forwarded-For", xForwardedFor))
+                          .andReturn().getResponse();
+    }
+
+
     public String getAuthToken(String user, String password) throws Exception {
         return StringUtils.substringAfter(
             getAuthResponse(user, password).getHeader(AUTHORIZATION_HEADER),
+            AUTHORIZATION_TYPE);
+    }
+
+    public String getAuthTokenWithXForwardedForHeader(String user, String password, String xForwardedFor)
+        throws Exception {
+        return StringUtils.substringAfter(
+            getAuthResponseWithXForwardedForHeader(user, password, xForwardedFor).getHeader(AUTHORIZATION_HEADER),
             AUTHORIZATION_TYPE);
     }
 

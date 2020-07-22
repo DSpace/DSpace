@@ -13,7 +13,6 @@ import static org.junit.Assert.fail;
 import java.sql.SQLException;
 
 import org.apache.logging.log4j.Logger;
-
 import org.dspace.AbstractUnitTest;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
@@ -24,7 +23,6 @@ import org.dspace.content.service.CommunityService;
 import org.dspace.utils.DSpace;
 import org.dspace.xmlworkflow.factory.XmlWorkflowFactory;
 import org.dspace.xmlworkflow.state.Workflow;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

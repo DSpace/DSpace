@@ -32,13 +32,19 @@ import org.dspace.app.rest.model.patch.AddOperation;
 import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.rest.model.patch.ReplaceOperation;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
+import org.dspace.authorize.service.ResourcePolicyService;
 import org.dspace.content.Collection;
+import org.dspace.core.Constants;
 import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.MvcResult;
 
 public class ItemTemplateRestControllerIT extends AbstractControllerIntegrationTest {
+
+    @Autowired
+    ResourcePolicyService  resourcePolicyService;
 
     private ObjectMapper mapper;
     private String adminAuthToken;
@@ -158,6 +164,17 @@ public class ItemTemplateRestControllerIT extends AbstractControllerIntegrationT
                                          MetadataMatcher.matchMetadata("dc.description.abstract",
                                                                        "dc description abstract content")))
                                  )));
+    }
+
+    @Test
+    public void getTemplateItemFromCollectionForbiddenTest() throws Exception {
+        setupTestTemplate();
+        String itemUuidString = installTestTemplate();
+
+        resourcePolicyService.removePolicies(context, childCollection, Constants.READ);
+        String tokenEperson = getAuthToken(eperson.getEmail(), password);
+        getClient(tokenEperson).perform(get(getCollectionTemplateItemUrlTemplate(childCollection.getID().toString())))
+                .andExpect(status().isForbidden());
     }
 
     @Test

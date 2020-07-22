@@ -7,6 +7,7 @@
  */
 package org.dspace.app.rest.security;
 
+import org.dspace.authenticate.service.AuthenticationService;
 import org.dspace.services.RequestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.SecurityProperties;
@@ -52,6 +53,9 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     @Autowired
     private CustomLogoutHandler customLogoutHandler;
+
+    @Autowired
+    private AuthenticationService authenticationService;
 
     @Override
     public void configure(WebSecurity webSecurity) throws Exception {
@@ -103,9 +107,16 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
                 //Everyone can call GET on the status endpoint
                 .antMatchers(HttpMethod.GET, "/api/authn/status").permitAll()
             .and()
-
+            .addFilterBefore(new AnonymousAdditionalAuthorizationFilter(authenticationManager(), authenticationService),
+                             StatelessAuthenticationFilter.class)
             //Add a filter before our login endpoints to do the authentication based on the data in the HTTP request
             .addFilterBefore(new StatelessLoginFilter("/api/authn/login", authenticationManager(),
+                                                      restAuthenticationService),
+                             LogoutFilter.class)
+
+            //Add a filter before our shibboleth endpoints to do the authentication based on the data in the
+            // HTTP request
+            .addFilterBefore(new ShibbolethAuthenticationFilter("/api/authn/shibboleth", authenticationManager(),
                                                       restAuthenticationService),
                              LogoutFilter.class)
 
