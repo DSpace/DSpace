@@ -1,6 +1,6 @@
 $! /bin/sh
 
-/opt/dist/tools/preload_tracer mvn clean package \
+mvn clean package \
 	-f  pom.xml \
 	-B -V -e \
 	-Dfindbugs.skip \
