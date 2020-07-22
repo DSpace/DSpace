@@ -7,33 +7,44 @@
  */
 package org.dspace.app.rest.converter;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import javax.annotation.Nullable;
 import javax.annotation.PostConstruct;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.app.rest.link.HalLinkFactory;
 import org.dspace.app.rest.link.HalLinkService;
+import org.dspace.app.rest.model.BaseObjectRest;
 import org.dspace.app.rest.model.RestAddressableModel;
 import org.dspace.app.rest.model.RestModel;
 import org.dspace.app.rest.model.hateoas.HALResource;
 import org.dspace.app.rest.projection.DefaultProjection;
 import org.dspace.app.rest.projection.Projection;
+import org.dspace.app.rest.repository.DSpaceRestRepository;
+import org.dspace.app.rest.security.DSpacePermissionEvaluator;
+import org.dspace.app.rest.security.WebSecurityExpressionEvaluator;
 import org.dspace.app.rest.utils.Utils;
+import org.dspace.services.RequestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider;
+import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.core.type.filter.AssignableTypeFilter;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.Link;
-import org.springframework.hateoas.Resource;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
@@ -64,6 +75,15 @@ public class ConverterService {
     @Autowired
     private List<Projection> projections;
 
+    @Autowired
+    private DSpacePermissionEvaluator dSpacePermissionEvaluator;
+
+    @Autowired
+    private WebSecurityExpressionEvaluator webSecurityExpressionEvaluator;
+
+    @Autowired
+    private RequestService requestService;
+
     /**
      * Converts the given model object to a rest object, using the appropriate {@link DSpaceConverter} and
      * the given projection.
@@ -86,10 +106,67 @@ public class ConverterService {
         M transformedModel = projection.transformModel(modelObject);
         DSpaceConverter<M, R> converter = requireConverter(modelObject.getClass());
         R restObject = converter.convert(transformedModel, projection);
+        if (restObject instanceof BaseObjectRest) {
+            BaseObjectRest baseObjectRest = (BaseObjectRest) restObject;
+            // This section will verify whether the current user has permissions to retrieve the
+            // rest object. It'll only return the REST object if the permission is granted.
+            // If permission isn't granted, it'll return null
+            String preAuthorizeValue = getPreAuthorizeAnnotationForBaseObject(baseObjectRest);
+            if (!webSecurityExpressionEvaluator
+                .evaluate(preAuthorizeValue, requestService.getCurrentRequest().getHttpServletRequest(),
+                          requestService.getCurrentRequest().getHttpServletResponse(),
+                          String.valueOf(baseObjectRest.getId()))) {
+                log.debug("Access denied on " + restObject.getClass() + " with id: " +
+                              ((BaseObjectRest) restObject).getId());
+                return null;
+            }
+        }
         if (restObject instanceof RestModel) {
             return (R) projection.transformRest((RestModel) restObject);
         }
         return restObject;
+    }
+
+    private String getPreAuthorizeAnnotationForBaseObject(BaseObjectRest restObject) {
+        Annotation preAuthorize = getAnnotationForRestObject(restObject);
+        if (preAuthorize == null) {
+            preAuthorize = getDefaultFindOnePreAuthorize();
+
+        }
+        return parseAnnotation(preAuthorize);
+
+    }
+
+    private String parseAnnotation(Annotation preAuthorize) {
+        if (preAuthorize != null) {
+            return (String) AnnotationUtils.getValue(preAuthorize);
+        }
+        return null;
+    }
+
+    private Annotation getAnnotationForRestObject(BaseObjectRest restObject) {
+        BaseObjectRest baseObjectRest = restObject;
+        DSpaceRestRepository repositoryToUse = utils
+            .getResourceRepositoryByCategoryAndModel(baseObjectRest.getCategory(), baseObjectRest.getType());
+        Annotation preAuthorize = null;
+        for (Method m : repositoryToUse.getClass().getMethods()) {
+            if (StringUtils.equalsIgnoreCase(m.getName(), "findOne")) {
+                preAuthorize = AnnotationUtils.findAnnotation(m, PreAuthorize.class);
+            }
+        }
+        return preAuthorize;
+    }
+
+    private Annotation getDefaultFindOnePreAuthorize() {
+        for (Method m : DSpaceRestRepository.class.getMethods()) {
+            if (StringUtils.equalsIgnoreCase(m.getName(), "findOne")) {
+                Annotation annotation = AnnotationUtils.findAnnotation(m, PreAuthorize.class);
+                if (annotation != null) {
+                    return annotation;
+                }
+            }
+        }
+        return null;
     }
 
     /**
@@ -97,7 +174,6 @@ public class ConverterService {
      *
      * @param modelObjects the list of model objects.
      * @param pageable the pageable.
-     * @param total the total number of items.
      * @param projection the projection to use.
      * @param <M> the model object class.
      * @param <R> the rest object class.
@@ -105,24 +181,47 @@ public class ConverterService {
      * @throws IllegalArgumentException if there is no compatible converter.
      * @throws ClassCastException if the converter's return type is not compatible with the inferred return type.
      */
-    public <M, R> Page<R> toRestPage(List<M> modelObjects, Pageable pageable, long total, Projection projection) {
-        return new PageImpl<>(modelObjects, pageable, total).map((object) -> toRest(object, projection));
+    public <M, R> Page<R> toRestPage(List<M> modelObjects, Pageable pageable, Projection projection) {
+        List<R> transformedList = new LinkedList<>();
+        for (M modelObject : modelObjects) {
+            R transformedObject = toRest(modelObject, projection);
+            if (transformedObject != null) {
+                transformedList.add(transformedObject);
+            }
+        }
+        if (pageable == null) {
+            pageable = utils.getPageable(pageable);
+        }
+        return utils.getPage(transformedList, pageable);
     }
 
     /**
-     * Converts a list of model objects to a page of rest objects using the given {@link Projection}.
-     *
-     * @param modelObjects the page of model objects.
+     * Converts a list of ModelObjects to a page of Rest Objects using the given {@link Projection}
+     * This method differences in the sense that we define a total here instead of the size of the list because
+     * this method will be called if the list is limited through a DB call already and thus we need to give the
+     * total amount of records in the DB; not the size of the given list
+     * @param modelObjects the list of model objects.
+     * @param pageable the pageable.
+     * @param total The total amount of objects
      * @param projection the projection to use.
      * @param <M> the model object class.
      * @param <R> the rest object class.
      * @return the page.
-     * @throws IllegalArgumentException if there is no compatible converter.
-     * @throws ClassCastException if the converter's return type is not compatible with the inferred return type.
      */
-    public <M, R> Page<R> toRestPage(Page<M> modelObjects, Projection projection) {
-        return modelObjects.map((object) -> toRest(object, projection));
+    public <M, R> Page<R> toRestPage(List<M> modelObjects, Pageable pageable, long total, Projection projection) {
+        List<R> transformedList = new LinkedList<>();
+        for (M modelObject : modelObjects) {
+            R transformedObject = toRest(modelObject, projection);
+            if (transformedObject != null) {
+                transformedList.add(transformedObject);
+            }
+        }
+        if (pageable == null) {
+            pageable = utils.getPageable(pageable);
+        }
+        return new PageImpl(transformedList, pageable, total);
     }
+
 
     /**
      * Gets the converter supporting the given class as input.
@@ -177,6 +276,9 @@ public class ConverterService {
      * @return the fully converted resource, with all automatic links and embeds applied.
      */
     public <T extends HALResource> T toResource(RestModel restObject, Link... oldLinks) {
+        if (restObject == null) {
+            return null;
+        }
         T halResource = getResource(restObject);
         if (restObject instanceof RestAddressableModel) {
             utils.embedOrLinkClassLevelRels(halResource, oldLinks);
@@ -286,21 +388,21 @@ public class ConverterService {
         // scan all resource classes and look for compatible rest classes (by naming convention),
         // creating a map of resource constructors keyed by rest class, for later use.
         ClassPathScanningCandidateComponentProvider provider = new ClassPathScanningCandidateComponentProvider(false);
-        provider.addIncludeFilter(new AssignableTypeFilter(Resource.class));
+        provider.addIncludeFilter(new AssignableTypeFilter(EntityModel.class));
         Set<BeanDefinition> beanDefinitions = provider.findCandidateComponents(
-                HALResource.class.getPackage().getName().replaceAll("\\.", "/"));
+            HALResource.class.getPackage().getName().replaceAll("\\.", "/"));
         for (BeanDefinition beanDefinition : beanDefinitions) {
             String resourceClassName = beanDefinition.getBeanClassName();
             String resourceClassSimpleName = resourceClassName.substring(resourceClassName.lastIndexOf(".") + 1);
             String restClassSimpleName = resourceClassSimpleName
-                    .replaceAll("ResourceWrapper$", "RestWrapper")
-                    .replaceAll("Resource$", "Rest");
+                .replaceAll("ResourceWrapper$", "RestWrapper")
+                .replaceAll("Resource$", "Rest");
             String restClassName = RestModel.class.getPackage().getName() + "." + restClassSimpleName;
             try {
                 Class<? extends RestModel> restClass =
-                        (Class<? extends RestModel>) Class.forName(restClassName);
+                    (Class<? extends RestModel>) Class.forName(restClassName);
                 Class<HALResource<? extends RestModel>> resourceClass =
-                        (Class<HALResource<? extends RestModel>>) Class.forName(resourceClassName);
+                    (Class<HALResource<? extends RestModel>>) Class.forName(resourceClassName);
                 Constructor compatibleConstructor = null;
                 for (Constructor constructor : resourceClass.getDeclaredConstructors()) {
                     if (constructor.getParameterCount() == 2 && constructor.getParameterTypes()[1] == Utils.class) {
@@ -314,11 +416,11 @@ public class ConverterService {
                     resourceConstructors.put(restClass, compatibleConstructor);
                 } else {
                     log.warn("Skipping registration of resource class " + resourceClassName
-                                    + "; compatible constructor not found");
+                                 + "; compatible constructor not found");
                 }
             } catch (ClassNotFoundException e) {
                 log.warn("Skipping registration of resource class " + resourceClassName
-                        + "; rest class not found: " + restClassName);
+                             + "; rest class not found: " + restClassName);
             }
         }
     }

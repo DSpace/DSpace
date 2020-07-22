@@ -7,6 +7,8 @@
  */
 package org.dspace.app.rest.repository;
 
+import static org.dspace.xmlworkflow.state.actions.processingaction.ProcessingAction.SUBMIT_EDIT_METADATA;
+
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -32,21 +34,32 @@ import org.dspace.app.util.SubmissionConfigReader;
 import org.dspace.app.util.SubmissionConfigReaderException;
 import org.dspace.app.util.SubmissionStepConfig;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.service.AuthorizeService;
+import org.dspace.content.Item;
 import org.dspace.content.service.BitstreamFormatService;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.ItemService;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.EPersonServiceImpl;
 import org.dspace.services.ConfigurationService;
 import org.dspace.workflow.WorkflowException;
 import org.dspace.workflow.WorkflowService;
+import org.dspace.xmlworkflow.WorkflowConfigurationException;
+import org.dspace.xmlworkflow.factory.XmlWorkflowFactory;
+import org.dspace.xmlworkflow.state.Step;
+import org.dspace.xmlworkflow.state.Workflow;
+import org.dspace.xmlworkflow.state.actions.WorkflowActionConfig;
+import org.dspace.xmlworkflow.storedcomponents.ClaimedTask;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
+import org.dspace.xmlworkflow.storedcomponents.service.ClaimedTaskService;
 import org.dspace.xmlworkflow.storedcomponents.service.XmlWorkflowItemService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
@@ -88,6 +101,18 @@ public class WorkflowItemRestRepository extends DSpaceRestRepository<WorkflowIte
     @Autowired
     WorkflowService<XmlWorkflowItem> wfs;
 
+    @Autowired
+    AuthorizeService authorizeService;
+
+    @Autowired
+    ClaimedTaskService claimedTaskService;
+
+    @Autowired
+    protected XmlWorkflowItemService xmlWorkflowItemService;
+
+    @Autowired
+    protected XmlWorkflowFactory workflowFactory;
+
     private final SubmissionConfigReader submissionConfigReader;
 
     public WorkflowItemRestRepository() throws SubmissionConfigReaderException {
@@ -117,7 +142,8 @@ public class WorkflowItemRestRepository extends DSpaceRestRepository<WorkflowIte
             List<XmlWorkflowItem> witems = wis.findAll(context, pageable.getPageNumber(), pageable.getPageSize());
             return converter.toRestPage(witems, pageable, total, utils.obtainProjection());
         } catch (SQLException e) {
-            throw new RuntimeException(e.getMessage(), e);
+            throw new RuntimeException("SQLException in " + this.getClass() + "#findAll trying to retrieve all " +
+                "workflowitems from db.", e);
         }
     }
 
@@ -132,7 +158,8 @@ public class WorkflowItemRestRepository extends DSpaceRestRepository<WorkflowIte
                     pageable.getPageSize());
             return converter.toRestPage(witems, pageable, total, utils.obtainProjection());
         } catch (SQLException e) {
-            throw new RuntimeException(e.getMessage(), e);
+            throw new RuntimeException("SQLException in " + this.getClass() + "#findBySubmitter trying to retrieve " +
+                "eperson or their workflowitems from db.", e);
         }
     }
 
@@ -150,7 +177,8 @@ public class WorkflowItemRestRepository extends DSpaceRestRepository<WorkflowIte
             throw new UnprocessableEntityException(
                     "Invalid workflow action: " + e.getMessage(), e);
         } catch (SQLException e) {
-            throw new RuntimeException(e.getMessage(), e);
+            throw new RuntimeException("SQLException in " + this.getClass() + "#findBySubmitter trying to create " +
+                "a workflow and adding it to db.", e);
         }
         //if the item go directly in published status we have to manage a status code 204 with no content
         if (source.getItem().isArchived()) {
@@ -166,11 +194,14 @@ public class WorkflowItemRestRepository extends DSpaceRestRepository<WorkflowIte
 
     @Override
     public WorkflowItemRest upload(HttpServletRequest request, String apiCategory, String model, Integer id,
-                                   MultipartFile file) throws Exception {
+                                   MultipartFile file) throws SQLException {
 
         Context context = obtainContext();
         WorkflowItemRest wsi = findOne(context, id);
         XmlWorkflowItem source = wis.find(context, id);
+
+        this.checkIfEditMetadataAllowedInCurrentStep(context, source);
+
         List<ErrorRest> errors = new ArrayList<ErrorRest>();
         SubmissionConfig submissionConfig =
             submissionConfigReader.getSubmissionConfigByName(wsi.getSubmissionDefinition().getName());
@@ -219,6 +250,9 @@ public class WorkflowItemRestRepository extends DSpaceRestRepository<WorkflowIte
         List<Operation> operations = patch.getOperations();
         WorkflowItemRest wsi = findOne(context, id);
         XmlWorkflowItem source = wis.find(context, id);
+
+        this.checkIfEditMetadataAllowedInCurrentStep(context, source);
+
         for (Operation op : operations) {
             //the value in the position 0 is a null value
             String[] path = op.getPath().substring(1).split("/", 3);
@@ -258,7 +292,8 @@ public class WorkflowItemRestRepository extends DSpaceRestRepository<WorkflowIte
                         AbstractRestProcessingStep stepProcessing =
                             (AbstractRestProcessingStep) stepClass.newInstance();
                         stepProcessing.doPreProcessing(context, source);
-                        stepProcessing.doPatchProcessing(context, getRequestService().getCurrentRequest(), source, op);
+                        stepProcessing.doPatchProcessing(context, getRequestService().getCurrentRequest(),
+                                                          source, op, stepConfig);
                         stepProcessing.doPostProcessing(context, source);
                     } else {
                         throw new DSpaceBadRequestException(
@@ -289,8 +324,71 @@ public class WorkflowItemRestRepository extends DSpaceRestRepository<WorkflowIte
             wfs.abort(context, witem, context.getCurrentUser());
         } catch (AuthorizeException e) {
             throw new RESTAuthorizationException(e);
-        } catch (SQLException | IOException e) {
+        } catch (SQLException e) {
+            throw new RuntimeException("SQLException in " + this.getClass() + "#delete trying to retrieve or delete a" +
+                " workflowitem from db.", e);
+        } catch (IOException e) {
+            throw new RuntimeException("IOException in " + this.getClass() + "#delete trying to delete a workflowitem" +
+                " from db (abort).", e);
+        }
+    }
+
+    /**
+     * Checks if @link{SUBMIT_EDIT_METADATA} is a valid option in the workflow step this task is currently at.
+     * Patching and uploading is only allowed if this is the case.
+     * @param context               Context
+     * @param xmlWorkflowItem       WorkflowItem of the task
+     */
+    private void checkIfEditMetadataAllowedInCurrentStep(Context context, XmlWorkflowItem xmlWorkflowItem) {
+        try {
+            ClaimedTask claimedTask = claimedTaskService.findByWorkflowIdAndEPerson(context, xmlWorkflowItem,
+                context.getCurrentUser());
+            if (claimedTask == null) {
+                throw new UnprocessableEntityException("WorkflowItem with id " + xmlWorkflowItem.getID()
+                    + " has not been claimed yet.");
+            }
+            Workflow workflow = workflowFactory.getWorkflow(claimedTask.getWorkflowItem().getCollection());
+            Step step = workflow.getStep(claimedTask.getStepID());
+            WorkflowActionConfig currentActionConfig = step.getActionConfig(claimedTask.getActionID());
+            if (!currentActionConfig.getProcessingAction().getOptions().contains(SUBMIT_EDIT_METADATA)) {
+                throw new UnprocessableEntityException(SUBMIT_EDIT_METADATA + " is not a valid option on this " +
+                    "action (" + currentActionConfig.getProcessingAction().getClass() + ").");
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("SQLException in " + this.getClass()
+                + "#checkIfEditMetadataAllowedInCurrentStep trying to retrieve workflowitem from db by eperson.", e);
+        } catch (WorkflowConfigurationException e) {
+            throw new RuntimeException("WorkflowConfigurationException in " + this.getClass()
+                + "#checkIfEditMetadataAllowedInCurrentStep trying to retrieve workflow configuration from config", e);
+        }
+    }
+
+    /**
+     * This is a search method that will return the WorkflowItemRest object found through the UUID of an item. It'll
+     * find the Item through the given UUID and try to resolve the WorkflowItem relevant for that item and return it.
+     * It'll return a 401/403 if the current user isn't allowed to view the WorkflowItem.
+     * It'll return a 204 if nothing was found
+     * @param itemUuid  The UUID for the Item to be used
+     * @param pageable  The pageable if present
+     * @return          The resulting WorkflowItemRest object
+     */
+    @SearchRestMethod(name = "item")
+    public WorkflowItemRest findByItemUuid(@Parameter(value = "uuid", required = true) UUID itemUuid,
+                                           Pageable pageable) {
+        try {
+            Context context = obtainContext();
+            Item item = itemService.find(context, itemUuid);
+            XmlWorkflowItem xmlWorkflowItem = wis.findByItem(context, item);
+            if (xmlWorkflowItem == null) {
+                return null;
+            }
+            if (!authorizeService.authorizeActionBoolean(context, xmlWorkflowItem.getItem(), Constants.READ)) {
+                throw new AccessDeniedException("The current user does not have rights to view the WorkflowItem");
+            }
+            return converter.toRest(xmlWorkflowItem, utils.obtainProjection());
+        } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
     }
+
 }

@@ -37,7 +37,23 @@ public class MetadataFieldBuilder extends AbstractBuilder<MetadataField, Metadat
 
     @Override
     public void cleanup() throws Exception {
-        delete(metadataField);
+        try (Context c = new Context()) {
+            c.turnOffAuthorisationSystem();
+            // Ensure object and any related objects are reloaded before checking to see what needs cleanup
+            metadataField = c.reloadEntity(metadataField);
+            if (metadataField != null) {
+                delete(c, metadataField);
+            }
+            c.complete();
+            indexingService.commit();
+        }
+    }
+
+    @Override
+    public void delete(Context c, MetadataField dso) throws Exception {
+        if (dso != null) {
+            getService().delete(c, dso);
+        }
     }
 
     @Override
@@ -76,6 +92,26 @@ public class MetadataFieldBuilder extends AbstractBuilder<MetadataField, Metadat
         indexingService.commit();
     }
 
+    /**
+     * Delete the Test MetadataField referred to by the given ID
+     * @param id Integer of Test MetadataField to delete
+     * @throws SQLException
+     * @throws IOException
+     */
+    public static void deleteMetadataField(Integer id) throws SQLException, IOException {
+        try (Context c = new Context()) {
+            c.turnOffAuthorisationSystem();
+            MetadataField metadataField = metadataFieldService.find(c, id);
+            if (metadataField != null) {
+                try {
+                     metadataFieldService.delete(c, metadataField);
+                } catch (AuthorizeException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+            c.complete();
+        }
+    }
 
     public static MetadataFieldBuilder createMetadataField(Context context, String element, String qualifier,
                                                            String scopeNote) throws SQLException, AuthorizeException {

@@ -24,19 +24,10 @@ import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
-import org.dspace.content.service.CollectionService;
-import org.dspace.content.service.ItemService;
 import org.hamcrest.Matchers;
 import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 
 public class MappedCollectionRestRepositoryIT extends AbstractControllerIntegrationTest {
-
-    @Autowired
-    private CollectionService collectionService;
-
-    @Autowired
-    private ItemService itemService;
 
     @Test
     public void itemHasNoExtraCollectionsAndCollectionHasNoExtraItemsTest() throws Exception {

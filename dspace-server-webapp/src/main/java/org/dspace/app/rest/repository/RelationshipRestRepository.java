@@ -40,6 +40,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
 /**
@@ -71,6 +72,7 @@ public class RelationshipRestRepository extends DSpaceRestRepository<Relationshi
     private RequestService requestService;
 
     @Override
+    @PreAuthorize("permitAll()")
     public RelationshipRest findOne(Context context, Integer integer) {
         try {
             return converter.toRest(relationshipService.find(context, integer), utils.obtainProjection());

@@ -48,9 +48,9 @@ public class RootConverterTest {
     public void testCorrectPropertiesSetFromConfigurationService() throws Exception {
         String restUrl = "rest";
         RootRest rootRest = rootConverter.convert();
-        assertEquals("dspaceurl", rootRest.getDspaceURL());
+        assertEquals("dspaceurl", rootRest.getDspaceUI());
         assertEquals("dspacename", rootRest.getDspaceName());
-        assertEquals(restUrl, rootRest.getDspaceRest());
+        assertEquals(restUrl, rootRest.getDspaceServer());
     }
 
     @Test

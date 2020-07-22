@@ -16,6 +16,7 @@ import org.dspace.browse.BrowseIndex;
 import org.dspace.core.Context;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
 /**
@@ -27,6 +28,7 @@ import org.springframework.stereotype.Component;
 public class BrowseIndexRestRepository extends DSpaceRestRepository<BrowseIndexRest, String> {
 
     @Override
+    @PreAuthorize("permitAll()")
     public BrowseIndexRest findOne(Context context, String name) {
         BrowseIndexRest bi = null;
         BrowseIndex bix;

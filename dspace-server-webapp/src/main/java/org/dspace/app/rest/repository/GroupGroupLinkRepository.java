@@ -27,7 +27,7 @@ import org.springframework.stereotype.Component;
 /**
  * Link repository for "groups" subresource of an individual group.
  */
-@Component(GroupRest.CATEGORY + "." + GroupRest.NAME + "." + GroupRest.GROUPS)
+@Component(GroupRest.CATEGORY + "." + GroupRest.NAME + "." + GroupRest.SUBGROUPS)
 public class GroupGroupLinkRepository extends AbstractDSpaceRestRepository
         implements LinkRestRepository {
 
@@ -45,8 +45,7 @@ public class GroupGroupLinkRepository extends AbstractDSpaceRestRepository
             if (group == null) {
                 throw new ResourceNotFoundException("No such group: " + groupId);
             }
-            Page<Group> groups = utils.getPage(group.getMemberGroups(), optionalPageable);
-            return converter.toRestPage(groups, projection);
+            return converter.toRestPage(group.getMemberGroups(), optionalPageable, projection);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
