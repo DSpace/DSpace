@@ -7,109 +7,67 @@
  */
 package org.dspace.statistics.export;
 
+import java.sql.SQLException;
+
 import org.apache.commons.cli.Options;
-import org.apache.commons.cli.ParseException;
-import org.apache.commons.lang3.StringUtils;
+import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.core.Context;
-import org.dspace.scripts.DSpaceRunnable;
 import org.dspace.scripts.configuration.ScriptConfiguration;
-import org.dspace.statistics.export.factory.OpenURLTrackerLoggerServiceFactory;
-import org.dspace.statistics.export.service.OpenUrlService;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * Script to retry the failed url transmissions to IRUS
- * This script also has an option to add new failed urls for testing purposes
+ * The {@link ScriptConfiguration} for the {@link RetryFailedOpenUrlTracker} script
  */
-public class RetryFailedOpenUrlTracker extends DSpaceRunnable {
+public class RetryFailedOpenUrlTrackerScriptConfiguration<T extends RetryFailedOpenUrlTracker>
+        extends ScriptConfiguration<T> {
 
-    private Context context = null;
-    private String lineToAdd = null;
-    private boolean help = false;
-    private boolean retryFailed = false;
+    @Autowired
+    private AuthorizeService authorizeService;
 
-    private OpenUrlService openUrlService;
+    private Class<T> dspaceRunnableClass;
+
+    @Override
+    public Class<T> getDspaceRunnableClass() {
+        return dspaceRunnableClass;
+    }
 
     /**
-     * Run the script
-     * When the -a option is used, a new "failed" url will be added to the database
+     * Generic setter for the dspaceRunnableClass
      *
-     * @throws Exception
+     * @param dspaceRunnableClass The dspaceRunnableClass to be set on this RetryFailedOpenUrlTrackerScriptConfiguration
      */
-    public void internalRun() throws Exception {
-        if (help) {
-            printHelp();
-            return;
-        }
-        context.turnOffAuthorisationSystem();
+    @Override
+    public void setDspaceRunnableClass(Class<T> dspaceRunnableClass) {
+        this.dspaceRunnableClass = dspaceRunnableClass;
+    }
 
-        if (StringUtils.isNotBlank(lineToAdd)) {
-            openUrlService.logfailed(context, lineToAdd);
-            handler.logInfo("Created dummy entry in OpenUrlTracker with URL: " + lineToAdd);
-        }
-        if (retryFailed) {
-            handler.logInfo("Reprocessing failed URLs stored in the db");
-            openUrlService.reprocessFailedQueue(context);
-        }
-        context.restoreAuthSystemState();
+    @Override
+    public boolean isAllowedToExecute(Context context) {
         try {
-            context.complete();
-        } catch (Exception e) {
-            handler.logError(e.getMessage());
+            return authorizeService.isAdmin(context);
+        } catch (SQLException e) {
+            throw new RuntimeException("SQLException occurred when checking if the current user is an admin", e);
         }
     }
 
-    public ScriptConfiguration getScriptConfiguration() {
-        return null;
-    }
+    @Override
+    public Options getOptions() {
+        if (options == null) {
+            Options options = new Options();
 
-    /**
-     * Setups the parameters
-     *
-     * @throws ParseException
-     */
-    public void setup() throws ParseException {
-        context = new Context();
-        openUrlService = OpenURLTrackerLoggerServiceFactory.getInstance().getOpenUrlService();
+            options.addOption("a", true, "Add a new \"failed\" row to the table with a url (test purposes only)");
+            options.getOption("a").setType(String.class);
 
-        if (!(commandLine.hasOption('a') || commandLine.hasOption('r') || commandLine.hasOption('h'))) {
-            throw new ParseException("At least one of the parameters (-a, -r, -h) is required!");
+            options.addOption("r", false,
+                              "Retry sending requests to all urls stored in the table with failed requests. " +
+                                      "This includes the url that can be added through the -a option.");
+            options.getOption("r").setType(boolean.class);
+
+            options.addOption("h", "help", false, "print this help message");
+            options.getOption("h").setType(boolean.class);
+
+            super.options = options;
         }
-
-
-        if (commandLine.hasOption('h')) {
-            help = true;
-        }
-        if (commandLine.hasOption('a')) {
-            lineToAdd = commandLine.getOptionValue('a');
-        }
-        if (commandLine.hasOption('r')) {
-            retryFailed = true;
-        }
-    }
-
-    private RetryFailedOpenUrlTracker() {
-        Options options = constructOptions();
-        this.options = options;
-    }
-
-    /**
-     * Constructs the script options
-     *
-     * @return the constructed options
-     */
-    private Options constructOptions() {
-        Options options = new Options();
-
-        options.addOption("a", true, "Add a new \"failed\" row to the table with a url (test purposes only)");
-        options.getOption("a").setType(String.class);
-
-        options.addOption("r", false, "Retry sending requests to all urls stored in the table with failed requests. " +
-                "This includes the url that can be added through the -a option.");
-        options.getOption("r").setType(boolean.class);
-
-        options.addOption("h", "help", false, "print this help message");
-        options.getOption("h").setType(boolean.class);
-
         return options;
     }
 

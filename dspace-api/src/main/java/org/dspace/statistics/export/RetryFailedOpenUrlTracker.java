@@ -7,19 +7,19 @@
  */
 package org.dspace.statistics.export;
 
-import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.core.Context;
 import org.dspace.scripts.DSpaceRunnable;
 import org.dspace.statistics.export.factory.OpenURLTrackerLoggerServiceFactory;
 import org.dspace.statistics.export.service.OpenUrlService;
+import org.dspace.utils.DSpace;
 
 /**
  * Script to retry the failed url transmissions to IRUS
  * This script also has an option to add new failed urls for testing purposes
  */
-public class RetryFailedOpenUrlTracker extends DSpaceRunnable {
+public class RetryFailedOpenUrlTracker extends DSpaceRunnable<RetryFailedOpenUrlTrackerScriptConfiguration> {
 
     private Context context = null;
     private String lineToAdd = null;
@@ -57,6 +57,11 @@ public class RetryFailedOpenUrlTracker extends DSpaceRunnable {
         }
     }
 
+    public RetryFailedOpenUrlTrackerScriptConfiguration getScriptConfiguration() {
+        return new DSpace().getServiceManager().getServiceByName("retry-tracker",
+                                                                 RetryFailedOpenUrlTrackerScriptConfiguration.class);
+    }
+
     /**
      * Setups the parameters
      *
@@ -70,7 +75,6 @@ public class RetryFailedOpenUrlTracker extends DSpaceRunnable {
             throw new ParseException("At least one of the parameters (-a, -r, -h) is required!");
         }
 
-
         if (commandLine.hasOption('h')) {
             help = true;
         }
@@ -80,32 +84,6 @@ public class RetryFailedOpenUrlTracker extends DSpaceRunnable {
         if (commandLine.hasOption('r')) {
             retryFailed = true;
         }
-    }
-
-    private RetryFailedOpenUrlTracker() {
-        Options options = constructOptions();
-        this.options = options;
-    }
-
-    /**
-     * Constructs the script options
-     *
-     * @return the constructed options
-     */
-    private Options constructOptions() {
-        Options options = new Options();
-
-        options.addOption("a", true, "Add a new \"failed\" row to the table with a url (test purposes only)");
-        options.getOption("a").setType(String.class);
-
-        options.addOption("r", false, "Retry sending requests to all urls stored in the table with failed requests. " +
-                "This includes the url that can be added through the -a option.");
-        options.getOption("r").setType(boolean.class);
-
-        options.addOption("h", "help", false, "print this help message");
-        options.getOption("h").setType(boolean.class);
-
-        return options;
     }
 
 }

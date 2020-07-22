@@ -18,6 +18,7 @@ import org.apache.log4j.Logger;
 import org.dspace.AbstractIntegrationTest;
 import org.dspace.app.scripts.handler.impl.TestDSpaceRunnableHandler;
 import org.dspace.scripts.DSpaceRunnable;
+import org.dspace.scripts.configuration.ScriptConfiguration;
 import org.dspace.scripts.factory.ScriptServiceFactory;
 import org.dspace.scripts.service.ScriptService;
 import org.dspace.services.factory.DSpaceServicesFactory;
@@ -82,11 +83,13 @@ public class ITRetryFailedOpenUrlTracker extends AbstractIntegrationTest {
     public void testAddNewFailedUrl() throws Exception {
 
         TestDSpaceRunnableHandler testDSpaceRunnableHandler = new TestDSpaceRunnableHandler();
-        DSpaceRunnable retryOpenUrlTracker = scriptService.getScriptForName("retry-tracker");
+        ScriptConfiguration retryOpenUrlTrackerConfig = scriptService.getScriptConfiguration("retry-tracker");
+        DSpaceRunnable retryOpenUrlTracker =
+                scriptService.createDSpaceRunnableForScriptConfiguration(retryOpenUrlTrackerConfig);
         String urlToAdd = "test-failed-url";
         String[] args = {"-a", urlToAdd};
 
-        retryOpenUrlTracker.initialize(args, testDSpaceRunnableHandler);
+        retryOpenUrlTracker.initialize(args, testDSpaceRunnableHandler, eperson);
         retryOpenUrlTracker.internalRun();
 
         List<OpenURLTracker> all = failedOpenURLTrackerService.findAll(context);
@@ -105,7 +108,9 @@ public class ITRetryFailedOpenUrlTracker extends AbstractIntegrationTest {
     public void testReprocessAllUrls() throws Exception {
 
         TestDSpaceRunnableHandler testDSpaceRunnableHandler = new TestDSpaceRunnableHandler();
-        DSpaceRunnable retryOpenUrlTracker = scriptService.getScriptForName("retry-tracker");
+        ScriptConfiguration retryOpenUrlTrackerConfig = scriptService.getScriptConfiguration("retry-tracker");
+        DSpaceRunnable retryOpenUrlTracker =
+                scriptService.createDSpaceRunnableForScriptConfiguration(retryOpenUrlTrackerConfig);
         String[] args = {"-r"};
 
         OpenURLTracker tracker1 = failedOpenURLTrackerService.create(context);
@@ -116,7 +121,7 @@ public class ITRetryFailedOpenUrlTracker extends AbstractIntegrationTest {
         tracker3.setUrl("test-url-3");
 
 
-        retryOpenUrlTracker.initialize(args, testDSpaceRunnableHandler);
+        retryOpenUrlTracker.initialize(args, testDSpaceRunnableHandler, eperson);
         retryOpenUrlTracker.internalRun();
 
         List<OpenURLTracker> all = failedOpenURLTrackerService.findAll(context);
@@ -138,7 +143,9 @@ public class ITRetryFailedOpenUrlTracker extends AbstractIntegrationTest {
     public void testReprocessPartOfUrls() throws Exception {
 
         TestDSpaceRunnableHandler testDSpaceRunnableHandler = new TestDSpaceRunnableHandler();
-        DSpaceRunnable retryOpenUrlTracker = scriptService.getScriptForName("retry-tracker");
+        ScriptConfiguration retryOpenUrlTrackerConfig = scriptService.getScriptConfiguration("retry-tracker");
+        DSpaceRunnable retryOpenUrlTracker =
+                scriptService.createDSpaceRunnableForScriptConfiguration(retryOpenUrlTrackerConfig);
         String[] args = {"-r"};
 
         OpenURLTracker tracker1 = failedOpenURLTrackerService.create(context);
@@ -153,7 +160,7 @@ public class ITRetryFailedOpenUrlTracker extends AbstractIntegrationTest {
         tracker5.setUrl("test-url-5");
 
 
-        retryOpenUrlTracker.initialize(args, testDSpaceRunnableHandler);
+        retryOpenUrlTracker.initialize(args, testDSpaceRunnableHandler, eperson);
         retryOpenUrlTracker.internalRun();
 
         List<OpenURLTracker> all = failedOpenURLTrackerService.findAll(context);
