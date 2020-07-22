@@ -41,6 +41,7 @@ import org.dspace.discovery.IndexableObject;
 import org.dspace.discovery.SearchService;
 import org.dspace.discovery.SearchServiceException;
 import org.dspace.discovery.indexobject.IndexableMetadataField;
+import org.dspace.discovery.indexobject.MetadataFieldIndexFactoryImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -130,47 +131,67 @@ public class MetadataFieldRestRepository extends DSpaceRestRepository<MetadataFi
         @Parameter(value = "query", required = false) String query,
         Pageable pageable) throws SQLException {
         Context context = obtainContext();
+        DiscoverQuery discoverQuery = this.createDiscoverQuery(context, schemaName, elementName, qualifierName, query);
+
+        List<MetadataField> matchingMetadataFields = new ArrayList<>();
+
+        try {
+            DiscoverResult searchResult = searchService.search(context, null, discoverQuery);
+            for (IndexableObject object : searchResult.getIndexableObjects()) {
+                if (object instanceof IndexableMetadataField) {
+                    matchingMetadataFields.add(((IndexableMetadataField) object).getIndexedObject());
+                }
+            }
+        } catch (SearchServiceException e) {
+            log.error("Error while searching with Discovery", e);
+            throw new IllegalArgumentException("Error while searching with Discovery: " + e.getMessage());
+        }
+
+        return converter.toRestPage(matchingMetadataFields, pageable, utils.obtainProjection());
+    }
+
+    /**
+     * Creates a discovery query containing the filter queries derived from the request params
+     *
+     * @param context       Context request
+     * @param schemaName    an exact match of the prefix of the metadata schema (e.g. "dc", "dcterms", "eperson")
+     * @param elementName   an exact match of the field's element (e.g. "contributor", "title")
+     * @param qualifierName an exact match of the field's qualifier (e.g. "author", "alternative")
+     * @param query         part of the fully qualified field, should start with the start of the schema, element or
+     *                      qualifier (e.g. "dc.ti", "contributor", "auth", "contributor.ot")
+     * @return Discover query containing the filter queries derived from the request params
+     * @throws SQLException If DB error
+     */
+    private DiscoverQuery createDiscoverQuery(Context context, String schemaName, String elementName,
+        String qualifierName, String query) throws SQLException {
         List<String> filterQueries = new ArrayList<>();
         if (StringUtils.isNotBlank(query)) {
             if (query.split("\\.").length > 3) {
                 throw new IllegalArgumentException("Query param should not contain more than 2 dot (.) separators, " +
                                                    "forming schema.element.qualifier metadata field name");
             }
-            filterQueries
-                .add(searchService.toFilterQuery(context, "fieldName", OPERATOR_EQUALS, query).getFilterQuery() + "*");
+            filterQueries.add(searchService.toFilterQuery(context, MetadataFieldIndexFactoryImpl.FIELD_NAME_VARIATIONS,
+                OPERATOR_EQUALS, query).getFilterQuery() + "*");
         }
         if (StringUtils.isNotBlank(schemaName)) {
-            filterQueries
-                .add(searchService.toFilterQuery(context, "schema", OPERATOR_EQUALS, schemaName).getFilterQuery());
+            filterQueries.add(
+                searchService.toFilterQuery(context, MetadataFieldIndexFactoryImpl.SCHEMA_FIELD_NAME, OPERATOR_EQUALS,
+                    schemaName).getFilterQuery());
         }
         if (StringUtils.isNotBlank(elementName)) {
-            filterQueries
-                .add(searchService.toFilterQuery(context, "element", OPERATOR_EQUALS, elementName).getFilterQuery());
+            filterQueries.add(
+                searchService.toFilterQuery(context, MetadataFieldIndexFactoryImpl.ELEMENT_FIELD_NAME, OPERATOR_EQUALS,
+                    elementName).getFilterQuery());
         }
         if (StringUtils.isNotBlank(qualifierName)) {
-            filterQueries.add(
-                searchService.toFilterQuery(context, "qualifier", OPERATOR_EQUALS, qualifierName).getFilterQuery());
+            filterQueries.add(searchService
+                .toFilterQuery(context, MetadataFieldIndexFactoryImpl.QUALIFIER_FIELD_NAME, OPERATOR_EQUALS,
+                    qualifierName).getFilterQuery());
         }
 
-        DiscoverResult searchResult = null;
         DiscoverQuery discoverQuery = new DiscoverQuery();
         discoverQuery.addFilterQueries(filterQueries.toArray(new String[filterQueries.size()]));
-
-        try {
-            searchResult = searchService.search(context, null, discoverQuery);
-        } catch (SearchServiceException e) {
-            log.error("Error while searching with Discovery", e);
-            throw new IllegalArgumentException("Error while searching with Discovery: " + e.getMessage());
-        }
-
-        List<MetadataField> matchingMetadataFields = new ArrayList<>();
-        for (IndexableObject object : searchResult.getIndexableObjects()) {
-            if (object instanceof IndexableMetadataField) {
-                matchingMetadataFields.add(((IndexableMetadataField) object).getIndexedObject());
-            }
-        }
-        // Correct conversion
-        return converter.toRestPage(matchingMetadataFields, pageable, utils.obtainProjection());
+        return discoverQuery;
     }
 
     @Override
