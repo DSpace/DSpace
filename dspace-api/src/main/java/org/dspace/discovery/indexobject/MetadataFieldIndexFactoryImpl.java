@@ -32,6 +32,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class MetadataFieldIndexFactoryImpl extends IndexFactoryImpl<IndexableMetadataField, MetadataField>
     implements MetadataFieldIndexFactory {
 
+    public static final String SCHEMA_FIELD_NAME = "schema";
+    public static final String ELEMENT_FIELD_NAME = "element";
+    public static final String QUALIFIER_FIELD_NAME = "qualifier";
+    public static final String FIELD_NAME_VARIATIONS = "fieldName";
+
     @Autowired
     protected GroupService groupService;
 
@@ -42,17 +47,17 @@ public class MetadataFieldIndexFactoryImpl extends IndexFactoryImpl<IndexableMet
         final SolrInputDocument doc = super.buildDocument(context, indexableObject);
         final MetadataField metadataField = indexableObject.getIndexedObject();
         // add schema, element, qualifier and full fieldName
-        addFacetIndex(doc, "schema", metadataField.getMetadataSchema().getName(),
+        addFacetIndex(doc, SCHEMA_FIELD_NAME, metadataField.getMetadataSchema().getName(),
             metadataField.getMetadataSchema().getName());
-        addFacetIndex(doc, "element", metadataField.getElement(), metadataField.getElement());
+        addFacetIndex(doc, ELEMENT_FIELD_NAME, metadataField.getElement(), metadataField.getElement());
         String fieldName = metadataField.toString().replace('_', '.');
-        addFacetIndex(doc, "fieldName", fieldName, fieldName);
+        addFacetIndex(doc, FIELD_NAME_VARIATIONS, fieldName, fieldName);
         if (StringUtils.isNotBlank(metadataField.getQualifier())) {
-            addFacetIndex(doc, "qualifier", metadataField.getQualifier(), metadataField.getQualifier());
-            addFacetIndex(doc, "fieldName", fieldName, metadataField.getElement() + "." + metadataField.getQualifier());
-            addFacetIndex(doc, "fieldName", metadataField.getQualifier(), metadataField.getQualifier());
+            addFacetIndex(doc, QUALIFIER_FIELD_NAME, metadataField.getQualifier(), metadataField.getQualifier());
+            addFacetIndex(doc, FIELD_NAME_VARIATIONS, fieldName, metadataField.getElement() + "." + metadataField.getQualifier());
+            addFacetIndex(doc, FIELD_NAME_VARIATIONS, metadataField.getQualifier(), metadataField.getQualifier());
         } else {
-            addFacetIndex(doc, "fieldName", metadataField.getElement(), metadataField.getElement());
+            addFacetIndex(doc, FIELD_NAME_VARIATIONS, metadataField.getElement(), metadataField.getElement());
         }
         addNamedResourceTypeIndex(doc, indexableObject.getTypeText());
         Group anonymousGroup = groupService.findByName(context, Group.ANONYMOUS);
