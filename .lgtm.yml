@@ -4,6 +4,9 @@
 
 extraction:
   java:
+    before_index:
+      # Magic path from IncPlusPlus/bigtoolbox-io
+      export JAVA_HOME="/usr/lib/jvm/java-11-openjdk-amd64"
     index:
       # Specify the Java version required to build the project
       java_version: 11
