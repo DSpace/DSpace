@@ -10,8 +10,9 @@ package org.dspace.builder;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.UUID;
-import org.apache.log4j.Logger;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.service.DSpaceObjectService;
 import org.dspace.core.Context;
@@ -20,7 +21,7 @@ import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 
 public class EPersonBuilder extends AbstractDSpaceObjectBuilder<EPerson> {
-    private static final Logger LOG = Logger.getLogger(EPersonBuilder.class);
+    private static final Logger LOG = LogManager.getLogger(EPersonBuilder.class);
 
     private EPerson ePerson;
 
