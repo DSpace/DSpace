@@ -1199,6 +1199,11 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
     }
 
     @Test
+    /**
+     * This test proves that, if a bitstream is linked to multiple bundles, we only ever return the first bundle.
+     * **NOTE: DSpace does NOT support or expect to have a bitstream linked to multiple bundles**.
+     * But, because the database does allow for it, this test simply proves the REST API will respond without an error.
+     */
     public void linksToFirstBundleWhenMultipleBundles() throws Exception {
         //We turn off the authorization system in order to create the structure as defined below
         context.turnOffAuthorisationSystem();

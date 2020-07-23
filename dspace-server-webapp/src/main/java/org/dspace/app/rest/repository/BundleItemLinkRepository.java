@@ -36,7 +36,7 @@ public class BundleItemLinkRepository extends AbstractDSpaceRestRepository
     BundleService bundleService;
 
     /**
-     * Get the first item the provided bundle resides in
+     * Get the item where the provided bundle resides in
      */
     @PreAuthorize("hasPermission(#bundleId, 'BUNDLE', 'READ')")
     public ItemRest getItem(@Nullable HttpServletRequest request,
