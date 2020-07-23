@@ -7,12 +7,13 @@
  */
 package org.dspace.xmlworkflow;
 
+import java.io.IOException;
 import static junit.framework.TestCase.assertEquals;
 import static org.junit.Assert.fail;
 
 import java.sql.SQLException;
-import org.apache.logging.log4j.LogManager;
 
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.AbstractUnitTest;
 import org.dspace.authorize.AuthorizeException;
@@ -97,7 +98,7 @@ public class XmlWorkflowFactoryTest extends AbstractUnitTest {
             this.collectionService.delete(context, this.nonMappedCollection);
             this.collectionService.delete(context, this.mappedCollection);
             this.communityService.delete(context, this.owningCommunity);
-        } catch (Exception e) {
+        } catch (IOException | SQLException | AuthorizeException e) {
             log.error("Error in destroy", e);
         }
 
