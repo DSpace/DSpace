@@ -110,7 +110,7 @@ public class MockSolrServer {
                 server.deleteByQuery("*:*");
                 server.commit();
             } catch (SolrServerException | IOException e) {
-                e.printStackTrace(System.err);
+                log.error("Failed to empty Solr index:  {}", e.getMessage(), e);
             }
 
             loadedCores.put(coreName, server);

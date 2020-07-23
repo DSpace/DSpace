@@ -27,8 +27,6 @@ import com.maxmind.geoip2.record.MaxMind;
 import com.maxmind.geoip2.record.Postal;
 import com.maxmind.geoip2.record.RepresentedCountry;
 import com.maxmind.geoip2.record.Traits;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.dspace.solr.MockSolrServer;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
@@ -41,8 +39,6 @@ import org.springframework.stereotype.Service;
 public class MockSolrLoggerServiceImpl
         extends SolrLoggerServiceImpl
         implements InitializingBean, DisposableBean {
-
-    private static final Logger log = LogManager.getLogger();
 
     private MockSolrServer mockSolrServer;
 

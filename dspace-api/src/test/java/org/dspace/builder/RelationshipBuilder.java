@@ -56,6 +56,7 @@ public class RelationshipBuilder extends AbstractBuilder<Relationship, Relations
         }
     }
 
+    @Override
     public Relationship build() {
         try {
 
@@ -117,7 +118,7 @@ public class RelationshipBuilder extends AbstractBuilder<Relationship, Relations
         try {
             relationship = relationshipService.create(context, leftItem, rightItem, relationshipType, 0, 0);
         } catch (SQLException | AuthorizeException e) {
-            e.printStackTrace();
+            log.warn("Failed to create relationship", e);
         }
 
         return this;

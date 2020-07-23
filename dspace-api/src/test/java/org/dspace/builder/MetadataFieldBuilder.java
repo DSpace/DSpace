@@ -64,17 +64,9 @@ public class MetadataFieldBuilder extends AbstractBuilder<MetadataField, Metadat
             context.dispatchEvents();
 
             indexingService.commit();
-        } catch (SearchServiceException e) {
-            log.error(e);
-        } catch (SQLException e) {
-            log.error(e);
-        } catch (AuthorizeException e) {
-            log.error(e);
-            ;
-        } catch (NonUniqueMetadataException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (SearchServiceException | SQLException | AuthorizeException
+                | NonUniqueMetadataException | IOException e) {
+            log.error("Failed to complete MetadataField", e);
         }
         return metadataField;
     }
@@ -104,7 +96,7 @@ public class MetadataFieldBuilder extends AbstractBuilder<MetadataField, Metadat
             MetadataField metadataField = metadataFieldService.find(c, id);
             if (metadataField != null) {
                 try {
-                     metadataFieldService.delete(c, metadataField);
+                    metadataFieldService.delete(c, metadataField);
                 } catch (AuthorizeException e) {
                     throw new RuntimeException(e);
                 }
@@ -141,7 +133,7 @@ public class MetadataFieldBuilder extends AbstractBuilder<MetadataField, Metadat
             metadataField = metadataFieldService
                 .create(context, schema, element, qualifier, scopeNote);
         } catch (NonUniqueMetadataException e) {
-            e.printStackTrace();
+            log.error("Failed to create MetadataField", e);
         }
 
         return this;

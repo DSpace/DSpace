@@ -62,6 +62,7 @@ public class RelationshipTypeBuilder extends AbstractBuilder<RelationshipType, R
         }
     }
 
+    @Override
     public RelationshipType build() {
         try {
 
@@ -116,7 +117,7 @@ public class RelationshipTypeBuilder extends AbstractBuilder<RelationshipType, R
                             leftCardinalityMax, rightCardinalityMin, rightCardinalityMax);
 
         } catch (SQLException | AuthorizeException e) {
-            e.printStackTrace();
+            log.error("Failed to create RelationshipType", e);
         }
 
         return this;

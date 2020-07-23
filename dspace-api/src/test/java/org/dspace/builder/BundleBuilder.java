@@ -25,7 +25,7 @@ public class BundleBuilder extends AbstractDSpaceObjectBuilder<Bundle>  {
     private Bundle bundle;
     private Item item;
     private String name;
-    private List<Bitstream> bitstreams = new ArrayList<>();
+    private final List<Bitstream> bitstreams = new ArrayList<>();
 
     protected BundleBuilder(Context context) {
         super(context);
@@ -52,6 +52,7 @@ public class BundleBuilder extends AbstractDSpaceObjectBuilder<Bundle>  {
         return this;
     }
 
+    @Override
     public void cleanup() throws Exception {
         try (Context c = new Context()) {
             c.turnOffAuthorisationSystem();
@@ -64,10 +65,12 @@ public class BundleBuilder extends AbstractDSpaceObjectBuilder<Bundle>  {
         }
     }
 
+    @Override
     protected DSpaceObjectService<Bundle> getService() {
         return bundleService;
     }
 
+    @Override
     public Bundle build() throws SQLException, AuthorizeException {
         bundle = bundleService.create(context, item, name);
 
