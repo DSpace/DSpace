@@ -660,6 +660,11 @@ public class BundleRestRepositoryIT extends AbstractControllerIntegrationTest {
     }
 
     @Test
+    /**
+     * This test proves that, if a bundle is linked to multiple items, we only ever return the first item.
+     * **NOTE: DSpace does NOT support or expect to have a bundle linked to multiple items**.
+     * But, because the database does allow for it, this test simply proves the REST API will respond without an error
+     */
     public void linksToFirstItemWhenMultipleItems() throws Exception {
         context.turnOffAuthorisationSystem();
 
