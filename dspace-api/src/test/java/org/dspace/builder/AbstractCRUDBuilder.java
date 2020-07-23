@@ -13,6 +13,8 @@ import org.dspace.service.DSpaceCRUDService;
 
 /**
  * @author Jonas Van Goolen - (jonas@atmire.com)
+ *
+ * @param <T> A specific kind of ReloadableEntity.
  */
 public abstract class AbstractCRUDBuilder<T extends ReloadableEntity> extends AbstractBuilder<T, DSpaceCRUDService> {
 
@@ -20,8 +22,10 @@ public abstract class AbstractCRUDBuilder<T extends ReloadableEntity> extends Ab
         super(context);
     }
 
+    @Override
     protected abstract DSpaceCRUDService getService();
 
+    @Override
     public abstract T build();
 
     public void delete(T dso) throws Exception {

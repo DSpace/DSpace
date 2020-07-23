@@ -43,12 +43,15 @@ public abstract class AbstractDSpaceObjectBuilder<T extends DSpaceObject>
         this.context = context;
     }
 
+    @Override
     public abstract void cleanup() throws Exception;
 
 
+    @Override
     protected abstract DSpaceObjectService<T> getService();
 
 
+    @Override
     protected <B> B handleException(final Exception e) {
         log.error(e.getMessage(), e);
         return null;
@@ -231,13 +234,15 @@ public abstract class AbstractDSpaceObjectBuilder<T extends DSpaceObject>
         return (B) this;
     }
 
+    @Override
     public abstract T build() throws SQLException, AuthorizeException;
 
+    @Override
     public void delete(Context c, T dso) throws Exception {
-       if (dso != null) {
-           getService().delete(c, dso);
-       }
-       c.complete();
-       indexingService.commit();
+        if (dso != null) {
+            getService().delete(c, dso);
+        }
+        c.complete();
+        indexingService.commit();
     }
 }

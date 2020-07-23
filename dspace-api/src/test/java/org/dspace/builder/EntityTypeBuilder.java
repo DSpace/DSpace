@@ -53,6 +53,7 @@ public class EntityTypeBuilder extends AbstractBuilder<EntityType, EntityTypeSer
         }
     }
 
+    @Override
     public EntityType build() {
         try {
 
@@ -91,7 +92,7 @@ public class EntityTypeBuilder extends AbstractBuilder<EntityType, EntityTypeSer
             this.entityType = entityTypeService.create(context, entityType);
 
         } catch (SQLException | AuthorizeException e) {
-            e.printStackTrace();
+            log.warn("Failed to create the EntityType", e);
         }
 
         return this;

@@ -10,6 +10,7 @@ package org.dspace.builder;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.UUID;
+import org.apache.log4j.Logger;
 
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.service.DSpaceObjectService;
@@ -19,6 +20,7 @@ import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 
 public class EPersonBuilder extends AbstractDSpaceObjectBuilder<EPerson> {
+    private static final Logger LOG = Logger.getLogger(EPersonBuilder.class);
 
     private EPerson ePerson;
 
@@ -39,20 +41,18 @@ public class EPersonBuilder extends AbstractDSpaceObjectBuilder<EPerson> {
         }
     }
 
+    @Override
     protected DSpaceObjectService<EPerson> getService() {
         return ePersonService;
     }
 
+    @Override
     public EPerson build() {
         try {
             ePersonService.update(context, ePerson);
             indexingService.commit();
-        } catch (SearchServiceException e) {
-            e.printStackTrace();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } catch (AuthorizeException e) {
-            e.printStackTrace();
+        } catch (SearchServiceException | SQLException | AuthorizeException e) {
+            LOG.warn("Failed to complete the EPerson", e);
         }
         return ePerson;
     }
@@ -65,10 +65,8 @@ public class EPersonBuilder extends AbstractDSpaceObjectBuilder<EPerson> {
     private EPersonBuilder create() {
         try {
             ePerson = ePersonService.create(context);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } catch (AuthorizeException e) {
-            e.printStackTrace();
+        } catch (SQLException | AuthorizeException e) {
+            LOG.warn("Failed to create the EPerson", e);
         }
         return this;
     }

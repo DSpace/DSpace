@@ -11,6 +11,7 @@ import static junit.framework.TestCase.assertEquals;
 import static org.junit.Assert.fail;
 
 import java.sql.SQLException;
+import org.apache.logging.log4j.LogManager;
 
 import org.apache.logging.log4j.Logger;
 import org.dspace.AbstractUnitTest;
@@ -35,9 +36,11 @@ import org.junit.Test;
  */
 public class XmlWorkflowFactoryTest extends AbstractUnitTest {
 
-    private CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
-    private CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
-    private XmlWorkflowFactory xmlWorkflowFactory
+    private final CollectionService collectionService
+            = ContentServiceFactory.getInstance().getCollectionService();
+    private final CommunityService communityService
+            = ContentServiceFactory.getInstance().getCommunityService();
+    private final XmlWorkflowFactory xmlWorkflowFactory
             = new DSpace().getServiceManager().getServiceByName("xmlWorkflowFactory",
             XmlWorkflowFactoryImpl.class);
     private Community owningCommunity;
@@ -47,7 +50,7 @@ public class XmlWorkflowFactoryTest extends AbstractUnitTest {
     /**
      * log4j category
      */
-    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(XmlWorkflowFactoryTest.class);
+    private static final Logger log = LogManager.getLogger(XmlWorkflowFactoryTest.class);
 
     /**
      * This method will be run before every test as per @Before. It will
@@ -112,12 +115,12 @@ public class XmlWorkflowFactoryTest extends AbstractUnitTest {
     @Test
     public void workflowMapping_NonMappedCollection() throws WorkflowConfigurationException {
         Workflow workflow = xmlWorkflowFactory.getWorkflow(this.nonMappedCollection);
-        assertEquals(workflow.getID(), "defaultWorkflow");
+        assertEquals("defaultWorkflow", workflow.getID());
     }
 
     @Test
     public void workflowMapping_MappedCollection() throws WorkflowConfigurationException {
         Workflow workflow = xmlWorkflowFactory.getWorkflow(this.mappedCollection);
-        assertEquals(workflow.getID(), "selectSingleReviewer");
+        assertEquals("selectSingleReviewer", workflow.getID());
     }
 }

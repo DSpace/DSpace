@@ -63,15 +63,10 @@ public class MetadataSchemaBuilder extends AbstractBuilder<MetadataSchema, Metad
             context.dispatchEvents();
 
             indexingService.commit();
-        } catch (SearchServiceException e) {
+        } catch (SearchServiceException | SQLException | AuthorizeException e) {
             log.error(e);
-        } catch (SQLException e) {
-            log.error(e);
-        } catch (AuthorizeException e) {
-            log.error(e);
-            ;
         } catch (NonUniqueMetadataException e) {
-            e.printStackTrace();
+            log.error("Failed to complete MetadataSchema", e);
         }
         return metadataSchema;
     }
@@ -101,7 +96,7 @@ public class MetadataSchemaBuilder extends AbstractBuilder<MetadataSchema, Metad
             MetadataSchema metadataSchema = metadataSchemaService.find(c, id);
             if (metadataSchema != null) {
                 try {
-                     metadataSchemaService.delete(c, metadataSchema);
+                    metadataSchemaService.delete(c, metadataSchema);
                 } catch (AuthorizeException e) {
                     throw new RuntimeException(e);
                 }
@@ -123,7 +118,7 @@ public class MetadataSchemaBuilder extends AbstractBuilder<MetadataSchema, Metad
         try {
             metadataSchema = metadataSchemaService.create(context, name, namespace);
         } catch (NonUniqueMetadataException e) {
-            e.printStackTrace();
+            log.error("Failed to create MetadataSchema", e);
         }
 
         return this;

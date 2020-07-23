@@ -129,6 +129,7 @@ public class BitstreamBuilder extends AbstractDSpaceObjectBuilder<Bitstream> {
         return this;
     }
 
+    @Override
     public Bitstream build() {
         try {
             bitstreamService.update(context, bitstream);
@@ -152,7 +153,7 @@ public class BitstreamBuilder extends AbstractDSpaceObjectBuilder<Bitstream> {
 
     @Override
     public void cleanup() throws Exception {
-       try (Context c = new Context()) {
+        try (Context c = new Context()) {
             c.turnOffAuthorisationSystem();
             // Ensure object and any related objects are reloaded before checking to see what needs cleanup
             bitstream = c.reloadEntity(bitstream);
@@ -163,6 +164,7 @@ public class BitstreamBuilder extends AbstractDSpaceObjectBuilder<Bitstream> {
         }
     }
 
+    @Override
     protected DSpaceObjectService<Bitstream> getService() {
         return bitstreamService;
     }
