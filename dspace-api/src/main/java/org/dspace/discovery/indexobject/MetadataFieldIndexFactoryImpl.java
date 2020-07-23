@@ -21,6 +21,7 @@ import org.dspace.content.service.MetadataFieldService;
 import org.dspace.core.Context;
 import org.dspace.discovery.indexobject.factory.MetadataFieldIndexFactory;
 import org.dspace.eperson.Group;
+import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.GroupService;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -37,8 +38,7 @@ public class MetadataFieldIndexFactoryImpl extends IndexFactoryImpl<IndexableMet
     public static final String QUALIFIER_FIELD_NAME = "qualifier";
     public static final String FIELD_NAME_VARIATIONS = "fieldName";
 
-    @Autowired
-    protected GroupService groupService;
+    protected GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
 
     @Override
     public SolrInputDocument buildDocument(Context context, IndexableMetadataField indexableObject) throws SQLException,
@@ -54,7 +54,8 @@ public class MetadataFieldIndexFactoryImpl extends IndexFactoryImpl<IndexableMet
         addFacetIndex(doc, FIELD_NAME_VARIATIONS, fieldName, fieldName);
         if (StringUtils.isNotBlank(metadataField.getQualifier())) {
             addFacetIndex(doc, QUALIFIER_FIELD_NAME, metadataField.getQualifier(), metadataField.getQualifier());
-            addFacetIndex(doc, FIELD_NAME_VARIATIONS, fieldName, metadataField.getElement() + "." + metadataField.getQualifier());
+            addFacetIndex(doc, FIELD_NAME_VARIATIONS, fieldName,
+                metadataField.getElement() + "." + metadataField.getQualifier());
             addFacetIndex(doc, FIELD_NAME_VARIATIONS, metadataField.getQualifier(), metadataField.getQualifier());
         } else {
             addFacetIndex(doc, FIELD_NAME_VARIATIONS, metadataField.getElement(), metadataField.getElement());
