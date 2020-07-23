@@ -56,7 +56,7 @@ public class MetadataExportScriptConfiguration<T extends MetadataExport> extends
 
             options.addOption("i", "id", true, "ID or handle of thing to export (item, collection, or community)");
             options.getOption("i").setType(String.class);
-            options.addOption("f", "file", true, "destination where you want file written");
+            options.addOption("f", "file", true, getFileParameterDescription());
             options.getOption("f").setType(OutputStream.class);
             options.getOption("f").setRequired(true);
             options.addOption("a", "all", false,
@@ -69,6 +69,10 @@ public class MetadataExportScriptConfiguration<T extends MetadataExport> extends
             super.options = options;
         }
         return options;
+    }
+
+    protected String getFileParameterDescription() {
+        return "file name of the exported file";
     }
 
 }

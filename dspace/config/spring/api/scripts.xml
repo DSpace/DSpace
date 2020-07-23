@@ -14,7 +14,7 @@
         <property name="dspaceRunnableClass" value="org.dspace.app.bulkedit.MetadataImportCLI"/>
     </bean>
 
-    <bean id="metadata-export" class="org.dspace.app.bulkedit.MetadataExportScriptConfiguration">
+    <bean id="metadata-export" class="org.dspace.app.bulkedit.MetadataExportCLIScriptConfiguration">
         <property name="description" value="Export metadata for batch editing"/>
         <property name="dspaceRunnableClass" value="org.dspace.app.bulkedit.MetadataExport"/>
     </bean>
