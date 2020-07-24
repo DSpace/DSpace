@@ -78,10 +78,18 @@ public class OpenAIREImportMetadataSourceServiceImpl extends AbstractImportMetad
         return "openaire";
     }
 
+    /**
+     * Get a single record from the source by id
+     *
+     * @param id   id of the record in OpenAIRE
+     * 
+     * @return the first matching record
+     * @throws MetadataSourceException if the underlying methods throw any exception.
+     */
     @Override
     public ImportRecord getRecord(String id) throws MetadataSourceException {
-        // TODO Auto-generated method stub
-        return null;
+        List<ImportRecord> records = retry(new SearchByIdCallable(id));
+        return records == null || records.isEmpty() ? null : records.get(0);
     }
 
     @Override
@@ -160,6 +168,62 @@ public class OpenAIREImportMetadataSourceServiceImpl extends AbstractImportMetad
                 HttpClient client = hcBuilder.build();
                 // open session
                 method = new HttpGet(ENDPOINT_SEARCH_OPENAIRE + "?name=" + URLEncoder.encode(queryString));
+                method.setConfig(requestConfigBuilder.build());
+                // Execute the method.
+                HttpResponse httpResponse = client.execute(method);
+                int statusCode = httpResponse.getStatusLine().getStatusCode();
+                if (statusCode != HttpStatus.SC_OK) {
+                    throw new RuntimeException("WS call failed: " + statusCode);
+                }
+                InputStream is = httpResponse.getEntity().getContent();
+                String response = IOUtils.toString(is, Charsets.UTF_8);
+                List<OMElement> omElements = splitToRecords(response);
+                for (OMElement record : omElements) {
+                    results.add(transformSourceRecords(record));
+                }
+            } catch (Exception e1) {
+                log.error(e1.getMessage(), e1);
+            } finally {
+                if (method != null) {
+                    method.releaseConnection();
+                }
+            }
+            return results;
+        }
+    }
+
+    private class SearchByIdCallable implements Callable<List<ImportRecord>> {
+        private Query query;
+
+        private SearchByIdCallable(Query query) {
+            this.query = query;
+        }
+
+        private SearchByIdCallable(String id) {
+            this.query = new Query();
+            query.addParameter("id", id);
+        }
+
+        @Override
+        public List<ImportRecord> call() throws Exception {
+            List<ImportRecord> results = new ArrayList<ImportRecord>();
+            String id = query.getParameterAsClass("id", String.class);
+            String proxyHost = configurationService.getProperty("http.proxy.host");
+            String proxyPort = configurationService.getProperty("http.proxy.port");
+            HttpGet method = null;
+            try {
+                HttpClientBuilder hcBuilder = HttpClients.custom();
+                Builder requestConfigBuilder = RequestConfig.custom();
+                requestConfigBuilder.setConnectionRequestTimeout(timeout);
+
+                if (StringUtils.isNotBlank(proxyHost) && StringUtils.isNotBlank(proxyPort)) {
+                    HttpHost proxy = new HttpHost(proxyHost, Integer.parseInt(proxyPort), "http");
+                    DefaultProxyRoutePlanner routePlanner = new DefaultProxyRoutePlanner(proxy);
+                    hcBuilder.setRoutePlanner(routePlanner);
+                }
+                HttpClient client = hcBuilder.build();
+                // open session
+                method = new HttpGet(ENDPOINT_SEARCH_OPENAIRE + "?grantID=" + URLEncoder.encode(id));
                 method.setConfig(requestConfigBuilder.build());
                 // Execute the method.
                 HttpResponse httpResponse = client.execute(method);
