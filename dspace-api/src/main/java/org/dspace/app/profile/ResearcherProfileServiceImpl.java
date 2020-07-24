@@ -107,7 +107,9 @@ public class ResearcherProfileServiceImpl implements ResearcherProfileService {
             throw new IllegalStateException("No collection found for researcher profiles");
         }
 
+        context.turnOffAuthorisationSystem();
         Item item = createProfileItem(context, ePerson, collection);
+        context.restoreAuthSystemState();
         return new ResearcherProfile(item);
     }
 
