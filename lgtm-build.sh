@@ -8,7 +8,8 @@ mvn clean package \
 	-Dpmd.skip=true \
 	-Denforcer.skip \
 	-Dmaven.javadoc.skip \
-	-DskipTests \
+	-DskipTests=true \
+	-Dmaven.test.skip=false \
 	-Dlicense.skip=true \
 	-Drat.skip=true \
 	-Dmaven.repo.local=/opt/work/semmle_data/maven_repo \
