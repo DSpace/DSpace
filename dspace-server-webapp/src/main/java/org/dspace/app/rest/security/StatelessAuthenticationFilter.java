@@ -17,6 +17,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.dspace.app.rest.utils.ContextUtil;
+import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.core.Context;
@@ -79,6 +80,10 @@ public class StatelessAuthenticationFilter extends BasicAuthenticationFilter {
         Authentication authentication;
         try {
             authentication = getAuthentication(req, res);
+        } catch (AuthorizeException e) {
+            // just return an error, but do not log
+            res.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Authentication is required");
+            return;
         } catch (IllegalArgumentException | SQLException e) {
             res.sendError(HttpServletResponse.SC_BAD_REQUEST, "Authentication request is invalid or incorrect");
             log.error("Authentication request is invalid or incorrect (status:{})",
@@ -111,7 +116,7 @@ public class StatelessAuthenticationFilter extends BasicAuthenticationFilter {
      * @throws IOException  If something goes wrong
      */
     private Authentication getAuthentication(HttpServletRequest request, HttpServletResponse res)
-        throws AccessDeniedException, SQLException {
+        throws AuthorizeException, SQLException {
 
         if (restAuthenticationService.hasAuthenticationData(request)) {
             // parse the token.
@@ -130,7 +135,7 @@ public class StatelessAuthenticationFilter extends BasicAuthenticationFilter {
                     if (configurationService.getBooleanProperty("webui.user.assumelogin")) {
                         return getOnBehalfOfAuthentication(context, onBehalfOfParameterValue, res);
                     } else {
-                        throw new IllegalArgumentException("The login as feature is not allowed" +
+                        throw new IllegalArgumentException("The 'login as' feature is not allowed" +
                                                      " due to the current configuration");
                     }
                 }
@@ -142,7 +147,7 @@ public class StatelessAuthenticationFilter extends BasicAuthenticationFilter {
             }
         } else {
             if (request.getHeader(ON_BEHALF_OF_REQUEST_PARAM) != null) {
-                throw new AccessDeniedException("Only admins are allowed to use the login as feature");
+                throw new AuthorizeException("Must be logged in (as an admin) to use the 'login as' feature");
             }
         }
 
