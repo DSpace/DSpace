@@ -150,8 +150,12 @@ public class DSpaceApiExceptionControllerAdvice extends ResponseEntityExceptionH
         //Make sure Spring picks up this exception
         request.setAttribute(EXCEPTION_ATTRIBUTE, ex);
 
-        //Log the full error and status code
-        log.error("{} (status:{})", message, statusCode, ex);
+        // For now, just logging server errors.
+        // We don't want to fill logs with bad/invalid REST API requests.
+        if (statusCode == HttpServletResponse.SC_INTERNAL_SERVER_ERROR) {
+            // Log the full error and status code
+            log.error("{} (status:{})", message, statusCode, ex);
+        }
 
         //Exception properties will be set by org.springframework.boot.web.support.ErrorPageFilter
         response.sendError(statusCode, message);
