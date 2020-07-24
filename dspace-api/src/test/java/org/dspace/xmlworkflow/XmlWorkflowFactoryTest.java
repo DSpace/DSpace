@@ -7,10 +7,10 @@
  */
 package org.dspace.xmlworkflow;
 
-import java.io.IOException;
 import static junit.framework.TestCase.assertEquals;
 import static org.junit.Assert.fail;
 
+import java.io.IOException;
 import java.sql.SQLException;
 
 import org.apache.logging.log4j.LogManager;

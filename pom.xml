@@ -475,29 +475,33 @@
     </build>
 
     <profiles>
-        <!-- Skip Unit Tests by default, but allow override on command line
-           by setting property "-Dmaven.test.skip=false" -->
+        <!-- Skip running Unit Tests by default, but allow override on
+           command line by setting property "-DskipTests=false".
+	   Tests are always built, because we have modules that depend
+	   on common test infrastructure. -->
         <profile>
             <id>skiptests</id>
             <activation>
-                <!-- This profile should be active at all times, unless the user
-                     specifies a different value for "maven.test.skip" -->
+                <!-- This profile should be active at all times, unless the
+                     user specifies a different value for "skipTests" -->
                 <property>
-                    <name>!maven.test.skip</name>
+                    <name>!skipTests</name>
                 </property>
             </activation>
             <properties>
-                <maven.test.skip>true</maven.test.skip>
+                <skipTests>true</skipTests>
             </properties>
         </profile>
 
-        <!-- Skip Integration Tests by default, but allow override on
-             command line by setting property "-DskipITs=false" -->
+        <!-- Skip running Integration Tests by default, but allow override on
+             command line by setting property "-DskipITs=false".
+             ITs are always built, because we have modules that depend
+	     on common test infrastructure. -->
         <profile>
             <id>skipits</id>
             <activation>
-                <!-- This profile should be active at all times, unless the user
-                     specifies a different value for "skipITs" -->
+                <!-- This profile should be active at all times, unless the
+                     user specifies a different value for "skipITs" -->
                 <property>
                     <name>!skipITs</name>
                 </property>
@@ -532,7 +536,7 @@
             <activation>
                 <activeByDefault>false</activeByDefault>
                 <property>
-                    <name>maven.test.skip</name>
+                    <name>skipTests</name>
                     <value>false</value>
                 </property>
                 <file>
@@ -572,7 +576,7 @@
             <activation>
                 <activeByDefault>false</activeByDefault>
                 <property>
-                    <name>maven.test.skip</name>
+                    <name>skipTests</name>
                     <value>false</value>
                 </property>
             </activation>
@@ -1040,6 +1044,12 @@
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-services</artifactId>
+                <version>7.0-beta4-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>org.dspace</groupId>
+                <artifactId>dspace-server-webapp</artifactId>
+                <type>test-jar</type>
                 <version>7.0-beta4-SNAPSHOT</version>
             </dependency>
             <dependency>

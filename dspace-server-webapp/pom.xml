@@ -37,7 +37,7 @@
             <activation>
                 <activeByDefault>false</activeByDefault>
                 <property>
-                    <name>maven.test.skip</name>
+                    <name>skipTests</name>
                     <value>false</value>
                 </property>
             </activation>
