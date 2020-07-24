@@ -17,7 +17,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.dspace.app.rest.utils.ContextUtil;
-import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.core.Context;
@@ -77,20 +76,17 @@ public class StatelessAuthenticationFilter extends BasicAuthenticationFilter {
                                     HttpServletResponse res,
                                     FilterChain chain) throws IOException, ServletException {
 
-        Authentication authentication = null;
+        Authentication authentication;
         try {
             authentication = getAuthentication(req, res);
-        } catch (AuthorizeException e) {
-            res.sendError(HttpServletResponse.SC_UNAUTHORIZED, e.getMessage());
-            log.error(e.getMessage(), e);
-            return;
         } catch (IllegalArgumentException | SQLException e) {
-            res.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
-            log.error(e.getMessage(), e);
+            res.sendError(HttpServletResponse.SC_BAD_REQUEST, "Authentication request is invalid or incorrect");
+            log.error("Authentication request is invalid or incorrect (status:{})",
+                      HttpServletResponse.SC_BAD_REQUEST, e);
             return;
         } catch (AccessDeniedException e) {
-            res.sendError(HttpServletResponse.SC_FORBIDDEN, e.getMessage());
-            log.error(e.getMessage(), e);
+            res.sendError(HttpServletResponse.SC_FORBIDDEN, "Access is denied");
+            log.error("Access is denied (status:{})", HttpServletResponse.SC_FORBIDDEN, e);
             return;
         }
         if (authentication != null) {
@@ -115,7 +111,7 @@ public class StatelessAuthenticationFilter extends BasicAuthenticationFilter {
      * @throws IOException  If something goes wrong
      */
     private Authentication getAuthentication(HttpServletRequest request, HttpServletResponse res)
-        throws AuthorizeException, SQLException {
+        throws AccessDeniedException, SQLException {
 
         if (restAuthenticationService.hasAuthenticationData(request)) {
             // parse the token.
@@ -146,7 +142,7 @@ public class StatelessAuthenticationFilter extends BasicAuthenticationFilter {
             }
         } else {
             if (request.getHeader(ON_BEHALF_OF_REQUEST_PARAM) != null) {
-                throw new AuthorizeException("Only admins are allowed to use the login as feature");
+                throw new AccessDeniedException("Only admins are allowed to use the login as feature");
             }
         }
 
