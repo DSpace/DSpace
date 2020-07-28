@@ -24,6 +24,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 /**
@@ -78,9 +79,9 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
             .anonymous().authorities(ANONYMOUS_GRANT).and()
             //Wire up the HttpServletRequest with the current SecurityContext values
             .servletApi().and().cors().and()
-            //Disable CSRF as our API can be used by clients on an other domain, we are also protected against this,
-            // since we pass the token in a header
-            .csrf().disable()
+            //Enable CSRF protection with the CookieCsrfTokenRepository designed for Angular apps
+            // See https://docs.spring.io/spring-security/site/docs/current/reference/html5/#servlet-csrf
+            .csrf(csrf -> csrf.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
             //Return 401 on authorization failures with a correct WWWW-Authenticate header
             .exceptionHandling().authenticationEntryPoint(
                     new DSpace401AuthenticationEntryPoint(restAuthenticationService))
