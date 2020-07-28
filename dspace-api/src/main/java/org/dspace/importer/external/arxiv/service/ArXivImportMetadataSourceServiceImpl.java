@@ -164,6 +164,13 @@ public class ArXivImportMetadataSourceServiceImpl extends AbstractImportMetadata
         return retry(new FindMatchingRecordCallable(query));
     }
 
+    /**
+     * This class is a Callable implementation to count the number of entries for an ArXiv
+     * query.
+     * 
+     * @author Pasquale Cavallo (pasquale.cavallo at 4science dot it)
+     *
+     */
     private class CountByQueryCallable implements Callable<Integer> {
         private Query query;
 
@@ -207,7 +214,14 @@ public class ArXivImportMetadataSourceServiceImpl extends AbstractImportMetadata
         }
     }
 
-
+    /**
+     * This class is a Callable implementation to get ArXiv entries based on
+     * query object.
+     * 
+     * @see org.dspace.importer.external.datamodel.Query
+     * @author Pasquale Cavallo (pasquale.cavallo at 4science dot it)
+     *
+     */
     private class SearchByQueryCallable implements Callable<List<ImportRecord>> {
         private Query query;
 
@@ -239,6 +253,9 @@ public class ArXivImportMetadataSourceServiceImpl extends AbstractImportMetadata
             }
             Invocation.Builder invocationBuilder = local.request(MediaType.TEXT_PLAIN_TYPE);
             Response response = invocationBuilder.get();
+            if (response.getStatus() == 400) {
+                throw new IllegalArgumentException("Invalid ArXiv ID");
+            }
             String responseString = response.readEntity(String.class);
             List<OMElement> omElements = splitToRecords(responseString);
             for (OMElement record : omElements) {
@@ -248,6 +265,12 @@ public class ArXivImportMetadataSourceServiceImpl extends AbstractImportMetadata
         }
     }
 
+    /**
+     * This class is a Callable implementation to get ArXiv entry using ArXiv ID
+     * 
+     * @author Pasquale Cavallo (pasquale.cavallo at 4science dot it)
+     *
+     */
     private class SearchByIdCallable implements Callable<List<ImportRecord>> {
         private Query query;
 
@@ -275,6 +298,9 @@ public class ArXivImportMetadataSourceServiceImpl extends AbstractImportMetadata
             WebTarget local = webTarget.queryParam("id_list", arxivid);
             Invocation.Builder invocationBuilder = local.request(MediaType.TEXT_PLAIN_TYPE);
             Response response = invocationBuilder.get();
+            if (response.getStatus() == 400) {
+                throw new IllegalArgumentException("Invalid ArXiv ID");
+            }
             String responseString = response.readEntity(String.class);
             List<OMElement> omElements = splitToRecords(responseString);
             for (OMElement record : omElements) {
@@ -284,6 +310,14 @@ public class ArXivImportMetadataSourceServiceImpl extends AbstractImportMetadata
         }
     }
 
+    /**
+     * This class is a Callable implementation to search ArXiv entries
+     * using author and title.
+     * 
+     * @see org.dspace.importer.external.datamodel.Query
+     * @author Pasquale Cavallo (pasquale.cavallo at 4science dot it)
+     *
+     */
     private class FindMatchingRecordCallable implements Callable<List<ImportRecord>> {
 
         private Query query;
@@ -299,6 +333,9 @@ public class ArXivImportMetadataSourceServiceImpl extends AbstractImportMetadata
             WebTarget local = webTarget.queryParam("search_query", queryString);
             Invocation.Builder invocationBuilder = local.request(MediaType.TEXT_PLAIN_TYPE);
             Response response = invocationBuilder.get();
+            if (response.getStatus() == 400) {
+                throw new IllegalArgumentException("Invalid ArXiv ID");
+            }
             String responseString = response.readEntity(String.class);
             List<OMElement> omElements = splitToRecords(responseString);
             for (OMElement record : omElements) {
