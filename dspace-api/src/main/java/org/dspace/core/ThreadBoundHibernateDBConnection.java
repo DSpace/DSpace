@@ -15,6 +15,9 @@ import org.hibernate.Transaction;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
+/**
+ * Implementing class for the regular Context states for {@link HibernateDBConnection}
+ */
 public class ThreadBoundHibernateDBConnection extends HibernateDBConnection {
 
     @Autowired(required = true)

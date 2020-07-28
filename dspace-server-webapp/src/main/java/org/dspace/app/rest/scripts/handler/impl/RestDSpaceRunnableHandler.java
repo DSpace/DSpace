@@ -175,11 +175,19 @@ public class RestDSpaceRunnableHandler implements DSpaceRunnableHandler {
     }
 
 
-    private void appendLogToProcess(String message, ProcessLogLevel error) {
+    /**
+     * This method will ensure that the current {@link Process} has the given {@link org.dspace.scripts.ProcessLog}
+     * objects made and attached to it in the DB when a log is called.
+     * It'll use a separate Context for this and close this one immediately afterwards so that it's updated in
+     * real-time
+     * @param message   The message to be used in the log
+     * @param processLogLevel   The log level to be used in the log
+     */
+    private void appendLogToProcess(String message, ProcessLogLevel processLogLevel) {
         Context context = new Context(Context.Mode.MANAGED);
         try {
             Process process = processService.find(context, processId);
-            processService.appendLog(context, process, message, error);
+            processService.appendLog(context, process, message, processLogLevel);
             context.complete();
         } catch (SQLException e) {
             log.error("RestDSpaceRunnableHandler with process: " + processId + " could not write log to process", e);

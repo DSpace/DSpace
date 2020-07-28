@@ -20,8 +20,12 @@ import org.dspace.scripts.Process;
 import org.dspace.scripts.ProcessLog;
 import org.dspace.scripts.ProcessLog_;
 
+/**
+ * This is the implementing class for the {@link ProcessLogDAO}
+ */
 public class ProcessLogDAOImpl extends AbstractHibernateDAO<ProcessLog> implements ProcessLogDAO {
 
+    @Override
     public List<ProcessLog> findByProcess(Context context, Process process) throws SQLException {
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, ProcessLog.class);
