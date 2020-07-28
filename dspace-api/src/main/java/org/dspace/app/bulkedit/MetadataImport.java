@@ -182,24 +182,7 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
         c.turnOffAuthorisationSystem();
 
         // Find the EPerson, assign to context
-        try {
-            if (commandLine.hasOption('e')) {
-                EPerson eperson;
-                String e = commandLine.getOptionValue('e');
-                if (e.indexOf('@') != -1) {
-                    eperson = EPersonServiceFactory.getInstance().getEPersonService().findByEmail(c, e);
-                } else {
-                    eperson = EPersonServiceFactory.getInstance().getEPersonService().find(c, UUID.fromString(e));
-                }
-
-                if (eperson == null) {
-                    throw new ParseException("Error, eperson cannot be found: " + e);
-                }
-                c.setCurrentUser(eperson);
-            }
-        } catch (Exception e) {
-            throw new ParseException("Unable to find DSpace user: " + e.getMessage());
-        }
+        assignCurrentUserInContext(c);
 
         if (authorityControlled == null) {
             setAuthorizedMetadataFields();
@@ -275,6 +258,18 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
                 "Error committing changes to database: " + e.getMessage() + ", aborting most recent changes", e);
         }
 
+    }
+
+    protected void assignCurrentUserInContext(Context context) throws ParseException {
+        UUID uuid = getEpersonIdentifier();
+        if (uuid != null) {
+            try {
+                EPerson ePerson = EPersonServiceFactory.getInstance().getEPersonService().find(context, uuid);
+                context.setCurrentUser(ePerson);
+            } catch (SQLException e) {
+                log.error("Something went wrong trying to fetch the eperson for uuid: " + uuid, e);
+            }
+        }
     }
 
     /**

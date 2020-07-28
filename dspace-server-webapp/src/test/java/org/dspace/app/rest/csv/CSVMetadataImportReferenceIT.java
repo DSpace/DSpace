@@ -479,11 +479,9 @@ public class CSVMetadataImportReferenceIT extends AbstractEntityIntegrationTest 
         out.close();
         try {
             if (validateOnly) {
-                return runDSpaceScript("metadata-import", "-f", csvFile.getAbsolutePath(), "-e", "admin@email.com",
-                                       "-s", "-v");
+                return runDSpaceScript("metadata-import", "-f", csvFile.getAbsolutePath(), "-s", "-v");
             } else {
-                return runDSpaceScript("metadata-import", "-f", csvFile.getAbsolutePath(), "-e", "admin@email.com",
-                                       "-s");
+                return runDSpaceScript("metadata-import", "-f", csvFile.getAbsolutePath(), "-s");
             }
         } finally {
             csvFile.delete();
