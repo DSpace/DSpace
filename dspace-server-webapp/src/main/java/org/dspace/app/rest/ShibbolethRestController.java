@@ -11,7 +11,9 @@ import java.io.IOException;
 import java.util.Arrays;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.model.AuthnRest;
+import org.dspace.core.Utils;
 import org.dspace.services.ConfigurationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,8 +55,20 @@ public class ShibbolethRestController implements InitializingBean {
         if (redirectUrl == null) {
             redirectUrl = configurationService.getProperty("dspace.ui.url");
         }
-        log.info("Redirecting to " + redirectUrl);
-        response.sendRedirect(redirectUrl);
+
+        // Validate that the redirectURL matches either the server or UI hostname. It *cannot* be an arbitrary URL.
+        String redirectHostName = Utils.getHostName(redirectUrl);
+        String serverHostName = Utils.getHostName(configurationService.getProperty("dspace.server.url"));
+        String clientHostName = Utils.getHostName(configurationService.getProperty("dspace.ui.url"));
+        if (StringUtils.equalsAnyIgnoreCase(redirectHostName, serverHostName, clientHostName)) {
+            log.debug("Shibboleth redirecting to " + redirectUrl);
+            response.sendRedirect(redirectUrl);
+        } else {
+            log.error("Invalid Shibboleth redirectURL=" + redirectUrl +
+                          ". URL doesn't match hostname of server or UI!");
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST,
+                               "Invalid redirectURL! Must match server or ui hostname.");
+        }
     }
 
 }
