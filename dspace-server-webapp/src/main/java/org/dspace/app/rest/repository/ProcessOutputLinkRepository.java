@@ -27,6 +27,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
+/**
+ * This is the LinkRepository that deals with GET calls for the {@link ProcessLog} list from a given {@link Process}
+ */
 @Component(ProcessRest.CATEGORY + "." + ProcessRest.NAME + "." + ProcessRest.OUTPUT)
 public class ProcessOutputLinkRepository extends AbstractDSpaceRestRepository implements LinkRestRepository {
 
@@ -36,6 +39,18 @@ public class ProcessOutputLinkRepository extends AbstractDSpaceRestRepository im
     @Autowired
     private AuthorizeService authorizeService;
 
+    /**
+     * This method will retrieve the list of {@link ProcessLog} objects from the {@link Process} as defined through the
+     * given ID in the rest call and it'll wrap this in a {@link ProcessOutputRest} object to return these
+     * @param request           The current request
+     * @param processId         The given processId for the {@link Process}
+     * @param optionalPageable  Pageable if applicable
+     * @param projection        The current projection
+     * @return                  The {@link ProcessOutputRest} containing the list of all {@link ProcessLog} for the
+     *                          given {@link Process}
+     * @throws SQLException         If something goes wrong
+     * @throws AuthorizeException   If something goes wrong
+     */
     @PreAuthorize("hasAuthority('ADMIN')")
     public ProcessOutputRest getOutputFromProcess(@Nullable HttpServletRequest request,
                                                       Integer processId,

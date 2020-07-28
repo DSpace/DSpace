@@ -23,6 +23,9 @@ import javax.persistence.TemporalType;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
+/**
+ * This class is the representation of the ProcessLog entity stored in the process_log table in the DB
+ */
 @Entity
 @Table(name = "process_log")
 public class ProcessLog {

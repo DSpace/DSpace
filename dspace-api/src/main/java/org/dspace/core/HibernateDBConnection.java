@@ -64,8 +64,19 @@ public abstract class HibernateDBConnection implements DBConnection<Session> {
     private boolean batchModeEnabled = false;
     private boolean readOnlyEnabled = false;
 
+    /**
+     * Retrieves the current Session from Hibernate (per our settings, Hibernate is configured to create one Session
+     * per thread). If Session doesn't yet exist, it is created. A Transaction is also initialized (or reinintialized)
+     * in the Session if one doesn't exist, or was previously closed (e.g. if commit() was previously called)
+     * @return Hibernate current Session object
+     * @throws SQLException
+     */
     public abstract Session getSession() throws SQLException;
 
+    /**
+     * Retrieves the current Session from Hibernate
+     * @return  The current Session
+     */
     public abstract Session getCurrentSession();
 
 

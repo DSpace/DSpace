@@ -15,7 +15,17 @@ import org.dspace.core.GenericDAO;
 import org.dspace.scripts.Process;
 import org.dspace.scripts.ProcessLog;
 
+/**
+ * This is a DAO class that deals with DB calls for the {@link ProcessLog} entity
+ */
 public interface ProcessLogDAO extends GenericDAO<ProcessLog> {
 
+    /**
+     * This method will return a list of {@link ProcessLog} objects for the given {@link Process}
+     * @param context   The relevant DSpace context
+     * @param process   The {@link Process} from which we'll retrieve the {@link ProcessLog} objects
+     * @return          The list of {@link ProcessLog} objects
+     * @throws SQLException If something goes wrong
+     */
     public List<ProcessLog> findByProcess(Context context, Process process) throws SQLException;
 }

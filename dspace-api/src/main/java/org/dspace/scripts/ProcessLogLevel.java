@@ -7,6 +7,9 @@
  */
 package org.dspace.scripts;
 
+/**
+ * This Enum defines all the possible Log levels that a {@link ProcessLog} can hold in the DB
+ */
 public enum ProcessLogLevel {
     INFO,
     WARNING,
