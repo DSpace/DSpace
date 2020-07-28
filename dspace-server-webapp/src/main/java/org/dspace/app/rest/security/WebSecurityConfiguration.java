@@ -24,10 +24,11 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
+import org.springframework.security.web.csrf.CsrfTokenRepository;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 /**
- * Spring Security configuration for DSpace Spring Rest
+ * Spring Security configuration for DSpace Server Webapp
  *
  * @author Frederic Van Reet (frederic dot vanreet at atmire dot com)
  * @author Tom Desair (tom dot desair at atmire dot com)
@@ -77,10 +78,9 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
             //Anonymous requests should have the "ANONYMOUS" security grant
             .anonymous().authorities(ANONYMOUS_GRANT).and()
             //Wire up the HttpServletRequest with the current SecurityContext values
-            .servletApi().and().cors().and()
-            //Disable CSRF as our API can be used by clients on an other domain, we are also protected against this,
-            // since we pass the token in a header
-            .csrf().disable()
+            .servletApi().and()
+            //Enable CORS for Spring Security (see CORS settings in Application and ApplicationConfig)
+            .cors().and()
             //Return 401 on authorization failures with a correct WWWW-Authenticate header
             .exceptionHandling().authenticationEntryPoint(
                     new DSpace401AuthenticationEntryPoint(restAuthenticationService))
@@ -98,9 +98,17 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .permitAll()
             .and()
 
+            //Enable CSRF protection (only on /api/ URLs) with the CookieCsrfTokenRepository designed for Angular apps
+            // See https://docs.spring.io/spring-security/site/docs/current/reference/html5/#servlet-csrf
+            // While we primarily use JWT in headers, enabled CSRF protection because we also support JWT via Cookies
+            .antMatcher("/api/**")
+                .csrf().csrfTokenRepository(this.getCsrfTokenRepository())
+            .and()
+
             //Configure the URL patterns with their authentication requirements
             //Enable Spring Security authorization on /api/ URLs only
-            .antMatcher("/api/**").authorizeRequests()
+            .antMatcher("/api/**")
+                .authorizeRequests()
                 //Allow POST by anyone on the login endpoint
                 .antMatchers(HttpMethod.POST,"/api/authn/login").permitAll()
                 //TRACE, CONNECT, OPTIONS, HEAD
@@ -130,6 +138,26 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.authenticationProvider(ePersonRestAuthenticationProvider);
+    }
+
+    /**
+     * Override the defaults of CookieCsrfTokenRepository to always set the Path to "/"
+     * <P>
+     * We use the CookieCsrfTokenRepository designed for Angular apps
+     * See https://docs.spring.io/spring-security/site/docs/current/reference/html5/#servlet-csrf
+     * <P>
+     * However, Angular *requires* the CSR cookie path to always be "/" or it will ignore it.
+     * See: https://stackoverflow.com/a/50511663
+     * @return CookieCsrfTokenRepository with cookie path="/"
+     */
+    private CsrfTokenRepository getCsrfTokenRepository() {
+        // We are using a *custom* CrossSiteCookieCsrfTokenRepository in which sets
+        // "SameSite=None" to allow this XSRF-TOKEN cookie to be used in cross site requests.
+        // This custom class should be REMOVED when this Spring Security ticket is resolved:
+        // https://github.com/spring-projects/spring-security/issues/7537
+        CrossSiteCookieCsrfTokenRepository tokenRepository = CrossSiteCookieCsrfTokenRepository.withHttpOnlyFalse();
+        tokenRepository.setCookiePath("/");
+        return tokenRepository;
     }
 
 }
