@@ -213,32 +213,28 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
 
     @Override
     public List<Collection> findDirectMapped(Context context, int actionID) throws SQLException {
-        return collectionDAO.findAuthorized(context, context.getCurrentUser(), Arrays.asList(Constants.ADD,Constants.ADMIN));
+        return collectionDAO.findAuthorized(context, context.getCurrentUser(), Arrays.asList(actionID,Constants.ADMIN));
     }
 
     @Override
     public List<Collection> findGroup2CommunityMapped(Context context) throws SQLException {
-        List<Community> communities = communityService.findAuthorizedGroupMapped(context, Arrays.asList(Constants.ADD, Constants.ADMIN));
+        List<Community> communities = communityService.findAuthorizedGroupMapped(context, Collections
+            .singletonList(Constants.ADMIN));
         List<Collection> collections = new ArrayList<>();
         for (Community community : communities) {
-            collections.addAll(community.getCollections());
+            collections.addAll(community.getAllCollections());
         }
         return collections;
     }
 
     @Override
     public List<Collection> findGroup2GroupMapped(Context context, int actionID) throws SQLException {
-        return collectionDAO.findAuthorizedByGroup(context, context.getCurrentUser(), Collections.singletonList(actionID));
+        return collectionDAO.findAuthorizedByGroup2Group(context, context.getCurrentUser(), Arrays.asList(actionID, Constants.ADMIN));
     }
 
     @Override
     public List<Collection> findGroupMapped(Context context, int actionID) throws SQLException {
-        List<Community> communities = communityService.findAuthorized(context, Arrays.asList(Constants.ADD, Constants.ADMIN));
-        List<Collection> collections = new ArrayList<>();
-        for (Community community : communities) {
-            collections.addAll(community.getCollections());
-        }
-        return collections;
+        return collectionDAO.findAuthorizedByGroup(context, context.getCurrentUser(), Arrays.asList(actionID, Constants.ADMIN));
     }
 
     @Override

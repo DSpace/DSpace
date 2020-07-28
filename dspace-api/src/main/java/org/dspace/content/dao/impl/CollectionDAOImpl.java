@@ -128,36 +128,27 @@ public class CollectionDAOImpl extends AbstractHibernateDSODAO<Collection> imple
 
     @Override
     public List<Collection> findAuthorizedByGroup(Context context, EPerson ePerson, List<Integer> actions) throws SQLException {
- //        TableRowIterator tri = DatabaseManager.query(context,
- //                "SELECT \n" +
- //                        "  * \n" +
- //                        "FROM \n" +
- //                        "  public.eperson, \n" +
- //                        "  public.epersongroup2eperson, \n" +
- //                        "  public.epersongroup, \n" +
- //                        "  public.group2group, \n" +
- //                        "  public.resourcepolicy rp_parent, \n" +
- //                        "  public.collection\n" +
- //                        "WHERE \n" +
- //                        "  epersongroup2eperson.eperson_id = eperson.eperson_id AND\n" +
- //                        "  epersongroup.eperson_group_id = epersongroup2eperson.eperson_group_id AND\n" +
- //                        "  group2group.child_id = epersongroup.eperson_group_id AND\n" +
- //                        "  rp_parent.epersongroup_id = group2group.parent_id AND\n" +
- //                        "  collection.collection_id = rp_parent.resource_id AND\n" +
- //                        "  eperson.eperson_id = ? AND \n" +
- //                        "  (rp_parent.action_id = 3 OR \n" +
- //                        "  rp_parent.action_id = 11  \n" +
- //                        "  )  AND rp_parent.resource_type_id = 3;", context.getCurrentUser().getID());
+
+ //       TableRowIterator tri = DatabaseManager.query(context,
+ //                                                    "SELECT * FROM collection, resourcepolicy, eperson, epersongroup2eperson " +
+ //                                                        "WHERE resourcepolicy.resource_id = collection.collection_id AND "+
+ //                                                        "eperson.eperson_id = epersongroup2eperson.eperson_id AND "+
+ //                                                        "epersongroup2eperson.eperson_group_id = resourcepolicy.epersongroup_id AND "+
+ //                                                        "resourcepolicy.resource_type_id = 3 AND "+
+ //                                                        "( resourcepolicy.action_id = 3 OR resourcepolicy.action_id = 11 ) AND "+
+ //                                                        "eperson.eperson_id = ?", context.getCurrentUser().getID());
         StringBuilder query = new StringBuilder();
         query.append("select c from Collection c join c.resourcePolicies rp join rp.epersonGroup rpGroup WHERE ");
+        query.append(" ( ");
         for (int i = 0; i < actions.size(); i++) {
             Integer action = actions.get(i);
             if(i != 0)
             {
-                query.append(" AND ");
+                query.append(" OR ");
             }
             query.append("rp.actionId=").append(action);
         }
+        query.append(" ) ");
         query.append(" AND rp.resourceTypeId=").append(Constants.COLLECTION);
         query.append(" AND rp.epersonGroup.id IN (select g.id from Group g where (from EPerson e where e.id = :eperson_id) in elements(epeople))");
         Query hibernateQuery = createQuery(context, query.toString());
@@ -165,8 +156,51 @@ public class CollectionDAOImpl extends AbstractHibernateDSODAO<Collection> imple
         hibernateQuery.setCacheable(true);
 
         return list(hibernateQuery);
+    }
 
+    @Override
+    public List<Collection> findAuthorizedByGroup2Group(Context context, EPerson ePerson, List<Integer> actions) throws SQLException {
+        //        TableRowIterator tri = DatabaseManager.query(context,
+        //                "SELECT \n" +
+        //                        "  * \n" +
+        //                        "FROM \n" +
+        //                        "  public.eperson, \n" +
+        //                        "  public.epersongroup2eperson, \n" +
+        //                        "  public.epersongroup, \n" +
+        //                        "  public.group2group, \n" +
+        //                        "  public.resourcepolicy rp_parent, \n" +
+        //                        "  public.collection\n" +
+        //                        "WHERE \n" +
+        //                        "  epersongroup2eperson.eperson_id = eperson.eperson_id AND\n" +
+        //                        "  epersongroup.eperson_group_id = epersongroup2eperson.eperson_group_id AND\n" +
+        //                        "  group2group.child_id = epersongroup.eperson_group_id AND\n" +
+        //                        "  rp_parent.epersongroup_id = group2group.parent_id AND\n" +
+        //                        "  collection.collection_id = rp_parent.resource_id AND\n" +
+        //                        "  eperson.eperson_id = ? AND \n" +
+        //                        "  (rp_parent.action_id = 3 OR \n" +
+        //                        "  rp_parent.action_id = 11  \n" +
+        //                        "  )  AND rp_parent.resource_type_id = 3;", context.getCurrentUser().getID());
 
+        StringBuilder query = new StringBuilder();
+        query.append("select c from Collection c join c.resourcePolicies rp join rp.epersonGroup rpGroup WHERE ");
+        query.append(" ( ");
+        for (int i = 0; i < actions.size(); i++) {
+            Integer action = actions.get(i);
+            if(i != 0)
+            {
+                query.append(" OR ");
+            }
+            query.append("rp.actionId=").append(action);
+        }
+        query.append(" ) ");
+        query.append(" AND rp.resourceTypeId=").append(Constants.COLLECTION);
+        query.append(" AND rp.epersonGroup.id IN (select g.id from Group g join g.groups g2 " +
+                         "where (from EPerson e where e.id = :eperson_id) in elements(g2.epeople))");
+        Query hibernateQuery = createQuery(context, query.toString());
+        hibernateQuery.setParameter("eperson_id", ePerson.getID());
+        hibernateQuery.setCacheable(true);
+
+        return list(hibernateQuery);
     }
 
     @Override

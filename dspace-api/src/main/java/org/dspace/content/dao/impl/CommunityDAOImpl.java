@@ -155,14 +155,16 @@ public class CommunityDAOImpl extends AbstractHibernateDSODAO<Community> impleme
 //                "  resourcepolicy.resource_type_id = 4 AND eperson.eperson_id = ?", context.getCurrentUser().getID());
         StringBuilder query = new StringBuilder();
         query.append("select c from Community c join c.resourcePolicies rp join rp.epersonGroup rpGroup WHERE ");
+        query.append(" ( ");
         for (int i = 0; i < actions.size(); i++) {
             Integer action = actions.get(i);
             if(i != 0)
             {
-                query.append(" AND ");
+                query.append(" OR ");
             }
             query.append("rp.actionId=").append(action);
         }
+        query.append(" ) ");
         query.append(" AND rp.resourceTypeId=").append(Constants.COMMUNITY);
         query.append(" AND rp.epersonGroup.id IN (select g.id from Group g where (from EPerson e where e.id = :eperson_id) in elements(epeople))");
         Query hibernateQuery = createQuery(context, query.toString());
