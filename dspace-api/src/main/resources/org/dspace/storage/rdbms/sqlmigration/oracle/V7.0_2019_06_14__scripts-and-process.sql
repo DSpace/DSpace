@@ -14,6 +14,7 @@
 -- http://flywaydb.org/
 -- ===============================================================
 CREATE SEQUENCE process_id_seq;
+CREATE SEQUENCE process_log_id_seq;
 
 CREATE TABLE process
 (
@@ -24,17 +25,28 @@ CREATE TABLE process
     creation_time           TIMESTAMP NOT NULL,
     script                  VARCHAR(256) NOT NULL,
     status                  VARCHAR(32),
-    parameters              VARCHAR(512)
+    parameters              VARCHAR (512)
+);
+
+CREATE TABLE process_log
+(
+    process_log_id          INTEGER NOT NULL PRIMARY KEY,
+    process_id              INTEGER NOT NULL REFERENCES process(process_id),
+    output                  CLOB NOT NULL,
+    time                    TIMESTAMP NOT NULL,
+    log_level               INTEGER NOT NULL
 );
 
 CREATE TABLE process2bitstream
 (
-  process_id   INTEGER REFERENCES process(process_id),
-  bitstream_id RAW(16) REFERENCES bitstream(uuid),
-  CONSTRAINT PK_process2bitstream PRIMARY KEY (process_id, bitstream_id)
+    process_id   INTEGER REFERENCES process(process_id),
+    bitstream_id RAW(16) REFERENCES bitstream(uuid),
+    CONSTRAINT PK_process2bitstream PRIMARY KEY (process_id, bitstream_id)
+
 );
 
 CREATE INDEX process_user_id_idx ON process(user_id);
 CREATE INDEX process_status_idx ON process(status);
+CREATE INDEX process_log_process_id_idx ON process_log(process_id);
 CREATE INDEX process_name_idx on process(script);
 CREATE INDEX process_start_time_idx on process(start_time);

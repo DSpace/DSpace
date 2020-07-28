@@ -29,6 +29,7 @@ import org.dspace.eperson.EPerson;
 import org.dspace.scripts.DSpaceCommandLineParameter;
 import org.dspace.scripts.DSpaceRunnable;
 import org.dspace.scripts.Process;
+import org.dspace.scripts.ProcessLogLevel;
 import org.dspace.scripts.factory.ScriptServiceFactory;
 import org.dspace.scripts.handler.DSpaceRunnableHandler;
 import org.dspace.scripts.service.ProcessService;
@@ -156,19 +157,39 @@ public class RestDSpaceRunnableHandler implements DSpaceRunnableHandler {
         String logMessage = getLogMessage(message);
         log.info(logMessage);
 
+        appendLogToProcess(message, ProcessLogLevel.INFO);
     }
 
     @Override
     public void logWarning(String message) {
         String logMessage = getLogMessage(message);
         log.warn(logMessage);
+        appendLogToProcess(message, ProcessLogLevel.WARNING);
     }
 
     @Override
     public void logError(String message) {
         String logMessage = getLogMessage(message);
         log.error(logMessage);
+        appendLogToProcess(message, ProcessLogLevel.ERROR);
     }
+
+
+    private void appendLogToProcess(String message, ProcessLogLevel error) {
+        Context context = new Context(Context.Mode.MANAGED);
+        try {
+            Process process = processService.find(context, processId);
+            processService.appendLog(context, process, message, error);
+            context.complete();
+        } catch (SQLException e) {
+            log.error("RestDSpaceRunnableHandler with process: " + processId + " could not write log to process", e);
+        } finally {
+            if (context.isValid()) {
+                context.abort();
+            }
+        }
+    }
+
 
     @Override
     public void printHelp(Options options, String name) {

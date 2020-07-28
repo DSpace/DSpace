@@ -30,6 +30,7 @@ import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.ProcessStatus;
 import org.dspace.content.dao.ProcessDAO;
+import org.dspace.content.dao.ProcessLogDAO;
 import org.dspace.content.service.BitstreamFormatService;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.MetadataFieldService;
@@ -49,6 +50,9 @@ public class ProcessServiceImpl implements ProcessService {
 
     @Autowired
     private ProcessDAO processDAO;
+
+    @Autowired
+    private ProcessLogDAO processLogDAO;
 
     @Autowired
     private BitstreamService bitstreamService;
@@ -110,6 +114,25 @@ public class ProcessServiceImpl implements ProcessService {
     }
 
     @Override
+    public void appendLog(Context context, Process process, String output, ProcessLogLevel processLogLevel) {
+        ProcessLog processLog = new ProcessLog();
+        Date time = new Date();
+        processLog.setTime(time);
+        processLog.setProcess(process);
+        processLog.setOutput(output);
+        processLog.setProcessLogLevel(processLogLevel);
+        try {
+            processLogDAO.create(context, processLog);
+        } catch (SQLException e) {
+            log.error(LogManager.getHeader(context, "process_appendLog", "ProccessLog with time " + time
+                + " for Process with ID " + process.getID() +
+                " with output " + output + " and ProcessLogLevel "
+                + processLogLevel + " could nto be created"), e);
+        }
+    }
+
+
+    @Override
     public void start(Context context, Process process) throws SQLException {
         process.setProcessStatus(ProcessStatus.RUNNING);
         process.setStartTime(new Date());
@@ -162,7 +185,9 @@ public class ProcessServiceImpl implements ProcessService {
 
     @Override
     public void delete(Context context, Process process) throws SQLException, IOException, AuthorizeException {
-
+        for (ProcessLog processLog : processLogDAO.findByProcess(context, process)) {
+            processLogDAO.delete(context, processLog);
+        }
         for (Bitstream bitstream : ListUtils.emptyIfNull(process.getBitstreams())) {
             bitstreamService.delete(context, bitstream);
         }
@@ -174,6 +199,11 @@ public class ProcessServiceImpl implements ProcessService {
     @Override
     public void update(Context context, Process process) throws SQLException {
         processDAO.save(context, process);
+    }
+
+    @Override
+    public List<ProcessLog> getProcessLogsFromProcess(Context context, Process process) throws SQLException {
+        return process == null ? Collections.emptyList() : processLogDAO.findByProcess(context, process);
     }
 
     @Override

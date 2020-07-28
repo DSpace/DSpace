@@ -18,6 +18,8 @@ import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.scripts.DSpaceCommandLineParameter;
 import org.dspace.scripts.Process;
+import org.dspace.scripts.ProcessLog;
+import org.dspace.scripts.ProcessLogLevel;
 
 /**
  * An interface for the ProcessService with methods regarding the Process workload
@@ -82,6 +84,16 @@ public interface ProcessService {
     public List<Process> findAllSortByStartTime(Context context) throws SQLException;
 
     /**
+     * This method will append the Process with a {@link ProcessLog} of log level as defined by the given
+     * {@link ProcessLogLevel}
+     * @param context   The relevant DSpace context
+     * @param process   The Process for which a log will be created
+     * @param output    The output to be written in the log
+     * @param processLogLevel   The level of the log
+     */
+    public void appendLog(Context context, Process process, String output, ProcessLogLevel processLogLevel);
+
+    /**
      * This method will perform the logic needed to update the Process object in the database to represent a
      * started state. A started state refers to {@link org.dspace.content.ProcessStatus#RUNNING}
      * @param context   The relevant DSpace context
@@ -140,6 +152,15 @@ public interface ProcessService {
     public void update(Context context, Process process) throws SQLException;
 
     /**
+     * This method fetches the List of {@link ProcessLog} objects for a given {@link Process}
+     * @param context   The relevant DSpace context
+     * @param process   The Process that we need to get the logs for
+     * @return The list of {@link ProcessLog} objects
+     * @throws SQLException If something goes wrong
+     */
+    public List<ProcessLog> getProcessLogsFromProcess(Context context, Process process) throws SQLException;
+
+    /**
      * This method will retrieve the list of parameters from the Process in its String format and it will parse
      * these parameters to a list of {@link DSpaceCommandLineParameter} objects for better usability throughout DSpace
      * @param process   The Process object for which we'll return the parameters
@@ -152,7 +173,7 @@ public interface ProcessService {
      * @param context           The relevant DSpace context
      * @param process           The process that should hold the requested Bitstream
      * @param bitstreamName     The name of the requested Bitstream
-     * @return                  The Bitstream from the given Process that matches the given bitstream name
+     * @return The Bitstream from the given Process that matches the given bitstream name
      */
     public Bitstream getBitstreamByName(Context context, Process process, String bitstreamName);
 
@@ -161,7 +182,7 @@ public interface ProcessService {
      * @param context   The relevant DSpace context
      * @param process   The process that holds the Bitstreams to be searched in
      * @param type      The type that the Bitstream must have
-     * @return          The Bitstream of the given type for the given Process
+     * @return The Bitstream of the given type for the given Process
      */
     public Bitstream getBitstream(Context context, Process process, String type);
 
@@ -169,14 +190,14 @@ public interface ProcessService {
      * This method will return all the Bitstreams for a given process
      * @param context   The relevant DSpace context
      * @param process   The process that holds the Bitstreams to be searched in
-     * @return          The list of Bitstreams
+     * @return The list of Bitstreams
      */
     public List<Bitstream> getBitstreams(Context context, Process process);
 
     /**
      * Returns the total amount of Process objects in the dataase
      * @param context   The relevant DSpace context
-     * @return          An integer that describes the amount of Process objects in the database
+     * @return An integer that describes the amount of Process objects in the database
      * @throws SQLException If something goes wrong
      */
     int countTotal(Context context) throws SQLException;
@@ -185,7 +206,7 @@ public interface ProcessService {
      * This will return a list of Strings where each String represents the type of a Bitstream in the Process given
      * @param context   The DSpace context
      * @param process   The Process object that we'll use to find the bitstreams
-     * @return          A list of Strings where each String represents a fileType that is in the Process
+     * @return A list of Strings where each String represents a fileType that is in the Process
      */
     public List<String> getFileTypesForProcessBitstreams(Context context, Process process);
 

@@ -33,6 +33,7 @@
     <bean class="org.dspace.content.dao.impl.RelationshipTypeDAOImpl"/>
 
     <bean class="org.dspace.content.dao.impl.ProcessDAOImpl"/>
+    <bean class="org.dspace.content.dao.impl.ProcessLogDAOImpl"/>
 
     <bean class="org.dspace.eperson.dao.impl.EPersonDAOImpl"/>
     <bean class="org.dspace.eperson.dao.impl.Group2GroupCacheDAOImpl"/>
