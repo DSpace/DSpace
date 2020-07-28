@@ -10,6 +10,7 @@ package org.dspace.app.rest.csv;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -24,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.builder.CollectionBuilder;
 import org.dspace.app.rest.builder.CommunityBuilder;
 import org.dspace.app.rest.builder.ItemBuilder;
@@ -233,11 +235,68 @@ public class CsvImportIT extends AbstractEntityIntegrationTest {
         out.close();
         out = null;
 
+        runDSpaceScript("metadata-import", "-f", filename, "-s");
+
+        File file = new File(filename);
+        if (file.exists()) {
+            file.delete();
+        }
+    }
+
+    @Test
+    public void createRelationshipsWithCsvImportWithSpecifiedEPersonParameterTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
+        Collection col3 = CollectionBuilder.createCollection(context, child1).withName("OrgUnits").build();
+
+        Item article = ItemBuilder.createItem(context, col1)
+                                  .withTitle("Article")
+                                  .withIssueDate("2017-10-17")
+                                  .withRelationshipType("Publication")
+                                  .build();
+
+        String csvLineString = "+," + col1.getHandle() + ",TestItemB,Person," + article
+            .getID().toString();
+        String[] csv = {"id,collection,dc.title,relationship.type,relation.isPublicationOfAuthor", csvLineString};
+
+        String filename = "test.csv";
+        BufferedWriter out = new BufferedWriter(
+            new OutputStreamWriter(
+                new FileOutputStream(filename), "UTF-8"));
+        for (String csvLine : csv) {
+            out.write(csvLine + "\n");
+        }
+        out.flush();
+        out.close();
+        out = null;
+
         runDSpaceScript("metadata-import", "-f", filename, "-e", "admin@email.com", "-s");
 
         File file = new File(filename);
         if (file.exists()) {
             file.delete();
         }
+
+        Iterator<Item> itemIteratorItem = itemService.findByMetadataField(context, "dc", "title", null, "TestItemB");
+        Item item = itemIteratorItem.next();
+
+        List<Relationship> relationships = relationshipService.findByItem(context, item);
+        assertThat("Relationship list size is 1", relationships.size(), equalTo(1));
+        getClient().perform(get("/api/core/items/" + item.getID())).andExpect(status().isOk());
+        getClient().perform(get("/api/core/relationships/" + relationships.get(0).getID()).param("projection", "full"))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$.leftPlace", is(0)))
+                   .andExpect(jsonPath("$.rightPlace", is(0)))
+                   .andExpect(jsonPath("$", Matchers.is(RelationshipMatcher.matchRelationship(relationships.get(0)))));
+
+        assertFalse(StringUtils.equalsIgnoreCase(item.getSubmitter().getEmail(), "admin@email.com"));
     }
 }
