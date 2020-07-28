@@ -253,9 +253,6 @@ public class ArXivImportMetadataSourceServiceImpl extends AbstractImportMetadata
             }
             Invocation.Builder invocationBuilder = local.request(MediaType.TEXT_PLAIN_TYPE);
             Response response = invocationBuilder.get();
-            if (response.getStatus() == 400) {
-                throw new IllegalArgumentException("Invalid ArXiv ID");
-            }
             String responseString = response.readEntity(String.class);
             List<OMElement> omElements = splitToRecords(responseString);
             for (OMElement record : omElements) {
@@ -298,9 +295,6 @@ public class ArXivImportMetadataSourceServiceImpl extends AbstractImportMetadata
             WebTarget local = webTarget.queryParam("id_list", arxivid);
             Invocation.Builder invocationBuilder = local.request(MediaType.TEXT_PLAIN_TYPE);
             Response response = invocationBuilder.get();
-            if (response.getStatus() == 400) {
-                throw new IllegalArgumentException("Invalid ArXiv ID");
-            }
             String responseString = response.readEntity(String.class);
             List<OMElement> omElements = splitToRecords(responseString);
             for (OMElement record : omElements) {
@@ -333,9 +327,6 @@ public class ArXivImportMetadataSourceServiceImpl extends AbstractImportMetadata
             WebTarget local = webTarget.queryParam("search_query", queryString);
             Invocation.Builder invocationBuilder = local.request(MediaType.TEXT_PLAIN_TYPE);
             Response response = invocationBuilder.get();
-            if (response.getStatus() == 400) {
-                throw new IllegalArgumentException("Invalid ArXiv ID");
-            }
             String responseString = response.readEntity(String.class);
             List<OMElement> omElements = splitToRecords(responseString);
             for (OMElement record : omElements) {
