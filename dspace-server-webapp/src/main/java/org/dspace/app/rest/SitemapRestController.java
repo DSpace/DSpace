@@ -43,7 +43,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
  * @author Maria Verdonck (Atmire) on 08/07/2020
  */
 @Controller
-@RequestMapping("/sitemaps")
+@RequestMapping("/${sitemap.path:sitemaps}")
 public class SitemapRestController {
 
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(SitemapRestController.class);

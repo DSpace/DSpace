@@ -27,6 +27,7 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
@@ -61,8 +62,6 @@ public class GenerateSitemaps {
     private static final ConfigurationService configurationService =
         DSpaceServicesFactory.getInstance().getConfigurationService();
 
-    public static final String SITEMAPS_ENDPOINT = "/sitemaps";
-
     /**
      * Default constructor
      */
@@ -86,6 +85,9 @@ public class GenerateSitemaps {
         options
             .addOption("p", "ping", true,
                        "ping specified search engine URL");
+        options
+            .addOption("d", "delete", false,
+                "delete sitemaps dir and its contents");
 
         CommandLine line = null;
 
@@ -107,10 +109,9 @@ public class GenerateSitemaps {
         }
 
         /*
-         * Sanity check -- if no sitemap generation or pinging to do, print
-         * usage
+         * Sanity check -- if no sitemap generation or pinging to do, or deletion, print usage
          */
-        if (line.getArgs().length != 0 || line.hasOption('b')
+        if (line.getArgs().length != 0 || line.hasOption('d') || line.hasOption('b')
             && line.hasOption('s') && !line.hasOption('g')
             && !line.hasOption('m') && !line.hasOption('y')
             && !line.hasOption('p')) {
@@ -123,6 +124,10 @@ public class GenerateSitemaps {
         // Note the negation (CLI options indicate NOT to generate a sitemap)
         if (!line.hasOption('b') || !line.hasOption('s')) {
             generateSitemaps(!line.hasOption('b'), !line.hasOption('s'));
+        }
+
+        if (line.hasOption('d')) {
+            deleteSitemaps();
         }
 
         if (line.hasOption('a')) {
@@ -153,6 +158,19 @@ public class GenerateSitemaps {
     }
 
     /**
+     * Delete the sitemaps directory and its contents if it exists
+     * @throws IOException  if IO error occurs
+     */
+    public static void deleteSitemaps() throws IOException {
+        File outputDir = new File(configurationService.getProperty("sitemap.dir"));
+        if (!outputDir.exists() && !outputDir.isDirectory()) {
+            log.error("Unable to delete sitemaps directory, doesn't exist or isn't a directort");
+        } else {
+            FileUtils.deleteDirectory(outputDir);
+        }
+    }
+
+    /**
      * Generate sitemap.org protocol and/or basic HTML sitemaps.
      *
      * @param makeHTMLMap    if {@code true}, generate an HTML sitemap.
@@ -163,8 +181,9 @@ public class GenerateSitemaps {
      *                      if IO error occurs.
      */
     public static void generateSitemaps(boolean makeHTMLMap, boolean makeSitemapOrg) throws SQLException, IOException {
-        String sitemapStem = configurationService.getProperty("dspace.server.url")
-            + SITEMAPS_ENDPOINT + "/sitemap";
+        String sitemapsEndpoint = configurationService.getProperty("sitemap.path", "sitemaps");
+        String sitemapStem = configurationService.getProperty("dspace.server.url") + "/"
+            + sitemapsEndpoint + "/sitemap";
         String uiURLStem = configurationService.getProperty("dspace.ui.url");
 
         File outputDir = new File(configurationService.getProperty("sitemap.dir"));
