@@ -476,9 +476,9 @@
 
     <profiles>
         <!-- Skip running Unit Tests by default, but allow override on
-           command line by setting property "-DskipTests=false".
-	   Tests are always built, because we have modules that depend
-	   on common test infrastructure. -->
+             command line by setting property "-DskipTests=false".
+             Tests are always built, because we have modules that depend
+             on common test infrastructure. -->
         <profile>
             <id>skiptests</id>
             <activation>
@@ -496,7 +496,7 @@
         <!-- Skip running Integration Tests by default, but allow override on
              command line by setting property "-DskipITs=false".
              ITs are always built, because we have modules that depend
-	     on common test infrastructure. -->
+             on common test infrastructure. -->
         <profile>
             <id>skipits</id>
             <activation>
