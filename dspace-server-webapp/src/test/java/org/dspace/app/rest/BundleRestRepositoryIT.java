@@ -37,6 +37,7 @@ import org.dspace.app.rest.builder.ResourcePolicyBuilder;
 import org.dspace.app.rest.matcher.BitstreamMatcher;
 import org.dspace.app.rest.matcher.BundleMatcher;
 import org.dspace.app.rest.matcher.HalMatcher;
+import org.dspace.app.rest.matcher.ItemMatcher;
 import org.dspace.app.rest.matcher.MetadataMatcher;
 import org.dspace.app.rest.model.BundleRest;
 import org.dspace.app.rest.model.MetadataRest;
@@ -50,6 +51,7 @@ import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
+import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.eperson.EPerson;
 import org.hamcrest.Matchers;
@@ -62,6 +64,9 @@ public class BundleRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     @Autowired
     ResourcePolicyService resourcePolicyService;
+
+    @Autowired
+    ItemService itemService;
 
     private Collection collection;
     private Item item;
@@ -634,6 +639,56 @@ public class BundleRestRepositoryIT extends AbstractControllerIntegrationTest {
         // Verify the bundle is still here
         getClient().perform(get("/api/core/bundles/" + bundle1.getID()))
                 .andExpect(status().isOk());
+    }
+
+    @Test
+    public void getEmbeddedItemForBundle() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        bundle1 = BundleBuilder.createBundle(context, item)
+                .withName("testname")
+                .build();
+
+        context.restoreAuthSystemState();
+
+        getClient().perform(get("/api/core/bundles/" + bundle1.getID() + "?embed=item"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$._embedded.item",
+                        ItemMatcher.matchItemWithTitleAndDateIssued(item, "Public item 1", "2017-10-17")
+                ));
+    }
+
+    @Test
+    /**
+     * This test proves that, if a bundle is linked to multiple items, we only ever return the first item.
+     * **NOTE: DSpace does NOT support or expect to have a bundle linked to multiple items**.
+     * But, because the database does allow for it, this test simply proves the REST API will respond without an error
+     */
+    public void linksToFirstItemWhenMultipleItems() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        bundle1 = BundleBuilder.createBundle(context, item)
+                .withName("testname")
+                .build();
+
+        Item item2 = ItemBuilder.createItem(context, collection)
+                .withTitle("Public item 2")
+                .withIssueDate("2020-07-08")
+                .withAuthor("Smith, Donald").withAuthor("Doe, John")
+                .withSubject("SecondEntry")
+                .build();
+
+        itemService.addBundle(context, item2, bundle1);
+
+        context.restoreAuthSystemState();
+
+        getClient().perform(get("/api/core/bundles/" + bundle1.getID() + "/item"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$",
+                        ItemMatcher.matchItemWithTitleAndDateIssued(item, "Public item 1", "2017-10-17")
+                ));
     }
 
 }
