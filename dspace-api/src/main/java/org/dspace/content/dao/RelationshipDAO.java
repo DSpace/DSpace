@@ -9,6 +9,7 @@ package org.dspace.content.dao;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Set;
 
 import org.dspace.content.Item;
 import org.dspace.content.Relationship;
@@ -175,6 +176,21 @@ public interface RelationshipDAO extends GenericDAO<Relationship> {
      * @throws SQLException if database error
      */
     int countByRelationshipType(Context context, RelationshipType relationshipType) throws SQLException;
+
+    /**
+     * This method returns a list of relationships for a specific item based on a list of RelationshipType ids
+     * @param context   The relevant DSpace context
+     * @param item      The Item that has to be the left or right item for the relationship to be included in the list
+     * @param relationshipTypeIds The set of relationshipType Ids to filter by
+     * @param limit     paging limit
+     * @param offset    paging offset
+     * @return  The list of matching relationships
+     * @throws SQLException If something goes wrong
+     */
+    List<Relationship> findByItemAndRelationshipTypeIds(Context context, Item item,
+                                                        Set<Integer> relationshipTypeIds,
+                                                        Integer limit, Integer offset)
+            throws SQLException;
 
     /**
      * This method returns a count of Relationship objects that have the given Item object

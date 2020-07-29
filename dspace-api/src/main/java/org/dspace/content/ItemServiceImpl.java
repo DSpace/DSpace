@@ -1334,12 +1334,18 @@ prevent the generation of resource policy entry values with null dspace_object a
     @Override
     public List<MetadataValue> getMetadata(Item item, String schema, String element, String qualifier, String lang,
                                            boolean enableVirtualMetadata) {
+        return this.getMetadata(item, schema, element, qualifier, lang, enableVirtualMetadata, false);
+    }
+
+    @Override
+    public List<MetadataValue> getMetadata(Item item, String schema, String element, String qualifier, String lang,
+                                           boolean enableVirtualMetadata, boolean allRelationFields) {
         //Fields of the relation schema are virtual metadata
         //except for relation.type which is the type of item in the model
         if (StringUtils.equals(schema, MetadataSchemaEnum.RELATION.getName()) && !StringUtils.equals(element, "type")) {
 
             List<RelationshipMetadataValue> relationMetadata = relationshipMetadataService
-                .getRelationshipMetadata(item, false);
+                .getRelationshipMetadata(item, false, allRelationFields);
             List<MetadataValue> listToReturn = new LinkedList<>();
             for (MetadataValue metadataValue : relationMetadata) {
                 if (StringUtils.equals(metadataValue.getMetadataField().getElement(), element)) {
@@ -1355,7 +1361,8 @@ prevent the generation of resource policy entry values with null dspace_object a
 
             List<MetadataValue> fullMetadataValueList = new LinkedList<>();
             if (enableVirtualMetadata) {
-                fullMetadataValueList.addAll(relationshipMetadataService.getRelationshipMetadata(item, true));
+                fullMetadataValueList.addAll(
+                        relationshipMetadataService.getRelationshipMetadata(item, true, allRelationFields));
 
             }
             fullMetadataValueList.addAll(dbMetadataValues);

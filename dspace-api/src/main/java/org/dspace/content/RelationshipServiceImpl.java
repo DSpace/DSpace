@@ -11,6 +11,7 @@ import java.sql.SQLException;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -89,7 +90,7 @@ public class RelationshipServiceImpl implements RelationshipService {
                 // for a proper place allocation
                 Relationship relationshipToReturn = relationshipDAO.create(context, relationship);
                 updatePlaceInRelationship(context, relationshipToReturn);
-                update(context, relationshipToReturn);
+                relationshipDAO.save(context, relationshipToReturn);
                 return relationshipToReturn;
             } else {
                 throw new AuthorizeException(
@@ -281,6 +282,13 @@ public class RelationshipServiceImpl implements RelationshipService {
             }
         });
         return list;
+    }
+
+    @Override
+    public List<Relationship> findByItemAndRelationshipTypeIds(Context context, Item item,
+                                                               Set<Integer> relationshipTypeIds,
+                                                               Integer limit, Integer offset) throws SQLException {
+        return relationshipDAO.findByItemAndRelationshipTypeIds(context, item, relationshipTypeIds, limit, offset);
     }
 
     @Override

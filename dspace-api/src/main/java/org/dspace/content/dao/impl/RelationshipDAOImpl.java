@@ -9,7 +9,9 @@ package org.dspace.content.dao.impl;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
@@ -44,6 +46,26 @@ public class RelationshipDAOImpl extends AbstractHibernateDAO<Relationship> impl
             .where(criteriaBuilder.or(criteriaBuilder.equal(relationshipRoot.get(Relationship_.leftItem), item),
                                       criteriaBuilder.equal(relationshipRoot.get(Relationship_.rightItem), item)));
         return list(context, criteriaQuery, false, Relationship.class, limit, offset);
+    }
+
+    @Override
+    public List<Relationship> findByItemAndRelationshipTypeIds(Context context, Item item,
+                                                               Set<Integer> relationshipTypeIds,
+                                                               Integer limit, Integer offset)
+            throws SQLException {
+
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, Relationship.class);
+        Root<Relationship> relationshipRoot = criteriaQuery.from(Relationship.class);
+        criteriaQuery.select(relationshipRoot);
+        if (relationshipTypeIds != null && !relationshipTypeIds.isEmpty()) {
+            criteriaQuery
+                    .where(criteriaBuilder.or(criteriaBuilder.equal(relationshipRoot.get(Relationship_.leftItem), item),
+                            criteriaBuilder.equal(relationshipRoot.get(Relationship_.rightItem), item)),
+                            relationshipRoot.get(Relationship_.relationshipType).in(relationshipTypeIds));
+            return list(context, criteriaQuery, false, Relationship.class, limit, offset);
+        }
+        return new LinkedList<>();
     }
 
     @Override

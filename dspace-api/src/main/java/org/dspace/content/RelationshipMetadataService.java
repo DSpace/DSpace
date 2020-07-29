@@ -31,6 +31,20 @@ public interface RelationshipMetadataService {
     public List<RelationshipMetadataValue> getRelationshipMetadata(Item item, boolean enableVirtualMetadata);
 
     /**
+     * This method retrieves a list of MetadataValue objects that get constructed from processing
+     * the given Item's Relationships through the config given to the {@link VirtualMetadataPopulator}
+     * @param item  The Item that will be processed through it's Relationships
+     * @param enableVirtualMetadata This parameter will determine whether the list of Relationship metadata
+     *                              should be populated with metadata that is being generated through the
+     *                              VirtualMetadataPopulator functionality or not
+     * @param allRelationFields If true, all relation fields will be used and generation of relation metadata will not
+     *                          be impacted by ignoredRelationFields configuration
+     * @return      The list of MetadataValue objects constructed through the Relationships
+     */
+    public List<RelationshipMetadataValue> getRelationshipMetadata(Item item, boolean enableVirtualMetadata,
+                                                                   boolean allRelationFields);
+
+    /**
      * Retrieves the list of RelationshipMetadataValue objects specific to only one Relationship of the item.
      *
      * This method processes one Relationship of an Item and will return a list of RelationshipMetadataValue objects

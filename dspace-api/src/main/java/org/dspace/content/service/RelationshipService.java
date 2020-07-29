@@ -9,6 +9,7 @@ package org.dspace.content.service;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Set;
 
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Item;
@@ -51,6 +52,20 @@ public interface RelationshipService extends DSpaceCRUDService<Relationship> {
      * @throws SQLException If something goes wrong
      */
     public List<Relationship> findAll(Context context) throws SQLException;
+
+    /**
+     * Retrieves the a list of relationships currently in the system delimited by a list of RelationshipType ids
+     * @param context   The relevant DSpace context
+     * @param item      The Item that has to be the left or right item for the relationship to be included in the list
+     * @param relationshipTypeIds The set of relationshipType Ids to filter by
+     * @param limit     paging limit
+     * @param offset    paging offset
+     * @return  The list of all relationships currently in the system
+     * @throws SQLException If something goes wrong
+     */
+    List<Relationship> findByItemAndRelationshipTypeIds(Context context, Item item,
+                                                        Set<Integer> relationshipTypeIds,
+                                                        Integer limit, Integer offset) throws SQLException;
 
     /**
      * Retrieves the full list of relationships currently in the system

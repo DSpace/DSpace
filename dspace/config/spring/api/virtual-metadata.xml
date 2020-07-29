@@ -23,6 +23,13 @@
                 <entry key="isJournalIssueOfPublication" value-ref="isJournalIssueOfPublicationMap"/>
             </map>
         </property>
+        <property name="ignoredRelationFields">
+            <set>
+                <!-- Relationsips listed here will be excluded when deriving metadata from relationships -->
+                <!-- e.g. Exclude parent-to-child relationships to improve performance -->
+                <!--<value>isPublicationOfOrgUnit</value>-->
+            </set>
+        </property>
     </bean>
 
     <bean class="org.dspace.content.virtual.EntityTypeToFilterQueryService">

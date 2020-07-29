@@ -9,14 +9,18 @@ package org.dspace.content;
 
 import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
+import org.dspace.content.service.EntityTypeService;
 import org.dspace.content.service.MetadataFieldService;
 import org.dspace.content.service.RelationshipService;
+import org.dspace.content.service.RelationshipTypeService;
 import org.dspace.content.virtual.VirtualMetadataConfiguration;
 import org.dspace.content.virtual.VirtualMetadataPopulator;
 import org.dspace.core.Constants;
@@ -34,19 +38,41 @@ public class RelationshipMetadataServiceImpl implements RelationshipMetadataServ
     protected RelationshipService relationshipService;
 
     @Autowired(required = true)
+    protected RelationshipTypeService relationshipTypeService;
+
+    @Autowired(required = true)
+    protected EntityTypeService entityTypeService;
+
+    @Autowired(required = true)
     protected VirtualMetadataPopulator virtualMetadataPopulator;
 
     @Autowired(required = true)
     protected MetadataFieldService metadataFieldService;
 
+    private List<String> typeNameList;
+
     @Override
     public List<RelationshipMetadataValue> getRelationshipMetadata(Item item, boolean enableVirtualMetadata) {
+        return this.getRelationshipMetadata(item, enableVirtualMetadata, false);
+    }
+
+    @Override
+    public List<RelationshipMetadataValue> getRelationshipMetadata(Item item, boolean enableVirtualMetadata,
+                                                                   boolean allRelationFields) {
         Context context = new Context();
         List<RelationshipMetadataValue> fullMetadataValueList = new LinkedList<>();
         try {
             String entityType = getEntityTypeStringFromMetadata(item);
+            buildTypeIds(context);
             if (StringUtils.isNotBlank(entityType)) {
-                List<Relationship> relationships = relationshipService.findByItem(context, item);
+                List<Relationship> relationships;
+                if (allRelationFields || virtualMetadataPopulator.getIgnoredRelationFields() == null ||
+                        virtualMetadataPopulator.getIgnoredRelationFields().isEmpty()) {
+                    relationships = relationshipService.findByItem(context, item);
+                } else {
+                    relationships = relationshipService.findByItemAndRelationshipTypeIds(context, item,
+                            buildRelationshipTypeIdSet(context, entityType), -1, -1);
+                }
                 for (Relationship relationship : relationships) {
                     fullMetadataValueList
                         .addAll(findRelationshipMetadataValueForItemRelationship(context, item, entityType,
@@ -261,15 +287,97 @@ public class RelationshipMetadataServiceImpl implements RelationshipMetadataServ
     private RelationshipMetadataValue getRelationMetadataFromOtherItem(Context context, Item otherItem,
                                                                        String relationName,
                                                                        Integer relationshipId, int place) {
-        RelationshipMetadataValue metadataValue = constructMetadataValue(context,
-            MetadataSchemaEnum.RELATION
-                .getName() + "." + relationName);
-        if (metadataValue != null) {
-            metadataValue.setAuthority(Constants.VIRTUAL_AUTHORITY_PREFIX + relationshipId);
-            metadataValue.setValue(otherItem.getID().toString());
-            metadataValue.setPlace(place);
-            return metadataValue;
+        if ((virtualMetadataPopulator.getIgnoredRelationFields() == null ||
+                !virtualMetadataPopulator.getIgnoredRelationFields().contains(relationName))) {
+            RelationshipMetadataValue metadataValue = constructMetadataValue(context,
+                    MetadataSchemaEnum.RELATION
+                            .getName() + "." + relationName);
+            if (metadataValue != null) {
+                metadataValue.setAuthority(Constants.VIRTUAL_AUTHORITY_PREFIX + relationshipId);
+                metadataValue.setValue(otherItem.getID().toString());
+                metadataValue.setPlace(place);
+                return metadataValue;
+            }
         }
         return null;
+    }
+
+    /**
+     * This method populates the virtualMetadataPopulator TypeIds map with all the registered entity types to their
+     * RelationshipType left&right typeNames and RealtionshipType ids
+     * @param context the current context
+     */
+    public void buildTypeIds(Context context) throws SQLException {
+        Map<String, Map<String, Integer>> typeIds = new HashMap<>();
+        for (EntityType entityType : entityTypeService.findAll(context)) {
+            Map<String, Integer> typeMap = new HashMap<String, Integer>();
+            for (RelationshipType relationshipType :
+                    relationshipTypeService.findByEntityType(context, entityType)) {
+                typeMap.put(relationshipType.getLeftwardType(), relationshipType.getID());
+                typeMap.put(relationshipType.getRightwardType(), relationshipType.getID());
+            }
+            typeIds.put(entityType.getLabel(), typeMap);
+        }
+        virtualMetadataPopulator.setTypeIds(typeIds);
+    }
+
+    /**
+     * This method returns a set of acceptable RelationType Ids based on virtual metadata configuration
+     * @param context the current context
+     * @param entityType  The relationshipType for which this should be checked
+     */
+    public Set<Integer> buildRelationshipTypeIdSet(Context context, String entityType) {
+        if (entityType == null || virtualMetadataPopulator.getTypeIds().get(entityType) == null) {
+            return null;
+        }
+        Set<Integer> idsList = new HashSet<>();
+        List<String> typeList = new LinkedList<>();
+        populateTypeNameList(context, entityType);
+        for (String applicableTypes : virtualMetadataPopulator.getTypeIds().get(entityType).keySet()) {
+            if ((virtualMetadataPopulator.getIgnoredRelationFields() == null ||
+                    !virtualMetadataPopulator.getIgnoredRelationFields().contains(applicableTypes)) &&
+                    typeNameList.contains(applicableTypes)) {
+                typeList.add(applicableTypes);
+            }
+        }
+        for (String virtualRequiredTypeNames : virtualMetadataPopulator.getMap().keySet()) {
+            if (virtualRequiredTypeNames.contains(entityType)) {
+                typeList.add(virtualRequiredTypeNames);
+            }
+        }
+        for (String key : virtualMetadataPopulator.getTypeIds().keySet()) {
+            if (key.equalsIgnoreCase(entityType)) {
+                for (String applicableTypeName : typeList) {
+                    Integer id = virtualMetadataPopulator.getTypeIds().get(key).get(applicableTypeName);
+                    if (id != null) {
+                        idsList.add(id);
+                    }
+                }
+            }
+        }
+        return idsList;
+    }
+
+    /**
+     * This method calculates the determinate typeNames that references the given entityType as in
+     * if the entityType is a Publication the typeNames in the populated list should always referer to Publications
+     * @param context the current context
+     * @param entityType  The relationshipType for which this should be checked
+     */
+    public void populateTypeNameList(Context context, String entityType) {
+        typeNameList = new LinkedList<>();
+        try {
+            EntityType entityTypeObject = entityTypeService.findByEntityType(context, entityType);
+            for (RelationshipType relationshipType :
+                    relationshipTypeService.findByEntityType(context, entityTypeObject)) {
+                if (relationshipType.getRightType() == entityTypeObject) {
+                    typeNameList.add(relationshipType.getLeftwardType());
+                } else {
+                    typeNameList.add(relationshipType.getRightwardType());
+                }
+            }
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
     }
 }

@@ -9,6 +9,7 @@ package org.dspace.content.virtual;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import org.dspace.content.RelationshipType;
 
@@ -25,6 +26,13 @@ public class VirtualMetadataPopulator {
     private Map<String, HashMap<String, VirtualMetadataConfiguration>> map;
 
     /**
+     * The relation metadata fields that should be excluded when deriving metadata from relationships.
+     */
+    private Set<String> ignoredRelationFields;
+
+    private Map<String, Map<String, Integer>> typeIds;
+
+    /**
      * Standard setter for the map
      * @param map   The map to be used in the VirtualMetadataPopulator
      */
@@ -38,6 +46,37 @@ public class VirtualMetadataPopulator {
      */
     public Map<String, HashMap<String, VirtualMetadataConfiguration>> getMap() {
         return map;
+    }
+
+    /**
+     * Standard setter for ignoredRelationFields
+     * @param ignoredRelationFields  The relation metadata fields that should be excluded when deriving metadata
+     *                               from relationships.
+     */
+    public void setIgnoredRelationFields(Set<String> ignoredRelationFields) {
+        this.ignoredRelationFields = ignoredRelationFields;
+    }
+
+    /**
+     * Standard getter for ignoredRelationFields
+     * @return  The relation metadata fields that should be excluded when deriving metadata from relationships.
+     */
+    public Set<String> getIgnoredRelationFields() {
+        return ignoredRelationFields;
+    }
+
+    /**
+     * Standard setter for typeIds
+     */
+    public void setTypeIds(Map<String, Map<String, Integer>> typeIds) {
+        this.typeIds = typeIds;
+    }
+
+    /**
+     * Standard getter for typeIds
+     */
+    public Map<String, Map<String, Integer>> getTypeIds() {
+        return typeIds;
     }
 
     /**
