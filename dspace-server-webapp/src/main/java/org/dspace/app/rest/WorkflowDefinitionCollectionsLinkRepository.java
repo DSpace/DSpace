@@ -71,8 +71,8 @@ public class WorkflowDefinitionCollectionsLinkRepository extends AbstractDSpaceR
             }
             collectionsMappedToWorkflow.addAll(xmlWorkflowFactory.getCollectionHandlesMappedToWorklow(context,
                 workflowName));
-            Pageable pageable = optionalPageable != null ? optionalPageable : new PageRequest(0, 20);
-            return converter.toRestPage(utils.getPage(collectionsMappedToWorkflow, pageable),
+            Pageable pageable = optionalPageable != null ? optionalPageable : PageRequest.of(0, 20);
+            return converter.toRestPage(collectionsMappedToWorkflow, pageable,
                 projection);
         } else {
             throw new ResourceNotFoundException("No workflow with name " + workflowName + " is configured");

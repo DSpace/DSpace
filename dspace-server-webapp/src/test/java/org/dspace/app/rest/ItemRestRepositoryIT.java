@@ -7,7 +7,11 @@
  */
 package org.dspace.app.rest;
 
+import static com.jayway.jsonpath.JsonPath.read;
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
+import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadata;
+import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadataDoesNotExist;
+import static org.dspace.core.Constants.WRITE;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -23,6 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicReference;
 import javax.ws.rs.core.MediaType;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -34,12 +39,12 @@ import org.dspace.app.rest.builder.CommunityBuilder;
 import org.dspace.app.rest.builder.EPersonBuilder;
 import org.dspace.app.rest.builder.GroupBuilder;
 import org.dspace.app.rest.builder.ItemBuilder;
+import org.dspace.app.rest.builder.ResourcePolicyBuilder;
 import org.dspace.app.rest.builder.WorkspaceItemBuilder;
 import org.dspace.app.rest.matcher.BitstreamMatcher;
 import org.dspace.app.rest.matcher.CollectionMatcher;
 import org.dspace.app.rest.matcher.HalMatcher;
 import org.dspace.app.rest.matcher.ItemMatcher;
-import org.dspace.app.rest.matcher.MetadataMatcher;
 import org.dspace.app.rest.model.ItemRest;
 import org.dspace.app.rest.model.MetadataRest;
 import org.dspace.app.rest.model.MetadataValueRest;
@@ -104,6 +109,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                                       .withSubject("ExtraEntry")
                                       .build();
 
+        context.restoreAuthSystemState();
         String token = getAuthToken(admin.getEmail(), password);
 
         getClient(token).perform(get("/api/core/items"))
@@ -168,6 +174,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                                       .withSubject("ExtraEntry")
                                       .build();
 
+        context.restoreAuthSystemState();
         String token = getAuthToken(admin.getEmail(), password);
 
         getClient(token).perform(get("/api/core/items")
@@ -250,11 +257,15 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                                       .withSubject("ExtraEntry")
                                       .build();
 
+        context.restoreAuthSystemState();
         Matcher<? super Object> publicItem1Matcher = ItemMatcher.matchItemWithTitleAndDateIssued(publicItem1,
                         "Public item 1", "2017-10-17");
 
+        String token = getAuthToken(admin.getEmail(), password);
+        // We want to test a full projection here, but only admins should expect for it to never cause
+        // authorization issues
         // When full projection is requested, response should include expected properties, links, and embeds.
-        getClient().perform(get("/api/core/items/" + publicItem1.getID())
+        getClient(token).perform(get("/api/core/items/" + publicItem1.getID())
                 .param("projection", "full"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", ItemMatcher.matchFullEmbeds()))
@@ -326,6 +337,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                                          .build();
         }
 
+        context.restoreAuthSystemState();
         getClient().perform(get("/api/core/items/" + publicItem1.getID()))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$", Matchers.is(
@@ -373,6 +385,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
         Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
 
+        context.restoreAuthSystemState();
         String token = getAuthToken(admin.getEmail(), password);
 
         getClient(token).perform(get("/api/core/items/" + UUID.randomUUID()))
@@ -404,6 +417,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                                .withSubject("ExtraEntry")
                                .build();
 
+        context.restoreAuthSystemState();
         // A token must be provided for withdraw operation. The person
         // is used in the provenance note.
         String token = getAuthToken(admin.getEmail(), password);
@@ -462,6 +476,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                                .withSubject("ExtraEntry")
                                .build();
 
+        context.restoreAuthSystemState();
         List<Operation> ops = new ArrayList<Operation>();
         ReplaceOperation replaceOperation = new ReplaceOperation("/withdrawn", true);
         ops.add(replaceOperation);
@@ -507,6 +522,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                                .withSubject("ExtraEntry")
                                .build();
 
+        context.restoreAuthSystemState();
         // try to use an unauthorized user
         String token = getAuthToken(eperson.getEmail(), password);
 
@@ -567,6 +583,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                                .withdrawn()
                                .build();
 
+        context.restoreAuthSystemState();
         String token = getAuthToken(admin.getEmail(), password);
 
         List<Operation> ops = new ArrayList<Operation>();
@@ -626,6 +643,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                                .withdrawn()
                                .build();
 
+        context.restoreAuthSystemState();
         // A token must be provided for reinstate operation. The person
         // is used in the provenance note.
         String token = getAuthToken(admin.getEmail(), password);
@@ -687,6 +705,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                                .withdrawn()
                                .build();
 
+        context.restoreAuthSystemState();
         String tokenAdmin = getAuthToken(admin.getEmail(), password);
 
         List<Operation> ops = new ArrayList<Operation>();
@@ -735,6 +754,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                                .withdrawn()
                                .build();
 
+        context.restoreAuthSystemState();
         String token = getAuthToken(eperson.getEmail(), password);
         String tokenAdmin = getAuthToken(admin.getEmail(), password);
 
@@ -780,6 +800,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                                .makeUnDiscoverable()
                                .build();
 
+        context.restoreAuthSystemState();
         String token = getAuthToken(admin.getEmail(), password);
 
         List<Operation> ops = new ArrayList<Operation>();
@@ -833,6 +854,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                                .makeUnDiscoverable()
                                .build();
 
+        context.restoreAuthSystemState();
         String token = getAuthToken(admin.getEmail(), password);
 
         List<Operation> ops = new ArrayList<Operation>();
@@ -876,6 +898,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                                .makeUnDiscoverable()
                                .build();
 
+        context.restoreAuthSystemState();
         String token = getAuthToken(eperson.getEmail(), password);
         String tokenAdmin = getAuthToken(admin.getEmail(), password);
 
@@ -919,6 +942,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                                .withSubject("ExtraEntry")
                                .build();
 
+        context.restoreAuthSystemState();
         String token = getAuthToken(admin.getEmail(), password);
 
         List<Operation> ops = new ArrayList<Operation>();
@@ -964,6 +988,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                                .withSubject("ExtraEntry")
                                .build();
 
+        context.restoreAuthSystemState();
         String token = getAuthToken(admin.getEmail(), password);
 
         List<Operation> ops = new ArrayList<Operation>();
@@ -1010,6 +1035,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                                .withSubject("ExtraEntry")
                                .build();
 
+        context.restoreAuthSystemState();
         String token = getAuthToken(admin.getEmail(), password);
 
         List<Operation> ops = new ArrayList<Operation>();
@@ -1053,6 +1079,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                                .withSubject("ExtraEntry")
                                .build();
 
+        context.restoreAuthSystemState();
         String token = getAuthToken(eperson.getEmail(), password);
         String tokenAdmin = getAuthToken(admin.getEmail(), password);
 
@@ -1107,6 +1134,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                                .makeUnDiscoverable()
                                .build();
 
+        context.restoreAuthSystemState();
         String token = getAuthToken(admin.getEmail(), password);
 
         List<Operation> ops = new ArrayList<Operation>();
@@ -1174,6 +1202,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                                          .build();
         }
 
+        context.restoreAuthSystemState();
         // Check publicItem creation
         getClient().perform(get("/api/core/items/" + publicItem.getID()))
                    .andExpect(status().isOk());
@@ -1218,6 +1247,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         Item templateItem = col1.getTemplateItem();
 
+        context.restoreAuthSystemState();
         String token = getAuthToken(admin.getEmail(), password);
 
         //Trying to delete a templateItem should fail with 422
@@ -1246,6 +1276,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         WorkspaceItem workspaceItem = WorkspaceItemBuilder.createWorkspaceItem(context, col1)
                             .build();
 
+        context.restoreAuthSystemState();
         String token = getAuthToken(admin.getEmail(), password);
 
         //Trying to delete a workspaceItem should fail with 422
@@ -1705,8 +1736,11 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                                            .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
 
+        context.restoreAuthSystemState();
 
-
+        UUID idRef = null;
+        AtomicReference<UUID> idRefNoEmbeds = new AtomicReference<UUID>();
+        try {
         ObjectMapper mapper = new ObjectMapper();
         ItemRest itemRest = new ItemRest();
         ItemRest itemRestFull = new ItemRest();
@@ -1749,8 +1783,9 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         String itemUuidString = String.valueOf(map.get("uuid"));
         String itemHandleString = String.valueOf(map.get("handle"));
 
+        idRef = UUID.fromString(itemUuidString);
         //TODO Refactor this to use the converter to Item instead of checking every property separately
-        getClient(token).perform(get("/api/core/items/" + itemUuidString))
+        getClient(token).perform(get("/api/core/items/" + idRef.toString()))
                         .andExpect(status().isOk())
                         .andExpect(jsonPath("$", Matchers.allOf(
                             hasJsonPath("$.id", is(itemUuidString)),
@@ -1759,24 +1794,30 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                             hasJsonPath("$.handle", is(itemHandleString)),
                             hasJsonPath("$.type", is("item")),
                             hasJsonPath("$.metadata", Matchers.allOf(
-                                MetadataMatcher.matchMetadata("dc.description",
+                                matchMetadata("dc.description",
                                     "<p>Some cool HTML code here</p>"),
-                                MetadataMatcher.matchMetadata("dc.description.abstract",
+                                matchMetadata("dc.description.abstract",
                                     "Sample item created via the REST API"),
-                                MetadataMatcher.matchMetadata("dc.description.tableofcontents",
+                                matchMetadata("dc.description.tableofcontents",
                                     "<p>HTML News</p>"),
-                                MetadataMatcher.matchMetadata("dc.rights",
+                                matchMetadata("dc.rights",
                                     "Custom Copyright Text"),
-                                MetadataMatcher.matchMetadata("dc.title",
+                                matchMetadata("dc.title",
                                     "Title Text")
                             )))));
 
-        MvcResult mvcResultFull = getClient(token).perform(post("/api/core/items?owningCollection=" +
+        getClient(token).perform(post("/api/core/items?owningCollection=" +
                 col1.getID().toString()).param("projection", "full")
                 .content(mapper.writeValueAsBytes(itemRestFull)).contentType(contentType))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$", ItemMatcher.matchFullEmbeds()))
-                .andReturn();
+                .andDo(result -> idRefNoEmbeds
+                        .set(UUID.fromString(read(result.getResponse().getContentAsString(), "$.id"))));
+
+        } finally {
+            ItemBuilder.deleteItem(idRef);
+            ItemBuilder.deleteItem(idRefNoEmbeds.get());
+        }
     }
 
     @Test
@@ -1793,6 +1834,10 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                                            .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
 
+        context.restoreAuthSystemState();
+
+        String itemUuidString = null;
+        try {
         ObjectMapper mapper = new ObjectMapper();
         ItemRest itemRest = new ItemRest();
         itemRest.setName("Practices of research data curation in institutional repositories:" +
@@ -1812,7 +1857,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         String content = mvcResult.getResponse().getContentAsString();
         Map<String,Object> map = mapper.readValue(content, Map.class);
-        String itemUuidString = String.valueOf(map.get("uuid"));
+        itemUuidString = String.valueOf(map.get("uuid"));
         String itemHandleString = String.valueOf(map.get("handle"));
 
         itemRest.setMetadata(new MetadataRest()
@@ -1825,14 +1870,10 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         itemRest.setUuid(itemUuidString);
         itemRest.setHandle(itemHandleString);
 
-        mvcResult = getClient(token).perform(put("/api/core/items/" + itemUuidString)
+        getClient(token).perform(put("/api/core/items/" + itemUuidString)
                                                            .content(mapper.writeValueAsBytes(itemRest))
                                                            .contentType(contentType))
-                                              .andExpect(status().isOk())
-                                              .andReturn();
-        map = mapper.readValue(content, Map.class);
-        itemUuidString = String.valueOf(map.get("uuid"));
-        itemHandleString = String.valueOf(map.get("handle"));
+                                              .andExpect(status().isOk());
 
         //TODO Refactor this to use the converter to Item instead of checking every property separately
         getClient(token).perform(get("/api/core/items/" + itemUuidString))
@@ -1844,17 +1885,20 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                             hasJsonPath("$.handle", is(itemHandleString)),
                             hasJsonPath("$.type", is("item")),
                             hasJsonPath("$.metadata", Matchers.allOf(
-                                MetadataMatcher.matchMetadata("dc.description",
+                                matchMetadata("dc.description",
                                     "<p>Some cool HTML code here</p>"),
-                                MetadataMatcher.matchMetadata("dc.description.abstract",
+                                matchMetadata("dc.description.abstract",
                                     "Sample item created via the REST API"),
-                                MetadataMatcher.matchMetadata("dc.description.tableofcontents",
+                                matchMetadata("dc.description.tableofcontents",
                                     "<p>HTML News</p>"),
-                                MetadataMatcher.matchMetadata("dc.rights",
+                                matchMetadata("dc.rights",
                                     "New Custom Copyright Text"),
-                                MetadataMatcher.matchMetadata("dc.title",
+                                matchMetadata("dc.title",
                                     "New title")
                             )))));
+        } finally {
+            ItemBuilder.deleteItem(UUID.fromString(itemUuidString));
+        }
     }
 
 
@@ -1874,7 +1918,9 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
 
 
-
+        context.restoreAuthSystemState();
+        String itemUuidString = null;
+        try {
         ObjectMapper mapper = new ObjectMapper();
         ItemRest itemRest = new ItemRest();
         itemRest.setName("Practices of research data curation in institutional repositories:" +
@@ -1900,7 +1946,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         String content = mvcResult.getResponse().getContentAsString();
         Map<String,Object> map = mapper.readValue(content, Map.class);
-        String itemUuidString = String.valueOf(map.get("uuid"));
+        itemUuidString = String.valueOf(map.get("uuid"));
         String itemHandleString = String.valueOf(map.get("handle"));
 
         //TODO Refactor this to use the converter to Item instead of checking every property separately
@@ -1913,15 +1959,15 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                             hasJsonPath("$.handle", is(itemHandleString)),
                             hasJsonPath("$.type", is("item")),
                             hasJsonPath("$.metadata", Matchers.allOf(
-                                MetadataMatcher.matchMetadata("dc.description",
+                                matchMetadata("dc.description",
                                     "<p>Some cool HTML code here</p>"),
-                                MetadataMatcher.matchMetadata("dc.description.abstract",
+                                matchMetadata("dc.description.abstract",
                                     "Sample item created via the REST API"),
-                                MetadataMatcher.matchMetadata("dc.description.tableofcontents",
+                                matchMetadata("dc.description.tableofcontents",
                                     "<p>HTML News</p>"),
-                                MetadataMatcher.matchMetadata("dc.rights",
+                                matchMetadata("dc.rights",
                                     "Custom Copyright Text"),
-                                MetadataMatcher.matchMetadata("dc.title",
+                                matchMetadata("dc.title",
                                     "Title Text")
                             )))));
 
@@ -1930,6 +1976,9 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         getClient(token).perform(get("/api/core/items/" + itemUuidString))
                         .andExpect(status().isNotFound());
+        } finally {
+            ItemBuilder.deleteItem(UUID.fromString(itemUuidString));
+        }
     }
 
     @Test
@@ -1947,8 +1996,10 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                                            .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
 
+        context.restoreAuthSystemState();
 
-
+        String itemUuidString = null;
+        try {
         ObjectMapper mapper = new ObjectMapper();
         ItemRest itemRest = new ItemRest();
         itemRest.setName("Practices of research data curation in institutional repositories:" +
@@ -1974,7 +2025,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         String content = mvcResult.getResponse().getContentAsString();
         Map<String,Object> map = mapper.readValue(content, Map.class);
-        String itemUuidString = String.valueOf(map.get("uuid"));
+        itemUuidString = String.valueOf(map.get("uuid"));
         String itemHandleString = String.valueOf(map.get("handle"));
 
         //TODO Refactor this to use the converter to Item instead of checking every property separately
@@ -1987,15 +2038,15 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                             hasJsonPath("$.handle", is(itemHandleString)),
                             hasJsonPath("$.type", is("item")),
                             hasJsonPath("$.metadata", Matchers.allOf(
-                                MetadataMatcher.matchMetadata("dc.description",
+                                matchMetadata("dc.description",
                                     "<p>Some cool HTML code here</p>"),
-                                MetadataMatcher.matchMetadata("dc.description.abstract",
+                                matchMetadata("dc.description.abstract",
                                     "Sample item created via the REST API"),
-                                MetadataMatcher.matchMetadata("dc.description.tableofcontents",
+                                matchMetadata("dc.description.tableofcontents",
                                     "<p>HTML News</p>"),
-                                MetadataMatcher.matchMetadata("dc.rights",
+                                matchMetadata("dc.rights",
                                     "Custom Copyright Text"),
-                                MetadataMatcher.matchMetadata("dc.title",
+                                matchMetadata("dc.title",
                                     "Title Text")
                             )))));
 
@@ -2004,6 +2055,9 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         getClient(token).perform(get("/api/core/items/" + itemUuidString))
                         .andExpect(status().isOk());
+        } finally {
+            ItemBuilder.deleteItem(UUID.fromString(itemUuidString));
+        }
     }
 
     @Test
@@ -2026,7 +2080,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                                      .withSubject("ExtraEntry")
                                      .build();
 
-
+        context.restoreAuthSystemState();
         String token = getAuthToken(admin.getEmail(), password);
 
         //Delete public item
@@ -2078,7 +2132,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                                            .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
 
-
+        context.restoreAuthSystemState();
         ObjectMapper mapper = new ObjectMapper();
         ItemRest itemRest = new ItemRest();
         itemRest.setName("Practices of research data curation in institutional repositories:" +
@@ -2116,7 +2170,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                                            .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
 
-
+        context.restoreAuthSystemState();
         ObjectMapper mapper = new ObjectMapper();
         ItemRest itemRest = new ItemRest();
         itemRest.setName("Practices of research data curation in institutional repositories:" +
@@ -2155,6 +2209,8 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         context.restoreAuthSystemState();
 
+        String itemUuidString = null;
+        try {
         ObjectMapper mapper = new ObjectMapper();
         ItemRest itemRest = new ItemRest();
         itemRest.setName("Practices of research data curation in institutional repositories:" +
@@ -2174,7 +2230,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         String content = mvcResult.getResponse().getContentAsString();
         Map<String,Object> map = mapper.readValue(content, Map.class);
-        String itemUuidString = String.valueOf(map.get("uuid"));
+        itemUuidString = String.valueOf(map.get("uuid"));
         String itemHandleString = String.valueOf(map.get("handle"));
 
         itemRest.setMetadata(new MetadataRest()
@@ -2193,6 +2249,9 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                                                  .content(mapper.writeValueAsBytes(itemRest))
                                                  .contentType(contentType))
                                     .andExpect(status().isForbidden());
+        } finally {
+            ItemBuilder.deleteItem(UUID.fromString(itemUuidString));
+        }
     }
 
     @Test
@@ -2211,6 +2270,8 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         context.restoreAuthSystemState();
 
+        String itemUuidString = null;
+        try {
         ObjectMapper mapper = new ObjectMapper();
         String token = getAuthToken(admin.getEmail(), password);
         MvcResult mvcResult = getClient(token).perform(post("/api/core/items?owningCollection="
@@ -2222,7 +2283,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         String content = mvcResult.getResponse().getContentAsString();
         Map<String,Object> map = mapper.readValue(content, Map.class);
-        String itemUuidString = String.valueOf(map.get("uuid"));
+        itemUuidString = String.valueOf(map.get("uuid"));
         String itemHandleString = String.valueOf(map.get("handle"));
 
         getClient(token).perform(get("/api/core/items/" + itemUuidString))
@@ -2233,8 +2294,11 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                             hasJsonPath("$.handle", is(itemHandleString)),
                             hasJsonPath("$.type", is("item")),
                             hasJsonPath("$.metadata", Matchers.allOf(
-                                MetadataMatcher.matchMetadata("dc.contributor.author", "Donald, Smith")
+                                matchMetadata("dc.contributor.author", "Donald, Smith")
                             )))));
+        } finally {
+            ItemBuilder.deleteItem(UUID.fromString(itemUuidString));
+        }
     }
 
     @Test
@@ -2244,7 +2308,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                                    .contentType(org.springframework.http.MediaType.parseMediaType(
                                        org.springframework.data.rest.webmvc.RestMediaTypes.TEXT_URI_LIST_VALUE))
                                    .content("https://localhost:8080/server/api/integration/externalsources/" +
-                                        "mock/entryValues/one")).andExpect(status().isBadRequest()).andReturn();
+                                        "mock/entryValues/one")).andExpect(status().isBadRequest());
     }
 
     @Test
@@ -2254,7 +2318,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                                      .contentType(org.springframework.http.MediaType.parseMediaType(
                                          org.springframework.data.rest.webmvc.RestMediaTypes.TEXT_URI_LIST_VALUE))
                                      .content("https://localhost:8080/server/api/integration/externalsources/" +
-                                          "mock/entryValues/one")).andExpect(status().isBadRequest()).andReturn();
+                                          "mock/entryValues/one")).andExpect(status().isBadRequest());
     }
 
     @Test
@@ -2273,7 +2337,6 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         context.restoreAuthSystemState();
 
-        ObjectMapper mapper = new ObjectMapper();
         String token = getAuthToken(admin.getEmail(), password);
         getClient(token).perform(post("/api/core/items?owningCollection=" + col1.getID().toString())
                                     .contentType(org.springframework.http.MediaType.parseMediaType(
@@ -2552,4 +2615,88 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                                   .doesNotExist())
         ;
     }
+
+    @Test
+    public void testHiddenMetadataForAnonymousUser() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1").build();
+
+        Item item = ItemBuilder.createItem(context, col1)
+                                      .withTitle("Public item 1")
+                                      .withProvenanceData("Provenance data")
+                                      .build();
+
+        context.restoreAuthSystemState();
+
+
+        getClient().perform(get("/api/core/items/" + item.getID()))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$", ItemMatcher.matchItemProperties(item)))
+                   .andExpect(jsonPath("$.metadata", matchMetadata("dc.title", "Public item 1")))
+                   .andExpect(jsonPath("$.metadata", matchMetadataDoesNotExist("dc.description.provenance")));
+    }
+
+    @Test
+    public void testHiddenMetadataForAdminUser() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1").build();
+
+        Item item = ItemBuilder.createItem(context, col1)
+                               .withTitle("Public item 1")
+                               .withProvenanceData("Provenance data")
+                               .build();
+
+        context.restoreAuthSystemState();
+
+        String token = getAuthToken(admin.getEmail(), password);
+
+        getClient(token).perform(get("/api/core/items/" + item.getID()))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$", ItemMatcher.matchItemProperties(item)))
+                   .andExpect(jsonPath("$.metadata", matchMetadata("dc.title", "Public item 1")))
+                   .andExpect(jsonPath("$.metadata", matchMetadata("dc.description.provenance", "Provenance data")));
+    }
+
+    @Test
+    public void testHiddenMetadataForUserWithWriteRights() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1").build();
+
+        Item item = ItemBuilder.createItem(context, col1)
+                               .withTitle("Public item 1")
+                               .withProvenanceData("Provenance data")
+                               .build();
+
+        context.restoreAuthSystemState();
+
+
+        ResourcePolicyBuilder.createResourcePolicy(context)
+                             .withUser(eperson)
+                             .withAction(WRITE)
+                             .withDspaceObject(item)
+                             .build();
+
+        String token = getAuthToken(eperson.getEmail(), password);
+
+        getClient(token).perform(get("/api/core/items/" + item.getID()))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$", ItemMatcher.matchItemProperties(item)))
+                        .andExpect(jsonPath("$.metadata", matchMetadata("dc.title", "Public item 1")))
+                        .andExpect(jsonPath("$.metadata", matchMetadataDoesNotExist("dc.description.provenance")));
+
+    }
+
+
 }

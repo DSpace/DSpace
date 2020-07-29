@@ -12,6 +12,7 @@ import java.util.LinkedList;
 import org.dspace.app.rest.model.FacetConfigurationRest;
 import org.dspace.app.rest.model.hateoas.FacetConfigurationResource;
 import org.springframework.data.domain.Pageable;
+import org.springframework.hateoas.IanaLinkRelations;
 import org.springframework.hateoas.Link;
 import org.springframework.stereotype.Component;
 
@@ -31,7 +32,7 @@ public class FacetConfigurationResourceHalLinkFactory extends DiscoveryRestHalLi
         FacetConfigurationRest data = halResource.getContent();
 
         if (data != null) {
-            list.add(buildLink(Link.REL_SELF, getMethodOn()
+            list.add(buildLink(IanaLinkRelations.SELF.value(), getMethodOn()
                 .getFacetsConfiguration(data.getScope(), data.getConfiguration(), page)));
         }
     }
