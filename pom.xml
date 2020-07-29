@@ -1238,13 +1238,13 @@
             <dependency>
                 <groupId>net.handle</groupId>
                 <artifactId>handle</artifactId>
-                <version>9.3.0-SNAPSHOT</version>
+                <version>9.3.0</version>
             </dependency>
             <!-- Required to run Handle Server -->
             <dependency>
                 <groupId>net.cnri</groupId>
                 <artifactId>cnri-servlet-container</artifactId>
-                <version>3.0.0-SNAPSHOT</version>
+                <version>3.0.0</version>
             </dependency>
             <!-- Jetty is needed to run Handle Server (and tests in some modules) -->
             <dependency>
