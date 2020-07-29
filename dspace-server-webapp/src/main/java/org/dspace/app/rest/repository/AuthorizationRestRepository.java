@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import org.apache.commons.lang3.ObjectUtils;
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.authorization.Authorization;
@@ -155,7 +156,7 @@ public class AuthorizationRestRepository extends DSpaceRestRepository<Authorizat
         EPerson currUser = context.getCurrentUser();
         // get the user specified in the requested parameters, can be null for anonymous
         EPerson user = getUserFromRequestParameter(context, epersonUuid);
-        if (currUser != user) {
+        if (ObjectUtils.notEqual(currUser, user)) {
             // Temporarily change the Context's current user in order to retrieve
             // authorizations based on that user
             context.switchContextUser(user);
@@ -173,7 +174,7 @@ public class AuthorizationRestRepository extends DSpaceRestRepository<Authorizat
             // restore the real current user
             context.restoreContextUser();
         }
-        return converter.toRestPage(utils.getPage(authorizations, pageable), utils.obtainProjection());
+        return converter.toRestPage(authorizations, pageable, utils.obtainProjection());
     }
 
     /**
@@ -241,25 +242,27 @@ public class AuthorizationRestRepository extends DSpaceRestRepository<Authorizat
      */
     private EPerson getUserFromRequestParameter(Context context, UUID epersonUuid)
             throws AuthorizeException, SQLException {
+
         EPerson currUser = context.getCurrentUser();
-        EPerson user = currUser;
-        if (epersonUuid != null) {
+
+        if (epersonUuid == null) {
+            // no user is specified in the request parameters, check the permissions for the current user
+            return currUser;
+
+        } else {
+            // a user is specified in the request parameters
+
             if (currUser == null) {
                 throw new AuthorizeException("attempt to anonymously access the authorization of the eperson "
                         + epersonUuid);
-            } else {
-                // an user is specified in the request parameters
-                if (!authorizeService.isAdmin(context) && !epersonUuid.equals(currUser.getID())) {
-                    throw new AuthorizeException("attempt to access the authorization of the eperson " + epersonUuid
-                            + " only system administrators can see the authorization of other users");
-                }
-                user = epersonService.find(context, epersonUuid);
+
+            } else if (!authorizeService.isAdmin(context) && !epersonUuid.equals(currUser.getID())) {
+                throw new AuthorizeException("attempt to access the authorization of the eperson " + epersonUuid
+                        + " as a non-admin; only system administrators can see the authorization of other users");
             }
-        } else {
-            // the request asks to check the permission for the anonymous user
-            user = null;
+
+            return epersonService.find(context, epersonUuid);
         }
-        return user;
     }
 
     @Override

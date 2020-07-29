@@ -11,12 +11,14 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.SortedMap;
 import java.util.UUID;
 import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
@@ -24,6 +26,9 @@ import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.BitstreamRest;
 import org.dspace.app.rest.model.CommunityRest;
+import org.dspace.app.rest.model.GroupRest;
+import org.dspace.app.rest.model.MetadataRest;
+import org.dspace.app.rest.model.MetadataValueRest;
 import org.dspace.app.rest.model.patch.Patch;
 import org.dspace.app.rest.utils.CommunityRestEqualityUtils;
 import org.dspace.authorize.AuthorizeException;
@@ -39,6 +44,8 @@ import org.dspace.discovery.IndexableObject;
 import org.dspace.discovery.SearchService;
 import org.dspace.discovery.SearchServiceException;
 import org.dspace.discovery.indexobject.IndexableCommunity;
+import org.dspace.eperson.Group;
+import org.dspace.eperson.service.GroupService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -64,6 +71,9 @@ public class CommunityRestRepository extends DSpaceObjectRestRepository<Communit
 
     @Autowired
     CommunityRestEqualityUtils communityRestEqualityUtils;
+
+    @Autowired
+    private GroupService groupService;
 
     @Autowired
     SearchService searchService;
@@ -191,7 +201,7 @@ public class CommunityRestRepository extends DSpaceObjectRestRepository<Communit
     public Page<CommunityRest> findAllTop(Pageable pageable) {
         try {
             List<Community> communities = cs.findAllTop(obtainContext());
-            return converter.toRestPage(utils.getPage(communities, pageable), utils.obtainProjection());
+            return converter.toRestPage(communities, pageable, utils.obtainProjection());
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -277,5 +287,59 @@ public class CommunityRestRepository extends DSpaceObjectRestRepository<Communit
         cs.update(context, community);
         bitstreamService.update(context, bitstream);
         return converter.toRest(context.reloadEntity(bitstream), utils.obtainProjection());
+    }
+
+    /**
+     * This method will create an AdminGroup for the given Community with the given Information through JSON
+     * @param context   The current context
+     * @param request   The current request
+     * @param community The community for which we'll create an admingroup
+     * @return          The created AdminGroup's REST object
+     * @throws SQLException If something goes wrong
+     * @throws AuthorizeException   If something goes wrong
+     */
+    public GroupRest createAdminGroup(Context context, HttpServletRequest request, Community community)
+        throws SQLException, AuthorizeException {
+
+        Group group = cs.createAdministrators(context, community);
+        ObjectMapper mapper = new ObjectMapper();
+        GroupRest groupRest = new GroupRest();
+        try {
+            ServletInputStream input = request.getInputStream();
+            groupRest = mapper.readValue(input, GroupRest.class);
+            if (groupRest.isPermanent() || StringUtils.isNotBlank(groupRest.getName())) {
+                throw new UnprocessableEntityException("The given GroupRest object has to be non-permanent and can't" +
+                                                           " contain a name");
+            }
+            MetadataRest metadata = groupRest.getMetadata();
+            SortedMap<String, List<MetadataValueRest>> map = metadata.getMap();
+            if (map != null) {
+                List<MetadataValueRest> dcTitleMetadata = map.get("dc.title");
+                if (dcTitleMetadata != null) {
+                    if (!dcTitleMetadata.isEmpty()) {
+                        throw new UnprocessableEntityException("The given GroupRest can't contain a dc.title mdv");
+                    }
+                }
+            }
+            metadataConverter.setMetadata(context, group, metadata);
+        } catch (IOException e1) {
+            throw new UnprocessableEntityException("Error parsing request body.", e1);
+        }
+        return converter.toRest(group, utils.obtainProjection());
+    }
+
+    /**
+     * This method will delete the AdminGroup for the given Community
+     * @param context       The current context
+     * @param community     The community for which we'll delete the admingroup
+     * @throws SQLException If something goes wrong
+     * @throws AuthorizeException   If something goes wrong
+     * @throws IOException  If something goes wrong
+     */
+    public void deleteAdminGroup(Context context, Community community)
+        throws SQLException, AuthorizeException, IOException {
+        Group adminGroup = community.getAdministrators();
+        cs.removeAdministrators(context, community);
+        groupService.delete(context, adminGroup);
     }
 }

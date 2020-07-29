@@ -27,7 +27,7 @@ public class ShibbolethRestControllerIT extends AbstractControllerIntegrationTes
 
         getClient(token).perform(get("/api/authn/shibboleth"))
                 .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("http://localhost:3000"));
+                .andExpect(redirectedUrl("http://localhost:4000"));
     }
 
     @Test

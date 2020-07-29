@@ -12,7 +12,7 @@
     <parent>
         <groupId>org.dspace</groupId>
         <artifactId>dspace-parent</artifactId>
-        <version>7.0-SNAPSHOT</version>
+        <version>7.0-beta4-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
 
@@ -97,20 +97,6 @@
                         </goals>
                     </execution>
                 </executions>
-            </plugin>
-            <!-- Verify OS license headers for all source code files -->
-            <plugin>
-                <groupId>com.mycila</groupId>
-                <artifactId>license-maven-plugin</artifactId>
-                <configuration>
-                    <excludes>
-                        <exclude>**/src/test/resources/**</exclude>
-                        <exclude>**/src/test/data/**</exclude>
-                        <exclude>**/.gitignore</exclude>
-                        <exclude>**/src/main/resources/rebel.xml</exclude>
-                        <exclude>src/test/data/dspaceFolder/config/spiders/**</exclude>
-                    </excludes>
-                </configuration>
             </plugin>
 
             <plugin>
@@ -305,18 +291,24 @@
         </dependency>
 
         <dependency>
-            <groupId>org.dspace</groupId>
+            <groupId>net.handle</groupId>
             <artifactId>handle</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.eclipse.jetty.aggregate</groupId>
-            <artifactId>jetty-all</artifactId>
+            <groupId>net.cnri</groupId>
+            <artifactId>cnri-servlet-container</artifactId>
             <exclusions>
+                <!-- Newer versions provided in our parent POM -->
                 <exclusion>
-                    <artifactId>javax.servlet</artifactId>
-                    <groupId>org.eclipse.jetty.orbit</groupId>
+                    <groupId>org.ow2.asm</groupId>
+                    <artifactId>asm-commons</artifactId>
                 </exclusion>
             </exclusions>
+        </dependency>
+        <!-- Jetty is needed to run Handle Server -->
+        <dependency>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-server</artifactId>
         </dependency>
         <dependency>
             <groupId>org.dspace</groupId>
@@ -489,6 +481,61 @@
             <groupId>org.apache.solr</groupId>
             <artifactId>solr-cell</artifactId>
             <version>${solr.client.version}</version>
+            <exclusions>
+                <!-- Newer versions provided in our parent POM -->
+                <exclusion>
+                    <groupId>org.ow2.asm</groupId>
+                    <artifactId>asm-commons</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.bouncycastle</groupId>
+                    <artifactId>bcpkix-jdk15on</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.bouncycastle</groupId>
+                    <artifactId>bcprov-jdk15on</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.eclipse.jetty</groupId>
+                    <artifactId>jetty-xml</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.eclipse.jetty</groupId>
+                    <artifactId>jetty-http</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.eclipse.jetty</groupId>
+                    <artifactId>jetty-servlet</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.eclipse.jetty</groupId>
+                    <artifactId>jetty-webapp</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.eclipse.jetty</groupId>
+                    <artifactId>jetty-util</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.eclipse.jetty</groupId>
+                    <artifactId>jetty-deploy</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.eclipse.jetty</groupId>
+                    <artifactId>jetty-continuation</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.eclipse.jetty</groupId>
+                    <artifactId>jetty-servlets</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.eclipse.jetty</groupId>
+                    <artifactId>jetty-io</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.eclipse.jetty</groupId>
+                    <artifactId>jetty-security</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>

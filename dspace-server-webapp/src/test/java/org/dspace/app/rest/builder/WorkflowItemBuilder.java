@@ -86,64 +86,52 @@ public class WorkflowItemBuilder extends AbstractBuilder<XmlWorkflowItem, XmlWor
     }
 
     @Override
-    public void delete(XmlWorkflowItem dso) throws Exception {
-        try (Context c = new Context()) {
-            c.turnOffAuthorisationSystem();
-            XmlWorkflowItem attachedDso = c.reloadEntity(dso);
-            if (attachedDso != null) {
-                getService().delete(c, attachedDso);
-                item = null;
-            }
-            c.complete();
+    public void delete(Context c, XmlWorkflowItem dso) throws Exception {
+        if (dso != null) {
+            getService().delete(c, dso);
+            item = null;
         }
-
-        indexingService.commit();
     }
 
-    private void deleteWsi(WorkspaceItem dso) throws Exception {
-        try (Context c = new Context()) {
-            c.turnOffAuthorisationSystem();
-            WorkspaceItem attachedDso = c.reloadEntity(dso);
-            if (attachedDso != null) {
-                workspaceItemService.deleteAll(c, attachedDso);
-                item = null;
-            }
-            c.complete();
+    private void deleteWsi(Context c, WorkspaceItem dso) throws Exception {
+        if (dso != null) {
+            workspaceItemService.deleteAll(c, dso);
+            item = null;
         }
-
-        indexingService.commit();
     }
 
-    private void deleteItem(Item dso) throws Exception {
-        try (Context c = new Context()) {
-            c.turnOffAuthorisationSystem();
-            Item attachedDso = c.reloadEntity(dso);
-            if (attachedDso != null) {
-                // if we still have a reference to an item it could be an approved workflow or a rejected one. In the
-                // last case we need to remove the "new" workspaceitem
-                WorkspaceItem wi = workspaceItemService.findByItem(c, item);
-                if (wi != null) {
-                    workspaceItemService.deleteAll(c, wi);
-                } else {
-                    itemService.delete(c, attachedDso);
-                }
+    private void deleteItem(Context c, Item dso) throws Exception {
+        if (dso != null) {
+            // if we still have a reference to an item it could be an approved workflow or a rejected one. In the
+            // last case we need to remove the "new" workspaceitem
+            WorkspaceItem wi = workspaceItemService.findByItem(c, item);
+            if (wi != null) {
+                workspaceItemService.deleteAll(c, wi);
+            } else {
+                itemService.delete(c, dso);
             }
-            c.complete();
         }
-
-        indexingService.commit();
     }
 
     @Override
     public void cleanup() throws Exception {
-        if (workspaceItem != null) {
-            deleteWsi(workspaceItem);
-        }
-        if (workflowItem != null) {
-            delete(workflowItem);
-        }
-        if (item != null) {
-            deleteItem(item);
+        try (Context c = new Context()) {
+            c.turnOffAuthorisationSystem();
+            // Ensure object and any related objects are reloaded before checking to see what needs cleanup
+            workspaceItem = c.reloadEntity(workspaceItem);
+            workflowItem = c.reloadEntity(workflowItem);
+            item = c.reloadEntity(item);
+            if (workspaceItem != null) {
+                deleteWsi(c, workspaceItem);
+            }
+            if (workflowItem != null) {
+                delete(c, workflowItem);
+            }
+            if (item != null) {
+                deleteItem(c, item);
+            }
+            c.complete();
+            indexingService.commit();
         }
     }
 

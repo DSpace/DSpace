@@ -17,9 +17,9 @@ import org.dspace.app.rest.RootRestResourceController;
 public class RootRest extends RestAddressableModel {
     public static final String NAME = "root";
     public static final String CATEGORY = RestModel.ROOT;
-    private String dspaceURL;
+    private String dspaceUI;
     private String dspaceName;
-    private String dspaceRest;
+    private String dspaceServer;
 
     public String getCategory() {
         return CATEGORY;
@@ -33,13 +33,13 @@ public class RootRest extends RestAddressableModel {
         return RootRestResourceController.class;
     }
 
-    public String getDspaceURL() {
+    public String getDspaceUI() {
 
-        return dspaceURL;
+        return dspaceUI;
     }
 
-    public void setDspaceURL(String dspaceURL) {
-        this.dspaceURL = dspaceURL;
+    public void setDspaceUI(String dspaceUI) {
+        this.dspaceUI = dspaceUI;
     }
 
     public String getDspaceName() {
@@ -50,12 +50,12 @@ public class RootRest extends RestAddressableModel {
         this.dspaceName = dspaceName;
     }
 
-    public String getDspaceRest() {
-        return dspaceRest;
+    public String getDspaceServer() {
+        return dspaceServer;
     }
 
-    public void setDspaceRest(String dspaceRest) {
-        this.dspaceRest = dspaceRest;
+    public void setDspaceServer(String dspaceServerURL) {
+        this.dspaceServer = dspaceServerURL;
     }
 
     @Override
@@ -64,9 +64,9 @@ public class RootRest extends RestAddressableModel {
             new EqualsBuilder().append(this.getCategory(), ((RootRest) object).getCategory())
                                .append(this.getType(), ((RootRest) object).getType())
                                .append(this.getController(), ((RootRest) object).getController())
-                               .append(this.getDspaceURL(), ((RootRest) object).getDspaceURL())
+                               .append(this.getDspaceUI(), ((RootRest) object).getDspaceUI())
                                .append(this.getDspaceName(), ((RootRest) object).getDspaceName())
-                               .append(this.getDspaceRest(), ((RootRest) object).getDspaceRest())
+                               .append(this.getDspaceServer(), ((RootRest) object).getDspaceServer())
                                .isEquals());
     }
 
@@ -77,8 +77,8 @@ public class RootRest extends RestAddressableModel {
             .append(this.getType())
             .append(this.getController())
             .append(this.getDspaceName())
-            .append(this.getDspaceURL())
-            .append(this.getDspaceRest())
+            .append(this.getDspaceUI())
+            .append(this.getDspaceServer())
             .toHashCode();
     }
 }
