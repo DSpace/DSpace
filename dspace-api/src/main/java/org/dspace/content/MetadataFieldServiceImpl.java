@@ -22,6 +22,9 @@ import org.dspace.content.service.MetadataSchemaService;
 import org.dspace.content.service.MetadataValueService;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
+import org.dspace.discovery.IndexingService;
+import org.dspace.discovery.indexobject.IndexableMetadataField;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -46,6 +49,7 @@ public class MetadataFieldServiceImpl implements MetadataFieldService {
     protected MetadataValueService metadataValueService;
     @Autowired(required = true)
     protected MetadataSchemaService metadataSchemaService;
+    private IndexingService indexer;
 
     protected MetadataFieldServiceImpl() {
 
@@ -77,6 +81,8 @@ public class MetadataFieldServiceImpl implements MetadataFieldService {
 
         log.info(LogManager.getHeader(context, "create_metadata_field",
                                       "metadata_field_id=" + metadataField.getID()));
+        // Update the index of type metadatafield
+        this.updateMetadataFieldIndex(context);
         return metadataField;
     }
 
@@ -149,6 +155,8 @@ public class MetadataFieldServiceImpl implements MetadataFieldService {
                                       "metadata_field_id=" + metadataField.getID() + "element=" + metadataField
                                           .getElement()
                                           + "qualifier=" + metadataField.getQualifier()));
+        // Update the index of type metadatafield
+        this.updateMetadataFieldIndex(context);
     }
 
     @Override
@@ -177,6 +185,22 @@ public class MetadataFieldServiceImpl implements MetadataFieldService {
 
         log.info(LogManager.getHeader(context, "delete_metadata_field",
                                       "metadata_field_id=" + metadataField.getID()));
+        // Update the index of type metadatafield
+        this.updateMetadataFieldIndex(context);
+    }
+
+    /**
+     * Updates the index of type metadatafield. Indexed metadatafields are used by the /search/byFieldName endpoint,
+     * see MetadataFieldRestRepository
+     * @param context   DSpace context
+     */
+    private void updateMetadataFieldIndex(Context context) {
+        if (this.indexer == null) {
+            this.indexer = DSpaceServicesFactory.getInstance().getServiceManager()
+                                                .getServiceByName(IndexingService.class.getName(),
+                                                    IndexingService.class);
+        }
+        this.indexer.updateIndex(context, true, IndexableMetadataField.TYPE);
     }
 
     /**

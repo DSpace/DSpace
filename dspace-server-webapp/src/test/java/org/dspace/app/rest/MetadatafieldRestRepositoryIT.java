@@ -184,8 +184,6 @@ public class MetadatafieldRestRepositoryIT extends AbstractControllerIntegration
 
         context.restoreAuthSystemState();
 
-        super.runDSpaceScript("index-discovery", "-b");
-
         getClient().perform(get(SEARCH_BYFIELDNAME_ENDPOINT)
             .param("schema", schema.getName()))
                    .andExpect(status().isOk())
@@ -213,8 +211,6 @@ public class MetadatafieldRestRepositoryIT extends AbstractControllerIntegration
             .createMetadataField(context, schema2, "AnElement", "AQualifier2", "AScopeNote2").build();
 
         context.restoreAuthSystemState();
-
-        super.runDSpaceScript("index-discovery", "-b");
 
         getClient().perform(get(SEARCH_BYFIELDNAME_ENDPOINT)
             .param("element", "AnElement"))
@@ -249,8 +245,6 @@ public class MetadatafieldRestRepositoryIT extends AbstractControllerIntegration
             .createMetadataField(context, schema, "AnElement2", "AQualifier", "AScopeNote2").build();
 
         context.restoreAuthSystemState();
-
-        super.runDSpaceScript("index-discovery", "-b");
 
         getClient().perform(get(SEARCH_BYFIELDNAME_ENDPOINT)
             .param("element", "AnElement2")
@@ -290,8 +284,6 @@ public class MetadatafieldRestRepositoryIT extends AbstractControllerIntegration
 
         context.restoreAuthSystemState();
 
-        super.runDSpaceScript("index-discovery", "-b");
-
         getClient().perform(get(SEARCH_BYFIELDNAME_ENDPOINT)
             .param("schema", schema.getName())
             .param("qualifier", "AQualifier"))
@@ -308,6 +300,45 @@ public class MetadatafieldRestRepositoryIT extends AbstractControllerIntegration
                                                                                  )))
                    .andExpect(jsonPath("$.page.size", is(20)))
                    .andExpect(jsonPath("$.page.totalElements", is(2)));
+    }
+
+    @Test
+    public void findByFieldName_schemaElementAndQualifier() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        MetadataSchema schema = MetadataSchemaBuilder.createMetadataSchema(context, "ASchema",
+            "http://www.dspace.org/ns/aschema").build();
+        MetadataSchema schema2 = MetadataSchemaBuilder.createMetadataSchema(context, "ASchema2",
+            "http://www.dspace.org/ns/aschema2").build();
+
+        MetadataField metadataField = MetadataFieldBuilder
+            .createMetadataField(context, schema, "AnElement1", "AQualifier", "AScopeNote").build();
+
+        MetadataField metadataField2 = MetadataFieldBuilder
+            .createMetadataField(context, schema2, "AnElement2", "AQualifier", "AScopeNote2").build();
+
+        MetadataField metadataField3 = MetadataFieldBuilder
+            .createMetadataField(context, schema, "AnElement3", "AQualifier", "AScopeNote3").build();
+
+        context.restoreAuthSystemState();
+
+        getClient().perform(get(SEARCH_BYFIELDNAME_ENDPOINT)
+            .param("schema", schema.getName())
+            .param("element", metadataField3.getElement())
+            .param("qualifier", metadataField3.getQualifier()))
+                   .andExpect(status().isOk())
+                   .andExpect(content().contentType(contentType))
+                   .andExpect(jsonPath("$._embedded.metadatafields", Matchers.not(hasItem(
+                       MetadataFieldMatcher.matchMetadataField(metadataField))
+                                                                                 )))
+                   .andExpect(jsonPath("$._embedded.metadatafields", Matchers.not(hasItem(
+                       MetadataFieldMatcher.matchMetadataField(metadataField2))
+                                                                                 )))
+                   .andExpect(jsonPath("$._embedded.metadatafields", Matchers.hasItem(
+                       MetadataFieldMatcher.matchMetadataField(metadataField3))
+                                      ))
+                   .andExpect(jsonPath("$.page.size", is(20)))
+                   .andExpect(jsonPath("$.page.totalElements", is(1)));
     }
 
     @Test
@@ -329,8 +360,6 @@ public class MetadatafieldRestRepositoryIT extends AbstractControllerIntegration
             .createMetadataField(context, schema, "AnElement3", "AQualifier", "AScopeNote2").build();
 
         context.restoreAuthSystemState();
-
-        super.runDSpaceScript("index-discovery", "-b");
 
         getClient().perform(get(SEARCH_BYFIELDNAME_ENDPOINT)
             .param("query", schema.getName()))
@@ -401,8 +430,6 @@ public class MetadatafieldRestRepositoryIT extends AbstractControllerIntegration
 
         context.restoreAuthSystemState();
 
-        super.runDSpaceScript("index-discovery", "-b");
-
         getClient().perform(get(SEARCH_BYFIELDNAME_ENDPOINT)
             .param("query", "test"))
                    .andExpect(status().isOk())
@@ -453,6 +480,49 @@ public class MetadatafieldRestRepositoryIT extends AbstractControllerIntegration
                                 .andExpect(status().isOk())
                                 .andExpect(jsonPath("$", MetadataFieldMatcher.matchMetadataFieldByKeys(
                                     metadataSchema.getName(), "testElementForCreate", "testQualifierForCreate")));
+        } finally {
+            MetadataFieldBuilder.deleteMetadataField(idRef.get());
+        }
+    }
+
+    @Test
+    public void create_checkAddedToIndex() throws Exception {
+
+        MetadataFieldRest metadataFieldRest = new MetadataFieldRest();
+        metadataFieldRest.setElement("testElementForCreate");
+        metadataFieldRest.setQualifier("testQualifierForCreate");
+        metadataFieldRest.setScopeNote(SCOPE_NOTE);
+
+        String authToken = getAuthToken(admin.getEmail(), password);
+        AtomicReference<Integer> idRef = new AtomicReference<>();
+        try {
+            assertThat(metadataFieldService.findByElement(context, metadataSchema, ELEMENT, QUALIFIER), nullValue());
+
+            getClient(authToken)
+                .perform(post("/api/core/metadatafields")
+                    .param("schemaId", metadataSchema.getID() + "")
+                    .param("projection", "full")
+                    .content(new ObjectMapper().writeValueAsBytes(metadataFieldRest))
+                    .contentType(contentType))
+                .andExpect(status().isCreated())
+                .andDo(result -> idRef.set(read(result.getResponse().getContentAsString(), "$.id")));
+
+            getClient(authToken).perform(get("/api/core/metadatafields/" + idRef.get()))
+                                .andExpect(status().isOk())
+                                .andExpect(jsonPath("$", MetadataFieldMatcher.matchMetadataFieldByKeys(
+                                    metadataSchema.getName(), "testElementForCreate", "testQualifierForCreate")));
+
+            // new metadata field found in index
+            getClient().perform(get(SEARCH_BYFIELDNAME_ENDPOINT)
+                .param("schema", metadataSchema.getName())
+                .param("element", metadataFieldRest.getElement())
+                .param("qualifier", metadataFieldRest.getQualifier()))
+                       .andExpect(status().isOk())
+                       .andExpect(jsonPath("$._embedded.metadatafields", Matchers.hasItem(
+                           MetadataFieldMatcher.matchMetadataFieldByKeys(metadataSchema.getName(),
+                               metadataFieldRest.getElement(), metadataFieldRest.getQualifier()))
+                                          ))
+                       .andExpect(jsonPath("$.page.totalElements", is(1)));
         } finally {
             MetadataFieldBuilder.deleteMetadataField(idRef.get());
         }
@@ -575,6 +645,44 @@ public class MetadatafieldRestRepositoryIT extends AbstractControllerIntegration
     }
 
     @Test
+    public void delete_checkDeletedFromIndex() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        MetadataSchema schema = MetadataSchemaBuilder.createMetadataSchema(context, "ASchema",
+            "http://www.dspace.org/ns/aschema").build();
+
+        MetadataField metadataField = MetadataFieldBuilder.createMetadataField(context, schema, ELEMENT, QUALIFIER,
+            SCOPE_NOTE).build();
+
+        context.restoreAuthSystemState();
+
+        Integer id = metadataField.getID();
+
+        getClient().perform(get(SEARCH_BYFIELDNAME_ENDPOINT)
+            .param("schema", schema.getName())
+            .param("element", metadataField.getElement())
+            .param("qualifier", metadataField.getQualifier()))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$._embedded.metadatafields", Matchers.hasItem(
+                       MetadataFieldMatcher.matchMetadataField(metadataField))
+                                      ));
+
+        getClient(getAuthToken(admin.getEmail(), password))
+            .perform(delete("/api/core/metadatafields/" + id))
+            .andExpect(status().isNoContent());
+
+        assertThat(metadataFieldService.find(context, id), nullValue());
+
+        // deleted metadata field not found in index
+        getClient().perform(get(SEARCH_BYFIELDNAME_ENDPOINT)
+            .param("schema", schema.getName())
+            .param("element", metadataField.getElement())
+            .param("qualifier", metadataField.getQualifier()))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$.page.totalElements", is(0)));
+    }
+
+    @Test
     public void update() throws Exception {
         context.turnOffAuthorisationSystem();
 
@@ -600,6 +708,59 @@ public class MetadatafieldRestRepositoryIT extends AbstractControllerIntegration
                    .andExpect(jsonPath("$", MetadataFieldMatcher.matchMetadataFieldByKeys(
                        metadataSchema.getName(), ELEMENT_UPDATED, QUALIFIER_UPDATED)
                                       ));
+    }
+
+    @Test
+    public void update_checkUpdatedInIndex() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        MetadataField metadataField = MetadataFieldBuilder.createMetadataField(context, ELEMENT, QUALIFIER, SCOPE_NOTE)
+                                                          .build();
+
+        getClient().perform(get(SEARCH_BYFIELDNAME_ENDPOINT)
+            .param("schema", metadataSchema.getName())
+            .param("element", metadataField.getElement())
+            .param("qualifier", metadataField.getQualifier()))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$._embedded.metadatafields", Matchers.hasItem(
+                       MetadataFieldMatcher.matchMetadataFieldByKeys(metadataSchema.getName(),
+                           metadataField.getElement(), metadataField.getQualifier()))
+                                      ))
+                   .andExpect(jsonPath("$.page.totalElements", is(1)));
+
+        context.restoreAuthSystemState();
+
+        MetadataFieldRest metadataFieldRest = new MetadataFieldRest();
+        metadataFieldRest.setId(metadataField.getID());
+        metadataFieldRest.setElement(ELEMENT_UPDATED);
+        metadataFieldRest.setQualifier(QUALIFIER_UPDATED);
+        metadataFieldRest.setScopeNote(SCOPE_NOTE_UPDATED);
+
+        getClient(getAuthToken(admin.getEmail(), password))
+            .perform(put("/api/core/metadatafields/" + metadataField.getID())
+                .content(new ObjectMapper().writeValueAsBytes(metadataFieldRest))
+                .contentType(contentType))
+            .andExpect(status().isOk());
+
+        // new metadata field found in index
+        getClient().perform(get(SEARCH_BYFIELDNAME_ENDPOINT)
+            .param("schema", metadataSchema.getName())
+            .param("element", ELEMENT_UPDATED)
+            .param("qualifier", QUALIFIER_UPDATED))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$._embedded.metadatafields", Matchers.hasItem(
+                       MetadataFieldMatcher.matchMetadataFieldByKeys(metadataSchema.getName(),
+                           ELEMENT_UPDATED, QUALIFIER_UPDATED))
+                                      ))
+                   .andExpect(jsonPath("$.page.totalElements", is(1)));
+
+        // original metadata field not found in index
+        getClient().perform(get(SEARCH_BYFIELDNAME_ENDPOINT)
+            .param("schema", metadataSchema.getName())
+            .param("element", metadataField.getElement())
+            .param("qualifier", metadataField.getQualifier()))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$.page.totalElements", is(0)));
     }
 
     @Test
