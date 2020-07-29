@@ -57,4 +57,12 @@ public class MetadataImportCLI extends MetadataImport {
             throw new ParseException("Unable to find DSpace user: " + e.getMessage());
         }
     }
+
+    @Override
+    public void setup() throws ParseException {
+        super.setup();
+        if (!commandLine.hasOption('e')) {
+            throw new ParseException("Required parameter -e missing!");
+        }
+    }
 }
