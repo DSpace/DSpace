@@ -154,6 +154,7 @@ public class JWTTokenRestAuthenticationServiceImpl implements RestAuthentication
         Cookie cookie = new Cookie(AUTHORIZATION_COOKIE, "");
         cookie.setHttpOnly(true);
         cookie.setMaxAge(0);
+        cookie.setSecure(true);
         response.addCookie(cookie);
     }
 
