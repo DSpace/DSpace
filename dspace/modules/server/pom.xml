@@ -13,7 +13,7 @@ just adding new jar in the classloader</description>
     <parent>
         <artifactId>modules</artifactId>
         <groupId>org.dspace</groupId>
-        <version>7.0-beta3-SNAPSHOT</version>
+        <version>7.0-beta4-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
 
@@ -194,7 +194,7 @@ just adding new jar in the classloader</description>
                 <dependency>
                     <groupId>org.dspace</groupId>
                     <artifactId>dspace-server-webapp</artifactId>
-                    <version>7.0-beta3-SNAPSHOT</version>
+                    <version>7.0-beta4-SNAPSHOT</version>
                     <type>test-jar</type>
                     <scope>test</scope>
                 </dependency>
@@ -266,6 +266,14 @@ just adding new jar in the classloader</description>
             <artifactId>solr-cell</artifactId>
             <scope>test</scope>
             <exclusions>
+                <exclusion>
+                    <groupId>org.bouncycastle</groupId>
+                    <artifactId>bcpkix-jdk15on</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.bouncycastle</groupId>
+                    <artifactId>bcprov-jdk15on</artifactId>
+                </exclusion>
                 <exclusion>
                     <groupId>org.eclipse.jetty</groupId>
                     <artifactId>jetty-continuation</artifactId>
