@@ -52,6 +52,22 @@ public class PubmedImportMetadataSourceServiceImpl extends AbstractImportMetadat
 
     private WebTarget pubmedWebTarget;
 
+    private List<String> supportedExtensions;
+
+    /**
+     * Set the file extensions supported by this metadata service
+     * 
+     * @param supportedExtensionsthe file extensions (xml,txt,...) supported by this service
+     */
+    public void setSupportedExtensions(List<String> supportedExtensions) {
+        this.supportedExtensions = supportedExtensions;
+    }
+
+    @Override
+    public List<String> getSupportedExtensions() {
+        return supportedExtensions;
+    }
+
     /**
      * Find the number of records matching a query;
      *
@@ -429,5 +445,4 @@ public class PubmedImportMetadataSourceServiceImpl extends AbstractImportMetadat
         }
         return records;
     }
-
 }

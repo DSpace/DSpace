@@ -36,6 +36,23 @@ public abstract class AbstractPlainMetadataSource
     protected abstract List<PlainMetadataSourceDto>
         readData(InputStream fileInpuStream) throws FileSourceException;
 
+
+    private List<String> supportedExtensions;
+
+    /**
+     * Set the file extensions supported by this metadata service
+     * 
+     * @param supportedExtensionsthe file extensions (xml,txt,...) supported by this service
+     */
+    public void setSupportedExtensions(List<String> supportedExtensions) {
+        this.supportedExtensions = supportedExtensions;
+    }
+
+    @Override
+    public List<String> getSupportedExtensions() {
+        return supportedExtensions;
+    }
+
     /**
      * Return a list of ImportRecord constructed from input file. This list is based on
      * the results retrieved from the file (InputStream) parsed through abstract method readData
