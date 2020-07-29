@@ -170,7 +170,6 @@
                          install of DSpace, against which Tests can be run. -->
                     <plugin>
                         <artifactId>maven-dependency-plugin</artifactId>
-                        <version>3.1.2</version>
                         <configuration>
                             <outputDirectory>${project.build.directory}/testing</outputDirectory>
                             <artifactItems>
