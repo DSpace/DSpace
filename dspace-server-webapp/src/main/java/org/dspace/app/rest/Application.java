@@ -140,11 +140,11 @@ public class Application extends SpringBootServletInitializer {
                             // Set Access-Control-Allow-Credentials to "true" and specify which origins are valid
                             // for our Access-Control-Allow-Origin header
                             .allowCredentials(corsAllowCredentials).allowedOrigins(corsAllowedOrigins)
-                            // Whitelist of request preflight headers allowed to be sent to us from the client
+                            // Allow list of request preflight headers allowed to be sent to us from the client
                             .allowedHeaders("Authorization", "Content-Type", "X-Requested-With", "accept", "Origin",
                                             "Access-Control-Request-Method", "Access-Control-Request-Headers",
                                             "X-On-Behalf-Of")
-                            // Whitelist of response headers allowed to be sent by us (the server)
+                            // Allow list of response headers allowed to be sent by us (the server)
                             .exposedHeaders("Access-Control-Allow-Origin", "Access-Control-Allow-Credentials",
                                             "Authorization");
                 }
