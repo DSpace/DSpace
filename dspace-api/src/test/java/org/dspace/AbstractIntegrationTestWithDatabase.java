@@ -15,7 +15,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.launcher.ScriptLauncher;
 import org.dspace.app.scripts.handler.impl.TestDSpaceRunnableHandler;
-import org.dspace.authority.AuthoritySearchService;
 import org.dspace.authority.MockAuthoritySolrServiceImpl;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.builder.AbstractBuilder;
@@ -23,12 +22,12 @@ import org.dspace.content.Community;
 import org.dspace.core.Context;
 import org.dspace.core.I18nUtil;
 import org.dspace.discovery.MockSolrSearchCore;
-import org.dspace.discovery.SolrSearchCore;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.eperson.service.GroupService;
+import org.dspace.kernel.ServiceManager;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.statistics.MockSolrLoggerServiceImpl;
 import org.dspace.storage.rdbms.DatabaseUtils;
@@ -181,21 +180,20 @@ public class AbstractIntegrationTestWithDatabase extends AbstractDSpaceIntegrati
             parentCommunity = null;
             cleanupContext();
 
+            ServiceManager serviceManager = DSpaceServicesFactory.getInstance().getServiceManager();
             // Clear the search core.
-            MockSolrSearchCore searchService = DSpaceServicesFactory.getInstance()
-                    .getServiceManager()
-                    .getServiceByName(SolrSearchCore.class.getName(), MockSolrSearchCore.class);
+            MockSolrSearchCore searchService = serviceManager
+                    .getServiceByName(null, MockSolrSearchCore.class);
             searchService.reset();
 
-            MockSolrLoggerServiceImpl statisticsService = DSpaceServicesFactory.getInstance()
-                    .getServiceManager()
-                    .getServiceByName("solrLoggerService", MockSolrLoggerServiceImpl.class);
+            MockSolrLoggerServiceImpl statisticsService = serviceManager
+                    .getServiceByName(null, MockSolrLoggerServiceImpl.class);
             statisticsService.reset();
 
-            MockAuthoritySolrServiceImpl authorityService = DSpaceServicesFactory.getInstance()
-                    .getServiceManager()
-                    .getServiceByName(AuthoritySearchService.class.getName(), MockAuthoritySolrServiceImpl.class);
+            MockAuthoritySolrServiceImpl authorityService = serviceManager
+                    .getServiceByName(null, MockAuthoritySolrServiceImpl.class);
             authorityService.reset();
+
             // Reload our ConfigurationService (to reset configs to defaults again)
             DSpaceServicesFactory.getInstance().getConfigurationService().reloadConfig();
 
@@ -209,6 +207,7 @@ public class AbstractIntegrationTestWithDatabase extends AbstractDSpaceIntegrati
     /**
      * Utility method to cleanup a created Context object (to save memory).
      * This can also be used by individual tests to cleanup context objects they create.
+     * @throws java.sql.SQLException passed through.
      */
     protected void cleanupContext() throws SQLException {
         // If context still valid, flush all database changes and close it

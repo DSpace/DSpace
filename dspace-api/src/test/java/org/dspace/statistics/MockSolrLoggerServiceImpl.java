@@ -60,7 +60,9 @@ public class MockSolrLoggerServiceImpl
     }
 
     /**
-     * A mock/fake GeoIP CityResponse, which will be used for *all* test statistical requests
+     * A mock/fake GeoIP CityResponse, which will be used for *all* test
+     * statistical requests.
+     *
      * @return faked CityResponse
      */
     private CityResponse mockCityResponse() {
@@ -79,7 +81,7 @@ public class MockSolrLoggerServiceImpl
                                                  new Traits());
     }
 
-    /** Remove all records. */
+    /** Reset the core for the next test.  See {@link MockSolrServer#reset()}. */
     public void reset() {
         mockSolrServer.reset();
     }
