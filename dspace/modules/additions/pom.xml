@@ -184,6 +184,10 @@
          <artifactId>dspace-api-lang</artifactId>
       </dependency>
       <dependency>
+          <groupId>org.dspace</groupId>
+          <artifactId>dspace-services</artifactId>
+      </dependency>
+      <dependency>
          <groupId>javax.servlet</groupId>
          <artifactId>javax.servlet-api</artifactId>
          <scope>provided</scope>
@@ -199,6 +203,35 @@
             </exclusion>
          </exclusions>
       </dependency>
+        <dependency>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-core</artifactId>
+            <version>${solr.client.version}</version>
+        </dependency>
+        <!-- Reminder: Keep icu4j (in Parent POM) synced with version used by lucene-analyzers-icu below,
+             otherwise ICUFoldingFilterFactory may throw errors in tests.  -->
+        <dependency>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-analyzers-icu</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-analyzers-smartcn</artifactId>
+            <version>${solr.client.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-analyzers-stempel</artifactId>
+            <version>${solr.client.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.xmlbeans</groupId>
+            <artifactId>xmlbeans</artifactId>
+            <version>2.6.0</version>
+        </dependency>
 
       <dependency>
          <groupId>junit</groupId>
