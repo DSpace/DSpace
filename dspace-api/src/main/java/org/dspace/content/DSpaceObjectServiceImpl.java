@@ -656,6 +656,8 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
                 return new String[] {"eperson", "language", null};
             case "entity-type":
                 return new String[] {MetadataSchemaEnum.RELATIONSHIP.getName(), "type", null};
+            case "submission-type":
+                return new String[] { MetadataSchemaEnum.CRIS.getName(), "submission", "definition" };
             default:
                 return new String[] {null, null, null};
         }

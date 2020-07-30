@@ -131,7 +131,7 @@
         </field>
       </row>
     </form>
-    <form name="rp-crisrp-affiliation">
+    <form name="person-crisrp-affiliation">
       <row>
         <field>
           <dc-schema>crisrp</dc-schema>
@@ -178,7 +178,7 @@
         </field>
       </row>
     </form>
-    <form name="rp-crisrp-qualification">
+    <form name="person-crisrp-qualification">
       <row>
         <field>
           <dc-schema>crisrp</dc-schema>
@@ -215,7 +215,7 @@
         </field>
       </row>
     </form>
-    <form name="rp-crisrp-education">
+    <form name="person-crisrp-education">
       <row>
         <field>
           <dc-schema>crisrp</dc-schema>
@@ -314,7 +314,7 @@
         </field>
       </row>
     </form>
-    <form name="rp-crisrp-site-url">
+    <form name="person-crisrp-site-url">
       <row>
         <field>
           <dc-schema>crisrp</dc-schema>
@@ -492,7 +492,7 @@ it, please enter the types and the actual numbers or codes.</hint>
           <input-type>onebox</input-type>
           <repeatable>false</repeatable>
           <required>You must select a publication type</required>
-          <hint>Select the type of content of the item.</hint>
+          <hint>Select the type(s) of content of the item. To select more than one value in the list, you may have to hold down the "CTRL" or "Shift" key.</hint>
           <vocabulary>types</vocabulary>
         </field>
       </row>
@@ -885,7 +885,7 @@ it, please enter the types and the actual numbers or codes.</hint>
           <dc-schema>dc</dc-schema>
           <dc-element>subject</dc-element>
           <label>Subject Keywords</label>
-          <input-type>onebox</input-type>
+          <input-type>tag</input-type>
           <repeatable>true</repeatable>
           <required />
           <hint>Enter appropriate subject keywords or phrases.</hint>
@@ -1170,7 +1170,7 @@ You can leave out the day and/or month if they aren't applicable.</hint>
         </field>
       </row>
     </form>
-    <form name="rp">
+    <form name="person">
       <row>
         <field>
           <dc-schema>dc</dc-schema>
@@ -1196,9 +1196,22 @@ You can leave out the day and/or month if they aren't applicable.</hint>
       </row>
       <row>
         <field>
-          <dc-schema>crisrp</dc-schema>
+          <dc-schema>cris</dc-schema>
           <dc-element>policy</dc-element>
-          <label>Policy</label>
+          <dc-qualifier>eperson</dc-qualifier>
+          <label>Eperson Policy</label>
+          <input-type>onebox</input-type>
+          <repeatable>false</repeatable>
+          <required />
+          <hint />
+        </field>
+      </row>
+      <row>
+        <field>
+          <dc-schema>cris</dc-schema>
+          <dc-element>policy</dc-element>
+          <dc-qualifier>group</dc-qualifier>
+          <label>Group Policy</label>
           <input-type>onebox</input-type>
           <repeatable>false</repeatable>
           <required />
@@ -1489,8 +1502,9 @@ You can leave out the day and/or month if they aren't applicable.</hint>
       </row>
       <row>
         <field>
-          <dc-schema>crisou</dc-schema>
+          <dc-schema>dc</dc-schema>
           <dc-element>description</dc-element>
+          <dc-qualifier>abstract</dc-qualifier>
           <label>Description for OrgUnit</label>
           <input-type>textarea</input-type>
           <repeatable>false</repeatable>

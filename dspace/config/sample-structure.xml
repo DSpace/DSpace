@@ -9,6 +9,7 @@
 		<collection>
 			<name>Person</name>
 			<entity-type>Person</entity-type>
+			<submission-type>person</submission-type>
 			<description />
 			<intro />
 			<copyright />
@@ -19,6 +20,7 @@
         <collection>
             <name>Project</name>
             <entity-type>Project</entity-type>
+			<submission-type>project</submission-type>
             <description />
             <intro />
             <copyright />
@@ -29,6 +31,7 @@
         <collection>
             <name>OrgUnit</name>
             <entity-type>OrgUnit</entity-type>
+			<submission-type>orgunit</submission-type>
             <description />
             <intro />
             <copyright />
@@ -39,6 +42,7 @@
         <collection>
             <name>Journal</name>
             <entity-type>Journal</entity-type>
+			<submission-type>journal</submission-type>
             <description />
             <intro />
             <copyright />
@@ -49,6 +53,7 @@
         <collection>
             <name>Publication</name>
             <entity-type>Publication</entity-type>
+			<submission-type>publication</submission-type>
             <description />
             <intro />
             <copyright />
@@ -59,6 +64,7 @@
         <collection>
             <name>Patent</name>
             <entity-type>Patent</entity-type>
+			<submission-type>patent</submission-type>
             <description />
             <intro />
             <copyright />
@@ -79,6 +85,7 @@
         <collection>
             <name>Event</name>
             <entity-type>Event</entity-type>
+			<submission-type>event</submission-type>
             <description />
             <intro />
             <copyright />
@@ -89,6 +96,7 @@
         <collection>
             <name>Equipment</name>
             <entity-type>Equipment</entity-type>
+			<submission-type>equipment</submission-type>
             <description />
             <intro />
             <copyright />

@@ -103,8 +103,8 @@
       <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
       <type>submission-form</type>
     </step>
-    <step id="rp" mandatory="true">
-      <heading>submit.progressbar.describe.rp</heading>
+    <step id="person" mandatory="true">
+      <heading>submit.progressbar.describe.person</heading>
       <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
       <type>submission-form</type>
     </step>
@@ -156,9 +156,9 @@
       <step id="upload" />
       <step id="license" />
     </submission-process>
-    <submission-process name="rp">
+    <submission-process name="person">
       <step id="collection" />
-      <step id="rp" />
+      <step id="person" />
       <step id="detect-duplicate"/>
       <step id="upload" />
       <step id="license" />

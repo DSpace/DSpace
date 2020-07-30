@@ -270,6 +270,7 @@ public class StructBuilder {
 
         collectionMap.put("name", "name");
         collectionMap.put("entity-type", "entity-type");
+        collectionMap.put("submission-type", "submission-type");
         collectionMap.put("description", "short_description");
         collectionMap.put("intro", "introductory_text");
         collectionMap.put("copyright", "copyright_text");
@@ -383,6 +384,12 @@ public class StructBuilder {
                 MetadataSchemaEnum.RELATIONSHIP.getName(), "type", null, Item.ANY);
         if (StringUtils.isNotBlank(entityType)) {
             element.addContent(new Element("entity-type").setText(entityType));
+        }
+
+        String submissionDefinition = collectionService.getMetadataFirstValue(collection,
+            MetadataSchemaEnum.CRIS.getName(), "submission", "definition", Item.ANY);
+        if (StringUtils.isNotBlank(entityType)) {
+            element.addContent(new Element("submission-type").setText(submissionDefinition));
         }
 
         return element;
@@ -784,6 +791,12 @@ public class StructBuilder {
                     "type", null, Item.ANY);
             if (StringUtils.isNotBlank(entityType)) {
                 element.addContent(new Element("entity-type").setText(entityType));
+            }
+
+            String submissionDefinition = collectionService.getMetadataFirstValue(collection,
+                MetadataSchemaEnum.CRIS.getName(), "submission", "definition", Item.ANY);
+            if (StringUtils.isNotBlank(entityType)) {
+                element.addContent(new Element("submission-type").setText(submissionDefinition));
             }
 
             elements[i] = element;
