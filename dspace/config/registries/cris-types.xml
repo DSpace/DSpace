@@ -29,5 +29,12 @@
         <qualifier>group</qualifier>
         <scope_note>Default metadata for custom policies rule</scope_note>
     </dc-type>
+    
+    <dc-type>
+		<schema>cris</schema>
+		<element>submission</element>
+		<qualifier>definition</qualifier>
+        <scope_note>Metadata to link a collection with a submission type</scope_note>
+	</dc-type>
 
 </dspace-dc-types>

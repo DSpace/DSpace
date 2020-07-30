@@ -87,6 +87,10 @@ public class CollectionBuilder extends AbstractDSpaceObjectBuilder<Collection> {
         return addMetadataValue(collection, MetadataSchemaEnum.DC.getName(), "title", null, language, name);
     }
 
+    public CollectionBuilder withSubmissionDefinition(final String name) {
+        return addMetadataValue(collection, "cris", "submission", "definition", null, name);
+    }
+
     public CollectionBuilder withLogo(final String content) throws AuthorizeException, IOException, SQLException {
 
         InputStream is = IOUtils.toInputStream(content, CharEncoding.UTF_8);

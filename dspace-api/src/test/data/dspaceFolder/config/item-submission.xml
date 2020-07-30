@@ -22,6 +22,7 @@
         <name-map collection-handle="123456789/language-test-1" submission-name="languagetestprocess"/>
         <name-map collection-handle="123456789/patent-test" submission-name="patent"/>
         <name-map collection-handle="123456789/traditional-cris" submission-name="traditional-cris"/>
+        <name-map collection-handle="entityType" submission-name="patent"/>
     </submission-map>
 
 

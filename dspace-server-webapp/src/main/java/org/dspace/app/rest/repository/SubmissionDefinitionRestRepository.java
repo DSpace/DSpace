@@ -68,10 +68,26 @@ public class SubmissionDefinitionRestRepository extends DSpaceRestRepository<Sub
         if (col == null) {
             return null;
         }
-        SubmissionDefinitionRest def = converter
-            .toRest(submissionConfigReader.getSubmissionConfigByCollection(col.getHandle()),
-                    utils.obtainProjection());
-        return def;
+
+        String submissionName = collectionService.getMetadataFirstValue(col, "cris", "submission", "definition", null);
+        if (submissionName != null) {
+            SubmissionConfig subConfig = submissionConfigReader.getSubmissionConfigByName(submissionName);
+            if (subConfig != null) {
+                return converter.toRest(subConfig, utils.obtainProjection());
+            }
+        }
+
+        submissionName = collectionService.getMetadataFirstValue(col, "relationship", "type", null, null);
+        if (submissionName != null) {
+            SubmissionConfig subConfig = submissionConfigReader.getSubmissionConfigByCollection(submissionName);
+            if (subConfig != null) {
+                return converter.toRest(subConfig, utils.obtainProjection());
+            }
+        }
+
+        submissionName = submissionConfigReader.getDefaultSubmissionConfigName();
+        SubmissionConfig subConfig = submissionConfigReader.getSubmissionConfigByName(submissionName);
+        return converter.toRest(subConfig, utils.obtainProjection());
     }
 
     @Override

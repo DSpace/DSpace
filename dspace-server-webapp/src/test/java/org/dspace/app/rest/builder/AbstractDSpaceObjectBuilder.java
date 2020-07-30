@@ -85,7 +85,7 @@ public abstract class AbstractDSpaceObjectBuilder<T extends DSpaceObject>
                                                                                   final String qualifier,
                                                                                   final String value) {
         try {
-            getService().setMetadataSingleValue(context, dso, schema, element, qualifier, Item.ANY, value);
+            getService().setMetadataSingleValue(context, dso, schema, element, qualifier, null, value);
         } catch (Exception e) {
             return handleException(e);
         }
