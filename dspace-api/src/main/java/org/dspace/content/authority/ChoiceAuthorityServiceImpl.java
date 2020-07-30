@@ -388,22 +388,22 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService 
      * @param fieldKey       the field key that use the authority
      */
     private void addFormDetailsToAuthorityCacheMap(String submissionName, String authorityName, String fieldKey) {
-        Map<String, List<String>> authorityName2definitions;
+        Map<String, List<String>> submissionDefinitionNames2fieldKeys;
         if (authoritiesFormDefinitions.containsKey(authorityName)) {
-            authorityName2definitions = authoritiesFormDefinitions.get(authorityName);
+            submissionDefinitionNames2fieldKeys = authoritiesFormDefinitions.get(authorityName);
         } else {
-            authorityName2definitions = new HashMap<String, List<String>>();
+            submissionDefinitionNames2fieldKeys = new HashMap<String, List<String>>();
         }
 
         List<String> fields;
-        if (authorityName2definitions.containsKey(submissionName)) {
-            fields = authorityName2definitions.get(submissionName);
+        if (submissionDefinitionNames2fieldKeys.containsKey(submissionName)) {
+            fields = submissionDefinitionNames2fieldKeys.get(submissionName);
         } else {
             fields = new ArrayList<String>();
         }
         fields.add(fieldKey);
-        authorityName2definitions.put(submissionName, fields);
-        authoritiesFormDefinitions.put(authorityName, authorityName2definitions);
+        submissionDefinitionNames2fieldKeys.put(submissionName, fields);
+        authoritiesFormDefinitions.put(authorityName, submissionDefinitionNames2fieldKeys);
     }
 
     /**
