@@ -260,7 +260,7 @@ public class SubmissionDefinitionsControllerIT extends AbstractControllerIntegra
 
         Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
             .withName("Collection 1")
-            .withRelationshipType("entityType")
+            .withRelationshipType("patent")
             .build();
 
         context.restoreAuthSystemState();

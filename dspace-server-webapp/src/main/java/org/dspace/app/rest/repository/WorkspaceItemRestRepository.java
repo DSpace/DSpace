@@ -407,8 +407,7 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
             collection = collectionService.findAuthorizedOptimized(context, Constants.ADD).get(0);
         }
 
-        SubmissionConfig submissionConfig =
-            submissionConfigReader.getSubmissionConfigByCollection(collection.getHandle());
+        SubmissionConfig submissionConfig = submissionConfigReader.getSubmissionConfigByCollection(collection);
         List<WorkspaceItem> result = null;
         List<ImportRecord> records = new ArrayList<>();
         try {

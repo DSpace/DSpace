@@ -150,19 +150,19 @@ public class DCInputsReader {
     }
 
     /**
-     * Returns the set of DC inputs used for a particular collection, or the
-     * default set if no inputs defined for the collection
+     * Returns the set of DC inputs used for a particular collection, or the default
+     * set if no inputs defined for the collection
      *
-     * @param collectionHandle collection's unique Handle
+     * @param collectionHandle collection
      * @return DC input set
      * @throws DCInputsReaderException if no default set defined
      * @throws ServletException
      */
-    public List<DCInputSet> getInputsByCollectionHandle(String collectionHandle)
+    public List<DCInputSet> getInputsByCollection(Collection collection)
         throws DCInputsReaderException {
         SubmissionConfig config;
         try {
-            config = new SubmissionConfigReader().getSubmissionConfigByCollection(collectionHandle);
+            config = new SubmissionConfigReader().getSubmissionConfigByCollection(collection);
             String formName = config.getSubmissionName();
             if (formName == null) {
                 throw new DCInputsReaderException("No form designated as default");
@@ -180,11 +180,11 @@ public class DCInputsReader {
         }
     }
 
-    public List<DCInputSet> getInputsUploadByCollectionHandle(String collectionHandle)
+    public List<DCInputSet> getInputsUploadByCollection(Collection collection)
             throws DCInputsReaderException {
         SubmissionConfig config;
         try {
-            config = new SubmissionConfigReader().getSubmissionConfigByCollection(collectionHandle);
+            config = new SubmissionConfigReader().getSubmissionConfigByCollection(collection);
             String formName = config.getSubmissionName();
             if (formName == null) {
                 throw new DCInputsReaderException("No form designated as default");
@@ -206,11 +206,11 @@ public class DCInputsReader {
 
     }
 
-    public List<DCInputSet> getInputsGroupByCollectionHandle(String collectionHandle)
+    public List<DCInputSet> getInputsGroupByCollection(Collection collection)
             throws DCInputsReaderException {
         SubmissionConfig config;
         try {
-            config = new SubmissionConfigReader().getSubmissionConfigByCollection(collectionHandle);
+            config = new SubmissionConfigReader().getSubmissionConfigByCollection(collection);
             String formName = config.getSubmissionName();
             if (formName == null) {
                 throw new DCInputsReaderException("No form designated as default");
@@ -782,9 +782,9 @@ public class DCInputsReader {
     public String getInputFormNameByCollectionAndField(Collection collection, String field)
         throws DCInputsReaderException {
         ArrayList<List<DCInputSet>> arrayInputSets = new ArrayList<List<DCInputSet>>();
-        arrayInputSets.add(getInputsGroupByCollectionHandle(collection.getHandle()));
-        arrayInputSets.add(getInputsByCollectionHandle(collection.getHandle()));
-        arrayInputSets.add(getInputsUploadByCollectionHandle(collection.getHandle()));
+        arrayInputSets.add(getInputsGroupByCollection(collection));
+        arrayInputSets.add(getInputsByCollection(collection));
+        arrayInputSets.add(getInputsUploadByCollection(collection));
 
         for (List<DCInputSet> inputSets: arrayInputSets) {
             for (DCInputSet inputSet : inputSets) {
