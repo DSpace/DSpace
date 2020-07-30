@@ -33,6 +33,7 @@ import org.dspace.scripts.factory.ScriptServiceFactory;
 import org.dspace.scripts.handler.DSpaceRunnableHandler;
 import org.dspace.scripts.service.ProcessService;
 import org.dspace.utils.DSpace;
+import org.springframework.core.task.TaskExecutor;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 /**
@@ -231,9 +232,9 @@ public class RestDSpaceRunnableHandler implements DSpaceRunnableHandler {
      * @param script    The script to be ran
      */
     public void schedule(DSpaceRunnable script) {
-        ThreadPoolTaskExecutor taskExecutor = new DSpace().getServiceManager()
-                                                          .getServiceByName("dspaceRunnableThreadExecutor",
-                                                                            ThreadPoolTaskExecutor.class);
+//        script.run();
+        TaskExecutor taskExecutor = new DSpace().getServiceManager()
+                                                .getServiceByName("dspaceRunnableThreadExecutor", TaskExecutor.class);
         Context context = new Context();
         try {
             Process process = processService.find(context, processId);
