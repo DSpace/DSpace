@@ -7,29 +7,45 @@
  */
 package org.dspace.app.rest.csv;
 
+import static com.jayway.jsonpath.JsonPath.read;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.fileUpload;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.io.BufferedWriter;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.io.OutputStreamWriter;
+import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
 
+import com.google.gson.Gson;
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.builder.CollectionBuilder;
 import org.dspace.app.rest.builder.CommunityBuilder;
 import org.dspace.app.rest.builder.ItemBuilder;
+import org.dspace.app.rest.builder.ProcessBuilder;
+import org.dspace.app.rest.converter.DSpaceRunnableParameterConverter;
+import org.dspace.app.rest.matcher.ProcessMatcher;
 import org.dspace.app.rest.matcher.RelationshipMatcher;
+import org.dspace.app.rest.model.ParameterValueRest;
+import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.test.AbstractEntityIntegrationTest;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
@@ -39,9 +55,12 @@ import org.dspace.content.service.EntityTypeService;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.RelationshipService;
 import org.dspace.content.service.RelationshipTypeService;
+import org.dspace.scripts.DSpaceCommandLineParameter;
 import org.hamcrest.Matchers;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 
 public class CsvImportIT extends AbstractEntityIntegrationTest {
 
@@ -56,6 +75,9 @@ public class CsvImportIT extends AbstractEntityIntegrationTest {
 
     @Autowired
     private ItemService itemService;
+
+    @Autowired
+    private DSpaceRunnableParameterConverter dSpaceRunnableParameterConverter;
 
     @Test
     public void createRelationshipsWithCsvImportTest() throws Exception {
@@ -120,6 +142,8 @@ public class CsvImportIT extends AbstractEntityIntegrationTest {
         getClient().perform(get("/api/core/items/" + article.getID())).andExpect(status().isOk());
 
         assertArticleRelationships(article, itemB, itemC, itemF);
+
+
 
     }
 
@@ -224,22 +248,37 @@ public class CsvImportIT extends AbstractEntityIntegrationTest {
     }
 
     private void performImportScript(String[] csv) throws Exception {
-        String filename = "test.csv";
-        BufferedWriter out = new BufferedWriter(
-            new OutputStreamWriter(
-                new FileOutputStream(filename), "UTF-8"));
-        for (String csvLine : csv) {
-            out.write(csvLine + "\n");
-        }
-        out.flush();
-        out.close();
-        out = null;
+        InputStream inputStream = new ByteArrayInputStream(String.join(System.lineSeparator(), Arrays.asList(csv)).getBytes(
+            StandardCharsets.UTF_8));
 
-        runDSpaceScript("metadata-import", "-f", filename, "-s");
+        MockMultipartFile bitstreamFile = new MockMultipartFile("file",
+                                                                "test.csv", MediaType.TEXT_PLAIN_VALUE,
+                                                                inputStream);
 
-        File file = new File(filename);
-        if (file.exists()) {
-            file.delete();
+        AtomicReference<Integer> idRef = new AtomicReference<>();
+
+        LinkedList<DSpaceCommandLineParameter> parameters = new LinkedList<>();
+        parameters.add(new DSpaceCommandLineParameter("-f", "test.csv"));
+        parameters.add(new DSpaceCommandLineParameter("-s", ""));
+
+        List<ParameterValueRest> list = parameters.stream()
+                                                  .map(dSpaceCommandLineParameter -> dSpaceRunnableParameterConverter
+                                                      .convert(dSpaceCommandLineParameter, Projection.DEFAULT))
+                                                  .collect(Collectors.toList());
+
+        try {
+            String token = getAuthToken(admin.getEmail(), password);
+
+            getClient(token)
+                .perform(fileUpload("/api/system/scripts/metadata-import/processes").file(bitstreamFile)
+                                                                                .param("properties",
+                                                                                       new Gson().toJson(list)))
+                .andExpect(status().isAccepted())
+                .andDo(result -> idRef
+                    .set(read(result.getResponse().getContentAsString(), "$.processId")));
+            String t = "";
+        } finally {
+            ProcessBuilder.deleteProcess(idRef.get());
         }
     }
 
@@ -267,36 +306,41 @@ public class CsvImportIT extends AbstractEntityIntegrationTest {
             .getID().toString();
         String[] csv = {"id,collection,dc.title,relationship.type,relation.isPublicationOfAuthor", csvLineString};
 
-        String filename = "test.csv";
-        BufferedWriter out = new BufferedWriter(
-            new OutputStreamWriter(
-                new FileOutputStream(filename), "UTF-8"));
-        for (String csvLine : csv) {
-            out.write(csvLine + "\n");
-        }
-        out.flush();
-        out.close();
-        out = null;
+        InputStream inputStream = new ByteArrayInputStream(String.join(System.lineSeparator(), Arrays.asList(csv)).getBytes(
+            StandardCharsets.UTF_8));
 
-        runDSpaceScript("metadata-import", "-f", filename, "-e", "admin@email.com", "-s");
+        MockMultipartFile bitstreamFile = new MockMultipartFile("file",
+                                                                "test.csv", MediaType.TEXT_PLAIN_VALUE,
+                                                                inputStream);
 
-        File file = new File(filename);
-        if (file.exists()) {
-            file.delete();
+        AtomicReference<Integer> idRef = new AtomicReference<>();
+
+        LinkedList<DSpaceCommandLineParameter> parameters = new LinkedList<>();
+        parameters.add(new DSpaceCommandLineParameter("-f", "test.csv"));
+        parameters.add(new DSpaceCommandLineParameter("-s", ""));
+        parameters.add(new DSpaceCommandLineParameter("-e", "dspace@dspace.com"));
+
+        List<ParameterValueRest> list = parameters.stream()
+                                                  .map(dSpaceCommandLineParameter -> dSpaceRunnableParameterConverter
+                                                      .convert(dSpaceCommandLineParameter, Projection.DEFAULT))
+                                                  .collect(Collectors.toList());
+
+        try {
+            String token = getAuthToken(admin.getEmail(), password);
+
+            getClient(token)
+                .perform(fileUpload("/api/system/scripts/metadata-import/processes").file(bitstreamFile)
+                                                                                    .param("properties",
+                                                                                           new Gson().toJson(list)))
+                .andExpect(status().isAccepted())
+                .andDo(result -> idRef
+                    .set(read(result.getResponse().getContentAsString(), "$.processId")));
+            String t = "";
+        } finally {
+            ProcessBuilder.deleteProcess(idRef.get());
         }
 
         Iterator<Item> itemIteratorItem = itemService.findByMetadataField(context, "dc", "title", null, "TestItemB");
-        Item item = itemIteratorItem.next();
-
-        List<Relationship> relationships = relationshipService.findByItem(context, item);
-        assertThat("Relationship list size is 1", relationships.size(), equalTo(1));
-        getClient().perform(get("/api/core/items/" + item.getID())).andExpect(status().isOk());
-        getClient().perform(get("/api/core/relationships/" + relationships.get(0).getID()).param("projection", "full"))
-                   .andExpect(status().isOk())
-                   .andExpect(jsonPath("$.leftPlace", is(0)))
-                   .andExpect(jsonPath("$.rightPlace", is(0)))
-                   .andExpect(jsonPath("$", Matchers.is(RelationshipMatcher.matchRelationship(relationships.get(0)))));
-
-        assertFalse(StringUtils.equalsIgnoreCase(item.getSubmitter().getEmail(), "admin@email.com"));
+        assertFalse(itemIteratorItem.hasNext());
     }
 }
