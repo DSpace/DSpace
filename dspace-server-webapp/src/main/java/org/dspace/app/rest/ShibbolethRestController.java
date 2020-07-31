@@ -49,6 +49,9 @@ public class ShibbolethRestController implements InitializingBean {
             .register(this, Arrays.asList(new Link("/api/" + AuthnRest.CATEGORY, "shibboleth")));
     }
 
+    // LGTM.com thinks this method has an unvalidated URL redirect (https://lgtm.com/rules/4840088/) in `redirectUrl`,
+    // even though we are clearly validating the hostname of `redirectUrl` and test it in ShibbolethRestControllerIT
+    @SuppressWarnings("lgtm[java/unvalidated-url-redirection]")
     @RequestMapping(method = RequestMethod.GET)
     public void shibboleth(HttpServletResponse response,
             @RequestParam(name = "redirectUrl", required = false) String redirectUrl) throws IOException {
