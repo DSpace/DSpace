@@ -34,7 +34,6 @@ import org.dspace.scripts.handler.DSpaceRunnableHandler;
 import org.dspace.scripts.service.ProcessService;
 import org.dspace.utils.DSpace;
 import org.springframework.core.task.TaskExecutor;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 /**
  * The {@link DSpaceRunnableHandler} dealing with Scripts started from the REST api
