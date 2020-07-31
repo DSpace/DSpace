@@ -11,7 +11,6 @@ import static com.jayway.jsonpath.JsonPath.read;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.fileUpload;
@@ -19,12 +18,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.InputStream;
-import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -36,13 +31,11 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 import com.google.gson.Gson;
-import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.builder.CollectionBuilder;
 import org.dspace.app.rest.builder.CommunityBuilder;
 import org.dspace.app.rest.builder.ItemBuilder;
 import org.dspace.app.rest.builder.ProcessBuilder;
 import org.dspace.app.rest.converter.DSpaceRunnableParameterConverter;
-import org.dspace.app.rest.matcher.ProcessMatcher;
 import org.dspace.app.rest.matcher.RelationshipMatcher;
 import org.dspace.app.rest.model.ParameterValueRest;
 import org.dspace.app.rest.projection.Projection;
@@ -248,8 +241,8 @@ public class CsvImportIT extends AbstractEntityIntegrationTest {
     }
 
     private void performImportScript(String[] csv) throws Exception {
-        InputStream inputStream = new ByteArrayInputStream(String.join(System.lineSeparator(), Arrays.asList(csv)).getBytes(
-            StandardCharsets.UTF_8));
+        InputStream inputStream = new ByteArrayInputStream(String.join(System.lineSeparator(),
+                                                               Arrays.asList(csv)).getBytes(StandardCharsets.UTF_8));
 
         MockMultipartFile bitstreamFile = new MockMultipartFile("file",
                                                                 "test.csv", MediaType.TEXT_PLAIN_VALUE,
@@ -306,8 +299,8 @@ public class CsvImportIT extends AbstractEntityIntegrationTest {
             .getID().toString();
         String[] csv = {"id,collection,dc.title,relationship.type,relation.isPublicationOfAuthor", csvLineString};
 
-        InputStream inputStream = new ByteArrayInputStream(String.join(System.lineSeparator(), Arrays.asList(csv)).getBytes(
-            StandardCharsets.UTF_8));
+        InputStream inputStream = new ByteArrayInputStream(String.join(System.lineSeparator(),
+                                                               Arrays.asList(csv)).getBytes(StandardCharsets.UTF_8));
 
         MockMultipartFile bitstreamFile = new MockMultipartFile("file",
                                                                 "test.csv", MediaType.TEXT_PLAIN_VALUE,
