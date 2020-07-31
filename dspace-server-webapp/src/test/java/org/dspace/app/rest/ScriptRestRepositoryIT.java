@@ -82,7 +82,9 @@ public class ScriptRestRepositoryIT extends AbstractControllerIntegrationTest {
                             ScriptMatcher.matchScript(scriptConfigurations.get(2).getName(),
                                                       scriptConfigurations.get(2).getDescription()),
                             ScriptMatcher.matchScript(scriptConfigurations.get(3).getName(),
-                                                      scriptConfigurations.get(3).getDescription())
+                                                      scriptConfigurations.get(3).getDescription()),
+                            ScriptMatcher.matchScript(scriptConfigurations.get(4).getName(),
+                                scriptConfigurations.get(4).getDescription())
                         )));
 
     }
@@ -139,7 +141,7 @@ public class ScriptRestRepositoryIT extends AbstractControllerIntegrationTest {
         getClient(token).perform(get("/api/system/scripts/mock-script"))
                         .andExpect(status().isOk())
                         .andExpect(jsonPath("$", ScriptMatcher
-                            .matchMockScript(scriptConfigurations.get(3).getOptions())));
+                            .matchMockScript(scriptConfigurations.get(scriptConfigurations.size() - 1).getOptions())));
     }
 
     @Test
