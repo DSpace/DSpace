@@ -231,7 +231,6 @@ public class RestDSpaceRunnableHandler implements DSpaceRunnableHandler {
      * @param script    The script to be ran
      */
     public void schedule(DSpaceRunnable script) {
-//        script.run();
         TaskExecutor taskExecutor = new DSpace().getServiceManager()
                                                 .getServiceByName("dspaceRunnableThreadExecutor", TaskExecutor.class);
         Context context = new Context();
