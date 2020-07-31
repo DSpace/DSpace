@@ -241,7 +241,7 @@ public class WorkflowDefinitionRestRepositoryIT extends AbstractControllerIntegr
         getClient(token).perform(get(WORKFLOW_DEFINITIONS_ENDPOINT + "/search/findByCollection?uuid=" + nonValidUUID))
             //We expect a 400 Illegal Argument Exception (Bad Request) cannot convert UUID
             .andExpect(status().isBadRequest())
-            .andExpect(status().reason(containsString("Failed to convert " + nonValidUUID)));
+            .andExpect(status().reason(containsString("A required parameter is invalid")));
     }
 
     @Test
