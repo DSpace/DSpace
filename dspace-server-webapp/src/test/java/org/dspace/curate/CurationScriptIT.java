@@ -8,8 +8,6 @@
 package org.dspace.curate;
 
 import static com.jayway.jsonpath.JsonPath.read;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.containsStringIgnoringCase;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -94,9 +92,7 @@ public class CurationScriptIT extends AbstractControllerIntegrationTest {
                                                  .param("properties",
                                                      new Gson().toJson(list)))
             // Illegal Argument Exception
-            .andExpect(status().isBadRequest())
-            // Contains the valid options
-            .andExpect(status().reason(containsString(CurationClientOptions.getTaskOptions().toString())));
+            .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -138,9 +134,7 @@ public class CurationScriptIT extends AbstractControllerIntegrationTest {
                                                  .param("properties",
                                                      new Gson().toJson(list)))
             // Illegal Argument Exception
-            .andExpect(status().isBadRequest())
-            // Contains -e (the missing required cl option
-            .andExpect(status().reason(containsString("-e")));
+            .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -183,9 +177,7 @@ public class CurationScriptIT extends AbstractControllerIntegrationTest {
                                                  .param("properties",
                                                      new Gson().toJson(list)))
             // Illegal Argument Exception
-            .andExpect(status().isBadRequest())
-            // Contains email
-            .andExpect(status().reason(containsString("email")));
+            .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -208,9 +200,7 @@ public class CurationScriptIT extends AbstractControllerIntegrationTest {
                                                  .param("properties",
                                                      new Gson().toJson(list)))
             // Illegal Argument Exception
-            .andExpect(status().isBadRequest())
-            // Contains handle
-            .andExpect(status().reason(containsString("handle")));
+            .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -234,9 +224,7 @@ public class CurationScriptIT extends AbstractControllerIntegrationTest {
                                                  .param("properties",
                                                      new Gson().toJson(list)))
             // Illegal Argument Exception
-            .andExpect(status().isBadRequest())
-            // Contains invalidHandle
-            .andExpect(status().reason(containsStringIgnoringCase("invalidhandle")));
+            .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -278,9 +266,7 @@ public class CurationScriptIT extends AbstractControllerIntegrationTest {
                                                  .param("properties",
                                                      new Gson().toJson(list)))
             // Illegal Argument Exception
-            .andExpect(status().isBadRequest())
-            // Contains task
-            .andExpect(status().reason(containsString("task")));
+            .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -328,9 +314,7 @@ public class CurationScriptIT extends AbstractControllerIntegrationTest {
                                                  .param("properties",
                                                      new Gson().toJson(list)))
             // Illegal Argument Exception
-            .andExpect(status().isBadRequest())
-            // Contains taskFile
-            .andExpect(status().reason(containsString("taskFile")));
+            .andExpect(status().isBadRequest());
     }
 
     @Test
