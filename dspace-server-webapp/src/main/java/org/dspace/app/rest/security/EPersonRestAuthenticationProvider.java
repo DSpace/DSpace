@@ -17,6 +17,7 @@ import java.util.Objects;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
+import org.dspace.app.rest.login.PostLoggedInAction;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.app.util.AuthorizeUtil;
 import org.dspace.authenticate.AuthenticationMethod;
@@ -62,6 +63,9 @@ public class EPersonRestAuthenticationProvider implements AuthenticationProvider
     @Autowired
     private HttpServletRequest request;
 
+    @Autowired
+    private List<PostLoggedInAction> postLoggedInActions;
+
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
         Context context = ContextUtil.obtainContext(request);
@@ -97,10 +101,13 @@ public class EPersonRestAuthenticationProvider implements AuthenticationProvider
                         .authenticate(newContext, name, password, null, request);
                     if (AuthenticationMethod.SUCCESS == authenticateResult) {
 
-                        log.info(LogManager
-                                     .getHeader(newContext, "login", "type=explicit"));
-
+                        log.info(LogManager.getHeader(newContext, "login", "type=explicit"));
                         output = createAuthentication(password, newContext);
+
+                        for (PostLoggedInAction action : postLoggedInActions) {
+                            action.loggedIn(newContext, request);
+                        }
+
                     } else {
                         log.info(LogManager.getHeader(newContext, "failed_login", "email="
                             + name + ", result="

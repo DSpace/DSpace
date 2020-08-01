@@ -37,4 +37,11 @@
         <scope_note>Metadata to link a collection with a submission type</scope_note>
 	</dc-type>
 
+    <dc-type>
+        <schema>cris</schema>
+        <element>owner</element>
+        <qualifier></qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
 </dspace-dc-types>

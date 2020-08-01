@@ -294,7 +294,7 @@ public class EZIDIdentifierProvider
             found = itemService.findByMetadataField(context,
                                                     MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER,
                                                     idToDOI(identifier));
-        } catch (IdentifierException | SQLException | AuthorizeException | IOException ex) {
+        } catch (IdentifierException | SQLException | AuthorizeException ex) {
             log.error(ex.getMessage());
             throw new IdentifierNotResolvableException(ex);
         }

@@ -534,16 +534,15 @@ public interface ItemService
      * @return an iterator over the items matching that authority value
      * @throws SQLException       if database error
      * @throws AuthorizeException if authorization error
-     * @throws IOException        if IO error
      */
     public Iterator<Item> findByMetadataField(Context context,
                                               String schema, String element, String qualifier, String value)
-        throws SQLException, AuthorizeException, IOException;
+        throws SQLException, AuthorizeException;
 
     public Iterator<Item> findByMetadataQuery(Context context, List<List<MetadataField>> listFieldList,
                                               List<String> query_op, List<String> query_val, List<UUID> collectionUuids,
                                               String regexClause, int offset, int limit)
-        throws SQLException, AuthorizeException, IOException;
+        throws SQLException, AuthorizeException;
 
     /**
      * Find all the items in the archive with a given authority key value
@@ -557,11 +556,10 @@ public interface ItemService
      * @return an iterator over the items matching that authority value
      * @throws SQLException       if database error
      * @throws AuthorizeException if authorization error
-     * @throws IOException        if IO error
      */
     public Iterator<Item> findByAuthorityValue(Context context,
                                                String schema, String element, String qualifier, String value)
-        throws SQLException, AuthorizeException, IOException;
+        throws SQLException, AuthorizeException;
 
 
     public Iterator<Item> findByMetadataFieldAuthority(Context context, String mdString, String authority)

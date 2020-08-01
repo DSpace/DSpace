@@ -13,6 +13,7 @@ import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.is;
 
 import org.hamcrest.Matcher;
+import org.hamcrest.Matchers;
 
 /**
  * Utility class to provide convenient matchers for metadata.
@@ -43,6 +44,22 @@ public class MetadataMatcher {
      */
     public static Matcher<? super Object> matchMetadata(String key, String value, int position) {
         return hasJsonPath("$.['" + key + "'][" + position + "].value", is(value));
+    }
+
+    /**
+     * Gets a matcher to ensure a given value is present at a specific position in
+     * the list of values for a given key.
+     *
+     * @param key       the metadata key.
+     * @param value     the value that must be present.
+     * @param authority the authority that must be present.
+     * @param position  the position it must be present at.
+     * @return the matcher.
+     */
+    public static Matcher<? super Object> matchMetadata(String key, String value, String authority, int position) {
+        Matcher<Object> hasValue = hasJsonPath("$.['" + key + "'][" + position + "].value", is(value));
+        Matcher<Object> hasAuthority = hasJsonPath("$.['" + key + "'][" + position + "].authority", is(authority));
+        return Matchers.allOf(hasValue, hasAuthority);
     }
 
     /**
