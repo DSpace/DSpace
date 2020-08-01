@@ -7,14 +7,26 @@
  */
 package org.dspace.app.rest.layout;
 
+import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
+import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import javax.ws.rs.core.MediaType;
+
 import org.dspace.app.rest.builder.CrisLayoutBoxBuilder;
 import org.dspace.app.rest.builder.CrisLayoutFieldBuilder;
 import org.dspace.app.rest.builder.EntityTypeBuilder;
+import org.dspace.app.rest.model.patch.AddOperation;
+import org.dspace.app.rest.model.patch.Operation;
+import org.dspace.app.rest.model.patch.RemoveOperation;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.content.EntityType;
 import org.dspace.content.MetadataField;
@@ -131,4 +143,111 @@ public class MetadataComponentsRestControllerIT extends AbstractControllerIntegr
             .andExpect(jsonPath("$.rows[2].fields.length()", Matchers.is(1)));
     }
 
+    @Test
+    public void patchAddMetadataTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        EntityType eType = EntityTypeBuilder.createEntityTypeBuilder(context, "Person").build();
+
+        CrisLayoutBox box = CrisLayoutBoxBuilder.createBuilder(context, eType, true, 0, true)
+                                                .withShortname("box-shortname-test")
+                                                .build();
+
+        context.restoreAuthSystemState();
+        String authToken = getAuthToken(admin.getEmail(), password);
+
+        List<Operation> operations = new ArrayList<Operation>();
+        List<Map<String, String>> metadataValues = new ArrayList<Map<String, String>>();
+        Map<String, String> values = new HashMap<String, String>();
+        values.put("metadata", "dc.contibutor.author");
+        values.put("label", "Author");
+        values.put("fieldType", "metadata");
+        metadataValues.add(values);
+        operations.add(new AddOperation("/rows/0/fields/0", metadataValues));
+
+        String patchBody = getPatchContent(operations);
+        getClient(authToken).perform(patch("/api/layout/metadatacomponents/box-shortname-test")
+                .content(patchBody)
+                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.rows[0].fields.length()", Matchers.is(1)))
+                .andExpect(jsonPath("$", Matchers.allOf(
+                        hasJsonPath("$.id", is("box-shortname-test")),
+                        hasJsonPath("$.type", is("metadatacomponent")),
+                        hasJsonPath("$.rows[0].fields[0].metadata", is("dc.contibutor.author")),
+                        hasJsonPath("$.rows[0].fields[0].label", is("Author")),
+                        hasJsonPath("$.rows[0].fields[0].fieldType", is("metadata"))
+                       )));
+
+    }
+
+    @Test
+    public void patchRemoveMetadataTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        EntityType eType = EntityTypeBuilder.createEntityTypeBuilder(context, "Person").build();
+
+        MetadataSchema schema = mdss.find(context, "dc");
+        MetadataField contributor = mfss.findByElement(context, schema, "contributor", "author");
+
+        CrisLayoutField fieldContributor = CrisLayoutFieldBuilder.createField(context, contributor, 0, 0)
+                                                                 .withLabel("Author")
+                                                                 .withRendering("")
+                                                                 .withStyle("STYLE")
+                                                                 .withType("metadata")
+                                                                 .build();
+
+        CrisLayoutBox box = CrisLayoutBoxBuilder.createBuilder(context, eType, true, 0, true)
+                .withShortname("box-shortname-test")
+                .addField(fieldContributor)
+                .build();
+
+        context.restoreAuthSystemState();
+        String authToken = getAuthToken(admin.getEmail(), password);
+
+        List<Operation> operations = new ArrayList<Operation>();
+        operations.add(new RemoveOperation("/rows/0/fields/0"));
+
+        String patchBody = getPatchContent(operations);
+        getClient(authToken).perform(patch("/api/layout/metadatacomponents/mybox")
+                .content(patchBody)
+                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                            .andExpect(status().isNoContent());
+
+        getClient(authToken).perform(get("/api/layout/metadatacomponents/" + box.getShortname()))
+                            .andExpect(status().isOk())
+                            .andExpect(content().contentType(contentType))
+                            .andExpect(jsonPath("$.id", Matchers.is(box.getShortname())))
+                            .andExpect(jsonPath("$.rows.length()", Matchers.is(3)))
+                            .andExpect(jsonPath("$.rows[0].fields.length()", Matchers.is(0)));
+    }
+
+    @Test
+    public void patchAddMetadataNotExistTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        EntityType eType = EntityTypeBuilder.createEntityTypeBuilder(context, "Person").build();
+
+        CrisLayoutBox box = CrisLayoutBoxBuilder.createBuilder(context, eType, true, 0, true)
+                                                .withShortname("box-shortname-test")
+                                                .build();
+
+        context.restoreAuthSystemState();
+        String authToken = getAuthToken(admin.getEmail(), password);
+
+        List<Operation> operations = new ArrayList<Operation>();
+        List<Map<String, String>> metadataValues = new ArrayList<Map<String, String>>();
+        Map<String, String> values = new HashMap<String, String>();
+        values.put("metadata", "dc.not.exist");
+        values.put("label", "wrong metadata");
+        values.put("fieldType", "metadata");
+        metadataValues.add(values);
+        operations.add(new AddOperation("/rows/0/fields/0", metadataValues));
+
+        String patchBody = getPatchContent(operations);
+        getClient(authToken).perform(patch("/api/layout/metadatacomponents/mybox")
+                .content(patchBody)
+                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                            .andExpect(status().isUnprocessableEntity());
+
+    }
 }
