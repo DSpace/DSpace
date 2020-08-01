@@ -56,15 +56,10 @@ public class Constants {
     public static final int EPERSON = 7;
 
     /**
-     * Type of individual profile objects
-     */
-    public static final int PROFILE = 8;
-
-    /**
      * lets you look up type names from the type IDs
      */
     public static final String[] typeText = { "BITSTREAM", "BUNDLE", "ITEM", "COLLECTION", "COMMUNITY", "SITE", "GROUP",
-        "EPERSON", "PROFILE" };
+        "EPERSON" };
 
     /**
      * Special Bundle and Bitstream Names:

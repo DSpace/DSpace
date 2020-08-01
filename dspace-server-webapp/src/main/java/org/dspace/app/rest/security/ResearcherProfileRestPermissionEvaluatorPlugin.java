@@ -14,8 +14,9 @@ import static org.dspace.app.rest.security.DSpaceRestPermission.WRITE;
 import java.io.Serializable;
 import java.util.UUID;
 
+import org.apache.commons.lang3.StringUtils;
+import org.dspace.app.rest.model.ResearcherProfileRest;
 import org.dspace.app.rest.utils.ContextUtil;
-import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.services.RequestService;
@@ -47,7 +48,7 @@ public class ResearcherProfileRestPermissionEvaluatorPlugin extends RestObjectPe
             return false;
         }
 
-        if (Constants.getTypeID(targetType) != Constants.PROFILE) {
+        if (!StringUtils.equalsIgnoreCase(targetType, ResearcherProfileRest.NAME)) {
             return false;
         }
 
