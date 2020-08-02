@@ -156,15 +156,22 @@ public class CrisLayoutBoxDAOImpl extends AbstractHibernateDAO<CrisLayoutBox> im
         return query.getResultList();
     }
 
-    /* (non-Javadoc)
-     * @see org.dspace.layout.dao.CrisLayoutBoxDAO#findByShortname(org.dspace.core.Context, java.lang.String)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.dspace.layout.dao.CrisLayoutBoxDAO#findByShortname(org.dspace.core.
+     * Context, java.lang.String, java.lang.String)
      */
     @Override
-    public CrisLayoutBox findByShortname(Context context, String shortname) throws SQLException {
+    public CrisLayoutBox findByShortname(Context context, Integer entityTypeId, String shortname) throws SQLException {
         CriteriaBuilder cb = getCriteriaBuilder(context);
         CriteriaQuery<CrisLayoutBox> query = cb.createQuery(CrisLayoutBox.class);
         Root<CrisLayoutBox> boxRoot = query.from(CrisLayoutBox.class);
-        query.where(cb.equal(boxRoot.get(CrisLayoutBox_.SHORTNAME), shortname));
+        Join<CrisLayoutBox, EntityType> join = boxRoot.join(CrisLayoutBox_.entitytype);
+        query.where(
+                cb.and(
+                        cb.equal(boxRoot.get(CrisLayoutBox_.SHORTNAME), shortname),
+                        cb.equal(join.get(EntityType_.id), entityTypeId)));
         TypedQuery<CrisLayoutBox> tq = getHibernateSession(context).createQuery(query);
         return tq.getSingleResult();
     }

@@ -26,7 +26,6 @@ import org.dspace.app.rest.builder.CrisLayoutTabBuilder;
 import org.dspace.app.rest.builder.EntityTypeBuilder;
 import org.dspace.app.rest.builder.ItemBuilder;
 import org.dspace.app.rest.matcher.CrisLayoutBoxMatcher;
-import org.dspace.app.rest.matcher.CrisLayoutFieldMatcher;
 import org.dspace.app.rest.model.CrisLayoutBoxRest;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.content.Collection;
@@ -102,90 +101,6 @@ public class BoxesRestControllerIT extends AbstractControllerIntegrationTest {
             .andExpect(content().contentType(contentType))
             .andExpect(jsonPath("$", Matchers.is(
                     CrisLayoutBoxMatcher.matchBox(box))));
-    }
-
-    /**
-     * Test for endpoint GET /api/layout/boxes/<:id>/fields
-     * It returns all the fields included in the box.
-     * @throws Exception
-     */
-    @Test
-    public void getBoxFields() throws Exception {
-        context.turnOffAuthorisationSystem();
-        // Create new EntityType Publication
-        EntityType eType = EntityTypeBuilder.createEntityTypeBuilder(context, "Publication").build();
-        // Create an empty box
-        CrisLayoutBoxBuilder.createBuilder(context, eType, false, 0, false)
-                .withShortname("Box one shortname")
-                .build();
-        // Create fields for next box
-        MetadataSchema dc = mdss.find(context, "dc");
-        MetadataField mfOne = mfss.findByElement(context, dc, "description", "abstract");
-        CrisLayoutField fieldOne = CrisLayoutFieldBuilder.createField(context, mfOne, 0, 0)
-                .withBundle("bundle 1")
-                .withLabel("label 1")
-                .withRendering("rendering 1")
-                .withStyle("style 1")
-                .withType("type 1")
-                .build();
-        MetadataField mfTwo = mfss.findByElement(context, dc, "description", "provenance");
-        CrisLayoutField fieldTwo = CrisLayoutFieldBuilder.createField(context, mfTwo, 0, 1)
-                .withBundle("bundle 2")
-                .withLabel("label 2")
-                .withRendering("rendering 2")
-                .withStyle("style 2")
-                .withType("type 2")
-                .build();
-        MetadataField mfThree = mfss.findByElement(context, dc, "description", "sponsorship");
-        CrisLayoutField fieldThree = CrisLayoutFieldBuilder.createField(context, mfThree, 0, 2)
-                .withBundle("bundle 3")
-                .withLabel("label 3")
-                .withRendering("rendering 3")
-                .withStyle("style 3")
-                .withType("type 3")
-                .build();
-        MetadataField mfFour = mfss.findByElement(context, dc, "description", "statementofresponsibility");
-        CrisLayoutField fieldFour = CrisLayoutFieldBuilder.createField(context, mfFour, 0, 3)
-                .withBundle("bundle 4")
-                .withLabel("label 4")
-                .withRendering("rendering 4")
-                .withStyle("style 4")
-                .withType("type 4")
-                .build();
-        CrisLayoutBox boxTwo = CrisLayoutBoxBuilder.createBuilder(context, eType, false, 1, false)
-                .withShortname("Box two shortname")
-                .addField(fieldOne)
-                .addField(fieldTwo)
-                .addField(fieldThree)
-                .addField(fieldFour)
-                .build();
-        // Create another box with a field
-        MetadataField mfFive = mfss.findByElement(context, dc, "description", "tableofcontents");
-        CrisLayoutField fieldFive = CrisLayoutFieldBuilder.createField(context, mfFive, 0, 4)
-                .withBundle("bundle 5")
-                .withLabel("label 5")
-                .withRendering("rendering 5")
-                .withStyle("style 5")
-                .withType("type 5")
-                .build();
-        CrisLayoutBoxBuilder.createBuilder(context, eType, false, 2, false)
-                .addField(fieldFive)
-                .withShortname("Box three shortname")
-                .build();
-        context.restoreAuthSystemState();
-        // Test WS invocation
-        getClient().perform(get("/api/layout/boxes/" + boxTwo.getID() + "/fields"))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(contentType))
-                .andExpect(jsonPath("$.page.totalElements", Matchers.is(4)))
-                .andExpect(jsonPath("$._embedded.fields[0]", Matchers.is(
-                        CrisLayoutFieldMatcher.matchField(fieldOne))))
-                .andExpect(jsonPath("$._embedded.fields[1]", Matchers.is(
-                        CrisLayoutFieldMatcher.matchField(fieldTwo))))
-                .andExpect(jsonPath("$._embedded.fields[2]", Matchers.is(
-                        CrisLayoutFieldMatcher.matchField(fieldThree))))
-                .andExpect(jsonPath("$._embedded.fields[3]", Matchers.is(
-                        CrisLayoutFieldMatcher.matchField(fieldFour))));
     }
 
     /**
@@ -481,7 +396,7 @@ public class BoxesRestControllerIT extends AbstractControllerIntegrationTest {
         getClient().perform(get("/api/layout/boxes/" + box.getID() + "/configuration"))
             .andExpect(status().isOk())
             .andExpect(content().contentType(contentType))
-            .andExpect(jsonPath("$.id", Matchers.is(box.getShortname())))
+            .andExpect(jsonPath("$.id", Matchers.is(box.getID())))
             .andExpect(jsonPath("$.rows.length()", Matchers.is(3)))
             .andExpect(jsonPath("$.rows[0].fields.length()", Matchers.is(2)))
             .andExpect(jsonPath("$.rows[1].fields.length()", Matchers.is(3)))

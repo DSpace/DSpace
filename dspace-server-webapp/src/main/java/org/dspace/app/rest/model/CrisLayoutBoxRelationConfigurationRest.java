@@ -7,23 +7,27 @@
  */
 package org.dspace.app.rest.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.dspace.app.rest.RestResourceController;
 
 /**
  * @author Danilo Di Nuzzo (danilo.dinuzzo at 4science.it)
  *
  */
-public class CrisLayoutSearchComponentRest extends BaseObjectRest<String> {
+public class CrisLayoutBoxRelationConfigurationRest extends BaseObjectRest<Integer>
+        implements CrisLayoutBoxConfigurationRest {
 
     private static final long serialVersionUID = 1L;
 
     public static final String NAME = "searchcomponent";
     public static final String CATEGORY = RestAddressableModel.LAYOUT;
 
-    private String id;
-    private String configuration;
+    @JsonProperty(value = "discovery-configuration")
+    private String discoveryConfiguration;
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.dspace.app.rest.model.RestModel#getType()
      */
     @Override
@@ -31,7 +35,9 @@ public class CrisLayoutSearchComponentRest extends BaseObjectRest<String> {
         return NAME;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.dspace.app.rest.model.RestAddressableModel#getCategory()
      */
     @Override
@@ -39,7 +45,9 @@ public class CrisLayoutSearchComponentRest extends BaseObjectRest<String> {
         return CATEGORY;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.dspace.app.rest.model.RestAddressableModel#getController()
      */
     @Override
@@ -47,19 +55,11 @@ public class CrisLayoutSearchComponentRest extends BaseObjectRest<String> {
         return RestResourceController.class;
     }
 
-    public String getId() {
-        return id;
+    public String getDiscoveryConfiguration() {
+        return discoveryConfiguration;
     }
 
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getConfiguration() {
-        return configuration;
-    }
-
-    public void setConfiguration(String configuration) {
-        this.configuration = configuration;
+    public void setDiscoveryConfiguration(String configuration) {
+        this.discoveryConfiguration = configuration;
     }
 }

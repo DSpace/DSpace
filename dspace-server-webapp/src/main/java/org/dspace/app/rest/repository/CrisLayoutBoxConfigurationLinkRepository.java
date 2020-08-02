@@ -11,12 +11,12 @@ import java.sql.SQLException;
 import javax.annotation.Nullable;
 import javax.servlet.http.HttpServletRequest;
 
+import org.dspace.app.rest.model.CrisLayoutBoxConfigurationRest;
 import org.dspace.app.rest.model.CrisLayoutBoxRest;
-import org.dspace.app.rest.model.CrisLayoutSearchComponentRest;
 import org.dspace.app.rest.projection.Projection;
-import org.dspace.content.EntityType;
 import org.dspace.core.Context;
 import org.dspace.layout.CrisLayoutBox;
+import org.dspace.layout.CrisLayoutBoxConfiguration;
 import org.dspace.layout.factory.CrisLayoutServiceFactory;
 import org.dspace.layout.service.CrisLayoutBoxService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,38 +31,26 @@ import org.springframework.stereotype.Component;
  */
 @Component(CrisLayoutBoxRest.CATEGORY + "." + CrisLayoutBoxRest.NAME + "." + CrisLayoutBoxRest.CONFIGURATON)
 public class CrisLayoutBoxConfigurationLinkRepository extends AbstractDSpaceRestRepository
-    implements LinkRestRepository {
+        implements LinkRestRepository {
 
     @Autowired
     private CrisLayoutServiceFactory serviceFactory;
 
-    public CrisLayoutSearchComponentRest getConfiguration(
-            @Nullable HttpServletRequest request,
-            Integer boxId,
-            @Nullable Pageable pageable,
-            Projection projection) {
+    public CrisLayoutBoxConfigurationRest getConfiguration(@Nullable HttpServletRequest request, Integer boxId,
+            @Nullable Pageable pageable, Projection projection) {
         Context context = obtainContext();
-        String boxConfigurationId = null;
         CrisLayoutBoxService service = serviceFactory.getBoxService();
-        CrisLayoutSearchComponentRest rVal = null;
 
         try {
             CrisLayoutBox box = service.find(context, boxId);
-            if (box != null && box.getType() != null) {
-                rVal = new CrisLayoutSearchComponentRest();
-                rVal.setId(box.getShortname());
-
-                boxConfigurationId = box.getType();
-                EntityType entity = box.getEntitytype();
-                if (entity != null) {
-                    boxConfigurationId += "." + entity.getLabel();
-                }
-                boxConfigurationId += "." + box.getShortname();
-                rVal.setConfiguration(boxConfigurationId);
+            if (box != null) {
+                CrisLayoutBoxConfiguration configuration = service.getConfiguration(context, box);
+                CrisLayoutBoxConfigurationRest confRest = converter.toRest(configuration, utils.obtainProjection());
+                return confRest;
             }
+            return null;
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-        return rVal;
     }
 }

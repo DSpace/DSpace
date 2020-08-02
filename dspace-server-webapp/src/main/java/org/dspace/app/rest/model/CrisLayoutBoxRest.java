@@ -7,10 +7,6 @@
  */
 package org.dspace.app.rest.model;
 
-import java.util.List;
-
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
 import org.dspace.app.rest.RestResourceController;
@@ -22,10 +18,6 @@ import org.dspace.app.rest.RestResourceController;
  *
  */
 @LinksRest(links = {
-        @LinkRest(
-                name = CrisLayoutBoxRest.FIELDS,
-                method = "getFields"
-        ),
         @LinkRest(
                 name = CrisLayoutBoxRest.SECURITY_METADATA,
                 method = "getSecurityMetadata"
@@ -44,7 +36,6 @@ public class CrisLayoutBoxRest extends BaseObjectRest<Integer> {
     public static final String FIELDS = "fields";
     public static final String SECURITY_METADATA = "securitymetadata";
     public static final String CONFIGURATON = "configuration";
-
     private String shortname;
     private String header;
     private String entityType;
@@ -55,7 +46,6 @@ public class CrisLayoutBoxRest extends BaseObjectRest<Integer> {
     private Integer security;
     private String boxType;
     private Boolean clear;
-    private List<CrisLayoutFieldRest> fields;
 
     /* (non-Javadoc)
      * @see org.dspace.app.rest.model.RestModel#getType()
@@ -206,14 +196,4 @@ public class CrisLayoutBoxRest extends BaseObjectRest<Integer> {
     public void setClear(Boolean clear) {
         this.clear = clear;
     }
-
-    @JsonInclude(Include.NON_NULL)
-    public List<CrisLayoutFieldRest> getFields() {
-        return fields;
-    }
-
-    public void setFields(List<CrisLayoutFieldRest> fields) {
-        this.fields = fields;
-    }
-
 }

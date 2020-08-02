@@ -133,10 +133,10 @@ public class MetadataComponentsRestControllerIT extends AbstractControllerIntegr
                 .build();
         context.restoreAuthSystemState();
         // Test WS endpoint
-        getClient().perform(get("/api/layout/metadatacomponents/" + box.getShortname()))
+        getClient().perform(get("/api/layout/metadatacomponents/" + box.getID()))
             .andExpect(status().isOk())
             .andExpect(content().contentType(contentType))
-            .andExpect(jsonPath("$.id", Matchers.is(box.getShortname())))
+            .andExpect(jsonPath("$.id", Matchers.is(box.getID())))
             .andExpect(jsonPath("$.rows.length()", Matchers.is(3)))
             .andExpect(jsonPath("$.rows[0].fields.length()", Matchers.is(2)))
             .andExpect(jsonPath("$.rows[1].fields.length()", Matchers.is(3)))
@@ -165,7 +165,7 @@ public class MetadataComponentsRestControllerIT extends AbstractControllerIntegr
         operations.add(new AddOperation("/rows/0/fields/0", metadataValues));
 
         String patchBody = getPatchContent(operations);
-        getClient(authToken).perform(patch("/api/layout/metadatacomponents/box-shortname-test")
+        getClient(authToken).perform(patch("/api/layout/metadatacomponents/" + box.getID())
                 .content(patchBody)
                 .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
                 .andExpect(status().isOk())
@@ -208,15 +208,15 @@ public class MetadataComponentsRestControllerIT extends AbstractControllerIntegr
         operations.add(new RemoveOperation("/rows/0/fields/0"));
 
         String patchBody = getPatchContent(operations);
-        getClient(authToken).perform(patch("/api/layout/metadatacomponents/mybox")
+        getClient(authToken).perform(patch("/api/layout/metadatacomponents/" + box.getID())
                 .content(patchBody)
                 .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
                             .andExpect(status().isNoContent());
 
-        getClient(authToken).perform(get("/api/layout/metadatacomponents/" + box.getShortname()))
+        getClient(authToken).perform(get("/api/layout/metadatacomponents/" + box.getID()))
                             .andExpect(status().isOk())
                             .andExpect(content().contentType(contentType))
-                            .andExpect(jsonPath("$.id", Matchers.is(box.getShortname())))
+                            .andExpect(jsonPath("$.id", Matchers.is(box.getID())))
                             .andExpect(jsonPath("$.rows.length()", Matchers.is(3)))
                             .andExpect(jsonPath("$.rows[0].fields.length()", Matchers.is(0)));
     }
@@ -244,7 +244,7 @@ public class MetadataComponentsRestControllerIT extends AbstractControllerIntegr
         operations.add(new AddOperation("/rows/0/fields/0", metadataValues));
 
         String patchBody = getPatchContent(operations);
-        getClient(authToken).perform(patch("/api/layout/metadatacomponents/mybox")
+        getClient(authToken).perform(patch("/api/layout/metadatacomponents/" + box.getID())
                 .content(patchBody)
                 .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
                             .andExpect(status().isUnprocessableEntity());

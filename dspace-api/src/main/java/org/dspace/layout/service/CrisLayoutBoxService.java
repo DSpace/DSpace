@@ -17,6 +17,7 @@ import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataValue;
 import org.dspace.core.Context;
 import org.dspace.layout.CrisLayoutBox;
+import org.dspace.layout.CrisLayoutBoxConfiguration;
 import org.dspace.service.DSpaceCRUDService;
 
 /**
@@ -41,6 +42,7 @@ public interface CrisLayoutBoxService extends DSpaceCRUDService<CrisLayoutBox> {
      * with required field
      * @param context The relevant DSpace Context
      * @param eType EntiType of new Box {@link EntityType}
+     * @param boxType the type of Box
      * @param collapsed this attribute define if the box is collapsed or not
      * @param priority this attribute is used for define the position of the box in its tab
      * @param minor this attribute is used to flag box that should be ignored in the determination
@@ -51,6 +53,7 @@ public interface CrisLayoutBoxService extends DSpaceCRUDService<CrisLayoutBox> {
     public CrisLayoutBox create(
             Context context,
             EntityType eType,
+            String boxType,
             boolean collapsed,
             int priority,
             boolean minor) throws SQLException, AuthorizeException;
@@ -143,11 +146,12 @@ public interface CrisLayoutBoxService extends DSpaceCRUDService<CrisLayoutBox> {
     /**
      * find a box by its shortname
      * @param context The relevant DSpace Context
+     * @param entityType the label of the entityType
      * @param shortname of the box to search
      * @return CrisLayoutBox if present, null otherwise
      * @throws SQLException An exception that provides information on a database errors.
      */
-    public CrisLayoutBox findByShortname(Context context, String shortname) throws SQLException;
+    public CrisLayoutBox findByShortname(Context context, String entityType, String shortname) throws SQLException;
 
     /**
      * Check if the box has content to show
@@ -156,4 +160,15 @@ public interface CrisLayoutBoxService extends DSpaceCRUDService<CrisLayoutBox> {
      * @return true if the box has contet to show, false otherwise
      */
     public boolean hasContent(CrisLayoutBox box, List<MetadataValue> values);
+
+    /**
+     * Retrieve the configuration details of a specific box. By default the
+     * configuration object is just a wrapper of box object as all the details are
+     * currently stored inside the box object itself
+     * 
+     * @param context the dspace context
+     * @param box     the CrisLayoutBox
+     * @return the configuration details
+     */
+    public CrisLayoutBoxConfiguration getConfiguration(Context context, CrisLayoutBox box);
 }

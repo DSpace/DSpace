@@ -7,23 +7,25 @@
  */
 package org.dspace.app.rest.model.hateoas;
 
-import org.dspace.app.rest.model.CrisLayoutSearchComponentRest;
+import org.dspace.app.rest.model.CrisLayoutMetadataConfigurationRest;
 import org.dspace.app.rest.model.hateoas.annotations.RelNameDSpaceResource;
 import org.dspace.app.rest.utils.Utils;
 
 /**
+ * CrisLayoutMetadataConfiguration Rest HAL Resource.
+ * The HAL Resource wraps the REST Resource adding support for the links and embedded resources
+ * 
  * @author Danilo Di Nuzzo (danilo.dinuzzo at 4science.it)
  *
  */
-@RelNameDSpaceResource(CrisLayoutSearchComponentRest.NAME)
-public class CrisLayoutSearchComponentResource
-    extends DSpaceResource<CrisLayoutSearchComponentRest> {
+@RelNameDSpaceResource(CrisLayoutMetadataConfigurationRest.NAME)
+public class CrisLayoutMetadataConfigurationResource extends DSpaceResource<CrisLayoutMetadataConfigurationRest> {
 
     /**
      * @param data
      * @param utils
      */
-    public CrisLayoutSearchComponentResource(CrisLayoutSearchComponentRest data, Utils utils) {
+    public CrisLayoutMetadataConfigurationResource(CrisLayoutMetadataConfigurationRest data, Utils utils) {
         super(data, utils);
     }
 

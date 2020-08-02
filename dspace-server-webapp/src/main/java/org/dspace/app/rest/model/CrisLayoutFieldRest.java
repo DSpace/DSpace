@@ -15,12 +15,7 @@ import org.dspace.app.rest.RestResourceController;
  * @author Danilo Di Nuzzo (danilo.dinuzzo at 4science.it)
  *
  */
-public class CrisLayoutFieldRest implements RestModel {
-
-    public static final String NAME = "field";
-    public static final String CATEGORY = RestAddressableModel.LAYOUT;
-
-    private static final long serialVersionUID = 5591380126666737586L;
+public class CrisLayoutFieldRest {
 
     private Integer id;
     private String bundle;
@@ -29,15 +24,6 @@ public class CrisLayoutFieldRest implements RestModel {
     private Integer priority;
     private String label;
     private String style;
-
-    @Override
-    public String getType() {
-        return NAME;
-    }
-
-    public String getCategory() {
-        return CATEGORY;
-    }
 
     public Class<RestResourceController> getController() {
         return RestResourceController.class;

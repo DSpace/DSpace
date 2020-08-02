@@ -13,20 +13,20 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import org.dspace.app.rest.RestResourceController;
+
 /**
- * The CrisLayoutMetadataComponent REST Resource
+ * The CrisLayoutMetadataConfiguration details
  * 
  * @author Danilo Di Nuzzo (danilo.dinuzzo at 4science.it)
  *
  */
-public class CrisLayoutMetadataComponentRest extends BaseObjectRest<String> {
-
+public class CrisLayoutMetadataConfigurationRest extends BaseObjectRest<Integer>
+        implements CrisLayoutBoxConfigurationRest {
     private static final long serialVersionUID = -4103165494268147700L;
 
     public static final String NAME = "metadatacomponent";
     public static final String CATEGORY = RestAddressableModel.LAYOUT;
 
-    private String id;
     private List<Row> rows;
 
     /* (non-Javadoc)
@@ -45,12 +45,12 @@ public class CrisLayoutMetadataComponentRest extends BaseObjectRest<String> {
         return CATEGORY;
     }
 
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
+    /* (non-Javadoc)
+     * @see org.dspace.app.rest.model.RestAddressableModel#getController()
+     */
+    @Override
+    public Class<RestResourceController> getController() {
+        return RestResourceController.class;
     }
 
     public List<Row> getRows() {
@@ -66,14 +66,6 @@ public class CrisLayoutMetadataComponentRest extends BaseObjectRest<String> {
             this.rows = new ArrayList<>();
         }
         this.rows.add(row);
-    }
-
-    /* (non-Javadoc)
-     * @see org.dspace.app.rest.model.RestAddressableModel#getController()
-     */
-    @Override
-    public Class<RestResourceController> getController() {
-        return RestResourceController.class;
     }
 
     public static class Row {

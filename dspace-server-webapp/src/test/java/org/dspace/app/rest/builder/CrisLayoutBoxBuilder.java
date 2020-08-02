@@ -19,6 +19,7 @@ import org.dspace.content.MetadataField;
 import org.dspace.core.Context;
 import org.dspace.discovery.SearchServiceException;
 import org.dspace.layout.CrisLayoutBox;
+import org.dspace.layout.CrisLayoutBoxTypes;
 import org.dspace.layout.CrisLayoutField;
 import org.dspace.layout.LayoutSecurity;
 import org.dspace.layout.service.CrisLayoutBoxService;
@@ -40,15 +41,20 @@ public class CrisLayoutBoxBuilder extends AbstractBuilder<CrisLayoutBox, CrisLay
 
     public static CrisLayoutBoxBuilder createBuilder(Context context, EntityType eType, boolean collapsed, int priority,
             boolean minor) {
-        CrisLayoutBoxBuilder builder = new CrisLayoutBoxBuilder(context);
-        return builder.create(context, eType, collapsed, priority, minor);
+        return createBuilder(context, eType, CrisLayoutBoxTypes.METADATA.name(), collapsed, priority, minor);
     }
 
-    private CrisLayoutBoxBuilder create(Context context, EntityType eType, boolean collapsed, int priority,
-            boolean minor) {
+    public static CrisLayoutBoxBuilder createBuilder(Context context, EntityType eType, String boxType,
+            boolean collapsed, int priority, boolean minor) {
+        CrisLayoutBoxBuilder builder = new CrisLayoutBoxBuilder(context);
+        return builder.create(context, eType, boxType, collapsed, priority, minor);
+    }
+
+    private CrisLayoutBoxBuilder create(Context context, EntityType eType, String boxType, boolean collapsed,
+            int priority, boolean minor) {
         try {
             this.context = context;
-            this.box = getService().create(context, eType, collapsed, priority, minor);
+            this.box = getService().create(context, eType, boxType, collapsed, priority, minor);
         } catch (Exception e) {
             log.error("Error in CrisLayoutTabBuilder.create(..), error: ", e);
         }
