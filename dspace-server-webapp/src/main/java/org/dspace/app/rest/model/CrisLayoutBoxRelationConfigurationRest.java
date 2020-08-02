@@ -19,7 +19,7 @@ public class CrisLayoutBoxRelationConfigurationRest extends BaseObjectRest<Integ
 
     private static final long serialVersionUID = 1L;
 
-    public static final String NAME = "searchcomponent";
+    public static final String NAME = "boxrelationconfiguration";
     public static final String CATEGORY = RestAddressableModel.LAYOUT;
 
     @JsonProperty(value = "discovery-configuration")

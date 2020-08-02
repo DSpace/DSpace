@@ -37,6 +37,7 @@ import org.dspace.content.MetadataSchema;
 import org.dspace.content.service.MetadataFieldService;
 import org.dspace.content.service.MetadataSchemaService;
 import org.dspace.layout.CrisLayoutBox;
+import org.dspace.layout.CrisLayoutBoxTypes;
 import org.dspace.layout.CrisLayoutField;
 import org.dspace.layout.CrisLayoutTab;
 import org.dspace.layout.LayoutSecurity;
@@ -311,11 +312,11 @@ public class BoxesRestControllerIT extends AbstractControllerIntegrationTest {
 
     /**
      * Test for endpoint /api/layout/boxes/<BOX_ID>/configuration.
-     * It returns configuration entity with more information specific for the box
+     * It returns configuration entity with more information specific a metadata box
      * @throws Exception
      */
     @Test
-    public void getConfiguration() throws Exception {
+    public void getMetadataConfiguration() throws Exception {
         context.turnOffAuthorisationSystem();
         // Create entity type Publication
         EntityType eType = EntityTypeBuilder.createEntityTypeBuilder(context, "Publication").build();
@@ -401,6 +402,27 @@ public class BoxesRestControllerIT extends AbstractControllerIntegrationTest {
             .andExpect(jsonPath("$.rows[0].fields.length()", Matchers.is(2)))
             .andExpect(jsonPath("$.rows[1].fields.length()", Matchers.is(3)))
             .andExpect(jsonPath("$.rows[2].fields.length()", Matchers.is(1)));
+    }
+
+    /**
+     * Test for endpoint /api/layout/boxes/<BOX_ID>/configuration.
+     * It returns configuration entity with more information specific a relation box
+     * @throws Exception
+     */
+    @Test
+    public void getRelationConfiguration() throws Exception {
+        context.turnOffAuthorisationSystem();
+        // Create entity type Publication
+        EntityType eType = EntityTypeBuilder.createEntityTypeBuilder(context, "Person").build();
+        // Create a box
+        CrisLayoutBox box = CrisLayoutBoxBuilder
+                .createBuilder(context, eType, CrisLayoutBoxTypes.RELATION.name(), true, 0, true)
+                .withShortname("shortname1").build();
+        context.restoreAuthSystemState();
+        // Test WS endpoint
+        getClient().perform(get("/api/layout/boxes/" + box.getID() + "/configuration")).andExpect(status().isOk())
+                .andExpect(content().contentType(contentType)).andExpect(jsonPath("$.id", Matchers.is(box.getID())))
+                .andExpect(jsonPath("$.discovery-configuration", Matchers.is("RELATION.Person.shortname1")));
     }
 
     /**

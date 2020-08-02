@@ -24,7 +24,7 @@ public class CrisLayoutMetadataConfigurationRest extends BaseObjectRest<Integer>
         implements CrisLayoutBoxConfigurationRest {
     private static final long serialVersionUID = -4103165494268147700L;
 
-    public static final String NAME = "metadatacomponent";
+    public static final String NAME = "boxmetadataconfiguration";
     public static final String CATEGORY = RestAddressableModel.LAYOUT;
 
     private List<Row> rows;
