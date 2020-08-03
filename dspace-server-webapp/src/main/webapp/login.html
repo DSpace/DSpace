@@ -98,6 +98,11 @@
         $.ajax({
           url : window.location.href.replace("login.html", "") + 'api/authn/login',
           type : 'POST',
+          beforeSend: function (xhr, settings) {
+               // If CSRF token found in cookie, send it back as X-XSRF-Token header
+               var csrfToken = getCSRFToken();
+               xhr.setRequestHeader('X-XSRF-Token', csrfToken ? csrfToken : '');
+          },
           success : successHandler,
           error : function(result, status, xhr) {
               if (result.status === 401) {
@@ -108,12 +113,11 @@
                       if (realms.length == 1){
                           var loc = /location="([^,]*)"/.exec(authenticate);
                           if (loc !== null && loc.length === 2) {
-                          document.location = loc[1];
+                              document.location = loc[1];
                           }
                       } else if (realms.length > 1){
                           for (var i = 0; i < realms.length; i++){
                               addLocationButton(realms[i], element);
-
                           }
                       }
                   }
@@ -134,6 +138,18 @@
             return string.charAt(0).toUpperCase() + string.slice(1);
         }
 
+       /**
+        * Get CSRF Token by parsing it out of the XSRF-TOKEN cookie sent by our DSpace server webapp
+        **/
+        function getCSRFToken() {
+            var cookie = document.cookie.match('(^|;)\\s*' + 'XSRF-TOKEN' + '\\s*=\\s*([^;]+)');
+            if(cookie != undefined) {
+                return cookie.pop();
+            } else {
+                return undefined;
+            }
+        }
+
         $("#login-form").submit(function(event) {
             event.preventDefault();
             $.ajax({
@@ -144,6 +160,11 @@
                 data: {
                     user: $("#username").val(),
                     password: $("#password").val()
+                },
+                beforeSend: function (xhr, settings) {
+                    // If CSRF token found in cookie, send it back as X-XSRF-Token header
+                    var csrfToken = getCSRFToken();
+                    xhr.setRequestHeader('X-XSRF-Token', csrfToken ? csrfToken : '');
                 },
                 success : successHandler,
                 error : function() {
