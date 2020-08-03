@@ -124,13 +124,13 @@ public class AbstractControllerIntegrationTest extends AbstractIntegrationTestWi
             // Enable/Integrate Spring Security with MockMVC
             .apply(springSecurity());
 
-        // Make sure all MockMvc requests (in all tests) include a valid CSRF token by default
+        // Make sure all MockMvc requests (in all tests) include a valid CSRF token (in header) by default.
         // If an authToken was passed in, also make sure request sends the authToken in the "Authorization" header
         if (StringUtils.isNotBlank(authToken)) {
             mockMvcBuilder.defaultRequest(
-                get("/").with(csrf()).header(AUTHORIZATION_HEADER, AUTHORIZATION_TYPE + authToken));
+                get("/").with(csrf().asHeader()).header(AUTHORIZATION_HEADER, AUTHORIZATION_TYPE + authToken));
         } else {
-            mockMvcBuilder.defaultRequest(get("/").with(csrf()));
+            mockMvcBuilder.defaultRequest(get("/").with(csrf().asHeader()));
         }
 
         return mockMvcBuilder
@@ -138,7 +138,7 @@ public class AbstractControllerIntegrationTest extends AbstractIntegrationTestWi
     }
 
     public MockHttpServletResponse getAuthResponse(String user, String password) throws Exception {
-        return getClient().perform(post("/api/authn/login").with(csrf())
+        return getClient().perform(post("/api/authn/login")
                                        .param("user", user)
                                        .param("password", password))
                           .andReturn().getResponse();
@@ -146,7 +146,7 @@ public class AbstractControllerIntegrationTest extends AbstractIntegrationTestWi
 
     public MockHttpServletResponse getAuthResponseWithXForwardedForHeader(String user, String password,
                                                                           String xForwardedFor) throws Exception {
-        return getClient().perform(post("/api/authn/login").with(csrf())
+        return getClient().perform(post("/api/authn/login")
                                        .param("user", user)
                                        .param("password", password)
                                        .header("X-Forwarded-For", xForwardedFor))
