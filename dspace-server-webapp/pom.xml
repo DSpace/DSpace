@@ -407,8 +407,7 @@
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-test</artifactId>
-            <!-- Must be kept in sync with version of Spring Security used by Spring Boot -->
-            <version>5.2.2.RELEASE</version>
+            <version>${spring-security.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
