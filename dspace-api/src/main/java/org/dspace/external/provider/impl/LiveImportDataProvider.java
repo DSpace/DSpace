@@ -127,6 +127,10 @@ public class LiveImportDataProvider implements ExternalDataProvider {
      * @return
      */
     private ExternalDataObject getExternalDataObject(ImportRecord record) {
+        //return 400 if no record were found
+        if (record == null) {
+            throw new IllegalArgumentException("No record found for query or id");
+        }
         ExternalDataObject externalDataObject = new ExternalDataObject(sourceIdentifier);
         String id = getFirstValue(record, recordIdMetadata);
         String display = getFirstValue(record, displayMetadata);
