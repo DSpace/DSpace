@@ -61,8 +61,10 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     @Override
     public void configure(WebSecurity webSecurity) throws Exception {
+        // Define URL patterns which Spring Security will ignore entirely.
         webSecurity
             .ignoring()
+                // These /login request types are purposefully unsecured, as they all throw errors.
                 .antMatchers(HttpMethod.GET, "/api/authn/login")
                 .antMatchers(HttpMethod.PUT, "/api/authn/login")
                 .antMatchers(HttpMethod.PATCH, "/api/authn/login")
@@ -72,63 +74,57 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.headers().cacheControl();
-        http
-            //Tell Spring to not create Sessions
+        // Configure authentication requirements for ${dspace.server.url}/api/ URL only
+        // NOTE: REST API is hardcoded to respond on /api/. Other modules (OAI, SWORD, etc) use other root paths.
+        http.antMatcher("/api/**")
+            // Enable Spring Security authorization on these paths
+            .authorizeRequests()
+                // Allow POST by anyone on the login endpoint
+                .antMatchers(HttpMethod.POST,"/api/authn/login").permitAll()
+                // Everyone can call GET on the status endpoint (used to check your authentication status)
+                .antMatchers(HttpMethod.GET, "/api/authn/status").permitAll()
+            .and()
+            // Tell Spring to not create Sessions
             .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
-            //Anonymous requests should have the "ANONYMOUS" security grant
+            // Anonymous requests should have the "ANONYMOUS" security grant
             .anonymous().authorities(ANONYMOUS_GRANT).and()
-            //Wire up the HttpServletRequest with the current SecurityContext values
+            // Wire up the HttpServletRequest with the current SecurityContext values
             .servletApi().and()
-            //Enable CORS for Spring Security (see CORS settings in Application and ApplicationConfig)
+            // Enable CORS for Spring Security (see CORS settings in Application and ApplicationConfig)
             .cors().and()
-            //Return 401 on authorization failures with a correct WWWW-Authenticate header
+            // Enable CSRF protection with custom CookieCsrfTokenRepository (see below) designed for Angular apps
+            // While we primarily use JWT in headers, CSRF protection is needed because we also support JWT via Cookies
+            .csrf().csrfTokenRepository(this.getCsrfTokenRepository()).and()
+            // Return 401 on authorization failures with a correct WWWW-Authenticate header
             .exceptionHandling().authenticationEntryPoint(
                     new DSpace401AuthenticationEntryPoint(restAuthenticationService))
             .and()
 
-            //Logout configuration
+            // Logout configuration
             .logout()
-                //On logout, clear the "session" salt
+                // On logout, clear the "session" salt
                 .addLogoutHandler(customLogoutHandler)
-                //Configure the logout entry point
+                // Configure the logout entry point
                 .logoutRequestMatcher(new AntPathRequestMatcher("/api/authn/logout"))
-                //When logout is successful, return OK (204) status
+                // When logout is successful, return OK (204) status
                 .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler(HttpStatus.NO_CONTENT))
-                //Everyone can call this endpoint
+                // Everyone can call this endpoint
                 .permitAll()
             .and()
 
-            //Enable CSRF protection (only on /api/ URLs) with the CookieCsrfTokenRepository designed for Angular apps
-            // See https://docs.spring.io/spring-security/site/docs/current/reference/html5/#servlet-csrf
-            // While we primarily use JWT in headers, enabled CSRF protection because we also support JWT via Cookies
-            .antMatcher("/api/**")
-                .csrf().csrfTokenRepository(this.getCsrfTokenRepository())
-            .and()
-
-            //Configure the URL patterns with their authentication requirements
-            //Enable Spring Security authorization on /api/ URLs only
-            .antMatcher("/api/**")
-                .authorizeRequests()
-                //Allow POST by anyone on the login endpoint
-                .antMatchers(HttpMethod.POST,"/api/authn/login").permitAll()
-                //TRACE, CONNECT, OPTIONS, HEAD
-                //Everyone can call GET on the status endpoint
-                .antMatchers(HttpMethod.GET, "/api/authn/status").permitAll()
-            .and()
+            // Add a filter before any request to handle DSpace IP-based authorization/authentication
+            // (e.g. anonymous users may be added to special DSpace groups if they are in a given IP range)
             .addFilterBefore(new AnonymousAdditionalAuthorizationFilter(authenticationManager(), authenticationService),
                              StatelessAuthenticationFilter.class)
-            //Add a filter before our login endpoints to do the authentication based on the data in the HTTP request
+            // Add a filter before our login endpoints to do the authentication based on the data in the HTTP request
             .addFilterBefore(new StatelessLoginFilter("/api/authn/login", authenticationManager(),
                                                       restAuthenticationService),
                              LogoutFilter.class)
-
-            //Add a filter before our shibboleth endpoints to do the authentication based on the data in the
+            // Add a filter before our shibboleth endpoints to do the authentication based on the data in the
             // HTTP request
             .addFilterBefore(new ShibbolethAuthenticationFilter("/api/authn/shibboleth", authenticationManager(),
                                                       restAuthenticationService),
                              LogoutFilter.class)
-
             // Add a custom Token based authentication filter based on the token previously given to the client
             // before each URL
             .addFilterBefore(new StatelessAuthenticationFilter(authenticationManager(), restAuthenticationService,
@@ -142,12 +138,16 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
     }
 
     /**
-     * Override the defaults of CookieCsrfTokenRepository to always set the Path to "/"
+     * Override the defaults of CookieCsrfTokenRepository to always set the Cookie Path to "/"
      * <P>
      * We use the CookieCsrfTokenRepository designed for Angular apps
      * See https://docs.spring.io/spring-security/site/docs/current/reference/html5/#servlet-csrf
      * <P>
-     * However, Angular *requires* the CSR cookie path to always be "/" or it will ignore it.
+     * This CookieCsrfTokenRepository will write a cookie named XSRF-TOKEN and read it from
+     * a header named X-XSRF-TOKEN *or* a URL parameter named "_csrf". Angular apps will respond to
+     * XSRF-TOKEN automatically, see: https://angular.io/guide/http#security-xsrf-protection
+     * <P>
+     * However, currently Angular *requires* the CSR cookie path to always be "/" or it will ignore it.
      * See: https://stackoverflow.com/a/50511663
      * @return CookieCsrfTokenRepository with cookie path="/"
      */
