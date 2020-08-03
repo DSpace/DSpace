@@ -700,7 +700,7 @@ public class BoxesRestControllerIT extends AbstractControllerIntegrationTest {
 
     @Test
     @Ignore
-    public void patchBoxRepalaceShortnameTest() throws Exception {
+    public void patchBoxReplaceShortnameTest() throws Exception {
         context.turnOffAuthorisationSystem();
         // Create entity type Publication
         EntityType eType = EntityTypeBuilder.createEntityTypeBuilder(context, "Publication").build();
@@ -775,7 +775,7 @@ public class BoxesRestControllerIT extends AbstractControllerIntegrationTest {
 
     @Test
     @Ignore
-    public void patchBoxRepalaceShortnameWrongPathTest() throws Exception {
+    public void patchBoxReplaceShortnameWrongPathTest() throws Exception {
         context.turnOffAuthorisationSystem();
         // Create entity type Publication
         EntityType eType = EntityTypeBuilder.createEntityTypeBuilder(context, "Publication").build();
@@ -808,7 +808,7 @@ public class BoxesRestControllerIT extends AbstractControllerIntegrationTest {
 
     @Test
     @Ignore
-    public void patchBoxRepalaceShortnameNotFoundTest() throws Exception {
+    public void patchBoxReplaceShortnameNotFoundTest() throws Exception {
         String tokenAdmin = getAuthToken(admin.getEmail(), password);
         String newShortname = "New Shortname";
         List<Operation> ops = new ArrayList<Operation>();
@@ -860,7 +860,7 @@ public class BoxesRestControllerIT extends AbstractControllerIntegrationTest {
 
     @Test
     @Ignore
-    public void patchBoxRepalaceCollapsedTest() throws Exception {
+    public void patchBoxReplaceCollapsedTest() throws Exception {
         context.turnOffAuthorisationSystem();
         // Create entity type Publication
         EntityType eType = EntityTypeBuilder.createEntityTypeBuilder(context, "Publication").build();
@@ -900,7 +900,7 @@ public class BoxesRestControllerIT extends AbstractControllerIntegrationTest {
 
     @Test
     @Ignore
-    public void patchBoxRepalaceCollapsedUnprocessableEntityTest() throws Exception {
+    public void patchBoxReplaceCollapsedUnprocessableEntityTest() throws Exception {
         context.turnOffAuthorisationSystem();
         // Create entity type Publication
         EntityType eType = EntityTypeBuilder.createEntityTypeBuilder(context, "Publication").build();
