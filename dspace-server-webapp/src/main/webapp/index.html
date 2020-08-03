@@ -180,10 +180,10 @@
         <h3>Make a non-GET request</h3>
     </div>
 
-    <form class="non-safe" action="<%= href %>">
+    <form class="non-safe" action="<%= _.escape(href) %>">
         <div class="modal-body">
             <p>Target URI</p>
-            <input name="url" type="text" class="url" value="<%= href %>" />
+            <input name="url" type="text" class="url" value="<%= _.escape(href) %>" />
             <p>Method:</p>
             <input name="method" type="text" class="method" value="POST" />
             <p>Headers:</p>
