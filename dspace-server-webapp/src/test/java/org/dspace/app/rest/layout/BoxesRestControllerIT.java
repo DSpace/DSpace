@@ -15,6 +15,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -25,8 +26,12 @@ import org.dspace.app.rest.builder.CrisLayoutFieldBuilder;
 import org.dspace.app.rest.builder.CrisLayoutTabBuilder;
 import org.dspace.app.rest.builder.EntityTypeBuilder;
 import org.dspace.app.rest.builder.ItemBuilder;
+import org.dspace.app.rest.builder.MetadataFieldBuilder;
+import org.dspace.app.rest.builder.MetadataSchemaBuilder;
 import org.dspace.app.rest.matcher.CrisLayoutBoxMatcher;
 import org.dspace.app.rest.model.CrisLayoutBoxRest;
+import org.dspace.app.rest.model.MetadataFieldRest;
+import org.dspace.app.rest.model.MetadataSchemaRest;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
@@ -308,6 +313,157 @@ public class BoxesRestControllerIT extends AbstractControllerIntegrationTest {
             .andExpect(content().contentType(contentType))
             .andExpect(jsonPath("$._embedded.securitymetadata", Matchers.not(Matchers.empty())))
             .andExpect(jsonPath("$.page.totalElements", Matchers.is(4)));
+    }
+
+    public void addSecurityMetadataTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        // Create entity type Publication
+        EntityType eType = EntityTypeBuilder.createEntityTypeBuilder(context, "Publication").build();
+        // Create box
+        CrisLayoutBox box = CrisLayoutBoxBuilder.createBuilder(context, eType, true, 0, true)
+                                                   .withShortname("Box shortname")
+                                                   .build();
+        context.restoreAuthSystemState();
+
+        ObjectMapper mapper = new ObjectMapper();
+        MetadataSchemaRest schema = new MetadataSchemaRest();
+        schema.setNamespace("dc");
+        MetadataFieldRest isbn = new MetadataFieldRest();
+        isbn.setSchema(schema);
+        isbn.setElement("identifier");
+        isbn.setQualifier("isbn");
+        isbn.setScopeNote(" Is a numeric commercial identifier ");
+
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        getClient(tokenAdmin).perform(get("/api/layout/boxes/" + box.getID() + "/securitymetadata"))
+                             .andExpect(status().isOk())
+                             .andExpect(content().contentType(contentType))
+                             .andExpect(jsonPath("$._embedded.securitymetadata", Matchers.is(Matchers.empty())))
+                             .andExpect(jsonPath("$.page.totalElements", Matchers.is(0)));
+
+
+        getClient(tokenAdmin).perform(post("/api/layout/boxes/" + box.getID() + "/securitymetadata")
+                             .content(mapper.writeValueAsBytes(isbn))
+                             .contentType(contentType))
+                             .andExpect(status().isNoContent());
+
+        getClient(tokenAdmin).perform(get("/api/layout/boxes/" + box.getID() + "/securitymetadata"))
+                             .andExpect(status().isOk())
+                             .andExpect(content().contentType(contentType))
+                             .andExpect(jsonPath("$._embedded.securitymetadata", Matchers.not(Matchers.empty())))
+                             .andExpect(jsonPath("$.page.totalElements", Matchers.is(1)));
+    }
+
+    public void addSecurityMetadataUnauthorizedTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        // Create entity type Publication
+        EntityType eType = EntityTypeBuilder.createEntityTypeBuilder(context, "Publication").build();
+        // Create box
+        CrisLayoutBox box = CrisLayoutBoxBuilder.createBuilder(context, eType, true, 0, true)
+                            .withShortname("Box shortname")
+                            .build();
+        context.restoreAuthSystemState();
+
+        ObjectMapper mapper = new ObjectMapper();
+        MetadataFieldRest isbn = new MetadataFieldRest();
+        MetadataSchemaRest schema = new MetadataSchemaRest();
+        try {
+            schema.setNamespace("dc");
+            isbn.setSchema(schema);
+            isbn.setElement("identifier");
+            isbn.setQualifier("isbn");
+            isbn.setScopeNote(" Is a numeric commercial identifier ");
+
+            getClient().perform(post("/api/layout/boxes/" + box.getID() + "/securitymetadata")
+                       .content(mapper.writeValueAsBytes(isbn))
+                       .contentType(contentType))
+                       .andExpect(status().isUnauthorized());
+
+            String tokenAdmin = getAuthToken(admin.getEmail(), password);
+            getClient(tokenAdmin).perform(get("/api/layout/boxes/" + box.getID() + "/securitymetadata"))
+                                 .andExpect(status().isOk())
+                                 .andExpect(content().contentType(contentType))
+                                 .andExpect(jsonPath("$._embedded.securitymetadata", Matchers.is(Matchers.empty())))
+                                 .andExpect(jsonPath("$.page.totalElements", Matchers.is(0)));
+        } finally {
+            MetadataSchemaBuilder.deleteMetadataSchema(schema.getId());
+            MetadataFieldBuilder.deleteMetadataField(isbn.getId());
+        }
+    }
+
+    public void addSecurityMetadataForbiddenTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        // Create entity type Publication
+        EntityType eType = EntityTypeBuilder.createEntityTypeBuilder(context, "Publication").build();
+        // Create box
+        CrisLayoutBox box = CrisLayoutBoxBuilder.createBuilder(context, eType, true, 0, true)
+                            .withShortname("Box shortname")
+                            .build();
+        context.restoreAuthSystemState();
+
+        ObjectMapper mapper = new ObjectMapper();
+        MetadataFieldRest isbn = new MetadataFieldRest();
+        MetadataSchemaRest schema = new MetadataSchemaRest();
+        try {
+            schema.setNamespace("dc");
+            isbn.setSchema(schema);
+            isbn.setElement("identifier");
+            isbn.setQualifier("isbn");
+            isbn.setScopeNote(" Is a numeric commercial identifier ");
+
+            String tokenEperson = getAuthToken(eperson.getEmail(), password);
+            getClient(tokenEperson).perform(post("/api/layout/boxes/" + box.getID() + "/securitymetadata")
+                                   .content(mapper.writeValueAsBytes(isbn))
+                                   .contentType(contentType))
+                                   .andExpect(status().isForbidden());
+
+            String tokenAdmin = getAuthToken(admin.getEmail(), password);
+            getClient(tokenAdmin).perform(get("/api/layout/boxes/" + box.getID() + "/securitymetadata"))
+                                 .andExpect(status().isOk())
+                                 .andExpect(content().contentType(contentType))
+                                 .andExpect(jsonPath("$._embedded.securitymetadata", Matchers.is(Matchers.empty())))
+                                 .andExpect(jsonPath("$.page.totalElements", Matchers.is(0)));
+        } finally {
+            MetadataSchemaBuilder.deleteMetadataSchema(schema.getId());
+            MetadataFieldBuilder.deleteMetadataField(isbn.getId());
+        }
+    }
+
+    public void addSecurityMetadataNotFoundBoxTest() throws Exception {
+        ObjectMapper mapper = new ObjectMapper();
+        MetadataFieldRest isbn = new MetadataFieldRest();
+        MetadataSchemaRest schema = new MetadataSchemaRest();
+        try {
+            schema.setNamespace("dc");
+            isbn.setSchema(schema);
+            isbn.setElement("identifier");
+            isbn.setQualifier("isbn");
+            isbn.setScopeNote(" Is a numeric commercial identifier ");
+
+            String tokenAdmin = getAuthToken(admin.getEmail(), password);
+            getClient(tokenAdmin).perform(post("/api/layout/boxes/" + UUID.randomUUID() + "/securitymetadata")
+                                   .content(mapper.writeValueAsBytes(isbn))
+                                   .contentType(contentType))
+                                   .andExpect(status().isNotFound());
+        } finally {
+            MetadataSchemaBuilder.deleteMetadataSchema(schema.getId());
+            MetadataFieldBuilder.deleteMetadataField(isbn.getId());
+        }
+    }
+
+    public void addSecurityMetadataUnpTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        // Create entity type Publication
+        EntityType eType = EntityTypeBuilder.createEntityTypeBuilder(context, "Publication").build();
+        // Create box
+        CrisLayoutBox box = CrisLayoutBoxBuilder.createBuilder(context, eType, true, 0, true)
+                            .withShortname("Box shortname")
+                            .build();
+        context.restoreAuthSystemState();
+
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        getClient(tokenAdmin).perform(post("/api/layout/boxes/" + box.getID() + "/securitymetadata"))
+                             .andExpect(status().isUnprocessableEntity());
     }
 
     /**
