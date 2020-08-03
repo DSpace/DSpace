@@ -12,10 +12,30 @@ HAL.Http.Client = function(opts) {
     this.defaultHeaders = {'Accept': 'application/hal+json, application/json, */*; q=0.01'};
     var authorizationHeader = getAuthorizationHeader();
     authorizationHeader ? this.defaultHeaders.Authorization = authorizationHeader : '';
+    // If we find a CSRF header (in a cookie), send it back in X-XSRF-Token header
+    var csrfToken = getCSRFToken();
+    csrfToken ? this.defaultHeaders['X-XSRF-Token'] = csrfToken : '';
+    // Write all headers to console (for easy debugging)
     console.log(this.defaultHeaders);
     this.headers = this.defaultHeaders;
 };
 
+/**
+ * Get CSRF Token by parsing it out of the XSRF-TOKEN cookie sent by our DSpace server webapp
+ **/
+function getCSRFToken() {
+    var cookie = document.cookie.match('(^|;)\\s*' + 'XSRF-TOKEN' + '\\s*=\\s*([^;]+)');
+    if(cookie != undefined) {
+        return cookie.pop();
+    } else {
+        return undefined;
+    }
+}
+
+/**
+ * Get Authorization Header by parsing it out of the "MyHalBrowserToken" cookie.
+ * This cookie is set in login.html after a successful login occurs.
+ **/
 function getAuthorizationHeader() {
     var cookie = document.cookie.match('(^|;)\\s*' + 'MyHalBrowserToken' + '\\s*=\\s*([^;]+)');
     if(cookie != undefined) {
