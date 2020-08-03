@@ -34,6 +34,7 @@ import org.dspace.app.rest.security.DSpacePermissionEvaluator;
 import org.dspace.app.rest.security.WebSecurityExpressionEvaluator;
 import org.dspace.app.rest.utils.Utils;
 import org.dspace.services.RequestService;
+import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider;
@@ -51,6 +52,8 @@ import org.springframework.stereotype.Service;
 /**
  * Converts domain objects from the DSpace service layer to rest objects, and from rest objects to resource
  * objects, applying {@link Projection}s where applicable.
+ * 
+ * @author Luca Giamminonni (luca.giamminonni at 4science dot it)
  */
 @Service
 public class ConverterService {
@@ -150,7 +153,8 @@ public class ConverterService {
             .getResourceRepositoryByCategoryAndModel(baseObjectRest.getCategory(), baseObjectRest.getType());
         Annotation preAuthorize = null;
         int maxDepth = 0;
-        for (Method m : repositoryToUse.getClass().getMethods()) {
+        // DS-4530 exclude the AOP Proxy from determining the annotations
+        for (Method m : AopUtils.getTargetClass(repositoryToUse).getMethods()) {
             if (StringUtils.equalsIgnoreCase(m.getName(), "findOne")) {
                 int depth = howManySuperclass(m.getDeclaringClass());
                 if (depth > maxDepth) {

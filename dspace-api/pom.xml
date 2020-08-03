@@ -323,6 +323,14 @@
             <artifactId>apache-jena-libs</artifactId>
             <type>pom</type>
         </dependency>
+        <!-- This was added to support the pubmed api call -->
+        <!-- Makes runtime operations in Jersey Dependency Injection -->
+        <dependency>
+            <groupId>org.glassfish.jersey.inject</groupId>
+            <artifactId>jersey-hk2</artifactId>
+            <version>${jersey.version}</version>
+        </dependency>
+        
         <dependency>
             <groupId>commons-codec</groupId>
             <artifactId>commons-codec</artifactId>
