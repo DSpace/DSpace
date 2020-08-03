@@ -8,15 +8,22 @@
 package org.dspace.app.rest.layout;
 
 import static com.jayway.jsonpath.JsonPath.read;
+import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
+import javax.ws.rs.core.MediaType;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.dspace.app.rest.builder.CollectionBuilder;
@@ -35,6 +42,10 @@ import org.dspace.app.rest.model.CrisLayoutBoxRest;
 import org.dspace.app.rest.model.CrisLayoutTabRest;
 import org.dspace.app.rest.model.MetadataFieldRest;
 import org.dspace.app.rest.model.MetadataSchemaRest;
+import org.dspace.app.rest.model.patch.AddOperation;
+import org.dspace.app.rest.model.patch.Operation;
+import org.dspace.app.rest.model.patch.RemoveOperation;
+import org.dspace.app.rest.model.patch.ReplaceOperation;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
@@ -49,6 +60,7 @@ import org.dspace.layout.CrisLayoutField;
 import org.dspace.layout.CrisLayoutTab;
 import org.dspace.layout.LayoutSecurity;
 import org.hamcrest.Matchers;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -1047,4 +1059,236 @@ public class TabsRestControllerIT extends AbstractControllerIntegrationTest {
                  .andExpect(jsonPath("$.page.totalElements", Matchers.is(2)));
     }
 
+    @Test
+    @Ignore
+    public void patchTabReplaceShortnameTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        // Create new EntityType Person
+        EntityType eType = EntityTypeBuilder.createEntityTypeBuilder(context, "Person").build();
+        CrisLayoutTab tab = CrisLayoutTabBuilder.createTab(context, eType, 0)
+                            .withShortName("Tab shortname")
+                            .withHeader("Tab Header")
+                            .withSecurity(LayoutSecurity.PUBLIC)
+                            .build();
+
+        context.restoreAuthSystemState();
+
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        String shortname = "New Shortname";
+        List<Operation> ops = new ArrayList<Operation>();
+        ReplaceOperation replaceOperation = new ReplaceOperation("/shortname", shortname);
+        ops.add(replaceOperation);
+        String patchBody = getPatchContent(ops);
+
+        getClient(tokenAdmin).perform(patch("/api/layout/tabs/" + tab.getID())
+                 .content(patchBody)
+                 .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                 .andExpect(status().isOk())
+                 .andExpect(content().contentType(contentType))
+                 .andExpect(jsonPath("$", Matchers.allOf(
+                         hasJsonPath("$.shortname", is(shortname)),
+                         hasJsonPath("$.header", is(tab.getHeader()))
+                         )));
+
+        getClient().perform(get("/api/layout/tabs/" + tab.getID()))
+                   .andExpect(status().isOk())
+                   .andExpect(content().contentType(contentType))
+                   .andExpect(jsonPath("$", Matchers.is(CrisLayoutTabMatcher.matchTab(tab))));
+    }
+
+    @Test
+    @Ignore
+    public void patchTabAddShortnameTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        // Create new EntityType Person
+        EntityType eType = EntityTypeBuilder.createEntityTypeBuilder(context, "Person").build();
+        CrisLayoutTab tab = CrisLayoutTabBuilder.createTab(context, eType, 0)
+                            .withHeader("Tab Header")
+                            .withSecurity(LayoutSecurity.PUBLIC)
+                            .build();
+        context.restoreAuthSystemState();
+
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        String shortname = "Tab Shortname";
+        List<Operation> ops = new ArrayList<Operation>();
+        AddOperation addOperation = new AddOperation("/shortname", shortname);
+        ops.add(addOperation);
+        String patchBody = getPatchContent(ops);
+
+        getClient(tokenAdmin).perform(patch("/api/layout/tabs/" + tab.getID())
+                 .content(patchBody)
+                 .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                 .andExpect(status().isOk())
+                 .andExpect(content().contentType(contentType))
+                 .andExpect(jsonPath("$", Matchers.allOf(
+                         hasJsonPath("$.shortname", is(shortname)),
+                         hasJsonPath("$.header", is(tab.getHeader()))
+                         )));
+
+        getClient().perform(get("/api/layout/tabs/" + tab.getID()))
+                   .andExpect(status().isOk())
+                   .andExpect(content().contentType(contentType))
+                   .andExpect(jsonPath("$", Matchers.allOf(
+                           hasJsonPath("$.shortname", is(shortname)),
+                           hasJsonPath("$.header", is(tab.getHeader()))
+                           )));
+    }
+
+    @Test
+    @Ignore
+    public void patchTabRemoveShortnameTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        // Create new EntityType Person
+        EntityType eType = EntityTypeBuilder.createEntityTypeBuilder(context, "Person").build();
+        CrisLayoutTab tab = CrisLayoutTabBuilder.createTab(context, eType, 0)
+                            .withShortName("Tab Shortname")
+                            .withHeader("Tab Header")
+                            .withSecurity(LayoutSecurity.PUBLIC)
+                            .build();
+        context.restoreAuthSystemState();
+
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        List<Operation> ops = new ArrayList<Operation>();
+        RemoveOperation removeOperation = new RemoveOperation("/shortname");
+        ops.add(removeOperation);
+        String patchBody = getPatchContent(ops);
+
+        getClient(tokenAdmin).perform(patch("/api/layout/tabs/" + tab.getID())
+                 .content(patchBody)
+                 .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                 .andExpect(status().isOk())
+                 .andExpect(content().contentType(contentType))
+                 .andExpect(jsonPath("$", Matchers.allOf(
+                         hasJsonPath("$.shortname", nullValue()),
+                         hasJsonPath("$.header", is(tab.getHeader()))
+                         )));
+
+        getClient().perform(get("/api/layout/tabs/" + tab.getID()))
+                   .andExpect(status().isOk())
+                   .andExpect(content().contentType(contentType))
+                   .andExpect(jsonPath("$", Matchers.allOf(
+                           hasJsonPath("$.shortname", nullValue()),
+                           hasJsonPath("$.header", is(tab.getHeader()))
+                           )));
+    }
+
+    @Test
+    @Ignore
+    public void patchTabRemoveShortnameWrongPathTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        // Create new EntityType Person
+        EntityType eType = EntityTypeBuilder.createEntityTypeBuilder(context, "Person").build();
+        CrisLayoutTab tab = CrisLayoutTabBuilder.createTab(context, eType, 0)
+                            .withShortName("Tab Shortname")
+                            .withHeader("Tab Header")
+                            .withSecurity(LayoutSecurity.PUBLIC)
+                            .build();
+        context.restoreAuthSystemState();
+
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        List<Operation> ops = new ArrayList<Operation>();
+        RemoveOperation removeOperation = new RemoveOperation("/wrongPath");
+        ops.add(removeOperation);
+        String patchBody = getPatchContent(ops);
+
+        getClient(tokenAdmin).perform(patch("/api/layout/tabs/" + tab.getID())
+                 .content(patchBody)
+                 .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                 .andExpect(status().isUnprocessableEntity());
+
+    }
+
+    @Test
+    @Ignore
+    public void patchTabAddShortnameBadRequestTest() throws Exception {
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        String shortname = "Tab Shortname";
+        List<Operation> ops = new ArrayList<Operation>();
+        AddOperation addOperation = new AddOperation("/shortname", shortname);
+        ops.add(addOperation);
+        String patchBody = getPatchContent(ops);
+
+        getClient(tokenAdmin).perform(patch("/api/layout/tabs/" + UUID.randomUUID())
+                             .content(patchBody)
+                             .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                             .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @Ignore
+    public void patchTabReplacePriotityTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        // Create new EntityType Person
+        EntityType eType = EntityTypeBuilder.createEntityTypeBuilder(context, "Person").build();
+        CrisLayoutTab tab = CrisLayoutTabBuilder.createTab(context, eType, 0)
+                            .withShortName("Tab shortname")
+                            .withHeader("Tab Header")
+                            .withSecurity(LayoutSecurity.PUBLIC)
+                            .build();
+
+        context.restoreAuthSystemState();
+
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        int newPriority = 99;
+        List<Operation> ops = new ArrayList<Operation>();
+        ReplaceOperation replaceOperation = new ReplaceOperation("/priority", newPriority);
+        ops.add(replaceOperation);
+        String patchBody = getPatchContent(ops);
+
+        getClient(tokenAdmin).perform(patch("/api/layout/tabs/" + tab.getID())
+                 .content(patchBody)
+                 .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                 .andExpect(status().isOk())
+                 .andExpect(content().contentType(contentType))
+                 .andExpect(jsonPath("$", Matchers.allOf(
+                         hasJsonPath("$.shortname", is("Tab shortname")),
+                         hasJsonPath("$.priority", is(99)),
+                         hasJsonPath("$.header", is(tab.getHeader()))
+                         )));
+
+        getClient(tokenAdmin).perform(get("/api/layout/tabs/" + tab.getID()))
+                   .andExpect(status().isOk())
+                   .andExpect(content().contentType(contentType))
+                   .andExpect(jsonPath("$", Matchers.allOf(
+                           hasJsonPath("$.shortname", is("Tab shortname")),
+                           hasJsonPath("$.priority", is(99)),
+                           hasJsonPath("$.header", is(tab.getHeader()))
+                           )));
+    }
+
+    @Test
+    @Ignore
+    public void patchTabReplacePriotityBadRequestTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        // Create new EntityType Person
+        EntityType eType = EntityTypeBuilder.createEntityTypeBuilder(context, "Person").build();
+        CrisLayoutTab tab = CrisLayoutTabBuilder.createTab(context, eType, 0)
+                            .withShortName("Tab shortname")
+                            .withHeader("Tab Header")
+                            .withSecurity(LayoutSecurity.PUBLIC)
+                            .build();
+
+        context.restoreAuthSystemState();
+
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        String newPriority = "wrongPriority";
+        List<Operation> ops = new ArrayList<Operation>();
+        ReplaceOperation replaceOperation = new ReplaceOperation("/priority", newPriority);
+        ops.add(replaceOperation);
+        String patchBody = getPatchContent(ops);
+
+        getClient(tokenAdmin).perform(patch("/api/layout/tabs/" + tab.getID())
+                 .content(patchBody)
+                 .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                 .andExpect(status().isBadRequest());
+
+        getClient(tokenAdmin).perform(get("/api/layout/tabs/" + tab.getID()))
+                   .andExpect(status().isOk())
+                   .andExpect(content().contentType(contentType))
+                   .andExpect(jsonPath("$", Matchers.allOf(
+                           hasJsonPath("$.shortname", is("Tab shortname")),
+                           hasJsonPath("$.priority", is(0)),
+                           hasJsonPath("$.header", is(tab.getHeader()))
+                           )));
+    }
 }
