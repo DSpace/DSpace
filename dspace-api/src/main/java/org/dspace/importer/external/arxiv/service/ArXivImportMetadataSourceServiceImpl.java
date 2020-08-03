@@ -199,16 +199,20 @@ public class ArXivImportMetadataSourceServiceImpl extends AbstractImportMetadata
             }
             Invocation.Builder invocationBuilder = local.request(MediaType.TEXT_PLAIN_TYPE);
             Response response = invocationBuilder.get();
-            String responseString = response.readEntity(String.class);
-            OMXMLParserWrapper records = OMXMLBuilderFactory.createOMBuilder(new StringReader(responseString));
-            OMElement element = records.getDocumentElement();
-            AXIOMXPath xpath = null;
-            try {
-                xpath = new AXIOMXPath("opensearch:totalResults");
-                xpath.addNamespace("opensearch", "http://a9.com/-/spec/opensearch/1.1/");
-                OMElement count = (OMElement) xpath.selectSingleNode(element);
-                return Integer.parseInt(count.getText());
-            } catch (JaxenException e) {
+            if (response.getStatus() == 200) {
+                String responseString = response.readEntity(String.class);
+                OMXMLParserWrapper records = OMXMLBuilderFactory.createOMBuilder(new StringReader(responseString));
+                OMElement element = records.getDocumentElement();
+                AXIOMXPath xpath = null;
+                try {
+                    xpath = new AXIOMXPath("opensearch:totalResults");
+                    xpath.addNamespace("opensearch", "http://a9.com/-/spec/opensearch/1.1/");
+                    OMElement count = (OMElement) xpath.selectSingleNode(element);
+                    return Integer.parseInt(count.getText());
+                } catch (JaxenException e) {
+                    return null;
+                }
+            } else {
                 return null;
             }
         }
@@ -253,12 +257,16 @@ public class ArXivImportMetadataSourceServiceImpl extends AbstractImportMetadata
             }
             Invocation.Builder invocationBuilder = local.request(MediaType.TEXT_PLAIN_TYPE);
             Response response = invocationBuilder.get();
-            String responseString = response.readEntity(String.class);
-            List<OMElement> omElements = splitToRecords(responseString);
-            for (OMElement record : omElements) {
-                results.add(transformSourceRecords(record));
+            if (response.getStatus() == 200) {
+                String responseString = response.readEntity(String.class);
+                List<OMElement> omElements = splitToRecords(responseString);
+                for (OMElement record : omElements) {
+                    results.add(transformSourceRecords(record));
+                }
+                return results;
+            } else {
+                return null;
             }
-            return results;
         }
     }
 
@@ -295,12 +303,16 @@ public class ArXivImportMetadataSourceServiceImpl extends AbstractImportMetadata
             WebTarget local = webTarget.queryParam("id_list", arxivid);
             Invocation.Builder invocationBuilder = local.request(MediaType.TEXT_PLAIN_TYPE);
             Response response = invocationBuilder.get();
-            String responseString = response.readEntity(String.class);
-            List<OMElement> omElements = splitToRecords(responseString);
-            for (OMElement record : omElements) {
-                results.add(transformSourceRecords(record));
+            if (response.getStatus() == 200) {
+                String responseString = response.readEntity(String.class);
+                List<OMElement> omElements = splitToRecords(responseString);
+                for (OMElement record : omElements) {
+                    results.add(transformSourceRecords(record));
+                }
+                return results;
+            } else {
+                return null;
             }
-            return results;
         }
     }
 
@@ -327,12 +339,16 @@ public class ArXivImportMetadataSourceServiceImpl extends AbstractImportMetadata
             WebTarget local = webTarget.queryParam("search_query", queryString);
             Invocation.Builder invocationBuilder = local.request(MediaType.TEXT_PLAIN_TYPE);
             Response response = invocationBuilder.get();
-            String responseString = response.readEntity(String.class);
-            List<OMElement> omElements = splitToRecords(responseString);
-            for (OMElement record : omElements) {
-                results.add(transformSourceRecords(record));
+            if (response.getStatus() == 200) {
+                String responseString = response.readEntity(String.class);
+                List<OMElement> omElements = splitToRecords(responseString);
+                for (OMElement record : omElements) {
+                    results.add(transformSourceRecords(record));
+                }
+                return results;
+            } else {
+                return null;
             }
-            return results;
         }
 
         private String getQuery(Query query) {
