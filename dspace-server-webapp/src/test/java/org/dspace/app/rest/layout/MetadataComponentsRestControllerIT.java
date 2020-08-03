@@ -41,7 +41,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * This test class verify the REST Services for the Layout Metadata Component functionality
- * (endpoint /api/layout/metadatacomponents/<:string>)
+ * (endpoint /api/layout/boxmetadataconfiguration/<:string>)
  * 
  * @author Danilo Di Nuzzo (danilo dot dinuzzo at 4science dot it)
  *
@@ -133,7 +133,7 @@ public class MetadataComponentsRestControllerIT extends AbstractControllerIntegr
                 .build();
         context.restoreAuthSystemState();
         // Test WS endpoint
-        getClient().perform(get("/api/layout/metadatacomponents/" + box.getID()))
+        getClient().perform(get("/api/layout/boxmetadataconfiguration/" + box.getID()))
             .andExpect(status().isOk())
             .andExpect(content().contentType(contentType))
             .andExpect(jsonPath("$.id", Matchers.is(box.getID())))
@@ -165,7 +165,7 @@ public class MetadataComponentsRestControllerIT extends AbstractControllerIntegr
         operations.add(new AddOperation("/rows/0/fields/0", metadataValues));
 
         String patchBody = getPatchContent(operations);
-        getClient(authToken).perform(patch("/api/layout/metadatacomponents/" + box.getID())
+        getClient(authToken).perform(patch("/api/layout/boxmetadataconfiguration/" + box.getID())
                 .content(patchBody)
                 .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
                 .andExpect(status().isOk())
@@ -208,12 +208,12 @@ public class MetadataComponentsRestControllerIT extends AbstractControllerIntegr
         operations.add(new RemoveOperation("/rows/0/fields/0"));
 
         String patchBody = getPatchContent(operations);
-        getClient(authToken).perform(patch("/api/layout/metadatacomponents/" + box.getID())
+        getClient(authToken).perform(patch("/api/layout/boxmetadataconfiguration/" + box.getID())
                 .content(patchBody)
                 .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
                             .andExpect(status().isNoContent());
 
-        getClient(authToken).perform(get("/api/layout/metadatacomponents/" + box.getID()))
+        getClient(authToken).perform(get("/api/layout/boxmetadataconfiguration/" + box.getID()))
                             .andExpect(status().isOk())
                             .andExpect(content().contentType(contentType))
                             .andExpect(jsonPath("$.id", Matchers.is(box.getID())))
@@ -244,7 +244,7 @@ public class MetadataComponentsRestControllerIT extends AbstractControllerIntegr
         operations.add(new AddOperation("/rows/0/fields/0", metadataValues));
 
         String patchBody = getPatchContent(operations);
-        getClient(authToken).perform(patch("/api/layout/metadatacomponents/" + box.getID())
+        getClient(authToken).perform(patch("/api/layout/boxmetadataconfiguration/" + box.getID())
                 .content(patchBody)
                 .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
                             .andExpect(status().isUnprocessableEntity());
