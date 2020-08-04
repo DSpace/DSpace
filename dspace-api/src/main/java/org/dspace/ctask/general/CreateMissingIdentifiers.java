@@ -10,6 +10,7 @@ package org.dspace.ctask.general;
 
 import java.io.IOException;
 import java.sql.SQLException;
+
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
@@ -30,18 +31,17 @@ import org.slf4j.LoggerFactory;
  * @author Mark H. Wood {@literal <mwood@iupui.edu>}
  */
 public class CreateMissingIdentifiers
-        extends AbstractCurationTask
-{
+        extends AbstractCurationTask {
     private static final Logger LOG
             = LoggerFactory.getLogger(CreateMissingIdentifiers.class);
 
     @Override
     public int perform(DSpaceObject dso)
-            throws IOException
-    {
+            throws IOException {
         // Only some kinds of model objects get identifiers
-        if (!(dso instanceof Item))
+        if (!(dso instanceof Item)) {
             return Curator.CURATE_SKIP;
+        }
 
         String typeText = Constants.typeText[dso.getType()];
 
