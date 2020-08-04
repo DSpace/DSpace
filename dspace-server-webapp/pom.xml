@@ -37,7 +37,7 @@
             <activation>
                 <activeByDefault>false</activeByDefault>
                 <property>
-                    <name>maven.test.skip</name>
+                    <name>skipTests</name>
                     <value>false</value>
                 </property>
             </activation>
@@ -309,6 +309,13 @@
 
         <dependency>
             <groupId>org.dspace</groupId>
+            <artifactId>dspace-api</artifactId>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.dspace</groupId>
             <artifactId>dspace-services</artifactId>
         </dependency>
 
@@ -532,13 +539,11 @@
         <dependency>
             <groupId>org.apache.lucene</groupId>
             <artifactId>lucene-analyzers-smartcn</artifactId>
-            <version>${solr.client.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.lucene</groupId>
             <artifactId>lucene-analyzers-stempel</artifactId>
-            <version>${solr.client.version}</version>
             <scope>test</scope>
         </dependency>
 
