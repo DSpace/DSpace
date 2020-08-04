@@ -168,11 +168,11 @@ public class MetadataField implements ReloadableEntity<Integer> {
             return false;
         }
         Class<?> objClass = HibernateProxyHelper.getClassWithoutInitializingProxy(obj);
-        if (getClass() != objClass) {
+        if (!getClass().equals(objClass)) {
             return false;
         }
         final MetadataField other = (MetadataField) obj;
-        if (this.getID() != other.getID()) {
+        if (!this.getID().equals(other.getID())) {
             return false;
         }
         if (!getMetadataSchema().equals(other.getMetadataSchema())) {

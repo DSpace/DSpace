@@ -272,12 +272,16 @@ public class METSManifest {
         // Set validation feature
         if (validate) {
             builder.setFeature("http://apache.org/xml/features/validation/schema", true);
-        }
 
-        // Tell the parser where local copies of schemas are, to speed up
-        // validation.  Local XSDs are identified in the configuration file.
-        if (localSchemas.length() > 0) {
-            builder.setProperty("http://apache.org/xml/properties/schema/external-schemaLocation", localSchemas);
+            // Tell the parser where local copies of schemas are, to speed up
+            // validation & avoid XXE attacks from remote schemas. Local XSDs are identified in the configuration file.
+            if (localSchemas.length() > 0) {
+                builder.setProperty("http://apache.org/xml/properties/schema/external-schemaLocation", localSchemas);
+            }
+        } else {
+            // disallow DTD parsing to ensure no XXE attacks can occur.
+            // See https://cheatsheetseries.owasp.org/cheatsheets/XML_External_Entity_Prevention_Cheat_Sheet.html
+            builder.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
         }
 
         // Parse the METS file

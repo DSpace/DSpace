@@ -1,5 +1,5 @@
 # This image will be published as dspace/dspace-cli
-# See https://github.com/DSpace/DSpace/tree/master/dspace/src/main/docker for usage details
+# See https://github.com/DSpace/DSpace/tree/main/dspace/src/main/docker for usage details
 #
 # This version is JDK11 compatible
 # - openjdk:11

@@ -21,10 +21,10 @@ import java.util.UUID;
 
 import org.dspace.app.bulkedit.MetadataImportException;
 import org.dspace.app.bulkedit.MetadataImportInvalidHeadingException;
-import org.dspace.app.rest.builder.CollectionBuilder;
-import org.dspace.app.rest.builder.CommunityBuilder;
-import org.dspace.app.rest.builder.ItemBuilder;
 import org.dspace.app.rest.test.AbstractEntityIntegrationTest;
+import org.dspace.builder.CollectionBuilder;
+import org.dspace.builder.CommunityBuilder;
+import org.dspace.builder.ItemBuilder;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataField;

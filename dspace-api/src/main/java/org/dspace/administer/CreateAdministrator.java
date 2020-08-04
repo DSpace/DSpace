@@ -115,7 +115,7 @@ public final class CreateAdministrator {
         String lastName = null;
         char[] password1 = null;
         char[] password2 = null;
-        String language = I18nUtil.DEFAULTLOCALE.getLanguage();
+        String language = I18nUtil.getDefaultLocale().getLanguage();
 
         while (!dataOK) {
             System.out.print("E-mail address: ");

@@ -67,11 +67,11 @@ public class MetadataSchema implements ReloadableEntity<Integer> {
             return false;
         }
         Class<?> objClass = HibernateProxyHelper.getClassWithoutInitializingProxy(obj);
-        if (getClass() != objClass) {
+        if (!getClass().equals(objClass)) {
             return false;
         }
         final MetadataSchema other = (MetadataSchema) obj;
-        if (this.id != other.id) {
+        if (!this.id.equals(other.id)) {
             return false;
         }
         if ((this.namespace == null) ? (other.namespace != null) : !this.namespace.equals(other.namespace)) {

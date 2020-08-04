@@ -1,8 +1,7 @@
 ## References
-_Add references/links to any related tickets or PRs. These may include:_
-* Link to [JIRA](https://jira.lyrasis.org/projects/DS/summary) ticket(s), if any
-* Link to [REST Contract](https://github.com/DSpace/Rest7Contract) or an open REST Contract PR, if any
-* Link to [Angular issue or PR](https://github.com/DSpace/dspace-angular/issues) related to this PR, if any
+_Add references/links to any related issues or PRs. These may include:_
+* Related to [REST Contract](https://github.com/DSpace/Rest7Contract) or an open REST Contract PR, if any
+* Fixes [GitHub issue](https://github.com/DSpace/DSpace/issues), if any
 
 ## Description
 Short summary of changes (1-2 sentences).
@@ -23,5 +22,5 @@ _This checklist provides a reminder of what we are going to look for when review
 - [ ] My PR passes Checkstyle validation based on the [Code Style Guide](https://wiki.lyrasis.org/display/DSPACE/Code+Style+Guide).
 - [ ] My PR includes Javadoc for _all new (or modified) public methods and classes_. It also includes Javadoc for large or complex private methods.
 - [ ] My PR passes all tests and includes new/updated Unit or Integration Tests based on the [Code Testing Guide](https://wiki.lyrasis.org/display/DSPACE/Code+Testing+Guide).
-- [ ] If my PR includes new, third-party dependencies (in any `pom.xml`), I've made sure their licenses align with the [DSpace BSD License](https://github.com/DSpace/DSpace/blob/master/LICENSE) based on the [Licensing of Contributions](https://wiki.lyrasis.org/display/DSPACE/Code+Contribution+Guidelines#CodeContributionGuidelines-LicensingofContributions) documentation.
+- [ ] If my PR includes new, third-party dependencies (in any `pom.xml`), I've made sure their licenses align with the [DSpace BSD License](https://github.com/DSpace/DSpace/blob/main/LICENSE) based on the [Licensing of Contributions](https://wiki.lyrasis.org/display/DSPACE/Code+Contribution+Guidelines#CodeContributionGuidelines-LicensingofContributions) documentation.
 - [ ] If my PR modifies the REST API, I've linked to the REST Contract page (or open PR) related to this change.

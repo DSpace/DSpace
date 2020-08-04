@@ -489,8 +489,8 @@
         <form name="journalVolumeStep">
             <row>
                 <relation-field>
-                    <relationship-type>isVolumeOfJournal</relationship-type>
-                    <search-configuration>periodical</search-configuration>
+                    <relationship-type>isJournalOfVolume</relationship-type>
+                    <search-configuration>journal</search-configuration>
                     <filter>creativework.publisher:somepublishername</filter>
                     <label>Journal</label>
                     <hint>Select the journal related to this volume.</hint>
@@ -614,7 +614,7 @@
             <row>
                 <relation-field>
                     <relationship-type>isAuthorOfPublication</relationship-type>
-                    <search-configuration>personOrOrganization</search-configuration>
+                    <search-configuration>personOrOrgunit</search-configuration>
                     <repeatable>true</repeatable>
                     <name-variants>true</name-variants>
                     <label>Author</label>

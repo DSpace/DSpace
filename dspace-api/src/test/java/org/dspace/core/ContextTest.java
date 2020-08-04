@@ -130,7 +130,7 @@ public class ContextTest extends AbstractUnitTest {
     public void testGetCurrentLocale() {
         //NOTE: CurrentLocale is not initialized in AbstractUnitTest. So it should be DEFAULTLOCALE
         assertThat("testGetCurrentLocale 0", context.getCurrentLocale(), notNullValue());
-        assertThat("testGetCurrentLocale 1", context.getCurrentLocale(), equalTo(I18nUtil.DEFAULTLOCALE));
+        assertThat("testGetCurrentLocale 1", context.getCurrentLocale(), equalTo(I18nUtil.getDefaultLocale()));
     }
 
     /**

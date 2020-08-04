@@ -25,14 +25,14 @@ import java.util.Random;
 import java.util.concurrent.atomic.AtomicReference;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.dspace.app.rest.builder.BitstreamFormatBuilder;
-import org.dspace.app.rest.builder.EPersonBuilder;
 import org.dspace.app.rest.converter.BitstreamFormatConverter;
 import org.dspace.app.rest.matcher.BitstreamFormatMatcher;
 import org.dspace.app.rest.matcher.HalMatcher;
 import org.dspace.app.rest.model.BitstreamFormatRest;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
+import org.dspace.builder.BitstreamFormatBuilder;
+import org.dspace.builder.EPersonBuilder;
 import org.dspace.content.BitstreamFormat;
 import org.dspace.content.service.BitstreamFormatService;
 import org.dspace.core.I18nUtil;

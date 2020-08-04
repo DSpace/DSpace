@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.lang3.ArrayUtils;
+import org.dspace.AbstractIntegrationTestWithDatabase;
 import org.dspace.app.rest.authorization.AlwaysFalseFeature;
 import org.dspace.app.rest.authorization.AlwaysThrowExceptionFeature;
 import org.dspace.app.rest.authorization.AlwaysTrueFeature;
@@ -26,7 +27,6 @@ import org.dspace.app.rest.converter.SiteConverter;
 import org.dspace.app.rest.model.CollectionRest;
 import org.dspace.app.rest.model.SiteRest;
 import org.dspace.app.rest.projection.DefaultProjection;
-import org.dspace.app.rest.test.AbstractIntegrationTestWithDatabase;
 import org.dspace.app.rest.utils.DSpaceConfigurationInitializer;
 import org.dspace.app.rest.utils.DSpaceKernelInitializer;
 import org.dspace.content.Site;
@@ -77,7 +77,7 @@ public class AuthorizationFeatureServiceIT extends AbstractIntegrationTestWithDa
         assertThat("We have at least our 7 mock features for testing",
                 authzFeatureServiceFindAll.size(), greaterThanOrEqualTo(7));
 
-        Set<String> featureNames = new HashSet<String>();
+        Set<String> featureNames = new HashSet<>();
         for (AuthorizationFeature f : authzFeatureServiceFindAll) {
             featureNames.add(f.getName());
         }

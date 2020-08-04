@@ -27,11 +27,6 @@ import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.dspace.app.rest.builder.CollectionBuilder;
-import org.dspace.app.rest.builder.CommunityBuilder;
-import org.dspace.app.rest.builder.EPersonBuilder;
-import org.dspace.app.rest.builder.GroupBuilder;
-import org.dspace.app.rest.builder.ResourcePolicyBuilder;
 import org.dspace.app.rest.converter.CollectionConverter;
 import org.dspace.app.rest.matcher.CollectionMatcher;
 import org.dspace.app.rest.matcher.CommunityMatcher;
@@ -46,6 +41,11 @@ import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.app.rest.test.MetadataPatchSuite;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.authorize.service.ResourcePolicyService;
+import org.dspace.builder.CollectionBuilder;
+import org.dspace.builder.CommunityBuilder;
+import org.dspace.builder.EPersonBuilder;
+import org.dspace.builder.GroupBuilder;
+import org.dspace.builder.ResourcePolicyBuilder;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.core.Constants;
@@ -435,7 +435,7 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                            CollectionMatcher.matchCollectionEntrySpecificEmbedProjection(col2.getName(), col2.getID(),
                                                                                 col2.getHandle())
                        )))
-                   )
+        )
         ;
 
         getClient().perform(get("/api/core/collections/" + col1.getID() + "/logo"))

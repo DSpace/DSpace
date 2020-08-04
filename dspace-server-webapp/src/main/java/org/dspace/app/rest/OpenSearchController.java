@@ -34,6 +34,7 @@ import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
+import org.dspace.core.Utils;
 import org.dspace.discovery.DiscoverQuery;
 import org.dspace.discovery.DiscoverResult;
 import org.dspace.discovery.IndexableObject;
@@ -103,7 +104,8 @@ public class OpenSearchController {
 
             // do some sanity checking
             if (!openSearchService.getFormats().contains(format)) {
-                String err = "Format " + format + " is not supported.";
+                // Since we are returning error response as HTML, escape any HTML in "format" param
+                String err = "Format " + Utils.addEntities(format) + " is not supported.";
                 response.setContentType("text/html");
                 response.setContentLength(err.length());
                 response.getWriter().write(err);

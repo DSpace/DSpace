@@ -164,7 +164,8 @@ public class ServiceDocumentServlet extends HttpServlet {
         } catch (SWORDException se) {
             log.error("Internal error", se);
             // Throw a HTTP 500
-            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, se.getMessage());
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+                               "Internal error (check logs for more information)");
         }
     }
 

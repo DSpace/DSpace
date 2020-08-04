@@ -134,11 +134,13 @@ public class HarvestScheduler implements Runnable {
         if (maxActiveThreads == 0) {
             maxActiveThreads = 3;
         }
-        minHeartbeat = ConfigurationManager.getIntProperty("oai", "harvester.minHeartbeat") * 1000;
+        minHeartbeat = ConfigurationManager.getIntProperty("oai", "harvester.minHeartbeat");
+        minHeartbeat = minHeartbeat * 1000; // multiple by 1000 to turn seconds to ms
         if (minHeartbeat == 0) {
             minHeartbeat = 30000;
         }
-        maxHeartbeat = ConfigurationManager.getIntProperty("oai", "harvester.maxHeartbeat") * 1000;
+        maxHeartbeat = ConfigurationManager.getIntProperty("oai", "harvester.maxHeartbeat");
+        maxHeartbeat = maxHeartbeat * 1000; // multiple by 1000 to turn seconds to ms
         if (maxHeartbeat == 0) {
             maxHeartbeat = 3600000;
         }

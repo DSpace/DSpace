@@ -11,7 +11,7 @@ version: "3.7"
 services:
   dspace-cli:
     environment:
-    - AIPZIP=https://github.com/DSpace-Labs/AIP-Files/raw/master/dogAndReport.zip
+    - AIPZIP=https://github.com/DSpace-Labs/AIP-Files/raw/main/dogAndReport.zip
     - ADMIN_EMAIL=test@test.edu
     - AIPDIR=/tmp/aip-dir
     entrypoint:

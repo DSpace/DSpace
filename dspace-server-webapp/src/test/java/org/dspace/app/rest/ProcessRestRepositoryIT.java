@@ -22,11 +22,11 @@ import java.util.Random;
 import org.apache.commons.codec.CharEncoding;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.IOUtils;
-import org.dspace.app.rest.builder.ProcessBuilder;
 import org.dspace.app.rest.matcher.PageMatcher;
 import org.dspace.app.rest.matcher.ProcessFileTypesMatcher;
 import org.dspace.app.rest.matcher.ProcessMatcher;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
+import org.dspace.builder.ProcessBuilder;
 import org.dspace.content.Bitstream;
 import org.dspace.content.ProcessStatus;
 import org.dspace.scripts.DSpaceCommandLineParameter;
@@ -72,7 +72,7 @@ public class ProcessRestRepositoryIT extends AbstractControllerIntegrationTest {
                         .andExpect(jsonPath("$", Matchers.is(
                             ProcessMatcher.matchProcess(process.getName(), String.valueOf(process.getEPerson().getID()),
                                                         process.getID(), parameters, ProcessStatus.SCHEDULED)))
-                        );
+        );
     }
 
     @Test
@@ -86,7 +86,7 @@ public class ProcessRestRepositoryIT extends AbstractControllerIntegrationTest {
                         .andExpect(jsonPath("$", Matchers.is(
                             ProcessMatcher.matchProcess(process.getName(), String.valueOf(process.getEPerson().getID()),
                                                         process.getID(), new LinkedList<>(), ProcessStatus.SCHEDULED)))
-                        );
+        );
     }
 
     @Test
@@ -323,6 +323,7 @@ public class ProcessRestRepositoryIT extends AbstractControllerIntegrationTest {
     }
 
     @After
+    @Override
     public void destroy() throws Exception {
         super.destroy();
     }

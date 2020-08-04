@@ -25,15 +25,6 @@ import java.util.UUID;
 import com.jayway.jsonpath.matchers.JsonPathMatchers;
 import org.apache.commons.codec.CharEncoding;
 import org.apache.commons.io.IOUtils;
-import org.dspace.app.rest.builder.BitstreamBuilder;
-import org.dspace.app.rest.builder.ClaimedTaskBuilder;
-import org.dspace.app.rest.builder.CollectionBuilder;
-import org.dspace.app.rest.builder.CommunityBuilder;
-import org.dspace.app.rest.builder.EPersonBuilder;
-import org.dspace.app.rest.builder.GroupBuilder;
-import org.dspace.app.rest.builder.ItemBuilder;
-import org.dspace.app.rest.builder.WorkflowItemBuilder;
-import org.dspace.app.rest.builder.WorkspaceItemBuilder;
 import org.dspace.app.rest.matcher.AppliedFilterMatcher;
 import org.dspace.app.rest.matcher.FacetEntryMatcher;
 import org.dspace.app.rest.matcher.FacetValueMatcher;
@@ -45,6 +36,15 @@ import org.dspace.app.rest.matcher.SortOptionMatcher;
 import org.dspace.app.rest.matcher.WorkflowItemMatcher;
 import org.dspace.app.rest.matcher.WorkspaceItemMatcher;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
+import org.dspace.builder.BitstreamBuilder;
+import org.dspace.builder.ClaimedTaskBuilder;
+import org.dspace.builder.CollectionBuilder;
+import org.dspace.builder.CommunityBuilder;
+import org.dspace.builder.EPersonBuilder;
+import org.dspace.builder.GroupBuilder;
+import org.dspace.builder.ItemBuilder;
+import org.dspace.builder.WorkflowItemBuilder;
+import org.dspace.builder.WorkspaceItemBuilder;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
@@ -95,11 +95,11 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 //We have 4 facets in the default configuration, they need to all be present in the embedded section
                 .andExpect(jsonPath("$._embedded.facets", containsInAnyOrder(
                         FacetEntryMatcher.authorFacet(false),
-                       FacetEntryMatcher.entityTypeFacet(false),
+                        FacetEntryMatcher.entityTypeFacet(false),
                         FacetEntryMatcher.dateIssuedFacet(false),
                         FacetEntryMatcher.subjectFacet(false),
                         FacetEntryMatcher.hasContentInOriginalBundleFacet(false)))
-                );
+        );
     }
 
     @Test

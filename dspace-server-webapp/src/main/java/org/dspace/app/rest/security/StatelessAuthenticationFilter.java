@@ -77,20 +77,21 @@ public class StatelessAuthenticationFilter extends BasicAuthenticationFilter {
                                     HttpServletResponse res,
                                     FilterChain chain) throws IOException, ServletException {
 
-        Authentication authentication = null;
+        Authentication authentication;
         try {
             authentication = getAuthentication(req, res);
         } catch (AuthorizeException e) {
-            res.sendError(HttpServletResponse.SC_UNAUTHORIZED, e.getMessage());
-            log.error(e.getMessage(), e);
+            // just return an error, but do not log
+            res.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Authentication is required");
             return;
         } catch (IllegalArgumentException | SQLException e) {
-            res.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
-            log.error(e.getMessage(), e);
+            res.sendError(HttpServletResponse.SC_BAD_REQUEST, "Authentication request is invalid or incorrect");
+            log.error("Authentication request is invalid or incorrect (status:{})",
+                      HttpServletResponse.SC_BAD_REQUEST, e);
             return;
         } catch (AccessDeniedException e) {
-            res.sendError(HttpServletResponse.SC_FORBIDDEN, e.getMessage());
-            log.error(e.getMessage(), e);
+            res.sendError(HttpServletResponse.SC_FORBIDDEN, "Access is denied");
+            log.error("Access is denied (status:{})", HttpServletResponse.SC_FORBIDDEN, e);
             return;
         }
         if (authentication != null) {
@@ -134,7 +135,7 @@ public class StatelessAuthenticationFilter extends BasicAuthenticationFilter {
                     if (configurationService.getBooleanProperty("webui.user.assumelogin")) {
                         return getOnBehalfOfAuthentication(context, onBehalfOfParameterValue, res);
                     } else {
-                        throw new IllegalArgumentException("The login as feature is not allowed" +
+                        throw new IllegalArgumentException("The 'login as' feature is not allowed" +
                                                      " due to the current configuration");
                     }
                 }
@@ -146,7 +147,7 @@ public class StatelessAuthenticationFilter extends BasicAuthenticationFilter {
             }
         } else {
             if (request.getHeader(ON_BEHALF_OF_REQUEST_PARAM) != null) {
-                throw new AuthorizeException("Only admins are allowed to use the login as feature");
+                throw new AuthorizeException("Must be logged in (as an admin) to use the 'login as' feature");
             }
         }
 

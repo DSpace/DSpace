@@ -19,13 +19,13 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.ws.rs.core.MediaType;
 
-import org.dspace.app.rest.builder.CollectionBuilder;
-import org.dspace.app.rest.builder.CommunityBuilder;
-import org.dspace.app.rest.builder.WorkspaceItemBuilder;
 import org.dspace.app.rest.model.patch.AddOperation;
 import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.rest.model.patch.RemoveOperation;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
+import org.dspace.builder.CollectionBuilder;
+import org.dspace.builder.CommunityBuilder;
+import org.dspace.builder.WorkspaceItemBuilder;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.WorkspaceItem;
@@ -62,7 +62,7 @@ public class CCLicenseRemovePatchOperationIT extends AbstractControllerIntegrati
         String epersonToken = getAuthToken(eperson.getEmail(), password);
 
         // First add a license and verify it is added
-        List<Operation> ops = new ArrayList<Operation>();
+        List<Operation> ops = new ArrayList<>();
         AddOperation addOperation = new AddOperation("/sections/cclicense/uri",
                                                      "http://creativecommons.org/licenses/by-nc-sa/4.0/");
 
@@ -84,7 +84,7 @@ public class CCLicenseRemovePatchOperationIT extends AbstractControllerIntegrati
 
         // Remove the license again and verify it is removed
 
-        List<Operation> removeOps = new ArrayList<Operation>();
+        List<Operation> removeOps = new ArrayList<>();
         RemoveOperation removeOperation = new RemoveOperation("/sections/cclicense/uri");
 
         removeOps.add(removeOperation);
@@ -120,7 +120,7 @@ public class CCLicenseRemovePatchOperationIT extends AbstractControllerIntegrati
         String epersonToken = getAuthToken(eperson.getEmail(), password);
 
 
-        List<Operation> removeOps = new ArrayList<Operation>();
+        List<Operation> removeOps = new ArrayList<>();
         RemoveOperation removeOperation = new RemoveOperation("/sections/cclicense/uri");
 
         removeOps.add(removeOperation);
