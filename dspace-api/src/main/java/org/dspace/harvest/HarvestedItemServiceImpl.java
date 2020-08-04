@@ -7,14 +7,14 @@
  */
 package org.dspace.harvest;
 
+import java.sql.SQLException;
+
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.harvest.dao.HarvestedItemDAO;
 import org.dspace.harvest.service.HarvestedItemService;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import java.sql.SQLException;
 
 /**
  * Service implementation for the HarvestedItem object.
@@ -28,8 +28,7 @@ public class HarvestedItemServiceImpl implements HarvestedItemService {
     @Autowired(required = true)
     protected HarvestedItemDAO harvestedItemDAO;
 
-    protected HarvestedItemServiceImpl()
-    {
+    protected HarvestedItemServiceImpl() {
 
     }
 
@@ -41,12 +40,9 @@ public class HarvestedItemServiceImpl implements HarvestedItemService {
     @Override
     public Item getItemByOAIId(Context context, String itemOaiID, Collection collection) throws SQLException {
         HarvestedItem harvestedItem = harvestedItemDAO.findByOAIId(context, itemOaiID, collection);
-        if(harvestedItem != null)
-        {
+        if (harvestedItem != null) {
             return harvestedItem.getItem();
-        }
-        else
-        {
+        } else {
             return null;
         }
     }

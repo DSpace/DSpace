@@ -10,99 +10,94 @@ package org.purl.sword.base;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-
 import java.util.Properties;
+
 import nu.xom.Attribute;
 import nu.xom.Element;
 import nu.xom.Elements;
-
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.purl.sword.atom.Accept;
 import org.purl.sword.atom.ContentType;
 import org.purl.sword.atom.Title;
-import org.purl.sword.atom.Accept;
 
 /**
  * A representation of a SWORD Collection.
- * 
+ *
  * @author Stuart Lewis
  * @author Neil Taylor
  */
-public class Collection extends XmlElement implements SwordElementInterface
-{
-    /** 
-     * Collection location, expressed as a URL. 
+public class Collection extends XmlElement implements SwordElementInterface {
+    /**
+     * Collection location, expressed as a URL.
      */
     private String location;
- 
+
     /**
-     * Holds the ATOM Title for the collection. 
+     * Holds the ATOM Title for the collection.
      */
     private Title title;
- 
-    /** 
-     * List of the APP:Accept elements. 
+
+    /**
+     * List of the APP:Accept elements.
      */
     private List<Accept> accepts;
- 
+
     /**
-     * Holds the SWORD Collection policy. 
+     * Holds the SWORD Collection policy.
      */
     //private String collectionPolicy;
- 
-    /** 
-     * The SWORD mediation value. Indicates if mediation is allowed. 
+
+    /**
+     * The SWORD mediation value. Indicates if mediation is allowed.
      */
     //private boolean mediation;
     private SwordMediation swordMediation;
- 
+
     private SwordService swordService;
- 
+
     private DcAbstract dcTermsAbstract;
- 
+
     private SwordTreatment swordTreatment;
- 
-    private SwordCollectionPolicy swordCollectionPolicy; 
-    
+
+    private SwordCollectionPolicy swordCollectionPolicy;
+
     /**
      * The SWORD acceptsPackaging details.
      */
     private List<SwordAcceptPackaging> acceptPackaging;
- 
+
     /**
-     * The logger. 
+     * The logger.
      */
-    private static Logger log = Logger.getLogger(Collection.class);
- 
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(Collection.class);
+
     /**
-     * Label for the Href attribute.  
+     * Label for the Href attribute.
      */
     public static final String ATTRIBUTE_HREF = "href";
-    
+
     /**
-     * Label for the local part of this element. 
+     * Label for the local part of this element.
      */
     @Deprecated
     public static final String ELEMENT_NAME = "collection";
- 
+
     private static final XmlName XML_NAME =
-            new XmlName(Namespaces.PREFIX_APP, "collection", Namespaces.NS_APP);
- 
+        new XmlName(Namespaces.PREFIX_APP, "collection", Namespaces.NS_APP);
+
     /**
      * Create a new instance.
      */
-    public Collection()
-    {
+    public Collection() {
         super(XML_NAME);
-        initialise(); 
+        initialise();
     }
- 
-    public static XmlName elementName()
-    {
+
+    public static XmlName elementName() {
         return XML_NAME;
     }
- 
-    protected final void initialise()
-    {
+
+    protected final void initialise() {
         location = null;
         title = null;
         accepts = new ArrayList<Accept>();
@@ -113,667 +108,566 @@ public class Collection extends XmlElement implements SwordElementInterface
         dcTermsAbstract = null;
         swordTreatment = null;
     }
- 
+
     /**
-     * Create a new instance and set the initial location for the collection. 
-     * 
-     * @param location The initial location, expressed as a URL. 
+     * Create a new instance and set the initial location for the collection.
+     *
+     * @param location The initial location, expressed as a URL.
      */
-    public Collection(String location) 
-    {
+    public Collection(String location) {
         this();
         this.location = location;
     }
- 
+
     /**
-     * Retrieve an array that holds all of the Accept details. 
-     * 
-     * @return An array of strings. Each string represents an 
-     *         individual accept element. The array will have a length
-     *         of 0 if no accepts elements are stored in this collection. 
+     * Retrieve an array that holds all of the Accept details.
+     *
+     * @return An array of strings. Each string represents an
+     * individual accept element. The array will have a length
+     * of 0 if no accepts elements are stored in this collection.
      */
-    public String[] getAccepts() 
-    {
+    public String[] getAccepts() {
         String[] values = new String[this.accepts.size()];
         Iterator<Accept> iterator = accepts.iterator();
-        for (int i = 0; iterator.hasNext(); i++ )
-        {
+        for (int i = 0; iterator.hasNext(); i++) {
             Accept accept = iterator.next();
             values[i] = accept.getContent();
         }
-        return values; 
+        return values;
     }
- 
+
     /**
-     * Retrieve an array that holds all of the Accept details. 
-     * 
-     * @return An array of strings. Each string represents an 
-     *         individual accept element. The array will have a length
-     *         of 0 if no accepts elements are stored in this collection. 
+     * Retrieve an array that holds all of the Accept details.
+     *
+     * @return An array of strings. Each string represents an
+     * individual accept element. The array will have a length
+     * of 0 if no accepts elements are stored in this collection.
      */
     @Deprecated
-    public List<String> getAcceptsList() 
-    {
+    public List<String> getAcceptsList() {
         ArrayList<String> items = new ArrayList<String>();
-        for (Accept item : accepts )
-        {
+        for (Accept item : accepts) {
             items.add(item.getContent());
         }
         return items;
-    }   
- 
+    }
+
     /**
      * Return the list of accepts entries.
      *
      * @return the list of accepts entries
      */
-    public List<Accept> getAcceptList()
-    {
+    public List<Accept> getAcceptList() {
         return accepts;
     }
- 
+
     /**
-     * Add an accepts entry. 
-     * 
-     * @param accepts The accepts value. 
+     * Add an accepts entry.
+     *
+     * @param accepts The accepts value.
      */
     public void addAccepts(String accepts) {
         this.accepts.add(new Accept(accepts));
     }
- 
+
     /**
-     * Remove all of the accepts associated with this Collection. 
+     * Remove all of the accepts associated with this Collection.
      */
-    public void clearAccepts( )
-    {
+    public void clearAccepts() {
         this.accepts.clear();
     }
- 
+
     /**
-     * Retrieve a hashtable that holds all the acceptsPackaging details. 
-     * 
+     * Retrieve a hashtable that holds all the acceptsPackaging details.
+     *
      * @return A hashtable. The keys are accepted packaging formats,
-     *           and the values the quality values (stored as QualityValue objects)
+     * and the values the quality values (stored as QualityValue objects)
      */
-    public List<SwordAcceptPackaging> getAcceptPackaging()
-    {
+    public List<SwordAcceptPackaging> getAcceptPackaging() {
         return acceptPackaging;
     }
- 
+
     /**
-     * Add an acceptPackaging format. 
-     * 
+     * Add an acceptPackaging format.
+     *
      * @param acceptPackaging the packaging format.
-     * @param qualityValue the quality value of accepted packaging format.
+     * @param qualityValue    the quality value of accepted packaging format.
      */
     public void addAcceptPackaging(String acceptPackaging, float qualityValue) {
- 
-        this.acceptPackaging.add(new SwordAcceptPackaging(acceptPackaging, qualityValue)); 
+
+        this.acceptPackaging.add(new SwordAcceptPackaging(acceptPackaging, qualityValue));
     }
- 
+
     /**
      * Add an acceptPackaging format. A default quality vale is given.
-     * 
+     *
      * @param acceptPackaging the packaging format.
      */
     public void addAcceptPackaging(String acceptPackaging) {
         this.acceptPackaging.add(new SwordAcceptPackaging(acceptPackaging, new QualityValue()));
     }
- 
+
     /**
-     * Remove all of the accepted packaging formats associated with this Collection. 
+     * Remove all of the accepted packaging formats associated with this Collection.
      */
-    public void clearAcceptPackaging( )
-    {
+    public void clearAcceptPackaging() {
         this.acceptPackaging.clear();
     }
- 
+
     /**
-     * Get the collection policy. 
-     * 
+     * Get the collection policy.
+     *
      * @return The SWORD collectionPolicy.
      */
-    public String getCollectionPolicy() 
-    {
-        if ( swordCollectionPolicy == null )
-        {
-             return null;
+    public String getCollectionPolicy() {
+        if (swordCollectionPolicy == null) {
+            return null;
         }
         return swordCollectionPolicy.getContent();
     }
- 
+
     /**
-     * Set the collection policy. 
-     * 
+     * Set the collection policy.
+     *
      * @param collectionPolicy The collection policy.
      */
-    public void setCollectionPolicy(String collectionPolicy) 
-    {
+    public void setCollectionPolicy(String collectionPolicy) {
         swordCollectionPolicy = new SwordCollectionPolicy(collectionPolicy);
     }
- 
+
     /**
-     * Get the location. 
-     * 
+     * Get the location.
+     *
      * @return TShe location
      */
     public String getLocation() {
         return location;
     }
- 
+
     /**
-     * Set the location. 
-     * 
+     * Set the location.
+     *
      * @param location The location.
      */
     public void setLocation(String location) {
         this.location = location;
     }
- 
+
     /**
-     * Get the mediation value. 
-     * 
+     * Get the mediation value.
+     *
      * @return The mediation
      */
     public boolean getMediation() {
-        if ( swordMediation == null )
-        {
-            return false; 
+        if (swordMediation == null) {
+            return false;
         }
         return swordMediation.getContent();
     }
- 
-    public boolean isMediationSet()
-    {
-        if ( swordMediation == null )
-        {
+
+    public boolean isMediationSet() {
+        if (swordMediation == null) {
             return false;
         }
         return swordMediation.isSet();
     }
- 
+
     /**
-     * Set the mediation value. 
-     * 
-     * @param mediation The mediation value. 
+     * Set the mediation value.
+     *
+     * @param mediation The mediation value.
      */
-    public void setMediation(boolean mediation)
-    {
-        swordMediation = new SwordMediation(mediation); 
+    public void setMediation(boolean mediation) {
+        swordMediation = new SwordMediation(mediation);
     }
- 
+
     /**
      * Get the DC Term abstract.
-     *  
-     * @return The abstract. 
+     *
+     * @return The abstract.
      */
-    public String getAbstract()
-    {
-        if ( dcTermsAbstract == null )
-        {
+    public String getAbstract() {
+        if (dcTermsAbstract == null) {
             return null;
         }
         return dcTermsAbstract.getContent();
     }
- 
+
     /**
-     * Set the abstract. 
-     * 
-     * @param abstractString The abstract. 
+     * Set the abstract.
+     *
+     * @param abstractString The abstract.
      */
-    public void setAbstract(String abstractString)
-    {
+    public void setAbstract(String abstractString) {
         dcTermsAbstract = new DcAbstract(abstractString);
     }
- 
+
     /**
      * Get the sword service.
-     *  
-     * @return The service. 
+     *
+     * @return The service.
      */
-    public String getService()
-    {
-        if ( swordService == null )
-        {
+    public String getService() {
+        if (swordService == null) {
             return null;
         }
         return swordService.getContent();
     }
- 
+
     /**
-     * Set the sword service. 
-     * 
-     * @param serviceString The service. 
+     * Set the sword service.
+     *
+     * @param serviceString The service.
      */
-    public void setService(String serviceString)
-    {
+    public void setService(String serviceString) {
         swordService = new SwordService(serviceString);
     }
- 
+
     /**
-     * Set the title. This will set the title type to ContentType.TEXT. 
-     * 
-     * @param title The title. 
+     * Set the title. This will set the title type to ContentType.TEXT.
+     *
+     * @param title The title.
      */
-    public void setTitle( String title )
-    {
-        if ( this.title == null)
-        {
+    public void setTitle(String title) {
+        if (this.title == null) {
             this.title = new Title();
         }
         this.title.setContent(title);
         this.title.setType(ContentType.TEXT);
     }
- 
+
     /**
-     * Get the title. 
-     * 
-     * @return The title, or <code>null</code> if no title has been set. 
+     * Get the title.
+     *
+     * @return The title, or <code>null</code> if no title has been set.
      */
-    public String getTitle( )
-    {
-        if ( title == null ) 
-        {
+    public String getTitle() {
+        if (title == null) {
             return null;
         }
-        return title.getContent(); 
+        return title.getContent();
     }
- 
+
     /**
-     * Get the treatment value. 
-     * 
+     * Get the treatment value.
+     *
      * @return The treatment.
      */
-    public String getTreatment() 
-    {
-        if ( swordTreatment == null )
-        {
+    public String getTreatment() {
+        if (swordTreatment == null) {
             return null;
         }
         return swordTreatment.getContent();
     }
- 
+
     /**
-     * Set the treatment. 
-     * 
+     * Set the treatment.
+     *
      * @param treatment The treatment.
      */
-    public void setTreatment(String treatment) 
-    {
+    public void setTreatment(String treatment) {
         swordTreatment = new SwordTreatment(treatment);
-    }  
- 
+    }
+
     /**
-     * Get a string representation of this object. This is 
+     * Get a string representation of this object. This is
      * equivalent to calling marshall().toString().
      */
     @Override
-    public String toString()
-    {
-        Element element = marshall(); 
-        return element.toString(); 
+    public String toString() {
+        Element element = marshall();
+        return element.toString();
     }
- 
+
     /**
-     * Marshall the data in this object to an Element object. 
-     * 
-     * @return A XOM Element that holds the data for this Content element. 
+     * Marshall the data in this object to an Element object.
+     *
+     * @return A XOM Element that holds the data for this Content element.
      */
-    public Element marshall( )
-    {
-        // convert data into XOM elements and return the 'root', i.e. the one 
-        // that represents the collection. 
+    public Element marshall() {
+        // convert data into XOM elements and return the 'root', i.e. the one
+        // that represents the collection.
         Element collection = new Element(getQualifiedName(), Namespaces.NS_APP);
         Attribute href = new Attribute(ATTRIBUTE_HREF, location);
         collection.addAttribute(href);
-  
-        if (title == null)
-        {
+
+        if (title == null) {
             title = new Title();
             title.setContent("Untitled");
         }
         collection.appendChild(title.marshall());
-  
-        for (Accept item:accepts)
-        {
+
+        for (Accept item : accepts) {
             collection.appendChild(item.marshall());
         }
-        
+
         Iterator<SwordAcceptPackaging> apIterator = acceptPackaging.iterator();
-        while ( apIterator.hasNext() )
-        {
+        while (apIterator.hasNext()) {
             collection.appendChild(apIterator.next().marshall());
         }
-  
-        if (swordCollectionPolicy != null)
-        {
+
+        if (swordCollectionPolicy != null) {
             collection.appendChild(swordCollectionPolicy.marshall());
         }
-  
-        if (dcTermsAbstract != null)
-        {
+
+        if (dcTermsAbstract != null) {
             collection.appendChild(dcTermsAbstract.marshall());
         }
-  
-        if (swordService != null)
-        {
-            collection.appendChild(swordService.marshall()); 
+
+        if (swordService != null) {
+            collection.appendChild(swordService.marshall());
         }
-  
-        if (swordMediation != null )
-        {
+
+        if (swordMediation != null) {
             collection.appendChild(swordMediation.marshall());
         }
-  
-        if (swordTreatment != null)
-        {
-            collection.appendChild(swordTreatment.marshall()); 
+
+        if (swordTreatment != null) {
+            collection.appendChild(swordTreatment.marshall());
         }
-  
-        return collection; 
+
+        return collection;
     }
- 
+
     /**
-     * Unmarshall the content element into the data in this object. 
-     * 
+     * Unmarshall the content element into the data in this object.
+     *
      * @throws UnmarshallException If the element does not contain a
      *                             content element or if there are problems
-     *                             accessing the data. 
+     *                             accessing the data.
      */
     public void unmarshall(Element collection)
-    throws UnmarshallException 
-    {
+        throws UnmarshallException {
         unmarshall(collection, null);
     }
- 
-    
+
+
     public SwordValidationInfo unmarshall(Element collection, Properties validationProperties)
-    throws UnmarshallException
-    {
-        if (!isInstanceOf(collection, xmlName))
-        {
+        throws UnmarshallException {
+        if (!isInstanceOf(collection, xmlName)) {
             return handleIncorrectElement(collection, validationProperties);
         }
-  
+
         ArrayList<SwordValidationInfo> validationItems = new ArrayList<SwordValidationInfo>();
         ArrayList<SwordValidationInfo> attributeValidationItems = new ArrayList<SwordValidationInfo>();
-  
-        try
-        {
+
+        try {
             initialise();
-  
+
             // retrieve the attributes
             int count = collection.getAttributeCount();
             Attribute a = null;
-            for ( int i = 0; i < count; i++ )
-            {
+            for (int i = 0; i < count; i++) {
                 a = collection.getAttribute(i);
-                if (ATTRIBUTE_HREF.equals(a.getQualifiedName()))
-                {
+                if (ATTRIBUTE_HREF.equals(a.getQualifiedName())) {
                     location = a.getValue();
                     SwordValidationInfo info = new SwordValidationInfo(xmlName, new XmlName(a));
                     info.setContentDescription(location);
                     attributeValidationItems.add(info);
-                }
-                else
-                {
+                } else {
                     SwordValidationInfo info = new SwordValidationInfo(xmlName, new XmlName(a),
-                        SwordValidationInfo.UNKNOWN_ATTRIBUTE,
-                        SwordValidationInfoType.INFO );
+                                                                       SwordValidationInfo.UNKNOWN_ATTRIBUTE,
+                                                                       SwordValidationInfoType.INFO);
                     info.setContentDescription(a.getValue());
                     attributeValidationItems.add(info);
                 }
             }
-  
+
             // retrieve all of the sub-elements
             Elements elements = collection.getChildElements();
             Element element = null;
             int length = elements.size();
-  
-            for (int i = 0; i < length; i++)
-            {
-               element = elements.get(i);
-               if (isInstanceOf(element, Title.elementName()))
-               {
-                  if ( title == null )
-                  {
-                     title = new Title();
-                     validationItems.add(title.unmarshall(element, validationProperties));
-                  }
-                  else if ( validationProperties != null )
-                  {
-                      SwordValidationInfo info = new SwordValidationInfo(
-                          Title.elementName(),
-                          SwordValidationInfo.DUPLICATE_ELEMENT,
-                          SwordValidationInfoType.INFO);
-                      info.setContentDescription(element.getValue());
-                      validationItems.add(info);
-                  }
-               }
-               else if (isInstanceOf(element, Accept.elementName()) )
-               {
-                  Accept accept = new Accept();
-                  SwordValidationInfo info = accept.unmarshall(element, validationProperties);
-                  accepts.add(accept);
-                  validationItems.add(info);
-               }
-               else if (isInstanceOf(element, SwordAcceptPackaging.elementName()))
-               {
-                   SwordAcceptPackaging packaging = new SwordAcceptPackaging();
-                   validationItems.add(packaging.unmarshall(element, validationProperties));
-                   acceptPackaging.add(packaging);
-               }
-               else if (isInstanceOf(element, SwordCollectionPolicy.elementName()))
-               {
-                   if (swordCollectionPolicy == null) {
-                       swordCollectionPolicy = new SwordCollectionPolicy();
-                       validationItems.add(swordCollectionPolicy.unmarshall(element, validationProperties));
-                   } 
-                   else if ( validationProperties != null )
-                   {
-                       SwordValidationInfo info = new SwordValidationInfo(
-                          SwordCollectionPolicy.elementName(),
-                          SwordValidationInfo.DUPLICATE_ELEMENT,
-                          SwordValidationInfoType.INFO);
-                       info.setContentDescription(element.getValue());
-                       validationItems.add(info);
-                   }
-                  
-               }
-               else if (isInstanceOf(element, DcAbstract.elementName()))
-               {
-                  if ( dcTermsAbstract == null )
-                  {
-                     dcTermsAbstract = new DcAbstract();
-                     validationItems.add(dcTermsAbstract.unmarshall(element, validationProperties));
-                  }
-                  else if ( validationProperties != null )
-                  {
-                      SwordValidationInfo info = new SwordValidationInfo(DcAbstract.elementName(),
-                          SwordValidationInfo.DUPLICATE_ELEMENT, SwordValidationInfoType.INFO);
-                      info.setContentDescription(element.getValue());
-                      validationItems.add(info);
-                  }
-               }
-               else if (isInstanceOf(element, SwordService.elementName()))
-               {
-                  if ( swordService == null )
-                  {
-                     swordService = new SwordService();
-                     validationItems.add(swordService.unmarshall(element, validationProperties));
-                  }
-                  else if ( validationProperties != null )
-                  {
-                      SwordValidationInfo info = new SwordValidationInfo(SwordService.elementName(),
-                          SwordValidationInfo.DUPLICATE_ELEMENT,
-                          SwordValidationInfoType.INFO);
-                      info.setContentDescription(element.getValue());
-                      validationItems.add(info);
-                  }
-               }
-               else if (isInstanceOf(element, SwordMediation.elementName()))
-               {
-                  if ( swordMediation == null )
-                  {
-                      swordMediation = new SwordMediation();
-                      validationItems.add(swordMediation.unmarshall(element, validationProperties));
-                  }
-                  else if ( validationProperties != null )
-                  {
-                      SwordValidationInfo info = new SwordValidationInfo(SwordMediation.elementName(),
-                          SwordValidationInfo.DUPLICATE_ELEMENT,
-                          SwordValidationInfoType.WARNING);
-                      info.setContentDescription(element.getValue());
-                      validationItems.add(info);
-                  }
-               }
-               else if (isInstanceOf(element, SwordTreatment.elementName()))
-               {
-                  if ( swordTreatment == null )
-                  {
-                      swordTreatment = new SwordTreatment();
-                      validationItems.add(swordTreatment.unmarshall(element, validationProperties));
-                  }
-                  else if ( validationProperties != null )
-                  {
-                      SwordValidationInfo info = new SwordValidationInfo(SwordTreatment.elementName(),
-                          SwordValidationInfo.DUPLICATE_ELEMENT,
-                          SwordValidationInfoType.WARNING);
-                      info.setContentDescription(element.getValue());
-                      validationItems.add(info);
-                  }
-               }
-               else if ( validationProperties != null )
-               {
-                   SwordValidationInfo info = new SwordValidationInfo(new XmlName(element),
-                       SwordValidationInfo.UNKNOWN_ELEMENT,
-                       SwordValidationInfoType.INFO);
-                   info.setContentDescription(element.getValue());
-                   validationItems.add(info);
-               }
+
+            for (int i = 0; i < length; i++) {
+                element = elements.get(i);
+                if (isInstanceOf(element, Title.elementName())) {
+                    if (title == null) {
+                        title = new Title();
+                        validationItems.add(title.unmarshall(element, validationProperties));
+                    } else if (validationProperties != null) {
+                        SwordValidationInfo info = new SwordValidationInfo(
+                            Title.elementName(),
+                            SwordValidationInfo.DUPLICATE_ELEMENT,
+                            SwordValidationInfoType.INFO);
+                        info.setContentDescription(element.getValue());
+                        validationItems.add(info);
+                    }
+                } else if (isInstanceOf(element, Accept.elementName())) {
+                    Accept accept = new Accept();
+                    SwordValidationInfo info = accept.unmarshall(element, validationProperties);
+                    accepts.add(accept);
+                    validationItems.add(info);
+                } else if (isInstanceOf(element, SwordAcceptPackaging.elementName())) {
+                    SwordAcceptPackaging packaging = new SwordAcceptPackaging();
+                    validationItems.add(packaging.unmarshall(element, validationProperties));
+                    acceptPackaging.add(packaging);
+                } else if (isInstanceOf(element, SwordCollectionPolicy.elementName())) {
+                    if (swordCollectionPolicy == null) {
+                        swordCollectionPolicy = new SwordCollectionPolicy();
+                        validationItems.add(swordCollectionPolicy.unmarshall(element, validationProperties));
+                    } else if (validationProperties != null) {
+                        SwordValidationInfo info = new SwordValidationInfo(
+                            SwordCollectionPolicy.elementName(),
+                            SwordValidationInfo.DUPLICATE_ELEMENT,
+                            SwordValidationInfoType.INFO);
+                        info.setContentDescription(element.getValue());
+                        validationItems.add(info);
+                    }
+
+                } else if (isInstanceOf(element, DcAbstract.elementName())) {
+                    if (dcTermsAbstract == null) {
+                        dcTermsAbstract = new DcAbstract();
+                        validationItems.add(dcTermsAbstract.unmarshall(element, validationProperties));
+                    } else if (validationProperties != null) {
+                        SwordValidationInfo info = new SwordValidationInfo(DcAbstract.elementName(),
+                                                                           SwordValidationInfo.DUPLICATE_ELEMENT,
+                                                                           SwordValidationInfoType.INFO);
+                        info.setContentDescription(element.getValue());
+                        validationItems.add(info);
+                    }
+                } else if (isInstanceOf(element, SwordService.elementName())) {
+                    if (swordService == null) {
+                        swordService = new SwordService();
+                        validationItems.add(swordService.unmarshall(element, validationProperties));
+                    } else if (validationProperties != null) {
+                        SwordValidationInfo info = new SwordValidationInfo(SwordService.elementName(),
+                                                                           SwordValidationInfo.DUPLICATE_ELEMENT,
+                                                                           SwordValidationInfoType.INFO);
+                        info.setContentDescription(element.getValue());
+                        validationItems.add(info);
+                    }
+                } else if (isInstanceOf(element, SwordMediation.elementName())) {
+                    if (swordMediation == null) {
+                        swordMediation = new SwordMediation();
+                        validationItems.add(swordMediation.unmarshall(element, validationProperties));
+                    } else if (validationProperties != null) {
+                        SwordValidationInfo info = new SwordValidationInfo(SwordMediation.elementName(),
+                                                                           SwordValidationInfo.DUPLICATE_ELEMENT,
+                                                                           SwordValidationInfoType.WARNING);
+                        info.setContentDescription(element.getValue());
+                        validationItems.add(info);
+                    }
+                } else if (isInstanceOf(element, SwordTreatment.elementName())) {
+                    if (swordTreatment == null) {
+                        swordTreatment = new SwordTreatment();
+                        validationItems.add(swordTreatment.unmarshall(element, validationProperties));
+                    } else if (validationProperties != null) {
+                        SwordValidationInfo info = new SwordValidationInfo(SwordTreatment.elementName(),
+                                                                           SwordValidationInfo.DUPLICATE_ELEMENT,
+                                                                           SwordValidationInfoType.WARNING);
+                        info.setContentDescription(element.getValue());
+                        validationItems.add(info);
+                    }
+                } else if (validationProperties != null) {
+                    SwordValidationInfo info = new SwordValidationInfo(new XmlName(element),
+                                                                       SwordValidationInfo.UNKNOWN_ELEMENT,
+                                                                       SwordValidationInfoType.INFO);
+                    info.setContentDescription(element.getValue());
+                    validationItems.add(info);
+                }
             }
-        }
-        catch (Exception ex)
-        {
+        } catch (Exception ex) {
             log.error("Unable to parse an element in collection: " + ex.getMessage());
             throw new UnmarshallException("Unable to parse an element in Collection", ex);
         }
-  
+
         SwordValidationInfo result = null;
-        if ( validationProperties != null )
-        {
+        if (validationProperties != null) {
             result = validate(validationItems, attributeValidationItems, validationProperties);
         }
-        return result; 
-  
+        return result;
+
     }
- 
+
     /**
      *
      */
     @Override
-    public SwordValidationInfo validate(Properties validationContext)
-    {
+    public SwordValidationInfo validate(Properties validationContext) {
         return validate(null, null, validationContext);
     }
- 
+
     /**
-     *
-     * @param existing add results to this.
-     * @param attributes FIXME: PLEASE DOCUMENT.
+     * @param existing          add results to this.
+     * @param attributes        FIXME: PLEASE DOCUMENT.
      * @param validationContext FIXME: PLEASE DOCUMENT.
      * @return SWORD validation info
      */
     protected SwordValidationInfo validate(List<SwordValidationInfo> existing,
-            List<SwordValidationInfo> attributes,
-            Properties validationContext)
-    {
+                                           List<SwordValidationInfo> attributes,
+                                           Properties validationContext) {
         boolean validateAll = (existing == null);
-  
+
         SwordValidationInfo result = new SwordValidationInfo(xmlName);
-  
-        if ( accepts == null || accepts.size() == 0 )
-        {
+
+        if (accepts == null || accepts.size() == 0) {
             result.addValidationInfo(new SwordValidationInfo(Accept.elementName(),
-                SwordValidationInfo.MISSING_ELEMENT_ERROR,
-                SwordValidationInfoType.WARNING ));
+                                                             SwordValidationInfo.MISSING_ELEMENT_ERROR,
+                                                             SwordValidationInfoType.WARNING));
         }
-  
-        if ( location == null )
-        {
-            XmlName attribute = new XmlName(Namespaces.PREFIX_ATOM, 
-                                            ATTRIBUTE_HREF, 
+
+        if (location == null) {
+            XmlName attribute = new XmlName(Namespaces.PREFIX_ATOM,
+                                            ATTRIBUTE_HREF,
                                             Namespaces.NS_ATOM);
-  
+
             result.addAttributeValidationInfo(new SwordValidationInfo(xmlName,
-                attribute, SwordValidationInfo.MISSING_ATTRIBUTE_WARNING,
-                SwordValidationInfoType.WARNING ));
+                                                                      attribute,
+                                                                      SwordValidationInfo.MISSING_ATTRIBUTE_WARNING,
+                                                                      SwordValidationInfoType.WARNING));
         }
-  
-        if ( swordMediation == null )
-        {
+
+        if (swordMediation == null) {
             result.addValidationInfo(new SwordValidationInfo(SwordMediation.elementName(),
-                SwordValidationInfo.MISSING_ELEMENT_WARNING,
-                SwordValidationInfoType.WARNING));
+                                                             SwordValidationInfo.MISSING_ELEMENT_WARNING,
+                                                             SwordValidationInfoType.WARNING));
         }
-  
-        if ( validateAll )
-        {
-            if ( accepts.size() > 0 )
-            {
-               Iterator<Accept> acceptIterator = accepts.iterator();
-               while ( acceptIterator.hasNext() )
-               {
-                   result.addValidationInfo(acceptIterator.next().validate(validationContext));
-               }
+
+        if (validateAll) {
+            if (accepts.size() > 0) {
+                Iterator<Accept> acceptIterator = accepts.iterator();
+                while (acceptIterator.hasNext()) {
+                    result.addValidationInfo(acceptIterator.next().validate(validationContext));
+                }
             }
-  
-            if ( acceptPackaging.size() > 0 )
-            {
-               Iterator<SwordAcceptPackaging> apIterator = acceptPackaging.iterator();
-               while ( apIterator.hasNext() )
-               {
-                   result.addValidationInfo(apIterator.next().validate(validationContext));
-               }
+
+            if (acceptPackaging.size() > 0) {
+                Iterator<SwordAcceptPackaging> apIterator = acceptPackaging.iterator();
+                while (apIterator.hasNext()) {
+                    result.addValidationInfo(apIterator.next().validate(validationContext));
+                }
             }
-  
-            if ( location != null )
-            {
+
+            if (location != null) {
                 result.addAttributeValidationInfo(createValidAttributeInfo(ATTRIBUTE_HREF, location));
             }
-  
-            if ( title != null )
-            {
+
+            if (title != null) {
                 result.addValidationInfo(title.validate(validationContext));
             }
-  
-            if ( swordMediation != null )
-            {
+
+            if (swordMediation != null) {
                 result.addValidationInfo(swordMediation.validate(validationContext));
             }
-  
-            if ( swordService != null )
-            {
+
+            if (swordService != null) {
                 result.addValidationInfo(swordService.validate(validationContext));
             }
-  
-            if ( swordTreatment != null )
-            {
+
+            if (swordTreatment != null) {
                 result.addValidationInfo(swordTreatment.validate(validationContext));
             }
-  
-            if ( swordCollectionPolicy != null ) 
-            {
+
+            if (swordCollectionPolicy != null) {
                 result.addValidationInfo(swordCollectionPolicy.validate(validationContext));
             }
-            
-            if ( dcTermsAbstract != null )
-            {
+
+            if (dcTermsAbstract != null) {
                 result.addValidationInfo(dcTermsAbstract.validate(validationContext));
             }
         }
-  
+
         result.addUnmarshallValidationInfo(existing, attributes);
-        return result; 
+        return result;
     }
 }

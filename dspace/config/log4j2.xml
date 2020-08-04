@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Logging configuration for DSpace command line tools -->
+<Configuration strict='true'
+               xmlns='http://logging.apache.org/log4j/2.0/config'>
+
+    <Properties>
+        <!-- Default log file directory for DSpace.
+             NOTE: The value of 'dspace.dir' will be replaced by its value in
+             your configuration when DSpace is installed. -->
+        <Property name='log.dir'>${log4j:configParentLocation}/../log</Property>
+
+        <!-- Log level for all DSpace-specific code (org.dspace.*)
+             Possible values (from most to least info):
+	     DEBUG, INFO, WARN, ERROR, FATAL -->
+        <Property name='loglevel.dspace'>INFO</Property>
+
+        <!-- Log level for other third-party tools/APIs used by DSpace
+             Possible values (from most to least info):
+	     DEBUG, INFO, WARN, ERROR, FATAL -->
+        <Property name='loglevel.other'>INFO</Property>
+    </Properties>
+
+    <Appenders>
+        <!-- A1 is for most DSpace activity -->
+        <Appender name='A1'
+                  filePattern="${log.dir}/dspace.log-%d{yyyy-MM-dd}"
+                  type='RollingFile'
+                  fileName='${log.dir}/dspace.log'
+
+        >
+            <Layout type='PatternLayout'
+                    pattern='%d %-5p %c @ %m%n'/>
+            <policies>
+                <policy type='TimeBasedTriggeringPolicy'>yyyy-MM-dd</policy>
+                <!-- Sample deletion policy:  keep last 30 archived files
+                <Delete basePath='${log.dir}'>
+                            <IfFileName glob='dspace.log-*'/>
+                            <IfAccumulatedFileCount exceeds='30'/>
+                </Delete>
+                -->
+            </policies>
+        </Appender>
+
+        <!-- A2 is for the checksum checker -->
+        <Appender name='A2'
+                  filePattern="${log.dir}/checker.log-%d{yyyy-MM-dd}"
+                  type='RollingFile'
+                  fileName='${log.dir}/checker.log'>
+            <Layout type='PatternLayout'
+                    pattern='%m%n'/>
+            <policies>
+                <policy type='TimeBasedTriggeringPolicy'>yyyy-MM-dd</policy>
+                <!-- Sample deletion policy:  keep last 30 archived files
+                <Delete basePath='${log.dir}'>
+                            <IfFileName glob='dspace.log-*'/>
+                            <IfAccumulatedFileCount exceeds='30'/>
+                </Delete>
+                -->
+            </policies>
+        </Appender>
+    </Appenders>
+
+    <Loggers>
+
+        <!-- Most parts of DSpace -->
+        <Logger name='org.dspace'
+                level='${loglevel.dspace}'
+                additivity='false'>
+            <AppenderRef ref='A1'/>
+        </Logger>
+
+        <!-- The checksum checker -->
+        <Logger name='org.dspace.checker'
+                level='INFO'
+                additivity='false'>
+            <AppenderRef ref='A2'/>
+        </Logger>
+
+        # Block services logging except on exceptions
+        <Logger name='org.dspace.kernel'
+                level='ERROR'/>
+        <Logger name='org.dspace.services'
+                level='ERROR'/>
+        <Logger name='org.dspace.servicemanager'
+                level='ERROR'/>
+        <Logger name='org.dspace.providers'
+                level='ERROR'/>
+        <Logger name='org.dspace.utils'
+                level='ERROR'/>
+
+        # Block passwords from being exposed in Axis logs.
+        # (DEBUG exposes passwords in Basic Auth)
+        <Logger name='org.apache.axis.handlers.http.HTTPAuthHandler'
+                level='INFO'/>
+        <!-- Anything not a part of DSpace -->
+        <Root level='${loglevel.other}'>
+            <AppenderRef ref='A1'/>
+        </Root>
+    </Loggers>
+</Configuration>

@@ -7,20 +7,21 @@
  */
 package org.dspace.xoai.services.impl.context;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.dspace.core.Context;
 import org.dspace.xoai.services.api.context.ContextService;
 import org.dspace.xoai.services.api.context.ContextServiceException;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-import javax.servlet.http.HttpServletRequest;
-
 public class DSpaceContextService implements ContextService {
     private static final String OAI_CONTEXT = "OAI_CONTEXT";
 
     @Override
     public Context getContext() throws ContextServiceException {
-        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
+        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes())
+            .getRequest();
         Object value = request.getAttribute(OAI_CONTEXT);
         if (value == null || !(value instanceof Context)) {
             request.setAttribute(OAI_CONTEXT, new Context());

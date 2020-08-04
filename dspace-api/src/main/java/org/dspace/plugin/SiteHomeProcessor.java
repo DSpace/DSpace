@@ -19,24 +19,21 @@ import org.dspace.core.Context;
  * implement the process method and appear in the configuration will be run
  * before the at the start of preparing the home page has any chance
  * to continue its execution
- * 
+ *
  * @author Andrea Bollini
- * 
  */
-public interface SiteHomeProcessor
-{
-	/**
-	 * execute the process
-	 * 
-	 * @param context       the DSpace context
-	 * @param request	    the HTTP request
-	 * @param response	    the HTTP response
-	 * 
-	 * @throws PluginException	any particular problem with the plugin execution
-	 * @throws AuthorizeException	Authorisation errors during plugin execution
-	 */
-	void process(Context context, HttpServletRequest request,
-    		HttpServletResponse response)
-		throws PluginException, AuthorizeException;
-	
+public interface SiteHomeProcessor {
+    /**
+     * execute the process
+     *
+     * @param context  the DSpace context
+     * @param request  the HTTP request
+     * @param response the HTTP response
+     * @throws PluginException    any particular problem with the plugin execution
+     * @throws AuthorizeException Authorisation errors during plugin execution
+     */
+    void process(Context context, HttpServletRequest request,
+                 HttpServletResponse response)
+        throws PluginException, AuthorizeException;
+
 }

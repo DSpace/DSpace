@@ -317,6 +317,33 @@
   </bitstream-type>
 
   <bitstream-type>
+    <mimetype>video/mp4</mimetype>
+    <short_description>Video MP4</short_description>
+    <description>Video MP4</description>
+    <support_level>1</support_level>
+    <internal>false</internal>
+    <extension>mp4</extension>
+  </bitstream-type>
+
+  <bitstream-type>
+    <mimetype>video/ogg</mimetype>
+    <short_description>Video OGG</short_description>
+    <description>Video OGG</description>
+    <support_level>1</support_level>
+    <internal>false</internal>
+    <extension>ogg</extension>
+  </bitstream-type>
+
+  <bitstream-type>
+    <mimetype>video/webm</mimetype>
+    <short_description>Video WEBM</short_description>
+    <description>Video WEBM</description>
+    <support_level>1</support_level>
+    <internal>false</internal>
+    <extension>webm</extension>
+  </bitstream-type>
+
+  <bitstream-type>
     <mimetype>audio/x-mpeg</mimetype>
     <short_description>MPEG Audio</short_description>
     <description>MPEG Audio</description>
@@ -734,6 +761,24 @@
       <support_level>1</support_level>
       <internal>false</internal>
       <extension>epub</extension>
+    </bitstream-type>
+
+    <bitstream-type>
+        <mimetype>video/mp4</mimetype>
+        <short_description>mp4</short_description>
+        <description>mpeg4</description>
+        <support_level>1</support_level>
+        <internal>false</internal>
+        <extension>mp4</extension>
+    </bitstream-type>
+
+    <bitstream-type>
+        <mimetype>audio/mpeg</mimetype>
+        <short_description>mp3</short_description>
+        <description>MPEG audio</description>
+        <support_level>1</support_level>
+        <internal>false</internal>
+        <extension>mp3</extension>
     </bitstream-type>
 
 </dspace-bitstream-types>

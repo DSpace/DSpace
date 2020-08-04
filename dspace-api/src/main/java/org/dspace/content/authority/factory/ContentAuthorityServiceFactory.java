@@ -12,7 +12,8 @@ import org.dspace.content.authority.service.MetadataAuthorityService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
- * Abstract factory to get services for the content.authority package, use ContentAuthorityServiceFactory.getInstance() to retrieve an implementation
+ * Abstract factory to get services for the content.authority package, use ContentAuthorityServiceFactory.getInstance
+ * () to retrieve an implementation
  *
  * @author kevinvandevelde at atmire.com
  */
@@ -22,7 +23,9 @@ public abstract class ContentAuthorityServiceFactory {
 
     public abstract MetadataAuthorityService getMetadataAuthorityService();
 
-    public static ContentAuthorityServiceFactory getInstance(){
-        return DSpaceServicesFactory.getInstance().getServiceManager().getServiceByName("contentAuthorityServiceFactory", ContentAuthorityServiceFactory.class);
+    public static ContentAuthorityServiceFactory getInstance() {
+        return DSpaceServicesFactory.getInstance().getServiceManager()
+                                    .getServiceByName("contentAuthorityServiceFactory",
+                                                      ContentAuthorityServiceFactory.class);
     }
 }

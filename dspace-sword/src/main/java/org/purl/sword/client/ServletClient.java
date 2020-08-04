@@ -5,38 +5,39 @@
  *
  * http://www.dspace.org/license/
  */
+
 /**
  * Copyright (c) 2008, Aberystwyth University
  * All rights reserved.
- * Redistribution and use in source and binary forms, with or without 
- * modification, are permitted provided that the following conditions 
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
  * are met:
- * 
- *  - Redistributions of source code must retain the above 
- *    copyright notice, this list of conditions and the 
+ *
+ *  - Redistributions of source code must retain the above
+ *    copyright notice, this list of conditions and the
  *    following disclaimer.
- *  
- *  - Redistributions in binary form must reproduce the above copyright 
- *    notice, this list of conditions and the following disclaimer in 
- *    the documentation and/or other materials provided with the 
+ *
+ *  - Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in
+ *    the documentation and/or other materials provided with the
  *    distribution.
- *    
- *  - Neither the name of the Centre for Advanced Software and 
- *    Intelligent Systems (CASIS) nor the names of its 
- *    contributors may be used to endorse or promote products derived 
+ *
+ *  - Neither the name of the Centre for Advanced Software and
+ *    Intelligent Systems (CASIS) nor the names of its
+ *    contributors may be used to endorse or promote products derived
  *    from this software without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT 
- * OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, 
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT 
- * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, 
- * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON 
- * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR 
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF 
- * THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF 
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+ * OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+ * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
+ * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
+ * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF
+ * THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
 
@@ -47,7 +48,6 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.Iterator;
 import java.util.List;
-
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -63,7 +63,7 @@ import org.purl.sword.base.ServiceDocument;
 
 /**
  * Example client that runs as a Servlet.
- * 
+ *
  * @author Stuart Lewis
  */
 public class ServletClient extends HttpServlet {
@@ -71,9 +71,10 @@ public class ServletClient extends HttpServlet {
     /**
      * The user agent name of this library
      */
-    public static final String userAgent = "SWORDAPP Java Client: SWORD version 1.3 compatible (http://sourceforge.net/projects/sword-app/)";
-    
-    /** 
+    public static final String userAgent = "SWORDAPP Java Client: SWORD version 1.3 compatible (http://sourceforge" +
+        ".net/projects/sword-app/)";
+
+    /**
      * Temporary directory.
      */
     private String tempDirectory;
@@ -106,17 +107,17 @@ public class ServletClient extends HttpServlet {
      */
     public void init() {
         tempDirectory = getServletContext().getInitParameter(
-                "upload-temp-directory");
+            "upload-temp-directory");
         if ((tempDirectory == null) || (tempDirectory.equals(""))) {
             tempDirectory = System.getProperty("java.io.tmpdir");
         }
         String lots = getServletContext().getInitParameter("client-urls");
         urls = lots.split(",");
-        
+
         pHost = getServletContext().getInitParameter("proxy-host");
         String pPortstr = getServletContext().getInitParameter("proxy-port");
         if (((pHost != null) && (!pHost.equals("")))
-                && ((pPortstr != null) && (!pPortstr.equals("")))) {
+            && ((pPortstr != null) && (!pPortstr.equals("")))) {
             try {
                 pPort = Integer.parseInt(pPortstr);
                 useProxy = true;
@@ -128,10 +129,10 @@ public class ServletClient extends HttpServlet {
 
     /**
      * Handle a get request. Simply show the default form (form.jsp)
-     * 
+     *
      * @param request The request details
      * @param response The response to write to.
-     * 
+     *
      * @throws ServletException
      *     An exception that provides information on a database access error or other errors.
      * @throws IOException
@@ -147,10 +148,10 @@ public class ServletClient extends HttpServlet {
     /**
      * Process the post. Determine if the request is for a post or service
      * document. Then, dispatch the request to the appropriate handler.
-     * 
+     *
      * @param request The request details.
      * @param response The response to write to.
-     * 
+     *
      * @throws ServletException
      *     An exception that provides information on a database access error or other errors.
      * @throws IOException
@@ -182,13 +183,13 @@ public class ServletClient extends HttpServlet {
         }
     }
 
-    /** 
+    /**
      * Process the request for a service document.
-     * 
+     *
      * @param request The request details.
      * @param response The response to write to.
      *
-     * @throws ServletException 
+     * @throws ServletException
      *     An exception that provides information on a database access error or other errors.
      * @throws IOException
      *     A general class of exceptions produced by failed or interrupted I/O operations.
@@ -201,9 +202,9 @@ public class ServletClient extends HttpServlet {
         // Which URL do we want?
         URL url = new URL(request.getParameter("url"));
         String theUrl = request.getParameter("url");
-        
+
         if ((request.getParameter("ownurl") != null)
-                && (!request.getParameter("ownurl").equals(""))) {
+            && (!request.getParameter("ownurl").equals(""))) {
             url = new URL(request.getParameter("ownurl"));
             theUrl = request.getParameter("ownurl");
         }
@@ -222,9 +223,9 @@ public class ServletClient extends HttpServlet {
 
         try {
             ServiceDocument sd = client.getServiceDocument(theUrl,
-            request.getParameter("obo"));
+                                                           request.getParameter("obo"));
 
-            // Set the status 
+            // Set the status
             Status status = client.getStatus();
             request.setAttribute("status", status.toString());
             if (status.getCode() == 200) {
@@ -238,11 +239,11 @@ public class ServletClient extends HttpServlet {
                 validateXml = validateXml.replaceAll("\"", "&quot;");
                 validateXml = validateXml.replaceAll("'", "&apos;");
                 request.setAttribute("xmlValidate", validateXml); // for passing to validation
-                
+
                 xml = xml.replaceAll("<", "&lt;");
                 xml = xml.replaceAll(">", "&gt;");
                 request.setAttribute("xml", xml);
-                
+
                 // Set the ServiceDocument and associated values
                 request.setAttribute("sd", sd);
                 request.setAttribute("sdURL", theUrl);
@@ -250,14 +251,14 @@ public class ServletClient extends HttpServlet {
                 request.setAttribute("p", request.getParameter("p"));
                 request.setAttribute("sdOBO", request.getParameter("obo"));
                 request.getRequestDispatcher("servicedocument.jsp").forward(
-                        request, response);
+                    request, response);
                 return;
             } else {
                 request.setAttribute("error", status.getCode() + " "
-                        + status.getMessage());
+                    + status.getMessage());
                 request.setAttribute("urls", urls);
                 request.getRequestDispatcher("form.jsp").forward(request,
-                        response);
+                                                                 response);
                 return;
             }
         } catch (SWORDClientException e) {
@@ -270,10 +271,10 @@ public class ServletClient extends HttpServlet {
 
     /**
      * Process a deposit.
-     * 
+     *
      * @param request The request details.
      * @param response The response to output to.
-     * 
+     *
      * @throws ServletException
      *     An exception that provides information on a database access error or other errors.
      * @throws IOException
@@ -286,13 +287,13 @@ public class ServletClient extends HttpServlet {
         try {
             PostMessage message = new PostMessage();
             message.setUserAgent(ClientConstants.SERVICE_NAME);
-            
+
             // Get the file
             FileItemFactory factory = new DiskFileItemFactory();
-            
+
             // Create a new file upload handler
             ServletFileUpload upload = new ServletFileUpload(factory);
-            
+
             // Parse the request
             List<FileItem> items = upload.parseRequest(request);
             Iterator<FileItem> iter = items.iterator();
@@ -350,8 +351,8 @@ public class ServletClient extends HttpServlet {
                     }
                     request.setAttribute(name, value);
                 } else {
-                    String fname = tempDirectory + File.separator + 
-                                   "ServletClient-" + counter++;
+                    String fname = tempDirectory + File.separator +
+                        "ServletClient-" + counter++;
                     if ((contentDisposition != null) && (!contentDisposition.equals(""))) {
                         fname = tempDirectory + File.separator + contentDisposition;
                     }
@@ -416,7 +417,7 @@ public class ServletClient extends HttpServlet {
                 request.setAttribute("packaging", se.getPackaging());
                 request.setAttribute("links", se.getLinks());
                 request.setAttribute("location", resp.getLocation());
-                
+
                 // Set the ServiceDocument and associated values
                 request.getRequestDispatcher("deposit.jsp").forward(request, response);
                 return;
@@ -424,18 +425,18 @@ public class ServletClient extends HttpServlet {
                 String error = status.getCode() + " " + status.getMessage() + " - ";
                 try {
                     error += resp.getEntry().getSummary().getContent();
-                } catch (Exception e) { 
+                } catch (Exception e) {
                     // Do nothing - we have default error message
                     e.printStackTrace();
                 }
                 request.setAttribute("error", error);
-                
+
                 // Try and get an error document in xml
                 String xml = resp.marshall();
                 xml = xml.replaceAll("<", "&lt;");
                 xml = xml.replaceAll(">", "&gt;");
                 request.setAttribute("xml", xml);
-                
+
                 request.getRequestDispatcher("depositform.jsp").forward(request, response);
                 return;
             }

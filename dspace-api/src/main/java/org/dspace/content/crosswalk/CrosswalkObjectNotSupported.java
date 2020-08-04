@@ -18,20 +18,16 @@ package org.dspace.content.crosswalk;
  * @author Larry Stone
  * @version $Revision$
  */
-public class CrosswalkObjectNotSupported extends CrosswalkException
-{
-    public CrosswalkObjectNotSupported(String s)
-    {
+public class CrosswalkObjectNotSupported extends CrosswalkException {
+    public CrosswalkObjectNotSupported(String s) {
         super(s);
     }
 
-    public CrosswalkObjectNotSupported(String arg0, Throwable arg1)
-    {
+    public CrosswalkObjectNotSupported(String arg0, Throwable arg1) {
         super(arg0, arg1);
     }
 
-    public CrosswalkObjectNotSupported(Throwable arg0)
-    {
+    public CrosswalkObjectNotSupported(Throwable arg0) {
         super(arg0);
     }
 }

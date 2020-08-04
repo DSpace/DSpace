@@ -11,7 +11,8 @@ import org.dspace.storage.bitstore.service.BitstreamStorageService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * Factory implementation to get services for the storage package, use StorageServiceFactory.getInstance() to retrieve an implementation
+ * Factory implementation to get services for the storage package, use StorageServiceFactory.getInstance() to
+ * retrieve an implementation
  *
  * @author kevinvandevelde at atmire.com
  */

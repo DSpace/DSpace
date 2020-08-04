@@ -11,14 +11,22 @@ import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
+import javax.persistence.Table;
+import javax.persistence.Transient;
 
+import org.apache.log4j.Logger;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.hibernate.proxy.HibernateProxyHelper;
-
-import javax.persistence.*;
 
 /**
  * Class representing bitstreams stored in the DSpace system.
@@ -26,15 +34,20 @@ import javax.persistence.*;
  * When modifying the bitstream metadata, changes are not reflected in the
  * database until <code>update</code> is called. Note that you cannot alter
  * the contents of a bitstream; you need to create a new bitstream.
- * 
+ *
  * @author Robert Tansley
  * @version $Revision$
  */
 @Entity
-@Table(name="bitstream")
-public class Bitstream extends DSpaceObject implements DSpaceObjectLegacySupport
-{
-    @Column(name="bitstream_id", insertable = false, updatable = false)
+@Table(name = "bitstream")
+public class Bitstream extends DSpaceObject implements DSpaceObjectLegacySupport {
+
+    /**
+     * log4j logger
+     */
+    private static Logger log = Logger.getLogger(Bitstream.class);
+
+    @Column(name = "bitstream_id", insertable = false, updatable = false)
     private Integer legacyId;
 
     @Column(name = "sequence_id")
@@ -65,10 +78,10 @@ public class Bitstream extends DSpaceObject implements DSpaceObjectLegacySupport
     @ManyToMany(fetch = FetchType.LAZY, mappedBy = "bitstreams")
     private List<Bundle> bundles = new ArrayList<>();
 
-    @OneToOne(fetch = FetchType.LAZY, mappedBy="logo")
+    @OneToOne(fetch = FetchType.LAZY, mappedBy = "logo")
     private Community community;
 
-    @OneToOne(fetch = FetchType.LAZY, mappedBy="logo")
+    @OneToOne(fetch = FetchType.LAZY, mappedBy = "logo")
     private Collection collection;
 
     @Transient
@@ -81,33 +94,36 @@ public class Bitstream extends DSpaceObject implements DSpaceObjectLegacySupport
      * or
      * {@link org.dspace.content.service.BitstreamService#create(Context, InputStream)}
      */
-    protected Bitstream()
-    {
+    protected Bitstream() {
     }
 
     /**
-     * Get the sequence ID of this bitstream
-     * 
+     * Get the sequence ID of this bitstream. The sequence ID is a unique (within an Item) integer that references
+     * this bitstream. It acts as a "persistent" identifier within the Item for this Bitstream (as Bitstream names
+     * are not persistent). Because it is unique within an Item, sequence IDs are assigned by the ItemService.update()
+     * method.
+     *
+     * @see org.dspace.content.ItemServiceImpl#update(Context, Item)
      * @return the sequence ID
      */
-    public int getSequenceID()
-    {
-        if(sequenceId == null)
-        {
+    public int getSequenceID() {
+        if (sequenceId == null) {
             return -1;
-        }else{
+        } else {
             return sequenceId;
         }
     }
 
     /**
-     * Set the sequence ID of this bitstream
-     * 
-     * @param sid
-     *            the ID
+     * Set the sequence ID of this bitstream. The sequence ID is a unique (within an Item) integer that references
+     * this bitstream. While this method is public, it should only be used by ItemService.update() or other methods
+     * which validate the uniqueness of the ID within the associated Item. This method itself does not validate
+     * uniqueness of the ID, nor does the underlying database table.
+     *
+     * @see org.dspace.content.ItemServiceImpl#update(Context, Item)
+     * @param sid the ID
      */
-    public void setSequenceID(int sid)
-    {
+    public void setSequenceID(int sid) {
         sequenceId = sid;
         setMetadataModified();
         addDetails("SequenceID");
@@ -116,80 +132,81 @@ public class Bitstream extends DSpaceObject implements DSpaceObjectLegacySupport
     /**
      * Get the name of this bitstream - typically the filename, without any path
      * information
-     * 
+     *
      * @return the name of the bitstream
      */
     @Override
-    public String getName(){
-        return getBitstreamService().getMetadataFirstValue(this, MetadataSchema.DC_SCHEMA, "title", null, Item.ANY);
+    public String getName() {
+        return getBitstreamService().getMetadataFirstValue(this, MetadataSchemaEnum.DC.getName(),
+                                                           "title", null, Item.ANY);
     }
 
     /**
      * Set the name of the bitstream
-     * 
+     *
      * @param context context
-     * @param n
-     *            the new name of the bitstream
+     * @param n       the new name of the bitstream
      * @throws SQLException if database error
      */
     public void setName(Context context, String n) throws SQLException {
-        getBitstreamService().setMetadataSingleValue(context, this, MetadataSchema.DC_SCHEMA, "title", null, null, n);
+        getBitstreamService().setMetadataSingleValue(context, this, MetadataSchemaEnum.DC.getName(),
+                                                     "title", null, null, n);
     }
 
     /**
      * Get the source of this bitstream - typically the filename with path
      * information (if originally provided) or the name of the tool that
      * generated this bitstream
-     * 
+     *
      * @return the source of the bitstream
      */
-    public String getSource()
-    {
-        return getBitstreamService().getMetadataFirstValue(this, MetadataSchema.DC_SCHEMA, "source", null, Item.ANY);
+    public String getSource() {
+        return getBitstreamService().getMetadataFirstValue(this, MetadataSchemaEnum.DC.getName(),
+                                                           "source", null, Item.ANY);
     }
 
     /**
      * Set the source of the bitstream
-     * 
+     *
      * @param context context
-     * @param n
-     *            the new source of the bitstream
+     * @param n       the new source of the bitstream
      * @throws SQLException if database error
      */
     public void setSource(Context context, String n) throws SQLException {
-        getBitstreamService().setMetadataSingleValue(context, this, MetadataSchema.DC_SCHEMA, "source", null, null, n);
+        getBitstreamService().setMetadataSingleValue(context, this, MetadataSchemaEnum.DC.getName(),
+                                                     "source", null, null, n);
     }
 
     /**
      * Get the description of this bitstream - optional free text, typically
      * provided by a user at submission time
-     * 
+     *
      * @return the description of the bitstream
      */
-    public String getDescription()
-    {
-        return getBitstreamService().getMetadataFirstValue(this, MetadataSchema.DC_SCHEMA, "description", null, Item.ANY);
+    public String getDescription() {
+        return getBitstreamService()
+            .getMetadataFirstValue(this, MetadataSchemaEnum.DC.getName(), "description",
+                                   null, Item.ANY);
     }
 
     /**
      * Set the description of the bitstream
-     * 
+     *
      * @param context context
-     * @param n
-     *            the new description of the bitstream
+     * @param n       the new description of the bitstream
      * @throws SQLException if database error
      */
     public void setDescription(Context context, String n) throws SQLException {
-        getBitstreamService().setMetadataSingleValue(context, this, MetadataSchema.DC_SCHEMA, "description", null, null, n);
+        getBitstreamService()
+            .setMetadataSingleValue(context, this, MetadataSchemaEnum.DC.getName(), "description", null, null, n);
     }
 
     /**
      * Get the checksum of the content of the bitstream, for integrity checking
-     * 
+     *
      * @return the checksum
      */
-    public String getChecksum()
-    {
+    public String getChecksum() {
         return checksum;
     }
 
@@ -199,11 +216,10 @@ public class Bitstream extends DSpaceObject implements DSpaceObjectLegacySupport
 
     /**
      * Get the algorithm used to calculate the checksum
-     * 
+     *
      * @return the algorithm, e.g. "MD5"
      */
-    public String getChecksumAlgorithm()
-    {
+    public String getChecksumAlgorithm() {
         return checksumAlgorithm;
     }
 
@@ -213,11 +229,10 @@ public class Bitstream extends DSpaceObject implements DSpaceObjectLegacySupport
 
     /**
      * Get the size of the bitstream
-     * 
+     *
      * @return the size in bytes
      */
-    public long getSize()
-    {
+    public long getSizeBytes() {
         return sizeBytes;
     }
 
@@ -228,28 +243,26 @@ public class Bitstream extends DSpaceObject implements DSpaceObjectLegacySupport
     /**
      * Get the user's format description. Returns null if the format is known by
      * the system.
-     * 
+     *
      * @return the user's format description.
      */
-    public String getUserFormatDescription()
-    {
-        return getBitstreamService().getMetadataFirstValue(this, MetadataSchema.DC_SCHEMA, "format", null, Item.ANY);
+    public String getUserFormatDescription() {
+        return getBitstreamService().getMetadataFirstValue(this, MetadataSchemaEnum.DC.getName(),
+                                                           "format", null, Item.ANY);
     }
 
-    protected BitstreamFormat getBitstreamFormat()
-    {
+    protected BitstreamFormat getBitstreamFormat() {
         return bitstreamFormat;
     }
 
     /**
      * Get the format of the bitstream
-     * 
+     *
      * @param context context
      * @return the format of this bitstream
      * @throws SQLException if database error
      */
-    public BitstreamFormat getFormat(Context context) throws SQLException
-    {
+    public BitstreamFormat getFormat(Context context) throws SQLException {
         return getBitstreamService().getFormat(context, this);
     }
 
@@ -265,8 +278,7 @@ public class Bitstream extends DSpaceObject implements DSpaceObjectLegacySupport
      * @return true if the bitstream has been deleted
      * @throws SQLException if database error
      */
-    public boolean isDeleted() throws SQLException
-    {
+    public boolean isDeleted() throws SQLException {
         return deleted;
     }
 
@@ -276,12 +288,11 @@ public class Bitstream extends DSpaceObject implements DSpaceObjectLegacySupport
 
     /**
      * Get the bundles this bitstream appears in
-     * 
+     *
      * @return array of <code>Bundle</code> s this bitstream appears in
      * @throws SQLException if database error
      */
-    public List<Bundle> getBundles() throws SQLException
-    {
+    public List<Bundle> getBundles() throws SQLException {
         return bundles;
     }
 
@@ -292,12 +303,11 @@ public class Bitstream extends DSpaceObject implements DSpaceObjectLegacySupport
 
     /**
      * return type found in Constants
-     * 
+     *
      * @return int Constants.BITSTREAM
      */
     @Override
-    public int getType()
-    {
+    public int getType() {
         return Constants.BITSTREAM;
     }
 
@@ -311,7 +321,7 @@ public class Bitstream extends DSpaceObject implements DSpaceObjectLegacySupport
 
     /**
      * Get the asset store number where this bitstream is stored
-     * 
+     *
      * @return the asset store number of the bitstream
      */
     public int getStoreNumber() {
@@ -336,7 +346,8 @@ public class Bitstream extends DSpaceObject implements DSpaceObjectLegacySupport
     }
 
     /*
-        Getters & setters which should be removed on the long run, they are just here to provide all getters & setters to the item object
+        Getters & setters which should be removed on the long run, they are just here to provide all getters &
+        setters to the item object
      */
 
 
@@ -344,14 +355,11 @@ public class Bitstream extends DSpaceObject implements DSpaceObjectLegacySupport
      * Set the user's format description. This implies that the format of the
      * bitstream is uncertain, and the format is set to "unknown."
      *
-     * @param context
-     *     The relevant DSpace Context.
-     * @param desc
-     *     the user's description of the format
+     * @param context The relevant DSpace Context.
+     * @param desc    the user's description of the format
      * @throws SQLException if database error
      */
-    public void setUserFormatDescription(Context context, String desc) throws SQLException
-    {
+    public void setUserFormatDescription(Context context, String desc) throws SQLException {
         getBitstreamService().setUserFormatDescription(context, this, desc);
     }
 
@@ -363,8 +371,7 @@ public class Bitstream extends DSpaceObject implements DSpaceObjectLegacySupport
      * @return a description of the format.
      * @throws SQLException if database error
      */
-    public String getFormatDescription(Context context) throws SQLException
-    {
+    public String getFormatDescription(Context context) throws SQLException {
         return getBitstreamService().getFormatDescription(context, this);
     }
 
@@ -374,13 +381,11 @@ public class Bitstream extends DSpaceObject implements DSpaceObjectLegacySupport
      * of this bitstream to "unknown".
      *
      * @param context context
-     * @param f
-     *            the format of this bitstream, or <code>null</code> for
-     *            unknown
+     * @param f       the format of this bitstream, or <code>null</code> for
+     *                unknown
      * @throws SQLException if database error
      */
-    public void setFormat(Context context, BitstreamFormat f) throws SQLException
-    {
+    public void setFormat(Context context, BitstreamFormat f) throws SQLException {
         getBitstreamService().setFormat(context, this, f);
     }
 
@@ -390,8 +395,7 @@ public class Bitstream extends DSpaceObject implements DSpaceObjectLegacySupport
     }
 
     private BitstreamService getBitstreamService() {
-        if(bitstreamService == null)
-        {
+        if (bitstreamService == null) {
             bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
         }
         return bitstreamService;
@@ -401,40 +405,46 @@ public class Bitstream extends DSpaceObject implements DSpaceObjectLegacySupport
      * Return <code>true</code> if <code>other</code> is the same Bitstream
      * as this object, <code>false</code> otherwise
      *
-     * @param other
-     *            object to compare to
-     *
+     * @param other object to compare to
      * @return <code>true</code> if object passed in represents the same
-     *         collection as this object
+     * collection as this object
      */
-     @Override
-     public boolean equals(Object other)
-     {
-         if (other == null)
-         {
-             return false;
-         }
-         Class<?> objClass = HibernateProxyHelper.getClassWithoutInitializingProxy(other);
-         if (this.getClass() != objClass)
-         {
-             return false;
-         }
-         final Bitstream otherBitstream = (Bitstream) other;
-         if (!this.getID().equals(otherBitstream.getID()))
-         {
-             return false;
-         }
+    @Override
+    public boolean equals(Object other) {
+        if (other == null) {
+            return false;
+        }
+        Class<?> objClass = HibernateProxyHelper.getClassWithoutInitializingProxy(other);
+        if (this.getClass() != objClass) {
+            return false;
+        }
+        final Bitstream otherBitstream = (Bitstream) other;
+        if (!this.getID().equals(otherBitstream.getID())) {
+            return false;
+        }
 
-         return true;
-     }
+        return true;
+    }
 
-     @Override
-     public int hashCode()
-     {
-         int hash = 5;
-         hash += 73 * hash + getType();
-         hash += 73 * hash + getID().hashCode();
-         return hash;
-     }
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash += 73 * hash + getType();
+        hash += 73 * hash + getID().hashCode();
+        return hash;
+    }
+
+    /**
+     * Add date for bitstream granted (used into the use case for license grant the
+     * {@link LicenseUtils#grantLicense(Context, Item, String, String)}
+     *
+     * @param context        the dspace context
+     * @param acceptanceDate the granted date
+     * @throws SQLException
+     */
+    public void setAcceptanceDate(Context context, DCDate acceptanceDate) throws SQLException {
+        getBitstreamService()
+            .setMetadataSingleValue(context, this, "dcterms", "accessRights", null, null, acceptanceDate.toString());
+    }
 
 }

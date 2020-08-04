@@ -15,7 +15,7 @@ import java.util.Collection;
  * @author Roeland Dillen (roeland at atmire dot com)
  */
 
-public interface MetadataFieldMapping<RecordType,QueryType> {
+public interface MetadataFieldMapping<RecordType, QueryType> {
 
     /**
      * @param field MetadataFieldConfig representing what to map the value to
@@ -27,11 +27,11 @@ public interface MetadataFieldMapping<RecordType,QueryType> {
 
     /**
      * Create a collection of MetadatumDTO retrieved from a given RecordType
+     *
      * @param record Used to retrieve the MetadatumDTO
      * @return Collection of MetadatumDTO
      */
     public Collection<MetadatumDTO> resultToDCValueMapping(RecordType record);
-
 
 
 }

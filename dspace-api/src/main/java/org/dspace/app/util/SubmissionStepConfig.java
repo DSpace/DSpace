@@ -7,8 +7,10 @@
  */
 package org.dspace.app.util;
 
-import java.util.Map;
 import java.io.Serializable;
+import java.util.Map;
+
+import org.apache.commons.lang3.BooleanUtils;
 
 /**
  * Class representing configuration for a single step within an Item Submission
@@ -18,15 +20,17 @@ import java.io.Serializable;
  *
  * Note: Implements Serializable as it will be saved to the current session during submission.
  * Please ensure that nothing is added to this class that isn't also serializable
- * 
- * @see org.dspace.app.util.SubmissionConfigReader
- * @see org.dspace.app.util.SubmissionConfig
- * 
+ *
  * @author Tim Donohue
  * @version $Revision$
+ * @see org.dspace.app.util.SubmissionConfigReader
+ * @see org.dspace.app.util.SubmissionConfig
  */
-public class SubmissionStepConfig implements Serializable
-{
+public class SubmissionStepConfig implements Serializable {
+
+    public static final String INPUT_FORM_STEP_NAME = "submission-form";
+    public static final String UPLOAD_STEP_NAME = "upload";
+
     /*
      * The identifier for the Select Collection step
      */
@@ -43,70 +47,80 @@ public class SubmissionStepConfig implements Serializable
      */
     private String id = null;
 
-    /** the heading for this step */
-    private String heading = null;
-
-    /** the name of the java processing class for this step */
-    private String processingClassName = null;
-   
-    /** whether or not this step is editable during workflow (default=true) */
-    private boolean workflowEditable = true;
-
-    /** 
-     * The full name of the JSP-UI binding class for this step. This field is
-     * ONLY used by the JSP-UI.
-     **/
-    private String jspBindingClassName = null;
+    private boolean mandatory = true;
 
     /**
-     * The full name of the Manakin XML-UI Transformer class which will generate
-     * the necessary DRI for displaying this class in Manakin. This field is
-     * ONLY used by the Manakin XML-UI.
+     * the heading for this step
      */
-    private String xmlBindingClassName = null;
+    private String heading = null;
 
-    /** The number of this step in the current SubmissionConfig */
+    /**
+     * the name of the java processing class for this step
+     */
+    private String processingClassName = null;
+
+    /**
+     * The name of the UI components for this step.
+     **/
+    private String type = null;
+
+
+    /**
+     * The scope restriction for this step (submission or workflow).
+     **/
+    private String scope = null;
+
+    /**
+     * visibility in the main scope (default=editable, eventually read-only)
+     */
+    private String visibility = null;
+
+    /**
+     * visibility outside the main scope (default=hidden, eventually read-only)
+     */
+    private String visibilityOutside = null;
+
+    /**
+     * The number of this step in the current SubmissionConfig
+     */
     private int number = -1;
 
     /**
      * Class constructor for creating an empty SubmissionStepConfig object
      */
-    public SubmissionStepConfig()
-    {
+    public SubmissionStepConfig() {
     }
 
     /**
      * Class constructor for creating a SubmissionStepConfig object based on the
      * contents of a HashMap initialized by the SubmissionConfig object.
-     * 
-     * @param stepMap
-     *            the HashMap containing all required information about this
-     *            step
+     *
+     * @param stepMap the HashMap containing all required information about this
+     *                step
      */
-    public SubmissionStepConfig(Map<String, String> stepMap)
-    {
+    public SubmissionStepConfig(Map<String, String> stepMap) {
         id = stepMap.get("id");
+        String s = stepMap.get("mandatory");
+        // only set if explicitly configured
+        if (s != null) {
+            mandatory = BooleanUtils.toBoolean(s);
+        }
         heading = stepMap.get("heading");
         processingClassName = stepMap.get("processing-class");
-        jspBindingClassName = stepMap.get("jspui-binding");
-        xmlBindingClassName = stepMap.get("xmlui-binding");
-
-        String wfEditString = stepMap.get("workflow-editable");
-        if (wfEditString != null && wfEditString.length() > 0)
-        {
-            workflowEditable = Boolean.parseBoolean(wfEditString);
-        }
+        type = stepMap.get("type");
+        scope = stepMap.get("scope");
+        visibility = stepMap.get("scope.visibility");
+        visibilityOutside = stepMap.get("scope.visibilityOutside");
     }
 
     /**
      * Get the ID for this step. An ID is only defined if the step exists in the
      * {@code <step-definitions>} section. This ID field is used to reference special
      * steps (like the required step with {@code id="collection"})
-     * 
+     *
      * @return the step ID
      */
-    public String getId()
-    {
+    public String getId() {
         return id;
     }
 
@@ -114,11 +128,10 @@ public class SubmissionStepConfig implements Serializable
      * Get the heading for this step. This can either be a property from
      * Messages.properties, or the actual heading text. If this "heading"
      * contains a period(.) it is assumed to reference Messages.properties.
-     * 
+     *
      * @return the heading
      */
-    public String getHeading()
-    {
+    public String getHeading() {
         return heading;
     }
 
@@ -127,58 +140,46 @@ public class SubmissionStepConfig implements Serializable
      * <p>
      * This class must extend the org.dspace.submit.AbstractProcessingStep class,
      * and provide processing for BOTH the JSP-UI and XML-UI
-     * 
+     *
      * @return the class's full class path (e.g.
-     *         "org.dspace.submit.step.MySampleStep")
+     * "org.dspace.submit.step.MySampleStep")
      */
-    public String getProcessingClassName()
-    {
+    public String getProcessingClassName() {
         return processingClassName;
     }
 
     /**
-     * Retrieve the full class name of the Manakin Transformer which will
-     * generate this step's DRI, for display in Manakin XML-UI.
-     * <P>
-     * This class must extend the
-     * org.dspace.app.xmlui.aspect.submission.StepTransformer class.
-     * <P>
-     * This property is only used by the Manakin XML-UI, and therefore is not
-     * relevant if you are using the JSP-UI.
-     * 
-     * @return the full java class name of the Transformer to use for this step
+     * Retrieve the name of the component used by this step in the UI
+     *
+     * @return the name of the UI component to use for this step
      */
-    public String getXMLUIClassName()
-    {
-        return xmlBindingClassName;
+    public String getType() {
+        return type;
     }
-    
+
     /**
-     * Retrieve the full class name of the JSP-UI "binding" class which will
-     * initialize and call the necessary JSPs for display in the JSP-UI
-     * <P>
-     * This class must extend the
-     * org.dspace.app.webui.submit.JSPStep class.
-     * <P>
-     * This property is only used by the JSP-UI, and therefore is not
-     * relevant if you are using the XML-UI (aka. Manakin).
-     * 
-     * @return the full java class name of the JSPStep to use for this step
+     * @return the scope restriction for this step
      */
-    public String getJSPUIClassName()
-    {
-        return jspBindingClassName;
+    public String getScope() {
+        return scope;
+    }
+
+    public String getVisibility() {
+        return visibility;
+    }
+
+    public String getVisibilityOutside() {
+        return visibilityOutside;
     }
 
     /**
      * Get the number of this step in the current Submission process config.
      * Step numbers start with #0 (although step #0 is ALWAYS the special
      * "select collection" step)
-     * 
+     *
      * @return the number of this step in the current SubmissionConfig
      */
-    public int getStepNumber()
-    {
+    public int getStepNumber() {
         return number;
     }
 
@@ -186,35 +187,24 @@ public class SubmissionStepConfig implements Serializable
      * Sets the number of this step in the current Submission process config.
      * Step numbers start with #0 (although step #0 is ALWAYS the special
      * "select collection" step)
-     * 
-     * @param stepNum
-     *            the step number.
+     *
+     * @param stepNum the step number.
      */
-    protected void setStepNumber(int stepNum)
-    {
+    protected void setStepNumber(int stepNum) {
         this.number = stepNum;
-    }
-
-    /**
-     * Whether or not this step is editable during workflow processing. If
-     * "true", then this step will appear in the "Edit Metadata" stage of the
-     * workflow process.
-     * 
-     * @return if step is editable in a workflow process
-     */
-    public boolean isWorkflowEditable()
-    {
-        return workflowEditable;
     }
 
     /**
      * Whether or not this step is visible within the Progress Bar. A step is
      * only visible if it has been assigned a Heading, otherwise it's invisible
-     * 
+     *
      * @return if step is visible within the progress bar
      */
-    public boolean isVisible()
-    {
+    public boolean isVisible() {
         return ((heading != null) && (heading.length() > 0));
+    }
+
+    public boolean isMandatory() {
+        return mandatory;
     }
 }

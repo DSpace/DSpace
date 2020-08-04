@@ -11,7 +11,8 @@ import org.dspace.handle.service.HandleService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * Factory implementation to get services for the handle package, use HandleServiceFactory.getInstance() to retrieve an implementation
+ * Factory implementation to get services for the handle package, use HandleServiceFactory.getInstance() to retrieve
+ * an implementation
  *
  * @author kevinvandevelde at atmire.com
  */

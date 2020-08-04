@@ -7,11 +7,15 @@
  */
 package org.dspace.eperson;
 
-import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.hibernate.proxy.HibernateProxyHelper;
-
-import javax.persistence.*;
 import java.io.Serializable;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+
+import org.hibernate.proxy.HibernateProxyHelper;
 
 /**
  * Database entity representation of the group2groupcache table
@@ -19,7 +23,7 @@ import java.io.Serializable;
  * @author kevinvandevelde at atmire.com
  */
 @Entity
-@Table(name = "group2groupcache" )
+@Table(name = "group2groupcache")
 public class Group2GroupCache implements Serializable {
 
     @Id
@@ -51,31 +55,25 @@ public class Group2GroupCache implements Serializable {
     /**
      * Protected constructor, create object using:
      * {@link org.dspace.eperson.service.GroupService}
-     *
      */
-    protected Group2GroupCache()
-    {
+    protected Group2GroupCache() {
 
     }
 
     @Override
     public boolean equals(Object obj) {
-        if (obj == null)
-        {
+        if (obj == null) {
             return false;
         }
         Class<?> objClass = HibernateProxyHelper.getClassWithoutInitializingProxy(obj);
-        if (getClass() != objClass)
-        {
+        if (getClass() != objClass) {
             return false;
         }
         final Group2GroupCache other = (Group2GroupCache) obj;
-        if(!parent.equals(other.getParent()))
-        {
+        if (!parent.equals(other.getParent())) {
             return false;
         }
-        if(!child.equals(other.getChild()))
-        {
+        if (!child.equals(other.getChild())) {
             return false;
         }
         return true;
@@ -83,9 +81,9 @@ public class Group2GroupCache implements Serializable {
 
     @Override
     public int hashCode() {
-        return new org.apache.commons.lang.builder.HashCodeBuilder()
-                .append(parent == null ? "" : parent.getID())
-                .append(child == null ? "" : child.getID())
-                .toHashCode();
+        return new org.apache.commons.lang3.builder.HashCodeBuilder()
+            .append(parent == null ? "" : parent.getID())
+            .append(child == null ? "" : child.getID())
+            .toHashCode();
     }
 }

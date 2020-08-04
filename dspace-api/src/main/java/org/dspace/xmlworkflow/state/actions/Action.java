@@ -7,26 +7,26 @@
  */
 package org.dspace.xmlworkflow.state.actions;
 
-import org.dspace.authorize.AuthorizeException;
-import org.dspace.core.Context;
-import org.dspace.xmlworkflow.RoleMembers;
-import org.dspace.xmlworkflow.WorkflowConfigurationException;
-import org.dspace.workflow.WorkflowException;
-import org.dspace.xmlworkflow.state.Step;
-import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
-
-import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import javax.servlet.http.HttpServletRequest;
+
+import org.dspace.authorize.AuthorizeException;
+import org.dspace.core.Context;
+import org.dspace.workflow.WorkflowException;
+import org.dspace.xmlworkflow.RoleMembers;
+import org.dspace.xmlworkflow.WorkflowConfigurationException;
+import org.dspace.xmlworkflow.state.Step;
+import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 
 /**
  * This abstract class represents an api action
  * Each step in the xml workflow consists of a number of actions
  * this abstract action contains some utility methods and the methods
  * that each of these actions must implement including:
- * activating, execution, ... 
+ * activating, execution, ...
  *
  * @author Bram De Schouwer (bram.deschouwer at dot com)
  * @author Kevin Van de Velde (kevin at atmire dot com)
@@ -36,12 +36,33 @@ import java.util.List;
 public abstract class Action {
 
     private WorkflowActionConfig parent;
-    private static String ERROR_FIELDS_ATTRIBUTE = "dspace.workflow.error_fields";
+    private static final String ERROR_FIELDS_ATTRIBUTE = "dspace.workflow.error_fields";
 
+    public abstract void activate(Context c, XmlWorkflowItem wf)
+        throws SQLException, IOException, AuthorizeException, WorkflowException;
 
-    public abstract void activate(Context c, XmlWorkflowItem wf) throws SQLException, IOException, AuthorizeException, WorkflowException;
+    public abstract ActionResult execute(Context c, XmlWorkflowItem wfi, Step step, HttpServletRequest request)
+        throws SQLException, AuthorizeException, IOException, WorkflowException;
 
-    public abstract ActionResult execute(Context c, XmlWorkflowItem wfi, Step step, HttpServletRequest request) throws SQLException, AuthorizeException, IOException, WorkflowException;
+    /**
+     * Returns a list of options that the user can select at this action which results in the next step in the workflow
+     * @return  A list of options of this action, resulting in the next step of the workflow
+     */
+    public abstract List<String> getOptions();
+
+    /**
+     * Returns true if one of the options is a parameter of the request
+     * @param request   Action request
+     * @return  true if one of the options is a parameter of the request; false if none was found
+     */
+    protected boolean isOptionInParam(HttpServletRequest request) {
+        for (String option: this.getOptions()) {
+            if (request.getParameter(option) != null) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     public WorkflowActionConfig getParent() {
         return parent;
@@ -51,15 +72,17 @@ public abstract class Action {
         this.parent = parent;
     }
 
-    public String getProvenanceStartId(){
+    public String getProvenanceStartId() {
         return "Step: " + getParent().getStep().getId() + " - action:" + getParent().getId();
     }
 
-    public void alertUsersOnActivation(Context c, XmlWorkflowItem wfi, RoleMembers members) throws SQLException, IOException {
+    public void alertUsersOnActivation(Context c, XmlWorkflowItem wfi, RoleMembers members)
+        throws SQLException, IOException {
 
     }
 
-    public abstract boolean isAuthorized(Context context, HttpServletRequest request, XmlWorkflowItem wfi) throws SQLException, AuthorizeException, IOException, WorkflowConfigurationException;
+    public abstract boolean isAuthorized(Context context, HttpServletRequest request, XmlWorkflowItem wfi)
+        throws SQLException, AuthorizeException, IOException, WorkflowConfigurationException;
 
 
     /**
@@ -67,17 +90,15 @@ public abstract class Action {
      * step processing. This list is for usage in generating the appropriate
      * error message(s) in the UI.
      *
-     * @param request
-     *            current servlet request object
-     * @param errorFields
-     *            List of all fields (as Strings) which had errors
+     * @param request     current servlet request object
+     * @param errorFields List of all fields (as Strings) which had errors
      */
-    private void setErrorFields(HttpServletRequest request, List errorFields)
-    {
-        if(errorFields==null)
+    private void setErrorFields(HttpServletRequest request, List errorFields) {
+        if (errorFields == null) {
             request.removeAttribute(ERROR_FIELDS_ATTRIBUTE);
-        else
+        } else {
             request.setAttribute(ERROR_FIELDS_ATTRIBUTE, errorFields);
+        }
     }
 
     /**
@@ -85,15 +106,14 @@ public abstract class Action {
      * workflow processing. This list is for usage in generating the appropriate
      * error message(s) in the UI.
      *
-     * @param request
-     *            current servlet request object
+     * @param request current servlet request object
      * @return List of error fields (as Strings)
      */
-    public static List getErrorFields(HttpServletRequest request)
-    {
+    public static List getErrorFields(HttpServletRequest request) {
         List result = new ArrayList();
-        if(request.getAttribute(ERROR_FIELDS_ATTRIBUTE) != null)
+        if (request.getAttribute(ERROR_FIELDS_ATTRIBUTE) != null) {
             result = (List) request.getAttribute(ERROR_FIELDS_ATTRIBUTE);
+        }
         return result;
     }
 
@@ -101,18 +121,14 @@ public abstract class Action {
      * Add a single UI field to the list of all error fields (which can
      * later be retrieved using getErrorFields())
      *
-     * @param request
-     *              current servlet request object
-     * @param fieldName
-     *            the name of the field which had an error
+     * @param request   current servlet request object
+     * @param fieldName the name of the field which had an error
      */
-    protected void addErrorField(HttpServletRequest request, String fieldName)
-    {
+    protected void addErrorField(HttpServletRequest request, String fieldName) {
         //get current list
         List errorFields = getErrorFields(request);
 
-        if (errorFields == null)
-        {
+        if (errorFields == null) {
             errorFields = new ArrayList();
         }
 

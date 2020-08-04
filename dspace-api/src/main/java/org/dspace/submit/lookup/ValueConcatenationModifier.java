@@ -8,17 +8,15 @@
 
 package org.dspace.submit.lookup;
 
-import gr.ekt.bte.core.AbstractModifier;
-import gr.ekt.bte.core.MutableRecord;
-import gr.ekt.bte.core.Record;
-
-import gr.ekt.bte.core.StringValue;
-import gr.ekt.bte.core.Value;
-
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
+import gr.ekt.bte.core.AbstractModifier;
+import gr.ekt.bte.core.MutableRecord;
+import gr.ekt.bte.core.Record;
+import gr.ekt.bte.core.StringValue;
+import gr.ekt.bte.core.Value;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * @author Andrea Bollini
@@ -26,33 +24,28 @@ import org.apache.commons.lang.StringUtils;
  * @author Luigi Andrea Pascarelli
  * @author Panagiotis Koutsourakis
  */
-public class ValueConcatenationModifier extends AbstractModifier
-{
+public class ValueConcatenationModifier extends AbstractModifier {
     private String field;
 
     private String separator = ",";
 
     private boolean whitespaceAfter = true;
 
-    public ValueConcatenationModifier()
-    {
+    public ValueConcatenationModifier() {
         super("ValueConcatenationModifier");
     }
 
     @Override
-    public Record modify(MutableRecord rec)
-    {
+    public Record modify(MutableRecord rec) {
         List<Value> values = rec.getValues(field);
-        if (values != null)
-        {
+        if (values != null) {
             List<String> converted_values = new ArrayList<String>();
-            for (Value val : values)
-            {
+            for (Value val : values) {
                 converted_values.add(val.getAsString());
             }
             List<Value> final_value = new ArrayList<Value>();
             String v = StringUtils.join(converted_values.iterator(), separator
-                    + (whitespaceAfter ? " " : ""));
+                + (whitespaceAfter ? " " : ""));
             final_value.add(new StringValue(v));
             rec.updateField(field, final_value);
         }
@@ -63,51 +56,42 @@ public class ValueConcatenationModifier extends AbstractModifier
     /**
      * @return the field
      */
-    public String getField()
-    {
+    public String getField() {
         return field;
     }
 
     /**
-     * @param field
-     *            the field to set
+     * @param field the field to set
      */
-    public void setField(String field)
-    {
+    public void setField(String field) {
         this.field = field;
     }
 
     /**
      * @return the separator
      */
-    public String getSeparator()
-    {
+    public String getSeparator() {
         return separator;
     }
 
     /**
-     * @param separator
-     *            the separator to set
+     * @param separator the separator to set
      */
-    public void setSeparator(String separator)
-    {
+    public void setSeparator(String separator) {
         this.separator = separator;
     }
 
     /**
      * @return the whiteSpaceAfter
      */
-    public boolean isWhitespaceAfter()
-    {
+    public boolean isWhitespaceAfter() {
         return whitespaceAfter;
     }
 
     /**
-     * @param whiteSpaceAfter
-     *            the whiteSpaceAfter to set
+     * @param whiteSpaceAfter the whiteSpaceAfter to set
      */
-    public void setWhitespaceAfter(boolean whiteSpaceAfter)
-    {
+    public void setWhitespaceAfter(boolean whiteSpaceAfter) {
         this.whitespaceAfter = whiteSpaceAfter;
     }
 }

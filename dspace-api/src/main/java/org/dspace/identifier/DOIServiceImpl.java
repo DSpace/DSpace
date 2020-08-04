@@ -7,17 +7,17 @@
  */
 package org.dspace.identifier;
 
+import java.sql.SQLException;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
 import org.dspace.identifier.dao.DOIDAO;
 import org.dspace.identifier.doi.DOIIdentifierException;
 import org.dspace.identifier.service.DOIService;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import java.sql.SQLException;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * Service implementation for the DOI object.
@@ -31,8 +31,7 @@ public class DOIServiceImpl implements DOIService {
     @Autowired(required = true)
     protected DOIDAO doiDAO;
 
-    protected DOIServiceImpl()
-    {
+    protected DOIServiceImpl() {
 
     }
 
@@ -57,23 +56,29 @@ public class DOIServiceImpl implements DOIService {
     }
 
     @Override
-    public DOI findDOIByDSpaceObject(Context context, DSpaceObject dso, List<Integer> statusToExclude) throws SQLException {
+    public DOI findDOIByDSpaceObject(Context context, DSpaceObject dso, List<Integer> statusToExclude)
+        throws SQLException {
         return doiDAO.findDOIByDSpaceObject(context, dso, statusToExclude);
     }
 
     @Override
     public String DOIToExternalForm(String identifier) throws IdentifierException {
-        if (null == identifier) 
+        if (null == identifier) {
             throw new IllegalArgumentException("Identifier is null.", new NullPointerException());
-        if (identifier.isEmpty())
+        }
+        if (identifier.isEmpty()) {
             throw new IllegalArgumentException("Cannot format an empty identifier.");
-        if (identifier.startsWith(DOI.SCHEME))
+        }
+        if (identifier.startsWith(DOI.SCHEME)) {
             return DOI.RESOLVER + "/" + identifier.substring(DOI.SCHEME.length());
-        if (identifier.startsWith("10.") && identifier.contains("/"))
+        }
+        if (identifier.startsWith("10.") && identifier.contains("/")) {
             return DOI.RESOLVER + "/" + identifier;
-        if (identifier.startsWith(DOI.RESOLVER + "/10."))
+        }
+        if (identifier.startsWith(DOI.RESOLVER + "/10.")) {
             return identifier;
-        
+        }
+
         throw new IdentifierException(identifier + "does not seem to be a DOI.");
     }
 
@@ -81,13 +86,12 @@ public class DOIServiceImpl implements DOIService {
     public String DOIFromExternalFormat(String identifier) throws DOIIdentifierException {
         Pattern pattern = Pattern.compile("^" + DOI.RESOLVER + "/+(10\\..*)$");
         Matcher matcher = pattern.matcher(identifier);
-        if (matcher.find())
-        {
+        if (matcher.find()) {
             return DOI.SCHEME + matcher.group(1);
         }
 
         throw new DOIIdentifierException("Cannot recognize DOI!",
-                DOIIdentifierException.UNRECOGNIZED);
+                                         DOIIdentifierException.UNRECOGNIZED);
     }
 
     @Override
@@ -108,18 +112,18 @@ public class DOIServiceImpl implements DOIService {
             return DOI.SCHEME + identifier.substring(18);
         }
         throw new DOIIdentifierException(identifier + "does not seem to be a DOI.",
-                DOIIdentifierException.UNRECOGNIZED);
+                                         DOIIdentifierException.UNRECOGNIZED);
     }
 
     @Override
-    public List<DOI> getDOIsByStatus(Context context, List<Integer> statuses) throws SQLException{
+    public List<DOI> getDOIsByStatus(Context context, List<Integer> statuses) throws SQLException {
         return doiDAO.findByStatus(context, statuses);
     }
-    
+
     @Override
-    public List<DOI> getSimilarDOIsNotInState(Context context, String doiPattern, List<Integer> statuses, boolean dsoIsNotNull)
-            throws SQLException
-    {
+    public List<DOI> getSimilarDOIsNotInState(Context context, String doiPattern, List<Integer> statuses,
+                                              boolean dsoIsNotNull)
+        throws SQLException {
         return doiDAO.findSimilarNotInState(context, doiPattern, statuses, dsoIsNotNull);
     }
 }

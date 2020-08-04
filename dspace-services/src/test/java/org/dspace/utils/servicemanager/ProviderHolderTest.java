@@ -7,13 +7,17 @@
  */
 package org.dspace.utils.servicemanager;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
 
 import org.junit.Test;
 
 /**
  * Tests the ability of a provider holder to release a reference correctly
- * 
+ *
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  */
 public class ProviderHolderTest {
@@ -28,12 +32,12 @@ public class ProviderHolderTest {
         assertNull(holder.getProvider());
 
         Thing t = new Thing();
-        holder.setProvider( t );
+        holder.setProvider(t);
 
         Thing t2 = holder.getProvider();
         assertNotNull(t2);
         assertEquals(t, t2);
-        
+
         //trash the references
         t = t2 = null;
     }
@@ -42,7 +46,7 @@ public class ProviderHolderTest {
     public void testHolderRelease() {
         ProviderHolder<Thing> holder = new ProviderHolder<Thing>();
         Thing t = new Thing();
-        holder.setProvider( t );
+        holder.setProvider(t);
 
         Thing t2 = holder.getProvider();
         assertNotNull(t2);
@@ -56,7 +60,7 @@ public class ProviderHolderTest {
 
         Thing t3 = holder.getProvider();
         assertNull(t3);
-        
+
         t3 = null;
     }
 
@@ -71,12 +75,12 @@ public class ProviderHolderTest {
         }
 
         Thing t = new Thing();
-        holder.setProvider( t );
+        holder.setProvider(t);
 
         Thing t2 = holder.getProviderOrFail();
         assertNotNull(t2);
         assertEquals(t, t2);
-        
+
         //trash the references
         t = t2 = null;
     }
@@ -84,16 +88,16 @@ public class ProviderHolderTest {
     @Test
     public void testHolderHashEqualsString() {
         ProviderHolder<Thing> holder = new ProviderHolder<Thing>();
-        assertNotNull( holder.hashCode() );
-        assertFalse( holder.equals(null) );
-        assertNotNull( holder.toString() );
+        assertNotNull(holder.hashCode());
+        assertFalse(holder.equals(null));
+        assertNotNull(holder.toString());
 
-        holder.setProvider( new Thing() );
-        assertNotNull( holder.hashCode() );
-        assertFalse( holder.equals(null) );
-        assertNotNull( holder.toString() );
-        
+        holder.setProvider(new Thing());
+        assertNotNull(holder.hashCode());
+        assertFalse(holder.equals(null));
+        assertNotNull(holder.toString());
+
         holder = null;
     }
-    
+
 }

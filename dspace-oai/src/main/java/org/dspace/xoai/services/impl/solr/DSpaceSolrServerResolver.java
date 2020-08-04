@@ -7,35 +7,31 @@
  */
 package org.dspace.xoai.services.impl.solr;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
-import org.apache.solr.client.solrj.SolrServer;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.impl.HttpSolrServer;
+import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.dspace.xoai.services.api.config.ConfigurationService;
 import org.dspace.xoai.services.api.solr.SolrServerResolver;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class DSpaceSolrServerResolver implements SolrServerResolver {
-    private static Logger log = LogManager.getLogger(DSpaceSolrServerResolver.class);
-    private static SolrServer server = null;
+    private static final Logger log = LogManager.getLogger(DSpaceSolrServerResolver.class);
+    private static SolrClient server = null;
 
     @Autowired
     private ConfigurationService configurationService;
 
     @Override
-    public SolrServer getServer() throws SolrServerException
-    {
-        if (server == null)
-        {
-            try
-            {
-                server = new HttpSolrServer(configurationService.getProperty("oai", "solr.url"));
-                log.debug("Solr Server Initialized");
-            }
-            catch (Exception e)
-            {
-                log.error(e.getMessage(), e);
+    public SolrClient getServer() throws SolrServerException {
+        if (server == null) {
+            String serverUrl = configurationService.getProperty("oai.solr.url");
+            try {
+                server = new HttpSolrClient.Builder(serverUrl).build();
+                log.debug("OAI Solr Server Initialized");
+            } catch (Exception e) {
+                log.error("Could not initialize OAI Solr Server at " + serverUrl , e);
             }
         }
         return server;

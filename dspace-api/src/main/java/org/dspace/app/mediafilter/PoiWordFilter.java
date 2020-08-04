@@ -8,8 +8,8 @@
 package org.dspace.app.mediafilter;
 
 import java.io.ByteArrayInputStream;
-import java.io.InputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 import org.apache.poi.POITextExtractor;
 import org.apache.poi.extractor.ExtractorFactory;
@@ -23,55 +23,45 @@ import org.slf4j.LoggerFactory;
  * Extract flat text from Microsoft Word documents (.doc, .docx).
  */
 public class PoiWordFilter
-        extends MediaFilter
-{
+    extends MediaFilter {
     private static final Logger LOG = LoggerFactory.getLogger(PoiWordFilter.class);
 
     @Override
-    public String getFilteredName(String oldFilename)
-    {
+    public String getFilteredName(String oldFilename) {
         return oldFilename + ".txt";
     }
 
     @Override
-    public String getBundleName()
-    {
+    public String getBundleName() {
         return "TEXT";
     }
 
     @Override
-    public String getFormatString()
-    {
+    public String getFormatString() {
         return "Text";
     }
 
     @Override
-    public String getDescription()
-    {
+    public String getDescription() {
         return "Extracted text";
     }
 
     @Override
     public InputStream getDestinationStream(Item currentItem, InputStream source, boolean verbose)
-            throws Exception
-    {
+        throws Exception {
         String text;
-        try  
-        {
+        try {
             // get input stream from bitstream, pass to filter, get string back
             POITextExtractor extractor = ExtractorFactory.createExtractor(source);
             text = extractor.getText();
-        }
-        catch (IOException | OpenXML4JException | XmlException e)
-        {
+        } catch (IOException | OpenXML4JException | XmlException e) {
             System.err.format("Invalid File Format:  %s%n", e.getMessage());
             LOG.error("Unable to parse the bitstream:  ", e);
             throw e;
         }
 
         // if verbose flag is set, print out extracted text to STDOUT
-        if (verbose)
-        {
+        if (verbose) {
             System.out.println(text);
         }
 

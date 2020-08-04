@@ -1,0 +1,32 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!--
+    log4j2-console.xml
+
+    Simple log4j configuration file used during Ant build tasks.
+
+    Its goal is to simply output logs to the commandline / console.
+-->
+<Configuration strict='true'
+               xmlns='http://logging.apache.org/log4j/2.0/config'>
+    <Properties>
+        <!-- Default log file directory for DSpace. -->
+        <Property name='log.dir'>${log4j:configParentLocation}/../log</Property>
+    </Properties>
+
+    <Appenders>
+        <Appender name='A1'
+		  type='Console'>
+            <Layout type='PatternLayout'
+		    pattern='%d %-5p %c @ %m%n'/>
+        </Appender>
+    </Appenders>
+
+    <!-- Set root category priority to WARN and its only appender to A1.
+         For command line / Ant scripts, we are only concerned about significant warnings/errors.
+         For the full detail, change this to INFO and re-run Ant. -->
+    <Loggers>
+        <Root level='WARN'>
+            <AppenderRef ref='A1'/>
+        </Root>
+    </Loggers>
+</Configuration>

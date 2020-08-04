@@ -7,8 +7,8 @@
  */
 package org.dspace.embargo;
 
-import java.sql.SQLException;
 import java.io.IOException;
+import java.sql.SQLException;
 
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DCDate;
@@ -21,8 +21,7 @@ import org.dspace.core.Context;
  * @author Larry Stone
  * @author Richard Rodgers
  */
-public interface EmbargoSetter
-{
+public interface EmbargoSetter {
     /**
      * Get lift date of embargo from the "terms" supplied in the
      * metadata (or other available state) of this Item.  Return null
@@ -39,14 +38,12 @@ public interface EmbargoSetter
      * significant if the embargo lift date is computed relative to the present.
      *
      * @param context the DSpace context
-     * @param item the item to embargo
-     * @param terms value of the metadata field configured as embargo terms, if any.
+     * @param item    the item to embargo
+     * @param terms   value of the metadata field configured as embargo terms, if any.
      * @return absolute date on which the embargo is to be lifted, or null if none
-     * @throws SQLException
-     *     An exception that provides information on a database access error or other errors.
-     * @throws AuthorizeException
-     *     Exception indicating the current user of the context does not have permission
-     *     to perform a particular action.
+     * @throws SQLException       An exception that provides information on a database access error or other errors.
+     * @throws AuthorizeException Exception indicating the current user of the context does not have permission
+     *                            to perform a particular action.
      */
     public DCDate parseTerms(Context context, Item item, String terms)
         throws SQLException, AuthorizeException;
@@ -56,12 +53,10 @@ public interface EmbargoSetter
      * bitstreams in this Item.
      *
      * @param context the DSpace context
-     * @param item the item to embargo
-     * @throws SQLException
-     *     An exception that provides information on a database access error or other errors.
-     * @throws AuthorizeException
-     *     Exception indicating the current user of the context does not have permission
-     *     to perform a particular action.
+     * @param item    the item to embargo
+     * @throws SQLException       An exception that provides information on a database access error or other errors.
+     * @throws AuthorizeException Exception indicating the current user of the context does not have permission
+     *                            to perform a particular action.
      */
     public void setEmbargo(Context context, Item item)
         throws SQLException, AuthorizeException;
@@ -77,14 +72,11 @@ public interface EmbargoSetter
      * long as its member Bitstreams are not readable.
      *
      * @param context the DSpace context
-     * @param item the item to embargo
-     * @throws IOException
-     *     A general class of exceptions produced by failed or interrupted I/O operations.
-     * @throws SQLException
-     *     An exception that provides information on a database access error or other errors.
-     * @throws AuthorizeException
-     *     Exception indicating the current user of the context does not have permission
-     *     to perform a particular action.
+     * @param item    the item to embargo
+     * @throws IOException        A general class of exceptions produced by failed or interrupted I/O operations.
+     * @throws SQLException       An exception that provides information on a database access error or other errors.
+     * @throws AuthorizeException Exception indicating the current user of the context does not have permission
+     *                            to perform a particular action.
      */
     public void checkEmbargo(Context context, Item item)
         throws SQLException, AuthorizeException, IOException;

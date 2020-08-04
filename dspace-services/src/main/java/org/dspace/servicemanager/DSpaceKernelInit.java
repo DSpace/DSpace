@@ -13,17 +13,22 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This class simplifies the handling of lookup, registration, and 
- * access of a DSpace Kernel MBean.  This class has all static 
+ * This class simplifies the handling of lookup, registration, and
+ * access of a DSpace Kernel MBean.  This class has all static
  * methods.
- * 
+ *
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  */
 public class DSpaceKernelInit {
 
     private static Logger log = LoggerFactory.getLogger(DSpaceKernelInit.class);
-    
+
     private static final Object staticLock = new Object();
+
+    /**
+     * Default constructor
+     */
+    private DSpaceKernelInit() { }
 
     /**
      * Creates or retrieves a DSpace Kernel with the given name.
@@ -38,7 +43,7 @@ public class DSpaceKernelInit {
                 DSpaceKernel kernel = new DSpaceKernelManager().getKernel(name);
                 if (kernel != null) {
                     if (kernel instanceof DSpaceKernelImpl) {
-                        return (DSpaceKernelImpl)kernel;
+                        return (DSpaceKernelImpl) kernel;
                     }
 
                     throw new IllegalStateException("Wrong DSpaceKernel implementation");
@@ -46,6 +51,8 @@ public class DSpaceKernelInit {
             } catch (Exception e) {
                 // Ignore exceptions here
             }
+        } else if (DSpaceKernelManager.getDefaultKernel() != null) {
+            return (DSpaceKernelImpl) DSpaceKernelManager.getDefaultKernel();
         }
 
         synchronized (staticLock) {

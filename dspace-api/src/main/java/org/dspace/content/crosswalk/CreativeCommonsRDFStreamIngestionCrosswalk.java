@@ -7,12 +7,11 @@
  */
 package org.dspace.content.crosswalk;
 
-import java.io.InputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.sql.SQLException;
 
-import org.apache.log4j.Logger;
-
+import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
@@ -31,27 +30,27 @@ import org.dspace.license.service.CreativeCommonsService;
  * <p>
  * This crosswalk should only be used when ingesting other kinds of SIPs.
  *
- * @author  Larry Stone
+ * @author Larry Stone
  * @version $Revision: 1.0 $
  */
 public class CreativeCommonsRDFStreamIngestionCrosswalk
-    implements StreamIngestionCrosswalk
-{
-    /** log4j logger */
-    private static Logger log = Logger.getLogger(CreativeCommonsRDFStreamIngestionCrosswalk.class);
+    implements StreamIngestionCrosswalk {
+    /**
+     * log4j logger
+     */
+    private static Logger log =
+            org.apache.logging.log4j.LogManager.getLogger(CreativeCommonsRDFStreamIngestionCrosswalk.class);
 
-    protected CreativeCommonsService creativeCommonsService = LicenseServiceFactory.getInstance().getCreativeCommonsService();
+    protected CreativeCommonsService creativeCommonsService = LicenseServiceFactory.getInstance()
+                                                                                   .getCreativeCommonsService();
 
 
     @Override
     public void ingest(Context context, DSpaceObject dso, InputStream in, String MIMEType)
-        throws CrosswalkException, IOException, SQLException, AuthorizeException
-    {
+        throws CrosswalkException, IOException, SQLException, AuthorizeException {
         // If package includes a Creative Commons license, add that:
-        if (dso.getType() == Constants.ITEM)
-        {
-            if (log.isDebugEnabled())
-            {
+        if (dso.getType() == Constants.ITEM) {
+            if (log.isDebugEnabled()) {
                 log.debug("Reading a Creative Commons license, MIMEtype=" + MIMEType);
             }
 
@@ -60,8 +59,7 @@ public class CreativeCommonsRDFStreamIngestionCrosswalk
     }
 
 
-    public String getMIMEType()
-    {
+    public String getMIMEType() {
         return "text/rdf";
     }
 }

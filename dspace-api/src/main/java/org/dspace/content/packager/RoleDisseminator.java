@@ -7,7 +7,21 @@
  */
 package org.dspace.content.packager;
 
-import org.apache.log4j.Logger;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.PipedInputStream;
+import java.io.PipedOutputStream;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+import javax.xml.stream.XMLOutputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
+
+import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
@@ -23,24 +37,17 @@ import org.dspace.eperson.service.EPersonService;
 import org.dspace.eperson.service.GroupService;
 import org.jdom.Namespace;
 
-import javax.xml.stream.XMLOutputFactory;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
-import java.io.*;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * Plugin to export all Group and EPerson objects in XML, perhaps for reloading.
- * 
+ *
  * @author Mark Wood
  */
-public class RoleDisseminator implements PackageDisseminator
-{
+public class RoleDisseminator implements PackageDisseminator {
 
-    /** log4j category */
-    private static final Logger log = Logger.getLogger(RoleDisseminator.class);
+    /**
+     * log4j category
+     */
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(RoleDisseminator.class);
 
     /**
      * DSpace Roles XML Namespace in JDOM form.
@@ -84,7 +91,7 @@ public class RoleDisseminator implements PackageDisseminator
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * org.dspace.content.packager.PackageDisseminator#disseminate(org.dspace
      * .core.Context, org.dspace.content.DSpaceObject,
@@ -92,24 +99,19 @@ public class RoleDisseminator implements PackageDisseminator
      */
     @Override
     public void disseminate(Context context, DSpaceObject object,
-                     PackageParameters params, File pkgFile)
+                            PackageParameters params, File pkgFile)
         throws PackageException, CrosswalkException,
-               AuthorizeException, SQLException, IOException
-    {
+        AuthorizeException, SQLException, IOException {
         boolean emitPasswords = params.containsKey("passwords");
 
         FileOutputStream fileOut = null;
-        try
-        {
+        try {
             //open file stream for writing
             fileOut = new FileOutputStream(pkgFile);
             writeToStream(context, object, fileOut, emitPasswords);
-        }
-        finally
-        {
+        } finally {
             //close file stream & save
-            if (fileOut != null)
-            {
+            if (fileOut != null) {
                 fileOut.close();
             }
         }
@@ -118,22 +120,21 @@ public class RoleDisseminator implements PackageDisseminator
     /**
      * Make serialized users and groups available on an InputStream, for code
      * which wants to read one.
-     * 
+     *
      * @param emitPasswords true if password hashes should be included.
      * @return the stream of XML representing users and groups.
      * @throws IOException if IO error
-     *             if a PipedOutputStream or PipedInputStream cannot be created.
+     *                     if a PipedOutputStream or PipedInputStream cannot be created.
      */
     InputStream asStream(Context context, DSpaceObject object, boolean emitPasswords)
-            throws IOException
-    {
+        throws IOException {
         // Create a PipedOutputStream to which to write some XML
         PipedOutputStream outStream = new PipedOutputStream();
         PipedInputStream inStream = new PipedInputStream(outStream);
 
         // Create a new Thread to push serialized objects into the pipe
         Serializer serializer = new Serializer(context, object, outStream,
-                emitPasswords);
+                                               emitPasswords);
         new Thread(serializer).start();
 
         return inStream;
@@ -141,28 +142,27 @@ public class RoleDisseminator implements PackageDisseminator
 
     /**
      * Embody a thread for serializing users and groups.
-     * 
+     *
      * @author mwood
      */
-    protected class Serializer implements Runnable
-    {
+    protected class Serializer implements Runnable {
         private Context context;
         private DSpaceObject object;
         private OutputStream stream;
         private boolean emitPasswords;
-        
+
         @SuppressWarnings("unused")
-        private Serializer() {}
+        private Serializer() {
+        }
 
         /**
          * @param context
-         * @param object the DSpaceObject
-         * @param stream receives serialized user and group objects.  Will be
-         *          closed when serialization is complete.
+         * @param object        the DSpaceObject
+         * @param stream        receives serialized user and group objects.  Will be
+         *                      closed when serialization is complete.
          * @param emitPasswords true if password hashes should be included.
          */
-        Serializer(Context context, DSpaceObject object, OutputStream stream, boolean emitPasswords)
-        {
+        Serializer(Context context, DSpaceObject object, OutputStream stream, boolean emitPasswords) {
             this.context = context;
             this.object = object;
             this.stream = stream;
@@ -170,19 +170,13 @@ public class RoleDisseminator implements PackageDisseminator
         }
 
         @Override
-        public void run()
-        {
-            try
-            {
+        public void run() {
+            try {
                 writeToStream(context, object, stream, emitPasswords);
                 stream.close();
-            }
-            catch (IOException e)
-            {
+            } catch (IOException e) {
                 log.error(e);
-            }
-            catch (PackageException e)
-            {
+            } catch (PackageException e) {
                 log.error(e);
             }
         }
@@ -190,27 +184,24 @@ public class RoleDisseminator implements PackageDisseminator
 
     /**
      * Serialize users and groups to a stream.
-     * 
-     * @param context current Context
-     * @param object DSpaceObject
-     * @param stream receives the output.  Is not closed by this method.
+     *
+     * @param context       current Context
+     * @param object        DSpaceObject
+     * @param stream        receives the output.  Is not closed by this method.
      * @param emitPasswords true if password hashes should be included.
      * @throws PackageException if error
      */
     protected void writeToStream(Context context, DSpaceObject object, OutputStream stream,
-            boolean emitPasswords)
-    throws PackageException
-    {
-        try
-        {
+                                 boolean emitPasswords)
+        throws PackageException {
+        try {
             //First, find all Groups/People associated with our current Object
             List<Group> groups = findAssociatedGroups(context, object);
             List<EPerson> people = findAssociatedPeople(context, object);
 
             //Only continue if we've found Groups or People which we need to disseminate
-            if((groups!=null && groups.size()>0) ||
-               (people!=null && people.size()>0))
-            {
+            if ((groups != null && groups.size() > 0) ||
+                (people != null && people.size() > 0)) {
                 XMLOutputFactory factory = XMLOutputFactory.newInstance();
                 XMLStreamWriter writer;
 
@@ -220,12 +211,10 @@ public class RoleDisseminator implements PackageDisseminator
                 writer.writeStartElement(DSPACE_ROLES);
 
                 //Only disseminate a <Groups> element if some groups exist
-                if(groups!=null)
-                {
+                if (groups != null) {
                     writer.writeStartElement(GROUPS);
 
-                    for (Group group : groups)
-                    {
+                    for (Group group : groups) {
                         writeGroup(context, object, group, writer);
                     }
 
@@ -233,12 +222,10 @@ public class RoleDisseminator implements PackageDisseminator
                 }
 
                 //Only disseminate an <People> element if some people exist
-                if(people!=null)
-                {
+                if (people != null) {
                     writer.writeStartElement(EPERSONS);
 
-                    for (EPerson eperson : people)
-                    {
+                    for (EPerson eperson : people) {
                         writeEPerson(eperson, writer, emitPasswords);
                     }
 
@@ -248,71 +235,63 @@ public class RoleDisseminator implements PackageDisseminator
                 writer.writeEndElement(); // DSPACE_ROLES
                 writer.writeEndDocument();
                 writer.close();
-            }//end if Groups or People exist
-        }
-        catch (Exception e)
-        {
+            } //end if Groups or People exist
+        } catch (Exception e) {
             throw new PackageException(e);
         }
     }
 
     /* (non-Javadoc)
-     * 
+     *
      * @see
      * org.dspace.content.packager.PackageDisseminator#disseminateAll(org.dspace
      * .core.Context, org.dspace.content.DSpaceObject,
      * org.dspace.content.packager.PackageParameters, java.io.File)
      */
     @Override
-     public List<File> disseminateAll(Context context, DSpaceObject dso,
-                     PackageParameters params, File pkgFile)
+    public List<File> disseminateAll(Context context, DSpaceObject dso,
+                                     PackageParameters params, File pkgFile)
         throws PackageException, CrosswalkException,
-               AuthorizeException, SQLException, IOException
-    {
-        throw new PackageException("disseminateAll() is not implemented, as disseminate() method already handles dissemination of all roles to an external file.");
+        AuthorizeException, SQLException, IOException {
+        throw new PackageException(
+            "disseminateAll() is not implemented, as disseminate() method already handles dissemination of all roles " +
+                "to an external file.");
     }
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * org.dspace.content.packager.PackageDisseminator#getMIMEType(org.dspace
      * .content.packager.PackageParameters)
      */
     @Override
-    public String getMIMEType(PackageParameters params)
-    {
+    public String getMIMEType(PackageParameters params) {
         return "application/xml";
     }
 
     /**
      * Emit XML describing a single Group.
      *
-     * @param context
-     *            the DSpace Context
-     * @param relatedObject
-     *            the DSpaceObject related to this group (if any)
-     * @param group
-     *            the Group to describe
-     * @param writer
-     *            the description to this stream
+     * @param context       the DSpace Context
+     * @param relatedObject the DSpaceObject related to this group (if any)
+     * @param group         the Group to describe
+     * @param writer        the description to this stream
      * @throws XMLStreamException if XML error
-     * @throws PackageException if packaging error
+     * @throws PackageException   if packaging error
      */
     protected void writeGroup(Context context, DSpaceObject relatedObject, Group group, XMLStreamWriter writer)
-            throws XMLStreamException, PackageException
-    {
+        throws XMLStreamException, PackageException {
         //Translate the Group name for export.  This ensures that groups with Internal IDs in their names
         // (e.g. COLLECTION_1_ADMIN) are properly translated using the corresponding Handle or external identifier.
         String exportGroupName = PackageUtils.translateGroupNameForExport(context, group.getName());
 
-        //If translated group name is returned as "null", this means the Group name 
+        //If translated group name is returned as "null", this means the Group name
         // had an Internal Collection/Community ID embedded, which could not be
         // translated properly to a Handle.  We will NOT export these groups,
         // as they could cause conflicts or data integrity problems if they are
         // imported into another DSpace system.
-        if(exportGroupName==null)
-        {
+        if (exportGroupName == null) {
             return;
         }
 
@@ -320,37 +299,32 @@ public class RoleDisseminator implements PackageDisseminator
         writer.writeAttribute(ID, String.valueOf(group.getID()));
         writer.writeAttribute(NAME, exportGroupName);
 
-        String groupType = getGroupType(relatedObject, group);
-        if(groupType!=null && !groupType.isEmpty())
-        {
+        String groupType = getGroupType(context, relatedObject, group);
+        if (groupType != null && !groupType.isEmpty()) {
             writer.writeAttribute(TYPE, groupType);
         }
 
         //Add People to Group (if any belong to this group)
-        if(group.getMembers().size()>0)
-        {
+        if (group.getMembers().size() > 0) {
             writer.writeStartElement(MEMBERS);
-            for (EPerson member : group.getMembers())
-            {
+            for (EPerson member : group.getMembers()) {
                 writer.writeEmptyElement(MEMBER);
                 writer.writeAttribute(ID, String.valueOf(member.getID()));
-                if (null != member.getName())
+                if (null != member.getName()) {
                     writer.writeAttribute(NAME, member.getName());
+                }
             }
             writer.writeEndElement();
         }
 
         //Add Groups as Member Groups (if any belong to this group)
-        if(group.getMemberGroups().size()>0)
-        {
+        if (group.getMemberGroups().size() > 0) {
             writer.writeStartElement(MEMBER_GROUPS);
-            for (Group member : group.getMemberGroups())
-            {
+            for (Group member : group.getMemberGroups()) {
                 String exportMemberName = PackageUtils.translateGroupNameForExport(context, member.getName());
                 //Only export member group if its name can be properly translated for export.  As noted above,
                 // we don't want groups that are *unable* to be accurately translated causing issues on import.
-                if(exportMemberName!=null)
-                {
+                if (exportMemberName != null) {
                     writer.writeEmptyElement(MEMBER_GROUP);
                     writer.writeAttribute(ID, String.valueOf(member.getID()));
                     writer.writeAttribute(NAME, exportMemberName);
@@ -371,55 +345,38 @@ public class RoleDisseminator implements PackageDisseminator
      * <P>
      * If type string cannot be determined, null is returned.
      *
-     * @param dso
-     *          the related DSpaceObject
-     * @param group
-     *          the group
+     * @param dso   the related DSpaceObject
+     * @param group the group
      * @return a group type string or null
      */
-    protected String getGroupType(DSpaceObject dso, Group group)
-    {
-        if (dso == null || group == null)
-        {
+    protected String getGroupType(Context context, DSpaceObject dso, Group group) {
+        if (dso == null || group == null) {
             return null;
         }
 
-        if( dso.getType()==Constants.COMMUNITY)
-        {
+        if (dso.getType() == Constants.COMMUNITY) {
             Community community = (Community) dso;
 
             //Check if this is the ADMIN group for this community
-            if (group.equals(community.getAdministrators()))
-            {
+            if (group.equals(community.getAdministrators())) {
                 return GROUP_TYPE_ADMIN;
             }
-        }
-        else if(dso.getType() == Constants.COLLECTION)
-        {
+        } else if (dso.getType() == Constants.COLLECTION) {
             Collection collection = (Collection) dso;
 
-            if (group.equals(collection.getAdministrators()))
-            {
+            if (group.equals(collection.getAdministrators())) {
                 //Check if this is the ADMIN group for this collection
                 return GROUP_TYPE_ADMIN;
-            }
-            else if (group.equals(collection.getSubmitters()))
-            {
+            } else if (group.equals(collection.getSubmitters())) {
                 //Check if Submitters group
                 return GROUP_TYPE_SUBMIT;
-            }
-            else if (group.equals(collection.getWorkflowStep1()))
-            {
+            } else if (group.equals(collection.getWorkflowStep1(context))) {
                 //Check if workflow step 1 group
                 return GROUP_TYPE_WORKFLOW_STEP_1;
-            }
-            else if (group.equals(collection.getWorkflowStep2()))
-            {
+            } else if (group.equals(collection.getWorkflowStep2(context))) {
                 //check if workflow step 2 group
                 return GROUP_TYPE_WORKFLOW_STEP_2;
-            }
-            else if (group.equals(collection.getWorkflowStep3()))
-            {
+            } else if (group.equals(collection.getWorkflowStep3(context))) {
                 //check if workflow step 3 group
                 return GROUP_TYPE_WORKFLOW_STEP_3;
             }
@@ -431,72 +388,59 @@ public class RoleDisseminator implements PackageDisseminator
 
     /**
      * Emit XML describing a single EPerson.
-     * 
-     * @param eperson
-     *            the EPerson to describe
-     * @param writer
-     *            the description to this stream
-     * @param emitPassword
-     *            do not export the password hash unless true
+     *
+     * @param eperson      the EPerson to describe
+     * @param writer       the description to this stream
+     * @param emitPassword do not export the password hash unless true
      * @throws XMLStreamException if XML error
      */
     protected void writeEPerson(EPerson eperson, XMLStreamWriter writer,
-            boolean emitPassword) throws XMLStreamException
-    {
+                                boolean emitPassword) throws XMLStreamException {
         writer.writeStartElement(EPERSON);
         writer.writeAttribute(ID, String.valueOf(eperson.getID()));
 
-        if (eperson.getEmail()!=null)
-        {
+        if (eperson.getEmail() != null) {
             writer.writeStartElement(EMAIL);
             writer.writeCharacters(eperson.getEmail());
             writer.writeEndElement();
         }
 
-        if(eperson.getNetid()!=null)
-        {
+        if (eperson.getNetid() != null) {
             writer.writeStartElement(NETID);
             writer.writeCharacters(eperson.getNetid());
             writer.writeEndElement();
         }
 
-        if(eperson.getFirstName()!=null)
-        {
+        if (eperson.getFirstName() != null) {
             writer.writeStartElement(FIRST_NAME);
             writer.writeCharacters(eperson.getFirstName());
             writer.writeEndElement();
         }
 
-        if(eperson.getLastName()!=null)
-        {
+        if (eperson.getLastName() != null) {
             writer.writeStartElement(LAST_NAME);
             writer.writeCharacters(eperson.getLastName());
             writer.writeEndElement();
         }
 
-        if(eperson.getLanguage()!=null)
-        {
+        if (eperson.getLanguage() != null) {
             writer.writeStartElement(LANGUAGE);
             writer.writeCharacters(eperson.getLanguage());
             writer.writeEndElement();
         }
-        
-        if (emitPassword)
-        {
+
+        if (emitPassword) {
             PasswordHash password = ePersonService.getPasswordHash(eperson);
-            if (null != password)
-            {
+            if (null != password) {
                 writer.writeStartElement(PASSWORD_HASH);
 
                 String algorithm = password.getAlgorithm();
-                if (null != algorithm)
-                {
+                if (null != algorithm) {
                     writer.writeAttribute(PASSWORD_DIGEST, algorithm);
                 }
 
                 String salt = password.getSaltString();
-                if (null != salt)
-                {
+                if (null != salt) {
                     writer.writeAttribute(PASSWORD_SALT, salt);
                 }
 
@@ -505,18 +449,15 @@ public class RoleDisseminator implements PackageDisseminator
             }
         }
 
-        if (eperson.canLogIn())
-        {
+        if (eperson.canLogIn()) {
             writer.writeEmptyElement(CAN_LOGIN);
         }
 
-        if (eperson.getRequireCertificate())
-        {
+        if (eperson.getRequireCertificate()) {
             writer.writeEmptyElement(REQUIRE_CERTIFICATE);
         }
 
-        if (eperson.getSelfRegistered())
-        {
+        if (eperson.getSelfRegistered()) {
             writer.writeEmptyElement(SELF_REGISTERED);
         }
 
@@ -534,92 +475,74 @@ public class RoleDisseminator implements PackageDisseminator
      * For all other objects, null is returned.
      *
      * @param context The DSpace context
-     * @param object the DSpace object
+     * @param object  the DSpace object
      * @return array of all associated groups
      * @throws SQLException if database error
      */
     protected List<Group> findAssociatedGroups(Context context, DSpaceObject object)
-            throws SQLException
-    {
-        if(object.getType()==Constants.SITE)
-        {
+        throws SQLException {
+        if (object.getType() == Constants.SITE) {
             // TODO FIXME -- if there was a way to ONLY export Groups which are NOT
             // associated with a Community or Collection, we should be doing that instead!
             return groupService.findAll(context, null);
-        }
-        else if(object.getType()==Constants.COMMUNITY)
-        {
+        } else if (object.getType() == Constants.COMMUNITY) {
             Community community = (Community) object;
 
             ArrayList<Group> list = new ArrayList<Group>();
 
             //check for admin group
-            if(community.getAdministrators()!=null)
-            {
+            if (community.getAdministrators() != null) {
                 list.add(community.getAdministrators());
             }
 
             // FINAL CATCH-ALL -> Find any other groups where name begins with "COMMUNITY_<ID>_"
             // (There should be none, but this code is here just in case)
             List<Group> matchingGroups = groupService.search(context, "COMMUNITY\\_" + community.getID() + "\\_");
-            for(Group g : matchingGroups)
-            {
-                if(!list.contains(g))
-                {
+            for (Group g : matchingGroups) {
+                if (!list.contains(g)) {
                     list.add(g);
                 }
             }
 
-            if(list.size()>0)
-            {
+            if (list.size() > 0) {
                 return list;
             }
-        }
-        else if(object.getType()==Constants.COLLECTION)
-        {
+        } else if (object.getType() == Constants.COLLECTION) {
             Collection collection = (Collection) object;
-            
+
             ArrayList<Group> list = new ArrayList<Group>();
-            
+
             //check for admin group
-            if(collection.getAdministrators()!=null)
-            {
+            if (collection.getAdministrators() != null) {
                 list.add(collection.getAdministrators());
             }
             //check for submitters group
-            if(collection.getSubmitters()!=null)
-            {
+            if (collection.getSubmitters() != null) {
                 list.add(collection.getSubmitters());
             }
             //check for workflow step 1 group
-            if(collection.getWorkflowStep1()!=null)
-            {
-                list.add(collection.getWorkflowStep1());
+            if (collection.getWorkflowStep1(context) != null) {
+                list.add(collection.getWorkflowStep1(context));
             }
             //check for workflow step 2 group
-            if(collection.getWorkflowStep2()!=null)
-            {
-                list.add(collection.getWorkflowStep2());
+            if (collection.getWorkflowStep2(context) != null) {
+                list.add(collection.getWorkflowStep2(context));
             }
             //check for workflow step 3 group
-            if(collection.getWorkflowStep3()!=null)
-            {
-                list.add(collection.getWorkflowStep3());
+            if (collection.getWorkflowStep3(context) != null) {
+                list.add(collection.getWorkflowStep3(context));
             }
 
             // FINAL CATCH-ALL -> Find any other groups where name begins with "COLLECTION_<ID>_"
             // (Necessary cause XMLUI allows you to generate a 'COLLECTION_<ID>_DEFAULT_READ' group)
             List<Group> matchingGroups = groupService.search(context, "COLLECTION\\_" + collection.getID() + "\\_");
-            for(Group g : matchingGroups)
-            {
-                if(!list.contains(g))
-                {
+            for (Group g : matchingGroups) {
+                if (!list.contains(g)) {
                     list.add(g);
                 }
             }
 
-            if(list.size()>0)
-            {
+            if (list.size() > 0) {
                 return list;
             }
         }
@@ -637,15 +560,13 @@ public class RoleDisseminator implements PackageDisseminator
      * For all other objects, null is returned.
      *
      * @param context The DSpace context
-     * @param object the DSpace object
+     * @param object  the DSpace object
      * @return array of all associated EPerson objects
      * @throws SQLException if database error
      */
     protected List<EPerson> findAssociatedPeople(Context context, DSpaceObject object)
-            throws SQLException
-    {
-        if(object.getType()==Constants.SITE)
-        {
+        throws SQLException {
+        if (object.getType() == Constants.SITE) {
             return ePersonService.findAll(context, EPerson.EMAIL);
         }
 
@@ -663,10 +584,10 @@ public class RoleDisseminator implements PackageDisseminator
      * with this packager
      */
     @Override
-    public String getParameterHelp()
-    {
-        return  "* passwords=[boolean]      " +
-                   "If true, user password hashes are also exported (so that they can be later restored).  If false, user passwords are not exported. (Default is false)";
+    public String getParameterHelp() {
+        return "* passwords=[boolean]      " +
+            "If true, user password hashes are also exported (so that they can be later restored).  If false, user " +
+            "passwords are not exported. (Default is false)";
     }
 
 }

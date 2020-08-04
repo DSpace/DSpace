@@ -7,12 +7,23 @@
  */
 package org.dspace.content;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.Lob;
+import javax.persistence.ManyToOne;
+import javax.persistence.SequenceGenerator;
+import javax.persistence.Table;
+
 import org.dspace.core.Context;
 import org.dspace.core.ReloadableEntity;
 import org.hibernate.annotations.Type;
 import org.hibernate.proxy.HibernateProxyHelper;
-
-import javax.persistence.*;
 
 /**
  * Database access class representing a Dublin Core metadata value.
@@ -26,54 +37,65 @@ import javax.persistence.*;
  * @see org.dspace.content.MetadataField
  */
 @Entity
-@Table(name="metadatavalue")
-public class MetadataValue implements ReloadableEntity<Integer>
-{
-    /** The reference to the metadata field */
+@Table(name = "metadatavalue")
+public class MetadataValue implements ReloadableEntity<Integer> {
+    /**
+     * The reference to the metadata field
+     */
     @Id
-    @Column(name="metadata_value_id")
-    @GeneratedValue(strategy = GenerationType.SEQUENCE ,generator="metadatavalue_seq")
-    @SequenceGenerator(name="metadatavalue_seq", sequenceName="metadatavalue_seq", allocationSize = 1)
+    @Column(name = "metadata_value_id")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "metadatavalue_seq")
+    @SequenceGenerator(name = "metadatavalue_seq", sequenceName = "metadatavalue_seq", allocationSize = 1)
     private Integer id;
 
-    /** The primary key for the metadata value */
+    /**
+     * The primary key for the metadata value
+     */
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "metadata_field_id")
     private MetadataField metadataField = null;
 
-    /** The value of the field */
+    /**
+     * The value of the field
+     */
     @Lob
-    @Type(type="org.hibernate.type.MaterializedClobType")
-    @Column(name="text_value")
+    @Type(type = "org.hibernate.type.MaterializedClobType")
+    @Column(name = "text_value")
     private String value;
 
-    /** The language of the field, may be <code>null</code> */
+    /**
+     * The language of the field, may be <code>null</code>
+     */
     @Column(name = "text_lang", length = 24)
     private String language;
 
-    /** The position of the record. */
+    /**
+     * The position of the record.
+     */
     @Column(name = "place")
     private int place = 1;
 
-    /** Authority key, if any */
+    /**
+     * Authority key, if any
+     */
     @Column(name = "authority", length = 100)
     private String authority = null;
 
-    /** Authority confidence value -- see Choices class for values */
+    /**
+     * Authority confidence value -- see Choices class for values
+     */
     @Column(name = "confidence")
     private int confidence = -1;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade={CascadeType.PERSIST})
-    @JoinColumn(name="dspace_object_id")
+    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST})
+    @JoinColumn(name = "dspace_object_id")
     protected DSpaceObject dSpaceObject;
 
     /**
      * Protected constructor, create object using:
      * {@link org.dspace.content.service.MetadataValueService#create(Context, DSpaceObject, MetadataField)}
-     *
      */
-    protected MetadataValue()
-    {
+    protected MetadataValue() {
         id = 0;
     }
 
@@ -82,8 +104,7 @@ public class MetadataValue implements ReloadableEntity<Integer>
      *
      * @return metadata value ID
      */
-    public Integer getID()
-    {
+    public Integer getID() {
         return id;
     }
 
@@ -92,8 +113,7 @@ public class MetadataValue implements ReloadableEntity<Integer>
      *
      * @return dspaceObject
      */
-    public DSpaceObject getDSpaceObject()
-    {
+    public DSpaceObject getDSpaceObject() {
         return dSpaceObject;
     }
 
@@ -102,8 +122,7 @@ public class MetadataValue implements ReloadableEntity<Integer>
      *
      * @param dso new dspaceObject ID
      */
-    public void setDSpaceObject(DSpaceObject dso)
-    {
+    public void setDSpaceObject(DSpaceObject dso) {
         this.dSpaceObject = dso;
     }
 
@@ -112,8 +131,7 @@ public class MetadataValue implements ReloadableEntity<Integer>
      *
      * @return language
      */
-    public String getLanguage()
-    {
+    public String getLanguage() {
         return language;
     }
 
@@ -122,8 +140,7 @@ public class MetadataValue implements ReloadableEntity<Integer>
      *
      * @param language new language
      */
-    public void setLanguage(String language)
-    {
+    public void setLanguage(String language) {
         this.language = language;
     }
 
@@ -132,8 +149,7 @@ public class MetadataValue implements ReloadableEntity<Integer>
      *
      * @return place ordering
      */
-    public int getPlace()
-    {
+    public int getPlace() {
         return place;
     }
 
@@ -142,8 +158,7 @@ public class MetadataValue implements ReloadableEntity<Integer>
      *
      * @param place new place (relative order in series of values)
      */
-    public void setPlace(int place)
-    {
+    public void setPlace(int place) {
         this.place = place;
     }
 
@@ -160,8 +175,7 @@ public class MetadataValue implements ReloadableEntity<Integer>
      *
      * @return metadata value
      */
-    public String getValue()
-    {
+    public String getValue() {
         return value;
     }
 
@@ -170,8 +184,7 @@ public class MetadataValue implements ReloadableEntity<Integer>
      *
      * @param value new metadata value
      */
-    public void setValue(String value)
-    {
+    public void setValue(String value) {
         this.value = value;
     }
 
@@ -180,9 +193,8 @@ public class MetadataValue implements ReloadableEntity<Integer>
      *
      * @return metadata authority
      */
-    public String getAuthority ()
-    {
-        return authority ;
+    public String getAuthority() {
+        return authority;
     }
 
     /**
@@ -190,9 +202,8 @@ public class MetadataValue implements ReloadableEntity<Integer>
      *
      * @param value new metadata authority
      */
-    public void setAuthority (String value)
-    {
-        this.authority  = value;
+    public void setAuthority(String value) {
+        this.authority = value;
     }
 
     /**
@@ -200,8 +211,7 @@ public class MetadataValue implements ReloadableEntity<Integer>
      *
      * @return metadata confidence
      */
-    public int getConfidence()
-    {
+    public int getConfidence() {
         return confidence;
     }
 
@@ -210,8 +220,7 @@ public class MetadataValue implements ReloadableEntity<Integer>
      *
      * @param value new metadata confidence
      */
-    public void setConfidence(int value)
-    {
+    public void setConfidence(int value) {
         this.confidence = value;
     }
 
@@ -220,43 +229,34 @@ public class MetadataValue implements ReloadableEntity<Integer>
      * Return <code>true</code> if <code>other</code> is the same MetadataValue
      * as this object, <code>false</code> otherwise
      *
-     * @param obj
-     *            object to compare to
-     *
+     * @param obj object to compare to
      * @return <code>true</code> if object passed in represents the same
-     *         MetadataValue as this object
+     * MetadataValue as this object
      */
     @Override
-    public boolean equals(Object obj)
-    {
-        if (obj == null)
-        {
+    public boolean equals(Object obj) {
+        if (obj == null) {
             return false;
         }
         Class<?> objClass = HibernateProxyHelper.getClassWithoutInitializingProxy(obj);
-        if (getClass() != objClass)
-        {
+        if (!getClass().equals(objClass)) {
             return false;
         }
         final MetadataValue other = (MetadataValue) obj;
-        if (this.id != other.id)
-        {
+        if (!this.id.equals(other.id)) {
             return false;
         }
-        if (this.getID() != other.getID())
-        {
+        if (!this.getID().equals(other.getID())) {
             return false;
         }
-        if (this.getDSpaceObject().getID() != other.getDSpaceObject().getID())
-        {
+        if (!this.getDSpaceObject().getID().equals(other.getDSpaceObject().getID())) {
             return false;
         }
         return true;
     }
 
     @Override
-    public int hashCode()
-    {
+    public int hashCode() {
         int hash = 7;
         hash = 47 * hash + this.id;
         hash = 47 * hash + this.getID();

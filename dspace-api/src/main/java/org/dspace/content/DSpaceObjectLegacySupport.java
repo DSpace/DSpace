@@ -8,7 +8,8 @@
 package org.dspace.content;
 
 /**
- * Database Object interface interface class that adds that getLegacyId method which returns the old integer based identifier
+ * Database Object interface interface class that adds that getLegacyId method which returns the old integer based
+ * identifier
  * that was used to identify DSpaceObjects prior to DSpace 6.0
  *
  * @author kevinvandevelde at atmire.com

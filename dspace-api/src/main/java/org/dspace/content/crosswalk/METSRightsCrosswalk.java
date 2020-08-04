@@ -10,16 +10,16 @@ package org.dspace.content.crosswalk;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Date;
 
-import java.text.SimpleDateFormat;
-import org.apache.commons.lang.ArrayUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
@@ -56,24 +56,25 @@ import org.jdom.Namespace;
  * @author Tim Donohue
  * @version $Revision: 2108 $
  */
-public class METSRightsCrosswalk 
-    implements IngestionCrosswalk, DisseminationCrosswalk
-{
-    /** log4j category */
-    private static Logger log = Logger.getLogger(METSRightsCrosswalk.class);
+public class METSRightsCrosswalk
+    implements IngestionCrosswalk, DisseminationCrosswalk {
+    /**
+     * log4j category
+     */
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(METSRightsCrosswalk.class);
 
     private static final Namespace METSRights_NS =
         Namespace.getNamespace("rights", "http://cosimo.stanford.edu/sdr/metsrights/");
 
     // XML schemaLocation fragment for this crosswalk, from config.
     private String schemaLocation =
-        METSRights_NS.getURI()+" http://cosimo.stanford.edu/sdr/metsrights.xsd";
+        METSRights_NS.getURI() + " http://cosimo.stanford.edu/sdr/metsrights.xsd";
 
-    private static final Namespace namespaces[] = { METSRights_NS };
+    private static final Namespace namespaces[] = {METSRights_NS};
 
-    private static final Map<Integer,String> otherTypesMapping = new HashMap<Integer,String>();
-    static
-    {
+    private static final Map<Integer, String> otherTypesMapping = new HashMap<Integer, String>();
+
+    static {
         //Mapping of DSpace Policy Actions to METSRights PermissionType values
         // (These are the values stored in the @OTHERPERMITTYPE attribute in METSRights)
         // NOTE: READ, WRITE, DELETE are not included here as they map directly to existing METSRights PermissionTypes
@@ -100,28 +101,26 @@ public class METSRightsCrosswalk
     protected AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
     protected EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
     protected GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
-    protected ResourcePolicyService resourcePolicyService = AuthorizeServiceFactory.getInstance().getResourcePolicyService();
+    protected ResourcePolicyService resourcePolicyService = AuthorizeServiceFactory.getInstance()
+                                                                                   .getResourcePolicyService();
 
 
     /*----------- Dissemination functions -------------------*/
 
     @Override
-    public Namespace[] getNamespaces()
-    {
+    public Namespace[] getNamespaces() {
         return (Namespace[]) ArrayUtils.clone(namespaces);
     }
 
     @Override
-    public String getSchemaLocation()
-    {
+    public String getSchemaLocation() {
         return schemaLocation;
     }
 
     @Override
-    public boolean canDisseminate(DSpaceObject dso)
-    {
+    public boolean canDisseminate(DSpaceObject dso) {
         //can disseminate all types of DSpace Objects, except for SITE
-        return (dso.getType()!=Constants.SITE);
+        return (dso.getType() != Constants.SITE);
     }
 
     /**
@@ -130,25 +129,21 @@ public class METSRightsCrosswalk
      * METSRights PermissionTypes.
      *
      * @param context context
-     * @param dso DSpace Object
+     * @param dso     DSpace Object
      * @return XML Element corresponding to the new {@code <RightsDeclarationMD>} translation
      * @throws CrosswalkException if crosswalk error
-     * @throws IOException if IO error
-     * @throws SQLException if database error
+     * @throws IOException        if IO error
+     * @throws SQLException       if database error
      * @throws AuthorizeException if authorization error
      */
     @Override
     public Element disseminateElement(Context context, DSpaceObject dso)
         throws CrosswalkException,
-               IOException, SQLException, AuthorizeException
-    {
-        if(dso==null)
-        {
+        IOException, SQLException, AuthorizeException {
+        if (dso == null) {
             return null;
-        }
-        // we don't have a way to provide METSRights for a SITE object
-        else if(dso.getType() == Constants.SITE)
-        {
+        } else if (dso.getType() == Constants.SITE) {
+            // we don't have a way to provide METSRights for a SITE object
             throw new CrosswalkObjectNotSupported("The METSRightsCrosswalk cannot crosswalk a SITE object");
         }
 
@@ -170,127 +165,115 @@ public class METSRightsCrosswalk
         List<ResourcePolicy> policies = authorizeService.getPolicies(context, dso);
 
         //For each DSpace policy
-        for(ResourcePolicy policy : policies)
-        {
-           // DSpace Policies can either reference a Group or an Individual, but not both!
-           Group group = policy.getGroup();
-           EPerson person = policy.getEPerson();
+        for (ResourcePolicy policy : policies) {
+            // DSpace Policies can either reference a Group or an Individual, but not both!
+            Group group = policy.getGroup();
+            EPerson person = policy.getEPerson();
 
-           // Create our <Context> node for this policy
-           Element rightsContext = new Element("Context", METSRights_NS);
+            // Create our <Context> node for this policy
+            Element rightsContext = new Element("Context", METSRights_NS);
 
-           String rpName = policy.getRpName();
-           if (rpName != null)
-           {
-               rightsContext.setAttribute("rpName",rpName);
-           }
+            String rpName = policy.getRpName();
+            if (rpName != null) {
+                rightsContext.setAttribute("rpName", rpName);
+            }
 
-           // As of DSpace 3.0, policies may have an effective date range, check if a policy is effective
-           rightsContext.setAttribute("in-effect","true");
-           Date now = new Date();   
-           SimpleDateFormat iso8601 = new SimpleDateFormat("yyyy-MM-dd"); 
-           if (policy.getStartDate() != null) 
-           {
-        	   rightsContext.setAttribute("start-date", iso8601.format(policy.getStartDate()));
-               if (policy.getStartDate().after(now))
-               {
-                   rightsContext.setAttribute("in-effect","false");
-               }
-           }
-           
-           if (policy.getEndDate() != null) 
-           {
-        	   rightsContext.setAttribute("end-date", iso8601.format(policy.getEndDate()));
-               if (policy.getEndDate().before(now))
-               {
-                   rightsContext.setAttribute("in-effect","false");
-               }
-           }
-  
-           //First, handle Group-based policies
-           // For Group policies we need to setup a
-           // <Context CONTEXTCLASS='[group-type]'><UserName USERTYPE='GROUP'>[group-name]</UserName>...
-           if(group != null)
-           {
-              //Default all DSpace groups to have "MANAGED GRP" as the type
-              String contextClass=GROUP_CONTEXTCLASS;
+            // As of DSpace 3.0, policies may have an effective date range, check if a policy is effective
+            rightsContext.setAttribute("in-effect", "true");
+            Date now = new Date();
+            SimpleDateFormat iso8601 = new SimpleDateFormat("yyyy-MM-dd");
+            if (policy.getStartDate() != null) {
+                rightsContext.setAttribute("start-date", iso8601.format(policy.getStartDate()));
+                if (policy.getStartDate().after(now)) {
+                    rightsContext.setAttribute("in-effect", "false");
+                }
+            }
 
-              if(StringUtils.equals(group.getName(), Group.ANONYMOUS)) //DSpace Anonymous Group = 'GENERAL PUBLIC' type
-              {
-                  contextClass = ANONYMOUS_CONTEXTCLASS;
-              }
-              else if(StringUtils.equals(group.getName(), Group.ADMIN)) //DSpace Administrator Group = 'REPOSITORY MGR' type
-              {
-                  contextClass = ADMIN_CONTEXTCLASS;
-              }
+            if (policy.getEndDate() != null) {
+                rightsContext.setAttribute("end-date", iso8601.format(policy.getEndDate()));
+                if (policy.getEndDate().before(now)) {
+                    rightsContext.setAttribute("in-effect", "false");
+                }
+            }
 
-              rightsContext.setAttribute("CONTEXTCLASS", contextClass);
+            //First, handle Group-based policies
+            // For Group policies we need to setup a
+            // <Context CONTEXTCLASS='[group-type]'><UserName USERTYPE='GROUP'>[group-name]</UserName>...
+            if (group != null) {
+                //Default all DSpace groups to have "MANAGED GRP" as the type
+                String contextClass = GROUP_CONTEXTCLASS;
 
-              //If this is a "MANAGED GRP", then create a <UserName> child
-              //to specify the group Name, and set @USERTYPE='GROUP'
-              if(contextClass.equals(GROUP_CONTEXTCLASS))
-              {
-                  try
-                  {
-                      //Translate the Group name for export.  This ensures that groups with Internal IDs in their names
-                      // (e.g. COLLECTION_1_ADMIN) are properly translated using the corresponding Handle or external identifier.
-                      String exportGroupName = PackageUtils.translateGroupNameForExport(context, group.getName());
+                if (StringUtils.equals(group.getName(), Group.ANONYMOUS)) {
+                    //DSpace Anonymous Group = 'GENERAL PUBLIC' type
+                    contextClass = ANONYMOUS_CONTEXTCLASS;
+                } else if (StringUtils.equals(group.getName(), Group.ADMIN)) {
+                    //DSpace Administrator Group = 'REPOSITORY MGR' type
+                    contextClass = ADMIN_CONTEXTCLASS;
+                }
 
-                      //If translated group name is returned as "null", this means the Group name
-                      // had an Internal Collection/Community ID embedded, which could not be
-                      // translated properly to a Handle.  We will NOT export these groups,
-                      // as they could cause conflicts or data integrity problems if they are
-                      // imported into another DSpace system.
-                      if(exportGroupName!=null && !exportGroupName.isEmpty())
-                      {
-                          //Create <UserName USERTYPE='GROUP'> element.  Add the Group's name to that element
-                          Element rightsUser = new Element("UserName", METSRights_NS);
-                          rightsUser.setAttribute("USERTYPE",GROUP_USERTYPE);
-                          rightsUser.addContent(exportGroupName);
-                          rightsContext.addContent(rightsUser);
-                      }
-                      else
-                          //Skip over this Group, as we couldn't translate it for export.
-                          //The Group seems to refer to a Community or Collection which no longer exists
-                          continue; 
-                  }
-                  catch(PackageException pe)
-                  {
-                      //A PackageException will only be thrown if translateGroupNameForExport() fails
-                      //We'll just wrap it as a CrosswalkException and throw it upwards
-                      throw new CrosswalkException(pe);
-                  }
-              }
+                rightsContext.setAttribute("CONTEXTCLASS", contextClass);
 
-              rightsMD.addContent(rightsContext);
+                //If this is a "MANAGED GRP", then create a <UserName> child
+                //to specify the group Name, and set @USERTYPE='GROUP'
+                if (contextClass.equals(GROUP_CONTEXTCLASS)) {
+                    try {
+                        //Translate the Group name for export.  This ensures that groups with Internal IDs in their
+                        // names
+                        // (e.g. COLLECTION_1_ADMIN) are properly translated using the corresponding Handle or
+                        // external identifier.
+                        String exportGroupName = PackageUtils.translateGroupNameForExport(context, group.getName());
 
-           }//end if group
-           //Next, handle User-based policies
-           // For User policies we need to setup a
-           // <Context CONTEXTCLASS='ACADEMIC USER'><UserName USERTYPE='INDIVIDUAL'>[group-name]</UserName>...
-           else if(person!=null)
-           {
-              // All EPeople are considered 'Academic Users'
-              rightsContext.setAttribute("CONTEXTCLASS", PERSON_CONTEXTCLASS);
+                        //If translated group name is returned as "null", this means the Group name
+                        // had an Internal Collection/Community ID embedded, which could not be
+                        // translated properly to a Handle.  We will NOT export these groups,
+                        // as they could cause conflicts or data integrity problems if they are
+                        // imported into another DSpace system.
+                        if (exportGroupName != null && !exportGroupName.isEmpty()) {
+                            //Create <UserName USERTYPE='GROUP'> element.  Add the Group's name to that element
+                            Element rightsUser = new Element("UserName", METSRights_NS);
+                            rightsUser.setAttribute("USERTYPE", GROUP_USERTYPE);
+                            rightsUser.addContent(exportGroupName);
+                            rightsContext.addContent(rightsUser);
+                        } else {
+                            //Skip over this Group, as we couldn't translate it for export.
+                            //The Group seems to refer to a Community or Collection which no longer exists
+                            continue;
+                        }
+                    } catch (PackageException pe) {
+                        //A PackageException will only be thrown if translateGroupNameForExport() fails
+                        //We'll just wrap it as a CrosswalkException and throw it upwards
+                        throw new CrosswalkException(pe);
+                    }
+                }
 
-              //Create a <UserName> node corresponding to person's email, set @USERTYPE='INDIVIDUAL'
-              Element rightsUser = new Element("UserName", METSRights_NS);
-              rightsUser.setAttribute("USERTYPE",PERSON_USERTYPE);
-              rightsUser.addContent(person.getEmail());
-              rightsContext.addContent(rightsUser);
+                rightsMD.addContent(rightsContext);
 
-              rightsMD.addContent(rightsContext);
-           }//end if person
-           else
-               log.error("Policy " + String.valueOf(policy.getID())
-                       + " is neither user nor group!  Omitted from package.");
+            } else if (person != null) {
+                //Next, handle User-based policies
+                // For User policies we need to setup a
+                // <Context CONTEXTCLASS='ACADEMIC USER'><UserName USERTYPE='INDIVIDUAL'>[group-name]</UserName>...
+
+                // All EPeople are considered 'Academic Users'
+                rightsContext.setAttribute("CONTEXTCLASS", PERSON_CONTEXTCLASS);
+
+                //Create a <UserName> node corresponding to person's email, set @USERTYPE='INDIVIDUAL'
+                Element rightsUser = new Element("UserName", METSRights_NS);
+                rightsUser.setAttribute("USERTYPE", PERSON_USERTYPE);
+                rightsUser.addContent(person.getEmail());
+                rightsContext.addContent(rightsUser);
+
+                rightsMD.addContent(rightsContext);
+            } else {
+                log.error("Policy " + String.valueOf(policy.getID())
+                              + " is neither user nor group!  Omitted from package.");
+            }
 
 
-           //Translate the DSpace ResourcePolicy into a <Permissions> element
-           Element rightsPerm = translatePermissions(policy);
-           rightsContext.addContent(rightsPerm);
-           
-        }//end for each policy
+            //Translate the DSpace ResourcePolicy into a <Permissions> element
+            Element rightsPerm = translatePermissions(policy);
+            rightsContext.addContent(rightsPerm);
+
+        } //end for each policy
 
         return rightsMD;
     }
@@ -298,16 +281,14 @@ public class METSRightsCrosswalk
     @Override
     public List<Element> disseminateList(Context context, DSpaceObject dso)
         throws CrosswalkException,
-               IOException, SQLException, AuthorizeException
-    {
+        IOException, SQLException, AuthorizeException {
         List<Element> result = new ArrayList<Element>(1);
         result.add(disseminateElement(context, dso));
         return result;
     }
 
     @Override
-    public boolean preferList()
-    {
+    public boolean preferList() {
         return false;
     }
 
@@ -318,52 +299,42 @@ public class METSRightsCrosswalk
      * <code>Permissions</code> element. This element may be empty if
      * there was an issue translating the ResourcePolicy.
      *
-     * @param policy  The DSpace ResourcePolicy
+     * @param policy The DSpace ResourcePolicy
      * @return the Element representing the METSRIghts <code>Permissions</code> or null.
      */
-    private Element translatePermissions(ResourcePolicy policy)
-    {
+    private Element translatePermissions(ResourcePolicy policy) {
         //Create our <Permissions> node to store all permissions in this context
         Element rightsPerm = new Element("Permissions", METSRights_NS);
 
         //Determine the 'actions' permitted by this DSpace policy, and translate to METSRights PermissionTypes
         int action = policy.getAction();
         //All READ-based actions = cannot modify or delete object
-        if(action==Constants.READ
-                || action==Constants.DEFAULT_BITSTREAM_READ
-                || action==Constants.DEFAULT_ITEM_READ)
-        {
-             // For DSpace, READ = Discover and Display
-             rightsPerm.setAttribute("DISCOVER", "true");
-             rightsPerm.setAttribute("DISPLAY", "true");
-             //Read = cannot modify or delete
-             rightsPerm.setAttribute("MODIFY", "false");
-             rightsPerm.setAttribute("DELETE", "false");
-        }
-        //All WRITE-based actions = can modify, but cannot delete
-        else if(action == Constants.WRITE
-                || action==Constants.ADD)
-        {
+        if (action == Constants.READ
+            || action == Constants.DEFAULT_BITSTREAM_READ
+            || action == Constants.DEFAULT_ITEM_READ) {
+            // For DSpace, READ = Discover and Display
+            rightsPerm.setAttribute("DISCOVER", "true");
+            rightsPerm.setAttribute("DISPLAY", "true");
+            //Read = cannot modify or delete
+            rightsPerm.setAttribute("MODIFY", "false");
+            rightsPerm.setAttribute("DELETE", "false");
+        } else if (action == Constants.WRITE || action == Constants.ADD) {
+            //All WRITE-based actions = can modify, but cannot delete
             rightsPerm.setAttribute("DISCOVER", "true");
             rightsPerm.setAttribute("DISPLAY", "true");
             //Write = can modify, but cannot delete
             rightsPerm.setAttribute("MODIFY", "true");
             rightsPerm.setAttribute("DELETE", "false");
-        }
-        //All DELETE-based actions = can modify & can delete
-        //(NOTE: Although Constants.DELETE is marked as "obsolete", it is still used in dspace-api)
-        else if(action == Constants.DELETE
-                || action==Constants.REMOVE)
-        {
+        } else if (action == Constants.DELETE || action == Constants.REMOVE) {
+            //All DELETE-based actions = can modify & can delete
+            //(NOTE: Although Constants.DELETE is marked as "obsolete", it is still used in dspace-api)
             rightsPerm.setAttribute("DISCOVER", "true");
             rightsPerm.setAttribute("DISPLAY", "true");
             //Delete = can both modify and delete
             rightsPerm.setAttribute("MODIFY", "true");
             rightsPerm.setAttribute("DELETE", "true");
-        }
-        //ADMIN action = full permissions
-        else if(action == Constants.ADMIN)
-        {
+        } else if (action == Constants.ADMIN) {
+            //ADMIN action = full permissions
             rightsPerm.setAttribute("DISCOVER", "true");
             rightsPerm.setAttribute("DISPLAY", "true");
             rightsPerm.setAttribute("COPY", "true");
@@ -371,9 +342,7 @@ public class METSRightsCrosswalk
             rightsPerm.setAttribute("MODIFY", "true");
             rightsPerm.setAttribute("DELETE", "true");
             rightsPerm.setAttribute("PRINT", "true");
-        }
-        else
-        {
+        } else {
             //Unknown action -- don't enable any rights by default
             //NOTE: ALL WORKFLOW RELATED ACTIONS ARE NOT INCLUDED IN METSRIGHTS
             //DSpace API no longer assigns nor checks any of the following 'action' types:
@@ -381,13 +350,13 @@ public class METSRightsCrosswalk
             // * Constants.WORKFLOW_STEP_2
             // * Constants.WORKFLOW_STEP_3
             // * Constants.WORKFLOW_ABORT
-        }//end if
+        } //end if
 
         //Also add in OTHER permissionTypes, as necessary (see 'otherTypesMapping' above)
         // (These OTHER permissionTypes are used to tell apart similar DSpace permissions during Ingestion)
-        if(otherTypesMapping.containsKey(action))
-        {
-            //if found in our 'otherTypesMapping', enable @OTHER attribute and add in the appropriate value to @OTHERPERMITTYPE attribute
+        if (otherTypesMapping.containsKey(action)) {
+            //if found in our 'otherTypesMapping', enable @OTHER attribute and add in the appropriate value to
+            // @OTHERPERMITTYPE attribute
             rightsPerm.setAttribute("OTHER", "true");
             rightsPerm.setAttribute("OTHERPERMITTYPE", otherTypesMapping.get(action));
         }
@@ -401,25 +370,19 @@ public class METSRightsCrosswalk
     /**
      * Ingest a whole XML document, starting at specified root.
      *
-     * @param context
-     *     The relevant DSpace Context.
-     * @param dso
-     *     DSpace object to ingest
-     * @param root
-     *     root element
-     * @param createMissingMetadataFields
-     *     whether to create missing fields
+     * @param context                     The relevant DSpace Context.
+     * @param dso                         DSpace object to ingest
+     * @param root                        root element
+     * @param createMissingMetadataFields whether to create missing fields
      * @throws CrosswalkException if crosswalk error
-     * @throws IOException if IO error
-     * @throws SQLException if database error
+     * @throws IOException        if IO error
+     * @throws SQLException       if database error
      * @throws AuthorizeException if authorization error
      */
     @Override
     public void ingest(Context context, DSpaceObject dso, Element root, boolean createMissingMetadataFields)
-        throws CrosswalkException, IOException, SQLException, AuthorizeException
-    {
-        if (!(root.getName().equals("RightsDeclarationMD")))
-        {
+        throws CrosswalkException, IOException, SQLException, AuthorizeException {
+        if (!(root.getName().equals("RightsDeclarationMD"))) {
             throw new MetadataValidationException("Wrong root element for METSRights: " + root.toString());
         }
         ingest(context, dso, root.getChildren(), createMissingMetadataFields);
@@ -437,100 +400,89 @@ public class METSRightsCrosswalk
      * conjunction with another Crosswalk which can create/restore missing
      * Groups or EPeople (e.g. RoleCrosswalk).
      *
-     * @param context context
-     * @param dso Dspace object
-     * @param ml list of elements
+     * @param context                     context
+     * @param dso                         Dspace object
+     * @param ml                          list of elements
      * @param createMissingMetadataFields whether to create missing fields
      * @throws CrosswalkException if crosswalk error
-     * @throws IOException if IO error
-     * @throws SQLException if database error
+     * @throws IOException        if IO error
+     * @throws SQLException       if database error
      * @throws AuthorizeException if authorization error
      * @see RoleCrosswalk
      */
     @Override
     public void ingest(Context context, DSpaceObject dso, List<Element> ml, boolean createMissingMetadataFields)
-        throws CrosswalkException, IOException, SQLException, AuthorizeException
-    {
+        throws CrosswalkException, IOException, SQLException, AuthorizeException {
         // SITE objects are not supported by the METSRightsCrosswalk
-        if (dso.getType() == Constants.SITE)
-        {
-            throw new CrosswalkObjectNotSupported("Wrong target object type, METSRightsCrosswalk cannot crosswalk a SITE object.");
+        if (dso.getType() == Constants.SITE) {
+            throw new CrosswalkObjectNotSupported(
+                "Wrong target object type, METSRightsCrosswalk cannot crosswalk a SITE object.");
         }
 
         // If we're fed the top-level <RightsDeclarationMD> wrapper element, recurse into its guts.
         // What we need to analyze are the <Context> elements underneath it.
-        if(!ml.isEmpty() && ml.get(0).getName().equals("RightsDeclarationMD"))
-        {
+        if (!ml.isEmpty() && ml.get(0).getName().equals("RightsDeclarationMD")) {
             ingest(context, dso, ml.get(0).getChildren(), createMissingMetadataFields);
-        }
-        else
-        {
+        } else {
             // Loop through each <Context> Element in the passed in List, creating a ResourcePolicy for each
             List<ResourcePolicy> policies = new ArrayList<>();
-            for (Element element : ml)
-            {
+            for (Element element : ml) {
                 // Must be a "Context" section (where permissions are stored)
-                if (element.getName().equals("Context"))
-                {
+                if (element.getName().equals("Context")) {
                     //get what class of context this is
                     String contextClass = element.getAttributeValue("CONTEXTCLASS");
 
                     ResourcePolicy rp = resourcePolicyService.create(context);
-                    SimpleDateFormat sdf = new SimpleDateFormat( "yyyy-MM-dd" );
+                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 
                     // get reference to the <Permissions> element
                     // Note: we are assuming here that there will only ever be ONE <Permissions>
                     //  element. Currently there are no known use cases for multiple.
                     Element permsElement = element.getChild("Permissions", METSRights_NS);
-                    if(permsElement == null) {
-                            log.error("No <Permissions> element was found. Skipping this <Context> element.");
-                            continue;
+                    if (permsElement == null) {
+                        log.error("No <Permissions> element was found. Skipping this <Context> element.");
+                        continue;
                     }
 
-                    if (element.getAttributeValue("rpName") != null)
-                    {
+                    if (element.getAttributeValue("rpName") != null) {
                         rp.setRpName(element.getAttributeValue("rpName"));
                     }
                     try {
-                        if (element.getAttributeValue("start-date") != null)
-                        {
+                        if (element.getAttributeValue("start-date") != null) {
                             rp.setStartDate(sdf.parse(element.getAttributeValue("start-date")));
                         }
-                        if (element.getAttributeValue("end-date") != null)
-                        {
+                        if (element.getAttributeValue("end-date") != null) {
                             rp.setEndDate(sdf.parse(element.getAttributeValue("end-date")));
                         }
-                    }catch (ParseException ex) {
+                    } catch (ParseException ex) {
                         log.error("Failed to parse embargo date. The date needs to be in the format 'yyyy-MM-dd'.", ex);
                     }
 
                     //Check if this permission pertains to Anonymous users
-                    if(ANONYMOUS_CONTEXTCLASS.equals(contextClass))
-                    {
+                    if (ANONYMOUS_CONTEXTCLASS.equals(contextClass)) {
                         //get DSpace Anonymous group, ID=0
                         Group anonGroup = groupService.findByName(context, Group.ANONYMOUS);
-                        if(anonGroup==null)
-                        {
-                            throw new CrosswalkInternalException("The DSpace database has not been properly initialized.  The Anonymous Group is missing from the database.");
+                        if (anonGroup == null) {
+                            throw new CrosswalkInternalException(
+                                "The DSpace database has not been properly initialized.  The Anonymous Group is " +
+                                    "missing from the database.");
                         }
 
                         rp.setGroup(anonGroup);
-                    } // else if this permission declaration pertains to Administrators
-                    else if(ADMIN_CONTEXTCLASS.equals(contextClass))
-                    {
-                        //get DSpace Administrator group, ID=1
+                    } else if (ADMIN_CONTEXTCLASS.equals(contextClass)) {
+                        // else if this permission declaration pertains to Administrators
+                        // get DSpace Administrator group
                         Group adminGroup = groupService.findByName(context, Group.ADMIN);
-                        if(adminGroup==null)
-                        {
-                            throw new CrosswalkInternalException("The DSpace database has not been properly initialized.  The Administrator Group is missing from the database.");
+                        if (adminGroup == null) {
+                            throw new CrosswalkInternalException(
+                                "The DSpace database has not been properly initialized.  The Administrator Group is " +
+                                    "missing from the database.");
                         }
 
                         rp.setGroup(adminGroup);
-                    } // else if this permission pertains to another DSpace group
-                    else if(GROUP_CONTEXTCLASS.equals(contextClass))
-                    {
-                        try
-                        {
+                    } else if (GROUP_CONTEXTCLASS.equals(contextClass)) {
+                        // else if this permission pertains to another DSpace group
+                        try {
                             //we need to find the name of DSpace group it pertains to
                             //Get the text within the <UserName> child element,
                             // this is the group's name
@@ -544,29 +496,29 @@ public class METSRightsCrosswalk
                             Group group = groupService.findByName(context, groupName);
 
                             //if not found, throw an error -- user should restore group from the SITE AIP
-                            if(group==null)
-                            {
+                            if (group == null) {
                                 throw new CrosswalkInternalException("Cannot restore Group permissions on object ("
-                                        + "type=" + Constants.typeText[dso.getType()] + ", "
-                                        + "handle=" + dso.getHandle() + ", "
-                                        + "ID=" + dso.getID()
-                                        + "). The Group named '" + groupName + "' is missing from DSpace. "
-                                        + "Please restore this group using the SITE AIP, or recreate it.");
+                                                                         + "type=" + Constants.typeText[dso
+                                    .getType()] + ", "
+                                                                         + "handle=" + dso.getHandle() + ", "
+                                                                         + "ID=" + dso.getID()
+                                                                         + "). The Group named '" + groupName + "' is" +
+                                                                         " missing from DSpace. "
+                                                                         + "Please restore this group using the SITE " +
+                                                                         "AIP, or recreate it.");
                             }
 
                             //assign group to policy
                             rp.setGroup(group);
-                        }
-                        catch(PackageException pe)
-                        {
+                        } catch (PackageException pe) {
                             //A PackageException will only be thrown if translateDefaultGroupName() fails
                             //We'll just wrap it as a CrosswalkException and throw it upwards
                             throw new CrosswalkException(pe);
                         }
-                    }// else if this permission pertains to a DSpace person
-                    else if(PERSON_CONTEXTCLASS.equals(contextClass))
-                    {
-                        //we need to find the person it pertains to
+                    } else if (PERSON_CONTEXTCLASS.equals(contextClass)) {
+                        // else if this permission pertains to a DSpace person
+
+                        // we need to find the person it pertains to
                         // Get the text within the <UserName> child element,
                         // this is the person's email address
                         String personEmail = element.getChildTextTrim("UserName", METSRights_NS);
@@ -576,26 +528,26 @@ public class METSRightsCrosswalk
 
                         //If cannot find by email, try by netID
                         //(though METSRights should contain email if it was exported by DSpace)
-                        if(person==null)
-                        {
+                        if (person == null) {
                             person = ePersonService.findByNetid(context, personEmail);
                         }
 
                         //if not found, throw an error -- user should restore person from the SITE AIP
-                        if(person==null)
-                        {
+                        if (person == null) {
                             throw new CrosswalkInternalException("Cannot restore Person permissions on object ("
-                                    + "type=" + Constants.typeText[dso.getType()] + ", "
-                                    + "handle=" + dso.getHandle() + ", "
-                                    + "ID=" + dso.getID()
-                                    + "). The Person with email/netid '" + personEmail + "' is missing from DSpace. "
-                                    + "Please restore this Person object using the SITE AIP, or recreate it.");
+                                                                     + "type=" + Constants.typeText[dso
+                                .getType()] + ", "
+                                                                     + "handle=" + dso.getHandle() + ", "
+                                                                     + "ID=" + dso.getID()
+                                                                     + "). The Person with email/netid '" +
+                                                                     personEmail + "' is missing from DSpace. "
+                                                                     + "Please restore this Person object using the " +
+                                                                     "SITE AIP, or recreate it.");
                         }
 
                         //assign person to the policy
                         rp.setEPerson(person);
-                    }//end if Person
-                    else {
+                    } else {
                         log.error("Unrecognized CONTEXTCLASS:  " + contextClass);
                     }
 
@@ -603,7 +555,7 @@ public class METSRightsCrosswalk
                     rp.setAction(parsePermissions(permsElement));
                     policies.add(rp);
                 } //end if "Context" element
-            }//end for loop
+            } //end for loop
 
             // Finally, we need to remove any existing policies from the current object,
             // and replace them with the policies provided via METSRights. NOTE:
@@ -625,35 +577,27 @@ public class METSRightsCrosswalk
      * @param permsElement The METSRights <code>Permissions</code> element
      * @return A DSpace Action ID from <code>org.dspace.core.Constants</code>
      */
-    private int parsePermissions(Element permsElement)
-    {
+    private int parsePermissions(Element permsElement) {
         //First, check if the @OTHERPERMITTYPE attribute is specified
         String otherPermitType = permsElement.getAttributeValue("OTHERPERMITTYPE");
 
         //if @OTHERPERMITTYPE attribute exists, it will map directly to a DSpace Action type
-        if(otherPermitType!=null && !otherPermitType.isEmpty())
-        {
-            if(otherTypesMapping.containsValue(otherPermitType))
-            {
+        if (otherPermitType != null && !otherPermitType.isEmpty()) {
+            if (otherTypesMapping.containsValue(otherPermitType)) {
                 //find the Action ID this value maps to
-                for(int actionType: otherTypesMapping.keySet())
-                {
+                for (int actionType : otherTypesMapping.keySet()) {
                     //if found, this is the Action ID corresponding to this permission
-                    if(otherTypesMapping.get(actionType).equals(otherPermitType))
-                    {
+                    if (otherTypesMapping.get(actionType).equals(otherPermitType)) {
                         return actionType;
                     }
                 }
-            }
-            else
-            {
+            } else {
                 log.warn("Unrecognized @OTHERPERMITTYPE attribute value ("
-                            + otherPermitType
-                            + ") found in METSRights section of METS Manifest.");
+                             + otherPermitType
+                             + ") found in METSRights section of METS Manifest.");
             }
-        }
-        else // Otherwise, a closer analysis of all Permission element attributes is necessary
-        {
+        } else {
+            // Otherwise, a closer analysis of all Permission element attributes is necessary
             boolean discoverPermit = Boolean.parseBoolean(permsElement.getAttributeValue("DISCOVER"));
             boolean displayPermit = Boolean.parseBoolean(permsElement.getAttributeValue("DISPLAY"));
             boolean modifyPermit = Boolean.parseBoolean(permsElement.getAttributeValue("MODIFY"));
@@ -661,20 +605,15 @@ public class METSRightsCrosswalk
             boolean otherPermit = Boolean.parseBoolean(permsElement.getAttributeValue("OTHER"));
 
             //if DELETE='true'
-            if(deletePermit && !otherPermit)
-            {
+            if (deletePermit && !otherPermit) {
                 //This must refer to the DELETE action type
                 //(note REMOVE & ADMIN action type have @OTHERPERMITTYPE values specified)
                 return Constants.DELETE;
-            }//if MODIFY='true'
-            else if(modifyPermit && !otherPermit)
-            {
+            } else if (modifyPermit && !otherPermit) {
                 //This must refer to the WRITE action type
                 //(note ADD action type has an @OTHERPERMITTYPE value specified)
                 return Constants.WRITE;
-            }
-            else if(discoverPermit && displayPermit && !otherPermit)
-            {
+            } else if (discoverPermit && displayPermit && !otherPermit) {
                 //This must refer to the READ action type
                 return Constants.READ;
             }

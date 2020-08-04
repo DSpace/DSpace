@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean id="dspaceRunnableThreadExecutor" class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
+        <property name="corePoolSize" value="5"/>
+    </bean>
+
+    <!-- This primary attribute is present so that we can assure that in the REST layer we'll always use this
+        bean if it is present-->
+    <bean id="metadata-import" class="org.dspace.app.bulkedit.MetadataImportScriptConfiguration" primary="true">
+        <property name="description" value="Import metadata after batch editing" />
+        <property name="dspaceRunnableClass" value="org.dspace.app.bulkedit.MetadataImport"/>
+    </bean>
+</beans>

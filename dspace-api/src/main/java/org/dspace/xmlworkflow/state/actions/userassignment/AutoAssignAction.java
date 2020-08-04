@@ -7,26 +7,29 @@
  */
 package org.dspace.xmlworkflow.state.actions.userassignment;
 
-import org.apache.log4j.Logger;
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+import javax.servlet.http.HttpServletRequest;
+
+import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.service.GroupService;
-import org.dspace.xmlworkflow.*;
+import org.dspace.xmlworkflow.Role;
+import org.dspace.xmlworkflow.RoleMembers;
+import org.dspace.xmlworkflow.WorkflowConfigurationException;
 import org.dspace.xmlworkflow.factory.XmlWorkflowServiceFactory;
 import org.dspace.xmlworkflow.service.WorkflowRequirementsService;
 import org.dspace.xmlworkflow.state.Step;
+import org.dspace.xmlworkflow.state.actions.ActionResult;
 import org.dspace.xmlworkflow.state.actions.WorkflowActionConfig;
 import org.dspace.xmlworkflow.storedcomponents.WorkflowItemRole;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
-import org.dspace.xmlworkflow.state.actions.ActionResult;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.List;
 
 /**
  * A user selection action that will create pooled tasks
@@ -40,7 +43,7 @@ import java.util.List;
  */
 public class AutoAssignAction extends UserSelectionAction {
 
-    private final Logger log = Logger.getLogger(AutoAssignAction.class);
+    private final Logger log = org.apache.logging.log4j.LogManager.getLogger(AutoAssignAction.class);
 
     @Autowired(required = true)
     protected GroupService groupService;
@@ -49,26 +52,27 @@ public class AutoAssignAction extends UserSelectionAction {
 
     @Override
     public void activate(Context c, XmlWorkflowItem wfItem) {
-        
+
     }
 
     @Override
-    public ActionResult execute(Context c, XmlWorkflowItem wfi, Step step, HttpServletRequest request) throws SQLException, AuthorizeException, IOException {
+    public ActionResult execute(Context c, XmlWorkflowItem wfi, Step step, HttpServletRequest request)
+        throws SQLException, AuthorizeException, IOException {
         try {
             Role role = getParent().getStep().getRole();
-            if(role != null){
+            if (role != null) {
                 WorkflowActionConfig nextAction = getParent().getStep().getNextAction(this.getParent());
                 //Retrieve the action which has a user interface
-                while(nextAction != null && !nextAction.requiresUI()){
+                while (nextAction != null && !nextAction.requiresUI()) {
                     nextAction = nextAction.getStep().getNextAction(nextAction);
                 }
 
-                if(nextAction != null){
+                if (nextAction != null) {
                     List<WorkflowItemRole> workflowItemRoles = workflowItemRoleService.find(c, wfi, role.getId());
                     for (WorkflowItemRole workflowItemRole : workflowItemRoles) {
-                        if(workflowItemRole.getEPerson() != null){
+                        if (workflowItemRole.getEPerson() != null) {
                             createTaskForEPerson(c, wfi, step, nextAction, workflowItemRole.getEPerson());
-                        }else{
+                        } else {
                             List<EPerson> members = groupService.allMembers(c, workflowItemRole.getGroup());
                             for (EPerson member : members) {
                                 createTaskForEPerson(c, wfi, step, nextAction, member);
@@ -77,18 +81,25 @@ public class AutoAssignAction extends UserSelectionAction {
                         //Delete our workflow item role since the users have been assigned
                         workflowItemRoleService.delete(c, workflowItemRole);
                     }
-                }else{
-                    log.warn(LogManager.getHeader(c, "Error while executing auto assign action", "No valid next action. Workflow item:" + wfi.getID()));
+                } else {
+                    log.warn(LogManager.getHeader(c, "Error while executing auto assign action",
+                                                  "No valid next action. Workflow item:" + wfi.getID()));
                 }
             }
         } catch (SQLException e) {
-            log.error(LogManager.getHeader(c, "Error while executing auto assign action", "Workflow item: " + wfi.getID() + " step :" + getParent().getStep().getId()), e);
+            log.error(LogManager.getHeader(c, "Error while executing auto assign action",
+                                           "Workflow item: " + wfi.getID() + " step :" + getParent().getStep().getId()),
+                      e);
             throw e;
         } catch (AuthorizeException e) {
-            log.error(LogManager.getHeader(c, "Error while executing auto assign action", "Workflow item: " + wfi.getID() + " step :" + getParent().getStep().getId()), e);
+            log.error(LogManager.getHeader(c, "Error while executing auto assign action",
+                                           "Workflow item: " + wfi.getID() + " step :" + getParent().getStep().getId()),
+                      e);
             throw e;
         } catch (IOException e) {
-            log.error(LogManager.getHeader(c, "Error while executing auto assign action", "Workflow item: " + wfi.getID() + " step :" + getParent().getStep().getId()), e);
+            log.error(LogManager.getHeader(c, "Error while executing auto assign action",
+                                           "Workflow item: " + wfi.getID() + " step :" + getParent().getStep().getId()),
+                      e);
             throw e;
         }
 
@@ -96,21 +107,29 @@ public class AutoAssignAction extends UserSelectionAction {
         return new ActionResult(ActionResult.TYPE.TYPE_OUTCOME, ActionResult.OUTCOME_COMPLETE);
     }
 
+    @Override
+    public List<String> getOptions() {
+        return new ArrayList<>();
+    }
+
     /**
      * Create a claimed task for the user IF this user doesn't have a claimed action for this workflow item
-     * @param c the dspace context
-     * @param wfi the workflow item
-     * @param step  the current step
+     *
+     * @param c            the dspace context
+     * @param wfi          the workflow item
+     * @param step         the current step
      * @param actionConfig the action
-     * @param user the user to create the action for
-     * @throws SQLException ...
+     * @param user         the user to create the action for
+     * @throws SQLException       ...
      * @throws AuthorizeException ...
-     * @throws IOException ...
+     * @throws IOException        ...
      */
-    protected void createTaskForEPerson(Context c, XmlWorkflowItem wfi, Step step, WorkflowActionConfig actionConfig, EPerson user) throws SQLException, AuthorizeException, IOException {
-        if(claimedTaskService.find(c, wfi, step.getId(), actionConfig.getId()) != null){
+    protected void createTaskForEPerson(Context c, XmlWorkflowItem wfi, Step step, WorkflowActionConfig actionConfig,
+                                        EPerson user) throws SQLException, AuthorizeException, IOException {
+        if (claimedTaskService.find(c, wfi, step.getId(), actionConfig.getId()) != null) {
             workflowRequirementsService.addClaimedUser(c, wfi, step, c.getCurrentUser());
-            XmlWorkflowServiceFactory.getInstance().getXmlWorkflowService().createOwnedTask(c, wfi, step, actionConfig, user);
+            XmlWorkflowServiceFactory.getInstance().getXmlWorkflowService()
+                                     .createOwnedTask(c, wfi, step, actionConfig, user);
         }
     }
 
@@ -120,21 +139,23 @@ public class AutoAssignAction extends UserSelectionAction {
     }
 
     @Override
-    public void regenerateTasks(Context c, XmlWorkflowItem wfi,  RoleMembers roleMembers) throws SQLException {
+    public void regenerateTasks(Context c, XmlWorkflowItem wfi, RoleMembers roleMembers) throws SQLException {
 
     }
 
     @Override
-    public boolean isValidUserSelection(Context context, XmlWorkflowItem wfi, boolean hasUI) throws WorkflowConfigurationException, SQLException {
+    public boolean isValidUserSelection(Context context, XmlWorkflowItem wfi, boolean hasUI)
+        throws WorkflowConfigurationException, SQLException {
         //This is an automatic assign action, it can never have a user interface
         Role role = getParent().getStep().getRole();
-        if(role != null){
+        if (role != null) {
             List<WorkflowItemRole> workflowItemRoles = workflowItemRoleService.find(context, wfi, role.getId());
-            if(workflowItemRoles.size() == 0){
-                throw new WorkflowConfigurationException("The next step is invalid, since it doesn't have any individual item roles");
+            if (workflowItemRoles.size() == 0) {
+                throw new WorkflowConfigurationException(
+                    "The next step is invalid, since it doesn't have any individual item roles");
             }
             return true;
-        }else{
+        } else {
             throw new WorkflowConfigurationException("The next step is invalid, since it doesn't have a valid role");
         }
     }

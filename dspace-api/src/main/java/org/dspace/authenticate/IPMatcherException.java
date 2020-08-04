@@ -9,29 +9,24 @@ package org.dspace.authenticate;
 
 /**
  * Thrown when there is a problem parsing an IP matcher specification.
- * 
- * @version $Revision$
+ *
  * @author Robert Tansley
+ * @version $Revision$
  */
-public class IPMatcherException extends Exception
-{
-    public IPMatcherException()
-    {
+public class IPMatcherException extends Exception {
+    public IPMatcherException() {
         super();
     }
 
-    public IPMatcherException(String message)
-    {
+    public IPMatcherException(String message) {
         super(message);
     }
 
-    public IPMatcherException(Throwable cause)
-    {
+    public IPMatcherException(Throwable cause) {
         super(cause);
     }
 
-    public IPMatcherException(String message, Throwable cause)
-    {
+    public IPMatcherException(String message, Throwable cause) {
         super(message, cause);
     }
 }

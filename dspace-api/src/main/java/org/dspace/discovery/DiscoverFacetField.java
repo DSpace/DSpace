@@ -17,7 +17,7 @@ import org.dspace.discovery.configuration.DiscoveryConfigurationParameters;
 public class DiscoverFacetField {
     private String field;
     private int limit;
-    private int offset=-1;
+    private int offset = -1;
     /* The facet prefix, all facet values will have to start with the given prefix */
     private String prefix;
     private String type;
@@ -30,7 +30,8 @@ public class DiscoverFacetField {
         this.sortOrder = sortOrder;
     }
 
-    public DiscoverFacetField(String field, String type, int limit, DiscoveryConfigurationParameters.SORT sortOrder, int offset) {
+    public DiscoverFacetField(String field, String type, int limit, DiscoveryConfigurationParameters.SORT sortOrder,
+                              int offset) {
         this.field = field;
         this.type = type;
         this.limit = limit;
@@ -38,7 +39,8 @@ public class DiscoverFacetField {
         this.offset = offset;
     }
 
-    public DiscoverFacetField(String field, String type, int limit, DiscoveryConfigurationParameters.SORT sortOrder, String prefix) {
+    public DiscoverFacetField(String field, String type, int limit, DiscoveryConfigurationParameters.SORT sortOrder,
+                              String prefix) {
         this.prefix = prefix;
         this.limit = limit;
         this.type = type;
@@ -46,7 +48,8 @@ public class DiscoverFacetField {
         this.field = field;
     }
 
-    public DiscoverFacetField(String field, String type, int limit, DiscoveryConfigurationParameters.SORT sortOrder, String prefix, int offset) {
+    public DiscoverFacetField(String field, String type, int limit, DiscoveryConfigurationParameters.SORT sortOrder,
+                              String prefix, int offset) {
         this.prefix = prefix;
         this.limit = limit;
         this.type = type;
@@ -54,6 +57,7 @@ public class DiscoverFacetField {
         this.field = field;
         this.offset = offset;
     }
+
     public String getField() {
         return field;
     }
@@ -73,14 +77,12 @@ public class DiscoverFacetField {
     public DiscoveryConfigurationParameters.SORT getSortOrder() {
         return sortOrder;
     }
-    
-    public int getOffset()
-    {
+
+    public int getOffset() {
         return offset;
     }
-    
-    public void setOffset(int offset)
-    {
+
+    public void setOffset(int offset) {
         this.offset = offset;
     }
 }

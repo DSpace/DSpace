@@ -7,26 +7,37 @@
  */
 package org.dspace.app.requestitem;
 
+import java.util.Date;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.SequenceGenerator;
+import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+
 import org.dspace.content.Bitstream;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.core.ReloadableEntity;
 
-import javax.persistence.*;
-import java.util.Date;
-
 /**
  * Object representing an Item Request
  */
 @Entity
-@Table(name="requestitem")
+@Table(name = "requestitem")
 public class RequestItem implements ReloadableEntity<Integer> {
 
 
     @Id
-    @Column(name="requestitem_id")
-    @GeneratedValue(strategy = GenerationType.SEQUENCE ,generator="requestitem_seq")
-    @SequenceGenerator(name="requestitem_seq", sequenceName="requestitem_seq", allocationSize = 1)
+    @Column(name = "requestitem_id")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "requestitem_seq")
+    @SequenceGenerator(name = "requestitem_seq", sequenceName = "requestitem_seq", allocationSize = 1)
     private int requestitem_id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -43,9 +54,9 @@ public class RequestItem implements ReloadableEntity<Integer> {
     @Column(name = "request_name", length = 64)
     private String reqName;
 
-//    @Column(name = "request_message")
+    //    @Column(name = "request_message")
 //    @Lob
-    @Column(name="request_message", columnDefinition = "text")
+    @Column(name = "request_message", columnDefinition = "text")
     private String reqMessage;
 
     @Column(name = "token", unique = true, length = 48)
@@ -67,16 +78,17 @@ public class RequestItem implements ReloadableEntity<Integer> {
     private Date request_date = null;
 
     @Column(name = "accept_request")
-    private Boolean accept_request = null;
+    private boolean accept_request;
 
     /**
      * Protected constructor, create object using:
-     * {@link org.dspace.app.requestitem.service.RequestItemService#createRequest(Context, Bitstream, Item, boolean, String, String, String)}
+     * {@link org.dspace.app.requestitem.service.RequestItemService#createRequest(Context, Bitstream, Item,
+     * boolean, String, String, String)}
      */
-    protected RequestItem()
-    {
+    protected RequestItem() {
     }
 
+    @Override
     public Integer getID() {
         return requestitem_id;
     }

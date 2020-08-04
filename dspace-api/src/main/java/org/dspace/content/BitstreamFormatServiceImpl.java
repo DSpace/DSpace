@@ -7,8 +7,12 @@
  */
 package org.dspace.content;
 
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.log4j.Logger;
+import java.sql.SQLException;
+import java.util.Collections;
+import java.util.List;
+
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.dao.BitstreamFormatDAO;
@@ -16,10 +20,6 @@ import org.dspace.content.service.BitstreamFormatService;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import java.sql.SQLException;
-import java.util.Collections;
-import java.util.List;
 
 /**
  * Service implementation for the BitstreamFormat object.
@@ -30,8 +30,10 @@ import java.util.List;
  */
 public class BitstreamFormatServiceImpl implements BitstreamFormatService {
 
-    /** log4j logger */
-    private static Logger log = Logger.getLogger(BitstreamFormat.class);
+    /**
+     * log4j logger
+     */
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(BitstreamFormat.class);
 
     @Autowired(required = true)
     protected BitstreamFormatDAO bitstreamFormatDAO;
@@ -39,52 +41,45 @@ public class BitstreamFormatServiceImpl implements BitstreamFormatService {
     @Autowired(required = true)
     protected AuthorizeService authorizeService;
 
-    protected BitstreamFormatServiceImpl()
-    {
+    protected BitstreamFormatServiceImpl() {
 
     }
 
-    /** translate support-level ID to string.  MUST keep this table in sync
-     *  with support level definitions above.
+    /**
+     * translate support-level ID to string.  MUST keep this table in sync
+     * with support level definitions above.
      */
     protected final String supportLevelText[] =
-        { "UNKNOWN", "KNOWN", "SUPPORTED" };
+        {"UNKNOWN", "KNOWN", "SUPPORTED"};
 
 
     /**
      * Get a bitstream format from the database.
      *
-     * @param context
-     *            DSpace context object
-     * @param id
-     *            ID of the bitstream format
-     *
+     * @param context DSpace context object
+     * @param id      ID of the bitstream format
      * @return the bitstream format, or null if the ID is invalid.
      * @throws SQLException if database error
      */
     @Override
     public BitstreamFormat find(Context context, int id)
-            throws SQLException
-    {
+        throws SQLException {
         BitstreamFormat bitstreamFormat = bitstreamFormatDAO.findByID(context, BitstreamFormat.class, id);
 
-        if (bitstreamFormat == null)
-        {
-            if (log.isDebugEnabled())
-            {
+        if (bitstreamFormat == null) {
+            if (log.isDebugEnabled()) {
                 log.debug(LogManager.getHeader(context,
-                        "find_bitstream_format",
-                        "not_found,bitstream_format_id=" + id));
+                                               "find_bitstream_format",
+                                               "not_found,bitstream_format_id=" + id));
             }
 
             return null;
         }
 
         // not null, return format object
-        if (log.isDebugEnabled())
-        {
+        if (log.isDebugEnabled()) {
             log.debug(LogManager.getHeader(context, "find_bitstream_format",
-                    "bitstream_format_id=" + id));
+                                           "bitstream_format_id=" + id));
         }
 
         return bitstreamFormat;
@@ -96,7 +91,7 @@ public class BitstreamFormatServiceImpl implements BitstreamFormatService {
     }
 
     @Override
-    public BitstreamFormat findByShortDescription(Context context, String desc) throws SQLException{
+    public BitstreamFormat findByShortDescription(Context context, String desc) throws SQLException {
         return bitstreamFormatDAO.findByShortDescription(context, desc);
     }
 
@@ -104,10 +99,9 @@ public class BitstreamFormatServiceImpl implements BitstreamFormatService {
     public BitstreamFormat findUnknown(Context context) throws SQLException {
         BitstreamFormat bf = findByShortDescription(context, "Unknown");
 
-        if (bf == null)
-        {
+        if (bf == null) {
             throw new IllegalStateException(
-                    "No `Unknown' bitstream format in registry");
+                "No `Unknown' bitstream format in registry");
         }
 
         return bf;
@@ -125,11 +119,10 @@ public class BitstreamFormatServiceImpl implements BitstreamFormatService {
 
     @Override
     public BitstreamFormat create(Context context) throws SQLException, AuthorizeException {
-                // Check authorisation - only administrators can create new formats
-        if (!authorizeService.isAdmin(context))
-        {
+        // Check authorisation - only administrators can create new formats
+        if (!authorizeService.isAdmin(context)) {
             throw new AuthorizeException(
-                    "Only administrators can create bitstream formats");
+                "Only administrators can create bitstream formats");
         }
 
         // Create a table row
@@ -137,31 +130,32 @@ public class BitstreamFormatServiceImpl implements BitstreamFormatService {
 
 
         log.info(LogManager.getHeader(context, "create_bitstream_format",
-                "bitstream_format_id="
-                        + bitstreamFormat.getID()));
+                                      "bitstream_format_id="
+                                          + bitstreamFormat.getID()));
 
         return bitstreamFormat;
     }
 
     @Override
-    public void setShortDescription(Context context, BitstreamFormat bitstreamFormat, String shortDescription) throws SQLException {
-                // You can not reset the unknown's registry's name
+    public void setShortDescription(Context context, BitstreamFormat bitstreamFormat, String shortDescription)
+        throws SQLException {
+        // You can not reset the unknown's registry's name
         BitstreamFormat unknown = null;
-		try {
-			unknown = findUnknown(context);
-		} catch (IllegalStateException e) {
-			// No short_description='Unknown' found in bitstreamformatregistry
-			// table. On first load of registries this is expected because it
-			// hasn't been inserted yet! So, catch but ignore this runtime
-			// exception thrown by method findUnknown.
-		}
+        try {
+            unknown = findUnknown(context);
+        } catch (IllegalStateException e) {
+            // No short_description='Unknown' found in bitstreamformatregistry
+            // table. On first load of registries this is expected because it
+            // hasn't been inserted yet! So, catch but ignore this runtime
+            // exception thrown by method findUnknown.
+        }
 
-		// If the exception was thrown, unknown will == null so goahead and
-		// load s. If not, check that the unknown's registry's name is not
-		// being reset.
-		if (unknown == null || unknown.getID() != bitstreamFormat.getID()) {
+        // If the exception was thrown, unknown will == null so goahead and
+        // load s. If not, check that the unknown's registry's name is not
+        // being reset.
+        if (unknown == null || !unknown.getID().equals(bitstreamFormat.getID())) {
             bitstreamFormat.setShortDescriptionInternal(shortDescription);
-		}
+        }
     }
 
     @Override
@@ -171,9 +165,8 @@ public class BitstreamFormatServiceImpl implements BitstreamFormatService {
 
     @Override
     public void setSupportLevel(BitstreamFormat bitstreamFormat, int supportLevel) {
-                // Sanity check
-        if ((supportLevel < 0) || (supportLevel > 2))
-        {
+        // Sanity check
+        if ((supportLevel < 0) || (supportLevel > 2)) {
             throw new IllegalArgumentException("Invalid support level");
         }
 
@@ -186,17 +179,18 @@ public class BitstreamFormatServiceImpl implements BitstreamFormatService {
     }
 
     @Override
-    public void update(Context context, List<BitstreamFormat> bitstreamFormats) throws SQLException, AuthorizeException {
-        if(CollectionUtils.isNotEmpty(bitstreamFormats)) {
+    public void update(Context context, List<BitstreamFormat> bitstreamFormats)
+        throws SQLException, AuthorizeException {
+        if (CollectionUtils.isNotEmpty(bitstreamFormats)) {
             // Check authorisation - only administrators can change formats
             if (!authorizeService.isAdmin(context)) {
                 throw new AuthorizeException(
-                        "Only administrators can modify bitstream formats");
+                    "Only administrators can modify bitstream formats");
             }
 
             for (BitstreamFormat bitstreamFormat : bitstreamFormats) {
                 log.info(LogManager.getHeader(context, "update_bitstream_format",
-                        "bitstream_format_id=" + bitstreamFormat.getID()));
+                                              "bitstream_format_id=" + bitstreamFormat.getID()));
 
                 bitstreamFormatDAO.save(context, bitstreamFormat);
             }
@@ -205,18 +199,16 @@ public class BitstreamFormatServiceImpl implements BitstreamFormatService {
 
     @Override
     public void delete(Context context, BitstreamFormat bitstreamFormat) throws SQLException, AuthorizeException {
-                // Check authorisation - only administrators can delete formats
-        if (!authorizeService.isAdmin(context))
-        {
+        // Check authorisation - only administrators can delete formats
+        if (!authorizeService.isAdmin(context)) {
             throw new AuthorizeException(
-                    "Only administrators can delete bitstream formats");
+                "Only administrators can delete bitstream formats");
         }
 
         // Find "unknown" type
         BitstreamFormat unknown = findUnknown(context);
 
-        if (unknown.getID() == bitstreamFormat.getID())
-        {
+        if (unknown.getID().equals(bitstreamFormat.getID())) {
             throw new IllegalArgumentException("The Unknown bitstream format may not be deleted.");
         }
 
@@ -227,16 +219,14 @@ public class BitstreamFormatServiceImpl implements BitstreamFormatService {
         bitstreamFormatDAO.delete(context, bitstreamFormat);
 
         log.info(LogManager.getHeader(context, "delete_bitstream_format",
-                "bitstream_format_id=" + bitstreamFormat.getID() + ",bitstreams_changed="
-                        + numberChanged));
+                                      "bitstream_format_id=" + bitstreamFormat.getID() + ",bitstreams_changed="
+                                          + numberChanged));
     }
 
     @Override
     public int getSupportLevelID(String supportLevel) {
-        for (int i = 0; i < supportLevelText.length; i++)
-        {
-            if (supportLevelText[i].equals(supportLevel))
-            {
+        for (int i = 0; i < supportLevelText.length; i++) {
+            if (supportLevelText[i].equals(supportLevel)) {
                 return i;
             }
         }
@@ -275,8 +265,7 @@ public class BitstreamFormatServiceImpl implements BitstreamFormatService {
 
         List<BitstreamFormat> bitstreamFormats = bitstreamFormatDAO.findByFileExtension(context, extension);
 
-        if(CollectionUtils.isNotEmpty(bitstreamFormats))
-        {
+        if (CollectionUtils.isNotEmpty(bitstreamFormats)) {
             return bitstreamFormats.get(0);
         }
         return null;

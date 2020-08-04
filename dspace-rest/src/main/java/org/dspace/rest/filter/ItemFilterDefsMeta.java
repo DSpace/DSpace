@@ -9,7 +9,7 @@ package org.dspace.rest.filter;
 
 import java.util.regex.Pattern;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
@@ -18,17 +18,18 @@ import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
  * Define the set of use cases for filtering items of interest through the REST API.
- * @author Terry Brady, Georgetown University
  *
+ * @author Terry Brady, Georgetown University
  */
 
 public class ItemFilterDefsMeta implements ItemFilterList {
     protected static ItemService itemService = ContentServiceFactory.getInstance().getItemService();
-    static Logger log = Logger.getLogger(ItemFilterDefsMeta.class);
+    static Logger log = org.apache.logging.log4j.LogManager.getLogger(ItemFilterDefsMeta.class);
 
     public static final String CAT_META_GEN = "General Metadata Filters";
     public static final String CAT_META_SPEC = "Specific Metadata Filters";
     public static final String CAT_MOD = "Recently Modified";
+
     private enum EnumItemFilterDefs implements ItemFilterTest {
         has_no_title("Has no dc.title", null, CAT_META_SPEC) {
             public boolean testItem(Context context, Item item) {
@@ -47,14 +48,17 @@ public class ItemFilterDefsMeta implements ItemFilterList {
         },
         has_compound_subject("Has compound subject", null, CAT_META_SPEC) {
             public boolean testItem(Context context, Item item) {
-                String regex = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("rest.report-regex-compound-subject");
+                String regex = DSpaceServicesFactory.getInstance().getConfigurationService()
+                                                    .getProperty("rest.report-regex-compound-subject");
                 return ItemFilterUtil.hasMetadataMatch(item, "dc.subject.*", Pattern.compile(regex));
             }
         },
         has_compound_author("Has compound author", null, CAT_META_SPEC) {
             public boolean testItem(Context context, Item item) {
-                String regex = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("rest.report-regex-compound-author");
-                return ItemFilterUtil.hasMetadataMatch(item, "dc.creator,dc.contributor.author", Pattern.compile(regex));
+                String regex = DSpaceServicesFactory.getInstance().getConfigurationService()
+                                                    .getProperty("rest.report-regex-compound-author");
+                return ItemFilterUtil
+                    .hasMetadataMatch(item, "dc.creator,dc.contributor.author", Pattern.compile(regex));
             }
         },
         has_empty_metadata("Has empty metadata", null, CAT_META_GEN) {
@@ -64,43 +68,50 @@ public class ItemFilterDefsMeta implements ItemFilterList {
         },
         has_unbreaking_metadata("Has unbreaking metadata", null, CAT_META_GEN) {
             public boolean testItem(Context context, Item item) {
-                String regex = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("rest.report-regex-unbreaking");
+                String regex = DSpaceServicesFactory.getInstance().getConfigurationService()
+                                                    .getProperty("rest.report-regex-unbreaking");
                 return ItemFilterUtil.hasMetadataMatch(item, "*", Pattern.compile(regex));
             }
         },
         has_long_metadata("Has long metadata field", null, CAT_META_GEN) {
             public boolean testItem(Context context, Item item) {
-                String regex = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("rest.report-regex-long");
+                String regex = DSpaceServicesFactory.getInstance().getConfigurationService()
+                                                    .getProperty("rest.report-regex-long");
                 return ItemFilterUtil.hasMetadataMatch(item, "*", Pattern.compile(regex));
             }
         },
         has_xml_entity("Has XML entity in metadata", null, CAT_META_GEN) {
             public boolean testItem(Context context, Item item) {
-                String regex = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("rest.report-regex-xml-entity");
+                String regex = DSpaceServicesFactory.getInstance().getConfigurationService()
+                                                    .getProperty("rest.report-regex-xml-entity");
                 return ItemFilterUtil.hasMetadataMatch(item, "*", Pattern.compile(regex));
             }
         },
         has_non_ascii("Has non-ascii in metadata", null, CAT_META_GEN) {
             public boolean testItem(Context context, Item item) {
-                String regex = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("rest.report-regex-non-ascii");
+                String regex = DSpaceServicesFactory.getInstance().getConfigurationService()
+                                                    .getProperty("rest.report-regex-non-ascii");
                 return ItemFilterUtil.hasMetadataMatch(item, "*", Pattern.compile(regex));
             }
         },
         has_desc_url("Has url in description", null, CAT_META_SPEC) {
             public boolean testItem(Context context, Item item) {
-                String regex = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("rest.report-regex-url");
+                String regex = DSpaceServicesFactory.getInstance().getConfigurationService()
+                                                    .getProperty("rest.report-regex-url");
                 return ItemFilterUtil.hasMetadataMatch(item, "dc.description.*", Pattern.compile(regex));
             }
         },
         has_fulltext_provenance("Has fulltext in provenance", null, CAT_META_SPEC) {
             public boolean testItem(Context context, Item item) {
-                String regex = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("rest.report-regex-fulltext");
+                String regex = DSpaceServicesFactory.getInstance().getConfigurationService()
+                                                    .getProperty("rest.report-regex-fulltext");
                 return ItemFilterUtil.hasMetadataMatch(item, "dc.description.provenance", Pattern.compile(regex));
             }
         },
         no_fulltext_provenance("Doesn't have fulltext in provenance", null, CAT_META_SPEC) {
             public boolean testItem(Context context, Item item) {
-                String regex = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("rest.report-regex-fulltext");
+                String regex = DSpaceServicesFactory.getInstance().getConfigurationService()
+                                                    .getProperty("rest.report-regex-fulltext");
                 return !ItemFilterUtil.hasMetadataMatch(item, "dc.description.provenance", Pattern.compile(regex));
             }
         },
@@ -123,11 +134,11 @@ public class ItemFilterDefsMeta implements ItemFilterList {
             public boolean testItem(Context context, Item item) {
                 return ItemFilterUtil.recentlyModified(item, 60);
             }
-        },
-        ;
+        },;
 
         private String title = null;
         private String description = null;
+
         private EnumItemFilterDefs(String title, String description, String category) {
             this.title = title;
             this.description = description;
@@ -141,14 +152,17 @@ public class ItemFilterDefsMeta implements ItemFilterList {
         public String getName() {
             return name();
         }
+
         public String getTitle() {
             return title;
         }
+
         public String getDescription() {
             return description;
         }
 
         private String category = null;
+
         public String getCategory() {
             return category;
         }
@@ -156,6 +170,7 @@ public class ItemFilterDefsMeta implements ItemFilterList {
 
     public ItemFilterDefsMeta() {
     }
+
     public ItemFilterTest[] getFilters() {
         return EnumItemFilterDefs.values();
     }

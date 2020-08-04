@@ -12,40 +12,36 @@ import javax.xml.bind.annotation.XmlRootElement;
 /**
  * Used to handle/determine status of REST API.
  * Mainly to know your authentication status
- *
  */
 @XmlRootElement(name = "report")
-public class Report
-{
+public class Report {
     private String nickname;
     private String url;
 
     public Report() {
-    	setNickname("na");
-    	setUrl("");
+        setNickname("na");
+        setUrl("");
     }
 
-    
+
     public Report(String nickname, String url) {
         setNickname(nickname);
         setUrl(url);
     }
-    public String getUrl()
-    {
+
+    public String getUrl() {
         return this.url;
     }
-    public String getNickname()
-    {
+
+    public String getNickname() {
         return this.nickname;
     }
 
-    public void setUrl(String url)
-    {
+    public void setUrl(String url) {
         this.url = url;
     }
 
-    public void setNickname(String nickname)
-    {
+    public void setNickname(String nickname) {
         this.nickname = nickname;
     }
 }

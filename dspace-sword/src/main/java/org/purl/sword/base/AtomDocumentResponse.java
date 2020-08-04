@@ -8,20 +8,18 @@
 package org.purl.sword.base;
 
 /**
- * Represents a deposit response. This holds the SWORD Entry element. 
- * 
+ * Represents a deposit response. This holds the SWORD Entry element.
+ *
  * @author Stuart Lewis
  */
-public class AtomDocumentResponse extends DepositResponse
-{
+public class AtomDocumentResponse extends DepositResponse {
 
-   /**
-     * Create a new response with the specified http code. 
-     * 
-     * @param httpResponse Response code. 
+    /**
+     * Create a new response with the specified http code.
+     *
+     * @param httpResponse Response code.
      */
-    public AtomDocumentResponse(int httpResponse) 
-    {
+    public AtomDocumentResponse(int httpResponse) {
         super(httpResponse);
     }
 

@@ -10,15 +10,15 @@ package org.dspace.kernel.mixins;
 /**
  * Allow the service or provider to be initialized when it is started
  * by the service manager.  After all injections are complete the init
- * method will be called.  Any initialization that a service needs to do 
+ * method will be called.  Any initialization that a service needs to do
  * should happen here.
- * 
+ *
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  */
 public interface InitializedService {
 
     /**
-     * Executed after the service is created and all dependencies and 
+     * Executed after the service is created and all dependencies and
      * configurations injected.
      */
     public void init();

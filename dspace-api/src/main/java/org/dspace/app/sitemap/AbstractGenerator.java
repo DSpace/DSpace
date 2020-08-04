@@ -36,35 +36,44 @@ import java.util.zip.GZIPOutputStream;
  *
  * @author Robert Tansley
  */
-public abstract class AbstractGenerator
-{
-    /** Number of files written so far */
+public abstract class AbstractGenerator {
+    /**
+     * Number of files written so far
+     */
     protected int fileCount;
 
-    /** Number of bytes written to current file */
+    /**
+     * Number of bytes written to current file
+     */
     protected int bytesWritten;
 
-    /** Number of URLs written to current file */
+    /**
+     * Number of URLs written to current file
+     */
     protected int urlsWritten;
 
-    /** Directory files are written to */
+    /**
+     * Directory files are written to
+     */
     protected File outputDir;
 
-    /** Current output */
+    /**
+     * Current output
+     */
     protected PrintStream currentOutput;
 
-    /** Size in bytes of trailing boilerplate */
+    /**
+     * Size in bytes of trailing boilerplate
+     */
     private int trailingByteCount;
 
     /**
      * Initialize this generator to write to the given directory. This must be
      * called by any subclass constructor.
      *
-     * @param outputDirIn
-     *            directory to write sitemap files to
+     * @param outputDirIn directory to write sitemap files to
      */
-    public AbstractGenerator(File outputDirIn)
-    {
+    public AbstractGenerator(File outputDirIn) {
         fileCount = 0;
         outputDir = outputDirIn;
         trailingByteCount = getTrailingBoilerPlate().length();
@@ -75,17 +84,15 @@ public abstract class AbstractGenerator
      * Start writing a new sitemap file.
      *
      * @throws IOException if IO error
-     *             if an error occurs creating the file
+     *                     if an error occurs creating the file
      */
-    protected void startNewFile() throws IOException
-    {
+    protected void startNewFile() throws IOException {
         String lbp = getLeadingBoilerPlate();
 
         OutputStream fo = new FileOutputStream(new File(outputDir,
-                getFilename(fileCount)));
+                                                        getFilename(fileCount)));
 
-        if (useCompression())
-        {
+        if (useCompression()) {
             fo = new GZIPOutputStream(fo);
         }
 
@@ -98,26 +105,21 @@ public abstract class AbstractGenerator
     /**
      * Add the given URL to the sitemap.
      *
-     * @param url
-     *            Full URL to add
-     * @param lastMod
-     *            Date URL was last modified, or {@code null}
+     * @param url     Full URL to add
+     * @param lastMod Date URL was last modified, or {@code null}
      * @throws IOException if IO error
-     *             if an error occurs writing
+     *                     if an error occurs writing
      */
-    public void addURL(String url, Date lastMod) throws IOException
-    {
+    public void addURL(String url, Date lastMod) throws IOException {
         // Kick things off if this is the first call
-        if (currentOutput == null)
-        {
+        if (currentOutput == null) {
             startNewFile();
         }
 
         String newURLText = getURLText(url, lastMod);
 
         if (bytesWritten + newURLText.length() + trailingByteCount > getMaxSize()
-                || urlsWritten + 1 > getMaxURLs())
-        {
+            || urlsWritten + 1 > getMaxURLs()) {
             closeCurrentFile();
             startNewFile();
         }
@@ -131,10 +133,9 @@ public abstract class AbstractGenerator
      * Finish with the current sitemap file.
      *
      * @throws IOException if IO error
-     *             if an error occurs writing
+     *                     if an error occurs writing
      */
-    protected void closeCurrentFile() throws IOException
-    {
+    protected void closeCurrentFile() throws IOException {
         currentOutput.print(getTrailingBoilerPlate());
         currentOutput.close();
         fileCount++;
@@ -146,22 +147,18 @@ public abstract class AbstractGenerator
      * been completed, and invalidates the generator.
      *
      * @return number of sitemap files written.
-     *
      * @throws IOException if IO error
-     *             if an error occurs writing
+     *                     if an error occurs writing
      */
-    public int finish() throws IOException
-    {
-        if (null != currentOutput)
-        {
+    public int finish() throws IOException {
+        if (null != currentOutput) {
             closeCurrentFile();
         }
 
         OutputStream fo = new FileOutputStream(new File(outputDir,
-                getIndexFilename()));
+                                                        getIndexFilename()));
 
-        if (useCompression())
-        {
+        if (useCompression()) {
             fo = new GZIPOutputStream(fo);
         }
 
@@ -175,11 +172,9 @@ public abstract class AbstractGenerator
     /**
      * Return marked-up text to be included in a sitemap about a given URL.
      *
-     * @param url
-     *            URL to add information about
-     * @param lastMod
-     *            date URL was last modified, or {@code null} if unknown or not
-     *            applicable
+     * @param url     URL to add information about
+     * @param lastMod date URL was last modified, or {@code null} if unknown or not
+     *                applicable
      * @return the mark-up to include
      */
     public abstract String getURLText(String url, Date lastMod);
@@ -219,15 +214,14 @@ public abstract class AbstractGenerator
      * GZIP-compressed.
      *
      * @return {@code true} if GZIP compression should be used, {@code false}
-     *         otherwise.
+     * otherwise.
      */
     public abstract boolean useCompression();
 
     /**
      * Return the filename a sitemap at the given index should be stored at.
      *
-     * @param number
-     *            index of the sitemap file (zero is first).
+     * @param number index of the sitemap file (zero is first).
      * @return the filename to write the sitemap to.
      */
     public abstract String getFilename(int number);
@@ -242,13 +236,11 @@ public abstract class AbstractGenerator
     /**
      * Write the index file.
      *
-     * @param output
-     *            stream to write the index to
-     * @param sitemapCount
-     *            number of sitemaps that were generated
+     * @param output       stream to write the index to
+     * @param sitemapCount number of sitemaps that were generated
      * @throws IOException if IO error
-     *             if an IO error occurs
+     *                     if an IO error occurs
      */
     public abstract void writeIndex(PrintStream output, int sitemapCount)
-            throws IOException;
+        throws IOException;
 }

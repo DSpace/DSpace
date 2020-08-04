@@ -16,8 +16,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
-
+import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.DSpaceObject;
@@ -56,23 +55,24 @@ import org.dspace.workflow.WorkflowException;
  * @see org.dspace.core.service.PluginService
  */
 public abstract class AbstractPackageIngester
-        implements PackageIngester
-{
-    /** log4j category */
-    private static Logger log = Logger.getLogger(AbstractPackageIngester.class);
+    implements PackageIngester {
+    /**
+     * log4j category
+     */
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(AbstractPackageIngester.class);
 
     protected final CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
     protected final ItemService itemService = ContentServiceFactory.getInstance().getItemService();
     protected final HandleService handleService = HandleServiceFactory.getInstance().getHandleService();
 
-    /** 
+    /**
      * References to other packages -- these are the next packages to ingest recursively
      * Key = DSpace Object just ingested, Value = List of all packages relating to a DSpaceObject
      **/
-    private Map<DSpaceObject,List<String>> packageReferences = new HashMap<DSpaceObject,List<String>>();
-    
-    /**  
-     * Map of all successfully ingested/replaced DSpace objects for current 
+    private Map<DSpaceObject, List<String>> packageReferences = new HashMap<DSpaceObject, List<String>>();
+
+    /**
+     * Map of all successfully ingested/replaced DSpace objects for current
      * import process (used by ingestAll()/replaceAll()).
      * The key is the package file (which was used to create the object),
      * and the value is the Identifier (i.e. Handle) of the DSpaceObject created/replaced.
@@ -101,95 +101,84 @@ public abstract class AbstractPackageIngester
      * package formats.  It is optional and may be given as
      * <code>null</code>.
      *
-     * @param context  DSpace context.
-     * @param parent parent under which to create the initial object
-     *        (may be null -- in which case ingester must determine parent from package
-     *         or throw an error).
-     * @param pkgFile  The initial package file to ingest
-     * @param params Properties-style list of options (interpreted by each packager).
-     * @param license  may be null, which takes default license.
+     * @param context DSpace context.
+     * @param parent  parent under which to create the initial object
+     *                (may be null -- in which case ingester must determine parent from package
+     *                or throw an error).
+     * @param pkgFile The initial package file to ingest
+     * @param params  Properties-style list of options (interpreted by each packager).
+     * @param license may be null, which takes default license.
      * @return List of DSpaceObjects created
-     *
-     * @throws PackageValidationException if initial package (or any referenced package)
-     *          is unacceptable or there is a fatal error in creating a DSpaceObject
+     * @throws PackageValidationException    if initial package (or any referenced package)
+     *                                       is unacceptable or there is a fatal error in creating a DSpaceObject
      * @throws UnsupportedOperationException if this packager does not
-     *  implement <code>ingestAll</code>
-     * @throws CrosswalkException if crosswalk error
-     * @throws IOException if IO error
-     * @throws SQLException if database error
-     * @throws AuthorizeException if authorization error
-     * @throws WorkflowException if workflow error
+     *                                       implement <code>ingestAll</code>
+     * @throws CrosswalkException            if crosswalk error
+     * @throws IOException                   if IO error
+     * @throws SQLException                  if database error
+     * @throws AuthorizeException            if authorization error
+     * @throws WorkflowException             if workflow error
      */
     @Override
     public List<String> ingestAll(Context context, DSpaceObject parent, File pkgFile,
-                                PackageParameters params, String license)
-            throws PackageException, UnsupportedOperationException,
-            CrosswalkException, AuthorizeException,
-            SQLException, IOException, WorkflowException {
+                                  PackageParameters params, String license)
+        throws PackageException, UnsupportedOperationException,
+        CrosswalkException, AuthorizeException,
+        SQLException, IOException, WorkflowException {
         //If unset, make sure the Parameters specifies this is a recursive ingest
-        if(!params.recursiveModeEnabled())
-        {
+        if (!params.recursiveModeEnabled()) {
             params.setRecursiveModeEnabled(true);
         }
 
         //Initial DSpace Object to ingest
         DSpaceObject dso = null;
-        
+
         // If we have not previously parsed/ingested this package file
         // NOTE: This ensures we don't accidentally ingest the same package
-        // TWICE, e.g. an Item's package may be referenced from multiple 
+        // TWICE, e.g. an Item's package may be referenced from multiple
         // Collection packages (if Item is mapped to multiple Collections)
-        if(!getIngestedMap().containsKey(pkgFile))
-        {
-            try
-            {
+        if (!getIngestedMap().containsKey(pkgFile)) {
+            try {
                 //actually ingest pkg using provided PackageIngester
                 dso = ingest(context, parent, pkgFile, params, license);
-            }
-            catch(IllegalStateException ie)
-            {
+            } catch (IllegalStateException ie) {
                 // NOTE: if we encounter an IllegalStateException, this means the
                 // handle is already in use and this object already exists.
 
                 //if we are skipping over (i.e. keeping) existing objects
-                if(params.keepExistingModeEnabled())
-                {
-                    log.warn(LogManager.getHeader(context, "skip_package_ingest", "Object already exists, package-skipped=" + pkgFile.getName()));
-                }
-                else // Pass this exception on -- which essentially causes a full rollback of all changes (this is the default)
-                {
+                if (params.keepExistingModeEnabled()) {
+                    log.warn(LogManager.getHeader(context, "skip_package_ingest",
+                                                  "Object already exists, package-skipped=" + pkgFile.getName()));
+                } else {
+                    // Pass this exception on -- which essentially causes a full rollback of all changes (this is
+                    // the default)
                     throw ie;
                 }
             }
-        }
-        else
-        {
-            log.info(LogManager.getHeader(context, "skip_package_ingest", "Object was already ingested, package-skipped=" + pkgFile.getName()));     
+        } else {
+            log.info(LogManager.getHeader(context, "skip_package_ingest",
+                                          "Object was already ingested, package-skipped=" + pkgFile.getName()));
         }
 
         // As long as an object was successfully created from this package
-        if(dso!=null)
-        {
+        if (dso != null) {
             // Add to map of successfully ingested packages/objects (if not already added)
             addToIngestedMap(pkgFile, dso);
 
             //We can only recursively ingest non-Item packages
             //(NOTE: Items have no children, as Bitstreams/Bundles are created from Item packages)
-            if(dso.getType()!=Constants.ITEM)
-            {
+            if (dso.getType() != Constants.ITEM) {
                 //Check if we found child package references when ingesting this latest DSpaceObject
                 List<String> childPkgRefs = getPackageReferences(dso);
-                
+
                 //we can only recursively ingest child packages
-                //if we have references to them 
-                if(childPkgRefs!=null && !childPkgRefs.isEmpty())
-                {
+                //if we have references to them
+                if (childPkgRefs != null && !childPkgRefs.isEmpty()) {
                     //Recursively ingest each child package, using this current object as the parent DSpace Object
-                    for(String childPkgRef : childPkgRefs)
-                    {
+                    for (String childPkgRef : childPkgRefs) {
                         //Assume package reference is relative to current (parent) package location
                         File childPkg = new File(pkgFile.getAbsoluteFile().getParent(), childPkgRef);
-                        
+
                         // fun, it's recursive! -- ingested referenced package
                         // NOTE: we are passing "null" as the Parent object, since we want to restore to the
                         // Parent object specified in the child Package.
@@ -199,27 +188,24 @@ public abstract class AbstractPackageIngester
                         // A Collection can map to Items that it does not "own".
                         // If a Collection package has an Item as a child, it
                         // should be mapped regardless of ownership.
-                        if (Constants.COLLECTION == dso.getType())
-                        {
+                        if (Constants.COLLECTION == dso.getType()) {
                             // If this newly ingested parent object was a Collection,
                             // lookup the newly ingested child Item and make sure
                             // it is mapped to this Collection.
                             String childHandle = getIngestedMap().get(childPkg);
-                            if(childHandle!=null)
-                            {
+                            if (childHandle != null) {
                                 Item childItem = (Item) handleService.resolveToObject(context, childHandle);
                                 // Ensure Item is mapped to Collection that referenced it
                                 Collection collection = (Collection) dso;
-                                if (childItem!=null && !itemService.isIn(childItem, collection))
-                                {
+                                if (childItem != null && !itemService.isIn(childItem, collection)) {
                                     collectionService.addItem(context, collection, childItem);
                                 }
                             }
                         }
                     }
-                }//end if child pkgs
-            }//end if not an Item
-        }//end if DSpaceObject not null
+                } //end if child pkgs
+            } //end if not an Item
+        } //end if DSpaceObject not null
 
         //Return list of all objects ingested
         return getIngestedList();
@@ -248,74 +234,66 @@ public abstract class AbstractPackageIngester
      * may choose to forward the call to <code>replace</code> if it is unable to
      * support recursive replacement.
      *
-     * @param context  DSpace context.
-     * @param dso initial existing DSpace Object to be replaced, may be null
-     *            if object to replace can be determined from package
-     * @param pkgFile  The package file to ingest.
-     * @param params Properties-style list of options specific to this packager
+     * @param context DSpace context.
+     * @param dso     initial existing DSpace Object to be replaced, may be null
+     *                if object to replace can be determined from package
+     * @param pkgFile The package file to ingest.
+     * @param params  Properties-style list of options specific to this packager
      * @return List of Identifiers of DSpaceObjects replaced
-     *
-     * @throws PackageValidationException if initial package (or any referenced package)
-     *          is unacceptable or there is a fatal error in creating a DSpaceObject
+     * @throws PackageValidationException    if initial package (or any referenced package)
+     *                                       is unacceptable or there is a fatal error in creating a DSpaceObject
      * @throws UnsupportedOperationException if this packager does not
-     *  implement <code>replaceAll</code>
-     * @throws CrosswalkException if crosswalk error
-     * @throws IOException if IO error
-     * @throws SQLException if database error
-     * @throws AuthorizeException if authorization error
-     * @throws WorkflowException if workflow error
+     *                                       implement <code>replaceAll</code>
+     * @throws CrosswalkException            if crosswalk error
+     * @throws IOException                   if IO error
+     * @throws SQLException                  if database error
+     * @throws AuthorizeException            if authorization error
+     * @throws WorkflowException             if workflow error
      */
     @Override
     public List<String> replaceAll(Context context, DSpaceObject dso,
-                                File pkgFile, PackageParameters params)
-            throws PackageException, UnsupportedOperationException,
-            CrosswalkException, AuthorizeException,
-            SQLException, IOException, WorkflowException {
+                                   File pkgFile, PackageParameters params)
+        throws PackageException, UnsupportedOperationException,
+        CrosswalkException, AuthorizeException,
+        SQLException, IOException, WorkflowException {
         //If unset, make sure the Parameters specifies this is a recursive replace
-        if(!params.recursiveModeEnabled())
-        {
+        if (!params.recursiveModeEnabled()) {
             params.setRecursiveModeEnabled(true);
         }
 
         //Initial DSpace Object to replace
         DSpaceObject replacedDso = null;
-        
+
         // If we have not previously parsed/ingested this package file
         // NOTE: This ensures we don't accidentally ingest the same package
-        // TWICE, e.g. an Item's package may be referenced from multiple 
+        // TWICE, e.g. an Item's package may be referenced from multiple
         // Collection packages (if Item is mapped to multiple Collections)
-        if(!getIngestedMap().containsKey(pkgFile))
-        { 
+        if (!getIngestedMap().containsKey(pkgFile)) {
             //Actually ingest pkg using provided PackageIngester, and replace object
             //NOTE: 'dso' may be null! If it is null, the PackageIngester must determine
             //      the object to be replaced from the package itself.
             replacedDso = replace(context, dso, pkgFile, params);
-        }
-        else
-        {
-            log.info(LogManager.getHeader(context, "skip_package_replace", "Object was already replaced, package-skipped=" + pkgFile.getName()));     
+        } else {
+            log.info(LogManager.getHeader(context, "skip_package_replace",
+                                          "Object was already replaced, package-skipped=" + pkgFile.getName()));
         }
 
         // As long as an object was successfully replaced from this package
-        if(replacedDso!=null)
-        {
+        if (replacedDso != null) {
             // Add to map of successfully ingested packages/objects (if not already added)
             addToIngestedMap(pkgFile, replacedDso);
 
             //We can only recursively ingest non-Item packages
             //(NOTE: Items have no children, as Bitstreams/Bundles are created from Item packages)
-            if(replacedDso.getType()!=Constants.ITEM)
-            {
+            if (replacedDso.getType() != Constants.ITEM) {
                 //Check if we found child package references when replacing this latest DSpaceObject
                 List<String> childPkgRefs = getPackageReferences(replacedDso);
 
                 //we can only recursively ingest child packages
                 //if we have references to them
-                if(childPkgRefs!=null && !childPkgRefs.isEmpty())
-                {
+                if (childPkgRefs != null && !childPkgRefs.isEmpty()) {
                     //Recursively replace each child package
-                    for(String childPkgRef : childPkgRefs)
-                    {
+                    for (String childPkgRef : childPkgRefs) {
                         //Assume package reference is relative to current package location
                         File childPkg = new File(pkgFile.getAbsoluteFile().getParent(), childPkgRef);
 
@@ -327,33 +305,30 @@ public abstract class AbstractPackageIngester
                         // A Collection can map to Items that it does not "own".
                         // If a Collection package has an Item as a child, it
                         // should be mapped regardless of ownership.
-                        if (Constants.COLLECTION == replacedDso.getType())
-                        {
+                        if (Constants.COLLECTION == replacedDso.getType()) {
                             // If this newly ingested parent object was a Collection,
                             // lookup the newly ingested child Item and make sure
                             // it is mapped to this Collection.
                             String childHandle = getIngestedMap().get(childPkg);
-                            if(childHandle!=null)
-                            {
+                            if (childHandle != null) {
                                 Item childItem = (Item) handleService.resolveToObject(context, childHandle);
                                 // Ensure Item is mapped to Collection that referenced it
                                 Collection collection = (Collection) replacedDso;
-                                if (childItem!=null && !itemService.isIn(childItem, collection))
-                                {
+                                if (childItem != null && !itemService.isIn(childItem, collection)) {
                                     collectionService.addItem(context, collection, childItem);
                                 }
                             }
                         }
                     }
-                }//end if child pkgs
-            }//end if not an Item
-        }//end if DSpaceObject not null
+                } //end if child pkgs
+            } //end if not an Item
+        } //end if DSpaceObject not null
 
         //Return list of all objects replaced
         return getIngestedList();
     }
 
-   
+
     /**
      * During ingestion process, some submission information packages (SIPs)
      * may reference other packages to be ingested (recursively).
@@ -365,20 +340,16 @@ public abstract class AbstractPackageIngester
      * References are collected based on the DSpaceObject created from the SIP
      * (this way we keep the context of these references).
      *
-     * @param dso DSpaceObject whose SIP referenced another package
+     * @param dso        DSpaceObject whose SIP referenced another package
      * @param packageRef A reference to another package, which can be ingested after this one
      */
-    public void addPackageReference(DSpaceObject dso, String packageRef)
-    {
+    public void addPackageReference(DSpaceObject dso, String packageRef) {
         List<String> packageRefValues = null;
 
         // Check if we already have an entry for packages reference by this object
-        if(packageReferences.containsKey(dso))
-        {
+        if (packageReferences.containsKey(dso)) {
             packageRefValues = packageReferences.get(dso);
-        }
-        else
-        {
+        } else {
             //Create a new empty list of references
             packageRefValues = new ArrayList<String>();
         }
@@ -399,43 +370,40 @@ public abstract class AbstractPackageIngester
      *
      * @param dso DSpaceObject whose SIP referenced other SIPs
      * @return List of Strings which are the references to external submission ingestion packages
-     *         (may be null if no SIPs were referenced)
+     * (may be null if no SIPs were referenced)
      */
-    public List<String> getPackageReferences(DSpaceObject dso)
-    {
+    public List<String> getPackageReferences(DSpaceObject dso) {
         return packageReferences.get(dso);
     }
 
     /**
-     * Add parsed package and resulting DSpaceObject to list of successfully 
+     * Add parsed package and resulting DSpaceObject to list of successfully
      * ingested/replaced objects.
+     *
      * @param pkgFile the package file that was used to create the object
-     * @param dso the DSpaceObject created/replaced
+     * @param dso     the DSpaceObject created/replaced
      */
-    protected void addToIngestedMap(File pkgFile, DSpaceObject dso)
-    {
+    protected void addToIngestedMap(File pkgFile, DSpaceObject dso) {
         // Add to list of successfully ingested packages
-        if(!pkgIngestedMap.containsKey(pkgFile))
-        {
+        if (!pkgIngestedMap.containsKey(pkgFile)) {
             pkgIngestedMap.put(pkgFile, dso.getHandle());
         }
     }
 
     /**
-     * Return Map of all packages ingested and the DSpaceObjects which have been 
+     * Return Map of all packages ingested and the DSpaceObjects which have been
      * created/replaced by this instance of the Ingester.
-     * 
+     *
      * <P>
      * The Map "key" is the package file which was parsed, and the "value"
      * is the Identifier (i.e. Handle) of the DSpaceObject which was created/replaced.
-     * 
+     *
      * @return Map of DSpaceObjects which have been created/replaced.
      */
-    protected Map<File,String> getIngestedMap()
-    {
+    protected Map<File, String> getIngestedMap() {
         return pkgIngestedMap;
     }
-    
+
     /**
      * Return List of all DSpaceObject Identifiers which have been ingested/replaced by
      * this instance of the Ingester.
@@ -446,15 +414,15 @@ public abstract class AbstractPackageIngester
      *
      * @return List of Identifiers for DSpaceObjects which have been added/replaced
      */
-    protected List<String> getIngestedList()
-    {
+    protected List<String> getIngestedList() {
         // We have the list of ingested objects in our IngestedMap.
         // So, we simply have to convert that Collection to a List
         java.util.Collection<String> coll = pkgIngestedMap.values();
-        
-        if(coll instanceof List)
+
+        if (coll instanceof List) {
             return (List) coll;
-        else
+        } else {
             return new ArrayList(coll);
-    }   
+        }
+    }
 }

@@ -10,13 +10,12 @@ package org.dspace.xoai.filter;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
-import org.dspace.xoai.data.DSpaceItem;
-import org.dspace.xoai.filter.results.SolrFilterResult;
-
 import com.lyncode.xoai.dataprovider.xml.xoaiconfig.parameters.ParameterValue;
 import com.lyncode.xoai.dataprovider.xml.xoaiconfig.parameters.SimpleType;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.dspace.xoai.data.DSpaceItem;
+import org.dspace.xoai.filter.results.SolrFilterResult;
 
 /**
  * This filter allows one to retrieve (from the data source) those items
@@ -30,22 +29,25 @@ import com.lyncode.xoai.dataprovider.xml.xoaiconfig.parameters.SimpleType;
  */
 public class DSpaceMetadataExistsFilter extends DSpaceFilter {
     private static final Logger log = LogManager
-            .getLogger(DSpaceMetadataExistsFilter.class);
+        .getLogger(DSpaceMetadataExistsFilter.class);
 
     private List<String> fields;
 
     private List<String> getFields() {
         if (this.fields == null) {
             ParameterValue fields = getConfiguration().get("fields");
-            if (fields == null) fields = getConfiguration().get("field");
+            if (fields == null) {
+                fields = getConfiguration().get("field");
+            }
 
             if (fields instanceof SimpleType) {
                 this.fields = new ArrayList<String>();
                 this.fields.add(((SimpleType) fields).asString());
             } else {
                 this.fields = new ArrayList<String>();
-                for (ParameterValue val : fields.asParameterList().getValues())
+                for (ParameterValue val : fields.asParameterList().getValues()) {
                     this.fields.add(val.asSimpleType().asString());
+                }
             }
 
         }
@@ -56,8 +58,9 @@ public class DSpaceMetadataExistsFilter extends DSpaceFilter {
     public boolean isShown(DSpaceItem item) {
         for (String field : this.getFields()) {
             //do we have a match? if yes, our job is done
-            if (item.getMetadata(field).size() > 0)
+            if (item.getMetadata(field).size() > 0) {
                 return true;
+            }
         }
         return false;
     }
@@ -68,8 +71,9 @@ public class DSpaceMetadataExistsFilter extends DSpaceFilter {
         List<String> fields = this.getFields();
         for (int i = 0; i < fields.size(); i++) {
             cond.append("metadata.").append(fields.get(i)).append(":[* TO *]");
-            if (i < fields.size() - 1)
+            if (i < fields.size() - 1) {
                 cond.append(" OR ");
+            }
         }
         cond.append(")");
 

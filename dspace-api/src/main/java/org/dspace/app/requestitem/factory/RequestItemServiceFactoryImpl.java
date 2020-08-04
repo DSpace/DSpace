@@ -8,11 +8,11 @@
 package org.dspace.app.requestitem.factory;
 
 import org.dspace.app.requestitem.service.RequestItemService;
-import org.dspace.handle.service.HandleService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * Factory implementation to get services for the requestitem package, use RequestItemServiceFactory.getInstance() to retrieve an implementation
+ * Factory implementation to get services for the requestitem package, use RequestItemServiceFactory.getInstance() to
+ * retrieve an implementation
  *
  * @author kevinvandevelde at atmire.com
  */

@@ -15,11 +15,10 @@ import java.lang.annotation.RetentionPolicy;
  * Annotation type for CurationTasks. A task is distributive if it
  * distributes its performance to the component parts of it's target object.
  * This usually implies container iteration.
- * 
+ *
  * @author richardrodgers
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Distributive
-{
+public @interface Distributive {
 }

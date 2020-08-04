@@ -15,13 +15,16 @@ package org.dspace.statistics.content;
  * @author kevinvandevelde at atmire.com
  * Date: 23-dec-2008
  * Time: 12:44:27
- * 
  */
 public class DatasetTypeGenerator extends DatasetGenerator {
 
-    /** The type of our generator (EXAMPLE: country) **/
+    /**
+     * The type of our generator (EXAMPLE: country)
+     **/
     private String type;
-    /** The number of values shown (max) **/
+    /**
+     * The number of values shown (max)
+     **/
     private int max;
 
 

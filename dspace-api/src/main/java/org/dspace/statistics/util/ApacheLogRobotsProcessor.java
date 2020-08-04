@@ -7,25 +7,36 @@
  */
 package org.dspace.statistics.util;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
+import java.util.HashSet;
+import java.util.Set;
+
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.PosixParser;
 
-import java.io.*;
-import java.util.HashSet;
-import java.util.Set;
-
 /**
  * Commandline utility to create a file of spider addresses from an Apache
  * log file.
- * 
+ *
  * @author Mark Diggory (mdiggory at atmire.com)
  * @author kevinvandevelde at atmire.com
  * @author ben at atmire.com
  */
 public class ApacheLogRobotsProcessor {
 
+    /**
+     * Default constructor
+     */
+    private ApacheLogRobotsProcessor() { }
 
     /**
      * Creates a file containing spiders based on an Apache logfile
@@ -47,21 +58,17 @@ public class ApacheLogRobotsProcessor {
 
         // Log source
         String logFileLoc;
-        if (line.hasOption("l"))
-        {
+        if (line.hasOption("l")) {
             logFileLoc = line.getOptionValue("l");
-        }
-        else {
+        } else {
             logFileLoc = "-";
         }
 
         // Spider IP list
         String spiderIpPath;
-        if (line.hasOption("s"))
-        {
+        if (line.hasOption("s")) {
             spiderIpPath = line.getOptionValue("s");
-        }
-        else {
+        } else {
             spiderIpPath = "-";
         }
 
@@ -69,21 +76,15 @@ public class ApacheLogRobotsProcessor {
         Set<String> logSpiders;
         Writer output;
 
-        if ("-".equals(spiderIpPath))
-        {
+        if ("-".equals(spiderIpPath)) {
             logSpiders = new HashSet<String>();
             output = new BufferedWriter(new OutputStreamWriter(System.out));
-        }
-        else
-        {
+        } else {
             File spiderIpFile = new File(spiderIpPath);
 
-            if (spiderIpFile.exists())
-            {
+            if (spiderIpFile.exists()) {
                 logSpiders = SpiderDetector.readPatterns(spiderIpFile);
-            }
-            else
-            {
+            } else {
                 logSpiders = new HashSet<String>();
             }
             output = new BufferedWriter(new FileWriter(spiderIpFile));
@@ -91,10 +92,11 @@ public class ApacheLogRobotsProcessor {
 
         //First read in our log file line per line
         BufferedReader in;
-        if ("-".equals(logFileLoc))
+        if ("-".equals(logFileLoc)) {
             in = new BufferedReader(new InputStreamReader(System.in));
-        else
+        } else {
             in = new BufferedReader(new FileReader(logFileLoc));
+        }
 
         String logLine;
         while ((logLine = in.readLine()) != null) {

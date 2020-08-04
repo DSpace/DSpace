@@ -12,7 +12,8 @@ import org.dspace.versioning.service.VersioningService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * Factory implementation to get services for the versioning package, use VersionServiceFactory.getInstance() to retrieve an implementation
+ * Factory implementation to get services for the versioning package, use VersionServiceFactory.getInstance() to
+ * retrieve an implementation
  *
  * @author kevinvandevelde at atmire.com
  */

@@ -7,61 +7,51 @@
  */
 package org.dspace.rest.common;
 
-import javax.xml.bind.annotation.XmlRootElement;
 import java.util.regex.Pattern;
+import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * @author peterdietz, Rostislav Novak (Computing and Information Centre, CTU in
- *         Prague)
- * 
+ * Prague)
  */
 @XmlRootElement(name = "metadataentry")
-public class MetadataEntry
-{
+public class MetadataEntry {
     String key;
 
     String value;
 
     String language;
 
-    public MetadataEntry()
-    {
+    public MetadataEntry() {
     }
 
-    public MetadataEntry(String key, String value, String language)
-    {
+    public MetadataEntry(String key, String value, String language) {
         this.key = key;
         this.value = value;
         this.language = language;
     }
 
-    public String getValue()
-    {
+    public String getValue() {
         return value;
     }
 
-    public void setValue(String value)
-    {
+    public void setValue(String value) {
         this.value = value;
     }
 
-    public String getKey()
-    {
+    public String getKey() {
         return key;
     }
 
-    public void setKey(String key)
-    {
+    public void setKey(String key) {
         this.key = key;
     }
 
-    public String getLanguage()
-    {
+    public String getLanguage() {
         return language;
     }
 
-    public void setLanguage(String language)
-    {
+    public void setLanguage(String language) {
         this.language = language;
     }
 
@@ -77,7 +67,7 @@ public class MetadataEntry
 
     public String getQualifier() {
         String[] fieldPieces = key.split(Pattern.quote("."));
-        if(fieldPieces.length == 3) {
+        if (fieldPieces.length == 3) {
             return fieldPieces[2];
         } else {
             return null;

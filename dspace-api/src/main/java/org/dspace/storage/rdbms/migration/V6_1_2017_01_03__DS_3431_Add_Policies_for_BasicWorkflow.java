@@ -7,41 +7,40 @@
  */
 package org.dspace.storage.rdbms.migration;
 
+import java.sql.Connection;
+
 import org.dspace.core.Constants;
 import org.dspace.storage.rdbms.DatabaseUtils;
 import org.flywaydb.core.api.migration.MigrationChecksumProvider;
 import org.flywaydb.core.api.migration.jdbc.JdbcMigration;
 import org.flywaydb.core.internal.util.scanner.classpath.ClassPathResource;
 
-import java.sql.Connection;
-
 public class V6_1_2017_01_03__DS_3431_Add_Policies_for_BasicWorkflow
-    implements JdbcMigration, MigrationChecksumProvider
-{
+    implements JdbcMigration, MigrationChecksumProvider {
 
     // Size of migration script run
     Integer migration_file_size = -1;
 
 
     @Override
-    public void migrate(Connection connection) throws Exception
-    {
+    public void migrate(Connection connection) throws Exception {
         // Based on type of DB, get path to SQL migration script
         String dbtype = DatabaseUtils.getDbType(connection);
 
         String dataMigrateSQL;
-        String sqlMigrationPath = "org/dspace/storage/rdbms/sqlmigration/workflow/" + dbtype +"/";
+        String sqlMigrationPath = "org/dspace/storage/rdbms/sqlmigration/workflow/" + dbtype + "/";
         // Now, check if the XMLWorkflow table (cwf_workflowitem) already exists in this database
         // If XMLWorkflow Table does NOT exist in this database, then lets do the migration!
-        // If XMLWorkflow Table ALREADY exists, then this migration is a noop, we assume you manually ran the sql scripts
-        if (DatabaseUtils.tableExists(connection, "cwf_workflowitem"))
-        {
+        // If XMLWorkflow Table ALREADY exists, then this migration is a noop, we assume you manually ran the sql
+        // scripts
+        if (DatabaseUtils.tableExists(connection, "cwf_workflowitem")) {
             return;
-        }else{
+        } else {
             //Migrate the basic workflow
-                        // Get the contents of our data migration script, based on path & DB type
+            // Get the contents of our data migration script, based on path & DB type
             dataMigrateSQL = new ClassPathResource(sqlMigrationPath + "basicWorkflow" + "/V6.1_2017.01.03__DS-3431.sql",
-                    getClass().getClassLoader()).loadAsString(Constants.DEFAULT_ENCODING);
+                                                   getClass().getClassLoader())
+                .loadAsString(Constants.DEFAULT_ENCODING);
         }
 
         // Actually execute the Data migration SQL

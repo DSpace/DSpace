@@ -7,25 +7,26 @@
  */
 package org.dspace.xoai.tests.stylesheets;
 
-import org.apache.commons.io.IOUtils;
-
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.stream.StreamResult;
-import javax.xml.transform.stream.StreamSource;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.InputStream;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
+
+import org.apache.commons.io.IOUtils;
 
 public abstract class AbstractXSLTest {
-    private static final TransformerFactory factory = TransformerFactory.newInstance();
+    private static final TransformerFactory factory = TransformerFactory
+            .newInstance("net.sf.saxon.TransformerFactoryImpl", null);
 
-    protected TransformBuilder apply (String xslLocation) throws Exception {
+    protected TransformBuilder apply(String xslLocation) throws Exception {
         return new TransformBuilder(xslLocation);
     }
 
-    protected InputStream resource (String location) throws Exception {
+    protected InputStream resource(String location) throws Exception {
         return print(this.getClass().getClassLoader().getResourceAsStream(location));
     }
 
@@ -42,7 +43,8 @@ public abstract class AbstractXSLTest {
         private final Transformer transformer;
 
         public TransformBuilder(String xslLocation) throws Exception {
-            this.transformer = factory.newTransformer(new StreamSource(new File("../dspace/config/crosswalks/oai/metadataFormats", xslLocation)));
+            this.transformer = factory.newTransformer(
+                new StreamSource(new File("../dspace/config/crosswalks/oai/metadataFormats", xslLocation)));
         }
 
         public String to(InputStream input) throws Exception {

@@ -7,18 +7,15 @@
  */
 package org.dspace.rest.common;
 
-import org.atteo.evo.inflector.English;
-import org.dspace.content.factory.ContentServiceFactory;
-import org.dspace.content.service.DSpaceObjectService;
-import org.dspace.rest.Resource;
-
+import java.util.ArrayList;
+import java.util.List;
 import javax.servlet.ServletContext;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import org.atteo.evo.inflector.English;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.DSpaceObjectService;
 
 /**
  * Created with IntelliJ IDEA.
@@ -55,7 +52,7 @@ public class DSpaceObject {
         link = createLink(servletContext);
     }
 
-    public String getName(){
+    public String getName() {
         return this.name;
     }
 
@@ -104,7 +101,7 @@ public class DSpaceObject {
         this.uuid = uuid;
     }
 
-    private String createLink(ServletContext context){
+    private String createLink(ServletContext context) {
         return context.getContextPath() + "/" + English.plural(getType()) + "/" + getUUID();
     }
 }

@@ -7,18 +7,16 @@
  */
 package org.dspace.versioning.service;
 
+import java.sql.SQLException;
+import java.util.Date;
+import java.util.List;
+
 import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.versioning.Version;
 import org.dspace.versioning.VersionHistory;
 
-import java.sql.SQLException;
-import java.util.Date;
-import java.util.List;
-
 /**
- *
- *
  * @author Fabio Bolognesi (fabio at atmire dot com)
  * @author Mark Diggory (markd at atmire dot com)
  * @author Ben Bosman (ben at atmire dot com)
@@ -28,20 +26,17 @@ public interface VersioningService {
     Version createNewVersion(Context c, Item itemId);
 
     Version createNewVersion(Context c, Item itemId, String summary);
-    
+
     /**
      * Returns all versions of a version history.
-     * To keep version numbers stable we do not delete versions, we do only set 
+     * To keep version numbers stable we do not delete versions, we do only set
      * the item, date, summary and eperson null. This methods returns only those
      * versions that have an item assigned.
      *
-     * @param c
-     *     The relevant DSpace Context.
-     * @param vh
-     *     version history
+     * @param c  The relevant DSpace Context.
+     * @param vh version history
      * @return All versions of a version history that have an item assigned.
-     * @throws SQLException
-     *     An exception that provides information on a database access error or other errors.
+     * @throws SQLException An exception that provides information on a database access error or other errors.
      */
     List<Version> getVersionsByHistory(Context c, VersionHistory vh) throws SQLException;
 
@@ -59,5 +54,6 @@ public interface VersioningService {
 
     Version getVersion(Context c, Item item) throws SQLException;
 
-    Version createNewVersion(Context context, VersionHistory history, Item item, String summary, Date date, int versionNumber);
+    Version createNewVersion(Context context, VersionHistory history, Item item, String summary, Date date,
+                             int versionNumber);
 }

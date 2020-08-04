@@ -8,69 +8,58 @@
 package org.purl.sword.base;
 
 import java.util.Properties;
+
 import nu.xom.Element;
 
 /**
- *
  * @author Neil Taylor (nst@aber.ac.uk)
  */
-public class BasicIntegerContentElement extends BasicContentElement
-{
+public class BasicIntegerContentElement extends BasicContentElement {
     private int content = 0;
 
     private boolean isSet;
 
-    public BasicIntegerContentElement(String prefix, String localName, String namespaceUri)
-    {
+    public BasicIntegerContentElement(String prefix, String localName, String namespaceUri) {
         super(prefix, localName, namespaceUri);
     }
 
-    public BasicIntegerContentElement(XmlName name)
-    {
+    public BasicIntegerContentElement(XmlName name) {
         super(name);
     }
 
-    public int getContent()
-    {
+    public int getContent() {
         return content;
     }
 
-    public void setContent(int value)
-    {
-        isSet = true; 
-        content = value; 
+    public void setContent(int value) {
+        isSet = true;
+        content = value;
     }
 
-    public boolean isSet()
-    {
+    public boolean isSet() {
         return isSet;
     }
 
-    protected void marshallContent(Element element)
-    {
-       element.appendChild(Integer.toString(content));
+    protected void marshallContent(Element element) {
+        element.appendChild(Integer.toString(content));
     }
 
     protected void unmarshallContent(Element element)
-    throws UnmarshallException
-    {
-       setContent(unmarshallInteger(element));
+        throws UnmarshallException {
+        setContent(unmarshallInteger(element));
     }
 
-    protected SwordValidationInfo validateContent(Properties validationContext)
-    {
+    protected SwordValidationInfo validateContent(Properties validationContext) {
         SwordValidationInfo result = null;
-        if ( ! isSet )
-        {
-           result = new SwordValidationInfo(xmlName,
-               SwordValidationInfo.MISSING_CONTENT,
-               SwordValidationInfoType.WARNING);
+        if (!isSet) {
+            result = new SwordValidationInfo(xmlName,
+                                             SwordValidationInfo.MISSING_CONTENT,
+                                             SwordValidationInfoType.WARNING);
         }
         return result;
     }
 
-    protected String getContentAsString()
-    {
+    protected String getContentAsString() {
         return Integer.toString(content);
     }
 }

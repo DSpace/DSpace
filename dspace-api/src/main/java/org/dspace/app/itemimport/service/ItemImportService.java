@@ -7,15 +7,15 @@
  */
 package org.dspace.app.itemimport.service;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
+import javax.mail.MessagingException;
+
 import org.dspace.app.itemimport.BatchUpload;
 import org.dspace.content.Collection;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
-
-import javax.mail.MessagingException;
-import java.io.File;
-import java.io.IOException;
-import java.util.List;
 
 /**
  * Import items into DSpace. The conventional use is upload files by copying
@@ -37,30 +37,32 @@ public interface ItemImportService {
 
 
     /**
-     * 
-     * @param c DSpace Context
+     * @param c             DSpace Context
      * @param mycollections List of Collections
-     * @param sourceDir source location
-     * @param mapFile map file
-     * @param template whether to use template item
-     * @throws Exception if error 
+     * @param sourceDir     source location
+     * @param mapFile       map file
+     * @param template      whether to use template item
+     * @throws Exception if error
      */
-    public void addItemsAtomic(Context c, List<Collection> mycollections, String sourceDir, String mapFile, boolean template) throws Exception;
+    public void addItemsAtomic(Context c, List<Collection> mycollections, String sourceDir, String mapFile,
+                               boolean template) throws Exception;
 
     /**
      * Add items
-     * @param c DSpace Context
+     *
+     * @param c             DSpace Context
      * @param mycollections List of Collections
-     * @param sourceDir source location
-     * @param mapFile map file
-     * @param template whether to use template item
+     * @param sourceDir     source location
+     * @param mapFile       map file
+     * @param template      whether to use template item
      * @throws Exception if error
      */
     public void addItems(Context c, List<Collection> mycollections,
-            String sourceDir, String mapFile, boolean template) throws Exception;
+                         String sourceDir, String mapFile, boolean template) throws Exception;
 
     /**
      * Unzip a file
+     *
      * @param zipfile file
      * @return unzip location
      * @throws IOException if error
@@ -69,6 +71,7 @@ public interface ItemImportService {
 
     /**
      * Unzip a file to a destination
+     *
      * @param zipfile file
      * @param destDir destination directory
      * @return unzip location
@@ -78,7 +81,8 @@ public interface ItemImportService {
 
     /**
      * Unzip a file in a specific source directory
-     * @param sourcedir source directory
+     *
+     * @param sourcedir   source directory
      * @param zipfilename file name
      * @return unzip location
      * @throws IOException if error
@@ -86,18 +90,19 @@ public interface ItemImportService {
     public String unzip(String sourcedir, String zipfilename) throws IOException;
 
     /**
-     *
      * Given a public URL to a zip file that has the Simple Archive Format, this method imports the contents to DSpace
-     * @param url The public URL of the zip file
+     *
+     * @param url              The public URL of the zip file
      * @param owningCollection The owning collection the items will belong to
-     * @param collections The collections the created items will be inserted to, apart from the owning one
-     * @param resumeDir In case of a resume request, the directory that containsthe old mapfile and data
-     * @param inputType The input type of the data (bibtex, csv, etc.), in case of local file
-     * @param context The context
-     * @param template whether to use template item
+     * @param collections      The collections the created items will be inserted to, apart from the owning one
+     * @param resumeDir        In case of a resume request, the directory that containsthe old mapfile and data
+     * @param inputType        The input type of the data (bibtex, csv, etc.), in case of local file
+     * @param context          The context
+     * @param template         whether to use template item
      * @throws Exception if error
      */
-    public void processUIImport(String url, Collection owningCollection, String[] collections, String resumeDir, String inputType, Context context, boolean template) throws Exception;
+    public void processUIImport(String url, Collection owningCollection, String[] collections, String resumeDir,
+                                String inputType, Context context, boolean template) throws Exception;
 
     /**
      * Since the BTE batch import is done in a new thread we are unable to communicate
@@ -105,16 +110,13 @@ public interface ItemImportService {
      * communication with email instead. Send a success email once the batch
      * import is complete
      *
-     * @param context
-     *            - the current Context
-     * @param eperson
-     *            - eperson to send the email to
-     * @param fileName
-     *            - the filepath to the mapfile created by the batch import
+     * @param context  - the current Context
+     * @param eperson  - eperson to send the email to
+     * @param fileName - the filepath to the mapfile created by the batch import
      * @throws MessagingException if error
      */
     public void emailSuccessMessage(Context context, EPerson eperson,
-            String fileName) throws MessagingException;
+                                    String fileName) throws MessagingException;
 
     /**
      * Since the BTE batch import is done in a new thread we are unable to communicate
@@ -122,37 +124,38 @@ public interface ItemImportService {
      * communication with email instead. Send an error email if the batch
      * import fails
      *
-     * @param eperson
-     *            - EPerson to send the error message to
-     * @param error
-     *            - the error message
+     * @param eperson - EPerson to send the error message to
+     * @param error   - the error message
      * @throws MessagingException if error
      */
     public void emailErrorMessage(EPerson eperson, String error)
-            throws MessagingException;
+        throws MessagingException;
 
 
     /**
      * Get imports available for a person
+     *
      * @param eperson EPerson object
      * @return List of batch uploads
      * @throws Exception if error
      */
     public List<BatchUpload> getImportsAvailable(EPerson eperson)
-            throws Exception;
+        throws Exception;
 
     /**
      * Get import upload directory
+     *
      * @param ePerson EPerson object
      * @return directory
-     * @throws Exception if error 
+     * @throws Exception if error
      */
     public String getImportUploadableDirectory(EPerson ePerson)
-            throws Exception;
+        throws Exception;
 
     /**
      * Delete a batch by ID
-     * @param c DSpace Context
+     *
+     * @param c        DSpace Context
      * @param uploadId identifier
      * @throws Exception if error
      */
@@ -160,18 +163,21 @@ public interface ItemImportService {
 
     /**
      * Replace items
-     * @param c DSpace Context
+     *
+     * @param c             DSpace Context
      * @param mycollections List of Collections
-     * @param sourcedir source directory
-     * @param mapfile map file
-     * @param template whether to use template item
+     * @param sourcedir     source directory
+     * @param mapfile       map file
+     * @param template      whether to use template item
      * @throws Exception if error
      */
-    public void replaceItems(Context c, List<Collection> mycollections, String sourcedir, String mapfile, boolean template) throws Exception;
+    public void replaceItems(Context c, List<Collection> mycollections, String sourcedir, String mapfile,
+                             boolean template) throws Exception;
 
     /**
      * Delete items via mapfile
-     * @param c DSpace Context
+     *
+     * @param c       DSpace Context
      * @param mapfile map file
      * @throws Exception if error
      */
@@ -179,25 +185,29 @@ public interface ItemImportService {
 
     /**
      * Add items
-     * @param c DSpace Context
+     *
+     * @param c             DSpace Context
      * @param mycollections List of Collections
-     * @param sourcedir source directory
-     * @param mapfile map file
-     * @param template whether to use template item
-     * @param bteInputType The input type of the data (bibtex, csv, etc.), in case of local file
-     * @param workingDir working directory
+     * @param sourcedir     source directory
+     * @param mapfile       map file
+     * @param template      whether to use template item
+     * @param bteInputType  The input type of the data (bibtex, csv, etc.), in case of local file
+     * @param workingDir    working directory
      * @throws Exception if error
      */
-    public void addBTEItems(Context c, List<Collection> mycollections, String sourcedir, String mapfile, boolean template, String bteInputType, String workingDir) throws Exception;
+    public void addBTEItems(Context c, List<Collection> mycollections, String sourcedir, String mapfile,
+                            boolean template, String bteInputType, String workingDir) throws Exception;
 
     /**
      * Get temporary work directory
+     *
      * @return directory as string
      */
     public String getTempWorkDir();
 
     /**
      * Get temporary work directory (as File)
+     *
      * @return directory as File
      * @throws java.io.IOException if the directory cannot be created.
      */
@@ -210,18 +220,21 @@ public interface ItemImportService {
 
     /**
      * Set test flag
-     * @param isTest true or false 
+     *
+     * @param isTest true or false
      */
     public void setTest(boolean isTest);
 
     /**
      * Set resume flag
-     * @param isResume true or false 
+     *
+     * @param isResume true or false
      */
     public void setResume(boolean isResume);
 
     /**
      * Set use workflow
+     *
      * @param useWorkflow whether to enable workflow
      */
     public void setUseWorkflow(boolean useWorkflow);
@@ -233,6 +246,7 @@ public interface ItemImportService {
 
     /**
      * Set quiet flag
+     *
      * @param isQuiet true or false
      */
     public void setQuiet(boolean isQuiet);

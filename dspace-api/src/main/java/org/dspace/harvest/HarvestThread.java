@@ -7,7 +7,10 @@
  */
 package org.dspace.harvest;
 
-import org.apache.log4j.Logger;
+import java.sql.SQLException;
+import java.util.UUID;
+
+import org.apache.logging.log4j.Logger;
 import org.dspace.content.Collection;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
@@ -15,19 +18,18 @@ import org.dspace.core.Context;
 import org.dspace.harvest.factory.HarvestServiceFactory;
 import org.dspace.harvest.service.HarvestedCollectionService;
 
-import java.sql.SQLException;
-import java.util.UUID;
-
 /**
  * A harvester thread used to execute a single harvest cycle on a collection
+ *
  * @author alexey
  */
 public class HarvestThread extends Thread {
 
-    private static final Logger log = Logger.getLogger(HarvestThread.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(HarvestThread.class);
     protected UUID collectionId;
     protected CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
-    protected HarvestedCollectionService harvestedCollectionService = HarvestServiceFactory.getInstance().getHarvestedCollectionService();
+    protected HarvestedCollectionService harvestedCollectionService =
+        HarvestServiceFactory.getInstance().getHarvestedCollectionService();
 
 
     protected HarvestThread(UUID collectionId) throws SQLException {
@@ -35,14 +37,12 @@ public class HarvestThread extends Thread {
     }
 
     @Override
-    public void run()
-    {
+    public void run() {
         log.info("Thread for collection " + collectionId + " starts.");
         runHarvest();
     }
 
-    private void runHarvest()
-    {
+    private void runHarvest() {
         Context context;
         Collection dso;
         HarvestedCollection hc = null;

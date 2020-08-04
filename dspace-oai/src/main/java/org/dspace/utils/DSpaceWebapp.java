@@ -16,17 +16,13 @@ import org.dspace.app.util.AbstractDSpaceWebapp;
  * @author Christian Scheible (christian.scheible at uni-konstanz dot de)
  */
 public class DSpaceWebapp
-        extends AbstractDSpaceWebapp
-{
-    public DSpaceWebapp()
-    {
+    extends AbstractDSpaceWebapp {
+    public DSpaceWebapp() {
         super("OAI");
     }
 
     @Override
-    public boolean isUI()
-    {
+    public boolean isUI() {
         return false;
     }
 }
- 

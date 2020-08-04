@@ -11,23 +11,23 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Arrays;
+import java.util.List;
 
 import org.dspace.servicemanager.config.DSpaceConfigurationService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
- * Takes a list of paths to resources and turns them into different 
+ * Takes a list of paths to resources and turns them into different
  * things (file/IS/resource).
  * This also allows us to look on a relative or absolute path and will
  * automatically check the typical places one might expect to put DSpace
  * config files.
- * 
+ *
  * @author Aaron Zeckoski (aaron@caret.cam.ac.uk)
  */
 public class ResourceFinder {
@@ -36,6 +36,11 @@ public class ResourceFinder {
 
     public static final String relativePath = DSpaceConfigurationService.DSPACE + "/";
     public static final String environmentPathVariable = DSpaceConfigurationService.DSPACE_HOME;
+
+    /**
+     * Default constructor
+     */
+    private ResourceFinder() { }
 
     private static List<Resource> makeResources(List<String> paths) {
         List<Resource> rs = new ArrayList<Resource>();
@@ -58,7 +63,7 @@ public class ResourceFinder {
             path = path.substring(1);
         }
         Resource r = findResource(path);
-        if (! r.exists()) {
+        if (!r.exists()) {
             // try to find just the fileName
             // get the fileName from the path
             int fileStart = path.lastIndexOf('/') + 1;
@@ -66,8 +71,9 @@ public class ResourceFinder {
             r = findResource(fileName);
         }
         // try the environment path first
-        if (! r.exists()) {
-            throw new IllegalArgumentException("Could not find this resource ("+path+") in any of the checked locations");
+        if (!r.exists()) {
+            throw new IllegalArgumentException(
+                "Could not find this resource (" + path + ") in any of the checked locations");
         }
         return r;
     }
@@ -76,15 +82,15 @@ public class ResourceFinder {
         Resource r;
         String envPath = getEnvironmentPath() + path;
         r = new FileSystemResource(envPath);
-        if (! r.exists()) {
+        if (!r.exists()) {
             // try the relative path next
             String relPath = getRelativePath() + path;
-            r = new FileSystemResource(relPath);         
-            if (! r.exists()) {
+            r = new FileSystemResource(relPath);
+            if (!r.exists()) {
                 // now try the classloaders
                 ClassLoader cl = ResourceFinder.class.getClassLoader();
                 r = new ClassPathResource(path, cl);
-                if (! r.exists()) {
+                if (!r.exists()) {
                     // finally try the context classloader
                     cl = Thread.currentThread().getContextClassLoader();
                     r = new ClassPathResource(path, cl);
@@ -95,7 +101,7 @@ public class ResourceFinder {
     }
 
     /**
-     * Resolves a list of paths into resources relative to environmental 
+     * Resolves a list of paths into resources relative to environmental
      * defaults or relative paths or the classloader.
      *
      * @param paths a list of paths to resources (org/sakaiproject/mystuff/Thing.xml)
@@ -134,7 +140,7 @@ public class ResourceFinder {
     }
 
     /**
-     * Resolve a path into a resource relative to environmental defaults 
+     * Resolve a path into a resource relative to environmental defaults
      * or relative paths or the classloader.
      *
      * @param path a path to a resource (org/dspace/mystuff/Thing.xml)
@@ -170,7 +176,8 @@ public class ResourceFinder {
             break;
         }
         if (r == null) {
-            throw new IllegalArgumentException("Could not find any resource from paths (" + Arrays.toString(paths) + ") in any of the checked locations");
+            throw new IllegalArgumentException("Could not find any resource from paths (" + Arrays
+                .toString(paths) + ") in any of the checked locations");
         }
         return r;
     }
@@ -200,14 +207,14 @@ public class ResourceFinder {
     protected static String getRelativePath() {
         File currentPath = new File("");
         File f = new File(currentPath, relativePath);
-        if (! f.exists() || ! f.isDirectory()) {
+        if (!f.exists() || !f.isDirectory()) {
             f = new File(currentPath, DSpaceConfigurationService.DSPACE);
-            if (! f.exists() || ! f.isDirectory()) {
+            if (!f.exists() || !f.isDirectory()) {
                 f = currentPath;
             }
         }
         String absPath = f.getAbsolutePath();
-        if (! absPath.endsWith(File.separatorChar + "")) {
+        if (!absPath.endsWith(File.separatorChar + "")) {
             absPath += File.separatorChar;
         }
         return absPath;

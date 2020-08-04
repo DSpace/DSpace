@@ -7,14 +7,13 @@
  */
 package org.dspace.discovery;
 
-import org.dspace.content.DSpaceObject;
-import org.dspace.core.Context;
-
 import java.io.IOException;
 import java.sql.SQLException;
 
+import org.dspace.core.Context;
+
 /**
- * Interface used for indexing dspaceobject into discovery
+ * Interface used for indexing IndexableObject into discovery
  *
  * @author Kevin Van de Velde (kevin at atmire dot com)
  * @author Mark Diggory (markd at atmire dot com)
@@ -22,29 +21,29 @@ import java.sql.SQLException;
  */
 public interface IndexingService {
 
-    void indexContent(Context context, DSpaceObject dso)
-            throws SQLException;
+    void indexContent(Context context, IndexableObject dso)
+        throws SQLException;
 
-    void indexContent(Context context, DSpaceObject dso,
+    void indexContent(Context context, IndexableObject dso,
                       boolean force) throws SQLException;
 
-    void indexContent(Context context, DSpaceObject dso,
-            boolean force, boolean commit) throws SQLException, SearchServiceException;
-    
-    void unIndexContent(Context context, DSpaceObject dso)
-            throws SQLException, IOException;
+    void indexContent(Context context, IndexableObject dso,
+                      boolean force, boolean commit) throws SQLException, SearchServiceException;
 
-    void unIndexContent(Context context, DSpaceObject dso, boolean commit)
-            throws SQLException, IOException;
-    
-    void unIndexContent(Context context, String handle)
-            throws SQLException, IOException;
+    void unIndexContent(Context context, IndexableObject dso)
+        throws SQLException, IOException;
 
-    void unIndexContent(Context context, String handle, boolean commit)
-            throws SQLException, IOException;
+    void unIndexContent(Context context, IndexableObject dso, boolean commit)
+        throws SQLException, IOException;
 
-    void reIndexContent(Context context, DSpaceObject dso)
-            throws SQLException, IOException;
+    void unIndexContent(Context context, String uniqueSearchID)
+        throws IOException;
+
+    void unIndexContent(Context context, String uniqueSearchID, boolean commit)
+        throws IOException;
+
+    void reIndexContent(Context context, IndexableObject dso)
+        throws SQLException, IOException;
 
     void createIndex(Context context) throws SQLException, IOException;
 
@@ -52,12 +51,14 @@ public interface IndexingService {
 
     void updateIndex(Context context, boolean force);
 
+    void updateIndex(Context context, boolean force, String type);
+
     void cleanIndex(boolean force) throws IOException,
-            SQLException, SearchServiceException;
+        SQLException, SearchServiceException;
 
     void commit() throws SearchServiceException;
 
     void optimize() throws SearchServiceException;
 
-    void buildSpellCheck() throws SearchServiceException;
+    void buildSpellCheck() throws SearchServiceException, IOException;
 }

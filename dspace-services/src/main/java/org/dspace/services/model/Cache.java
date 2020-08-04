@@ -14,10 +14,10 @@ import java.util.List;
  * <p>
  * This is an abstraction of the general concept of a cache.
  * <p>
- * A Cache holds objects with keys with a limited lifespan and stores 
- * them based on the underlying implementation.  This cache interface 
+ * A Cache holds objects with keys with a limited lifespan and stores
+ * them based on the underlying implementation.  This cache interface
  * adheres to the JSR-107 spec.
- * 
+ *
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  */
 public interface Cache {
@@ -33,7 +33,7 @@ public interface Cache {
      * Puts an object in the cache which is identified by this key.
      * Will overwrite an existing object if one is already using this key.
      *
-     * @param key the key for an item in the cache
+     * @param key   the key for an item in the cache
      * @param value an object (this can be a null, e.g. to cache a miss)
      * @throws IllegalArgumentException if the cache name is invalid or cacheName or key is null
      */
@@ -55,16 +55,16 @@ public interface Cache {
      * or getting all items out of the cache.  The keys are returned in
      * no particular order.
      * <p>
-     * NOTE: that this is actually quite costly in most cases and should 
+     * NOTE: that this is actually quite costly in most cases and should
      * only be used when really needed.  It is much better to fetch the
      * items you actually need directly using {@link #get(String)}.
-     * 
+     *
      * @return the list of all keys currently in this cache
      */
     public List<String> getKeys();
 
     /**
-     * Gets an object from the cache without causing it to be refreshed 
+     * Gets an object from the cache without causing it to be refreshed
      * or renewed.  Like {@link #get(String)} except that it keeps the
      * cache from refreshing the item that was retrieved.
      *
@@ -76,7 +76,7 @@ public interface Cache {
     public Object look(String key);
 
     /**
-     * Removes an object from the cache if it exists or does nothing if 
+     * Removes an object from the cache if it exists or does nothing if
      * it does not.
      *
      * @param key the key for an item in the cache
@@ -108,7 +108,7 @@ public interface Cache {
     public void clear();
 
     /**
-     * Returns a readable object which has the configuration used by 
+     * Returns a readable object which has the configuration used by
      * this cache in it.
      *
      * @return the object indicating the configuration of this cache

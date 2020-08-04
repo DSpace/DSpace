@@ -18,20 +18,16 @@ package org.dspace.content.crosswalk;
  * @author Larry Stone
  * @version $Revision$
  */
-public class CrosswalkInternalException extends CrosswalkException
-{
-    public CrosswalkInternalException(String s)
-    {
+public class CrosswalkInternalException extends CrosswalkException {
+    public CrosswalkInternalException(String s) {
         super(s);
     }
 
-    public CrosswalkInternalException(String arg0, Throwable arg1)
-    {
+    public CrosswalkInternalException(String arg0, Throwable arg1) {
         super(arg0, arg1);
     }
 
-    public CrosswalkInternalException(Throwable arg0)
-    {
+    public CrosswalkInternalException(Throwable arg0) {
         super(arg0);
     }
 }

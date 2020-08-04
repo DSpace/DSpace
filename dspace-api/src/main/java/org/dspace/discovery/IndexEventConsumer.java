@@ -7,17 +7,18 @@
  */
 package org.dspace.discovery;
 
-import org.apache.log4j.Logger;
+import java.util.HashSet;
+import java.util.Set;
+
+import org.apache.logging.log4j.Logger;
 import org.dspace.content.Bundle;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.discovery.indexobject.factory.IndexObjectFactoryFactory;
 import org.dspace.event.Consumer;
 import org.dspace.event.Event;
 import org.dspace.services.factory.DSpaceServicesFactory;
-
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * Class for updating search indices in discovery from content events.
@@ -30,15 +31,19 @@ public class IndexEventConsumer implements Consumer {
     /**
      * log4j logger
      */
-    private static Logger log = Logger.getLogger(IndexEventConsumer.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(IndexEventConsumer.class);
 
     // collect Items, Collections, Communities that need indexing
-    private Set<DSpaceObject> objectsToUpdate = null;
+    private Set<IndexableObject> objectsToUpdate = new HashSet<>();
 
-    // handles to delete since IDs are not useful by now.
-    private Set<String> handlesToDelete = null;
+    // unique search IDs to delete
+    private Set<String> uniqueIdsToDelete = new HashSet<>();
 
-    IndexingService indexer = DSpaceServicesFactory.getInstance().getServiceManager().getServiceByName(IndexingService.class.getName(),IndexingService.class);
+    IndexingService indexer = DSpaceServicesFactory.getInstance().getServiceManager()
+                                                   .getServiceByName(IndexingService.class.getName(),
+                                                                     IndexingService.class);
+
+    IndexObjectFactoryFactory indexObjectServiceFactory = IndexObjectFactoryFactory.getInstance();
 
     @Override
     public void initialize() throws Exception {
@@ -56,16 +61,16 @@ public class IndexEventConsumer implements Consumer {
     public void consume(Context ctx, Event event) throws Exception {
 
         if (objectsToUpdate == null) {
-            objectsToUpdate = new HashSet<DSpaceObject>();
-            handlesToDelete = new HashSet<String>();
+            objectsToUpdate = new HashSet<>();
+            uniqueIdsToDelete = new HashSet<>();
         }
 
         int st = event.getSubjectType();
         if (!(st == Constants.ITEM || st == Constants.BUNDLE
-                || st == Constants.COLLECTION || st == Constants.COMMUNITY)) {
+            || st == Constants.COLLECTION || st == Constants.COMMUNITY)) {
             log
-                    .warn("IndexConsumer should not have been given this kind of Subject in an event, skipping: "
-                            + event.toString());
+                .warn("IndexConsumer should not have been given this kind of Subject in an event, skipping: "
+                          + event.toString());
             return;
         }
 
@@ -81,17 +86,15 @@ public class IndexEventConsumer implements Consumer {
         int et = event.getEventType();
         if (st == Constants.BUNDLE) {
             if ((et == Event.ADD || et == Event.REMOVE) && subject != null
-                    && ((Bundle) subject).getName().equals("TEXT")) {
+                && ((Bundle) subject).getName().equals("TEXT")) {
                 st = Constants.ITEM;
                 et = Event.MODIFY;
                 subject = ((Bundle) subject).getItems().get(0);
-                if (log.isDebugEnabled())
-                {
+                if (log.isDebugEnabled()) {
                     log.debug("Transforming Bundle event into MODIFY of Item "
-                            + subject.getHandle());
+                                  + subject.getHandle());
                 }
-            } else
-            {
+            } else {
                 return;
             }
         }
@@ -100,51 +103,45 @@ public class IndexEventConsumer implements Consumer {
             case Event.CREATE:
             case Event.MODIFY:
             case Event.MODIFY_METADATA:
-                if (subject == null)
-                {
+                if (subject == null) {
                     log.warn(event.getEventTypeAsString() + " event, could not get object for "
-                            + event.getSubjectTypeAsString() + " id="
-                            + String.valueOf(event.getSubjectID())
-                            + ", perhaps it has been deleted.");
-                }
-                else {
+                                 + event.getSubjectTypeAsString() + " id="
+                                 + event.getSubjectID()
+                                 + ", perhaps it has been deleted.");
+                } else {
                     log.debug("consume() adding event to update queue: " + event.toString());
-                    objectsToUpdate.add(subject);
+                    objectsToUpdate.addAll(indexObjectServiceFactory.getIndexableObjects(ctx, subject));
                 }
                 break;
 
             case Event.REMOVE:
             case Event.ADD:
-                if (object == null)
-                {
+                if (object == null) {
                     log.warn(event.getEventTypeAsString() + " event, could not get object for "
-                            + event.getObjectTypeAsString() + " id="
-                            + String.valueOf(event.getObjectID())
-                            + ", perhaps it has been deleted.");
-                }
-                else {
+                                 + event.getObjectTypeAsString() + " id="
+                                 + event.getObjectID()
+                                 + ", perhaps it has been deleted.");
+                } else {
                     log.debug("consume() adding event to update queue: " + event.toString());
-                    objectsToUpdate.add(object);
+                    objectsToUpdate.addAll(indexObjectServiceFactory.getIndexableObjects(ctx, subject));
                 }
                 break;
 
             case Event.DELETE:
-                String detail = event.getDetail();
-                if (detail == null)
-                {
-                    log.warn("got null detail on DELETE event, skipping it.");
-                }
-                else {
+                if (event.getSubjectType() == -1 || event.getSubjectID() == null) {
+                    log.warn("got null subject type and/or ID on DELETE event, skipping it.");
+                } else {
+                    String detail = event.getSubjectType() + "-" + event.getSubjectID().toString();
                     log.debug("consume() adding event to delete queue: " + event.toString());
-                    handlesToDelete.add(detail);
+                    uniqueIdsToDelete.add(detail);
                 }
                 break;
             default:
                 log
-                        .warn("IndexConsumer should not have been given a event of type="
-                                + event.getEventTypeAsString()
-                                + " on subject="
-                                + event.getSubjectTypeAsString());
+                    .warn("IndexConsumer should not have been given a event of type="
+                              + event.getEventTypeAsString()
+                              + " on subject="
+                              + event.getSubjectTypeAsString());
                 break;
         }
     }
@@ -157,49 +154,48 @@ public class IndexEventConsumer implements Consumer {
     @Override
     public void end(Context ctx) throws Exception {
 
-        if (objectsToUpdate != null && handlesToDelete != null) {
-
+        try {
             // update the changed Items not deleted because they were on create list
-            for (DSpaceObject o : objectsToUpdate) {
-                /* we let all types through here and 
-                 * allow the search indexer to make 
+            for (IndexableObject iu : objectsToUpdate) {
+                /* we let all types through here and
+                 * allow the search indexer to make
                  * decisions on indexing and/or removal
                  */
-                DSpaceObject iu = ctx.reloadEntity(o);
-                String hdl = iu.getHandle();
-                if (hdl != null && !handlesToDelete.contains(hdl)) {
+                iu.setIndexedObject(ctx.reloadEntity(iu.getIndexedObject()));
+                String uniqueIndexID = iu.getUniqueIndexID();
+                if (uniqueIndexID != null && !uniqueIdsToDelete.contains(uniqueIndexID)) {
                     try {
-                        indexer.indexContent(ctx, iu, true);
+                        indexer.indexContent(ctx, iu, true, false);
                         log.debug("Indexed "
-                                + Constants.typeText[iu.getType()]
-                                + ", id=" + String.valueOf(iu.getID())
-                                + ", handle=" + hdl);
-                    }
-                    catch (Exception e) {
+                                + iu.getTypeText()
+                                + ", id=" + iu.getID()
+                                + ", unique_id=" + uniqueIndexID);
+                    } catch (Exception e) {
                         log.error("Failed while indexing object: ", e);
                     }
                 }
             }
 
-            for (String hdl : handlesToDelete) {
+            for (String uid : uniqueIdsToDelete) {
                 try {
-                    indexer.unIndexContent(ctx, hdl, true);
-                    if (log.isDebugEnabled())
-                    {
-                        log.debug("UN-Indexed Item, handle=" + hdl);
+                    indexer.unIndexContent(ctx, uid, false);
+                    if (log.isDebugEnabled()) {
+                        log.debug("UN-Indexed Item, handle=" + uid);
                     }
+                } catch (Exception e) {
+                    log.error("Failed while UN-indexing object: " + uid, e);
                 }
-                catch (Exception e) {
-                    log.error("Failed while UN-indexing object: " + hdl, e);
-                }
-
             }
+        } finally {
+            if (!objectsToUpdate.isEmpty() || !uniqueIdsToDelete.isEmpty()) {
 
+                indexer.commit();
+
+                // "free" the resources
+                objectsToUpdate.clear();
+                uniqueIdsToDelete.clear();
+            }
         }
-
-        // "free" the resources
-        objectsToUpdate = null;
-        handlesToDelete = null;
     }
 
     @Override

@@ -7,18 +7,18 @@
  */
 package org.dspace.ctask.general;
 
-import org.apache.log4j.Logger;
-import org.dspace.content.MetadataValue;
-import org.dspace.content.DSpaceObject;
-import org.dspace.content.Item;
-import org.dspace.curate.AbstractCurationTask;
-import org.dspace.curate.Curator;
-
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.apache.logging.log4j.Logger;
+import org.dspace.content.DSpaceObject;
+import org.dspace.content.Item;
+import org.dspace.content.MetadataValue;
+import org.dspace.curate.AbstractCurationTask;
+import org.dspace.curate.Curator;
 
 /**
  * A basic link checker that is designed to be extended. By default this link checker
@@ -31,8 +31,7 @@ import java.util.List;
  * @author Stuart Lewis
  */
 
-public class BasicLinkChecker extends AbstractCurationTask
-{
+public class BasicLinkChecker extends AbstractCurationTask {
 
     // The status of the link checking of this item
     private int status = Curator.CURATE_UNSET;
@@ -41,7 +40,7 @@ public class BasicLinkChecker extends AbstractCurationTask
     private List<String> results = null;
 
     // The log4j logger for this class
-    private static Logger log = Logger.getLogger(BasicLinkChecker.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(BasicLinkChecker.class);
 
 
     /**
@@ -52,16 +51,14 @@ public class BasicLinkChecker extends AbstractCurationTask
      * @throws java.io.IOException THrown if something went wrong
      */
     @Override
-    public int perform(DSpaceObject dso) throws IOException
-    {
+    public int perform(DSpaceObject dso) throws IOException {
         // The results that we'll return
         StringBuilder results = new StringBuilder();
 
         // Unless this is  an item, we'll skip this item
         status = Curator.CURATE_SKIP;
-        if (dso instanceof Item)
-        {
-            Item item = (Item)dso;
+        if (dso instanceof Item) {
+            Item item = (Item) dso;
 
             // Get the URLs
             List<String> urls = getURLs(item);
@@ -71,16 +68,12 @@ public class BasicLinkChecker extends AbstractCurationTask
             results.append("Item: ").append(getItemHandle(item)).append("\n");
 
             // Check the URLs
-            for (String url : urls)
-            {
+            for (String url : urls) {
                 boolean ok = checkURL(url, results);
 
-                if(ok)
-                {
+                if (ok) {
                     status = Curator.CURATE_SUCCESS;
-                }
-                else
-                {
+                } else {
                     status = Curator.CURATE_FAIL;
                 }
             }
@@ -98,13 +91,11 @@ public class BasicLinkChecker extends AbstractCurationTask
      * @param item The item to extract URLs from
      * @return An array of URL Strings
      */
-    protected List<String> getURLs(Item item)
-    {
+    protected List<String> getURLs(Item item) {
         // Get URIs from anyschema.anyelement.uri.*
         List<MetadataValue> urls = itemService.getMetadata(item, Item.ANY, Item.ANY, "uri", Item.ANY);
         ArrayList<String> theURLs = new ArrayList<String>();
-        for (MetadataValue url : urls)
-        {
+        for (MetadataValue url : urls) {
             theURLs.add(url.getValue());
         }
         return theURLs;
@@ -113,24 +104,18 @@ public class BasicLinkChecker extends AbstractCurationTask
     /**
      * Check the URL and perform appropriate reporting
      *
-     * @param url
-     *     The URL to check
-     * @param results
-     *     Result string with HTTP status codes
+     * @param url     The URL to check
+     * @param results Result string with HTTP status codes
      * @return If the URL was OK or not
      */
-    protected boolean checkURL(String url, StringBuilder results)
-    {
+    protected boolean checkURL(String url, StringBuilder results) {
         // Link check the URL
         int httpStatus = getResponseStatus(url);
 
-        if ((httpStatus >= 200) && (httpStatus < 300))
-        {
+        if ((httpStatus >= 200) && (httpStatus < 300)) {
             results.append(" - " + url + " = " + httpStatus + " - OK\n");
             return true;
-        }
-        else
-        {
+        } else {
             results.append(" - " + url + " = " + httpStatus + " - FAILED\n");
             return false;
         }
@@ -143,19 +128,16 @@ public class BasicLinkChecker extends AbstractCurationTask
      * @param url The url to open
      * @return The HTTP response code (e.g. 200 / 301 / 404 / 500)
      */
-    protected int getResponseStatus(String url)
-    {
-        try
-        {
+    protected int getResponseStatus(String url) {
+        try {
             URL theURL = new URL(url);
-            HttpURLConnection connection = (HttpURLConnection)theURL.openConnection();
+            HttpURLConnection connection = (HttpURLConnection) theURL.openConnection();
             int code = connection.getResponseCode();
             connection.disconnect();
 
             return code;
 
-        } catch (IOException ioe)
-        {
+        } catch (IOException ioe) {
             // Must be a bad URL
             log.debug("Bad link: " + ioe.getMessage());
             return 0;
@@ -168,10 +150,9 @@ public class BasicLinkChecker extends AbstractCurationTask
      * @param item The item to get a description of
      * @return The handle, or in workflow
      */
-    protected String getItemHandle(Item item)
-    {
+    protected String getItemHandle(Item item) {
         String handle = item.getHandle();
-        return (handle != null) ? handle: " in workflow";
+        return (handle != null) ? handle : " in workflow";
     }
 
 }

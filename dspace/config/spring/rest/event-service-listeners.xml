@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans
+        xmlns="http://www.springframework.org/schema/beans"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:util="http://www.springframework.org/schema/util"
+        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.3.xsd
+                           http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.3.xsd">
+
+    <!-- Inject the Default LoggerUsageEventListener into the EventService  -->
+    <bean class="org.dspace.usage.LoggerUsageEventListener">
+        <property name="eventService" ref="org.dspace.services.EventService"/>
+    </bean>
+
+    <!-- Inject the SolrLoggerUsageEventListener into the EventService  -->
+    <bean class="org.dspace.statistics.SolrLoggerUsageEventListener">
+        <property name="eventService" ref="org.dspace.services.EventService"/>
+    </bean>
+
+    <!-- Google Analytics recording  -->
+    <bean class="org.dspace.google.GoogleRecorderEventListener">
+        <property name="eventService" ref="org.dspace.services.EventService"/>
+    </bean>
+
+</beans>

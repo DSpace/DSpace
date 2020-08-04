@@ -15,29 +15,26 @@ import org.dspace.content.Community;
 import org.dspace.core.Context;
 
 /**
- * Interface that must be implemented by any plugin wanting to be called at 
+ * Interface that must be implemented by any plugin wanting to be called at
  * the inception of the Community home page (in HandleServlet).  Classes that implement the process method
  * and appear in the configuration will be run before the at the start of preparing the community home page has any
  * chance to continue its execution
- * 
- * @author Richard Jones
  *
+ * @author Richard Jones
  */
-public interface CommunityHomeProcessor
-{
-	/**
-	 * execute the process
-	 * 
-	 * @param context	the DSpace context
-	 * @param request	the HTTP request
-	 * @param response	the HTTP response
-	 * @param community	The community object whose home page we are on
-	 * 
-	 * @throws PluginException	any particular problem with the plugin execution
-	 * @throws AuthorizeException	Authorisation errors during plugin execution
-	 */
-	void process(Context context, HttpServletRequest request,
-    		HttpServletResponse response, Community community)
-		throws PluginException, AuthorizeException;
-	
+public interface CommunityHomeProcessor {
+    /**
+     * execute the process
+     *
+     * @param context   the DSpace context
+     * @param request   the HTTP request
+     * @param response  the HTTP response
+     * @param community The community object whose home page we are on
+     * @throws PluginException    any particular problem with the plugin execution
+     * @throws AuthorizeException Authorisation errors during plugin execution
+     */
+    void process(Context context, HttpServletRequest request,
+                 HttpServletResponse response, Community community)
+        throws PluginException, AuthorizeException;
+
 }

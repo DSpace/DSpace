@@ -7,9 +7,17 @@
  */
 package org.dspace.content;
 
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import java.io.IOException;
+import java.io.InputStream;
+import java.sql.SQLException;
+import java.util.Iterator;
+import java.util.List;
+import java.util.UUID;
+import javax.annotation.Nullable;
+
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.dao.BitstreamDAO;
@@ -24,13 +32,6 @@ import org.dspace.event.Event;
 import org.dspace.storage.bitstore.service.BitstreamStorageService;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.sql.SQLException;
-import java.util.Iterator;
-import java.util.List;
-import java.util.UUID;
-
 /**
  * Service implementation for the Bitstream object.
  * This class is responsible for all business logic calls for the Bitstream object and is autowired by spring.
@@ -40,8 +41,10 @@ import java.util.UUID;
  */
 public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> implements BitstreamService {
 
-    /** log4j logger */
-    private static Logger log = Logger.getLogger(BitstreamServiceImpl.class);
+    /**
+     * log4j logger
+     */
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(BitstreamServiceImpl.class);
 
 
     @Autowired(required = true)
@@ -59,8 +62,7 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
     @Autowired(required = true)
     protected BitstreamStorageService bitstreamStorageService;
 
-    protected BitstreamServiceImpl()
-    {
+    protected BitstreamServiceImpl() {
         super();
     }
 
@@ -68,36 +70,58 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
     public Bitstream find(Context context, UUID id) throws SQLException {
         Bitstream bitstream = bitstreamDAO.findByID(context, Bitstream.class, id);
 
-        if (bitstream == null)
-        {
-            if (log.isDebugEnabled())
-            {
+        if (bitstream == null) {
+            if (log.isDebugEnabled()) {
                 log.debug(LogManager.getHeader(context, "find_bitstream",
-                        "not_found,bitstream_id=" + id));
+                                               "not_found,bitstream_id=" + id));
             }
 
             return null;
         }
 
-                // not null, return Bitstream
-        if (log.isDebugEnabled())
-        {
+        // not null, return Bitstream
+        if (log.isDebugEnabled()) {
             log.debug(LogManager.getHeader(context, "find_bitstream",
-                    "bitstream_id=" + id));
+                                           "bitstream_id=" + id));
         }
 
         return bitstream;
     }
 
     @Override
-    public List<Bitstream> findAll(Context context) throws SQLException
-    {
+    public List<Bitstream> findAll(Context context) throws SQLException {
         return bitstreamDAO.findAll(context, Bitstream.class);
     }
 
     @Override
-    public Iterator<Bitstream> findAll(Context context, int limit, int offset) throws SQLException
-    {
+    public Bitstream clone(Context context, Bitstream bitstream)
+            throws SQLException {
+        // Create a new bitstream with a new ID.
+        Bitstream clonedBitstream = bitstreamDAO.create(context, new Bitstream());
+        // Set the internal identifier, file size, checksum, and
+        // checksum algorithm as same as the given bitstream.
+        clonedBitstream.setInternalId(bitstream.getInternalId());
+        clonedBitstream.setSizeBytes(bitstream.getSizeBytes());
+        clonedBitstream.setChecksum(bitstream.getChecksum());
+        clonedBitstream.setChecksumAlgorithm(bitstream.getChecksumAlgorithm());
+        clonedBitstream.setFormat(bitstream.getBitstreamFormat());
+
+        try {
+            //Update our bitstream but turn off the authorization system since permissions
+            //haven't been set at this point in time.
+            context.turnOffAuthorisationSystem();
+            update(context, clonedBitstream);
+        } catch (AuthorizeException e) {
+            log.error(e);
+            //Can never happen since we turn off authorization before we update
+        } finally {
+            context.restoreAuthSystemState();
+        }
+        return clonedBitstream;
+    }
+
+    @Override
+    public Iterator<Bitstream> findAll(Context context, int limit, int offset) throws SQLException {
         return bitstreamDAO.findAll(context, limit, offset);
     }
 
@@ -107,19 +131,21 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
         UUID bitstreamID = bitstreamStorageService.store(context, bitstreamDAO.create(context, new Bitstream()), is);
 
         log.info(LogManager.getHeader(context, "create_bitstream",
-                "bitstream_id=" + bitstreamID));
+                                      "bitstream_id=" + bitstreamID));
 
         // Set the format to "unknown"
         Bitstream bitstream = find(context, bitstreamID);
         setFormat(context, bitstream, null);
 
-        context.addEvent(new Event(Event.CREATE, Constants.BITSTREAM, bitstreamID, null, getIdentifiers(context, bitstream)));
+        context.addEvent(
+            new Event(Event.CREATE, Constants.BITSTREAM, bitstreamID, null, getIdentifiers(context, bitstream)));
 
         return bitstream;
     }
 
     @Override
-    public Bitstream create(Context context, Bundle bundle, InputStream is) throws IOException, SQLException, AuthorizeException {
+    public Bitstream create(Context context, Bundle bundle, InputStream is)
+        throws IOException, SQLException, AuthorizeException {
         // Check authorisation
         authorizeService.authorizeAction(context, bundle, Constants.ADD);
 
@@ -129,7 +155,8 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
     }
 
     @Override
-    public Bitstream register(Context context, Bundle bundle, int assetstore, String bitstreamPath) throws IOException, SQLException, AuthorizeException {
+    public Bitstream register(Context context, Bundle bundle, int assetstore, String bitstreamPath)
+        throws IOException, SQLException, AuthorizeException {
         // check authorisation
         authorizeService.authorizeAction(context, bundle, Constants.ADD);
 
@@ -146,52 +173,49 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
      * check authorisation.  The newly created bitstream has the "unknown"
      * format.
      *
-     * @param  context DSpace context object
-     * @param assetstore corresponds to an assetstore in dspace.cfg
+     * @param context       DSpace context object
+     * @param assetstore    corresponds to an assetstore in dspace.cfg
      * @param bitstreamPath the path and filename relative to the assetstore
-     * @return  the newly registered bitstream
-     * @throws IOException if IO error
-     * @throws SQLException if database error
+     * @return the newly registered bitstream
+     * @throws IOException        if IO error
+     * @throws SQLException       if database error
      * @throws AuthorizeException if authorization error
      */
     @Override
     public Bitstream register(Context context,
-    		int assetstore, String bitstreamPath)
-            throws IOException, SQLException, AuthorizeException {
+                              int assetstore, String bitstreamPath)
+        throws IOException, SQLException, AuthorizeException {
         // Store the bits
         Bitstream bitstream = bitstreamDAO.create(context, new Bitstream());
         bitstreamStorageService.register(
-                context, bitstream, assetstore, bitstreamPath);
+            context, bitstream, assetstore, bitstreamPath);
 
         log.info(LogManager.getHeader(context,
-            "create_bitstream",
-            "bitstream_id=" + bitstream.getID()));
+                                      "create_bitstream",
+                                      "bitstream_id=" + bitstream.getID()));
 
         // Set the format to "unknown"
         setFormat(context, bitstream, null);
 
         context.addEvent(new Event(Event.CREATE, Constants.BITSTREAM,
-                bitstream.getID(), "REGISTER", getIdentifiers(context, bitstream)));
+                                   bitstream.getID(), "REGISTER", getIdentifiers(context, bitstream)));
 
         return bitstream;
     }
 
     @Override
     public void setUserFormatDescription(Context context, Bitstream bitstream, String desc) throws SQLException {
-        setFormat(context,bitstream,  null);
-        setMetadataSingleValue(context, bitstream, MetadataSchema.DC_SCHEMA, "format", null, null, desc);
+        setFormat(context, bitstream, null);
+        setMetadataSingleValue(context, bitstream, MetadataSchemaEnum.DC.getName(), "format", null, null, desc);
     }
 
     @Override
-    public String getFormatDescription(Context context, Bitstream bitstream) throws SQLException
-    {
-        if (bitstream.getFormat(context).getShortDescription().equals("Unknown"))
-        {
+    public String getFormatDescription(Context context, Bitstream bitstream) throws SQLException {
+        if (bitstream.getFormat(context).getShortDescription().equals("Unknown")) {
             // Get user description if there is one
             String desc = bitstream.getUserFormatDescription();
 
-            if (desc == null)
-            {
+            if (desc == null) {
                 return "Unknown";
             }
 
@@ -204,16 +228,15 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
 
     @Override
     public void setFormat(Context context, Bitstream bitstream, BitstreamFormat bitstreamFormat) throws SQLException {
-                // FIXME: Would be better if this didn't throw an SQLException,
+        // FIXME: Would be better if this didn't throw an SQLException,
         // but we need to find the unknown format!
-        if (bitstreamFormat == null)
-        {
+        if (bitstreamFormat == null) {
             // Use "Unknown" format
             bitstreamFormat = bitstreamFormatService.findUnknown(context);
         }
 
         // Remove user type description
-        clearMetadata(context, bitstream, MetadataSchema.DC_SCHEMA,"format",null, Item.ANY);
+        clearMetadata(context, bitstream, MetadataSchemaEnum.DC.getName(), "format", null, Item.ANY);
 
         // Update the ID in the table row
         bitstream.setFormat(bitstreamFormat);
@@ -225,16 +248,17 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
         authorizeService.authorizeAction(context, bitstream, Constants.WRITE);
 
         log.info(LogManager.getHeader(context, "update_bitstream",
-                "bitstream_id=" + bitstream.getID()));
+                                      "bitstream_id=" + bitstream.getID()));
         super.update(context, bitstream);
-        if (bitstream.isModified())
-        {
-            context.addEvent(new Event(Event.MODIFY, Constants.BITSTREAM, bitstream.getID(), null, getIdentifiers(context, bitstream)));
+        if (bitstream.isModified()) {
+            context.addEvent(new Event(Event.MODIFY, Constants.BITSTREAM, bitstream.getID(), null,
+                                       getIdentifiers(context, bitstream)));
             bitstream.setModified();
         }
-        if (bitstream.isMetadataModified())
-        {
-            context.addEvent(new Event(Event.MODIFY_METADATA, Constants.BITSTREAM, bitstream.getID(), bitstream.getDetails(), getIdentifiers(context, bitstream)));
+        if (bitstream.isMetadataModified()) {
+            context.addEvent(
+                new Event(Event.MODIFY_METADATA, Constants.BITSTREAM, bitstream.getID(), bitstream.getDetails(),
+                          getIdentifiers(context, bitstream)));
             bitstream.clearModified();
             bitstream.clearDetails();
         }
@@ -249,10 +273,10 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
         // Check authorisation
         authorizeService.authorizeAction(context, bitstream, Constants.DELETE);
         log.info(LogManager.getHeader(context, "delete_bitstream",
-                "bitstream_id=" + bitstream.getID()));
+                                      "bitstream_id=" + bitstream.getID()));
 
         context.addEvent(new Event(Event.DELETE, Constants.BITSTREAM, bitstream.getID(),
-                String.valueOf(bitstream.getSequenceID()), getIdentifiers(context, bitstream)));
+                                   String.valueOf(bitstream.getSequenceID()), getIdentifiers(context, bitstream)));
 
         // Remove bitstream itself
         bitstream.setDeleted(true);
@@ -277,7 +301,8 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
     }
 
     @Override
-    public InputStream retrieve(Context context, Bitstream bitstream) throws IOException, SQLException, AuthorizeException {
+    public InputStream retrieve(Context context, Bitstream bitstream)
+        throws IOException, SQLException, AuthorizeException {
         // Maybe should return AuthorizeException??
         authorizeService.authorizeAction(context, bitstream, Constants.READ);
 
@@ -292,26 +317,17 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
     @Override
     public DSpaceObject getParentObject(Context context, Bitstream bitstream) throws SQLException {
         List<Bundle> bundles = bitstream.getBundles();
-        if (CollectionUtils.isNotEmpty(bundles))
-        {
+        if (CollectionUtils.isNotEmpty(bundles)) {
             // the ADMIN action is not allowed on Bundle object so skip to the item
             Item item = (Item) bundleService.getParentObject(context, bundles.iterator().next());
-            if (item != null)
-            {
+            if (item != null) {
                 return item;
-            }
-            else
-            {
+            } else {
                 return null;
             }
-        }
-        else
-        if(bitstream.getCommunity() != null)
-        {
+        } else if (bitstream.getCommunity() != null) {
             return bitstream.getCommunity();
-        }else
-        if(bitstream.getCollection() != null)
-        {
+        } else if (bitstream.getCollection() != null) {
             return bitstream.getCollection();
         }
         return null;
@@ -320,7 +336,8 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
     @Override
     public void updateLastModified(Context context, Bitstream bitstream) {
         //Also fire a modified event since the bitstream HAS been modified
-        context.addEvent(new Event(Event.MODIFY, Constants.BITSTREAM, bitstream.getID(), null, getIdentifiers(context, bitstream)));
+        context.addEvent(
+            new Event(Event.MODIFY, Constants.BITSTREAM, bitstream.getID(), null, getIdentifiers(context, bitstream)));
     }
 
     @Override
@@ -331,8 +348,7 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
     @Override
     public void expunge(Context context, Bitstream bitstream) throws SQLException, AuthorizeException {
         authorizeService.authorizeAction(context, bitstream, Constants.DELETE);
-        if(!bitstream.isDeleted())
-        {
+        if (!bitstream.isDeleted()) {
             throw new IllegalStateException("Bitstream must be deleted before it can be removed from the database");
         }
         bitstreamDAO.delete(context, bitstream);
@@ -373,8 +389,7 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
             List<Bitstream> bitstreams = bundle.getBitstreams();
             for (int j = 0; j < bitstreams.size(); j++) {
                 Bitstream bitstream = bitstreams.get(j);
-                if(StringUtils.equals(bitstream.getName(), bitstreamName))
-                {
+                if (StringUtils.equals(bitstream.getName(), bitstreamName)) {
                     return bitstream;
                 }
             }
@@ -385,11 +400,9 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
     @Override
     public Bitstream getFirstBitstream(Item item, String bundleName) throws SQLException {
         List<Bundle> bundles = itemService.getBundles(item, bundleName);
-        if(CollectionUtils.isNotEmpty(bundles))
-        {
+        if (CollectionUtils.isNotEmpty(bundles)) {
             List<Bitstream> bitstreams = bundles.get(0).getBitstreams();
-            if(CollectionUtils.isNotEmpty(bitstreams))
-            {
+            if (CollectionUtils.isNotEmpty(bitstreams)) {
                 return bitstreams.get(0);
             }
         }
@@ -398,10 +411,9 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
 
     @Override
     public BitstreamFormat getFormat(Context context, Bitstream bitstream) throws SQLException {
-        if(bitstream.getBitstreamFormat() == null)
-        {
+        if (bitstream.getBitstreamFormat() == null) {
             return bitstreamFormatService.findUnknown(context);
-        }else{
+        } else {
             return bitstream.getBitstreamFormat();
         }
     }
@@ -423,12 +435,9 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
 
     @Override
     public Bitstream findByIdOrLegacyId(Context context, String id) throws SQLException {
-        if(StringUtils.isNumeric(id))
-        {
+        if (StringUtils.isNumeric(id)) {
             return findByLegacyId(context, Integer.parseInt(id));
-        }
-        else
-        {
+        } else {
             return find(context, UUID.fromString(id));
         }
     }
@@ -452,5 +461,11 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
     @Override
     public List<Bitstream> getNotReferencedBitstreams(Context context) throws SQLException {
         return bitstreamDAO.getNotReferencedBitstreams(context);
+    }
+
+    @Nullable
+    @Override
+    public Long getLastModified(Bitstream bitstream) throws IOException {
+        return bitstreamStorageService.getLastModified(bitstream);
     }
 }

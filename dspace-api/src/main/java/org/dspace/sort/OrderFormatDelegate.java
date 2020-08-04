@@ -9,21 +9,18 @@ package org.dspace.sort;
 
 /**
  * Interface for browse order delegates
- * 
+ *
  * @author Graham Triggs
  */
-public interface OrderFormatDelegate
-{
-	/**
-	 * Prepare the appropriate sort string for the given value in the
-	 * given language.  Language should be supplied with the ISO-6390-1
-	 * or ISO-639-2 standards.  For example "en" or "eng".
-	 * 
-	 * @param value
-         *     the string value
-	 * @param language
-         *     the language to interpret in
-	 * @return the sort string
-	 */
+public interface OrderFormatDelegate {
+    /**
+     * Prepare the appropriate sort string for the given value in the
+     * given language.  Language should be supplied with the ISO-6390-1
+     * or ISO-639-2 standards.  For example "en" or "eng".
+     *
+     * @param value    the string value
+     * @param language the language to interpret in
+     * @return the sort string
+     */
     public String makeSortString(String value, String language);
 }

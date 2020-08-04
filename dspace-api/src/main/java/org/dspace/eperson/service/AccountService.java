@@ -7,16 +7,15 @@
  */
 package org.dspace.eperson.service;
 
+import java.io.IOException;
+import java.sql.SQLException;
+import javax.mail.MessagingException;
+
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 
-import javax.mail.MessagingException;
-import java.io.IOException;
-import java.sql.SQLException;
-
 /**
- *
  * Methods for handling registration by email and forgotten passwords. When
  * someone registers as a user, or forgets their password, the
  * sendRegistrationInfo or sendForgotPasswordInfo methods can be used to send an
@@ -32,17 +31,26 @@ import java.sql.SQLException;
  */
 public interface AccountService {
 
-    public void sendRegistrationInfo(Context context, String email) throws SQLException, IOException, MessagingException, AuthorizeException;
+    public void sendRegistrationInfo(Context context, String email)
+        throws SQLException, IOException, MessagingException, AuthorizeException;
 
-    public void sendForgotPasswordInfo(Context context, String email) throws SQLException, IOException, MessagingException, AuthorizeException;
+    public void sendForgotPasswordInfo(Context context, String email)
+        throws SQLException, IOException, MessagingException, AuthorizeException;
 
     public EPerson getEPerson(Context context, String token)
-                throws SQLException, AuthorizeException;
+        throws SQLException, AuthorizeException;
 
 
     public String getEmail(Context context, String token)
-                throws SQLException;
+        throws SQLException;
 
     public void deleteToken(Context context, String token)
-                throws SQLException;
+        throws SQLException;
+
+    /**
+     * This method verifies that a certain String adheres to the password rules for DSpace
+     * @param password  The String to be checked
+     * @return          A boolean indicating whether or not the given String adheres to the password rules
+     */
+    public boolean verifyPasswordStructure(String password);
 }

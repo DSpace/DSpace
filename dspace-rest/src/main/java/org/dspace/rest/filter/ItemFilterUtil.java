@@ -5,14 +5,15 @@
  *
  * http://www.dspace.org/license/
  */
- package org.dspace.rest.filter;
+package org.dspace.rest.filter;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import org.apache.log4j.Logger;
+import com.ibm.icu.util.Calendar;
+import org.apache.logging.log4j.Logger;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.Item;
@@ -22,36 +23,40 @@ import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.services.factory.DSpaceServicesFactory;
 
-import com.ibm.icu.util.Calendar;
-
 public class ItemFilterUtil {
     protected static ItemService itemService = ContentServiceFactory.getInstance().getItemService();
-    static Logger log = Logger.getLogger(ItemFilterUtil.class);
-    public enum BundleName{ORIGINAL,TEXT,LICENSE,THUMBNAIL;}
+    static Logger log = org.apache.logging.log4j.LogManager.getLogger(ItemFilterUtil.class);
+
+    public enum BundleName { ORIGINAL, TEXT, LICENSE, THUMBNAIL }
+
+    /**
+     * Default constructor
+     */
+    private ItemFilterUtil() { }
 
     static String[] getDocumentMimeTypes() {
-        return DSpaceServicesFactory.getInstance().getConfigurationService().getArrayProperty("rest.report-mime-document");
+        return DSpaceServicesFactory.getInstance().getConfigurationService()
+                                    .getArrayProperty("rest.report-mime-document");
     }
 
     static String[] getSupportedDocumentMimeTypes() {
-        return DSpaceServicesFactory.getInstance().getConfigurationService().getArrayProperty("rest.report-mime-document-supported");
+        return DSpaceServicesFactory.getInstance().getConfigurationService()
+                                    .getArrayProperty("rest.report-mime-document-supported");
     }
 
     static String[] getSupportedImageMimeTypes() {
-        return DSpaceServicesFactory.getInstance().getConfigurationService().getArrayProperty("rest.report-mime-document-image");
+        return DSpaceServicesFactory.getInstance().getConfigurationService()
+                                    .getArrayProperty("rest.report-mime-document-image");
     }
 
     static int countOriginalBitstream(Item item) {
         return countBitstream(BundleName.ORIGINAL, item);
     }
 
-    static int countBitstream(BundleName bundleName, Item item)
-    {
+    static int countBitstream(BundleName bundleName, Item item) {
         int count = 0;
-        for (Bundle bundle: item.getBundles())
-        {
-            if (!bundle.getName().equals(bundleName.name()))
-            {
+        for (Bundle bundle : item.getBundles()) {
+            if (!bundle.getName().equals(bundleName.name())) {
                 continue;
             }
             count += bundle.getBitstreams().size();
@@ -60,17 +65,13 @@ public class ItemFilterUtil {
         return count;
     }
 
-    static List<String> getBitstreamNames(BundleName bundleName, Item item)
-    {
+    static List<String> getBitstreamNames(BundleName bundleName, Item item) {
         ArrayList<String> names = new ArrayList<String>();
-        for (Bundle bundle: item.getBundles())
-        {
-            if (!bundle.getName().equals(bundleName.name()))
-            {
+        for (Bundle bundle : item.getBundles()) {
+            if (!bundle.getName().equals(bundleName.name())) {
                 continue;
             }
-            for (Bitstream bit: bundle.getBitstreams())
-            {
+            for (Bitstream bit : bundle.getBitstreams()) {
                 names.add(bit.getName());
             }
         }
@@ -82,28 +83,19 @@ public class ItemFilterUtil {
         return countBitstreamMime(context, BundleName.ORIGINAL, item, mimeList);
     }
 
-    static int countBitstreamMime(Context context, BundleName bundleName, Item item, String[] mimeList)
-    {
+    static int countBitstreamMime(Context context, BundleName bundleName, Item item, String[] mimeList) {
         int count = 0;
-        for (Bundle bundle: item.getBundles())
-        {
-            if (!bundle.getName().equals(bundleName.name()))
-            {
+        for (Bundle bundle : item.getBundles()) {
+            if (!bundle.getName().equals(bundleName.name())) {
                 continue;
             }
-            for (Bitstream bit: bundle.getBitstreams())
-            {
-                for (String mime: mimeList)
-                {
-                    try
-                    {
-                        if (bit.getFormat(context).getMIMEType().equals(mime.trim()))
-                        {
+            for (Bitstream bit : bundle.getBitstreams()) {
+                for (String mime : mimeList) {
+                    try {
+                        if (bit.getFormat(context).getMIMEType().equals(mime.trim())) {
                             count++;
                         }
-                    }
-                    catch (SQLException e)
-                    {
+                    } catch (SQLException e) {
                         log.error("Get format error for bitstream " + bit.getName());
                     }
                 }
@@ -112,26 +104,19 @@ public class ItemFilterUtil {
         return count;
     }
 
-    static int countBitstreamByDesc(BundleName bundleName, Item item, String[] descList)
-    {
+    static int countBitstreamByDesc(BundleName bundleName, Item item, String[] descList) {
         int count = 0;
-        for (Bundle bundle: item.getBundles())
-        {
-            if (!bundle.getName().equals(bundleName.name()))
-            {
+        for (Bundle bundle : item.getBundles()) {
+            if (!bundle.getName().equals(bundleName.name())) {
                 continue;
             }
-            for (Bitstream bit: bundle.getBitstreams())
-            {
-                for (String desc: descList)
-                {
+            for (Bitstream bit : bundle.getBitstreams()) {
+                for (String desc : descList) {
                     String bitDesc = bit.getDescription();
-                    if (bitDesc == null)
-                    {
+                    if (bitDesc == null) {
                         continue;
                     }
-                    if (bitDesc.equals(desc.trim()))
-                    {
+                    if (bitDesc.equals(desc.trim())) {
                         count++;
                     }
                 }
@@ -140,26 +125,19 @@ public class ItemFilterUtil {
         return count;
     }
 
-    static int countBitstreamSmallerThanMinSize(Context context, BundleName bundleName, Item item, String[] mimeList, String prop)
-    {
+    static int countBitstreamSmallerThanMinSize(Context context, BundleName bundleName, Item item, String[] mimeList,
+                                                String prop) {
         long size = DSpaceServicesFactory.getInstance().getConfigurationService().getLongProperty(prop);
         int count = 0;
-        try
-        {
-            for (Bundle bundle: item.getBundles())
-            {
-                if (!bundle.getName().equals(bundleName.name()))
-                {
+        try {
+            for (Bundle bundle : item.getBundles()) {
+                if (!bundle.getName().equals(bundleName.name())) {
                     continue;
                 }
-                for (Bitstream bit: bundle.getBitstreams())
-                {
-                    for (String mime: mimeList)
-                    {
-                        if (bit.getFormat(context).getMIMEType().equals(mime.trim()))
-                        {
-                            if (bit.getSize() < size)
-                            {
+                for (Bitstream bit : bundle.getBitstreams()) {
+                    for (String mime : mimeList) {
+                        if (bit.getFormat(context).getMIMEType().equals(mime.trim())) {
+                            if (bit.getSizeBytes() < size) {
                                 count++;
                             }
                         }
@@ -167,39 +145,32 @@ public class ItemFilterUtil {
                 }
             }
         } catch (SQLException e) {
+            // ignore
         }
         return count;
     }
 
-    static int countBitstreamLargerThanMaxSize(Context context, BundleName bundleName, Item item, String[] mimeList, String prop)
-    {
+    static int countBitstreamLargerThanMaxSize(Context context, BundleName bundleName, Item item, String[] mimeList,
+                                               String prop) {
         long size = DSpaceServicesFactory.getInstance().getConfigurationService().getLongProperty(prop);
         int count = 0;
-        try
-        {
-            for (Bundle bundle: item.getBundles())
-            {
-                if (!bundle.getName().equals(bundleName.name()))
-                {
+        try {
+            for (Bundle bundle : item.getBundles()) {
+                if (!bundle.getName().equals(bundleName.name())) {
                     continue;
                 }
-                for (Bitstream bit: bundle.getBitstreams())
-                {
-                    for (String mime: mimeList)
-                    {
-                        if (bit.getFormat(context).getMIMEType().equals(mime.trim()))
-                        {
-                            if (bit.getSize() > size)
-                            {
+                for (Bitstream bit : bundle.getBitstreams()) {
+                    for (String mime : mimeList) {
+                        if (bit.getFormat(context).getMIMEType().equals(mime.trim())) {
+                            if (bit.getSizeBytes() > size) {
                                 count++;
                             }
                         }
                     }
                 }
             }
-        }
-        catch (SQLException e)
-        {
+        } catch (SQLException e) {
+            // ignore
         }
         return count;
     }
@@ -208,47 +179,35 @@ public class ItemFilterUtil {
         return countBitstreamMimeStartsWith(context, BundleName.ORIGINAL, item, prefix);
     }
 
-    static int countBitstreamMimeStartsWith(Context context, BundleName bundleName, Item item, String prefix)
-    {
+    static int countBitstreamMimeStartsWith(Context context, BundleName bundleName, Item item, String prefix) {
         int count = 0;
-        try
-        {
-            for (Bundle bundle: item.getBundles())
-            {
-                if (!bundle.getName().equals(bundleName.name()))
-                {
+        try {
+            for (Bundle bundle : item.getBundles()) {
+                if (!bundle.getName().equals(bundleName.name())) {
                     continue;
                 }
-                for (Bitstream bit: bundle.getBitstreams())
-                {
-                    if (bit.getFormat(context).getMIMEType().startsWith(prefix))
-                    {
+                for (Bitstream bit : bundle.getBitstreams()) {
+                    if (bit.getFormat(context).getMIMEType().startsWith(prefix)) {
                         count++;
                     }
                 }
             }
-        }
-        catch (SQLException e)
-        {
+        } catch (SQLException e) {
+            // ignore
         }
         return count;
     }
 
-    static boolean hasUnsupportedBundle(Item item, String[] bundleList)
-    {
-        if (bundleList == null)
-        {
+    static boolean hasUnsupportedBundle(Item item, String[] bundleList) {
+        if (bundleList == null) {
             return false;
         }
         ArrayList<String> bundles = new ArrayList<String>();
-        for (String bundleName: bundleList)
-        {
+        for (String bundleName : bundleList) {
             bundles.add(bundleName.trim());
         }
-        for (Bundle bundle: item.getBundles())
-        {
-            if (!bundles.contains(bundle.getName()))
-            {
+        for (Bundle bundle : item.getBundles()) {
+            if (!bundles.contains(bundle.getName())) {
                 return true;
             }
         }
@@ -263,26 +222,19 @@ public class ItemFilterUtil {
         return countBitstreamMime(context, bundleName, item, mimeList) > 0;
     }
 
-    static boolean hasMetadataMatch(Item item, String fieldList, Pattern regex)
-    {
-        if (fieldList.equals("*"))
-        {
-            for (MetadataValue md: itemService.getMetadata(item, org.dspace.content.Item.ANY, org.dspace.content.Item.ANY, org.dspace.content.Item.ANY, org.dspace.content.Item.ANY))
-            {
-                if (regex.matcher(md.getValue()).matches())
-                {
+    static boolean hasMetadataMatch(Item item, String fieldList, Pattern regex) {
+        if (fieldList.equals("*")) {
+            for (MetadataValue md : itemService
+                .getMetadata(item, org.dspace.content.Item.ANY, org.dspace.content.Item.ANY,
+                             org.dspace.content.Item.ANY, org.dspace.content.Item.ANY)) {
+                if (regex.matcher(md.getValue()).matches()) {
                     return true;
                 }
             }
-        }
-        else
-        {
-            for (String field: fieldList.split(","))
-            {
-                for (MetadataValue md: itemService.getMetadataByMetadataString(item, field.trim()))
-                {
-                    if (regex.matcher(md.getValue()).matches())
-                    {
+        } else {
+            for (String field : fieldList.split(",")) {
+                for (MetadataValue md : itemService.getMetadataByMetadataString(item, field.trim())) {
+                    if (regex.matcher(md.getValue()).matches()) {
                         return true;
                     }
                 }
@@ -292,35 +244,24 @@ public class ItemFilterUtil {
         return false;
     }
 
-    static boolean hasOnlyMetadataMatch(Item item, String fieldList, Pattern regex)
-    {
+    static boolean hasOnlyMetadataMatch(Item item, String fieldList, Pattern regex) {
         boolean matches = false;
-        if (fieldList.equals("*"))
-        {
-            for (MetadataValue md: itemService.getMetadata(item, org.dspace.content.Item.ANY, org.dspace.content.Item.ANY, org.dspace.content.Item.ANY, org.dspace.content.Item.ANY))
-            {
-                if (regex.matcher(md.getValue()).matches())
-                {
+        if (fieldList.equals("*")) {
+            for (MetadataValue md : itemService
+                .getMetadata(item, org.dspace.content.Item.ANY, org.dspace.content.Item.ANY,
+                             org.dspace.content.Item.ANY, org.dspace.content.Item.ANY)) {
+                if (regex.matcher(md.getValue()).matches()) {
                     matches = true;
-                }
-                else
-                {
+                } else {
                     return false;
                 }
             }
-        }
-        else
-        {
-            for (String field: fieldList.split(","))
-            {
-                for (MetadataValue md: itemService.getMetadataByMetadataString(item, field.trim()))
-                {
-                    if (regex.matcher(md.getValue()).matches())
-                    {
+        } else {
+            for (String field : fieldList.split(",")) {
+                for (MetadataValue md : itemService.getMetadataByMetadataString(item, field.trim())) {
+                    if (regex.matcher(md.getValue()).matches()) {
                         matches = true;
-                    }
-                    else
-                    {
+                    } else {
                         return false;
                     }
                 }

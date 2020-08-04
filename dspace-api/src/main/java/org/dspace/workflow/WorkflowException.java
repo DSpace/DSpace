@@ -15,7 +15,7 @@ package org.dspace.workflow;
  * @author Ben Bosman (ben at atmire dot com)
  * @author Mark Diggory (markd at atmire dot com)
  */
-public class WorkflowException extends Exception{
+public class WorkflowException extends Exception {
 
     private String reason;
 
@@ -23,10 +23,11 @@ public class WorkflowException extends Exception{
         super(cause);
     }
 
-    public WorkflowException(String reason){
+    public WorkflowException(String reason) {
         this.reason = reason;
     }
-    public String toString(){
+
+    public String toString() {
         return reason;
     }
 }

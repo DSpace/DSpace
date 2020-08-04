@@ -7,13 +7,12 @@
  */
 package org.dspace.health;
 
-
-import org.dspace.app.statistics.LogAnalyser;
-import org.dspace.core.Context;
-
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.Map;
+
+import org.dspace.app.statistics.LogAnalyser;
+import org.dspace.core.Context;
 
 /**
  * @author LINDAT/CLARIN dev team
@@ -21,16 +20,16 @@ import java.util.Map;
 public class LogAnalyserCheck extends Check {
 
     final static private String[][] interesting_fields = new String[][] {
-        new String[] { "exceptions", "Exceptions" },
-        new String[] { "warnings", "Warnings" },
-        new String[] { "action.browse", "Archive browsed" },
-        new String[] { "action.search", "Archive searched" },
-        new String[] { "action.login", "Logged in" },
-        new String[] { "action.oai_request", "OAI requests" },
+        new String[] {"exceptions", "Exceptions"},
+        new String[] {"warnings", "Warnings"},
+        new String[] {"action.browse", "Archive browsed"},
+        new String[] {"action.search", "Archive searched"},
+        new String[] {"action.login", "Logged in"},
+        new String[] {"action.oai_request", "OAI requests"},
     };
 
     @Override
-    public String run( ReportInfo ri ) {
+    public String run(ReportInfo ri) {
         StringBuilder sb = new StringBuilder();
 
         Map<String, String> info_map = new HashMap<>();
@@ -53,12 +52,12 @@ public class LogAnalyserCheck extends Check {
             }
 
             // create report
-            for (String[] info : interesting_fields ) {
-                sb.append( String.format("%-20s: %s\n", info[1], info_map.get(info[0])) );
+            for (String[] info : interesting_fields) {
+                sb.append(String.format("%-20s: %s\n", info[1], info_map.get(info[0])));
             }
-            sb.append( String.format("Items added since [%s] (db): %s\n",
-                new SimpleDateFormat("yyyy-MM-dd").format(ri.from().getTime()),
-                LogAnalyser.getNumItems(c)));
+            sb.append(String.format("Items added since [%s] (db): %s\n",
+                                    new SimpleDateFormat("yyyy-MM-dd").format(ri.from().getTime()),
+                                    LogAnalyser.getNumItems(c)));
 
             c.complete();
 

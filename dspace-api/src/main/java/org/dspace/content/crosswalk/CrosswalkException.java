@@ -15,25 +15,20 @@ package org.dspace.content.crosswalk;
  * @author Larry Stone
  * @version $Revision$
  */
-public class CrosswalkException extends Exception
-{
-    public CrosswalkException()
-    {
+public class CrosswalkException extends Exception {
+    public CrosswalkException() {
         super();
     }
 
-    public CrosswalkException(String s, Throwable t)
-    {
+    public CrosswalkException(String s, Throwable t) {
         super(s, t);
     }
 
-    public CrosswalkException(String s)
-    {
+    public CrosswalkException(String s) {
         super(s);
     }
 
-    public CrosswalkException(Throwable t)
-    {
+    public CrosswalkException(Throwable t) {
         super(t);
     }
 }

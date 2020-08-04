@@ -15,15 +15,15 @@ package org.dspace.xmlworkflow;
  * @author Ben Bosman (ben at atmire dot com)
  * @author Mark Diggory (markd at atmire dot com)
  */
-public class WorkflowConfigurationException extends Exception{
+public class WorkflowConfigurationException extends Exception {
 
     private String error;
 
-    public WorkflowConfigurationException(String error){
+    public WorkflowConfigurationException(String error) {
         this.error = error;
     }
 
-    public String toString(){
+    public String toString() {
         return this.error;
     }
 

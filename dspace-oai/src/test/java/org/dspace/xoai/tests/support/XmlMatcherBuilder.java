@@ -7,18 +7,22 @@
  */
 package org.dspace.xoai.tests.support;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import javax.xml.namespace.NamespaceContext;
+
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
 import org.xmlmatchers.XmlMatchers;
 import org.xmlmatchers.transform.StringSource;
 
-import javax.xml.namespace.NamespaceContext;
-import java.util.*;
-
 
 public class XmlMatcherBuilder extends MatcherBuilder<XmlMatcherBuilder, String> {
-    public static XmlMatcherBuilder xml () {
+    public static XmlMatcherBuilder xml() {
         return new XmlMatcherBuilder();
     }
 
@@ -63,8 +67,8 @@ public class XmlMatcherBuilder extends MatcherBuilder<XmlMatcherBuilder, String>
             @Override
             protected boolean matchesSafely(String item) {
                 return XmlMatchers
-                        .hasXPath(xPath, namespaces, subMatcher)
-                        .matches(StringSource.toSource(item));
+                    .hasXPath(xPath, namespaces, subMatcher)
+                    .matches(StringSource.toSource(item));
             }
 
             @Override
@@ -74,7 +78,7 @@ public class XmlMatcherBuilder extends MatcherBuilder<XmlMatcherBuilder, String>
         });
     }
 
-    public XmlMatcherBuilder withNamespace (String prefix, String uri) {
+    public XmlMatcherBuilder withNamespace(String prefix, String uri) {
         namespaces.with(prefix, uri);
         return this;
     }
@@ -91,16 +95,20 @@ public class XmlMatcherBuilder extends MatcherBuilder<XmlMatcherBuilder, String>
         public String getPrefix(String namespaceURI) {
             Iterator<String> prefixes = getPrefixes(namespaceURI);
 
-            if (!prefixes.hasNext()) return null;
-            else return prefixes.next();
+            if (!prefixes.hasNext()) {
+                return null;
+            } else {
+                return prefixes.next();
+            }
         }
 
         @Override
         public Iterator getPrefixes(String namespaceURI) {
             List<String> list = new ArrayList<>();
             for (Map.Entry<String, String> stringStringEntry : namespace.entrySet()) {
-                if (stringStringEntry.getValue().equals(namespaceURI))
+                if (stringStringEntry.getValue().equals(namespaceURI)) {
                     list.add(stringStringEntry.getKey());
+                }
             }
 
             return list.iterator();

@@ -7,10 +7,10 @@
  */
 package org.dspace.storage.rdbms.migration;
 
+import java.sql.Connection;
+
 import org.flywaydb.core.api.migration.MigrationChecksumProvider;
 import org.flywaydb.core.api.migration.jdbc.JdbcMigration;
-
-import java.sql.Connection;
 
 /**
  * Migration class that will drop the public key for the dspace objects, the integer based key will be moved to a UUID

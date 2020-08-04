@@ -7,15 +7,15 @@
  */
 package org.dspace.statistics.content.filter;
 
-import org.dspace.statistics.SolrLoggerServiceImpl;
-
 import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.Calendar;
+import java.util.Date;
+
+import org.dspace.statistics.SolrLoggerServiceImpl;
 
 /**
  * Encapsulate a range of dates for Solr query filtering.
- * 
+ *
  * @author Kevin Van de Velde (kevin at atmire dot com)
  */
 public class StatisticsSolrDateFilter implements StatisticsFilter {
@@ -30,12 +30,11 @@ public class StatisticsSolrDateFilter implements StatisticsFilter {
     }
 
     /**
-     *  Set the start date as a string expression.
-     *     
-     * @param startStr
-     *     statistics start date as a string
+     * Set the start date as a string expression.
      *
-     * Must be paired with {@link #setEndStr(String)}.
+     * @param startStr statistics start date as a string
+     *
+     *                 Must be paired with {@link #setEndStr(String)}.
      */
     public void setStartStr(String startStr) {
         this.startStr = startStr;
@@ -43,11 +42,10 @@ public class StatisticsSolrDateFilter implements StatisticsFilter {
 
     /**
      * Set the end date as a string expression.
-     *     
-     * @param endStr
-     *     statistics end date as a string
      *
-     * Must be paired with {@link #setStartStr(String)}.
+     * @param endStr statistics end date as a string
+     *
+     *               Must be paired with {@link #setStartStr(String)}.
      */
     public void setEndStr(String endStr) {
         this.endStr = endStr;
@@ -56,8 +54,7 @@ public class StatisticsSolrDateFilter implements StatisticsFilter {
     /**
      * Set the range granularity:  DAY, MONTH, or YEAR.
      *
-     * @param typeStr
-     *     which granularity (case insensitive string: "day" / "month" / "year")
+     * @param typeStr which granularity (case insensitive string: "day" / "month" / "year")
      */
     public void setTypeStr(String typeStr) {
         this.typeStr = typeStr;
@@ -65,11 +62,10 @@ public class StatisticsSolrDateFilter implements StatisticsFilter {
 
     /**
      * Set the start date as a Date object.
-     *     
-     * @param startDate
-     *     statistics start date object
      *
-     * Must be paired with {@link #setEndDate(Date)}.
+     * @param startDate statistics start date object
+     *
+     *                  Must be paired with {@link #setEndDate(Date)}.
      */
     public void setStartDate(Date startDate) {
         this.startDate = (startDate == null ? null : new Date(startDate.getTime()));
@@ -77,11 +73,10 @@ public class StatisticsSolrDateFilter implements StatisticsFilter {
 
     /**
      * Set the end date as a Date object.
-     *     
-     * @param endDate
-     *     statistics end date object
      *
-     * Must be paired with {@link #setStartDate(Date)}.
+     * @param endDate statistics end date object
+     *
+     *                Must be paired with {@link #setStartDate(Date)}.
      */
     public void setEndDate(Date endDate) {
         this.endDate = (endDate == null ? null : new Date(endDate.getTime()));
@@ -89,6 +84,7 @@ public class StatisticsSolrDateFilter implements StatisticsFilter {
 
     /**
      * Convert the date range to a filter expression.
+     *
      * @return Solr date filter expression
      */
     @Override
@@ -113,17 +109,14 @@ public class StatisticsSolrDateFilter implements StatisticsFilter {
                 startCal.clear(Calendar.MONTH);
                 startCal.set(Calendar.DATE, 1);
                 dateType = Calendar.YEAR;
-            } else
-            {
+            } else {
                 return "";
             }
 
             Calendar endCal = (Calendar) startCal.clone();
 
-            if (startDate == null)
-            {
-                if (startStr.startsWith("+"))
-                {
+            if (startDate == null) {
+                if (startStr.startsWith("+")) {
                     startStr = startStr.substring(startStr.indexOf('+') + 1);
                 }
 
@@ -131,10 +124,8 @@ public class StatisticsSolrDateFilter implements StatisticsFilter {
                 startDate = startCal.getTime();
             }
 
-            if (endDate == null)
-            {
-                if (endStr.startsWith("+"))
-                {
+            if (endDate == null) {
+                if (endStr.startsWith("+")) {
                     endStr = endStr.substring(endStr.indexOf('+') + 1);
                 }
 

@@ -10,17 +10,26 @@ package org.dspace.sword2;
 import org.dspace.core.factory.CoreServiceFactory;
 import org.swordapp.server.SwordError;
 
-public class WorkflowManagerFactory
-{
+public class WorkflowManagerFactory {
+
+    /**
+     * Default constructor
+     */
+    private WorkflowManagerFactory() { }
+
+    /**
+     * Get an instance of WorkflowManager
+     * @return WorkflowManager
+     * @throws DSpaceSwordException
+     * @throws SwordError
+     */
     public static WorkflowManager getInstance()
-            throws DSpaceSwordException, SwordError
-    {
+        throws DSpaceSwordException, SwordError {
         WorkflowManager manager = (WorkflowManager) CoreServiceFactory.getInstance().getPluginService()
-                .getSinglePlugin(WorkflowManager.class);
-        if (manager == null)
-        {
+                                                                      .getSinglePlugin(WorkflowManager.class);
+        if (manager == null) {
             throw new SwordError(DSpaceUriRegistry.REPOSITORY_ERROR,
-                    "No workflow manager configured");
+                                 "No workflow manager configured");
         }
         return manager;
     }

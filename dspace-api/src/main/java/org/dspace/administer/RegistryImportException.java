@@ -12,45 +12,40 @@ package org.dspace.administer;
  *
  * An exception to report any problems with registry imports
  */
-public class RegistryImportException extends Exception
-{
+public class RegistryImportException extends Exception {
     /**
      * Create an empty authorize exception
      */
-    public RegistryImportException()
-    {
+    public RegistryImportException() {
         super();
     }
 
     /**
      * create an exception with only a message
-     * 
+     *
      * @param message error message
      */
-    public RegistryImportException(String message)
-    {
+    public RegistryImportException(String message) {
         super(message);
     }
-    
+
     /**
      * create an exception with an inner exception and a message
-     * 
-     * @param	message error message
-     * @param	e throwable
+     *
+     * @param message error message
+     * @param e       throwable
      */
-    public RegistryImportException(String message, Throwable e)
-    {
-    	super(message, e);
+    public RegistryImportException(String message, Throwable e) {
+        super(message, e);
     }
-    
+
     /**
      * create an exception with an inner exception
-     * 
-     * @param	e throwable
+     *
+     * @param e throwable
      */
-    public RegistryImportException(Throwable e)
-    {
-    	super(e);
+    public RegistryImportException(Throwable e) {
+        super(e);
     }
-    
+
 }

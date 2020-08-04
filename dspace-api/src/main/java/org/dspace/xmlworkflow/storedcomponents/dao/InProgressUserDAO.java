@@ -7,25 +7,27 @@
  */
 package org.dspace.xmlworkflow.storedcomponents.dao;
 
+import java.sql.SQLException;
+import java.util.List;
+
 import org.dspace.core.Context;
 import org.dspace.core.GenericDAO;
 import org.dspace.eperson.EPerson;
 import org.dspace.xmlworkflow.storedcomponents.InProgressUser;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 
-import java.sql.SQLException;
-import java.util.List;
-
 /**
  * Database Access Object interface class for the InProgressUser object.
- * The implementation of this class is responsible for all database calls for the InProgressUser object and is autowired by spring
+ * The implementation of this class is responsible for all database calls for the InProgressUser object and is
+ * autowired by spring
  * This class should only be accessed from a single service and should never be exposed outside of the API
  *
  * @author kevinvandevelde at atmire.com
  */
 public interface InProgressUserDAO extends GenericDAO<InProgressUser> {
 
-    public InProgressUser findByWorkflowItemAndEPerson(Context context, XmlWorkflowItem workflowItem, EPerson ePerson) throws SQLException;
+    public InProgressUser findByWorkflowItemAndEPerson(Context context, XmlWorkflowItem workflowItem, EPerson ePerson)
+        throws SQLException;
 
     public List<InProgressUser> findByEperson(Context context, EPerson ePerson) throws SQLException;
 

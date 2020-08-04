@@ -14,11 +14,10 @@ import org.dspace.core.Context;
 
 /**
  * Interface to abstract the strategy for item signing
- * 
+ *
  * @author Kostas Stamatis
- * 
  */
 public interface ItemMarkingExtractor {
-	public ItemMarkingInfo getItemMarkingInfo(Context context, Item item)
-			throws SQLException;
+    public ItemMarkingInfo getItemMarkingInfo(Context context, Item item)
+        throws SQLException;
 }

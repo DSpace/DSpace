@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.ParseException;
@@ -25,8 +26,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Decoded response data evoked by a request made to EZID.
  */
-public class EZIDResponse
-{
+public class EZIDResponse {
     private static final Logger log = LoggerFactory.getLogger(EZIDResponse.class);
 
     private static final String UTF_8 = "UTF-8";
@@ -40,27 +40,23 @@ public class EZIDResponse
     private final HttpResponse response;
 
     public EZIDResponse(HttpResponse response)
-            throws IdentifierException
-    {
+        throws IdentifierException {
         this.response = response;
 
         HttpEntity responseBody = response.getEntity();
 
         // Collect the content of the percent-encoded response.
         String body;
-        try
-        {
+        try {
             body = EntityUtils.toString(responseBody, UTF_8);
-        } catch (IOException ex)
-        {
+        } catch (IOException ex) {
             log.error(ex.getMessage());
             throw new IdentifierException("EZID response not understood:  "
-                    + ex.getMessage());
-        } catch (ParseException ex)
-        {
+                                              + ex.getMessage());
+        } catch (ParseException ex) {
             log.error(ex.getMessage());
             throw new IdentifierException("EZID response not understood:  "
-                    + ex.getMessage());
+                                              + ex.getMessage());
         }
 
         String[] parts;
@@ -70,28 +66,22 @@ public class EZIDResponse
         // First line is request status and message or value
         parts = lines[0].split(":", 2);
         status = parts[0].trim();
-        if (parts.length > 1)
-        {
+        if (parts.length > 1) {
             statusValue = parts[1].trim();
-        }
-        else
-        {
+        } else {
             statusValue = null;
         }
 
         // Remaining lines are key: value pairs
-        for (int i = 1; i < lines.length; i++)
-        {
+        for (int i = 1; i < lines.length; i++) {
             parts = lines[i].split(":", 2);
-            String key = null, value = null;
+            String key = null;
+            String value = null;
             try {
                 key = URLDecoder.decode(parts[0], UTF_8).trim();
-                if (parts.length > 1)
-                {
+                if (parts.length > 1) {
                     value = URLDecoder.decode(parts[1], UTF_8).trim();
-                }
-                else
-                {
+                } else {
                     value = null;
                 }
             } catch (UnsupportedEncodingException e) {
@@ -106,8 +96,7 @@ public class EZIDResponse
      *
      * @return returned status was success.
      */
-    public boolean isSuccess()
-    {
+    public boolean isSuccess() {
         return status.equalsIgnoreCase("success");
     }
 
@@ -116,8 +105,7 @@ public class EZIDResponse
      *
      * @return should be "success" or "error".
      */
-    public String getEZIDStatus()
-    {
+    public String getEZIDStatus() {
         return status;
     }
 
@@ -126,8 +114,7 @@ public class EZIDResponse
      *
      * @return EZID status value
      */
-    public String getEZIDStatusValue()
-    {
+    public String getEZIDStatusValue() {
         return statusValue;
     }
 
@@ -136,11 +123,9 @@ public class EZIDResponse
      *
      * @return all keys found in the response.
      */
-    public List<String> getKeys()
-    {
+    public List<String> getKeys() {
         List<String> keys = new ArrayList<String>();
-        for (String key : attributes.keySet())
-        {
+        for (String key : attributes.keySet()) {
             keys.add(key);
         }
         return keys;
@@ -152,24 +137,21 @@ public class EZIDResponse
      * @param key the datum to look up.
      * @return the value of {@code key}, or null if {@code key} is undefined.
      */
-    public String get(String key)
-    {
+    public String get(String key) {
         return attributes.get(key);
     }
 
     /**
      * @return status of the HTTP request.
      */
-    public int getHttpStatusCode()
-    {
+    public int getHttpStatusCode() {
         return response.getStatusLine().getStatusCode();
     }
 
     /**
      * @return reason for status of the HTTP request.
      */
-    public String getHttpReasonPhrase()
-    {
+    public String getHttpReasonPhrase() {
         return response.getStatusLine().getReasonPhrase();
     }
 }

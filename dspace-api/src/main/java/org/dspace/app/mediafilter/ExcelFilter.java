@@ -11,12 +11,11 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.logging.log4j.Logger;
 import org.apache.poi.POITextExtractor;
 import org.apache.poi.extractor.ExtractorFactory;
 import org.apache.poi.hssf.extractor.ExcelExtractor;
 import org.apache.poi.xssf.extractor.XSSFExcelExtractor;
-
-import org.apache.log4j.Logger;
 import org.dspace.content.Item;
 
 /*
@@ -35,79 +34,62 @@ import org.dspace.content.Item;
  * filter.org.dspace.app.mediafilter.ExcelFilter.inputFormats = Microsoft Excel, Microsoft Excel XML
  *
  */
-public class ExcelFilter extends MediaFilter
-{
+public class ExcelFilter extends MediaFilter {
 
-    private static Logger log = Logger.getLogger(ExcelFilter.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(ExcelFilter.class);
 
-    public String getFilteredName(String oldFilename)
-    {
+    public String getFilteredName(String oldFilename) {
         return oldFilename + ".txt";
     }
 
     /**
      * @return String bundle name
-     * 
      */
-    public String getBundleName()
-    {
+    public String getBundleName() {
         return "TEXT";
     }
 
     /**
      * @return String bitstream format
-     * 
-     *
      */
-    public String getFormatString()
-    {
+    public String getFormatString() {
         return "Text";
     }
 
     /**
      * @return String description
      */
-    public String getDescription()
-    {
+    public String getDescription() {
         return "Extracted text";
     }
 
     /**
-     * @param item item
-     * @param source source input stream
+     * @param item    item
+     * @param source  source input stream
      * @param verbose verbose mode
-     * 
      * @return InputStream the resulting input stream
      * @throws Exception if error
      */
     @Override
     public InputStream getDestinationStream(Item item, InputStream source, boolean verbose)
-            throws Exception
-    {
+        throws Exception {
         String extractedText = null;
 
-        try
-        {
+        try {
             POITextExtractor theExtractor = ExtractorFactory.createExtractor(source);
-            if (theExtractor instanceof ExcelExtractor)
-            {
+            if (theExtractor instanceof ExcelExtractor) {
                 // for xls file
                 extractedText = (theExtractor).getText();
-            }
-            else if (theExtractor instanceof XSSFExcelExtractor)
-            {
+            } else if (theExtractor instanceof XSSFExcelExtractor) {
                 // for xlsx file
                 extractedText = (theExtractor).getText();
             }
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             log.error("Error filtering bitstream: " + e.getMessage(), e);
             throw e;
         }
 
-        if (extractedText != null)
-        {
+        if (extractedText != null) {
             // generate an input stream with the extracted text
             return IOUtils.toInputStream(extractedText, StandardCharsets.UTF_8);
         }

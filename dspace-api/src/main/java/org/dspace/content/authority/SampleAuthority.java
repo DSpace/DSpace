@@ -13,8 +13,7 @@ import org.dspace.content.Collection;
  * This is a *very* stupid test fixture for authority control, and also
  * serves as a trivial example of an authority plugin implementation.
  */
-public class SampleAuthority implements ChoiceAuthority
-{
+public class SampleAuthority implements ChoiceAuthority {
     protected static String values[] = {
         "sun",
         "mon",
@@ -36,15 +35,12 @@ public class SampleAuthority implements ChoiceAuthority
     };
 
     @Override
-    public Choices getMatches(String field, String query, Collection collection, int start, int limit, String locale)
-    {
+    public Choices getMatches(String field, String query, Collection collection, int start, int limit, String locale) {
         int dflt = -1;
         Choice v[] = new Choice[values.length];
-        for (int i = 0; i < values.length; ++i)
-        {
+        for (int i = 0; i < values.length; ++i) {
             v[i] = new Choice(String.valueOf(i), values[i], labels[i]);
-            if (values[i].equalsIgnoreCase(query))
-            {
+            if (values[i].equalsIgnoreCase(query)) {
                 dflt = i;
             }
         }
@@ -52,12 +48,9 @@ public class SampleAuthority implements ChoiceAuthority
     }
 
     @Override
-    public Choices getBestMatch(String field, String text, Collection collection, String locale)
-    {
-        for (int i = 0; i < values.length; ++i)
-        {
-            if (text.equalsIgnoreCase(values[i]))
-            {
+    public Choices getBestMatch(String field, String text, Collection collection, String locale) {
+        for (int i = 0; i < values.length; ++i) {
+            if (text.equalsIgnoreCase(values[i])) {
                 Choice v[] = new Choice[1];
                 v[0] = new Choice(String.valueOf(i), values[i], labels[i]);
                 return new Choices(v, 0, v.length, Choices.CF_UNCERTAIN, false, 0);
@@ -67,8 +60,7 @@ public class SampleAuthority implements ChoiceAuthority
     }
 
     @Override
-    public String getLabel(String field, String key, String locale)
-    {
+    public String getLabel(String field, String key, String locale) {
         return labels[Integer.parseInt(key)];
     }
 }

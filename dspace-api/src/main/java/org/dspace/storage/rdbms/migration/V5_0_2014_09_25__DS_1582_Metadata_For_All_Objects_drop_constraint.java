@@ -10,6 +10,7 @@ package org.dspace.storage.rdbms.migration;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
+
 import org.flywaydb.core.api.migration.MigrationChecksumProvider;
 import org.flywaydb.core.api.migration.jdbc.JdbcMigration;
 
@@ -38,24 +39,20 @@ import org.flywaydb.core.api.migration.jdbc.JdbcMigration;
  * @author Tim Donohue
  */
 public class V5_0_2014_09_25__DS_1582_Metadata_For_All_Objects_drop_constraint
-    implements JdbcMigration, MigrationChecksumProvider
-{
+    implements JdbcMigration, MigrationChecksumProvider {
     /* The checksum to report for this migration (when successful) */
     private int checksum = -1;
 
     /**
      * Actually migrate the existing database
-     * @param connection
-     *     SQL Connection object
-     * @throws IOException
-     *     A general class of exceptions produced by failed or interrupted I/O operations.
-     * @throws SQLException
-     *     An exception that provides information on a database access error or other errors.
+     *
+     * @param connection SQL Connection object
+     * @throws IOException  A general class of exceptions produced by failed or interrupted I/O operations.
+     * @throws SQLException An exception that provides information on a database access error or other errors.
      */
     @Override
     public void migrate(Connection connection)
-            throws IOException, SQLException
-    {
+        throws IOException, SQLException {
         // Drop the constraint associated with "item_id" column of "metadatavalue"
         checksum = MigrationUtils.dropDBConstraint(connection, "metadatavalue", "item_id", "fkey");
     }
@@ -63,11 +60,11 @@ public class V5_0_2014_09_25__DS_1582_Metadata_For_All_Objects_drop_constraint
     /**
      * Return the checksum to be associated with this Migration
      * in the Flyway database table (schema_version).
+     *
      * @return checksum as an Integer
      */
     @Override
-    public Integer getChecksum()
-    {
+    public Integer getChecksum() {
         return checksum;
     }
 }

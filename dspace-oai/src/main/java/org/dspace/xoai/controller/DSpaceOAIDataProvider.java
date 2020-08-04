@@ -7,13 +7,28 @@
  */
 package org.dspace.xoai.controller;
 
+import static java.util.Arrays.asList;
+import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
+import static org.apache.logging.log4j.LogManager.getLogger;
+
+import java.io.IOException;
+import java.io.OutputStream;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.xml.stream.XMLStreamException;
+
 import com.lyncode.xoai.dataprovider.OAIDataProvider;
 import com.lyncode.xoai.dataprovider.OAIRequestParameters;
 import com.lyncode.xoai.dataprovider.core.XOAIManager;
 import com.lyncode.xoai.dataprovider.exceptions.InvalidContextException;
 import com.lyncode.xoai.dataprovider.exceptions.OAIException;
 import com.lyncode.xoai.dataprovider.exceptions.WritingXmlException;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.dspace.core.Context;
 import org.dspace.xoai.services.api.cache.XOAICacheService;
 import org.dspace.xoai.services.api.config.XOAIManagerResolver;
@@ -25,46 +40,40 @@ import org.dspace.xoai.services.api.xoai.ItemRepositoryResolver;
 import org.dspace.xoai.services.api.xoai.SetRepositoryResolver;
 import org.dspace.xoai.services.impl.xoai.DSpaceResumptionTokenFormatter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.xml.stream.XMLStreamException;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import static java.util.Arrays.asList;
-import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
-import static org.apache.log4j.Logger.getLogger;
-
 /**
- * 
  * @author Lyncode Development Team (dspace at lyncode dot com)
  */
 @Controller
-public class DSpaceOAIDataProvider
-{
+// Use the configured "oai.path" for all requests, or "/oai" by default
+@RequestMapping("/${oai.path:oai}")
+// Only enable this controller if "oai.enabled=true"
+@ConditionalOnProperty("oai.enabled")
+public class DSpaceOAIDataProvider {
     private static final Logger log = getLogger(DSpaceOAIDataProvider.class);
 
-    @Autowired XOAICacheService cacheService;
-    @Autowired ContextService contextService;
-    @Autowired XOAIManagerResolver xoaiManagerResolver;
-    @Autowired ItemRepositoryResolver itemRepositoryResolver;
-    @Autowired IdentifyResolver identifyResolver;
-    @Autowired SetRepositoryResolver setRepositoryResolver;
+    @Autowired
+    XOAICacheService cacheService;
+    @Autowired
+    ContextService contextService;
+    @Autowired
+    XOAIManagerResolver xoaiManagerResolver;
+    @Autowired
+    ItemRepositoryResolver itemRepositoryResolver;
+    @Autowired
+    IdentifyResolver identifyResolver;
+    @Autowired
+    SetRepositoryResolver setRepositoryResolver;
 
     private DSpaceResumptionTokenFormatter resumptionTokenFormat = new DSpaceResumptionTokenFormatter();
 
-    @RequestMapping("/")
-    public String indexAction (HttpServletResponse response, Model model) throws ServletException {
+    @RequestMapping({"", "/"})
+    public String indexAction(HttpServletResponse response, Model model) throws ServletException {
         try {
             XOAIManager manager = xoaiManagerResolver.getManager();
             model.addAttribute("contexts", manager.getContextManager().getContexts());
@@ -77,7 +86,8 @@ public class DSpaceOAIDataProvider
     }
 
     @RequestMapping("/{context}")
-    public String contextAction (Model model, HttpServletRequest request, HttpServletResponse response, @PathVariable("context") String xoaiContext) throws IOException, ServletException {
+    public String contextAction(Model model, HttpServletRequest request, HttpServletResponse response,
+                                @PathVariable("context") String xoaiContext) throws IOException, ServletException {
         Context context = null;
         try {
             request.setCharacterEncoding("UTF-8");
@@ -86,25 +96,28 @@ public class DSpaceOAIDataProvider
             XOAIManager manager = xoaiManagerResolver.getManager();
 
             OAIDataProvider dataProvider = new OAIDataProvider(manager, xoaiContext,
-                    identifyResolver.getIdentify(),
-                    setRepositoryResolver.getSetRepository(),
-                    itemRepositoryResolver.getItemRepository(),
-                    resumptionTokenFormat);
+                                                               identifyResolver.getIdentify(),
+                                                               setRepositoryResolver.getSetRepository(),
+                                                               itemRepositoryResolver.getItemRepository(),
+                                                               resumptionTokenFormat);
 
             OutputStream out = response.getOutputStream();
             OAIRequestParameters parameters = new OAIRequestParameters(buildParametersMap(request));
 
-            response.setContentType("application/xml");
+            response.setContentType("text/xml");
             response.setCharacterEncoding("UTF-8");
 
             String identification = xoaiContext + parameters.requestID();
 
             if (cacheService.isActive()) {
-                if (!cacheService.hasCache(identification))
+                if (!cacheService.hasCache(identification)) {
                     cacheService.store(identification, dataProvider.handle(parameters));
+                }
 
                 cacheService.handle(identification, out);
-            } else dataProvider.handle(parameters, out);
+            } else {
+                dataProvider.handle(parameters, out);
+            }
 
 
             out.flush();
@@ -119,24 +132,25 @@ public class DSpaceOAIDataProvider
             log.error(e.getMessage(), e);
             closeContext(context);
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-                    "Unexpected error while writing the output. For more information visit the log files.");
+                               "Unexpected error while writing the output. For more information visit the log files.");
         } catch (XOAIManagerResolverException e) {
-            throw new ServletException("OAI 2.0 wasn't correctly initialized, please check the log for previous errors", e);
+            throw new ServletException("OAI 2.0 wasn't correctly initialized, please check the log for previous errors",
+                                       e);
         } catch (OAIException e) {
             log.error(e.getMessage(), e);
             closeContext(context);
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-                    "Unexpected error. For more information visit the log files.");
+                               "Unexpected error. For more information visit the log files.");
         } catch (WritingXmlException e) {
             log.error(e.getMessage(), e);
             closeContext(context);
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-                    "Unexpected error while writing the output. For more information visit the log files.");
+                               "Unexpected error while writing the output. For more information visit the log files.");
         } catch (XMLStreamException e) {
             log.error(e.getMessage(), e);
             closeContext(context);
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-                    "Unexpected error while writing the output. For more information visit the log files.");
+                               "Unexpected error while writing the output. For more information visit the log files.");
         } finally {
             closeContext(context);
         }
@@ -145,20 +159,21 @@ public class DSpaceOAIDataProvider
     }
 
     private void closeContext(Context context) {
-        if (context != null && context.isValid())
+        if (context != null && context.isValid()) {
             context.abort();
+        }
     }
 
-	private Map<String, List<String>> buildParametersMap(
-			HttpServletRequest request) {
-		Map<String, List<String>> map = new HashMap<String, List<String>>();
-		Enumeration names = request.getParameterNames();
-		while (names.hasMoreElements()) {
-			String name = (String) names.nextElement();
-			String[] values = request.getParameterValues(name);
-			map.put(name, asList(values));
-		}
-		return map;
-	}
+    private Map<String, List<String>> buildParametersMap(
+        HttpServletRequest request) {
+        Map<String, List<String>> map = new HashMap<String, List<String>>();
+        Enumeration names = request.getParameterNames();
+        while (names.hasMoreElements()) {
+            String name = (String) names.nextElement();
+            String[] values = request.getParameterValues(name);
+            map.put(name, asList(values));
+        }
+        return map;
+    }
 
 }

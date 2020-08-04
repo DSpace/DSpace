@@ -18,15 +18,13 @@ import java.util.List;
 import java.util.Map;
 
 import au.com.bytecode.opencsv.CSVWriter;
-import org.apache.commons.lang.ArrayUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
 
 /**
- *
  * @author kevinvandevelde at atmire.com
  * Date: 21-jan-2009
  * Time: 13:44:48
- *
  */
 public class Dataset {
 
@@ -43,13 +41,12 @@ public class Dataset {
     /* The attributes for the rows */
     private List<Map<String, String>> rowLabelsAttrs;
     /* The data in a matrix */
-    private String[][]matrix;
+    private String[][] matrix;
     /* The format in which we format our floats */
     private String format = "0";
 
 
-
-    public Dataset(int rows, int cols){
+    public Dataset(int rows, int cols) {
         matrix = new String[rows][cols];
         nbRows = rows;
         nbCols = cols;
@@ -57,11 +54,10 @@ public class Dataset {
         initRowLabels(rows);
     }
 
-    public Dataset(float[][] matrix){
-        this.matrix = (String[][]) ArrayUtils.clone(matrix);
+    public Dataset(String[][] matrix) {
+        this.matrix = ArrayUtils.clone(matrix);
         nbRows = matrix.length;
-        if(0 < matrix.length && 0 < matrix[0].length)
-        {
+        if (0 < matrix.length && 0 < matrix[0].length) {
             nbCols = matrix[0].length;
         }
         initColumnLabels(nbCols);
@@ -72,7 +68,7 @@ public class Dataset {
         rowLabels = new ArrayList<String>(rows);
         rowLabelsAttrs = new ArrayList<Map<String, String>>();
         for (int i = 0; i < rows; i++) {
-            rowLabels.add("Row " + (i+1));
+            rowLabels.add("Row " + (i + 1));
             rowLabelsAttrs.add(new HashMap<String, String>());
         }
     }
@@ -81,16 +77,16 @@ public class Dataset {
         colLabels = new ArrayList<String>(nbCols);
         colLabelsAttrs = new ArrayList<Map<String, String>>();
         for (int i = 0; i < nbCols; i++) {
-            colLabels.add("Column " + (i+1));
+            colLabels.add("Column " + (i + 1));
             colLabelsAttrs.add(new HashMap<String, String>());
         }
     }
 
-    public void setColLabel(int n, String label){
+    public void setColLabel(int n, String label) {
         colLabels.set(n, label);
     }
 
-    public void setRowLabel(int n, String label){
+    public void setRowLabel(int n, String label) {
         rowLabels.set(n, label);
     }
 
@@ -111,17 +107,17 @@ public class Dataset {
         this.rowTitle = rowTitle;
     }
 
-    public void setRowLabelAttr(int pos, String attrName, String attr){
+    public void setRowLabelAttr(int pos, String attrName, String attr) {
         Map<String, String> attrs = rowLabelsAttrs.get(pos);
         attrs.put(attrName, attr);
         rowLabelsAttrs.set(pos, attrs);
     }
 
-    public void setRowLabelAttr(int pos, Map<String, String> attrMap){
+    public void setRowLabelAttr(int pos, Map<String, String> attrMap) {
         rowLabelsAttrs.set(pos, attrMap);
     }
 
-    public void setColLabelAttr(int pos, String attrName, String attr){
+    public void setColLabelAttr(int pos, String attrName, String attr) {
         Map<String, String> attrs = colLabelsAttrs.get(pos);
         attrs.put(attrName, attr);
         colLabelsAttrs.set(pos, attrs);
@@ -164,7 +160,7 @@ public class Dataset {
         this.format = format;
     }
 
-    public String[][] getMatrix(){
+    public String[][] getMatrix() {
         if (matrix.length == 0) {
             return new String[0][0];
         } else {
@@ -187,12 +183,11 @@ public class Dataset {
      *
      * @return false if this dataset only contains zeroes.
      */
-    public boolean containsNonZeroValues(){
+    public boolean containsNonZeroValues() {
         if (matrix != null) {
             for (String[] vector : matrix) {
                 for (String v : vector) {
-                    if (StringUtils.isBlank(v) || v.equals("0"))
-                    {
+                    if (StringUtils.isBlank(v) || v.equals("0")) {
                         return true;
                     }
                 }
@@ -202,10 +197,9 @@ public class Dataset {
     }
 
 
-
-    public void flipRowCols(){
+    public void flipRowCols() {
         //Lets make sure we at least have something to flip
-        if(0 < matrix.length && 0 < matrix[0].length){
+        if (0 < matrix.length && 0 < matrix[0].length) {
             //Flip the data first
             String[][] newMatrix = new String[matrix[0].length][matrix.length];
             for (int i = 0; i < matrix.length; i++) {
@@ -248,7 +242,7 @@ public class Dataset {
         String[][] matrix = getMatrix();
         for (int i = 0; i < rowLabels.size(); i++) {
             String rowLabel = rowLabels.get(i);
-            ecsvp.writeNext((String[]) ArrayUtils.addAll(new String[]{rowLabel}, matrix[i]));
+            ecsvp.writeNext((String[]) ArrayUtils.addAll(new String[] {rowLabel}, matrix[i]));
         }
         ecsvp.flush();
         ecsvp.close();

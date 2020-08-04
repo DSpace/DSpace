@@ -14,16 +14,18 @@ import org.dspace.kernel.mixins.InitializedService;
 
 /**
  * Simple fake service 2
- * 
+ *
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  */
 public class FakeService2 implements InitializedService, Comparable<FakeService2>, Serializable {
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
     public String data = "data";
+
     public String getData() {
         return data;
     }
+
     public void setData(String data) {
         this.data = data;
     }

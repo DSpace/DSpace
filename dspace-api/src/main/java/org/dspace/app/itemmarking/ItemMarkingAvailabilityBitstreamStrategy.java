@@ -23,75 +23,71 @@ import org.springframework.beans.factory.annotation.Autowired;
 /**
  * This is an item marking Strategy class that tries to mark an item availability
  * based on the existence of bitstreams within the ORIGINAL bundle.
- * 
+ *
  * @author Kostas Stamatis
- * 
  */
 public class ItemMarkingAvailabilityBitstreamStrategy implements ItemMarkingExtractor {
 
-	private String availableImageName;
-	private String nonAvailableImageName;
+    private String availableImageName;
+    private String nonAvailableImageName;
 
     @Autowired(required = true)
     protected ItemService itemService;
-	
-	public ItemMarkingAvailabilityBitstreamStrategy() {
-	
-	}
 
-	@Override
-	public ItemMarkingInfo getItemMarkingInfo(Context context, Item item)
-			throws SQLException {
-		
-		List<Bundle> bundles = itemService.getBundles(item, "ORIGINAL");
-		if (bundles.size() == 0){
-			ItemMarkingInfo markInfo = new ItemMarkingInfo();
-			markInfo.setImageName(nonAvailableImageName);	
-			
-			return markInfo;
-		}
-		else {
-			Bundle originalBundle = bundles.iterator().next();
-			if (originalBundle.getBitstreams().size() == 0){
-				ItemMarkingInfo markInfo = new ItemMarkingInfo();
-				markInfo.setImageName(nonAvailableImageName);
-				
-				return markInfo;
-			}
-			else {
+    public ItemMarkingAvailabilityBitstreamStrategy() {
+
+    }
+
+    @Override
+    public ItemMarkingInfo getItemMarkingInfo(Context context, Item item)
+        throws SQLException {
+
+        List<Bundle> bundles = itemService.getBundles(item, "ORIGINAL");
+        if (bundles.size() == 0) {
+            ItemMarkingInfo markInfo = new ItemMarkingInfo();
+            markInfo.setImageName(nonAvailableImageName);
+
+            return markInfo;
+        } else {
+            Bundle originalBundle = bundles.iterator().next();
+            if (originalBundle.getBitstreams().size() == 0) {
+                ItemMarkingInfo markInfo = new ItemMarkingInfo();
+                markInfo.setImageName(nonAvailableImageName);
+
+                return markInfo;
+            } else {
                 Bitstream bitstream = originalBundle.getBitstreams().get(0);
 
                 ItemMarkingInfo signInfo = new ItemMarkingInfo();
                 signInfo.setImageName(availableImageName);
                 signInfo.setTooltip(bitstream.getName());
-				
-				
-				
-				String bsLink = "";
+
+
+                String bsLink = "";
 
                 bsLink = bsLink + "bitstream/"
-                            + item.getHandle() + "/"
-                            + bitstream.getSequenceID() + "/";
-                
+                    + item.getHandle() + "/"
+                    + bitstream.getSequenceID() + "/";
+
                 try {
-					bsLink = bsLink + Util.encodeBitstreamName(bitstream.getName(),  Constants.DEFAULT_ENCODING);
-				} catch (UnsupportedEncodingException e) {
-					
-					e.printStackTrace();
-				}
-                
-				signInfo.setLink(bsLink);
-				
-				return signInfo;
-			}
-		}
-	}
+                    bsLink = bsLink + Util.encodeBitstreamName(bitstream.getName(), Constants.DEFAULT_ENCODING);
+                } catch (UnsupportedEncodingException e) {
 
-	public void setAvailableImageName(String availableImageName) {
-		this.availableImageName = availableImageName;
-	}
+                    e.printStackTrace();
+                }
 
-	public void setNonAvailableImageName(String nonAvailableImageName) {
-		this.nonAvailableImageName = nonAvailableImageName;
-	}	
+                signInfo.setLink(bsLink);
+
+                return signInfo;
+            }
+        }
+    }
+
+    public void setAvailableImageName(String availableImageName) {
+        this.availableImageName = availableImageName;
+    }
+
+    public void setNonAvailableImageName(String nonAvailableImageName) {
+        this.nonAvailableImageName = nonAvailableImageName;
+    }
 }

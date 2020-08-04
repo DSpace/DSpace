@@ -9,20 +9,18 @@ package org.dspace.rest.common;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement(name = "community")
-public class HierarchyCommunity extends HierarchyObject
-{
+public class HierarchyCommunity extends HierarchyObject {
     private List<HierarchyCommunity> communities = new ArrayList<HierarchyCommunity>();
     private List<HierarchyCollection> collections = new ArrayList<HierarchyCollection>();
 
-    public HierarchyCommunity(){
+    public HierarchyCommunity() {
     }
 
-    public HierarchyCommunity(String id, String name, String handle){
+    public HierarchyCommunity(String id, String name, String handle) {
         super(id, name, handle);
     }
 

@@ -17,7 +17,6 @@ import org.dspace.eperson.Group;
 /**
  * Extends the standard usage event to contain workflow information
  *
- *
  * @author Kevin Van de Velde (kevin at atmire dot com)
  * @author Ben Bosman (ben at atmire dot com)
  * @author Mark Diggory (markd at atmire dot com)
@@ -32,7 +31,8 @@ public class UsageWorkflowEvent extends UsageEvent {
     private EPerson actor;
     private InProgressSubmission workflowItem;
 
-    public UsageWorkflowEvent(Context context, Item item, InProgressSubmission workflowItem, String workflowStep, String oldState, Collection scope, EPerson actor) {
+    public UsageWorkflowEvent(Context context, Item item, InProgressSubmission workflowItem, String workflowStep,
+                              String oldState, Collection scope, EPerson actor) {
         super(Action.WORKFLOW, null, context, item);
         this.workflowItem = workflowItem;
         this.workflowStep = workflowStep;

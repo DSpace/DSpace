@@ -8,15 +8,15 @@
 
 package org.dspace.importer.external.pubmed.metadatamapping.transform;
 
+import java.util.List;
+
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
-import org.dspace.importer.external.exception.MetadataSourceException;
 import org.dspace.importer.external.datamodel.Query;
+import org.dspace.importer.external.exception.MetadataSourceException;
 import org.dspace.importer.external.metadatamapping.transform.GenerateQueryService;
-
-import java.util.List;
 
 /**
  * This class is an implementation of {@link GenerateQueryService}
@@ -33,6 +33,7 @@ public class GeneratePubmedQueryService implements GenerateQueryService {
      * If the item has at least 1 value for dc.identifier.doi, the first one will be used.
      * If no DOI is found, the title will be used.
      * When no DOI or title is found, an null object is returned instead.
+     *
      * @param item the Item to create a Query from
      */
     @Override
@@ -43,17 +44,17 @@ public class GeneratePubmedQueryService implements GenerateQueryService {
         ItemService itemService = ContentServiceFactory.getInstance().getItemService();
         List<MetadataValue> doi = itemService.getMetadata(item, "dc", "identifier", "doi", Item.ANY);
 
-        if(doi.size()>0){
+        if (doi.size() > 0) {
             query.addParameter("term", doi.get(0).getValue());
-            query.addParameter("field","ELocationID");
+            query.addParameter("field", "ELocationID");
             return query;
         }
 
         List<MetadataValue> title = itemService.getMetadata(item, "dc", "title", null, Item.ANY);
 
-        if(title.size()>0) {
+        if (title.size() > 0) {
             query.addParameter("term", title.get(0).getValue());
-            query.addParameter("field","title");
+            query.addParameter("field", "title");
             return query;
         }
         return null;

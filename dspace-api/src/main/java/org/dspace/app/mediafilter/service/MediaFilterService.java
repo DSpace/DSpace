@@ -7,15 +7,15 @@
  */
 package org.dspace.app.mediafilter.service;
 
+import java.util.List;
+import java.util.Map;
+
 import org.dspace.app.mediafilter.FormatFilter;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
-
-import java.util.List;
-import java.util.Map;
 
 /**
  * MediaFilterManager is the class that invokes the media/format filters over the
@@ -36,10 +36,10 @@ public interface MediaFilterService {
     public void applyFiltersAllItems(Context context) throws Exception;
 
     public void applyFiltersCommunity(Context context, Community community)
-            throws Exception;
+        throws Exception;
 
     public void applyFiltersCollection(Context context, Collection collection)
-            throws Exception;
+        throws Exception;
 
     public void applyFiltersItem(Context c, Item item) throws Exception;
 
@@ -49,9 +49,9 @@ public interface MediaFilterService {
      * filters if possible.
      *
      * @param context context
-     * @param myItem item
+     * @param myItem  item
      * @return true if any bitstreams processed,
-     *         false if none
+     * false if none
      * @throws Exception if error
      */
     public boolean filterItem(Context context, Item myItem) throws Exception;
@@ -63,11 +63,11 @@ public interface MediaFilterService {
      * instantiated.  Exceptions from filtering will be logged to STDOUT and
      * swallowed.
      *
-     * @param c context
-     * @param myItem item
+     * @param c           context
+     * @param myItem      item
      * @param myBitstream bitstream
      * @return true if bitstream processed,
-     *         false if no applicable filter or already processed
+     * false if no applicable filter or already processed
      * @throws Exception if error
      */
     public boolean filterBitstream(Context c, Item myItem, Bitstream myBitstream) throws Exception;
@@ -79,20 +79,16 @@ public interface MediaFilterService {
      * already been filtered, and if not or if overWrite is set, invokes the
      * filter.
      *
-     * @param context
-     *            context
-     * @param item
-     *            item containing bitstream to process
-     * @param source
-     *            source bitstream to process
-     * @param formatFilter
-     *            FormatFilter to perform filtering
-     * @throws Exception if error occurs
+     * @param context      context
+     * @param item         item containing bitstream to process
+     * @param source       source bitstream to process
+     * @param formatFilter FormatFilter to perform filtering
      * @return true if new rendition is created, false if rendition already
-     *         exists and overWrite is not set
+     * exists and overWrite is not set
+     * @throws Exception if error occurs
      */
     public boolean processBitstream(Context context, Item item, Bitstream source, FormatFilter formatFilter)
-            throws Exception;
+        throws Exception;
 
     /**
      * Return the item that is currently being processed/filtered
@@ -109,11 +105,9 @@ public interface MediaFilterService {
     /**
      * Check whether or not to skip processing the given identifier.
      *
-     * @param identifier
-     *            identifier (handle) of a community, collection or item
-     *
+     * @param identifier identifier (handle) of a community, collection or item
      * @return true if this community, collection or item should be skipped
-     *          during processing.  Otherwise, return false.
+     * during processing.  Otherwise, return false.
      */
     public boolean inSkipList(String identifier);
 

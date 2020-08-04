@@ -7,13 +7,22 @@
  */
 package org.dspace.xmlworkflow.storedcomponents;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
+import javax.persistence.SequenceGenerator;
+import javax.persistence.Table;
+
 import org.dspace.core.Context;
 import org.dspace.core.ReloadableEntity;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
-
-import javax.persistence.*;
-import java.sql.SQLException;
 
 /**
  * Pool task representing the database representation of a pool task for a step and an eperson
@@ -24,36 +33,36 @@ import java.sql.SQLException;
  * @author Mark Diggory (markd at atmire dot com)
  */
 @Entity
-@Table(name="cwf_pooltask")
+@Table(name = "cwf_pooltask")
 public class PoolTask implements ReloadableEntity<Integer> {
 
     @Id
-    @Column(name="pooltask_id")
-    @GeneratedValue(strategy = GenerationType.SEQUENCE ,generator="cwf_pooltask_seq")
-    @SequenceGenerator(name="cwf_pooltask_seq", sequenceName="cwf_pooltask_seq", allocationSize = 1)
+    @Column(name = "pooltask_id")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "cwf_pooltask_seq")
+    @SequenceGenerator(name = "cwf_pooltask_seq", sequenceName = "cwf_pooltask_seq", allocationSize = 1)
     private Integer id;
 
     @OneToOne
     @JoinColumn(name = "workflowitem_id")
     private XmlWorkflowItem workflowItem;
 
-//    @Column(name = "workflow_id")
+    //    @Column(name = "workflow_id")
 //    @Lob
-    @Column(name="workflow_id", columnDefinition = "text")
+    @Column(name = "workflow_id", columnDefinition = "text")
     private String workflowId;
 
-//    @Column(name = "step_id")
+    //    @Column(name = "step_id")
 //    @Lob
-    @Column(name="step_id", columnDefinition = "text")
+    @Column(name = "step_id", columnDefinition = "text")
     private String stepId;
 
-//    @Column(name = "action_id")
+    //    @Column(name = "action_id")
 //    @Lob
-    @Column(name="action_id", columnDefinition = "text")
+    @Column(name = "action_id", columnDefinition = "text")
     private String actionId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="eperson_id")
+    @JoinColumn(name = "eperson_id")
     private EPerson ePerson;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -64,10 +73,8 @@ public class PoolTask implements ReloadableEntity<Integer> {
     /**
      * Protected constructor, create object using:
      * {@link org.dspace.xmlworkflow.storedcomponents.service.PoolTaskService#create(Context)}
-     *
      */
-    protected PoolTask()
-    {
+    protected PoolTask() {
 
     }
 
@@ -75,51 +82,51 @@ public class PoolTask implements ReloadableEntity<Integer> {
         return id;
     }
 
-    public void setEperson(EPerson eperson){
+    public void setEperson(EPerson eperson) {
         this.ePerson = eperson;
     }
 
-    public EPerson getEperson(){
+    public EPerson getEperson() {
         return ePerson;
     }
 
-    public void setGroup(Group group){
+    public void setGroup(Group group) {
         this.group = group;
     }
 
-    public Group getGroup(){
+    public Group getGroup() {
         return this.group;
     }
 
-    public void setWorkflowID(String id){
+    public void setWorkflowID(String id) {
         this.workflowId = id;
     }
 
-    public String getWorkflowID(){
+    public String getWorkflowID() {
         return workflowId;
     }
 
-    public void setWorkflowItem(XmlWorkflowItem xmlWorkflowItem){
+    public void setWorkflowItem(XmlWorkflowItem xmlWorkflowItem) {
         this.workflowItem = xmlWorkflowItem;
     }
 
-    public XmlWorkflowItem getWorkflowItem(){
+    public XmlWorkflowItem getWorkflowItem() {
         return this.workflowItem;
     }
 
-    public void setStepID(String stepID){
+    public void setStepID(String stepID) {
         this.stepId = stepID;
     }
 
-    public String getStepID() throws SQLException {
+    public String getStepID() {
         return stepId;
     }
 
-    public void setActionID(String actionID){
+    public void setActionID(String actionID) {
         this.actionId = actionID;
     }
 
-    public String getActionID(){
+    public String getActionID() {
         return this.actionId;
     }
 }

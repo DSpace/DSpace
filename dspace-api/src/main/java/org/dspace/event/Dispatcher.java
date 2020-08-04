@@ -18,14 +18,15 @@ import org.dspace.core.Context;
  * deliver a set of events to a configured list of consumers. It may also
  * transform, consolidate, and otherwise optimize the event stream prior to
  * delivering events to its consumers.
- * 
+ *
  * @version $Revision$
  */
-public abstract class Dispatcher
-{
+public abstract class Dispatcher {
     protected String name;
 
-    /** unique identifier of this dispatcher - cached hash of its text Name */
+    /**
+     * unique identifier of this dispatcher - cached hash of its text Name
+     */
     protected int identifier;
 
     /**
@@ -33,41 +34,36 @@ public abstract class Dispatcher
      */
     protected Map<String, ConsumerProfile> consumers = new LinkedHashMap<String, ConsumerProfile>();
 
-    protected Dispatcher(String name)
-    {
+    protected Dispatcher(String name) {
         super();
         this.name = name;
         this.identifier = name.hashCode();
     }
 
-    public Collection getConsumers()
-    {
+    public Collection getConsumers() {
         return consumers.values();
     }
 
     /**
      * @return unique integer that identifies this Dispatcher configuration.
      */
-    public int getIdentifier()
-    {
+    public int getIdentifier() {
         return identifier;
     }
 
     /**
      * Add a consumer profile to the end of the list.
-     * 
-     * @param cp
-     *            the event consumer profile to add
+     *
+     * @param cp the event consumer profile to add
      */
     public abstract void addConsumerProfile(ConsumerProfile cp)
-            throws IllegalArgumentException;
+        throws IllegalArgumentException;
 
     /**
      * Dispatch all events added to this Context according to configured
      * consumers.
-     * 
-     * @param ctx
-     *            the execution context object
+     *
+     * @param ctx the execution context object
      */
     public abstract void dispatch(Context ctx);
 

@@ -12,13 +12,12 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
-
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.apache.xpath.XPathAPI;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.BitstreamFormat;
@@ -40,32 +39,37 @@ import org.xml.sax.SAXException;
  * <code>RegistryLoader -bitstream bitstream-formats.xml</code>
  * <P>
  * <code>RegistryLoader -dc dc-types.xml</code>
- * 
+ *
  * @author Robert Tansley
  * @version $Revision$
  */
-public class RegistryLoader
-{
-    /** log4j category */
-    private static Logger log = Logger.getLogger(RegistryLoader.class);
+public class RegistryLoader {
+    /**
+     * log4j category
+     */
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(RegistryLoader.class);
 
-    protected static BitstreamFormatService bitstreamFormatService = ContentServiceFactory.getInstance().getBitstreamFormatService();
+    protected static BitstreamFormatService bitstreamFormatService = ContentServiceFactory.getInstance()
+                                                                                          .getBitstreamFormatService();
+
+    /**
+     * Default constructor
+     */
+    private RegistryLoader() { }
 
     /**
      * For invoking via the command line
-     * 
+     *
      * @param argv the command line arguments given
      * @throws Exception if error
      */
-    public static void main(String[] argv) throws Exception
-    {
+    public static void main(String[] argv) throws Exception {
         String usage = "Usage: " + RegistryLoader.class.getName()
-                + " (-bitstream | -metadata) registry-file.xml";
+            + " (-bitstream | -metadata) registry-file.xml";
 
         Context context = null;
 
-        try
-        {
+        try {
             context = new Context();
 
             // Can't update registries anonymously, so we need to turn off
@@ -73,17 +77,12 @@ public class RegistryLoader
             context.turnOffAuthorisationSystem();
 
             // Work out what we're loading
-            if (argv[0].equalsIgnoreCase("-bitstream"))
-            {
+            if (argv[0].equalsIgnoreCase("-bitstream")) {
                 RegistryLoader.loadBitstreamFormats(context, argv[1]);
-            }
-            else if (argv[0].equalsIgnoreCase("-metadata"))
-            {
+            } else if (argv[0].equalsIgnoreCase("-metadata")) {
                 // Call MetadataImporter, as it handles Metadata schema updates
                 MetadataImporter.loadRegistry(argv[1], true);
-            }
-            else
-            {
+            } else {
                 System.err.println(usage);
             }
 
@@ -91,81 +90,69 @@ public class RegistryLoader
             context.complete();
 
             System.exit(0);
-        }
-        catch (ArrayIndexOutOfBoundsException ae)
-        {
+        } catch (ArrayIndexOutOfBoundsException ae) {
             System.err.println(usage);
 
             System.exit(1);
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             log.fatal(LogManager.getHeader(context, "error_loading_registries",
-                    ""), e);
+                                           ""), e);
 
             System.err.println("Error: \n - " + e.getMessage());
             System.exit(1);
-        }
-        finally
-        {
+        } finally {
             // Clean up our context, if it still exists & it was never completed
-            if(context!=null && context.isValid())
+            if (context != null && context.isValid()) {
                 context.abort();
+            }
         }
     }
 
     /**
      * Load Bitstream Format metadata
-     * 
-     * @param context
-     *            DSpace context object
-     * @param filename
-     *            the filename of the XML file to load
-     * @throws SQLException if database error
-     * @throws IOException if IO error
-     * @throws TransformerException if transformer error
+     *
+     * @param context  DSpace context object
+     * @param filename the filename of the XML file to load
+     * @throws SQLException                 if database error
+     * @throws IOException                  if IO error
+     * @throws TransformerException         if transformer error
      * @throws ParserConfigurationException if config error
-     * @throws AuthorizeException if authorization error
-     * @throws SAXException if parser error
+     * @throws AuthorizeException           if authorization error
+     * @throws SAXException                 if parser error
      */
     public static void loadBitstreamFormats(Context context, String filename)
-            throws SQLException, IOException, ParserConfigurationException,
-            SAXException, TransformerException, AuthorizeException
-    {
+        throws SQLException, IOException, ParserConfigurationException,
+        SAXException, TransformerException, AuthorizeException {
         Document document = loadXML(filename);
 
         // Get the nodes corresponding to formats
         NodeList typeNodes = XPathAPI.selectNodeList(document,
-                "dspace-bitstream-types/bitstream-type");
+                                                     "dspace-bitstream-types/bitstream-type");
 
         // Add each one as a new format to the registry
-        for (int i = 0; i < typeNodes.getLength(); i++)
-        {
+        for (int i = 0; i < typeNodes.getLength(); i++) {
             Node n = typeNodes.item(i);
             loadFormat(context, n);
         }
 
         log.info(LogManager.getHeader(context, "load_bitstream_formats",
-                "number_loaded=" + typeNodes.getLength()));
+                                      "number_loaded=" + typeNodes.getLength()));
     }
 
     /**
      * Process a node in the bitstream format registry XML file. The node must
      * be a "bitstream-type" node
-     * 
-     * @param context
-     *            DSpace context object
-     * @param node
-     *            the node in the DOM tree
-     * @throws SQLException if database error
-     * @throws IOException if IO error
+     *
+     * @param context DSpace context object
+     * @param node    the node in the DOM tree
+     * @throws SQLException         if database error
+     * @throws IOException          if IO error
      * @throws TransformerException if transformer error
-     * @throws AuthorizeException if authorization error
+     * @throws AuthorizeException   if authorization error
      */
     private static void loadFormat(Context context, Node node)
-            throws SQLException, IOException, TransformerException,
-            AuthorizeException
-    {
+        throws SQLException, IOException, TransformerException,
+        AuthorizeException {
         // Get the values
         String mimeType = getElementData(node, "mimetype");
         String shortDesc = getElementData(node, "short_description");
@@ -181,16 +168,14 @@ public class RegistryLoader
 
         // Check if this format already exists in our registry (by mime type)
         BitstreamFormat exists = bitstreamFormatService.findByMIMEType(context, mimeType);
-        
+
         // If not found by mimeType, check by short description (since this must also be unique)
-        if(exists==null)
-        {    
+        if (exists == null) {
             exists = bitstreamFormatService.findByShortDescription(context, shortDesc);
         }
-            
+
         // If it doesn't exist, create it..otherwise skip it.
-        if(exists==null)
-        {
+        if (exists == null) {
             // Create the format object
             BitstreamFormat format = bitstreamFormatService.create(context);
 
@@ -213,19 +198,17 @@ public class RegistryLoader
 
     /**
      * Load in the XML from file.
-     * 
-     * @param filename
-     *            the filename to load from
-     * @throws IOException if IO error
-     * @throws ParserConfigurationException if config error
-     * @throws SAXException if parser error
+     *
+     * @param filename the filename to load from
      * @return the DOM representation of the XML file
+     * @throws IOException                  if IO error
+     * @throws ParserConfigurationException if config error
+     * @throws SAXException                 if parser error
      */
     private static Document loadXML(String filename) throws IOException,
-            ParserConfigurationException, SAXException
-    {
+        ParserConfigurationException, SAXException {
         DocumentBuilder builder = DocumentBuilderFactory.newInstance()
-                .newDocumentBuilder();
+                                                        .newDocumentBuilder();
 
         return builder.parse(new File(filename));
     }
@@ -241,22 +224,18 @@ public class RegistryLoader
      * return <code>application/pdf</code>.
      * </P>
      * Why this isn't a core part of the XML API I do not know...
-     * 
-     * @param parentElement
-     *            the element, whose child element you want the CDATA from
-     * @param childName
-     *            the name of the element you want the CDATA from
-     * @throws TransformerException if transformer error
+     *
+     * @param parentElement the element, whose child element you want the CDATA from
+     * @param childName     the name of the element you want the CDATA from
      * @return the CDATA as a <code>String</code>
+     * @throws TransformerException if transformer error
      */
     private static String getElementData(Node parentElement, String childName)
-            throws TransformerException
-    {
+        throws TransformerException {
         // Grab the child node
         Node childNode = XPathAPI.selectSingleNode(parentElement, childName);
 
-        if (childNode == null)
-        {
+        if (childNode == null) {
             // No child node, so no values
             return null;
         }
@@ -264,8 +243,7 @@ public class RegistryLoader
         // Get the #text
         Node dataNode = childNode.getFirstChild();
 
-        if (dataNode == null)
-        {
+        if (dataNode == null) {
             return null;
         }
 
@@ -281,32 +259,28 @@ public class RegistryLoader
      * <P>
      * <code>
      * &lt;foo&gt;
-     *   &lt;bar&gt;val1&lt;/bar&gt;
-     *   &lt;bar&gt;val2&lt;/bar&gt;
+     * &lt;bar&gt;val1&lt;/bar&gt;
+     * &lt;bar&gt;val2&lt;/bar&gt;
      * &lt;/foo&gt;
      * </code>
      * passing this the <code>foo</code> node and <code>bar</code> will
      * return <code>val1</code> and <code>val2</code>.
      * </P>
      * Why this also isn't a core part of the XML API I do not know...
-     * 
-     * @param parentElement
-     *            the element, whose child element you want the CDATA from
-     * @param childName
-     *            the name of the element you want the CDATA from
-     * @throws TransformerException if transformer error
+     *
+     * @param parentElement the element, whose child element you want the CDATA from
+     * @param childName     the name of the element you want the CDATA from
      * @return the CDATA as a <code>String</code>
+     * @throws TransformerException if transformer error
      */
     private static String[] getRepeatedElementData(Node parentElement,
-            String childName) throws TransformerException
-    {
+                                                   String childName) throws TransformerException {
         // Grab the child node
         NodeList childNodes = XPathAPI.selectNodeList(parentElement, childName);
 
         String[] data = new String[childNodes.getLength()];
 
-        for (int i = 0; i < childNodes.getLength(); i++)
-        {
+        for (int i = 0; i < childNodes.getLength(); i++) {
             // Get the #text node
             Node dataNode = childNodes.item(i).getFirstChild();
 

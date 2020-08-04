@@ -12,12 +12,11 @@ import org.dspace.content.DSpaceObject;
 /**
  * Exception indicating the current user of the context does not have permission
  * to perform a particular action.
- * 
+ *
  * @author David Stuve
  * @version $Revision$
  */
-public class AuthorizeException extends Exception
-{
+public class AuthorizeException extends Exception {
     private int myaction; // action attempted, or -1
 
     private DSpaceObject myobject; // object action attempted on or null
@@ -25,8 +24,7 @@ public class AuthorizeException extends Exception
     /**
      * Create an empty authorize exception
      */
-    public AuthorizeException()
-    {
+    public AuthorizeException() {
         super();
 
         myaction = -1;
@@ -35,20 +33,17 @@ public class AuthorizeException extends Exception
 
     /**
      * create an exception with only a message
-     * 
-     * @param message
-     *     Exception message
+     *
+     * @param message Exception message
      */
-    public AuthorizeException(String message)
-    {
+    public AuthorizeException(String message) {
         super(message);
 
         myaction = -1;
         myobject = null;
     }
 
-    public AuthorizeException(Throwable throwable)
-    {
+    public AuthorizeException(Throwable throwable) {
         super(throwable);
 
         myaction = -1;
@@ -57,27 +52,23 @@ public class AuthorizeException extends Exception
 
     /**
      * Create an authorize exception with a message
-     * 
-     * @param message
-     *            the message
-     * @param o object
-     * @param a actionID
+     *
+     * @param message the message
+     * @param o       object
+     * @param a       actionID
      */
-    public AuthorizeException(String message, DSpaceObject o, int a)
-    {
+    public AuthorizeException(String message, DSpaceObject o, int a) {
         super(message);
 
         myobject = o;
         myaction = a;
     }
 
-    public int getAction()
-    {
+    public int getAction() {
         return myaction;
     }
 
-    public DSpaceObject getObject()
-    {
+    public DSpaceObject getObject() {
         return myobject;
     }
 }

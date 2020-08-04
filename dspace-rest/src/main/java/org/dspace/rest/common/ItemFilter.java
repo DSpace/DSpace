@@ -7,32 +7,32 @@
  */
 package org.dspace.rest.common;
 
-import org.apache.log4j.Logger;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.List;
+import javax.ws.rs.WebApplicationException;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+
+import org.apache.logging.log4j.Logger;
 import org.dspace.core.Context;
 import org.dspace.core.factory.CoreServiceFactory;
 import org.dspace.rest.filter.ItemFilterDefs;
 import org.dspace.rest.filter.ItemFilterList;
 import org.dspace.rest.filter.ItemFilterTest;
 
-import javax.ws.rs.WebApplicationException;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.List;
-
 
 /**
  * Use Case Item Filters that match a specific set of criteria.
+ *
  * @author Terry Brady, Georgetown University
  */
 @XmlRootElement(name = "item-filter")
 public class ItemFilter {
-    static Logger log = Logger.getLogger(ItemFilter.class);
+    static Logger log = org.apache.logging.log4j.LogManager.getLogger(ItemFilter.class);
 
     private ItemFilterTest itemFilterTest = null;
     private String filterName = "";
@@ -47,49 +47,40 @@ public class ItemFilter {
     private Integer unfilteredItemCount;
     private boolean saveItems = false;
 
-    public ItemFilter(){}
+    public ItemFilter() {
+    }
 
     public static final String ALL_FILTERS = "all_filters";
     public static final String ALL = "all";
 
-    public static List<ItemFilter> getItemFilters(String filters, boolean saveItems)
-    {
-        LinkedHashMap<String,ItemFilterTest> availableTests = new LinkedHashMap<String,ItemFilterTest>();
-        for (ItemFilterList plugobj:
-             (ItemFilterList[]) CoreServiceFactory.getInstance()
-                .getPluginService().getPluginSequence(ItemFilterList.class))
-        {
-            for (ItemFilterTest defFilter: plugobj.getFilters())
-            {
+    public static List<ItemFilter> getItemFilters(String filters, boolean saveItems) {
+        LinkedHashMap<String, ItemFilterTest> availableTests = new LinkedHashMap<String, ItemFilterTest>();
+        for (ItemFilterList plugobj :
+            (ItemFilterList[]) CoreServiceFactory.getInstance()
+                                                 .getPluginService().getPluginSequence(ItemFilterList.class)) {
+            for (ItemFilterTest defFilter : plugobj.getFilters()) {
                 availableTests.put(defFilter.getName(), defFilter);
             }
         }
         List<ItemFilter> itemFilters = new ArrayList<ItemFilter>();
         ItemFilter allFilters = new ItemFilter(ItemFilter.ALL_FILTERS, "Matches all specified filters",
-            "This filter includes all items that matched ALL specified filters",
-            ItemFilterDefs.CAT_ITEM, saveItems);
+                                               "This filter includes all items that matched ALL specified filters",
+                                               ItemFilterDefs.CAT_ITEM, saveItems);
 
-        if (filters.equals(ALL))
-        {
-            for (ItemFilterTest itemFilterDef: availableTests.values())
-            {
+        if (filters.equals(ALL)) {
+            for (ItemFilterTest itemFilterDef : availableTests.values()) {
                 itemFilters.add(new ItemFilter(itemFilterDef, saveItems));
             }
             itemFilters.add(allFilters);
-        }
-        else
-        {
-            for (String filter: Arrays.asList(filters.split(",")))
-            {
-                if (filter.equals(ItemFilter.ALL_FILTERS))
-                {
+        } else {
+            for (String filter : Arrays.asList(filters.split(","))) {
+                if (filter.equals(ItemFilter.ALL_FILTERS)) {
                     continue;
                 }
 
                 ItemFilterTest itemFilterDef;
                 itemFilterDef = availableTests.get(filter);
-                if (itemFilterDef == null)
-                {
+                if (itemFilterDef == null) {
                     continue;
                 }
                 itemFilters.add(new ItemFilter(itemFilterDef, saveItems));
@@ -99,12 +90,9 @@ public class ItemFilter {
         return itemFilters;
     }
 
-    public static ItemFilter getAllFiltersFilter(List<ItemFilter> itemFilters)
-    {
-        for (ItemFilter itemFilter: itemFilters)
-        {
-            if (itemFilter.getFilterName().equals(ALL_FILTERS))
-            {
+    public static ItemFilter getAllFiltersFilter(List<ItemFilter> itemFilters) {
+        for (ItemFilter itemFilter : itemFilters) {
+            if (itemFilter.getFilterName().equals(ALL_FILTERS)) {
                 itemFilter.initCount();
                 return itemFilter;
             }
@@ -113,16 +101,15 @@ public class ItemFilter {
     }
 
     public ItemFilter(ItemFilterTest itemFilterTest, boolean saveItems)
-        throws WebApplicationException
-    {
+        throws WebApplicationException {
         this.itemFilterTest = itemFilterTest;
         this.saveItems = saveItems;
         setup(itemFilterTest.getName(), itemFilterTest.getTitle(),
-            itemFilterTest.getDescription(), itemFilterTest.getCategory());
+              itemFilterTest.getDescription(), itemFilterTest.getCategory());
     }
 
     public ItemFilter(String name, String title, String description, String category, boolean saveItems)
-        throws WebApplicationException{
+        throws WebApplicationException {
         this.saveItems = saveItems;
         setup(name, title, description, category);
     }
@@ -134,14 +121,11 @@ public class ItemFilter {
         this.setCategory(category);
     }
 
-    private void initCount()
-    {
-        if (itemCount == null)
-        {
+    private void initCount() {
+        if (itemCount == null) {
             itemCount = 0;
         }
-        if (unfilteredItemCount == null)
-        {
+        if (unfilteredItemCount == null) {
             unfilteredItemCount = 0;
         }
     }
@@ -150,32 +134,27 @@ public class ItemFilter {
         return itemFilterTest != null;
     }
 
-    public void addItem(org.dspace.rest.common.Item restItem)
-    {
+    public void addItem(org.dspace.rest.common.Item restItem) {
         initCount();
-        if (saveItems)
-        {
+        if (saveItems) {
             items.add(restItem);
         }
         itemCount++;
     }
 
-    public boolean testItem(Context context, org.dspace.content.Item item, org.dspace.rest.common.Item restItem)
-    {
+    public boolean testItem(Context context, org.dspace.content.Item item, org.dspace.rest.common.Item restItem) {
         initCount();
-        if (itemFilterTest == null)
-        {
+        if (itemFilterTest == null) {
             return false;
         }
-        if (itemFilterTest.testItem(context, item))
-        {
+        if (itemFilterTest.testItem(context, item)) {
             addItem(restItem);
             return true;
         }
         return false;
     }
 
-    @XmlAttribute(name="filter-name")
+    @XmlAttribute(name = "filter-name")
     public String getFilterName() {
         return filterName;
     }
@@ -184,7 +163,7 @@ public class ItemFilter {
         this.filterName = name;
     }
 
-    @XmlAttribute(name="title")
+    @XmlAttribute(name = "title")
     public String getTitle() {
         return title;
     }
@@ -193,7 +172,7 @@ public class ItemFilter {
         this.title = title;
     }
 
-    @XmlAttribute(name="category")
+    @XmlAttribute(name = "category")
     public String getCategory() {
         return category;
     }
@@ -202,7 +181,7 @@ public class ItemFilter {
         this.category = category;
     }
 
-    @XmlAttribute(name="description")
+    @XmlAttribute(name = "description")
     public String getDescription() {
         return description;
     }
@@ -211,21 +190,18 @@ public class ItemFilter {
         this.description = description;
     }
 
-    @XmlAttribute(name="query-annotation")
+    @XmlAttribute(name = "query-annotation")
     public String getQueryAnnotation() {
         return queryAnnotation;
     }
 
     public void annotateQuery(List<String> query_field, List<String> query_op, List<String> query_val)
-        throws SQLException
-    {
+        throws SQLException {
         int index = Math.min(query_field.size(), Math.min(query_op.size(), query_val.size()));
         StringBuilder sb = new StringBuilder();
 
-        for (int i=0; i<index; i++)
-        {
-            if (!sb.toString().isEmpty())
-            {
+        for (int i = 0; i < index; i++) {
+            if (!sb.toString().isEmpty()) {
                 sb.append(" and ");
             }
             sb.append("(");
@@ -243,7 +219,7 @@ public class ItemFilter {
         this.queryAnnotation = queryAnnotation;
     }
 
-    @XmlAttribute(name="item-count")
+    @XmlAttribute(name = "item-count")
     public Integer getItemCount() {
         return itemCount;
     }
@@ -252,7 +228,7 @@ public class ItemFilter {
         this.itemCount = itemCount;
     }
 
-    @XmlAttribute(name="unfiltered-item-count")
+    @XmlAttribute(name = "unfiltered-item-count")
     public Integer getUnfilteredItemCount() {
         return unfilteredItemCount;
     }
@@ -277,13 +253,10 @@ public class ItemFilter {
         this.itemFilterQueries = itemFilterQueries;
     }
 
-    public void initMetadataList(List<String> show_fields)
-    {
-        if (show_fields != null)
-        {
+    public void initMetadataList(List<String> show_fields) {
+        if (show_fields != null) {
             List<MetadataEntry> returnFields = new ArrayList<MetadataEntry>();
-            for (String field: show_fields)
-            {
+            for (String field : show_fields) {
                 returnFields.add(new MetadataEntry(field, null, null));
             }
             setMetadata(returnFields);

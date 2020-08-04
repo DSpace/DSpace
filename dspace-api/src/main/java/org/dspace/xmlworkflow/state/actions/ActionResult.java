@@ -25,7 +25,7 @@ package org.dspace.xmlworkflow.state.actions;
  */
 public class ActionResult {
 
-    public static enum TYPE{
+    public static enum TYPE {
         TYPE_OUTCOME,
         TYPE_PAGE,
         TYPE_ERROR,
@@ -35,9 +35,14 @@ public class ActionResult {
 
     public static final int OUTCOME_COMPLETE = 0;
 
-    /** The type is used to send the user to the submission page, to another page in the step, to move to another step, ... */
+    /**
+     * The type is used to send the user to the submission page, to another page in the step, to move to another
+     * step, ...
+     */
     private TYPE type;
-    /** The result int will determine what our next step is */
+    /**
+     * The result int will determine what our next step is
+     */
     private int result;
 
     public ActionResult(TYPE type, int result) {

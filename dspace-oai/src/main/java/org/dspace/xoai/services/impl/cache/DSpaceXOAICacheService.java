@@ -7,6 +7,20 @@
  */
 package org.dspace.xoai.services.impl.cache;
 
+import static com.lyncode.xoai.dataprovider.core.Granularity.Second;
+import static org.apache.commons.io.FileUtils.deleteDirectory;
+import static org.apache.commons.io.IOUtils.copy;
+import static org.apache.commons.io.IOUtils.write;
+
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.Date;
+import javax.xml.stream.XMLStreamException;
+
 import com.lyncode.xoai.dataprovider.core.XOAIManager;
 import com.lyncode.xoai.dataprovider.exceptions.WritingXmlException;
 import com.lyncode.xoai.dataprovider.xml.XmlOutputContext;
@@ -18,15 +32,6 @@ import org.dspace.xoai.services.api.cache.XOAICacheService;
 import org.dspace.xoai.services.api.config.ConfigurationService;
 import org.dspace.xoai.util.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import javax.xml.stream.XMLStreamException;
-import java.io.*;
-import java.util.Date;
-
-import static com.lyncode.xoai.dataprovider.core.Granularity.Second;
-import static org.apache.commons.io.FileUtils.deleteDirectory;
-import static org.apache.commons.io.IOUtils.copy;
-import static org.apache.commons.io.IOUtils.write;
 
 
 public class DSpaceXOAICacheService implements XOAICacheService {
@@ -43,12 +48,15 @@ public class DSpaceXOAICacheService implements XOAICacheService {
     }
 
     private static String getStaticHead(XOAIManager manager, Date date) {
-        if (staticHead == null)
+        if (staticHead == null) {
             staticHead = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
-                    + ((manager.hasStyleSheet()) ? ("<?xml-stylesheet type=\"text/xsl\" href=\""
-                    + manager.getStyleSheet() + "\"?>") : "")
-                    + "<OAI-PMH xmlns=\"http://www.openarchives.org/OAI/2.0/\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" "
-                    + "xsi:schemaLocation=\"http://www.openarchives.org/OAI/2.0/ http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd\">";
+                + ((manager.hasStyleSheet()) ? ("<?xml-stylesheet type=\"text/xsl\" href=\""
+                + manager.getStyleSheet() + "\"?>") : "")
+                + "<OAI-PMH xmlns=\"http://www.openarchives.org/OAI/2.0/\" xmlns:xsi=\"http://www" +
+                ".w3.org/2001/XMLSchema-instance\" "
+                + "xsi:schemaLocation=\"http://www.openarchives.org/OAI/2.0/ http://www.openarchives" +
+                ".org/OAI/2.0/OAI-PMH.xsd\">";
+        }
 
         return staticHead + "<responseDate>" + DateUtils.format(date) + "</responseDate>";
     }
@@ -64,8 +72,9 @@ public class DSpaceXOAICacheService implements XOAICacheService {
 
     private File getCacheFile(String id) {
         File dir = new File(getBaseDir());
-        if (!dir.exists())
+        if (!dir.exists()) {
             dir.mkdirs();
+        }
 
         String name = File.separator + Base64Utils.encode(id);
         return new File(getBaseDir() + name);
@@ -103,8 +112,9 @@ public class DSpaceXOAICacheService implements XOAICacheService {
             // Cutting the header (to allow one to change the response time)
             String end = "</responseDate>";
             int pos = xoaiResponse.indexOf(end);
-            if (pos > 0)
+            if (pos > 0) {
                 xoaiResponse = xoaiResponse.substring(pos + (end.length()));
+            }
 
             FileUtils.write(this.getCacheFile(requestID), xoaiResponse);
         } catch (XMLStreamException e) {

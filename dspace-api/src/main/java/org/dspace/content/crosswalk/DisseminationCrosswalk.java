@@ -29,9 +29,10 @@ import org.jdom.Namespace;
  * @author Larry Stone
  * @version $Revision$
  */
-public interface DisseminationCrosswalk
-{
-    /** XSI namespace, required for xsi:schemalocation attributes */
+public interface DisseminationCrosswalk {
+    /**
+     * XSI namespace, required for xsi:schemalocation attributes
+     */
     static final Namespace XSI_NS =
         Namespace.getNamespace("xsi", "http://www.w3.org/2001/XMLSchema-instance");
 
@@ -47,12 +48,13 @@ public interface DisseminationCrosswalk
      * Get the XML Schema location(s) of the target metadata format.
      * Returns the string value of the <code>xsi:schemaLocation</code>
      * attribute that should be applied to the generated XML.
-     *  <p>
+     * <p>
      * It may return the empty string if no schema is known, but crosswalk
      * authors are strongly encouraged to implement this call so their output
      * XML can be validated correctly.
+     *
      * @return SchemaLocation string, including URI namespace, followed by
-     *  whitespace and URI of XML schema document, or empty string if unknown.
+     * whitespace and URI of XML schema document, or empty string if unknown.
      */
     public String getSchemaLocation();
 
@@ -60,7 +62,7 @@ public interface DisseminationCrosswalk
      * Predicate: Can this disseminator crosswalk the given object.
      * Needed by OAI-PMH server implementation.
      *
-     * @param dso  dspace object, e.g. an <code>Item</code>.
+     * @param dso dspace object, e.g. an <code>Item</code>.
      * @return true when disseminator is capable of producing metadata.
      */
     public boolean canDisseminate(DSpaceObject dso);
@@ -92,18 +94,18 @@ public interface DisseminationCrosswalk
      * empty list is returned, but never <code>null</code>.
      *
      * @param context context
-     * @param dso the  DSpace Object whose metadata to export.
+     * @param dso     the  DSpace Object whose metadata to export.
      * @return results of crosswalk as list of XML elements.
-     *
-     * @throws CrosswalkInternalException (<code>CrosswalkException</code>) failure of the crosswalk itself.
-     * @throws CrosswalkObjectNotSupported (<code>CrosswalkException</code>) Cannot crosswalk this kind of DSpace object.
-     * @throws IOException  I/O failure in services this calls
-     * @throws SQLException  Database failure in services this calls
-     * @throws AuthorizeException current user not authorized for this operation.
+     * @throws CrosswalkInternalException  (<code>CrosswalkException</code>) failure of the crosswalk itself.
+     * @throws CrosswalkObjectNotSupported (<code>CrosswalkException</code>) Cannot crosswalk this kind of DSpace
+     *                                     object.
+     * @throws IOException                 I/O failure in services this calls
+     * @throws SQLException                Database failure in services this calls
+     * @throws AuthorizeException          current user not authorized for this operation.
      */
     public List<Element> disseminateList(Context context, DSpaceObject dso)
         throws CrosswalkException, IOException, SQLException,
-               AuthorizeException;
+        AuthorizeException;
 
     /**
      * Execute crosswalk, returning one XML root element as
@@ -112,16 +114,16 @@ public interface DisseminationCrosswalk
      * <p>
      *
      * @param context context
-     * @param dso the  DSpace Object whose metadata to export.
+     * @param dso     the  DSpace Object whose metadata to export.
      * @return root Element of the target metadata, never <code>null</code>
-     *
-     * @throws CrosswalkInternalException (<code>CrosswalkException</code>) failure of the crosswalk itself.
-     * @throws CrosswalkObjectNotSupported (<code>CrosswalkException</code>) Cannot crosswalk this kind of DSpace object.
-     * @throws IOException  I/O failure in services this calls
-     * @throws SQLException  Database failure in services this calls
-     * @throws AuthorizeException current user not authorized for this operation.
+     * @throws CrosswalkInternalException  (<code>CrosswalkException</code>) failure of the crosswalk itself.
+     * @throws CrosswalkObjectNotSupported (<code>CrosswalkException</code>) Cannot crosswalk this kind of DSpace
+     *                                     object.
+     * @throws IOException                 I/O failure in services this calls
+     * @throws SQLException                Database failure in services this calls
+     * @throws AuthorizeException          current user not authorized for this operation.
      */
     public Element disseminateElement(Context context, DSpaceObject dso)
         throws CrosswalkException, IOException, SQLException,
-               AuthorizeException;
+        AuthorizeException;
 }

@@ -7,76 +7,69 @@
  */
 package org.dspace.submit.lookup;
 
-import gr.ekt.bte.core.Record;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.apache.http.HttpException;
 
+import gr.ekt.bte.core.Record;
+import org.apache.http.HttpException;
 import org.dspace.core.Context;
 
 /**
  * Load metadata from CiNii RDF API
+ *
  * @author Keiji Suzuki
  */
-public class CiNiiOnlineDataLoader extends NetworkSubmissionLookupDataLoader
-{
+public class CiNiiOnlineDataLoader extends NetworkSubmissionLookupDataLoader {
     protected CiNiiService ciniiService = new CiNiiService();
 
     protected boolean searchProvider = true;
 
-    /** Application id to use CiNii */
+    /**
+     * Application id to use CiNii
+     */
     protected String appId = null;
 
-    /** max result number to return */
+    /**
+     * max result number to return
+     */
     protected int maxResults = 10;
 
-    public void setCiNiiService(CiNiiService ciniiService)
-    {
+    public void setCiNiiService(CiNiiService ciniiService) {
         this.ciniiService = ciniiService;
     }
 
     @Override
-    public List<String> getSupportedIdentifiers()
-    {
-        return Arrays.asList(new String[] { CINII });
+    public List<String> getSupportedIdentifiers() {
+        return Arrays.asList(new String[] {CINII});
     }
 
-    public void setSearchProvider(boolean searchProvider)
-    {
+    public void setSearchProvider(boolean searchProvider) {
         this.searchProvider = searchProvider;
     }
 
     @Override
-    public boolean isSearchProvider()
-    {
+    public boolean isSearchProvider() {
         return searchProvider;
     }
 
     @Override
     public List<Record> getByIdentifier(Context context,
-            Map<String, Set<String>> keys) throws HttpException, IOException
-    {
-        if (appId == null)
-        {
+                                        Map<String, Set<String>> keys) throws HttpException, IOException {
+        if (appId == null) {
             throw new RuntimeException("No CiNii Application ID is specified!");
         }
 
         List<Record> results = new ArrayList<Record>();
-        if (keys != null)
-        {
+        if (keys != null) {
             Set<String> ciniiids = keys.get(CINII);
-            if (ciniiids != null && ciniiids.size() > 0)
-            {
-                for (String ciniiid : ciniiids)
-                {
+            if (ciniiids != null && ciniiids.size() > 0) {
+                for (String ciniiid : ciniiids) {
                     Record record = ciniiService.getByCiNiiID(ciniiid, getAppId());
-                    if (record != null)
-                    {
+                    if (record != null) {
                         results.add(convertFields(record));
                     }
                 }
@@ -87,34 +80,28 @@ public class CiNiiOnlineDataLoader extends NetworkSubmissionLookupDataLoader
 
     @Override
     public List<Record> search(Context context, String title, String author, int year)
-        throws HttpException, IOException
-    {
-        if (appId == null)
-        {
+        throws HttpException, IOException {
+        if (appId == null) {
             throw new RuntimeException("No CiNii Application ID is specified!");
         }
 
-        return ciniiService.searchByTerm(title, author, year, 
-            getMaxResults(), getAppId());
+        return ciniiService.searchByTerm(title, author, year,
+                                         getMaxResults(), getAppId());
     }
 
-    public String getAppId()
-    {
+    public String getAppId() {
         return appId;
     }
 
-    public void setAppId(String appId)
-    {
+    public void setAppId(String appId) {
         this.appId = appId;
     }
 
-    public int getMaxResults()
-    {
+    public int getMaxResults() {
         return maxResults;
     }
 
-    public void setMaxResults(int maxResults)
-    {
+    public void setMaxResults(int maxResults) {
         this.maxResults = maxResults;
     }
 }

@@ -18,15 +18,14 @@ import org.dspace.core.Context;
  *
  * @author richardrodgers
  */
-public interface CurationTask
-{
+public interface CurationTask {
     /**
      * Initialize task - parameters inform the task of it's invoking curator.
      * Since the curator can provide services to the task, this represents
      * curation DI.
-     * 
+     *
      * @param curator the Curator controlling this task
-     * @param taskId identifier task should use in invoking services
+     * @param taskId  identifier task should use in invoking services
      * @throws IOException if error
      */
     void init(Curator curator, String taskId) throws IOException;
@@ -42,9 +41,9 @@ public interface CurationTask
 
     /**
      * Perform the curation task for passed id
-     * 
+     *
      * @param ctx DSpace context object
-     * @param id persistent ID for DSpace object
+     * @param id  persistent ID for DSpace object
      * @return status code
      * @throws IOException if error
      */

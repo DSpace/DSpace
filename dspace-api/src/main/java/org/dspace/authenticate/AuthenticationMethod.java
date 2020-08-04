@@ -7,10 +7,10 @@
  */
 package org.dspace.authenticate;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.sql.SQLException;
 import java.util.List;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
@@ -33,10 +33,9 @@ import org.dspace.eperson.Group;
  * and validate the credentials and fail gracefully if they are not
  * appropriate for it.  The next method in the stack is then called.
  *
- * @see org.dspace.authenticate.service.AuthenticationService
- *
  * @author Larry Stone
  * @version $Revision$
+ * @see org.dspace.authenticate.service.AuthenticationService
  */
 public interface AuthenticationMethod {
 
@@ -44,19 +43,29 @@ public interface AuthenticationMethod {
      * Symbolic return values for authenticate() method:
      */
 
-    /** Authenticated OK, EPerson has been set. */
+    /**
+     * Authenticated OK, EPerson has been set.
+     */
     public static final int SUCCESS = 1;
 
-    /** User exists, but credentials (<em>e.g.</em> passwd) don't match. */
+    /**
+     * User exists, but credentials (<em>e.g.</em> passwd) don't match.
+     */
     public static final int BAD_CREDENTIALS = 2;
 
-    /** Not allowed to login this way without X.509 certificate. */
+    /**
+     * Not allowed to login this way without X.509 certificate.
+     */
     public static final int CERT_REQUIRED = 3;
 
-    /** User not found using this method. */
+    /**
+     * User not found using this method.
+     */
     public static final int NO_SUCH_USER = 4;
 
-    /** User or password is not appropriate for this method. */
+    /**
+     * User or password is not appropriate for this method.
+     */
     public static final int BAD_ARGS = 5;
 
 
@@ -67,12 +76,9 @@ public interface AuthenticationMethod {
      * corresponding EPerson in DSpace yet.
      * The EPerson is only created if authentication succeeds.
      *
-     * @param context
-     *            DSpace context
-     * @param request
-     *            HTTP request, in case it's needed. May be null.
-     * @param username
-     *            Username, if available.  May be null.
+     * @param context  DSpace context
+     * @param request  HTTP request, in case it's needed. May be null.
+     * @param username Username, if available.  May be null.
      * @return true if new ePerson should be created.
      * @throws SQLException if database error
      */
@@ -86,13 +92,10 @@ public interface AuthenticationMethod {
      * Set any data in the EPerson that is specific to this authentication
      * method.
      *
-     * @param context
-     *            DSpace context
-     * @param request
-     *            HTTP request, in case it's needed. May be null.
-     * @param eperson
-     *            newly created EPerson record - email + information from the
-     *            registration form will have been filled out.
+     * @param context DSpace context
+     * @param request HTTP request, in case it's needed. May be null.
+     * @param eperson newly created EPerson record - email + information from the
+     *                registration form will have been filled out.
      * @throws SQLException if database error
      */
     public void initEPerson(Context context,
@@ -106,12 +109,9 @@ public interface AuthenticationMethod {
      * <em>any</em> method in the stack returns true, the user is
      * allowed to change it.
      *
-     * @param context
-     *            DSpace context
-     * @param request
-     *            HTTP request, in case it's needed. May be null.
-     * @param username
-     *            Username, if available.  May be null.
+     * @param context  DSpace context
+     * @param request  HTTP request, in case it's needed. May be null.
+     * @param username Username, if available.  May be null.
      * @return true if this method allows user to change ePerson password.
      * @throws SQLException if database error
      */
@@ -142,16 +142,12 @@ public interface AuthenticationMethod {
      * belong with any existing auth method. The stackable authentication system
      * was designed expressly to separate functions into "stacked" methods to
      * keep your site-specific code modular and tidy.
-     * 
-     * @param context
-     *            A valid DSpace context.
-     * 
-     * @param request
-     *            The request that started this operation, or null if not
-     *            applicable.
-     * 
+     *
+     * @param context A valid DSpace context.
+     * @param request The request that started this operation, or null if not
+     *                applicable.
      * @return array of EPerson-group IDs, possibly 0-length, but never
-     *         <code>null</code>.
+     * <code>null</code>.
      * @throws SQLException if database error
      */
     public List<Group> getSpecialGroups(Context context, HttpServletRequest request)
@@ -164,25 +160,15 @@ public interface AuthenticationMethod {
      * (or optionally, create) an <code>EPerson</code>.  If an <code>EPerson</code> is found it is
      * set in the <code>Context</code> that was passed.
      *
-     * @param context
-     *  DSpace context, will be modified (ePerson set) upon success.
-     *
-     * @param username
-     *  Username (or email address) when method is explicit. Use null for
-     *  implicit method.
-     *
-     * @param password
-     *  Password for explicit auth, or null for implicit method.
-     *
-     * @param realm
-     *  Realm is an extra parameter used by some authentication methods, leave null if
-     *  not applicable.
-     *
-     * @param request
-     *  The HTTP request that started this operation, or null if not applicable.
-     *
+     * @param context  DSpace context, will be modified (ePerson set) upon success.
+     * @param username Username (or email address) when method is explicit. Use null for
+     *                 implicit method.
+     * @param password Password for explicit auth, or null for implicit method.
+     * @param realm    Realm is an extra parameter used by some authentication methods, leave null if
+     *                 not applicable.
+     * @param request  The HTTP request that started this operation, or null if not applicable.
      * @return One of:
-     *   SUCCESS, BAD_CREDENTIALS, CERT_REQUIRED, NO_SUCH_USER, BAD_ARGS
+     * SUCCESS, BAD_CREDENTIALS, CERT_REQUIRED, NO_SUCH_USER, BAD_ARGS
      * <p>Meaning:
      * <br>SUCCESS         - authenticated OK.
      * <br>BAD_CREDENTIALS - user exists, but credentials (e.g. passwd) don't match
@@ -200,10 +186,15 @@ public interface AuthenticationMethod {
         throws SQLException;
 
     /**
-     * Get login page to which to redirect.
+     * Get an external login page to which to redirect.
+     *
      * Returns URL (as string) to which to redirect to obtain
      * credentials (either password prompt or e.g. HTTPS port for client
      * cert.); null means no redirect.
+     *
+     * Note: Starting with DSpace 7, session logins will be managed through the REST
+     * API.  Therefore, only authn providers with external login pages (such as Shibboleth)
+     * should return a login page.
      *
      * @param context
      *  DSpace context, will be modified (ePerson set) upon success.
@@ -217,20 +208,12 @@ public interface AuthenticationMethod {
      * @return fully-qualified URL or null
      */
     public String loginPageURL(Context context,
-                            HttpServletRequest request,
-                            HttpServletResponse response);
+                               HttpServletRequest request,
+                               HttpServletResponse response);
 
     /**
-     * Get title of login page to which to redirect.
-     * Returns a <i>message key</i> that gets translated into the title
-     * or label for "login page" (or null, if not implemented) This
-     * title may be used to identify the link to the login page in a
-     * selection menu, when there are multiple ways to login.
-     *
-     * @param context
-     *  DSpace context, will be modified (ePerson set) upon success.
-     *
-     * @return title text.
+     * Returns a short name that uniquely identifies this authentication method
+     * @return The authentication method name
      */
-    public String loginPageTitle(Context context);
+    public String getName();
 }

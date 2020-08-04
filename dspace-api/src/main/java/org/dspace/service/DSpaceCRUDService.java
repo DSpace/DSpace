@@ -7,11 +7,11 @@
  */
 package org.dspace.service;
 
-import org.dspace.authorize.AuthorizeException;
-import org.dspace.core.Context;
-
 import java.sql.SQLException;
 import java.util.List;
+
+import org.dspace.authorize.AuthorizeException;
+import org.dspace.core.Context;
 
 /**
  * Interface containing the simple CRUD methods so we don't have to add them over and again to every service which

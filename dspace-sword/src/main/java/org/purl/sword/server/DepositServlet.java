@@ -19,14 +19,13 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.StringTokenizer;
 import java.util.concurrent.atomic.AtomicInteger;
-
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.codec.binary.Base64;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.purl.sword.atom.Summary;
 import org.purl.sword.atom.Title;
 import org.purl.sword.base.ChecksumUtils;
@@ -36,33 +35,45 @@ import org.purl.sword.base.ErrorCodes;
 import org.purl.sword.base.HttpHeaders;
 import org.purl.sword.base.SWORDAuthenticationException;
 import org.purl.sword.base.SWORDErrorDocument;
-import org.purl.sword.base.SWORDException;
 import org.purl.sword.base.SWORDErrorException;
+import org.purl.sword.base.SWORDException;
 
 /**
  * DepositServlet
- * 
+ *
  * @author Stuart Lewis
  */
 public class DepositServlet extends HttpServlet {
 
-    /** Sword repository */
+    /**
+     * Sword repository
+     */
     protected transient SWORDServer myRepository;
 
-    /** Authentication type */
+    /**
+     * Authentication type
+     */
     private String authN;
-    
-    /** Maximum file upload size in kB **/
+
+    /**
+     * Maximum file upload size in kB
+     **/
     private int maxUploadSize;
 
-    /** Temp directory */
+    /**
+     * Temp directory
+     */
     private String tempDirectory;
 
-    /** Counter */
+    /**
+     * Counter
+     */
     private static final AtomicInteger counter = new AtomicInteger(0);
 
-    /** Logger */
-    private static final Logger log = Logger.getLogger(DepositServlet.class);
+    /**
+     * Logger
+     */
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(DepositServlet.class);
 
     /**
      * Initialise the servlet.
@@ -81,14 +92,14 @@ public class DepositServlet extends HttpServlet {
 
         try {
             myRepository = (SWORDServer) Class.forName(className)
-                    .newInstance();
+                                              .newInstance();
             log.info("Using " + className + " as the SWORDServer");
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
             log.fatal("Unable to instantiate class from 'sword-server-class': "
-                            + className);
+                          + className);
             throw new ServletException(
-                    "Unable to instantiate class from 'sword-server-class': "
-                            + className, e);
+                "Unable to instantiate class from 'sword-server-class': "
+                    + className, e);
         }
 
         authN = getServletContext().getInitParameter("authentication-method");
@@ -98,8 +109,8 @@ public class DepositServlet extends HttpServlet {
         log.info("Authentication type set to: " + authN);
 
         String maxUploadSizeStr = getServletContext().getInitParameter("maxUploadSize");
-        if ((maxUploadSizeStr == null) || 
-            (maxUploadSizeStr.equals("")) || 
+        if ((maxUploadSizeStr == null) ||
+            (maxUploadSizeStr.equals("")) ||
             (maxUploadSizeStr.equals("-1"))) {
             maxUploadSize = -1;
             log.warn("No maxUploadSize set, so setting max file upload size to unlimited.");
@@ -114,65 +125,66 @@ public class DepositServlet extends HttpServlet {
         }
 
         tempDirectory = getServletContext().getInitParameter(
-                "upload-temp-directory");
+            "upload-temp-directory");
         if ((tempDirectory == null) || (tempDirectory.equals(""))) {
             tempDirectory = System.getProperty("java.io.tmpdir");
         }
-        if (!tempDirectory.endsWith(System.getProperty("file.separator")))
-        {
+        if (!tempDirectory.endsWith(System.getProperty("file.separator"))) {
             tempDirectory += System.getProperty("file.separator");
         }
         File tempDir = new File(tempDirectory);
         log.info("Upload temporary directory set to: " + tempDir);
         if (!tempDir.exists() && !tempDir.mkdirs()) {
             throw new ServletException(
-                    "Upload directory did not exist and I can't create it. "
-                            + tempDir);
+                "Upload directory did not exist and I can't create it. "
+                    + tempDir);
         }
         if (!tempDir.isDirectory()) {
             log.fatal("Upload temporary directory is not a directory: "
-                    + tempDir);
+                          + tempDir);
             throw new ServletException(
-                    "Upload temporary directory is not a directory: " + tempDir);
+                "Upload temporary directory is not a directory: " + tempDir);
         }
         if (!tempDir.canWrite()) {
             log.fatal("Upload temporary directory cannot be written to: "
-                    + tempDir);
+                          + tempDir);
             throw new ServletException(
-                    "Upload temporary directory cannot be written to: "
-                            + tempDir);
+                "Upload temporary directory cannot be written to: "
+                    + tempDir);
         }
     }
 
     /**
      * Process the Get request. This will return an unimplemented response.
-     * @param request the request.
+     *
+     * @param request  the request.
      * @param response the response.
      * @throws javax.servlet.ServletException passed through.
-     * @throws java.io.IOException passed through.
+     * @throws java.io.IOException            passed through.
      */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+        throws ServletException, IOException {
         // Send a '501 Not Implemented'
         response.sendError(HttpServletResponse.SC_NOT_IMPLEMENTED);
     }
 
     /**
      * Process a post request.
-     * @param request the request.
+     *
+     * @param request  the request.
      * @param response the response.
      * @throws javax.servlet.ServletException passed through.
-     * @throws java.io.IOException passed through.
+     * @throws java.io.IOException            passed through.
      */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+        throws ServletException, IOException {
         // Create the Deposit request
         Deposit d = new Deposit();
         Date date = new Date();
         log.debug("Starting deposit processing at " + date.toString() + " by "
-                + request.getRemoteAddr());
+                      + request.getRemoteAddr());
 
         // Are there any authentication details?
         String usernamePassword = getUsernamePassword(request);
@@ -188,29 +200,25 @@ public class DepositServlet extends HttpServlet {
             response.setStatus(401);
             return;
         }
-        
+
         // Set up some variables
         String filename = null;
-        
+
         // Do the processing
         try {
             // Write the file to the temp directory
             filename = tempDirectory + "SWORD-"
-                    + request.getRemoteAddr() + "-" + counter.addAndGet(1);
+                + request.getRemoteAddr() + "-" + counter.addAndGet(1);
             log.debug("Package temporarily stored as: " + filename);
             InputStream inputstream = request.getInputStream();
             OutputStream outputstream = new FileOutputStream(new File(filename));
-            try
-            {
+            try {
                 byte[] buf = new byte[1024];
                 int len;
-                while ((len = inputstream.read(buf)) > 0)
-                {
+                while ((len = inputstream.read(buf)) > 0) {
                     outputstream.write(buf, 0, len);
                 }
-            }
-            finally
-            {
+            } finally {
                 inputstream.close();
                 outputstream.close();
             }
@@ -219,16 +227,17 @@ public class DepositServlet extends HttpServlet {
             File file = new File(filename);
             long fLength = file.length() / 1024;
             if ((maxUploadSize != -1) && (fLength > maxUploadSize)) {
-                this.makeErrorDocument(ErrorCodes.MAX_UPLOAD_SIZE_EXCEEDED, 
-                                       HttpServletResponse.SC_REQUEST_ENTITY_TOO_LARGE, 
-                                       "The uploaded file exceeded the maximum file size this server will accept (the file is " + 
-                                       fLength + "kB but the server will only accept files as large as " + 
-                                       maxUploadSize + "kB)",
+                this.makeErrorDocument(ErrorCodes.MAX_UPLOAD_SIZE_EXCEEDED,
+                                       HttpServletResponse.SC_REQUEST_ENTITY_TOO_LARGE,
+                                       "The uploaded file exceeded the maximum file size this server will accept (the" +
+                                           " file is " +
+                                           fLength + "kB but the server will only accept files as large as " +
+                                           maxUploadSize + "kB)",
                                        request,
                                        response);
                 return;
             }
-            
+
             // Check the MD5 hash
             String receivedMD5 = ChecksumUtils.generateMD5(filename);
             log.debug("Received filechecksum: " + receivedMD5);
@@ -237,9 +246,10 @@ public class DepositServlet extends HttpServlet {
             log.debug("Received file checksum header: " + md5);
             if ((md5 != null) && (!md5.equals(receivedMD5))) {
                 // Return an error document
-                this.makeErrorDocument(ErrorCodes.ERROR_CHECKSUM_MISMATCH, 
+                this.makeErrorDocument(ErrorCodes.ERROR_CHECKSUM_MISMATCH,
                                        HttpServletResponse.SC_PRECONDITION_FAILED,
-                                       "The received MD5 checksum for the deposited file did not match the checksum sent by the deposit client",
+                                       "The received MD5 checksum for the deposited file did not match the checksum " +
+                                           "sent by the deposit client",
                                        request,
                                        response);
                 log.debug("Bad MD5 for file. Aborting with appropriate error message");
@@ -252,7 +262,7 @@ public class DepositServlet extends HttpServlet {
                 String onBehalfOf = request.getHeader(HttpHeaders.X_ON_BEHALF_OF);
                 if ((onBehalfOf != null) && (onBehalfOf.equals("reject"))) {
                     // user name is "reject", so throw a not know error to allow the client to be tested
-                    throw new SWORDErrorException(ErrorCodes.TARGET_OWNER_UKNOWN,"unknown user \"reject\"");
+                    throw new SWORDErrorException(ErrorCodes.TARGET_OWNER_UKNOWN, "unknown user \"reject\"");
                 } else {
                     d.setOnBehalfOf(onBehalfOf);
                 }
@@ -270,7 +280,7 @@ public class DepositServlet extends HttpServlet {
                 } else if (noop == null) {
                     d.setNoOp(false);
                 } else {
-                    throw new SWORDErrorException(ErrorCodes.ERROR_BAD_REQUEST,"Bad no-op");
+                    throw new SWORDErrorException(ErrorCodes.ERROR_BAD_REQUEST, "Bad no-op");
                 }
 
                 // Set the X-Verbose header
@@ -282,7 +292,7 @@ public class DepositServlet extends HttpServlet {
                 } else if (verbose == null) {
                     d.setVerbose(false);
                 } else {
-                    throw new SWORDErrorException(ErrorCodes.ERROR_BAD_REQUEST,"Bad verbose");
+                    throw new SWORDErrorException(ErrorCodes.ERROR_BAD_REQUEST, "Bad verbose");
                 }
 
                 // Set the slug
@@ -311,21 +321,20 @@ public class DepositServlet extends HttpServlet {
 
                 // Get the DepositResponse
                 DepositResponse dr = myRepository.doDeposit(d);
-                
+
                 // Echo back the user agent
                 if (request.getHeader(HttpHeaders.USER_AGENT) != null) {
                     dr.getEntry().setUserAgent(request.getHeader(HttpHeaders.USER_AGENT));
                 }
-                
+
                 // Echo back the packaging format
                 if (request.getHeader(HttpHeaders.X_PACKAGING) != null) {
                     dr.getEntry().setPackaging(request.getHeader(HttpHeaders.X_PACKAGING));
                 }
-                
+
                 // Print out the Deposit Response
                 response.setStatus(dr.getHttpResponse());
-                if ((dr.getLocation() != null) && (!dr.getLocation().equals("")))
-                {
+                if ((dr.getLocation() != null) && (!dr.getLocation().equals(""))) {
                     response.setHeader("Location", dr.getLocation());
                 }
                 response.setContentType("application/atom+xml; charset=UTF-8");
@@ -343,7 +352,7 @@ public class DepositServlet extends HttpServlet {
         } catch (SWORDErrorException see) {
             // Get the details and send the right SWORD error document
             log.error(see.toString());
-            this.makeErrorDocument(see.getErrorURI(), 
+            this.makeErrorDocument(see.getErrorURI(),
                                    see.getStatus(),
                                    see.getDescription(),
                                    request,
@@ -355,35 +364,30 @@ public class DepositServlet extends HttpServlet {
         } catch (NoSuchAlgorithmException nsae) {
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             log.error(nsae.toString());
-        }
-        
-        finally {
+        } finally {
             // Try deleting the temp file
             if (filename != null) {
                 File f = new File(filename);
-                if (f != null && !f.delete())
-                {
+                if (f != null && !f.delete()) {
                     log.error("Unable to delete file: " + filename);
                 }
             }
         }
     }
-    
+
     /**
      * Utility method to construct a SWORDErrorDocumentTest
-     * 
+     *
      * @param errorURI The error URI to pass
-     * @param status The HTTP status to return
-     * @param summary The textual description to give the user
-     * @param request The HttpServletRequest object
+     * @param status   The HTTP status to return
+     * @param summary  The textual description to give the user
+     * @param request  The HttpServletRequest object
      * @param response The HttpServletResponse to send the error document to
-     * @throws IOException
-     *     A general class of exceptions produced by failed or interrupted I/O operations.
+     * @throws IOException A general class of exceptions produced by failed or interrupted I/O operations.
      */
-    protected void makeErrorDocument(String errorURI, int status, String summary, 
-        HttpServletRequest request, HttpServletResponse response)
-        throws IOException
-    {
+    protected void makeErrorDocument(String errorURI, int status, String summary,
+                                     HttpServletRequest request, HttpServletResponse response)
+        throws IOException {
         SWORDErrorDocument sed = new SWORDErrorDocument(errorURI);
         Title title = new Title();
         title.setContent("ERROR");
@@ -409,9 +413,8 @@ public class DepositServlet extends HttpServlet {
     /**
      * Utility method to return the username and password (separated by a colon
      * ':')
-     * 
-     * @param request
-     *     Servlet's HTTP request object.
+     *
+     * @param request Servlet's HTTP request object.
      * @return The username and password combination
      */
     protected String getUsernamePassword(HttpServletRequest request) {
@@ -424,7 +427,7 @@ public class DepositServlet extends HttpServlet {
                     if (basic.equalsIgnoreCase("Basic")) {
                         String credentials = st.nextToken();
                         String userPass = new String(Base64
-                                .decodeBase64(credentials.getBytes()));
+                                                         .decodeBase64(credentials.getBytes()));
                         return userPass;
                     }
                 }
@@ -437,7 +440,7 @@ public class DepositServlet extends HttpServlet {
 
     /**
      * Utility method to decide if we are using HTTP Basic authentication
-     * 
+     *
      * @return if HTTP Basic authentication is in use or not
      */
     protected boolean authenticateWithBasic() {
@@ -446,7 +449,7 @@ public class DepositServlet extends HttpServlet {
 
     /**
      * Utility method to construct the URL called for this Servlet
-     * 
+     *
      * @param req The request object
      * @return The URL
      */

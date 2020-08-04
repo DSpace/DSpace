@@ -9,18 +9,15 @@ package org.dspace.administer;
 
 import java.io.File;
 import java.io.IOException;
-
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
 import org.apache.xpath.XPathAPI;
-
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-
 import org.xml.sax.SAXException;
 
 /**
@@ -31,30 +28,32 @@ import org.xml.sax.SAXException;
  * I am the author, really I ripped these methods off from other
  * classes
  */
-public class RegistryImporter
-{
+public class RegistryImporter {
+
+    /**
+     * Default constructor
+     */
+    private RegistryImporter() { }
+
     /**
      * Load in the XML from file.
-     * 
-     * @param filename
-     *            the filename to load from
-     * 
+     *
+     * @param filename the filename to load from
      * @return the DOM representation of the XML file
-     * @throws IOException if IO error
+     * @throws IOException                  if IO error
      * @throws ParserConfigurationException if configuration parse error
-     * @throws SAXException if XML parse error
+     * @throws SAXException                 if XML parse error
      */
-    public static Document loadXML(String filename) 
-    	throws IOException, ParserConfigurationException, SAXException
-    {
+    public static Document loadXML(String filename)
+        throws IOException, ParserConfigurationException, SAXException {
         DocumentBuilder builder = DocumentBuilderFactory.newInstance()
-                .newDocumentBuilder();
+                                                        .newDocumentBuilder();
 
         Document document = builder.parse(new File(filename));
-        
+
         return document;
     }
-    
+
     /**
      * Get the CDATA of a particular element. For example, if the XML document
      * contains:
@@ -66,22 +65,18 @@ public class RegistryImporter
      * return <code>application/pdf</code>.
      * </P>
      * Why this isn't a core part of the XML API I do not know...
-     * 
-     * @param parentElement
-     *            the element, whose child element you want the CDATA from
-     * @param childName
-     *            the name of the element you want the CDATA from
-     * @throws TransformerException if error
+     *
+     * @param parentElement the element, whose child element you want the CDATA from
+     * @param childName     the name of the element you want the CDATA from
      * @return the CDATA as a <code>String</code>
+     * @throws TransformerException if error
      */
     public static String getElementData(Node parentElement, String childName)
-            throws TransformerException
-    {
+        throws TransformerException {
         // Grab the child node
         Node childNode = XPathAPI.selectSingleNode(parentElement, childName);
 
-        if (childNode == null)
-        {
+        if (childNode == null) {
             // No child node, so no values
             return null;
         }
@@ -89,8 +84,7 @@ public class RegistryImporter
         // Get the #text
         Node dataNode = childNode.getFirstChild();
 
-        if (dataNode == null)
-        {
+        if (dataNode == null) {
             return null;
         }
 
@@ -106,32 +100,28 @@ public class RegistryImporter
      * <P>
      * <code>
      * &lt;foo&gt;
-     *   &lt;bar&gt;val1&lt;/bar&gt;
-     *   &lt;bar&gt;val2&lt;/bar&gt;
+     * &lt;bar&gt;val1&lt;/bar&gt;
+     * &lt;bar&gt;val2&lt;/bar&gt;
      * &lt;/foo&gt;
      * </code>
      * passing this the <code>foo</code> node and <code>bar</code> will
      * return <code>val1</code> and <code>val2</code>.
      * </P>
      * Why this also isn't a core part of the XML API I do not know...
-     * 
-     * @param parentElement
-     *            the element, whose child element you want the CDATA from
-     * @param childName
-     *            the name of the element you want the CDATA from
-     * @throws TransformerException if error
+     *
+     * @param parentElement the element, whose child element you want the CDATA from
+     * @param childName     the name of the element you want the CDATA from
      * @return the CDATA as a <code>String</code>
+     * @throws TransformerException if error
      */
     public static String[] getRepeatedElementData(Node parentElement,
-            String childName) throws TransformerException
-    {
+                                                  String childName) throws TransformerException {
         // Grab the child node
         NodeList childNodes = XPathAPI.selectNodeList(parentElement, childName);
 
         String[] data = new String[childNodes.getLength()];
 
-        for (int i = 0; i < childNodes.getLength(); i++)
-        {
+        for (int i = 0; i < childNodes.getLength(); i++) {
             // Get the #text node
             Node dataNode = childNodes.item(i).getFirstChild();
 

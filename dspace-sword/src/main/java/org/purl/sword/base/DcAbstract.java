@@ -8,27 +8,22 @@
 package org.purl.sword.base;
 
 /**
- *
  * @author Neil Taylor (nst@aber.ac.uk)
  */
-public class DcAbstract extends BasicStringContentElement
-{
+public class DcAbstract extends BasicStringContentElement {
     private static final XmlName XML_NAME =
-            new XmlName(Namespaces.PREFIX_DC_TERMS, "abstract", Namespaces.NS_DC_TERMS);
+        new XmlName(Namespaces.PREFIX_DC_TERMS, "abstract", Namespaces.NS_DC_TERMS);
 
-    public DcAbstract()
-    {
+    public DcAbstract() {
         super(XML_NAME);
     }
 
-    public DcAbstract(String version)
-    {
+    public DcAbstract(String version) {
         this();
-        setContent(version); 
+        setContent(version);
     }
 
-    public static XmlName elementName()
-    {
+    public static XmlName elementName() {
         return XML_NAME;
     }
 

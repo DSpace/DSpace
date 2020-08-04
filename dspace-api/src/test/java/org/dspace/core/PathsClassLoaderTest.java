@@ -7,16 +7,18 @@
  */
 package org.dspace.core;
 
-import static com.sun.org.apache.bcel.internal.Constants.ACC_PUBLIC;
-import com.sun.org.apache.bcel.internal.generic.ClassGen;
+import static org.apache.bcel.Const.ACC_PUBLIC;
+import static org.junit.Assert.assertNotNull;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.jar.JarEntry;
 import java.util.jar.JarOutputStream;
+
+import org.apache.bcel.generic.ClassGen;
 import org.junit.After;
 import org.junit.AfterClass;
-import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -26,32 +28,37 @@ import org.junit.Test;
  *
  * @author mhwood
  */
-public class PathsClassLoaderTest
-{
+public class PathsClassLoaderTest {
     private static final String FILENAME_PREFIX = "foo";
     private static final String CLASS_FILENAME_SUFFIX = ".class";
     private static final String JAR_FILENAME_SUFFIX = ".jar";
     private static final ClassLoader parentCL = PathsClassLoaderTest.class.getClassLoader();
 
-    /** The test bare class file. */
+    /**
+     * The test bare class file.
+     */
     private static File classFile;
 
-    /** The test class file in a JAR. */
+    /**
+     * The test class file in a JAR.
+     */
     private static File jarFile;
 
-    /** Name of the test class in the file. */
+    /**
+     * Name of the test class in the file.
+     */
     private static String className;
 
-    /** Name of the test class in the JAR. */
+    /**
+     * Name of the test class in the JAR.
+     */
     private static String jarClassName;
 
-    public PathsClassLoaderTest()
-    {
+    public PathsClassLoaderTest() {
     }
 
     @BeforeClass
-    public static void setUpClass()
-    {
+    public static void setUpClass() {
 
         // Create a name for a temporary class file.
         try {
@@ -64,11 +71,11 @@ public class PathsClassLoaderTest
 
         String classFileName = classFile.getName();
         className = classFileName.substring(0,
-                classFileName.length() - CLASS_FILENAME_SUFFIX.length());
+                                            classFileName.length() - CLASS_FILENAME_SUFFIX.length());
 
         // Create an empty class.
         ClassGen cg = new ClassGen(className, "java.lang.Object",
-                "<generated>", ACC_PUBLIC, null);
+                                   "<generated>", ACC_PUBLIC, null);
         cg.addEmptyConstructor(ACC_PUBLIC);
 
         // Create a class file from the empty class.
@@ -86,10 +93,10 @@ public class PathsClassLoaderTest
             jarFile.deleteOnExit();
             String jarFileName = jarFile.getName();
             jarClassName = jarFileName.substring(0,
-                    jarFileName.length() - JAR_FILENAME_SUFFIX.length());
+                                                 jarFileName.length() - JAR_FILENAME_SUFFIX.length());
 
             cg = new ClassGen(jarClassName, "java.lang.Object",
-                "<generated>", ACC_PUBLIC, null);
+                              "<generated>", ACC_PUBLIC, null);
             cg.addEmptyConstructor(ACC_PUBLIC);
 
             jar = new JarOutputStream(new FileOutputStream(jarFile));
@@ -104,40 +111,37 @@ public class PathsClassLoaderTest
     }
 
     @AfterClass
-    public static void tearDownClass()
-    {
+    public static void tearDownClass() {
     }
 
     @Before
-    public void setUp()
-    {
+    public void setUp() {
     }
 
     @After
-    public void tearDown()
-    {
+    public void tearDown() {
     }
 
     /**
      * Test of findClass method, of class PathsClassLoader.
+     *
      * @throws Exception if error
      */
     @Test
     public void testFindClass()
-            throws Exception
-    {
+        throws Exception {
         System.out.println("findClass");
 
-        String[] classpath = { classFile.getParent(),
-            jarFile.getCanonicalPath() };
+        String[] classpath = {classFile.getParent(),
+            jarFile.getCanonicalPath()};
         PathsClassLoader instance = new PathsClassLoader(parentCL, classpath);
         Class result = instance.findClass(className);
-        assertTrue("Should return a Class from file", result instanceof Class);
+        assertNotNull("Should return a Class from file", result);
 
         classpath[0] = jarFile.getCanonicalPath();
         instance = new PathsClassLoader(parentCL, classpath);
         result = instance.findClass(jarClassName);
-        assertTrue("Should return a Class from JAR", result instanceof Class);
+        assertNotNull("Should return a Class from JAR", result);
     }
 
 }

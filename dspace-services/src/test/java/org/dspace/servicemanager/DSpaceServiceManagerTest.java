@@ -7,8 +7,11 @@
  */
 package org.dspace.servicemanager;
 
-import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.util.HashMap;
 import java.util.List;
@@ -20,17 +23,17 @@ import org.dspace.servicemanager.config.DSpaceConfigurationService;
 import org.dspace.servicemanager.example.ConcreteExample;
 import org.dspace.servicemanager.fakeservices.FakeService1;
 import org.dspace.servicemanager.spring.SpringAnnotationBean;
-import org.dspace.servicemanager.spring.TestSpringServiceManager;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 /**
  * testing the main dspace service manager
- * 
+ *
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  */
 public class DSpaceServiceManagerTest {
+    public static String SPRING_TEST_CONFIG_FILE = "spring/spring-test-services.xml";
 
     DSpaceServiceManager dsm;
     DSpaceConfigurationService configurationService;
@@ -43,7 +46,7 @@ public class DSpaceServiceManagerTest {
         configurationService.loadConfig(SampleAnnotationBean.class.getName() + ".sampleValue", "beckyz");
         configurationService.loadConfig("fakeBean.fakeParam", "beckyz");
 
-        dsm = new DSpaceServiceManager(configurationService, TestSpringServiceManager.SPRING_TEST_CONFIG_FILE);
+        dsm = new DSpaceServiceManager(configurationService, SPRING_TEST_CONFIG_FILE);
     }
 
     @After
@@ -81,7 +84,8 @@ public class DSpaceServiceManagerTest {
     }
 
     /**
-     * Test method for {@link org.dspace.servicemanager.DSpaceServiceManager#registerService(java.lang.String, java.lang.Object)}.
+     * Test method for
+     * {@link org.dspace.servicemanager.DSpaceServiceManager#registerService(java.lang.String, java.lang.Object)}.
      */
     @Test
     public void testRegisterService() {
@@ -94,7 +98,7 @@ public class DSpaceServiceManagerTest {
         assertEquals("AZ", service);
 
         try {
-            dsm.registerService("fakey", (Object)null);
+            dsm.registerService("fakey", (Object) null);
             fail("should have thrown exception");
         } catch (IllegalArgumentException e) {
             assertNotNull(e.getMessage());
@@ -102,7 +106,8 @@ public class DSpaceServiceManagerTest {
     }
 
     /**
-     * Test method for {@link org.dspace.servicemanager.DSpaceServiceManager#registerServiceClass(java.lang.String, java.lang.Class)}.
+     * Test method for
+     * {@link org.dspace.servicemanager.DSpaceServiceManager#registerServiceClass(java.lang.String, java.lang.Class)}.
      */
     @Test
     public void testRegisterServiceClass() {
@@ -119,7 +124,7 @@ public class DSpaceServiceManagerTest {
 
 
         try {
-            dsm.registerService("fakey", (Class<?>)null);
+            dsm.registerService("fakey", (Class<?>) null);
             fail("should have thrown exception");
         } catch (IllegalArgumentException e) {
             assertNotNull(e.getMessage());
@@ -143,7 +148,8 @@ public class DSpaceServiceManagerTest {
     }
 
     /**
-     * Test method for {@link org.dspace.servicemanager.DSpaceServiceManager#getServiceByName(java.lang.String, java.lang.Class)}.
+     * Test method for
+     * {@link org.dspace.servicemanager.DSpaceServiceManager#getServiceByName(java.lang.String, java.lang.Class)}.
      */
     @Test
     public void testGetServiceByName() {
@@ -155,7 +161,8 @@ public class DSpaceServiceManagerTest {
         assertEquals("azeckoski", concrete.getName());
         concrete = null;
 
-        SampleAnnotationBean sab = dsm.getServiceByName(SampleAnnotationBean.class.getName(), SampleAnnotationBean.class);
+        SampleAnnotationBean sab = dsm
+            .getServiceByName(SampleAnnotationBean.class.getName(), SampleAnnotationBean.class);
         assertNotNull(sab);
         assertEquals(null, sab.getSampleValue());
         sab = null;
@@ -171,12 +178,21 @@ public class DSpaceServiceManagerTest {
         concrete = null;
 
         // initialize a SampleAnnotationBean
-        SampleAnnotationBean sab = dsm.getServiceByName(SampleAnnotationBean.class.getName(), SampleAnnotationBean.class);
+        SampleAnnotationBean sab = dsm
+            .getServiceByName(SampleAnnotationBean.class.getName(), SampleAnnotationBean.class);
         assertNotNull(sab);
         // Based on the configuration for "sampleValue" in the init() method above,
         // a value should be pre-set!
         assertEquals("beckyz", sab.getSampleValue());
         sab = null;
+
+        SpringAnnotationBean spr = dsm.getServiceByName(
+            SpringAnnotationBean.class.getName(), SpringAnnotationBean.class);
+        assertNotNull(spr);
+        assertEquals("azeckoski", spr.getConcreteName());
+        assertEquals("aaronz", spr.getExampleName());
+        assertEquals(null, spr.getSampleValue());
+        spr = null;
     }
 
     /**
@@ -248,7 +264,7 @@ public class DSpaceServiceManagerTest {
     public void testPushConfig() {
         dsm.startup();
 
-        Map<String, Object> properties = new HashMap<String, Object>();
+        Map<String, Object> properties = new HashMap<>();
         properties.put("some.test.thing", "A value");
         dsm.pushConfig(properties);
 
@@ -259,11 +275,12 @@ public class DSpaceServiceManagerTest {
     public void testInitAndShutdown() {
         dsm.startup();
 
-        SampleAnnotationBean sab = dsm.getServiceByName(SampleAnnotationBean.class.getName(), SampleAnnotationBean.class);
+        SampleAnnotationBean sab = dsm
+            .getServiceByName(SampleAnnotationBean.class.getName(), SampleAnnotationBean.class);
         assertNotNull(sab);
         assertEquals(1, sab.initCounter);
         sab = null;
-        
+
         TestService ts = new TestService();
         assertEquals(0, ts.value);
         dsm.registerService(TestService.class.getName(), ts);
@@ -289,7 +306,7 @@ public class DSpaceServiceManagerTest {
         assertEquals(1, service.getTriggers());
 
         // now we do a config change
-        Map<String, Object> properties = new HashMap<String, Object>();
+        Map<String, Object> properties = new HashMap<>();
         properties.put("azeckoski.FakeService1.something", "THING");
         dsm.pushConfig(properties);
         assertEquals("config:THING", service.getSomething());
@@ -299,7 +316,7 @@ public class DSpaceServiceManagerTest {
         dsm.unregisterService(serviceName);
         assertEquals("shutdown", service.getSomething());
         assertEquals(3, service.getTriggers());
-        
+
         service = null;
         properties = null;
     }
@@ -307,9 +324,13 @@ public class DSpaceServiceManagerTest {
     public static class TestService implements InitializedService, ShutdownService {
 
         public int value = 0;
+
+        @Override
         public void init() {
             value++;
         }
+
+        @Override
         public void shutdown() {
             value++;
         }

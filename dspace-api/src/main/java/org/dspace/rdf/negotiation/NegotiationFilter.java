@@ -19,52 +19,43 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.log4j.Logger;
-
+import org.apache.logging.log4j.Logger;
 import org.dspace.rdf.RDFUtil;
 import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
- *
  * @author Pascal-Nicolas Becker (dspace -at- pascal -hyphen- becker -dot- de)
  */
-public class NegotiationFilter implements Filter
-{
+public class NegotiationFilter implements Filter {
     public static final String ACCEPT_HEADER_NAME = "Accept";
-    
-    private static final Logger log = Logger.getLogger(NegotiationFilter.class);
-    
+
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(NegotiationFilter.class);
+
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
         // nothing to todo here.
     }
 
     @Override
-    public void doFilter(ServletRequest request, ServletResponse response, 
-            FilterChain chain)
-            throws IOException, ServletException
-    {
-        try
-        {
+    public void doFilter(ServletRequest request, ServletResponse response,
+                         FilterChain chain)
+        throws IOException, ServletException {
+        try {
             if (!DSpaceServicesFactory.getInstance().getConfigurationService()
-                    .getBooleanProperty(RDFUtil.CONTENT_NEGOTIATION_KEY, false))
-            {
+                                      .getBooleanProperty(RDFUtil.CONTENT_NEGOTIATION_KEY, false)) {
                 chain.doFilter(request, response);
                 return;
             }
-        }
-        catch (Exception ex)
-        {
+        } catch (Exception ex) {
             log.warn("Will deliver HTML, as I cannot determine if content "
-                    + "negotiation should be enabled or not:\n" 
-                    + ex.getMessage(), ex);
+                         + "negotiation should be enabled or not:\n"
+                         + ex.getMessage(), ex);
             chain.doFilter(request, response);
             return;
         }
 
-        if (!(request instanceof HttpServletRequest) 
-                || !(response instanceof HttpServletResponse))
-        {
+        if (!(request instanceof HttpServletRequest)
+            || !(response instanceof HttpServletResponse)) {
             // just pass request and response to the next filter, if we don't
             // have a HttpServletRequest.
             chain.doFilter(request, response);
@@ -73,17 +64,16 @@ public class NegotiationFilter implements Filter
         // cast HttpServletRequest and HttpServletResponse
         HttpServletRequest hrequest = (HttpServletRequest) request;
         HttpServletResponse hresponse = (HttpServletResponse) response;
-        
+
         String acceptHeader = hrequest.getHeader(ACCEPT_HEADER_NAME);
-        
+
         String handle = null;
         String extraPathInfo = null;
         String path = hrequest.getPathInfo();
         // in JSPUI the pathInfo starts after /handle, in XMLUI it starts with /handle
         Pattern handleCheckPattern = Pattern.compile("^/*handle/(.*)$");
         Matcher handleCheckMatcher = handleCheckPattern.matcher(path);
-        if (handleCheckMatcher.matches())
-        {
+        if (handleCheckMatcher.matches()) {
             // remove trailing /handle
             path = handleCheckMatcher.group(1);
         }
@@ -91,22 +81,22 @@ public class NegotiationFilter implements Filter
         // where <prefix> is a handle prefix, <suffix> is the handle suffix
         // and <stuff> may be further information.
         log.debug("PathInfo: " + path);
-        if (path == null) path = "";
-        Pattern pathPattern = 
-                Pattern.compile("^/*([^/]+)/+([^/]+)(?:/*||/+(.*))?$");
+        if (path == null) {
+            path = "";
+        }
+        Pattern pathPattern =
+            Pattern.compile("^/*([^/]+)/+([^/]+)(?:/*||/+(.*))?$");
         Matcher pathMatcher = pathPattern.matcher(path);
-        if (pathMatcher.matches())
-        {
+        if (pathMatcher.matches()) {
             handle = pathMatcher.group(1) + "/" + pathMatcher.group(2);
             extraPathInfo = pathMatcher.group(3);
         }
         log.debug("handle: " + handle + "\n" + "extraPathInfo: " + extraPathInfo);
-        
+
         int requestedContent = Negotiator.negotiate(acceptHeader);
-        
-        if (!Negotiator.sendRedirect(hresponse, handle, extraPathInfo, 
-                requestedContent, false))
-        {
+
+        if (!Negotiator.sendRedirect(hresponse, handle, extraPathInfo,
+                                     requestedContent, false)) {
             // as we do content negotiation, we should send a vary caching so
             // browsers can adopt their caching strategy
             // the method Negotiator.sendRedirect does this only if it actually

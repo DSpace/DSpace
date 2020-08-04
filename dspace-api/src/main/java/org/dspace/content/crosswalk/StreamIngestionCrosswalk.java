@@ -27,24 +27,23 @@ import org.dspace.core.Context;
  * are equipped to call these crosswalks as well as the XML-based ones,
  * just refer to the desired crosswalk by its plugin name.
  *
- * @author  Larry Stone
+ * @author Larry Stone
  * @version $Revision$
  */
-public interface StreamIngestionCrosswalk
-{
+public interface StreamIngestionCrosswalk {
     /**
      * Execute crosswalk on the given object, taking input from the stream.
      *
-     * @param context the DSpace context
-     * @param dso the  DSpace Object whose metadata is being ingested.
-     * @param in input stream containing the metadata.
+     * @param context  the DSpace context
+     * @param dso      the  DSpace Object whose metadata is being ingested.
+     * @param in       input stream containing the metadata.
      * @param MIMEType MIME type of the ???
-     *
-     * @throws CrosswalkInternalException (<code>CrosswalkException</code>) failure of the crosswalk itself.
-     * @throws CrosswalkObjectNotSupported (<code>CrosswalkException</code>) Cannot crosswalk this kind of DSpace object.
-     * @throws IOException  I/O failure in services this calls
-     * @throws SQLException  Database failure in services this calls
-     * @throws AuthorizeException current user not authorized for this operation.
+     * @throws CrosswalkInternalException  (<code>CrosswalkException</code>) failure of the crosswalk itself.
+     * @throws CrosswalkObjectNotSupported (<code>CrosswalkException</code>) Cannot crosswalk this kind of DSpace
+     *                                     object.
+     * @throws IOException                 I/O failure in services this calls
+     * @throws SQLException                Database failure in services this calls
+     * @throws AuthorizeException          current user not authorized for this operation.
      */
     public void ingest(Context context, DSpaceObject dso, InputStream in, String MIMEType)
         throws CrosswalkException, IOException, SQLException, AuthorizeException;

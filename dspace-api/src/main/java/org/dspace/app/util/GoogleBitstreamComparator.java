@@ -7,24 +7,24 @@
  */
 package org.dspace.app.util;
 
-import org.apache.log4j.Logger;
-import org.dspace.content.Bitstream;
-import org.dspace.content.BitstreamFormat;
-import org.dspace.content.factory.ContentServiceFactory;
-import org.dspace.core.Context;
-
 import java.sql.SQLException;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.logging.log4j.Logger;
+import org.dspace.content.Bitstream;
+import org.dspace.content.BitstreamFormat;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.core.Context;
+
 /**
  * This comparator is used to order files of an item, so that they are ordered in a way that the first one
  * is the most useful for use in the citation_pdf_url for Google Scholar
  */
-public class GoogleBitstreamComparator implements Comparator<Bitstream>{
+public class GoogleBitstreamComparator implements Comparator<Bitstream> {
 
-    private final static Logger log = Logger.getLogger(GoogleBitstreamComparator.class);
+    private final static Logger log = org.apache.logging.log4j.LogManager.getLogger(GoogleBitstreamComparator.class);
 
     HashMap<String, Integer> priorityMap = new HashMap<>();
 
@@ -33,45 +33,48 @@ public class GoogleBitstreamComparator implements Comparator<Bitstream>{
     public GoogleBitstreamComparator(Context context, Map<String, String> googleScholarSettings) {
         this.context = context;
         String[] shortDescriptions;
-        if (googleScholarSettings.containsKey("citation.prioritized_types")){
+        if (googleScholarSettings.containsKey("citation.prioritized_types")) {
             shortDescriptions = splitAndTrim(googleScholarSettings.get("citation.prioritized_types"));
         } else {
             log.warn("Please define citation.prioritized_types in google-metadata.properties");
             shortDescriptions = new String[0];
         }
         int priority = 1;
-        for(String s: shortDescriptions){
+        for (String s : shortDescriptions) {
             try {
-                BitstreamFormat format = ContentServiceFactory.getInstance().getBitstreamFormatService().findByShortDescription(context, s);
+                BitstreamFormat format = ContentServiceFactory.getInstance().getBitstreamFormatService()
+                                                              .findByShortDescription(context, s);
                 if (format != null) {
                     priorityMap.put(format.getMIMEType(), priority);
                 } else {
                     log.warn(s + " is not a valid short description, please add it to bitstream-formats.xml");
                 }
                 priority++;
-            } catch (SQLException e){
+            } catch (SQLException e) {
                 log.error(e.getMessage());
             }
         }
 
     }
 
-    private String[] splitAndTrim(String toSplit){
-        if(toSplit != null) {
+    private String[] splitAndTrim(String toSplit) {
+        if (toSplit != null) {
             String[] splittedArray = toSplit.split(",");
-            for (int i = 0; i < splittedArray.length; i++)
+            for (int i = 0; i < splittedArray.length; i++) {
                 splittedArray[i] = splittedArray[i].trim();
+            }
             return splittedArray;
-        }
-        else {
+        } else {
             return new String[0];
         }
     }
 
 
     /**
-     * Compares two bitstreams based on their mimetypes, if mimetypes are the same,then the largest bitstream comes first
+     * Compares two bitstreams based on their mimetypes, if mimetypes are the same,then the largest bitstream comes
+     * first
      * See google-metadata.properties to define the order
+     *
      * @param b1 first bitstream
      * @param b2 second bitstream
      * @return
@@ -80,18 +83,15 @@ public class GoogleBitstreamComparator implements Comparator<Bitstream>{
         int priority1 = getPriorityFromBitstream(b1);
         int priority2 = getPriorityFromBitstream(b2);
 
-        if(priority1 > priority2){
+        if (priority1 > priority2) {
             return 1;
-        }
-        else if(priority1 == priority2){
-            if(b1.getSize() <= b2.getSize()){
+        } else if (priority1 == priority2) {
+            if (b1.getSizeBytes() <= b2.getSizeBytes()) {
                 return 1;
-            }
-            else {
+            } else {
                 return -1;
             }
-        }
-        else {
+        } else {
             return -1;
         }
     }

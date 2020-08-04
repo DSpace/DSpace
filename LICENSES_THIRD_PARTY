@@ -1,19 +1,19 @@
 
-DSpace uses third-party libraries which may be distributed under different 
+DSpace uses third-party libraries which may be distributed under different
 licenses. We have listed all of these third party libraries and their licenses
 below. This file can be regenerated at any time by simply running:
-    
+
     mvn clean verify -Dthird.party.licenses=true
 
-You must agree to the terms of these licenses, in addition to the DSpace 
+You must agree to the terms of these licenses, in addition to the DSpace
 source code license, in order to use this software.
 
 ---------------------------------------------------
 Third party Java libraries listed by License type.
 
 PLEASE NOTE: Some dependencies may be listed under multiple licenses if they
-are dual-licensed. This is especially true of anything listed as 
-"GNU General Public Library" below, as DSpace actually does NOT allow for any 
+are dual-licensed. This is especially true of anything listed as
+"GNU General Public Library" below, as DSpace actually does NOT allow for any
 dependencies that are solely released under GPL terms. For more info see:
 https://wiki.duraspace.org/display/DSPACE/Code+Contribution+Guidelines
 ---------------------------------------------------
@@ -199,8 +199,6 @@ https://wiki.duraspace.org/display/DSPACE/Code+Contribution+Guidelines
         * Woodstox (org.codehaus.woodstox:woodstox-core-asl:4.1.4 - http://woodstox.codehaus.org)
         * Woodstox (org.codehaus.woodstox:wstx-asl:3.2.0 - http://woodstox.codehaus.org)
         * Woodstox (org.codehaus.woodstox:wstx-asl:3.2.7 - http://woodstox.codehaus.org)
-        * databene ContiPerf (org.databene:contiperf:2.3.4 - http://databene.org/contiperf)
-        * elasticsearch (org.elasticsearch:elasticsearch:1.4.0 - http://nexus.sonatype.org/oss-repository-hosting.html/elasticsearch)
         * flyway-core (org.flywaydb:flyway-core:4.0.3 - https://flywaydb.org/flyway-core)
         * Ogg and Vorbis for Java, Core (org.gagravarr:vorbis-java-core:0.1 - https://github.com/Gagravarr/VorbisJava)
         * Apache Tika plugin for Ogg, Vorbis and FLAC (org.gagravarr:vorbis-java-tika:0.1 - https://github.com/Gagravarr/VorbisJava)
@@ -300,7 +298,7 @@ https://wiki.duraspace.org/display/DSPACE/Code+Contribution+Guidelines
         * Repackaged Cocoon Servlet Service Implementation (org.dspace.dependencies.cocoon:dspace-cocoon-servlet-service-impl:1.0.3 - http://projects.dspace.org/dspace-pom/dspace-cocoon-servlet-service-impl)
         * DSpace Kernel :: Additions and Local Customizations (org.dspace.modules:additions:6.0-rc4-SNAPSHOT - https://github.com/dspace/DSpace/modules/additions)
         * Hamcrest All (org.hamcrest:hamcrest-all:1.3 - https://github.com/hamcrest/JavaHamcrest/hamcrest-all)
-        * Hamcrest Core (org.hamcrest:hamcrest-core:1.3 - https://github.com/hamcrest/JavaHamcrest/hamcrest-core)
+        * Hamcrest Core (org.hamcrest:hamcrest-all:1.3 - https://github.com/hamcrest/JavaHamcrest/hamcrest-all)
         * JBibTeX (org.jbibtex:jbibtex:1.0.10 - http://www.jbibtex.org)
         * ASM Core (org.ow2.asm:asm:4.1 - http://asm.objectweb.org/asm/)
         * ASM Analysis (org.ow2.asm:asm-analysis:4.1 - http://asm.objectweb.org/asm-analysis/)
@@ -368,7 +366,6 @@ https://wiki.duraspace.org/display/DSPACE/Code+Contribution+Guidelines
         * FindBugs-Annotations (com.google.code.findbugs:annotations:3.0.1u2 - http://findbugs.sourceforge.net/)
         * MaxMind GeoIP Legacy API (com.maxmind.geoip:geoip-api:1.3.0 - https://github.com/maxmind/geoip-api-java)
         * JHighlight (com.uwyn:jhighlight:1.0 - https://jhighlight.dev.java.net/)
-        * DSpace TM-Extractors Dependency (org.dspace.dependencies:dspace-tm-extractors:1.0.1 - http://projects.dspace.org/dspace-pom/dspace-tm-extractors)
         * A Hibernate O/RM Module (org.hibernate:hibernate-core:4.2.21.Final - http://hibernate.org)
         * A Hibernate O/RM Module (org.hibernate:hibernate-ehcache:4.2.21.Final - http://hibernate.org)
         * Hibernate Commons Annotations (org.hibernate.common:hibernate-commons-annotations:4.0.2.Final - http://hibernate.org)

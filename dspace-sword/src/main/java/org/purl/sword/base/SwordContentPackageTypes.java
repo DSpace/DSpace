@@ -7,73 +7,60 @@
  */
 package org.purl.sword.base;
 
-
 import java.io.InputStream;
 import java.util.Enumeration;
 import java.util.Properties;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 
 /**
- *
  * @author Neil Taylor (nst@aber.ac.uk)
  */
 public class SwordContentPackageTypes {
 
-    private static Logger log = Logger.getLogger(SwordContentPackageTypes.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(SwordContentPackageTypes.class);
 
     private static Properties types;
 
-    static
-    {
+    static {
         // static constructor to attempt to load the properties file
-        try
-        {
+        try {
             types = new Properties();
-            InputStream stream = SwordContentPackageTypes.class.getClassLoader().getResourceAsStream("swordContentPackageTypes.properties");
-            if ( stream != null )
-            {
+            InputStream stream = SwordContentPackageTypes.class.getClassLoader().getResourceAsStream(
+                "swordContentPackageTypes.properties");
+            if (stream != null) {
                 types.loadFromXML(stream);
             }
-        }
-        catch (Exception ex)
-        {
+        } catch (Exception ex) {
             log.error("Unable to load sword types property file: " + ex.getMessage());
         }
     }
 
-    public SwordContentPackageTypes()
-    {
+    public SwordContentPackageTypes() {
     }
 
     private static SwordContentPackageTypes instance;
 
-    public static SwordContentPackageTypes instance()
-    {
-       if ( instance == null )
-       {
-           instance = new SwordContentPackageTypes();
-       }
-       return instance;
+    public static SwordContentPackageTypes instance() {
+        if (instance == null) {
+            instance = new SwordContentPackageTypes();
+        }
+        return instance;
     }
 
-    public boolean isValidType(String uri)
-    {
+    public boolean isValidType(String uri) {
         return types.containsKey(uri);
     }
 
-    public boolean isEmpty()
-    {
+    public boolean isEmpty() {
         return types.isEmpty();
     }
 
-    public Enumeration elements()
-    {
+    public Enumeration elements() {
         return types.elements();
     }
-    
-    public Enumeration keys()
-    {
+
+    public Enumeration keys() {
         return types.keys();
     }
 }

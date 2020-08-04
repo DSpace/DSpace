@@ -4,9 +4,11 @@
 # of the same name in any of the DSpace *.cfg files. This includes overriding
 # settings in any of these files:
 #    * [dspace]/config/dspace.cfg
-#    * Or any configuration file that is included in 'dspace.cfg'
+#    * Any configuration file that is included in 'dspace.cfg'
 #     (See "include = [filepath]" settings near the end of dspace.cfg.
 #      By default, it includes all [dspace]/config/modules/*.cfg files)
+#    * Spring Boot's application.properties
+#      ([dspace-src]/dspace-server-webapp/src/main/resources/application.properties)
 #
 # By default, this EXAMPLE file includes a number of commonly overridden configurations.
 # * ADD configurations by simply copying them into this file from any existing *.cfg file.
@@ -30,21 +32,13 @@
 # Windows note: Please remember to use forward slashes for all paths (e.g. C:/dspace)
 dspace.dir=/dspace
 
-# DSpace host name - should match base URL.  Do not include port number
-dspace.hostname = localhost
+# URL of DSpace backend ('server' webapp). Include port number etc.
+# This is where REST API and all enabled server modules (OAI-PMH, SWORD, SWORDv2, RDF, etc) will respond
+dspace.server.url = http://localhost:8080/server
 
-# DSpace base host URL.  Include port number etc.
-dspace.baseUrl = http://localhost:8080
-
-# The user interface you will be using for DSpace. Common usage is either xmlui or jspui
-dspace.ui = xmlui
-
-# Full link your end users will use to access DSpace. In most cases, this will be the baseurl followed by
-# the context path to the UI you are using.
-#
-# Alternatively, you can use a url redirect or deploy the web application under the servlet container root.
-# In this case, make sure to remove the /${dspace.ui} from the dspace.url property.
-#dspace.url = ${dspace.baseUrl}/${dspace.ui}
+# URL of DSpace frontend (Angular UI). Include port number etc
+# This is used by the backend to provide links in emails, RSS feeds, Sitemaps, etc.
+dspace.ui.url = http://localhost:4000
 
 # Name of the site
 dspace.name = DSpace at My University
@@ -57,11 +51,9 @@ dspace.name = DSpace at My University
 #default.language = en_US
 
 # Solr server/webapp.
-# DSpace uses Solr for all search/browse capability (and for usage statistics by default).
-# The included 'solr' webapp MUST be deployed to Tomcat for DSpace to function.
-# Usually it will be available via port 8080 and the 'solr' context path. But,
-# But, you may need to modify this if you are running DSpace on a custom port, etc.
-solr.server = http://localhost:8080/solr
+# DSpace uses Solr for all search/browse capability (and for usage statistics).
+# Since DSpace 7, SOLR must be installed as a stand-alone service
+#solr.server = http://localhost:8983/solr
 
 ##########################
 # DATABASE CONFIGURATION #
@@ -147,7 +139,7 @@ db.schema = public
 #
 # Items in DSpace receive a unique URL, stored in dc.identifier.uri
 # after it is generated during the submission process.
-# 
+#
 # If you register with CNRI's handle service at http://www.handle.net/,
 # these links can be generated as permalinks using http://hdl.handle.net/
 # as canonical prefix. Please make sure to change handle.canonical.prefix
@@ -203,3 +195,21 @@ db.schema = public
 # Authentication by Password (encrypted in DSpace's database). See authentication-password.cfg for default configuration.
 # Enabled by default in authentication.cfg
 #plugin.sequence.org.dspace.authenticate.AuthenticationMethod = org.dspace.authenticate.PasswordAuthentication
+
+
+#################################################
+# SPRING BOOT SETTINGS (Used by Server Webapp)  #
+#################################################
+# NOTE: Common Spring Boot application settings may be found at
+# http://docs.spring.io/spring-boot/docs/current/reference/html/common-application-properties.html
+#
+# EXAMPLE OVERRIDE:
+# By uncommenting the below Spring Boot settings, you can increase or decrease the maximum upload size.
+# These defaults are specified in [dspace-src]/dspace-server-webapp/src/main/resources/application.properties
+# but may be overridden in this local.cfg
+#
+# Maximum size of a single uploaded file
+#spring.servlet.multipart.max-file-size = 512MB
+
+# Maximum size of a multipart request (i.e. max total size of all files in one request)
+#spring.servlet.multipart.max-request-size = 512MB

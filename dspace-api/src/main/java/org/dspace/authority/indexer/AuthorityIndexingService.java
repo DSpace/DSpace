@@ -11,7 +11,6 @@ package org.dspace.authority.indexer;
 import org.dspace.authority.AuthorityValue;
 
 /**
- *
  * @author Antoine Snyers (antoine at atmire.com)
  * @author Kevin Van de Velde (kevin at atmire dot com)
  * @author Ben Bosman (ben at atmire dot com)
@@ -20,7 +19,7 @@ import org.dspace.authority.AuthorityValue;
 public interface AuthorityIndexingService {
 
 
-    public void indexContent(AuthorityValue value, boolean force);
+    public void indexContent(AuthorityValue value);
 
     public void cleanIndex() throws Exception;
 

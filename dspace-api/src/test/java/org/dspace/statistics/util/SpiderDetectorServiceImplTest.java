@@ -7,67 +7,57 @@
  */
 package org.dspace.statistics.util;
 
-
-import mockit.Mock;
-import mockit.MockUp;
-import org.dspace.AbstractDSpaceTest;
-import org.dspace.services.ConfigurationService;
-import org.dspace.services.factory.DSpaceServicesFactory;
-import org.dspace.statistics.SolrLoggerServiceImpl;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-
-import org.mockito.runners.MockitoJUnitRunner;
-
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import static org.mockito.Mockito.mock;
+import org.dspace.AbstractDSpaceTest;
+import org.dspace.core.factory.CoreServiceFactory;
+import org.dspace.service.ClientInfoService;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * @author mwood
  * @author frederic at atmire.com
  */
-@RunWith(MockitoJUnitRunner.class)
-public class SpiderDetectorServiceImplTest extends AbstractDSpaceTest
-{
+public class SpiderDetectorServiceImplTest extends AbstractDSpaceTest {
     private static final String NOT_A_BOT_ADDRESS = "192.168.0.1";
 
     private ConfigurationService configurationService;
 
+    private ClientInfoService clientInfoService;
 
     private SpiderDetectorService spiderDetectorService;
 
     @Before
     public void init() {
         configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
-        spiderDetectorService = new SpiderDetectorServiceImpl(configurationService);
-
+        clientInfoService = CoreServiceFactory.getInstance().getClientInfoService();
+        spiderDetectorService = new SpiderDetectorServiceImpl(configurationService, clientInfoService);
     }
 
     @Test
-    public void testReadPatterns()
-    {
+    public void testReadPatterns() {
 // FIXME        fail("Not yet implemented");
     }
 
     @Test
-    public void testGetSpiderIpAddresses()
-    {
+    public void testGetSpiderIpAddresses() {
 // FIXME        fail("Not yet implemented");
     }
 
     /**
      * Test if Case Insitive matching option works
+     *
      * @throws Exception
      */
     @Test
-    public void testCaseInsensitiveMatching() throws Exception
-    {
+    public void testCaseInsensitiveMatching() throws Exception {
         configurationService.setProperty("usage-statistics.bots.case-insensitive", true);
-        spiderDetectorService = new SpiderDetectorServiceImpl(configurationService);
+        spiderDetectorService = new SpiderDetectorServiceImpl(configurationService, clientInfoService);
 
         DummyHttpServletRequest req = new DummyHttpServletRequest();
         req.setAddress(NOT_A_BOT_ADDRESS); // avoid surprises
@@ -103,11 +93,11 @@ public class SpiderDetectorServiceImplTest extends AbstractDSpaceTest
     }
 
     /**
-     * Test method for {@link org.dspace.statistics.util.SpiderDetectorService#isSpider(javax.servlet.http.HttpServletRequest)}.
+     * Test method for
+     * {@link org.dspace.statistics.util.SpiderDetectorService#isSpider(javax.servlet.http.HttpServletRequest)}.
      */
     @Test
-    public void testIsSpiderHttpServletRequest()
-    {
+    public void testIsSpiderHttpServletRequest() {
         DummyHttpServletRequest req = new DummyHttpServletRequest();
         req.setAddress(NOT_A_BOT_ADDRESS); // avoid surprises
         req.setRemoteHost("notabot.example.com"); // avoid surprises
@@ -141,67 +131,66 @@ public class SpiderDetectorServiceImplTest extends AbstractDSpaceTest
     }
 
     /**
-     * Test method for {@link org.dspace.statistics.util.SpiderDetectorService#isSpider(java.lang.String, java.lang.String, java.lang.String, java.lang.String)}.
+     * Test method for
+     * {@link org.dspace.statistics.util.SpiderDetectorService#isSpider(java.lang.String, java.lang.String, java.lang.String, java.lang.String)}.
      */
     @Test
-    public void testIsSpiderStringStringStringString()
-    {
+    public void testIsSpiderStringStringStringString() {
         String candidate;
 
         // Test IP patterns
         candidate = "192.168.2.1";
         assertTrue(candidate + " did not match IP patterns",
-                spiderDetectorService.isSpider(candidate, null, null, null));
+                   spiderDetectorService.isSpider(candidate, null, null, null));
 
         candidate = NOT_A_BOT_ADDRESS;
         assertFalse(candidate + " matched IP patterns",
-                spiderDetectorService.isSpider(candidate, null, null, null));
+                    spiderDetectorService.isSpider(candidate, null, null, null));
 
         // Test DNS patterns
         candidate = "baiduspider-dspace-test.crawl.baidu.com";
         assertTrue(candidate + " did not match DNS patterns",
-                spiderDetectorService.isSpider(NOT_A_BOT_ADDRESS, null, candidate, null));
+                   spiderDetectorService.isSpider(NOT_A_BOT_ADDRESS, null, candidate, null));
 
         candidate = "wiki.dspace.org";
         assertFalse(candidate + " matched DNS patterns",
-                spiderDetectorService.isSpider(NOT_A_BOT_ADDRESS, null, candidate, null));
+                    spiderDetectorService.isSpider(NOT_A_BOT_ADDRESS, null, candidate, null));
 
         // Test agent patterns
         candidate = "msnbot is watching you";
         assertTrue("'" + candidate + "' did not match agent patterns",
-                spiderDetectorService.isSpider(NOT_A_BOT_ADDRESS, null, null, candidate));
+                   spiderDetectorService.isSpider(NOT_A_BOT_ADDRESS, null, null, candidate));
 
         candidate = "Firefox";
         assertFalse("'" + candidate + "' matched agent patterns",
-                spiderDetectorService.isSpider(NOT_A_BOT_ADDRESS, null, null, candidate));
+                    spiderDetectorService.isSpider(NOT_A_BOT_ADDRESS, null, null, candidate));
     }
 
     /**
      * Test method for {@link org.dspace.statistics.util.SpiderDetectorService#isSpider(java.lang.String)}.
      */
     @Test
-    public void testIsSpiderString()
-    {
+    public void testIsSpiderString() {
         String candidate;
 
         candidate = "192.168.2.1";
         assertTrue(candidate + " did not match IP patterns",
-                spiderDetectorService.isSpider(candidate, null, null, null));
+                   spiderDetectorService.isSpider(candidate, null, null, null));
 
         candidate = NOT_A_BOT_ADDRESS;
         assertFalse(candidate + " matched IP patterns",
-                spiderDetectorService.isSpider(candidate, null, null, null));
+                    spiderDetectorService.isSpider(candidate, null, null, null));
 
     }
 
 
     /**
      * Test if Case Sensitive matching still works after adding the option
+     *
      * @throws Exception
      */
     @Test
-    public void testCaseSensitiveMatching() throws Exception
-    {
+    public void testCaseSensitiveMatching() throws Exception {
 
         DummyHttpServletRequest req = new DummyHttpServletRequest();
         req.setAddress(NOT_A_BOT_ADDRESS); // avoid surprises
@@ -273,7 +262,7 @@ public class SpiderDetectorServiceImplTest extends AbstractDSpaceTest
     public void testBothLowerAndUpperCaseGetMatched() {
 
         configurationService.setProperty("usage-statistics.bots.case-insensitive", true);
-        spiderDetectorService = new SpiderDetectorServiceImpl(configurationService);
+        spiderDetectorService = new SpiderDetectorServiceImpl(configurationService, clientInfoService);
 
         DummyHttpServletRequest req = new DummyHttpServletRequest();
         req.setAddress(NOT_A_BOT_ADDRESS); // avoid surprises
@@ -305,7 +294,7 @@ public class SpiderDetectorServiceImplTest extends AbstractDSpaceTest
     @Test
     public void testNonBooleanConfig() {
         configurationService.setProperty("usage-statistics.bots.case-insensitive", "RandomNonBooleanString");
-        spiderDetectorService = new SpiderDetectorServiceImpl(configurationService);
+        spiderDetectorService = new SpiderDetectorServiceImpl(configurationService, clientInfoService);
 
         DummyHttpServletRequest req = new DummyHttpServletRequest();
         req.setAddress(NOT_A_BOT_ADDRESS); // avoid surprises
@@ -334,39 +323,14 @@ public class SpiderDetectorServiceImplTest extends AbstractDSpaceTest
     }
 
 
-
     /**
      * Method to make sure the SpiderDetector is using CaseSensitive matching again after each test
+     *
      * @throws Exception
      */
     @After
     public void cleanup() throws Exception {
         spiderDetectorService = null;
-        configurationService.setProperty("usage-statistics.bots.case-insensitive", false);;
+        configurationService.setProperty("usage-statistics.bots.case-insensitive", false);
     }
-
-
-
-
-    /**
-     * Dummy SolrLogger for testing.
-     * @author mwood
-     */
-    static public class MockSolrLogger
-            extends MockUp<SolrLoggerServiceImpl>
-    {
-        @Mock
-        public void $init() {}
-
-        @Mock
-        public void $clinit() {}
-
-        @Mock
-        public boolean isUseProxies()
-        {
-            return false;
-        }
-
-    }
-
 }

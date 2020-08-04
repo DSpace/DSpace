@@ -7,6 +7,15 @@
  */
 package org.dspace.xoai.services.impl.cache;
 
+import static com.lyncode.xoai.dataprovider.core.Granularity.Second;
+import static org.apache.commons.io.FileUtils.deleteDirectory;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import javax.xml.stream.XMLStreamException;
+
 import com.lyncode.xoai.dataprovider.exceptions.WritingXmlException;
 import com.lyncode.xoai.dataprovider.xml.XmlOutputContext;
 import com.lyncode.xoai.dataprovider.xml.xoai.Metadata;
@@ -17,15 +26,6 @@ import org.dspace.xoai.services.api.cache.XOAIItemCacheService;
 import org.dspace.xoai.services.api.config.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import javax.xml.stream.XMLStreamException;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-
-import static com.lyncode.xoai.dataprovider.core.Granularity.Second;
-import static org.apache.commons.io.FileUtils.deleteDirectory;
-
 
 public class DSpaceXOAIItemCacheService implements XOAIItemCacheService {
     private static final String ITEMDIR = File.separator + "items";
@@ -35,34 +35,29 @@ public class DSpaceXOAIItemCacheService implements XOAIItemCacheService {
 
     private String baseDir;
 
-    private String getBaseDir()
-    {
-        if (baseDir == null)
+    private String getBaseDir() {
+        if (baseDir == null) {
             baseDir = configurationService.getProperty("oai", "cache.dir") + ITEMDIR;
+        }
         return baseDir;
     }
 
 
-    private File getMetadataCache(Item item)
-    {
+    private File getMetadataCache(Item item) {
         File dir = new File(getBaseDir());
-        if (!dir.exists())
+        if (!dir.exists()) {
             dir.mkdirs();
+        }
 
         String name = File.separator + item.getHandle().replace('/', '_');
         return new File(getBaseDir() + name);
     }
 
 
-
-
     @Override
     public boolean hasCache(Item item) {
         return getMetadataCache(item).exists();
     }
-
-
-
 
 
     @Override
@@ -76,12 +71,9 @@ public class DSpaceXOAIItemCacheService implements XOAIItemCacheService {
             throw new IOException(e);
         }
         input.close();
-        
+
         return metadata;
     }
-
-
-
 
 
     @Override
@@ -92,7 +84,7 @@ public class DSpaceXOAIItemCacheService implements XOAIItemCacheService {
             metadata.write(context);
             context.getWriter().flush();
             context.getWriter().close();
-            
+
             output.close();
         } catch (XMLStreamException e) {
             throw new IOException(e);

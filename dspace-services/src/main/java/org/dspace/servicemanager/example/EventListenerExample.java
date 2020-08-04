@@ -7,35 +7,41 @@
  */
 package org.dspace.servicemanager.example;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.services.model.Event;
 import org.dspace.services.model.EventListener;
 
 /**
- * A sample EventListener which writes a string form of each received 
+ * A sample EventListener which writes a string form of each received
  * Event to the DSpace log.
- * 
+ *
  * @author Mark Diggory (mdiggory at atmire.com)
  * @version $Revision$
  */
-public final class EventListenerExample implements EventListener{
+public final class EventListenerExample implements EventListener {
 
-	/** log4j category */
-    private static Logger log = Logger
-            .getLogger(EventListenerExample.class);
+    /**
+     * log4j category
+     */
+    private static Logger log = LogManager.getLogger(EventListenerExample.class);
 
-	/** @return null */
-	public String[] getEventNamePrefixes() {
-		return null;
-	}
+    /**
+     * @return null
+     */
+    public String[] getEventNamePrefixes() {
+        return null;
+    }
 
-	/** @return null */
-	public String getResourcePrefix() {
-		return null;
-	}
+    /**
+     * @return null
+     */
+    public String getResourcePrefix() {
+        return null;
+    }
 
-	public void receiveEvent(Event event) {
-		log.info(event.toString());
-	}
-    
+    public void receiveEvent(Event event) {
+        log.info(event.toString());
+    }
+
 }

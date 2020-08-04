@@ -12,19 +12,18 @@ import org.dspace.eperson.EPerson;
 /**
  * Simple DTO to transfer data about the corresponding author for the Request
  * Copy feature
- * 
+ *
  * @author Andrea Bollini
- * 
  */
 public class RequestItemAuthor {
-	private String fullName;
-	private String email;
+    private String fullName;
+    private String email;
 
-	public RequestItemAuthor(String fullName, String email) {
-		super();
-		this.fullName = fullName;
-		this.email = email;
-	}
+    public RequestItemAuthor(String fullName, String email) {
+        super();
+        this.fullName = fullName;
+        this.email = email;
+    }
 
     public RequestItemAuthor(EPerson ePerson) {
         super();
@@ -32,11 +31,11 @@ public class RequestItemAuthor {
         this.email = ePerson.getEmail();
     }
 
-	public String getEmail() {
-		return email;
-	}
+    public String getEmail() {
+        return email;
+    }
 
-	public String getFullName() {
-		return fullName;
-	}
+    public String getFullName() {
+        return fullName;
+    }
 }
