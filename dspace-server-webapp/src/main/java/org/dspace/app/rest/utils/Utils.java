@@ -268,6 +268,9 @@ public class Utils {
         if (StringUtils.equals(modelPlural, "properties")) {
             return PropertyRest.NAME;
         }
+        if (StringUtils.equals((modelPlural), "process")) {
+            return ProcessRest.NAME;
+        }
         return modelPlural.replaceAll("s$", "");
     }
 
