@@ -22,16 +22,16 @@ import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
 import org.dspace.content.service.ItemService;
-import org.dspace.services.ConfigurationService;
-import org.dspace.services.factory.DSpaceServicesFactory;
 import org.junit.Test;
 
 public class MetadataImportTest extends AbstractIntegrationTest {
 
-    private ItemService itemService = ContentServiceFactory.getInstance().getItemService();
-    private CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
-    private CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
-    private ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
+    private final ItemService itemService
+            = ContentServiceFactory.getInstance().getItemService();
+    private final CollectionService collectionService
+            = ContentServiceFactory.getInstance().getCollectionService();
+    private final CommunityService communityService
+            = ContentServiceFactory.getInstance().getCommunityService();
 
     @Test
     public void metadataImportTest() throws Exception {
