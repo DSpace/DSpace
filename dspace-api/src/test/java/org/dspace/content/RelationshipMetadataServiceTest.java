@@ -599,8 +599,9 @@ public class RelationshipMetadataServiceTest extends AbstractUnitTest {
         }
         assertTrue(foundVirtualMdCreativeWorksISSNInAllMD);
 
-        // Query for the publication itemService.getMetadata(publication, "creativeworkseries", "issn", null, Item.ANY, true);
-        // and verify it contains a creativeworkseries.issn metadata value with the value being the journal’s issn
+        // Query for the publication itemService.getMetadata(publication, "creativeworkseries", "issn", null, Item
+        // .ANY, true); and verify it contains a creativeworkseries.issn metadata value with the value being the
+        // journal’s issn
         List<MetadataValue> mdPublicationVirtualMdCreativeWorksISSN = itemService.getMetadata(publication,
             "creativeworkseries", "issn", Item.ANY, Item.ANY, true);
         boolean foundCreativeWorksISSNInSpecificQuery = false;
