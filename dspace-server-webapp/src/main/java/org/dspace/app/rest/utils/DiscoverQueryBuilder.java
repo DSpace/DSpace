@@ -69,6 +69,17 @@ public class DiscoverQueryBuilder implements InitializingBean {
         pageSizeLimit = configurationService.getIntProperty("rest.search.max.results", 100);
     }
 
+    /**
+     * Build a discovery query
+     *
+     * @param context                   the DSpace context
+     * @param scope                     the scope for this discovery query
+     * @param discoveryConfiguration    the discovery configuration for this discovery query
+     * @param query                     the query string for this discovery query
+     * @param searchFilters             the search filters for this discovery query
+     * @param dsoType                   only include search results with this type
+     * @param page                      the pageable for this discovery query
+     */
     public DiscoverQuery buildQuery(Context context, IndexableObject scope,
                                     DiscoveryConfiguration discoveryConfiguration,
                                     String query, List<SearchFilter> searchFilters,
@@ -80,6 +91,17 @@ public class DiscoverQueryBuilder implements InitializingBean {
         return buildQuery(context, scope, discoveryConfiguration, query, searchFilters, dsoTypes, page);
     }
 
+    /**
+     * Build a discovery query
+     *
+     * @param context                   the DSpace context
+     * @param scope                     the scope for this discovery query
+     * @param discoveryConfiguration    the discovery configuration for this discovery query
+     * @param query                     the query string for this discovery query
+     * @param searchFilters             the search filters for this discovery query
+     * @param dsoTypes                  only include search results with one of these types
+     * @param page                      the pageable for this discovery query
+     */
     public DiscoverQuery buildQuery(Context context, IndexableObject scope,
                                     DiscoveryConfiguration discoveryConfiguration,
                                     String query, List<SearchFilter> searchFilters,
@@ -113,6 +135,19 @@ public class DiscoverQueryBuilder implements InitializingBean {
         }
     }
 
+    /**
+     * Create a discovery facet query.
+     *
+     * @param context                   the DSpace context
+     * @param scope                     the scope for this discovery query
+     * @param discoveryConfiguration    the discovery configuration for this discovery query
+     * @param prefix                    limit the facets results to those starting with the given prefix.
+     * @param query                     the query string for this discovery query
+     * @param searchFilters             the search filters for this discovery query
+     * @param dsoType                   only include search results with this type
+     * @param page                      the pageable for this discovery query
+     * @param facetName                 the facet field
+     */
     public DiscoverQuery buildFacetQuery(Context context, IndexableObject scope,
                                          DiscoveryConfiguration discoveryConfiguration,
                                          String prefix, String query, List<SearchFilter> searchFilters,
@@ -125,6 +160,19 @@ public class DiscoverQueryBuilder implements InitializingBean {
                 context, scope, discoveryConfiguration, prefix, query, searchFilters, dsoTypes, page, facetName);
     }
 
+    /**
+     * Create a discovery facet query.
+     *
+     * @param context                   the DSpace context
+     * @param scope                     the scope for this discovery query
+     * @param discoveryConfiguration    the discovery configuration for this discovery query
+     * @param prefix                    limit the facets results to those starting with the given prefix.
+     * @param query                     the query string for this discovery query
+     * @param searchFilters             the search filters for this discovery query
+     * @param dsoTypes                  only include search results with one of these types
+     * @param page                      the pageable for this discovery query
+     * @param facetName                 the facet field
+     */
     public DiscoverQuery buildFacetQuery(Context context, IndexableObject scope,
                                          DiscoveryConfiguration discoveryConfiguration,
                                          String prefix, String query, List<SearchFilter> searchFilters,
