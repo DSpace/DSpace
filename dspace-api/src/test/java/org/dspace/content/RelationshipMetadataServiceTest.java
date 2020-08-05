@@ -10,6 +10,7 @@ package org.dspace.content;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.sql.SQLException;
@@ -496,6 +497,122 @@ public class RelationshipMetadataServiceTest extends AbstractUnitTest {
         assertThat(relationshipService.findNextLeftPlaceByLeftItem(context, leftItem), equalTo(2));
 
 
+    }
 
+    @Test
+    public void testGetVirtualMetadata() throws SQLException, AuthorizeException {
+        // Journal, JournalVolume, JournalIssue, Publication items, related to each other using the relationship types
+        // isJournalOfVolume, isJournalVolumeOfIssue, isJournalIssueOfPublication.
+        context.turnOffAuthorisationSystem();
+        EntityType publicationEntityType = entityTypeService.create(context, "Publication");
+        EntityType journalIssueEntityType = entityTypeService.create(context, "JournalIssue");
+        EntityType journalVolumeEntityType = entityTypeService.create(context, "JournalVolume");
+        EntityType journalEntityType = entityTypeService.create(context, "Journal");
+        RelationshipType isJournalVolumeOfIssueRelationshipType = relationshipTypeService
+            .create(context, journalIssueEntityType, journalVolumeEntityType,
+                "isIssueOfJournalVolume", "isJournalVolumeOfIssue",
+                null, null, null, null);
+        RelationshipType isJournalVolumeOfJournalRelationshipType = relationshipTypeService
+            .create(context, journalVolumeEntityType, journalEntityType,
+                "isJournalOfVolume", "isVolumeOfJournal",
+                null, null, null, null);
+        RelationshipType isJournalIssueOfPublicationRelationshipType = relationshipTypeService
+            .create(context, publicationEntityType, journalIssueEntityType,
+                "isJournalIssueOfPublication", "isPublicationOfJournalIssue",
+                null, null, null, null);
+
+        Community community = communityService.create(null, context);
+        Collection collection = collectionService.create(context, community);
+
+        WorkspaceItem iss = workspaceItemService.create(context, collection, false);
+        Item journalIssue = installItemService.installItem(context, iss);
+        itemService.addMetadata(context, journalIssue, "relationship", "type", null, null, "JournalIssue");
+        WorkspaceItem vol = workspaceItemService.create(context, collection, false);
+        Item journalVolume = installItemService.installItem(context, vol);
+        itemService.addMetadata(context, journalVolume, "publicationvolume", "volumeNumber", null, null, "30");
+        itemService.addMetadata(context, journalVolume, "relationship", "type", null, null, "JournalVolume");
+        WorkspaceItem jour = workspaceItemService.create(context, collection, false);
+        Item journal = installItemService.installItem(context, jour);
+        itemService.addMetadata(context, journal, "creativeworkseries", "issn", null, null, "issn journal");
+        itemService.addMetadata(context, journal, "relationship", "type", null, null, "Journal");
+        relationship =
+            relationshipService
+                .create(context, journalIssue, journalVolume, isJournalVolumeOfIssueRelationshipType, 0, 0);
+        relationship =
+            relationshipService.create(context, journalVolume, journal, isJournalVolumeOfJournalRelationshipType, 0, 0);
+
+        WorkspaceItem pub = workspaceItemService.create(context, collection, false);
+        Item publication = installItemService.installItem(context, pub);
+        itemService.addMetadata(context, publication, "dc", "title", null, null, "Pub 1");
+        itemService.addMetadata(context, publication, "relationship", "type", null, null, "Publication");
+
+        relationship =
+            relationshipService
+                .create(context, publication, journalIssue, isJournalIssueOfPublicationRelationshipType, 0, 0);
+        context.restoreAuthSystemState();
+
+        // Query for the publication itemService.getMetadata(publication, Item.ANY, Item.ANY, null, Item.ANY, true);
+        // and verify it contains a relation.isJournalOfPublication metadata value with the value being the journal’s
+        // UUID
+        List<MetadataValue> mdPublication =
+            itemService.getMetadata(publication, Item.ANY, Item.ANY, Item.ANY, Item.ANY, true);
+        boolean foundVirtualMdIsJournalOfPublicationInAllMD = false;
+        for (MetadataValue metadataValue : mdPublication) {
+            String schema = metadataValue.getMetadataField().getMetadataSchema().getName();
+            String element = metadataValue.getMetadataField().getElement();
+            String qualifier = metadataValue.getMetadataField().getQualifier();
+            if (schema.equals("relation") && element.equals("isJournalOfPublication") && qualifier == null &&
+                metadataValue.getValue().equals(journal.getID().toString())) {
+                foundVirtualMdIsJournalOfPublicationInAllMD = true;
+            }
+        }
+        assertTrue(foundVirtualMdIsJournalOfPublicationInAllMD);
+
+        // Query for the publication itemService.getMetadata(publication, "relation", "isJournalOfPublication", null,
+        // Item.ANY, true); and verify it contains a relation.isJournalOfPublication metadata value with the value
+        // being the journal’s UUID
+        List<MetadataValue> mdPublicationRelationIsJournalOfPublication =
+            itemService.getMetadata(publication, "relation", "isJournalOfPublication", Item.ANY, Item.ANY, true);
+        boolean foundVirtualMdIsJournalOfPublicationInSpecificQuery = false;
+        for (MetadataValue metadataValue : mdPublicationRelationIsJournalOfPublication) {
+            String schema = metadataValue.getMetadataField().getMetadataSchema().getName();
+            String element = metadataValue.getMetadataField().getElement();
+            String qualifier = metadataValue.getMetadataField().getQualifier();
+            if (schema.equals("relation") && element.equals("isJournalOfPublication") && qualifier == null &&
+                metadataValue.getValue().equals(journal.getID().toString())) {
+                foundVirtualMdIsJournalOfPublicationInSpecificQuery = true;
+            }
+        }
+        assertTrue(foundVirtualMdIsJournalOfPublicationInSpecificQuery);
+
+        // Query for the publication itemService.getMetadata(publication, Item.ANY, Item.ANY, null, Item.ANY, true);
+        // and verify it contains a creativeworkseries.issn metadata value with the value being the journal’s issn
+        boolean foundVirtualMdCreativeWorksISSNInAllMD = false;
+        for (MetadataValue metadataValue : mdPublication) {
+            String schema = metadataValue.getMetadataField().getMetadataSchema().getName();
+            String element = metadataValue.getMetadataField().getElement();
+            String qualifier = metadataValue.getMetadataField().getQualifier();
+            if (schema.equals("creativeworkseries") && element.equals("issn") && qualifier == null &&
+                metadataValue.getValue().equals("issn journal")) {
+                foundVirtualMdCreativeWorksISSNInAllMD = true;
+            }
+        }
+        assertTrue(foundVirtualMdCreativeWorksISSNInAllMD);
+
+        // Query for the publication itemService.getMetadata(publication, "creativeworkseries", "issn", null, Item.ANY, true);
+        // and verify it contains a creativeworkseries.issn metadata value with the value being the journal’s issn
+        List<MetadataValue> mdPublicationVirtualMdCreativeWorksISSN = itemService.getMetadata(publication,
+            "creativeworkseries", "issn", Item.ANY, Item.ANY, true);
+        boolean foundCreativeWorksISSNInSpecificQuery = false;
+        for (MetadataValue metadataValue : mdPublicationVirtualMdCreativeWorksISSN) {
+            String schema = metadataValue.getMetadataField().getMetadataSchema().getName();
+            String element = metadataValue.getMetadataField().getElement();
+            String qualifier = metadataValue.getMetadataField().getQualifier();
+            if (schema.equals("creativeworkseries") && element.equals("issn") && qualifier == null &&
+                metadataValue.getValue().equals("issn journal")) {
+                foundCreativeWorksISSNInSpecificQuery = true;
+            }
+        }
+        assertTrue(foundCreativeWorksISSNInSpecificQuery);
     }
 }
