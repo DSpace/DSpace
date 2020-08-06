@@ -27,10 +27,6 @@ import java.util.stream.Collectors;
 
 import com.google.gson.Gson;
 import org.apache.commons.collections4.CollectionUtils;
-import org.dspace.app.rest.builder.CollectionBuilder;
-import org.dspace.app.rest.builder.CommunityBuilder;
-import org.dspace.app.rest.builder.ItemBuilder;
-import org.dspace.app.rest.builder.ProcessBuilder;
 import org.dspace.app.rest.converter.DSpaceRunnableParameterConverter;
 import org.dspace.app.rest.matcher.PageMatcher;
 import org.dspace.app.rest.matcher.ProcessMatcher;
@@ -39,6 +35,10 @@ import org.dspace.app.rest.model.ParameterValueRest;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.builder.CollectionBuilder;
+import org.dspace.builder.CommunityBuilder;
+import org.dspace.builder.ItemBuilder;
+import org.dspace.builder.ProcessBuilder;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
@@ -82,7 +82,9 @@ public class ScriptRestRepositoryIT extends AbstractControllerIntegrationTest {
                             ScriptMatcher.matchScript(scriptConfigurations.get(2).getName(),
                                                       scriptConfigurations.get(2).getDescription()),
                             ScriptMatcher.matchScript(scriptConfigurations.get(3).getName(),
-                                                      scriptConfigurations.get(3).getDescription())
+                                                      scriptConfigurations.get(3).getDescription()),
+                            ScriptMatcher.matchScript(scriptConfigurations.get(4).getName(),
+                                scriptConfigurations.get(4).getDescription())
                         )));
 
     }
@@ -139,7 +141,7 @@ public class ScriptRestRepositoryIT extends AbstractControllerIntegrationTest {
         getClient(token).perform(get("/api/system/scripts/mock-script"))
                         .andExpect(status().isOk())
                         .andExpect(jsonPath("$", ScriptMatcher
-                            .matchMockScript(scriptConfigurations.get(3).getOptions())));
+                            .matchMockScript(scriptConfigurations.get(scriptConfigurations.size() - 1).getOptions())));
     }
 
     @Test

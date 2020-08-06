@@ -1,8 +1,7 @@
 ## References
-_Add references/links to any related tickets or PRs. These may include:_
-* Link to [JIRA](https://jira.lyrasis.org/projects/DS/summary) ticket(s), if any
-* Link to [REST Contract](https://github.com/DSpace/Rest7Contract) or an open REST Contract PR, if any
-* Link to [Angular issue or PR](https://github.com/DSpace/dspace-angular/issues) related to this PR, if any
+_Add references/links to any related issues or PRs. These may include:_
+* Related to [REST Contract](https://github.com/DSpace/Rest7Contract) or an open REST Contract PR, if any
+* Fixes [GitHub issue](https://github.com/DSpace/DSpace/issues), if any
 
 ## Description
 Short summary of changes (1-2 sentences).
