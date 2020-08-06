@@ -101,7 +101,7 @@ public class OpenURLTracker implements ReloadableEntity<Integer> {
         }
 
         final OpenURLTracker that = (OpenURLTracker) o;
-        if (this.getID() != that.getID()) {
+        if (!this.getID().equals(that.getID())) {
             return false;
         }
 
