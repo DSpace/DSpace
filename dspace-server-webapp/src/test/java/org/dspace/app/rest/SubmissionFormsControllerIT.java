@@ -18,7 +18,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.util.Locale;
 
-import org.dspace.app.rest.builder.EPersonBuilder;
 import org.dspace.app.rest.matcher.SubmissionFormFieldMatcher;
 import org.dspace.app.rest.repository.SubmissionFormRestRepository;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
@@ -26,6 +25,7 @@ import org.dspace.app.util.DCInputsReaderException;
 import org.dspace.content.authority.DCInputAuthority;
 import org.dspace.content.authority.service.ChoiceAuthorityService;
 import org.dspace.core.service.PluginService;
+import org.dspace.builder.EPersonBuilder;
 import org.dspace.eperson.EPerson;
 import org.dspace.services.ConfigurationService;
 import org.hamcrest.Matchers;
@@ -316,7 +316,7 @@ public class SubmissionFormsControllerIT extends AbstractControllerIntegrationTe
                         // check the first two rows
                         .andExpect(jsonPath("$.rows[0].fields", contains(
                             SubmissionFormFieldMatcher.matchFormClosedRelationshipFieldDefinition("Journal", null,
-                    false,"Select the journal related to this volume.", "isVolumeOfJournal",
+                    false,"Select the journal related to this volume.", "isJournalOfVolume",
                         "creativework.publisher:somepublishername", "periodical", false))))
         ;
     }
@@ -386,7 +386,6 @@ public class SubmissionFormsControllerIT extends AbstractControllerIntegrationTe
                            "Виберiть мову головного змiсту файлу, як що мови немає у списку, вибрати (Iнша)."
                          + " Як що вмiст вайлу не є текстовим, наприклад є фотографiєю, тодi вибрати (N/A)",
                          null, "dc.language.iso", "common_iso_languages"))));
-
          resetLocalesConfiguration();
     }
 
@@ -466,7 +465,6 @@ public class SubmissionFormsControllerIT extends AbstractControllerIntegrationTe
                            "Виберiть мову головного змiсту файлу, як що мови немає у списку, вибрати (Iнша)."
                          + " Як що вмiст вайлу не є текстовим, наприклад є фотографiєю, тодi вибрати (N/A)",
                          null, "dc.language.iso", "common_iso_languages"))));
-
          resetLocalesConfiguration();
     }
 
@@ -519,7 +517,6 @@ public class SubmissionFormsControllerIT extends AbstractControllerIntegrationTe
                          + " Se il contenuto non ha davvero una lingua"
                          + " (ad esempio, se è un set di dati o un'immagine) selezionare (N/A)",
                          null, "dc.language.iso", "common_iso_languages"))));
-
          resetLocalesConfiguration();
     }
 
@@ -555,7 +552,6 @@ public class SubmissionFormsControllerIT extends AbstractControllerIntegrationTe
                             .matchFormFieldDefinition("onebox", "Titolo",
                             "\u00C8 necessario inserire un titolo principale per questo item", false,
                             "Inserisci titolo principale di questo item", "dc.title"))));
-
          resetLocalesConfiguration();
     }
 
