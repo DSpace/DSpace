@@ -7,9 +7,11 @@
  */
 package org.dspace.app.rest;
 
+import static com.jayway.jsonpath.JsonPath.read;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.startsWith;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
@@ -18,12 +20,16 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.io.IOException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.dspace.app.rest.builder.CollectionBuilder;
 import org.dspace.app.rest.builder.CommunityBuilder;
 import org.dspace.app.rest.builder.ItemBuilder;
+import org.dspace.app.rest.builder.RelationshipBuilder;
 import org.dspace.app.rest.builder.WorkspaceItemBuilder;
 import org.dspace.app.rest.matcher.MetadataMatcher;
 import org.dspace.app.rest.model.MetadataValueRest;
@@ -44,11 +50,11 @@ import org.dspace.content.service.ItemService;
 import org.dspace.content.service.RelationshipTypeService;
 import org.dspace.content.service.WorkspaceItemService;
 import org.hamcrest.Matchers;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MvcResult;
 
 /**
  * Created by kristof on 20/02/2020
@@ -75,6 +81,9 @@ public class PatchMetadataIT extends AbstractEntityIntegrationTest {
 
     private List<String> authorsOriginalOrder;
 
+    private AtomicReference<Integer> idRef1;
+    private AtomicReference<Integer> idRef2;
+
     private String addedAuthor;
     private String replacedAuthor;
 
@@ -92,6 +101,13 @@ public class PatchMetadataIT extends AbstractEntityIntegrationTest {
                 .build();
 
         context.restoreAuthSystemState();
+    }
+
+    @After
+    @Override
+    public void destroy() throws Exception {
+        super.destroy();
+        cleanupPersonRelations();
     }
 
     /**
@@ -152,15 +168,15 @@ public class PatchMetadataIT extends AbstractEntityIntegrationTest {
         context.restoreAuthSystemState();
 
         // Create a relationship between publication and person 1
-        MvcResult mvcResult = getClient(adminToken).perform(post("/api/core/relationships")
+        idRef1 = new AtomicReference<>();
+        getClient(adminToken).perform(post("/api/core/relationships")
                 .param("relationshipType", publicationPersonRelationshipType.getID().toString())
                 .contentType(MediaType.parseMediaType
                         (org.springframework.data.rest.webmvc.RestMediaTypes.TEXT_URI_LIST_VALUE))
                 .content("https://localhost:8080/server/api/core/items/" + publicationItem.getItem().getID() + "\n" +
                                 "https://localhost:8080/server/api/core/items/" + personItem1.getID()))
                 .andExpect(status().isCreated())
-                .andReturn();
-
+                .andDo(result -> idRef1.set(read(result.getResponse().getContentAsString(), "$.id")));
         context.turnOffAuthorisationSystem();
 
         // Add two more regular authors
@@ -175,19 +191,20 @@ public class PatchMetadataIT extends AbstractEntityIntegrationTest {
         context.restoreAuthSystemState();
 
         // Create a relationship between publication and person 2
-        mvcResult = getClient(adminToken).perform(post("/api/core/relationships")
+        AtomicReference<Integer> idRef2 = new AtomicReference<>();
+        getClient(adminToken).perform(post("/api/core/relationships")
                 .param("relationshipType", publicationPersonRelationshipType.getID().toString())
                 .contentType(MediaType.parseMediaType
                         (org.springframework.data.rest.webmvc.RestMediaTypes.TEXT_URI_LIST_VALUE))
                 .content("https://localhost:8080/server/api/core/items/" + publicationItem.getItem().getID() + "\n" +
                                 "https://localhost:8080/server/api/core/items/" + personItem2.getID()))
                 .andExpect(status().isCreated())
-                .andReturn();
+                             .andDo(result -> idRef2.set(read(result.getResponse().getContentAsString(), "$.id")));
 
         publication = workspaceItemService.find(context, publicationItem.getID());
         List<MetadataValue> publicationAuthorList =
                 itemService.getMetadata(publication.getItem(), "dc", "contributor", "author", Item.ANY);
-        assertThat(publicationAuthorList.size(), equalTo(5));
+        assertEquals(publicationAuthorList.size(), 5);
         assertThat(publicationAuthorList.get(0).getValue(), equalTo(authorsOriginalOrder.get(0)));
         assertThat(publicationAuthorList.get(0).getAuthority(), not(startsWith("virtual::")));
         assertThat(publicationAuthorList.get(1).getValue(), equalTo(authorsOriginalOrder.get(1)));
@@ -198,6 +215,75 @@ public class PatchMetadataIT extends AbstractEntityIntegrationTest {
         assertThat(publicationAuthorList.get(3).getAuthority(), not(startsWith("virtual::")));
         assertThat(publicationAuthorList.get(4).getValue(), equalTo(authorsOriginalOrder.get(4)));
         assertThat(publicationAuthorList.get(4).getAuthority(), startsWith("virtual::"));
+    }
+
+    /**
+     * Clean up created Person Relationshipts
+     * @throws IOException
+     * @throws SQLException
+     */
+    private void cleanupPersonRelations() throws IOException, SQLException {
+        if (idRef1 != null) {
+            RelationshipBuilder.deleteRelationship(idRef1.get());
+            idRef1 = null;
+        }
+        if (idRef2 != null) {
+            RelationshipBuilder.deleteRelationship(idRef2.get());
+            idRef2 = null;
+        }
+    }
+
+    /**
+     * A method to create a workspace publication containing 5 authors: 3 regular authors and 2 related Person items.
+     * The authors are added in a specific order:
+     * - "Whyte, William": Regular author
+     * - "Dahlen, Sarah": Regular Person
+     * - "Peterson, Karrie": Regular author
+     * - "Perotti, Enrico": Regular author
+     * - "Linton, Oliver": Regular Person
+     */
+    private void initPlainTextPublicationWorkspace() throws Exception {
+        authorsOriginalOrder = new ArrayList<>();
+        authorsOriginalOrder.add("Whyte, William");
+        authorsOriginalOrder.add("Dahlen, Sarah");
+        authorsOriginalOrder.add("Peterson, Karrie");
+        authorsOriginalOrder.add("Perotti, Enrico");
+        authorsOriginalOrder.add("Linton, Oliver");
+
+        addedAuthor = "Semple, Robert";
+        replacedAuthor = "New Value";
+
+        context.turnOffAuthorisationSystem();
+
+        publicationItem = WorkspaceItemBuilder.createWorkspaceItem(context, collection)
+                                              .withTitle("Publication 1")
+                                              .withRelationshipType("Publication")
+                                              .build();
+
+        String adminToken = getAuthToken(admin.getEmail(), password);
+
+        // Make sure we grab the latest instance of the Item from the database before adding a regular author
+        WorkspaceItem publication = workspaceItemService.find(context, publicationItem.getID());
+        itemService.addMetadata(context, publication.getItem(),
+                                "dc", "contributor", "author", Item.ANY, authorsOriginalOrder);
+        workspaceItemService.update(context, publication);
+
+        context.restoreAuthSystemState();
+
+        publication = workspaceItemService.find(context, publicationItem.getID());
+        List<MetadataValue> publicationAuthorList =
+                itemService.getMetadata(publication.getItem(), "dc", "contributor", "author", Item.ANY);
+        assertEquals(publicationAuthorList.size(), 5);
+        assertThat(publicationAuthorList.get(0).getValue(), equalTo(authorsOriginalOrder.get(0)));
+        assertThat(publicationAuthorList.get(0).getAuthority(), not(startsWith("virtual::")));
+        assertThat(publicationAuthorList.get(1).getValue(), equalTo(authorsOriginalOrder.get(1)));
+        assertThat(publicationAuthorList.get(1).getAuthority(), not(startsWith("virtual::")));
+        assertThat(publicationAuthorList.get(2).getValue(), equalTo(authorsOriginalOrder.get(2)));
+        assertThat(publicationAuthorList.get(2).getAuthority(), not(startsWith("virtual::")));
+        assertThat(publicationAuthorList.get(3).getValue(), equalTo(authorsOriginalOrder.get(3)));
+        assertThat(publicationAuthorList.get(3).getAuthority(), not(startsWith("virtual::")));
+        assertThat(publicationAuthorList.get(4).getValue(), equalTo(authorsOriginalOrder.get(4)));
+        assertThat(publicationAuthorList.get(4).getAuthority(), not(startsWith("virtual::")));
     }
 
     /**
@@ -610,6 +696,436 @@ public class PatchMetadataIT extends AbstractEntityIntegrationTest {
         // The author at the fourth place is linked through a relationship and cannot be deleted through a PATCH request
         removeTraditionalPageOneAuthorTest(4, expectedOrder);
     }
+
+    /**
+     * This test will move an author (dc.contributor.author) within a workspace publication's "traditionalpageone"
+     * section from position 1 to 0 using a PATCH request and verify the order of the authors within the section.
+     * This test uses only plain text authors
+     * Original Order: 0,1,2,3,4
+     * Expected Order: 1,0,2,3,4
+     */
+    @Test
+    public void moveTraditionalPageOnePlainTextAuthorOneToZeroTest() throws Exception {
+        initPlainTextPublicationWorkspace();
+
+        List<String> expectedOrder = new ArrayList<>();
+        expectedOrder.add(authorsOriginalOrder.get(1));
+        expectedOrder.add(authorsOriginalOrder.get(0));
+        expectedOrder.add(authorsOriginalOrder.get(2));
+        expectedOrder.add(authorsOriginalOrder.get(3));
+        expectedOrder.add(authorsOriginalOrder.get(4));
+
+        moveTraditionalPageOneAuthorTest(1, 0, expectedOrder);
+    }
+
+    /**
+     * This test will move an author (dc.contributor.author) within a workspace publication's "traditionalpageone"
+     * section from position 2 to 0 using a PATCH request and verify the order of the authors within the section.
+     * This test uses only plain text authors
+     * Original Order: 0,1,2,3,4
+     * Expected Order: 2,0,1,3,4
+     */
+    @Test
+    public void moveTraditionalPageOnePlainTextAuthorTwoToZeroTest() throws Exception {
+        initPlainTextPublicationWorkspace();
+
+        List<String> expectedOrder = new ArrayList<>();
+        expectedOrder.add(authorsOriginalOrder.get(2));
+        expectedOrder.add(authorsOriginalOrder.get(0));
+        expectedOrder.add(authorsOriginalOrder.get(1));
+        expectedOrder.add(authorsOriginalOrder.get(3));
+        expectedOrder.add(authorsOriginalOrder.get(4));
+
+        moveTraditionalPageOneAuthorTest(2, 0, expectedOrder);
+    }
+
+    /**
+     * This test will move an author (dc.contributor.author) within a workspace publication's "traditionalpageone"
+     * section from position 3 to 0 using a PATCH request and verify the order of the authors within the section.
+     * This test uses only plain text authors
+     * Original Order: 0,1,2,3,4
+     * Expected Order: 3,0,1,2,4
+     */
+    @Test
+    public void moveTraditionalPageOnePlainTextAuthorThreeToZeroTest() throws Exception {
+        initPlainTextPublicationWorkspace();
+
+        List<String> expectedOrder = new ArrayList<>();
+        expectedOrder.add(authorsOriginalOrder.get(3));
+        expectedOrder.add(authorsOriginalOrder.get(0));
+        expectedOrder.add(authorsOriginalOrder.get(1));
+        expectedOrder.add(authorsOriginalOrder.get(2));
+        expectedOrder.add(authorsOriginalOrder.get(4));
+
+        moveTraditionalPageOneAuthorTest(3, 0, expectedOrder);
+    }
+
+    /**
+     * This test will move an author (dc.contributor.author) within a workspace publication's "traditionalpageone"
+     * section from position 4 to 0 using a PATCH request and verify the order of the authors within the section.
+     * This test uses only plain text authors
+     * Original Order: 0,1,2,3,4
+     * Expected Order: 4,0,1,2,3
+     */
+    @Test
+    public void moveTraditionalPageOnePlainTextAuthorFourToZeroTest() throws Exception {
+        initPlainTextPublicationWorkspace();
+
+        List<String> expectedOrder = new ArrayList<>();
+        expectedOrder.add(authorsOriginalOrder.get(4));
+        expectedOrder.add(authorsOriginalOrder.get(0));
+        expectedOrder.add(authorsOriginalOrder.get(1));
+        expectedOrder.add(authorsOriginalOrder.get(2));
+        expectedOrder.add(authorsOriginalOrder.get(3));
+
+        moveTraditionalPageOneAuthorTest(4, 0, expectedOrder);
+    }
+
+    /**
+     * This test will move an author (dc.contributor.author) within a workspace publication's "traditionalpageone"
+     * section from position 1 to 3 using a PATCH request and verify the order of the authors within the section.
+     * This test uses only plain text authors
+     * Original Order: 0,1,2,3,4
+     * Expected Order: 0,2,3,1,4
+     */
+    @Test
+    public void moveTraditionalPageOnePlainTextAuthorOneToThreeTest() throws Exception {
+        initPlainTextPublicationWorkspace();
+
+        List<String> expectedOrder = new ArrayList<>();
+        expectedOrder.add(authorsOriginalOrder.get(0));
+        expectedOrder.add(authorsOriginalOrder.get(2));
+        expectedOrder.add(authorsOriginalOrder.get(3));
+        expectedOrder.add(authorsOriginalOrder.get(1));
+        expectedOrder.add(authorsOriginalOrder.get(4));
+
+        moveTraditionalPageOneAuthorTest(1, 3, expectedOrder);
+    }
+
+    /**
+     * This test will move an author (dc.contributor.author) within a workspace publication's "traditionalpageone"
+     * section from position 1 to 4 using a PATCH request and verify the order of the authors within the section.
+     * This test uses only plain text authors
+     * Original Order: 0,1,2,3,4
+     * Expected Order: 0,2,3,4,1
+     */
+    @Test
+    public void moveTraditionalPageOnePlainTextAuthorOneToFourTest() throws Exception {
+        initPlainTextPublicationWorkspace();
+
+        List<String> expectedOrder = new ArrayList<>();
+        expectedOrder.add(authorsOriginalOrder.get(0));
+        expectedOrder.add(authorsOriginalOrder.get(2));
+        expectedOrder.add(authorsOriginalOrder.get(3));
+        expectedOrder.add(authorsOriginalOrder.get(4));
+        expectedOrder.add(authorsOriginalOrder.get(1));
+
+        moveTraditionalPageOneAuthorTest(1, 4, expectedOrder);
+    }
+
+    /**
+     * This test will replace an author (dc.contributor.author) within a workspace publication's "traditionalpageone"
+     * section at position 0 using a PATCH request and verify the order and value of the authors within the section.
+     * This test uses only plain text authors
+     * @throws Exception
+     */
+    @Test
+    public void replaceTraditionalPagePlainTextOneAuthorZeroTest() throws Exception {
+        initPlainTextPublicationWorkspace();
+
+        List<String> expectedOrder = new ArrayList<>();
+        expectedOrder.add(replacedAuthor);
+        expectedOrder.add(authorsOriginalOrder.get(1));
+        expectedOrder.add(authorsOriginalOrder.get(2));
+        expectedOrder.add(authorsOriginalOrder.get(3));
+        expectedOrder.add(authorsOriginalOrder.get(4));
+
+        replaceTraditionalPageOneAuthorTest(0, expectedOrder);
+    }
+
+    /**
+     * This test will replace an author (dc.contributor.author) within a workspace publication's "traditionalpageone"
+     * section at position 2 using a PATCH request and verify the order and value of the authors within the section.
+     * This test uses only plain text authors
+     * @throws Exception
+     */
+    @Test
+    public void replaceTraditionalPagePlainTextOneAuthorTwoTest() throws Exception {
+        initPlainTextPublicationWorkspace();
+
+        List<String> expectedOrder = new ArrayList<>();
+        expectedOrder.add(authorsOriginalOrder.get(0));
+        expectedOrder.add(authorsOriginalOrder.get(1));
+        expectedOrder.add(replacedAuthor);
+        expectedOrder.add(authorsOriginalOrder.get(3));
+        expectedOrder.add(authorsOriginalOrder.get(4));
+
+        replaceTraditionalPageOneAuthorTest(2, expectedOrder);
+    }
+
+    /**
+     * This test will replace an author (dc.contributor.author) within a workspace publication's "traditionalpageone"
+     * section at position 3 using a PATCH request and verify the order and value of the authors within the section.
+     * This test uses only plain text authors
+     * @throws Exception
+     */
+    @Test
+    public void replaceTraditionalPageOnePlainTextAuthorThreeTest() throws Exception {
+        initPlainTextPublicationWorkspace();
+
+        List<String> expectedOrder = new ArrayList<>();
+        expectedOrder.add(authorsOriginalOrder.get(0));
+        expectedOrder.add(authorsOriginalOrder.get(1));
+        expectedOrder.add(authorsOriginalOrder.get(2));
+        expectedOrder.add(replacedAuthor);
+        expectedOrder.add(authorsOriginalOrder.get(4));
+
+        replaceTraditionalPageOneAuthorTest(3, expectedOrder);
+    }
+
+
+    /**
+     * This test will add an author (dc.contributor.author) within a workspace publication's "traditionalpageone"
+     * section at position 0 using a PATCH request and verify the place of the new author and the order of the
+     * authors within the section.
+     * This test uses only plain text authors
+     * Original Order: 0,1,2,3,4
+     * Expected Order: +,0,1,2,3,4 (with + being the new author)
+     */
+    @Test
+    public void addAuthorOnTraditionalPageOnePlainTextPlaceZeroTest() throws Exception {
+        initPlainTextPublicationWorkspace();
+
+        List<String> expectedOrder = new ArrayList<>();
+        expectedOrder.add(addedAuthor);
+        expectedOrder.add(authorsOriginalOrder.get(0));
+        expectedOrder.add(authorsOriginalOrder.get(1));
+        expectedOrder.add(authorsOriginalOrder.get(2));
+        expectedOrder.add(authorsOriginalOrder.get(3));
+        expectedOrder.add(authorsOriginalOrder.get(4));
+
+        addTraditionalPageOneAuthorTest("0", expectedOrder);
+
+    }
+
+    /**
+     * This test will add an author (dc.contributor.author) within a workspace publication's "traditionalpageone"
+     * section at position 1 using a PATCH request and verify the place of the new author and the order of the
+     * authors within the section.
+     * This test uses only plain text authors
+     * Original Order: 0,1,2,3,4
+     * Expected Order: 0,+,1,2,3,4 (with + being the new author)
+     */
+    @Test
+    public void addAuthorOnTraditionalPageOnePlainTextPlaceOneTest() throws Exception {
+        initPlainTextPublicationWorkspace();
+
+        List<String> expectedOrder = new ArrayList<>();
+        expectedOrder.add(authorsOriginalOrder.get(0));
+        expectedOrder.add(addedAuthor);
+        expectedOrder.add(authorsOriginalOrder.get(1));
+        expectedOrder.add(authorsOriginalOrder.get(2));
+        expectedOrder.add(authorsOriginalOrder.get(3));
+        expectedOrder.add(authorsOriginalOrder.get(4));
+
+        addTraditionalPageOneAuthorTest("1", expectedOrder);
+
+    }
+
+    /**
+     * This test will add an author (dc.contributor.author) within a workspace publication's "traditionalpageone"
+     * section at position 2 using a PATCH request and verify the place of the new author and the order of the
+     * authors within the section.
+     * This test uses only plain text authors
+     * Original Order: 0,1,2,3,4
+     * Expected Order: 0,1,+,2,3,4 (with + being the new author)
+     */
+    @Test
+    public void addAuthorOnTraditionalPageOnePlainTextPlaceTwoTest() throws Exception {
+        initPlainTextPublicationWorkspace();
+
+        List<String> expectedOrder = new ArrayList<>();
+        expectedOrder.add(authorsOriginalOrder.get(0));
+        expectedOrder.add(authorsOriginalOrder.get(1));
+        expectedOrder.add(addedAuthor);
+        expectedOrder.add(authorsOriginalOrder.get(2));
+        expectedOrder.add(authorsOriginalOrder.get(3));
+        expectedOrder.add(authorsOriginalOrder.get(4));
+
+        addTraditionalPageOneAuthorTest("2", expectedOrder);
+
+    }
+
+    /**
+     * This test will add an author (dc.contributor.author) within a workspace publication's "traditionalpageone"
+     * section at position 3 using a PATCH request and verify the place of the new author and the order of the
+     * authors within the section.
+     * This test uses only plain text authors
+     * Original Order: 0,1,2,3,4
+     * Expected Order: 0,1,2,+,3,4 (with + being the new author)
+     */
+    @Test
+    public void addAuthorOnTraditionalPageOnePlainTextPlaceThreeTest() throws Exception {
+        initPlainTextPublicationWorkspace();
+
+        List<String> expectedOrder = new ArrayList<>();
+        expectedOrder.add(authorsOriginalOrder.get(0));
+        expectedOrder.add(authorsOriginalOrder.get(1));
+        expectedOrder.add(authorsOriginalOrder.get(2));
+        expectedOrder.add(addedAuthor);
+        expectedOrder.add(authorsOriginalOrder.get(3));
+        expectedOrder.add(authorsOriginalOrder.get(4));
+
+        addTraditionalPageOneAuthorTest("3", expectedOrder);
+
+    }
+
+    /**
+     * This test will add an author (dc.contributor.author) within a workspace publication's "traditionalpageone"
+     * section at position 4 using a PATCH request and verify the place of the new author and the order of the
+     * authors within the section.
+     * This test uses only plain text authors
+     * Original Order: 0,1,2,3,4
+     * Expected Order: 0,1,2,3,+,4 (with + being the new author)
+     */
+    @Test
+    public void addAuthorOnTraditionalPageOnePlainTextPlaceFourTest() throws Exception {
+        initPlainTextPublicationWorkspace();
+
+        List<String> expectedOrder = new ArrayList<>();
+        expectedOrder.add(authorsOriginalOrder.get(0));
+        expectedOrder.add(authorsOriginalOrder.get(1));
+        expectedOrder.add(authorsOriginalOrder.get(2));
+        expectedOrder.add(authorsOriginalOrder.get(3));
+        expectedOrder.add(addedAuthor);
+        expectedOrder.add(authorsOriginalOrder.get(4));
+
+        addTraditionalPageOneAuthorTest("4", expectedOrder);
+
+    }
+
+    /**
+     * This test will add an author (dc.contributor.author) within a workspace publication's "traditionalpageone"
+     * section at position 0 using a PATCH request and verify the place of the new author and the order of the
+     * authors within the section.
+     * This test uses only plain text authors
+     * Original Order: 0,1,2,3,4
+     * Expected Order: +,0,1,2,3,4 (with + being the new author)
+     */
+    @Test
+    public void addAuthorOnTraditionalPageOneLastPlainTextPlaceTest() throws Exception {
+        initPlainTextPublicationWorkspace();
+
+        List<String> expectedOrder = new ArrayList<>();
+        expectedOrder.add(authorsOriginalOrder.get(0));
+        expectedOrder.add(authorsOriginalOrder.get(1));
+        expectedOrder.add(authorsOriginalOrder.get(2));
+        expectedOrder.add(authorsOriginalOrder.get(3));
+        expectedOrder.add(authorsOriginalOrder.get(4));
+        expectedOrder.add(addedAuthor);
+
+        addTraditionalPageOneAuthorTest("-", expectedOrder);
+
+    }
+
+    /**
+     * This test will remove the author (dc.contributor.author) from a workspace publication's "traditionalpageone"
+     * section at position 0 using a PATCH request and verify the order of the remaining authors within the section.
+     * This test uses only plain text authors
+     * Original Order: 0,1,2,3,4
+     * Expected Order: 1,2,3,4
+     */
+    @Test
+    public void removeAuthorOnTraditionalPagePlainTextFromPlaceZeroTest() throws Exception {
+        initPlainTextPublicationWorkspace();
+
+        List<String> expectedOrder = new ArrayList<>();
+        expectedOrder.add(authorsOriginalOrder.get(1));
+        expectedOrder.add(authorsOriginalOrder.get(2));
+        expectedOrder.add(authorsOriginalOrder.get(3));
+        expectedOrder.add(authorsOriginalOrder.get(4));
+
+        removeTraditionalPageOneAuthorTest(0, expectedOrder);
+    }
+    /**
+     * This test will remove the author (dc.contributor.author) from a workspace publication's "traditionalpageone"
+     * section at position 1 using a PATCH request and verify the order of the remaining authors within the section.
+     * This test uses only plain text authors
+     * Original Order: 0,1,2,3,4
+     * Expected Order: 0,2,3,4
+     */
+    @Test
+    public void removeAuthorOnTraditionalPagePlainTextFromPlaceOneTest() throws Exception {
+        initPlainTextPublicationWorkspace();
+
+        List<String> expectedOrder = new ArrayList<>();
+        expectedOrder.add(authorsOriginalOrder.get(0));
+        expectedOrder.add(authorsOriginalOrder.get(2));
+        expectedOrder.add(authorsOriginalOrder.get(3));
+        expectedOrder.add(authorsOriginalOrder.get(4));
+
+        // The author at the first place is linked through a relationship and cannot be deleted through a PATCH request
+        removeTraditionalPageOneAuthorTest(1, expectedOrder);
+    }
+    /**
+     * This test will remove the author (dc.contributor.author) from a workspace publication's "traditionalpageone"
+     * section at position 2 using a PATCH request and verify the order of the remaining authors within the section.
+     * This test uses only plain text authors
+     * Original Order: 0,1,2,3,4
+     * Expected Order: 0,1,3,4
+     */
+    @Test
+    public void removeAuthorOnTraditionalPagePlainTextFromPlaceTwoTest() throws Exception {
+        initPlainTextPublicationWorkspace();
+
+        List<String> expectedOrder = new ArrayList<>();
+        expectedOrder.add(authorsOriginalOrder.get(0));
+        expectedOrder.add(authorsOriginalOrder.get(1));
+        expectedOrder.add(authorsOriginalOrder.get(3));
+        expectedOrder.add(authorsOriginalOrder.get(4));
+
+        removeTraditionalPageOneAuthorTest(2, expectedOrder);
+    }
+    /**
+     * This test will remove the author (dc.contributor.author) from a workspace publication's "traditionalpageone"
+     * section at position 3 using a PATCH request and verify the order of the remaining authors within the section.
+     * This test uses only plain text authors
+     * Original Order: 0,1,2,3,4
+     * Expected Order: 0,1,2,4
+     */
+    @Test
+    public void removeAuthorOnTraditionalPagePlainTextFromPlaceThreeTest() throws Exception {
+        initPlainTextPublicationWorkspace();
+
+        List<String> expectedOrder = new ArrayList<>();
+        expectedOrder.add(authorsOriginalOrder.get(0));
+        expectedOrder.add(authorsOriginalOrder.get(1));
+        expectedOrder.add(authorsOriginalOrder.get(2));
+        expectedOrder.add(authorsOriginalOrder.get(4));
+
+        removeTraditionalPageOneAuthorTest(3, expectedOrder);
+    }
+    /**
+     * This test will remove the author (dc.contributor.author) from a workspace publication's "traditionalpageone"
+     * section at position 4 using a PATCH request and verify the order of the remaining authors within the section.
+     * This test uses only plain text authors
+     * Original Order: 0,1,2,3,4
+     * Expected Order: 0,1,2,3
+     */
+    @Test
+    public void removeAuthorOnTraditionalPagePlainTextFromPlaceFourTest() throws Exception {
+        initPlainTextPublicationWorkspace();
+
+        List<String> expectedOrder = new ArrayList<>();
+        expectedOrder.add(authorsOriginalOrder.get(0));
+        expectedOrder.add(authorsOriginalOrder.get(1));
+        expectedOrder.add(authorsOriginalOrder.get(2));
+        expectedOrder.add(authorsOriginalOrder.get(3));
+
+        // The author at the fourth place is linked through a relationship and cannot be deleted through a PATCH request
+        removeTraditionalPageOneAuthorTest(4, expectedOrder);
+    }
+
 
     /**
      * This test will remove all authors (dc.contributor.author) that are not linked through a relationship  from a

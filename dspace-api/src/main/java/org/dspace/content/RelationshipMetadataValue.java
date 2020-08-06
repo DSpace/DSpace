@@ -60,6 +60,11 @@ public class RelationshipMetadataValue extends MetadataValue {
         return super.equals(obj);
     }
 
+    /**
+     * Retrieves the Relationship ID from which the current RelationshipMetadataValue is derived
+     *
+     * @return the relationship ID
+     */
     public int getRelationshipId() {
         return Integer.parseInt(getAuthority().substring(Constants.VIRTUAL_AUTHORITY_PREFIX.length()));
     }
