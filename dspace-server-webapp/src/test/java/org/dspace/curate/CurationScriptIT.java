@@ -361,7 +361,7 @@ public class CurationScriptIT extends AbstractControllerIntegrationTest {
                 .andExpect(jsonPath("$", is(
                     ProcessMatcher.matchProcess("curate",
                         String.valueOf(admin.getID()), parameters,
-                        ProcessStatus.SCHEDULED))))
+                        ProcessStatus.COMPLETED))))
                 .andDo(result -> idRef
                     .set(read(result.getResponse().getContentAsString(), "$.processId")));
         } finally {
@@ -414,7 +414,7 @@ public class CurationScriptIT extends AbstractControllerIntegrationTest {
                 .andExpect(jsonPath("$", is(
                     ProcessMatcher.matchProcess("curate",
                         String.valueOf(admin.getID()), parameters,
-                        ProcessStatus.SCHEDULED))))
+                        ProcessStatus.COMPLETED))))
                 .andDo(result -> idRef
                     .set(read(result.getResponse().getContentAsString(), "$.processId")));
         } finally {
