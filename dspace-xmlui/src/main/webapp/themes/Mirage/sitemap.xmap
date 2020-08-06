@@ -75,7 +75,7 @@
                 <map:parameter name="stylesheet.screen#1" value="lib/css/reset.css"/>
                 <map:parameter name="stylesheet.screen#2" value="lib/css/base.css"/>
                 <map:parameter name="stylesheet.screen#3" value="lib/css/helper.css"/>
-                <map:parameter name="stylesheet.screen#4" value="lib/css/jquery-ui-1.8.15.custom.css"/>
+                <map:parameter name="stylesheet.screen#4" value="lib/css/jquery-ui-1.12.1.css"/>
                 <map:parameter name="stylesheet.screen#5" value="lib/css/style.css"/>
                 <map:parameter name="stylesheet.screen#6" value="lib/css/authority-control.css"/>
             </map:transform>
@@ -85,7 +85,7 @@
             </map:transform>
             <map:transform type="IncludePageMeta">
                 <map:parameter name="stylesheet.all" value="lib/css/media.css"/>
-                <map:parameter name="javascript" value="lib/js/jquery-ui-1.8.15.custom.min.js"/>
+                <map:parameter name="javascript" value="lib/js/jquery-ui-1.12.1.min.js"/>
                 <map:parameter name="theme.path" value="{global:theme-path}"/>
                 <map:parameter name="theme.name" value="{global:theme-path}"/>
                 <map:parameter name="curRequestURI" value="{1}"/>
