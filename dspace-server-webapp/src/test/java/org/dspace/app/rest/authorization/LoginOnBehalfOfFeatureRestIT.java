@@ -7,12 +7,12 @@
  */
 package org.dspace.app.rest.authorization;
 
+import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import org.dspace.app.rest.authorization.impl.LoginOnBehalfOfFeature;
-import org.dspace.app.rest.builder.CommunityBuilder;
 import org.dspace.app.rest.converter.CommunityConverter;
 import org.dspace.app.rest.converter.SiteConverter;
 import org.dspace.app.rest.matcher.AuthorizationMatcher;
@@ -21,6 +21,7 @@ import org.dspace.app.rest.model.SiteRest;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.app.rest.utils.Utils;
+import org.dspace.builder.CommunityBuilder;
 import org.dspace.content.Site;
 import org.dspace.content.service.SiteService;
 import org.dspace.services.ConfigurationService;
@@ -101,8 +102,7 @@ public class LoginOnBehalfOfFeatureRestIT extends AbstractControllerIntegrationT
                                      .param("eperson", String.valueOf(admin.getID()))
                                      .param("feature", loginOnBehalfOf.getName()))
                         .andExpect(status().isOk())
-                        .andExpect(jsonPath("$._embedded.authorizations", Matchers.not(Matchers.hasItem(
-                            AuthorizationMatcher.matchAuthorization(loginOnBehalfOfAuthorization)))));
+                        .andExpect(jsonPath("$.page.totalElements", is(0)));
     }
 
     @Test
@@ -122,8 +122,7 @@ public class LoginOnBehalfOfFeatureRestIT extends AbstractControllerIntegrationT
                                      .param("eperson", String.valueOf(eperson.getID()))
                                      .param("feature", loginOnBehalfOf.getName()))
                         .andExpect(status().isOk())
-                        .andExpect(jsonPath("$._embedded.authorizations", Matchers.not(
-                            Matchers.hasItem(AuthorizationMatcher.matchAuthorization(loginOnBehalfOfAuthorization)))));
+                        .andExpect(jsonPath("$.page.totalElements", is(0)));
     }
 
     @Test
@@ -143,8 +142,7 @@ public class LoginOnBehalfOfFeatureRestIT extends AbstractControllerIntegrationT
                                      .param("eperson", String.valueOf(eperson.getID()))
                                      .param("feature", loginOnBehalfOf.getName()))
                         .andExpect(status().isOk())
-                        .andExpect(jsonPath("$._embedded.authorizations", Matchers.not(
-                            Matchers.hasItem(AuthorizationMatcher.matchAuthorization(loginOnBehalfOfAuthorization)))));
+                        .andExpect(jsonPath("$.page.totalElements", is(0)));
     }
 
     @Test
@@ -164,7 +162,6 @@ public class LoginOnBehalfOfFeatureRestIT extends AbstractControllerIntegrationT
                                      .param("eperson", String.valueOf(admin.getID()))
                                      .param("feature", loginOnBehalfOf.getName()))
                         .andExpect(status().isOk())
-                        .andExpect(jsonPath("$._embedded.authorizations", Matchers.not(
-                            Matchers.hasItem(AuthorizationMatcher.matchAuthorization(loginOnBehalfOfAuthorization)))));
+                        .andExpect(jsonPath("$.page.totalElements", is(0)));
     }
 }

@@ -28,18 +28,18 @@ import org.dspace.scripts.DSpaceRunnable;
 import org.dspace.scripts.configuration.ScriptConfiguration;
 import org.dspace.scripts.factory.ScriptServiceFactory;
 import org.dspace.scripts.service.ScriptService;
-import org.dspace.services.ConfigurationService;
-import org.dspace.services.factory.DSpaceServicesFactory;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 public class MetadataImportTest extends AbstractIntegrationTest {
 
-    private ItemService itemService = ContentServiceFactory.getInstance().getItemService();
-    private CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
-    private CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
-    private ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
+    private final ItemService itemService
+        = ContentServiceFactory.getInstance().getItemService();
+    private final CollectionService collectionService
+        = ContentServiceFactory.getInstance().getCollectionService();
+    private final CommunityService communityService
+        = ContentServiceFactory.getInstance().getCommunityService();
 
     @Rule
     public ExpectedException thrown = ExpectedException.none();
