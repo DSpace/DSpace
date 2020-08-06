@@ -121,7 +121,7 @@
 
         <script>
         <xsl:attribute name="src">
-        <xsl:text>http://code.jquery.com/jquery-1.7.1.min.js</xsl:text>
+        <xsl:text>http://code.jquery.com/jquery-3.4.1.min.js</xsl:text>
         </xsl:attribute>&#160;</script>
 
         <script>

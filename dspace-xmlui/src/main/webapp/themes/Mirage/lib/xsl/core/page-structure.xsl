@@ -682,7 +682,7 @@
 
     <xsl:template name="addJavascript">
         <xsl:variable name="jqueryVersion">
-            <xsl:text>1.6.4</xsl:text>
+            <xsl:text>3.4.1</xsl:text>
         </xsl:variable>
 
 
