@@ -15,6 +15,7 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.startsWith;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -340,6 +341,32 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
                            .andExpect(jsonPath("$.okay", is(true)))
                            .andExpect(jsonPath("$.authenticated", is(true)))
                            .andExpect(jsonPath("$.type", is("status")));
+    }
+
+    @Test
+    // This test is verifying that Spring Security's CSRF protection is working as we expect
+    // We must test this using a simple non-GET request, as CSRF Tokens are not validated in a GET request
+    public void testRefreshTokenWithInvalidCSRF() throws Exception {
+        // Login via password to retrieve a valid token
+        String token = getAuthToken(eperson.getEmail(), password);
+
+        // Remove "Bearer " from that token, so that we are left with the token itself
+        token = token.replace("Bearer ", "");
+
+        // Save token to an Authorization cookie
+        Cookie[] cookies = new Cookie[1];
+        cookies[0] = new Cookie(AUTHORIZATION_COOKIE, token);
+
+        // POSTing to /login should be a valid request...it just refreshes your token (see testRefreshToken())
+        // However, in this case, we are POSTing with an *INVALID* CSRF Token in Header.
+        getClient().perform(post("/api/authn/login").with(csrf().useInvalidToken().asHeader())
+                                                    .secure(true)
+                                                    .cookie(cookies))
+                   // Should return a 403 Forbidden, for an invalid CSRF token
+                   .andExpect(status().isForbidden());
+        //Logout
+        getClient(token).perform(get("/api/authn/logout"))
+                        .andExpect(status().isNoContent());
     }
 
     @Test
