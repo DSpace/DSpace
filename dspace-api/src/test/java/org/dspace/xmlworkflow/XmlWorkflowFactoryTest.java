@@ -116,12 +116,12 @@ public class XmlWorkflowFactoryTest extends AbstractUnitTest {
     @Test
     public void workflowMapping_NonMappedCollection() throws WorkflowConfigurationException {
         Workflow workflow = xmlWorkflowFactory.getWorkflow(this.nonMappedCollection);
-        assertEquals("defaultWorkflow", workflow.getID());
+        assertEquals(XmlWorkflowFactoryImpl.LEGACY_WORKFLOW_NAME, workflow.getID());
     }
 
     @Test
     public void workflowMapping_MappedCollection() throws WorkflowConfigurationException {
         Workflow workflow = xmlWorkflowFactory.getWorkflow(this.mappedCollection);
-        assertEquals("selectSingleReviewer", workflow.getID());
+        assertEquals( "selectSingleReviewer", workflow.getID());
     }
 }
