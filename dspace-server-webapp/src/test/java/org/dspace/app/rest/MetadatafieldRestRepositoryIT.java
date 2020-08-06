@@ -23,11 +23,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.util.concurrent.atomic.AtomicReference;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.dspace.app.rest.builder.MetadataFieldBuilder;
-import org.dspace.app.rest.builder.MetadataSchemaBuilder;
 import org.dspace.app.rest.matcher.MetadataFieldMatcher;
 import org.dspace.app.rest.model.MetadataFieldRest;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
+import org.dspace.builder.MetadataFieldBuilder;
+import org.dspace.builder.MetadataSchemaBuilder;
 import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataFieldServiceImpl;
 import org.dspace.content.MetadataSchema;
@@ -179,21 +179,21 @@ public class MetadatafieldRestRepositoryIT extends AbstractControllerIntegration
         String authToken = getAuthToken(admin.getEmail(), password);
         AtomicReference<Integer> idRef = new AtomicReference<>();
         try {
-        assertThat(metadataFieldService.findByElement(context, metadataSchema, ELEMENT, QUALIFIER), nullValue());
+            assertThat(metadataFieldService.findByElement(context, metadataSchema, ELEMENT, QUALIFIER), nullValue());
 
-        getClient(authToken)
-            .perform(post("/api/core/metadatafields")
-                         .param("schemaId", metadataSchema.getID() + "")
-                         .param("projection", "full")
-                         .content(new ObjectMapper().writeValueAsBytes(metadataFieldRest))
-                         .contentType(contentType))
-            .andExpect(status().isCreated())
-            .andDo(result -> idRef.set(read(result.getResponse().getContentAsString(), "$.id")));
+            getClient(authToken)
+                .perform(post("/api/core/metadatafields")
+                             .param("schemaId", metadataSchema.getID() + "")
+                             .param("projection", "full")
+                             .content(new ObjectMapper().writeValueAsBytes(metadataFieldRest))
+                             .contentType(contentType))
+                .andExpect(status().isCreated())
+                .andDo(result -> idRef.set(read(result.getResponse().getContentAsString(), "$.id")));
 
-        getClient(authToken).perform(get("/api/core/metadatafields/" + idRef.get()))
-                            .andExpect(status().isOk())
-                            .andExpect(jsonPath("$", MetadataFieldMatcher.matchMetadataFieldByKeys(
-                                metadataSchema.getName(), "testElementForCreate", "testQualifierForCreate")));
+            getClient(authToken).perform(get("/api/core/metadatafields/" + idRef.get()))
+                                .andExpect(status().isOk())
+                                .andExpect(jsonPath("$", MetadataFieldMatcher.matchMetadataFieldByKeys(
+                                    metadataSchema.getName(), "testElementForCreate", "testQualifierForCreate")));
         } finally {
             MetadataFieldBuilder.deleteMetadataField(idRef.get());
         }
