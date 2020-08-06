@@ -7,9 +7,7 @@
  */
 package org.dspace.app.rest;
 
-import static org.dspace.app.rest.builder.CollectionBuilder.createCollection;
-import static org.dspace.app.rest.builder.CommunityBuilder.createCommunity;
-import static org.dspace.app.rest.builder.ItemBuilder.createItem;
+import static org.dspace.builder.ItemBuilder.createItem;
 import static org.junit.Assert.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -18,6 +16,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import javax.servlet.ServletException;
 
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
+import org.dspace.builder.CollectionBuilder;
+import org.dspace.builder.CommunityBuilder;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
@@ -52,8 +52,8 @@ public class SitemapRestControllerIT extends AbstractControllerIntegrationTest {
 
         context.turnOffAuthorisationSystem();
 
-        Community community = createCommunity(context).build();
-        Collection collection = createCollection(context, community).build();
+        Community community = CommunityBuilder.createCommunity(context).build();
+        Collection collection = CollectionBuilder.createCollection(context, community).build();
         this.item1 = createItem(context, collection)
             .withTitle("Test 1")
             .withIssueDate("2010-10-17")
