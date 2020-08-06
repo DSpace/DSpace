@@ -22,8 +22,6 @@ import java.util.List;
 import java.util.Map;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.dspace.app.rest.builder.CollectionBuilder;
-import org.dspace.app.rest.builder.CommunityBuilder;
 import org.dspace.app.rest.matcher.MetadataMatcher;
 import org.dspace.app.rest.model.MetadataRest;
 import org.dspace.app.rest.model.MetadataValueRest;
@@ -33,6 +31,8 @@ import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.rest.model.patch.ReplaceOperation;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.authorize.service.ResourcePolicyService;
+import org.dspace.builder.CollectionBuilder;
+import org.dspace.builder.CommunityBuilder;
 import org.dspace.content.Collection;
 import org.dspace.core.Constants;
 import org.hamcrest.Matchers;
@@ -249,7 +249,7 @@ public class ItemTemplateRestControllerIT extends AbstractControllerIntegrationT
 
         String itemId = installTestTemplate();
 
-        List<Operation> ops = new ArrayList<Operation>();
+        List<Operation> ops = new ArrayList<>();
         ReplaceOperation replaceOperation = new ReplaceOperation("/inArchive", true);
         ops.add(replaceOperation);
         String illegalPatchBody = getPatchContent(ops);
@@ -266,7 +266,7 @@ public class ItemTemplateRestControllerIT extends AbstractControllerIntegrationT
 
         String itemId = installTestTemplate();
 
-        List<Operation> ops = new ArrayList<Operation>();
+        List<Operation> ops = new ArrayList<>();
         ReplaceOperation replaceOperation = new ReplaceOperation("/discoverable", true);
         ops.add(replaceOperation);
         String illegalPatchBody = getPatchContent(ops);
@@ -283,7 +283,7 @@ public class ItemTemplateRestControllerIT extends AbstractControllerIntegrationT
 
         String itemId = installTestTemplate();
 
-        List<Operation> ops = new ArrayList<Operation>();
+        List<Operation> ops = new ArrayList<>();
         ReplaceOperation replaceOperation = new ReplaceOperation("/withdrawn", true);
         ops.add(replaceOperation);
         String illegalPatchBody = getPatchContent(ops);
