@@ -12,8 +12,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.util.Locale;
 
-import org.dspace.app.rest.builder.EPersonBuilder;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
+import org.dspace.builder.EPersonBuilder;
 import org.dspace.content.authority.ChoiceAuthorityServiceImpl;
 import org.dspace.core.LegacyPluginServiceImpl;
 import org.dspace.eperson.EPerson;

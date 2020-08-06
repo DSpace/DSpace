@@ -38,7 +38,7 @@ public class DiscoverFacetsConverter {
     @Autowired
     private SearchService searchService;
 
-    public SearchResultsRest convert(Context context, String query, String dsoType, String configurationName,
+    public SearchResultsRest convert(Context context, String query, List<String> dsoTypes, String configurationName,
                                      String dsoScope, List<SearchFilter> searchFilters, final Pageable page,
                                      DiscoveryConfiguration configuration, DiscoverResult searchResult,
                                      Projection projection) {
@@ -46,7 +46,7 @@ public class DiscoverFacetsConverter {
         SearchResultsRest searchResultsRest = new SearchResultsRest();
         searchResultsRest.setProjection(projection);
 
-        setRequestInformation(context, query, dsoType, configurationName, dsoScope, searchFilters, page,
+        setRequestInformation(context, query, dsoTypes, configurationName, dsoScope, searchFilters, page,
                               searchResultsRest);
         addFacetValues(context, searchResult, searchResultsRest, configuration, projection);
 
@@ -129,13 +129,13 @@ public class DiscoverFacetsConverter {
         }
     }
 
-    private void setRequestInformation(final Context context, final String query, final String dsoType,
+    private void setRequestInformation(final Context context, final String query, final List<String> dsoTypes,
                                        final String configurationName, final String scope,
                                        final List<SearchFilter> searchFilters, final Pageable page,
                                        final SearchResultsRest resultsRest) {
         resultsRest.setQuery(query);
         resultsRest.setConfiguration(configurationName);
-        resultsRest.setDsoType(dsoType);
+        resultsRest.setDsoTypes(dsoTypes);
         resultsRest.setSort(SearchResultsRest.Sorting.fromPage(page));
 
         resultsRest.setScope(scope);
