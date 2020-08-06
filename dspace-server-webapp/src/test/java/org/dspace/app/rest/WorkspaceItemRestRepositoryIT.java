@@ -871,7 +871,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
      *
      * @throws Exception
      */
-    public void createMultipleWorkspaceItemFromFileTest() throws Exception {
+    public void createSingleWorkspaceItemFromFileWithOneEntryTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
         //** GIVEN **
@@ -892,55 +892,258 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                                            .build();
 
         InputStream bibtex = getClass().getResourceAsStream("bibtex-test.bib");
-        final MockMultipartFile bibtexFile = new MockMultipartFile("file", "bibtex-test.bib", "application/x-bibtex",
-                bibtex);
+        final MockMultipartFile bibtexFile = new MockMultipartFile("file", "/local/path/bibtex-test.bib",
+            "application/x-bibtex", bibtex);
 
         context.restoreAuthSystemState();
 
         String authToken = getAuthToken(eperson.getEmail(), password);
-        // bulk create workspaceitems in the default collection (col1)
+        // create a workspaceitem from a single bibliographic entry file explicitly in the default collection (col1)
         getClient(authToken).perform(fileUpload("/api/submission/workspaceitems")
                     .file(bibtexFile))
-                // bulk create should return 200, 201 (created) is better for single resource
+                // create should return 200, 201 (created) is better for single resource
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$._embedded.workspaceitems[0].sections.traditionalpageone['dc.title'][0].value",
                         is("My Article")))
                 .andExpect(
                         jsonPath("$._embedded.workspaceitems[0]._embedded.collection.id", is(col1.getID().toString())))
-                .andExpect(jsonPath("$._embedded.workspaceitems[1].sections.traditionalpageone['dc.title'][0].value",
-                        is("My Article 2")))
+                .andExpect(jsonPath("$._embedded.workspaceitems[0].sections.upload.files[0]"
+                     + ".metadata['dc.source'][0].value",
+                        is("/local/path/bibtex-test.bib")))
+                .andExpect(jsonPath("$._embedded.workspaceitems[0].sections.upload.files[0]"
+                     + ".metadata['dc.title'][0].value",
+                        is("bibtex-test.bib")))
                 .andExpect(
-                        jsonPath("$._embedded.workspaceitems[1]._embedded.collection.id", is(col1.getID().toString())))
-                .andExpect(jsonPath("$._embedded.workspaceitems[2].sections.traditionalpageone['dc.title'][0].value",
-                        is("My Article 3")))
-                .andExpect(
-                        jsonPath("$._embedded.workspaceitems[2]._embedded.collection.id", is(col1.getID().toString())))
-                .andExpect(
-                        jsonPath("$._embedded.workspaceitems[*]._embedded.upload").doesNotExist())
+                        jsonPath("$._embedded.workspaceitems[*]._embedded.upload").doesNotExist());
         ;
 
-        // bulk create workspaceitems explicitly in the col2
+        // create a workspaceitem from a single bibliographic entry file explicitly in the col2
         getClient(authToken).perform(fileUpload("/api/submission/workspaceitems")
                     .file(bibtexFile)
-                    .param("collection", col2.getID().toString()))
+                    .param("owningCollection", col2.getID().toString()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$._embedded.workspaceitems[0].sections.traditionalpageone['dc.title'][0].value",
                         is("My Article")))
                 .andExpect(
                         jsonPath("$._embedded.workspaceitems[0]._embedded.collection.id", is(col2.getID().toString())))
-                .andExpect(jsonPath("$._embedded.workspaceitems[1].sections.traditionalpageone['dc.title'][0].value",
-                        is("My Article 2")))
+                .andExpect(jsonPath("$._embedded.workspaceitems[0].sections.upload.files[0]"
+                     + ".metadata['dc.source'][0].value",
+                        is("/local/path/bibtex-test.bib")))
+                .andExpect(jsonPath("$._embedded.workspaceitems[0].sections.upload"
+                     + ".files[0].metadata['dc.title'][0].value",
+                        is("bibtex-test.bib")))
                 .andExpect(
-                        jsonPath("$._embedded.workspaceitems[1]._embedded.collection.id", is(col2.getID().toString())))
-                .andExpect(jsonPath("$._embedded.workspaceitems[2].sections.traditionalpageone['dc.title'][0].value",
-                        is("My Article 3")))
-                .andExpect(
-                        jsonPath("$._embedded.workspaceitems[2]._embedded.collection.id", is(col2.getID().toString())))
-                .andExpect(
-                        jsonPath("$._embedded.workspaceitems[*]._embedded.upload").doesNotExist())
-        ;
+                        jsonPath("$._embedded.workspaceitems[*]._embedded.upload").doesNotExist());
 
         bibtex.close();
+    }
+
+
+
+    @Test
+    /**
+     * Test the creation of workspaceitems POSTing to the resource collection endpoint a
+     * bibtex and pubmed files
+     *
+     * @throws Exception
+     */
+    public void createSingleWorkspaceItemFromMultipleFilesWithOneEntryTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and two collections.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1)
+                                           .withName("Collection 1")
+                                           .withSubmitterGroup(eperson)
+                                           .build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1)
+                                           .withName("Collection 2")
+                                           .withSubmitterGroup(eperson)
+                                           .build();
+
+        InputStream bibtex = getClass().getResourceAsStream("bibtex-test.bib");
+        final MockMultipartFile bibtexFile = new MockMultipartFile("file", "/local/path/bibtex-test.bib",
+            "application/x-bibtex", bibtex);
+        InputStream xmlIS = getClass().getResourceAsStream("pubmed-test.xml");
+        final MockMultipartFile pubmedFile = new MockMultipartFile("file", "/local/path/pubmed-test.xml",
+            "application/xml", xmlIS);
+
+        context.restoreAuthSystemState();
+
+        String authToken = getAuthToken(eperson.getEmail(), password);
+        // create a workspaceitem from a single bibliographic entry file explicitly in the default collection (col1)
+        getClient(authToken).perform(fileUpload("/api/submission/workspaceitems")
+                    .file(bibtexFile).file(pubmedFile))
+                // create should return 200, 201 (created) is better for single resource
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$._embedded.workspaceitems[0].sections.traditionalpageone['dc.title'][0].value",
+                        is("My Article")))
+                .andExpect(
+                        jsonPath("$._embedded.workspaceitems[0]._embedded.collection.id", is(col1.getID().toString())))
+                .andExpect(jsonPath("$._embedded.workspaceitems[0].sections.upload.files[0]"
+                     + ".metadata['dc.source'][0].value",
+                        is("/local/path/bibtex-test.bib")))
+                .andExpect(jsonPath("$._embedded.workspaceitems[0].sections.upload.files[0]"
+                     + ".metadata['dc.title'][0].value",
+                        is("bibtex-test.bib")))
+                .andExpect(jsonPath("$._embedded.workspaceitems[0].sections.traditionalpageone['dc.title'][1].value")
+                    .doesNotExist())
+                .andExpect(jsonPath("$._embedded.workspaceitems[0].sections.upload.files[1]"
+                        + ".metadata['dc.source'][0].value",
+                            is("/local/path/pubmed-test.xml")))
+                .andExpect(jsonPath("$._embedded.workspaceitems[0].sections.upload.files[1]"
+                        + ".metadata['dc.title'][0].value",
+                            is("pubmed-test.xml")));
+
+        // create a workspaceitem from a single bibliographic entry file explicitly in the col2
+        getClient(authToken).perform(fileUpload("/api/submission/workspaceitems")
+                    .file(bibtexFile).file(pubmedFile)
+                    .param("owningCollection", col2.getID().toString()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$._embedded.workspaceitems[0].sections.traditionalpageone['dc.title'][0].value",
+                        is("My Article")))
+                .andExpect(
+                        jsonPath("$._embedded.workspaceitems[0]._embedded.collection.id", is(col2.getID().toString())))
+                .andExpect(jsonPath("$._embedded.workspaceitems[0].sections.upload.files[0]"
+                     + ".metadata['dc.source'][0].value",
+                        is("/local/path/bibtex-test.bib")))
+                .andExpect(jsonPath("$._embedded.workspaceitems[0].sections.upload"
+                     + ".files[0].metadata['dc.title'][0].value",
+                        is("bibtex-test.bib")))
+                .andExpect(jsonPath("$._embedded.workspaceitems[0].sections.traditionalpageone['dc.title'][1].value")
+                        .doesNotExist())
+                .andExpect(jsonPath("$._embedded.workspaceitems[0].sections.upload.files[1]"
+                     + ".metadata['dc.source'][0].value",
+                         is("/local/path/pubmed-test.xml")))
+                .andExpect(jsonPath("$._embedded.workspaceitems[0].sections.upload.files[1]"
+                     + ".metadata['dc.title'][0].value",
+                         is("pubmed-test.xml")));
+        bibtex.close();
+        xmlIS.close();
+    }
+
+    @Test
+    /**
+     * Test the creation of workspaceitems POSTing to the resource collection endpoint a bibtex file
+     * contains more than one entry.
+     * 
+     * @throws Exception
+     */
+    public void createSingleWorkspaceItemsFromSingleFileWithMultipleEntriesTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and two collections.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1)
+                                           .withName("Collection 1")
+                                           .withSubmitterGroup(eperson)
+                                           .build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1)
+                                           .withName("Collection 2")
+                                           .withSubmitterGroup(eperson)
+                                           .build();
+
+        InputStream bibtex = getClass().getResourceAsStream("bibtex-test-3-entries.bib");
+        final MockMultipartFile bibtexFile = new MockMultipartFile("file", "bibtex-test-3-entries.bib",
+            "application/x-bibtex",
+                bibtex);
+
+        context.restoreAuthSystemState();
+
+        String authToken = getAuthToken(eperson.getEmail(), password);
+        // create a workspaceitem from a single bibliographic entry file explicitly in the default collection (col1)
+        getClient(authToken).perform(fileUpload("/api/submission/workspaceitems")
+                    .file(bibtexFile))
+                  // create should return return a 422 because we don't allow/support bibliographic files
+                 // that have multiple metadata records
+                .andExpect(status().is(422));
+        bibtex.close();
+    }
+
+    @Test
+    /**
+     * Test the creation of workspaceitems POSTing to the resource collection endpoint a pubmed XML
+     * file.
+     * 
+     * @throws Exception
+     */
+    public void createPubmedWorkspaceItemFromFileTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and two collections.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1)
+                                           .withName("Collection 1")
+                                           .withSubmitterGroup(eperson)
+                                           .build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1)
+                                           .withName("Collection 2")
+                                           .withSubmitterGroup(eperson)
+                                           .build();
+        InputStream xmlIS = getClass().getResourceAsStream("pubmed-test.xml");
+        final MockMultipartFile pubmedFile = new MockMultipartFile("file", "/local/path/pubmed-test.xml",
+            "application/xml", xmlIS);
+
+        context.restoreAuthSystemState();
+
+        String authToken = getAuthToken(eperson.getEmail(), password);
+        // create a workspaceitem from a single bibliographic entry file explicitly in the default collection (col1)
+        getClient(authToken).perform(fileUpload("/api/submission/workspaceitems")
+                    .file(pubmedFile))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$._embedded.workspaceitems[0].sections.traditionalpageone['dc.title'][0].value",
+                        is("Multistep microreactions with proteins using electrocapture technology.")))
+                .andExpect(
+                        jsonPath(
+                        "$._embedded.workspaceitems[0].sections.traditionalpageone['dc.identifier.other'][0].value",
+                        is("15117179")))
+                .andExpect(jsonPath("$._embedded.workspaceitems[0].sections.traditionalpageone"
+                        + "['dc.contributor.author'][0].value",
+                        is("Astorga-Wells, Juan")))
+                .andExpect(jsonPath("$._embedded.workspaceitems[0].sections.upload.files[0]"
+                    + ".metadata['dc.source'][0].value",
+                        is("/local/path/pubmed-test.xml")))
+                .andExpect(jsonPath("$._embedded.workspaceitems[0].sections.upload.files[0]"
+                    + ".metadata['dc.title'][0].value",
+                        is("pubmed-test.xml")));
+
+        // create a workspaceitem from a single bibliographic entry file explicitly in the col2
+        getClient(authToken).perform(fileUpload("/api/submission/workspaceitems")
+                    .file(pubmedFile)
+                    .param("owningCollection", col2.getID().toString()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$._embedded.workspaceitems[0].sections.traditionalpageone['dc.title'][0].value",
+                is("Multistep microreactions with proteins using electrocapture technology.")))
+            .andExpect(
+                jsonPath(
+                "$._embedded.workspaceitems[0].sections.traditionalpageone['dc.identifier.other'][0].value",
+                is("15117179")))
+            .andExpect(jsonPath("$._embedded.workspaceitems[0].sections.traditionalpageone"
+                + "['dc.contributor.author'][0].value",
+                is("Astorga-Wells, Juan")))
+            .andExpect(jsonPath("$._embedded.workspaceitems[0].sections.upload.files[0].metadata['dc.source'][0].value",
+                    is("/local/path/pubmed-test.xml")))
+            .andExpect(jsonPath("$._embedded.workspaceitems[0].sections.upload.files[0].metadata['dc.title'][0].value",
+                    is("pubmed-test.xml")));
+
+        xmlIS.close();
     }
 
     @Test
@@ -1052,7 +1255,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
 
         // create an empty workspaceitem explicitly in the col1, check validation on creation
         getClient(authToken).perform(post("/api/submission/workspaceitems")
-                    .param("collection", col1.getID().toString())
+                    .param("owningCollection", col1.getID().toString())
                     .contentType(org.springframework.http.MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated())
                 // title and dateissued are required in the first panel
