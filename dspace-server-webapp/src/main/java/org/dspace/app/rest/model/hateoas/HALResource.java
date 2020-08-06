@@ -55,13 +55,8 @@ public abstract class HALResource<T> extends EntityModel<T> {
             String name = link.getName();
             if (StringUtils.isNotBlank(name)) {
                 List<Link> list = this.getLinks(link.getRel());
-                boolean doesNameExist = false;
-                for (Link existingLink : list) {
-                    if (StringUtils.equalsIgnoreCase(existingLink.getName(), link.getName())) {
-                        doesNameExist = true;
-                    }
-                }
-                if (!doesNameExist) {
+                // If a link of this name doesn't already exist in the list, add it
+                if (!list.stream().anyMatch((l -> StringUtils.equalsIgnoreCase(l.getName(), name)))) {
                     super.add(link);
                 }
             }
