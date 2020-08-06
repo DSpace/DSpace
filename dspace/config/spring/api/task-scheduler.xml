@@ -8,7 +8,7 @@
     http://www.springframework.org/task/spring-task.xsd">
 
   <!-- Configure the scheduler -->
-  <task:scheduler id="myScheduler" pool-size="0"/>
+  <task:scheduler id="myScheduler" pool-size="10"/>
 
   <!-- Configure parameters -->
   <task:scheduled-tasks scheduler="myScheduler">
