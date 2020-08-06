@@ -92,7 +92,7 @@ public class EntityType implements ReloadableEntity<Integer> {
         }
         EntityType entityType = (EntityType) obj;
 
-        if (this.getID() != entityType.getID()) {
+        if (!this.getID().equals(entityType.getID())) {
             return false;
         }
 
