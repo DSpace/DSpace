@@ -25,12 +25,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
-import org.dspace.app.rest.builder.ClaimedTaskBuilder;
-import org.dspace.app.rest.builder.CollectionBuilder;
-import org.dspace.app.rest.builder.CommunityBuilder;
-import org.dspace.app.rest.builder.EPersonBuilder;
-import org.dspace.app.rest.builder.PoolTaskBuilder;
-import org.dspace.app.rest.builder.WorkflowItemBuilder;
 import org.dspace.app.rest.matcher.ClaimedTaskMatcher;
 import org.dspace.app.rest.matcher.EPersonMatcher;
 import org.dspace.app.rest.matcher.PoolTaskMatcher;
@@ -41,6 +35,12 @@ import org.dspace.app.rest.matcher.WorkspaceItemMatcher;
 import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.rest.model.patch.ReplaceOperation;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
+import org.dspace.builder.ClaimedTaskBuilder;
+import org.dspace.builder.CollectionBuilder;
+import org.dspace.builder.CommunityBuilder;
+import org.dspace.builder.EPersonBuilder;
+import org.dspace.builder.PoolTaskBuilder;
+import org.dspace.builder.WorkflowItemBuilder;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
@@ -339,7 +339,6 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
                 .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/workflow/pooltasks")))
                 .andExpect(jsonPath("$.page.size", is(20)))
                 .andExpect(jsonPath("$.page.totalElements", is(3)));
-        ;
 
         String authReviewer2 = getAuthToken(reviewer2.getEmail(), password);
         getClient(authReviewer2).perform(get("/api/workflow/pooltasks/search/findByUser")
@@ -360,7 +359,6 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
             .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/workflow/pooltasks")))
             .andExpect(jsonPath("$.page.size", is(20)))
             .andExpect(jsonPath("$.page.totalElements", is(2)));
-        ;
 
         String authAdmin = getAuthToken(admin.getEmail(), password);
         getClient(authAdmin).perform(get("/api/workflow/pooltasks/search/findByUser")
