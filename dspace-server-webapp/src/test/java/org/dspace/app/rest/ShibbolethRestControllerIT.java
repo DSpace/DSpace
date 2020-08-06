@@ -26,8 +26,8 @@ public class ShibbolethRestControllerIT extends AbstractControllerIntegrationTes
         String token = getAuthToken(eperson.getEmail(), password);
 
         getClient(token).perform(get("/api/authn/shibboleth"))
-                        .andExpect(status().is3xxRedirection())
-                        .andExpect(redirectedUrl("http://localhost:4000"));
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("http://localhost:4000"));
     }
 
     @Test
@@ -35,8 +35,8 @@ public class ShibbolethRestControllerIT extends AbstractControllerIntegrationTes
         String token = getAuthToken(eperson.getEmail(), password);
 
         getClient(token).perform(get("/api/authn/shibboleth")
-            .param("redirectUrl", "http://dspace.org"))
-                        .andExpect(status().is3xxRedirection())
-                        .andExpect(redirectedUrl("http://dspace.org"));
+                .param("redirectUrl", "http://dspace.org"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("http://dspace.org"));
     }
 }
