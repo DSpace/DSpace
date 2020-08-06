@@ -30,17 +30,17 @@ import javax.servlet.http.Cookie;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.codec.CharEncoding;
 import org.apache.commons.io.IOUtils;
-import org.dspace.app.rest.builder.BitstreamBuilder;
-import org.dspace.app.rest.builder.BundleBuilder;
-import org.dspace.app.rest.builder.CollectionBuilder;
-import org.dspace.app.rest.builder.CommunityBuilder;
-import org.dspace.app.rest.builder.EPersonBuilder;
-import org.dspace.app.rest.builder.GroupBuilder;
-import org.dspace.app.rest.builder.ItemBuilder;
 import org.dspace.app.rest.matcher.AuthenticationStatusMatcher;
 import org.dspace.app.rest.matcher.EPersonMatcher;
 import org.dspace.app.rest.matcher.HalMatcher;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
+import org.dspace.builder.BitstreamBuilder;
+import org.dspace.builder.BundleBuilder;
+import org.dspace.builder.CollectionBuilder;
+import org.dspace.builder.CommunityBuilder;
+import org.dspace.builder.EPersonBuilder;
+import org.dspace.builder.GroupBuilder;
+import org.dspace.builder.ItemBuilder;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
@@ -70,12 +70,14 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
 
     public static final String[] PASS_ONLY = {"org.dspace.authenticate.PasswordAuthentication"};
     public static final String[] SHIB_ONLY = {"org.dspace.authenticate.ShibAuthentication"};
-    public static final String[] SHIB_AND_PASS =
-            {"org.dspace.authenticate.ShibAuthentication",
-             "org.dspace.authenticate.PasswordAuthentication"};
-    public static final String[] SHIB_AND_IP =
-            {"org.dspace.authenticate.IPAuthentication",
-            "org.dspace.authenticate.ShibAuthentication"};
+    public static final String[] SHIB_AND_PASS = {
+        "org.dspace.authenticate.ShibAuthentication",
+        "org.dspace.authenticate.PasswordAuthentication"
+    };
+    public static final String[] SHIB_AND_IP = {
+        "org.dspace.authenticate.IPAuthentication",
+        "org.dspace.authenticate.ShibAuthentication"
+    };
 
     @Before
     public void setup() throws Exception {
@@ -406,7 +408,7 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
 
     @Test
     public void testLoginGetRequest() throws Exception {
-       getClient().perform(get("/api/authn/login")
+        getClient().perform(get("/api/authn/login")
             .param("user", eperson.getEmail())
             .param("password", password))
             .andExpect(status().isMethodNotAllowed());
@@ -721,8 +723,8 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
 
         //Check if WWW-Authenticate header contains only password
         getClient().perform(get("/api/authn/status").header("Referer", "http://my.uni.edu"))
-        .andExpect(status().isOk())
-        .andExpect(header().string("WWW-Authenticate",
+            .andExpect(status().isOk())
+            .andExpect(header().string("WWW-Authenticate",
                 "password realm=\"DSpace REST API\""));
 
         //Check if a shibboleth authentication fails
@@ -730,7 +732,6 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
                 .requestAttr("SHIB-MAIL", eperson.getEmail())
                 .requestAttr("SHIB-SCOPED-AFFILIATION", "faculty;staff"))
             .andExpect(status().isUnauthorized());
-
     }
 
     @Test

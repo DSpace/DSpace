@@ -16,11 +16,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.util.List;
 
-import org.dspace.app.rest.builder.CollectionBuilder;
-import org.dspace.app.rest.builder.CommunityBuilder;
-import org.dspace.app.rest.builder.ItemBuilder;
-import org.dspace.app.rest.builder.RelationshipBuilder;
 import org.dspace.app.rest.test.AbstractEntityIntegrationTest;
+import org.dspace.builder.CollectionBuilder;
+import org.dspace.builder.CommunityBuilder;
+import org.dspace.builder.ItemBuilder;
+import org.dspace.builder.RelationshipBuilder;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
@@ -618,7 +618,7 @@ public class RelationshipDeleteRestRepositoryIT extends AbstractEntityIntegratio
         assertThat(publicationAuthorList.size(), equalTo(0));
 
         List<MetadataValue> publicationRelationships = itemService.getMetadata(publicationItem,
-    "relation", "isAuthorOfPublication", Item.ANY, Item.ANY);
+            "relation", "isAuthorOfPublication", Item.ANY, Item.ANY);
         assertThat(publicationRelationships.size(), equalTo(0));
 
         projectItem = itemService.find(context, projectItem.getID());
@@ -628,7 +628,7 @@ public class RelationshipDeleteRestRepositoryIT extends AbstractEntityIntegratio
         assertThat(projectAuthorList.get(0).getValue(), equalTo("Smith, Donald"));
         assertNull(projectAuthorList.get(0).getAuthority());
         List<MetadataValue> projectRelationships = itemService.getMetadata(projectItem,
-    "relation", "isPersonOfProject", Item.ANY, Item.ANY);
+            "relation", "isPersonOfProject", Item.ANY, Item.ANY);
         assertThat(projectRelationships.size(), equalTo(0));
     }
 

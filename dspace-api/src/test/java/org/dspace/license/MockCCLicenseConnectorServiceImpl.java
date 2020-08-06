@@ -29,6 +29,7 @@ public class MockCCLicenseConnectorServiceImpl extends CCLicenseConnectorService
      * @param language - the language
      * @return a map of mocked licenses with the id and the license
      */
+    @Override
     public Map<String, CCLicense> retrieveLicenses(String language) {
         Map<String, CCLicense> ccLicenses = new HashMap<>();
         CCLicense mockLicense1 = createMockLicense(1, new int[]{3, 2, 3});
@@ -89,6 +90,7 @@ public class MockCCLicenseConnectorServiceImpl extends CCLicenseConnectorService
      * @param answerMap - the answers to the different field questions
      * @return the CC License URI
      */
+    @Override
     public String retrieveRightsByQuestion(final String licenseId,
                                            final String language,
                                            final Map<String, String> answerMap) {
@@ -105,6 +107,7 @@ public class MockCCLicenseConnectorServiceImpl extends CCLicenseConnectorService
      * @return a mock license RDF document or null when the URI contains invalid
      * @throws IOException
      */
+    @Override
     public Document retrieveLicenseRDFDoc(String licenseURI) throws IOException {
         if (!StringUtils.contains(licenseURI, "invalid")) {
             InputStream cclicense = null;

@@ -31,15 +31,14 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 import com.google.gson.Gson;
-import org.dspace.app.rest.builder.CollectionBuilder;
-import org.dspace.app.rest.builder.CommunityBuilder;
-import org.dspace.app.rest.builder.ItemBuilder;
-import org.dspace.app.rest.builder.ProcessBuilder;
 import org.dspace.app.rest.converter.DSpaceRunnableParameterConverter;
 import org.dspace.app.rest.matcher.RelationshipMatcher;
 import org.dspace.app.rest.model.ParameterValueRest;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.test.AbstractEntityIntegrationTest;
+import org.dspace.builder.CollectionBuilder;
+import org.dspace.builder.CommunityBuilder;
+import org.dspace.builder.ItemBuilder;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
@@ -137,7 +136,6 @@ public class CsvImportIT extends AbstractEntityIntegrationTest {
         assertArticleRelationships(article, itemB, itemC, itemF);
 
 
-
     }
 
     private void assertItemERelationships(Item itemB, Item itemE, Item itemF) throws SQLException {
@@ -151,8 +149,8 @@ public class CsvImportIT extends AbstractEntityIntegrationTest {
         List<Relationship> relationshipsForArticle = relationshipService
             .findByItemAndRelationshipType(context, article, relationshipTypeService
                 .findbyTypesAndTypeName(context, entityTypeService.findByEntityType(context, "Publication"),
-                                      entityTypeService.findByEntityType(context, "Person"), "isAuthorOfPublication",
-                                      "isPublicationOfAuthor"));
+                                        entityTypeService.findByEntityType(context, "Person"), "isAuthorOfPublication",
+                                        "isPublicationOfAuthor"));
         assertThat(relationshipsForArticle.size(), is(3));
         List<Item> expectedRelationshipsItemsForArticle = new ArrayList<>();
         expectedRelationshipsItemsForArticle.add(itemC);
@@ -168,7 +166,7 @@ public class CsvImportIT extends AbstractEntityIntegrationTest {
             }
         }
         assertThat(true, Matchers.is(actualRelationshipsItemsForArticle
-                                            .containsAll(expectedRelationshipsItemsForArticle)));
+                                         .containsAll(expectedRelationshipsItemsForArticle)));
     }
 
     private void updateArticleItemToAddAnotherRelationship(Collection col1, Item article, Item itemB, Item itemC,
@@ -242,7 +240,8 @@ public class CsvImportIT extends AbstractEntityIntegrationTest {
 
     private void performImportScript(String[] csv) throws Exception {
         InputStream inputStream = new ByteArrayInputStream(String.join(System.lineSeparator(),
-                                                               Arrays.asList(csv)).getBytes(StandardCharsets.UTF_8));
+                                                                       Arrays.asList(csv))
+                                                                 .getBytes(StandardCharsets.UTF_8));
 
         MockMultipartFile bitstreamFile = new MockMultipartFile("file",
                                                                 "test.csv", MediaType.TEXT_PLAIN_VALUE,
@@ -264,8 +263,8 @@ public class CsvImportIT extends AbstractEntityIntegrationTest {
 
             getClient(token)
                 .perform(fileUpload("/api/system/scripts/metadata-import/processes").file(bitstreamFile)
-                                                                                .param("properties",
-                                                                                       new Gson().toJson(list)))
+                                                                                    .param("properties",
+                                                                                           new Gson().toJson(list)))
                 .andExpect(status().isAccepted())
                 .andDo(result -> idRef
                     .set(read(result.getResponse().getContentAsString(), "$.processId")));
@@ -300,7 +299,8 @@ public class CsvImportIT extends AbstractEntityIntegrationTest {
         String[] csv = {"id,collection,dc.title,relationship.type,relation.isPublicationOfAuthor", csvLineString};
 
         InputStream inputStream = new ByteArrayInputStream(String.join(System.lineSeparator(),
-                                                               Arrays.asList(csv)).getBytes(StandardCharsets.UTF_8));
+                                                                       Arrays.asList(csv))
+                                                                 .getBytes(StandardCharsets.UTF_8));
 
         MockMultipartFile bitstreamFile = new MockMultipartFile("file",
                                                                 "test.csv", MediaType.TEXT_PLAIN_VALUE,
