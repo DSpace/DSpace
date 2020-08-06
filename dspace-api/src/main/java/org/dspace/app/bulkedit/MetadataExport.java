@@ -8,6 +8,7 @@
 package org.dspace.app.bulkedit;
 
 import java.sql.SQLException;
+import java.util.UUID;
 
 import org.apache.commons.cli.ParseException;
 import org.dspace.content.service.MetadataDSpaceCsvExportService;
@@ -41,8 +42,7 @@ public class MetadataExport extends DSpaceRunnable<MetadataExportScriptConfigura
     public void internalRun() throws Exception {
 
         if (help) {
-            handler.logInfo("\nfull export: metadata-export -f filename");
-            handler.logInfo("partial export: metadata-export -i handle -f filename");
+            logHelpInfo();
             printHelp();
             return;
         }
@@ -61,6 +61,11 @@ public class MetadataExport extends DSpaceRunnable<MetadataExportScriptConfigura
         context.complete();
     }
 
+    protected void logHelpInfo() {
+        handler.logInfo("\nfull export: metadata-export");
+        handler.logInfo("partial export: metadata-export -i handle");
+    }
+
     @Override
     public MetadataExportScriptConfiguration getScriptConfiguration() {
         return new DSpace().getServiceManager().getServiceByName("metadata-export",
@@ -75,11 +80,7 @@ public class MetadataExport extends DSpaceRunnable<MetadataExportScriptConfigura
             return;
         }
 
-        // Check a filename is given
-        if (!commandLine.hasOption('f')) {
-            throw new ParseException("Required parameter -f missing!");
-        }
-        filename = commandLine.getOptionValue('f');
+        filename = getFileNameForExportFile();
 
         exportAllMetadata = commandLine.hasOption('a');
 
@@ -87,5 +88,9 @@ public class MetadataExport extends DSpaceRunnable<MetadataExportScriptConfigura
             exportAllItems = true;
         }
         handle = commandLine.getOptionValue('i');
+    }
+
+    protected String getFileNameForExportFile() {
+        return UUID.randomUUID().toString();
     }
 }
