@@ -80,7 +80,7 @@ public class SitemapRestControllerIT extends AbstractControllerIntegrationTest {
     public void testSitemap_notValidSiteMapFile() throws Exception {
         //** WHEN **
         //We attempt to retrieve a non valid sitemap file
-        getClient().perform(get("/" + SITEMAPS_ENDPOINT + "/notValidSiteMapFile"))
+        getClient().perform(get("/" + SITEMAPS_ENDPOINT + "/no-such-file"))
                    //** THEN **
                    .andExpect(status().isNotFound());
     }
