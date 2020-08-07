@@ -9,11 +9,6 @@ package org.dspace.app.rest;
 
 import static org.apache.commons.codec.CharEncoding.UTF_8;
 import static org.apache.commons.io.IOUtils.toInputStream;
-import static org.dspace.app.rest.builder.BitstreamBuilder.createBitstream;
-import static org.dspace.app.rest.builder.CollectionBuilder.createCollection;
-import static org.dspace.app.rest.builder.CommunityBuilder.createCommunity;
-import static org.dspace.app.rest.builder.CommunityBuilder.createSubCommunity;
-import static org.dspace.app.rest.builder.ItemBuilder.createItem;
 import static org.dspace.app.rest.repository.UsageReportService.TOP_CITIES_REPORT_ID;
 import static org.dspace.app.rest.repository.UsageReportService.TOP_COUNTRIES_REPORT_ID;
 import static org.dspace.app.rest.repository.UsageReportService.TOTAL_DOWNLOADS_REPORT_ID;
@@ -34,9 +29,6 @@ import java.util.Locale;
 import java.util.UUID;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.dspace.app.rest.builder.EPersonBuilder;
-import org.dspace.app.rest.builder.ResourcePolicyBuilder;
-import org.dspace.app.rest.builder.SiteBuilder;
 import org.dspace.app.rest.matcher.UsageReportMatcher;
 import org.dspace.app.rest.model.UsageReportPointCityRest;
 import org.dspace.app.rest.model.UsageReportPointCountryRest;
@@ -48,6 +40,13 @@ import org.dspace.app.rest.repository.StatisticsRestRepository;
 import org.dspace.app.rest.repository.UsageReportService;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.authorize.service.AuthorizeService;
+import org.dspace.builder.BitstreamBuilder;
+import org.dspace.builder.CollectionBuilder;
+import org.dspace.builder.CommunityBuilder;
+import org.dspace.builder.EPersonBuilder;
+import org.dspace.builder.ItemBuilder;
+import org.dspace.builder.ResourcePolicyBuilder;
+import org.dspace.builder.SiteBuilder;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
@@ -99,16 +98,17 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
 
         context.turnOffAuthorisationSystem();
 
-        Community community = createCommunity(context).build();
-        communityNotVisited = createSubCommunity(context, community).build();
-        communityVisited = createSubCommunity(context, community).build();
-        collectionNotVisited = createCollection(context, community).build();
-        collectionVisited = createCollection(context, community).build();
-        itemVisited = createItem(context, collectionNotVisited).build();
-        itemNotVisitedWithBitstreams = createItem(context, collectionNotVisited).build();
-        bitstreamNotVisited = createBitstream(context,
+        Community community = CommunityBuilder.createCommunity(context).build();
+        communityNotVisited = CommunityBuilder.createSubCommunity(context, community).build();
+        communityVisited = CommunityBuilder.createSubCommunity(context, community).build();
+        collectionNotVisited = CollectionBuilder.createCollection(context, community).build();
+        collectionVisited = CollectionBuilder.createCollection(context, community).build();
+        itemVisited = ItemBuilder.createItem(context, collectionNotVisited).build();
+        itemNotVisitedWithBitstreams = ItemBuilder.createItem(context, collectionNotVisited).build();
+        bitstreamNotVisited = BitstreamBuilder.createBitstream(context,
             itemNotVisitedWithBitstreams, toInputStream("test", UTF_8)).withName("BitstreamNotVisitedName").build();
-        bitstreamVisited = createBitstream(context, itemNotVisitedWithBitstreams, toInputStream("test", UTF_8))
+        bitstreamVisited = BitstreamBuilder
+            .createBitstream(context, itemNotVisitedWithBitstreams, toInputStream("test", UTF_8))
             .withName("BitstreamVisitedName").build();
 
         loggedInToken = getAuthToken(eperson.getEmail(), password);
@@ -866,7 +866,7 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
     public void usageReportsSearch_Site() throws Exception {
         context.turnOffAuthorisationSystem();
         Site site = SiteBuilder.createSite(context).build();
-        Item itemVisited2 = createItem(context, collectionNotVisited).build();
+        Item itemVisited2 = ItemBuilder.createItem(context, collectionNotVisited).build();
         context.restoreAuthSystemState();
 
         // ** WHEN **
@@ -1058,9 +1058,11 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
     public void usageReportsSearch_ItemVisited_FilesVisited() throws Exception {
         context.turnOffAuthorisationSystem();
         Bitstream bitstream1 =
-            createBitstream(context, itemVisited, toInputStream("test", UTF_8)).withName("bitstream1").build();
+            BitstreamBuilder.createBitstream(context, itemVisited, toInputStream("test", UTF_8)).withName("bitstream1")
+                            .build();
         Bitstream bitstream2 =
-            createBitstream(context, itemVisited, toInputStream("test", UTF_8)).withName("bitstream2").build();
+            BitstreamBuilder.createBitstream(context, itemVisited, toInputStream("test", UTF_8)).withName("bitstream2")
+                            .build();
         context.restoreAuthSystemState();
 
         // ** WHEN **
