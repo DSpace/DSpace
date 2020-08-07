@@ -110,11 +110,21 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author mdiggory at atmire.com
  */
 public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBean {
-
     private static final Logger log = LogManager.getLogger();
 
+    @Autowired(required = true)
+    protected BitstreamService bitstreamService;
+    @Autowired(required = true)
+    protected ContentServiceFactory contentServiceFactory;
+    @Autowired(required = true)
+    protected ConfigurationService configurationService;
+    @Autowired(required = true)
+    protected ClientInfoService clientInfoService;
+
+    @Autowired(required = true)
+    protected SolrClientFactory solrClientFactory;
+
     private static final String MULTIPLE_VALUES_SPLITTER = "|";
-    protected SolrClient solr;
 
     public static final String DATE_FORMAT_8601 = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
 
@@ -127,21 +137,12 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
     private static final List<String> statisticYearCores = new ArrayList<>();
     private static boolean statisticYearCoresInit = false;
 
-    @Autowired(required = true)
-    protected BitstreamService bitstreamService;
-    @Autowired(required = true)
-    protected ContentServiceFactory contentServiceFactory;
-    @Autowired(required = true)
-    private ConfigurationService configurationService;
-    @Autowired(required = true)
-    private ClientInfoService clientInfoService;
-
-    /** URL to the current-year statistics core.  Prior-year shards will have a year suffixed. */
-    private String statisticsCoreURL;
+    protected SolrClient solr;
 
     /** Name of the current-year statistics core.  Prior-year shards will have a year suffixed. */
     private String statisticsCoreBase;
 
+    /** Possible values of the {@code type} field of a usage event document. */
     public static enum StatisticsType {
         VIEW("view"),
         SEARCH("search"),
@@ -160,13 +161,11 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
     }
 
     protected SolrLoggerServiceImpl() {
-
     }
-
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        statisticsCoreURL = configurationService.getProperty("solr-statistics.server");
+        String statisticsCoreURL = configurationService.getProperty("solr-statistics.server");
 
         if (null != statisticsCoreURL) {
             Path statisticsPath = Paths.get(new URI(statisticsCoreURL).getPath());
@@ -181,16 +180,7 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
         log.info("usage-statistics.dbfile:  {}",
                 configurationService.getProperty("usage-statistics.dbfile"));
 
-        HttpSolrClient server = null;
-
-        if (statisticsCoreURL != null) {
-            try {
-                server = new HttpSolrClient.Builder(statisticsCoreURL).build();
-            } catch (Exception e) {
-                log.error("Error accessing Solr server configured in 'solr-statistics.server'", e);
-            }
-        }
-        solr = server;
+        solr = solrClientFactory.getClient(statisticsCoreURL);
 
         // Read in the file so we don't have to do it all the time
         //spiderIps = SpiderDetector.getSpiderIpAddresses();
@@ -204,15 +194,15 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
                 service = new DatabaseReader.Builder(dbFile).build();
             } catch (FileNotFoundException fe) {
                 log.error(
-                    "The GeoLite Database file is missing (" + dbPath + ")! Solr Statistics cannot generate location " +
+                    "The GeoLite Database file is missing ({})! Solr Statistics cannot generate location " +
                         "based reports! Please see the DSpace installation instructions for instructions to install " +
                         "this file.",
-                    fe);
+                        dbPath, fe);
             } catch (IOException e) {
                 log.error(
-                    "Unable to load GeoLite Database file (" + dbPath + ")! You may need to reinstall it. See the " +
+                    "Unable to load GeoLite Database file ({})! You may need to reinstall it. See the " +
                         "DSpace installation instructions for more details.",
-                    e);
+                        dbPath, e);
             }
         } else {
             log.error("The required 'dbfile' configuration is missing in solr-statistics.cfg!");
@@ -918,7 +908,6 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
                 } catch (ParseException e1) {
                     e1.printStackTrace();
                 }
-                // e.printStackTrace();
             }
             String dateformatString = "dd-MM-yyyy";
             if ("DAY".equals(type)) {
@@ -1247,7 +1236,7 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
      * @throws IOException         When connection to the SOLR server fails
      */
     public Set<String> getMultivaluedFieldNames() throws SolrServerException, IOException {
-        Set<String> multivaluedFields = new HashSet<String>();
+        Set<String> multivaluedFields = new HashSet<>();
         LukeRequest lukeRequest = new LukeRequest();
         lukeRequest.setShowSchema(true);
         LukeResponse process = lukeRequest.process(solr);
