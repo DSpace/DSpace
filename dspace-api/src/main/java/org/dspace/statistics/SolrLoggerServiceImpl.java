@@ -141,6 +141,8 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
     protected ConfigurationService configurationService;
     @Autowired(required = true)
     protected ClientInfoService clientInfoService;
+    @Autowired(required = true)
+    protected SolrClientFactory solrClientFactory;
     @Autowired
     protected SolrStatisticsCore solrStatisticsCore;
     @Autowired
