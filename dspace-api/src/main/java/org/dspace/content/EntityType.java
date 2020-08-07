@@ -7,6 +7,7 @@
  */
 package org.dspace.content;
 
+import java.util.Objects;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -92,7 +93,7 @@ public class EntityType implements ReloadableEntity<Integer> {
         }
         EntityType entityType = (EntityType) obj;
 
-        if (!this.getID().equals(entityType.getID())) {
+        if (!Objects.equals(this.getID(), entityType.getID())) {
             return false;
         }
 
