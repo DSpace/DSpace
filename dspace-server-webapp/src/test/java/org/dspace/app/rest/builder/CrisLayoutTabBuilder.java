@@ -9,7 +9,6 @@ package org.dspace.app.rest.builder;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -126,15 +125,14 @@ public class CrisLayoutTabBuilder extends AbstractBuilder<CrisLayoutTab, CrisLay
     }
 
     public CrisLayoutTabBuilder withBoxes(List<CrisLayoutBox> boxes) {
-        this.tab.setBoxes(boxes);
+        for (CrisLayoutBox box: boxes) {
+            this.tab.addBox(box);
+        }
         return this;
     }
 
     public CrisLayoutTabBuilder addBox(CrisLayoutBox box) {
-        if (this.tab.getBoxes() == null) {
-            this.tab.setBoxes(new ArrayList<>());
-        }
-        this.tab.getBoxes().add(box);
+        this.tab.addBox(box);
         return this;
     }
 

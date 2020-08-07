@@ -7,9 +7,12 @@
  */
 package org.dspace.layout;
 
-import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 import javax.persistence.Cacheable;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -20,6 +23,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
@@ -46,8 +50,8 @@ public class CrisLayoutBox implements ReloadableEntity<Integer> {
     private String type;
     @Column(name = "collapsed", nullable = false)
     private Boolean collapsed;
-    @Column(name = "priority", nullable = false)
-    private Integer priority;
+//    @Column(name = "priority", nullable = false)
+//    private Integer priority;
     @Column(name = "shortname")
     private String shortname;
     @Column(name = "header")
@@ -65,20 +69,23 @@ public class CrisLayoutBox implements ReloadableEntity<Integer> {
         inverseJoinColumns = {@JoinColumn(name = "authorized_field_id")}
     )
     private Set<MetadataField> metadataSecurityFields;
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(
-        name = "cris_layout_box2field",
-        joinColumns = {@JoinColumn(name = "cris_layout_box_id")},
-        inverseJoinColumns = {@JoinColumn(name = "cris_layout_field_id")}
+    @OneToMany(
+        mappedBy = "box",
+        cascade = CascadeType.ALL
     )
-    private Set<CrisLayoutField> layoutFields;
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(
-            name = "cris_layout_tab2box",
-            joinColumns = {@JoinColumn(name = "cris_layout_box_id")},
-            inverseJoinColumns = {@JoinColumn(name = "cris_layout_tab_id")}
-        )
-    private Set<CrisLayoutTab> tabs;
+    private List<CrisLayoutBox2Field> box2field = new ArrayList<>();
+    @OneToMany(
+            mappedBy = "box",
+            cascade = CascadeType.ALL
+    )
+    private List<CrisLayoutTab2Box> tab2box = new ArrayList<>();
+//    @ManyToMany(fetch = FetchType.LAZY)
+//    @JoinTable(
+//            name = "cris_layout_tab2box",
+//            joinColumns = {@JoinColumn(name = "cris_layout_box_id")},
+//            inverseJoinColumns = {@JoinColumn(name = "cris_layout_tab_id")}
+//        )
+//    private Set<CrisLayoutTab> tabs;
     @Column(name = "clear")
     private Boolean clear;
 
@@ -115,13 +122,13 @@ public class CrisLayoutBox implements ReloadableEntity<Integer> {
         this.collapsed = collapsed;
     }
 
-    public Integer getPriority() {
-        return priority;
-    }
-
-    public void setPriority(Integer priority) {
-        this.priority = priority;
-    }
+//    public Integer getPriority() {
+//        return priority;
+//    }
+//
+//    public void setPriority(Integer priority) {
+//        this.priority = priority;
+//    }
 
     public String getShortname() {
         return shortname;
@@ -207,21 +214,21 @@ public class CrisLayoutBox implements ReloadableEntity<Integer> {
         this.metadataSecurityFields = metadataFields;
     }
 
-    public Set<CrisLayoutField> getLayoutFields() {
-        return layoutFields;
-    }
+//    public Set<CrisLayoutField> getLayoutFields() {
+//        return layoutFields;
+//    }
+//
+//    public void setLayoutFields(Set<CrisLayoutField> layoutFields) {
+//        this.layoutFields = layoutFields;
+//    }
 
-    public void setLayoutFields(Set<CrisLayoutField> layoutFields) {
-        this.layoutFields = layoutFields;
-    }
-
-    public Set<CrisLayoutTab> getTabs() {
-        return tabs;
-    }
-
-    public void setTabs(Set<CrisLayoutTab> tabs) {
-        this.tabs = tabs;
-    }
+//    public Set<CrisLayoutTab> getTabs() {
+//        return tabs;
+//    }
+//
+//    public void setTabs(Set<CrisLayoutTab> tabs) {
+//        this.tabs = tabs;
+//    }
 
     public Boolean getClear() {
         return clear;
@@ -231,17 +238,85 @@ public class CrisLayoutBox implements ReloadableEntity<Integer> {
         this.clear = clear;
     }
 
-    public void addTab(CrisLayoutTab tab) {
-        if (this.tabs == null) {
-            this.tabs = new HashSet<>();
+//    public void addTab(CrisLayoutTab tab) {
+//        if (this.tabs == null) {
+//            this.tabs = new HashSet<>();
+//        }
+//        this.tabs.add(tab);
+//    }
+//
+//    public void removeTab(CrisLayoutTab tab) {
+//        if (this.tabs != null && !this.tabs.isEmpty()) {
+//            this.tabs.remove(tab);
+//        }
+//    }
+
+    public void addLayoutField(CrisLayoutField field, Integer position) {
+        if (this.box2field.isEmpty()) {
+            position = 0;
+        } else if (position == null) {
+            position = 0;
+            for (Iterator<CrisLayoutBox2Field> it = this.box2field.iterator();
+                    it.hasNext(); ) {
+                CrisLayoutBox2Field b2f = it.next();
+                if (b2f.getPosition() > position) {
+                    position = b2f.getPosition();
+                }
+            }
+        } else {
+            int currentPosition = -1;
+            for (Iterator<CrisLayoutBox2Field> it = this.box2field.iterator();
+                    it.hasNext(); ) {
+                CrisLayoutBox2Field b2f = it.next();
+                currentPosition = b2f.getPosition();
+                if (currentPosition >= position ) {
+                    b2f.setPosition(++currentPosition);
+                }
+            }
+            if (position > ++currentPosition) {
+                position = currentPosition;
+            }
         }
-        this.tabs.add(tab);
+        CrisLayoutBox2Field box2field =
+                new CrisLayoutBox2Field(this, field, position);
+        this.box2field.add(box2field);
     }
 
-    public void removeTab(CrisLayoutTab tab) {
-        if (this.tabs != null && !this.tabs.isEmpty()) {
-            this.tabs.remove(tab);
+    public void addLayoutField(CrisLayoutField field) {
+        addLayoutField(field, null);
+    }
+
+    public void removeLayoutField(CrisLayoutField field) {
+        boolean found = false;
+        for (Iterator<CrisLayoutBox2Field> it = this.box2field.iterator();
+                it.hasNext();) {
+            CrisLayoutBox2Field b2f = it.next();
+            if (found) {
+                b2f.setPosition(b2f.getPosition() - 1);
+            }
+            if (b2f.getBox().equals(this) && b2f.getField().equals(field)) {
+                it.remove();
+                b2f.setBox(null);
+                b2f.setField(null);
+                found = true;
+            }
         }
+    }
+
+    public List<CrisLayoutBox2Field> getBox2field() {
+        return box2field;
+    }
+
+    public void setBox2field(List<CrisLayoutBox2Field> box2field) {
+        this.box2field = box2field;
+    }
+
+    public List<CrisLayoutTab2Box> getTab2box() {
+        return tab2box;
+    }
+
+    public void setTab2box(List<CrisLayoutTab2Box> tab2box) {
+        this.tab2box = tab2box;
     }
 
     @Override

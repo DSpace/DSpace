@@ -102,7 +102,7 @@ public class CrisLayoutTabBoxesAddOperation<D> extends PatchOperation<D> {
      * @param CrisLayoutTab Object on which patch is being done
      */
     private void checkModelForExistingValue(CrisLayoutTab tab) {
-        if (tab.getBoxes() == null) {
+        if (tab.getTab2Box() == null) {
             throw new DSpaceBadRequestException("Attempting to remove a non-existent value.");
         }
     }

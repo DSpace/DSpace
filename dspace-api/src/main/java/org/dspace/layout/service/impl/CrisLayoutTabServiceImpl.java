@@ -21,8 +21,8 @@ import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
-import org.dspace.layout.CrisLayoutBox;
 import org.dspace.layout.CrisLayoutTab;
+import org.dspace.layout.CrisLayoutTab2Box;
 import org.dspace.layout.dao.CrisLayoutTabDAO;
 import org.dspace.layout.service.CrisLayoutBoxService;
 import org.dspace.layout.service.CrisLayoutTabService;
@@ -180,10 +180,10 @@ public class CrisLayoutTabServiceImpl implements CrisLayoutTabService {
             List<MetadataValue> itemMetadata = item.getMetadata();
             if (itemMetadata != null && !itemMetadata.isEmpty() ) {
                 for (CrisLayoutTab tab: tabs) {
-                    List<CrisLayoutBox> boxes = tab.getBoxes();
-                    if (boxes != null && !boxes.isEmpty()) {
-                        for (CrisLayoutBox box: boxes) {
-                            if (boxService.hasContent(box, itemMetadata)) {
+                    List<CrisLayoutTab2Box> tab2box = tab.getTab2Box();
+                    if (tab2box != null && !tab2box.isEmpty()) {
+                        for (CrisLayoutTab2Box t2b: tab2box) {
+                            if (boxService.hasContent(t2b.getBox(), itemMetadata)) {
                                 resTabs.add(tab);
                                 break;
                             }

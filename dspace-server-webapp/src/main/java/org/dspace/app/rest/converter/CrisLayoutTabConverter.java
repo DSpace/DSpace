@@ -78,9 +78,8 @@ public class CrisLayoutTabConverter implements DSpaceConverter<CrisLayoutTab, Cr
         if (rest.getBoxes() != null && rest.getBoxes().size() > 0) {
             List<CrisLayoutBox> boxes = new ArrayList<>();
             for (CrisLayoutBoxRest boxRest: rest.getBoxes()) {
-                boxes.add( boxConverter.toModel(context, boxRest) );
+                tab.addBox( boxConverter.toModel(context, boxRest) );
             }
-            tab.setBoxes(boxes);
         }
         return tab;
     }

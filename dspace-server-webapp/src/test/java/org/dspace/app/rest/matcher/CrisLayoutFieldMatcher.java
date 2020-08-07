@@ -28,7 +28,7 @@ public class CrisLayoutFieldMatcher {
                 hasJsonPath("$.bundle", is(field.getBundle())),
                 hasJsonPath("$.rendering", is(field.getRendering())),
                 hasJsonPath("$.row", is(field.getRow())),
-                hasJsonPath("$.priority", is(field.getPriority())),
+//                hasJsonPath("$.priority", is(field.getPriority())),
                 hasJsonPath("$.label", is(field.getLabel())),
                 hasJsonPath("$.style", is(field.getStyle()))
         );

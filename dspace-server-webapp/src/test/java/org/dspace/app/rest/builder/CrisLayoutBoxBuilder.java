@@ -136,16 +136,13 @@ public class CrisLayoutBoxBuilder extends AbstractBuilder<CrisLayoutBox, CrisLay
         return this;
     }
 
-    public CrisLayoutBoxBuilder withFields(Set<CrisLayoutField> fields) {
-        this.box.setLayoutFields(fields);
-        return this;
-    }
+//    public CrisLayoutBoxBuilder withFields(Set<CrisLayoutField> fields) {
+//        this.box.setLayoutFields(fields);
+//        return this;
+//    }
 
     public CrisLayoutBoxBuilder addField(CrisLayoutField field) {
-        if (this.box.getLayoutFields() == null) {
-            this.box.setLayoutFields(new HashSet<>());
-        }
-        this.box.getLayoutFields().add(field);
+        this.box.addLayoutField(field);
         return this;
     }
 
@@ -162,8 +159,8 @@ public class CrisLayoutBoxBuilder extends AbstractBuilder<CrisLayoutBox, CrisLay
         return this;
     }
 
-    public CrisLayoutBoxBuilder withPriority(int priority) {
-        this.box.setPriority(priority);
-        return this;
-    }
+//    public CrisLayoutBoxBuilder withPriority(int priority) {
+//        this.box.setPriority(priority);
+//        return this;
+//    }
 }

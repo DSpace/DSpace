@@ -18,7 +18,6 @@ import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.ListJoin;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
-import javax.persistence.criteria.SetJoin;
 
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.EntityType;
@@ -28,8 +27,9 @@ import org.dspace.core.AbstractHibernateDAO;
 import org.dspace.core.Context;
 import org.dspace.layout.CrisLayoutBox;
 import org.dspace.layout.CrisLayoutBox_;
-import org.dspace.layout.CrisLayoutTab;
-import org.dspace.layout.CrisLayoutTab_;
+import org.dspace.layout.CrisLayoutTab2Box;
+import org.dspace.layout.CrisLayoutTab2BoxId_;
+import org.dspace.layout.CrisLayoutTab2Box_;
 import org.dspace.layout.dao.CrisLayoutBoxDAO;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -61,11 +61,11 @@ public class CrisLayoutBoxDAOImpl extends AbstractHibernateDAO<CrisLayoutBox> im
             throws SQLException {
         CriteriaBuilder cb = getHibernateSession(context).getCriteriaBuilder();
         CriteriaQuery<CrisLayoutBox> q = cb.createQuery(CrisLayoutBox.class);
-        Root<CrisLayoutTab> tabRoot = q.from(CrisLayoutTab.class);
-        q.where(cb.equal(tabRoot.get(CrisLayoutTab_.id), tabId));
-        ListJoin<CrisLayoutTab, CrisLayoutBox> tabs = tabRoot.join(CrisLayoutTab_.boxes);
-        CriteriaQuery<CrisLayoutBox> cqBoxes = q.select(tabs);
-        cqBoxes.orderBy(cb.asc(tabs.get(CrisLayoutBox_.PRIORITY)));
+        Root<CrisLayoutTab2Box> tab2boxRoot = q.from(CrisLayoutTab2Box.class);
+        q.where(cb.equal(tab2boxRoot.get(CrisLayoutTab2Box_.id).get(CrisLayoutTab2BoxId_.CRIS_LAYOUT_TAB_ID), tabId));
+        q.orderBy(cb.asc(tab2boxRoot.get(CrisLayoutTab2Box_.POSITION)));
+        Join<CrisLayoutTab2Box, CrisLayoutBox> tab2boxes = tab2boxRoot.join(CrisLayoutTab2Box_.BOX);
+        CriteriaQuery<CrisLayoutBox> cqBoxes = q.select(tab2boxes);
         TypedQuery<CrisLayoutBox> query = getHibernateSession(context).createQuery(cqBoxes);
         // If present set pagination
         if ( limit != null && offset != null ) {
@@ -82,10 +82,9 @@ public class CrisLayoutBoxDAOImpl extends AbstractHibernateDAO<CrisLayoutBox> im
     public Long countTotalBoxesInTab(Context context, Integer tabId) throws SQLException {
         CriteriaBuilder cb = getHibernateSession(context).getCriteriaBuilder();
         CriteriaQuery<Long> q = cb.createQuery(Long.class);
-        Root<CrisLayoutTab> tabRoot = q.from(CrisLayoutTab.class);
-        q.where(cb.equal(tabRoot.get(CrisLayoutTab_.id), tabId));
-        ListJoin<CrisLayoutTab, CrisLayoutBox> tabs = tabRoot.join(CrisLayoutTab_.boxes);
-        CriteriaQuery<Long> cqBoxes = q.select(cb.count(tabs));
+        Root<CrisLayoutTab2Box> tab2boxRoot = q.from(CrisLayoutTab2Box.class);
+        q.where(cb.equal(tab2boxRoot.get(CrisLayoutTab2Box_.id).get(CrisLayoutTab2BoxId_.CRIS_LAYOUT_TAB_ID), tabId));
+        CriteriaQuery<Long> cqBoxes = q.select(cb.count(tab2boxRoot));
         return getHibernateSession(context).createQuery(cqBoxes).getSingleResult();
     }
 
@@ -112,17 +111,19 @@ public class CrisLayoutBoxDAOImpl extends AbstractHibernateDAO<CrisLayoutBox> im
         // Initialize dynamic predicates list
         List<Predicate> predicates = new ArrayList<>();
         predicates.add(cb.equal(boxRoot.get(CrisLayoutBox_.entitytype).get(EntityType_.LABEL), entityType));
-        // Set filter if tabId parameter isn't null
-        if (tabId != null) {
-            SetJoin<CrisLayoutBox, CrisLayoutTab> tabs = boxRoot.join(CrisLayoutBox_.tabs);
-            predicates.add(cb.equal(tabs.get(CrisLayoutTab_.ID), tabId));
-        }
         Predicate[] predicateArray = new Predicate[predicates.size()];
         predicates.toArray(predicateArray);
         // Set where condition and orderBy
         query.select(boxRoot)
-            .where(predicateArray)
-            .orderBy(cb.asc(boxRoot.get(CrisLayoutBox_.PRIORITY)));
+            .where(predicateArray);
+        // Set filter if tabId parameter isn't null
+        if (tabId != null) {
+            ListJoin<CrisLayoutBox, CrisLayoutTab2Box> tabs = boxRoot.joinList(CrisLayoutTab2Box_.TAB);
+            predicates.add(cb.equal(tabs.get(CrisLayoutTab2Box_.ID)
+                    .get(CrisLayoutTab2BoxId_.CRIS_LAYOUT_TAB_ID), tabId));
+            query.orderBy(cb.asc(tabs.get(CrisLayoutTab2Box_.POSITION)));
+        }
+
         TypedQuery<CrisLayoutBox> exQuery = getHibernateSession(context).createQuery(query);
         // If present set pagination filter
         if ( limit != null && offset != null ) {

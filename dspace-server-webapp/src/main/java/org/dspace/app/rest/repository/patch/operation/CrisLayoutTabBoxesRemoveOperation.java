@@ -47,7 +47,7 @@ public class CrisLayoutTabBoxesRemoveOperation<D> extends PatchOperation<D> {
             // get index to remove from operation path
             int objIndex = objectIndex(operation.getPath());
             if (objIndex > -1) {
-                tab.removeBox(objIndex);
+                // tab.removeBox(objIndex);
             }
         } else {
             throw new DSpaceBadRequestException("CrisLayoutTabBoxesRemoveOperation does not support this operation");
@@ -70,7 +70,7 @@ public class CrisLayoutTabBoxesRemoveOperation<D> extends PatchOperation<D> {
      * @param CrisLayoutTab Object on which patch is being done
      */
     private void checkModelForExistingValue(CrisLayoutTab tab) {
-        if (tab.getBoxes() == null) {
+        if (tab.getTab2Box() == null) {
             throw new DSpaceBadRequestException("Attempting to remove a non-existent value.");
         }
     }

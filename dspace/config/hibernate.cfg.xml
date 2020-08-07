@@ -16,7 +16,7 @@
         <property name="hibernate.current_session_context_class">org.hibernate.context.internal.ThreadLocalSessionContext</property>
 
         <!--Debug property that can be used to display the sql-->
-        <property name="show_sql">false</property>
+        <property name="show_sql">true</property>
 
         <!--Second level cache configuration-->
         <property name="hibernate.cache.use_query_cache">true</property>
@@ -90,12 +90,16 @@
 		<mapping class="org.dspace.batch.ImpBitstreamMetadatavalue"/>
 		<mapping class="org.dspace.batch.ImpMetadatavalue"/>
 		<mapping class="org.dspace.batch.ImpRecordToItem"/>
-		
-		<!-- Configurable Layout -->
-		<mapping class="org.dspace.layout.CrisLayoutTab" />
-		<mapping class="org.dspace.layout.CrisLayoutBox" />
-		<mapping class="org.dspace.layout.CrisLayoutField" />
-		<mapping class="org.dspace.layout.CrisLayoutFieldBitstream" />
+
+        <!-- Configurable Layout -->
+        <mapping class="org.dspace.layout.CrisLayoutTab" />
+        <mapping class="org.dspace.layout.CrisLayoutBox" />
+        <mapping class="org.dspace.layout.CrisLayoutField" />
+        <mapping class="org.dspace.layout.CrisLayoutFieldBitstream" />
+        <mapping class="org.dspace.layout.CrisLayoutTab2Box" />
+        <mapping class="org.dspace.layout.CrisLayoutTab2BoxId" />
+        <mapping class="org.dspace.layout.CrisLayoutBox2Field" />
+        <mapping class="org.dspace.layout.CrisLayoutBox2FieldId" />
 
     </session-factory>
 </hibernate-configuration>

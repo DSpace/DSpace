@@ -28,7 +28,7 @@ public class CrisLayoutBoxMatcher {
                 hasJsonPath("$.collapsed", is(box.getCollapsed())),
                 hasJsonPath("$.minor", is(box.getMinor())),
                 hasJsonPath("$.style", is(box.getStyle())),
-                hasJsonPath("$.priority", is(box.getPriority())),
+                // hasJsonPath("$.priority", is(box.getPriority())),
                 hasJsonPath("$.security", is(box.getSecurity()))
         );
     }
