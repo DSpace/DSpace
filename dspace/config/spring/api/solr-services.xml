@@ -27,8 +27,18 @@
 
     <!--<bean class="org.dspace.discovery.SolrServiceIndexOutputPlugin" id="solrServiceIndexOutputPlugin"/>-->
 
-    <!-- Statistics services are both lazy loaded (by name), as you are likely just using ONE of them and not both -->
-    <bean id="solrLoggerService" class="org.dspace.statistics.SolrLoggerServiceImpl" lazy-init="true"/>
+    <bean id="solrLoggerService"
+          class="org.dspace.statistics.SolrLoggerServiceImpl"
+          lazy-init="true">
+        <description>Store and access DSpace usage statistics records in Solr.</description>
+        <property name='solrClientFactory'
+                  ref='HttpSolrClientFactory'/>
+    </bean>
+
+    <bean id='HttpSolrClientFactory'
+          class='org.dspace.statistics.​HttpSolrClientFactory'>
+        <description>HTTP connection to a Solr instance.</description>
+    </bean>
 
     <bean class="org.dspace.statistics.SolrStatisticsCore" autowire-candidate="true"/>
     

@@ -115,11 +115,21 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author mdiggory at atmire.com
  */
 public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBean {
-
     private static final Logger log = LogManager.getLogger();
 
+    @Autowired(required = true)
+    protected BitstreamService bitstreamService;
+    @Autowired(required = true)
+    protected ContentServiceFactory contentServiceFactory;
+    @Autowired(required = true)
+    protected ConfigurationService configurationService;
+    @Autowired(required = true)
+    protected ClientInfoService clientInfoService;
+
+    @Autowired(required = true)
+    protected SolrClientFactory solrClientFactory;
+
     private static final String MULTIPLE_VALUES_SPLITTER = "|";
-    protected SolrClient solr;
 
     public static final String DATE_FORMAT_8601 = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
 
@@ -135,14 +145,6 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
     private static final String IP_V4_REGEX = "^((?:\\d{1,3}\\.){3})\\d{1,3}$";
     private static final String IP_V6_REGEX = "^(.*):.*:.*$";
 
-    @Autowired(required = true)
-    protected BitstreamService bitstreamService;
-    @Autowired(required = true)
-    protected ContentServiceFactory contentServiceFactory;
-    @Autowired(required = true)
-    private ConfigurationService configurationService;
-    @Autowired(required = true)
-    private ClientInfoService clientInfoService;
     @Autowired
     private SolrStatisticsCore solrStatisticsCore;
     @Autowired
@@ -153,9 +155,12 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
     /** URL to the current-year statistics core.  Prior-year shards will have a year suffixed. */
     private String statisticsCoreURL;
 
+    protected SolrClient solr;
+
     /** Name of the current-year statistics core.  Prior-year shards will have a year suffixed. */
     private String statisticsCoreBase;
 
+    /** Possible values of the {@code type} field of a usage event document. */
     public static enum StatisticsType {
         VIEW("view"),
         SEARCH("search"),
@@ -174,13 +179,11 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
     }
 
     protected SolrLoggerServiceImpl() {
-
     }
-
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        statisticsCoreURL = configurationService.getProperty("solr-statistics.server");
+        String statisticsCoreURL = configurationService.getProperty("solr-statistics.server");
 
         if (null != statisticsCoreURL) {
             Path statisticsPath = Paths.get(new URI(statisticsCoreURL).getPath());
@@ -1009,7 +1012,6 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
                 } catch (ParseException e1) {
                     e1.printStackTrace();
                 }
-                // e.printStackTrace();
             }
             String dateformatString = "dd-MM-yyyy";
             if ("DAY".equals(type)) {

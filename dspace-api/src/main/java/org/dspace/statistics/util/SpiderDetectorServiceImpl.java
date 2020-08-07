@@ -21,10 +21,10 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.configuration2.ex.ConversionException;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.service.ClientInfoService;
 import org.dspace.services.ConfigurationService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -39,18 +39,18 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class SpiderDetectorServiceImpl implements SpiderDetectorService {
 
-    private static final Logger log = LoggerFactory.getLogger(SpiderDetectorServiceImpl.class);
+    private static final Logger log = LogManager.getLogger(SpiderDetectorServiceImpl.class);
 
     private Boolean useCaseInsensitiveMatching;
 
     private final List<Pattern> agents
-        = Collections.synchronizedList(new ArrayList<Pattern>());
+        = Collections.synchronizedList(new ArrayList<>());
 
     private final List<Pattern> domains
-        = Collections.synchronizedList(new ArrayList<Pattern>());
+        = Collections.synchronizedList(new ArrayList<>());
 
-    private ConfigurationService configurationService;
-    private ClientInfoService clientInfoService;
+    private final ConfigurationService configurationService;
+    private final ClientInfoService clientInfoService;
 
     /**
      * Sparse HashTable structure to hold IP address ranges.
@@ -63,22 +63,16 @@ public class SpiderDetectorServiceImpl implements SpiderDetectorService {
         this.clientInfoService = clientInfoService;
     }
 
+    @Override
     public IPTable getTable() {
         return table;
     }
 
-    /**
-     * Service Method for testing spiders against existing spider files.
-     * <p>
+    /*
      * In future spiders HashSet may be optimized as byte offset array to
      * improve performance and memory footprint further.
-     *
-     * @param clientIP address of the client.
-     * @param proxyIPs comma-list of X-Forwarded-For addresses, or null.
-     * @param hostname domain name of host, or null.
-     * @param agent    User-Agent header value, or null.
-     * @return true if the client matches any spider characteristics list.
      */
+    @Override
     public boolean isSpider(String clientIP, String proxyIPs, String hostname, String agent) {
         // See if any agent patterns match
         if (null != agent) {
@@ -137,13 +131,7 @@ public class SpiderDetectorServiceImpl implements SpiderDetectorService {
         return false;
     }
 
-    /**
-     * Utility method which reads lines from a file & returns them in a Set.
-     *
-     * @param patternFile the location of our spider file
-     * @return a vector full of patterns
-     * @throws IOException could not happen since we check the file be4 we use it
-     */
+    @Override
     public Set<String> readPatterns(File patternFile)
         throws IOException {
         Set<String> patterns = new HashSet<>();
@@ -210,12 +198,7 @@ public class SpiderDetectorServiceImpl implements SpiderDetectorService {
         }
     }
 
-    /**
-     * Service Method for testing spiders against existing spider files.
-     *
-     * @param request
-     * @return true|false if the request was detected to be from a spider.
-     */
+    @Override
     public boolean isSpider(HttpServletRequest request) {
         return isSpider(request.getRemoteAddr(),
                         request.getHeader("X-Forwarded-For"),
@@ -223,12 +206,7 @@ public class SpiderDetectorServiceImpl implements SpiderDetectorService {
                         request.getHeader("User-Agent"));
     }
 
-    /**
-     * Check individual IP is a spider.
-     *
-     * @param ip
-     * @return if is spider IP
-     */
+    @Override
     public boolean isSpider(String ip) {
         if (table == null) {
             loadSpiderIpAddresses();
@@ -238,16 +216,14 @@ public class SpiderDetectorServiceImpl implements SpiderDetectorService {
             if (table.contains(ip)) {
                 return true;
             }
-        } catch (Exception e) {
+        } catch (IPTable.IPFormatException e) {
             return false;
         }
 
         return false;
     }
 
-    /*
-     *  loader to populate the table from files.
-     */
+    @Override
     public synchronized void loadSpiderIpAddresses() {
 
         if (table == null) {
@@ -289,7 +265,7 @@ public class SpiderDetectorServiceImpl implements SpiderDetectorService {
     }
 
     /**
-     * checks if case insensitive matching is enabled
+     * Checks if case insensitive matching is enabled.
      *
      * @return true if it's enabled, false if not
      */
@@ -306,5 +282,4 @@ public class SpiderDetectorServiceImpl implements SpiderDetectorService {
 
         return useCaseInsensitiveMatching;
     }
-
 }
