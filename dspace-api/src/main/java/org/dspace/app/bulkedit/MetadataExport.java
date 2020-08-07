@@ -91,6 +91,6 @@ public class MetadataExport extends DSpaceRunnable<MetadataExportScriptConfigura
     }
 
     protected String getFileNameForExportFile() {
-        return UUID.randomUUID().toString();
+        return UUID.randomUUID().toString() + ".csv";
     }
 }
