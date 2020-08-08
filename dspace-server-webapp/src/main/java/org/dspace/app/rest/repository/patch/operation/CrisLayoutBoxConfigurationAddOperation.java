@@ -20,6 +20,7 @@ import org.dspace.content.service.MetadataFieldService;
 import org.dspace.core.Context;
 import org.dspace.layout.CrisLayoutBox;
 import org.dspace.layout.CrisLayoutField;
+import org.dspace.layout.service.CrisLayoutFieldService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -47,6 +48,9 @@ public class CrisLayoutBoxConfigurationAddOperation<D> extends PatchOperation<D>
 
     @Autowired
     private MetadataFieldService metadataService;
+
+    @Autowired
+    private CrisLayoutFieldService fieldService;
 
     /* (non-Javadoc)
      * @see org.dspace.app.rest.repository.patch.operation.PatchOperation#perform
@@ -78,10 +82,14 @@ public class CrisLayoutBoxConfigurationAddOperation<D> extends PatchOperation<D>
                 }
                 if (value.isArray()) {
                     for (JsonNode v: value) {
-                        box.addLayoutField(getLayoutFieldFromJsonNode(context, row, v), prosition);
+                        CrisLayoutField layoutField = getLayoutFieldFromJsonNode(context, row, v);
+                        layoutField = fieldService.create(context, layoutField);
+                        box.addLayoutField(layoutField, prosition);
                     }
                 } else {
-                    box.addLayoutField(getLayoutFieldFromJsonNode(context, row, value), prosition);
+                    CrisLayoutField layoutField = getLayoutFieldFromJsonNode(context, row, value);
+                    layoutField = fieldService.create(context, layoutField);
+                    box.addLayoutField(layoutField, prosition);
                 }
             } catch (Exception e) {
                 throw new RuntimeException(e.getMessage(), e);

@@ -61,14 +61,6 @@ public class CrisLayoutTab implements ReloadableEntity<Integer> {
         inverseJoinColumns = {@JoinColumn(name = "authorized_field_id")}
     )
     private Set<MetadataField> metadataSecurityFields;
-//    @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST})
-//    @JoinTable(
-//        name = "cris_layout_tab2box",
-//        joinColumns = {@JoinColumn(name = "cris_layout_tab_id")},
-//        inverseJoinColumns = {@JoinColumn(name = "cris_layout_box_id")}
-//    )
-//    @OrderBy(value = "priority")
-//    private List<CrisLayoutBox> boxes;
     @OneToMany(
         mappedBy = "tab",
         cascade = CascadeType.ALL
@@ -158,14 +150,6 @@ public class CrisLayoutTab implements ReloadableEntity<Integer> {
     public void setMetadataSecurityFields(Set<MetadataField> metadataFields) {
         this.metadataSecurityFields = metadataFields;
     }
-
-//    public List<CrisLayoutBox> getBoxes() {
-//        return boxes;
-//    }
-//
-//    public void setBoxes(List<CrisLayoutBox> boxes) {
-//        this.boxes = boxes;
-//    }
 
     public void addBox(CrisLayoutBox box) {
         this.addBox(box, null);

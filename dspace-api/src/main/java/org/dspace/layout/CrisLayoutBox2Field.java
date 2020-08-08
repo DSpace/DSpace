@@ -8,6 +8,7 @@
 package org.dspace.layout;
 
 import javax.persistence.Cacheable;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
@@ -40,7 +41,7 @@ public class CrisLayoutBox2Field {
     @JoinColumn(name = "cris_layout_box_id")
     private CrisLayoutBox box;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     @MapsId("id.crisLayoutFieldId")
     @JoinColumn(name = "cris_layout_field_id")
     private CrisLayoutField field;

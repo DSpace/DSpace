@@ -20,6 +20,8 @@ import org.dspace.app.rest.converter.CrisLayoutBoxConverter;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.CrisLayoutBoxRest;
+import org.dspace.app.rest.model.patch.Patch;
+import org.dspace.app.rest.repository.patch.ResourcePatch;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
 import org.dspace.layout.CrisLayoutBox;
@@ -46,6 +48,9 @@ public class CrisLayoutBoxRepository extends DSpaceRestRepository<CrisLayoutBoxR
 
     @Autowired
     private CrisLayoutBoxConverter boxConverter;
+
+    @Autowired
+    private ResourcePatch<CrisLayoutBox> resourcePatch;
 
     @Override
     public CrisLayoutBox findDomainObjectByPk(Context context, Integer id) throws SQLException {
@@ -161,4 +166,22 @@ public class CrisLayoutBoxRepository extends DSpaceRestRepository<CrisLayoutBoxR
         return CrisLayoutBoxRest.class;
     }
 
+    @Override
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public void patch(Context context, HttpServletRequest request, String apiCategory, String model, Integer id,
+            Patch patch) throws AuthorizeException, SQLException {
+        CrisLayoutBox box = null;
+        try {
+            box = service.find(context, id);
+            if (box == null) {
+                throw new ResourceNotFoundException(apiCategory + "." + model + " with id: " + id + " not found");
+            }
+            resourcePatch.patch(context, box, patch.getOperations());
+            service.update(context, box);
+        } catch (SQLException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        } catch (AuthorizeException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+    }
 }

@@ -19,8 +19,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
@@ -53,26 +51,17 @@ public class CrisLayoutField implements ReloadableEntity<Integer> {
     private String rendering;
     @Column(name = "row", nullable = false)
     private Integer row;
-//    @Column(name = "priority", nullable = false)
-//    private Integer priority;
     @Column(name = "type")
     private String type;
     @Column(name = "label")
     private String label;
     @Column(name = "style")
     private String style;
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(
-        name = "cris_layout_box2field",
-        joinColumns = {@JoinColumn(name = "cris_layout_field_id")},
-        inverseJoinColumns = {@JoinColumn(name = "cris_layout_box_id")}
-    )
-    private Set<CrisLayoutBox> boxes;
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "layoutField")
     private Set<CrisLayoutFieldBitstream> bitstreams;
     @OneToMany(
         mappedBy = "field",
-        cascade = CascadeType.ALL
+        cascade = CascadeType.REMOVE
     )
     private List<CrisLayoutBox2Field> box2field = new ArrayList<>();
 
@@ -117,14 +106,6 @@ public class CrisLayoutField implements ReloadableEntity<Integer> {
         this.row = row;
     }
 
-//    public Integer getPriority() {
-//        return priority;
-//    }
-//
-//    public void setPriority(Integer priority) {
-//        this.priority = priority;
-//    }
-
     public String getType() {
         return type;
     }
@@ -147,14 +128,6 @@ public class CrisLayoutField implements ReloadableEntity<Integer> {
 
     public void setStyle(String style) {
         this.style = style;
-    }
-
-    public Set<CrisLayoutBox> getBoxes() {
-        return boxes;
-    }
-
-    public void setBoxes(Set<CrisLayoutBox> boxes) {
-        this.boxes = boxes;
     }
 
     public Set<CrisLayoutFieldBitstream> getBitstreams() {

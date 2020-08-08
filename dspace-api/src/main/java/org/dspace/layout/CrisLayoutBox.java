@@ -50,8 +50,6 @@ public class CrisLayoutBox implements ReloadableEntity<Integer> {
     private String type;
     @Column(name = "collapsed", nullable = false)
     private Boolean collapsed;
-//    @Column(name = "priority", nullable = false)
-//    private Integer priority;
     @Column(name = "shortname")
     private String shortname;
     @Column(name = "header")
@@ -79,13 +77,6 @@ public class CrisLayoutBox implements ReloadableEntity<Integer> {
             cascade = CascadeType.ALL
     )
     private List<CrisLayoutTab2Box> tab2box = new ArrayList<>();
-//    @ManyToMany(fetch = FetchType.LAZY)
-//    @JoinTable(
-//            name = "cris_layout_tab2box",
-//            joinColumns = {@JoinColumn(name = "cris_layout_box_id")},
-//            inverseJoinColumns = {@JoinColumn(name = "cris_layout_tab_id")}
-//        )
-//    private Set<CrisLayoutTab> tabs;
     @Column(name = "clear")
     private Boolean clear;
 
@@ -121,14 +112,6 @@ public class CrisLayoutBox implements ReloadableEntity<Integer> {
     public void setCollapsed(Boolean collapsed) {
         this.collapsed = collapsed;
     }
-
-//    public Integer getPriority() {
-//        return priority;
-//    }
-//
-//    public void setPriority(Integer priority) {
-//        this.priority = priority;
-//    }
 
     public String getShortname() {
         return shortname;
@@ -214,22 +197,6 @@ public class CrisLayoutBox implements ReloadableEntity<Integer> {
         this.metadataSecurityFields = metadataFields;
     }
 
-//    public Set<CrisLayoutField> getLayoutFields() {
-//        return layoutFields;
-//    }
-//
-//    public void setLayoutFields(Set<CrisLayoutField> layoutFields) {
-//        this.layoutFields = layoutFields;
-//    }
-
-//    public Set<CrisLayoutTab> getTabs() {
-//        return tabs;
-//    }
-//
-//    public void setTabs(Set<CrisLayoutTab> tabs) {
-//        this.tabs = tabs;
-//    }
-
     public Boolean getClear() {
         return clear;
     }
@@ -237,19 +204,6 @@ public class CrisLayoutBox implements ReloadableEntity<Integer> {
     public void setClear(Boolean clear) {
         this.clear = clear;
     }
-
-//    public void addTab(CrisLayoutTab tab) {
-//        if (this.tabs == null) {
-//            this.tabs = new HashSet<>();
-//        }
-//        this.tabs.add(tab);
-//    }
-//
-//    public void removeTab(CrisLayoutTab tab) {
-//        if (this.tabs != null && !this.tabs.isEmpty()) {
-//            this.tabs.remove(tab);
-//        }
-//    }
 
     public void addLayoutField(CrisLayoutField field, Integer position) {
         if (this.box2field.isEmpty()) {
@@ -259,8 +213,9 @@ public class CrisLayoutBox implements ReloadableEntity<Integer> {
             for (Iterator<CrisLayoutBox2Field> it = this.box2field.iterator();
                     it.hasNext(); ) {
                 CrisLayoutBox2Field b2f = it.next();
-                if (b2f.getPosition() > position) {
-                    position = b2f.getPosition();
+                CrisLayoutField dbField = b2f.getField();
+                if (b2f.getPosition() > position && dbField.getRow().equals(field.getRow())) {
+                    position = b2f.getPosition() + 1;
                 }
             }
         } else {
@@ -268,12 +223,17 @@ public class CrisLayoutBox implements ReloadableEntity<Integer> {
             for (Iterator<CrisLayoutBox2Field> it = this.box2field.iterator();
                     it.hasNext(); ) {
                 CrisLayoutBox2Field b2f = it.next();
-                currentPosition = b2f.getPosition();
-                if (currentPosition >= position ) {
-                    b2f.setPosition(++currentPosition);
+                CrisLayoutField dbField = b2f.getField();
+                if (dbField.getRow().equals(field.getRow())) {
+                    currentPosition = b2f.getPosition();
+                    if (currentPosition >= position ) {
+                        b2f.setPosition(++currentPosition);
+                    }
                 }
             }
-            if (position > ++currentPosition) {
+            if (currentPosition < 0) {
+                position = 0;
+            } else if (position > ++currentPosition) {
                 position = currentPosition;
             }
         }
@@ -288,13 +248,15 @@ public class CrisLayoutBox implements ReloadableEntity<Integer> {
 
     public void removeLayoutField(CrisLayoutField field) {
         boolean found = false;
+        Integer row = null;
         for (Iterator<CrisLayoutBox2Field> it = this.box2field.iterator();
                 it.hasNext();) {
             CrisLayoutBox2Field b2f = it.next();
-            if (found) {
+            if (found && row.equals(field.getRow())) {
                 b2f.setPosition(b2f.getPosition() - 1);
             }
             if (b2f.getBox().equals(this) && b2f.getField().equals(field)) {
+                row = b2f.getField().getRow();
                 it.remove();
                 b2f.setBox(null);
                 b2f.setField(null);

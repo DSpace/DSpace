@@ -8,11 +8,13 @@
 package org.dspace.app.rest.repository.patch.operation;
 
 import java.sql.SQLException;
+import java.util.List;
 
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.core.Context;
 import org.dspace.layout.CrisLayoutTab;
+import org.dspace.layout.CrisLayoutTab2Box;
 import org.springframework.stereotype.Component;
 
 /**
@@ -47,7 +49,12 @@ public class CrisLayoutTabBoxesRemoveOperation<D> extends PatchOperation<D> {
             // get index to remove from operation path
             int objIndex = objectIndex(operation.getPath());
             if (objIndex > -1) {
-                // tab.removeBox(objIndex);
+                List<CrisLayoutTab2Box> tab2box = tab.getTab2Box();
+                if (tab2box != null
+                        && tab2box.size() > objIndex) {
+                    CrisLayoutTab2Box t2b = tab2box.get(objIndex);
+                    tab.removeBox(t2b.getBox());
+                }
             }
         } else {
             throw new DSpaceBadRequestException("CrisLayoutTabBoxesRemoveOperation does not support this operation");
