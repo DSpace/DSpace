@@ -13,15 +13,12 @@ import java.util.List;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.dspace.app.rest.converter.CrisLayoutBoxConverter;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
-import org.dspace.app.rest.model.CrisLayoutBoxRest;
 import org.dspace.app.rest.model.patch.JsonValueEvaluator;
 import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.core.Context;
 import org.dspace.layout.CrisLayoutBox;
 import org.dspace.layout.CrisLayoutTab;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -45,9 +42,6 @@ public class CrisLayoutTabBoxesAddOperation<D> extends PatchOperation<D> {
 
     private ObjectMapper objectMapper = new ObjectMapper();
 
-    @Autowired
-    private CrisLayoutBoxConverter boxConterter;
-
     /* (non-Javadoc)
      * @see org.dspace.app.rest.repository.patch.operation.PatchOperation#perform
      * (org.dspace.core.Context, java.lang.Object, org.dspace.app.rest.model.patch.Operation)
@@ -68,12 +62,12 @@ public class CrisLayoutTabBoxesAddOperation<D> extends PatchOperation<D> {
                 }
                 if (value.isArray()) {
                     for (JsonNode v: value) {
-                        CrisLayoutBoxRest rest = objectMapper.treeToValue(v, CrisLayoutBoxRest.class);
-                        boxes.add(boxConterter.toModel(context, rest));
+                        CrisLayoutBox box = objectMapper.treeToValue(v, CrisLayoutBox.class);
+                        boxes.add(box);
                     }
                 } else {
-                    CrisLayoutBoxRest rest = objectMapper.treeToValue(value, CrisLayoutBoxRest.class);
-                    boxes.add(boxConterter.toModel(context, rest));
+                    CrisLayoutBox box = objectMapper.treeToValue(value, CrisLayoutBox.class);
+                    boxes.add(box);
                 }
                 for (CrisLayoutBox box: boxes) {
                     tab.addBox(box);

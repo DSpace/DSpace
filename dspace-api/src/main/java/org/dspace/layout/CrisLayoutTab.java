@@ -164,7 +164,7 @@ public class CrisLayoutTab implements ReloadableEntity<Integer> {
                     it.hasNext(); ) {
                 CrisLayoutTab2Box t2b = it.next();
                 if (t2b.getPosition() > position) {
-                    position = t2b.getPosition();
+                    position = t2b.getPosition() + 1;
                 }
             }
         } else {
@@ -183,6 +183,24 @@ public class CrisLayoutTab implements ReloadableEntity<Integer> {
         }
         CrisLayoutTab2Box tab2box = new CrisLayoutTab2Box(this, box, position);
         this.tab2box.add(tab2box);
+    }
+
+    public void removeBox(int boxId) {
+        boolean found = false;
+        for (Iterator<CrisLayoutTab2Box> it = this.tab2box.iterator();
+                it.hasNext();) {
+            CrisLayoutTab2Box t2b = it.next();
+            if (found) {
+                t2b.setPosition(t2b.getPosition() - 1);
+            }
+            if (t2b.getTab().equals(this) &&
+                    t2b.getId().getCrisLayoutBoxId().equals(boxId)) {
+                it.remove();
+                t2b.setBox(null);
+                t2b.setTab(null);
+                found = true;
+            }
+        }
     }
 
     public void removeBox(CrisLayoutBox box) {

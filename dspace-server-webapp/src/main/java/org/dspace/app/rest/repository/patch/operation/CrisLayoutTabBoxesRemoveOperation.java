@@ -50,10 +50,9 @@ public class CrisLayoutTabBoxesRemoveOperation<D> extends PatchOperation<D> {
             int objIndex = objectIndex(operation.getPath());
             if (objIndex > -1) {
                 List<CrisLayoutTab2Box> tab2box = tab.getTab2Box();
-                if (tab2box != null
-                        && tab2box.size() > objIndex) {
+                if (tab2box != null) {
                     CrisLayoutTab2Box t2b = tab2box.get(objIndex);
-                    tab.removeBox(t2b.getBox());
+                    tab.removeBox(t2b.getId().getCrisLayoutBoxId());
                 }
             }
         } else {
