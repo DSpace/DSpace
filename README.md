@@ -90,33 +90,33 @@ run automatically by [Travis CI](https://travis-ci.com/DSpace/DSpace/) for all P
 
 * How to run both Unit Tests (via `maven-surefire-plugin`) and Integration Tests (via `maven-failsafe-plugin`):
   ```
-  mvn clean test -Dmaven.test.skip=false -DskipITs=false
+  mvn clean test -DskipTests=false -DskipITs=false
   ```
 * How to run just Unit Tests:
   ```
-  mvn test -Dmaven.test.skip=false
+  mvn test -DskipTests=false
   ```
 * How to run a *single* Unit Test
   ```
   # Run all tests in a specific test class
   # NOTE: failIfNoTests=false is required to skip tests in other modules
-  mvn test -Dmaven.test.skip=false -Dtest=[full.package.testClassName] -DfailIfNoTests=false
+  mvn test -DskipTests=false -Dtest=[full.package.testClassName] -DfailIfNoTests=false
 
   # Run one test method in a specific test class
-  mvn test -Dmaven.test.skip=false -Dtest=[full.package.testClassName]#[testMethodName] -DfailIfNoTests=false
+  mvn test -DskipTests=false -Dtest=[full.package.testClassName]#[testMethodName] -DfailIfNoTests=false
   ```
 * How to run Integration Tests (requires enabling Unit tests too)
   ```
-  mvn verify -Dmaven.test.skip=false -DskipITs=false
+  mvn verify -DskipTests=false -DskipITs=false
   ```
 * How to run a *single* Integration Test (requires enabling Unit tests too)
   ```
   # Run all integration tests in a specific test class
   # NOTE: failIfNoTests=false is required to skip tests in other modules
-  mvn test -Dmaven.test.skip=false -DskipITs=false -Dtest=[full.package.testClassName] -DfailIfNoTests=false
+  mvn test -DskipTests=false -DskipITs=false -Dtest=[full.package.testClassName] -DfailIfNoTests=false
 
   # Run one test method in a specific test class
-  mvn test -Dmaven.test.skip=false -DskipITs=false -Dtest=[full.package.testClassName]#[testMethodName] -DfailIfNoTests=false
+  mvn test -DskipTests=false -DskipITs=false -Dtest=[full.package.testClassName]#[testMethodName] -DfailIfNoTests=false
   ```
 * How to run only tests of a specific DSpace module
   ```
