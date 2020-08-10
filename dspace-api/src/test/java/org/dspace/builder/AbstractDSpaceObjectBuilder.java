@@ -146,6 +146,33 @@ public abstract class AbstractDSpaceObjectBuilder<T extends DSpaceObject>
         }
         return (B) this;
     }
+    /**
+     * Support method to grant the {@link Constants#READ} permission over an object only to a specific group. Any other
+     * READ permissions will be removed
+     *
+     * @param dso
+     *            the DSpaceObject on which grant the permission
+     * @param eperson
+     *            the eperson that will be granted of the permission
+     * @return the builder properly configured to build the object with the additional admin permission
+     */
+    protected <B extends AbstractDSpaceObjectBuilder<T>> B setAdminPermission(DSpaceObject dso, EPerson eperson,
+                                                                                 Date startDate) {
+        try {
+
+            ResourcePolicy rp = authorizeService.createOrModifyPolicy(null, context, null, null,
+                                                                      eperson, startDate, Constants.ADMIN,
+                                                                      "Integration Test", dso);
+            if (rp != null) {
+                log.info("Updating resource policy with REMOVE for eperson: " + eperson.getEmail());
+                resourcePolicyService.update(context, rp);
+            }
+        } catch (Exception e) {
+            return handleException(e);
+        }
+        return (B) this;
+
+    }
 
     /**
      * Support method to grant {@link Constants#REMOVE} permission to a specific eperson
