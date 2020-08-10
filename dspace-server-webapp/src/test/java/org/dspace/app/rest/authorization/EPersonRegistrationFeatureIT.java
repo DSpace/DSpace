@@ -7,7 +7,10 @@
  */
 package org.dspace.app.rest.authorization;
 
+import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import org.dspace.app.rest.authorization.impl.EPersonRegistrationFeature;
@@ -63,10 +66,11 @@ public class EPersonRegistrationFeatureIT extends AbstractControllerIntegrationT
         String siteUri = utils.linkToSingleResource(SiteRest, "self").getHref();
 
 
-        getClient().perform(get("/api/authz/authorizations/search/objectAndFeature")
+        getClient().perform(get("/api/authz/authorizations/search/object")
                                           .param("uri", siteUri)
                                           .param("feature", epersonRegistrationFeature.getName()))
-                             .andExpect(status().isOk());
+                             .andExpect(status().isOk())
+                .andExpect(jsonPath("$.page.totalElements", greaterThan(0)));
     }
 
     @Test
@@ -78,10 +82,11 @@ public class EPersonRegistrationFeatureIT extends AbstractControllerIntegrationT
 
         configurationService.setProperty("user.registration", false);
 
-        getClient().perform(get("/api/authz/authorizations/search/objectAndFeature")
-                                          .param("uri", siteUri)
-                                          .param("feature", epersonRegistrationFeature.getName()))
-                             .andExpect(status().isNoContent());
+        getClient().perform(get("/api/authz/authorizations/search/object")
+                .param("uri", siteUri)
+                .param("feature", epersonRegistrationFeature.getName()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.page.totalElements", is(0)));
 
     }
 
@@ -94,18 +99,20 @@ public class EPersonRegistrationFeatureIT extends AbstractControllerIntegrationT
         String siteUri = utils.linkToSingleResource(SiteRest, "self").getHref();
 
 
-        getClient().perform(get("/api/authz/authorizations/search/objectAndFeature")
-                                          .param("uri", siteUri)
-                                          .param("feature", epersonRegistrationFeature.getName()))
-                             .andExpect(status().isOk());
+        getClient().perform(get("/api/authz/authorizations/search/object")
+                .param("uri", siteUri)
+                .param("feature", epersonRegistrationFeature.getName()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.page.totalElements", greaterThan(0)));
 
         //Enable Shibboleth and password login
         configurationService.setProperty("plugin.sequence.org.dspace.authenticate.AuthenticationMethod", SHIB_ONLY);
 
-        getClient().perform(get("/api/authz/authorizations/search/objectAndFeature")
-                                          .param("uri", siteUri)
-                                          .param("feature", epersonRegistrationFeature.getName()))
-                             .andExpect(status().isNoContent());
+        getClient().perform(get("/api/authz/authorizations/search/object")
+                .param("uri", siteUri)
+                .param("feature", epersonRegistrationFeature.getName()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.page.totalElements", is(0)));
 
     }
 }
