@@ -200,7 +200,7 @@ public interface DSpaceObjectService<T extends DSpaceObject> {
      *                  and the ISO3166 country code. <code>null</code> means the
      *                  value has no language (for example, a date).
      * @param values    the values to add.
-     * @return the list of MetadataValues added ot the object
+     * @return the list of MetadataValues added to the object
      * @throws SQLException if database error
      */
     public List<MetadataValue> addMetadata(Context context, T dso, String schema, String element, String qualifier,
@@ -224,7 +224,7 @@ public interface DSpaceObjectService<T extends DSpaceObject> {
      * @param values      the values to add.
      * @param authorities the external authority key for this value (or null)
      * @param confidences the authority confidence (default 0)
-     * @return the list of MetadataValues added ot the object
+     * @return the list of MetadataValues added to the object
      * @throws SQLException if database error
      */
     public List<MetadataValue> addMetadata(Context context, T dso, String schema, String element, String qualifier,
@@ -245,7 +245,7 @@ public interface DSpaceObjectService<T extends DSpaceObject> {
      * @param values        the values to add.
      * @param authorities   the external authority key for this value (or null)
      * @param confidences   the authority confidence (default 0)
-     * @return the list of MetadataValues added ot the object
+     * @return the list of MetadataValues added to the object
      * @throws SQLException if database error
      */
     public List<MetadataValue> addMetadata(Context context, T dso, MetadataField metadataField, String lang,
@@ -298,7 +298,7 @@ public interface DSpaceObjectService<T extends DSpaceObject> {
      *                      and the ISO3166 country code. <code>null</code> means the
      *                      value has no language (for example, a date).
      * @param values        the values to add.
-     * @return the list of MetadataValues added ot the object
+     * @return the list of MetadataValues added to the object
      * @throws SQLException if database error
      */
     public List<MetadataValue> addMetadata(Context context, T dso, MetadataField metadataField, String language,
