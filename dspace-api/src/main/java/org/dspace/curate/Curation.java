@@ -248,6 +248,13 @@ public class Curation extends DSpaceRunnable<CurationScriptConfiguration> {
         }
     }
 
+    /**
+     * This method will assign the currentUser to the {@link Context} variable which is also created in this method.
+     * The instance of the method in this class will fetch the EPersonIdentifier from this class, this identifier
+     * was given to this class upon instantiation, it'll then be used to find the {@link EPerson} associated with it
+     * and this {@link EPerson} will be set as the currentUser of the created {@link Context}
+     * @throws ParseException If something went wrong with the retrieval of the EPerson Identifier
+     */
     protected void assignCurrentUserInContext() throws ParseException {
         UUID currentUserUuid = this.getEpersonIdentifier();
         try {

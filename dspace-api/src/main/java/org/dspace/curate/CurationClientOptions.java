@@ -45,6 +45,11 @@ public enum CurationClientOptions {
         return null;
     }
 
+    /**
+     * This method will create all the possible Options for the {@link Curation} script.
+     * This will be used by {@link CurationScriptConfiguration}
+     * @return  The options for the {@link Curation} script
+     */
     protected static Options constructOptions() {
         Options options = new Options();
 
