@@ -387,7 +387,7 @@ public class TabsRestControllerIT extends AbstractControllerIntegrationTest {
         context.restoreAuthSystemState();
 
         String tokenAdmin = getAuthToken(admin.getEmail(), password);
-        getClient(tokenAdmin).perform(post("/api/layout/tabs/9999/securitymetadata")
+        getClient(tokenAdmin).perform(post("/api/layout/tabs/" + Integer.MAX_VALUE + "/securitymetadata")
                 .contentType(org.springframework.http.MediaType.parseMediaType
                         (org.springframework.data.rest.webmvc.RestMediaTypes
                              .TEXT_URI_LIST_VALUE))
@@ -792,7 +792,7 @@ public class TabsRestControllerIT extends AbstractControllerIntegrationTest {
 
         String tokenAdmin = getAuthToken(admin.getEmail(), password);
         getClient(tokenAdmin)
-                .perform(post("/api/layout/tabs/8716/boxes")
+                .perform(post("/api/layout/tabs/" + Integer.MAX_VALUE + "/boxes")
                         .contentType(org.springframework.http.MediaType.parseMediaType
                                 (org.springframework.data.rest.webmvc.RestMediaTypes
                                      .TEXT_URI_LIST_VALUE))
@@ -1015,7 +1015,7 @@ public class TabsRestControllerIT extends AbstractControllerIntegrationTest {
                 .andExpect(jsonPath("$._embedded.boxes", Matchers.not(Matchers.empty())))
                 .andExpect(jsonPath("$.page.totalElements", Matchers.is(2)));
 
-       getClient(tokenAdmin).perform(delete("/api/layout/tabs/" + tab.getID() + "/boxes/9999"))
+       getClient(tokenAdmin).perform(delete("/api/layout/tabs/" + tab.getID() + "/boxes/" + Integer.MAX_VALUE))
                             .andExpect(status().isNoContent());
 
         // get boxes
