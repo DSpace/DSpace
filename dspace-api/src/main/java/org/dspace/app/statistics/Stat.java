@@ -15,7 +15,7 @@ package org.dspace.app.statistics;
  *
  * @author Richard Jones
  */
-public class Stat implements Comparable {
+public class Stat implements Comparable<Stat> {
     // FIXME: this class is functional but a bit messy, and should be neatened
     // up and completed
 
@@ -132,17 +132,17 @@ public class Stat implements Comparable {
 
 
     /**
-     * compare the current object to the given object returning -1 if o is less
-     * than the current object, 0 if they are the same, and +1 if o is greater
-     * than the current object.
+     * Compare the current Stat to the given Stat returning -1 if o is less
+     * than the current Stat, 0 if they are the same, and +1 if o is greater
+     * than the current Stat.
      *
-     * @param o the object to compare to the current one
+     * @param stat the Stat object to compare to the current one
      * @return +1, 0, -1 if o is less than, equal to, or greater than the
      * current object value.
      */
     @Override
-    public int compareTo(Object o) {
-        int objectValue = ((Stat) o).getValue();
+    public int compareTo(Stat stat) {
+        int objectValue = stat.getValue();
 
         if (objectValue < this.getValue()) {
             return -1;

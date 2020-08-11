@@ -74,6 +74,7 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataSchema;
+import org.dspace.content.MetadataSchemaEnum;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.content.service.BitstreamFormatService;
 import org.dspace.content.service.BitstreamService;
@@ -677,7 +678,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
         Node schemaAttr = metadata.item(0).getAttributes().getNamedItem(
             "schema");
         if (schemaAttr == null) {
-            schema = MetadataSchema.DC_SCHEMA;
+            schema = MetadataSchemaEnum.DC.getName();
         } else {
             schema = schemaAttr.getNodeValue();
         }
@@ -1518,6 +1519,12 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
                     if (!dir.exists() && !dir.mkdirs()) {
                         log.error("Unable to create directory: " + dir.getAbsolutePath());
                     }
+                    // Verify that the directory the entry is using is a subpath of zipDir (and not somewhere else!)
+                    if (!dir.toPath().normalize().startsWith(zipDir)) {
+                        throw new IOException("Bad zip entry: '" + entry.getName()
+                                                  + "' in file '" + zipfile.getAbsolutePath() + "'!"
+                                                  + " Cannot process this file.");
+                    }
 
                     //Entries could have too many directories, and we need to adjust the sourcedir
                     // file1.zip (SimpleArchiveFormat / item1 / contents|dublin_core|...
@@ -1538,9 +1545,16 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
                 }
                 byte[] buffer = new byte[1024];
                 int len;
+                File outFile = new File(zipDir + entry.getName());
+                // Verify that this file will be created in our zipDir (and not somewhere else!)
+                if (!outFile.toPath().normalize().startsWith(zipDir)) {
+                    throw new IOException("Bad zip entry: '" + entry.getName()
+                                              + "' in file '" + zipfile.getAbsolutePath() + "'!"
+                                              + " Cannot process this file.");
+                }
                 InputStream in = zf.getInputStream(entry);
                 BufferedOutputStream out = new BufferedOutputStream(
-                    new FileOutputStream(zipDir + entry.getName()));
+                    new FileOutputStream(outFile));
                 while ((len = in.read(buffer)) >= 0) {
                     out.write(buffer, 0, len);
                 }
@@ -1796,7 +1810,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
             Email email = Email.getEmail(I18nUtil.getEmailFilename(supportedLocale, "bte_batch_import_error"));
             email.addRecipient(eperson.getEmail());
             email.addArgument(error);
-            email.addArgument(ConfigurationManager.getProperty("dspace.url") + "/feedback");
+            email.addArgument(ConfigurationManager.getProperty("dspace.ui.url") + "/feedback");
 
             email.send();
         } catch (Exception e) {

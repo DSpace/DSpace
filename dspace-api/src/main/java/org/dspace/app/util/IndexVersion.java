@@ -121,20 +121,24 @@ public class IndexVersion {
             }
 
             // Open this index directory in Lucene
-            Directory indexDir = FSDirectory.open(dir);
+            Directory indexDir = FSDirectory.open(dir.toPath());
 
             // Get info on the Lucene segment file(s) in index directory
-            SegmentInfos sis = new SegmentInfos();
+            SegmentInfos sis;
             try {
-                sis.read(indexDir);
+                sis = SegmentInfos.readLatestCommit(indexDir);
             } catch (IOException ie) {
                 // Wrap default IOException, providing more info about which directory cannot be read
                 throw new IOException("Could not read Lucene segments files in " + dir.getAbsolutePath(), ie);
             }
 
+            if (null == sis) {
+                throw new IOException("Could not read Lucene segments files in " + dir.getAbsolutePath());
+            }
+
             // If we have a valid Solr index dir, but it has no existing segments
             // then just return an empty string. It's a valid but empty index.
-            if (sis != null && sis.size() == 0) {
+            if (sis.size() == 0) {
                 return "";
             }
 
@@ -246,12 +250,8 @@ public class IndexVersion {
         } else if (firstMinor > secondMinor) {
             // If we get here, major versions must be EQUAL. Now, time to check our minor versions
             return GREATER_THAN;
-        } else if (firstMinor < secondMinor) {
-            return LESS_THAN;
         } else {
-            // This is an impossible scenario.
-            // This 'else' should never be triggered since we've checked for equality above already
-            return EQUAL;
+            return LESS_THAN;
         }
     }
 

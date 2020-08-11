@@ -360,9 +360,13 @@ public class Util {
             InputStream cis = null;
             try {
                 cis = Util.class.getResourceAsStream("/META-INF/maven/org.dspace/dspace-api/pom.properties");
+                if (cis == null) {
+                    // pom.properties will not exist when running tests
+                    return "unknown";
+                }
                 constants.load(cis);
             } catch (Exception e) {
-                log.error(e.getMessage(), e);
+                log.error("Could not open dspace-api's pom.properties", e);
             } finally {
                 if (cis != null) {
                     try {
@@ -471,6 +475,26 @@ public class Util {
             }
         }
         return toReturn;
+    }
+
+    /**
+     * Split a list in an array of i sub-lists uniformly sized
+     *
+     * @param idsList the list to split
+     * @param i the number of sublists to return
+     *
+     * @return an array of sub-lists of fixed size
+     */
+    public static <T> List<T>[] splitList(List<T> idsList, int i) {
+        int setmin = idsList.size() / i;
+        List<T>[] result = new List[i];
+        int offset = 0;
+        for (int idx = 0; idx < i - 1; idx++) {
+            result[idx] = idsList.subList(offset, offset + setmin);
+            offset += setmin;
+        }
+        result[i - 1] = idsList.subList(offset, idsList.size());
+        return result;
     }
 
     public static List<String> differenceInSubmissionFields(Collection fromCollection, Collection toCollection)

@@ -35,6 +35,7 @@ public abstract class AuthorityServiceFactory {
 
     public abstract AuthorityService getAuthorityService();
 
+
     public abstract List<AuthorityIndexerInterface> getAuthorityIndexers();
 
     public static AuthorityServiceFactory getInstance() {

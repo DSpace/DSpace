@@ -21,6 +21,7 @@ import org.apache.xpath.XPathAPI;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataSchema;
+import org.dspace.content.MetadataSchemaEnum;
 import org.dspace.content.NonUniqueMetadataException;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.MetadataFieldService;
@@ -248,7 +249,7 @@ public class MetadataImporter {
 
         // If the schema is not provided default to DC
         if (schema == null) {
-            schema = MetadataSchema.DC_SCHEMA;
+            schema = MetadataSchemaEnum.DC.getName();
         }
 
 

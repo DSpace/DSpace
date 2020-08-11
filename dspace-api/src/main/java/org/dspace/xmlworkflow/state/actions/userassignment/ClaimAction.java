@@ -10,6 +10,7 @@ package org.dspace.xmlworkflow.state.actions.userassignment;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
 import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
 
@@ -60,17 +61,16 @@ public class ClaimAction extends UserSelectionAction {
 
     @Override
     public ActionResult execute(Context c, XmlWorkflowItem wfi, Step step, HttpServletRequest request)
-        throws SQLException, AuthorizeException, IOException {
-        //Check if we are accept this task, or accepting multiple tasks
-        if (request.getParameter("submit_take_task") != null || request.getParameter("submit_take_tasks") != null) {
-            //Add a claimed user to our task
-            XmlWorkflowServiceFactory.getInstance().getWorkflowRequirementsService()
-                                     .addClaimedUser(c, wfi, step, c.getCurrentUser());
+            throws SQLException, AuthorizeException, IOException {
+        // accept task, or accepting multiple tasks
+        XmlWorkflowServiceFactory.getInstance().getWorkflowRequirementsService().addClaimedUser(c, wfi, step,
+                c.getCurrentUser());
+        return new ActionResult(ActionResult.TYPE.TYPE_OUTCOME, ActionResult.OUTCOME_COMPLETE);
+    }
 
-            return new ActionResult(ActionResult.TYPE.TYPE_OUTCOME, ActionResult.OUTCOME_COMPLETE);
-        } else {
-            return new ActionResult(ActionResult.TYPE.TYPE_CANCEL);
-        }
+    @Override
+    public List<String> getOptions() {
+        return new ArrayList<>();
     }
 
     @Override

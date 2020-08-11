@@ -65,7 +65,6 @@ import org.dspace.xmlworkflow.storedcomponents.service.ClaimedTaskService;
 import org.dspace.xmlworkflow.storedcomponents.service.PoolTaskService;
 import org.dspace.xmlworkflow.storedcomponents.service.WorkflowItemRoleService;
 import org.dspace.xmlworkflow.storedcomponents.service.XmlWorkflowItemService;
-
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**

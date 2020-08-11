@@ -25,7 +25,6 @@ import javax.annotation.Nullable;
 import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.io.Charsets;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.common.util.ContentStreamBase;
@@ -209,7 +208,7 @@ public class FullTextContentStreams extends ContentStreamBase {
             }
 
             return inputStream == null ? null : new SequenceInputStream(
-                new ByteArrayInputStream("\n".getBytes(Charsets.UTF_8)), inputStream);
+                new ByteArrayInputStream("\n".getBytes(StandardCharsets.UTF_8)), inputStream);
         }
     }
 

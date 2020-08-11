@@ -51,6 +51,22 @@ public class DiscoveryConfiguration implements InitializingBean {
     private DiscoveryHitHighlightingConfiguration hitHighlightingConfiguration;
     private DiscoveryMoreLikeThisConfiguration moreLikeThisConfiguration;
     private boolean spellCheckEnabled;
+    private boolean indexAlways = false;
+
+    /**
+     * The `indexAlways` property determines whether the configuration should always be included when indexing items.
+     * The default value is false which implies the configuration is only used when it matches the collection or if
+     * it's the default configuration
+     * When set to true, the configuration is also used to index an item without a specific collection mapping
+     * This can be used for displaying different facets depending on the type of item instead of the collection
+     */
+    public boolean isIndexAlways() {
+        return indexAlways;
+    }
+
+    public void setIndexAlways(boolean indexAlways) {
+        this.indexAlways = indexAlways;
+    }
 
     public String getId() {
         return id;

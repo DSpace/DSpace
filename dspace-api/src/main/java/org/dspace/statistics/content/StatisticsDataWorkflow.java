@@ -38,7 +38,7 @@ import org.dspace.statistics.SolrLoggerServiceImpl;
 import org.dspace.statistics.content.filter.StatisticsFilter;
 
 /**
- * A workflow data implementation that will query the statistics backend for workflow information
+ * A workflow data implementation that will query the statistics backend for workflow information.
  *
  * @author Kevin Van de Velde (kevin at atmire dot com)
  * @author Ben Bosman (ben at atmire dot com)
@@ -166,19 +166,21 @@ public class StatisticsDataWorkflow extends StatisticsData {
      * @param typeGenerator the type generator
      * @return counts for each facet by name.
      * @throws org.apache.solr.client.solrj.SolrServerException passed through.
+     * @throws java.io.IOException passed through.
      */
-    protected Map<String, Long> getTotalFacetCounts(DatasetTypeGenerator typeGenerator) throws SolrServerException {
+    protected Map<String, Long> getTotalFacetCounts(DatasetTypeGenerator typeGenerator)
+            throws SolrServerException, IOException {
         ObjectCount[] objectCounts = solrLoggerService
             .queryFacetField(getQuery(), null, typeGenerator.getType(), -1, false, null);
-        Map<String, Long> result = new HashMap<String, Long>();
+        Map<String, Long> result = new HashMap<>();
         for (ObjectCount objectCount : objectCounts) {
             result.put(objectCount.getValue(), objectCount.getCount());
         }
         return result;
     }
 
-
-    protected Date getOldestWorkflowItemDate() throws SolrServerException {
+    protected Date getOldestWorkflowItemDate()
+            throws SolrServerException, IOException {
         ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
         String workflowStartDate = configurationService.getProperty("usage-statistics.workflow-start-date");
         if (workflowStartDate == null) {

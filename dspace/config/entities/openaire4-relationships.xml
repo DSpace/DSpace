@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE relationships SYSTEM "relationship-types.dtd">
+
+<relationships>
+
+	<!-- https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/v4.0.0/field_creator.html 
+		The relation between a Publication and a Person regarding the authorship -->
+	<type>
+		<leftType>Publication</leftType>
+		<rightType>Person</rightType>
+		<leftwardType>isAuthorOfPublication</leftwardType>
+		<rightwardType>isPublicationOfAuthor</rightwardType>
+		<leftCardinality>
+			<min>0</min>
+		</leftCardinality>
+		<rightCardinality>
+			<min>0</min>
+		</rightCardinality>
+	</type>
+	<!-- https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/v4.0.0/field_creator.html 
+		The relation between a Publication and an Organization regarding the authorship -->
+	<type>
+		<leftType>Publication</leftType>
+		<rightType>OrgUnit</rightType>
+		<leftwardType>isAuthorOfPublication</leftwardType>
+		<rightwardType>isPublicationOfAuthor</rightwardType>
+		<leftCardinality>
+			<min>0</min>
+		</leftCardinality>
+		<rightCardinality>
+			<min>0</min>
+		</rightCardinality>
+	</type>
+	<!-- https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/v4.0.0/field_contributor.html 
+		The relation between a Publication and a Person regarding the contribution -->
+	<type>
+		<leftType>Publication</leftType>
+		<rightType>Person</rightType>
+		<leftwardType>isContributorOfPublication</leftwardType>
+		<rightwardType>isPublicationOfContributor</rightwardType>
+		<leftCardinality>
+			<min>0</min>
+		</leftCardinality>
+		<rightCardinality>
+			<min>0</min>
+		</rightCardinality>
+	</type>
+	<!-- https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/v4.0.0/field_contributor.html 
+		The relation between a Publication and an Organization regarding the contribution -->
+	<type>
+		<leftType>Publication</leftType>
+		<rightType>OrgUnit</rightType>
+		<leftwardType>isContributorOfPublication</leftwardType>
+		<rightwardType>isPublicationOfContributor</rightwardType>
+		<leftCardinality>
+			<min>0</min>
+		</leftCardinality>
+		<rightCardinality>
+			<min>0</min>
+		</rightCardinality>
+	</type>
+	<!-- https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/v4.0.0/field_projectid.html 
+		The relation between a Publication and an Organization regarding the Funder -->
+	<type>
+		<leftType>Publication</leftType>
+		<rightType>Project</rightType>
+		<leftwardType>isProjectOfPublication</leftwardType>
+		<rightwardType>isPublicationOfProject</rightwardType>
+		<leftCardinality>
+			<min>0</min>
+		</leftCardinality>
+		<rightCardinality>
+			<min>0</min>
+		</rightCardinality>
+	</type>
+	<!-- https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/v4.0.0/field_projectid.html 
+		The relation between a Funded Project and an Organization regarding the Funder -->
+	<type>
+		<leftType>Project</leftType>
+		<rightType>OrgUnit</rightType>
+		<leftwardType>isFundingAgencyOfProject</leftwardType>
+		<rightwardType>isProjectOfFundingAgency</rightwardType>
+		<leftCardinality>
+			<min>0</min>
+		</leftCardinality>
+		<rightCardinality>
+			<min>0</min>
+		</rightCardinality>
+	</type>
+
+</relationships>

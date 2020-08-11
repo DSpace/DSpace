@@ -12,6 +12,7 @@ import java.util.List;
 
 import org.dspace.content.Collection;
 import org.dspace.core.Context;
+import org.dspace.eperson.EPerson;
 import org.dspace.workflow.WorkflowItemService;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 
@@ -66,5 +67,34 @@ public interface XmlWorkflowItemService extends WorkflowItemService<XmlWorkflowI
      * @throws SQLException An exception that provides information on a database access error or other errors.
      */
     public int countAllInCollection(Context context, Collection collection) throws SQLException;
+
+    /**
+     * Return all the workflow items from a specific submitter respecting the pagination parameters
+     * 
+     * @param context
+     *            The relevant DSpace Context.
+     * @param ep
+     *            the eperson that has submitted the item
+     * @param pageNumber
+     *            paging: page number
+     * @param pageSize
+     *            paging: items per page
+     * @return
+     * @throws SQLException
+     */
+    public List<XmlWorkflowItem> findBySubmitter(Context context, EPerson ep, Integer pageNumber, Integer pageSize)
+            throws SQLException;
+
+    /**
+     * Count the number of workflow items from a specific submitter
+     * 
+     * @param context
+     *            The relevant DSpace Context.
+     * @param ep
+     *            the eperson that has submitted the item
+     * @return
+     * @throws SQLException
+     */
+    public int countBySubmitter(Context context, EPerson ep) throws SQLException;
 
 }

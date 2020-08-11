@@ -15,6 +15,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
@@ -69,16 +70,12 @@ public class Curator {
         INTERACTIVE, BATCH, ANY
     }
 
-    ;
-
     // transaction scopes
     public static enum TxScope {
         OBJECT, CURATION, OPEN
     }
 
-    ;
-
-    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(Curator.class);
+    private static final Logger log = LogManager.getLogger();
 
     protected static final ThreadLocal<Context> curationCtx = new ThreadLocal<>();
 
@@ -86,7 +83,7 @@ public class Curator {
     protected Map<String, TaskRunner> trMap = new HashMap<>();
     protected List<String> perfList = new ArrayList<>();
     protected TaskQueue taskQ = null;
-    protected String reporter = null;
+    protected Appendable reporter = null;
     protected Invoked iMode = null;
     protected TaskResolver resolver = new TaskResolver();
     protected TxScope txScope = TxScope.OPEN;
@@ -101,6 +98,7 @@ public class Curator {
         communityService = ContentServiceFactory.getInstance().getCommunityService();
         itemService = ContentServiceFactory.getInstance().getItemService();
         handleService = HandleServiceFactory.getInstance().getHandleService();
+        resolver = new TaskResolver();
     }
 
     /**
@@ -145,10 +143,10 @@ public class Curator {
                 // performance order currently FIFO - to be revisited
                 perfList.add(taskName);
             } catch (IOException ioE) {
-                log.error("Task: '" + taskName + "' initialization failure: " + ioE.getMessage());
+                System.out.println("Task: '" + taskName + "' initialization failure: " + ioE.getMessage());
             }
         } else {
-            log.error("Task: '" + taskName + "' does not resolve");
+            System.out.println("Task: '" + taskName + "' does not resolve");
         }
         return this;
     }
@@ -193,7 +191,7 @@ public class Curator {
      *                 causes reporting to standard out.
      * @return return self (Curator instance) with reporter set
      */
-    public Curator setReporter(String reporter) {
+    public Curator setReporter(Appendable reporter) {
         this.reporter = reporter;
         return this;
     }
@@ -262,13 +260,6 @@ public class Curator {
     /**
      * Performs all configured tasks upon DSpace object
      * (Community, Collection or Item).
-     * <P>
-     * Note: Site-wide tasks will default to running as
-     * an Anonymous User unless you call the Site-wide task
-     * via the {@link curate(Context,String)} or
-     * {@link #curate(Context, DSpaceObject)} method with an
-     * authenticated Context object.
-     *
      * @param dso the DSpace object
      * @throws IOException if IO error
      */
@@ -328,7 +319,7 @@ public class Curator {
             taskQ.enqueue(queueId, new TaskQueueEntry(c.getCurrentUser().getName(),
                                                       System.currentTimeMillis(), perfList, id));
         } else {
-            log.error("curate - no TaskQueue implemented");
+            System.out.println("curate - no TaskQueue implemented");
         }
     }
 
@@ -346,9 +337,10 @@ public class Curator {
      * @param message the message to output to the reporting stream.
      */
     public void report(String message) {
-        // Stub for now
-        if ("-".equals(reporter)) {
-            System.out.println(message);
+        try {
+            reporter.append(message);
+        } catch (IOException ex) {
+            System.out.println("Task reporting failure: " +  ex);
         }
     }
 
@@ -554,7 +546,7 @@ public class Curator {
                 return !suspend(statusCode);
             } catch (IOException ioe) {
                 //log error & pass exception upwards
-                log.error("Error executing curation task '" + task.getName() + "'", ioe);
+                System.out.println("Error executing curation task '" + task.getName() + "'; " + ioe);
                 throw ioe;
             }
         }
@@ -570,7 +562,7 @@ public class Curator {
                 return !suspend(statusCode);
             } catch (IOException ioe) {
                 //log error & pass exception upwards
-                log.error("Error executing curation task '" + task.getName() + "'", ioe);
+                System.out.println("Error executing curation task '" + task.getName() + "'; " + ioe);
                 throw ioe;
             }
         }

@@ -7,8 +7,8 @@
  */
 package org.dspace.eperson;
 
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
@@ -143,7 +143,7 @@ public class GroupTest extends AbstractUnitTest {
         topGroup.setName("new name");
         groupService.update(context, topGroup);
         assertThat("setGroupName 1", topGroup.getName(), notNullValue());
-        assertEquals("setGroupName 2", topGroup.getName(), "new name");
+        assertThat("setGroupName 2", topGroup.getName(), equalTo("new name"));
     }
 
     @Test
@@ -153,7 +153,7 @@ public class GroupTest extends AbstractUnitTest {
         topGroup.setName("new name");
         groupService.update(context, topGroup);
         assertThat("setGroupName 1", topGroup.getName(), notNullValue());
-        assertEquals("setGroupName 2", topGroup.getName(), "topGroup");
+        assertThat("setGroupName 2", topGroup.getName(), equalTo("topGroup"));
 
         topGroup.setPermanent(false);
         groupService.update(context, topGroup);
@@ -164,7 +164,7 @@ public class GroupTest extends AbstractUnitTest {
         Group group = groupService.findByName(context, "topGroup");
         assertThat("findByName 1", group, notNullValue());
         assertThat("findByName 2", group.getName(), notNullValue());
-        assertEquals("findByName 2", group.getName(), "topGroup");
+        assertThat("findByName 2", group.getName(), equalTo("topGroup"));
     }
 
     @Test
@@ -219,7 +219,7 @@ public class GroupTest extends AbstractUnitTest {
         Collections.sort(sortedNames);
 
         // Verify the sorted arraylist is still equal to the original (unsorted) one
-        assertEquals("findAllNameSort compareLists", sortedNames, names);
+        assertThat("findAllNameSort compareLists", names, equalTo(sortedNames));
     }
 
     @Test
@@ -227,14 +227,14 @@ public class GroupTest extends AbstractUnitTest {
         //We can find 2 groups so attempt to retrieve with offset 0 and a max of one
         List<Group> groups = groupService.search(context, "level", 0, 1);
         assertThat("search 1", groups, notNullValue());
-        assertEquals("search 2", groups.size(), 1);
+        assertThat("search 2", groups.size(), equalTo(1));
         String firstGroupName = groups.iterator().next().getName();
         assertTrue("search 3", firstGroupName.equals("level1Group") || firstGroupName.equals("level2Group"));
 
         //Retrieve the second group
         groups = groupService.search(context, "level", 1, 2);
         assertThat("search 1", groups, notNullValue());
-        assertEquals("search 2", groups.size(), 1);
+        assertThat("search 2", groups.size(), equalTo(1));
         String secondGroupName = groups.iterator().next().getName();
         assertTrue("search 3", secondGroupName.equals("level1Group") || secondGroupName.equals("level2Group"));
     }
@@ -242,14 +242,14 @@ public class GroupTest extends AbstractUnitTest {
     @Test
     public void searchByID() throws SQLException {
         List<Group> searchResult = groupService.search(context, String.valueOf(topGroup.getID()), 0, 10);
-        assertEquals("searchID 1", searchResult.size(), 1);
-        assertEquals("searchID 2", searchResult.iterator().next(), topGroup);
+        assertThat("searchID 1", searchResult.size(), equalTo(1));
+        assertThat("searchID 2", searchResult.iterator().next(), equalTo(topGroup));
     }
 
 
     @Test
     public void searchResultCount() throws SQLException {
-        assertEquals("searchResultCount", groupService.searchResultCount(context, "level"), 2);
+        assertThat("searchResultCount", groupService.searchResultCount(context, "level"), equalTo(2));
     }
 
     @Test
@@ -259,7 +259,7 @@ public class GroupTest extends AbstractUnitTest {
             ePerson = createEPersonAndAddToGroup("addMemberEPerson@dspace.org", topGroup);
             groupService.update(context, topGroup);
 
-            assertEquals("addMemberEPerson 1", topGroup.getMembers().size(), 1);
+            assertThat("addMemberEPerson 1", topGroup.getMembers().size(), equalTo(1));
             assertTrue("addMemberEPerson 2", topGroup.getMembers().contains(ePerson));
         } finally {
             if (ePerson != null) {
@@ -295,7 +295,7 @@ public class GroupTest extends AbstractUnitTest {
             groupService.addMember(context, toDeleteGroup, ePerson);
             groupService.update(context, toDeleteGroup);
             groupService.delete(context, toDeleteGroup);
-            assertEquals("deleteGroupEPersonMembers", ePerson.getGroups().size(), 0);
+            assertThat("deleteGroupEPersonMembers", ePerson.getGroups().size(), equalTo(0));
         } finally {
             if (ePerson != null) {
                 ePersonService.delete(context, ePerson);

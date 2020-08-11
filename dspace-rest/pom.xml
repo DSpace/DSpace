@@ -1,25 +1,25 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.dspace</groupId>
     <artifactId>dspace-rest</artifactId>
     <packaging>war</packaging>
-    <version>7.0-SNAPSHOT</version>
-    <name>DSpace REST :: API and Implementation</name>
-    <description>DSpace RESTful Web Services API</description>
+    <version>7.0-beta4-SNAPSHOT</version>
+    <name>DSpace (Deprecated) REST Webapp</name>
+    <description>DSpace RESTful Web Services API. NOTE: this REST API is DEPRECATED.
+        Please consider using the REST API in the dspace-server-webapp instead!</description>
     <url>http://demo.dspace.org</url>
 
     <parent>
         <groupId>org.dspace</groupId>
         <artifactId>dspace-parent</artifactId>
-        <version>7.0-SNAPSHOT</version>
+        <version>7.0-beta4-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
 
     <properties>
         <!-- This is the path to the root [dspace-src] directory. -->
         <root.basedir>${basedir}/..</root.basedir>
-        <spring-security.version>3.2.9.RELEASE</spring-security.version>
+        <spring-security.version>5.3.3.RELEASE</spring-security.version>
     </properties>
     <build>
         <plugins>
@@ -104,7 +104,7 @@
             <version>${jackson.version}</version>
         </dependency>
 
-        <!-- Spring 3 dependencies -->
+        <!-- Spring dependencies -->
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-core</artifactId>
@@ -123,9 +123,10 @@
         <!-- Jersey + Spring -->
         <dependency>
             <groupId>org.glassfish.jersey.ext</groupId>
-            <artifactId>jersey-spring4</artifactId>
+            <artifactId>jersey-spring5</artifactId>
             <version>${jersey.version}</version>
             <exclusions>
+                <!-- We provide our own version of Spring framework dependencies -->
                 <exclusion>
                     <groupId>org.springframework</groupId>
                     <artifactId>spring</artifactId>
@@ -149,6 +150,11 @@
                 <exclusion>
                     <groupId>org.springframework</groupId>
                     <artifactId>spring-aop</artifactId>
+                </exclusion>
+                <!-- Newer version provided by jersey-server above -->
+                <exclusion>
+                    <groupId>jakarta.annotation</groupId>
+                    <artifactId>jakarta.annotation-api</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>

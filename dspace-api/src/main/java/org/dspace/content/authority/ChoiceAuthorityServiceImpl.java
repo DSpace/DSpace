@@ -220,6 +220,11 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService 
         return controller;
     }
 
+    @Override
+    public void clearCache() {
+        controller.clear();
+        authorities.clear();
+    }
     private void loadChoiceAuthorityConfigurations() {
         // Get all configuration keys starting with a given prefix
         List<String> propKeys = configurationService.getPropertyKeys(CHOICES_PLUGIN_PREFIX);

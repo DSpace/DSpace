@@ -1,50 +1,33 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <artifactId>dspace-oai</artifactId>
-    <packaging>war</packaging>
+    <packaging>jar</packaging>
     <name>DSpace OAI-PMH</name>
-    <description>DSpace OAI-PMH Web Application and API</description>
+    <description>DSpace OAI-PMH Extension</description>
 
     <parent>
         <artifactId>dspace-parent</artifactId>
         <groupId>org.dspace</groupId>
-        <version>7.0-SNAPSHOT</version>
+        <version>7.0-beta4-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
 
     <properties>
         <!-- This is the path to the root [dspace-src] directory. -->
         <root.basedir>${basedir}/..</root.basedir>
-        <xoai.version>3.2.10</xoai.version>
-        <jtwig.version>2.0.1</jtwig.version>
+        <xoai.version>3.3.0</xoai.version>
+        <jtwig.version>5.87.0.RELEASE</jtwig.version>
     </properties>
 
     <build>
         <plugins>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-war-plugin</artifactId>
-                <configuration>
-                    <attachClasses>true</attachClasses>
-                    <!-- In version 2.1-alpha-1, this was incorrectly named warSourceExcludes -->
-                    <packagingExcludes>WEB-INF/lib/*.jar</packagingExcludes>
-                    <warSourceExcludes>WEB-INF/lib/*.jar</warSourceExcludes>
-                    <!-- Filter the web.xml (needed for IDE compatibility/debugging) -->
-                    <filteringDeploymentDescriptors>true</filteringDeploymentDescriptors>
-                </configuration>
-                <executions>
-                    <execution>
-                        <phase>prepare-package</phase>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
                 <groupId>com.mycila</groupId>
                 <artifactId>license-maven-plugin</artifactId>
                 <configuration>
                     <excludes>
-                        <exclude>src/main/webapp/**</exclude>
+                        <!-- Ignore license header requirements on CSS/images/HTML/XSL -->
+                        <exclude>src/main/resources/**</exclude>
                         <exclude>**/*.xsl</exclude>
                     </excludes>
                 </configuration>
@@ -106,76 +89,73 @@
                 <exclusion>
                     <groupId>org.apache.commons</groupId>
                     <artifactId>commons-lang3</artifactId>
-	        </exclusion>
-		<exclusion>
-		    <groupId>log4j</groupId>
-		    <artifactId>log4j</artifactId>
-	        </exclusion>
-		<exclusion>
-		    <groupId>org.slf4j</groupId>
-		    <artifactId>slf4j-log4j12</artifactId>
-		</exclusion>
+                </exclusion>
+                <exclusion>
+                    <groupId>log4j</groupId>
+                    <artifactId>log4j</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-log4j12</artifactId>
+                </exclusion>
+                <!-- Later version provided by SolrJ -->
+                <exclusion>
+                    <groupId>org.codehaus.woodstox</groupId>
+                    <artifactId>wstx-asl</artifactId>
+                </exclusion>
+                <!-- Later version provided by Hibernate -->
+                <exclusion>
+                    <groupId>org.dom4j</groupId>
+                    <artifactId>dom4j</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
 
-        <!-- Java Injection and MVC -->
+        <!-- Java Injection -->
         <dependency>
             <groupId>javax.inject</groupId>
             <artifactId>javax.inject</artifactId>
             <version>1</version>
         </dependency>
+
+        <!-- Needed to support Spring @Configuration classes (to register servlets/beans with Spring Boot webapp) -->
         <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-webmvc</artifactId>
-            <version>${spring.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-beans</artifactId>
-            <version>${spring.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-context</artifactId>
-            <version>${spring.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-web</artifactId>
-            <version>${spring.version}</version>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter</artifactId>
+            <version>${spring-boot.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-logging</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <!-- Templating Engine -->
         <dependency>
-            <groupId>com.lyncode</groupId>
-            <artifactId>jtwig-spring</artifactId>
+            <groupId>org.jtwig</groupId>
+            <artifactId>jtwig-spring-boot-starter</artifactId>
             <version>${jtwig.version}</version>
             <exclusions>
+                <!-- We don't need spring-boot-starter-web, it is provided by our Spring Boot webapp -->
                 <exclusion>
-                    <groupId>com.google.guava</groupId>
-                    <artifactId>guava</artifactId>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-web</artifactId>
                 </exclusion>
+                <!-- More recent version is pulled in via below dependencies -->
                 <exclusion>
-                    <groupId>org.javassist</groupId>
-                    <artifactId>javassist</artifactId>
+                    <groupId>org.parboiled</groupId>
+                    <artifactId>parboiled-java</artifactId>
                 </exclusion>
-                <exclusion>
-                    <groupId>org.apache.commons</groupId>
-                    <artifactId>commons-lang3</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>javax.servlet</groupId>
-                    <artifactId>servlet-api</artifactId>
-                </exclusion>
-		<exclusion>
-		    <groupId>log4j</groupId>
-		    <artifactId>log4j</artifactId>
-	        </exclusion>
-		<exclusion>
-		    <groupId>org.slf4j</groupId>
-		    <artifactId>slf4j-log4j12</artifactId>
-	        </exclusion>
             </exclusions>
+        </dependency>
+
+        <!-- Newer version, necessary to align with newer version of ASM in parent POM
+             This is needed by both jtwig-spring-boot-starter and our tests. -->
+        <dependency>
+            <groupId>org.parboiled</groupId>
+            <artifactId>parboiled-java</artifactId>
+            <version>1.3.1</version>
         </dependency>
 
         <!-- Internal -->
@@ -188,7 +168,7 @@
         <dependency>
             <groupId>org.apache.solr</groupId>
             <artifactId>solr-solrj</artifactId>
-            <version>${solr.version}</version>
+            <version>${solr.client.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.codehaus.woodstox</groupId>
@@ -213,10 +193,10 @@
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-core</artifactId>
         </dependency>
-	<dependency>
+        <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-web</artifactId>
-	</dependency>
+        </dependency>
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-slf4j-impl</artifactId>
@@ -282,36 +262,10 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.parboiled</groupId>
-            <artifactId>parboiled-core</artifactId>
-            <version>1.1.6</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>org.xmlmatchers</groupId>
             <artifactId>xml-matchers</artifactId>
             <version>0.10</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
-
-    <developers>
-        <developer>
-            <name>DSpace @ Lyncode</name>
-            <email>dspace@lyncode.com</email>
-            <organization>Lyncode</organization>
-            <organizationUrl>http://www.lyncode.com</organizationUrl>
-        </developer>
-        <developer>
-            <id>helix84</id>
-            <name>Ivan Másar</name>
-            <email>helix84@centrum.sk</email>
-        </developer>
-        <developer>
-            <name>Ariel J. Lira</name>
-            <email>arieljlira@gmail.com</email>
-            <organization>SeDiCI</organization>
-            <organizationUrl>http://sedici.unlp.edu.ar</organizationUrl>
-        </developer>
-    </developers>
 </project>

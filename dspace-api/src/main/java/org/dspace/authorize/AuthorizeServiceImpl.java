@@ -430,7 +430,11 @@ public class AuthorizeServiceImpl implements AuthorizeService {
 
     public boolean isCommunityAdmin(Context c) throws SQLException {
         EPerson e = c.getCurrentUser();
+        return isCommunityAdmin(c, e);
+    }
 
+    @Override
+    public boolean isCommunityAdmin(Context c, EPerson e) throws SQLException {
         if (e != null) {
             List<ResourcePolicy> policies = resourcePolicyService.find(c, e,
                                                                        groupService.allMemberGroups(c, e),
@@ -446,7 +450,11 @@ public class AuthorizeServiceImpl implements AuthorizeService {
 
     public boolean isCollectionAdmin(Context c) throws SQLException {
         EPerson e = c.getCurrentUser();
+        return isCollectionAdmin(c, e);
+    }
 
+    @Override
+    public boolean isCollectionAdmin(Context c, EPerson e) throws SQLException {
         if (e != null) {
             List<ResourcePolicy> policies = resourcePolicyService.find(c, e,
                                                                        groupService.allMemberGroups(c, e),
@@ -771,6 +779,12 @@ public class AuthorizeServiceImpl implements AuthorizeService {
         policy.setRpName(name);
         policy.setRpDescription(reason);
         return policy;
+    }
+
+    @Override
+    public List<ResourcePolicy> getPoliciesActionFilterExceptRpType(Context c, DSpaceObject o, int actionID,
+                                                                    String rpType) throws SQLException {
+        return resourcePolicyService.findExceptRpType(c, o, actionID, rpType);
     }
 
 }

@@ -7,7 +7,6 @@
  */
 package org.dspace.workflowbasic;
 
-import java.sql.SQLException;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -145,12 +144,12 @@ public class BasicWorkflowItem implements WorkflowItem {
         return collection;
     }
 
-    void setCollection(Collection collection) {
+    public void setCollection(Collection collection) {
         this.collection = collection;
     }
 
     @Override
-    public EPerson getSubmitter() throws SQLException {
+    public EPerson getSubmitter() {
         return item.getSubmitter();
     }
 

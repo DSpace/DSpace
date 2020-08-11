@@ -7,6 +7,9 @@
  */
 package org.dspace.discovery;
 
+import static java.util.Collections.singletonList;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -31,7 +34,7 @@ public class DiscoverQuery {
      **/
     private String query;
     private List<String> filterQueries;
-    private int DSpaceObjectFilter = -1;
+    private List<String> dspaceObjectFilters = new ArrayList<>();
     private List<String> fieldPresentQueries;
     private boolean spellCheck;
 
@@ -68,6 +71,8 @@ public class DiscoverQuery {
      * Misc attributes can be implementation dependent
      **/
     private Map<String, List<String>> properties;
+
+    private String discoveryConfigurationName;
 
     public DiscoverQuery() {
         //Initialize all our lists
@@ -116,20 +121,33 @@ public class DiscoverQuery {
      * Sets the DSpace object filter, must be an DSpace Object type integer
      * can be used to only return objects from a certain DSpace Object type
      *
-     * @param DSpaceObjectFilter the DSpace object filer
+     * @param dspaceObjectFilter the DSpace object filter
      */
-    public void setDSpaceObjectFilter(int DSpaceObjectFilter) {
-        this.DSpaceObjectFilter = DSpaceObjectFilter;
+    public void setDSpaceObjectFilter(String dspaceObjectFilter) {
+        this.dspaceObjectFilters = singletonList(dspaceObjectFilter);
     }
 
     /**
-     * Gets the DSpace object filter
-     * can be used to only return objects from a certain DSpace Object type
+     * Adds a DSpace object filter, must be an DSpace Object type integer.
+     * Can be used to also return objects from a certain DSpace Object type.
      *
-     * @return the DSpace object filer
+     * @param dspaceObjectFilter the DSpace object filer
      */
-    public int getDSpaceObjectFilter() {
-        return DSpaceObjectFilter;
+    public void addDSpaceObjectFilter(String dspaceObjectFilter) {
+
+        if (isNotBlank(dspaceObjectFilter)) {
+            this.dspaceObjectFilters.add(dspaceObjectFilter);
+        }
+    }
+
+    /**
+     * Gets the DSpace object filters
+     * can be used to only return objects from certain DSpace Object types
+     *
+     * @return the DSpace object filters
+     */
+    public List<String> getDSpaceObjectFilters() {
+        return dspaceObjectFilters;
     }
 
     /**
@@ -331,6 +349,7 @@ public class DiscoverQuery {
             // Example: 2001 and a gap from 10 we need the following result: 2010 - 2000 ; 2000 - 1990 hence the top
             // year
             int topYear = getTopYear(newestYear, gap);
+
             if (gap == 1) {
                 //We need a list of our years
                 //We have a date range add faceting for our field
@@ -376,4 +395,22 @@ public class DiscoverQuery {
         return (int) (Math.ceil((float) (newestYear) / gap) * gap);
     }
 
+    /**
+     * Return the name of discovery configuration used by this query
+     * 
+     * @return the discovery configuration name used
+     */
+    public String getDiscoveryConfigurationName() {
+        return discoveryConfigurationName;
+    }
+
+    /**
+     * Set the name of discovery configuration to use to run this query
+     * 
+     * @param discoveryConfigurationName
+     *            the name of the discovery configuration to use to run this query
+     */
+    public void setDiscoveryConfigurationName(String discoveryConfigurationName) {
+        this.discoveryConfigurationName = discoveryConfigurationName;
+    }
 }

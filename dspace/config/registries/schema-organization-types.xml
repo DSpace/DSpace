@@ -1,0 +1,77 @@
+<dspace-dc-types>
+
+    <dspace-header>
+        <title>Organization Types</title>
+    </dspace-header>
+
+    <!-- NO EQUIVALENT FOUND:
+        - orgunit.identifier.id >  NOT FOUND(specific sort of id’s found/options: orgnization.isicV4,
+                organization.leiCode, organization.naics, .vatID, .taxID, …)
+    -->
+
+    <dc-schema>
+        <name>organization</name>
+        <namespace>https://schema.org/Organization</namespace>
+    </dc-schema>
+
+    <dc-type>
+        <schema>organization</schema>
+        <element>legalName</element>
+        <scope_note>The official name of the organization, e.g. the registered company name.</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>organization</schema>
+        <element>foundingDate</element>
+        <scope_note>The date that this organization was founded.</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>organization</schema>
+        <element>address</element>
+        <qualifier>addressLocality</qualifier>
+        <scope_note>Physical address locality (ex. Mountain View) of the organization.</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>organization</schema>
+        <element>address</element>
+        <qualifier>addressCountry</qualifier>
+        <scope_note>Physical address country (ex. USA) of the organization. You can also provide the two-letter ISO
+            3166-1 alpha-2 country code.
+        </scope_note>
+    </dc-type>
+    
+    <!-- OpenAIRE4 Guidelines -->
+    <!-- 2.2.2.1. Attribute nameType (R) -->
+    <!-- and 3.2.6. Subproperty nameIdentifier (R) -->
+    <!-- specific type required by OpenAIRE4 Guidelines -->  
+    
+    <dc-type>
+        <schema>organization</schema>
+        <element>identifier</element>
+        <scope_note>Generic Identifier</scope_note>
+    </dc-type>
+        
+    <dc-type>
+        <schema>organization</schema>
+        <element>identifier</element>
+        <qualifier>isni</qualifier>
+        <scope_note>International Standard Name Identifier</scope_note>
+    </dc-type>
+  
+    <dc-type>
+        <schema>organization</schema>
+        <element>identifier</element>
+        <qualifier>rin</qualifier>
+        <scope_note>Ringgold identifier</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>organization</schema>
+        <element>identifier</element>
+        <qualifier>ror</qualifier>
+        <scope_note>Research Organization Registry</scope_note>
+    </dc-type>
+
+</dspace-dc-types>

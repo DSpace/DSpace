@@ -107,7 +107,7 @@ public class Community extends DSpaceObject implements DSpaceObjectLegacySupport
         setModified();
     }
 
-    void removeSubCommunity(Community subCommunity) {
+    public void removeSubCommunity(Community subCommunity) {
         subCommunities.remove(subCommunity);
         setModified();
     }
@@ -254,7 +254,7 @@ public class Community extends DSpaceObject implements DSpaceObjectLegacySupport
     @Override
     public String getName() {
         String value = getCommunityService()
-            .getMetadataFirstValue(this, MetadataSchema.DC_SCHEMA, "title", null, Item.ANY);
+            .getMetadataFirstValue(this, MetadataSchemaEnum.DC.getName(), "title", null, Item.ANY);
         return value == null ? "" : value;
     }
 
@@ -269,4 +269,5 @@ public class Community extends DSpaceObject implements DSpaceObjectLegacySupport
         }
         return communityService;
     }
+
 }

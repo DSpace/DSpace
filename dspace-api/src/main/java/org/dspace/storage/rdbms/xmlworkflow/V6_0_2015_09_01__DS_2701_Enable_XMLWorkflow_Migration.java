@@ -55,6 +55,8 @@ public class V6_0_2015_09_01__DS_2701_Enable_XMLWorkflow_Migration implements Jd
                     dbFileLocation = "postgres";
                 } else if (dbtype.toLowerCase().contains("oracle")) {
                     dbFileLocation = "oracle";
+                } else if (dbtype.toLowerCase().contains("h2")) {
+                    dbFileLocation = "h2";
                 }
 
 

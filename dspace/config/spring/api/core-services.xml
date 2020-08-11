@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd" default-lazy-init="true">
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:util="http://www.springframework.org/schema/util"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd"
+    default-lazy-init="true">
 
 
     <!-- ******************** -->
@@ -43,12 +44,21 @@
     <bean class="org.dspace.content.CommunityServiceImpl"/>
     <bean class="org.dspace.content.InstallItemServiceImpl"/>
     <bean class="org.dspace.content.ItemServiceImpl"/>
+    <bean class="org.dspace.content.MetadataDSpaceCsvExportServiceImpl"/>
     <bean class="org.dspace.content.MetadataFieldServiceImpl"/>
     <bean class="org.dspace.content.MetadataSchemaServiceImpl"/>
     <bean class="org.dspace.content.MetadataValueServiceImpl"/>
     <bean class="org.dspace.content.SiteServiceImpl"/>
     <bean class="org.dspace.content.SupervisedItemServiceImpl"/>
     <bean class="org.dspace.content.WorkspaceItemServiceImpl"/>
+    <bean class="org.dspace.content.RelationshipServiceImpl"/>
+    <bean class="org.dspace.content.EntityTypeServiceImpl"/>
+    <bean class="org.dspace.content.EntityServiceImpl"/>
+    <bean class="org.dspace.content.RelationshipTypeServiceImpl"/>
+    <bean class="org.dspace.content.RelationshipMetadataServiceImpl"/>
+
+    <bean class="org.dspace.scripts.ProcessServiceImpl"/>
+    <bean class="org.dspace.scripts.ScriptServiceImpl"/>
 
     <bean class="org.dspace.content.authority.ChoiceAuthorityServiceImpl"/>
     <bean class="org.dspace.content.authority.MetadataAuthorityServiceImpl" lazy-init="true"/>
@@ -91,19 +101,15 @@
     <bean class="org.dspace.identifier.DOIServiceImpl"/>
 
     <bean class="org.dspace.license.CreativeCommonsServiceImpl"/>
+    <bean class="org.dspace.license.CCLicenseConnectorServiceImpl"/>
 
     <bean id="spiderDetectorService" class="org.dspace.statistics.util.SpiderDetectorServiceImpl"/>
     <bean id="clientInfoService" class="org.dspace.service.impl.ClientInfoServiceImpl"/>
 
     <bean class="org.dspace.versioning.VersionHistoryServiceImpl"/>
 
-    <!--Basic workflow services, comment or remove when switching to the configurable workflow -->
-    <bean class="org.dspace.workflowbasic.TaskListItemServiceImpl"/>
-    <bean class="org.dspace.workflowbasic.BasicWorkflowItemServiceImpl"/>
-    <bean class="org.dspace.workflowbasic.BasicWorkflowServiceImpl"/>
-
-    <!--Configurable workflow services, uncomment the xml workflow beans below to enable the configurable workflow-->
-    <!--<bean class="org.dspace.xmlworkflow.storedcomponents.ClaimedTaskServiceImpl"/>
+    <!-- Configurable workflow services -->
+    <bean class="org.dspace.xmlworkflow.storedcomponents.ClaimedTaskServiceImpl"/>
     <bean class="org.dspace.xmlworkflow.storedcomponents.CollectionRoleServiceImpl"/>
     <bean class="org.dspace.xmlworkflow.storedcomponents.InProgressUserServiceImpl"/>
     <bean class="org.dspace.xmlworkflow.storedcomponents.PoolTaskServiceImpl"/>
@@ -111,6 +117,15 @@
     <bean class="org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItemServiceImpl"/>
     <bean class="org.dspace.xmlworkflow.XmlWorkflowServiceImpl"/>
     <bean class="org.dspace.xmlworkflow.WorkflowRequirementsServiceImpl"/>
-    <bean class="org.dspace.xmlworkflow.XmlWorkflowFactoryImpl"/>-->
+
+    <!-- Discovery indexable object services -->
+    <bean class="org.dspace.discovery.indexobject.ClaimedTaskIndexFactoryImpl" autowire-candidate="true"/>
+    <bean class="org.dspace.discovery.indexobject.CollectionIndexFactoryImpl" autowire-candidate="true"/>
+    <bean class="org.dspace.discovery.indexobject.CommunityIndexFactoryImpl" autowire-candidate="true"/>
+    <bean class="org.dspace.discovery.indexobject.ItemIndexFactoryImpl" autowire-candidate="true"/>
+    <bean class="org.dspace.discovery.indexobject.PoolTaskIndexFactoryImpl" autowire-candidate="true"/>
+    <bean class="org.dspace.discovery.indexobject.WorkflowItemIndexFactoryImpl" autowire-candidate="true"/>
+    <bean class="org.dspace.discovery.indexobject.WorkspaceItemIndexFactoryImpl" autowire-candidate="true"/>
 
 </beans>
+

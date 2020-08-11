@@ -31,7 +31,7 @@ import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
 import org.dspace.content.DCDate;
 import org.dspace.content.Item;
-import org.dspace.content.MetadataSchema;
+import org.dspace.content.MetadataSchemaEnum;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.InstallItemService;
@@ -356,7 +356,7 @@ public class BasicWorkflowServiceImpl implements BasicWorkflowService {
                 // advance(...) will call itself if no workflow step group exists
                 // so we need to check permissions only if a workflow step group is
                 // in place.
-                if (workflowItem.getCollection().getWorkflowStep1() != null && e != null) {
+                if (workflowItem.getCollection().getWorkflowStep1(context) != null && e != null) {
                     authorizeService
                         .authorizeAction(context, e, workflowItem.getCollection(), Constants.WORKFLOW_STEP_1, true);
                 }
@@ -372,7 +372,7 @@ public class BasicWorkflowServiceImpl implements BasicWorkflowService {
                 // advance(...) will call itself if no workflow step group exists
                 // so we need to check permissions only if a workflow step group is
                 // in place.
-                if (workflowItem.getCollection().getWorkflowStep2() != null && e != null) {
+                if (workflowItem.getCollection().getWorkflowStep2(context) != null && e != null) {
                     authorizeService
                         .authorizeAction(context, e, workflowItem.getCollection(), Constants.WORKFLOW_STEP_2, true);
                 }
@@ -388,7 +388,7 @@ public class BasicWorkflowServiceImpl implements BasicWorkflowService {
                 // advance(...) will call itself if no workflow step group exists
                 // so we need to check permissions only if a workflow step group is
                 // in place.
-                if (workflowItem.getCollection().getWorkflowStep3() != null && e != null) {
+                if (workflowItem.getCollection().getWorkflowStep3(context) != null && e != null) {
                     authorizeService
                         .authorizeAction(context, e, workflowItem.getCollection(), Constants.WORKFLOW_STEP_3, true);
                 }
@@ -575,8 +575,8 @@ public class BasicWorkflowServiceImpl implements BasicWorkflowService {
 
         // if there is a workflow state group and it contains any members,
         // then we have to check permissions first
-        if ((collectionService.getWorkflowGroup(collection, step) != null)
-            && !(groupService.isEmpty(collectionService.getWorkflowGroup(collection, step)))
+        if ((collectionService.getWorkflowGroup(context, collection, step) != null)
+            && !(groupService.isEmpty(collectionService.getWorkflowGroup(context, collection, step)))
             && newowner != null) {
             authorizeService.authorizeAction(context, newowner, collection, correspondingAction, true);
         }
@@ -655,7 +655,7 @@ public class BasicWorkflowServiceImpl implements BasicWorkflowService {
         // any approvers?
         // if so, add them to tasklist
         // if not, skip to next state
-        Group workflowStepGroup = collectionService.getWorkflowGroup(collection, step);
+        Group workflowStepGroup = collectionService.getWorkflowGroup(context, collection, step);
 
         if ((workflowStepGroup != null) && !(groupService.isEmpty(workflowStepGroup))) {
             // set new item state
@@ -930,8 +930,8 @@ public class BasicWorkflowServiceImpl implements BasicWorkflowService {
             + rejection_message + " on " + now + " (GMT) ";
 
         // Add to item as a DC field
-        itemService
-            .addMetadata(context, myitem, MetadataSchema.DC_SCHEMA, "description", "provenance", "en", provDescription);
+        itemService.addMetadata(context, myitem, MetadataSchemaEnum.DC.getName(),
+                         "description", "provenance", "en", provDescription);
         itemService.update(context, myitem);
 
         // convert into personal workspace
@@ -1061,7 +1061,7 @@ public class BasicWorkflowServiceImpl implements BasicWorkflowService {
 
     @Override
     public String getMyDSpaceLink() {
-        return configurationService.getProperty("dspace.url") + "/mydspace";
+        return configurationService.getProperty("dspace.ui.url") + "/mydspace";
     }
 
     protected void notifyOfReject(Context context, BasicWorkflowItem workflowItem, EPerson e,
@@ -1162,8 +1162,8 @@ public class BasicWorkflowServiceImpl implements BasicWorkflowService {
         provDescription += installItemService.getBitstreamProvenanceMessage(context, item);
 
         // Add to item as a DC field
-        itemService
-            .addMetadata(context, item, MetadataSchema.DC_SCHEMA, "description", "provenance", "en", provDescription);
+        itemService.addMetadata(context, item, MetadataSchemaEnum.DC.getName(),
+                                "description", "provenance", "en", provDescription);
         itemService.update(context, item);
     }
 
@@ -1190,8 +1190,8 @@ public class BasicWorkflowServiceImpl implements BasicWorkflowService {
         provmessage += installItemService.getBitstreamProvenanceMessage(context, myitem);
 
         // Add message to the DC
-        itemService
-            .addMetadata(context, myitem, MetadataSchema.DC_SCHEMA, "description", "provenance", "en", provmessage);
+        itemService.addMetadata(context, myitem, MetadataSchemaEnum.DC.getName(),
+                                "description", "provenance", "en", provmessage);
         itemService.update(context, myitem);
     }
 
@@ -1223,24 +1223,30 @@ public class BasicWorkflowServiceImpl implements BasicWorkflowService {
     public Group getWorkflowRoleGroup(Context context, Collection collection, String roleName, Group roleGroup)
         throws SQLException, AuthorizeException {
         if ("WF_STEP1".equals(roleName)) {
-            roleGroup = collection.getWorkflowStep1();
+            roleGroup = collection.getWorkflowStep1(context);
             if (roleGroup == null) {
                 roleGroup = collectionService.createWorkflowGroup(context, collection, 1);
             }
 
         } else if ("WF_STEP2".equals(roleName)) {
-            roleGroup = collection.getWorkflowStep2();
+            roleGroup = collection.getWorkflowStep2(context);
             if (roleGroup == null) {
                 roleGroup = collectionService.createWorkflowGroup(context, collection, 2);
             }
         } else if ("WF_STEP3".equals(roleName)) {
-            roleGroup = collection.getWorkflowStep3();
+            roleGroup = collection.getWorkflowStep3(context);
             if (roleGroup == null) {
                 roleGroup = collectionService.createWorkflowGroup(context, collection, 3);
             }
 
         }
         return roleGroup;
+    }
+
+    @Override
+    public Group createWorkflowRoleGroup(Context context, Collection collection, String roleName)
+        throws AuthorizeException, SQLException {
+        return getWorkflowRoleGroup(context, collection, roleName, null);
     }
 
     @Override

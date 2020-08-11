@@ -1,0 +1,25 @@
+version: "3.7"
+
+services:
+  dspace-cli:
+    image: "${DOCKER_OWNER:-dspace}/dspace-cli:${DSPACE_VER:-dspace-7_x}"
+    container_name: dspace-cli
+    build:
+      context: .
+      dockerfile: Dockerfile.cli
+    #environment:
+    volumes:
+    - ./dspace/src/main/docker-compose/local.cfg:/dspace/config/local.cfg
+    - assetstore:/dspace/assetstore
+    entrypoint: /dspace/bin/dspace
+    command: help
+    networks:
+      - dspacenet
+    tty: true
+    stdin_open: true
+
+volumes:
+  assetstore:
+
+networks:
+  dspacenet:

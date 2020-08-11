@@ -13,6 +13,7 @@ import java.util.List;
 import org.dspace.content.Collection;
 import org.dspace.core.Context;
 import org.dspace.core.GenericDAO;
+import org.dspace.eperson.Group;
 import org.dspace.xmlworkflow.storedcomponents.CollectionRole;
 
 /**
@@ -26,6 +27,17 @@ import org.dspace.xmlworkflow.storedcomponents.CollectionRole;
 public interface CollectionRoleDAO extends GenericDAO<CollectionRole> {
 
     public List<CollectionRole> findByCollection(Context context, Collection collection) throws SQLException;
+
+    /**
+     * 
+     * @param context
+     *            DSpace context
+     * @param group
+     *            EPerson Group
+     * @return the list of CollectionRole assigned to the specified group
+     * @throws SQLException
+     */
+    public List<CollectionRole> findByGroup(Context context, Group group) throws SQLException;
 
     public CollectionRole findByCollectionAndRole(Context context, Collection collection, String role)
         throws SQLException;

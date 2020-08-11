@@ -79,13 +79,6 @@ Common usage:
         <format property="build.date" pattern="yyyyMMdd-HHmmss" />
     </tstamp>
 
-    <!-- Default location of GeoLite2 City database to download. This may be overridden, if URL path changes. -->
-    <property name="geolite" value="http://geolite.maxmind.com/download/geoip/database/GeoLite2-City.tar.gz" />
-
-    <!-- Default location of lucene-core JAR to download (for update_solr_indexes). This may be overridden, if URL path changes. -->
-    <!-- NOTE: this URL should have the version of the JAR replaced with "[version]" -->
-    <property name="lucene-core" value="http://search.maven.org/remotecontent?filepath=org/apache/lucene/lucene-core/[version]/lucene-core-[version].jar" />
-
 
     <!-- ============================================================= -->
     <!-- The DSpace class path for executing installation targets      -->
@@ -108,7 +101,7 @@ Common usage:
     <taskdef resource="net/sf/antcontrib/antlib.xml" classpathref="class.path"/>
 
     <!-- ============================================================= -->
-    <!-- Print some useful help text                                  -->
+    <!-- Print some useful help text.                                  -->
     <!-- ============================================================= -->
     <target name="help">
 
@@ -121,10 +114,8 @@ Common usage:
         <echo message="update          --> Update ${dspace.dir} config, etc, lib and web applications without " />
         <echo message="                    touching your data" />
     	<echo message="update_configs  --> Update your configs directory with new configuration files"/>
-    	<echo message="update_geolite  --> Dowload and install GeoCity database into ${dspace.dir}/config" />
         <echo message="update_code     --> Update compiled code (bin, lib, and etc directories)" />
         <echo message="update_webapps  --> Update web applications" />
-        <echo message="update_solr_indexes --> Checks if any Solr indexes need upgrading (to latest Solr), and if so, upgrades them." />
         <echo message="" />
         <echo message="init_configs    --> Write the configuration files to ${dspace.dir}/config" />
         <echo message="install_code    --> Install compiled code into ${dspace.dir}" />
@@ -152,7 +143,7 @@ Common usage:
 
 
     <!-- ============================================================= -->
-    <!-- clean out backup directories                  -->
+    <!-- clean out backup directories                                  -->
     <!-- ============================================================= -->
     <target name="clean_backups">
         <delete includeemptydirs="true">
@@ -173,16 +164,19 @@ Common usage:
     <!-- Update an installation                                        -->
     <!-- ============================================================= -->
 
-    <target name="update" depends="update_configs,update_code,test_database,update_webapps,update_solr_indexes" description="Update installed code and web applications (without clobbering data/config)">
+    <target name="update"
+            depends="update_configs,update_code,test_database,update_webapps"
+            description="Update installed code and web applications (without clobbering data/config)">
     </target>
 
     <!-- ============================================================= -->
     <!-- Update the config dir, only adds files, if a file is altered  -->
     <!-- in the target directory, the new file is suffixed wth *.new   -->
-    <!-- and should be hand updated afterward                .          -->
+    <!-- and should be hand updated afterward.                         -->
     <!-- ============================================================= -->
-    <target name="update_configs" depends="overwrite_configs,overwrite_solr_configs" description="Updates the Configuration Directory">
-    	<antcall target="init_geolite" />
+    <target name="update_configs"
+            depends="overwrite_configs,overwrite_solr_configs"
+            description="Updates the Configuration Directory">
     </target>
 
     <target name="overwrite_configs" description="Overwrites a configuration directory." if="${overwrite}" depends="copy_configs_keep">
@@ -355,8 +349,6 @@ Common usage:
                      autoconfiguring itself (e.g. see DS-3104). -->
                 <include name="log4j*.properties"/>
                 <include name="log4j2*.xml"/>
-                <!-- Filter OAI-PMH description so it can include hostname and handle prefix -->
-                <include name="crosswalks/oai/description.xml"/>
                 <!-- Filter sample Tomcat context.xml -->
                 <include name="default.context.xml"/>
                 <!-- Filter RDF configs as these are TTL files -->
@@ -371,7 +363,10 @@ Common usage:
 
     </target>
 
-    <target name="overwrite_solr_configs" description="Overwrites a configuration directory." if="${overwrite}" depends="copy_solr_configs_keep">
+    <target name="overwrite_solr_configs"
+            description="Overwrites a configuration directory."
+            if="${overwrite}"
+            depends="copy_solr_configs_keep">
 
         <!--
         Copy files that are absent in target
@@ -569,16 +564,6 @@ Common usage:
             <fileset dir="lib" />
         </copy>
 
-        <move todir="${dspace.dir}/etc.bak-${build.date}" failonerror="no">
-            <fileset dir="${dspace.dir}/etc">
-                <include name="**/*" />
-            </fileset>
-        </move>
-
-        <copy todir="${dspace.dir}/etc" preservelastmodified="true">
-            <fileset dir="etc" />
-        </copy>
-
     	<copy todir="${dspace.dir}/solr" preservelastmodified="true">
     	     <fileset dir="solr"/>
     	</copy>
@@ -592,10 +577,6 @@ Common usage:
  ${dspace.dir}/lib was backed up to
 
  ${dspace.dir}/lib.bak-${build.date}
-
- ${dspace.dir}/etc was backed up to
-
- ${dspace.dir}/etc.bak-${build.date}
 
  Please review these directories and delete if no longer needed.
 ====================================================================
@@ -728,8 +709,6 @@ Common usage:
 
         <mkdir dir="${dspace.dir}/lib" />
 
-        <mkdir dir="${dspace.dir}/etc" />
-
         <mkdir dir="${dspace.dir}/webapps" />
 
         <mkdir dir="${dspace.dir}/triplestore" />
@@ -821,17 +800,6 @@ Common usage:
             <fileset dir="lib" />
         </copy>
 
-        <!-- NB: no regular use is made of etc/ files in an installed
-        - system, so this step is 'deprecated', and will eventually
-        - be removed.  -->
-        <delete failonerror="no">
-            <fileset dir="${dspace.dir}/etc" includes="**/*" />
-        </delete>
-
-        <copy todir="${dspace.dir}/etc" preservelastmodified="true">
-            <fileset dir="etc" />
-        </copy>
-
     	<copy todir="${dspace.dir}/solr" preservelastmodified="true">
     	    <fileset dir="solr" />
     	</copy>
@@ -859,8 +827,6 @@ Common usage:
 
         <antcall target="copy_webapps" />
 
-    	<antcall target="init_geolite" />
-
         <echo>
 ====================================================================
  The DSpace code has been installed.
@@ -881,310 +847,13 @@ Common usage:
 
    ${dspace.dir}/bin/dspace create-administrator
 
- You should then be able to access your DSpace's 'home page':
+ You should then be able to access your DSpace's REST API:
 
-   ${dspace.url}
+   ${dspace.server.url}
 
 ====================================================================
         </echo>
 
-    </target>
-
-	<!-- installs GeoCity resolution database -->
-    <target name="update_geolite">
-        <echo>Downloading: ${geolite}</echo>
-        <trycatch property="geolite.error">
-            <try>
-                <get src="${geolite}"
-                     dest="${dspace.dir}/config/GeoLite2-City.tar.gz"
-                     verbose="true"/>
-                <untar src="${dspace.dir}/config/GeoLite2-City.tar.gz"
-                       dest="${dspace.dir}/config/"
-                       compression='gzip'>
-                    <patternset>
-                        <include name='**/GeoLite2-City.mmdb'/>
-                    </patternset>
-                    <mapper type='flatten'/>
-                </untar>
-                <delete file="${dspace.dir}/config/GeoLite2-City.tar.gz"/>
-            </try>
-            <catch>
-                <echo>
-====================================================================
-WARNING : FAILED TO DOWNLOAD GEOLITE DATABASE FILE
-          (Used for DSpace Solr Usage Statistics)
-
-Underlying Error: ${geolite.error}
-
-In order to use DSpace Solr Usage Statistics, you will need to
-manually re-run:
-
-ant update_geolite
-
-OR
-
-You may manually install this file by following these steps:
-(1) Download the latest database archive from ${geolite}
-(2) Unpack it.'
-(3) Copy the file 'GeoLite2-City.mmdb' to '${usage-statistics.dbfile}'.
-
-====================================================================
-                </echo>
-            </catch>
-        </trycatch>
-
-    </target>
-
-    <target name="check_geolite">
-        <condition property="need.geolite">
-            <not>
-                <available file="${usage-statistics.dbfile}" />
-            </not>
-        </condition>
-    </target>
-
-    <target name="init_geolite" depends="check_geolite" if="need.geolite">
-        <antcall target="update_geolite" />
-    </target>
-
-    <!-- Check if any Solr indexes need updating to the version of Solr/Lucene we are using. -->
-    <target name="update_solr_indexes">
-        <echo>Checking if any Solr indexes (${dspace.dir}/solr/*) need upgrading...</echo>
-
-        <!--
-            For each index, this is currently a two step process:
-             (1) Ensure the index is upgraded to Solr/Lucene 3.5.0
-                 (really old indexes need upgrading to this version first)
-             (2) Then, we can upgrade from 3.5.0 to latest version of Lucene
-        -->
-
-        <!-- Determine what version of Solr/Lucene is being used in DSpace. -->
-        <java classname="org.dspace.app.util.IndexVersion" classpathref="class.path" fork="yes" outputproperty="latest_version">
-            <sysproperty key="log4j.configurationFile"
-		         value="file:config/log4j2-console.xml" />
-            <sysproperty key="dspace.log.init.disable" value="true" />
-            <arg value="-v" />
-        </java>
-        <echo>Current version of Solr/Lucene: ${latest_version}</echo>
-
-        <!-- First, let's do the Solr Statistics index -->
-        <property name="stats.index" value="${dspace.dir}/solr/statistics/data/index/"/>
-        <if>
-            <available file="${stats.index}" type="dir"/>
-            <then>
-                <!-- Ensure Statistics index is >= Solr/Lucene 3.5.0 -->
-                <antcall target="check_solr_index">
-                    <param name="indexDir" value="${stats.index}"/>
-                    <param name="version" value="3.5.0"/>
-                    <param name="included" value="false"/>
-                </antcall>
-                <!-- Ensure Statistics index is upgraded to latest version (included in DSpace) -->
-                <antcall target="check_solr_index">
-                    <param name="indexDir" value="${stats.index}"/>
-                    <param name="version" value="${latest_version}"/>
-                    <param name="included" value="true"/>
-                </antcall>
-            </then>
-        </if>
-
-        <!-- Next, let's do the Discovery Solr index.
-             NOTE: Discovery will be reindexed post database migration, but this
-             is here as a safety measure for older versions of Solr/Lucene -->
-        <property name="discovery.index" value="${dspace.dir}/solr/search/data/index/"/>
-        <if>
-            <available file="${discovery.index}" type="dir"/>
-            <then>
-                <!-- Ensure Discovery index is >= Solr/Lucene 3.5.0 -->
-                <antcall target="check_solr_index">
-                    <param name="indexDir" value="${discovery.index}"/>
-                    <param name="version" value="3.5.0"/>
-                    <param name="included" value="false"/>
-                </antcall>
-                <!-- Ensure Discovery index is upgraded to latest version (included in DSpace) -->
-                <antcall target="check_solr_index">
-                    <param name="indexDir" value="${discovery.index}"/>
-                    <param name="version" value="${latest_version}"/>
-                    <param name="included" value="true"/>
-                </antcall>
-            </then>
-        </if>
-
-        <!-- Next, let's do the OAI-PMH Solr index -->
-        <property name="oai.index" value="${dspace.dir}/solr/oai/data/index/"/>
-        <if>
-            <available file="${oai.index}" type="dir"/>
-            <then>
-                <!-- Ensure OAI index is >= Solr/Lucene 3.5.0 -->
-                <antcall target="check_solr_index">
-                    <param name="indexDir" value="${oai.index}"/>
-                    <param name="version" value="3.5.0"/>
-                    <param name="included" value="false"/>
-                </antcall>
-                <!-- Ensure OAI index is upgraded to latest version (included in DSpace) -->
-                <antcall target="check_solr_index">
-                    <param name="indexDir" value="${oai.index}"/>
-                    <param name="version" value="${latest_version}"/>
-                    <param name="included" value="true"/>
-                </antcall>
-            </then>
-        </if>
-
-        <!-- Finally, cleanup any Lucene JARs that were downloaded into the Ant build directory -->
-        <!-- (These JARs are automatically downloaded when an index needs an upgrade). -->
-        <echo>Cleanup any downloaded lucene-core-*.jar files. We don't need them anymore.</echo>
-        <delete>
-            <fileset dir="." includes="lucene-core-*.jar"/>
-        </delete>
-    </target>
-
-    <!-- Target to check an existing Solr index to see if it            -->
-    <!-- meets a particular version requirement.                        -->
-    <!-- If the index is outdated, "upgrade_solr_index" is              -->
-    <!-- called to upgrade it to the specified version.                 -->
-    <!-- REQUIRES these params:                                         -->
-    <!--   * indexDir  = Full path to Index directory                   -->
-    <!--   * version   = Version of Solr to check against.              -->
-    <!--   * included  = Whether this version of Solr/Lucene is already -->
-    <!--                 included in DSpace classpath.                  -->
-    <target name="check_solr_index">
-        <!-- Check if the Solr Statistics index is AT LEAST compatible with Solr/Lucene version 3.5 -->
-        <echo>Checking if the Solr index at ${indexDir} is >= Solr ${version}</echo>
-        <java classname="org.dspace.app.util.IndexVersion" classpathref="class.path" fork="yes" resultproperty="version_returncode" outputproperty="version_compare">
-            <sysproperty key="log4j.configurationFile"
-		         value="file:config/log4j2-console.xml" />
-            <sysproperty key="dspace.log.init.disable" value="true" />
-            <arg value="${indexDir}" />
-            <arg value="${version}" />
-        </java>
-
-        <!-- Fail if the previous command returns a non-zero result, as this
-             means we couldn't determine the Solr index version.
-             We need this special error handling, since we are capturing the
-             output in ${version_compare}. -->
-        <fail>
-          <condition>
-              <not>
-                <equals arg1="${version_returncode}" arg2="0"/>
-              </not>
-          </condition>
-ERROR occurred while checking Solr index version:
-${version_compare}
-        </fail>
-
-        <!-- If the above java command returned -1, that means this index is NOT yet
-             upgraded to the specified Solr version. So, let's upgrade it! -->
-        <if>
-            <equals arg1="${version_compare}" arg2="-1"/>
-            <then>
-                <echo message="The Solr index in ${indexDir} needs an upgrade to Solr ${version}"/>
-                <!-- Call 'upgrade_solr_index' to actually upgrade the index-->
-                <antcall target="upgrade_solr_index">
-                    <param name="indexDir" value="${indexDir}"/>
-                    <param name="version" value="${version}"/>
-                    <param name="included" value="${included}"/>
-                </antcall>
-            </then>
-            <else>
-                <echo message="The Solr index in ${indexDir} IS >= Solr ${version}. Looks good!"/>
-            </else>
-        </if>
-    </target>
-
-    <!-- Target to actually *upgrade* an existing Solr index            -->
-    <!-- REQUIRES these params:                                         -->
-    <!--   * indexDir  = Full path to Index directory                   -->
-    <!--   * version   = Version of Solr to upgrade to                  -->
-    <!--   * included  = Whether this version of Solr/Lucene is already -->
-    <!--                 included in DSpace classpath. If 'false', then -->
-    <!--                 the appropriate Lucene JAR will be downloaded. -->
-    <target name="upgrade_solr_index">
-        <echo>Upgrading Solr/Lucene Index at ${indexDir} to Solr/Lucene ${version}.</echo>
-
-        <!-- Replace the "[version]" placeholders in ${lucene-core} with the actual ${version}-->
-        <propertyregex property="lucene-core.jar" input="${lucene-core}" regexp="\[version\]" replace="${version}" global="true"/>
-
-        <!-- Download the appropriate version of the lucene-core.jar, if we
-             haven't already AND it's not included on our DSpace classpath. -->
-        <if>
-            <and>
-                <not>
-                    <available file="./lucene-core-${version}.jar"/>
-                </not>
-                <equals arg1="${included}" arg2="false" casesensitive="false"/>
-            </and>
-            <then>
-                <echo>Downloading ${lucene-core.jar}</echo>
-                <trycatch property="lucene.download.error">
-                    <try>
-                        <get src="${lucene-core.jar}" dest="./lucene-core-${version}.jar" verbose="true"/>
-                    </try>
-                    <catch>
-                        <echo>
-====================================================================
-WARNING : FAILED TO DOWNLOAD LUCENE-CORE.JAR
-          (Needed to upgrade your existing Solr indexes)
-
-Underlying Error: ${lucene.download.error}
-
-In order to upgrade your Solr indexes to the latest version,
-you will need to do the following:
-
-(1) Manually download the lucene-core-${version}.jar at:
-
-    ${lucene-core.jar}
-
-(2) Place the JAR in the "[src]/dspace/target/dspace-installer" directory.
-
-    [src]/dspace/target/dspace-installer/${lucene-core}.jar
-
-(3) Manually re-run the following 'ant' upgrade command:
-
-    ant update_solr_indexes
-
-For more information, please see the Upgrade Instructions.
-====================================================================
-                        </echo>
-                    </catch>
-                </trycatch>
-            </then>
-        </if>
-
-        <!-- If we downloaded a "lucene-core-*.jar" in the previous step,
-             then use that downloaded JAR to upgrade the Solr/Lucene Index -->
-        <if>
-            <and>
-                <available file="./lucene-core-${version}.jar"/>
-                <equals arg1="${included}" arg2="false" casesensitive="false"/>
-            </and>
-            <then>
-                <echo>Upgrading the Solr index in ${indexDir}. Depending on the index size, this may take a while (please be patient)...</echo>
-                <!-- Run the Lucene IndexUpgrader on this index. This will upgrade the index based on the version of "lucene-core.jar" -->
-                <java classname="org.apache.lucene.index.IndexUpgrader" classpath="./lucene-core-${version}.jar" fork="yes" failonerror="yes">
-                    <sysproperty key="log4j.configurationFile"
-				 value="file:config/log4j2-console.xml" />
-                    <sysproperty key="dspace.log.init.disable"
-				 value="true" />
-                    <arg value="${indexDir}" />
-                </java>
-            </then>
-        </if>
-
-        <!-- Otherwise, if "included=true" then use the Lucene JAR included
-             in the DSpace classpath to upgrade the Solr/Lucene Index -->
-        <if>
-            <equals arg1="${included}" arg2="true" casesensitive="false"/>
-            <then>
-                <echo>Upgrading the Solr index in ${indexDir}. Depending on the index size, this may take a while (please be patient)...</echo>
-                <!-- Run the Lucene IndexUpgrader on this index. This will upgrade the index based on the version of "lucene-core.jar" -->
-                <java classname="org.apache.lucene.index.IndexUpgrader" classpathref="class.path" fork="yes" failonerror="yes">
-                    <sysproperty key="log4j.configurationFile"
-				 value="file:config/log4j2-console.xml" />
-                    <sysproperty key="dspace.log.init.disable"
-				 value="true" />
-                    <arg value="${indexDir}" />
-                </java>
-            </then>
-        </if>
     </target>
 
 </project>

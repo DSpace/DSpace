@@ -50,8 +50,11 @@ import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.ConfigurationManager;
-import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.discovery.IndexableObject;
+import org.dspace.discovery.indexobject.IndexableCollection;
+import org.dspace.discovery.indexobject.IndexableCommunity;
+import org.dspace.discovery.indexobject.IndexableItem;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
@@ -179,12 +182,12 @@ public class SyndicationFeed {
      *
      * @param request request
      * @param context context
-     * @param dso     DSpaceObject
+     * @param dso     the scope
      * @param items   array of objects
      * @param labels  label map
      */
-    public void populate(HttpServletRequest request, Context context, DSpaceObject dso,
-                         List<? extends DSpaceObject> items, Map<String, String> labels) {
+    public void populate(HttpServletRequest request, Context context, IndexableObject dso,
+                         List<IndexableObject> items, Map<String, String> labels) {
         String logoURL = null;
         String objectURL = null;
         String defaultTitle = null;
@@ -199,8 +202,8 @@ public class SyndicationFeed {
             logoURL = ConfigurationManager.getProperty("webui.feed.logo.url");
         } else {
             Bitstream logo = null;
-            if (dso.getType() == Constants.COLLECTION) {
-                Collection col = (Collection) dso;
+            if (dso instanceof IndexableCollection) {
+                Collection col = ((IndexableCollection) dso).getIndexedObject();
                 defaultTitle = col.getName();
                 feed.setDescription(collectionService.getMetadata(col, "short_description"));
                 logo = col.getLogo();
@@ -208,8 +211,9 @@ public class SyndicationFeed {
                 if (cols != null && cols.length() > 1 && cols.contains(col.getHandle())) {
                     podcastFeed = true;
                 }
-            } else if (dso.getType() == Constants.COMMUNITY) {
-                Community comm = (Community) dso;
+                objectURL = resolveURL(request, col);
+            } else if (dso instanceof IndexableCommunity) {
+                Community comm = ((IndexableCommunity) dso).getIndexedObject();
                 defaultTitle = comm.getName();
                 feed.setDescription(communityService.getMetadata(comm, "short_description"));
                 logo = comm.getLogo();
@@ -217,8 +221,9 @@ public class SyndicationFeed {
                 if (comms != null && comms.length() > 1 && comms.contains(comm.getHandle())) {
                     podcastFeed = true;
                 }
+                objectURL = resolveURL(request, comm);
             }
-            objectURL = resolveURL(request, dso);
+
             if (logo != null) {
                 logoURL = urlOfBitstream(request, logo);
             }
@@ -247,11 +252,11 @@ public class SyndicationFeed {
         // add entries for items
         if (items != null) {
             List<SyndEntry> entries = new ArrayList<SyndEntry>();
-            for (DSpaceObject itemDSO : items) {
-                if (itemDSO.getType() != Constants.ITEM) {
+            for (IndexableObject idxObj : items) {
+                if (!(idxObj instanceof IndexableItem)) {
                     continue;
                 }
-                Item item = (Item) itemDSO;
+                Item item = ((IndexableItem) idxObj).getIndexedObject();
                 boolean hasDate = false;
                 SyndEntry entry = new SyndEntryImpl();
                 entries.add(entry);
@@ -526,11 +531,9 @@ public class SyndicationFeed {
         if (dso == null) {
             if (baseURL == null) {
                 if (request == null) {
-                    baseURL = ConfigurationManager.getProperty("dspace.url");
+                    baseURL = ConfigurationManager.getProperty("dspace.ui.url");
                 } else {
-                    baseURL = (request.isSecure()) ? "https://" : "http://";
-                    baseURL += ConfigurationManager.getProperty("dspace.hostname");
-                    baseURL += ":" + request.getServerPort();
+                    baseURL = ConfigurationManager.getProperty("dspace.ui.url");
                     baseURL += request.getContextPath();
                 }
             }

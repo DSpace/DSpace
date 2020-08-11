@@ -18,7 +18,6 @@
     <bean name="AuthorityTypes" class="org.dspace.authority.AuthorityTypes">
         <property name="types">
             <list>
-                <bean class="org.dspace.authority.orcid.Orcidv2AuthorityValue"/>
                 <bean class="org.dspace.authority.PersonAuthorityValue"/>
             </list>
         </property>
@@ -30,11 +29,5 @@
             </map>
         </property>
     </bean>
-
-    <alias name="OrcidSource" alias="AuthoritySource"/>
-    <bean name="OrcidSource" class="org.dspace.authority.orcid.Orcidv2" init-method="init">
-        <constructor-arg value="${orcid.api.url}"/>
-    </bean>
-
 
 </beans>

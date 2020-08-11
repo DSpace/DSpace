@@ -59,6 +59,18 @@ public interface GenericDAO<T> {
     public List<T> findAll(Context context, Class<T> clazz) throws SQLException;
 
     /**
+     * Fetch all persisted instances of a given object type.
+     *
+     * @param context The relevant DSpace Context.
+     * @param clazz   the desired type.
+     * @param limit   paging limit
+     * @param offset  paging offset
+     * @return list of DAOs of the same type as clazz
+     * @throws SQLException if database error
+     */
+    List<T> findAll(Context context, Class<T> clazz, Integer limit, Integer offset) throws SQLException;
+
+    /**
      * Execute a JPQL query returning a unique result.
      *
      * @param context The relevant DSpace Context.
