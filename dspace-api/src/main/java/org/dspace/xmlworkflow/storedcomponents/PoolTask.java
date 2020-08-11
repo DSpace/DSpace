@@ -7,7 +7,6 @@
  */
 package org.dspace.xmlworkflow.storedcomponents;
 
-import java.sql.SQLException;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -119,7 +118,7 @@ public class PoolTask implements ReloadableEntity<Integer> {
         this.stepId = stepID;
     }
 
-    public String getStepID() throws SQLException {
+    public String getStepID() {
         return stepId;
     }
 

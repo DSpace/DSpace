@@ -23,7 +23,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.dspace.authorize.AuthorizeConfiguration;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.ResourcePolicy;
 import org.dspace.authorize.service.AuthorizeService;
+import org.dspace.authorize.service.ResourcePolicyService;
+import org.dspace.content.Collection;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.DSpaceObjectServiceImpl;
 import org.dspace.content.MetadataField;
@@ -39,6 +42,8 @@ import org.dspace.eperson.service.EPersonService;
 import org.dspace.eperson.service.GroupService;
 import org.dspace.event.Event;
 import org.dspace.util.UUIDUtils;
+import org.dspace.xmlworkflow.storedcomponents.CollectionRole;
+import org.dspace.xmlworkflow.storedcomponents.service.CollectionRoleService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,6 +68,9 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
     protected CollectionService collectionService;
 
     @Autowired(required = true)
+    protected CollectionRoleService collectionRoleService;
+
+    @Autowired(required = true)
     protected EPersonService ePersonService;
 
     @Autowired(required = true)
@@ -70,6 +78,8 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
 
     @Autowired(required = true)
     protected AuthorizeService authorizeService;
+    @Autowired(required = true)
+    protected ResourcePolicyService resourcePolicyService;
 
     protected GroupServiceImpl() {
         super();
@@ -179,7 +189,8 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
             return false;
 
             // special, everyone is member of group 0 (anonymous)
-        } else if (StringUtils.equals(group.getName(), Group.ANONYMOUS)) {
+        } else if (StringUtils.equals(group.getName(), Group.ANONYMOUS) ||
+                   isParentOf(context, group, findByName(context, Group.ANONYMOUS))) {
             return true;
 
         } else {
@@ -615,15 +626,6 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
             org.dspace.content.Collection collection = collectionService.findByGroup(context, group);
 
             if (collection != null) {
-                if ((group.equals(collection.getWorkflowStep1()) ||
-                    group.equals(collection.getWorkflowStep2()) ||
-                    group.equals(collection.getWorkflowStep3()))) {
-                    if (AuthorizeConfiguration.canCollectionAdminManageWorkflows()) {
-                        return collection;
-                    } else if (AuthorizeConfiguration.canCommunityAdminManageCollectionWorkflows()) {
-                        return collectionService.getParentObject(context, collection);
-                    }
-                }
                 if (group.equals(collection.getSubmitters())) {
                     if (AuthorizeConfiguration.canCollectionAdminManageSubmitters()) {
                         return collection;
@@ -638,10 +640,49 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
                         return collectionService.getParentObject(context, collection);
                     }
                 }
-            } else if (AuthorizeConfiguration.canCommunityAdminManageAdminGroup()) {
-                // is the group related to a community and community administrator allowed
-                // to manage it?
-                return communityService.findByAdminGroup(context, group);
+            } else {
+                if (AuthorizeConfiguration.canCollectionAdminManageWorkflows()
+                        || AuthorizeConfiguration.canCommunityAdminManageCollectionWorkflows()) {
+                    // if the group is used for one or more roles on a single collection,
+                    // admins can eventually manage it
+                    List<CollectionRole> collectionRoles = collectionRoleService.findByGroup(context, group);
+                    if (collectionRoles != null && collectionRoles.size() > 0) {
+                        Set<Collection> colls = new HashSet<Collection>();
+                        for (CollectionRole cr : collectionRoles) {
+                            colls.add(cr.getCollection());
+                        }
+                        if (colls.size() == 1) {
+                            collection = colls.iterator().next();
+                            if (AuthorizeConfiguration.canCollectionAdminManageWorkflows()) {
+                                return collection;
+                            } else {
+                                return collectionService.getParentObject(context, collection);
+                            }
+                        }
+                    } else {
+                        if (AuthorizeConfiguration.canCollectionAdminManagePolicies()
+                            || AuthorizeConfiguration.canCommunityAdminManagePolicies()
+                            || AuthorizeConfiguration.canCommunityAdminManageCollectionWorkflows()) {
+                            List<Group> groups = new ArrayList<Group>();
+                            groups.add(group);
+                            List<ResourcePolicy> policies = resourcePolicyService.find(context, null, groups,
+                                                            Constants.DEFAULT_ITEM_READ, Constants.COLLECTION);
+                            if (policies.size() > 0) {
+                                return policies.get(0).getdSpaceObject();
+                            }
+                            policies = resourcePolicyService.find(context, null, groups,
+                                                             Constants.DEFAULT_BITSTREAM_READ, Constants.COLLECTION);
+                            if (policies.size() > 0) {
+                                return policies.get(0).getdSpaceObject();
+                            }
+                        }
+                    }
+                }
+                if (AuthorizeConfiguration.canCommunityAdminManageAdminGroup()) {
+                    // is the group related to a community and community administrator allowed
+                    // to manage it?
+                    return communityService.findByAdminGroup(context, group);
+                }
             }
         }
         return null;

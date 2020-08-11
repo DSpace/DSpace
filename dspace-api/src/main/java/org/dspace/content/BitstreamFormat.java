@@ -71,7 +71,7 @@ public class BitstreamFormat implements Serializable, ReloadableEntity<Integer> 
     @Column(name = "internal")
     private boolean internal = false;
 
-    @ElementCollection(fetch = FetchType.LAZY)
+    @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "fileextension", joinColumns = @JoinColumn(name = "bitstream_format_id"))
     @CollectionId(
         columns = @Column(name = "file_extension_id"),
@@ -275,7 +275,7 @@ public class BitstreamFormat implements Serializable, ReloadableEntity<Integer> 
             return false;
         }
         final BitstreamFormat otherBitstreamFormat = (BitstreamFormat) other;
-        if (this.getID() != otherBitstreamFormat.getID()) {
+        if (!this.getID().equals(otherBitstreamFormat.getID())) {
             return false;
         }
 

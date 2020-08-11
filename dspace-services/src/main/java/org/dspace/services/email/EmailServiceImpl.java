@@ -16,6 +16,7 @@ import javax.naming.NameNotFoundException;
 import javax.naming.NamingException;
 import javax.naming.NoInitialContextException;
 
+import org.apache.commons.lang3.StringUtils;
 import org.dspace.kernel.mixins.InitializedService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.EmailService;
@@ -106,7 +107,7 @@ public class EmailServiceImpl
                     props.put(key, value);
                 }
             }
-            if (null == cfg.getProperty("mail.server.username")) {
+            if (StringUtils.isBlank(cfg.getProperty("mail.server.username"))) {
                 session = Session.getInstance(props);
             } else {
                 props.put("mail.smtp.auth", "true");
@@ -124,5 +125,13 @@ public class EmailServiceImpl
         return new PasswordAuthentication(
             cfg.getProperty("mail.server.username"),
             cfg.getProperty("mail.server.password"));
+    }
+
+    /**
+     * Force a new initialization of the session, useful for testing purpose
+     */
+    public void reset() {
+        session = null;
+        init();
     }
 }

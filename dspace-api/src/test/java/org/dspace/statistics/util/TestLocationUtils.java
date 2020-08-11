@@ -30,7 +30,7 @@ public class TestLocationUtils extends AbstractDSpaceTest {
      */
     @Test
     public void testGetContinentCode() {
-        assertEquals(LocationUtils.getContinentCode("US"), "NA");
+        assertEquals("NA", LocationUtils.getContinentCode("US"));
         assertTrue(LocationUtils.getContinentCode(null).length() > 2); // message
         assertTrue(LocationUtils.getContinentCode("xyz").length() > 2); // message
     }

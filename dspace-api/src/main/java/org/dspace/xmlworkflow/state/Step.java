@@ -7,22 +7,22 @@
  */
 package org.dspace.xmlworkflow.state;
 
-import java.io.IOException;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.dspace.core.Context;
-import org.dspace.workflow.WorkflowException;
 import org.dspace.xmlworkflow.Role;
 import org.dspace.xmlworkflow.WorkflowConfigurationException;
-import org.dspace.xmlworkflow.factory.XmlWorkflowFactory;
-import org.dspace.xmlworkflow.factory.XmlWorkflowServiceFactory;
 import org.dspace.xmlworkflow.state.actions.UserSelectionActionConfig;
 import org.dspace.xmlworkflow.state.actions.WorkflowActionConfig;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 import org.dspace.xmlworkflow.storedcomponents.service.InProgressUserService;
+import org.springframework.beans.factory.BeanNameAware;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Required;
 
 /**
  * A class that contains all the data of an xlworkflow step
@@ -32,46 +32,36 @@ import org.dspace.xmlworkflow.storedcomponents.service.InProgressUserService;
  * @author Ben Bosman (ben at atmire dot com)
  * @author Mark Diggory (markd at atmire dot com)
  */
-public class Step {
+public class Step implements BeanNameAware {
 
-
-    protected InProgressUserService inProgressUserService = XmlWorkflowServiceFactory.getInstance()
-                                                                                     .getInProgressUserService();
-    protected XmlWorkflowFactory xmlWorkflowFactory = XmlWorkflowServiceFactory.getInstance().getWorkflowFactory();
-
+    @Autowired
+    protected InProgressUserService inProgressUserService;
 
     private UserSelectionActionConfig userSelectionMethod;
-    private HashMap<String, WorkflowActionConfig> actionConfigsMap;
-    private List<String> actionConfigsList;
-    private Map<Integer, String> outcomes;
+    private List<WorkflowActionConfig> actions;
+    private Map<Integer, Step> outcomes = new HashMap<>();
     private String id;
     private Role role;
     private Workflow workflow;
-    private int requiredUsers;
+    private int requiredUsers = 1;
 
-    public Step(String id, Workflow workflow, Role role, UserSelectionActionConfig userSelectionMethod,
-                List<String> actionConfigsList, Map<Integer, String> outcomes, int requiredUsers) {
-        this.actionConfigsMap = new HashMap<>();
-        this.outcomes = outcomes;
-        this.userSelectionMethod = userSelectionMethod;
-        this.role = role;
-        this.actionConfigsList = actionConfigsList;
-        this.id = id;
-        userSelectionMethod.setStep(this);
-        this.requiredUsers = requiredUsers;
-        this.workflow = workflow;
-
-    }
-
-    public WorkflowActionConfig getActionConfig(String actionID) {
-        if (actionConfigsMap.get(actionID) != null) {
-            return actionConfigsMap.get(actionID);
-        } else {
-            WorkflowActionConfig action = xmlWorkflowFactory.createWorkflowActionConfig(actionID);
-            action.setStep(this);
-            actionConfigsMap.put(actionID, action);
-            return action;
+    /**
+     * Get an WorkflowActionConfiguration object for the provided action identifier
+     * @param actionID the action id for which we want our action config
+     * @return The corresponding WorkflowActionConfiguration
+     * @throws WorkflowConfigurationException occurs if the provided action isn't part of the step
+     */
+    public WorkflowActionConfig getActionConfig(String actionID) throws WorkflowConfigurationException {
+        // First check the userSelectionMethod as this is not a regular "action"
+        if (userSelectionMethod != null && StringUtils.equals(userSelectionMethod.getId(), actionID)) {
+            return userSelectionMethod;
         }
+        for (WorkflowActionConfig actionConfig : actions) {
+            if (StringUtils.equals(actionConfig.getId(), actionID)) {
+                return actionConfig;
+            }
+        }
+        throw new WorkflowConfigurationException("Action configuration not found for: " + actionID);
     }
 
     /**
@@ -80,8 +70,7 @@ public class Step {
      * @return a boolean
      */
     public boolean hasUI() {
-        for (String actionConfigId : actionConfigsList) {
-            WorkflowActionConfig actionConfig = getActionConfig(actionConfigId);
+        for (WorkflowActionConfig actionConfig : actions) {
             if (actionConfig.requiresUI()) {
                 return true;
             }
@@ -89,8 +78,12 @@ public class Step {
         return false;
     }
 
-    public String getNextStepID(int outcome)
-        throws WorkflowException, IOException, WorkflowConfigurationException, SQLException {
+    /**
+     * Get the next step based on out the outcome
+     * @param outcome the outcome of the previous step
+     * @return the next stepp or NULL if there is no step configured for this outcome
+     */
+    public Step getNextStep(int outcome) {
         return outcomes.get(outcome);
     }
 
@@ -109,9 +102,9 @@ public class Step {
     }
 
     public WorkflowActionConfig getNextAction(WorkflowActionConfig currentAction) {
-        int index = actionConfigsList.indexOf(currentAction.getId());
-        if (index < actionConfigsList.size() - 1) {
-            return getActionConfig(actionConfigsList.get(index + 1));
+        int index = actions.indexOf(currentAction);
+        if (index < actions.size() - 1) {
+            return actions.get(index + 1);
         } else {
             return null;
         }
@@ -124,7 +117,6 @@ public class Step {
     public Workflow getWorkflow() {
         return workflow;
     }
-
 
     /**
      * Check if enough users have finished this step for it to continue
@@ -146,6 +138,78 @@ public class Step {
         return role;
     }
 
-//    public boolean skipStep() {
-//    }
+    /**
+     * Set the user selection configuration, this is required as every step requires one
+     * @param userSelectionMethod the user selection method configuration
+     */
+    @Required
+    public void setUserSelectionMethod(UserSelectionActionConfig userSelectionMethod) {
+        this.userSelectionMethod = userSelectionMethod;
+        userSelectionMethod.setStep(this);
+    }
+
+    /**
+     * Set the outcomes as a map, if no outcomes are configured this step will be last step in the workflow
+     * @param outcomes the map containing the outcomes.
+     */
+    public void setOutcomes(Map<Integer, Step> outcomes) {
+        this.outcomes = outcomes;
+    }
+
+
+    /**
+     * Get the processing actions for the step. Processing actions contain the logic required to execute the required
+     * operations in each step.
+     * @return the actions configured for this step
+     */
+    public List<WorkflowActionConfig> getActions() {
+        return actions;
+    }
+
+    /**
+     * Set the processing actions for the step. Processing actions contain the logic required to execute the required
+     * operations in each step.
+     * @param actions the list of actions
+     */
+    @Required
+    public void setActions(List<WorkflowActionConfig> actions) {
+        for (WorkflowActionConfig workflowActionConfig : actions) {
+            workflowActionConfig.setStep(this);
+        }
+        this.actions = actions;
+    }
+
+    /**
+     * Set the workflow this step belongs to
+     * @param workflow the workflow configuration
+     */
+    protected void setWorkflow(Workflow workflow) {
+        this.workflow = workflow;
+    }
+
+    /**
+     * Store the name of the bean in the identifier
+     * @param s the bean name
+     */
+    @Override
+    public void setBeanName(String s) {
+        id = s;
+    }
+
+    /**
+     * Set the number of required users that need to execute this step before it is completed,
+     * the default is a single user
+     * @param requiredUsers the number of required users
+     */
+    public void setRequiredUsers(int requiredUsers) {
+        this.requiredUsers = requiredUsers;
+    }
+
+    /**
+     * Set the role of which users role should execute this step
+     * @param role the role to be configured for this step
+     */
+    public void setRole(Role role) {
+        this.role = role;
+    }
 }

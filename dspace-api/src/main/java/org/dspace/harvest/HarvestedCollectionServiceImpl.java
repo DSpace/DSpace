@@ -7,16 +7,28 @@
  */
 package org.dspace.harvest;
 
+import static org.dspace.harvest.OAIHarvester.OAI_ADDRESS_ERROR;
+import static org.dspace.harvest.OAIHarvester.OAI_DMD_ERROR;
+import static org.dspace.harvest.OAIHarvester.OAI_ORE_ERROR;
+import static org.dspace.harvest.OAIHarvester.OAI_SET_ERROR;
+
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import ORG.oclc.oai.harvester2.verb.Identify;
+import ORG.oclc.oai.harvester2.verb.ListIdentifiers;
 import org.dspace.content.Collection;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.harvest.dao.HarvestedCollectionDAO;
 import org.dspace.harvest.service.HarvestedCollectionService;
+import org.jdom.Document;
+import org.jdom.Element;
+import org.jdom.Namespace;
+import org.jdom.input.DOMBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -27,6 +39,10 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author kevinvandevelde at atmire.com
  */
 public class HarvestedCollectionServiceImpl implements HarvestedCollectionService {
+
+    private static final Namespace ORE_NS = Namespace.getNamespace("http://www.openarchives.org/ore/terms/");
+    private static final Namespace OAI_NS = Namespace.getNamespace("http://www.openarchives.org/OAI/2.0/");
+
     @Autowired(required = true)
     protected HarvestedCollectionDAO harvestedCollectionDAO;
 
@@ -154,6 +170,95 @@ public class HarvestedCollectionServiceImpl implements HarvestedCollectionServic
     @Override
     public boolean exists(Context context) throws SQLException {
         return 0 < harvestedCollectionDAO.count(context);
+    }
+
+    /**
+     * Verify the existence of an OAI server with the specified set and
+     * supporting the provided metadata formats.
+     *
+     * @param oaiSource  the address of the OAI-PMH provider
+     * @param oaiSetId   OAI set identifier
+     * @param metaPrefix OAI metadataPrefix
+     * @param testORE    whether the method should also check the PMH provider for ORE support
+     * @return list of errors encountered during verification. Empty list indicates a "success" condition.
+     */
+    public List<String> verifyOAIharvester(String oaiSource,
+                                                  String oaiSetId, String metaPrefix, boolean testORE) {
+        List<String> errorSet = new ArrayList<String>();
+
+        // First, see if we can contact the target server at all.
+        try {
+            new Identify(oaiSource);
+        } catch (Exception ex) {
+            errorSet.add(OAI_ADDRESS_ERROR + ": OAI server could not be reached.");
+            return errorSet;
+        }
+
+        // Next, make sure the metadata we need is supported by the target server
+        Namespace DMD_NS = OAIHarvester.getDMDNamespace(metaPrefix);
+        if (null == DMD_NS) {
+            errorSet.add(OAI_DMD_ERROR + ":  " + metaPrefix);
+            return errorSet;
+        }
+
+        String OREOAIPrefix = null;
+        String DMDOAIPrefix = null;
+
+        try {
+            OREOAIPrefix = OAIHarvester.oaiResolveNamespaceToPrefix(oaiSource, OAIHarvester.getORENamespace().getURI());
+            DMDOAIPrefix = OAIHarvester.oaiResolveNamespaceToPrefix(oaiSource, DMD_NS.getURI());
+        } catch (Exception ex) {
+            errorSet.add(OAI_ADDRESS_ERROR
+                + ": OAI did not respond to ListMetadataFormats query  ("
+                + ORE_NS.getPrefix() + ":" + OREOAIPrefix + " ; "
+                + DMD_NS.getPrefix() + ":" + DMDOAIPrefix + "):  "
+                + ex.getMessage());
+            return errorSet;
+        }
+
+        if (testORE && OREOAIPrefix == null) {
+            errorSet.add(OAI_ORE_ERROR + ": The OAI server does not support ORE dissemination");
+        }
+        if (DMDOAIPrefix == null) {
+            errorSet.add(OAI_DMD_ERROR + ": The OAI server does not support dissemination in this format");
+        }
+
+        // Now scan the sets and make sure the one supplied is in the list
+        boolean foundSet = false;
+        try {
+            //If we do not want to harvest from one set, then skip this.
+            if (!"all".equals(oaiSetId)) {
+                ListIdentifiers ls = new ListIdentifiers(oaiSource, null, null, oaiSetId, DMDOAIPrefix);
+
+                // The only error we can really get here is "noSetHierarchy"
+                if (ls.getErrors() != null && ls.getErrors().getLength() > 0) {
+                    for (int i = 0; i < ls.getErrors().getLength(); i++) {
+                        String errorCode = ls.getErrors().item(i).getAttributes().getNamedItem("code").getTextContent();
+                        errorSet.add(
+                            OAI_SET_ERROR + ": The OAI server does not have a set with the specified setSpec (" +
+                                errorCode + ")");
+                    }
+                } else {
+                    // Drilling down to /OAI-PMH/ListSets/set
+                    DOMBuilder db = new DOMBuilder();
+                    Document reply = db.build(ls.getDocument());
+                    Element root = reply.getRootElement();
+                    //Check if we can find items, if so this indicates that we have children and our sets exist
+                    foundSet = 0 < root.getChild("ListIdentifiers", OAI_NS).getChildren().size();
+
+                    if (!foundSet) {
+                        errorSet.add(OAI_SET_ERROR + ": The OAI server does not have a set with the specified setSpec");
+                    }
+                }
+            }
+        } catch (RuntimeException re) {
+            throw re;
+        } catch (Exception e) {
+            errorSet.add(OAI_ADDRESS_ERROR + ": OAI server could not be reached");
+            return errorSet;
+        }
+
+        return errorSet;
     }
 
 

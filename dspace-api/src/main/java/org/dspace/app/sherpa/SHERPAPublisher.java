@@ -15,6 +15,9 @@ import java.util.List;
  * @author Andrea Bollini
  */
 public class SHERPAPublisher {
+
+    private String id;
+
     private String name;
 
     private String alias;
@@ -49,7 +52,7 @@ public class SHERPAPublisher {
 
     private String dateupdated;
 
-    public SHERPAPublisher(String name, String alias, String homeurl,
+    public SHERPAPublisher(String id, String name, String alias, String homeurl,
                            String prearchiving, List<String> prerestriction,
                            String postarchiving, List<String> postrestriction,
                            String pubarchiving, List<String> pubrestriction,
@@ -57,6 +60,8 @@ public class SHERPAPublisher {
                            String paidaccessname, String paidaccessnotes,
                            List<String[]> copyright, String romeocolour, String datedded,
                            String dateupdated) {
+        this.id = id;
+
         this.name = name;
 
         this.alias = alias;
@@ -160,4 +165,11 @@ public class SHERPAPublisher {
         return dateupdated;
     }
 
+    /**
+     * Generic getter for the id
+     * @return the id value of this SHERPAPublisher
+     */
+    public String getId() {
+        return id;
+    }
 }

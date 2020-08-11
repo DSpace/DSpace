@@ -48,6 +48,11 @@ public class PoolTaskServiceImpl implements PoolTaskService {
     }
 
     @Override
+    public List<PoolTask> findAll(Context context) throws SQLException {
+        return poolTaskDAO.findAll(context, PoolTask.class);
+    }
+
+    @Override
     public List<PoolTask> findByEperson(Context context, EPerson ePerson)
         throws SQLException, AuthorizeException, IOException {
         List<PoolTask> result = poolTaskDAO.findByEPerson(context, ePerson);
@@ -136,6 +141,11 @@ public class PoolTaskServiceImpl implements PoolTaskService {
     @Override
     public List<PoolTask> findByEPerson(Context context, EPerson ePerson) throws SQLException {
         return poolTaskDAO.findByEPerson(context, ePerson);
+    }
+
+    @Override
+    public List<PoolTask> findByGroup(Context context, Group group) throws SQLException {
+        return poolTaskDAO.findByGroup(context, group);
     }
 
     @Override

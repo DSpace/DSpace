@@ -13,6 +13,7 @@ import static org.junit.Assert.fail;
 
 import java.io.IOException;
 import java.io.StringWriter;
+import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -103,11 +104,11 @@ public class LicenseUtilsTest extends AbstractUnitTest {
     @Test
     public void testGetLicenseText_5args() throws SQLException, AuthorizeException, IOException {
         //parameters for the test
-        Locale locale = null;
-        Collection collection = null;
-        Item item = null;
-        EPerson person = null;
-        Map<String, Object> additionalInfo = null;
+        Locale locale;
+        Collection collection;
+        Item item;
+        EPerson person;
+        Map<String, Object> additionalInfo;
 
         // We don't test attribute 4 as this is the date, and the date often differs between when the test
         // is executed, and when the LicenceUtils code gets the current date/time which causes the test to fail
@@ -194,10 +195,10 @@ public class LicenseUtilsTest extends AbstractUnitTest {
     @Test
     public void testGetLicenseText_4args() throws SQLException, AuthorizeException, IOException {
         //parameters for the test
-        Locale locale = null;
-        Collection collection = null;
-        Item item = null;
-        EPerson person = null;
+        Locale locale;
+        Collection collection;
+        Item item;
+        EPerson person;
 
         String template = "Template license: %1$s %2$s %3$s %5$s %6$s";
         String templateResult = "Template license: first name last name testgetlicensetext_4args@email.com  ";
@@ -259,7 +260,7 @@ public class LicenseUtilsTest extends AbstractUnitTest {
         StringWriter writer = new StringWriter();
         IOUtils.copy(
             bitstreamService.retrieve(context, itemService.getBundles(item, "LICENSE").get(0).getBitstreams().get(0)),
-            writer);
+            writer, StandardCharsets.UTF_8);
         String license = writer.toString();
 
         assertThat("testGrantLicense 0", license, equalTo(defaultLicense));

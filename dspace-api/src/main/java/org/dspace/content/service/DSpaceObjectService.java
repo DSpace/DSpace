@@ -30,17 +30,15 @@ import org.dspace.core.Context;
  */
 public interface DSpaceObjectService<T extends DSpaceObject> {
 
-
     /**
-     * Generic find for when the precise type of a DSO is not known, just the
-     * a pair of type number and database ID.
+     * Generic find for when the precise type of an Entity is not known
      *
      * @param context - the context
-     * @param id      - id within table of type'd objects
-     * @return the object found, or null if it does not exist.
+     * @param uuid      - uuid within table of type'd dspace objects
+     * @return the dspace object found, or null if it does not exist.
      * @throws SQLException only upon failure accessing the database.
      */
-    public T find(Context context, UUID id) throws SQLException;
+    public T find(Context context, UUID uuid) throws SQLException;
 
     /**
      * Get a proper name for the object. This may return <code>null</code>.
@@ -51,7 +49,6 @@ public interface DSpaceObjectService<T extends DSpaceObject> {
      * one
      */
     public abstract String getName(T dso);
-
 
     /**
      * Tries to lookup all Identifiers of this DSpaceObject.
@@ -185,7 +182,7 @@ public interface DSpaceObjectService<T extends DSpaceObject> {
 
     /**
      * Add metadata fields. These are appended to existing values.
-     * Use <code>clearDC</code> to remove values. The ordering of values
+     * Use <code>clearMetadata</code> to remove values. The ordering of values
      * passed in is maintained.
      * <p>
      * If metadata authority control is available, try to get authority
@@ -210,7 +207,7 @@ public interface DSpaceObjectService<T extends DSpaceObject> {
 
     /**
      * Add metadata fields. These are appended to existing values.
-     * Use <code>clearDC</code> to remove values. The ordering of values
+     * Use <code>clearMetadata</code> to remove values. The ordering of values
      * passed in is maintained.
      *
      * @param context     DSpace context
@@ -234,7 +231,7 @@ public interface DSpaceObjectService<T extends DSpaceObject> {
 
     /**
      * Add metadata fields. These are appended to existing values.
-     * Use <code>clearDC</code> to remove values. The ordering of values
+     * Use <code>clearMetadata</code> to remove values. The ordering of values
      * passed in is maintained.
      *
      * @param context       DSpace context
@@ -249,10 +246,23 @@ public interface DSpaceObjectService<T extends DSpaceObject> {
      * @throws SQLException if database error
      */
     public void addMetadata(Context context, T dso, MetadataField metadataField, String lang, List<String> values,
-                            List<String> authorities, List<Integer> confidences) throws SQLException;
+            List<String> authorities, List<Integer> confidences) throws SQLException;
 
+    /**
+     * Shortcut for {@link #addMetadata(Context, DSpaceObject, MetadataField, String, List, List, List)} when a single
+     * value need to be added
+     * 
+     * @param context
+     * @param dso
+     * @param metadataField
+     * @param language
+     * @param value
+     * @param authority
+     * @param confidence
+     * @throws SQLException
+     */
     public void addMetadata(Context context, T dso, MetadataField metadataField, String language, String value,
-                            String authority, int confidence) throws SQLException;
+            String authority, int confidence) throws SQLException;
 
     public void addMetadata(Context context, T dso, MetadataField metadataField, String language, String value)
         throws SQLException;
@@ -262,7 +272,7 @@ public interface DSpaceObjectService<T extends DSpaceObject> {
 
     /**
      * Add a single metadata field. This is appended to existing
-     * values. Use <code>clearDC</code> to remove values.
+     * values. Use <code>clearMetadata</code> to remove values.
      *
      * @param context   DSpace context
      * @param dso       DSpaceObject
@@ -282,7 +292,7 @@ public interface DSpaceObjectService<T extends DSpaceObject> {
 
     /**
      * Add a single metadata field. This is appended to existing
-     * values. Use <code>clearDC</code> to remove values.
+     * values. Use <code>clearMetadata</code> to remove values.
      *
      * @param context    DSpace context
      * @param dso        DSpaceObject
@@ -304,10 +314,10 @@ public interface DSpaceObjectService<T extends DSpaceObject> {
 
     /**
      * Clear metadata values. As with <code>getDC</code> above,
-     * passing in <code>null</code> only matches fields where the qualifier or
+     * passing in <code>null</code> only matches fields where the qualifier orr
      * language is actually <code>null</code>.<code>Item.ANY</code> will
      * match any element, qualifier or language, including <code>null</code>.
-     * Thus, <code>dspaceobject.clearDC(Item.ANY, Item.ANY, Item.ANY)</code> will
+     * Thus, <code>dspaceobject.clearMetadata(Item.ANY, Item.ANY, Item.ANY)</code> will
      * remove all Dublin Core metadata associated with an DSpaceObject.
      *
      * @param context   DSpace context
@@ -360,14 +370,26 @@ public interface DSpaceObjectService<T extends DSpaceObject> {
 
     public void delete(Context context, T dso) throws SQLException, AuthorizeException, IOException;
 
-
     /**
-     * Returns the Constants which this service supports
+     * Add a single metadata field. Whether it's appended or prepended depends on index parameter.
+     * Use <code>clearMetadata</code> to remove values.
      *
-     * @return a org.dspace.core.Constants that represents a DSpaceObjct type
+     * @param context    DSpace context
+     * @param dso        DSpaceObject
+     * @param schema     the schema for the metadata field. <em>Must</em> match
+     *                   the <code>name</code> of an existing metadata schema.
+     * @param element    the metadata element name
+     * @param qualifier  the metadata qualifier, or <code>null</code> for
+     *                   unqualified
+     * @param lang       the ISO639 language code, optionally followed by an underscore
+     *                   and the ISO3166 country code. <code>null</code> means the
+     *                   value has no language (for example, a date).
+     * @param value      the value to add.
+     * @param authority  the external authority key for this value (or null)
+     * @param confidence the authority confidence (default 0)
+     * @param index      the index at which this metadata is added (0: first place, -1 for last)
+     * @throws SQLException if database error
      */
-    public int getSupportsTypeConstant();
-
     void addAndShiftRightMetadata(Context context, T dso, String schema, String element, String qualifier, String lang,
                                   String value, String authority, int confidence, int index) throws SQLException;
 
@@ -376,4 +398,17 @@ public interface DSpaceObjectService<T extends DSpaceObject> {
 
     void moveMetadata(Context context, T dso, String schema, String element, String qualifier, int from, int to)
         throws SQLException;
+
+    /**
+     * Returns the Constants which this service supports
+     *
+     * @return a org.dspace.core.Constants that represents a IndexableObject type
+     */
+    public int getSupportsTypeConstant();
+
+    /**
+     * Trigger the modifiedMetadata variable in DSpaceObject
+     * @param dso   DSpaceObject whose metadata has been modified
+     */
+    public void setMetadataModified(T dso);
 }

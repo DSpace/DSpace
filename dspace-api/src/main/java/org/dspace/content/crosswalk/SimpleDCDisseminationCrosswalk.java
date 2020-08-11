@@ -17,7 +17,7 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
-import org.dspace.content.MetadataSchema;
+import org.dspace.content.MetadataSchemaEnum;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
@@ -101,7 +101,7 @@ public class SimpleDCDisseminationCrosswalk extends SelfNamedPlugin
 
         Item item = (Item) dso;
         List<MetadataValue> allDC = itemService
-            .getMetadata(item, MetadataSchema.DC_SCHEMA, Item.ANY, Item.ANY, Item.ANY);
+            .getMetadata(item, MetadataSchemaEnum.DC.getName(), Item.ANY, Item.ANY, Item.ANY);
 
         List<Element> dcl = new ArrayList<Element>(allDC.size());
 

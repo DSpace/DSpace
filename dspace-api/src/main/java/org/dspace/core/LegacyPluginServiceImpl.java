@@ -360,6 +360,11 @@ public class LegacyPluginServiceImpl implements PluginService {
         return null;
     }
 
+    @Override
+    public void clearNamedPluginClasses() {
+        namedPluginClasses.clear();
+    }
+
     /**
      * Returns whether a plugin exists which implements the specified interface
      * and has a specified name. If a matching plugin is found to be configured,

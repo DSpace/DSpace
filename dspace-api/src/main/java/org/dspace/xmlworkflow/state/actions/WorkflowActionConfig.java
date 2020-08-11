@@ -7,6 +7,8 @@
  */
 package org.dspace.xmlworkflow.state.actions;
 
+import java.util.List;
+
 import org.dspace.xmlworkflow.state.Step;
 
 /**
@@ -23,10 +25,6 @@ public class WorkflowActionConfig {
     private String id;
     private Step step;
     private boolean requiresUI;
-
-
-    private ActionInterface actionUI;
-
 
     public WorkflowActionConfig(String id) {
         this.id = id;
@@ -63,11 +61,12 @@ public class WorkflowActionConfig {
         return step;
     }
 
-    public ActionInterface getActionUI() {
-        return actionUI;
+    /**
+     * Returns a list of options the user has on this action, resulting in the next step of the workflow
+     * @return  A list of options of this action, resulting in the next step of the workflow
+     */
+    public List<String> getOptions() {
+        return this.processingAction.getOptions();
     }
 
-    public void setActionUI(ActionInterface actionUI) {
-        this.actionUI = actionUI;
-    }
 }

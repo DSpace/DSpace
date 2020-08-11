@@ -17,7 +17,7 @@ import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
-import org.dspace.content.MetadataSchema;
+import org.dspace.content.MetadataSchemaEnum;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.ConfigurationManager;
@@ -493,8 +493,8 @@ public class VersionedHandleIdentifierProviderWithCanonicalHandles extends Ident
         // identifiers which are not from type handle and add the new handle.
         String handleref = handleService.getCanonicalForm(handle);
         List<MetadataValue> identifiers = itemService
-            .getMetadata(item, MetadataSchema.DC_SCHEMA, "identifier", "uri", Item.ANY);
-        itemService.clearMetadata(context, item, MetadataSchema.DC_SCHEMA, "identifier", "uri", Item.ANY);
+            .getMetadata(item, MetadataSchemaEnum.DC.getName(), "identifier", "uri", Item.ANY);
+        itemService.clearMetadata(context, item, MetadataSchemaEnum.DC.getName(), "identifier", "uri", Item.ANY);
         for (MetadataValue identifier : identifiers) {
             if (this.supports(identifier.getValue())) {
                 // ignore handles
@@ -509,7 +509,8 @@ public class VersionedHandleIdentifierProviderWithCanonicalHandles extends Ident
                                     identifier.getConfidence());
         }
         if (!StringUtils.isEmpty(handleref)) {
-            itemService.addMetadata(context, item, MetadataSchema.DC_SCHEMA, "identifier", "uri", null, handleref);
+            itemService.addMetadata(context, item, MetadataSchemaEnum.DC.getName(),
+                                    "identifier", "uri", null, handleref);
         }
         itemService.update(context, item);
     }

@@ -9,12 +9,14 @@ package org.dspace.xmlworkflow.state.actions.processingaction;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import org.dspace.app.util.Util;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DCDate;
-import org.dspace.content.MetadataSchema;
+import org.dspace.content.MetadataSchemaEnum;
 import org.dspace.core.Context;
 import org.dspace.xmlworkflow.factory.XmlWorkflowServiceFactory;
 import org.dspace.xmlworkflow.state.Step;
@@ -39,6 +41,10 @@ public class SingleUserReviewAction extends ProcessingAction {
 
     public static final int OUTCOME_REJECT = 1;
 
+    protected static final String SUBMIT_APPROVE = "submit_approve";
+    protected static final String SUBMIT_REJECT = "submit_reject";
+    protected static final String SUBMIT_DECLINE_TASK = "submit_decline_task";
+
     @Override
     public void activate(Context c, XmlWorkflowItem wfItem) {
 
@@ -61,14 +67,23 @@ public class SingleUserReviewAction extends ProcessingAction {
         }
     }
 
+    @Override
+    public List<String> getOptions() {
+        List<String> options = new ArrayList<>();
+        options.add(SUBMIT_APPROVE);
+        options.add(SUBMIT_REJECT);
+        options.add(SUBMIT_DECLINE_TASK);
+        return options;
+    }
+
     public ActionResult processMainPage(Context c, XmlWorkflowItem wfi, Step step, HttpServletRequest request)
         throws SQLException, AuthorizeException {
-        if (request.getParameter("submit_approve") != null) {
+        if (request.getParameter(SUBMIT_APPROVE) != null) {
             //Delete the tasks
             addApprovedProvenance(c, wfi);
 
             return new ActionResult(ActionResult.TYPE.TYPE_OUTCOME, ActionResult.OUTCOME_COMPLETE);
-        } else if (request.getParameter("submit_reject") != null) {
+        } else if (request.getParameter(SUBMIT_REJECT) != null) {
             // Make sure we indicate which page we want to process
             if (wfi.getSubmitter() == null) {
                 request.setAttribute("page", SUBMITTER_IS_DELETED_PAGE);
@@ -77,7 +92,7 @@ public class SingleUserReviewAction extends ProcessingAction {
             }
             // We have pressed reject item, so take the user to a page where he can reject
             return new ActionResult(ActionResult.TYPE.TYPE_PAGE);
-        } else if (request.getParameter("submit_decline_task") != null) {
+        } else if (request.getParameter(SUBMIT_DECLINE_TASK) != null) {
             return new ActionResult(ActionResult.TYPE.TYPE_OUTCOME, OUTCOME_REJECT);
 
         } else {
@@ -98,7 +113,7 @@ public class SingleUserReviewAction extends ProcessingAction {
             + usersName + " on " + now + " (GMT) ";
 
         // Add to item as a DC field
-        itemService.addMetadata(c, wfi.getItem(), MetadataSchema.DC_SCHEMA, "description", "provenance", "en",
+        itemService.addMetadata(c, wfi.getItem(), MetadataSchemaEnum.DC.getName(), "description", "provenance", "en",
                                 provDescription);
         itemService.update(c, wfi.getItem());
     }

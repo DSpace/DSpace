@@ -13,6 +13,7 @@ import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
+import javax.annotation.Nullable;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -205,7 +206,7 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
     @Override
     public void setUserFormatDescription(Context context, Bitstream bitstream, String desc) throws SQLException {
         setFormat(context, bitstream, null);
-        setMetadataSingleValue(context, bitstream, MetadataSchema.DC_SCHEMA, "format", null, null, desc);
+        setMetadataSingleValue(context, bitstream, MetadataSchemaEnum.DC.getName(), "format", null, null, desc);
     }
 
     @Override
@@ -235,7 +236,7 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
         }
 
         // Remove user type description
-        clearMetadata(context, bitstream, MetadataSchema.DC_SCHEMA, "format", null, Item.ANY);
+        clearMetadata(context, bitstream, MetadataSchemaEnum.DC.getName(), "format", null, Item.ANY);
 
         // Update the ID in the table row
         bitstream.setFormat(bitstreamFormat);
@@ -462,7 +463,9 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
         return bitstreamDAO.getNotReferencedBitstreams(context);
     }
 
-    public Long getLastModified(Bitstream bitstream) {
+    @Nullable
+    @Override
+    public Long getLastModified(Bitstream bitstream) throws IOException {
         return bitstreamStorageService.getLastModified(bitstream);
     }
 }

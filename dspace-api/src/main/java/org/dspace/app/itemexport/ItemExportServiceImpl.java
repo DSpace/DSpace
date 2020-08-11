@@ -42,7 +42,7 @@ import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
-import org.dspace.content.MetadataSchema;
+import org.dspace.content.MetadataSchemaEnum;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.CommunityService;
@@ -214,7 +214,7 @@ public class ItemExportServiceImpl implements ItemExportService {
     protected void writeMetadata(Context c, String schema, Item i,
                                  File destDir, boolean migrate) throws Exception {
         String filename;
-        if (schema.equals(MetadataSchema.DC_SCHEMA)) {
+        if (schema.equals(MetadataSchemaEnum.DC.getName())) {
             filename = "dublin_core.xml";
         } else {
             filename = "metadata_" + schema + ".xml";
@@ -929,7 +929,7 @@ public class ItemExportServiceImpl implements ItemExportService {
             Locale supportedLocale = I18nUtil.getEPersonLocale(eperson);
             Email email = Email.getEmail(I18nUtil.getEmailFilename(supportedLocale, "export_success"));
             email.addRecipient(eperson.getEmail());
-            email.addArgument(ConfigurationManager.getProperty("dspace.url") + "/exportdownload/" + fileName);
+            email.addArgument(ConfigurationManager.getProperty("dspace.ui.url") + "/exportdownload/" + fileName);
             email.addArgument(ConfigurationManager.getProperty("org.dspace.app.itemexport.life.span.hours"));
 
             email.send();
@@ -947,7 +947,7 @@ public class ItemExportServiceImpl implements ItemExportService {
             Email email = Email.getEmail(I18nUtil.getEmailFilename(supportedLocale, "export_error"));
             email.addRecipient(eperson.getEmail());
             email.addArgument(error);
-            email.addArgument(ConfigurationManager.getProperty("dspace.url") + "/feedback");
+            email.addArgument(ConfigurationManager.getProperty("dspace.ui.url") + "/feedback");
 
             email.send();
         } catch (Exception e) {

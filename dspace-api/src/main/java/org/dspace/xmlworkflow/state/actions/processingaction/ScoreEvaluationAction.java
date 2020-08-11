@@ -9,15 +9,15 @@ package org.dspace.xmlworkflow.state.actions.processingaction;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Item;
-import org.dspace.content.MetadataSchema;
+import org.dspace.content.MetadataSchemaEnum;
 import org.dspace.content.MetadataValue;
 import org.dspace.core.Context;
-import org.dspace.workflow.WorkflowException;
 import org.dspace.xmlworkflow.factory.XmlWorkflowServiceFactory;
 import org.dspace.xmlworkflow.service.WorkflowRequirementsService;
 import org.dspace.xmlworkflow.state.Step;
@@ -40,14 +40,13 @@ public class ScoreEvaluationAction extends ProcessingAction {
     private int minimumAcceptanceScore;
 
     @Override
-    public void activate(Context c, XmlWorkflowItem wf)
-        throws SQLException, IOException, AuthorizeException, WorkflowException {
+    public void activate(Context c, XmlWorkflowItem wf) {
 
     }
 
     @Override
     public ActionResult execute(Context c, XmlWorkflowItem wfi, Step step, HttpServletRequest request)
-        throws SQLException, AuthorizeException, IOException, WorkflowException {
+        throws SQLException, AuthorizeException, IOException {
         boolean hasPassed = false;
         //Retrieve all our scores from the metadata & add em up
         List<MetadataValue> scores = itemService
@@ -66,8 +65,8 @@ public class ScoreEvaluationAction extends ProcessingAction {
 
             String provDescription = getProvenanceStartId() + " Approved for entry into archive with a score of: " +
                 scoreMean;
-            itemService.addMetadata(c, wfi.getItem(), MetadataSchema.DC_SCHEMA, "description", "provenance", "en",
-                                    provDescription);
+            itemService.addMetadata(c, wfi.getItem(), MetadataSchemaEnum.DC.getName(),
+                                    "description", "provenance", "en", provDescription);
             itemService.update(c, wfi.getItem());
         }
         if (hasPassed) {
@@ -80,6 +79,11 @@ public class ScoreEvaluationAction extends ProcessingAction {
                                                                      "The item was reject due to a bad review score.");
             return new ActionResult(ActionResult.TYPE.TYPE_SUBMISSION_PAGE);
         }
+    }
+
+    @Override
+    public List<String> getOptions() {
+        return new ArrayList<>();
     }
 
     public int getMinimumAcceptanceScore() {

@@ -15,7 +15,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.collections4.ListUtils;
-import org.dspace.content.DSpaceObject;
 import org.dspace.discovery.configuration.DiscoveryConfigurationParameters;
 import org.dspace.discovery.configuration.DiscoverySearchFilterFacet;
 
@@ -28,32 +27,31 @@ public class DiscoverResult {
 
     private long totalSearchResults;
     private int start;
-    private List<DSpaceObject> dspaceObjects;
+    private List<IndexableObject> indexableObjects;
     private Map<String, List<FacetResult>> facetResults;
+
     /**
-     * A map that contains all the documents sougth after, the key is a string representation of the DSpace object
+     * A map that contains all the documents sougth after, the key is a string representation of the Indexable Object
      */
     private Map<String, List<SearchDocument>> searchDocuments;
     private int maxResults = -1;
     private int searchTime;
-    private Map<String, DSpaceObjectHighlightResult> highlightedResults;
+    private Map<String, IndexableObjectHighlightResult> highlightedResults;
     private String spellCheckQuery;
 
-
     public DiscoverResult() {
-        dspaceObjects = new ArrayList<DSpaceObject>();
+        indexableObjects = new ArrayList<IndexableObject>();
         facetResults = new LinkedHashMap<String, List<FacetResult>>();
         searchDocuments = new LinkedHashMap<String, List<SearchDocument>>();
-        highlightedResults = new HashMap<String, DSpaceObjectHighlightResult>();
+        highlightedResults = new HashMap<String, IndexableObjectHighlightResult>();
     }
 
-
-    public void addDSpaceObject(DSpaceObject dso) {
-        this.dspaceObjects.add(dso);
+    public void addIndexableObject(IndexableObject idxObj) {
+        this.indexableObjects.add(idxObj);
     }
 
-    public List<DSpaceObject> getDspaceObjects() {
-        return dspaceObjects;
+    public List<IndexableObject> getIndexableObjects() {
+        return indexableObjects;
     }
 
     public long getTotalSearchResults() {
@@ -107,19 +105,19 @@ public class DiscoverResult {
 
     public List<FacetResult> getFacetResult(DiscoverySearchFilterFacet field) {
         List<DiscoverResult.FacetResult> facetValues = getFacetResult(field.getIndexFieldName());
-        //Check if we are dealing with a date, sometimes the facet values arrive as dates !
+        // Check if we are dealing with a date, sometimes the facet values arrive as dates !
         if (facetValues.size() == 0 && field.getType().equals(DiscoveryConfigurationParameters.TYPE_DATE)) {
             facetValues = getFacetResult(field.getIndexFieldName() + ".year");
         }
         return ListUtils.emptyIfNull(facetValues);
     }
 
-    public DSpaceObjectHighlightResult getHighlightedResults(DSpaceObject dso) {
-        return highlightedResults.get(dso.getHandle());
+    public IndexableObjectHighlightResult getHighlightedResults(IndexableObject dso) {
+        return highlightedResults.get(dso.getUniqueIndexID());
     }
 
-    public void addHighlightedResult(DSpaceObject dso, DSpaceObjectHighlightResult highlightedResult) {
-        this.highlightedResults.put(dso.getHandle(), highlightedResult);
+    public void addHighlightedResult(IndexableObject dso, IndexableObjectHighlightResult highlightedResult) {
+        this.highlightedResults.put(dso.getUniqueIndexID(), highlightedResult);
     }
 
     public static final class FacetResult {
@@ -131,7 +129,7 @@ public class DiscoverResult {
         private String fieldType;
 
         public FacetResult(String asFilterQuery, String displayedValue, String authorityKey, String sortValue,
-                           long count, String fieldType) {
+                long count, String fieldType) {
             this.asFilterQuery = asFilterQuery;
             this.displayedValue = displayedValue;
             this.authorityKey = authorityKey;
@@ -141,6 +139,10 @@ public class DiscoverResult {
         }
 
         public String getAsFilterQuery() {
+            if (asFilterQuery == null) {
+                // missing facet filter query
+                return "[* TO *]";
+            }
             return asFilterQuery;
         }
 
@@ -161,7 +163,7 @@ public class DiscoverResult {
         }
 
         public String getFilterType() {
-            return authorityKey != null ? "authority" : "equals";
+            return authorityKey != null ? "authority" : asFilterQuery != null ? "equals" : "notequals";
         }
 
         public String getFieldType() {
@@ -177,30 +179,51 @@ public class DiscoverResult {
         this.spellCheckQuery = spellCheckQuery;
     }
 
-    public static final class DSpaceObjectHighlightResult {
-        private DSpaceObject dso;
+    /**
+     * An utility class to represent the highlighting section of a Discovery Search
+     *
+     */
+    public static final class IndexableObjectHighlightResult {
+        private IndexableObject indexableObject;
         private Map<String, List<String>> highlightResults;
 
-        public DSpaceObjectHighlightResult(DSpaceObject dso, Map<String, List<String>> highlightResults) {
-            this.dso = dso;
+        public IndexableObjectHighlightResult(IndexableObject idxObj, Map<String, List<String>> highlightResults) {
+            this.indexableObject = idxObj;
             this.highlightResults = highlightResults;
         }
 
-        public DSpaceObject getDso() {
-            return dso;
+        /**
+         * Return the indexable object that the highlighting snippets refer to
+         * 
+         * @return the indexable object
+         */
+        public IndexableObject getIndexableObject() {
+            return indexableObject;
         }
 
+        /**
+         * The matching snippets for a specific metadata ignoring any authority value
+         * 
+         * @param metadataKey
+         *            the metadata where the snippets have been found
+         * @return the matching snippets
+         */
         public List<String> getHighlightResults(String metadataKey) {
             return highlightResults.get(metadataKey);
         }
 
+        /**
+         * All the matching snippets in whatever metadata ignoring any authority value
+         * 
+         * @return All the matching snippets
+         */
         public Map<String, List<String>> getHighlightResults() {
             return highlightResults;
         }
     }
 
-    public void addSearchDocument(DSpaceObject dso, SearchDocument searchDocument) {
-        String dsoString = SearchDocument.getDspaceObjectStringRepresentation(dso);
+    public void addSearchDocument(IndexableObject dso, SearchDocument searchDocument) {
+        String dsoString = SearchDocument.getIndexableObjectStringRepresentation(dso);
         List<SearchDocument> docs = searchDocuments.get(dsoString);
         if (docs == null) {
             docs = new ArrayList<SearchDocument>();
@@ -212,14 +235,15 @@ public class DiscoverResult {
     /**
      * Returns all the sought after search document values
      *
-     * @param dso the dspace object we want our search documents for
+     * @param idxObj
+     *            the indexable object we want our search documents for
      * @return the search documents list
      */
-    public List<SearchDocument> getSearchDocument(DSpaceObject dso) {
-        String dsoString = SearchDocument.getDspaceObjectStringRepresentation(dso);
+    public List<SearchDocument> getSearchDocument(IndexableObject idxObj) {
+        String dsoString = SearchDocument.getIndexableObjectStringRepresentation(idxObj);
         List<SearchDocument> result = searchDocuments.get(dsoString);
         if (result == null) {
-            return new ArrayList<SearchDocument>();
+            return new ArrayList<>();
         } else {
             return result;
         }
@@ -256,8 +280,8 @@ public class DiscoverResult {
             }
         }
 
-        public static String getDspaceObjectStringRepresentation(DSpaceObject dso) {
-            return dso.getType() + ":" + dso.getID();
+        public static String getIndexableObjectStringRepresentation(IndexableObject idxObj) {
+            return idxObj.getType() + ":" + idxObj.getID();
         }
     }
 }

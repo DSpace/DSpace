@@ -1,0 +1,69 @@
+version: '3.7'
+networks:
+  dspacenet:
+services:
+  dspace:
+    container_name: dspace
+    image: "${DOCKER_OWNER:-dspace}/dspace:${DSPACE_VER:-dspace-7_x-test}"
+    build:
+      context: .
+      dockerfile: Dockerfile.test
+    depends_on:
+    - dspacedb
+    networks:
+      dspacenet:
+    ports:
+    - published: 8080
+      target: 8080
+    stdin_open: true
+    tty: true
+    volumes:
+    - assetstore:/dspace/assetstore
+    - ./dspace/src/main/docker-compose/local.cfg:/dspace/config/local.cfg
+    # Ensure that the database is ready BEFORE starting tomcat
+    # 1. While a TCP connection to dspacedb port 5432 is not available, continue to sleep
+    # 2. Then, run database migration to init database tables
+    # 3. Finally, start Tomcat
+    entrypoint:
+    - /bin/bash
+    - '-c'
+    - |
+      while (!</dev/tcp/dspacedb/5432) > /dev/null 2>&1; do sleep 1; done;
+      /dspace/bin/dspace database migrate
+      catalina.sh run
+  dspacedb:
+    container_name: dspacedb
+    environment:
+      PGDATA: /pgdata
+    image: dspace/dspace-postgres-pgcrypto
+    networks:
+      dspacenet:
+    ports:
+    - published: 5432
+      target: 5432
+    stdin_open: true
+    tty: true
+    volumes:
+    - pgdata:/pgdata
+  dspacesolr:
+    container_name: dspacesolr
+    image: dspace/dspace-solr
+    networks:
+      dspacenet:
+    ports:
+    - published: 8983
+      target: 8983
+    stdin_open: true
+    tty: true
+    volumes:
+    - solr_authority:/opt/solr/server/solr/authority/data
+    - solr_oai:/opt/solr/server/solr/oai/data
+    - solr_search:/opt/solr/server/solr/search/data
+    - solr_statistics:/opt/solr/server/solr/statistics/data
+volumes:
+  assetstore:
+  pgdata:
+  solr_authority:
+  solr_oai:
+  solr_search:
+  solr_statistics:

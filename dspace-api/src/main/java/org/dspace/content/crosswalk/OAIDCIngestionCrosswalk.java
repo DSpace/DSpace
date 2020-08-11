@@ -15,7 +15,7 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
-import org.dspace.content.MetadataSchema;
+import org.dspace.content.MetadataSchemaEnum;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
@@ -67,7 +67,8 @@ public class OAIDCIngestionCrosswalk
                 lang = element.getAttributeValue("lang");
             }
             MetadataField metadataField = metadataValidator
-                .checkMetadata(context, MetadataSchema.DC_SCHEMA, element.getName(), null, createMissingMetadataFields);
+                .checkMetadata(context, MetadataSchemaEnum.DC.getName(),
+                               element.getName(), null, createMissingMetadataFields);
             itemService.addMetadata(context, item, metadataField, lang, element.getText());
         }
 

@@ -45,8 +45,20 @@ public class MetadataValueDAOImpl extends AbstractHibernateDAO<MetadataValue> im
         criteriaQuery.select(metadataValueRoot);
         criteriaQuery.where(criteriaBuilder.equal(join.get(MetadataField_.id), metadataField.getID()));
 
-
         return list(context, criteriaQuery, false, MetadataValue.class, -1, -1);
+    }
+
+    @Override
+    public Iterator<MetadataValue> findItemValuesByFieldAndValue(Context context,
+                                                                 MetadataField metadataField, String value)
+            throws SQLException {
+        String queryString = "SELECT m from MetadataValue m " +
+                "join Item i on m.dSpaceObject = i.id where m.metadataField.id = :metadata_field_id " +
+                "and m.value = :text_value";
+        Query query = createQuery(context, queryString);
+        query.setParameter("metadata_field_id", metadataField.getID());
+        query.setParameter("text_value", value);
+        return iterate(query);
     }
 
     @Override

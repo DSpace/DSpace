@@ -7,6 +7,7 @@
  */
 package org.dspace.statistics.content;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.sql.SQLException;
 import java.text.ParseException;
@@ -117,7 +118,7 @@ public class StatisticsDataVisits extends StatisticsData {
 
     @Override
     public Dataset createDataset(Context context) throws SQLException,
-        SolrServerException, ParseException {
+        SolrServerException, ParseException, IOException {
         // Check if we already have one.
         // If we do then give it back.
         if (getDataset() != null) {
@@ -127,7 +128,7 @@ public class StatisticsDataVisits extends StatisticsData {
         ///////////////////////////
         // 1. DETERMINE OUR AXIS //
         ///////////////////////////
-        ArrayList<DatasetQuery> datasetQueries = new ArrayList<DatasetQuery>();
+        ArrayList<DatasetQuery> datasetQueries = new ArrayList<>();
         for (int i = 0; i < getDatasetGenerators().size(); i++) {
             DatasetGenerator dataSet = getDatasetGenerators().get(i);
             processAxis(context, dataSet, datasetQueries);
@@ -353,13 +354,13 @@ public class StatisticsDataVisits extends StatisticsData {
                     /*
                     for (int j = 0; j < topCounts2.length; j++) {
                         ObjectCount count2 = topCounts2[j];
-                        String query = firsDataset.getFacetField() + ":" + count1.getValue();
+                        String query = firsDataset.getFacetField() + ":" + count1.getValues();
                         // Check if we also have a type present (if so this should be put into the query
                         if ("id".equals(firsDataset.getFacetField()) && firsDataset.getQueries().get(0).getDsoType()
                         != -1)
                             query += " AND type:" + firsDataset.getQueries().get(0).getDsoType();
 
-                        query += " AND " + secondDataSet.getFacetField() + ":" + count2.getValue();
+                        query += " AND " + secondDataSet.getFacetField() + ":" + count2.getValues();
                         // Check if we also have a type present (if so this should be put into the query
                         if ("id".equals(secondDataSet.getFacetField()) && secondDataSet.getQueries().get(0)
                         .getDsoType() != -1)
@@ -371,8 +372,8 @@ public class StatisticsDataVisits extends StatisticsData {
                         // No need to add this many times
                         // TODO: dit vervangen door te displayen value
                         if (i == 0) {
-                            dataset.setRowLabel(j, getResultName(count2.getValue(), secondDataSet, context));
-                            dataset.setRowLabelAttr(j, getAttributes(count2.getValue(), secondDataSet, context));
+                            dataset.setRowLabel(j, getResultName(count2.getValues(), secondDataSet, context));
+                            dataset.setRowLabelAttr(j, getAttributes(count2.getValues(), secondDataSet, context));
 
                         }
 
@@ -649,7 +650,7 @@ public class StatisticsDataVisits extends StatisticsData {
                     }
 
 
-                    String url = ConfigurationManager.getProperty("dspace.url") + "/bitstream/" + identifier + "/";
+                    String url = ConfigurationManager.getProperty("dspace.ui.url") + "/bitstream/" + identifier + "/";
 
                     // If we can put the pretty name of the bitstream on the end of the URL
                     try {
@@ -703,7 +704,8 @@ public class StatisticsDataVisits extends StatisticsData {
 
 
     protected ObjectCount[] queryFacetField(DatasetQuery dataset, String query,
-                                            String filterQuery) throws SolrServerException {
+                                            String filterQuery)
+            throws SolrServerException, IOException {
         String facetType = dataset.getFacetField() == null ? "id" : dataset
             .getFacetField();
         return solrLoggerService.queryFacetField(query, filterQuery, facetType,

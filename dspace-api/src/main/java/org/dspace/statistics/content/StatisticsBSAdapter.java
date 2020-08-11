@@ -7,6 +7,7 @@
  */
 package org.dspace.statistics.content;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -48,7 +49,7 @@ public class StatisticsBSAdapter {
     public StatisticsBSAdapter() {
         displayItemViews = false;
         displayBitstreamViews = false;
-        filters = new ArrayList<StatisticsFilter>();
+        filters = new ArrayList<>();
         solrLoggerService = StatisticsServiceFactory.getInstance().getSolrLoggerService();
     }
 
@@ -60,8 +61,10 @@ public class StatisticsBSAdapter {
      * @param item      the item from which we need our visits
      * @return the number of visits
      * @throws SolrServerException Exception from the Solr server to the solrj Java client.
+     * @throws java.io.IOException passed through.
      */
-    public long getNumberOfVisits(int visitType, Item item) throws SolrServerException {
+    public long getNumberOfVisits(int visitType, Item item)
+            throws SolrServerException, IOException {
         switch (visitType) {
             case ITEM_VISITS:
                 return solrLoggerService

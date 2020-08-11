@@ -47,6 +47,11 @@ public class ClaimedTaskServiceImpl implements ClaimedTaskService {
     }
 
     @Override
+    public List<ClaimedTask> findAll(Context context) throws SQLException {
+        return claimedTaskDAO.findAll(context, ClaimedTask.class);
+    }
+
+    @Override
     public void update(Context context, ClaimedTask claimedTask) throws SQLException, AuthorizeException {
         update(context, Collections.singletonList(claimedTask));
     }

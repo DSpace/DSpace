@@ -9,6 +9,7 @@ package org.dspace.xoai.services.impl.xoai;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -22,11 +23,14 @@ import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.core.Context;
+import org.dspace.core.Utils;
 import org.dspace.xoai.exceptions.InvalidMetadataFieldException;
 import org.dspace.xoai.services.api.EarliestDateResolver;
 import org.dspace.xoai.services.api.config.ConfigurationService;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import org.springframework.web.util.UriComponentsBuilder;
 
 /**
  * @author Lyncode Development Team (dspace at lyncode dot com)
@@ -68,17 +72,27 @@ public class DSpaceRepositoryConfiguration implements RepositoryConfiguration {
     public String getBaseUrl() {
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes())
             .getRequest();
+
+        // Parse the current OAI "context" path out of the last HTTP request.
+        // (e.g. for "http://mydspace.edu/oai/request", the oaiContextPath is "request")
+        UriComponentsBuilder builder = ServletUriComponentsBuilder.fromRequest(request);
+        List<String> pathSegments = builder.buildAndExpand().getPathSegments();
+        String oaiContextPath = pathSegments.get(pathSegments.size() - 1);
+
         if (baseUrl == null) {
             baseUrl = configurationService.getProperty("oai.url");
             if (baseUrl == null) {
                 log.warn(
                     "{ OAI 2.0 :: DSpace } Not able to retrieve the oai.url property from oai.cfg. Falling back to " +
                         "request address");
+                // initialize baseUrl to a fallback "oai.url" which is the current request with OAI context removed.
                 baseUrl = request.getRequestURL().toString()
-                                 .replace(request.getPathInfo(), "");
+                                 .replace(oaiContextPath, "");
             }
         }
-        return baseUrl + request.getPathInfo();
+
+        // BaseURL is the path of OAI with the current OAI context appended
+        return baseUrl + "/" + oaiContextPath;
     }
 
     @Override
@@ -120,13 +134,13 @@ public class DSpaceRepositoryConfiguration implements RepositoryConfiguration {
     @Override
     public List<String> getDescription() {
         List<String> result = new ArrayList<String>();
-        String descriptionFile = configurationService.getProperty("oai", "description.file");
+        String descriptionFile = configurationService.getProperty("oai.description.file");
         if (descriptionFile == null) {
             // Try indexed
             boolean stop = false;
             List<String> descriptionFiles = new ArrayList<String>();
             for (int i = 0; !stop; i++) {
-                String tmp = configurationService.getProperty("oai", "description.file." + i);
+                String tmp = configurationService.getProperty("oai.description.file." + i);
                 if (tmp == null) {
                     stop = true;
                 } else {
@@ -138,7 +152,10 @@ public class DSpaceRepositoryConfiguration implements RepositoryConfiguration {
                 try {
                     File f = new File(path);
                     if (f.exists()) {
-                        result.add(FileUtils.readFileToString(f));
+                        String fileAsString = FileUtils.readFileToString(f, StandardCharsets.UTF_8);
+                        // replace any configuration placeholders (e.g. ${variable}) in string
+                        fileAsString = Utils.interpolateConfigsInString(fileAsString);
+                        result.add(fileAsString);
                     }
                 } catch (IOException e) {
                     log.debug(e.getMessage(), e);
@@ -149,7 +166,10 @@ public class DSpaceRepositoryConfiguration implements RepositoryConfiguration {
             try {
                 File f = new File(descriptionFile);
                 if (f.exists()) {
-                    result.add(FileUtils.readFileToString(f));
+                    String fileAsString = FileUtils.readFileToString(f, StandardCharsets.UTF_8);
+                    // replace any configuration placeholders (e.g. ${variable}) in string
+                    fileAsString = Utils.interpolateConfigsInString(fileAsString);
+                    result.add(fileAsString);
                 }
             } catch (IOException e) {
                 log.debug(e.getMessage(), e);

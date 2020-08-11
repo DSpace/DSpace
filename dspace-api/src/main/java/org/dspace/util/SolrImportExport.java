@@ -31,7 +31,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.impl.HttpSolrServer;
+import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.client.solrj.request.AbstractUpdateRequest;
 import org.apache.solr.client.solrj.request.ContentStreamUpdateRequest;
 import org.apache.solr.client.solrj.request.CoreAdminRequest;
@@ -275,7 +275,7 @@ public class SolrImportExport {
         }
 
         try {
-            HttpSolrServer adminSolr = new HttpSolrServer(baseSolrUrl);
+            HttpSolrClient adminSolr = new HttpSolrClient.Builder(baseSolrUrl).build();
 
             // try to find out size of core and compare with free space in export directory
             CoreAdminResponse status = CoreAdminRequest.getStatus(indexName, adminSolr);
@@ -342,7 +342,7 @@ public class SolrImportExport {
             }
 
             // commit changes
-            HttpSolrServer origSolr = new HttpSolrServer(origSolrUrl);
+            HttpSolrClient origSolr = new HttpSolrClient.Builder(origSolrUrl).build();
             origSolr.commit();
 
             // swap back (statistics now going to actual core name in actual data dir)
@@ -424,7 +424,7 @@ public class SolrImportExport {
                                                     + indexName);
         }
 
-        HttpSolrServer solr = new HttpSolrServer(solrUrl);
+        HttpSolrClient solr = new HttpSolrClient.Builder(solrUrl).build();
 
         // must get multivalue fields before clearing
         List<String> multivaluedFields = getMultiValuedFields(solr);
@@ -471,7 +471,7 @@ public class SolrImportExport {
      * @param solr the solr server to query.
      * @return A list containing all multi-valued fields, or an empty list if none are found / there aren't any.
      */
-    private static List<String> getMultiValuedFields(HttpSolrServer solr) {
+    private static List<String> getMultiValuedFields(HttpSolrClient solr) {
         List<String> result = new ArrayList<>();
         try {
             LukeRequest request = new LukeRequest();
@@ -497,7 +497,7 @@ public class SolrImportExport {
      * @throws SolrServerException if there is a problem in communicating with Solr.
      */
     public static void clearIndex(String solrUrl) throws IOException, SolrServerException {
-        HttpSolrServer solr = new HttpSolrServer(solrUrl);
+        HttpSolrClient solr = new HttpSolrClient.Builder(solrUrl).build();
         solr.deleteByQuery("*:*");
         solr.commit();
         solr.optimize();
@@ -536,7 +536,7 @@ public class SolrImportExport {
                                                     + indexName);
         }
 
-        HttpSolrServer solr = new HttpSolrServer(solrUrl);
+        HttpSolrClient solr = new HttpSolrClient.Builder(solrUrl).build();
 
         SolrQuery query = new SolrQuery("*:*");
         if (StringUtils.isNotBlank(fromWhen)) {

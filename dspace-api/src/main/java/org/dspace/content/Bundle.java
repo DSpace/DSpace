@@ -88,7 +88,7 @@ public class Bundle extends DSpaceObject implements DSpaceObjectLegacySupport {
      */
     @Override
     public String getName() {
-        return getBundleService().getMetadataFirstValue(this, MetadataSchema.DC_SCHEMA, "title", null, Item.ANY);
+        return getBundleService().getMetadataFirstValue(this, MetadataSchemaEnum.DC.getName(), "title", null, Item.ANY);
     }
 
     /**
@@ -100,7 +100,8 @@ public class Bundle extends DSpaceObject implements DSpaceObjectLegacySupport {
      * @throws SQLException if database error
      */
     public void setName(Context context, String name) throws SQLException {
-        getBundleService().setMetadataSingleValue(context, this, MetadataSchema.DC_SCHEMA, "title", null, null, name);
+        getBundleService().setMetadataSingleValue(context, this, MetadataSchemaEnum.DC.getName(),
+                                                  "title", null, null, name);
     }
 
     /**

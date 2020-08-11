@@ -13,6 +13,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.math.BigInteger;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.rmi.dgc.VMID;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -30,7 +34,10 @@ import java.util.regex.Pattern;
 
 import com.coverity.security.Escape;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.text.StringSubstitutor;
 import org.apache.logging.log4j.Logger;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
  * Utility functions for DSpace.
@@ -407,5 +414,56 @@ public final class Utils {
         } else {
             return schema + separator + element + separator + qualifier;
         }
+    }
+
+    /**
+     * Retrieve the baseurl from a given URL string
+     * @param urlString URL string
+     * @return baseurl (without any context path) or null (if URL was invalid)
+     */
+    public static String getBaseUrl(String urlString) {
+        try {
+            URL url = new URL(urlString);
+            String baseUrl = url.getProtocol() + "://" + url.getHost();
+            if (url.getPort() != -1) {
+                baseUrl += (":" + url.getPort());
+            }
+            return baseUrl;
+        } catch (MalformedURLException e) {
+            return null;
+        }
+    }
+
+    /**
+     * Retrieve the hostname from a given URI string
+     * @param uriString URI string
+     * @return hostname (without any www.) or null (if URI was invalid)
+     */
+    public static String getHostName(String uriString) {
+        try {
+            URI uri = new URI(uriString);
+            String hostname = uri.getHost();
+            // remove the "www." from hostname, if it exists
+            if (hostname != null) {
+                return hostname.startsWith("www.") ? hostname.substring(4) : hostname;
+            }
+            return hostname;
+        } catch (URISyntaxException e) {
+            return null;
+        }
+    }
+
+    /**
+     * Replaces configuration placeholders within a String with the corresponding value
+     * from DSpace's Configuration Service.
+     * <P>
+     * For example, given a String like "My DSpace is installed at ${dspace.dir}", this
+     * method will replace "${dspace.dir}" with the configured value of that property.
+     * @param string source string
+     * @return string with any placeholders replaced with configured values.
+     */
+    public static String interpolateConfigsInString(String string) {
+        ConfigurationService config = DSpaceServicesFactory.getInstance().getConfigurationService();
+        return StringSubstitutor.replace(string, config.getProperties());
     }
 }

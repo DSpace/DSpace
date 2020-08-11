@@ -26,6 +26,7 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataSchema;
+import org.dspace.content.MetadataSchemaEnum;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
@@ -353,7 +354,7 @@ public class QDCCrosswalk extends SelfNamedPlugin
 
             // only complain about missing elements in the DC schema:
             if (elt == null) {
-                if (metadataField.getMetadataSchema().getName().equals(MetadataSchema.DC_SCHEMA)) {
+                if (metadataField.getMetadataSchema().getName().equals(MetadataSchemaEnum.DC.getName())) {
                     log.warn("WARNING: " + myName + ": No QDC mapping for \"" + qdc + "\"");
                 }
             } else {
