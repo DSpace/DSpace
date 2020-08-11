@@ -8,14 +8,22 @@
 package org.dspace.app.rest.layout;
 
 import static com.jayway.jsonpath.JsonPath.read;
+import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
+import javax.ws.rs.core.MediaType;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.dspace.app.rest.builder.CollectionBuilder;
@@ -25,8 +33,16 @@ import org.dspace.app.rest.builder.CrisLayoutFieldBuilder;
 import org.dspace.app.rest.builder.CrisLayoutTabBuilder;
 import org.dspace.app.rest.builder.EntityTypeBuilder;
 import org.dspace.app.rest.builder.ItemBuilder;
+import org.dspace.app.rest.builder.MetadataFieldBuilder;
+import org.dspace.app.rest.builder.MetadataSchemaBuilder;
 import org.dspace.app.rest.matcher.CrisLayoutBoxMatcher;
 import org.dspace.app.rest.model.CrisLayoutBoxRest;
+import org.dspace.app.rest.model.MetadataFieldRest;
+import org.dspace.app.rest.model.MetadataSchemaRest;
+import org.dspace.app.rest.model.patch.AddOperation;
+import org.dspace.app.rest.model.patch.Operation;
+import org.dspace.app.rest.model.patch.RemoveOperation;
+import org.dspace.app.rest.model.patch.ReplaceOperation;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
@@ -42,6 +58,7 @@ import org.dspace.layout.CrisLayoutField;
 import org.dspace.layout.CrisLayoutTab;
 import org.dspace.layout.LayoutSecurity;
 import org.hamcrest.Matchers;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -310,6 +327,157 @@ public class BoxesRestControllerIT extends AbstractControllerIntegrationTest {
             .andExpect(jsonPath("$.page.totalElements", Matchers.is(4)));
     }
 
+    public void addSecurityMetadataTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        // Create entity type Publication
+        EntityType eType = EntityTypeBuilder.createEntityTypeBuilder(context, "Publication").build();
+        // Create box
+        CrisLayoutBox box = CrisLayoutBoxBuilder.createBuilder(context, eType, true, 0, true)
+                                                   .withShortname("Box shortname")
+                                                   .build();
+        context.restoreAuthSystemState();
+
+        ObjectMapper mapper = new ObjectMapper();
+        MetadataSchemaRest schema = new MetadataSchemaRest();
+        schema.setNamespace("dc");
+        MetadataFieldRest isbn = new MetadataFieldRest();
+        isbn.setSchema(schema);
+        isbn.setElement("identifier");
+        isbn.setQualifier("isbn");
+        isbn.setScopeNote(" Is a numeric commercial identifier ");
+
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        getClient(tokenAdmin).perform(get("/api/layout/boxes/" + box.getID() + "/securitymetadata"))
+                             .andExpect(status().isOk())
+                             .andExpect(content().contentType(contentType))
+                             .andExpect(jsonPath("$._embedded.securitymetadata", Matchers.is(Matchers.empty())))
+                             .andExpect(jsonPath("$.page.totalElements", Matchers.is(0)));
+
+
+        getClient(tokenAdmin).perform(post("/api/layout/boxes/" + box.getID() + "/securitymetadata")
+                             .content(mapper.writeValueAsBytes(isbn))
+                             .contentType(contentType))
+                             .andExpect(status().isNoContent());
+
+        getClient(tokenAdmin).perform(get("/api/layout/boxes/" + box.getID() + "/securitymetadata"))
+                             .andExpect(status().isOk())
+                             .andExpect(content().contentType(contentType))
+                             .andExpect(jsonPath("$._embedded.securitymetadata", Matchers.not(Matchers.empty())))
+                             .andExpect(jsonPath("$.page.totalElements", Matchers.is(1)));
+    }
+
+    public void addSecurityMetadataUnauthorizedTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        // Create entity type Publication
+        EntityType eType = EntityTypeBuilder.createEntityTypeBuilder(context, "Publication").build();
+        // Create box
+        CrisLayoutBox box = CrisLayoutBoxBuilder.createBuilder(context, eType, true, 0, true)
+                            .withShortname("Box shortname")
+                            .build();
+        context.restoreAuthSystemState();
+
+        ObjectMapper mapper = new ObjectMapper();
+        MetadataFieldRest isbn = new MetadataFieldRest();
+        MetadataSchemaRest schema = new MetadataSchemaRest();
+        try {
+            schema.setNamespace("dc");
+            isbn.setSchema(schema);
+            isbn.setElement("identifier");
+            isbn.setQualifier("isbn");
+            isbn.setScopeNote(" Is a numeric commercial identifier ");
+
+            getClient().perform(post("/api/layout/boxes/" + box.getID() + "/securitymetadata")
+                       .content(mapper.writeValueAsBytes(isbn))
+                       .contentType(contentType))
+                       .andExpect(status().isUnauthorized());
+
+            String tokenAdmin = getAuthToken(admin.getEmail(), password);
+            getClient(tokenAdmin).perform(get("/api/layout/boxes/" + box.getID() + "/securitymetadata"))
+                                 .andExpect(status().isOk())
+                                 .andExpect(content().contentType(contentType))
+                                 .andExpect(jsonPath("$._embedded.securitymetadata", Matchers.is(Matchers.empty())))
+                                 .andExpect(jsonPath("$.page.totalElements", Matchers.is(0)));
+        } finally {
+            MetadataSchemaBuilder.deleteMetadataSchema(schema.getId());
+            MetadataFieldBuilder.deleteMetadataField(isbn.getId());
+        }
+    }
+
+    public void addSecurityMetadataForbiddenTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        // Create entity type Publication
+        EntityType eType = EntityTypeBuilder.createEntityTypeBuilder(context, "Publication").build();
+        // Create box
+        CrisLayoutBox box = CrisLayoutBoxBuilder.createBuilder(context, eType, true, 0, true)
+                            .withShortname("Box shortname")
+                            .build();
+        context.restoreAuthSystemState();
+
+        ObjectMapper mapper = new ObjectMapper();
+        MetadataFieldRest isbn = new MetadataFieldRest();
+        MetadataSchemaRest schema = new MetadataSchemaRest();
+        try {
+            schema.setNamespace("dc");
+            isbn.setSchema(schema);
+            isbn.setElement("identifier");
+            isbn.setQualifier("isbn");
+            isbn.setScopeNote(" Is a numeric commercial identifier ");
+
+            String tokenEperson = getAuthToken(eperson.getEmail(), password);
+            getClient(tokenEperson).perform(post("/api/layout/boxes/" + box.getID() + "/securitymetadata")
+                                   .content(mapper.writeValueAsBytes(isbn))
+                                   .contentType(contentType))
+                                   .andExpect(status().isForbidden());
+
+            String tokenAdmin = getAuthToken(admin.getEmail(), password);
+            getClient(tokenAdmin).perform(get("/api/layout/boxes/" + box.getID() + "/securitymetadata"))
+                                 .andExpect(status().isOk())
+                                 .andExpect(content().contentType(contentType))
+                                 .andExpect(jsonPath("$._embedded.securitymetadata", Matchers.is(Matchers.empty())))
+                                 .andExpect(jsonPath("$.page.totalElements", Matchers.is(0)));
+        } finally {
+            MetadataSchemaBuilder.deleteMetadataSchema(schema.getId());
+            MetadataFieldBuilder.deleteMetadataField(isbn.getId());
+        }
+    }
+
+    public void addSecurityMetadataNotFoundBoxTest() throws Exception {
+        ObjectMapper mapper = new ObjectMapper();
+        MetadataFieldRest isbn = new MetadataFieldRest();
+        MetadataSchemaRest schema = new MetadataSchemaRest();
+        try {
+            schema.setNamespace("dc");
+            isbn.setSchema(schema);
+            isbn.setElement("identifier");
+            isbn.setQualifier("isbn");
+            isbn.setScopeNote(" Is a numeric commercial identifier ");
+
+            String tokenAdmin = getAuthToken(admin.getEmail(), password);
+            getClient(tokenAdmin).perform(post("/api/layout/boxes/" + UUID.randomUUID() + "/securitymetadata")
+                                   .content(mapper.writeValueAsBytes(isbn))
+                                   .contentType(contentType))
+                                   .andExpect(status().isNotFound());
+        } finally {
+            MetadataSchemaBuilder.deleteMetadataSchema(schema.getId());
+            MetadataFieldBuilder.deleteMetadataField(isbn.getId());
+        }
+    }
+
+    public void addSecurityMetadataUnpTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        // Create entity type Publication
+        EntityType eType = EntityTypeBuilder.createEntityTypeBuilder(context, "Publication").build();
+        // Create box
+        CrisLayoutBox box = CrisLayoutBoxBuilder.createBuilder(context, eType, true, 0, true)
+                            .withShortname("Box shortname")
+                            .build();
+        context.restoreAuthSystemState();
+
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        getClient(tokenAdmin).perform(post("/api/layout/boxes/" + box.getID() + "/securitymetadata"))
+                             .andExpect(status().isUnprocessableEntity());
+    }
+
     /**
      * Test for endpoint /api/layout/boxes/<BOX_ID>/configuration.
      * It returns configuration entity with more information specific a metadata box
@@ -528,5 +696,239 @@ public class BoxesRestControllerIT extends AbstractControllerIntegrationTest {
         getClient(tokenAdmin).perform(
                 get("/api/layout/boxes/" + box.getID())
         ).andExpect(status().isNotFound());
+    }
+
+    @Test
+    @Ignore
+    public void patchBoxReplaceShortnameTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        // Create entity type Publication
+        EntityType eType = EntityTypeBuilder.createEntityTypeBuilder(context, "Publication").build();
+        // Create box
+        CrisLayoutBox box = CrisLayoutBoxBuilder.createBuilder(context, eType, true, 0, true)
+                            .withShortname("Box shortname")
+                            .build();
+        context.restoreAuthSystemState();
+
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        String newShortname = "New Shortname";
+        List<Operation> ops = new ArrayList<Operation>();
+        ReplaceOperation replaceOperation = new ReplaceOperation("/shortname", newShortname);
+        ops.add(replaceOperation);
+        String patchBody = getPatchContent(ops);
+
+        getClient(tokenAdmin).perform(patch("/api/layout/boxes/" + box.getID())
+                 .content(patchBody)
+                 .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                 .andExpect(status().isOk())
+                 .andExpect(content().contentType(contentType))
+                 .andExpect(jsonPath("$", Matchers.allOf(
+                         hasJsonPath("$.shortname", is(newShortname)),
+                         hasJsonPath("$.header", is(box.getHeader()))
+                         )));
+
+        getClient().perform(get("/api/layout/boxes/" + box.getID()))
+                   .andExpect(status().isOk())
+                   .andExpect(content().contentType(contentType))
+                   .andExpect(jsonPath("$", Matchers.allOf(
+                           hasJsonPath("$.shortname", is(newShortname)),
+                           hasJsonPath("$.header", is(box.getHeader()))
+                           )));
+    }
+
+    @Test
+    @Ignore
+    public void patchBoxRemoveShortnameTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        // Create entity type Publication
+        EntityType eType = EntityTypeBuilder.createEntityTypeBuilder(context, "Publication").build();
+        // Create box
+        CrisLayoutBox box = CrisLayoutBoxBuilder.createBuilder(context, eType, true, 0, true)
+                            .withShortname("Box shortname")
+                            .build();
+        context.restoreAuthSystemState();
+
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        List<Operation> ops = new ArrayList<Operation>();
+        RemoveOperation removeOperation = new RemoveOperation("/shortname");
+        ops.add(removeOperation);
+        String patchBody = getPatchContent(ops);
+
+        getClient(tokenAdmin).perform(patch("/api/layout/boxes/" + box.getID())
+                 .content(patchBody)
+                 .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                 .andExpect(status().isOk())
+                 .andExpect(content().contentType(contentType))
+                 .andExpect(jsonPath("$", Matchers.allOf(
+                         hasJsonPath("$.shortname", nullValue()),
+                         hasJsonPath("$.header", is(box.getHeader()))
+                         )));
+
+        getClient().perform(get("/api/layout/boxes/" + box.getID()))
+                   .andExpect(status().isOk())
+                   .andExpect(content().contentType(contentType))
+                   .andExpect(jsonPath("$", Matchers.allOf(
+                           hasJsonPath("$.shortname", nullValue()),
+                           hasJsonPath("$.header", is(box.getHeader()))
+                           )));
+    }
+
+    @Test
+    @Ignore
+    public void patchBoxReplaceShortnameWrongPathTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        // Create entity type Publication
+        EntityType eType = EntityTypeBuilder.createEntityTypeBuilder(context, "Publication").build();
+        // Create box
+        CrisLayoutBox box = CrisLayoutBoxBuilder.createBuilder(context, eType, true, 0, true)
+                            .withShortname("Box shortname")
+                            .build();
+        context.restoreAuthSystemState();
+
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        String newShortname = "New Shortname";
+        List<Operation> ops = new ArrayList<Operation>();
+        ReplaceOperation replaceOperation = new ReplaceOperation("/wrongPath", newShortname);
+        ops.add(replaceOperation);
+        String patchBody = getPatchContent(ops);
+
+        getClient(tokenAdmin).perform(patch("/api/layout/boxes/" + box.getID())
+                 .content(patchBody)
+                 .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                 .andExpect(status().isUnprocessableEntity());
+
+        getClient().perform(get("/api/layout/boxes/" + box.getID()))
+                   .andExpect(status().isOk())
+                   .andExpect(content().contentType(contentType))
+                   .andExpect(jsonPath("$", Matchers.allOf(
+                           hasJsonPath("$.shortname", is(box.getShortname())),
+                           hasJsonPath("$.header", is(box.getHeader()))
+                           )));
+    }
+
+    @Test
+    @Ignore
+    public void patchBoxReplaceShortnameNotFoundTest() throws Exception {
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        String newShortname = "New Shortname";
+        List<Operation> ops = new ArrayList<Operation>();
+        ReplaceOperation replaceOperation = new ReplaceOperation("/shortname", newShortname);
+        ops.add(replaceOperation);
+        String patchBody = getPatchContent(ops);
+
+        getClient(tokenAdmin).perform(patch("/api/layout/boxes/" + UUID.randomUUID())
+                             .content(patchBody)
+                             .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                             .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @Ignore
+    public void patchBoxAddShortnameTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        // Create entity type Publication
+        EntityType eType = EntityTypeBuilder.createEntityTypeBuilder(context, "Publication").build();
+        // Create box
+        CrisLayoutBox box = CrisLayoutBoxBuilder.createBuilder(context, eType, true, 0, true).build();
+        context.restoreAuthSystemState();
+
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        String shortname = "Tab Shortname";
+        List<Operation> ops = new ArrayList<Operation>();
+        AddOperation addOperation = new AddOperation("/shortname", shortname);
+        ops.add(addOperation);
+        String patchBody = getPatchContent(ops);;
+
+        getClient(tokenAdmin).perform(patch("/api/layout/boxes/" + box.getID())
+                 .content(patchBody)
+                 .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                 .andExpect(status().isOk())
+                 .andExpect(content().contentType(contentType))
+                 .andExpect(jsonPath("$", Matchers.allOf(
+                         hasJsonPath("$.shortname", is(shortname)),
+                         hasJsonPath("$.header", is(box.getHeader()))
+                         )));
+
+        getClient().perform(get("/api/layout/boxes/" + box.getID()))
+                   .andExpect(status().isOk())
+                   .andExpect(content().contentType(contentType))
+                   .andExpect(jsonPath("$", Matchers.allOf(
+                           hasJsonPath("$.shortname", is(shortname)),
+                           hasJsonPath("$.header", is(box.getHeader()))
+                           )));
+    }
+
+    @Test
+    @Ignore
+    public void patchBoxReplaceCollapsedTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        // Create entity type Publication
+        EntityType eType = EntityTypeBuilder.createEntityTypeBuilder(context, "Publication").build();
+        // Create box
+        CrisLayoutBox box = CrisLayoutBoxBuilder.createBuilder(context, eType, true, 0, true)
+                            .withShortname("Box shortname")
+                            .build();
+        context.restoreAuthSystemState();
+
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        boolean newCollapsed = false;
+        List<Operation> ops = new ArrayList<Operation>();
+        ReplaceOperation replaceOperation = new ReplaceOperation("/collapsed", newCollapsed);
+        ops.add(replaceOperation);
+        String patchBody = getPatchContent(ops);
+
+        getClient(tokenAdmin).perform(patch("/api/layout/boxes/" + box.getID())
+                 .content(patchBody)
+                 .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                 .andExpect(status().isOk())
+                 .andExpect(content().contentType(contentType))
+                 .andExpect(jsonPath("$", Matchers.allOf(
+                         hasJsonPath("$.shortname", is(box.getShortname())),
+                         hasJsonPath("$.collapsed", is(newCollapsed)),
+                         hasJsonPath("$.header", is(box.getHeader()))
+                         )));
+
+        getClient().perform(get("/api/layout/boxes/" + box.getID()))
+                   .andExpect(status().isOk())
+                   .andExpect(content().contentType(contentType))
+                   .andExpect(jsonPath("$", Matchers.allOf(
+                           hasJsonPath("$.shortname", is(box.getShortname())),
+                           hasJsonPath("$.collapsed", is(newCollapsed)),
+                           hasJsonPath("$.header", is(box.getHeader()))
+                           )));
+    }
+
+    @Test
+    @Ignore
+    public void patchBoxReplaceCollapsedUnprocessableEntityTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        // Create entity type Publication
+        EntityType eType = EntityTypeBuilder.createEntityTypeBuilder(context, "Publication").build();
+        // Create box
+        CrisLayoutBox box = CrisLayoutBoxBuilder.createBuilder(context, eType, true, 0, true)
+                            .withShortname("Box shortname")
+                            .build();
+        context.restoreAuthSystemState();
+
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        String newCollapsed = "wrongValue";
+        List<Operation> ops = new ArrayList<Operation>();
+        ReplaceOperation replaceOperation = new ReplaceOperation("/collapsed", newCollapsed);
+        ops.add(replaceOperation);
+        String patchBody = getPatchContent(ops);
+
+        getClient(tokenAdmin).perform(patch("/api/layout/boxes/" + box.getID())
+                 .content(patchBody)
+                 .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                 .andExpect(status().isUnprocessableEntity());
+
+        getClient().perform(get("/api/layout/boxes/" + box.getID()))
+                   .andExpect(status().isOk())
+                   .andExpect(content().contentType(contentType))
+                   .andExpect(jsonPath("$", Matchers.allOf(
+                           hasJsonPath("$.shortname", is(box.getShortname())),
+                           hasJsonPath("$.collapsed", is(box.getCollapsed())),
+                           hasJsonPath("$.header", is(box.getHeader()))
+                           )));
     }
 }
