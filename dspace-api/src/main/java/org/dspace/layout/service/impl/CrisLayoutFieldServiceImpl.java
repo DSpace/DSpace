@@ -84,7 +84,7 @@ public class CrisLayoutFieldServiceImpl implements CrisLayoutFieldService {
             throws SQLException {
         CrisLayoutField field = new CrisLayoutField();
         field.setRow(row);
-//        field.setPriority(priority);
+        field.setPriority(priority);
         field.setMetadataField(mf);
         return dao.create(context, field);
     }

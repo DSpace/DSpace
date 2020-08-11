@@ -7,11 +7,8 @@
  */
 package org.dspace.layout;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Set;
 import javax.persistence.Cacheable;
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -19,6 +16,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
@@ -51,19 +50,23 @@ public class CrisLayoutField implements ReloadableEntity<Integer> {
     private String rendering;
     @Column(name = "row", nullable = false)
     private Integer row;
+    @Column(name = "priority", nullable = false)
+    private Integer priority;
     @Column(name = "type")
     private String type;
     @Column(name = "label")
     private String label;
     @Column(name = "style")
     private String style;
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+        name = "cris_layout_box2field",
+        joinColumns = {@JoinColumn(name = "cris_layout_field_id")},
+        inverseJoinColumns = {@JoinColumn(name = "cris_layout_box_id")}
+    )
+    private Set<CrisLayoutBox> boxes;
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "layoutField")
     private Set<CrisLayoutFieldBitstream> bitstreams;
-    @OneToMany(
-        mappedBy = "field",
-        cascade = CascadeType.REMOVE
-    )
-    private List<CrisLayoutBox2Field> box2field = new ArrayList<>();
 
     @Override
     public Integer getID() {
@@ -106,6 +109,14 @@ public class CrisLayoutField implements ReloadableEntity<Integer> {
         this.row = row;
     }
 
+    public Integer getPriority() {
+        return priority;
+    }
+
+    public void setPriority(Integer priority) {
+        this.priority = priority;
+    }
+
     public String getType() {
         return type;
     }
@@ -130,20 +141,20 @@ public class CrisLayoutField implements ReloadableEntity<Integer> {
         this.style = style;
     }
 
+    public Set<CrisLayoutBox> getBoxes() {
+        return boxes;
+    }
+
+    public void setBoxes(Set<CrisLayoutBox> boxes) {
+        this.boxes = boxes;
+    }
+
     public Set<CrisLayoutFieldBitstream> getBitstreams() {
         return bitstreams;
     }
 
     public void setBitstreams(Set<CrisLayoutFieldBitstream> bitstreams) {
         this.bitstreams = bitstreams;
-    }
-
-    public List<CrisLayoutBox2Field> getBox2field() {
-        return box2field;
-    }
-
-    public void setBox2field(List<CrisLayoutBox2Field> box2field) {
-        this.box2field = box2field;
     }
 
 }

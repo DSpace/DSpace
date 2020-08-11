@@ -24,7 +24,6 @@ import org.dspace.app.rest.model.CrisLayoutMetadataConfigurationRest.Row;
 import org.dspace.content.CrisLayoutFieldRowPriorityComparator;
 import org.dspace.content.MetadataField;
 import org.dspace.layout.CrisLayoutBox;
-import org.dspace.layout.CrisLayoutBox2Field;
 import org.dspace.layout.CrisLayoutBoxTypes;
 import org.dspace.layout.CrisLayoutField;
 import org.dspace.layout.CrisLayoutFieldBitstream;
@@ -48,14 +47,10 @@ public class CrisLayoutMetadataBoxConfigurator implements CrisLayoutBoxConfigura
     public CrisLayoutBoxConfigurationRest getConfiguration(CrisLayoutBox box) {
         CrisLayoutMetadataConfigurationRest rest = new CrisLayoutMetadataConfigurationRest();
         rest.setId(box.getID());
-        List<CrisLayoutBox2Field> uLayoutFields = box.getBox2field();
-        Collections.sort(uLayoutFields, new CrisLayoutFieldRowPriorityComparator());
+        Set<CrisLayoutField> uLayoutFields = box.getLayoutFields();
         List<CrisLayoutField> layoutFields = new ArrayList<>();
-        for (Iterator<CrisLayoutBox2Field> it = uLayoutFields.iterator();
-                it.hasNext();) {
-            CrisLayoutBox2Field b2f = it.next();
-            layoutFields.add(b2f.getField());
-        }
+        layoutFields.addAll(uLayoutFields);
+        Collections.sort(layoutFields, new CrisLayoutFieldRowPriorityComparator());
         if (layoutFields != null && !layoutFields.isEmpty()) {
             Map<Integer, Row> rows = new HashMap<>();
             for (CrisLayoutField layoutField : layoutFields) {

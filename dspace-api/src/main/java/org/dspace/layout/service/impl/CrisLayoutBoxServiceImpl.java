@@ -11,6 +11,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import org.apache.commons.collections.CollectionUtils;
@@ -24,8 +25,8 @@ import org.dspace.content.service.EntityTypeService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.layout.CrisLayoutBox;
-import org.dspace.layout.CrisLayoutBox2Field;
 import org.dspace.layout.CrisLayoutBoxConfiguration;
+import org.dspace.layout.CrisLayoutField;
 import org.dspace.layout.dao.CrisLayoutBoxDAO;
 import org.dspace.layout.service.CrisLayoutBoxService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -204,18 +205,17 @@ public class CrisLayoutBoxServiceImpl implements CrisLayoutBoxService {
     @Override
     public boolean hasContent(CrisLayoutBox box, List<MetadataValue> values) {
         boolean found = false;
-//        Set<CrisLayoutField> boxFields = box.getLayoutFields();
-        List<CrisLayoutBox2Field> box2Fields = box.getBox2field();
+        Set<CrisLayoutField> boxFields = box.getLayoutFields();
         // Check if the box type is relation
         boolean isRelationBox = box.getType() != null ?
                 box.getType().equalsIgnoreCase("relation") : false;
         if (isRelationBox) {
             // The relation box has no associated content
             found = true;
-        } else if ( box2Fields != null && !box2Fields.isEmpty() ) {
+        } else if ( boxFields != null && !boxFields.isEmpty() ) {
             for (MetadataValue value: values) {
-                for (CrisLayoutBox2Field field: box2Fields) {
-                    if (value.getMetadataField().equals(field.getField().getMetadataField())) {
+                for (CrisLayoutField field: boxFields) {
+                    if (value.getMetadataField().equals(field.getMetadataField())) {
                         found = true;
                         break;
                     }

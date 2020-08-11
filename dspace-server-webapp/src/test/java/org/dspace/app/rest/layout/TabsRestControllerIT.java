@@ -33,15 +33,9 @@ import org.dspace.app.rest.builder.CrisLayoutFieldBuilder;
 import org.dspace.app.rest.builder.CrisLayoutTabBuilder;
 import org.dspace.app.rest.builder.EntityTypeBuilder;
 import org.dspace.app.rest.builder.ItemBuilder;
-import org.dspace.app.rest.builder.MetadataFieldBuilder;
-import org.dspace.app.rest.builder.MetadataSchemaBuilder;
-import org.dspace.app.rest.converter.CrisLayoutBoxConverter;
 import org.dspace.app.rest.matcher.CrisLayoutBoxMatcher;
 import org.dspace.app.rest.matcher.CrisLayoutTabMatcher;
-import org.dspace.app.rest.model.CrisLayoutBoxRest;
 import org.dspace.app.rest.model.CrisLayoutTabRest;
-import org.dspace.app.rest.model.MetadataFieldRest;
-import org.dspace.app.rest.model.MetadataSchemaRest;
 import org.dspace.app.rest.model.patch.AddOperation;
 import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.rest.model.patch.RemoveOperation;
@@ -78,8 +72,9 @@ public class TabsRestControllerIT extends AbstractControllerIntegrationTest {
     @Autowired
     private MetadataFieldService mfss;
 
-    @Autowired
-    private CrisLayoutBoxConverter boxConverter;
+    private final String BOX_URL = "http://localhost:8080/api/layout/boxes/";
+    private final String METADATASECURITY_URL = "http://localhost:8080/api/core/metadatafield/";
+
     /**
      * Test for endopint /api/layout/tabs/<ID>. It returns a determinate tab
      * identified by its ID
@@ -279,16 +274,11 @@ public class TabsRestControllerIT extends AbstractControllerIntegrationTest {
                             .withSecurity(LayoutSecurity.PUBLIC)
                             .build();
 
-        context.restoreAuthSystemState();
+        // get metadata field isbn
+        MetadataSchema schema = mdss.find(context, "dc");
+        MetadataField isbn = mfss.findByElement(context, schema, "identifier", "isbn");
 
-        ObjectMapper mapper = new ObjectMapper();
-        MetadataSchemaRest schema = new MetadataSchemaRest();
-        schema.setNamespace("dc");
-        MetadataFieldRest isbn = new MetadataFieldRest();
-        isbn.setSchema(schema);
-        isbn.setElement("identifier");
-        isbn.setQualifier("isbn");
-        isbn.setScopeNote(" Is a numeric commercial identifier ");
+        context.restoreAuthSystemState();
 
         String tokenAdmin = getAuthToken(admin.getEmail(), password);
         getClient(tokenAdmin).perform(get("/api/layout/tabs/" + tab.getID() + "/securitymetadata"))
@@ -298,14 +288,18 @@ public class TabsRestControllerIT extends AbstractControllerIntegrationTest {
                              .andExpect(jsonPath("$.page.totalElements", Matchers.is(0)));
 
         getClient(tokenAdmin).perform(post("/api/layout/tabs/" + tab.getID() + "/securitymetadata")
-                             .content(mapper.writeValueAsBytes(isbn))
-                             .contentType(contentType))
-                             .andExpect(status().isNoContent());
+                            .contentType(org.springframework.http.MediaType.parseMediaType
+                                    (org.springframework.data.rest.webmvc.RestMediaTypes
+                                         .TEXT_URI_LIST_VALUE))
+                            .content(METADATASECURITY_URL + isbn.getID())
+                            ).andExpect(status().isNoContent());
 
         getClient(tokenAdmin).perform(get("/api/layout/tabs/" + tab.getID() + "/securitymetadata"))
                              .andExpect(status().isOk())
                              .andExpect(content().contentType(contentType))
-                             .andExpect(jsonPath("$._embedded.securitymetadata", Matchers.is(Matchers.empty())))
+                             // Expect a not empty collection in $._embedded.securitymetadata because
+                             // the previous POST invocation add the ISBN element
+                             .andExpect(jsonPath("$._embedded.securitymetadata", Matchers.not(Matchers.empty())))
                              .andExpect(jsonPath("$.page.totalElements", Matchers.is(1)));
     }
 
@@ -320,38 +314,30 @@ public class TabsRestControllerIT extends AbstractControllerIntegrationTest {
                             .withSecurity(LayoutSecurity.PUBLIC)
                             .build();
 
+        // get metadata field isbn
+        MetadataSchema schema = mdss.find(context, "dc");
+        MetadataField isbn = mfss.findByElement(context, schema, "identifier", "isbn");
+
         context.restoreAuthSystemState();
 
-        ObjectMapper mapper = new ObjectMapper();
-        MetadataSchemaRest schema = new MetadataSchemaRest();
-        MetadataFieldRest isbn = new MetadataFieldRest();
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        getClient(tokenAdmin).perform(get("/api/layout/tabs/" + tab.getID() + "/securitymetadata"))
+                .andExpect(status().isOk()).andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$._embedded.securitymetadata", Matchers.is(Matchers.empty())))
+                .andExpect(jsonPath("$.page.totalElements", Matchers.is(0)));
 
-        try {
-            schema.setNamespace("dc");
-            isbn.setSchema(schema);
-            isbn.setElement("identifier");
-            isbn.setQualifier("isbn");
-            isbn.setScopeNote(" Is a numeric commercial identifier ");
+        getClient().perform(post("/api/layout/tabs/" + tab.getID() + "/securitymetadata")
+                    .contentType(org.springframework.http.MediaType.parseMediaType
+                            (org.springframework.data.rest.webmvc.RestMediaTypes
+                                 .TEXT_URI_LIST_VALUE))
+                    .content(METADATASECURITY_URL + isbn.getID())
+                    ).andExpect(status().isUnauthorized());
 
-            String tokenAdmin = getAuthToken(admin.getEmail(), password);
-            getClient(tokenAdmin).perform(get("/api/layout/tabs/" + tab.getID() + "/securitymetadata"))
-                    .andExpect(status().isOk()).andExpect(content().contentType(contentType))
-                    .andExpect(jsonPath("$._embedded.securitymetadata", Matchers.is(Matchers.empty())))
-                    .andExpect(jsonPath("$.page.totalElements", Matchers.is(0)));
-
-            getClient().perform(post("/api/layout/tabs/" + tab.getID() + "/securitymetadata")
-                       .content(mapper.writeValueAsBytes(isbn)).contentType(contentType))
-                       .andExpect(status().isUnauthorized());
-
-            getClient(tokenAdmin).perform(get("/api/layout/tabs/" + tab.getID() + "/securitymetadata"))
-                    .andExpect(status().isOk())
-                    .andExpect(content().contentType(contentType))
-                    .andExpect(jsonPath("$._embedded.securitymetadata", Matchers.is(Matchers.empty())))
-                    .andExpect(jsonPath("$.page.totalElements", Matchers.is(0)));
-        } finally {
-            MetadataSchemaBuilder.deleteMetadataSchema(schema.getId());
-            MetadataFieldBuilder.deleteMetadataField(isbn.getId());
-        }
+        getClient(tokenAdmin).perform(get("/api/layout/tabs/" + tab.getID() + "/securitymetadata"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$._embedded.securitymetadata", Matchers.is(Matchers.empty())))
+                .andExpect(jsonPath("$.page.totalElements", Matchers.is(0)));
     }
 
     @Test
@@ -365,62 +351,48 @@ public class TabsRestControllerIT extends AbstractControllerIntegrationTest {
                             .withSecurity(LayoutSecurity.PUBLIC)
                             .build();
 
+        // get metadata field isbn
+        MetadataSchema schema = mdss.find(context, "dc");
+        MetadataField isbn = mfss.findByElement(context, schema, "identifier", "isbn");
+
         context.restoreAuthSystemState();
 
-        ObjectMapper mapper = new ObjectMapper();
-        MetadataSchemaRest schema = new MetadataSchemaRest();
-        MetadataFieldRest isbn = new MetadataFieldRest();
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        getClient(tokenAdmin).perform(get("/api/layout/tabs/" + tab.getID() + "/securitymetadata"))
+                .andExpect(status().isOk()).andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$._embedded.securitymetadata", Matchers.is(Matchers.empty())))
+                .andExpect(jsonPath("$.page.totalElements", Matchers.is(0)));
 
-        try {
-            schema.setNamespace("dc");
-            isbn.setSchema(schema);
-            isbn.setElement("identifier");
-            isbn.setQualifier("isbn");
-            isbn.setScopeNote(" Is a numeric commercial identifier ");
+        String tokenEperson = getAuthToken(eperson.getEmail(), password);
+        getClient(tokenEperson).perform(post("/api/layout/tabs/" + tab.getID() + "/securitymetadata")
+                                .contentType(org.springframework.http.MediaType.parseMediaType
+                                        (org.springframework.data.rest.webmvc.RestMediaTypes
+                                             .TEXT_URI_LIST_VALUE))
+                                .content(METADATASECURITY_URL + isbn.getID()))
+                               .andExpect(status().isForbidden());
 
-            String tokenAdmin = getAuthToken(admin.getEmail(), password);
-            getClient(tokenAdmin).perform(get("/api/layout/tabs/" + tab.getID() + "/securitymetadata"))
-                    .andExpect(status().isOk()).andExpect(content().contentType(contentType))
-                    .andExpect(jsonPath("$._embedded.securitymetadata", Matchers.is(Matchers.empty())))
-                    .andExpect(jsonPath("$.page.totalElements", Matchers.is(0)));
-
-            String tokenEperson = getAuthToken(eperson.getEmail(), password);
-            getClient(tokenEperson).perform(post("/api/layout/tabs/" + tab.getID() + "/securitymetadata")
-                                   .content(mapper.writeValueAsBytes(isbn)).contentType(contentType))
-                                   .andExpect(status().isForbidden());
-
-            getClient(tokenAdmin).perform(get("/api/layout/tabs/" + tab.getID() + "/securitymetadata"))
-                    .andExpect(status().isOk())
-                    .andExpect(content().contentType(contentType))
-                    .andExpect(jsonPath("$._embedded.securitymetadata", Matchers.is(Matchers.empty())))
-                    .andExpect(jsonPath("$.page.totalElements", Matchers.is(0)));
-        } finally {
-            MetadataSchemaBuilder.deleteMetadataSchema(schema.getId());
-            MetadataFieldBuilder.deleteMetadataField(isbn.getId());
-        }
+        getClient(tokenAdmin).perform(get("/api/layout/tabs/" + tab.getID() + "/securitymetadata"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$._embedded.securitymetadata", Matchers.is(Matchers.empty())))
+                .andExpect(jsonPath("$.page.totalElements", Matchers.is(0)));
     }
 
     @Test
     public void addSecurityMetadataisNotFoundTabTest() throws Exception {
-        ObjectMapper mapper = new ObjectMapper();
-        MetadataSchemaRest schema = new MetadataSchemaRest();
-        MetadataFieldRest isbn = new MetadataFieldRest();
-        try {
-            schema.setNamespace("dc");
-            isbn.setSchema(schema);
-            isbn.setElement("identifier");
-            isbn.setQualifier("isbn");
-            isbn.setScopeNote(" Is a numeric commercial identifier ");
+        context.turnOffAuthorisationSystem();
+        // get metadata field isbn
+        MetadataSchema schema = mdss.find(context, "dc");
+        MetadataField isbn = mfss.findByElement(context, schema, "identifier", "isbn");
+        context.restoreAuthSystemState();
 
-            String tokenAdmin = getAuthToken(admin.getEmail(), password);
-            getClient(tokenAdmin).perform(post("/api/layout/tabs/" + UUID.randomUUID() + "/securitymetadata")
-                                 .content(mapper.writeValueAsBytes(isbn)).contentType(contentType))
-                                 .andExpect(status().isNotFound());
-
-        } finally {
-            MetadataSchemaBuilder.deleteMetadataSchema(schema.getId());
-            MetadataFieldBuilder.deleteMetadataField(isbn.getId());
-        }
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        getClient(tokenAdmin).perform(post("/api/layout/tabs/9999/securitymetadata")
+                .contentType(org.springframework.http.MediaType.parseMediaType
+                        (org.springframework.data.rest.webmvc.RestMediaTypes
+                             .TEXT_URI_LIST_VALUE))
+                .content(METADATASECURITY_URL + isbn.getID()))
+                             .andExpect(status().isNotFound());
     }
 
     @Test
@@ -437,8 +409,12 @@ public class TabsRestControllerIT extends AbstractControllerIntegrationTest {
        context.restoreAuthSystemState();
 
        String tokenAdmin = getAuthToken(admin.getEmail(), password);
-       getClient(tokenAdmin).perform(post("/api/layout/tabs/" + tab.getID() + "/securitymetadata"))
-                            .andExpect(status().isUnprocessableEntity());
+       getClient(tokenAdmin).perform(
+               post("/api/layout/tabs/" + tab.getID() + "/securitymetadata")
+               .contentType(org.springframework.http.MediaType.parseMediaType
+                       (org.springframework.data.rest.webmvc.RestMediaTypes
+                            .TEXT_URI_LIST_VALUE)))
+            .andExpect(status().isUnprocessableEntity());
     }
 
     /**
@@ -705,23 +681,22 @@ public class TabsRestControllerIT extends AbstractControllerIntegrationTest {
                             .withSecurity(LayoutSecurity.PUBLIC)
                             .build();
 
-        context.restoreAuthSystemState();
+        CrisLayoutBox box = CrisLayoutBoxBuilder.createBuilder(context, eType, false, 0, false)
+                .withShortname("Shortname")
+                .withSecurity(LayoutSecurity.PUBLIC)
+                .withHeader("Header")
+                .withStyle("Style")
+                .build();
 
-        ObjectMapper mapper = new ObjectMapper();
-        CrisLayoutBoxRest boxRest = new CrisLayoutBoxRest();
-        boxRest.setEntityType(eType.toString());
-        boxRest.setCollapsed(false);
-        boxRest.setPriority(1);
-        boxRest.setMinor(false);
-        boxRest.setHeader("First New Box Header");
-        boxRest.setSecurity(LayoutSecurity.PUBLIC.getValue());
+        context.restoreAuthSystemState();
 
         String tokenAdmin = getAuthToken(admin.getEmail(), password);
         getClient(tokenAdmin).perform(post("/api/layout/tabs/" + tab.getID() + "/boxes")
-                             .content(mapper.writeValueAsBytes(boxRest))
-                             .contentType(contentType))
-                             .andExpect(status().isCreated())
-                             .andExpect(content().contentType(contentType));
+                .contentType(org.springframework.http.MediaType.parseMediaType
+                        (org.springframework.data.rest.webmvc.RestMediaTypes
+                             .TEXT_URI_LIST_VALUE))
+                .content(BOX_URL + box.getID())
+                ).andExpect(status().isNoContent());
 
         getClient(tokenAdmin).perform(get("/api/layout/tabs/" + tab.getID() + "/boxes"))
                  .andExpect(status().isOk())
@@ -741,30 +716,28 @@ public class TabsRestControllerIT extends AbstractControllerIntegrationTest {
                             .withSecurity(LayoutSecurity.PUBLIC)
                             .build();
 
+        CrisLayoutBox box = CrisLayoutBoxBuilder.createBuilder(context, eType, false, 0, false)
+                .withShortname("Shortname")
+                .withSecurity(LayoutSecurity.PUBLIC)
+                .withHeader("Header")
+                .withStyle("Style")
+                .build();
+
         context.restoreAuthSystemState();
 
-        ObjectMapper mapper = new ObjectMapper();
-        CrisLayoutBoxRest boxRest = new CrisLayoutBoxRest();
-        try {
-            boxRest.setEntityType(eType.toString());
-            boxRest.setCollapsed(false);
-            boxRest.setPriority(1);
-            boxRest.setMinor(false);
-            boxRest.setHeader("First New Box Header");
-            boxRest.setSecurity(LayoutSecurity.PUBLIC.getValue());
+        getClient().perform(post("/api/layout/tabs/" + tab.getID() + "/boxes")
+                .contentType(org.springframework.http.MediaType.parseMediaType
+                        (org.springframework.data.rest.webmvc.RestMediaTypes
+                             .TEXT_URI_LIST_VALUE))
+                .content(BOX_URL + box.getID())
+                ).andExpect(status().isUnauthorized());
 
-            getClient().perform(post("/api/layout/tabs/" + tab.getID() + "/boxes")
-                       .content(mapper.writeValueAsBytes(boxRest)).contentType(contentType))
-                       .andExpect(status().isUnauthorized());
-
-            String tokenAdmin = getAuthToken(admin.getEmail(), password);
-            getClient(tokenAdmin).perform(get("/api/layout/tabs/" + tab.getID() + "/boxes")).andExpect(status().isOk())
-                    .andExpect(content().contentType(contentType))
-                    .andExpect(jsonPath("$._embedded.boxes", Matchers.not(Matchers.empty())))
-                    .andExpect(jsonPath("$.page.totalElements", Matchers.is(0)));
-        } finally {
-            CrisLayoutBoxBuilder.delete(boxRest.getId());
-        }
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        getClient(tokenAdmin).perform(get("/api/layout/tabs/" + tab.getID() + "/boxes")).andExpect(status().isOk())
+                .andExpect(content().contentType(contentType))
+                // Expect an empty list of boxes because the previous POST invocation returns
+                // an unauthorized status
+                .andExpect(jsonPath("$._embedded.boxes", Matchers.empty()));
     }
 
     @Test
@@ -774,34 +747,33 @@ public class TabsRestControllerIT extends AbstractControllerIntegrationTest {
         EntityType eType = EntityTypeBuilder.createEntityTypeBuilder(context, "Person").build();
 
         CrisLayoutTab tab = CrisLayoutTabBuilder.createTab(context, eType, 0)
-                            .withShortName("New Tab shortname")
-                            .withSecurity(LayoutSecurity.PUBLIC)
-                            .build();
+                .withShortName("New Tab shortname")
+                .withSecurity(LayoutSecurity.PUBLIC)
+                .build();
+
+        CrisLayoutBox box = CrisLayoutBoxBuilder.createBuilder(context, eType, false, 0, false)
+                .withShortname("Shortname")
+                .withSecurity(LayoutSecurity.PUBLIC)
+                .withHeader("Header")
+                .withStyle("Style")
+                .build();
 
         context.restoreAuthSystemState();
-        ObjectMapper mapper = new ObjectMapper();
-        CrisLayoutBoxRest boxRest = new CrisLayoutBoxRest();
-        try {
-            boxRest.setEntityType(eType.toString());
-            boxRest.setCollapsed(false);
-            boxRest.setPriority(1);
-            boxRest.setMinor(false);
-            boxRest.setHeader("First New Box Header");
-            boxRest.setSecurity(LayoutSecurity.PUBLIC.getValue());
 
-            String tokenEperson = getAuthToken(eperson.getEmail(), password);
-            getClient(tokenEperson).perform(post("/api/layout/tabs/" + tab.getID() + "/boxes")
-                                   .content(mapper.writeValueAsBytes(boxRest)).contentType(contentType))
-                                   .andExpect(status().isForbidden());
+        String tokenEperson = getAuthToken(eperson.getEmail(), password);
+        getClient(tokenEperson).perform(
+                post("/api/layout/tabs/" + tab.getID() + "/boxes")
+                .contentType(org.springframework.http.MediaType.parseMediaType
+                        (org.springframework.data.rest.webmvc.RestMediaTypes
+                             .TEXT_URI_LIST_VALUE))
+                .content(BOX_URL + box.getID())).andExpect(status().isForbidden());
 
-            String tokenAdmin = getAuthToken(admin.getEmail(), password);
-            getClient(tokenAdmin).perform(get("/api/layout/tabs/" + tab.getID() + "/boxes")).andExpect(status().isOk())
-                    .andExpect(content().contentType(contentType))
-                    .andExpect(jsonPath("$._embedded.boxes", Matchers.not(Matchers.empty())))
-                    .andExpect(jsonPath("$.page.totalElements", Matchers.is(0)));
-        } finally {
-            CrisLayoutBoxBuilder.delete(boxRest.getId());
-        }
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        getClient(tokenAdmin).perform(get("/api/layout/tabs/" + tab.getID() + "/boxes")).andExpect(status().isOk())
+                .andExpect(content().contentType(contentType))
+                // Expect an empty list of boxes because the previous POST invocation returns
+                // an forbidden status
+                .andExpect(jsonPath("$._embedded.boxes", Matchers.empty()));
     }
 
     @Test
@@ -809,26 +781,23 @@ public class TabsRestControllerIT extends AbstractControllerIntegrationTest {
         context.turnOffAuthorisationSystem();
         // Create new EntityType Person
         EntityType eType = EntityTypeBuilder.createEntityTypeBuilder(context, "Person").build();
+
+        CrisLayoutBox box = CrisLayoutBoxBuilder.createBuilder(context, eType, false, 0, false)
+                .withShortname("Shortname")
+                .withSecurity(LayoutSecurity.PUBLIC)
+                .withHeader("Header")
+                .withStyle("Style")
+                .build();
         context.restoreAuthSystemState();
 
-        ObjectMapper mapper = new ObjectMapper();
-        CrisLayoutBoxRest boxRest = new CrisLayoutBoxRest();
-        try {
-            boxRest.setEntityType(eType.toString());
-            boxRest.setCollapsed(false);
-            boxRest.setPriority(1);
-            boxRest.setMinor(false);
-            boxRest.setHeader("First New Box Header");
-            boxRest.setSecurity(LayoutSecurity.PUBLIC.getValue());
-
-            String tokenAdmin = getAuthToken(admin.getEmail(), password);
-            getClient(tokenAdmin)
-                    .perform(post("/api/layout/tabs/" + UUID.randomUUID() + "/boxes")
-                            .content(mapper.writeValueAsBytes(boxRest)).contentType(contentType))
-                    .andExpect(status().isNotFound());
-        } finally {
-            CrisLayoutBoxBuilder.delete(boxRest.getId());
-        }
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        getClient(tokenAdmin)
+                .perform(post("/api/layout/tabs/8716/boxes")
+                        .contentType(org.springframework.http.MediaType.parseMediaType
+                                (org.springframework.data.rest.webmvc.RestMediaTypes
+                                     .TEXT_URI_LIST_VALUE))
+                        .content(BOX_URL + box.getID()))
+                .andExpect(status().isNotFound());
     }
 
     @Test
@@ -843,31 +812,29 @@ public class TabsRestControllerIT extends AbstractControllerIntegrationTest {
                             .withSecurity(LayoutSecurity.PUBLIC)
                             .build();
 
+        CrisLayoutBox box = CrisLayoutBoxBuilder.createBuilder(context, eTypeOrgUnit, false, 0, false)
+                .withShortname("Shortname")
+                .withSecurity(LayoutSecurity.PUBLIC)
+                .withHeader("Header")
+                .withStyle("Style")
+                .build();
         context.restoreAuthSystemState();
 
-        ObjectMapper mapper = new ObjectMapper();
-        CrisLayoutBoxRest boxRest = new CrisLayoutBoxRest();
-        try {
-            boxRest.setEntityType(eTypeOrgUnit.toString());
-            boxRest.setCollapsed(false);
-            boxRest.setPriority(1);
-            boxRest.setMinor(false);
-            boxRest.setHeader("First New Box Header");
-            boxRest.setSecurity(LayoutSecurity.PUBLIC.getValue());
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        getClient(tokenAdmin).perform(post("/api/layout/tabs/" + tab.getID() + "/boxes")
+                .contentType(org.springframework.http.MediaType.parseMediaType
+                        (org.springframework.data.rest.webmvc.RestMediaTypes
+                             .TEXT_URI_LIST_VALUE))
+                .content(BOX_URL + box.getID()))
+                 .andExpect(status().isUnprocessableEntity());
 
-            String tokenAdmin = getAuthToken(admin.getEmail(), password);
-            getClient(tokenAdmin).perform(post("/api/layout/tabs/" + tab.getID() + "/boxes")
-                                 .content(mapper.writeValueAsBytes(boxRest)).contentType(contentType))
-                                 .andExpect(status().isUnprocessableEntity());
+        getClient(tokenAdmin).perform(get("/api/layout/tabs/" + tab.getID() + "/boxes"))
+                 .andExpect(status().isOk())
+                 .andExpect(content().contentType(contentType))
+                 // Expect an empty collection because previus POST return an Unprocessable Entity
+                 // cause by the different Entity Type of Tab and Box
+                 .andExpect(jsonPath("$._embedded.boxes", Matchers.empty()));
 
-            getClient(tokenAdmin).perform(get("/api/layout/tabs/" + tab.getID() + "/boxes"))
-                     .andExpect(status().isOk())
-                     .andExpect(content().contentType(contentType))
-                     .andExpect(jsonPath("$._embedded.boxes", Matchers.not(Matchers.empty())))
-                     .andExpect(jsonPath("$.page.totalElements", Matchers.is(1)));
-        } finally {
-            CrisLayoutBoxBuilder.delete(boxRest.getId());
-        }
     }
 
     @Test
@@ -1048,7 +1015,7 @@ public class TabsRestControllerIT extends AbstractControllerIntegrationTest {
                 .andExpect(jsonPath("$._embedded.boxes", Matchers.not(Matchers.empty())))
                 .andExpect(jsonPath("$.page.totalElements", Matchers.is(2)));
 
-       getClient(tokenAdmin).perform(delete("/api/layout/tabs/" + tab.getID() + "/boxes/" + UUID.randomUUID()))
+       getClient(tokenAdmin).perform(delete("/api/layout/tabs/" + tab.getID() + "/boxes/9999"))
                             .andExpect(status().isNoContent());
 
         // get boxes

@@ -69,27 +69,27 @@ public class CrisLayoutBoxConfigurationAddOperation<D> extends PatchOperation<D>
                     value = objectMapper.readTree((String)operation.getValue());
                 }
                 Integer row = null;
-                Integer prosition = null;
+                Integer position = null;
                 String[] tks = operation.getPath().split("/");
                 if (tks != null && tks.length > 0) {
                     for (int i = 0; i < tks.length; i++) {
                         if (tks[i].equalsIgnoreCase("rows") && tks.length > i + 1) {
                             row = parseInteger(tks[++i]);
                         } else if (tks[i].equalsIgnoreCase("fields") && tks.length > i + 1) {
-                            prosition = parseInteger(tks[++i]);
+                            position = parseInteger(tks[++i]);
                         }
                     }
                 }
                 if (value.isArray()) {
                     for (JsonNode v: value) {
-                        CrisLayoutField layoutField = getLayoutFieldFromJsonNode(context, row, v);
+                        CrisLayoutField layoutField = getLayoutFieldFromJsonNode(context, row, position, v);
                         layoutField = fieldService.create(context, layoutField);
-                        box.addLayoutField(layoutField, prosition);
+                        box.addLayoutField(layoutField);
                     }
                 } else {
-                    CrisLayoutField layoutField = getLayoutFieldFromJsonNode(context, row, value);
+                    CrisLayoutField layoutField = getLayoutFieldFromJsonNode(context, row, position, value);
                     layoutField = fieldService.create(context, layoutField);
-                    box.addLayoutField(layoutField, prosition);
+                    box.addLayoutField(layoutField);
                 }
             } catch (Exception e) {
                 throw new RuntimeException(e.getMessage(), e);
@@ -121,7 +121,7 @@ public class CrisLayoutBoxConfigurationAddOperation<D> extends PatchOperation<D>
      * @throws JsonProcessingException
      * @throws SQLException
      */
-    private CrisLayoutField getLayoutFieldFromJsonNode (Context context, Integer row, JsonNode node)
+    private CrisLayoutField getLayoutFieldFromJsonNode (Context context, Integer row, Integer position, JsonNode node)
             throws JsonProcessingException, SQLException {
         CrisLayoutField field = new CrisLayoutField();
         field.setRow(row);

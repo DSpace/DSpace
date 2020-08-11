@@ -25,6 +25,7 @@ import org.dspace.core.Context;
 import org.dspace.layout.CrisLayoutTab;
 import org.dspace.layout.service.CrisLayoutTabService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -52,8 +53,7 @@ public class CrisLayoutTabMetadatasecurityRestController {
 
     @RequestMapping(
             method = RequestMethod.POST,
-            consumes = {"text/uri-list"},
-            value = {"/{position:\\d+}", ""} )
+            consumes = {"text/uri-list"})
     @PreAuthorize("hasAuthority('ADMIN')")
     public void addMetadatasecurity(
             @PathVariable(name = "id", required = true) Integer idTab,
@@ -69,8 +69,8 @@ public class CrisLayoutTabMetadatasecurityRestController {
                 response.setStatus(HttpServletResponse.SC_NOT_FOUND);
                 return;
             }
-            if (links == null) {
-                response.setStatus(HttpServletResponse.SC_NOT_ACCEPTABLE);
+            if (links == null || links.isEmpty()) {
+                response.setStatus(HttpStatus.UNPROCESSABLE_ENTITY.value());
                 return;
             }
             Set<MetadataField> metadataFields = getMedatafieldList(context, links);

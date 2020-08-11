@@ -69,8 +69,8 @@ public class CrisLayoutTabBoxesRestController {
                 response.setStatus(HttpServletResponse.SC_NOT_FOUND);
                 return;
             }
-            if (links == null) {
-                response.setStatus(HttpServletResponse.SC_NOT_ACCEPTABLE);
+            if (links == null || links.isEmpty()) {
+                response.setStatus(HttpStatus.UNPROCESSABLE_ENTITY.value());
                 return;
             }
             List<CrisLayoutBox> boxes = getBoxList(context, links);
@@ -95,11 +95,11 @@ public class CrisLayoutTabBoxesRestController {
 
     @RequestMapping(
             method = RequestMethod.DELETE,
-            value = "/{position:\\d+}" )
+            value = "/{boxId:\\d+}" )
     @PreAuthorize("hasAuthority('ADMIN')")
     public void removeBox(
             @PathVariable(name = "id", required = true) Integer idTab,
-            @PathVariable(required = true) Integer position,
+            @PathVariable(required = true) Integer boxId,
             HttpServletResponse response, HttpServletRequest request) {
         Context context = ContextUtil.obtainContext(request);
         log.info("Start method for remove box association to tab with tabId <" + idTab + ">");
@@ -113,7 +113,7 @@ public class CrisLayoutTabBoxesRestController {
             List<CrisLayoutTab2Box> tab2box = tab.getTab2Box();
             if (tab2box != null ) {
                 for (CrisLayoutTab2Box t2b: tab2box) {
-                    if (t2b.getPosition() == position) {
+                    if (t2b.getId().getCrisLayoutBoxId() == boxId) {
                         tab.removeBox(t2b.getId().getCrisLayoutBoxId());
                         context.commit();
                         break;

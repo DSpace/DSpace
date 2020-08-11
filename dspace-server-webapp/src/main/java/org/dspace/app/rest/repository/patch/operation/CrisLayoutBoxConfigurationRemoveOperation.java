@@ -8,16 +8,13 @@
 package org.dspace.app.rest.repository.patch.operation;
 
 import java.sql.SQLException;
-import java.util.List;
+import java.util.Iterator;
+import java.util.Set;
 
 import org.dspace.app.rest.model.patch.Operation;
-import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
 import org.dspace.layout.CrisLayoutBox;
-import org.dspace.layout.CrisLayoutBox2Field;
 import org.dspace.layout.CrisLayoutField;
-import org.dspace.layout.service.CrisLayoutFieldService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -36,9 +33,6 @@ public class CrisLayoutBoxConfigurationRemoveOperation<D> extends PatchOperation
      * Path in json body of patch that uses this operation
      */
     private static final String OPERATION_CONFIGURATION_PATH = "^/rows/[0-9]+/fields/[0-9]+";
-
-    @Autowired
-    private CrisLayoutFieldService fieldService;
 
     /* (non-Javadoc)
      * @see org.dspace.app.rest.repository.patch.operation.PatchOperation#perform
@@ -61,16 +55,12 @@ public class CrisLayoutBoxConfigurationRemoveOperation<D> extends PatchOperation
                 }
             }
             if (row != null && position != null) {
-                List<CrisLayoutBox2Field> box2field = box.getBox2field();
-                for (CrisLayoutBox2Field b2f:box2field) {
-                    CrisLayoutField field = b2f.getField();
-                    if (field.getRow().equals(row) && position.equals(b2f.getPosition())) {
-                        box.removeLayoutField(field);
-                        try {
-                            fieldService.delete(context, field);
-                        } catch (AuthorizeException e) {
-                            throw new RuntimeException(e.getMessage(), e);
-                        }
+                Set<CrisLayoutField> fields = box.getLayoutFields();
+                for (Iterator<CrisLayoutField> it = fields.iterator(); it.hasNext(); ) {
+                    CrisLayoutField field = it.next();
+                    // TODO convert priority to position
+                    if (field.getPriority().equals(position)) {
+                        it.remove();
                     }
                 }
             }

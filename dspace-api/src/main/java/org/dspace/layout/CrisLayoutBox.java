@@ -8,7 +8,7 @@
 package org.dspace.layout;
 
 import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import javax.persistence.Cacheable;
@@ -67,14 +67,17 @@ public class CrisLayoutBox implements ReloadableEntity<Integer> {
         inverseJoinColumns = {@JoinColumn(name = "authorized_field_id")}
     )
     private Set<MetadataField> metadataSecurityFields;
-    @OneToMany(
-        mappedBy = "box",
-        cascade = CascadeType.ALL
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+        name = "cris_layout_box2field",
+        joinColumns = {@JoinColumn(name = "cris_layout_box_id")},
+        inverseJoinColumns = {@JoinColumn(name = "cris_layout_field_id")}
     )
-    private List<CrisLayoutBox2Field> box2field = new ArrayList<>();
+    private Set<CrisLayoutField> layoutFields;
     @OneToMany(
             mappedBy = "box",
-            cascade = CascadeType.ALL
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
     )
     private List<CrisLayoutTab2Box> tab2box = new ArrayList<>();
     @Column(name = "clear")
@@ -197,80 +200,27 @@ public class CrisLayoutBox implements ReloadableEntity<Integer> {
         this.metadataSecurityFields = metadataFields;
     }
 
+    public Set<CrisLayoutField> getLayoutFields() {
+        return layoutFields;
+    }
+
+    public void addLayoutField(CrisLayoutField layoutField) {
+        if (this.layoutFields == null) {
+            this.layoutFields = new HashSet<>();
+        }
+        this.layoutFields.add(layoutField);
+    }
+
+    public void setLayoutFields(Set<CrisLayoutField> layoutFields) {
+        this.layoutFields = layoutFields;
+    }
+
     public Boolean getClear() {
         return clear;
     }
 
     public void setClear(Boolean clear) {
         this.clear = clear;
-    }
-
-    public void addLayoutField(CrisLayoutField field, Integer position) {
-        if (this.box2field.isEmpty()) {
-            position = 0;
-        } else if (position == null) {
-            position = 0;
-            for (Iterator<CrisLayoutBox2Field> it = this.box2field.iterator();
-                    it.hasNext(); ) {
-                CrisLayoutBox2Field b2f = it.next();
-                CrisLayoutField dbField = b2f.getField();
-                if (b2f.getPosition() > position && dbField.getRow().equals(field.getRow())) {
-                    position = b2f.getPosition() + 1;
-                }
-            }
-        } else {
-            int currentPosition = -1;
-            for (Iterator<CrisLayoutBox2Field> it = this.box2field.iterator();
-                    it.hasNext(); ) {
-                CrisLayoutBox2Field b2f = it.next();
-                CrisLayoutField dbField = b2f.getField();
-                if (dbField.getRow().equals(field.getRow())) {
-                    currentPosition = b2f.getPosition();
-                    if (currentPosition >= position ) {
-                        b2f.setPosition(++currentPosition);
-                    }
-                }
-            }
-            if (currentPosition < 0) {
-                position = 0;
-            } else if (position > ++currentPosition) {
-                position = currentPosition;
-            }
-        }
-        CrisLayoutBox2Field box2field =
-                new CrisLayoutBox2Field(this, field, position);
-        this.box2field.add(box2field);
-    }
-
-    public void addLayoutField(CrisLayoutField field) {
-        addLayoutField(field, null);
-    }
-
-    public void removeLayoutField(CrisLayoutField field) {
-        boolean found = false;
-        Integer row = null;
-        for (Iterator<CrisLayoutBox2Field> it = this.box2field.iterator();
-                it.hasNext();) {
-            CrisLayoutBox2Field b2f = it.next();
-            if (found && row.equals(field.getRow())) {
-                b2f.setPosition(b2f.getPosition() - 1);
-            }
-            if (b2f.getBox().equals(this) && b2f.getField().equals(field)) {
-                row = b2f.getField().getRow();
-                it.remove();
-                b2f.setBox(null);
-                b2f.setField(null);
-                found = true;
-            }
-        }
-    }
-
-    public List<CrisLayoutBox2Field> getBox2field() {
-        return box2field;
-    }
-
-    public void setBox2field(List<CrisLayoutBox2Field> box2field) {
-        this.box2field = box2field;
     }
 
     public List<CrisLayoutTab2Box> getTab2box() {
