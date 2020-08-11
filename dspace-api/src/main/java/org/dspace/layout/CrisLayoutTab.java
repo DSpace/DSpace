@@ -8,6 +8,7 @@
 package org.dspace.layout;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -63,7 +64,8 @@ public class CrisLayoutTab implements ReloadableEntity<Integer> {
     private Set<MetadataField> metadataSecurityFields;
     @OneToMany(
         mappedBy = "tab",
-        cascade = CascadeType.ALL
+        cascade = CascadeType.ALL,
+        orphanRemoval = true
     )
     private List<CrisLayoutTab2Box> tab2box = new ArrayList<>();
 
@@ -151,6 +153,13 @@ public class CrisLayoutTab implements ReloadableEntity<Integer> {
         this.metadataSecurityFields = metadataFields;
     }
 
+    public void addMetadataSecurityFields(Set<MetadataField> metadataFields) {
+        if (this.metadataSecurityFields == null) {
+            this.metadataSecurityFields = new HashSet<>();
+        }
+        this.metadataSecurityFields.addAll(metadataFields);
+    }
+
     public void addBox(CrisLayoutBox box) {
         this.addBox(box, null);
     }
@@ -163,7 +172,7 @@ public class CrisLayoutTab implements ReloadableEntity<Integer> {
             for (Iterator<CrisLayoutTab2Box> it = this.tab2box.iterator();
                     it.hasNext(); ) {
                 CrisLayoutTab2Box t2b = it.next();
-                if (t2b.getPosition() > position) {
+                if (t2b.getPosition() >= position) {
                     position = t2b.getPosition() + 1;
                 }
             }
@@ -196,6 +205,7 @@ public class CrisLayoutTab implements ReloadableEntity<Integer> {
             if (t2b.getTab().equals(this) &&
                     t2b.getId().getCrisLayoutBoxId().equals(boxId)) {
                 it.remove();
+                t2b.getBox().getTab2box().remove(t2b);
                 t2b.setBox(null);
                 t2b.setTab(null);
                 found = true;
@@ -213,6 +223,7 @@ public class CrisLayoutTab implements ReloadableEntity<Integer> {
             }
             if (t2b.getTab().equals(this) && t2b.getBox().equals(box)) {
                 it.remove();
+                t2b.getBox().getTab2box().remove(t2b);
                 t2b.setBox(null);
                 t2b.setTab(null);
                 found = true;

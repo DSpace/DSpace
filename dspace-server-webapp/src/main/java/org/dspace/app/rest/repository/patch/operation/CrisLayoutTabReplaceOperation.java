@@ -16,11 +16,13 @@ import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.core.Context;
 import org.dspace.layout.CrisLayoutTab;
 import org.dspace.layout.LayoutSecurity;
+import org.springframework.stereotype.Component;
 
 /**
  * @author Danilo Di Nuzzo (danilo.dinuzzo at 4science.it)
  *
  */
+@Component
 public class CrisLayoutTabReplaceOperation<D> extends PatchOperation<D> {
 
     /**
