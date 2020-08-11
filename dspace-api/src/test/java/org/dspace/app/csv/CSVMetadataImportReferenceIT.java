@@ -19,11 +19,15 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 
-import org.dspace.AbstractIntegrationTest;
+import org.dspace.AbstractIntegrationTestWithDatabase;
 import org.dspace.app.bulkedit.MetadataImportException;
 import org.dspace.app.bulkedit.MetadataImportInvalidHeadingException;
 import org.dspace.app.scripts.handler.impl.TestDSpaceRunnableHandler;
-import org.dspace.authorize.AuthorizeException;
+import org.dspace.builder.CollectionBuilder;
+import org.dspace.builder.CommunityBuilder;
+import org.dspace.builder.EntityTypeBuilder;
+import org.dspace.builder.ItemBuilder;
+import org.dspace.builder.RelationshipTypeBuilder;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.EntityType;
@@ -31,23 +35,15 @@ import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.Relationship;
-import org.dspace.content.WorkspaceItem;
 import org.dspace.content.factory.ContentServiceFactory;
-import org.dspace.content.service.CollectionService;
-import org.dspace.content.service.CommunityService;
-import org.dspace.content.service.EntityTypeService;
-import org.dspace.content.service.InstallItemService;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.MetadataFieldService;
 import org.dspace.content.service.MetadataValueService;
 import org.dspace.content.service.RelationshipService;
-import org.dspace.content.service.RelationshipTypeService;
-import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.scripts.DSpaceRunnable;
 import org.dspace.scripts.configuration.ScriptConfiguration;
 import org.dspace.scripts.factory.ScriptServiceFactory;
 import org.dspace.scripts.service.ScriptService;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -55,20 +51,13 @@ import org.junit.Test;
  * Created by: Andrew Wood
  * Date: 26 Jul 2019
  */
-public class CSVMetadataImportReferenceIT extends AbstractIntegrationTest {
+public class CSVMetadataImportReferenceIT extends AbstractIntegrationTestWithDatabase {
 
     //Common collection to utilize for test
     private Collection col1;
 
     private RelationshipService relationshipService = ContentServiceFactory.getInstance().getRelationshipService();
     private ItemService itemService = ContentServiceFactory.getInstance().getItemService();
-    private CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
-    private CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
-    private WorkspaceItemService workspaceItemService = ContentServiceFactory.getInstance().getWorkspaceItemService();
-    private InstallItemService installItemService = ContentServiceFactory.getInstance().getInstallItemService();
-    private EntityTypeService entityTypeService = ContentServiceFactory.getInstance().getEntityTypeService();
-    private RelationshipTypeService relationshipTypeService = ContentServiceFactory.getInstance()
-                                                                                   .getRelationshipTypeService();
 
 
     Community parentCommunity;
@@ -77,72 +66,32 @@ public class CSVMetadataImportReferenceIT extends AbstractIntegrationTest {
      * Setup testing enviorment
      */
     @Before
-    public void setup() throws SQLException, AuthorizeException {
+    public void setup() throws SQLException {
         context.turnOffAuthorisationSystem();
-        parentCommunity = communityService.create(null, context);
-        communityService.addMetadata(context, parentCommunity, "dc", "title", null, null, "Parent Community");
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
 
-        col1 = collectionService.create(context, parentCommunity);
-        collectionService.addMetadata(context, col1, "dc", "title", null, null, "Collection 1");
+        col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1").build();
 
-        if (entityTypeService.findAll(context).size() > 0) {
-            //Don't initialize the setup more than once
-            return;
-        }
 
         context.turnOffAuthorisationSystem();
 
-        EntityType publicationEntityType = entityTypeService.create(context, "Publication");
-        EntityType personEntityType = entityTypeService.create(context, "Person");
-        EntityType orgUnitType = entityTypeService.create(context, "OrgUnit");
-        EntityType projectType = entityTypeService.create(context, "Project");
-        relationshipTypeService
-            .create(context, publicationEntityType, personEntityType, "isAuthorOfPublication", "isPublicationOfAuthor",
-                    null, null, null, null);
-        relationshipTypeService
-            .create(context, publicationEntityType, projectType, "isProjectOfPublication", "isPublicationOfProject", 0,
-                    null, 0, null, false, true);
+        EntityType publication = EntityTypeBuilder.createEntityTypeBuilder(context, "Publication").build();
+        EntityType person = EntityTypeBuilder.createEntityTypeBuilder(context, "Person").build();
+        EntityType project = EntityTypeBuilder.createEntityTypeBuilder(context, "Project").build();
+        EntityType orgUnit = EntityTypeBuilder.createEntityTypeBuilder(context, "OrgUnit").build();
+
+        RelationshipTypeBuilder
+            .createRelationshipTypeBuilder(context, publication, person, "isAuthorOfPublication",
+                                           "isPublicationOfAuthor", 0, null, 0,
+                                           null).withCopyToLeft(false).withCopyToRight(true).build();
+
+        RelationshipTypeBuilder.createRelationshipTypeBuilder(context, publication, project, "isProjectOfPublication",
+                                                              "isPublicationOfProject", 0, null, 0,
+                                                              null).withCopyToRight(true).build();
 
         context.restoreAuthSystemState();
-
-        context.restoreAuthSystemState();
-    }
-
-    @After
-    @Override
-    public void destroy() {
-        context.turnOffAuthorisationSystem();
-        try {
-            List<Relationship> relationships = relationshipService.findAll(context);
-            for (Relationship relationship : relationships) {
-                relationshipService.delete(context, relationship);
-            }
-            Iterator<Item> itemIterator = itemService.findAll(context);
-            while (itemIterator.hasNext()) {
-                Item item = itemIterator.next();
-                itemService.delete(context, item);
-            }
-            List<Collection> collections = collectionService.findAll(context);
-            for (Collection collection : collections) {
-                collectionService.delete(context, collection);
-            }
-            List<Community> communities = communityService.findAll(context);
-            for (Community community : communities) {
-                communityService.delete(context, community);
-            }
-            context.commit();
-        } catch (Exception e) {
-            String t = "";
-        }
-
-        context.restoreAuthSystemState();
-        col1 = null;
-        parentCommunity = null;
-        try {
-            super.destroy();
-        } catch (Exception e) {
-            String t = "";
-        }
     }
 
     /**
@@ -253,10 +202,14 @@ public class CSVMetadataImportReferenceIT extends AbstractIntegrationTest {
     @Test
     public void testSingleUUIDReference() throws Exception {
         context.turnOffAuthorisationSystem();
-        WorkspaceItem workspaceItem = workspaceItemService.create(context, col1, false);
-        Item person = installItemService.installItem(context, workspaceItem);
-        itemService.addMetadata(context, person, "relationship", "type", null, null, "Person");
-        itemService.update(context, person);
+        Item person = ItemBuilder.createItem(context, col1)
+                             .withTitle("Author1")
+                             .withIssueDate("2017-10-17")
+                             .withAuthor("Smith, Donald")
+                             .withPersonIdentifierLastName("Smith")
+                             .withPersonIdentifierFirstName("Donald")
+                             .withRelationshipType("Person")
+                             .build();
         context.restoreAuthSystemState();
         String[] csv = {"id,relationship.type,relation.isAuthorOfPublication,collection,rowName,dc.identifier.other",
             "+,Publication," + person.getID().toString() + "," + col1.getHandle() + ",anything,0"};
@@ -271,15 +224,22 @@ public class CSVMetadataImportReferenceIT extends AbstractIntegrationTest {
     @Test
     public void testMultiUUIDReference() throws Exception {
         context.turnOffAuthorisationSystem();
-        WorkspaceItem workspaceItem = workspaceItemService.create(context, col1, false);
-        Item person = installItemService.installItem(context, workspaceItem);
-        itemService.addMetadata(context, person, "relationship", "type", null, null, "Person");
-        itemService.update(context, person);
-        WorkspaceItem workspaceItem2 = workspaceItemService.create(context, col1, false);
-        Item person2 = installItemService.installItem(context, workspaceItem2);
-        itemService.addMetadata(context, person2, "relationship", "type", null, null, "Person");
-        itemService.update(context, person2);
-        context.restoreAuthSystemState();
+        Item person = ItemBuilder.createItem(context, col1)
+                                 .withTitle("Author1")
+                                 .withIssueDate("2017-10-17")
+                                 .withAuthor("Smith, Donald")
+                                 .withPersonIdentifierLastName("Smith")
+                                 .withPersonIdentifierFirstName("Donald")
+                                 .withRelationshipType("Person")
+                                 .build();
+        Item person2 = ItemBuilder.createItem(context, col1)
+                                 .withTitle("Author2")
+                                 .withIssueDate("2017-10-17")
+                                 .withAuthor("Smith, John")
+                                 .withPersonIdentifierLastName("Smith")
+                                 .withPersonIdentifierFirstName("John")
+                                 .withRelationshipType("Person")
+                                 .build();
         String[] csv = {"id,relationship.type,relation.isAuthorOfPublication,collection,rowName,dc.identifier.other",
             "+,Publication," + person.getID().toString() + "||" + person2.getID().toString() + "," +
                 col1.getHandle() + ",anything,0"};
@@ -295,12 +255,14 @@ public class CSVMetadataImportReferenceIT extends AbstractIntegrationTest {
     @Test
     public void testMultiRefArchivedCsv() throws Exception {
         context.turnOffAuthorisationSystem();
-        WorkspaceItem workspaceItem = workspaceItemService.create(context, col1, false);
-        Item person = installItemService.installItem(context, workspaceItem);
-        itemService.addMetadata(context, person, "relationship", "type", null, null, "Person");
-        itemService.addMetadata(context, person, "dc", "title", null, null, "Person");
-        itemService.update(context, person);
-
+        Item person = ItemBuilder.createItem(context, col1)
+                                 .withTitle("Person")
+                                 .withIssueDate("2017-10-17")
+                                 .withAuthor("Smith, Donald")
+                                 .withPersonIdentifierLastName("Smith")
+                                 .withPersonIdentifierFirstName("Donald")
+                                 .withRelationshipType("Person")
+                                 .build();
         String[] csv = {"id,dc.title,relationship.type,relation.isAuthorOfPublication,collection,rowName," +
             "dc.identifier.other",
             "+,Person2,Person,," + col1.getHandle() + ",idVal,0",
@@ -319,16 +281,22 @@ public class CSVMetadataImportReferenceIT extends AbstractIntegrationTest {
     @Test
     public void testMultiMixedRefArchivedCsv() throws Exception {
         context.turnOffAuthorisationSystem();
-        WorkspaceItem workspaceItem = workspaceItemService.create(context, col1, false);
-        Item person = installItemService.installItem(context, workspaceItem);
-        itemService.addMetadata(context, person, "relationship", "type", null, null, "Person");
-        itemService.addMetadata(context, person, "dc", "title", null, null, "Person");
-        itemService.update(context, person);
-        WorkspaceItem workspaceItem2 = workspaceItemService.create(context, col1, false);
-        Item person2 = installItemService.installItem(context, workspaceItem2);
-        itemService.addMetadata(context, person2, "relationship", "type", null, null, "Person");
-        itemService.addMetadata(context, person2, "dc", "title", null, null, "Person2");
-        itemService.update(context, person2);
+        Item person = ItemBuilder.createItem(context, col1)
+                                 .withTitle("Person")
+                                 .withIssueDate("2017-10-17")
+                                 .withAuthor("Smith, Donald")
+                                 .withPersonIdentifierLastName("Smith")
+                                 .withPersonIdentifierFirstName("Donald")
+                                 .withRelationshipType("Person")
+                                 .build();
+        Item person2 = ItemBuilder.createItem(context, col1)
+                                 .withTitle("Person2")
+                                 .withIssueDate("2017-10-17")
+                                 .withAuthor("Smith, John")
+                                 .withPersonIdentifierLastName("Smith")
+                                 .withPersonIdentifierFirstName("John")
+                                 .withRelationshipType("Person")
+                                 .build();
 
         context.restoreAuthSystemState();
         String[] csv = {"id,dc.title,relationship.type,relation.isAuthorOfPublication,collection,rowName," +
@@ -386,16 +354,24 @@ public class CSVMetadataImportReferenceIT extends AbstractIntegrationTest {
     @Test(expected = MetadataImportException.class)
     public void testNonUniqueMDRefInDb() throws Exception {
         context.turnOffAuthorisationSystem();
-        WorkspaceItem workspaceItem = workspaceItemService.create(context, col1, false);
-        Item person = installItemService.installItem(context, workspaceItem);
-        itemService.addMetadata(context, person, "relationship", "type", null, null, "Person");
-        itemService.addMetadata(context, person, "dc", "identifier", "other", null, "1");
-        itemService.update(context, person);
-        WorkspaceItem workspaceItem2 = workspaceItemService.create(context, col1, false);
-        Item person2 = installItemService.installItem(context, workspaceItem2);
-        itemService.addMetadata(context, person2, "relationship", "type", null, null, "Person");
-        itemService.addMetadata(context, person2, "dc", "identifier", "other", null, "1");
-        itemService.update(context, person2);
+        Item person = ItemBuilder.createItem(context, col1)
+                                 .withTitle("Person")
+                                 .withIssueDate("2017-10-17")
+                                 .withAuthor("Smith, Donald")
+                                 .withPersonIdentifierLastName("Smith")
+                                 .withPersonIdentifierFirstName("Donald")
+                                 .withRelationshipType("Person")
+                                 .withIdentifierOther("1")
+                                 .build();
+        Item person2 = ItemBuilder.createItem(context, col1)
+                                 .withTitle("Person2")
+                                 .withIssueDate("2017-10-17")
+                                 .withAuthor("Smith, John")
+                                 .withPersonIdentifierLastName("Smith")
+                                 .withPersonIdentifierFirstName("John")
+                                 .withRelationshipType("Person")
+                                 .withIdentifierOther("1")
+                                 .build();
 
         context.restoreAuthSystemState();
         String[] csv = {"id,relationship.type,relation.isAuthorOfPublication,collection,dc.identifier.other",
@@ -409,11 +385,15 @@ public class CSVMetadataImportReferenceIT extends AbstractIntegrationTest {
     @Test(expected = MetadataImportException.class)
     public void testNonUniqueMDRefInBoth() throws Exception {
         context.turnOffAuthorisationSystem();
-        WorkspaceItem workspaceItem = workspaceItemService.create(context, col1, false);
-        Item person = installItemService.installItem(context, workspaceItem);
-        itemService.addMetadata(context, person, "relationship", "type", null, null, "Person");
-        itemService.addMetadata(context, person, "dc", "identifier", "other", null, "1");
-        itemService.update(context, person);
+        Item person = ItemBuilder.createItem(context, col1)
+                                 .withTitle("Person")
+                                 .withIssueDate("2017-10-17")
+                                 .withAuthor("Smith, Donald")
+                                 .withPersonIdentifierLastName("Smith")
+                                 .withPersonIdentifierFirstName("Donald")
+                                 .withRelationshipType("Person")
+                                 .withIdentifierOther("1")
+                                 .build();
         context.restoreAuthSystemState();
         String[] csv = {"id,relationship.type,relation.isAuthorOfPublication,collection,dc.identifier.other",
             "+,Person,," + col1.getHandle() + ",1",
@@ -471,10 +451,11 @@ public class CSVMetadataImportReferenceIT extends AbstractIntegrationTest {
     @Test(expected = MetadataImportInvalidHeadingException.class)
     public void testInvalidRelationshipArchivedOrigin() throws Exception {
         context.turnOffAuthorisationSystem();
-        WorkspaceItem workspaceItem = workspaceItemService.create(context, col1, false);
-        Item testItem = installItemService.installItem(context, workspaceItem);
-        itemService.addMetadata(context, testItem, "relationship", "type", null, null, "OrgUnit");
-        itemService.update(context, testItem);
+        Item testItem = ItemBuilder.createItem(context, col1)
+                                 .withTitle("OrgUnit")
+                                 .withIssueDate("2017-10-17")
+                                 .withRelationshipType("OrgUnit")
+                                 .build();
         context.restoreAuthSystemState();
         String[] csv = {"id,relationship.type,relation.isAuthorOfPublication,collection,rowName",
             "+,Person,," + col1.getHandle() + ",1" +
@@ -488,10 +469,11 @@ public class CSVMetadataImportReferenceIT extends AbstractIntegrationTest {
     @Test(expected = MetadataImportInvalidHeadingException.class)
     public void testInvalidRelationshipArchivedTarget() throws Exception {
         context.turnOffAuthorisationSystem();
-        WorkspaceItem workspaceItem = workspaceItemService.create(context, col1, false);
-        Item testItem = installItemService.installItem(context, workspaceItem);
-        itemService.addMetadata(context, testItem, "relationship", "type", null, null, "OrgUnit");
-        itemService.update(context, testItem);
+        Item testItem = ItemBuilder.createItem(context, col1)
+                                   .withTitle("OrgUnit")
+                                   .withIssueDate("2017-10-17")
+                                   .withRelationshipType("OrgUnit")
+                                   .build();
         context.restoreAuthSystemState();
         String[] csv = {"id,relationship.type,relation.isAuthorOfPublication,collection,rowName",
             testItem.getID().toString() + ",Person,," + col1.getHandle() + ",1" +
@@ -506,25 +488,31 @@ public class CSVMetadataImportReferenceIT extends AbstractIntegrationTest {
     public void testValidRelationshipNoDefinedTypesInCSV() throws Exception {
         context.turnOffAuthorisationSystem();
 
-        WorkspaceItem workspaceItem = workspaceItemService.create(context, col1, false);
-        Item testItem = installItemService.installItem(context, workspaceItem);
-        itemService.addMetadata(context, testItem, "relationship", "type", null, null, "Person");
-        itemService.addMetadata(context, testItem, "dc", "identifier", "other", null, "testItemOne");
-        itemService.update(context, testItem);
+        Item testItem = ItemBuilder.createItem(context, col1)
+                                 .withTitle("Person")
+                                 .withIssueDate("2017-10-17")
+                                 .withAuthor("Smith, Donald")
+                                 .withPersonIdentifierLastName("Smith")
+                                 .withPersonIdentifierFirstName("Donald")
+                                 .withRelationshipType("Person")
+                                 .withIdentifierOther("testItemOne")
+                                 .build();
 
 
-        WorkspaceItem workspaceItem2 = workspaceItemService.create(context, col1, false);
-        Item testItem2 = installItemService.installItem(context, workspaceItem2);
-        itemService.addMetadata(context, testItem2, "relationship", "type", null, null, "Publication");
-        itemService.addMetadata(context, testItem2, "dc", "identifier", "other", null, "testItemTwo");
-        itemService.update(context, testItem2);
+        Item testItem2 = ItemBuilder.createItem(context, col1)
+                                 .withTitle("Publication")
+                                 .withIssueDate("2017-10-17")
+                                 .withRelationshipType("Publication")
+                                 .withIdentifierOther("testItemTwo")
+                                 .build();
 
 
-        WorkspaceItem workspaceItem3 = workspaceItemService.create(context, col1, false);
-        Item testItem3 = installItemService.installItem(context, workspaceItem3);
-        itemService.addMetadata(context, testItem3, "relationship", "type", null, null, "Project");
-        itemService.addMetadata(context, testItem3, "dc", "identifier", "other", null, "testItemThree");
-        itemService.update(context, testItem3);
+        Item testItem3 = ItemBuilder.createItem(context, col1)
+                                 .withTitle("Project")
+                                 .withIssueDate("2017-10-17")
+                                 .withRelationshipType("Project")
+                                 .withIdentifierOther("testItemThree")
+                                 .build();
 
 
         context.restoreAuthSystemState();
@@ -558,11 +546,11 @@ public class CSVMetadataImportReferenceIT extends AbstractIntegrationTest {
     public void testInvalidTypeNameDefined() throws Exception {
         context.turnOffAuthorisationSystem();
 
-        WorkspaceItem workspaceItem = workspaceItemService.create(context, col1, false);
-        Item testItem = installItemService.installItem(context, workspaceItem);
-        itemService.addMetadata(context, testItem, "relationship", "type", null, null, "Publication");
-        itemService.update(context, testItem);
-
+        Item testItem = ItemBuilder.createItem(context, col1)
+                                 .withTitle("Publication")
+                                 .withIssueDate("2017-10-17")
+                                 .withRelationshipType("Publication")
+                                 .build();
         context.restoreAuthSystemState();
         String[] csv = {"id,collection,relationship.type,dc.title," +
             "relation.isProjectOfPublication,relation.isPublicationOfProject",

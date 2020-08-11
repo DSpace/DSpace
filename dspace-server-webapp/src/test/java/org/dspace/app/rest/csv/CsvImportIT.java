@@ -32,6 +32,7 @@ import java.util.stream.Collectors;
 
 import com.google.gson.Gson;
 import org.dspace.app.rest.converter.DSpaceRunnableParameterConverter;
+import org.dspace.app.rest.matcher.ProcessMatcher;
 import org.dspace.app.rest.matcher.RelationshipMatcher;
 import org.dspace.app.rest.model.ParameterValueRest;
 import org.dspace.app.rest.projection.Projection;
@@ -43,6 +44,7 @@ import org.dspace.builder.ProcessBuilder;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
+import org.dspace.content.ProcessStatus;
 import org.dspace.content.Relationship;
 import org.dspace.content.service.EntityTypeService;
 import org.dspace.content.service.ItemService;
@@ -276,7 +278,7 @@ public class CsvImportIT extends AbstractEntityIntegrationTest {
     }
 
     @Test
-    public void createRelationshipsWithCsvImportWithSpecifiedEPersonParameterTest() throws Exception {
+    public void csvImportWithSpecifiedEPersonParameterTestShouldFailProcess() throws Exception {
         context.turnOffAuthorisationSystem();
 
         parentCommunity = CommunityBuilder.createCommunity(context)
@@ -327,9 +329,12 @@ public class CsvImportIT extends AbstractEntityIntegrationTest {
                                                                                     .param("properties",
                                                                                            new Gson().toJson(list)))
                 .andExpect(status().isAccepted())
+                .andExpect(jsonPath("$", is(
+                    ProcessMatcher.matchProcess("metadata-import",
+                                                String.valueOf(admin.getID()), parameters,
+                                                ProcessStatus.FAILED))))
                 .andDo(result -> idRef
                     .set(read(result.getResponse().getContentAsString(), "$.processId")));
-            String t = "";
         } finally {
             ProcessBuilder.deleteProcess(idRef.get());
         }
