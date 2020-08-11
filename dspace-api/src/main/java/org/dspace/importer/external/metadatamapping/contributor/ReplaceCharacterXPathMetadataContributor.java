@@ -7,8 +7,6 @@
  */
 package org.dspace.importer.external.metadatamapping.contributor;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -21,12 +19,27 @@ import org.dspace.importer.external.metadatamapping.MetadataFieldConfig;
 import org.dspace.importer.external.metadatamapping.MetadatumDTO;
 import org.jaxen.JaxenException;
 /**
- * This contributor encode the metadata value. It is usefull in url building
+ * This contributor replace specific character in the metadata value.
+ * It is useful for some provider (e.g. Scopus) which use containing "/" character.
+ * Actually, "/" will never encode by framework in URL building. In the same ways, if we
+ * encode "/" -> %2F, it will be encoded by framework and become %252F.
  * 
  * @author Pasquale Cavallo (pasquale.cavallo at 4science dot it)
  *
  */
-public class UrlencodeXPathMetadataContributor extends SimpleXpathMetadatumContributor {
+public class ReplaceCharacterXPathMetadataContributor extends SimpleXpathMetadatumContributor {
+
+    private char characterToBeReplaced;
+
+    private char characterToReplaceWith;
+
+    public void setCharacterToBeReplaced(int characterToBeReplaced) {
+        this.characterToBeReplaced = (char)characterToBeReplaced;
+    }
+
+    public void setCharacterToReplaceWith(int characterToReplaceWith) {
+        this.characterToReplaceWith = (char)characterToReplaceWith;
+    }
 
     @Override
     public Collection<MetadatumDTO> contributeMetadata(OMElement t) {
@@ -63,11 +76,7 @@ public class UrlencodeXPathMetadataContributor extends SimpleXpathMetadatumContr
         if (field == null) {
             return null;
         }
-        try {
-            dcValue.setValue(URLEncoder.encode(value, "UTF-8"));
-        } catch (UnsupportedEncodingException e) {
-            dcValue.setValue(value);
-        }
+        dcValue.setValue(value == null ? null : value.replace(characterToBeReplaced, characterToReplaceWith));
         dcValue.setElement(field.getElement());
         dcValue.setQualifier(field.getQualifier());
         dcValue.setSchema(field.getSchema());
