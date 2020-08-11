@@ -9,6 +9,10 @@ package org.dspace.curate;
 
 import org.apache.commons.cli.Options;
 
+/**
+ * This is the CLI version of the {@link CurationScriptConfiguration} class that handles the configuration for the
+ * {@link CurationCli} script
+ */
 public class CurationCliScriptConfiguration extends CurationScriptConfiguration<Curation> {
 
     @Override
