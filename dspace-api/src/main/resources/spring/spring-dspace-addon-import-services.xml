@@ -19,7 +19,6 @@
 
     <context:annotation-config/> <!-- allows us to use spring annotations in beans -->
 
-
     <!--If multiple importServices have been configured here but only one is to be used during the lookup step (StartSubmissionLookupStep),
         this can be accomplished by specifying the property "publication-lookup.url" to the baseAddress of the required importService
         So for example
@@ -30,9 +29,14 @@
 
     <bean id="importService" class="org.dspace.importer.external.service.ImportService" scope="singleton"
           lazy-init="false" autowire="byType" destroy-method="destroy">
-
+        <property name="importSources">
+            <list>
+                <ref bean="PubmedImportService"></ref>
+                <ref bean="BibtexImportService"></ref>
+            </list>
+         </property>
     </bean>
-
+  
     <bean id="ArXivImportService"
           class="org.dspace.importer.external.arxiv.service.ArXivImportMetadataSourceServiceImpl" scope="singleton">
         <property name="metadataFieldMapping" ref="ArXivMetadataFieldMapping"/>
@@ -48,10 +52,26 @@
         <property name="metadataFieldMapping" ref="PubmedMetadataFieldMapping"/>
         <property name="baseAddress" value="https://eutils.ncbi.nlm.nih.gov/entrez/eutils/"/>
         <property name="generateQueryForItem" ref="pubmedService"></property>
-
+        <property name="supportedExtensions">
+            <list>
+                 <value>xml</value>
+            </list>
+        </property>
     </bean>
+
+
     <bean id="PubmedMetadataFieldMapping"
           class="org.dspace.importer.external.pubmed.metadatamapping.PubmedFieldMapping">
+    </bean>
+
+    <bean id="BibtexImportService"
+          class="org.dspace.importer.external.bibtex.service.BibtexImportMetadataSourceServiceImpl" scope="singleton">
+          <property name="supportedExtensions">
+               <list>
+                     <value>bib</value>
+                     <value>bibtex</value>
+               </list>
+          </property>
     </bean>
 
     <!-- Metadatafield used to check against if it's already imported or not during the JSONLookupSearcher-->
