@@ -463,7 +463,7 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
      * @throws IOException
      * @throws AuthorizeException
      */
-    public Iterable<T> upload(HttpServletRequest request, MultipartFile uploadfile)
+    public Iterable<T> upload(HttpServletRequest request, List<MultipartFile> uploadfile)
         throws SQLException, FileNotFoundException, IOException, AuthorizeException {
         Context context = obtainContext();
         Iterable<T> entity = upload(context, request, uploadfile);
@@ -486,7 +486,7 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
      * @throws RepositoryMethodNotImplementedException
      */
     protected Iterable<T> upload(Context context, HttpServletRequest request,
-            MultipartFile uploadfile)
+            List<MultipartFile> uploadfile)
         throws SQLException, FileNotFoundException, IOException, AuthorizeException {
         throw new RepositoryMethodNotImplementedException("No implementation found; Method not allowed!", "");
     }
