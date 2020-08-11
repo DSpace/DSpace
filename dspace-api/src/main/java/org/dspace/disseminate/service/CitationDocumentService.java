@@ -38,7 +38,7 @@ public interface CitationDocumentService {
      * Citation enabled globally (all citable bitstreams will get "watermarked") modules/disseminate-citation:
      * enable_globally
      * OR
-     * The container is this object is whitelist enabled.
+     * The container is this object is "allow list" enabled.
      * - community:  modules/disseminate-citation: enabled_communities
      * - collection: modules/disseminate-citation: enabled_collections
      * AND

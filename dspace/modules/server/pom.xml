@@ -13,7 +13,7 @@ just adding new jar in the classloader</description>
     <parent>
         <artifactId>modules</artifactId>
         <groupId>org.dspace</groupId>
-        <version>7.0-beta3-SNAPSHOT</version>
+        <version>7.0-beta4-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
 
@@ -84,7 +84,7 @@ just adding new jar in the classloader</description>
             <activation>
                 <activeByDefault>false</activeByDefault>
                 <property>
-                    <name>maven.test.skip</name>
+                    <name>skipTests</name>
                     <value>false</value>
                 </property>
             </activation>
@@ -194,7 +194,6 @@ just adding new jar in the classloader</description>
                 <dependency>
                     <groupId>org.dspace</groupId>
                     <artifactId>dspace-server-webapp</artifactId>
-                    <version>7.0-beta3-SNAPSHOT</version>
                     <type>test-jar</type>
                     <scope>test</scope>
                 </dependency>
@@ -236,6 +235,18 @@ just adding new jar in the classloader</description>
 
         <!-- Test Dependencies -->
         <dependency>
+            <groupId>org.dspace</groupId>
+            <artifactId>dspace-api</artifactId>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.dspace</groupId>
+            <artifactId>dspace-server-webapp</artifactId>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
@@ -266,6 +277,14 @@ just adding new jar in the classloader</description>
             <artifactId>solr-cell</artifactId>
             <scope>test</scope>
             <exclusions>
+                <exclusion>
+                    <groupId>org.bouncycastle</groupId>
+                    <artifactId>bcpkix-jdk15on</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.bouncycastle</groupId>
+                    <artifactId>bcprov-jdk15on</artifactId>
+                </exclusion>
                 <exclusion>
                     <groupId>org.eclipse.jetty</groupId>
                     <artifactId>jetty-continuation</artifactId>

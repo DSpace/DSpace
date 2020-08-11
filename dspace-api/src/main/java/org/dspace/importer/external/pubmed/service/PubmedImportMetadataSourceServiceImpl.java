@@ -77,7 +77,7 @@ public class PubmedImportMetadataSourceServiceImpl extends AbstractImportMetadat
      * @throws MetadataSourceException if the underlying methods throw any exception.
      */
     @Override
-    public int getNbRecords(String query) throws MetadataSourceException {
+    public int getRecordsCount(String query) throws MetadataSourceException {
         return retry(new GetNbRecords(query));
     }
 
@@ -89,7 +89,7 @@ public class PubmedImportMetadataSourceServiceImpl extends AbstractImportMetadat
      * @throws MetadataSourceException if the underlying methods throw any exception.
      */
     @Override
-    public int getNbRecords(Query query) throws MetadataSourceException {
+    public int getRecordsCount(Query query) throws MetadataSourceException {
         return retry(new GetNbRecords(query));
     }
 
@@ -446,6 +446,4 @@ public class PubmedImportMetadataSourceServiceImpl extends AbstractImportMetadat
         }
         return records;
     }
-
-
 }

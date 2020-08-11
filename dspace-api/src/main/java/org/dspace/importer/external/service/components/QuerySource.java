@@ -42,7 +42,7 @@ public interface QuerySource extends MetadataSource {
      * @return the number of records matching the query
      * @throws MetadataSourceException if the underlying methods throw any exception.
      */
-    public int getNbRecords(String query) throws MetadataSourceException;
+    public int getRecordsCount(String query) throws MetadataSourceException;
 
     /**
      * Gets the number of records matching a query
@@ -51,7 +51,7 @@ public interface QuerySource extends MetadataSource {
      * @return the number of records matching the query
      * @throws MetadataSourceException if the underlying methods throw any exception.
      */
-    public int getNbRecords(Query query) throws MetadataSourceException;
+    public int getRecordsCount(Query query) throws MetadataSourceException;
 
     /**
      * Gets a set of records matching a query. Supports pagination

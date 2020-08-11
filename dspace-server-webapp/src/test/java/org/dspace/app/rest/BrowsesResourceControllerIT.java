@@ -19,14 +19,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import org.dspace.app.rest.builder.CollectionBuilder;
-import org.dspace.app.rest.builder.CommunityBuilder;
-import org.dspace.app.rest.builder.GroupBuilder;
-import org.dspace.app.rest.builder.ItemBuilder;
 import org.dspace.app.rest.matcher.BrowseEntryResourceMatcher;
 import org.dspace.app.rest.matcher.BrowseIndexMatcher;
 import org.dspace.app.rest.matcher.ItemMatcher;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
+import org.dspace.builder.CollectionBuilder;
+import org.dspace.builder.CommunityBuilder;
+import org.dspace.builder.GroupBuilder;
+import org.dspace.builder.ItemBuilder;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
