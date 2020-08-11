@@ -45,10 +45,10 @@
         <property name="metadataFieldMapping" ref="PubmedMetadataFieldMapping"/>
         <property name="baseAddress" value="https://eutils.ncbi.nlm.nih.gov/entrez/eutils/"/>
         <property name="supportedExtensions">
-               <list>
-                     <value>xml</value>
-               </list>
-          </property>
+            <list>
+                 <value>xml</value>
+            </list>
+        </property>
     </bean>
 
 

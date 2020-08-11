@@ -75,6 +75,10 @@ public class CCLicenseConnectorServiceImpl implements CCLicenseConnectorService,
                 .disableAutomaticRetries()
                 .setMaxConnTotal(5)
                 .build();
+
+        // disallow DTD parsing to ensure no XXE attacks can occur.
+        // See https://cheatsheetseries.owasp.org/cheatsheets/XML_External_Entity_Prevention_Cheat_Sheet.html
+        parser.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
     }
 
     /**

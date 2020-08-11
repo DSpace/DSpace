@@ -19,12 +19,12 @@ import java.util.List;
 import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
-import org.dspace.app.rest.builder.CollectionBuilder;
-import org.dspace.app.rest.builder.CommunityBuilder;
 import org.dspace.app.rest.matcher.WorkflowDefinitionMatcher;
 import org.dspace.app.rest.model.WorkflowDefinitionRest;
 import org.dspace.app.rest.repository.WorkflowDefinitionRestRepository;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
+import org.dspace.builder.CollectionBuilder;
+import org.dspace.builder.CommunityBuilder;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.xmlworkflow.factory.XmlWorkflowFactory;
@@ -41,7 +41,8 @@ import org.junit.Test;
  */
 public class WorkflowDefinitionRestRepositoryIT extends AbstractControllerIntegrationTest {
 
-    private XmlWorkflowFactory xmlWorkflowFactory = XmlWorkflowServiceFactory.getInstance().getWorkflowFactory();
+    private final XmlWorkflowFactory xmlWorkflowFactory
+            = XmlWorkflowServiceFactory.getInstance().getWorkflowFactory();
 
     private static final String WORKFLOW_DEFINITIONS_ENDPOINT
         = "/api/" + WorkflowDefinitionRest.CATEGORY + "/" + WorkflowDefinitionRest.NAME_PLURAL;
@@ -240,7 +241,7 @@ public class WorkflowDefinitionRestRepositoryIT extends AbstractControllerIntegr
         getClient(token).perform(get(WORKFLOW_DEFINITIONS_ENDPOINT + "/search/findByCollection?uuid=" + nonValidUUID))
             //We expect a 400 Illegal Argument Exception (Bad Request) cannot convert UUID
             .andExpect(status().isBadRequest())
-            .andExpect(status().reason(containsString("Failed to convert " + nonValidUUID)));
+            .andExpect(status().reason(containsString("A required parameter is invalid")));
     }
 
     @Test

@@ -48,7 +48,6 @@ public interface FileSource extends MetadataSource {
     public ImportRecord getRecord(InputStream inputStream)
         throws FileSourceException, FileMultipleOccurencesException;
 
-
     /**
      * This method is used to decide if the FileSource manage the file format
      * 
@@ -67,4 +66,10 @@ public interface FileSource extends MetadataSource {
         }
         return false;
     }
+
+    /**
+     * Get the file extensions (xml, csv, txt, ...) supported by the FileSource implementation
+     */
+    public List<String> getSupportedExtensions();
+
 }
