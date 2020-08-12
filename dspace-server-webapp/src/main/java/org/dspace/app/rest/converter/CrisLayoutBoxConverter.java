@@ -74,7 +74,6 @@ public class CrisLayoutBoxConverter implements DSpaceConverter<CrisLayoutBox, Cr
         box.setHeader(rest.getHeader());
         box.setId(rest.getId());
         box.setMinor(rest.getMinor());
-        // box.setPriority(rest.getPriority());
         box.setSecurity(LayoutSecurity.valueOf(rest.getSecurity()));
         box.setShortname(rest.getShortname());
         box.setStyle(rest.getStyle());

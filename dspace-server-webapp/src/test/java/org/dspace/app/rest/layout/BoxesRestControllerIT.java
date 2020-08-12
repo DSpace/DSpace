@@ -601,12 +601,12 @@ public class BoxesRestControllerIT extends AbstractControllerIntegrationTest {
     @Test
     public void createBox() throws Exception {
         context.turnOffAuthorisationSystem();
+        // Create entity type
+        EntityType eTypePer = EntityTypeBuilder.createEntityTypeBuilder(context, "Person").build();
+        context.restoreAuthSystemState();
+
         AtomicReference<Integer> idRef = new AtomicReference<Integer>();
         try {
-            // Create entity type
-            EntityType eTypePer = EntityTypeBuilder.createEntityTypeBuilder(context, "Person").build();
-            context.restoreAuthSystemState();
-
             CrisLayoutBoxRest rest = new CrisLayoutBoxRest();
             rest.setEntityType(eTypePer.getLabel());
             rest.setBoxType("box-type");
@@ -614,7 +614,6 @@ public class BoxesRestControllerIT extends AbstractControllerIntegrationTest {
             rest.setCollapsed(false);
             rest.setHeader("box-header");
             rest.setMinor(false);
-            rest.setPriority(0);
             rest.setSecurity(0);
             rest.setShortname("shortname-box");
             rest.setStyle("style-box");

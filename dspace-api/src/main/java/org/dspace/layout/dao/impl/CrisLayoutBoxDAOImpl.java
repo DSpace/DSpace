@@ -15,7 +15,6 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Join;
 import javax.persistence.criteria.JoinType;
-import javax.persistence.criteria.ListJoin;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
@@ -111,19 +110,20 @@ public class CrisLayoutBoxDAOImpl extends AbstractHibernateDAO<CrisLayoutBox> im
         // Initialize dynamic predicates list
         List<Predicate> predicates = new ArrayList<>();
         predicates.add(cb.equal(boxRoot.get(CrisLayoutBox_.entitytype).get(EntityType_.LABEL), entityType));
-        Predicate[] predicateArray = new Predicate[predicates.size()];
-        predicates.toArray(predicateArray);
-        // Set where condition and orderBy
-        query.select(boxRoot)
-            .where(predicateArray);
+
         // Set filter if tabId parameter isn't null
         if (tabId != null) {
-            ListJoin<CrisLayoutBox, CrisLayoutTab2Box> tabs = boxRoot.joinList(CrisLayoutTab2Box_.TAB);
+            Join<CrisLayoutBox, CrisLayoutTab2Box> tabs = boxRoot.join(CrisLayoutBox_.TAB2BOX);
             predicates.add(cb.equal(tabs.get(CrisLayoutTab2Box_.ID)
                     .get(CrisLayoutTab2BoxId_.CRIS_LAYOUT_TAB_ID), tabId));
             query.orderBy(cb.asc(tabs.get(CrisLayoutTab2Box_.POSITION)));
         }
 
+        Predicate[] predicateArray = new Predicate[predicates.size()];
+        predicates.toArray(predicateArray);
+        // Set where condition and orderBy
+        query.select(boxRoot)
+            .where(predicateArray);
         TypedQuery<CrisLayoutBox> exQuery = getHibernateSession(context).createQuery(query);
         // If present set pagination filter
         if ( limit != null && offset != null ) {
