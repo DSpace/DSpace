@@ -448,7 +448,14 @@ public class MetadatafieldRestRepositoryIT extends AbstractControllerIntegration
     }
 
     @Test
-    public void findByFieldName_query_exactName() throws Exception {
+    public void findByFieldName_invalidQuery() throws Exception {
+        getClient().perform(get(SEARCH_BYFIELDNAME_ENDPOINT)
+            .param("query", "schema.element.qualifier.morestuff"))
+                   .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void findByFieldName_exactName() throws Exception {
         context.turnOffAuthorisationSystem();
 
         MetadataSchema schema = MetadataSchemaBuilder.createMetadataSchema(context, "ASchema",
@@ -485,25 +492,7 @@ public class MetadatafieldRestRepositoryIT extends AbstractControllerIntegration
     }
 
     @Test
-    public void findByFieldName_query_exactName_NoResult() throws Exception {
-        context.turnOffAuthorisationSystem();
-
-        MetadataSchema schema = MetadataSchemaBuilder.createMetadataSchema(context, "ASchema",
-            "http://www.dspace.org/ns/aschema").build();
-        MetadataSchema schema2 = MetadataSchemaBuilder.createMetadataSchema(context, "test",
-            "http://www.dspace.org/ns/aschema2").build();
-
-        MetadataField metadataField = MetadataFieldBuilder
-            .createMetadataField(context, schema, "AnElement1", null, "AScopeNote").build();
-
-        MetadataField metadataField2 = MetadataFieldBuilder
-            .createMetadataField(context, schema2, "AnElement2", null, "AScopeNote2").build();
-
-        MetadataField metadataField3 = MetadataFieldBuilder
-            .createMetadataField(context, schema, "test", null, "AScopeNote2").build();
-
-        context.restoreAuthSystemState();
-
+    public void findByFieldName_exactName_NoResult() throws Exception {
         getClient().perform(get(SEARCH_BYFIELDNAME_ENDPOINT)
             .param("exactName", "not.valid.mdstring"))
                    .andExpect(status().isOk())
@@ -512,10 +501,63 @@ public class MetadatafieldRestRepositoryIT extends AbstractControllerIntegration
     }
 
     @Test
-    public void findByFieldName_invalidQuery() throws Exception {
+    public void findByFieldName_exactName_combinedDiscoveryQueryParams_query() throws Exception {
+        context.turnOffAuthorisationSystem();
+        MetadataSchema schema = MetadataSchemaBuilder.createMetadataSchema(context, "ASchema",
+            "http://www.dspace.org/ns/aschema").build();
+        MetadataField metadataField = MetadataFieldBuilder
+            .createMetadataField(context, schema, "AnElement1", null, "AScopeNote").build();
+        context.restoreAuthSystemState();
+
         getClient().perform(get(SEARCH_BYFIELDNAME_ENDPOINT)
-            .param("query", "schema.element.qualifier.morestuff"))
-                   .andExpect(status().isBadRequest());
+            .param("exactName", metadataField.toString('.'))
+            .param("query", "query"))
+                   .andExpect(status().isUnprocessableEntity());
+    }
+
+    @Test
+    public void findByFieldName_exactName_combinedDiscoveryQueryParams_schema() throws Exception {
+        context.turnOffAuthorisationSystem();
+        MetadataSchema schema = MetadataSchemaBuilder.createMetadataSchema(context, "ASchema",
+            "http://www.dspace.org/ns/aschema").build();
+        MetadataField metadataField = MetadataFieldBuilder
+            .createMetadataField(context, schema, "AnElement1", null, "AScopeNote").build();
+        context.restoreAuthSystemState();
+
+        getClient().perform(get(SEARCH_BYFIELDNAME_ENDPOINT)
+            .param("exactName", metadataField.toString('.'))
+            .param("schema", "schema"))
+                   .andExpect(status().isUnprocessableEntity());
+    }
+
+    @Test
+    public void findByFieldName_exactName_combinedDiscoveryQueryParams_element() throws Exception {
+        context.turnOffAuthorisationSystem();
+        MetadataSchema schema = MetadataSchemaBuilder.createMetadataSchema(context, "ASchema",
+            "http://www.dspace.org/ns/aschema").build();
+        MetadataField metadataField = MetadataFieldBuilder
+            .createMetadataField(context, schema, "AnElement1", null, "AScopeNote").build();
+        context.restoreAuthSystemState();
+
+        getClient().perform(get(SEARCH_BYFIELDNAME_ENDPOINT)
+            .param("exactName", metadataField.toString('.'))
+            .param("element", "element"))
+                   .andExpect(status().isUnprocessableEntity());
+    }
+
+    @Test
+    public void findByFieldName_exactName_combinedDiscoveryQueryParams_qualifier() throws Exception {
+        context.turnOffAuthorisationSystem();
+        MetadataSchema schema = MetadataSchemaBuilder.createMetadataSchema(context, "ASchema",
+            "http://www.dspace.org/ns/aschema").build();
+        MetadataField metadataField = MetadataFieldBuilder
+            .createMetadataField(context, schema, "AnElement1", null, "AScopeNote").build();
+        context.restoreAuthSystemState();
+
+        getClient().perform(get(SEARCH_BYFIELDNAME_ENDPOINT)
+            .param("exactName", metadataField.toString('.'))
+            .param("qualifier", "qualifier"))
+                   .andExpect(status().isUnprocessableEntity());
     }
 
     @Test
