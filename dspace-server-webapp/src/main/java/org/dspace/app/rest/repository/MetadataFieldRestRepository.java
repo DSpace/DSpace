@@ -120,6 +120,9 @@ public class MetadataFieldRestRepository extends DSpaceRestRepository<MetadataFi
      * @param qualifierName an exact match of the field's qualifier (e.g. "author", "alternative")
      * @param query         part of the fully qualified field, should start with the start of the schema, element or
      *                      qualifier (e.g. "dc.ti", "contributor", "auth", "contributor.ot")
+     * @param exactName     exactName, The exact fully qualified field, should use the syntax schema.element
+     *                      .qualifier or schema.element if no qualifier exists (e.g. "dc.title", "dc.contributor
+     *                      .author"). It will only return one value if there's an exact match
      * @param pageable      the pagination options
      * @return List of {@link MetadataFieldRest} objects representing all {@link MetadataField} objects that match
      * the given params
@@ -129,22 +132,32 @@ public class MetadataFieldRestRepository extends DSpaceRestRepository<MetadataFi
         @Parameter(value = "element", required = false) String elementName,
         @Parameter(value = "qualifier", required = false) String qualifierName,
         @Parameter(value = "query", required = false) String query,
+        @Parameter(value = "exactName", required = false) String exactName,
         Pageable pageable) throws SQLException {
         Context context = obtainContext();
-        DiscoverQuery discoverQuery = this.createDiscoverQuery(context, schemaName, elementName, qualifierName, query);
 
         List<MetadataField> matchingMetadataFields = new ArrayList<>();
 
-        try {
-            DiscoverResult searchResult = searchService.search(context, null, discoverQuery);
-            for (IndexableObject object : searchResult.getIndexableObjects()) {
-                if (object instanceof IndexableMetadataField) {
-                    matchingMetadataFields.add(((IndexableMetadataField) object).getIndexedObject());
+        if (StringUtils.isBlank(exactName)) {
+            // Find matches in Solr Search core
+            DiscoverQuery discoverQuery = this.createDiscoverQuery(context, schemaName, elementName, qualifierName, query);
+            try {
+                DiscoverResult searchResult = searchService.search(context, null, discoverQuery);
+                for (IndexableObject object : searchResult.getIndexableObjects()) {
+                    if (object instanceof IndexableMetadataField) {
+                        matchingMetadataFields.add(((IndexableMetadataField) object).getIndexedObject());
+                    }
                 }
+            } catch (SearchServiceException e) {
+                log.error("Error while searching with Discovery", e);
+                throw new IllegalArgumentException("Error while searching with Discovery: " + e.getMessage());
             }
-        } catch (SearchServiceException e) {
-            log.error("Error while searching with Discovery", e);
-            throw new IllegalArgumentException("Error while searching with Discovery: " + e.getMessage());
+        } else {
+            // Find at most one match with exactName query param in DB
+            MetadataField exactMatchingMdField = metadataFieldService.findByString(context, exactName, '.');
+            if (exactMatchingMdField != null) {
+                matchingMetadataFields.add(exactMatchingMdField);
+            }
         }
 
         return converter.toRestPage(matchingMetadataFields, pageable, utils.obtainProjection());
@@ -202,15 +215,15 @@ public class MetadataFieldRestRepository extends DSpaceRestRepository<MetadataFi
     @Override
     @PreAuthorize("hasAuthority('ADMIN')")
     protected MetadataFieldRest createAndReturn(Context context)
-            throws AuthorizeException, SQLException {
+        throws AuthorizeException, SQLException {
 
         // parse request body
         MetadataFieldRest metadataFieldRest;
         try {
             metadataFieldRest = new ObjectMapper().readValue(
-                    getRequestService().getCurrentRequest().getHttpServletRequest().getInputStream(),
-                    MetadataFieldRest.class
-            );
+                getRequestService().getCurrentRequest().getHttpServletRequest().getInputStream(),
+                MetadataFieldRest.class
+                                                            );
         } catch (IOException excIO) {
             throw new DSpaceBadRequestException("error parsing request body", excIO);
         }
@@ -234,14 +247,14 @@ public class MetadataFieldRestRepository extends DSpaceRestRepository<MetadataFi
         MetadataField metadataField;
         try {
             metadataField = metadataFieldService.create(context, schema,
-                    metadataFieldRest.getElement(), metadataFieldRest.getQualifier(), metadataFieldRest.getScopeNote());
+                metadataFieldRest.getElement(), metadataFieldRest.getQualifier(), metadataFieldRest.getScopeNote());
             metadataFieldService.update(context, metadataField);
         } catch (NonUniqueMetadataException e) {
             throw new UnprocessableEntityException(
-                    "metadata field "
-                            + schema.getName() + "." + metadataFieldRest.getElement()
-                            + (metadataFieldRest.getQualifier() != null ? "." + metadataFieldRest.getQualifier() : "")
-                            + " already exists"
+                "metadata field "
+                + schema.getName() + "." + metadataFieldRest.getElement()
+                + (metadataFieldRest.getQualifier() != null ? "." + metadataFieldRest.getQualifier() : "")
+                + " already exists"
             );
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -271,7 +284,7 @@ public class MetadataFieldRestRepository extends DSpaceRestRepository<MetadataFi
     @Override
     @PreAuthorize("hasAuthority('ADMIN')")
     protected MetadataFieldRest put(Context context, HttpServletRequest request, String apiCategory, String model,
-                                    Integer id, JsonNode jsonNode) throws SQLException, AuthorizeException {
+        Integer id, JsonNode jsonNode) throws SQLException, AuthorizeException {
 
         MetadataFieldRest metadataFieldRest = new Gson().fromJson(jsonNode.toString(), MetadataFieldRest.class);
 
@@ -297,9 +310,11 @@ public class MetadataFieldRestRepository extends DSpaceRestRepository<MetadataFi
             context.commit();
         } catch (NonUniqueMetadataException e) {
             throw new UnprocessableEntityException("metadata field "
-                    + metadataField.getMetadataSchema().getName() + "." + metadataFieldRest.getElement()
-                    + (metadataFieldRest.getQualifier() != null ? "." + metadataFieldRest.getQualifier() : "")
-                    + " already exists");
+                                                   + metadataField.getMetadataSchema().getName() + "." +
+                                                   metadataFieldRest.getElement()
+                                                   + (metadataFieldRest.getQualifier() != null ?
+                "." + metadataFieldRest.getQualifier() : "")
+                                                   + " already exists");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

@@ -448,6 +448,70 @@ public class MetadatafieldRestRepositoryIT extends AbstractControllerIntegration
     }
 
     @Test
+    public void findByFieldName_query_exactName() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        MetadataSchema schema = MetadataSchemaBuilder.createMetadataSchema(context, "ASchema",
+            "http://www.dspace.org/ns/aschema").build();
+        MetadataSchema schema2 = MetadataSchemaBuilder.createMetadataSchema(context, "test",
+            "http://www.dspace.org/ns/aschema2").build();
+
+        MetadataField metadataField = MetadataFieldBuilder
+            .createMetadataField(context, schema, "AnElement1", null, "AScopeNote").build();
+
+        MetadataField metadataField2 = MetadataFieldBuilder
+            .createMetadataField(context, schema2, "AnElement2", null, "AScopeNote2").build();
+
+        MetadataField metadataField3 = MetadataFieldBuilder
+            .createMetadataField(context, schema, "test", null, "AScopeNote2").build();
+
+        context.restoreAuthSystemState();
+
+        getClient().perform(get(SEARCH_BYFIELDNAME_ENDPOINT)
+            .param("exactName", metadataField.toString('.')))
+                   .andExpect(status().isOk())
+                   .andExpect(content().contentType(contentType))
+                   .andExpect(jsonPath("$._embedded.metadatafields", Matchers.hasItem(
+                       MetadataFieldMatcher.matchMetadataField(metadataField))
+                                                                                 ))
+                   .andExpect(jsonPath("$._embedded.metadatafields", Matchers.not(hasItem(
+                       MetadataFieldMatcher.matchMetadataField(metadataField3))
+                                      )))
+                   .andExpect(jsonPath("$._embedded.metadatafields", Matchers.not(hasItem(
+                       MetadataFieldMatcher.matchMetadataField(metadataField2))
+                                      )))
+                   .andExpect(jsonPath("$.page.size", is(20)))
+                   .andExpect(jsonPath("$.page.totalElements", is(1)));
+    }
+
+    @Test
+    public void findByFieldName_query_exactName_NoResult() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        MetadataSchema schema = MetadataSchemaBuilder.createMetadataSchema(context, "ASchema",
+            "http://www.dspace.org/ns/aschema").build();
+        MetadataSchema schema2 = MetadataSchemaBuilder.createMetadataSchema(context, "test",
+            "http://www.dspace.org/ns/aschema2").build();
+
+        MetadataField metadataField = MetadataFieldBuilder
+            .createMetadataField(context, schema, "AnElement1", null, "AScopeNote").build();
+
+        MetadataField metadataField2 = MetadataFieldBuilder
+            .createMetadataField(context, schema2, "AnElement2", null, "AScopeNote2").build();
+
+        MetadataField metadataField3 = MetadataFieldBuilder
+            .createMetadataField(context, schema, "test", null, "AScopeNote2").build();
+
+        context.restoreAuthSystemState();
+
+        getClient().perform(get(SEARCH_BYFIELDNAME_ENDPOINT)
+            .param("exactName", "not.valid.mdstring"))
+                   .andExpect(status().isOk())
+                   .andExpect(content().contentType(contentType))
+                   .andExpect(jsonPath("$.page.totalElements", is(0)));
+    }
+
+    @Test
     public void findByFieldName_invalidQuery() throws Exception {
         getClient().perform(get(SEARCH_BYFIELDNAME_ENDPOINT)
             .param("query", "schema.element.qualifier.morestuff"))
