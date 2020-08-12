@@ -92,27 +92,47 @@ public class CharacterSeparatedImportMetadataSourceServiceImpl extends AbstractP
         this.escapeCharacter = (char)escapeCharacter;
     }
 
+    /**
+     * The method process any kind of "character separated" files, like CSV, TSV, and so on.
+     * It return a List of PlainMetadataSourceDto.
+     * Using the superclass methods AbstractPlainMetadataSource.getRecord(s), any of this
+     * element will then be converted in an {@link org.dspace.importer.external.datamodel.ImportRecord}.
+
+     * Columns will be identified by their position, zero based notation.
+     * Separator character and escape character MUST be defined at class level. Number of lines to skip (headers)
+     * could also be defined in the field skipLines.
+     * 
+     * @param InputStream The inputStream of the file
+     * @return A list of PlainMetadataSourceDto
+     * @throws FileSourceException if, for any reason, the file is not parsable
+
+     */
     @Override
     protected List<PlainMetadataSourceDto> readData(InputStream inputStream) throws FileSourceException {
         List<PlainMetadataSourceDto> plainMetadataList = new ArrayList<>();
         try (CSVReader csvReader = new CSVReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8),
             separator, escapeCharacter);) {
+            // read all row
             List<String[]> lines = csvReader.readAll();
             int listSize = lines == null ? 0 : lines.size();
             int count = skipLines;
+            // iterate over row (skipping the first skipLines)
             while (count < listSize) {
                 String [] items = lines.get(count);
                 List<PlainMetadataKeyValueItem> keyValueList = new ArrayList<>();
                 if (items != null) {
                     int size = items.length;
                     int index = 0;
+                    //iterate over column in the selected row
                     while (index < size) {
+                        //create key/value item for the specifics row/column
                         PlainMetadataKeyValueItem keyValueItem = new PlainMetadataKeyValueItem();
                         keyValueItem.setKey(String.valueOf(index));
                         keyValueItem.setValue(items[index]);
                         keyValueList.add(keyValueItem);
                         index++;
                     }
+                    //save all column key/value for the given row
                     PlainMetadataSourceDto dto = new PlainMetadataSourceDto();
                     dto.setMetadata(keyValueList);
                     plainMetadataList.add(dto);
