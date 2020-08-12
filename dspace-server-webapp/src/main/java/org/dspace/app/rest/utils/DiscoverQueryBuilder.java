@@ -8,6 +8,7 @@
 package org.dspace.app.rest.utils;
 
 import java.sql.SQLException;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,6 +30,7 @@ import org.dspace.discovery.SearchService;
 import org.dspace.discovery.configuration.DiscoveryConfiguration;
 import org.dspace.discovery.configuration.DiscoveryConfigurationParameters;
 import org.dspace.discovery.configuration.DiscoveryHitHighlightFieldConfiguration;
+import org.dspace.discovery.configuration.DiscoveryRelatedItemConfiguration;
 import org.dspace.discovery.configuration.DiscoverySearchFilter;
 import org.dspace.discovery.configuration.DiscoverySearchFilterFacet;
 import org.dspace.discovery.configuration.DiscoverySortConfiguration;
@@ -72,7 +74,7 @@ public class DiscoverQueryBuilder implements InitializingBean {
         throws DSpaceBadRequestException {
 
         DiscoverQuery queryArgs = buildCommonDiscoverQuery(context, discoveryConfiguration, query, searchFilters,
-                                                           dsoType);
+                                                           dsoType, scope);
 
         //When all search criteria are set, configure facet results
         addFaceting(context, scope, queryArgs, discoveryConfiguration);
@@ -105,7 +107,7 @@ public class DiscoverQueryBuilder implements InitializingBean {
         throws DSpaceBadRequestException {
 
         DiscoverQuery queryArgs = buildCommonDiscoverQuery(context, discoveryConfiguration, query, searchFilters,
-                                                           dsoType);
+                                                           dsoType, scope);
 
         //When all search criteria are set, configure facet results
         addFacetingForFacets(context, scope, prefix, queryArgs, discoveryConfiguration, facetName, page);
@@ -170,9 +172,10 @@ public class DiscoverQueryBuilder implements InitializingBean {
 
     private DiscoverQuery buildCommonDiscoverQuery(Context context, DiscoveryConfiguration discoveryConfiguration,
                                                    String query,
-                                                   List<SearchFilter> searchFilters, String dsoType)
+                                                   List<SearchFilter> searchFilters, String dsoType,
+                                                   IndexableObject scope)
         throws DSpaceBadRequestException {
-        DiscoverQuery queryArgs = buildBaseQueryForConfiguration(discoveryConfiguration);
+        DiscoverQuery queryArgs = buildBaseQueryForConfiguration(discoveryConfiguration, scope);
 
         //Add search filters
         queryArgs.addFilterQueries(convertFilters(context, discoveryConfiguration, searchFilters));
@@ -189,13 +192,28 @@ public class DiscoverQueryBuilder implements InitializingBean {
         return queryArgs;
     }
 
-    private DiscoverQuery buildBaseQueryForConfiguration(DiscoveryConfiguration discoveryConfiguration) {
+    private DiscoverQuery buildBaseQueryForConfiguration(
+            DiscoveryConfiguration discoveryConfiguration, IndexableObject scope) {
         DiscoverQuery queryArgs = new DiscoverQuery();
         queryArgs.setDiscoveryConfigurationName(discoveryConfiguration.getId());
-        queryArgs.addFilterQueries(discoveryConfiguration.getDefaultFilterQueries()
-                                                         .toArray(
-                                                             new String[discoveryConfiguration.getDefaultFilterQueries()
-                                                                                              .size()]));
+
+        String[] queryArray = discoveryConfiguration.getDefaultFilterQueries()
+                .toArray(
+                        new String[discoveryConfiguration.getDefaultFilterQueries()
+                                                         .size()]);
+
+        if (discoveryConfiguration != null &&
+                discoveryConfiguration instanceof DiscoveryRelatedItemConfiguration) {
+            if (queryArray != null) {
+                for ( int i = 0; i < queryArray.length; i++ ) {
+                    queryArray[i] = MessageFormat.format(queryArray[i], scope.getID());
+                }
+            } else {
+                log.warn("you are trying to set queries parameters on an empty queries list");
+            }
+        }
+
+        queryArgs.addFilterQueries(queryArray);
         return queryArgs;
     }
 
