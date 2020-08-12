@@ -153,6 +153,10 @@ public class MetadataFieldRestRepository extends DSpaceRestRepository<MetadataFi
                 throw new IllegalArgumentException("Error while searching with Discovery: " + e.getMessage());
             }
         } else {
+            if (StringUtils.isNotBlank(elementName) || StringUtils.isNotBlank(qualifierName) || StringUtils.isNotBlank(schemaName) || StringUtils.isNotBlank(query)) {
+                throw new UnprocessableEntityException("Use either exactName or a combination of element, qualifier " +
+                                                       "and schema to search discovery for metadata fields");
+            }
             // Find at most one match with exactName query param in DB
             MetadataField exactMatchingMdField = metadataFieldService.findByString(context, exactName, '.');
             if (exactMatchingMdField != null) {
