@@ -8,13 +8,16 @@
 package org.dspace.app.rest.repository.patch.operation;
 
 import java.sql.SQLException;
+import java.util.List;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
+import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.patch.JsonValueEvaluator;
 import org.dspace.app.rest.model.patch.Operation;
+import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.MetadataField;
 import org.dspace.content.service.MetadataFieldService;
 import org.dspace.core.Context;
@@ -82,15 +85,19 @@ public class CrisLayoutBoxConfigurationAddOperation<D> extends PatchOperation<D>
                 }
                 if (value.isArray()) {
                     for (JsonNode v: value) {
-                        CrisLayoutField layoutField = getLayoutFieldFromJsonNode(context, row, position, v);
+                        CrisLayoutField layoutField = getLayoutFieldFromJsonNode(
+                                context, box.getID(), row, position, v);
                         layoutField = fieldService.create(context, layoutField);
                         box.addLayoutField(layoutField);
                     }
                 } else {
-                    CrisLayoutField layoutField = getLayoutFieldFromJsonNode(context, row, position, value);
+                    CrisLayoutField layoutField = getLayoutFieldFromJsonNode(
+                            context, box.getID(), row, position, value);
                     layoutField = fieldService.create(context, layoutField);
                     box.addLayoutField(layoutField);
                 }
+            } catch (UnprocessableEntityException e) {
+                throw new UnprocessableEntityException(e.getMessage(), e);
             } catch (Exception e) {
                 throw new RuntimeException(e.getMessage(), e);
             }
@@ -114,15 +121,18 @@ public class CrisLayoutBoxConfigurationAddOperation<D> extends PatchOperation<D>
     /**
      * Create new CrisLayoutField from json node
      * @param context DSpace current context
+     * @param boxId
      * @param row
      * @param priority
      * @param node json value
      * @return
      * @throws JsonProcessingException
      * @throws SQLException
+     * @throws AuthorizeException
      */
-    private CrisLayoutField getLayoutFieldFromJsonNode (Context context, Integer row, Integer position, JsonNode node)
-            throws JsonProcessingException, SQLException {
+    private CrisLayoutField getLayoutFieldFromJsonNode(
+            Context context, Integer boxId, Integer row, Integer position, JsonNode node)
+            throws JsonProcessingException, SQLException, UnprocessableEntityException, AuthorizeException {
         CrisLayoutField field = new CrisLayoutField();
         field.setRow(row);
 
@@ -130,7 +140,12 @@ public class CrisLayoutBoxConfigurationAddOperation<D> extends PatchOperation<D>
         if (metadataNode != null && metadataNode.asText() != null ) {
             String metadata = metadataNode.asText();
             MetadataField metadataField = metadataService.findByString(context, metadata, '.');
+            if (metadataField == null) {
+                throw new UnprocessableEntityException("MetadataField <" + metadata + "> not exsists!");
+            }
             field.setMetadataField(metadataField);
+        } else {
+            throw new UnprocessableEntityException("metadata field cannot be null!");
         }
 
         JsonNode labelNode = node.get("label");
@@ -157,6 +172,25 @@ public class CrisLayoutBoxConfigurationAddOperation<D> extends PatchOperation<D>
         if (bundleNode != null && bundleNode.asText() != null ) {
             field.setStyle(bundleNode.asText());
         }
+
+        Integer priority = null;
+        List<CrisLayoutField> fields = fieldService.findFieldByBoxId(context, boxId, row);
+        if (fields != null && !fields.isEmpty()) {
+            if (position == null || position > fields.size()) {
+                position = fields.size();
+            }
+            priority = position;
+            fields.add(position, field);
+            for ( int i = position + 1; i < fields.size(); i++ ) {
+                fields.get(i).setPriority(
+                        fields.get(i).getPriority() + 1);
+            }
+            fieldService.update(context, fields.subList(position + 1, fields.size()));
+        } else {
+            priority = 0;
+        }
+        field.setPriority(priority);
+
         return field;
     }
 

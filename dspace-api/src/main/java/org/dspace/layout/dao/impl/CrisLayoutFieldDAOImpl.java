@@ -77,4 +77,24 @@ public class CrisLayoutFieldDAOImpl extends AbstractHibernateDAO<CrisLayoutField
         return getHibernateSession(context).createQuery(cqFields).getSingleResult();*/
     }
 
+    /* (non-Javadoc)
+     * @see org.dspace.layout.dao.CrisLayoutFieldDAO#
+     * findByBoxId(org.dspace.core.Context, java.lang.Integer, java.lang.Integer)
+     */
+    @Override
+    public List<CrisLayoutField> findByBoxId(Context context, Integer boxId, Integer row) throws SQLException {
+        CriteriaBuilder cb = getHibernateSession(context).getCriteriaBuilder();
+        CriteriaQuery<CrisLayoutField> q = cb.createQuery(CrisLayoutField.class);
+        Root<CrisLayoutBox> boxRoot = q.from(CrisLayoutBox.class);
+
+        SetJoin<CrisLayoutBox, CrisLayoutField> join = boxRoot.join(CrisLayoutBox_.layoutFields);
+        CriteriaQuery<CrisLayoutField> cqFields = q.select(join)
+                .where(
+                        cb.equal(join.get(CrisLayoutField_.ROW), row),
+                        cb.equal(boxRoot.get(CrisLayoutBox_.ID), boxId))
+                .orderBy(cb.asc(join.get(CrisLayoutField_.PRIORITY)));
+        TypedQuery<CrisLayoutField> query = getHibernateSession(context).createQuery(cqFields);
+        return query.getResultList();
+    }
+
 }

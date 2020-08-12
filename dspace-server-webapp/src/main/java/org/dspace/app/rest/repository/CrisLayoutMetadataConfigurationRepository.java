@@ -82,7 +82,7 @@ public class CrisLayoutMetadataConfigurationRepository
     }
 
     @Override
-    // @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public void patch(Context context, HttpServletRequest request, String apiCategory, String model, Integer id,
             Patch patch) throws AuthorizeException, SQLException {
         CrisLayoutBox box = null;

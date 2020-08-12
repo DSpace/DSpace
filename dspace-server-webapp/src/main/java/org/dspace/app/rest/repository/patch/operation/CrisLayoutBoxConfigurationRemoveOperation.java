@@ -8,13 +8,16 @@
 package org.dspace.app.rest.repository.patch.operation;
 
 import java.sql.SQLException;
-import java.util.Iterator;
-import java.util.Set;
+import java.util.List;
 
+import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.patch.Operation;
+import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
 import org.dspace.layout.CrisLayoutBox;
 import org.dspace.layout.CrisLayoutField;
+import org.dspace.layout.service.CrisLayoutFieldService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -33,6 +36,9 @@ public class CrisLayoutBoxConfigurationRemoveOperation<D> extends PatchOperation
      * Path in json body of patch that uses this operation
      */
     private static final String OPERATION_CONFIGURATION_PATH = "^/rows/[0-9]+/fields/[0-9]+";
+
+    @Autowired
+    private CrisLayoutFieldService fieldService;
 
     /* (non-Javadoc)
      * @see org.dspace.app.rest.repository.patch.operation.PatchOperation#perform
@@ -55,13 +61,28 @@ public class CrisLayoutBoxConfigurationRemoveOperation<D> extends PatchOperation
                 }
             }
             if (row != null && position != null) {
-                Set<CrisLayoutField> fields = box.getLayoutFields();
-                for (Iterator<CrisLayoutField> it = fields.iterator(); it.hasNext(); ) {
-                    CrisLayoutField field = it.next();
-                    // TODO convert priority to position
-                    if (field.getPriority().equals(position)) {
-                        it.remove();
+                List<CrisLayoutField> fields = fieldService.findFieldByBoxId(context, box.getID(), row);
+                if (fields != null && fields.size() > position) {
+                    try {
+                        fieldService.delete(context, fields.get(position));
+                        fields.remove(fields.get(position));
+                        // Update other field position
+                        for (int i = position; i < fields.size(); i++) {
+                            fields.get(i).setPriority(
+                                    fields.get(i).getPriority() - 1
+                            );
+                        }
+                        fieldService.update(context, fields);
+                    } catch (AuthorizeException e) {
+                        throw new RuntimeException(e.getMessage(), e);
                     }
+                } else if (fields.isEmpty()) {
+                    throw new
+                    UnprocessableEntityException("The row <" + row + "> hasn't fields!");
+                } else {
+                    throw new
+                    UnprocessableEntityException("The row <" + row + "> hasn't a field in position <" + position + ">."
+                            + "Hint: the position is zero-based");
                 }
             }
         }

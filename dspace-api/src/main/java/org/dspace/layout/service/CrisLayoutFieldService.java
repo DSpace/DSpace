@@ -63,4 +63,15 @@ public interface CrisLayoutFieldService extends DSpaceCRUDService<CrisLayoutFiel
      */
     public List<CrisLayoutField> findFieldByBoxId(
             Context context, Integer boxId, Integer limit, Integer offset) throws SQLException;
+
+    /**
+     * Returns all field of a specific row in a Box
+     * @param context The relevant DSpace Context
+     * @param boxId id of the box {@link CrisLayoutBox}
+     * @param row
+     * @return
+     * @throws SQLException
+     */
+    public List<CrisLayoutField> findFieldByBoxId(
+            Context context, Integer boxId, Integer row) throws SQLException;
 }

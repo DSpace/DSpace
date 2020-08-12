@@ -45,4 +45,16 @@ public interface CrisLayoutFieldDAO extends GenericDAO<CrisLayoutField> {
      * @throws SQLException An exception that provides information on a database errors.
      */
     public Long countByBoxId(Context context, Integer boxId) throws SQLException;
+
+    /**
+     * Returns the field that are available for specific Box
+     * @param context The relevant DSpace Context
+     * @param boxId id of the box {@link CrisLayoutBox}
+     * @param limit how many results return
+     * @param offset the position of the first result to return
+     * @return List of CrisLayoutField {@link CrisLayoutField}
+     * @throws SQLException An exception that provides information on a database errors.
+     */
+    public List<CrisLayoutField> findByBoxId(
+            Context context, Integer boxId, Integer row) throws SQLException;
 }

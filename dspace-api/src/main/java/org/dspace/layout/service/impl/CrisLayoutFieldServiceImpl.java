@@ -89,4 +89,13 @@ public class CrisLayoutFieldServiceImpl implements CrisLayoutFieldService {
         return dao.create(context, field);
     }
 
+    /* (non-Javadoc)
+     * @see org.dspace.layout.service.CrisLayoutFieldService#
+     * findFieldByBoxId(org.dspace.core.Context, java.lang.Integer, java.lang.Integer)
+     */
+    @Override
+    public List<CrisLayoutField> findFieldByBoxId(Context context, Integer boxId, Integer row) throws SQLException {
+        return dao.findByBoxId(context, boxId, row);
+    }
+
 }
