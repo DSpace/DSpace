@@ -38,14 +38,28 @@ public class RisImportMetadataSourceServiceImpl extends AbstractPlainMetadataSou
     }
 
     protected List<PlainMetadataSourceDto> readData(InputStream inputStream) throws FileSourceException {
-        return aggreageteData(inputStream);
+        return aggregateData(inputStream);
     }
 
-    private List<PlainMetadataSourceDto> aggreageteData(InputStream inputStream) throws FileSourceException {
+    /**
+     * This method map the data present in the inputStream, then return a list PlainMetadataSourceDto.
+     * Any PlainMetadataSourceDto will be used to create a single {@link org.dspace.importer.external.datamodel.ImportRecord}
+     * 
+     * @see org.dspace.importer.external.service.components.AbstractPlainMetadataSource
+     * 
+     * @param inputStream the inputStream of the RIS file
+     * @return List of {@link org.dspace.importer.external.service.components.dto.PlainMetadataSourceDto}
+     * @throws FileSourceException
+     */
+    private List<PlainMetadataSourceDto> aggregateData(InputStream inputStream) throws FileSourceException {
         List<PlainMetadataSourceDto> metadata = new ArrayList<>();
+        //map any line of the field to a key/value pair
         List<PlainMetadataKeyValueItem> notAggregatedItems = notAggregatedData(inputStream);
         List<PlainMetadataKeyValueItem> aggregatedTmpList = null;
         Iterator<PlainMetadataKeyValueItem> itr = notAggregatedItems.iterator();
+        // iterate over the list of key/value items
+        // create a new PlainMetadataSourceDto (which map and ImportRecord)
+        // any times the key is "TY" (content separator in RIS)
         while (itr.hasNext()) {
             PlainMetadataKeyValueItem item = itr.next();
             if ("TY".equals(item.getKey())) {
@@ -71,6 +85,15 @@ public class RisImportMetadataSourceServiceImpl extends AbstractPlainMetadataSou
         return metadata;
     }
 
+    /**
+     * This method transform any row of the RIS file into a PlainMetadataKeyValueItem,
+     * splitting the row sequentially through a RegExp without take care of the means of the data.
+     * In this way, all entries present in the file are mapped in the resulting list.
+     * 
+     * @param inputStream the inputStrem of the file
+     * @return A list
+     * @throws FileSourceException
+     */
     private List<PlainMetadataKeyValueItem> notAggregatedData(InputStream inputStream) throws FileSourceException {
         LinkedList<PlainMetadataKeyValueItem> items = new LinkedList<>();
         BufferedReader reader;

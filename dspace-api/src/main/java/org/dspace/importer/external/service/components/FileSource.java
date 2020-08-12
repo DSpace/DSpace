@@ -67,9 +67,4 @@ public interface FileSource extends MetadataSource {
         return false;
     }
 
-    /**
-     * Get the file extensions (xml, csv, txt, ...) supported by the FileSource implementation
-     */
-    public List<String> getSupportedExtensions();
-
 }

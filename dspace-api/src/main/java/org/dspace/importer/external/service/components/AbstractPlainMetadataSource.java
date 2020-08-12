@@ -33,22 +33,6 @@ public abstract class AbstractPlainMetadataSource
     extends AbstractMetadataFieldMapping<PlainMetadataSourceDto>
     implements FileSource {
 
-    private List<String> supportedExtensions;
-
-    /**
-     * Set the file extensions supported by the implementation of this abstract
-     * 
-     * @param supportedExtensionsthe file extensions (xml,txt,...) supported by the specific implementation
-     */
-    public void setSupportedExtensions(List<String> supportedExtensions) {
-        this.supportedExtensions = supportedExtensions;
-    }
-
-    @Override
-    public List<String> getSupportedExtensions() {
-        return supportedExtensions;
-    }
-
     protected abstract List<PlainMetadataSourceDto>
         readData(InputStream fileInpuStream) throws FileSourceException;
 
