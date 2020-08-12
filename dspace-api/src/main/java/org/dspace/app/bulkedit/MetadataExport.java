@@ -8,13 +8,16 @@
 package org.dspace.app.bulkedit;
 
 import java.sql.SQLException;
-import java.util.UUID;
 
 import org.apache.commons.cli.ParseException;
+import org.apache.commons.lang3.StringUtils;
+import org.dspace.content.DSpaceObject;
+import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.MetadataDSpaceCsvExportService;
 import org.dspace.core.Context;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
+import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.scripts.DSpaceRunnable;
 import org.dspace.utils.DSpace;
 
@@ -80,17 +83,32 @@ public class MetadataExport extends DSpaceRunnable<MetadataExportScriptConfigura
             return;
         }
 
-        filename = getFileNameForExportFile();
-
-        exportAllMetadata = commandLine.hasOption('a');
-
         if (!commandLine.hasOption('i')) {
             exportAllItems = true;
         }
         handle = commandLine.getOptionValue('i');
+        filename = getFileNameForExportFile();
+
+        exportAllMetadata = commandLine.hasOption('a');
+
     }
 
-    protected String getFileNameForExportFile() {
-        return UUID.randomUUID().toString() + ".csv";
+    protected String getFileNameForExportFile() throws ParseException {
+        Context context = new Context();
+        try {
+            DSpaceObject dso = null;
+            if (StringUtils.isNotBlank(handle)) {
+                dso = HandleServiceFactory.getInstance().getHandleService().resolveToObject(context, handle);
+            } else {
+                dso = ContentServiceFactory.getInstance().getSiteService().findSite(context);
+            }
+            if (dso == null) {
+                throw new ParseException("A handle got given that wasn't able to be parsed to a DSpaceObject");
+            }
+            return dso.getID().toString() + ".csv";
+        } catch (SQLException e) {
+            handler.handleException("Something went wrong trying to retrieve DSO for handle: " + handle, e);
+        }
+        return null;
     }
 }
