@@ -19,7 +19,7 @@ import org.dspace.external.provider.ExternalDataProvider;
 import org.dspace.importer.external.datamodel.ImportRecord;
 import org.dspace.importer.external.exception.MetadataSourceException;
 import org.dspace.importer.external.metadatamapping.MetadatumDTO;
-import org.dspace.importer.external.service.components.MetadataSource;
+import org.dspace.importer.external.service.components.QuerySource;
 
 /**
  * This class allows to configure a Live Import Provider as an External Data Provider
@@ -29,9 +29,9 @@ import org.dspace.importer.external.service.components.MetadataSource;
  */
 public class LiveImportDataProvider implements ExternalDataProvider {
     /**
-     * The {@link MetadataSource} live import provider
+     * The {@link QuerySource} live import provider
      */
-    private MetadataSource metadataSource;
+    private QuerySource querySource;
 
     /**
      * An unique human readable identifier for this provider
@@ -59,8 +59,8 @@ public class LiveImportDataProvider implements ExternalDataProvider {
      * This method set the MetadataSource for the ExternalDataProvider
      * @param metadataSource {@link org.dspace.importer.external.service.components.MetadataSource} implementation used to process the input data
      */
-    public void setMetadataSource(MetadataSource metadataSource) {
-        this.metadataSource = metadataSource;
+    public void setMetadataSource(QuerySource querySource) {
+        this.querySource = querySource;
     }
 
     /**
@@ -82,11 +82,11 @@ public class LiveImportDataProvider implements ExternalDataProvider {
     @Override
     public Optional<ExternalDataObject> getExternalDataObject(String id) {
         try {
-            ExternalDataObject externalDataObject = getExternalDataObject(metadataSource.getRecord(id));
+            ExternalDataObject externalDataObject = getExternalDataObject(querySource.getRecord(id));
             return Optional.of(externalDataObject);
         } catch (MetadataSourceException e) {
             throw new RuntimeException(
-                    "The live import provider " + metadataSource.getImportSource() + " throws an exception", e);
+                    "The live import provider " + querySource.getImportSource() + " throws an exception", e);
         }
     }
 
@@ -94,11 +94,11 @@ public class LiveImportDataProvider implements ExternalDataProvider {
     public List<ExternalDataObject> searchExternalDataObjects(String query, int start, int limit) {
         Collection<ImportRecord> records;
         try {
-            records = metadataSource.getRecords(query, start, limit);
+            records = querySource.getRecords(query, start, limit);
             return records.stream().map(r -> getExternalDataObject(r)).collect(Collectors.toList());
         } catch (MetadataSourceException e) {
             throw new RuntimeException(
-                    "The live import provider " + metadataSource.getImportSource() + " throws an exception", e);
+                    "The live import provider " + querySource.getImportSource() + " throws an exception", e);
         }
     }
 
@@ -110,10 +110,10 @@ public class LiveImportDataProvider implements ExternalDataProvider {
     @Override
     public int getNumberOfResults(String query) {
         try {
-            return metadataSource.getNbRecords(query);
+            return querySource.getRecordsCount(query);
         } catch (MetadataSourceException e) {
             throw new RuntimeException(
-                    "The live import provider " + metadataSource.getImportSource() + " throws an exception", e);
+                    "The live import provider " + querySource.getImportSource() + " throws an exception", e);
         }
     }
 
