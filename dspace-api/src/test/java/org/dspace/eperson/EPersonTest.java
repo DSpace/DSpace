@@ -78,6 +78,22 @@ public class EPersonTest extends AbstractUnitTest {
         super.destroy();
     }
 
+    @Test
+    public void testPreferences() throws Exception {
+
+        ePersonService.addMetadata(context, eperson, "dspace", "cookies", "functional", null, "true");
+        ePersonService.addMetadata(context, eperson, "dspace", "cookies", "statistics", null, "false");
+        context.commit();
+
+        assertEquals(
+                "true",
+                ePersonService.getMetadataFirstValue(eperson, "dspace", "cookies", "functional", null)
+        );
+        assertEquals(
+                "false",
+                ePersonService.getMetadataFirstValue(eperson, "dspace", "cookies", "statistics", null)
+        );
+    }
 
     /**
      * Test of equals method, of class EPerson.
