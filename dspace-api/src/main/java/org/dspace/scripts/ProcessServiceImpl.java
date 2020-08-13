@@ -245,4 +245,17 @@ public class ProcessServiceImpl implements ProcessService {
         return new ArrayList<>(fileTypesSet);
     }
 
+    @Override
+    public List<Process> search(Context context, ProcessQueryParameterContainer processQueryParameterContainer,
+                                int limit, int offset) throws SQLException {
+        return processDAO.search(context, processQueryParameterContainer, limit, offset);
+    }
+
+    @Override
+    public int countSearch(Context context, ProcessQueryParameterContainer processQueryParameterContainer)
+        throws SQLException {
+        return processDAO.countTotalWithParameters(context, processQueryParameterContainer);
+    }
+
+
 }

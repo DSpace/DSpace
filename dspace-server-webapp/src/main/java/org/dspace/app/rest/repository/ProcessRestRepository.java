@@ -10,10 +10,15 @@ package org.dspace.app.rest.repository;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
+import org.dspace.app.rest.Parameter;
+import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.converter.ConverterService;
+import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.model.BitstreamRest;
 import org.dspace.app.rest.model.ProcessRest;
@@ -21,8 +26,12 @@ import org.dspace.app.rest.projection.Projection;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Bitstream;
+import org.dspace.content.ProcessStatus;
 import org.dspace.core.Context;
+import org.dspace.eperson.EPerson;
+import org.dspace.eperson.service.EPersonService;
 import org.dspace.scripts.Process;
+import org.dspace.scripts.ProcessQueryParameterContainer;
 import org.dspace.scripts.service.ProcessService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -48,6 +57,9 @@ public class ProcessRestRepository extends DSpaceRestRepository<ProcessRest, Int
 
     @Autowired
     private AuthorizeService authorizeService;
+
+    @Autowired
+    private EPersonService epersonService;
 
 
     @Override
@@ -135,6 +147,50 @@ public class ProcessRestRepository extends DSpaceRestRepository<ProcessRest, Int
         }
     }
 
+    /**
+     * Search method that will take Parameters and return a list of {@link ProcessRest} objects
+     * based on the {@link Process} objects that were in the databank that adhere to these params
+     * @param ePersonUuid   The UUID for the EPerson that started the Process
+     * @param scriptName    The name of the Script for which the Process belongs to
+     * @param processStatusString   The status of the Process
+     * @param pageable      The pageable
+     * @return              A page of {@link ProcessRest} objects adhering to the params
+     * @throws SQLException If something goes wrong
+     */
+    @SearchRestMethod(name = "byProperty")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public Page<ProcessRest> findProcessesByProperty(@Parameter(value = "userId") UUID ePersonUuid,
+                                                     @Parameter(value = "scriptName") String scriptName,
+                                                     @Parameter(value = "processStatus") String processStatusString,
+                                                     Pageable pageable)
+        throws SQLException {
+        if (StringUtils.isBlank(scriptName) && ePersonUuid == null && StringUtils.isBlank(processStatusString)) {
+            throw new DSpaceBadRequestException("Either a name, user UUID or ProcessStatus should be provided");
+        }
+
+        Context context = obtainContext();
+        EPerson ePerson = epersonService.find(context, ePersonUuid);
+        if (ePersonUuid != null && ePerson == null) {
+            throw new DSpaceBadRequestException("No EPerson with the given UUID is found");
+        }
+
+        ProcessStatus processStatus = StringUtils.isBlank(processStatusString) ? null :
+            ProcessStatus.valueOf(processStatusString);
+        if (processStatus != null && processStatus != ProcessStatus.RUNNING && processStatus != ProcessStatus.COMPLETED
+            && processStatus != ProcessStatus.FAILED) {
+            throw new DSpaceBadRequestException("The given ProcessStatus isn't within the accepted boundaries: "
+                                                    + processStatusString);
+        }
+        ProcessQueryParameterContainer processQueryParameterContainer =
+            new ProcessQueryParameterContainer(scriptName, ePerson, processStatus);
+        List<Process> processes = processService.search(context, processQueryParameterContainer, pageable.getPageSize(),
+                                                        Math.toIntExact(pageable.getOffset()));
+        return converterService.toRestPage(processes, pageable,
+                                           processService.countSearch(context, processQueryParameterContainer),
+                                           utils.obtainProjection());
+
+
+    }
     @Override
     public Class<ProcessRest> getDomainClass() {
         return ProcessRest.class;
