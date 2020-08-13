@@ -43,7 +43,10 @@ import org.dspace.eperson.service.GroupService;
 import org.dspace.event.Event;
 import org.dspace.util.UUIDUtils;
 import org.dspace.xmlworkflow.storedcomponents.CollectionRole;
+import org.dspace.xmlworkflow.storedcomponents.PoolTask;
+import org.dspace.xmlworkflow.storedcomponents.service.ClaimedTaskService;
 import org.dspace.xmlworkflow.storedcomponents.service.CollectionRoleService;
+import org.dspace.xmlworkflow.storedcomponents.service.PoolTaskService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -80,6 +83,11 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
     protected AuthorizeService authorizeService;
     @Autowired(required = true)
     protected ResourcePolicyService resourcePolicyService;
+
+    @Autowired(required = true)
+    protected PoolTaskService poolTaskService;
+    @Autowired(required = true)
+    protected ClaimedTaskService claimedTaskService;
 
     protected GroupServiceImpl() {
         super();
@@ -144,7 +152,20 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
     }
 
     @Override
-    public void removeMember(Context context, Group group, EPerson ePerson) {
+    public void removeMember(Context context, Group group, EPerson ePerson) throws SQLException {
+        List<CollectionRole> collectionRoles = collectionRoleService.findByGroup(context, group);
+        if (!collectionRoles.isEmpty()) {
+            List<PoolTask> poolTasks = poolTaskService.findByGroup(context, group);
+            if (!poolTasks.isEmpty()) {
+                List<EPerson> ePeople = allMembers(context, group);
+                if (ePeople.size() == 1 && ePeople.contains(ePerson)) {
+                    throw new IllegalStateException(
+                            "Refused to remove user " + ePerson
+                                    .getID() + " from workflow group because the group " + group
+                                    .getID() + " has no other members");
+                }
+            }
+        }
         if (group.remove(ePerson)) {
             context.addEvent(new Event(Event.REMOVE, Constants.GROUP, group.getID(), Constants.EPERSON, ePerson.getID(),
                                        ePerson.getEmail(), getIdentifiers(context, group)));
@@ -153,6 +174,20 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
 
     @Override
     public void removeMember(Context context, Group groupParent, Group childGroup) throws SQLException {
+        List<CollectionRole> collectionRoles = collectionRoleService.findByGroup(context, groupParent);
+        if (!collectionRoles.isEmpty()) {
+            List<PoolTask> poolTasks = poolTaskService.findByGroup(context, groupParent);
+            if (!poolTasks.isEmpty()) {
+                List<EPerson> parentPeople = allMembers(context, groupParent);
+                List<EPerson> childPeople = allMembers(context, childGroup);
+                if (childPeople.containsAll(parentPeople)) {
+                    throw new IllegalStateException(
+                            "Refused to remove sub group " + childGroup
+                                    .getID() + " from workflow group because the group " + groupParent
+                                    .getID() + " has no other members");
+                }
+            }
+        }
         if (groupParent.remove(childGroup)) {
             childGroup.removeParentGroup(groupParent);
             context.addEvent(

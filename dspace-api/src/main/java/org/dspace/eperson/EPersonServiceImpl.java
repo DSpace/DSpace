@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -39,6 +40,7 @@ import org.dspace.core.LogManager;
 import org.dspace.core.Utils;
 import org.dspace.eperson.dao.EPersonDAO;
 import org.dspace.eperson.service.EPersonService;
+import org.dspace.eperson.service.GroupService;
 import org.dspace.eperson.service.SubscribeService;
 import org.dspace.event.Event;
 import org.dspace.versioning.Version;
@@ -60,8 +62,10 @@ import org.dspace.xmlworkflow.factory.XmlWorkflowServiceFactory;
 import org.dspace.xmlworkflow.service.WorkflowRequirementsService;
 import org.dspace.xmlworkflow.service.XmlWorkflowService;
 import org.dspace.xmlworkflow.storedcomponents.ClaimedTask;
+import org.dspace.xmlworkflow.storedcomponents.CollectionRole;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 import org.dspace.xmlworkflow.storedcomponents.service.ClaimedTaskService;
+import org.dspace.xmlworkflow.storedcomponents.service.CollectionRoleService;
 import org.dspace.xmlworkflow.storedcomponents.service.PoolTaskService;
 import org.dspace.xmlworkflow.storedcomponents.service.WorkflowItemRoleService;
 import org.dspace.xmlworkflow.storedcomponents.service.XmlWorkflowItemService;
@@ -89,9 +93,17 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
     @Autowired(required = true)
     protected ItemService itemService;
     @Autowired(required = true)
+    protected WorkflowItemRoleService workflowItemRoleService;
+    @Autowired(required = true)
+    CollectionRoleService collectionRoleService;
+    @Autowired(required = true)
+    protected GroupService groupService;
+    @Autowired(required = true)
     protected SubscribeService subscribeService;
     @Autowired(required = true)
     protected VersionDAO versionDAO;
+    @Autowired(required = true)
+    protected ClaimedTaskService claimedTaskService;
 
     protected EPersonServiceImpl() {
         super();
@@ -236,6 +248,8 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
         } catch (IOException ex) {
             log.error("This IOException: " + ex + " occured while deleting Eperson with the ID: " + ePerson.getID());
             throw new AuthorizeException(new EPersonDeletionException());
+        } catch (EPersonDeletionException e) {
+            throw new IllegalStateException(e.getMessage());
         }
     }
 
@@ -259,11 +273,20 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
      * @throws IOException
      */
     public void delete(Context context, EPerson ePerson, boolean cascade)
-            throws SQLException, AuthorizeException, IOException {
+            throws SQLException, AuthorizeException, IOException, EPersonDeletionException {
         // authorized?
         if (!authorizeService.isAdmin(context)) {
             throw new AuthorizeException(
                     "You must be an admin to delete an EPerson");
+        }
+        Set<Group> workFlowGroups = getAllWorkFlowGroups(context, ePerson);
+        for (Group group: workFlowGroups) {
+            List<EPerson> ePeople = groupService.allMembers(context, group);
+            if (ePeople.size() == 1 && ePeople.contains(ePerson)) {
+                throw new IllegalStateException(
+                        "Refused to delete user " + ePerson.getID() + " because it’s part of the group " + group
+                                .getID());
+            }
         }
         // check for presence of eperson in tables that
         // have constraints on eperson_id
@@ -324,15 +347,14 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
 
                         List<XmlWorkflowItem> xmlWorkflowItems = xmlWorkflowItemService
                                                                  .findBySubmitter(context, ePerson);
+                        List<ClaimedTask> claimedTasks = claimedTaskService.findByEperson(context, ePerson);
 
-                        for (XmlWorkflowItem xmlWorkflowItem : xmlWorkflowItems) {
-                            ClaimedTask pooledTask = claimedTaskService
-                                                     .findByWorkflowIdAndEPerson(context, xmlWorkflowItem, ePerson);
-                            xmlWorkflowService.deleteClaimedTask(context, xmlWorkflowItem, pooledTask);
+                        for (ClaimedTask task : claimedTasks) {
+                            xmlWorkflowService.deleteClaimedTask(context, task.getWorkflowItem(), task);
 
                             try {
-                                workflowRequirementsService.removeClaimedUser(context, xmlWorkflowItem,
-                                                                              ePerson, pooledTask.getStepID());
+                                workflowRequirementsService.removeClaimedUser(context, task.getWorkflowItem(),
+                                                                              ePerson, task.getStepID());
                             } catch (WorkflowConfigurationException ex) {
                                 log.error("This WorkflowConfigurationException: " + ex +
                                           " occured while deleting Eperson with the ID: " + ePerson.getID());
@@ -388,7 +410,7 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
                     }
                 }
             } else {
-                throw new AuthorizeException(new EPersonDeletionException(constraintList));
+                throw new EPersonDeletionException(constraintList);
             }
         }
         context.addEvent(new Event(Event.DELETE, Constants.EPERSON, ePerson.getID(), ePerson.getEmail(),
@@ -413,6 +435,19 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
 
         log.info(LogManager.getHeader(context, "delete_eperson",
                 "eperson_id=" + ePerson.getID()));
+    }
+
+    private Set<Group> getAllWorkFlowGroups(Context context, EPerson ePerson) throws SQLException {
+        Set<Group> workFlowGroups = new HashSet<>();
+
+        Set<Group> groups = groupService.allMemberGroupsSet(context, ePerson);
+        for (Group group: groups) {
+            List<CollectionRole> collectionRoles = collectionRoleService.findByGroup(context, group);
+            if (!collectionRoles.isEmpty()) {
+                workFlowGroups.add(group);
+            }
+        }
+        return workFlowGroups;
     }
 
     @Override
