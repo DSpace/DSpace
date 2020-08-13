@@ -43,6 +43,11 @@ public class ProcessBuilder extends AbstractBuilder<Process, ProcessService> {
         return this;
     }
 
+    public ProcessBuilder withProcessStatus(ProcessStatus processStatus) {
+        process.setProcessStatus(processStatus);
+        return this;
+    }
+
     @Override
     public void cleanup() throws Exception {
         try (Context c = new Context()) {

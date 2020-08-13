@@ -18,6 +18,7 @@ import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
+import java.util.UUID;
 
 import org.apache.commons.codec.CharEncoding;
 import org.apache.commons.collections4.CollectionUtils;
@@ -320,6 +321,249 @@ public class ProcessRestRepositoryIT extends AbstractControllerIntegrationTest {
                         .andExpect(status().isNotFound());
 
 
+    }
+
+    @Test
+    public void searchProcessTestForbidden() throws Exception {
+        String token = getAuthToken(eperson.getEmail(), password);
+
+        getClient(token).perform(get("/api/system/processes/search/byProperty"))
+                        .andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void searchProcessTestUnauthorized() throws Exception {
+
+        getClient().perform(get("/api/system/processes/search/byProperty"))
+                        .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    public void searchProcessTestByUser() throws Exception {
+        Process newProcess = ProcessBuilder.createProcess(context, eperson, "mock-script", parameters).build();
+        Process newProcess1 = ProcessBuilder.createProcess(context, eperson, "mock-script", parameters).build();
+        Process newProcess2 = ProcessBuilder.createProcess(context, eperson, "mock-script", parameters).build();
+        Process newProcess3 = ProcessBuilder.createProcess(context, eperson, "mock-script", parameters).build();
+        Process newProcess4 = ProcessBuilder.createProcess(context, eperson, "mock-script", parameters).build();
+        Process newProcess5 = ProcessBuilder.createProcess(context, eperson, "mock-script", parameters).build();
+        Process newProcess6 = ProcessBuilder.createProcess(context, eperson, "mock-script", parameters).build();
+        Process newProcess7 = ProcessBuilder.createProcess(context, admin, "mock-script", parameters).build();
+        Process newProcess8 = ProcessBuilder.createProcess(context, admin, "mock-script", parameters).build();
+        Process newProcess9 = ProcessBuilder.createProcess(context, admin, "mock-script", parameters).build();
+
+        String token = getAuthToken(admin.getEmail(), password);
+
+        getClient(token).perform(get("/api/system/processes/search/byProperty")
+                                .param("userId", admin.getID().toString()))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$._embedded.processes", containsInAnyOrder(
+                            ProcessMatcher.matchProcess(process.getName(),
+                                                        String.valueOf(admin.getID().toString()),
+                                                        process.getID(), parameters, ProcessStatus.SCHEDULED),
+                            ProcessMatcher.matchProcess(newProcess7.getName(),
+                                                        String.valueOf(admin.getID().toString()),
+                                                        newProcess7.getID(), parameters, ProcessStatus.SCHEDULED),
+                            ProcessMatcher.matchProcess(newProcess8.getName(),
+                                                        String.valueOf(admin.getID().toString()),
+                                                        newProcess8.getID(), parameters, ProcessStatus.SCHEDULED),
+                            ProcessMatcher.matchProcess(newProcess9.getName(),
+                                                        String.valueOf(admin.getID().toString()),
+                                                        newProcess9.getID(), parameters, ProcessStatus.SCHEDULED)
+                        )))
+                        .andExpect(jsonPath("$.page", is(
+                            PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 4))));
+    }
+
+    @Test
+    public void searchProcessTestByProcessStatus() throws Exception {
+        Process newProcess = ProcessBuilder.createProcess(context, eperson, "mock-script", parameters).build();
+        Process newProcess1 = ProcessBuilder.createProcess(context, eperson, "mock-script", parameters).build();
+        Process newProcess2 = ProcessBuilder.createProcess(context, eperson, "mock-script", parameters).build();
+        Process newProcess3 = ProcessBuilder.createProcess(context, eperson, "mock-script", parameters).build();
+        Process newProcess4 = ProcessBuilder.createProcess(context, eperson, "mock-script", parameters).build();
+        Process newProcess5 = ProcessBuilder.createProcess(context, eperson, "mock-script", parameters).build();
+        Process newProcess6 = ProcessBuilder.createProcess(context, eperson, "mock-script", parameters).build();
+        Process newProcess7 = ProcessBuilder.createProcess(context, admin, "mock-script", parameters)
+                                            .withProcessStatus(ProcessStatus.FAILED).build();
+        Process newProcess8 = ProcessBuilder.createProcess(context, admin, "mock-script", parameters).build();
+        Process newProcess9 = ProcessBuilder.createProcess(context, admin, "mock-script", parameters)
+                                            .withProcessStatus(ProcessStatus.FAILED).build();
+
+        String token = getAuthToken(admin.getEmail(), password);
+
+        getClient(token).perform(get("/api/system/processes/search/byProperty")
+                                     .param("processStatus", "FAILED"))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$._embedded.processes", containsInAnyOrder(
+                            ProcessMatcher.matchProcess(newProcess7.getName(),
+                                                        String.valueOf(admin.getID().toString()),
+                                                        newProcess7.getID(), parameters, ProcessStatus.FAILED),
+                            ProcessMatcher.matchProcess(newProcess9.getName(),
+                                                        String.valueOf(admin.getID().toString()),
+                                                        newProcess9.getID(), parameters, ProcessStatus.FAILED)
+                        )))
+                        .andExpect(jsonPath("$.page", is(
+                            PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 2))));
+    }
+
+    @Test
+    public void searchProcessTestByScriptName() throws Exception {
+        Process newProcess = ProcessBuilder.createProcess(context, eperson, "mock-script", parameters).build();
+        Process newProcess1 = ProcessBuilder.createProcess(context, eperson, "mock-script", parameters).build();
+        Process newProcess2 = ProcessBuilder.createProcess(context, eperson, "mock-script", parameters).build();
+        Process newProcess3 = ProcessBuilder.createProcess(context, eperson, "mock-script", parameters).build();
+        Process newProcess4 = ProcessBuilder.createProcess(context, eperson, "mock-script", parameters).build();
+        Process newProcess5 = ProcessBuilder.createProcess(context, eperson, "mock-script", parameters).build();
+        Process newProcess6 = ProcessBuilder.createProcess(context, eperson, "mock-script", parameters).build();
+        Process newProcess7 = ProcessBuilder.createProcess(context, admin, "mock-script", parameters)
+                                            .withProcessStatus(ProcessStatus.FAILED).build();
+        Process newProcess8 = ProcessBuilder.createProcess(context, admin, "another-mock-script", parameters).build();
+        Process newProcess9 = ProcessBuilder.createProcess(context, admin, "mock-script", parameters)
+                                            .withProcessStatus(ProcessStatus.FAILED).build();
+
+        String token = getAuthToken(admin.getEmail(), password);
+
+        getClient(token).perform(get("/api/system/processes/search/byProperty")
+                                     .param("scriptName", "another-mock-script"))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$._embedded.processes", containsInAnyOrder(
+                            ProcessMatcher.matchProcess(newProcess8.getName(),
+                                                        String.valueOf(admin.getID().toString()),
+                                                        newProcess8.getID(), parameters, ProcessStatus.SCHEDULED)
+                        )))
+                        .andExpect(jsonPath("$.page", is(
+                            PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 1))));
+    }
+
+    @Test
+    public void searchProcessTestByScriptNameAndUserId() throws Exception {
+        Process newProcess = ProcessBuilder.createProcess(context, eperson, "mock-script", parameters).build();
+        Process newProcess1 = ProcessBuilder.createProcess(context, eperson, "mock-script", parameters).build();
+        Process newProcess2 = ProcessBuilder.createProcess(context, eperson, "mock-script", parameters).build();
+        Process newProcess3 = ProcessBuilder.createProcess(context, eperson, "mock-script", parameters).build();
+        Process newProcess4 = ProcessBuilder.createProcess(context, eperson, "another-mock-script", parameters).build();
+        Process newProcess5 = ProcessBuilder.createProcess(context, eperson, "another-mock-script", parameters).build();
+        Process newProcess6 = ProcessBuilder.createProcess(context, eperson, "another-mock-script", parameters).build();
+        Process newProcess7 = ProcessBuilder.createProcess(context, admin, "another-mock-script", parameters)
+                                            .withProcessStatus(ProcessStatus.FAILED).build();
+        Process newProcess8 = ProcessBuilder.createProcess(context, admin, "another-mock-script", parameters).build();
+        Process newProcess9 = ProcessBuilder.createProcess(context, admin, "mock-script", parameters)
+                                            .withProcessStatus(ProcessStatus.FAILED).build();
+
+        String token = getAuthToken(admin.getEmail(), password);
+
+        getClient(token).perform(get("/api/system/processes/search/byProperty")
+                                     .param("scriptName", "another-mock-script")
+                                     .param("userId", admin.getID().toString()))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$._embedded.processes", containsInAnyOrder(
+                            ProcessMatcher.matchProcess(newProcess7.getName(),
+                                                        String.valueOf(admin.getID().toString()),
+                                                        newProcess7.getID(), parameters, ProcessStatus.FAILED),
+                            ProcessMatcher.matchProcess(newProcess8.getName(),
+                                                        String.valueOf(admin.getID().toString()),
+                                                        newProcess8.getID(), parameters, ProcessStatus.SCHEDULED)
+                        )))
+                        .andExpect(jsonPath("$.page", is(
+                            PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 2))));
+    }
+
+    @Test
+    public void searchProcessTestByUserIdAndProcessStatus() throws Exception {
+        Process newProcess = ProcessBuilder.createProcess(context, eperson, "mock-script", parameters).build();
+        Process newProcess1 = ProcessBuilder.createProcess(context, eperson, "mock-script", parameters).build();
+        Process newProcess2 = ProcessBuilder.createProcess(context, eperson, "mock-script", parameters).build();
+        Process newProcess3 = ProcessBuilder.createProcess(context, eperson, "mock-script", parameters)
+                                            .withProcessStatus(ProcessStatus.FAILED).build();
+        Process newProcess4 = ProcessBuilder.createProcess(context, eperson, "another-mock-script", parameters).build();
+        Process newProcess5 = ProcessBuilder.createProcess(context, eperson, "another-mock-script", parameters).build();
+        Process newProcess6 = ProcessBuilder.createProcess(context, eperson, "another-mock-script", parameters).build();
+        Process newProcess7 = ProcessBuilder.createProcess(context, admin, "another-mock-script", parameters).build();
+        Process newProcess8 = ProcessBuilder.createProcess(context, admin, "another-mock-script", parameters)
+                                            .withProcessStatus(ProcessStatus.FAILED).build();
+        Process newProcess9 = ProcessBuilder.createProcess(context, admin, "mock-script", parameters)
+                                            .withProcessStatus(ProcessStatus.FAILED).build();
+
+        String token = getAuthToken(admin.getEmail(), password);
+
+        getClient(token).perform(get("/api/system/processes/search/byProperty")
+                                     .param("processStatus", "FAILED")
+                                     .param("userId", admin.getID().toString()))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$._embedded.processes", containsInAnyOrder(
+                            ProcessMatcher.matchProcess(newProcess9.getName(),
+                                                        String.valueOf(admin.getID().toString()),
+                                                        newProcess9.getID(), parameters, ProcessStatus.FAILED),
+                            ProcessMatcher.matchProcess(newProcess8.getName(),
+                                                        String.valueOf(admin.getID().toString()),
+                                                        newProcess8.getID(), parameters, ProcessStatus.FAILED)
+                        )))
+                        .andExpect(jsonPath("$.page", is(
+                            PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 2))));
+    }
+
+    @Test
+    public void searchProcessTestByUserIdAndProcessStatusAndScriptName() throws Exception {
+        Process newProcess = ProcessBuilder.createProcess(context, eperson, "mock-script", parameters).build();
+        Process newProcess1 = ProcessBuilder.createProcess(context, eperson, "mock-script", parameters)
+                                            .withProcessStatus(ProcessStatus.FAILED).build();
+        Process newProcess2 = ProcessBuilder.createProcess(context, eperson, "mock-script", parameters).build();
+        Process newProcess3 = ProcessBuilder.createProcess(context, eperson, "mock-script", parameters)
+                                            .withProcessStatus(ProcessStatus.FAILED).build();
+        Process newProcess4 = ProcessBuilder.createProcess(context, eperson, "mock-script", parameters).build();
+        Process newProcess5 = ProcessBuilder.createProcess(context, eperson, "another-mock-script", parameters).build();
+        Process newProcess6 = ProcessBuilder.createProcess(context, eperson, "another-mock-script", parameters).build();
+        Process newProcess7 = ProcessBuilder.createProcess(context, admin, "another-mock-script", parameters).build();
+        Process newProcess8 = ProcessBuilder.createProcess(context, admin, "another-mock-script", parameters)
+                                            .withProcessStatus(ProcessStatus.FAILED).build();
+        Process newProcess9 = ProcessBuilder.createProcess(context, admin, "mock-script", parameters).build();
+
+        String token = getAuthToken(admin.getEmail(), password);
+
+        getClient(token).perform(get("/api/system/processes/search/byProperty")
+                                     .param("processStatus", "FAILED")
+                                     .param("userId", eperson.getID().toString())
+                                     .param("scriptName", "mock-script"))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$._embedded.processes", containsInAnyOrder(
+                            ProcessMatcher.matchProcess("mock-script",
+                                                        String.valueOf(eperson.getID().toString()),
+                                                        newProcess1.getID(), parameters, ProcessStatus.FAILED),
+                            ProcessMatcher.matchProcess("mock-script",
+                                                        String.valueOf(eperson.getID().toString()),
+                                                        newProcess3.getID(), parameters, ProcessStatus.FAILED)
+                        )))
+                        .andExpect(jsonPath("$.page", is(
+                            PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 2))));
+    }
+
+    @Test
+    public void searchProcessTestNoParametersBadRequest() throws Exception {
+
+        String token = getAuthToken(admin.getEmail(), password);
+
+        getClient(token).perform(get("/api/system/processes/search/byProperty"))
+                        .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void searchProcessTestInvalidProcessStatusParamBadRequest() throws Exception {
+
+        String token = getAuthToken(admin.getEmail(), password);
+
+        getClient(token).perform(get("/api/system/processes/search/byProperty")
+                                     .param("processStatus", "SCHEDULED"))
+                        .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void searchProcessTestInvalidEPersonUuid() throws Exception {
+
+        String token = getAuthToken(admin.getEmail(), password);
+
+        getClient(token).perform(get("/api/system/processes/search/byProperty")
+                                     .param("userId", UUID.randomUUID().toString()))
+                        .andExpect(status().isBadRequest());
     }
 
     @After
