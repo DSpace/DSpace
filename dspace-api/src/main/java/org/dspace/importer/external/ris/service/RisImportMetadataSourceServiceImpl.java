@@ -37,6 +37,7 @@ public class RisImportMetadataSourceServiceImpl extends AbstractPlainMetadataSou
         return "RISMetadataSource";
     }
 
+    @Override
     protected List<PlainMetadataSourceDto> readData(InputStream inputStream) throws FileSourceException {
         return aggregateData(inputStream);
     }
@@ -119,7 +120,7 @@ public class RisImportMetadataSourceServiceImpl extends AbstractPlainMetadataSou
                 }
             }
         } catch (Exception e) {
-            throw new FileSourceException("Cannot parse RIS file");
+            throw new FileSourceException("Cannot parse RIS file", e);
         }
         return items;
     }

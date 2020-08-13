@@ -19,15 +19,16 @@
 
     <context:annotation-config/> <!-- allows us to use spring annotations in beans -->
 
-    <bean id="importService" class="org.dspace.importer.external.service.ImportService" scope="singleton"
+    <bean id="importService" class="org.dspace.importer.external.service.ImportService"
           lazy-init="false" autowire="byType" destroy-method="destroy">
         <property name="importSources">
             <list>
-                <ref bean="PubmedImportService" />
-                <ref bean="BibtexImportService" />
-                <ref bean="RisImportService" />
-                <ref bean="CsvImportService" />
-                <ref bean="TsvImportService" />
+                <ref bean="pubmedImportService" />
+                <ref bean="bibtexImportService" />
+                <ref bean="risImportService" />
+                <ref bean="csvImportService" />
+                <ref bean="tsvImportService" />
+                <ref bean="endnoteImportService" />
             </list>
          </property>
     </bean>
@@ -40,9 +41,9 @@
         Omitting this property will default to searching over all configured ImportService implementations
     -->
 
-    <bean id="PubmedImportService"
-          class="org.dspace.importer.external.pubmed.service.PubmedImportMetadataSourceServiceImpl" scope="singleton">
-        <property name="metadataFieldMapping" ref="PubmedMetadataFieldMapping"/>
+    <bean id="pubmedImportService"
+          class="org.dspace.importer.external.pubmed.service.PubmedImportMetadataSourceServiceImpl">
+        <property name="metadataFieldMapping" ref="pubmedMetadataFieldMapping"/>
         <property name="baseAddress" value="https://eutils.ncbi.nlm.nih.gov/entrez/eutils/"/>
         <property name="supportedExtensions">
             <list>
@@ -52,12 +53,12 @@
     </bean>
 
 
-    <bean id="PubmedMetadataFieldMapping"
+    <bean id="pubmedMetadataFieldMapping"
           class="org.dspace.importer.external.pubmed.metadatamapping.PubmedFieldMapping">
     </bean>
 
-    <bean id="RisImportService"
-          class="org.dspace.importer.external.ris.service.RisImportMetadataSourceServiceImpl" scope="singleton">
+    <bean id="risImportService"
+          class="org.dspace.importer.external.ris.service.RisImportMetadataSourceServiceImpl">
           <property name="supportedExtensions">
                <list>
                      <value>ris</value>
@@ -65,8 +66,8 @@
           </property>
     </bean>
 
-    <bean id="BibtexImportService"
-          class="org.dspace.importer.external.bibtex.service.BibtexImportMetadataSourceServiceImpl" scope="singleton">
+    <bean id="bibtexImportService"
+          class="org.dspace.importer.external.bibtex.service.BibtexImportMetadataSourceServiceImpl">
           <property name="supportedExtensions">
                <list>
                      <value>bib</value>
@@ -75,8 +76,8 @@
           </property>
     </bean>
 
-    <bean id="CsvImportService"
-          class="org.dspace.importer.external.csv.service.CharacterSeparatedImportMetadataSourceServiceImpl" scope="singleton">
+    <bean id="csvImportService"
+          class="org.dspace.importer.external.csv.service.CharacterSeparatedImportMetadataSourceServiceImpl">
           <property name="metadataFieldMap" ref="csvMetadataFieldMap"></property>
           <property name="skipLines" value="1" />
           <property name="supportedExtensions">
@@ -86,8 +87,8 @@
           </property>
     </bean>
 
-    <bean id="TsvImportService"
-          class="org.dspace.importer.external.csv.service.CharacterSeparatedImportMetadataSourceServiceImpl" scope="singleton">
+    <bean id="tsvImportService"
+          class="org.dspace.importer.external.csv.service.CharacterSeparatedImportMetadataSourceServiceImpl">
           <property name="importSource" value="TsvMetadataSource" />
           <property name="separator" value="9" />
           <property name="skipLines" value="1" />
@@ -99,8 +100,8 @@
           </property>
     </bean>
 
-    <bean id="EndnoteImportService"
-          class="org.dspace.importer.external.endnote.service.EndnoteImportMetadataSourceServiceImpl" scope="singleton">
+    <bean id="endnoteImportService"
+          class="org.dspace.importer.external.endnote.service.EndnoteImportMetadataSourceServiceImpl">
           <property name="metadataFieldMap" ref="endnoteMetadataFieldMap"></property>
           <property name="supportedExtensions">
                <list>
