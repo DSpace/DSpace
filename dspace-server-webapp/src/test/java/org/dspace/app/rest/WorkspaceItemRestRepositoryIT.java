@@ -897,9 +897,11 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
 
         context.restoreAuthSystemState();
 
+        AtomicReference<List<Integer>> idRef = new AtomicReference<>();
         String authToken = getAuthToken(eperson.getEmail(), password);
-        // create a workspaceitem from a single bibliographic entry file explicitly in the default collection (col1)
-        getClient(authToken).perform(fileUpload("/api/submission/workspaceitems")
+        try {
+            // create a workspaceitem from a single bibliographic entry file explicitly in the default collection (col1)
+            getClient(authToken).perform(fileUpload("/api/submission/workspaceitems")
                     .file(bibtexFile))
                 // create should return 200, 201 (created) is better for single resource
                 .andExpect(status().isOk())
@@ -914,11 +916,20 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                      + ".metadata['dc.title'][0].value",
                         is("bibtex-test.bib")))
                 .andExpect(
-                        jsonPath("$._embedded.workspaceitems[*]._embedded.upload").doesNotExist());
-        ;
+                        jsonPath("$._embedded.workspaceitems[*]._embedded.upload").doesNotExist())
+                .andDo(result -> idRef.set(read(result.getResponse().getContentAsString(),
+                    "$._embedded.workspaceitems[*].id")));
+        } finally {
+            if (idRef != null && idRef.get() != null) {
+                for (int i : idRef.get()) {
+                    WorkspaceItemBuilder.deleteWorkspaceItem(i);
+                }
+            }
+        }
 
         // create a workspaceitem from a single bibliographic entry file explicitly in the col2
-        getClient(authToken).perform(fileUpload("/api/submission/workspaceitems")
+        try {
+            getClient(authToken).perform(fileUpload("/api/submission/workspaceitems")
                     .file(bibtexFile)
                     .param("owningCollection", col2.getID().toString()))
                 .andExpect(status().isOk())
@@ -933,8 +944,16 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                      + ".files[0].metadata['dc.title'][0].value",
                         is("bibtex-test.bib")))
                 .andExpect(
-                        jsonPath("$._embedded.workspaceitems[*]._embedded.upload").doesNotExist());
-
+                        jsonPath("$._embedded.workspaceitems[*]._embedded.upload").doesNotExist())
+                .andDo(result -> idRef.set(read(result.getResponse().getContentAsString(),
+                        "$._embedded.workspaceitems[*].id")));
+        } finally {
+            if (idRef != null && idRef.get() != null) {
+                for (int i : idRef.get()) {
+                    WorkspaceItemBuilder.deleteWorkspaceItem(i);
+                }
+            }
+        }
         bibtex.close();
     }
 
@@ -972,7 +991,9 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
 
         String authToken = getAuthToken(eperson.getEmail(), password);
         // bulk create workspaceitems in the default collection (col1)
-        getClient(authToken).perform(fileUpload("/api/submission/workspaceitems")
+        AtomicReference<List<Integer>> idRef = new AtomicReference<>();
+        try {
+            getClient(authToken).perform(fileUpload("/api/submission/workspaceitems")
                     .file(csvFile))
                 // bulk create should return 200, 201 (created) is better for single resource
                 .andExpect(status().isOk())
@@ -998,11 +1019,20 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                      + ".metadata['dc.title'][0].value",
                         is("csv-test.csv")))
                 .andExpect(
-                        jsonPath("$._embedded.workspaceitems[*]._embedded.upload").doesNotExist());
-        ;
+                        jsonPath("$._embedded.workspaceitems[*]._embedded.upload").doesNotExist())
+                .andDo(result -> idRef.set(read(result.getResponse().getContentAsString(),
+                        "$._embedded.workspaceitems[*].id")));
+        } finally {
+            if (idRef != null && idRef.get() != null) {
+                for (int i : idRef.get()) {
+                    WorkspaceItemBuilder.deleteWorkspaceItem(i);
+                }
+            }
+        }
 
         // bulk create workspaceitems explicitly in the col2
-        getClient(authToken).perform(fileUpload("/api/submission/workspaceitems")
+        try {
+            getClient(authToken).perform(fileUpload("/api/submission/workspaceitems")
                     .file(csvFile)
                     .param("owningCollection", col2.getID().toString()))
                     .andExpect(status().isOk())
@@ -1029,7 +1059,16 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                      + ".files[0].metadata['dc.title'][0].value",
                         is("csv-test.csv")))
                  .andExpect(
-                     jsonPath("$._embedded.workspaceitems[*]._embedded.upload").doesNotExist());
+                     jsonPath("$._embedded.workspaceitems[*]._embedded.upload").doesNotExist())
+                 .andDo(result -> idRef.set(read(result.getResponse().getContentAsString(),
+                         "$._embedded.workspaceitems[*].id")));
+        } finally {
+            if (idRef != null && idRef.get() != null) {
+                for (int i : idRef.get()) {
+                    WorkspaceItemBuilder.deleteWorkspaceItem(i);
+                }
+            }
+        }
         csv.close();
     }
 
@@ -1067,9 +1106,11 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         context.restoreAuthSystemState();
 
         String authToken = getAuthToken(eperson.getEmail(), password);
-
+        AtomicReference<List<Integer>> idRef = new AtomicReference<>();
         // bulk create workspaceitems in the default collection (col1)
-        getClient(authToken).perform(fileUpload("/api/submission/workspaceitems")
+
+        try {
+            getClient(authToken).perform(fileUpload("/api/submission/workspaceitems")
                 .file(csvFile))
             // bulk create should return 200, 201 (created) is better for single resource
             .andExpect(status().isOk())
@@ -1097,8 +1138,17 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                  + ".metadata['dc.title'][0].value",
                     is("csv-missing-field-test.csv")))
             .andExpect(
-                    jsonPath("$._embedded.workspaceitems[*]._embedded.upload").doesNotExist());
-            csv.close();
+                    jsonPath("$._embedded.workspaceitems[*]._embedded.upload").doesNotExist())
+            .andDo(result -> idRef.set(read(result.getResponse().getContentAsString(),
+                    "$._embedded.workspaceitems[*].id")));
+        } finally {
+            if (idRef != null && idRef.get() != null) {
+                for (int i : idRef.get()) {
+                    WorkspaceItemBuilder.deleteWorkspaceItem(i);
+                }
+            }
+        }
+        csv.close();
     }
 
     @Test
@@ -1134,8 +1184,11 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         context.restoreAuthSystemState();
 
         String authToken = getAuthToken(eperson.getEmail(), password);
+        AtomicReference<List<Integer>> idRef = new AtomicReference<>();
+
         // bulk create workspaceitems in the default collection (col1)
-        getClient(authToken).perform(fileUpload("/api/submission/workspaceitems")
+        try {
+            getClient(authToken).perform(fileUpload("/api/submission/workspaceitems")
                     .file(tsvFile))
                 // bulk create should return 200, 201 (created) is better for single resource
                 .andExpect(status().isOk())
@@ -1161,8 +1214,16 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                      + ".metadata['dc.title'][0].value",
                         is("tsv-test.tsv")))
                 .andExpect(
-                        jsonPath("$._embedded.workspaceitems[*]._embedded.upload").doesNotExist());
-        ;
+                        jsonPath("$._embedded.workspaceitems[*]._embedded.upload").doesNotExist())
+                .andDo(result -> idRef.set(read(result.getResponse().getContentAsString(),
+                        "$._embedded.workspaceitems[*].id")));
+        } finally {
+            if (idRef != null && idRef.get() != null) {
+                for (int i : idRef.get()) {
+                    WorkspaceItemBuilder.deleteWorkspaceItem(i);
+                }
+            }
+        }
         tsv.close();
     }
 
@@ -1194,8 +1255,11 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         context.restoreAuthSystemState();
 
         String authToken = getAuthToken(eperson.getEmail(), password);
+        AtomicReference<List<Integer>> idRef = new AtomicReference<>();
+
         // bulk create workspaceitems in the default collection (col1)
-        getClient(authToken).perform(fileUpload("/api/submission/workspaceitems")
+        try {
+            getClient(authToken).perform(fileUpload("/api/submission/workspaceitems")
                     .file(tsvFile))
                 // bulk create should return 200, 201 (created) is better for single resource
                 .andExpect(status().isOk())
@@ -1221,8 +1285,16 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                      + ".metadata['dc.title'][0].value",
                         is("ris-test.ris")))
                 .andExpect(
-                        jsonPath("$._embedded.workspaceitems[*]._embedded.upload").doesNotExist());
-        ;
+                        jsonPath("$._embedded.workspaceitems[*]._embedded.upload").doesNotExist())
+                .andDo(result -> idRef.set(read(result.getResponse().getContentAsString(),
+                                "$._embedded.workspaceitems[*].id")));
+        } finally {
+            if (idRef != null && idRef.get() != null) {
+                for (int i : idRef.get()) {
+                    WorkspaceItemBuilder.deleteWorkspaceItem(i);
+                }
+            }
+        }
         ris.close();
     }
 
@@ -1253,8 +1325,10 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         context.restoreAuthSystemState();
 
         String authToken = getAuthToken(eperson.getEmail(), password);
+        AtomicReference<List<Integer>> idRef = new AtomicReference<>();
         // bulk create workspaceitems in the default collection (col1)
-        getClient(authToken).perform(fileUpload("/api/submission/workspaceitems")
+        try {
+            getClient(authToken).perform(fileUpload("/api/submission/workspaceitems")
                     .file(endnoteFile))
                 // bulk create should return 200, 201 (created) is better for single resource
                 .andExpect(status().isOk())
@@ -1281,8 +1355,16 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                      + ".metadata['dc.title'][0].value",
                         is("endnote-test.enw")))
                 .andExpect(
-                        jsonPath("$._embedded.workspaceitems[*]._embedded.upload").doesNotExist());
-        ;
+                        jsonPath("$._embedded.workspaceitems[*]._embedded.upload").doesNotExist())
+                .andDo(result -> idRef.set(read(result.getResponse().getContentAsString(),
+                        "$._embedded.workspaceitems[*].id")));
+        } finally {
+            if (idRef != null && idRef.get() != null) {
+                for (int i : idRef.get()) {
+                     WorkspaceItemBuilder.deleteWorkspaceItem(i);
+                }
+            }
+        }
         endnote.close();
     }
 
@@ -1321,9 +1403,11 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         context.restoreAuthSystemState();
 
         String authToken = getAuthToken(eperson.getEmail(), password);
+        AtomicReference<List<Integer>> idRef = new AtomicReference<>();
 
         // bulk create workspaceitems in the default collection (col1)
-        getClient(authToken).perform(fileUpload("/api/submission/workspaceitems")
+        try {
+            getClient(authToken).perform(fileUpload("/api/submission/workspaceitems")
                 .file(csvFile))
             // bulk create should return 200, 201 (created) is better for single resource
             .andExpect(status().isOk())
@@ -1351,7 +1435,16 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                  + ".metadata['dc.title'][0].value",
                     is("tsv-missing-field-test.tsv")))
             .andExpect(
-                    jsonPath("$._embedded.workspaceitems[*]._embedded.upload").doesNotExist());
+                    jsonPath("$._embedded.workspaceitems[*]._embedded.upload").doesNotExist())
+            .andDo(result -> idRef.set(read(result.getResponse().getContentAsString(),
+                    "$._embedded.workspaceitems[*].id")));
+            } finally {
+                if (idRef != null && idRef.get() != null) {
+                    for (int i : idRef.get()) {
+                        WorkspaceItemBuilder.deleteWorkspaceItem(i);
+                    }
+                }
+            }
             tsv.close();
     }
 
@@ -1391,8 +1484,11 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         context.restoreAuthSystemState();
 
         String authToken = getAuthToken(eperson.getEmail(), password);
+        AtomicReference<List<Integer>> idRef = new AtomicReference<>();
+
         // create a workspaceitem from a single bibliographic entry file explicitly in the default collection (col1)
-        getClient(authToken).perform(fileUpload("/api/submission/workspaceitems")
+        try {
+            getClient(authToken).perform(fileUpload("/api/submission/workspaceitems")
                     .file(bibtexFile).file(pubmedFile))
                 // create should return 200, 201 (created) is better for single resource
                 .andExpect(status().isOk())
@@ -1413,10 +1509,20 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                             is("/local/path/pubmed-test.xml")))
                 .andExpect(jsonPath("$._embedded.workspaceitems[0].sections.upload.files[1]"
                         + ".metadata['dc.title'][0].value",
-                            is("pubmed-test.xml")));
+                            is("pubmed-test.xml")))
+                .andDo(result -> idRef.set(read(result.getResponse().getContentAsString(),
+                        "$._embedded.workspaceitems[*].id")));
+        } finally {
+            if (idRef != null && idRef.get() != null) {
+                for (int i : idRef.get()) {
+                    WorkspaceItemBuilder.deleteWorkspaceItem(i);
+                }
+            }
+        }
 
         // create a workspaceitem from a single bibliographic entry file explicitly in the col2
-        getClient(authToken).perform(fileUpload("/api/submission/workspaceitems")
+        try {
+            getClient(authToken).perform(fileUpload("/api/submission/workspaceitems")
                     .file(bibtexFile).file(pubmedFile)
                     .param("owningCollection", col2.getID().toString()))
                 .andExpect(status().isOk())
@@ -1437,7 +1543,16 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                          is("/local/path/pubmed-test.xml")))
                 .andExpect(jsonPath("$._embedded.workspaceitems[0].sections.upload.files[1]"
                      + ".metadata['dc.title'][0].value",
-                         is("pubmed-test.xml")));
+                         is("pubmed-test.xml")))
+                .andDo(result -> idRef.set(read(result.getResponse().getContentAsString(),
+                        "$._embedded.workspaceitems[*].id")));
+        } finally {
+            if (idRef != null && idRef.get() != null) {
+                for (int i : idRef.get()) {
+                    WorkspaceItemBuilder.deleteWorkspaceItem(i);
+                }
+            }
+        }
         bibtex.close();
         xmlIS.close();
     }
@@ -1477,6 +1592,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         context.restoreAuthSystemState();
 
         String authToken = getAuthToken(eperson.getEmail(), password);
+
         // create a workspaceitem from a single bibliographic entry file explicitly in the default collection (col1)
         getClient(authToken).perform(fileUpload("/api/submission/workspaceitems")
                     .file(bibtexFile))
@@ -1519,8 +1635,11 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         context.restoreAuthSystemState();
 
         String authToken = getAuthToken(eperson.getEmail(), password);
+        AtomicReference<List<Integer>> idRef = new AtomicReference<>();
+
         // create a workspaceitem from a single bibliographic entry file explicitly in the default collection (col1)
-        getClient(authToken).perform(fileUpload("/api/submission/workspaceitems")
+        try {
+            getClient(authToken).perform(fileUpload("/api/submission/workspaceitems")
                     .file(pubmedFile))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$._embedded.workspaceitems[0].sections.traditionalpageone['dc.title'][0].value",
@@ -1537,10 +1656,21 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                         is("/local/path/pubmed-test.xml")))
                 .andExpect(jsonPath("$._embedded.workspaceitems[0].sections.upload.files[0]"
                     + ".metadata['dc.title'][0].value",
-                        is("pubmed-test.xml")));
+                        is("pubmed-test.xml")))
+                .andDo(result -> idRef.set(read(result.getResponse().getContentAsString(),
+                        "$._embedded.workspaceitems[*].id")));
+        } finally {
+            if (idRef != null && idRef.get() != null) {
+                for (int i : idRef.get()) {
+                    WorkspaceItemBuilder.deleteWorkspaceItem(i);
+                }
+            }
+        }
+
 
         // create a workspaceitem from a single bibliographic entry file explicitly in the col2
-        getClient(authToken).perform(fileUpload("/api/submission/workspaceitems")
+        try {
+            getClient(authToken).perform(fileUpload("/api/submission/workspaceitems")
                     .file(pubmedFile)
                     .param("owningCollection", col2.getID().toString()))
             .andExpect(status().isOk())
@@ -1556,8 +1686,16 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
             .andExpect(jsonPath("$._embedded.workspaceitems[0].sections.upload.files[0].metadata['dc.source'][0].value",
                     is("/local/path/pubmed-test.xml")))
             .andExpect(jsonPath("$._embedded.workspaceitems[0].sections.upload.files[0].metadata['dc.title'][0].value",
-                    is("pubmed-test.xml")));
-
+                    is("pubmed-test.xml")))
+            .andDo(result -> idRef.set(read(result.getResponse().getContentAsString(),
+                    "$._embedded.workspaceitems[*].id")));
+        } finally {
+            if (idRef != null && idRef.get() != null) {
+                for (int i : idRef.get()) {
+                    WorkspaceItemBuilder.deleteWorkspaceItem(i);
+                }
+            }
+        }
         xmlIS.close();
     }
 
