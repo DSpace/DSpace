@@ -7,8 +7,8 @@
  */
 package org.dspace.scripts;
 
-import org.dspace.content.ProcessStatus;
-import org.dspace.eperson.EPerson;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * This is a container class in which the variables can be stored that a {@link Process} must adhere to when being
@@ -16,74 +16,29 @@ import org.dspace.eperson.EPerson;
  */
 public class ProcessQueryParameterContainer {
 
-    /**
-     * The scriptName that a Process must have
-     */
-    private String scriptName;
-    /**
-     * The starter of the Process
-     */
-    private EPerson ePerson;
-    /**
-     * the currentStatus of the Script
-     */
-    private ProcessStatus processStatus;
+
+    private Map<String, Object> queryParameterMap = new HashMap<>();
 
     /**
-     * Default constructor with the args
+     * Generic getter for the queryParameterMap
+     * @return the queryParameterMap value of this ProcessQueryParameterContainer
      */
-    public ProcessQueryParameterContainer(String scriptName, EPerson ePerson,
-                                          ProcessStatus processStatus) {
-        this.scriptName = scriptName;
-        this.ePerson = ePerson;
-        this.processStatus = processStatus;
+    public Map<String, Object> getQueryParameterMap() {
+        return queryParameterMap;
     }
 
     /**
-     * Generic getter for the scriptName
-     * @return the scriptName value of this ProcessQueryParameterContainer
+     * Generic setter for the queryParameterMap
+     * @param queryParameterMap   The queryParameterMap to be set on this ProcessQueryParameterContainer
      */
-    public String getScriptName() {
-        return scriptName;
+    public void setQueryParameterMap(Map<String, Object> queryParameterMap) {
+        this.queryParameterMap = queryParameterMap;
     }
 
-    /**
-     * Generic setter for the scriptName
-     * @param scriptName   The scriptName to be set on this ProcessQueryParameterContainer
-     */
-    public void setScriptName(String scriptName) {
-        this.scriptName = scriptName;
-    }
-
-    /**
-     * Generic getter for the ePerson
-     * @return the ePerson value of this ProcessQueryParameterContainer
-     */
-    public EPerson getEPerson() {
-        return ePerson;
-    }
-
-    /**
-     * Generic setter for the ePerson
-     * @param ePerson   The ePerson to be set on this ProcessQueryParameterContainer
-     */
-    public void setEPerson(EPerson ePerson) {
-        this.ePerson = ePerson;
-    }
-
-    /**
-     * Generic getter for the processStatus
-     * @return the processStatus value of this ProcessQueryParameterContainer
-     */
-    public ProcessStatus getProcessStatus() {
-        return processStatus;
-    }
-
-    /**
-     * Generic setter for the processStatus
-     * @param processStatus   The processStatus to be set on this ProcessQueryParameterContainer
-     */
-    public void setProcessStatus(ProcessStatus processStatus) {
-        this.processStatus = processStatus;
+    public void addToQueryParameterMap(String key, Object object) {
+        if (queryParameterMap == null) {
+            queryParameterMap = new HashMap<>();
+        }
+        queryParameterMap.put(key, object);
     }
 }

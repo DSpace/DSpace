@@ -32,6 +32,7 @@ import org.dspace.eperson.EPerson;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.scripts.Process;
 import org.dspace.scripts.ProcessQueryParameterContainer;
+import org.dspace.scripts.Process_;
 import org.dspace.scripts.service.ProcessService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -181,8 +182,8 @@ public class ProcessRestRepository extends DSpaceRestRepository<ProcessRest, Int
             throw new DSpaceBadRequestException("The given ProcessStatus isn't within the accepted boundaries: "
                                                     + processStatusString);
         }
-        ProcessQueryParameterContainer processQueryParameterContainer =
-            new ProcessQueryParameterContainer(scriptName, ePerson, processStatus);
+        ProcessQueryParameterContainer processQueryParameterContainer = createProcessQueryParameterContainer(scriptName,
+                                                                            ePerson, processStatus);
         List<Process> processes = processService.search(context, processQueryParameterContainer, pageable.getPageSize(),
                                                         Math.toIntExact(pageable.getOffset()));
         return converterService.toRestPage(processes, pageable,
@@ -191,6 +192,23 @@ public class ProcessRestRepository extends DSpaceRestRepository<ProcessRest, Int
 
 
     }
+
+    private ProcessQueryParameterContainer createProcessQueryParameterContainer(String scriptName, EPerson ePerson,
+                                                                                ProcessStatus processStatus) {
+        ProcessQueryParameterContainer processQueryParameterContainer =
+            new ProcessQueryParameterContainer();
+        if (StringUtils.isNotBlank(scriptName)) {
+            processQueryParameterContainer.addToQueryParameterMap(Process_.NAME, scriptName);
+        }
+        if (ePerson != null) {
+            processQueryParameterContainer.addToQueryParameterMap(Process_.E_PERSON, ePerson);
+        }
+        if (processStatus != null) {
+            processQueryParameterContainer.addToQueryParameterMap(Process_.PROCESS_STATUS, processStatus);
+        }
+        return processQueryParameterContainer;
+    }
+
     @Override
     public Class<ProcessRest> getDomainClass() {
         return ProcessRest.class;
