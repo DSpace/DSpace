@@ -16,5 +16,19 @@
         <scope_note></scope_note>
     </dc-type>
 
+    <dc-type>
+        <schema>dspace</schema>
+        <element>cookies</element>
+        <qualifier>functional</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>dspace</schema>
+        <element>cookies</element>
+        <qualifier>statistics</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
 
 </dspace-dc-types>
