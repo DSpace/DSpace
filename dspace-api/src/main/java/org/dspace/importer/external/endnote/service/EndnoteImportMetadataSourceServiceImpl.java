@@ -78,7 +78,7 @@ public class EndnoteImportMetadataSourceServiceImpl extends AbstractPlainMetadat
                 lineForDebug++;
             }
         } catch (Exception e) {
-            throw new FileSourceException("Error reading file");
+            throw new FileSourceException("Error reading file", e);
         }
         return list;
     }
