@@ -53,7 +53,7 @@ public class EndnoteImportMetadataSourceServiceImpl extends AbstractPlainMetadat
             int lineForDebug = 3;
             List<PlainMetadataKeyValueItem> tokenized = tokenize(fileInpuStream);
             List<PlainMetadataKeyValueItem> tmpList = new ArrayList<>();
-            //iterate over key/value pairs, create a new PlainMetadataSourceDto on "ER" rows (which means "new record)
+            // iterate over key/value pairs, create a new PlainMetadataSourceDto on "ER" rows (which means "new record)
             // and stop on EF (end of file).
             for (PlainMetadataKeyValueItem item : tokenized) {
                 if (item.getKey() == null || item.getKey().isEmpty()) {
@@ -61,9 +61,12 @@ public class EndnoteImportMetadataSourceServiceImpl extends AbstractPlainMetadat
                     + lineForDebug + ". Keys cannot be null nor empty");
                 }
                 if ("EF".equals(item.getKey())) {
+                    // end of file
                     break;
                 }
                 if ("ER".equals(item.getKey())) {
+                    // new ImportRecord start from here (ER is a content delimiter)
+                    // save the previous, then create a new one
                     PlainMetadataSourceDto dto = new PlainMetadataSourceDto();
                     dto.setMetadata(new ArrayList<>(tmpList));
                     list.add(dto);
@@ -99,6 +102,7 @@ public class EndnoteImportMetadataSourceServiceImpl extends AbstractPlainMetadat
         BufferedReader reader = new BufferedReader(new InputStreamReader(fileInpuStream));
         String line;
         line = reader.readLine();
+        // FN and VR works as preamble, just check and skip them
         if (line == null || !line.startsWith("FN")) {
             throw new FileSourceException("Invalid endNote file");
         }
@@ -106,10 +110,13 @@ public class EndnoteImportMetadataSourceServiceImpl extends AbstractPlainMetadat
         if (line == null || !line.startsWith("VR")) {
             throw new FileSourceException("Invalid endNote file");
         }
+        // split any row into first part ^[A-Z]{2} used as key (the meaning of the data)
+        // and second part ?(.*) used as value (the data)
         Pattern pattern = Pattern.compile("(^[A-Z]{2}) ?(.*)$");
         List<PlainMetadataKeyValueItem> list = new ArrayList<PlainMetadataKeyValueItem>();
         while ((line = reader.readLine()) != null) {
             line = line.trim();
+            // skip empty lines
             if (line.isEmpty() || line.equals("")) {
                 continue;
             }
