@@ -166,7 +166,7 @@ public class SimpleXpathMetadatumContributor implements MetadataContributor<OMEl
             }
             return values;
         } catch (JaxenException e) {
-            log.error(query);
+            log.error(query, e);
             throw new RuntimeException(e);
         }
 
