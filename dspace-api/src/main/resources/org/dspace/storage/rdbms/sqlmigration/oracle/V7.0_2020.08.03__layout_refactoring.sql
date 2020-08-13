@@ -51,3 +51,25 @@ ALTER TABLE cris_layout_tab2box ADD COLUMN position INTEGER;
 -- in the tab is defined by the field cris_layout_tab2box.position
 -- --
 ALTER TABLE cris_layout_box DROP COLUMN priority;
+
+ALTER TABLE cris_layout_box2securityfield RENAME TO cris_layout_box2securitymetadata;
+
+ALTER TABLE cris_layout_tab2securityfield RENAME TO cris_layout_tab2securitymetadata;
+
+ALTER TABLE cris_layout_box2securitymetadata RENAME COLUMN authorized_field_id TO metadata_field_id;
+
+ALTER TABLE cris_layout_tab2securitymetadata RENAME COLUMN authorized_field_id TO metadata_field_id;
+
+ALTER TABLE cris_layout_box2securitymetadata ADD CONSTRAINT cris_layout_box2securitymetadata_pkey PRIMARY KEY (metadata_field_id, box_id);
+
+ALTER TABLE cris_layout_tab2securitymetadata ADD CONSTRAINT cris_layout_tab2securitymetadata_pkey PRIMARY KEY (metadata_field_id, tab_id);
+
+ALTER TABLE cris_layout_tab2box ADD CONSTRAINT cris_layout_tab2box_pkey PRIMARY KEY (cris_layout_tab_id, cris_layout_box_id);
+
+ALTER TABLE cris_layout_field ADD COLUMN box_id INTEGER;
+
+DROP TABLE cris_layout_box2field, cris_layout_fieldbitstream2metadata;
+
+ALTER TABLE cris_layout_field ADD CONSTRAINT cris_layout_field_box_fkey FOREIGN KEY (box_id) REFERENCES cris_layout_box (id);
+
+ALTER TABLE cris_layout_field ADD COLUMN metadata_value VARCHAR(255);

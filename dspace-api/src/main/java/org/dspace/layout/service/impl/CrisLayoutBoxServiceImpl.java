@@ -11,7 +11,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
 import org.apache.commons.collections.CollectionUtils;
@@ -205,7 +204,7 @@ public class CrisLayoutBoxServiceImpl implements CrisLayoutBoxService {
     @Override
     public boolean hasContent(CrisLayoutBox box, List<MetadataValue> values) {
         boolean found = false;
-        Set<CrisLayoutField> boxFields = box.getLayoutFields();
+        List<CrisLayoutField> boxFields = box.getLayoutFields();
         // Check if the box type is relation
         boolean isRelationBox = box.getType() != null ?
                 box.getType().equalsIgnoreCase("relation") : false;

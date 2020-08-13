@@ -23,6 +23,8 @@ import org.dspace.content.service.MetadataFieldService;
 import org.dspace.core.Context;
 import org.dspace.layout.CrisLayoutBox;
 import org.dspace.layout.CrisLayoutField;
+import org.dspace.layout.CrisLayoutFieldBitstream;
+import org.dspace.layout.CrisLayoutFieldMetadata;
 import org.dspace.layout.service.CrisLayoutFieldService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -86,15 +88,13 @@ public class CrisLayoutBoxConfigurationAddOperation<D> extends PatchOperation<D>
                 if (value.isArray()) {
                     for (JsonNode v: value) {
                         CrisLayoutField layoutField = getLayoutFieldFromJsonNode(
-                                context, box.getID(), row, position, v);
+                                context, box, row, position, v);
                         layoutField = fieldService.create(context, layoutField);
-                        box.addLayoutField(layoutField);
                     }
                 } else {
                     CrisLayoutField layoutField = getLayoutFieldFromJsonNode(
-                            context, box.getID(), row, position, value);
+                            context, box, row, position, value);
                     layoutField = fieldService.create(context, layoutField);
-                    box.addLayoutField(layoutField);
                 }
             } catch (UnprocessableEntityException e) {
                 throw new UnprocessableEntityException(e.getMessage(), e);
@@ -131,10 +131,14 @@ public class CrisLayoutBoxConfigurationAddOperation<D> extends PatchOperation<D>
      * @throws AuthorizeException
      */
     private CrisLayoutField getLayoutFieldFromJsonNode(
-            Context context, Integer boxId, Integer row, Integer position, JsonNode node)
+            Context context, CrisLayoutBox box, Integer row, Integer position, JsonNode node)
             throws JsonProcessingException, SQLException, UnprocessableEntityException, AuthorizeException {
-        CrisLayoutField field = new CrisLayoutField();
+        CrisLayoutField field = new CrisLayoutFieldMetadata();
+        if (node.has("bundle") || node.has("metadata_value")) {
+            field = new CrisLayoutFieldBitstream();
+        }
         field.setRow(row);
+        field.setBox(box);
 
         JsonNode metadataNode = node.get("metadata");
         if (metadataNode != null && metadataNode.asText() != null ) {
@@ -158,11 +162,6 @@ public class CrisLayoutBoxConfigurationAddOperation<D> extends PatchOperation<D>
             field.setRendering(renderingNode.asText());
         }
 
-        JsonNode fieldTypeNode = node.get("fieldType");
-        if (fieldTypeNode != null && fieldTypeNode.asText() != null ) {
-            field.setType(fieldTypeNode.asText());
-        }
-
         JsonNode styleNode = node.get("style");
         if (styleNode != null && styleNode.asText() != null ) {
             field.setStyle(styleNode.asText());
@@ -170,11 +169,16 @@ public class CrisLayoutBoxConfigurationAddOperation<D> extends PatchOperation<D>
 
         JsonNode bundleNode = node.get("bundle");
         if (bundleNode != null && bundleNode.asText() != null ) {
-            field.setStyle(bundleNode.asText());
+            ((CrisLayoutFieldBitstream)field).setBundle(bundleNode.asText());
+        }
+
+        JsonNode metadataValueNode = node.get("metadata_value");
+        if (bundleNode != null && bundleNode.asText() != null ) {
+            ((CrisLayoutFieldBitstream)field).setMetadataValue(metadataValueNode.asText());
         }
 
         Integer priority = null;
-        List<CrisLayoutField> fields = fieldService.findFieldByBoxId(context, boxId, row);
+        List<CrisLayoutField> fields = fieldService.findFieldByBoxId(context, box.getID(), row);
         if (fields != null && !fields.isEmpty()) {
             if (position == null || position > fields.size()) {
                 position = fields.size();

@@ -95,9 +95,9 @@
         <mapping class="org.dspace.layout.CrisLayoutTab" />
         <mapping class="org.dspace.layout.CrisLayoutBox" />
         <mapping class="org.dspace.layout.CrisLayoutField" />
+        <mapping class="org.dspace.layout.CrisLayoutFieldMetadata" />
         <mapping class="org.dspace.layout.CrisLayoutFieldBitstream" />
         <mapping class="org.dspace.layout.CrisLayoutTab2Box" />
-        <mapping class="org.dspace.layout.CrisLayoutBox2Field" />
 
     </session-factory>
 </hibernate-configuration>

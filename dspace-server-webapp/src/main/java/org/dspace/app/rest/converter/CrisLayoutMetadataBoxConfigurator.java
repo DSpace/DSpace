@@ -7,10 +7,8 @@
  */
 package org.dspace.app.rest.converter;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -27,6 +25,7 @@ import org.dspace.layout.CrisLayoutBox;
 import org.dspace.layout.CrisLayoutBoxTypes;
 import org.dspace.layout.CrisLayoutField;
 import org.dspace.layout.CrisLayoutFieldBitstream;
+import org.dspace.layout.CrisLayoutFieldMetadata;
 import org.springframework.stereotype.Component;
 
 /**
@@ -47,9 +46,7 @@ public class CrisLayoutMetadataBoxConfigurator implements CrisLayoutBoxConfigura
     public CrisLayoutBoxConfigurationRest getConfiguration(CrisLayoutBox box) {
         CrisLayoutMetadataConfigurationRest rest = new CrisLayoutMetadataConfigurationRest();
         rest.setId(box.getID());
-        Set<CrisLayoutField> uLayoutFields = box.getLayoutFields();
-        List<CrisLayoutField> layoutFields = new ArrayList<>();
-        layoutFields.addAll(uLayoutFields);
+        List<CrisLayoutField> layoutFields = box.getLayoutFields();
         Collections.sort(layoutFields, new CrisLayoutFieldRowPriorityComparator());
         if (layoutFields != null && !layoutFields.isEmpty()) {
             Map<Integer, Row> rows = new HashMap<>();
@@ -63,20 +60,17 @@ public class CrisLayoutMetadataBoxConfigurator implements CrisLayoutBoxConfigura
                 field.setLabel(layoutField.getLabel());
                 field.setRendering(layoutField.getRendering());
                 field.setStyle(layoutField.getStyle());
-                field.setFieldType(layoutField.getType());
-                if (layoutField.getType() != null && layoutField.getType().equals("metadata")) {
+                if (layoutField instanceof CrisLayoutFieldMetadata) {
                     field.setMetadata(composeMetadataFieldIdentifier(layoutField.getMetadataField()));
-                } else if (layoutField.getType() != null && layoutField.getType().equals("bitstream")) {
-                    Set<CrisLayoutFieldBitstream> bitstreams = layoutField.getBitstreams();
-                    Iterator<CrisLayoutFieldBitstream> it = bitstreams.iterator();
-                    if (it.hasNext()) {
-                        CrisLayoutFieldBitstream bitstream = it.next();
-                        Bitstream bits = new Bitstream();
-                        bits.setBundle(bitstream.getBundle());
-                        bits.setMetadataValue(bitstream.getMetadataValue());
-                        bits.setMetadataField(composeMetadataFieldIdentifier(bitstream.getMetadataField()));
-                        field.setBitstream(bits);
-                    }
+                    field.setFieldType("METADATA");
+                } else if (layoutField instanceof CrisLayoutFieldBitstream) {
+                    CrisLayoutFieldBitstream bitstream = (CrisLayoutFieldBitstream) layoutField;
+                    field.setFieldType("BITSTREAM");
+                    Bitstream bits = new Bitstream();
+                    bits.setBundle(bitstream.getBundle());
+                    bits.setMetadataValue(bitstream.getMetadataValue());
+                    bits.setMetadataField(composeMetadataFieldIdentifier(bitstream.getMetadataField()));
+                    field.setBitstream(bits);
                 }
                 row.addField(field);
             }

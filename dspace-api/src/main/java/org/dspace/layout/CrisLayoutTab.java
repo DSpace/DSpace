@@ -57,9 +57,9 @@ public class CrisLayoutTab implements ReloadableEntity<Integer> {
     private Integer security;
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
-        name = "cris_layout_tab2securityfield",
+        name = "cris_layout_tab2securitymetadata",
         joinColumns = {@JoinColumn(name = "tab_id")},
-        inverseJoinColumns = {@JoinColumn(name = "authorized_field_id")}
+        inverseJoinColumns = {@JoinColumn(name = "metadata_field_id")}
     )
     private Set<MetadataField> metadataSecurityFields;
     @OneToMany(

@@ -25,10 +25,10 @@ public class CrisLayoutFieldMatcher {
     public static Matcher<? super Object> matchField(CrisLayoutField field) {
         return allOf(
                 hasJsonPath("$.id", is(field.getID())),
-                hasJsonPath("$.bundle", is(field.getBundle())),
+//                hasJsonPath("$.bundle", is(field.getBundle())),
                 hasJsonPath("$.rendering", is(field.getRendering())),
                 hasJsonPath("$.row", is(field.getRow())),
-//                hasJsonPath("$.priority", is(field.getPriority())),
+                hasJsonPath("$.priority", is(field.getPriority())),
                 hasJsonPath("$.label", is(field.getLabel())),
                 hasJsonPath("$.style", is(field.getStyle()))
         );

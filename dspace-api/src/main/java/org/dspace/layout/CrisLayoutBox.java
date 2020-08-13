@@ -8,7 +8,6 @@
 package org.dspace.layout;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import javax.persistence.Cacheable;
@@ -24,6 +23,7 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.OrderBy;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
@@ -62,18 +62,14 @@ public class CrisLayoutBox implements ReloadableEntity<Integer> {
     private String style;
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
-        name = "cris_layout_box2securityfield",
+        name = "cris_layout_box2securitymetadata",
         joinColumns = {@JoinColumn(name = "box_id")},
-        inverseJoinColumns = {@JoinColumn(name = "authorized_field_id")}
+        inverseJoinColumns = {@JoinColumn(name = "metadata_field_id")}
     )
     private Set<MetadataField> metadataSecurityFields;
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(
-        name = "cris_layout_box2field",
-        joinColumns = {@JoinColumn(name = "cris_layout_box_id")},
-        inverseJoinColumns = {@JoinColumn(name = "cris_layout_field_id")}
-    )
-    private Set<CrisLayoutField> layoutFields;
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "box", cascade = CascadeType.ALL)
+    @OrderBy(value = "row, priority")
+    private List<CrisLayoutField> layoutFields;
     @OneToMany(
             mappedBy = "box",
             cascade = CascadeType.ALL,
@@ -200,18 +196,18 @@ public class CrisLayoutBox implements ReloadableEntity<Integer> {
         this.metadataSecurityFields = metadataFields;
     }
 
-    public Set<CrisLayoutField> getLayoutFields() {
+    public List<CrisLayoutField> getLayoutFields() {
         return layoutFields;
     }
 
     public void addLayoutField(CrisLayoutField layoutField) {
         if (this.layoutFields == null) {
-            this.layoutFields = new HashSet<>();
+            this.layoutFields = new ArrayList<>();
         }
         this.layoutFields.add(layoutField);
     }
 
-    public void setLayoutFields(Set<CrisLayoutField> layoutFields) {
+    public void setLayoutFields(List<CrisLayoutField> layoutFields) {
         this.layoutFields = layoutFields;
     }
 

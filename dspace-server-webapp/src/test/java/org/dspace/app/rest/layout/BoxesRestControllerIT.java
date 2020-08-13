@@ -54,7 +54,6 @@ import org.dspace.content.service.MetadataFieldService;
 import org.dspace.content.service.MetadataSchemaService;
 import org.dspace.layout.CrisLayoutBox;
 import org.dspace.layout.CrisLayoutBoxTypes;
-import org.dspace.layout.CrisLayoutField;
 import org.dspace.layout.CrisLayoutTab;
 import org.dspace.layout.LayoutSecurity;
 import org.hamcrest.Matchers;
@@ -162,29 +161,27 @@ public class BoxesRestControllerIT extends AbstractControllerIntegrationTest {
             .withStyle("Style")
             .build();
         // Create boxes with content
-        CrisLayoutField fieldFirstName = CrisLayoutFieldBuilder.createField(context, firstName, 0, 0)
-            .withBundle("BUNDLE")
-            .withLabel("ISSUE NUMBER")
-            .withRendering("TEXT")
-            .build();
         CrisLayoutBox boxTwo = CrisLayoutBoxBuilder.createBuilder(context, eTypePer, false, 1, false)
             .withShortname("Shortname 1")
             .withSecurity(LayoutSecurity.PUBLIC)
             .withHeader("Header")
             .withStyle("Style")
-            .addField(fieldFirstName)
             .build();
-        CrisLayoutField fieldLastName = CrisLayoutFieldBuilder.createField(context, lastName, 0, 0)
-            .withBundle("BUNDLE")
+        CrisLayoutFieldBuilder.createMetadataField(context, firstName, 0, 0)
             .withLabel("ISSUE NUMBER")
             .withRendering("TEXT")
+            .withBox(boxTwo)
             .build();
         CrisLayoutBox boxThree = CrisLayoutBoxBuilder.createBuilder(context, eTypePer, false, 2, false)
             .withShortname("Shortname 3")
             .withSecurity(LayoutSecurity.PUBLIC)
             .withHeader("Header")
             .withStyle("Style")
-            .addField(fieldLastName)
+            .build();
+        CrisLayoutFieldBuilder.createMetadataField(context, lastName, 0, 0)
+            .withLabel("ISSUE NUMBER")
+            .withRendering("TEXT")
+            .withBox(boxThree)
             .build();
         // Create tab
         CrisLayoutTab tab = CrisLayoutTabBuilder.createTab(context, eTypePer, 0)
@@ -494,68 +491,49 @@ public class BoxesRestControllerIT extends AbstractControllerIntegrationTest {
         MetadataField uri = mfss.findByElement(context, schema, "identifier", "uri");
         MetadataField abs = mfss.findByElement(context, schema, "description", "abstract");
         MetadataField provenance = mfss.findByElement(context, schema, "description", "provenance");
-        MetadataField sponsorship = mfss.findByElement(context, schema, "description", "sponsorship");
         MetadataField extent = mfss.findByElement(context, schema, "format", "extent");
         // Create boxes
         CrisLayoutBoxBuilder.createBuilder(context, eType, true, 0, true)
                 .withShortname("Box shortname 1")
                 .build();
-        CrisLayoutField fieldIsbn = CrisLayoutFieldBuilder.createField(context, isbn, 0, 0)
-                .withBundle("BUNDLE ISBN")
+        CrisLayoutBox box = CrisLayoutBoxBuilder.createBuilder(context, eType, true, 0, true)
+                .withShortname("Box shortname 2")
+                .build();
+        CrisLayoutFieldBuilder.createMetadataField(context, isbn, 0, 0)
                 .withLabel("LABEL ISBN")
                 .withRendering("RENDERIGN ISBN")
                 .withStyle("STYLE")
-                .withType("TYPE")
+                .withBox(box)
                 .build();
-        CrisLayoutField fieldUri = CrisLayoutFieldBuilder.createField(context, uri, 0, 1)
-                .withBundle("BUNDLE URI")
+        CrisLayoutFieldBuilder.createMetadataField(context, uri, 0, 1)
                 .withLabel("LABEL URI")
                 .withRendering("RENDERIGN URI")
                 .withStyle("STYLE")
-                .withType("TYPE")
+                .withBox(box)
                 .build();
-        CrisLayoutField fieldAbs = CrisLayoutFieldBuilder.createField(context, abs, 1, 0)
-                .withBundle("BUNDLE ABS")
+        CrisLayoutFieldBuilder.createMetadataField(context, abs, 1, 0)
                 .withLabel("LABEL ABS")
                 .withRendering("RENDERIGN ABS")
                 .withStyle("STYLE")
-                .withType("TYPE")
+                .withBox(box)
                 .build();
-        CrisLayoutField fieldProvenance = CrisLayoutFieldBuilder.createField(context, provenance, 1, 1)
-                .withBundle("BUNDLE PROVENANCE")
+        CrisLayoutFieldBuilder.createMetadataField(context, provenance, 1, 1)
                 .withLabel("LABEL PROVENANCE")
                 .withRendering("RENDERIGN PROVENANCE")
                 .withStyle("STYLE")
-                .withType("TYPE")
+                .withBox(box)
                 .build();
-        CrisLayoutField fieldSponsorship = CrisLayoutFieldBuilder.createField(context, provenance, 1, 2)
-                .withBundle("BUNDLE SPRONSORSHIP")
+        CrisLayoutFieldBuilder.createMetadataField(context, provenance, 1, 2)
                 .withLabel("LABEL SPRONSORSHIP")
                 .withRendering("RENDERIGN SPRONSORSHIP")
                 .withStyle("STYLE")
-                .withType("TYPE")
+                .withBox(box)
                 .build();
-        CrisLayoutField fieldExtent = CrisLayoutFieldBuilder.createField(context, extent, 2, 0)
-                .withBundle("BUNDLE EXTENT")
+        CrisLayoutFieldBuilder.createMetadataField(context, extent, 2, 0)
                 .withLabel("LABEL EXTENT")
                 .withRendering("RENDERIGN EXTENT")
                 .withStyle("STYLE")
-                .withType("TYPE")
-                .build();
-        CrisLayoutBox box = CrisLayoutBoxBuilder.createBuilder(context, eType, true, 0, true)
-                .withShortname("Box shortname 2")
-                .addField(fieldIsbn)
-                .addField(fieldUri)
-                .addField(fieldAbs)
-                .addField(fieldProvenance)
-                .addField(fieldSponsorship)
-                .addField(fieldExtent)
-                .addMetadataSecurityField(isbn)
-                .addMetadataSecurityField(uri)
-                .addMetadataSecurityField(abs)
-                .addMetadataSecurityField(provenance)
-                .addMetadataSecurityField(sponsorship)
-                .addMetadataSecurityField(extent)
+                .withBox(box)
                 .build();
         CrisLayoutBoxBuilder.createBuilder(context, eType, true, 0, true)
                 .withShortname("Box shortname 3")

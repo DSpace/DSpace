@@ -50,7 +50,6 @@ import org.dspace.content.MetadataSchema;
 import org.dspace.content.service.MetadataFieldService;
 import org.dspace.content.service.MetadataSchemaService;
 import org.dspace.layout.CrisLayoutBox;
-import org.dspace.layout.CrisLayoutField;
 import org.dspace.layout.CrisLayoutTab;
 import org.dspace.layout.LayoutSecurity;
 import org.hamcrest.Matchers;
@@ -452,14 +451,13 @@ public class TabsRestControllerIT extends AbstractControllerIntegrationTest {
         MetadataField provenance = mfss.findByElement(context, schema, "description", "provenance");
         MetadataField sponsorship = mfss.findByElement(context, schema, "description", "sponsorship");
         // Create tabs for Person Entity
-        CrisLayoutField fieldFirstname = CrisLayoutFieldBuilder.createField(context, firstName, 0, 1)
-            .withBundle("BUNDLE")
-            .withLabel("LAST NAME")
-            .withRendering("TEXT")
-            .build();
        CrisLayoutBox boxOne = CrisLayoutBoxBuilder.createBuilder(context, eTypePer, false, 0, false)
            .withShortname("Box shortname 1")
-           .addField(fieldFirstname)
+           .build();
+       CrisLayoutFieldBuilder.createMetadataField(context, firstName, 0, 1)
+           .withLabel("LAST NAME")
+           .withRendering("TEXT")
+           .withBox(boxOne)
            .build();
         CrisLayoutTab tab = CrisLayoutTabBuilder.createTab(context, eTypePer, 0)
             .withShortName("TabOne For Person - priority 0")
@@ -467,14 +465,13 @@ public class TabsRestControllerIT extends AbstractControllerIntegrationTest {
             .withHeader("New Tab header")
             .addBox(boxOne)
             .build();
-        CrisLayoutField field = CrisLayoutFieldBuilder.createField(context, lastName, 0, 1)
-             .withBundle("BUNDLE")
-             .withLabel("LAST NAME")
-             .withRendering("TEXT")
-             .build();
         CrisLayoutBox box = CrisLayoutBoxBuilder.createBuilder(context, eTypePer, false, 0, false)
             .withShortname("Box shortname 2")
-            .addField(field)
+            .build();
+        CrisLayoutFieldBuilder.createMetadataField(context, lastName, 0, 1)
+            .withLabel("LAST NAME")
+            .withRendering("TEXT")
+            .withBox(box)
             .build();
         CrisLayoutTab tabTwo = CrisLayoutTabBuilder.createTab(context, eTypePer, 1)
             .withShortName("TabTwo For Person - priority 1")

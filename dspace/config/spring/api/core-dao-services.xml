@@ -71,10 +71,10 @@
     <bean class="org.dspace.batch.dao.impl.ImpRecordToItemDAOImpl"/>
 	<bean class="org.dspace.batch.dao.impl.ImpBitstreamMetadatavalueDAOImpl"/>
 	<bean class="org.dspace.batch.dao.impl.ImpWorkflowNStateDAOImpl"/>
-	
-	<!-- Configurable layout DAO -->
-	<bean class="org.dspace.layout.dao.impl.CrisLayoutTabDAOImpl" />
-	<bean class="org.dspace.layout.dao.impl.CrisLayoutBoxDAOImpl" />
-	<bean class="org.dspace.layout.dao.impl.CrisLayoutFieldDAOImpl" />
-	<bean class="org.dspace.layout.dao.impl.CrisLayoutFieldBitstreamDAOImpl" />
+
+    <!-- Configurable layout DAO -->
+    <bean class="org.dspace.layout.dao.impl.CrisLayoutTabDAOImpl" />
+    <bean class="org.dspace.layout.dao.impl.CrisLayoutBoxDAOImpl" />
+    <bean class="org.dspace.layout.dao.impl.CrisLayoutFieldDAOImpl" />
+
 </beans>

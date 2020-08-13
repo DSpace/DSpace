@@ -8,7 +8,6 @@
 package org.dspace.layout.factory;
 
 import org.dspace.layout.service.CrisLayoutBoxService;
-import org.dspace.layout.service.CrisLayoutFieldBitstreamService;
 import org.dspace.layout.service.CrisLayoutFieldService;
 import org.dspace.layout.service.CrisLayoutTabService;
 import org.dspace.services.factory.DSpaceServicesFactory;
@@ -31,7 +30,5 @@ public abstract class CrisLayoutServiceFactory {
     public abstract CrisLayoutBoxService getBoxService();
 
     public abstract CrisLayoutFieldService getFieldService();
-
-    public abstract CrisLayoutFieldBitstreamService getBitstreamService();
 
 }

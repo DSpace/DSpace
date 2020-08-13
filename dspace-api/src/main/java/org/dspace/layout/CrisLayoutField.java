@@ -7,19 +7,18 @@
  */
 package org.dspace.layout;
 
-import java.util.Set;
 import javax.persistence.Cacheable;
 import javax.persistence.Column;
+import javax.persistence.DiscriminatorColumn;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
 import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
@@ -29,6 +28,8 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 @Entity
 @Table(name = "cris_layout_field")
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name = "type")
 @Cacheable
 @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE, include = "non-lazy")
 public class CrisLayoutField implements ReloadableEntity<Integer> {
@@ -44,29 +45,19 @@ public class CrisLayoutField implements ReloadableEntity<Integer> {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "metadata_field_id")
     private MetadataField metadataField;
-    @Column(name = "bundle")
-    private String bundle;
     @Column(name = "rendering")
     private String rendering;
     @Column(name = "row", nullable = false)
     private Integer row;
     @Column(name = "priority", nullable = false)
     private Integer priority;
-    @Column(name = "type")
-    private String type;
     @Column(name = "label")
     private String label;
     @Column(name = "style")
     private String style;
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(
-        name = "cris_layout_box2field",
-        joinColumns = {@JoinColumn(name = "cris_layout_field_id")},
-        inverseJoinColumns = {@JoinColumn(name = "cris_layout_box_id")}
-    )
-    private Set<CrisLayoutBox> boxes;
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "layoutField")
-    private Set<CrisLayoutFieldBitstream> bitstreams;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "box_id")
+    private CrisLayoutBox box;
 
     @Override
     public Integer getID() {
@@ -83,14 +74,6 @@ public class CrisLayoutField implements ReloadableEntity<Integer> {
 
     public void setMetadataField(MetadataField metadataField) {
         this.metadataField = metadataField;
-    }
-
-    public String getBundle() {
-        return bundle;
-    }
-
-    public void setBundle(String bundle) {
-        this.bundle = bundle;
     }
 
     public String getRendering() {
@@ -117,14 +100,6 @@ public class CrisLayoutField implements ReloadableEntity<Integer> {
         this.priority = priority;
     }
 
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
-
     public String getLabel() {
         return label;
     }
@@ -141,20 +116,12 @@ public class CrisLayoutField implements ReloadableEntity<Integer> {
         this.style = style;
     }
 
-    public Set<CrisLayoutBox> getBoxes() {
-        return boxes;
+    public CrisLayoutBox getBox() {
+        return box;
     }
 
-    public void setBoxes(Set<CrisLayoutBox> boxes) {
-        this.boxes = boxes;
-    }
-
-    public Set<CrisLayoutFieldBitstream> getBitstreams() {
-        return bitstreams;
-    }
-
-    public void setBitstreams(Set<CrisLayoutFieldBitstream> bitstreams) {
-        this.bitstreams = bitstreams;
+    public void setBox(CrisLayoutBox box) {
+        this.box = box;
     }
 
 }

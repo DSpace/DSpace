@@ -13,7 +13,10 @@ import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.MetadataField;
 import org.dspace.core.Context;
+import org.dspace.layout.CrisLayoutBox;
 import org.dspace.layout.CrisLayoutField;
+import org.dspace.layout.CrisLayoutFieldBitstream;
+import org.dspace.layout.CrisLayoutFieldMetadata;
 import org.dspace.layout.service.CrisLayoutFieldService;
 
 /**
@@ -53,15 +56,30 @@ public class CrisLayoutFieldBuilder extends AbstractBuilder<CrisLayoutField, Cri
         return field;
     }
 
-    public static CrisLayoutFieldBuilder createField(Context context, MetadataField mf, int row, int priority) {
-        CrisLayoutFieldBuilder builder = new CrisLayoutFieldBuilder(context);
-        return builder.create(context, mf, row, priority);
+    private static CrisLayoutFieldBuilder createField(
+            Context ctx, CrisLayoutField field, MetadataField mf, int row, int priority) {
+        CrisLayoutFieldBuilder builder = new CrisLayoutFieldBuilder(ctx);
+        field.setMetadataField(mf);
+        field.setRow(row);
+        field.setPriority(priority);
+        return builder.create(ctx, field);
     }
 
-    private CrisLayoutFieldBuilder create(Context context, MetadataField mf, Integer row, Integer priority) {
+    public static CrisLayoutFieldBuilder createMetadataField(Context context, MetadataField mf, int row, int priority) {
+        CrisLayoutFieldMetadata metadata = new CrisLayoutFieldMetadata();
+        return createField(context, metadata, mf, row, priority);
+    }
+
+    public static CrisLayoutFieldBuilder createBistreamField(
+            Context context, MetadataField mf, String bundle, int row, int priority) {
+        CrisLayoutFieldBitstream bitstream = new CrisLayoutFieldBitstream();
+        return createField(context, bitstream, mf, row, priority);
+    }
+
+    private CrisLayoutFieldBuilder create(Context context, CrisLayoutField field) {
         try {
             this.context = context;
-            this.field = getService().create(context, mf, row, priority);
+            this.field = getService().create(context, field);
         } catch (Exception e) {
             log.error("Error in CrisLayoutTabBuilder.create(..), error: ", e);
         }
@@ -96,18 +114,8 @@ public class CrisLayoutFieldBuilder extends AbstractBuilder<CrisLayoutField, Cri
         return crisLayoutFieldService;
     }
 
-    public CrisLayoutFieldBuilder withBundle(String bundle) {
-        this.field.setBundle(bundle);
-        return this;
-    }
-
     public CrisLayoutFieldBuilder withRendering(String rendering) {
         this.field.setRendering(rendering);
-        return this;
-    }
-
-    public CrisLayoutFieldBuilder withType(String type) {
-        this.field.setType(type);
         return this;
     }
 
@@ -118,6 +126,11 @@ public class CrisLayoutFieldBuilder extends AbstractBuilder<CrisLayoutField, Cri
 
     public CrisLayoutFieldBuilder withStyle(String style) {
         this.field.setStyle(style);
+        return this;
+    }
+
+    public CrisLayoutFieldBuilder withBox(CrisLayoutBox box) {
+        this.field.setBox(box);
         return this;
     }
 }
