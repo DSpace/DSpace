@@ -35,8 +35,6 @@ public class EnhancedSimpleMetadataContributor extends SimpleMetadataContributor
 
     private char escape = '"';
 
-    private boolean useEnhancer;
-
     /**
      * This method could be used to set the delimiter used during parse
      * If no delimiter is set, comma will be used
@@ -71,42 +69,20 @@ public class EnhancedSimpleMetadataContributor extends SimpleMetadataContributor
         return escape;
     }
 
-    /**
-     * Method to set up the enhancer. If set to false, enhancing will be not used
-     * In this case, the metadata value will
-     * As default, it is valued as false
-     * 
-     */
-    public void setUseEnhancer(boolean useEnhancer) {
-        this.useEnhancer = useEnhancer;
-    }
-
-    /**
-     * 
-     * @return true if the enhancer is set up, false otherwise.
-     */
-    public boolean isUseEnhancer() {
-        return useEnhancer;
-    }
-
     @Override
     public Collection<MetadatumDTO> contributeMetadata(PlainMetadataSourceDto t) {
         Collection<MetadatumDTO> values = null;
-        if (!useEnhancer) {
-            values = super.contributeMetadata(t);
-        } else {
-            values = new LinkedList<>();
-            for (PlainMetadataKeyValueItem metadatum : t.getMetadata()) {
-                if (getKey().equals(metadatum.getKey())) {
-                    String[] splitted = splitToRecord(metadatum.getValue());
-                    for (String value : splitted) {
-                        MetadatumDTO dcValue = new MetadatumDTO();
-                        dcValue.setValue(value);
-                        dcValue.setElement(getField().getElement());
-                        dcValue.setQualifier(getField().getQualifier());
-                        dcValue.setSchema(getField().getSchema());
-                        values.add(dcValue);
-                    }
+        values = new LinkedList<>();
+        for (PlainMetadataKeyValueItem metadatum : t.getMetadata()) {
+            if (getKey().equals(metadatum.getKey())) {
+                String[] splitted = splitToRecord(metadatum.getValue());
+                for (String value : splitted) {
+                    MetadatumDTO dcValue = new MetadatumDTO();
+                    dcValue.setValue(value);
+                    dcValue.setElement(getField().getElement());
+                    dcValue.setQualifier(getField().getQualifier());
+                    dcValue.setSchema(getField().getSchema());
+                    values.add(dcValue);
                 }
             }
         }
