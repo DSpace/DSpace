@@ -45,4 +45,7 @@
     <bean class="org.dspace.storage.rdbms.PostgreSQLCryptoChecker"/>
     <bean class="org.dspace.storage.rdbms.SiteServiceInitializer"/>
 
+    <bean name="threadBoundHibernateDBConnection" class="org.dspace.core.ThreadBoundHibernateDBConnection" lazy-init="true"/>
+    <bean name="managedHibernateDBConnection" class="org.dspace.core.ManagedHibernateDBConnection" lazy-init="true" scope="prototype"/>
+
 </beans>

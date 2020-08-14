@@ -126,7 +126,8 @@ public class Context implements AutoCloseable {
     public enum Mode {
         READ_ONLY,
         READ_WRITE,
-        BATCH_EDIT
+        BATCH_EDIT,
+        MANAGED
     }
 
     protected Context(EventService eventService, DBConnection dbConnection) {
@@ -169,9 +170,15 @@ public class Context implements AutoCloseable {
             eventService = EventServiceFactory.getInstance().getEventService();
         }
         if (dbConnection == null) {
-            // Obtain a non-auto-committing connection
-            dbConnection = new DSpace().getServiceManager()
-                                       .getServiceByName(null, DBConnection.class);
+            if (mode == Mode.MANAGED) {
+                dbConnection = new DSpace().getServiceManager().getServiceByName("managedHibernateDBConnection",
+                                                                                 ManagedHibernateDBConnection.class);
+            } else {
+                // Obtain a non-auto-committing connection
+                dbConnection = new DSpace().getServiceManager()
+                                           .getServiceByName("threadBoundHibernateDBConnection",
+                                                             ThreadBoundHibernateDBConnection.class);
+            }
             if (dbConnection == null) {
                 log.fatal("Cannot obtain the bean which provides a database connection. " +
                               "Check previous entries in the dspace.log to find why the db failed to initialize.");
@@ -727,6 +734,9 @@ public class Context implements AutoCloseable {
         try {
             //update the database settings
             switch (newMode) {
+                case MANAGED:
+                    dbConnection.setConnectionMode(false, false);
+                    break;
                 case BATCH_EDIT:
                     dbConnection.setConnectionMode(true, false);
                     break;
@@ -737,7 +747,7 @@ public class Context implements AutoCloseable {
                     dbConnection.setConnectionMode(false, false);
                     break;
                 default:
-                    log.warn("New context mode detected that has nog been configured.");
+                    log.warn("New context mode detected that has not been configured.");
                     break;
             }
         } catch (SQLException ex) {
