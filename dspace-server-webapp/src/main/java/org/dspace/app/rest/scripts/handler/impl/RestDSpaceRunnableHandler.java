@@ -188,7 +188,7 @@ public class RestDSpaceRunnableHandler implements DSpaceRunnableHandler {
         String logMessage = getLogMessage(message);
         log.warn(logMessage);
 
-        appendLogToProcess(message, ProcessLogLevel.INFO);
+        appendLogToProcess(message, ProcessLogLevel.WARNING);
 
     }
 
