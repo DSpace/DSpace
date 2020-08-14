@@ -61,7 +61,7 @@ public class RestDSpaceRunnableHandler implements DSpaceRunnableHandler {
      * @param parameters    The parameters for this process
      */
     public RestDSpaceRunnableHandler(EPerson ePerson, String scriptName, List<DSpaceCommandLineParameter> parameters) {
-        Context context = new Context();
+        Context context = new Context(Context.Mode.MANAGED);
         try {
             ePersonId = ePerson.getID();
             Process process = processService.create(context, ePerson, scriptName, parameters);
@@ -82,7 +82,7 @@ public class RestDSpaceRunnableHandler implements DSpaceRunnableHandler {
 
     @Override
     public void start() {
-        Context context = new Context();
+        Context context = new Context(Context.Mode.MANAGED);
         try {
             Process process = processService.find(context, processId);
             processService.start(context, process);
@@ -99,7 +99,7 @@ public class RestDSpaceRunnableHandler implements DSpaceRunnableHandler {
 
     @Override
     public void handleCompletion() {
-        Context context = new Context();
+        Context context = new Context(Context.Mode.MANAGED);
         try {
             Process process = processService.find(context, processId);
             processService.complete(context, process);
@@ -141,7 +141,7 @@ public class RestDSpaceRunnableHandler implements DSpaceRunnableHandler {
             logError(ExceptionUtils.getStackTrace(e));
         }
 
-        Context context = new Context();
+        Context context = new Context(Context.Mode.MANAGED);
         try {
             Process process = processService.find(context, processId);
             processService.fail(context, process);
@@ -265,7 +265,7 @@ public class RestDSpaceRunnableHandler implements DSpaceRunnableHandler {
         ThreadPoolTaskExecutor taskExecutor = new DSpace().getServiceManager()
                                                           .getServiceByName("dspaceRunnableThreadExecutor",
                                                                             ThreadPoolTaskExecutor.class);
-        Context context = new Context();
+        Context context = new Context(Context.Mode.MANAGED);
         try {
             Process process = processService.find(context, processId);
             process.setProcessStatus(ProcessStatus.SCHEDULED);
