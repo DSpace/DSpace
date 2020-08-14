@@ -7,6 +7,8 @@
  */
 package org.dspace.discovery;
 
+import static java.util.stream.Collectors.joining;
+
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -24,7 +26,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.TimeZone;
 import java.util.UUID;
 
@@ -69,7 +70,6 @@ import org.dspace.discovery.indexobject.IndexableCommunity;
 import org.dspace.discovery.indexobject.IndexableItem;
 import org.dspace.discovery.indexobject.factory.IndexFactory;
 import org.dspace.discovery.indexobject.factory.IndexObjectFactoryFactory;
-import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.GroupService;
@@ -99,16 +99,6 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class SolrServiceImpl implements SearchService, IndexingService {
-
-    /**
-     * The name of the discover configuration used to search for workflow tasks in the mydspace
-     */
-    public static final String DISCOVER_WORKFLOW_CONFIGURATION_NAME = "workflow";
-
-    /**
-     * The name of the discover configuration used to search for inprogress submission in the mydspace
-     */
-    public static final String DISCOVER_WORKSPACE_CONFIGURATION_NAME = "workspace";
 
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(SolrServiceImpl.class);
 
@@ -763,8 +753,13 @@ public class SolrServiceImpl implements SearchService, IndexingService {
             String filterQuery = discoveryQuery.getFilterQueries().get(i);
             solrQuery.addFilterQuery(filterQuery);
         }
-        if (discoveryQuery.getDSpaceObjectFilter() != null) {
-            solrQuery.addFilterQuery(SearchUtils.RESOURCE_TYPE_FIELD + ":" + discoveryQuery.getDSpaceObjectFilter());
+        if (discoveryQuery.getDSpaceObjectFilters() != null) {
+            solrQuery.addFilterQuery(
+                    discoveryQuery.getDSpaceObjectFilters()
+                            .stream()
+                            .map(filter -> SearchUtils.RESOURCE_TYPE_FIELD + ":" + filter)
+                            .collect(joining(" OR "))
+            );
         }
 
         for (int i = 0; i < discoveryQuery.getFieldPresentQueries().size(); i++) {
@@ -848,46 +843,9 @@ public class SolrServiceImpl implements SearchService, IndexingService {
 
         }
 
-        boolean isWorkspace = StringUtils.startsWith(discoveryQuery.getDiscoveryConfigurationName(),
-                DISCOVER_WORKSPACE_CONFIGURATION_NAME);
-        boolean isWorkflow = StringUtils.startsWith(discoveryQuery.getDiscoveryConfigurationName(),
-                DISCOVER_WORKFLOW_CONFIGURATION_NAME);
-        EPerson currentUser = context.getCurrentUser();
-
-        // extra security check to avoid the possibility that an anonymous user
-        // get access to workspace or workflow
-        if (currentUser == null && (isWorkflow || isWorkspace)) {
-            throw new IllegalStateException("An anonymous user cannot perform a workspace or workflow search");
-        }
-        if (isWorkspace) {
-            // insert filter by submitter
-            solrQuery
-                .addFilterQuery("submitter_authority:(" + currentUser.getID() + ")");
-        } else if (isWorkflow) {
-            // Retrieve all the groups the current user is a member of !
-            Set<Group> groups;
-            try {
-                groups = groupService.allMemberGroupsSet(context, currentUser);
-            } catch (SQLException e) {
-                throw new org.dspace.discovery.SearchServiceException(e.getMessage(), e);
-            }
-
-            // insert filter by controllers
-            StringBuilder controllerQuery = new StringBuilder();
-            controllerQuery.append("taskfor:(e" + currentUser.getID());
-            for (Group group : groups) {
-                controllerQuery.append(" OR g").append(group.getID());
-            }
-            controllerQuery.append(")");
-            solrQuery.addFilterQuery(controllerQuery.toString());
-        }
-
-
         //Add any configured search plugins !
-        List<SolrServiceSearchPlugin> solrServiceSearchPlugins = DSpaceServicesFactory.getInstance().getServiceManager()
-                                                                                      .getServicesByType(
-                                                                                          SolrServiceSearchPlugin
-                                                                                              .class);
+        List<SolrServiceSearchPlugin> solrServiceSearchPlugins = DSpaceServicesFactory.getInstance()
+                .getServiceManager().getServicesByType(SolrServiceSearchPlugin.class);
         for (SolrServiceSearchPlugin searchPlugin : solrServiceSearchPlugins) {
             searchPlugin.additionalSearchParameters(context, discoveryQuery, solrQuery);
         }

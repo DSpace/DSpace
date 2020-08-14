@@ -28,14 +28,6 @@ import javax.ws.rs.core.MediaType;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.CharEncoding;
-import org.dspace.app.rest.builder.BitstreamBuilder;
-import org.dspace.app.rest.builder.ClaimedTaskBuilder;
-import org.dspace.app.rest.builder.CollectionBuilder;
-import org.dspace.app.rest.builder.CommunityBuilder;
-import org.dspace.app.rest.builder.EPersonBuilder;
-import org.dspace.app.rest.builder.ItemBuilder;
-import org.dspace.app.rest.builder.WorkflowItemBuilder;
-import org.dspace.app.rest.builder.WorkspaceItemBuilder;
 import org.dspace.app.rest.matcher.CollectionMatcher;
 import org.dspace.app.rest.matcher.ItemMatcher;
 import org.dspace.app.rest.matcher.WorkflowItemMatcher;
@@ -46,6 +38,14 @@ import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.rest.model.patch.RemoveOperation;
 import org.dspace.app.rest.model.patch.ReplaceOperation;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
+import org.dspace.builder.BitstreamBuilder;
+import org.dspace.builder.ClaimedTaskBuilder;
+import org.dspace.builder.CollectionBuilder;
+import org.dspace.builder.CommunityBuilder;
+import org.dspace.builder.EPersonBuilder;
+import org.dspace.builder.ItemBuilder;
+import org.dspace.builder.WorkflowItemBuilder;
+import org.dspace.builder.WorkspaceItemBuilder;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
@@ -93,6 +93,7 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
      * @throws Exception
      */
     public void findAllTest() throws Exception {
+        context.turnOffAuthorisationSystem();
         context.setCurrentUser(admin);
 
         //** GIVEN **
@@ -125,6 +126,7 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
                                       .withIssueDate("2016-02-13")
                                       .build();
 
+        context.restoreAuthSystemState();
         String token = getAuthToken(admin.getEmail(), password);
 
         getClient(token).perform(get("/api/workflow/workflowitems"))
@@ -216,6 +218,7 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
      * @throws Exception
      */
     public void findAllForbiddenTest() throws Exception {
+        context.turnOffAuthorisationSystem();
         context.setCurrentUser(admin);
 
         //** GIVEN **
@@ -249,6 +252,7 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
                                       .withIssueDate("2016-02-13")
                                       .build();
 
+        context.restoreAuthSystemState();
         String token = getAuthToken(eperson.getEmail(), password);
 
         // a normal user cannot access the workflowitems collection endpoint
@@ -771,7 +775,6 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
             // submit the workspaceitem to start the workflow
             getClient(authToken)
                     .perform(post(BASE_REST_SERVER_URL + "/api/workflow/workflowitems")
-                            .param("projection", "full")
                             .content("/api/submission/workspaceitems/" + wsitem.getID())
                             .contentType(textUriContentType))
                     .andExpect(status().isCreated())
@@ -816,6 +819,7 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
 
         context.setCurrentUser(submitter);
 
+        context.restoreAuthSystemState();
         // get the submitter auth token
         String authToken = getAuthToken(submitter.getEmail(), "dspace");
 
@@ -1588,6 +1592,7 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
                                                    .withSubject("ExtraEntry")
                                                    .build();
 
+        context.restoreAuthSystemState();
         String authToken = getAuthToken(admin.getEmail(), password);
 
         getClient(authToken).perform(get("/api/workflow/workflowitems/search/item")
@@ -1616,6 +1621,7 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
                                            .withWorkflowGroup(1, admin).build();
 
 
+        context.restoreAuthSystemState();
         String token = getAuthToken(admin.getEmail(), password);
         getClient(token).perform(get("/api/workflow/workflowitems/search/item"))
                         .andExpect(status().isBadRequest());
@@ -1646,6 +1652,7 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
                                                    .withSubject("ExtraEntry")
                                                    .build();
 
+        context.restoreAuthSystemState();
         String token = getAuthToken(admin.getEmail(), password);
         getClient(token).perform(get("/api/workflow/workflowitems/search/item")
                                      .param("uuid", String.valueOf(item.getID())))
@@ -1706,6 +1713,7 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
                                                    .withSubject("ExtraEntry")
                                                    .build();
 
+        context.restoreAuthSystemState();
         getClient().perform(get("/api/workflow/workflowitems/search/item")
                                 .param("uuid", String.valueOf(witem.getItem().getID())))
                    .andExpect(status().isUnauthorized());
@@ -1760,6 +1768,8 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
                                                     .build();
 
         Step step = xmlWorkflowFactory.getStepByName("reviewstep");
+
+        context.restoreAuthSystemState();
         String token = getAuthToken(admin.getEmail(), password);
 
         getClient(token).perform(get("/api/workflow/workflowitems/" + witem1.getID())
@@ -1789,5 +1799,22 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
                                             WorkflowItemMatcher.matchItemWithTitleAndDateIssued(witem3,
                                                                  "Workflow Item 3", "2016-02-13")))
                         .andExpect(jsonPath("$._embedded.step", WorkflowStepMatcher.matchWorkflowStepEntry(step)));
+    }
+
+    @Test
+    public void discoverableNestedLinkTest() throws Exception {
+        String token = getAuthToken(eperson.getEmail(), password);
+        getClient(token).perform(get("/api"))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$._links",Matchers.allOf(
+                                hasJsonPath("$.claimedtasks.href",
+                                         is("http://localhost/api/workflow/claimedtasks")),
+                                hasJsonPath("$.claimedtask-search.href",
+                                         is("http://localhost/api/workflow/claimedtask/search")),
+                                hasJsonPath("$.pooltasks.href",
+                                         is("http://localhost/api/workflow/pooltasks")),
+                                hasJsonPath("$.pooltask-search.href",
+                                         is("http://localhost/api/workflow/pooltask/search"))
+                        )));
     }
 }
