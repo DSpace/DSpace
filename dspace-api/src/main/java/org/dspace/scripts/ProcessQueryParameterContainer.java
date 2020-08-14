@@ -27,6 +27,8 @@ public class ProcessQueryParameterContainer {
         return queryParameterMap;
     }
 
+    private String sortProperty = "startTime";
+    private String sortOrder = "desc";
     /**
      * Generic setter for the queryParameterMap
      * @param queryParameterMap   The queryParameterMap to be set on this ProcessQueryParameterContainer
@@ -40,5 +42,37 @@ public class ProcessQueryParameterContainer {
             queryParameterMap = new HashMap<>();
         }
         queryParameterMap.put(key, object);
+    }
+
+    /**
+     * Generic getter for the sortProperty
+     * @return the sortProperty value of this ProcessQueryParameterContainer
+     */
+    public String getSortProperty() {
+        return sortProperty;
+    }
+
+    /**
+     * Generic setter for the sortProperty
+     * @param sortProperty   The sortProperty to be set on this ProcessQueryParameterContainer
+     */
+    public void setSortProperty(String sortProperty) {
+        this.sortProperty = sortProperty;
+    }
+
+    /**
+     * Generic getter for the sortOrder
+     * @return the sortOrder value of this ProcessQueryParameterContainer
+     */
+    public String getSortOrder() {
+        return sortOrder;
+    }
+
+    /**
+     * Generic setter for the sortOrder
+     * @param sortOrder   The sortOrder to be set on this ProcessQueryParameterContainer
+     */
+    public void setSortOrder(String sortOrder) {
+        this.sortOrder = sortOrder;
     }
 }

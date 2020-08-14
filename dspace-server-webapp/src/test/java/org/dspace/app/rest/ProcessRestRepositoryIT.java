@@ -7,6 +7,7 @@
  */
 package org.dspace.app.rest;
 
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -564,6 +565,204 @@ public class ProcessRestRepositoryIT extends AbstractControllerIntegrationTest {
         getClient(token).perform(get("/api/system/processes/search/byProperty")
                                      .param("userId", UUID.randomUUID().toString()))
                         .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void searchProcessTestByUserSortedOnStartTimeAsc() throws Exception {
+        Process newProcess1 = ProcessBuilder.createProcess(context, eperson, "mock-script", parameters)
+                                            .withStartAndEndTime("10/01/1990", "20/01/1990").build();
+        Process newProcess2 = ProcessBuilder.createProcess(context, eperson, "mock-script", parameters)
+                                            .withStartAndEndTime("11/01/1990", "19/01/1990").build();
+        Process newProcess3 = ProcessBuilder.createProcess(context, eperson, "mock-script", parameters)
+                                            .withStartAndEndTime("12/01/1990", "18/01/1990").build();
+
+        String token = getAuthToken(admin.getEmail(), password);
+
+        getClient(token).perform(get("/api/system/processes/search/byProperty")
+                                     .param("userId", eperson.getID().toString())
+                                    .param("sort", "startTime,asc"))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$._embedded.processes", contains(
+                            ProcessMatcher.matchProcess(newProcess1.getName(),
+                                                        String.valueOf(eperson.getID().toString()),
+                                                        newProcess1.getID(), parameters, ProcessStatus.SCHEDULED),
+                            ProcessMatcher.matchProcess(newProcess2.getName(),
+                                                        String.valueOf(eperson.getID().toString()),
+                                                        newProcess2.getID(), parameters, ProcessStatus.SCHEDULED),
+                            ProcessMatcher.matchProcess(newProcess3.getName(),
+                                                        String.valueOf(eperson.getID().toString()),
+                                                        newProcess3.getID(), parameters, ProcessStatus.SCHEDULED)
+                        )))
+                        .andExpect(jsonPath("$.page", is(
+                            PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 3))));
+    }
+
+    @Test
+    public void searchProcessTestByUserSortedOnStartTimeDesc() throws Exception {
+        Process newProcess1 = ProcessBuilder.createProcess(context, eperson, "mock-script", parameters)
+                                            .withStartAndEndTime("10/01/1990", "20/01/1990").build();
+        Process newProcess2 = ProcessBuilder.createProcess(context, eperson, "mock-script", parameters)
+                                            .withStartAndEndTime("11/01/1990", "19/01/1990").build();
+        Process newProcess3 = ProcessBuilder.createProcess(context, eperson, "mock-script", parameters)
+                                            .withStartAndEndTime("12/01/1990", "18/01/1990").build();
+
+        String token = getAuthToken(admin.getEmail(), password);
+
+        getClient(token).perform(get("/api/system/processes/search/byProperty")
+                                     .param("userId", eperson.getID().toString())
+                                     .param("sort", "startTime,desc"))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$._embedded.processes", contains(
+                            ProcessMatcher.matchProcess(newProcess3.getName(),
+                                                        String.valueOf(eperson.getID().toString()),
+                                                        newProcess3.getID(), parameters, ProcessStatus.SCHEDULED),
+                            ProcessMatcher.matchProcess(newProcess2.getName(),
+                                                        String.valueOf(eperson.getID().toString()),
+                                                        newProcess2.getID(), parameters, ProcessStatus.SCHEDULED),
+                            ProcessMatcher.matchProcess(newProcess1.getName(),
+                                                        String.valueOf(eperson.getID().toString()),
+                                                        newProcess1.getID(), parameters, ProcessStatus.SCHEDULED)
+                        )))
+                        .andExpect(jsonPath("$.page", is(
+                            PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 3))));
+    }
+
+    @Test
+    public void searchProcessTestByUserSortedOnEndTimeAsc() throws Exception {
+        Process newProcess1 = ProcessBuilder.createProcess(context, eperson, "mock-script", parameters)
+                                            .withStartAndEndTime("10/01/1990", "20/01/1990").build();
+        Process newProcess2 = ProcessBuilder.createProcess(context, eperson, "mock-script", parameters)
+                                            .withStartAndEndTime("11/01/1990", "19/01/1990").build();
+        Process newProcess3 = ProcessBuilder.createProcess(context, eperson, "mock-script", parameters)
+                                            .withStartAndEndTime("12/01/1990", "18/01/1990").build();
+
+        String token = getAuthToken(admin.getEmail(), password);
+
+        getClient(token).perform(get("/api/system/processes/search/byProperty")
+                                     .param("userId", eperson.getID().toString())
+                                     .param("sort", "endTime,asc"))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$._embedded.processes", contains(
+                            ProcessMatcher.matchProcess(newProcess3.getName(),
+                                                        String.valueOf(eperson.getID().toString()),
+                                                        newProcess3.getID(), parameters, ProcessStatus.SCHEDULED),
+                            ProcessMatcher.matchProcess(newProcess2.getName(),
+                                                        String.valueOf(eperson.getID().toString()),
+                                                        newProcess2.getID(), parameters, ProcessStatus.SCHEDULED),
+                            ProcessMatcher.matchProcess(newProcess1.getName(),
+                                                        String.valueOf(eperson.getID().toString()),
+                                                        newProcess1.getID(), parameters, ProcessStatus.SCHEDULED)
+                        )))
+                        .andExpect(jsonPath("$.page", is(
+                            PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 3))));
+    }
+
+    @Test
+    public void searchProcessTestByUserSortedOnEndTimeDesc() throws Exception {
+        Process newProcess1 = ProcessBuilder.createProcess(context, eperson, "mock-script", parameters)
+                                            .withStartAndEndTime("10/01/1990", "20/01/1990").build();
+        Process newProcess2 = ProcessBuilder.createProcess(context, eperson, "mock-script", parameters)
+                                            .withStartAndEndTime("11/01/1990", "19/01/1990").build();
+        Process newProcess3 = ProcessBuilder.createProcess(context, eperson, "mock-script", parameters)
+                                            .withStartAndEndTime("12/01/1990", "18/01/1990").build();
+
+        String token = getAuthToken(admin.getEmail(), password);
+
+        getClient(token).perform(get("/api/system/processes/search/byProperty")
+                                     .param("userId", eperson.getID().toString())
+                                     .param("sort", "endTime,desc"))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$._embedded.processes", contains(
+                            ProcessMatcher.matchProcess(newProcess1.getName(),
+                                                        String.valueOf(eperson.getID().toString()),
+                                                        newProcess1.getID(), parameters, ProcessStatus.SCHEDULED),
+                            ProcessMatcher.matchProcess(newProcess2.getName(),
+                                                        String.valueOf(eperson.getID().toString()),
+                                                        newProcess2.getID(), parameters, ProcessStatus.SCHEDULED),
+                            ProcessMatcher.matchProcess(newProcess3.getName(),
+                                                        String.valueOf(eperson.getID().toString()),
+                                                        newProcess3.getID(), parameters, ProcessStatus.SCHEDULED)
+                        )))
+                        .andExpect(jsonPath("$.page", is(
+                            PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 3))));
+    }
+
+    @Test
+    public void searchProcessTestByUserSortedOnMultipleBadRequest() throws Exception {
+        Process newProcess1 = ProcessBuilder.createProcess(context, eperson, "mock-script", parameters)
+                                            .withStartAndEndTime("10/01/1990", "20/01/1990").build();
+        Process newProcess2 = ProcessBuilder.createProcess(context, eperson, "mock-script", parameters)
+                                            .withStartAndEndTime("11/01/1990", "19/01/1990").build();
+        Process newProcess3 = ProcessBuilder.createProcess(context, eperson, "mock-script", parameters)
+                                            .withStartAndEndTime("12/01/1990", "18/01/1990").build();
+
+        String token = getAuthToken(admin.getEmail(), password);
+
+        getClient(token).perform(get("/api/system/processes/search/byProperty")
+                                     .param("userId", eperson.getID().toString())
+                                     .param("sort", "endTime,desc")
+                                     .param("sort", "startTime,desc"))
+                        .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void searchProcessTestByUserSortedOnDefault() throws Exception {
+        Process newProcess1 = ProcessBuilder.createProcess(context, eperson, "mock-script", parameters)
+                                            .withStartAndEndTime("10/01/1990", "20/01/1990").build();
+        Process newProcess2 = ProcessBuilder.createProcess(context, eperson, "mock-script", parameters)
+                                            .withStartAndEndTime("11/01/1990", "19/01/1990").build();
+        Process newProcess3 = ProcessBuilder.createProcess(context, eperson, "mock-script", parameters)
+                                            .withStartAndEndTime("12/01/1990", "18/01/1990").build();
+
+        String token = getAuthToken(admin.getEmail(), password);
+
+        getClient(token).perform(get("/api/system/processes/search/byProperty")
+                                     .param("userId", eperson.getID().toString())
+                                     .param("sort", "startTime,desc"))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$._embedded.processes", contains(
+                            ProcessMatcher.matchProcess(newProcess3.getName(),
+                                                        String.valueOf(eperson.getID().toString()),
+                                                        newProcess3.getID(), parameters, ProcessStatus.SCHEDULED),
+                            ProcessMatcher.matchProcess(newProcess2.getName(),
+                                                        String.valueOf(eperson.getID().toString()),
+                                                        newProcess2.getID(), parameters, ProcessStatus.SCHEDULED),
+                            ProcessMatcher.matchProcess(newProcess1.getName(),
+                                                        String.valueOf(eperson.getID().toString()),
+                                                        newProcess1.getID(), parameters, ProcessStatus.SCHEDULED)
+                        )))
+                        .andExpect(jsonPath("$.page", is(
+                            PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 3))));
+    }
+
+    @Test
+    public void searchProcessTestByUserSortedOnNonExistingIsSortedAsDefault() throws Exception {
+        Process newProcess1 = ProcessBuilder.createProcess(context, eperson, "mock-script", parameters)
+                                            .withStartAndEndTime("10/01/1990", "20/01/1990").build();
+        Process newProcess2 = ProcessBuilder.createProcess(context, eperson, "mock-script", parameters)
+                                            .withStartAndEndTime("11/01/1990", "19/01/1990").build();
+        Process newProcess3 = ProcessBuilder.createProcess(context, eperson, "mock-script", parameters)
+                                            .withStartAndEndTime("12/01/1990", "18/01/1990").build();
+
+        String token = getAuthToken(admin.getEmail(), password);
+
+        getClient(token).perform(get("/api/system/processes/search/byProperty")
+                                     .param("userId", eperson.getID().toString())
+                                     .param("sort", "eaz,desc"))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$._embedded.processes", contains(
+                            ProcessMatcher.matchProcess(newProcess3.getName(),
+                                                        String.valueOf(eperson.getID().toString()),
+                                                        newProcess3.getID(), parameters, ProcessStatus.SCHEDULED),
+                            ProcessMatcher.matchProcess(newProcess2.getName(),
+                                                        String.valueOf(eperson.getID().toString()),
+                                                        newProcess2.getID(), parameters, ProcessStatus.SCHEDULED),
+                            ProcessMatcher.matchProcess(newProcess1.getName(),
+                                                        String.valueOf(eperson.getID().toString()),
+                                                        newProcess1.getID(), parameters, ProcessStatus.SCHEDULED)
+                        )))
+                        .andExpect(jsonPath("$.page", is(
+                            PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 3))));
     }
 
     @After
