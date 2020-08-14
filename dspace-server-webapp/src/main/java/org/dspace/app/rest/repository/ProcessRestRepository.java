@@ -9,6 +9,7 @@ package org.dspace.app.rest.repository;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -37,6 +38,7 @@ import org.dspace.scripts.service.ProcessService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
@@ -184,6 +186,7 @@ public class ProcessRestRepository extends DSpaceRestRepository<ProcessRest, Int
         }
         ProcessQueryParameterContainer processQueryParameterContainer = createProcessQueryParameterContainer(scriptName,
                                                                             ePerson, processStatus);
+        handleSearchSort(pageable, processQueryParameterContainer);
         List<Process> processes = processService.search(context, processQueryParameterContainer, pageable.getPageSize(),
                                                         Math.toIntExact(pageable.getOffset()));
         return converterService.toRestPage(processes, pageable,
@@ -191,6 +194,26 @@ public class ProcessRestRepository extends DSpaceRestRepository<ProcessRest, Int
                                            utils.obtainProjection());
 
 
+    }
+
+    private void handleSearchSort(Pageable pageable, ProcessQueryParameterContainer processQueryParameterContainer) {
+        Sort sort = pageable.getSort();
+        if (sort != null) {
+            Iterator<Sort.Order> iterator = sort.iterator();
+            if (iterator.hasNext()) {
+                Sort.Order order = iterator.next();
+                if (StringUtils.equalsIgnoreCase(order.getProperty(), "startTime")) {
+                    processQueryParameterContainer.setSortProperty(Process_.START_TIME);
+                    processQueryParameterContainer.setSortOrder(order.getDirection().name());
+                } else if (StringUtils.equalsIgnoreCase(order.getProperty(), "endTime")) {
+                    processQueryParameterContainer.setSortProperty(Process_.FINISHED_TIME);
+                    processQueryParameterContainer.setSortOrder(order.getDirection().name());
+                }
+                if (iterator.hasNext()) {
+                    throw new DSpaceBadRequestException("Only one sort method is supported, can't give multiples");
+                }
+            }
+        }
     }
 
     private ProcessQueryParameterContainer createProcessQueryParameterContainer(String scriptName, EPerson ePerson,
