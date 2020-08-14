@@ -66,8 +66,8 @@ public class CharacterSeparatedImportMetadataSourceServiceImpl extends AbstractP
      * related to the char.
      * In example, 9 for tab, 44 for comma
      */
-    public void setSeparator(int separator) {
-        this.separator = (char)separator;
+    public void setSeparator(char separator) {
+        this.separator = separator;
     }
 
     @Override
@@ -88,8 +88,8 @@ public class CharacterSeparatedImportMetadataSourceServiceImpl extends AbstractP
      * In example, 9 for tab, 44 for comma
      * 
      */
-    public void setEscapeCharacter(int escapeCharacter) {
-        this.escapeCharacter = (char)escapeCharacter;
+    public void setEscapeCharacter(char escapeCharacter) {
+        this.escapeCharacter = escapeCharacter;
     }
 
     /**

@@ -90,7 +90,7 @@
     <bean id="tsvImportService"
           class="org.dspace.importer.external.csv.service.CharacterSeparatedImportMetadataSourceServiceImpl">
           <property name="importSource" value="TsvMetadataSource" />
-          <property name="separator" value="9" />
+          <property name="separator" value="\u0009" />
           <property name="skipLines" value="1" />
           <property name="metadataFieldMap" ref="tsvMetadataFieldMap" />
           <property name="supportedExtensions">

@@ -50,9 +50,6 @@
     <bean id="charSepAuthorsContrib" class="org.dspace.importer.external.metadatamapping.contributor.EnhancedSimpleMetadataContributor">
         <property name="field" ref="dcAuthors"/>
         <property name="key" value="1" />
-        <!-- List of author must be: Author 1, author 2, author 3
-        if author name contains comma, is important to escape its in this way: Author 1, \"Author 2, something\", Author 3  -->
-        <property name="delimiter" value="44" />
     </bean>
 
     <bean id="charSepDateContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleMetadataContributor">

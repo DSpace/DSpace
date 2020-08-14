@@ -39,8 +39,8 @@ public class EnhancedSimpleMetadataContributor extends SimpleMetadataContributor
      * This method could be used to set the delimiter used during parse
      * If no delimiter is set, comma will be used
      */
-    public void setDelimiter(int delimiter) {
-        this.delimiter = (char)delimiter;
+    public void setDelimiter(char delimiter) {
+        this.delimiter = delimiter;
     }
 
     /**
@@ -57,8 +57,8 @@ public class EnhancedSimpleMetadataContributor extends SimpleMetadataContributor
      * In example, 9 for tab, 44 for comma
      * If no escape is set, double quote will be used
      */
-    public void setEscape(int escape) {
-        this.escape = (char)escape;
+    public void setEscape(char escape) {
+        this.escape = escape;
     }
 
     /**
@@ -91,6 +91,9 @@ public class EnhancedSimpleMetadataContributor extends SimpleMetadataContributor
 
     private String[] splitToRecord(String value) {
         List<String[]> rows;
+        // For example, list of author must be: Author 1, author 2, author 3
+        // if author name contains comma, is important to escape its in
+        // this way: Author 1, \"Author 2, something\", Author 3
         try (CSVReader csvReader = new CSVReader(new StringReader(value),
             delimiter, escape);) {
             rows = csvReader.readAll();
