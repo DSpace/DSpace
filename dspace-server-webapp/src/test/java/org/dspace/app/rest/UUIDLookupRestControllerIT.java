@@ -16,13 +16,13 @@ import java.util.UUID;
 
 import org.apache.commons.codec.CharEncoding;
 import org.apache.commons.io.IOUtils;
-import org.dspace.app.rest.builder.BitstreamBuilder;
-import org.dspace.app.rest.builder.CollectionBuilder;
-import org.dspace.app.rest.builder.CommunityBuilder;
-import org.dspace.app.rest.builder.GroupBuilder;
-import org.dspace.app.rest.builder.ItemBuilder;
-import org.dspace.app.rest.builder.SiteBuilder;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
+import org.dspace.builder.BitstreamBuilder;
+import org.dspace.builder.CollectionBuilder;
+import org.dspace.builder.CommunityBuilder;
+import org.dspace.builder.GroupBuilder;
+import org.dspace.builder.ItemBuilder;
+import org.dspace.builder.SiteBuilder;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
@@ -237,7 +237,9 @@ public class UUIDLookupRestControllerIT extends AbstractControllerIntegrationTes
         String uuid = eperson.getID().toString();
         String epersonDetail = REST_SERVER_URL + "eperson/epersons/" + uuid;
 
-        getClient().perform(get("/api/dso/find?uuid={uuid}",uuid))
+        String token = getAuthToken(admin.getEmail(), password);
+
+        getClient(token).perform(get("/api/dso/find?uuid={uuid}",uuid))
                         .andExpect(status().isFound())
                         //We expect a Location header to redirect to the eperson details
                         .andExpect(header().string("Location", epersonDetail));
@@ -262,7 +264,9 @@ public class UUIDLookupRestControllerIT extends AbstractControllerIntegrationTes
         String uuid = group.getID().toString();
         String groupDetail = REST_SERVER_URL + "eperson/groups/" + uuid;
 
-        getClient().perform(get("/api/dso/find?uuid={uuid}",uuid))
+        String token = getAuthToken(admin.getEmail(), password);
+
+        getClient(token).perform(get("/api/dso/find?uuid={uuid}",uuid))
                         .andExpect(status().isFound())
                         //We expect a Location header to redirect to the group details
                         .andExpect(header().string("Location", groupDetail));

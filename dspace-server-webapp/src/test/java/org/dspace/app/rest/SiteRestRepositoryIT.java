@@ -14,10 +14,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.util.UUID;
 
-import org.dspace.app.rest.builder.SiteBuilder;
 import org.dspace.app.rest.matcher.SiteMatcher;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.app.rest.test.MetadataPatchSuite;
+import org.dspace.builder.SiteBuilder;
 import org.dspace.content.Site;
 import org.dspace.eperson.EPerson;
 import org.hamcrest.Matchers;
@@ -33,6 +33,7 @@ public class SiteRestRepositoryIT extends AbstractControllerIntegrationTest {
         //This will always return just one site, DSpace doesn't allow for more to be created
         Site site = SiteBuilder.createSite(context).build();
 
+        context.restoreAuthSystemState();
 
         getClient().perform(get("/api/core/sites"))
                    .andExpect(status().isOk())
@@ -50,6 +51,7 @@ public class SiteRestRepositoryIT extends AbstractControllerIntegrationTest {
         //This will always return just one site, DSpace doesn't allow for more to be created
         Site site = SiteBuilder.createSite(context).build();
 
+        context.restoreAuthSystemState();
 
         getClient().perform(get("/api/core/sites/" + site.getID()))
                    .andExpect(status().isOk())
@@ -61,13 +63,8 @@ public class SiteRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     @Test
     public void findOneWrongUUID() throws Exception {
-
-
-        context.turnOffAuthorisationSystem();
-
         getClient().perform(get("/api/core/sites/" + UUID.randomUUID()))
                    .andExpect(status().isNotFound());
-
     }
 
     @Test

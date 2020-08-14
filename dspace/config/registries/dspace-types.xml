@@ -1,0 +1,20 @@
+<dspace-dc-types>
+
+    <dspace-header>
+        <title>DSpace Internal Types Registry</title>
+    </dspace-header>
+
+    <dc-schema>
+        <name>dspace</name>
+        <namespace>http://dspace.org/dspace</namespace>
+    </dc-schema>
+
+    <dc-type>
+        <schema>dspace</schema>
+        <element>process</element>
+        <qualifier>filetype</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+
+</dspace-dc-types>
