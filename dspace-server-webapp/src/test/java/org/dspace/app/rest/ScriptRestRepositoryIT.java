@@ -289,6 +289,52 @@ public class ScriptRestRepositoryIT extends AbstractControllerIntegrationTest {
     }
 
     @Test
+    public void postProcessAndVerifyOutput() throws Exception {
+        LinkedList<DSpaceCommandLineParameter> parameters = new LinkedList<>();
+
+        parameters.add(new DSpaceCommandLineParameter("-r", "test"));
+        parameters.add(new DSpaceCommandLineParameter("-i", null));
+
+        List<ParameterValueRest> list = parameters.stream()
+                                                  .map(dSpaceCommandLineParameter -> dSpaceRunnableParameterConverter
+                                                          .convert(dSpaceCommandLineParameter, Projection.DEFAULT))
+                                                  .collect(Collectors.toList());
+
+        String token = getAuthToken(admin.getEmail(), password);
+        List<ProcessStatus> acceptableProcessStatuses = new LinkedList<>();
+        acceptableProcessStatuses.addAll(Arrays.asList(ProcessStatus.SCHEDULED,
+                                                       ProcessStatus.RUNNING,
+                                                       ProcessStatus.COMPLETED));
+
+        AtomicReference<Integer> idRef = new AtomicReference<>();
+
+        try {
+            getClient(token)
+                    .perform(post("/api/system/scripts/mock-script/processes").contentType("multipart/form-data")
+                                                                              .param("properties",
+                                                                                     new Gson().toJson(list)))
+                    .andExpect(status().isAccepted())
+                    .andExpect(jsonPath("$", is(
+                            ProcessMatcher.matchProcess("mock-script",
+                                                        String.valueOf(admin.getID()),
+                                                        parameters,
+                                                        acceptableProcessStatuses))))
+                    .andDo(result -> idRef
+                            .set(read(result.getResponse().getContentAsString(), "$.processId")));
+
+            getClient(token).perform(get("/api/system/processes/" + idRef.get() + "/output"))
+                            .andExpect(status().isOk())
+                            .andExpect(jsonPath("$.logs", containsInAnyOrder("testlog")))
+                            .andExpect(jsonPath("$.type", is("processOutput")));
+
+
+        } finally {
+            ProcessBuilder.deleteProcess(idRef.get());
+        }
+    }
+
+
+    @Test
     public void postProcessAdminWithWrongContentTypeBadRequestException() throws Exception {
 
         String token = getAuthToken(admin.getEmail(), password);

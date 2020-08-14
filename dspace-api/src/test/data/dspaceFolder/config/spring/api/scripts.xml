@@ -4,6 +4,9 @@
     xsi:schemaLocation="http://www.springframework.org/schema/beans
            http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
 
+    <bean id="dspaceRunnableThreadExecutor" class="org.springframework.core.task.SyncTaskExecutor"/>
+
+
     <bean id="index-discovery" class="org.dspace.discovery.IndexDiscoveryScriptConfiguration">
         <property name="description" value="Update Discovery Solr Search Index"/>
         <property name="dspaceRunnableClass" value="org.dspace.discovery.IndexClient"/>
