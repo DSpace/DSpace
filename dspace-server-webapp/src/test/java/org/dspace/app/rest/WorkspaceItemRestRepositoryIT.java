@@ -1031,7 +1031,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
     /**
      * Test the creation of workspaceitems POSTing to the resource collection endpoint a bibtex file
      * contains more than one entry.
-     *
+     * 
      * @throws Exception
      */
     public void createSingleWorkspaceItemsFromSingleFileWithMultipleEntriesTest() throws Exception {
@@ -1075,7 +1075,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
     /**
      * Test the creation of workspaceitems POSTing to the resource collection endpoint a pubmed XML
      * file.
-     *
+     * 
      * @throws Exception
      */
     public void createPubmedWorkspaceItemFromFileTest() throws Exception {
