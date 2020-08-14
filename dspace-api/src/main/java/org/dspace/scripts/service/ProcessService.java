@@ -18,6 +18,7 @@ import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.scripts.DSpaceCommandLineParameter;
 import org.dspace.scripts.Process;
+import org.dspace.scripts.ProcessLogLevel;
 
 /**
  * An interface for the ProcessService with methods regarding the Process workload
@@ -189,4 +190,7 @@ public interface ProcessService {
      */
     public List<String> getFileTypesForProcessBitstreams(Context context, Process process);
 
+    void appendLog(int processId, String scriptName, String output, ProcessLogLevel processLogLevel) throws IOException;
+     void createLogBitstream(Context context, Process process)
+             throws IOException, SQLException, AuthorizeException;
 }

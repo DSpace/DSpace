@@ -14,6 +14,7 @@ import java.io.StringWriter;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
@@ -26,9 +27,12 @@ import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
+import org.dspace.eperson.factory.EPersonServiceFactory;
+import org.dspace.eperson.service.EPersonService;
 import org.dspace.scripts.DSpaceCommandLineParameter;
 import org.dspace.scripts.DSpaceRunnable;
 import org.dspace.scripts.Process;
+import org.dspace.scripts.ProcessLogLevel;
 import org.dspace.scripts.factory.ScriptServiceFactory;
 import org.dspace.scripts.handler.DSpaceRunnableHandler;
 import org.dspace.scripts.service.ProcessService;
@@ -44,9 +48,11 @@ public class RestDSpaceRunnableHandler implements DSpaceRunnableHandler {
 
     private BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
     private ProcessService processService = ScriptServiceFactory.getInstance().getProcessService();
+    private EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
 
     private Integer processId;
     private String scriptName;
+    private UUID ePersonId;
 
     /**
      * This constructor will initialise the handler with the process created from the parameters
@@ -57,6 +63,7 @@ public class RestDSpaceRunnableHandler implements DSpaceRunnableHandler {
     public RestDSpaceRunnableHandler(EPerson ePerson, String scriptName, List<DSpaceCommandLineParameter> parameters) {
         Context context = new Context();
         try {
+            ePersonId = ePerson.getID();
             Process process = processService.create(context, ePerson, scriptName, parameters);
             processId = process.getID();
             this.scriptName = process.getName();
@@ -96,11 +103,20 @@ public class RestDSpaceRunnableHandler implements DSpaceRunnableHandler {
         try {
             Process process = processService.find(context, processId);
             processService.complete(context, process);
-            context.complete();
             logInfo("The script has completed");
+
+            EPerson ePerson = ePersonService.find(context, ePersonId);
+            context.setCurrentUser(ePerson);
+            processService.createLogBitstream(context, process);
+            context.complete();
         } catch (SQLException e) {
             log.error("RestDSpaceRunnableHandler with process: " + processId + " could not be completed", e);
-        } finally {
+        } catch (IOException | AuthorizeException e) {
+            log.error("RestDSpaceRunnableHandler with process: " + processId + " could not be completed due to an " +
+                              "error with the logging bitstream", e);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }finally {
             if (context.isValid()) {
                 context.abort();
             }
@@ -130,9 +146,19 @@ public class RestDSpaceRunnableHandler implements DSpaceRunnableHandler {
         try {
             Process process = processService.find(context, processId);
             processService.fail(context, process);
+
+            EPerson ePerson = ePersonService.find(context, ePersonId);
+            context.setCurrentUser(ePerson);
+            processService.createLogBitstream(context, process);
+
             context.complete();
         } catch (SQLException sqlException) {
             log.error("SQL exception while handling another exception", e);
+        } catch (IOException | AuthorizeException ioException) {
+            log.error("RestDSpaceRunnableHandler with process: " + processId + " could not be completed due to an " +
+                              "error with the logging bitstream", e);
+        } catch (Exception whatev) {
+            log.error(e.getMessage(), whatev);
         } finally {
             if (context.isValid()) {
                 context.abort();
@@ -156,18 +182,26 @@ public class RestDSpaceRunnableHandler implements DSpaceRunnableHandler {
         String logMessage = getLogMessage(message);
         log.info(logMessage);
 
+        appendLogToProcess(message, ProcessLogLevel.INFO);
+
     }
 
     @Override
     public void logWarning(String message) {
         String logMessage = getLogMessage(message);
         log.warn(logMessage);
+
+        appendLogToProcess(message, ProcessLogLevel.INFO);
+
     }
 
     @Override
     public void logError(String message) {
         String logMessage = getLogMessage(message);
         log.error(logMessage);
+
+        appendLogToProcess(message, ProcessLogLevel.ERROR);
+
     }
 
     @Override
@@ -248,5 +282,13 @@ public class RestDSpaceRunnableHandler implements DSpaceRunnableHandler {
             }
         }
         taskExecutor.execute(script);
+    }
+
+    private void appendLogToProcess(String message, ProcessLogLevel error) {
+        try {
+            processService.appendLog(processId, scriptName, message, error);
+        }  catch (IOException e) {
+            log.error("RestDSpaceRunnableHandler with process: " + processId + " could not write log to process", e);
+        }
     }
 }

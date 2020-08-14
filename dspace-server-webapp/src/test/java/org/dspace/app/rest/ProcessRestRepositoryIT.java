@@ -31,6 +31,7 @@ import org.dspace.content.Bitstream;
 import org.dspace.content.ProcessStatus;
 import org.dspace.scripts.DSpaceCommandLineParameter;
 import org.dspace.scripts.Process;
+import org.dspace.scripts.ProcessLogLevel;
 import org.dspace.scripts.service.ProcessService;
 import org.hamcrest.Matchers;
 import org.junit.After;
@@ -321,6 +322,50 @@ public class ProcessRestRepositoryIT extends AbstractControllerIntegrationTest {
 
 
     }
+
+//    @Test
+//    public void getProcessOutput() throws Exception {
+//        try (InputStream is = IOUtils.toInputStream("Test File For Process", CharEncoding.UTF_8)) {
+//            processService.appendLog(process.getID(), process.getName(), "testlog", ProcessLogLevel.INFO);
+//        }
+//
+//        List<String> fileTypesToCheck = new LinkedList<>();
+//        fileTypesToCheck.add("inputfile");
+//
+//        String token = getAuthToken(admin.getEmail(), password);
+//
+//        getClient(token).perform(get("/api/system/processes/" + process.getID() + "/output"))
+//                        .andExpect(status().isOk())
+//                        .andExpect(jsonPath("$.logs", containsInAnyOrder("testlog")))
+//                        .andExpect(jsonPath("$.type", is("processOutput")));
+//
+//
+//    }
+//    @Test
+//    public void getProcessOutput() throws Exception {
+//        String token = getAuthToken(admin.getEmail(), password);
+//
+//        Process process = ProcessBuilder.createProcess(context, admin, "mock-script", new LinkedList<>()).build();
+//
+//        getClient(token).perform(get("/api/system/processes/" + process.getID()))
+//                        .andExpect(status().isOk())
+//                        .andExpect(jsonPath("$", Matchers.is(
+//                                ProcessMatcher.matchProcess(process.getName(), String.valueOf(process.getEPerson().getID()),
+//                                                            process.getID(), new LinkedList<>(), ProcessStatus.SCHEDULED)))
+//                        );
+//
+//        List<String> fileTypesToCheck = new LinkedList<>();
+//        fileTypesToCheck.add("inputfile");
+//
+//        String token = getAuthToken(admin.getEmail(), password);
+//
+//        getClient(token).perform(get("/api/system/processes/" + process.getID() + "/output"))
+//                        .andExpect(status().isOk())
+//                        .andExpect(jsonPath("$.logs", containsInAnyOrder("testlog")))
+//                        .andExpect(jsonPath("$.type", is("processOutput")));
+//
+//
+//    }
 
     @After
     @Override
