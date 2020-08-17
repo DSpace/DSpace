@@ -125,13 +125,13 @@ public class TabsRestControllerIT extends AbstractControllerIntegrationTest {
         // Create new EntityType Person
         EntityType eType = EntityTypeBuilder.createEntityTypeBuilder(context, "Person").build();
         // Create new Boxes
-        CrisLayoutBox boxOne = CrisLayoutBoxBuilder.createBuilder(context, eType, false, 0, false)
+        CrisLayoutBox boxOne = CrisLayoutBoxBuilder.createBuilder(context, eType, false, false)
                 .withHeader("First New Box Header")
                 .withSecurity(LayoutSecurity.PUBLIC)
                 .withShortname("Shortname for new first box")
                 .withStyle("STYLE")
                 .build();
-        CrisLayoutBox boxTwo = CrisLayoutBoxBuilder.createBuilder(context, eType, false, 0, false)
+        CrisLayoutBox boxTwo = CrisLayoutBoxBuilder.createBuilder(context, eType, false, false)
                 .withHeader("Second New Box Header")
                 .withSecurity(LayoutSecurity.PUBLIC)
                 .withShortname("Shortname for new second box")
@@ -146,21 +146,21 @@ public class TabsRestControllerIT extends AbstractControllerIntegrationTest {
                 .addBox(boxTwo)
                 .build();
         // Create new Boxes
-        CrisLayoutBox boxThree = CrisLayoutBoxBuilder.createBuilder(context, eType, false, 0, false)
+        CrisLayoutBox boxThree = CrisLayoutBoxBuilder.createBuilder(context, eType, false, false)
                 .withHeader("Third New Box Header - priority 0")
                 .withSecurity(LayoutSecurity.PUBLIC)
                 .withShortname("Shortname 3")
                 .withStyle("STYLE")
                 .build();
         // Create new Boxes
-        CrisLayoutBox boxFour = CrisLayoutBoxBuilder.createBuilder(context, eType, false, 1, false)
+        CrisLayoutBox boxFour = CrisLayoutBoxBuilder.createBuilder(context, eType, false, false)
                 .withHeader("Fourth New Box Header - priority 1")
                 .withSecurity(LayoutSecurity.PUBLIC)
                 .withShortname("Shortname 4")
                 .withStyle("STYLE")
                 .build();
         // Create new Boxes
-        CrisLayoutBox boxFive = CrisLayoutBoxBuilder.createBuilder(context, eType, false, 2, false)
+        CrisLayoutBox boxFive = CrisLayoutBoxBuilder.createBuilder(context, eType, false, false)
                 .withHeader("Fifth New Box Header - priority 2")
                 .withSecurity(LayoutSecurity.PUBLIC)
                 .withShortname("Shortname 5")
@@ -451,7 +451,7 @@ public class TabsRestControllerIT extends AbstractControllerIntegrationTest {
         MetadataField provenance = mfss.findByElement(context, schema, "description", "provenance");
         MetadataField sponsorship = mfss.findByElement(context, schema, "description", "sponsorship");
         // Create tabs for Person Entity
-       CrisLayoutBox boxOne = CrisLayoutBoxBuilder.createBuilder(context, eTypePer, false, 0, false)
+       CrisLayoutBox boxOne = CrisLayoutBoxBuilder.createBuilder(context, eTypePer, false, false)
            .withShortname("Box shortname 1")
            .build();
        CrisLayoutFieldBuilder.createMetadataField(context, firstName, 0, 1)
@@ -465,7 +465,7 @@ public class TabsRestControllerIT extends AbstractControllerIntegrationTest {
             .withHeader("New Tab header")
             .addBox(boxOne)
             .build();
-        CrisLayoutBox box = CrisLayoutBoxBuilder.createBuilder(context, eTypePer, false, 0, false)
+        CrisLayoutBox box = CrisLayoutBoxBuilder.createBuilder(context, eTypePer, false, false)
             .withShortname("Box shortname 2")
             .build();
         CrisLayoutFieldBuilder.createMetadataField(context, lastName, 0, 1)
@@ -678,7 +678,7 @@ public class TabsRestControllerIT extends AbstractControllerIntegrationTest {
                             .withSecurity(LayoutSecurity.PUBLIC)
                             .build();
 
-        CrisLayoutBox box = CrisLayoutBoxBuilder.createBuilder(context, eType, false, 0, false)
+        CrisLayoutBox box = CrisLayoutBoxBuilder.createBuilder(context, eType, false, false)
                 .withShortname("Shortname")
                 .withSecurity(LayoutSecurity.PUBLIC)
                 .withHeader("Header")
@@ -713,7 +713,7 @@ public class TabsRestControllerIT extends AbstractControllerIntegrationTest {
                             .withSecurity(LayoutSecurity.PUBLIC)
                             .build();
 
-        CrisLayoutBox box = CrisLayoutBoxBuilder.createBuilder(context, eType, false, 0, false)
+        CrisLayoutBox box = CrisLayoutBoxBuilder.createBuilder(context, eType, false, false)
                 .withShortname("Shortname")
                 .withSecurity(LayoutSecurity.PUBLIC)
                 .withHeader("Header")
@@ -748,7 +748,7 @@ public class TabsRestControllerIT extends AbstractControllerIntegrationTest {
                 .withSecurity(LayoutSecurity.PUBLIC)
                 .build();
 
-        CrisLayoutBox box = CrisLayoutBoxBuilder.createBuilder(context, eType, false, 0, false)
+        CrisLayoutBox box = CrisLayoutBoxBuilder.createBuilder(context, eType, false, false)
                 .withShortname("Shortname")
                 .withSecurity(LayoutSecurity.PUBLIC)
                 .withHeader("Header")
@@ -779,7 +779,7 @@ public class TabsRestControllerIT extends AbstractControllerIntegrationTest {
         // Create new EntityType Person
         EntityType eType = EntityTypeBuilder.createEntityTypeBuilder(context, "Person").build();
 
-        CrisLayoutBox box = CrisLayoutBoxBuilder.createBuilder(context, eType, false, 0, false)
+        CrisLayoutBox box = CrisLayoutBoxBuilder.createBuilder(context, eType, false, false)
                 .withShortname("Shortname")
                 .withSecurity(LayoutSecurity.PUBLIC)
                 .withHeader("Header")
@@ -809,7 +809,7 @@ public class TabsRestControllerIT extends AbstractControllerIntegrationTest {
                             .withSecurity(LayoutSecurity.PUBLIC)
                             .build();
 
-        CrisLayoutBox box = CrisLayoutBoxBuilder.createBuilder(context, eTypeOrgUnit, false, 0, false)
+        CrisLayoutBox box = CrisLayoutBoxBuilder.createBuilder(context, eTypeOrgUnit, false, false)
                 .withShortname("Shortname")
                 .withSecurity(LayoutSecurity.PUBLIC)
                 .withHeader("Header")
@@ -840,13 +840,13 @@ public class TabsRestControllerIT extends AbstractControllerIntegrationTest {
        // Create new EntityType Person
        EntityType eType = EntityTypeBuilder.createEntityTypeBuilder(context, "Person").build();
        // Create new Boxes
-       CrisLayoutBox boxOne = CrisLayoutBoxBuilder.createBuilder(context, eType, false, 0, false)
+       CrisLayoutBox boxOne = CrisLayoutBoxBuilder.createBuilder(context, eType, false, false)
                 .withHeader("First New Box Header")
                 .withSecurity(LayoutSecurity.PUBLIC)
                 .withShortname("Shortname for new first box")
                 .withStyle("STYLE")
                 .build();
-       CrisLayoutBox boxTwo = CrisLayoutBoxBuilder.createBuilder(context, eType, false, 1, false)
+       CrisLayoutBox boxTwo = CrisLayoutBoxBuilder.createBuilder(context, eType, false, false)
                 .withHeader("Second New Box Header")
                 .withSecurity(LayoutSecurity.PUBLIC)
                 .withShortname("Shortname for new second box")
@@ -887,13 +887,13 @@ public class TabsRestControllerIT extends AbstractControllerIntegrationTest {
        // Create new EntityType Person
        EntityType eType = EntityTypeBuilder.createEntityTypeBuilder(context, "Person").build();
        // Create new Boxes
-       CrisLayoutBox boxOne = CrisLayoutBoxBuilder.createBuilder(context, eType, false, 0, false)
+       CrisLayoutBox boxOne = CrisLayoutBoxBuilder.createBuilder(context, eType, false, false)
                 .withHeader("First New Box Header")
                 .withSecurity(LayoutSecurity.PUBLIC)
                 .withShortname("Shortname for new first box")
                 .withStyle("STYLE")
                 .build();
-       CrisLayoutBox boxTwo = CrisLayoutBoxBuilder.createBuilder(context, eType, false, 1, false)
+       CrisLayoutBox boxTwo = CrisLayoutBoxBuilder.createBuilder(context, eType, false, false)
                 .withHeader("Second New Box Header")
                 .withSecurity(LayoutSecurity.PUBLIC)
                 .withShortname("Shortname for new second box")
@@ -934,13 +934,13 @@ public class TabsRestControllerIT extends AbstractControllerIntegrationTest {
        // Create new EntityType Person
        EntityType eType = EntityTypeBuilder.createEntityTypeBuilder(context, "Person").build();
        // Create new Boxes
-       CrisLayoutBox boxOne = CrisLayoutBoxBuilder.createBuilder(context, eType, false, 0, false)
+       CrisLayoutBox boxOne = CrisLayoutBoxBuilder.createBuilder(context, eType, false, false)
                 .withHeader("First New Box Header")
                 .withSecurity(LayoutSecurity.PUBLIC)
                 .withShortname("Shortname for new first box")
                 .withStyle("STYLE")
                 .build();
-       CrisLayoutBox boxTwo = CrisLayoutBoxBuilder.createBuilder(context, eType, false, 1, false)
+       CrisLayoutBox boxTwo = CrisLayoutBoxBuilder.createBuilder(context, eType, false, false)
                 .withHeader("Second New Box Header")
                 .withSecurity(LayoutSecurity.PUBLIC)
                 .withShortname("Shortname for new second box")
@@ -982,13 +982,13 @@ public class TabsRestControllerIT extends AbstractControllerIntegrationTest {
        // Create new EntityType Person
        EntityType eType = EntityTypeBuilder.createEntityTypeBuilder(context, "Person").build();
        // Create new Boxes
-       CrisLayoutBox boxOne = CrisLayoutBoxBuilder.createBuilder(context, eType, false, 0, false)
+       CrisLayoutBox boxOne = CrisLayoutBoxBuilder.createBuilder(context, eType, false, false)
                 .withHeader("First New Box Header")
                 .withSecurity(LayoutSecurity.PUBLIC)
                 .withShortname("Shortname for new first box")
                 .withStyle("STYLE")
                 .build();
-       CrisLayoutBox boxTwo = CrisLayoutBoxBuilder.createBuilder(context, eType, false, 1, false)
+       CrisLayoutBox boxTwo = CrisLayoutBoxBuilder.createBuilder(context, eType, false, false)
                 .withHeader("Second New Box Header")
                 .withSecurity(LayoutSecurity.PUBLIC)
                 .withShortname("Shortname for new second box")

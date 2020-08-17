@@ -101,7 +101,7 @@ public class CrisLayoutBoxServiceImpl implements CrisLayoutBoxService {
     }
 
     @Override
-    public CrisLayoutBox create(Context context, EntityType eType, String boxType, boolean collapsed, int priority,
+    public CrisLayoutBox create(Context context, EntityType eType, String boxType, boolean collapsed,
             boolean minor) throws SQLException, AuthorizeException {
         if (!authorizeService.isAdmin(context)) {
             throw new AuthorizeException(
@@ -110,7 +110,6 @@ public class CrisLayoutBoxServiceImpl implements CrisLayoutBoxService {
         CrisLayoutBox box = new CrisLayoutBox();
         box.setEntitytype(eType);
         box.setCollapsed(collapsed);
-//        box.setPriority(priority);
         box.setMinor(minor);
         box.setType(boxType);
         return dao.create(context, box);

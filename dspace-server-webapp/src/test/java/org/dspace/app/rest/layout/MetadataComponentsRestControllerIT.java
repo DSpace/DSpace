@@ -68,10 +68,10 @@ public class MetadataComponentsRestControllerIT extends AbstractControllerIntegr
         MetadataField sponsorship = mfss.findByElement(context, schema, "description", "sponsorship");
         MetadataField extent = mfss.findByElement(context, schema, "format", "extent");
         // Create boxes
-        CrisLayoutBoxBuilder.createBuilder(context, eType, true, 0, true)
+        CrisLayoutBoxBuilder.createBuilder(context, eType, true, true)
                 .withShortname("box-shortname-one")
                 .build();
-        CrisLayoutBox box = CrisLayoutBoxBuilder.createBuilder(context, eType, true, 0, true)
+        CrisLayoutBox box = CrisLayoutBoxBuilder.createBuilder(context, eType, true, true)
                 .withShortname("box-shortname-two")
                 .build();
         CrisLayoutFieldBuilder.createMetadataField(context, isbn, 0, 0)
@@ -110,7 +110,7 @@ public class MetadataComponentsRestControllerIT extends AbstractControllerIntegr
                 .withStyle("STYLE")
                 .withBox(box)
                 .build();
-        CrisLayoutBoxBuilder.createBuilder(context, eType, true, 0, true)
+        CrisLayoutBoxBuilder.createBuilder(context, eType, true, true)
                 .withShortname("box-shortname-three")
                 .build();
         context.restoreAuthSystemState();
@@ -130,7 +130,7 @@ public class MetadataComponentsRestControllerIT extends AbstractControllerIntegr
         context.turnOffAuthorisationSystem();
         EntityType eType = EntityTypeBuilder.createEntityTypeBuilder(context, "Person").build();
 
-        CrisLayoutBox box = CrisLayoutBoxBuilder.createBuilder(context, eType, true, 0, true)
+        CrisLayoutBox box = CrisLayoutBoxBuilder.createBuilder(context, eType, true, true)
                                                 .withShortname("box-shortname-test")
                                                 .build();
 
@@ -182,7 +182,7 @@ public class MetadataComponentsRestControllerIT extends AbstractControllerIntegr
         MetadataField firstName = mfss.findByElement(context, schema, "givenName", null);
         MetadataField lastName = mfss.findByElement(context, schema, "familyName", null);
 
-        CrisLayoutBox box = CrisLayoutBoxBuilder.createBuilder(context, eType, true, 0, true)
+        CrisLayoutBox box = CrisLayoutBoxBuilder.createBuilder(context, eType, true, true)
                 .withShortname("box-shortname-test")
                 .addField(fieldContributor)
                 .build();
@@ -227,7 +227,7 @@ public class MetadataComponentsRestControllerIT extends AbstractControllerIntegr
 
         EntityType eType = EntityTypeBuilder.createEntityTypeBuilder(context, "Person").build();
 
-        CrisLayoutBox box = CrisLayoutBoxBuilder.createBuilder(context, eType, true, 0, true)
+        CrisLayoutBox box = CrisLayoutBoxBuilder.createBuilder(context, eType, true, true)
                                                 .withShortname("box-shortname-test")
                                                 .build();
 

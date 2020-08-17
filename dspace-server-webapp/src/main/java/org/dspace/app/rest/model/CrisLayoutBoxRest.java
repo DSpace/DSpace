@@ -42,7 +42,6 @@ public class CrisLayoutBoxRest extends BaseObjectRest<Integer> {
     private Boolean collapsed;
     private Boolean minor;
     private String style;
-    private Integer priority;
     private Integer security;
     private String boxType;
     private Boolean clear;
@@ -135,14 +134,6 @@ public class CrisLayoutBoxRest extends BaseObjectRest<Integer> {
 
     public void setStyle(String style) {
         this.style = style;
-    }
-
-    public Integer getPriority() {
-        return priority;
-    }
-
-    public void setPriority(Integer priority) {
-        this.priority = priority;
     }
 
     /**

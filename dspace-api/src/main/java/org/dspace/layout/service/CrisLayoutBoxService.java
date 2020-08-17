@@ -44,7 +44,6 @@ public interface CrisLayoutBoxService extends DSpaceCRUDService<CrisLayoutBox> {
      * @param eType EntiType of new Box {@link EntityType}
      * @param boxType the type of Box
      * @param collapsed this attribute define if the box is collapsed or not
-     * @param priority this attribute is used for define the position of the box in its tab
      * @param minor this attribute is used to flag box that should be ignored in the determination
      *              of the tab visualization
      * @return the stored CrisLayoutBox instance
@@ -55,7 +54,6 @@ public interface CrisLayoutBoxService extends DSpaceCRUDService<CrisLayoutBox> {
             EntityType eType,
             String boxType,
             boolean collapsed,
-            int priority,
             boolean minor) throws SQLException, AuthorizeException;
 
     /**

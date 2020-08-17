@@ -85,19 +85,19 @@ public class BoxesRestControllerIT extends AbstractControllerIntegrationTest {
         context.turnOffAuthorisationSystem();
         // Create new EntityType Publication
         EntityType eType = EntityTypeBuilder.createEntityTypeBuilder(context, "Publication").build();
-        CrisLayoutBoxBuilder.createBuilder(context, eType, false, 0, false)
+        CrisLayoutBoxBuilder.createBuilder(context, eType, false, false)
             .withShortname("Shortname 1")
             .withSecurity(LayoutSecurity.PUBLIC)
             .withHeader("Header")
             .withStyle("Style")
             .build();
-        CrisLayoutBox box = CrisLayoutBoxBuilder.createBuilder(context, eType, false, 0, false)
+        CrisLayoutBox box = CrisLayoutBoxBuilder.createBuilder(context, eType, false, false)
             .withShortname("Shortname 2")
             .withSecurity(LayoutSecurity.PUBLIC)
             .withHeader("Header")
             .withStyle("Style")
             .build();
-        CrisLayoutBoxBuilder.createBuilder(context, eType, false, 0, false)
+        CrisLayoutBoxBuilder.createBuilder(context, eType, false, false)
             .withShortname("Shortname 3")
             .withSecurity(LayoutSecurity.PUBLIC)
             .withHeader("Header")
@@ -105,7 +105,7 @@ public class BoxesRestControllerIT extends AbstractControllerIntegrationTest {
             .build();
         // Create new EntityType Person
         EntityType eTypePerson = EntityTypeBuilder.createEntityTypeBuilder(context, "Person").build();
-        CrisLayoutBoxBuilder.createBuilder(context, eTypePerson, false, 0, false)
+        CrisLayoutBoxBuilder.createBuilder(context, eTypePerson, false, false)
             .withShortname("Shortname 4")
             .withSecurity(LayoutSecurity.PUBLIC)
             .withHeader("Header")
@@ -154,14 +154,14 @@ public class BoxesRestControllerIT extends AbstractControllerIntegrationTest {
         MetadataField provenance = mfss.findByElement(context, schema, "description", "provenance");
         MetadataField sponsorship = mfss.findByElement(context, schema, "description", "sponsorship");
         // Create box without content
-        CrisLayoutBox boxOne = CrisLayoutBoxBuilder.createBuilder(context, eTypePer, false, 0, false)
+        CrisLayoutBox boxOne = CrisLayoutBoxBuilder.createBuilder(context, eTypePer, false, false)
             .withShortname("Shortname 2")
             .withSecurity(LayoutSecurity.PUBLIC)
             .withHeader("Header")
             .withStyle("Style")
             .build();
         // Create boxes with content
-        CrisLayoutBox boxTwo = CrisLayoutBoxBuilder.createBuilder(context, eTypePer, false, 1, false)
+        CrisLayoutBox boxTwo = CrisLayoutBoxBuilder.createBuilder(context, eTypePer, false, false)
             .withShortname("Shortname 1")
             .withSecurity(LayoutSecurity.PUBLIC)
             .withHeader("Header")
@@ -172,7 +172,7 @@ public class BoxesRestControllerIT extends AbstractControllerIntegrationTest {
             .withRendering("TEXT")
             .withBox(boxTwo)
             .build();
-        CrisLayoutBox boxThree = CrisLayoutBoxBuilder.createBuilder(context, eTypePer, false, 2, false)
+        CrisLayoutBox boxThree = CrisLayoutBoxBuilder.createBuilder(context, eTypePer, false, false)
             .withShortname("Shortname 3")
             .withSecurity(LayoutSecurity.PUBLIC)
             .withHeader("Header")
@@ -193,7 +193,7 @@ public class BoxesRestControllerIT extends AbstractControllerIntegrationTest {
             .addBox(boxThree)
             .build();
         // Create box and tab for other entity type
-        CrisLayoutBox boxFour = CrisLayoutBoxBuilder.createBuilder(context, eType, false, 0, false)
+        CrisLayoutBox boxFour = CrisLayoutBoxBuilder.createBuilder(context, eType, false, false)
             .withShortname("Shortname 4")
             .withSecurity(LayoutSecurity.PUBLIC)
             .withHeader("Header")
@@ -235,25 +235,25 @@ public class BoxesRestControllerIT extends AbstractControllerIntegrationTest {
         EntityType eTypePub = EntityTypeBuilder.createEntityTypeBuilder(context, "Publication").build();
         EntityTypeBuilder.createEntityTypeBuilder(context, "Project").build();
         // Create box without content
-        CrisLayoutBoxBuilder.createBuilder(context, eTypePer, false, 0, false)
+        CrisLayoutBoxBuilder.createBuilder(context, eTypePer, false, false)
             .withShortname("Shortname 1")
             .withSecurity(LayoutSecurity.PUBLIC)
             .withHeader("Header")
             .withStyle("Style")
             .build();
-        CrisLayoutBox boxOne = CrisLayoutBoxBuilder.createBuilder(context, eTypePub, false, 0, false)
+        CrisLayoutBox boxOne = CrisLayoutBoxBuilder.createBuilder(context, eTypePub, false, false)
             .withShortname("Shortname 2")
             .withSecurity(LayoutSecurity.PUBLIC)
             .withHeader("Header")
             .withStyle("Style")
             .build();
-        CrisLayoutBox boxTwo = CrisLayoutBoxBuilder.createBuilder(context, eTypePub, false, 1, false)
+        CrisLayoutBox boxTwo = CrisLayoutBoxBuilder.createBuilder(context, eTypePub, false, false)
             .withShortname("Shortname 3")
             .withSecurity(LayoutSecurity.PUBLIC)
             .withHeader("Header")
             .withStyle("Style")
             .build();
-        CrisLayoutBoxBuilder.createBuilder(context, eTypePer, false, 0, false)
+        CrisLayoutBoxBuilder.createBuilder(context, eTypePer, false, false)
             .withShortname("Shortname 4")
             .withSecurity(LayoutSecurity.PUBLIC)
             .withHeader("Header")
@@ -300,18 +300,18 @@ public class BoxesRestControllerIT extends AbstractControllerIntegrationTest {
         MetadataField extent = mfss.findByElement(context, schema, "format", "extent");
         // Create entity type Publication
         EntityType eType = EntityTypeBuilder.createEntityTypeBuilder(context, "Publication").build();
-        CrisLayoutBoxBuilder.createBuilder(context, eType, true, 0, true)
+        CrisLayoutBoxBuilder.createBuilder(context, eType, true, true)
             .withShortname("Box one shortname")
             .addMetadataSecurityField(sponsorship)
             .build();
-        CrisLayoutBox boxTwo = CrisLayoutBoxBuilder.createBuilder(context, eType, true, 0, true)
+        CrisLayoutBox boxTwo = CrisLayoutBoxBuilder.createBuilder(context, eType, true, true)
             .withShortname("Box two shortname")
             .addMetadataSecurityField(isbn)
             .addMetadataSecurityField(uri)
             .addMetadataSecurityField(abs)
             .addMetadataSecurityField(provenance)
             .build();
-        CrisLayoutBoxBuilder.createBuilder(context, eType, true, 0, true)
+        CrisLayoutBoxBuilder.createBuilder(context, eType, true, true)
             .withShortname("Box three shortname")
             .addMetadataSecurityField(extent)
             .build();
@@ -329,7 +329,7 @@ public class BoxesRestControllerIT extends AbstractControllerIntegrationTest {
         // Create entity type Publication
         EntityType eType = EntityTypeBuilder.createEntityTypeBuilder(context, "Publication").build();
         // Create box
-        CrisLayoutBox box = CrisLayoutBoxBuilder.createBuilder(context, eType, true, 0, true)
+        CrisLayoutBox box = CrisLayoutBoxBuilder.createBuilder(context, eType, true, true)
                                                    .withShortname("Box shortname")
                                                    .build();
         context.restoreAuthSystemState();
@@ -368,7 +368,7 @@ public class BoxesRestControllerIT extends AbstractControllerIntegrationTest {
         // Create entity type Publication
         EntityType eType = EntityTypeBuilder.createEntityTypeBuilder(context, "Publication").build();
         // Create box
-        CrisLayoutBox box = CrisLayoutBoxBuilder.createBuilder(context, eType, true, 0, true)
+        CrisLayoutBox box = CrisLayoutBoxBuilder.createBuilder(context, eType, true, true)
                             .withShortname("Box shortname")
                             .build();
         context.restoreAuthSystemState();
@@ -405,7 +405,7 @@ public class BoxesRestControllerIT extends AbstractControllerIntegrationTest {
         // Create entity type Publication
         EntityType eType = EntityTypeBuilder.createEntityTypeBuilder(context, "Publication").build();
         // Create box
-        CrisLayoutBox box = CrisLayoutBoxBuilder.createBuilder(context, eType, true, 0, true)
+        CrisLayoutBox box = CrisLayoutBoxBuilder.createBuilder(context, eType, true, true)
                             .withShortname("Box shortname")
                             .build();
         context.restoreAuthSystemState();
@@ -465,7 +465,7 @@ public class BoxesRestControllerIT extends AbstractControllerIntegrationTest {
         // Create entity type Publication
         EntityType eType = EntityTypeBuilder.createEntityTypeBuilder(context, "Publication").build();
         // Create box
-        CrisLayoutBox box = CrisLayoutBoxBuilder.createBuilder(context, eType, true, 0, true)
+        CrisLayoutBox box = CrisLayoutBoxBuilder.createBuilder(context, eType, true, true)
                             .withShortname("Box shortname")
                             .build();
         context.restoreAuthSystemState();
@@ -493,10 +493,10 @@ public class BoxesRestControllerIT extends AbstractControllerIntegrationTest {
         MetadataField provenance = mfss.findByElement(context, schema, "description", "provenance");
         MetadataField extent = mfss.findByElement(context, schema, "format", "extent");
         // Create boxes
-        CrisLayoutBoxBuilder.createBuilder(context, eType, true, 0, true)
+        CrisLayoutBoxBuilder.createBuilder(context, eType, true, true)
                 .withShortname("Box shortname 1")
                 .build();
-        CrisLayoutBox box = CrisLayoutBoxBuilder.createBuilder(context, eType, true, 0, true)
+        CrisLayoutBox box = CrisLayoutBoxBuilder.createBuilder(context, eType, true, true)
                 .withShortname("Box shortname 2")
                 .build();
         CrisLayoutFieldBuilder.createMetadataField(context, isbn, 0, 0)
@@ -535,7 +535,7 @@ public class BoxesRestControllerIT extends AbstractControllerIntegrationTest {
                 .withStyle("STYLE")
                 .withBox(box)
                 .build();
-        CrisLayoutBoxBuilder.createBuilder(context, eType, true, 0, true)
+        CrisLayoutBoxBuilder.createBuilder(context, eType, true, true)
                 .withShortname("Box shortname 3")
                 .build();
         context.restoreAuthSystemState();
@@ -562,7 +562,7 @@ public class BoxesRestControllerIT extends AbstractControllerIntegrationTest {
         EntityType eType = EntityTypeBuilder.createEntityTypeBuilder(context, "Person").build();
         // Create a box
         CrisLayoutBox box = CrisLayoutBoxBuilder
-                .createBuilder(context, eType, CrisLayoutBoxTypes.RELATION.name(), true, 0, true)
+                .createBuilder(context, eType, CrisLayoutBoxTypes.RELATION.name(), true, true)
                 .withShortname("shortname1").build();
         context.restoreAuthSystemState();
         // Test WS endpoint
@@ -642,7 +642,7 @@ public class BoxesRestControllerIT extends AbstractControllerIntegrationTest {
         // Create entity type Publication
         EntityType eType = EntityTypeBuilder.createEntityTypeBuilder(context, "Publication").build();
         // Create box
-        CrisLayoutBox box = CrisLayoutBoxBuilder.createBuilder(context, eType, true, 0, true)
+        CrisLayoutBox box = CrisLayoutBoxBuilder.createBuilder(context, eType, true, true)
                 .withShortname("Box shortname 1")
                 .withSecurity(LayoutSecurity.PUBLIC)
                 .build();
@@ -682,7 +682,7 @@ public class BoxesRestControllerIT extends AbstractControllerIntegrationTest {
         // Create entity type Publication
         EntityType eType = EntityTypeBuilder.createEntityTypeBuilder(context, "Publication").build();
         // Create box
-        CrisLayoutBox box = CrisLayoutBoxBuilder.createBuilder(context, eType, true, 0, true)
+        CrisLayoutBox box = CrisLayoutBoxBuilder.createBuilder(context, eType, true, true)
                             .withShortname("Box shortname")
                             .build();
         context.restoreAuthSystemState();
@@ -720,7 +720,7 @@ public class BoxesRestControllerIT extends AbstractControllerIntegrationTest {
         // Create entity type Publication
         EntityType eType = EntityTypeBuilder.createEntityTypeBuilder(context, "Publication").build();
         // Create box
-        CrisLayoutBox box = CrisLayoutBoxBuilder.createBuilder(context, eType, true, 0, true)
+        CrisLayoutBox box = CrisLayoutBoxBuilder.createBuilder(context, eType, true, true)
                             .withShortname("Box shortname")
                             .build();
         context.restoreAuthSystemState();
@@ -757,7 +757,7 @@ public class BoxesRestControllerIT extends AbstractControllerIntegrationTest {
         // Create entity type Publication
         EntityType eType = EntityTypeBuilder.createEntityTypeBuilder(context, "Publication").build();
         // Create box
-        CrisLayoutBox box = CrisLayoutBoxBuilder.createBuilder(context, eType, true, 0, true)
+        CrisLayoutBox box = CrisLayoutBoxBuilder.createBuilder(context, eType, true, true)
                             .withShortname("Box shortname")
                             .build();
         context.restoreAuthSystemState();
@@ -806,7 +806,7 @@ public class BoxesRestControllerIT extends AbstractControllerIntegrationTest {
         // Create entity type Publication
         EntityType eType = EntityTypeBuilder.createEntityTypeBuilder(context, "Publication").build();
         // Create box
-        CrisLayoutBox box = CrisLayoutBoxBuilder.createBuilder(context, eType, true, 0, true).build();
+        CrisLayoutBox box = CrisLayoutBoxBuilder.createBuilder(context, eType, true, true).build();
         context.restoreAuthSystemState();
 
         String tokenAdmin = getAuthToken(admin.getEmail(), password);
@@ -842,7 +842,7 @@ public class BoxesRestControllerIT extends AbstractControllerIntegrationTest {
         // Create entity type Publication
         EntityType eType = EntityTypeBuilder.createEntityTypeBuilder(context, "Publication").build();
         // Create box
-        CrisLayoutBox box = CrisLayoutBoxBuilder.createBuilder(context, eType, true, 0, true)
+        CrisLayoutBox box = CrisLayoutBoxBuilder.createBuilder(context, eType, true, true)
                             .withShortname("Box shortname")
                             .build();
         context.restoreAuthSystemState();
@@ -882,7 +882,7 @@ public class BoxesRestControllerIT extends AbstractControllerIntegrationTest {
         // Create entity type Publication
         EntityType eType = EntityTypeBuilder.createEntityTypeBuilder(context, "Publication").build();
         // Create box
-        CrisLayoutBox box = CrisLayoutBoxBuilder.createBuilder(context, eType, true, 0, true)
+        CrisLayoutBox box = CrisLayoutBoxBuilder.createBuilder(context, eType, true, true)
                             .withShortname("Box shortname")
                             .build();
         context.restoreAuthSystemState();

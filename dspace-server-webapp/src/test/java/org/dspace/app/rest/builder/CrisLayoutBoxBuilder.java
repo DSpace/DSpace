@@ -39,22 +39,22 @@ public class CrisLayoutBoxBuilder extends AbstractBuilder<CrisLayoutBox, CrisLay
         delete(box);
     }
 
-    public static CrisLayoutBoxBuilder createBuilder(Context context, EntityType eType, boolean collapsed, int priority,
+    public static CrisLayoutBoxBuilder createBuilder(Context context, EntityType eType, boolean collapsed,
             boolean minor) {
-        return createBuilder(context, eType, CrisLayoutBoxTypes.METADATA.name(), collapsed, priority, minor);
+        return createBuilder(context, eType, CrisLayoutBoxTypes.METADATA.name(), collapsed, minor);
     }
 
     public static CrisLayoutBoxBuilder createBuilder(Context context, EntityType eType, String boxType,
-            boolean collapsed, int priority, boolean minor) {
+            boolean collapsed, boolean minor) {
         CrisLayoutBoxBuilder builder = new CrisLayoutBoxBuilder(context);
-        return builder.create(context, eType, boxType, collapsed, priority, minor);
+        return builder.create(context, eType, boxType, collapsed, minor);
     }
 
     private CrisLayoutBoxBuilder create(Context context, EntityType eType, String boxType, boolean collapsed,
-            int priority, boolean minor) {
+            boolean minor) {
         try {
             this.context = context;
-            this.box = getService().create(context, eType, boxType, collapsed, priority, minor);
+            this.box = getService().create(context, eType, boxType, collapsed, minor);
         } catch (Exception e) {
             log.error("Error in CrisLayoutTabBuilder.create(..), error: ", e);
         }
