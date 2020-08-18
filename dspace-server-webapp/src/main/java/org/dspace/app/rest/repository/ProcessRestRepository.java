@@ -196,6 +196,13 @@ public class ProcessRestRepository extends DSpaceRestRepository<ProcessRest, Int
 
     }
 
+    /**
+     * This method will retrieve the {@link Sort} from the given {@link Pageable} and it'll create the sortOrder and
+     * sortProperty Strings on the {@link ProcessQueryParameterContainer} object so that we can store how the sorting
+     * should be done
+     * @param pageable                          The pageable object
+     * @param processQueryParameterContainer    The object in which the sorting will be filled in
+     */
     private void handleSearchSort(Pageable pageable, ProcessQueryParameterContainer processQueryParameterContainer) {
         Sort sort = pageable.getSort();
         if (sort != null) {
@@ -216,6 +223,15 @@ public class ProcessRestRepository extends DSpaceRestRepository<ProcessRest, Int
         }
     }
 
+    /**
+     * This method will create a new {@link ProcessQueryParameterContainer} object and return it.
+     * This object will contain a map which is filled in with the database column reference as key and the value that
+     * it should contain when searching as the value of the entry
+     * @param scriptName    The name that the script of the process should have
+     * @param ePerson       The eperson that the process should have
+     * @param processStatus The status that the process should have
+     * @return              The newly created {@link ProcessQueryParameterContainer}
+     */
     private ProcessQueryParameterContainer createProcessQueryParameterContainer(String scriptName, EPerson ePerson,
                                                                                 ProcessStatus processStatus) {
         ProcessQueryParameterContainer processQueryParameterContainer =
