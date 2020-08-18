@@ -1036,51 +1036,51 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
         context.restoreAuthSystemState();
 
 
-        getClient().perform(get("/api/discover/browses/title/items")
+        getClient().perform(get("/api/discover/browses/author/entries")
                                 .param("projection", "full"))
-                   //** THEN **
-                   //The status has to be 200 OK
                    .andExpect(status().isOk())
-                   //We expect the content type to be "application/hal+json;charset=UTF-8"
                    .andExpect(content().contentType(contentType))
-                   //We expect 21 public items
                    .andExpect(jsonPath("$.page.size", is(20)))
                    .andExpect(jsonPath("$.page.totalElements", is(21)))
                    .andExpect(jsonPath("$.page.totalPages", is(2)))
                    .andExpect(jsonPath("$.page.number", is(0)))
-                   // embedded items are already checked by other test, we focus on links here
                    .andExpect(
-                       jsonPath("$._links.next.href", Matchers.containsString("/api/discover/browses/title/items?")))
+                       jsonPath("$._links.next.href", Matchers.containsString("/api/discover/browses/author/entries")))
                    .andExpect(
-                       jsonPath("$._links.last.href", Matchers.containsString("/api/discover/browses/title/items?")))
-                   .andExpect(jsonPath("$._links.self.href", Matchers.endsWith("/api/discover/browses/title/items")))
-                   // The full projection for anon shouldn't show the adminGroup in the response
+                       jsonPath("$._links.last.href", Matchers.containsString("/api/discover/browses/author/entries")))
                    .andExpect(
-                       jsonPath("$._embedded.items[0]._embedded.owningCollection._embedded.adminGroup").doesNotExist());
+                       jsonPath("$._links.self.href", Matchers.endsWith("/api/discover/browses/author/entries")));
 
         String adminToken = getAuthToken(admin.getEmail(), password);
-        getClient(adminToken).perform(get("/api/discover/browses/title/items")
+        getClient(adminToken).perform(get("/api/discover/browses/author/entries")
                                           .param("projection", "full"))
-                             //** THEN **
-                             //The status has to be 200 OK
                              .andExpect(status().isOk())
-                             //We expect the content type to be "application/hal+json;charset=UTF-8"
                              .andExpect(content().contentType(contentType))
-                             //We expect 21 public items
                              .andExpect(jsonPath("$.page.size", is(20)))
                              .andExpect(jsonPath("$.page.totalElements", is(21)))
                              .andExpect(jsonPath("$.page.totalPages", is(2)))
                              .andExpect(jsonPath("$.page.number", is(0)))
-                             // embedded items are already checked by other test, we focus on links here
                              .andExpect(jsonPath("$._links.next.href",
-                                                 Matchers.containsString("/api/discover/browses/title/items?")))
+                                                 Matchers.containsString("/api/discover/browses/author/entries")))
                              .andExpect(jsonPath("$._links.last.href",
-                                                 Matchers.containsString("/api/discover/browses/title/items?")))
+                                                 Matchers.containsString("/api/discover/browses/author/entries")))
                              .andExpect(
-                                 jsonPath("$._links.self.href", Matchers.endsWith("/api/discover/browses/title/items")))
-                             // The full projection for anon shouldn't show the adminGroup in the response
-                             .andExpect(jsonPath("$._embedded.items[0]._embedded.owningCollection._embedded.adminGroup",
-                                                 nullValue()));
+                                 jsonPath("$._links.self.href",
+                                          Matchers.endsWith("/api/discover/browses/author/entries")));
+
+        getClient().perform(get("/api/discover/browses/author/entries"))
+                   .andExpect(status().isOk())
+                   .andExpect(content().contentType(contentType))
+                   .andExpect(jsonPath("$.page.size", is(20)))
+                   .andExpect(jsonPath("$.page.totalElements", is(21)))
+                   .andExpect(jsonPath("$.page.totalPages", is(2)))
+                   .andExpect(jsonPath("$.page.number", is(0)))
+                   .andExpect(
+                       jsonPath("$._links.next.href", Matchers.containsString("/api/discover/browses/author/entries")))
+                   .andExpect(
+                       jsonPath("$._links.last.href", Matchers.containsString("/api/discover/browses/author/entries")))
+                   .andExpect(
+                       jsonPath("$._links.self.href", Matchers.endsWith("/api/discover/browses/author/entries")));
 
     }
 
