@@ -44,7 +44,7 @@ public class HibernateDBConnectionTest extends AbstractUnitTest {
         super.init();
         // Get a DB connection to test with
         connection = new DSpace().getServiceManager()
-                                 .getServiceByName(null, ThreadBoundHibernateDBConnection.class);
+                                 .getServiceByName(null, HibernateDBConnection.class);
     }
 
     /**

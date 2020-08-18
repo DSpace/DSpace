@@ -16,32 +16,9 @@
         <property name="hibernateProperties">
             <props>
                 <prop key="hibernate.dialect">${db.dialect}</prop>
-                <prop key="hibernate.current_session_context_class">org.hibernate.context.internal.ThreadLocalSessionContext</prop>
                 <prop key="hibernate.default_schema">${db.schema}</prop>
                 <prop key='net.sf.ehcache.configurationResourceName'>
                     file:${dspace.dir}/config/hibernate-ehcache-config.xml
-                </prop>
-            </props>
-        </property>
-    </bean>
-
-    <!-- Hibernate 4 Configuration -->
-    <bean id="managedSessionFactory" class="org.springframework.orm.hibernate5.LocalSessionFactoryBean" lazy-init="true">
-        <!-- Load most Hibernate settings from hibernate.cfg.xml -->
-        <property name="configLocation" value="file:${dspace.dir}/config/hibernate.cfg.xml"/>
-        <!-- Use the dataSource defined in the bean below. This is necessary so that Flyway can initialize
-             our database using the dataSource *prior* to Hibernate taking over -->
-        <property name="dataSource" ref="dataSource" />
-        <!-- Specify some additional Hibernate settings via dynamic properties. As noted below,
-        these values will be dynamically loaded from DSpace's ConfigurationService. -->
-        <!-- All other Hibernate settings are specified via the hibernate.cfg.xml referenced above. -->
-        <property name="hibernateProperties">
-            <props>
-                <prop key="hibernate.dialect">${db.dialect}</prop>
-                <prop key="hibernate.current_session_context_class">org.hibernate.context.internal.ManagedSessionContext</prop>
-                <prop key="hibernate.default_schema">${db.schema}</prop>
-                <prop key='net.sf.ehcache.configurationResourceName'>
-                    file:${dspace.dir}/config/hibernate-managed-ehcache-config.xml
                 </prop>
             </props>
         </property>

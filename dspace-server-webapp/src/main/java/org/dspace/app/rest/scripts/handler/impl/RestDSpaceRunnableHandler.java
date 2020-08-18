@@ -105,8 +105,9 @@ public class RestDSpaceRunnableHandler implements DSpaceRunnableHandler {
             processService.complete(context, process);
             logInfo("The script has completed");
 
-            addLogBitstreamToProcess();
-
+            EPerson ePerson = ePersonService.find(context, ePersonId);
+            context.setCurrentUser(ePerson);
+            processService.createLogBitstream(context, process);
             context.complete();
         } catch (SQLException e) {
             log.error("RestDSpaceRunnableHandler with process: " + processId + " could not be completed", e);
@@ -146,8 +147,10 @@ public class RestDSpaceRunnableHandler implements DSpaceRunnableHandler {
             Process process = processService.find(context, processId);
             processService.fail(context, process);
 
+            EPerson ePerson = ePersonService.find(context, ePersonId);
+            context.setCurrentUser(ePerson);
+            processService.createLogBitstream(context, process);
 
-            addLogBitstreamToProcess();
             context.complete();
         } catch (SQLException sqlException) {
             log.error("SQL exception while handling another exception", e);
@@ -286,32 +289,6 @@ public class RestDSpaceRunnableHandler implements DSpaceRunnableHandler {
             processService.appendLog(processId, scriptName, message, error);
         }  catch (IOException e) {
             log.error("RestDSpaceRunnableHandler with process: " + processId + " could not write log to process", e);
-        }
-    }
-
-    /**
-     * This method will ensure that the current {@link Process} has the given {@link org.dspace.scripts.ProcessLog}
-     * objects made and attached to it in the DB when a log is called.
-     * It'll use a separate Context for this and close this one immediately afterwards so that it's updated in
-     * real-time
-     * @param message   The message to be used in the log
-     * @param processLogLevel   The log level to be used in the log
-     */
-    private void addLogBitstreamToProcess() throws SQLException, IOException, AuthorizeException {
-        Context context = new Context(Context.Mode.MANAGED);
-        try {
-            EPerson ePerson = ePersonService.find(context, ePersonId);
-            Process process = processService.find(context, processId);
-            
-            context.setCurrentUser(ePerson);
-            processService.createLogBitstream(context, process);
-            context.complete();
-//        } catch (SQLException | IOException | AuthorizeException e) {
-//            log.error("RestDSpaceRunnableHandler with process: " + processId + " could not write log to process", e);
-        } finally {
-            if (context.isValid()) {
-                context.abort();
-            }
         }
     }
 }
