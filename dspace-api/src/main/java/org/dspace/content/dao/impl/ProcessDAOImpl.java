@@ -90,6 +90,14 @@ public class ProcessDAOImpl extends AbstractHibernateDAO<Process> implements Pro
 
     }
 
+    /**
+     * This method will ensure that the params contained in the {@link ProcessQueryParameterContainer} are transferred
+     * to the ProcessRoot and that the correct conditions apply to the query
+     * @param processQueryParameterContainer    The object containing the conditions that need to be met
+     * @param criteriaBuilder                   The criteriaBuilder to be used
+     * @param criteriaQuery                     The criteriaQuery to be used
+     * @param processRoot                       The processRoot to be used
+     */
     private void handleProcessQueryParameters(ProcessQueryParameterContainer processQueryParameterContainer,
                                               CriteriaBuilder criteriaBuilder, CriteriaQuery criteriaQuery,
                                               Root<Process> processRoot) {
