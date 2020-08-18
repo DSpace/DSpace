@@ -105,9 +105,8 @@ public class RestDSpaceRunnableHandler implements DSpaceRunnableHandler {
             processService.complete(context, process);
             logInfo("The script has completed");
 
-            EPerson ePerson = ePersonService.find(context, ePersonId);
-            context.setCurrentUser(ePerson);
-            processService.createLogBitstream(context, process);
+            addLogBitstreamToProcess(context);
+
             context.complete();
         } catch (SQLException e) {
             log.error("RestDSpaceRunnableHandler with process: " + processId + " could not be completed", e);
@@ -116,10 +115,6 @@ public class RestDSpaceRunnableHandler implements DSpaceRunnableHandler {
                               "error with the logging bitstream", e);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-        }finally {
-            if (context.isValid()) {
-                context.abort();
-            }
         }
     }
 
@@ -147,10 +142,8 @@ public class RestDSpaceRunnableHandler implements DSpaceRunnableHandler {
             Process process = processService.find(context, processId);
             processService.fail(context, process);
 
-            EPerson ePerson = ePersonService.find(context, ePersonId);
-            context.setCurrentUser(ePerson);
-            processService.createLogBitstream(context, process);
 
+            addLogBitstreamToProcess(context);
             context.complete();
         } catch (SQLException sqlException) {
             log.error("SQL exception while handling another exception", e);
@@ -288,6 +281,18 @@ public class RestDSpaceRunnableHandler implements DSpaceRunnableHandler {
         try {
             processService.appendLog(processId, scriptName, message, error);
         }  catch (IOException e) {
+            log.error("RestDSpaceRunnableHandler with process: " + processId + " could not write log to process", e);
+        }
+    }
+
+    private void addLogBitstreamToProcess(Context context) throws SQLException, IOException, AuthorizeException {
+        try {
+            EPerson ePerson = ePersonService.find(context, ePersonId);
+            Process process = processService.find(context, processId);
+
+            context.setCurrentUser(ePerson);
+            processService.createLogBitstream(context, process);
+        } catch (SQLException | IOException | AuthorizeException e) {
             log.error("RestDSpaceRunnableHandler with process: " + processId + " could not write log to process", e);
         }
     }
