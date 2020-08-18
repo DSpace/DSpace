@@ -86,6 +86,11 @@
                         <xsl:value-of select="$environmentBannerText"/>
                     </p>
                     </xsl:if>
+
+                    <!--  Add skip to content link -->
+                    <div id="skiplinks">
+                        <a href="#main-container">Skip to content</a>
+                    </div>
                     <!-- End UMD Customization -->
 
                     <!-- Prompt IE 6 users to install Chrome Frame. Remove this if you support IE 6.

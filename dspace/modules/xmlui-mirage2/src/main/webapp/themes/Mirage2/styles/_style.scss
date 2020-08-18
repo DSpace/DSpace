@@ -152,3 +152,29 @@ header .navbar-default .navbar-nav {
 .prod.environment-banner {
   display: none !important;
 }
+
+/* 
+  Customization for LIBDRUM-613
+  - Skip to content
+*/
+#skip-link>a {
+  position: absolute;
+  left: -999px!important;
+  top: auto;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  z-index: -999
+}
+#skip-link>a:active, #skip-link>a:focus {
+  color: #951022;
+  background-color: #fff;
+  left: auto!important;
+  top: 45px;
+  width: auto;
+  height: auto;
+  padding: 10px;
+  overflow: auto;
+  z-index: 999;
+  text-decoration: underline
+}
