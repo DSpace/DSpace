@@ -55,7 +55,7 @@ import org.springframework.orm.hibernate5.SessionFactoryUtils;
  *
  * @author kevinvandevelde at atmire.com
  */
-public abstract class HibernateDBConnection implements DBConnection<Session> {
+public class HibernateDBConnection implements DBConnection<Session> {
 
     @Autowired(required = true)
     @Qualifier("sessionFactory")
@@ -71,14 +71,18 @@ public abstract class HibernateDBConnection implements DBConnection<Session> {
      * @return Hibernate current Session object
      * @throws SQLException
      */
-    public abstract Session getSession() throws SQLException;
+    @Override
+    public Session getSession() throws SQLException {
+        // If we don't yet have a live transaction, start a new one
+        // NOTE: a Session cannot be used until a Transaction is started.
+        if (!isTransActionAlive()) {
+            sessionFactory.getCurrentSession().beginTransaction();
+            configureDatabaseMode();
+        }
+        // Return the current Hibernate Session object (Hibernate will create one if it doesn't yet exist)
+        return sessionFactory.getCurrentSession();
+    }
 
-    /**
-     * Retrieves the current Session from Hibernate
-     * @return  The current Session
-     */
-    public abstract Session getCurrentSession();
-    
     /**
      * Check if the connection has a currently active Transaction. A Transaction is active if it has not yet been
      * either committed or rolled back.
@@ -228,7 +232,7 @@ public abstract class HibernateDBConnection implements DBConnection<Session> {
         return batchModeEnabled;
     }
 
-    protected void configureDatabaseMode() throws SQLException {
+    private void configureDatabaseMode() throws SQLException {
         if (batchModeEnabled) {
             getSession().setHibernateFlushMode(FlushMode.ALWAYS);
         } else if (readOnlyEnabled) {
