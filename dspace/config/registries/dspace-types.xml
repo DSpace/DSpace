@@ -18,17 +18,9 @@
 
     <dc-type>
         <schema>dspace</schema>
-        <element>cookies</element>
-        <qualifier>functional</qualifier>
+        <element>agreements</element>
+        <qualifier>end-user</qualifier>
         <scope_note></scope_note>
     </dc-type>
-
-    <dc-type>
-        <schema>dspace</schema>
-        <element>cookies</element>
-        <qualifier>statistics</qualifier>
-        <scope_note></scope_note>
-    </dc-type>
-
 
 </dspace-dc-types>
