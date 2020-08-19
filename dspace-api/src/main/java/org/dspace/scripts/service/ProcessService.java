@@ -191,6 +191,6 @@ public interface ProcessService {
     public List<String> getFileTypesForProcessBitstreams(Context context, Process process);
 
     void appendLog(int processId, String scriptName, String output, ProcessLogLevel processLogLevel) throws IOException;
-     void createLogBitstream(Context context, Process process)
+    void createLogBitstream(Context context, Process process)
              throws IOException, SQLException, AuthorizeException;
 }
