@@ -15,17 +15,22 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.dspace.content.Item;
 import org.dspace.core.Context;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 
 /**
- * Processor that handles Item events from the ExportUsageEventListener
+ * Processor that handles Item events from the IrusExportUsageEventListener
  */
 public class ItemEventProcessor extends ExportEventProcessor {
+
+    private ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
 
     private Item item;
 
     /**
      * Creates a new ItemEventProcessor that will set the params
+     *
      * @param context
      * @param request
      * @param item
@@ -39,6 +44,7 @@ public class ItemEventProcessor extends ExportEventProcessor {
      * Process the event
      * Check if the item should be processed
      * Create the url to be transmitted based on item data
+     *
      * @throws SQLException
      * @throws IOException
      */
@@ -52,6 +58,7 @@ public class ItemEventProcessor extends ExportEventProcessor {
 
     /**
      * Adds additional item data to the url
+     *
      * @param string to which the additional data needs to be added
      * @param item
      * @return the string with additional data
@@ -69,6 +76,7 @@ public class ItemEventProcessor extends ExportEventProcessor {
 
     /**
      * Get Item info used for the url
+     *
      * @param item
      * @return item info
      */

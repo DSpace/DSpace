@@ -27,7 +27,6 @@ import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.EntityService;
-import org.dspace.content.service.EntityTypeService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.core.Utils;
@@ -38,37 +37,23 @@ import org.dspace.statistics.export.service.OpenUrlService;
 
 /**
  * Abstract export event processor that contains all shared logic to handle both Items and Bitstreams
- * from the ExportUsageEventListener
+ * from the IrusExportUsageEventListener
  */
 public abstract class ExportEventProcessor {
 
     private static Logger log = Logger.getLogger(ExportEventProcessor.class);
 
-    /* The metadata field which is to be checked for */
-    protected String trackerTypeMetadataField;
-
-    /* A list of entity types that will be processed */
-    protected List<String> entityTypes;
     protected static final String ENTITY_TYPE_DEFAULT = "Publication";
-
-    /* A list of values the type might have */
-    protected List<String> trackerTypeMetadataValues;
-
-    /* The base url of the tracker */
-    protected String baseUrl;
-
-    protected String trackerUrlVersion;
 
     protected static final String ITEM_VIEW = "Investigation";
     protected static final String BITSTREAM_DOWNLOAD = "Request";
 
     protected final static String UTF_8 = CharEncoding.UTF_8;
 
-    protected ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
-    protected EntityTypeService entityTypeService = ContentServiceFactory.getInstance().getEntityTypeService();
-    protected EntityService entityService = ContentServiceFactory.getInstance().getEntityService();
-    protected ItemService itemService = ContentServiceFactory.getInstance().getItemService();
-    protected OpenUrlService openUrlService = OpenURLTrackerLoggerServiceFactory.getInstance().getOpenUrlService();
+    private ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
+    private EntityService entityService = ContentServiceFactory.getInstance().getEntityService();
+    private ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+    private OpenUrlService openUrlService = OpenURLTrackerLoggerServiceFactory.getInstance().getOpenUrlService();
 
 
     protected Context context;
@@ -83,7 +68,6 @@ public abstract class ExportEventProcessor {
     ExportEventProcessor(Context context, HttpServletRequest request) {
         this.context = context;
         this.request = request;
-        initProperties();
     }
 
     /**
@@ -102,6 +86,12 @@ public abstract class ExportEventProcessor {
      * @throws SQLException
      */
     protected void processObject(String urlParameters) throws IOException, SQLException {
+        String baseUrl;
+        if (StringUtils.equals(configurationService.getProperty("stats.tracker.environment"), "production")) {
+            baseUrl = configurationService.getProperty("stats.tracker.produrl");
+        } else {
+            baseUrl = configurationService.getProperty("stats.tracker.testurl");
+        }
 
         openUrlService.processUrl(context, baseUrl + "?" + urlParameters);
     }
@@ -136,7 +126,8 @@ public abstract class ExportEventProcessor {
 
         //Start adding our data
         StringBuilder data = new StringBuilder();
-        data.append(URLEncoder.encode("url_ver", UTF_8) + "=" + URLEncoder.encode(trackerUrlVersion, UTF_8));
+        data.append(URLEncoder.encode("url_ver", UTF_8) + "=" +
+                            URLEncoder.encode(configurationService.getProperty("stats.tracker.urlversion"), UTF_8));
         data.append("&").append(URLEncoder.encode("req_id", UTF_8)).append("=")
             .append(URLEncoder.encode(clientIP, UTF_8));
         data.append("&").append(URLEncoder.encode("req_dat", UTF_8)).append("=")
@@ -203,6 +194,15 @@ public abstract class ExportEventProcessor {
         Entity entity = entityService.findByItemId(context, item.getID());
         EntityType type = entityService.getType(context, entity);
 
+        String[] entityTypeStrings = configurationService.getArrayProperty("stats.tracker.entity-types");
+        List<String> entityTypes = new ArrayList<>();
+
+        if (entityTypeStrings.length != 0) {
+            entityTypes.addAll(Arrays.asList(entityTypeStrings));
+        } else {
+            entityTypes.add(ENTITY_TYPE_DEFAULT);
+        }
+
         if (type != null && entityTypes.contains(type.getLabel())) {
             return true;
         }
@@ -216,6 +216,18 @@ public abstract class ExportEventProcessor {
      * @return whether the item should be processed
      */
     protected boolean shouldProcessItemType(Item item) {
+        String trackerTypeMetadataField = configurationService.getProperty("stats.tracker.type-field");
+        String[] metadataValues = configurationService.getArrayProperty("stats.tracker.type-value");
+        List<String> trackerTypeMetadataValues;
+        if (metadataValues.length > 0) {
+            trackerTypeMetadataValues = new ArrayList<>();
+            for (String metadataValue : metadataValues) {
+                trackerTypeMetadataValues.add(metadataValue.toLowerCase());
+            }
+        } else {
+            trackerTypeMetadataValues = null;
+        }
+
         if (trackerTypeMetadataField != null && trackerTypeMetadataValues != null) {
 
             // Contains the schema, element and if present qualifier of the metadataField
@@ -241,48 +253,6 @@ public abstract class ExportEventProcessor {
         } else {
             // No types to be excluded
             return true;
-        }
-    }
-
-    /**
-     * Initializes services and params obtained from DSpace config
-     */
-    private void initProperties() {
-        try {
-            if (trackerTypeMetadataField == null) {
-                trackerTypeMetadataField = configurationService.getProperty("stats.tracker.type-field");
-
-                String[] metadataValues = configurationService.getArrayProperty("stats.tracker.type-value");
-                if (metadataValues.length > 0) {
-                    trackerTypeMetadataValues = new ArrayList<>();
-                    for (String metadataValue : metadataValues) {
-                        trackerTypeMetadataValues.add(metadataValue.toLowerCase());
-                    }
-                } else {
-                    trackerTypeMetadataValues = null;
-                }
-
-                if (StringUtils.equals(configurationService.getProperty("stats.tracker.environment"), "production")) {
-                    baseUrl = configurationService.getProperty("stats.tracker.produrl");
-                } else {
-                    baseUrl = configurationService.getProperty("stats.tracker.testurl");
-                }
-
-                trackerUrlVersion = configurationService.getProperty("stats.tracker.urlversion");
-                String[] entityTypeStrings = configurationService.getArrayProperty("stats.tracker.entity-types");
-                entityTypes = new ArrayList<>();
-                if (entityTypeStrings.length != 0) {
-                    entityTypes.addAll(Arrays.asList(entityTypeStrings));
-                } else {
-                    entityTypes.add(ENTITY_TYPE_DEFAULT);
-                }
-            }
-        } catch (Exception e) {
-            log.error("Unknown error resolving configuration for the export usage event.", e);
-            trackerTypeMetadataField = null;
-            trackerTypeMetadataValues = null;
-            baseUrl = null;
-            trackerUrlVersion = null;
         }
     }
 }

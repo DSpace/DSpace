@@ -17,12 +17,17 @@ import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.statistics.util.SpiderDetector;
 
 /**
- * Processor that handles Bitstream events from the ExportUsageEventListener
+ * Processor that handles Bitstream events from the IrusExportUsageEventListener
  */
 public class BitstreamEventProcessor extends ExportEventProcessor {
+
+    private ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
+
 
     private Item item;
     private Bitstream bitstream;

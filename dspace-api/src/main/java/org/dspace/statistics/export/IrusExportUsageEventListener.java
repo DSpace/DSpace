@@ -25,9 +25,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 /**
  * Class to receive usage events and send corresponding data to IRUS
  */
-public class ExportUsageEventListener extends AbstractUsageEventListener {
+public class IrusExportUsageEventListener extends AbstractUsageEventListener {
     /*  Log4j logger*/
-    private static Logger log = Logger.getLogger(ExportUsageEventListener.class);
+    private static Logger log = Logger.getLogger(IrusExportUsageEventListener.class);
 
     @Autowired
     ConfigurationService configurationService;

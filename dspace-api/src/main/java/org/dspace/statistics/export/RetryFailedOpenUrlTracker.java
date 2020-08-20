@@ -21,7 +21,6 @@ import org.dspace.utils.DSpace;
  */
 public class RetryFailedOpenUrlTracker extends DSpaceRunnable<RetryFailedOpenUrlTrackerScriptConfiguration> {
 
-    private Context context = null;
     private String lineToAdd = null;
     private boolean help = false;
     private boolean retryFailed = false;
@@ -39,6 +38,7 @@ public class RetryFailedOpenUrlTracker extends DSpaceRunnable<RetryFailedOpenUrl
             printHelp();
             return;
         }
+        Context context = new Context();
         context.turnOffAuthorisationSystem();
 
         if (StringUtils.isNotBlank(lineToAdd)) {
@@ -50,11 +50,7 @@ public class RetryFailedOpenUrlTracker extends DSpaceRunnable<RetryFailedOpenUrl
             openUrlService.reprocessFailedQueue(context);
         }
         context.restoreAuthSystemState();
-        try {
-            context.complete();
-        } catch (Exception e) {
-            handler.logError(e.getMessage());
-        }
+        context.complete();
     }
 
     public RetryFailedOpenUrlTrackerScriptConfiguration getScriptConfiguration() {
@@ -68,7 +64,6 @@ public class RetryFailedOpenUrlTracker extends DSpaceRunnable<RetryFailedOpenUrl
      * @throws ParseException
      */
     public void setup() throws ParseException {
-        context = new Context();
         openUrlService = OpenURLTrackerLoggerServiceFactory.getInstance().getOpenUrlService();
 
         if (!(commandLine.hasOption('a') || commandLine.hasOption('r') || commandLine.hasOption('h'))) {
