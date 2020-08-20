@@ -23,4 +23,11 @@
         <scope_note></scope_note>
     </dc-type>
 
+    <dc-type>
+        <schema>dspace</schema>
+        <element>agreements</element>
+        <qualifier>cookies</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
 </dspace-dc-types>

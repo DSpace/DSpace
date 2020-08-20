@@ -82,11 +82,16 @@ public class EPersonTest extends AbstractUnitTest {
     public void testPreferences() throws Exception {
 
         ePersonService.addMetadata(context, eperson, "dspace", "agreements", "end-user", null, "test");
+        ePersonService.addMetadata(context, eperson, "dspace", "agreements", "cookies", null, "Dspace cookies agreement metadata");
         context.commit();
 
         assertEquals(
                 "test",
                 ePersonService.getMetadataFirstValue(eperson, "dspace", "agreements", "end-user", null)
+        );
+        assertEquals(
+                "Dspace cookies agreement metadata",
+                ePersonService.getMetadataFirstValue(eperson, "dspace", "agreements", "cookies", null)
         );
     }
 
