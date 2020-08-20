@@ -9,43 +9,43 @@ package org.dspace.statistics.export.processor;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.CALLS_REAL_METHODS;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.util.UUID;
+import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.codec.CharEncoding;
-import org.dspace.AbstractDSpaceTest;
+import org.dspace.AbstractIntegrationTestWithDatabase;
+import org.dspace.builder.BitstreamBuilder;
+import org.dspace.builder.CollectionBuilder;
+import org.dspace.builder.CommunityBuilder;
+import org.dspace.builder.ItemBuilder;
 import org.dspace.content.Bitstream;
+import org.dspace.content.Collection;
+import org.dspace.content.Community;
+import org.dspace.content.Item;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 
 /**
  * Test class for the BitstreamEventProcessor
  */
-public class BitstreamEventProcessorTest extends AbstractDSpaceTest {
-
-    @Mock
-    private Bitstream bitstream = mock(Bitstream.class);
+public class BitstreamEventProcessorTest extends AbstractIntegrationTestWithDatabase {
 
     private ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
 
-
-    @InjectMocks
-    BitstreamEventProcessor bitstreamEventProcessor = mock(BitstreamEventProcessor.class, CALLS_REAL_METHODS);
 
     private String encodedUrl;
 
 
     @Before
-    public void setUp() {
+    public void setUp() throws Exception {
+        super.setUp();
         configurationService.setProperty("stats.tracker.enabled", true);
 
         String dspaceUrl = configurationService.getProperty("dspace.server.url");
@@ -61,17 +61,26 @@ public class BitstreamEventProcessorTest extends AbstractDSpaceTest {
     /**
      * Test the method that adds data based on the object types
      */
-    public void testAddObectSpecificData() throws UnsupportedEncodingException {
-        bitstreamEventProcessor.configurationService = configurationService;
+    public void testAddObectSpecificData() throws Exception {
+        HttpServletRequest request = mock(HttpServletRequest.class);
 
-        when(bitstream.getID()).thenReturn(UUID.fromString("455bd3cf-31d3-40db-b283-4106c47fc025"));
+        context.turnOffAuthorisationSystem();
+        Community community = CommunityBuilder.createCommunity(context).build();
+        Collection collection = CollectionBuilder.createCollection(context, community).build();
+        Item item = ItemBuilder.createItem(context, collection).build();
 
+        File f = new File(testProps.get("test.bitstream").toString());
+        Bitstream bitstream = BitstreamBuilder.createBitstream(context, item, new FileInputStream(f)).build();
+
+        context.restoreAuthSystemState();
+
+        BitstreamEventProcessor bitstreamEventProcessor = new BitstreamEventProcessor(context, request, bitstream);
 
         String result = bitstreamEventProcessor.addObjectSpecificData("existing-string", bitstream);
 
         assertThat(result,
-                   is("existing-string&svc_dat=" + encodedUrl + "%2Fapi%2Fcore%2Fbitstreams%2F455bd3cf-31d3-40db" +
-                              "-b283-4106c47fc025%2Fcontent&rft_dat=Request"));
+                   is("existing-string&svc_dat=" + encodedUrl + "%2Fapi%2Fcore%2Fbitstreams%2F" + bitstream.getID()
+                              + "%2Fcontent&rft_dat=Request"));
 
     }
 

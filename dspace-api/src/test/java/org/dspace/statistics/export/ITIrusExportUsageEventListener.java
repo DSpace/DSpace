@@ -7,10 +7,9 @@
  */
 package org.dspace.statistics.export;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -26,8 +25,13 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.codec.CharEncoding;
 import org.apache.log4j.Logger;
-import org.dspace.AbstractIntegrationTest;
+import org.dspace.AbstractIntegrationTestWithDatabase;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.builder.BitstreamBuilder;
+import org.dspace.builder.CollectionBuilder;
+import org.dspace.builder.CommunityBuilder;
+import org.dspace.builder.EntityTypeBuilder;
+import org.dspace.builder.ItemBuilder;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
@@ -54,17 +58,14 @@ import org.dspace.usage.UsageEvent;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Spy;
-import org.mockito.junit.MockitoJUnitRunner;
 
 /**
- * Test class for the ExportUsageEventListener
+ * Test class for the IrusExportUsageEventListener
  */
-@RunWith(MockitoJUnitRunner.class)
-public class ITExportUsageEventListener extends AbstractIntegrationTest {
+//@RunWith(MockitoJUnitRunner.class)
+public class ITIrusExportUsageEventListener extends AbstractIntegrationTestWithDatabase {
 
-    private static Logger log = Logger.getLogger(ITExportUsageEventListener.class);
+    private static Logger log = Logger.getLogger(ITIrusExportUsageEventListener.class);
 
 
     protected CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
@@ -85,8 +86,11 @@ public class ITExportUsageEventListener extends AbstractIntegrationTest {
                                                                  .getServiceByName("testProcessedUrls",
                                                                                    ArrayList.class);
 
-    @Spy
-    ExportUsageEventListener exportUsageEventListener;
+    private IrusExportUsageEventListener exportUsageEventListener =
+            DSpaceServicesFactory.getInstance()
+                                 .getServiceManager()
+                                 .getServicesByType(IrusExportUsageEventListener.class)
+                                 .get(0);
 
     private Item item;
     private Item itemNotToBeProcessed;
@@ -104,8 +108,8 @@ public class ITExportUsageEventListener extends AbstractIntegrationTest {
      * Initializes the test by setting up all objects needed to create a test item
      */
     @Before()
-    public void init() {
-        super.init();
+    public void setUp() throws Exception {
+        super.setUp();
 
         configurationService.setProperty("stats.tracker.enabled", true);
         configurationService.setProperty("stats.tracker.type-field", "dc.type");
@@ -114,26 +118,25 @@ public class ITExportUsageEventListener extends AbstractIntegrationTest {
 
         context.turnOffAuthorisationSystem();
         try {
-            exportUsageEventListener.configurationService = configurationService;
 
-            entityType = entityTypeService.create(context, "Publication");
-            community = communityService.create(null, context);
-            collection = collectionService.create(context, community);
-            item = installItemService.installItem(context, workspaceItemService.create(context, collection, false));
-            itemService.addMetadata(context, item, "relationship", "type", null, null, "Publication");
+            entityType = EntityTypeBuilder.createEntityTypeBuilder(context, "Publication").build();
+            community = CommunityBuilder.createCommunity(context).build();
+            collection = CollectionBuilder.createCollection(context, community).build();
+            item = ItemBuilder.createItem(context, collection)
+                              .withRelationshipType(entityType.getLabel())
+                              .build();
+
             File f = new File(testProps.get("test.bitstream").toString());
-            bitstream = itemService.createSingleBitstream(context, new FileInputStream(f), item);
-            itemService.update(context, item);
+            bitstream = BitstreamBuilder.createBitstream(context, item, new FileInputStream(f)).build();
 
-            itemNotToBeProcessed = installItemService
-                    .installItem(context, workspaceItemService.create(context, collection, false));
-            itemService.addMetadata(context, itemNotToBeProcessed, "relationship", "type", null, null, "Publication");
-            itemService.addMetadata(context, itemNotToBeProcessed, "dc", "type", null, null, "Excluded type");
+            itemNotToBeProcessed = ItemBuilder.createItem(context, collection)
+                                              .withRelationshipType(entityType.getLabel())
+                                              .withType("Excluded type")
+                                              .build();
             File itemNotToBeProcessedFile = new File(testProps.get("test.bitstream").toString());
-            bitstreamNotToBeProcessed = itemService.createSingleBitstream(context,
-                                                                          new FileInputStream(itemNotToBeProcessedFile),
-                                                                          itemNotToBeProcessed);
-            itemService.update(context, itemNotToBeProcessed);
+            bitstreamNotToBeProcessed = BitstreamBuilder
+                    .createBitstream(context, itemNotToBeProcessed, new FileInputStream(itemNotToBeProcessedFile))
+                    .build();
 
             String dspaceUrl = configurationService.getProperty("dspace.server.url");
             encodedUrl = URLEncoder.encode(dspaceUrl, CharEncoding.UTF_8);
@@ -154,25 +157,14 @@ public class ITExportUsageEventListener extends AbstractIntegrationTest {
      * Empty the database table where the failed urls are logged
      */
     @After
-    public void destroy() {
+    public void destroy() throws Exception {
         try {
             context.turnOffAuthorisationSystem();
-
-            itemService.delete(context, item);
-            collectionService.delete(context, collection);
-            communityService.delete(context, community);
-            entityTypeService.delete(context, entityType);
-
 
             List<OpenURLTracker> all = failedOpenURLTrackerService.findAll(context);
             for (OpenURLTracker tracker : all) {
                 failedOpenURLTrackerService.remove(context, tracker);
             }
-
-            entityType = null;
-            community = null;
-            collection = null;
-            item = null;
 
             // Clear the list of processedUrls
             testProcessedUrls.clear();
@@ -203,7 +195,6 @@ public class ITExportUsageEventListener extends AbstractIntegrationTest {
         when(usageEvent.getRequest()).thenReturn(request);
         when(usageEvent.getContext()).thenReturn(new Context());
 
-        doCallRealMethod().when(exportUsageEventListener).receiveEvent(usageEvent);
         exportUsageEventListener.receiveEvent(usageEvent);
 
 
@@ -218,9 +209,9 @@ public class ITExportUsageEventListener extends AbstractIntegrationTest {
 
         boolean isMatch = matchesString(String.valueOf(testProcessedUrls.get(0)), regex);
 
-        assertThat(testProcessedUrls.size(), is(1));
-        assertThat(isMatch, is(true));
-        assertThat(all.size(), is(0));
+        assertEquals(1, testProcessedUrls.size());
+        assertTrue(isMatch);
+        assertEquals(0, all.size());
 
 
     }
@@ -239,7 +230,6 @@ public class ITExportUsageEventListener extends AbstractIntegrationTest {
         when(usageEvent.getRequest()).thenReturn(request);
         when(usageEvent.getContext()).thenReturn(new Context());
 
-        doCallRealMethod().when(exportUsageEventListener).receiveEvent(usageEvent);
         exportUsageEventListener.receiveEvent(usageEvent);
 
 
@@ -253,10 +243,10 @@ public class ITExportUsageEventListener extends AbstractIntegrationTest {
 
         boolean isMatch = matchesString(all.get(0).getUrl(), regex);
 
-        assertThat(testProcessedUrls.size(), is(0));
+        assertEquals(0, testProcessedUrls.size());
 
-        assertThat(all.size(), is(1));
-        assertThat(isMatch, is(true));
+        assertEquals(1, all.size());
+        assertTrue(isMatch);
     }
 
     /**
@@ -279,14 +269,14 @@ public class ITExportUsageEventListener extends AbstractIntegrationTest {
 
         context.restoreAuthSystemState();
 
-        doCallRealMethod().when(exportUsageEventListener).receiveEvent(usageEvent);
+        // doCallRealMethod().when(IrusExportUsageEventListener).receiveEvent(usageEvent);
         exportUsageEventListener.receiveEvent(usageEvent);
 
         List<OpenURLTracker> all = failedOpenURLTrackerService.findAll(context);
 
 
-        assertThat(testProcessedUrls.size(), is(0));
-        assertThat(all.size(), is(0));
+        assertEquals(0, testProcessedUrls.size());
+        assertEquals(0, all.size());
     }
 
     /**
@@ -303,7 +293,6 @@ public class ITExportUsageEventListener extends AbstractIntegrationTest {
         when(usageEvent.getRequest()).thenReturn(request);
         when(usageEvent.getContext()).thenReturn(new Context());
 
-        doCallRealMethod().when(exportUsageEventListener).receiveEvent(usageEvent);
         exportUsageEventListener.receiveEvent(usageEvent);
 
         String regex = "https://irus.jisc.ac.uk/counter/test/\\?url_ver=Z39.88-2004&req_id=" +
@@ -314,11 +303,11 @@ public class ITExportUsageEventListener extends AbstractIntegrationTest {
 
         boolean isMatch = matchesString(String.valueOf(testProcessedUrls.get(0)), regex);
 
-        assertThat(testProcessedUrls.size(), is(1));
-        assertThat(isMatch, is(true));
+        assertEquals(1, testProcessedUrls.size());
+        assertTrue(isMatch);
 
         List<OpenURLTracker> all = failedOpenURLTrackerService.findAll(context);
-        assertThat(all.size(), is(0));
+        assertEquals(0, all.size());
     }
 
     /**
@@ -336,7 +325,6 @@ public class ITExportUsageEventListener extends AbstractIntegrationTest {
         when(usageEvent.getRequest()).thenReturn(request);
         when(usageEvent.getContext()).thenReturn(new Context());
 
-        doCallRealMethod().when(exportUsageEventListener).receiveEvent(usageEvent);
         exportUsageEventListener.receiveEvent(usageEvent);
 
         List<OpenURLTracker> all = failedOpenURLTrackerService.findAll(context);
@@ -350,9 +338,9 @@ public class ITExportUsageEventListener extends AbstractIntegrationTest {
 
         boolean isMatch = matchesString(all.get(0).getUrl(), regex);
 
-        assertThat(all.size(), is(1));
-        assertThat(isMatch, is(true));
-        assertThat(testProcessedUrls.size(), is(0));
+        assertEquals(1, all.size());
+        assertEquals(true, isMatch);
+        assertEquals(0, testProcessedUrls.size());
 
     }
 
@@ -377,14 +365,13 @@ public class ITExportUsageEventListener extends AbstractIntegrationTest {
 
         context.restoreAuthSystemState();
 
-        doCallRealMethod().when(exportUsageEventListener).receiveEvent(usageEvent);
         exportUsageEventListener.receiveEvent(usageEvent);
 
         List<OpenURLTracker> all = failedOpenURLTrackerService.findAll(context);
 
 
-        assertThat(all.size(), is(0));
-        assertThat(testProcessedUrls.size(), is(0));
+        assertEquals(0, all.size());
+        assertEquals(0, testProcessedUrls.size());
 
     }
 
@@ -400,14 +387,13 @@ public class ITExportUsageEventListener extends AbstractIntegrationTest {
         when(usageEvent.getObject()).thenReturn(community);
         when(usageEvent.getContext()).thenReturn(new Context());
 
-        doCallRealMethod().when(exportUsageEventListener).receiveEvent(usageEvent);
         exportUsageEventListener.receiveEvent(usageEvent);
 
         List<OpenURLTracker> all = failedOpenURLTrackerService.findAll(context);
 
 
-        assertThat(all.size(), is(0));
-        assertThat(testProcessedUrls.size(), is(0));
+        assertEquals(0, all.size());
+        assertEquals(0, testProcessedUrls.size());
 
     }
 

@@ -65,7 +65,11 @@ public class OpenUrlServiceImpl implements OpenUrlService {
         URL url = new URL(urlStr);
         conn = url.openConnection();
 
-        return ((HttpURLConnection) conn).getResponseCode();
+        HttpURLConnection httpURLConnection = (HttpURLConnection) conn;
+        int responseCode = httpURLConnection.getResponseCode();
+        httpURLConnection.disconnect();
+
+        return responseCode;
     }
 
     /**

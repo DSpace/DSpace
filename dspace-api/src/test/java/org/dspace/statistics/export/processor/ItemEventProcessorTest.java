@@ -9,40 +9,36 @@ package org.dspace.statistics.export.processor;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.CALLS_REAL_METHODS;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
 import org.apache.commons.codec.CharEncoding;
-import org.dspace.AbstractDSpaceTest;
+import org.dspace.AbstractIntegrationTestWithDatabase;
+import org.dspace.builder.CollectionBuilder;
+import org.dspace.builder.CommunityBuilder;
+import org.dspace.builder.ItemBuilder;
+import org.dspace.content.Collection;
+import org.dspace.content.Community;
 import org.dspace.content.Item;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 
 /**
  * Test class for the ItemEventProcessor
  */
-public class ItemEventProcessorTest extends AbstractDSpaceTest {
+public class ItemEventProcessorTest extends AbstractIntegrationTestWithDatabase {
 
-    @Mock
-    private Item item = mock(Item.class);
 
     private ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
-
-    @InjectMocks
-    ItemEventProcessor itemEventProcessor = mock(ItemEventProcessor.class, CALLS_REAL_METHODS);
 
     private String encodedUrl;
 
     @Before
-    public void setUp() {
+    public void setUp() throws Exception {
+        super.setUp();
         configurationService.setProperty("stats.tracker.enabled", true);
 
         String dspaceUrl = configurationService.getProperty("dspace.ui.url");
@@ -51,6 +47,7 @@ public class ItemEventProcessorTest extends AbstractDSpaceTest {
         } catch (UnsupportedEncodingException e) {
             throw new AssertionError("Error occurred in setup()", e);
         }
+
     }
 
     @Test
@@ -58,14 +55,20 @@ public class ItemEventProcessorTest extends AbstractDSpaceTest {
      * Test the method that adds data based on the object types
      */
     public void testAddObectSpecificData() throws UnsupportedEncodingException {
-        itemEventProcessor.configurationService = configurationService;
+        context.turnOffAuthorisationSystem();
+        Community community = CommunityBuilder.createCommunity(context).build();
+        Collection collection = CollectionBuilder.createCollection(context, community).build();
+        Item item = ItemBuilder.createItem(context, collection).build();
+        context.restoreAuthSystemState();
 
-        when(item.getHandle()).thenReturn("123456789/1");
+        String encodedHandle = URLEncoder.encode(item.getHandle(), CharEncoding.UTF_8);
 
+        ItemEventProcessor itemEventProcessor = new ItemEventProcessor(context, null, item);
         String result = itemEventProcessor.addObjectSpecificData("existing-string", item);
 
         assertThat(result,
-                   is("existing-string&svc_dat=" + encodedUrl + "%2Fhandle%2F123456789%2F1&rft_dat=Investigation"));
+                   is("existing-string&svc_dat=" + encodedUrl + "%2Fhandle%2F" + encodedHandle +
+                              "&rft_dat=Investigation"));
 
     }
 

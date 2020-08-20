@@ -7,8 +7,7 @@
  */
 package org.dspace.statistics.export;
 
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertEquals;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -94,9 +93,9 @@ public class ITRetryFailedOpenUrlTracker extends AbstractIntegrationTest {
 
         List<OpenURLTracker> all = failedOpenURLTrackerService.findAll(context);
 
-        assertThat(testProcessedUrls.size(), is(0));
-        assertThat(all.size(), is(1));
-        assertThat(all.get(0).getUrl(), is(urlToAdd));
+        assertEquals(0, testProcessedUrls.size());
+        assertEquals(1, all.size());
+        assertEquals(urlToAdd, all.get(0).getUrl());
     }
 
     /**
@@ -126,12 +125,12 @@ public class ITRetryFailedOpenUrlTracker extends AbstractIntegrationTest {
 
         List<OpenURLTracker> all = failedOpenURLTrackerService.findAll(context);
 
-        assertThat(testProcessedUrls.size(), is(3));
-        assertThat(testProcessedUrls.contains("test-url-1"), is(true));
-        assertThat(testProcessedUrls.contains("test-url-2"), is(true));
-        assertThat(testProcessedUrls.contains("test-url-3"), is(true));
+        assertEquals(3, testProcessedUrls.size());
+        assertEquals(true, testProcessedUrls.contains("test-url-1"));
+        assertEquals(true, testProcessedUrls.contains("test-url-2"));
+        assertEquals(true, testProcessedUrls.contains("test-url-3"));
 
-        assertThat(all.size(), is(0));
+        assertEquals(0, all.size());
     }
 
     /**
@@ -169,14 +168,14 @@ public class ITRetryFailedOpenUrlTracker extends AbstractIntegrationTest {
             storedTrackerUrls.add(tracker.getUrl());
         }
 
-        assertThat(testProcessedUrls.size(), is(2));
-        assertThat(testProcessedUrls.contains("test-url-1"), is(true));
-        assertThat(testProcessedUrls.contains("test-url-5"), is(true));
+        assertEquals(2, testProcessedUrls.size());
+        assertEquals(true, testProcessedUrls.contains("test-url-1"));
+        assertEquals(true, testProcessedUrls.contains("test-url-5"));
 
-        assertThat(all.size(), is(3));
-        assertThat(storedTrackerUrls.contains("test-url-2-fail"), is(true));
-        assertThat(storedTrackerUrls.contains("test-url-3-fail"), is(true));
-        assertThat(storedTrackerUrls.contains("test-url-4-fail"), is(true));
+        assertEquals(3, all.size());
+        assertEquals(true, storedTrackerUrls.contains("test-url-2-fail"));
+        assertEquals(true, storedTrackerUrls.contains("test-url-3-fail"));
+        assertEquals(true, storedTrackerUrls.contains("test-url-4-fail"));
     }
 
 
