@@ -150,8 +150,8 @@ public class RestDSpaceRunnableHandler implements DSpaceRunnableHandler {
         } catch (IOException | AuthorizeException ioException) {
             log.error("RestDSpaceRunnableHandler with process: " + processId + " could not be completed due to an " +
                               "error with the logging bitstream", e);
-        } catch (Exception whatev) {
-            log.error(e.getMessage(), whatev);
+        } catch (Exception exception) {
+            log.error(exception.getMessage(), exception);
         } finally {
             if (context.isValid()) {
                 context.abort();

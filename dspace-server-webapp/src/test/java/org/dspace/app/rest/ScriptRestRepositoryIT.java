@@ -60,7 +60,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.ResultActions;
 
 public class ScriptRestRepositoryIT extends AbstractControllerIntegrationTest {
 
@@ -343,13 +342,16 @@ public class ScriptRestRepositoryIT extends AbstractControllerIntegrationTest {
                                     .matchBitstreamEntryWithoutEmbed(bitstream.getID(), bitstream.getSizeBytes())));
 
 
-            MvcResult mvcResult = getClient(token).perform(get("/api/core/bitstreams/" + bitstream.getID() + "/content"))
-                                                  .andReturn();
+            MvcResult mvcResult = getClient(token)
+                    .perform(get("/api/core/bitstreams/" + bitstream.getID() + "/content")).andReturn();
             String content = mvcResult.getResponse().getContentAsString();
             assertThat(content, CoreMatchers.containsString("INFO mock-script - 1 @ The script has started"));
-            assertThat(content, CoreMatchers.containsString("INFO mock-script - 1 @ Logging INFO for Mock DSpace Script"));
-            assertThat(content, CoreMatchers.containsString("ERROR mock-script - 1 @ Logging ERROR for Mock DSpace Script"));
-            assertThat(content, CoreMatchers.containsString("WARNING mock-script - 1 @ Logging WARNING for Mock DSpace Script"));
+            assertThat(content,
+                       CoreMatchers.containsString("INFO mock-script - 1 @ Logging INFO for Mock DSpace Script"));
+            assertThat(content,
+                       CoreMatchers.containsString("ERROR mock-script - 1 @ Logging ERROR for Mock DSpace Script"));
+            assertThat(content,
+                       CoreMatchers.containsString("WARNING mock-script - 1 @ Logging WARNING for Mock DSpace Script"));
             assertThat(content, CoreMatchers.containsString("INFO mock-script - 1 @ The script has completed"));
 
 
