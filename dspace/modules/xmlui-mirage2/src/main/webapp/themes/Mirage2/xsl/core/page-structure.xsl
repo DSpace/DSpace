@@ -86,6 +86,11 @@
                         <xsl:value-of select="$environmentBannerText"/>
                     </p>
                     </xsl:if>
+
+                    <!--  Add skip to content link -->
+                    <div id="skip-link">
+                        <a href="#main-container">Skip to content</a>
+                    </div>
                     <!-- End UMD Customization -->
 
                     <!-- Prompt IE 6 users to install Chrome Frame. Remove this if you support IE 6.
@@ -898,6 +903,11 @@
         <!-- Begin UMD Customization -->
         <!-- UMD Header -->
         <script src="https://umd-header.umd.edu/build/bundle.js?search=0&amp;search_domain=&amp;events=0&amp;news=0&amp;schools=0&amp;admissions=0&amp;support=1&amp;support_url=https%253A%252F%252Fgiving.umd.edu%252Fgiving%252FshowSchool.php%253Fname%253Dlibraries&amp;wrapper=1160&amp;sticky=0"></script>
+        
+        <!-- Move skip-link div to top -->
+        <script>
+            $('#umdheader-main').prepend($('#skip-link'));
+        </script>
         <!-- End UMD Customization -->
 
         <xsl:call-template name="addJavascript-google-analytics" />
