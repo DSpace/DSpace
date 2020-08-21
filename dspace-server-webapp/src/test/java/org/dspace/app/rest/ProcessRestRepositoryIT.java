@@ -31,7 +31,6 @@ import org.dspace.content.Bitstream;
 import org.dspace.content.ProcessStatus;
 import org.dspace.scripts.DSpaceCommandLineParameter;
 import org.dspace.scripts.Process;
-import org.dspace.scripts.ProcessLogLevel;
 import org.dspace.scripts.service.ProcessService;
 import org.hamcrest.Matchers;
 import org.junit.After;
@@ -350,8 +349,8 @@ public class ProcessRestRepositoryIT extends AbstractControllerIntegrationTest {
 //        getClient(token).perform(get("/api/system/processes/" + process.getID()))
 //                        .andExpect(status().isOk())
 //                        .andExpect(jsonPath("$", Matchers.is(
-//                                ProcessMatcher.matchProcess(process.getName(), String.valueOf(process.getEPerson().getID()),
-//                                                            process.getID(), new LinkedList<>(), ProcessStatus.SCHEDULED)))
+//                                ProcessMatcher.matchProcess(process.getName(), String.valueOf(process.getEPerson()
+//                                .getID()),  process.getID(), new LinkedList<>(), ProcessStatus.SCHEDULED)))
 //                        );
 //
 //        List<String> fileTypesToCheck = new LinkedList<>();
