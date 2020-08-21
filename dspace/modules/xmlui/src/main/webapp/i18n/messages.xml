@@ -645,7 +645,7 @@
 	<message key="xmlui.Submission.Submissions.title">Submissions &amp; Workflow</message>
 	<message key="xmlui.Submission.Submissions.trail">Submissions</message>
 	<message key="xmlui.Submission.Submissions.head">Submissions &amp; Workflow tasks</message>
-	<message key="xmlui.Submission.Submissions.untitled"><i>Untitled</i></message>
+	<message key="xmlui.Submission.Submissions.untitled"><em>Untitled</em></message>
 	<message key="xmlui.Submission.Submissions.email">email: </message>
 	<!-- Same transformer, workflow section -->
 	<message key="xmlui.Submission.Submissions.workflow_head1">Workflow tasks</message>
@@ -739,7 +739,7 @@
 	<message key="xmlui.Submission.submit.InitialQuestionsStep.open_set"> (</message>
 	<message key="xmlui.Submission.submit.InitialQuestionsStep.close_set">)</message>
 	<message key="xmlui.Submission.submit.InitialQuestionsStep.multiple_titles">Multiple titles</message>
-	<message key="xmlui.Submission.submit.InitialQuestionsStep.multiple_titles_help">The item has more than one title, <i>e.g. a translated title</i></message>
+	<message key="xmlui.Submission.submit.InitialQuestionsStep.multiple_titles_help">The item has more than one title, <em>e.g. a translated title</em></message>
 	<message key="xmlui.Submission.submit.InitialQuestionsStep.multiple_titles_note">If the checkbox above is unchecked then the following title(s) will be removed from the item: </message>
 	<message key="xmlui.Submission.submit.InitialQuestionsStep.published_before">Published</message>
 	<message key="xmlui.Submission.submit.InitialQuestionsStep.published_before_help">The item has been published or publicly distributed before</message>
@@ -752,8 +752,8 @@
 	<message key="xmlui.Submission.submit.DescribeStep.head">Describe Item</message>
 	<message key="xmlui.Submission.submit.DescribeStep.unknown_field">Error: Unknown field type</message>
 	<message key="xmlui.Submission.submit.DescribeStep.required_field">This field is required</message>
-	<message key="xmlui.Submission.submit.DescribeStep.last_name_help">Last name, <i>e.g. Smith</i></message>
-	<message key="xmlui.Submission.submit.DescribeStep.first_name_help">First name(s) + "Jr", <i>e.g. Donald Jr</i></message>
+	<message key="xmlui.Submission.submit.DescribeStep.last_name_help">Last name, <em>e.g. Smith</em></message>
+	<message key="xmlui.Submission.submit.DescribeStep.first_name_help">First name(s) + "Jr", <em>e.g. Donald Jr</em></message>
 	<message key="xmlui.Submission.submit.DescribeStep.year">Year</message>
 	<message key="xmlui.Submission.submit.DescribeStep.month">Month</message>
 	<message key="xmlui.Submission.submit.DescribeStep.day">Day</message>
@@ -798,7 +798,7 @@
     <message key="xmlui.Submission.submit.AccessStep.table_edit_button">Edit</message>
     <message key="xmlui.Submission.submit.AccessStep.table_delete_button">Remove</message>
 	<message key="xmlui.administrative.authorization.AccessStep.label_date_help">The first day from which access is allowed. Accepted format: yyyy, yyyy-mm, yyyy-mm-dd</message>
-    <message key="xmlui.administrative.authorization.AccessStep.label_date_displayonly_help">The first day from which access is allowed. <b>This date cannot be modified on this form.</b> To set an embargo date for a bitstream, go to the <i>Item Status</i> tab, click <i>Authorizations...</i>, create or edit the bitstream's <i>READ</i> policy, and set the <i>Start Date</i> as desired.</message>
+    <message key="xmlui.administrative.authorization.AccessStep.label_date_displayonly_help">The first day from which access is allowed. <b>This date cannot be modified on this form.</b> To set an embargo date for a bitstream, go to the <em>Item Status</em> tab, click <em>Authorizations...</em>, create or edit the bitstream's <em>READ</em> policy, and set the <em>Start Date</em> as desired.</message>
     <message key="xmlui.Submission.submit.AccessStep.review_policy_line">Name: {0}; action: {1}, group: {2}, start date: {3}, end date: {4}</message>
     <message key="xmlui.Submission.submit.AccessStep.review_public_item">The item will be searchable</message>
     <message key="xmlui.Submission.submit.AccessStep.review_private_item">The item will not be searchable</message>
@@ -817,7 +817,7 @@
 	<message key="xmlui.Submission.submit.UploadStep.virus_error">The file has not been uploaded as it appears to contain a virus. Please contact the system administrator.</message>
     <message key="xmlui.Submission.submit.UploadStep.virus_checker_error">A technical problem was encountered whilst attempting to scan the file for viruses. Please contact the system administrator.</message>
     <message key="xmlui.Submission.submit.UploadStep.description">File Description</message>
-	<message key="xmlui.Submission.submit.UploadStep.description_help">Optionally, provide a brief description of the file, for example "<i>Main article</i>", or "<i>Experiment data readings</i>".</message>
+	<message key="xmlui.Submission.submit.UploadStep.description_help">Optionally, provide a brief description of the file, for example "<em>Main article</em>", or "<em>Experiment data readings</em>".</message>
 	<message key="xmlui.Submission.submit.UploadStep.submit_upload">Upload file &amp; add another</message>
 	<message key="xmlui.Submission.submit.UploadStep.head2">Files Uploaded</message>
 	<message key="xmlui.Submission.submit.UploadStep.column0">Primary</message>
@@ -846,7 +846,7 @@
     <message key="xmlui.Submission.submit.UploadWithEmbargoStep.virus_error">The file has not been uploaded as it appears to contain a virus. Please contact the system administrator.</message>
     <message key="xmlui.Submission.submit.UploadWithEmbargoStep.virus_checker_error">A technical problem was encountered whilst attempting to scan the file for viruses. Please contact the system administrator.</message>
     <message key="xmlui.Submission.submit.UploadWithEmbargoStep.description">File Description</message>
-    <message key="xmlui.Submission.submit.UploadWithEmbargoStep.description_help">Optionally, provide a brief description of the file, for example "<i>Main article</i>", or "<i>Experiment data readings</i>".</message>
+    <message key="xmlui.Submission.submit.UploadWithEmbargoStep.description_help">Optionally, provide a brief description of the file, for example "<em>Main article</em>", or "<em>Experiment data readings</em>".</message>
     <message key="xmlui.Submission.submit.UploadWithEmbargoStep.submit_upload">Upload file &amp; add another</message>
     <message key="xmlui.Submission.submit.UploadWithEmbargoStep.head2">Files Uploaded</message>
     <message key="xmlui.Submission.submit.UploadWithEmbargoStep.column0">Primary</message>
@@ -875,14 +875,14 @@
 	<message key="xmlui.Submission.submit.EditFileStep.head">Edit File</message>
 	<message key="xmlui.Submission.submit.EditFileStep.file">File</message>
 	<message key="xmlui.Submission.submit.EditFileStep.description">File Description</message>
-	<message key="xmlui.Submission.submit.EditFileStep.description_help">Optionally, provide a brief description of the contents; for example, "<i>Main article</i>", or "<i>Experiment data readings</i>".</message>
-	<message key="xmlui.Submission.submit.EditFileStep.info1">Select the format of the file from the list below, for example "<i>Adobe PDF</i>" or "<i>Microsoft Word</i>." <strong>If the format is not in the list</strong>, please describe it in the input box below the list.</message>
+	<message key="xmlui.Submission.submit.EditFileStep.description_help">Optionally, provide a brief description of the contents; for example, "<em>Main article</em>", or "<em>Experiment data readings</em>".</message>
+	<message key="xmlui.Submission.submit.EditFileStep.info1">Select the format of the file from the list below, for example "<em>Adobe PDF</em>" or "<em>Microsoft Word</em>." <strong>If the format is not in the list</strong>, please describe it in the input box below the list.</message>
 	<message key="xmlui.Submission.submit.EditFileStep.format_detected">Detected Format</message>
 	<message key="xmlui.Submission.submit.EditFileStep.format_selected">Selected Format</message>
 	<message key="xmlui.Submission.submit.EditFileStep.format_default">Format not in list</message>
 	<message key="xmlui.Submission.submit.EditFileStep.info2">If the format is not in the above list, <strong>select "format not in list" above</strong> and describe the file's format in the box below.</message>
 	<message key="xmlui.Submission.submit.EditFileStep.format_user">Other Format</message>
-	<message key="xmlui.Submission.submit.EditFileStep.format_user_help">The application's name you used to create the file, and the version number (for example, "<i>ACMESoft SuperApp version 1.5</i>").</message>
+	<message key="xmlui.Submission.submit.EditFileStep.format_user_help">The application's name you used to create the file, and the version number (for example, "<em>ACMESoft SuperApp version 1.5</em>").</message>
 
     <!-- org.dspace.app.xmlui.Submission.submit.EditBitstreamPolicies -->
     <message key="xmlui.Submission.submit.EditBitstreamPolicies.head">Bitstream Access</message>
@@ -1446,7 +1446,7 @@
 	<message key="xmlui.administrative.registries.FormatRegistryMain.column3">Name</message>
 	<message key="xmlui.administrative.registries.FormatRegistryMain.column4">MIME Type</message>
 	<message key="xmlui.administrative.registries.FormatRegistryMain.column5">Support Level</message>
-	<message key="xmlui.administrative.registries.FormatRegistryMain.internal">(<i>internal</i>)</message>
+	<message key="xmlui.administrative.registries.FormatRegistryMain.internal">(<em>internal</em>)</message>
 	<message key="xmlui.administrative.registries.FormatRegistryMain.support_0">Unknown</message>
 	<message key="xmlui.administrative.registries.FormatRegistryMain.support_1">Known</message>
 	<message key="xmlui.administrative.registries.FormatRegistryMain.support_2">Support</message>
@@ -1661,7 +1661,7 @@
 	<message key="xmlui.administrative.item.AddBitstreamForm.file_label">File</message>
 	<message key="xmlui.administrative.item.AddBitstreamForm.file_help">Please enter the name of the file on your computer corresponding to your item. If you click "Browse...", a new window will appear in which you can locate and select the file from your computer.</message>
 	<message key="xmlui.administrative.item.AddBitstreamForm.description_label">Description</message>
-	<message key="xmlui.administrative.item.AddBitstreamForm.description_help">Optionally, provide a brief description of the file, for example "<i>Main article</i>", or "<i>Experiment data readings</i>".</message>
+	<message key="xmlui.administrative.item.AddBitstreamForm.description_help">Optionally, provide a brief description of the file, for example "<em>Main article</em>", or "<em>Experiment data readings</em>".</message>
 	<message key="xmlui.administrative.item.AddBitstreamForm.submit_upload">Upload</message>
 	<message key="xmlui.administrative.item.AddBitstreamForm.no_bundles">You need the ADD &amp; WRITE privilege on at least one bundle to be able to upload new bitstreams.</message>
 
@@ -1709,13 +1709,13 @@
 	<message key="xmlui.administrative.item.EditBitstreamForm.primary_option_yes">yes</message>
 	<message key="xmlui.administrative.item.EditBitstreamForm.primary_option_no">no</message>
 	<message key="xmlui.administrative.item.EditBitstreamForm.description_label">Description</message>
-	<message key="xmlui.administrative.item.EditBitstreamForm.description_help">Optionally, provide a brief description of the file, for example "<i>Main article</i>", or "<i>Experiment data readings</i>"."</message>
-	<message key="xmlui.administrative.item.EditBitstreamForm.para1">Select the format of the file from the list below, for example "<i>Adobe PDF</i>" or "<i>Microsoft Word</i>", <b>OR</b> if the format is not in the list, please describe it in the box below.</message>
+	<message key="xmlui.administrative.item.EditBitstreamForm.description_help">Optionally, provide a brief description of the file, for example "<em>Main article</em>", or "<em>Experiment data readings</em>"."</message>
+	<message key="xmlui.administrative.item.EditBitstreamForm.para1">Select the format of the file from the list below, for example "<em>Adobe PDF</em>" or "<em>Microsoft Word</em>", <b>OR</b> if the format is not in the list, please describe it in the box below.</message>
 	<message key="xmlui.administrative.item.EditBitstreamForm.format_label">Selected Format</message>
 	<message key="xmlui.administrative.item.EditBitstreamForm.format_default">Format not in list</message>
 	<message key="xmlui.administrative.item.EditBitstreamForm.para2">If the format is not in the above list, <strong>select "format not in list" above</strong> and describe it in the field below.</message>
 	<message key="xmlui.administrative.item.EditBitstreamForm.user_label">Other Format</message>
-	<message key="xmlui.administrative.item.EditBitstreamForm.user_help">The application you used to create the file, and the version number (for example, "<i>ACMESoft SuperApp version 1.5</i>").</message>
+	<message key="xmlui.administrative.item.EditBitstreamForm.user_help">The application you used to create the file, and the version number (for example, "<em>ACMESoft SuperApp version 1.5</em>").</message>
     <message key="xmlui.administrative.item.EditBitstreamForm.name_label">Filename</message>
     <message key="xmlui.administrative.item.EditBitstreamForm.name_help">Change the filename for this bitstream. Note that this will change the display bitstream URL, but old links will still resolve as long as the sequence ID does not change.</message>
 

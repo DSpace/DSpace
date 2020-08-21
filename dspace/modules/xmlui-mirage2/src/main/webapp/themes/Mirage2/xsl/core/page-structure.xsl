@@ -555,7 +555,7 @@
         <!--put an arrow between the parts of the trail-->
         <li>
             <xsl:if test="position()=1">
-                <i class="glyphicon glyphicon-home" aria-hidden="true"/>&#160;
+                <span class="glyphicon glyphicon-home" aria-hidden="true"/>&#160;
             </xsl:if>
             <!-- Determine whether we are dealing with a link or plain text trail link -->
             <xsl:choose>
@@ -586,7 +586,7 @@
                             <xsl:value-of select="./@target"/>
                         </xsl:attribute>
                         <xsl:if test="position()=1">
-                            <i class="glyphicon glyphicon-home" aria-hidden="true"/>&#160;
+                            <span class="glyphicon glyphicon-home" aria-hidden="true"/>&#160;
                         </xsl:if>
                         <xsl:apply-templates />
                     </a>
@@ -600,7 +600,7 @@
                 <xsl:otherwise>
                     <xsl:attribute name="class">active</xsl:attribute>
                     <xsl:if test="position()=1">
-                        <i class="glyphicon glyphicon-home" aria-hidden="true"/>&#160;
+                        <span class="glyphicon glyphicon-home" aria-hidden="true"/>&#160;
                     </xsl:if>
                     <xsl:apply-templates />
                 </xsl:otherwise>
