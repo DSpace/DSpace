@@ -22,6 +22,7 @@ import org.dspace.layout.service.CrisLayoutBoxService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
 /**
@@ -37,6 +38,7 @@ public class CrisLayoutBoxMetadataLinkRepository extends AbstractDSpaceRestRepos
     @Autowired
     private CrisLayoutServiceFactory serviceFactory;
 
+    @PreAuthorize("hasAuthority('ADMIN')")
     public Page<MetadataFieldRest> getSecurityMetadata(
             @Nullable HttpServletRequest request,
             Integer boxId,

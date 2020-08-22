@@ -22,8 +22,8 @@ import org.dspace.app.rest.utils.Utils;
 import org.dspace.content.MetadataField;
 import org.dspace.content.service.MetadataFieldService;
 import org.dspace.core.Context;
-import org.dspace.layout.CrisLayoutTab;
-import org.dspace.layout.service.CrisLayoutTabService;
+import org.dspace.layout.CrisLayoutBox;
+import org.dspace.layout.service.CrisLayoutBoxService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -33,21 +33,22 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * This controller is used to manage metadatasecurity association in tabs.
+ * This controller is used to manage metadatasecurity association in boxes. It
+ * is mostly a copy-paste of the corresponding tab controller.
  * 
  * @author Danilo Di Nuzzo (danilo.dinuzzo at 4science.it)
  *
  */
 @RestController
-@RequestMapping("/api/layout/tabs" + REGEX_REQUESTMAPPING_IDENTIFIER_AS_DIGIT + "/securitymetadata")
-public class CrisLayoutTabMetadatasecurityRestController {
+@RequestMapping("/api/layout/boxes" + REGEX_REQUESTMAPPING_IDENTIFIER_AS_DIGIT + "/securitymetadata")
+public class CrisLayoutBoxMetadatasecurityRestController {
 
-    private static final Logger log = Logger.getLogger(CrisLayoutTabMetadatasecurityRestController.class);
+    private static final Logger log = Logger.getLogger(CrisLayoutBoxMetadatasecurityRestController.class);
 
     @Autowired
     private Utils utils;
     @Autowired
-    private CrisLayoutTabService tabService;
+    private CrisLayoutBoxService boxService;
     @Autowired
     private MetadataFieldService mfService;
 
@@ -56,16 +57,16 @@ public class CrisLayoutTabMetadatasecurityRestController {
             consumes = {"text/uri-list"})
     @PreAuthorize("hasAuthority('ADMIN')")
     public void addMetadatasecurity(
-            @PathVariable(name = "id", required = true) Integer idTab,
+            @PathVariable(name = "id", required = true) Integer idBox,
             @PathVariable(required = false) Integer position,
             HttpServletResponse response, HttpServletRequest request) {
         Context context = ContextUtil.obtainContext(request);
-        log.info("Start method for add metadatasecurity association to tab with tabId <" + idTab + ">");
+        log.info("Start method for add metadatasecurity association to box with boxId <" + idBox + ">");
         List<String> links = utils.getStringListFromRequest(request);
-        CrisLayoutTab tab = null;
+        CrisLayoutBox box = null;
         try {
-            tab = tabService.find(context, idTab);
-            if (tab == null) {
+            box = boxService.find(context, idBox);
+            if (box == null) {
                 response.setStatus(HttpServletResponse.SC_NOT_FOUND);
                 return;
             }
@@ -75,8 +76,8 @@ public class CrisLayoutTabMetadatasecurityRestController {
             }
             Set<MetadataField> metadataFields = getMedatafieldList(context, links);
             if (metadataFields != null && !metadataFields.isEmpty()) {
-                tab.addMetadataSecurityFields(metadataFields);
-                tabService.update(context, tab);
+                box.addMetadataSecurityFields(metadataFields);
+                boxService.update(context, box);
                 response.setStatus(HttpServletResponse.SC_NO_CONTENT);
                 context.commit();
             } else {
@@ -84,7 +85,8 @@ public class CrisLayoutTabMetadatasecurityRestController {
                 return;
             }
         } catch (Exception e) {
-            log.error("An error occured in method for add securitymetadata relation in tabs, idTab <" + idTab + ">", e);
+            log.error("An error occured in method for add securitymetadata relation in boxes, idBox <" + idBox + ">",
+                    e);
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
     }
@@ -94,19 +96,19 @@ public class CrisLayoutTabMetadatasecurityRestController {
             value = "/{mf_id:\\d+}" )
     @PreAuthorize("hasAuthority('ADMIN')")
     public void removeMetadatasecurity(
-            @PathVariable(name = "id", required = true) Integer idTab,
+            @PathVariable(name = "id", required = true) Integer idBox,
             @PathVariable(name = "mf_id", required = true) Integer metadatafieldId,
             HttpServletResponse response, HttpServletRequest request) {
         Context context = ContextUtil.obtainContext(request);
-        log.info("Start method for remove metadatasecurity association to tab with tabId <" + idTab + ">");
-        CrisLayoutTab tab = null;
+        log.info("Start method for remove metadatasecurity association to box with boxId <" + idBox + ">");
+        CrisLayoutBox box = null;
         try {
-            tab = tabService.find(context, idTab);
-            if (tab == null) {
+            box = boxService.find(context, idBox);
+            if (box == null) {
                 response.setStatus(HttpServletResponse.SC_NOT_FOUND);
                 return;
             }
-            Set<MetadataField> fields = tab.getMetadataSecurityFields();
+            Set<MetadataField> fields = box.getMetadataSecurityFields();
             if (fields != null && !fields.isEmpty()) {
                 boolean found = false;
                 for (Iterator<MetadataField> it = fields.iterator();it.hasNext(); ) {
@@ -117,13 +119,13 @@ public class CrisLayoutTabMetadatasecurityRestController {
                     }
                 }
                 if (found) {
-                    tabService.update(context, tab);
+                    boxService.update(context, box);
                     context.commit();
                 }
             }
         } catch (Exception e) {
             log.error("An error occured in method for remove"
-                    + "securitymetadata relation in tabs, idTab <" + idTab + ">", e);
+                    + "securitymetadata relation in tabs, idTab <" + idBox + ">", e);
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             return;
         }

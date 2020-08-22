@@ -8,6 +8,7 @@
 package org.dspace.layout;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import javax.persistence.Cacheable;
@@ -194,6 +195,13 @@ public class CrisLayoutBox implements ReloadableEntity<Integer> {
 
     public void setMetadataSecurityFields(Set<MetadataField> metadataFields) {
         this.metadataSecurityFields = metadataFields;
+    }
+
+    public void addMetadataSecurityFields(Set<MetadataField> metadataFields) {
+        if (this.metadataSecurityFields == null) {
+            this.metadataSecurityFields = new HashSet<>();
+        }
+        this.metadataSecurityFields.addAll(metadataFields);
     }
 
     public List<CrisLayoutField> getLayoutFields() {

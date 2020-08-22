@@ -33,12 +33,8 @@ import org.dspace.app.rest.builder.CrisLayoutFieldBuilder;
 import org.dspace.app.rest.builder.CrisLayoutTabBuilder;
 import org.dspace.app.rest.builder.EntityTypeBuilder;
 import org.dspace.app.rest.builder.ItemBuilder;
-import org.dspace.app.rest.builder.MetadataFieldBuilder;
-import org.dspace.app.rest.builder.MetadataSchemaBuilder;
 import org.dspace.app.rest.matcher.CrisLayoutBoxMatcher;
 import org.dspace.app.rest.model.CrisLayoutBoxRest;
-import org.dspace.app.rest.model.MetadataFieldRest;
-import org.dspace.app.rest.model.MetadataSchemaRest;
 import org.dspace.app.rest.model.patch.AddOperation;
 import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.rest.model.patch.RemoveOperation;
@@ -74,6 +70,7 @@ public class BoxesRestControllerIT extends AbstractControllerIntegrationTest {
 
     @Autowired
     private MetadataFieldService mfss;
+    private final String METADATASECURITY_URL = "http://localhost:8080/api/core/metadatafield/";
 
     /**
      * Test for endpoint /api/layout/boxes/<:id>. It returns
@@ -316,14 +313,23 @@ public class BoxesRestControllerIT extends AbstractControllerIntegrationTest {
             .addMetadataSecurityField(extent)
             .build();
         context.restoreAuthSystemState();
-        // Test WS endpoint
+        // Test without authentication
         getClient().perform(get("/api/layout/boxes/" + boxTwo.getID() + "/securitymetadata"))
+            .andExpect(status().isUnauthorized()); // 401 Unauthorized;
+        // Test with non admin user
+        String token = getAuthToken(eperson.getEmail(), password);
+        getClient(token).perform(get("/api/layout/boxes/" + boxTwo.getID() + "/securitymetadata"))
+            .andExpect(status().isForbidden()); // 403 - user haven't sufficient permission
+        // Test with admin user
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        getClient(tokenAdmin).perform(get("/api/layout/boxes/" + boxTwo.getID() + "/securitymetadata"))
             .andExpect(status().isOk())
             .andExpect(content().contentType(contentType))
             .andExpect(jsonPath("$._embedded.securitymetadata", Matchers.not(Matchers.empty())))
             .andExpect(jsonPath("$.page.totalElements", Matchers.is(4)));
     }
 
+    @Test
     public void addSecurityMetadataTest() throws Exception {
         context.turnOffAuthorisationSystem();
         // Create entity type Publication
@@ -334,14 +340,9 @@ public class BoxesRestControllerIT extends AbstractControllerIntegrationTest {
                                                    .build();
         context.restoreAuthSystemState();
 
-        ObjectMapper mapper = new ObjectMapper();
-        MetadataSchemaRest schema = new MetadataSchemaRest();
-        schema.setNamespace("dc");
-        MetadataFieldRest isbn = new MetadataFieldRest();
-        isbn.setSchema(schema);
-        isbn.setElement("identifier");
-        isbn.setQualifier("isbn");
-        isbn.setScopeNote(" Is a numeric commercial identifier ");
+        // get metadata field isbn
+        MetadataSchema schema = mdss.find(context, "dc");
+        MetadataField isbn = mfss.findByElement(context, schema, "identifier", "isbn");
 
         String tokenAdmin = getAuthToken(admin.getEmail(), password);
         getClient(tokenAdmin).perform(get("/api/layout/boxes/" + box.getID() + "/securitymetadata"))
@@ -352,8 +353,10 @@ public class BoxesRestControllerIT extends AbstractControllerIntegrationTest {
 
 
         getClient(tokenAdmin).perform(post("/api/layout/boxes/" + box.getID() + "/securitymetadata")
-                             .content(mapper.writeValueAsBytes(isbn))
-                             .contentType(contentType))
+                             .content(METADATASECURITY_URL + isbn.getID())
+                             .contentType(org.springframework.http.MediaType.parseMediaType
+                                     (org.springframework.data.rest.webmvc.RestMediaTypes
+                                          .TEXT_URI_LIST_VALUE)))
                              .andExpect(status().isNoContent());
 
         getClient(tokenAdmin).perform(get("/api/layout/boxes/" + box.getID() + "/securitymetadata"))
@@ -363,6 +366,7 @@ public class BoxesRestControllerIT extends AbstractControllerIntegrationTest {
                              .andExpect(jsonPath("$.page.totalElements", Matchers.is(1)));
     }
 
+    @Test
     public void addSecurityMetadataUnauthorizedTest() throws Exception {
         context.turnOffAuthorisationSystem();
         // Create entity type Publication
@@ -373,33 +377,25 @@ public class BoxesRestControllerIT extends AbstractControllerIntegrationTest {
                             .build();
         context.restoreAuthSystemState();
 
-        ObjectMapper mapper = new ObjectMapper();
-        MetadataFieldRest isbn = new MetadataFieldRest();
-        MetadataSchemaRest schema = new MetadataSchemaRest();
-        try {
-            schema.setNamespace("dc");
-            isbn.setSchema(schema);
-            isbn.setElement("identifier");
-            isbn.setQualifier("isbn");
-            isbn.setScopeNote(" Is a numeric commercial identifier ");
+        // get metadata field isbn
+        MetadataSchema schema = mdss.find(context, "dc");
+        MetadataField isbn = mfss.findByElement(context, schema, "identifier", "isbn");
+        getClient().perform(post("/api/layout/boxes/" + box.getID() + "/securitymetadata")
+                   .content(METADATASECURITY_URL + isbn.getID())
+                   .contentType(org.springframework.http.MediaType.parseMediaType
+                           (org.springframework.data.rest.webmvc.RestMediaTypes
+                                .TEXT_URI_LIST_VALUE)))
+                   .andExpect(status().isUnauthorized());
 
-            getClient().perform(post("/api/layout/boxes/" + box.getID() + "/securitymetadata")
-                       .content(mapper.writeValueAsBytes(isbn))
-                       .contentType(contentType))
-                       .andExpect(status().isUnauthorized());
-
-            String tokenAdmin = getAuthToken(admin.getEmail(), password);
-            getClient(tokenAdmin).perform(get("/api/layout/boxes/" + box.getID() + "/securitymetadata"))
-                                 .andExpect(status().isOk())
-                                 .andExpect(content().contentType(contentType))
-                                 .andExpect(jsonPath("$._embedded.securitymetadata", Matchers.is(Matchers.empty())))
-                                 .andExpect(jsonPath("$.page.totalElements", Matchers.is(0)));
-        } finally {
-            MetadataSchemaBuilder.deleteMetadataSchema(schema.getId());
-            MetadataFieldBuilder.deleteMetadataField(isbn.getId());
-        }
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        getClient(tokenAdmin).perform(get("/api/layout/boxes/" + box.getID() + "/securitymetadata"))
+                             .andExpect(status().isOk())
+                             .andExpect(content().contentType(contentType))
+                             .andExpect(jsonPath("$._embedded.securitymetadata", Matchers.is(Matchers.empty())))
+                             .andExpect(jsonPath("$.page.totalElements", Matchers.is(0)));
     }
 
+    @Test
     public void addSecurityMetadataForbiddenTest() throws Exception {
         context.turnOffAuthorisationSystem();
         // Create entity type Publication
@@ -410,56 +406,42 @@ public class BoxesRestControllerIT extends AbstractControllerIntegrationTest {
                             .build();
         context.restoreAuthSystemState();
 
-        ObjectMapper mapper = new ObjectMapper();
-        MetadataFieldRest isbn = new MetadataFieldRest();
-        MetadataSchemaRest schema = new MetadataSchemaRest();
-        try {
-            schema.setNamespace("dc");
-            isbn.setSchema(schema);
-            isbn.setElement("identifier");
-            isbn.setQualifier("isbn");
-            isbn.setScopeNote(" Is a numeric commercial identifier ");
+        // get metadata field isbn
+        MetadataSchema schema = mdss.find(context, "dc");
+        MetadataField isbn = mfss.findByElement(context, schema, "identifier", "isbn");
+        String tokenEperson = getAuthToken(eperson.getEmail(), password);
+        getClient(tokenEperson).perform(post("/api/layout/boxes/" + box.getID() + "/securitymetadata")
+                               .content(METADATASECURITY_URL + isbn.getID())
+                               .contentType(org.springframework.http.MediaType.parseMediaType
+                                       (org.springframework.data.rest.webmvc.RestMediaTypes
+                                            .TEXT_URI_LIST_VALUE)))
+                               .andExpect(status().isForbidden());
 
-            String tokenEperson = getAuthToken(eperson.getEmail(), password);
-            getClient(tokenEperson).perform(post("/api/layout/boxes/" + box.getID() + "/securitymetadata")
-                                   .content(mapper.writeValueAsBytes(isbn))
-                                   .contentType(contentType))
-                                   .andExpect(status().isForbidden());
-
-            String tokenAdmin = getAuthToken(admin.getEmail(), password);
-            getClient(tokenAdmin).perform(get("/api/layout/boxes/" + box.getID() + "/securitymetadata"))
-                                 .andExpect(status().isOk())
-                                 .andExpect(content().contentType(contentType))
-                                 .andExpect(jsonPath("$._embedded.securitymetadata", Matchers.is(Matchers.empty())))
-                                 .andExpect(jsonPath("$.page.totalElements", Matchers.is(0)));
-        } finally {
-            MetadataSchemaBuilder.deleteMetadataSchema(schema.getId());
-            MetadataFieldBuilder.deleteMetadataField(isbn.getId());
-        }
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        getClient(tokenAdmin).perform(get("/api/layout/boxes/" + box.getID() + "/securitymetadata"))
+                             .andExpect(status().isOk())
+                             .andExpect(content().contentType(contentType))
+                             .andExpect(jsonPath("$._embedded.securitymetadata", Matchers.is(Matchers.empty())))
+                             .andExpect(jsonPath("$.page.totalElements", Matchers.is(0)));
     }
 
+    @Test
     public void addSecurityMetadataNotFoundBoxTest() throws Exception {
-        ObjectMapper mapper = new ObjectMapper();
-        MetadataFieldRest isbn = new MetadataFieldRest();
-        MetadataSchemaRest schema = new MetadataSchemaRest();
-        try {
-            schema.setNamespace("dc");
-            isbn.setSchema(schema);
-            isbn.setElement("identifier");
-            isbn.setQualifier("isbn");
-            isbn.setScopeNote(" Is a numeric commercial identifier ");
+        // get metadata field isbn
+        MetadataSchema schema = mdss.find(context, "dc");
+        MetadataField isbn = mfss.findByElement(context, schema, "identifier", "isbn");
 
-            String tokenAdmin = getAuthToken(admin.getEmail(), password);
-            getClient(tokenAdmin).perform(post("/api/layout/boxes/" + UUID.randomUUID() + "/securitymetadata")
-                                   .content(mapper.writeValueAsBytes(isbn))
-                                   .contentType(contentType))
-                                   .andExpect(status().isNotFound());
-        } finally {
-            MetadataSchemaBuilder.deleteMetadataSchema(schema.getId());
-            MetadataFieldBuilder.deleteMetadataField(isbn.getId());
-        }
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        getClient(tokenAdmin)
+                .perform(post("/api/layout/boxes/" + Integer.MAX_VALUE + "/securitymetadata")
+                        .contentType(org.springframework.http.MediaType.parseMediaType
+                                (org.springframework.data.rest.webmvc.RestMediaTypes
+                                     .TEXT_URI_LIST_VALUE))
+                        .content(METADATASECURITY_URL + isbn.getID()))
+                .andExpect(status().isNotFound());
     }
 
+    @Test
     public void addSecurityMetadataUnpTest() throws Exception {
         context.turnOffAuthorisationSystem();
         // Create entity type Publication
@@ -471,8 +453,81 @@ public class BoxesRestControllerIT extends AbstractControllerIntegrationTest {
         context.restoreAuthSystemState();
 
         String tokenAdmin = getAuthToken(admin.getEmail(), password);
-        getClient(tokenAdmin).perform(post("/api/layout/boxes/" + box.getID() + "/securitymetadata"))
-                             .andExpect(status().isUnprocessableEntity());
+        getClient(tokenAdmin)
+                .perform(post("/api/layout/boxes/" + box.getID() + "/securitymetadata")
+                        .contentType(org.springframework.http.MediaType.parseMediaType(
+                                org.springframework.data.rest.webmvc.RestMediaTypes.TEXT_URI_LIST_VALUE)))
+                .andExpect(status().isUnprocessableEntity());
+    }
+
+    @Test
+    public void removeSecurityMetadata() throws Exception {
+        context.turnOffAuthorisationSystem();
+        // get metadata field
+        MetadataSchema schema = mdss.find(context, "dc");
+        MetadataField isbn = mfss.findByElement(context, schema, "identifier", "isbn");
+        MetadataField uri = mfss.findByElement(context, schema, "identifier", "uri");
+        MetadataField abs = mfss.findByElement(context, schema, "description", "abstract");
+        MetadataField provenance = mfss.findByElement(context, schema, "description", "provenance");
+        MetadataField sponsorship = mfss.findByElement(context, schema, "description", "sponsorship");
+        MetadataField extent = mfss.findByElement(context, schema, "format", "extent");
+        // Create entity type Publication
+        EntityType eType = EntityTypeBuilder.createEntityTypeBuilder(context, "Publication").build();
+        CrisLayoutBox boxOne = CrisLayoutBoxBuilder.createBuilder(context, eType, true, true)
+            .withShortname("Box one shortname")
+            .addMetadataSecurityField(sponsorship)
+            .build();
+        CrisLayoutBox boxTwo = CrisLayoutBoxBuilder.createBuilder(context, eType, true, true)
+            .withShortname("Box two shortname")
+            .addMetadataSecurityField(isbn)
+            .addMetadataSecurityField(uri)
+            .addMetadataSecurityField(abs)
+            .addMetadataSecurityField(provenance)
+            .build();
+        context.restoreAuthSystemState();
+
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        // try to remove a not existing metadata
+        getClient(tokenAdmin)
+                .perform(delete("/api/layout/boxes/" + boxOne.getID() + "/securitymetadata/" + Integer.MAX_VALUE))
+                .andExpect(status().isNoContent());
+
+        getClient(tokenAdmin).perform(get("/api/layout/boxes/" + boxOne.getID() + "/securitymetadata"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$._embedded.securitymetadata", Matchers.not(Matchers.empty())))
+                .andExpect(jsonPath("$.page.totalElements", Matchers.is(1)));
+
+        // try to remove a not associated metadata
+        getClient(tokenAdmin)
+                .perform(delete("/api/layout/boxes/" + boxOne.getID() + "/securitymetadata/" + isbn.getID()))
+                .andExpect(status().isNoContent());
+        getClient(tokenAdmin).perform(get("/api/layout/boxes/" + boxOne.getID() + "/securitymetadata"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$._embedded.securitymetadata", Matchers.not(Matchers.empty())))
+                .andExpect(jsonPath("$.page.totalElements", Matchers.is(1)));
+
+        // remove the only associated metadata
+        getClient(tokenAdmin)
+                .perform(delete("/api/layout/boxes/" + boxOne.getID() + "/securitymetadata/" + sponsorship.getID()))
+                .andExpect(status().isNoContent());
+
+        getClient(tokenAdmin).perform(get("/api/layout/boxes/" + boxOne.getID() + "/securitymetadata"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$.page.totalElements", Matchers.is(0)));
+
+        // remove one of the many associated metadata
+        getClient(tokenAdmin)
+                .perform(delete("/api/layout/boxes/" + boxTwo.getID() + "/securitymetadata/" + abs.getID()))
+                .andExpect(status().isNoContent());
+
+        getClient(tokenAdmin).perform(get("/api/layout/boxes/" + boxTwo.getID() + "/securitymetadata"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$._embedded.securitymetadata", Matchers.not(Matchers.empty())))
+                .andExpect(jsonPath("$.page.totalElements", Matchers.is(3)));
     }
 
     /**
