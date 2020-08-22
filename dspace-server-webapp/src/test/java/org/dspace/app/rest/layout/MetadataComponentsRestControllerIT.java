@@ -8,6 +8,7 @@
 package org.dspace.app.rest.layout;
 
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
+import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasNoJsonPath;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
@@ -143,6 +144,7 @@ public class MetadataComponentsRestControllerIT extends AbstractControllerIntegr
         values.put("metadata", "orgunit.identifier.name");
         values.put("label", "Department Name");
         values.put("rendering", "browselink");
+        values.put("fieldType", "metadata");
         metadataValues.add(values);
         operations.add(new AddOperation("/rows/0/fields/0", metadataValues));
 
@@ -250,4 +252,51 @@ public class MetadataComponentsRestControllerIT extends AbstractControllerIntegr
                             .andExpect(status().isUnprocessableEntity());
 
     }
+
+    @Test
+    public void patchAddBistreamFieldTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        EntityType eType = EntityTypeBuilder.createEntityTypeBuilder(context, "Person").build();
+
+        CrisLayoutBox box = CrisLayoutBoxBuilder.createBuilder(context, eType, true, true)
+                                                .withShortname("box-shortname-test")
+                                                .build();
+
+        context.restoreAuthSystemState();
+        String authToken = getAuthToken(admin.getEmail(), password);
+
+        List<Operation> operations = new ArrayList<Operation>();
+        List<Map<String, Object>> metadataValues = new ArrayList<Map<String, Object>>();
+        Map<String, Object> values = new HashMap<String, Object>();
+        Map<String, String> bitstream = new HashMap<String, String>();
+        values.put("label", "Department Logo");
+        values.put("rendering", "thumbnail");
+        values.put("fieldType", "bitstream");
+        values.put("bitstream", bitstream);
+        bitstream.put("metadataField", "dc.type");
+        bitstream.put("metadataValue", "Logo");
+        bitstream.put("bundle", "ORIGINAL");
+        metadataValues.add(values);
+        operations.add(new AddOperation("/rows/0/fields/0", metadataValues));
+
+        String patchBody = getPatchContent(operations);
+        getClient(authToken).perform(patch("/api/layout/boxmetadataconfigurations/" + box.getID())
+                .content(patchBody)
+                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.rows[0].fields.length()", Matchers.is(1)))
+                .andExpect(jsonPath("$", Matchers.allOf(
+                        hasJsonPath("$.id", is(box.getID())), // now the configuration id is a number (box id)
+                        hasJsonPath("$.type", is("boxmetadataconfiguration")),
+                        hasNoJsonPath("$.rows[0].fields[0].metadata"),
+                        hasJsonPath("$.rows[0].fields[0].bitstream.bundle", is("ORIGINAL")),
+                        hasJsonPath("$.rows[0].fields[0].bitstream.metadataField", is("dc.type")),
+                        hasJsonPath("$.rows[0].fields[0].bitstream.metadataValue", is("Logo")),
+                        hasJsonPath("$.rows[0].fields[0].label", is("Department Logo")),
+                        hasJsonPath("$.rows[0].fields[0].fieldType", is("BITSTREAM")),
+                        hasJsonPath("$.rows[0].fields[0].rendering", is("thumbnail"))
+                       )));
+
+    }
+
 }
