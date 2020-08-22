@@ -143,7 +143,7 @@ public class CrisLayoutBoxConfigurationAddOperation<D> extends PatchOperation<D>
         String metadataType = null;
         if (StringUtils.equalsIgnoreCase(fieldType.asText(), "bitstream")) {
             field = new CrisLayoutFieldBitstream();
-            JsonNode bitstreamNode = node.get("bistream");
+            JsonNode bitstreamNode = node.get("bitstream");
             if (bitstreamNode == null) {
                 throw new UnprocessableEntityException("Bitstream node cannot be null for a bitstream fieldType");
             }
@@ -157,7 +157,7 @@ public class CrisLayoutBoxConfigurationAddOperation<D> extends PatchOperation<D>
             if (bundleNode != null && bundleNode.asText() != null ) {
                 ((CrisLayoutFieldBitstream)field).setMetadataValue(metadataValueNode.asText());
             }
-            JsonNode metadataNode = node.get("metadataField");
+            JsonNode metadataNode = bitstreamNode.get("metadataField");
             if (metadataNode != null && metadataNode.asText() != null ) {
                 metadataType = metadataNode.asText();
             }
