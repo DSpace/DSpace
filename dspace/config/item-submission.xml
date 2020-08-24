@@ -109,7 +109,7 @@
     </step>
     <step id="extraction" mandatory="false">
       <heading>submit.progressbar.extraction</heading>
-      <processing-class />
+      <processing-class>org.dspace.app.rest.submit.step.ExtractMetadataStep</processing-class>
       <type>utils</type>
       <scope visibility="hidden" visibilityOutside="hidden">submission</scope>
     </step>
