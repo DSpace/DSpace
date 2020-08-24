@@ -10,6 +10,7 @@ package org.dspace.layout.factory.impl;
 import org.dspace.layout.factory.CrisLayoutServiceFactory;
 import org.dspace.layout.service.CrisLayoutBoxService;
 import org.dspace.layout.service.CrisLayoutFieldService;
+import org.dspace.layout.service.CrisLayoutSectionService;
 import org.dspace.layout.service.CrisLayoutTabService;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -30,6 +31,9 @@ public class CrisLayoutServiceFactoryImpl extends CrisLayoutServiceFactory {
     @Autowired(required = true)
     private CrisLayoutFieldService fieldService;
 
+    @Autowired(required = true)
+    private CrisLayoutSectionService sectionService;
+
     @Override
     public CrisLayoutTabService getTabService() {
         return this.tabService;
@@ -43,6 +47,11 @@ public class CrisLayoutServiceFactoryImpl extends CrisLayoutServiceFactory {
     @Override
     public CrisLayoutFieldService getFieldService() {
         return this.fieldService;
+    }
+
+    @Override
+    public CrisLayoutSectionService getSectionService() {
+        return sectionService;
     }
 
 }
