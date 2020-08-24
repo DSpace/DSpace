@@ -11,21 +11,7 @@
 
     <dc-type>
         <schema>crispj</schema>
-        <element>acronym</element>
-        <qualifier></qualifier>
-        <scope_note></scope_note>
-    </dc-type>
-
-    <dc-type>
-        <schema>crispj</schema>
         <element>coordinator</element>
-        <qualifier></qualifier>
-        <scope_note></scope_note>
-    </dc-type>
-
-    <dc-type>
-        <schema>crispj</schema>
-        <element>code</element>
         <qualifier></qualifier>
         <scope_note></scope_note>
     </dc-type>
@@ -46,21 +32,14 @@
 
     <dc-type>
         <schema>crispj</schema>
-        <element>award</element>
-        <qualifier>url</qualifier>
-        <scope_note></scope_note>
-    </dc-type>
-
-    <dc-type>
-        <schema>crispj</schema>
-        <element>funder</element>
+        <element>coinvestigators</element>
         <qualifier></qualifier>
         <scope_note></scope_note>
     </dc-type>
 
     <dc-type>
         <schema>crispj</schema>
-        <element>funding</element>
+        <element>funder</element>
         <qualifier></qualifier>
         <scope_note></scope_note>
     </dc-type>
@@ -76,48 +55,6 @@
         <schema>crispj</schema>
         <element>organization</element>
         <qualifier></qualifier>
-        <scope_note></scope_note>
-    </dc-type>
-
-    <dc-type>
-        <schema>crispj</schema>
-        <element>description</element>
-        <qualifier>url</qualifier>
-        <scope_note></scope_note>
-    </dc-type>
-
-    <dc-type>
-        <schema>crispj</schema>
-        <element>oamandate</element>
-        <qualifier></qualifier>
-        <scope_note></scope_note>
-    </dc-type>
-    
-    <dc-type>
-        <schema>crispj</schema>
-        <element>date</element>
-        <qualifier>start</qualifier>
-        <scope_note></scope_note>
-    </dc-type>
-
-    <dc-type>
-        <schema>crispj</schema>
-        <element>date</element>
-        <qualifier>end</qualifier>
-        <scope_note></scope_note>
-    </dc-type>
-
-    <dc-type>
-        <schema>crispj</schema>
-        <element>status</element>
-        <qualifier></qualifier>
-        <scope_note></scope_note>
-    </dc-type>
-
-    <dc-type>
-        <schema>crispj</schema>
-        <element>grant</element>
-        <qualifier>currency</qualifier>
         <scope_note></scope_note>
     </dc-type>
 

@@ -25,5 +25,138 @@
         <scope_note></scope_note>
     </dc-type>
 
+    <dc-type>
+        <schema>oairecerif</schema>
+        <element>identifier</element>
+        <qualifier>url</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
 
+    <dc-type>
+        <schema>oairecerif</schema>
+        <element>affiliation</element>
+        <qualifier>orgunit</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>oairecerif</schema>
+        <element>affiliation</element>
+        <qualifier>startDate</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>oairecerif</schema>
+        <element>affiliation</element>
+        <qualifier>endDate</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>oairecerif</schema>
+        <element>affiliation</element>
+        <qualifier>role</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>oairecerif</schema>
+        <element>person</element>
+        <qualifier>gender</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>oairecerif</schema>
+        <element>person</element>
+        <qualifier>affiliation</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+    
+    <dc-type>
+        <schema>oairecerif</schema>
+        <element>acronym</element>
+        <scope_note></scope_note>
+    </dc-type>
+    
+    <dc-type>
+        <schema>oairecerif</schema>
+        <element>internalid</element>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>oairecerif</schema>
+        <element>funder</element>
+        <scope_note></scope_note>
+    </dc-type>
+    
+    <dc-type>
+        <schema>oairecerif</schema>
+        <element>oamandate</element>
+        <scope_note></scope_note>
+    </dc-type>
+    
+    <dc-type>
+        <schema>oairecerif</schema>
+        <element>oamandate</element>
+        <qualifier>url</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>oairecerif</schema>
+        <element>project</element>
+        <qualifier>startDate</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>oairecerif</schema>
+        <element>project</element>
+        <qualifier>endDate</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>oairecerif</schema>
+        <element>project</element>
+        <qualifier>status</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>oairecerif</schema>
+        <element>fundingProgram</element>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>oairecerif</schema>
+        <element>amount</element>
+        <qualifier>currency</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>oairecerif</schema>
+        <element>amount</element>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>oairecerif</schema>
+        <element>funding</element>
+        <qualifier>identifier</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+
+    <dc-type>
+        <schema>oairecerif</schema>
+        <element>funding</element>
+        <qualifier>duration</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
 </dspace-dc-types>

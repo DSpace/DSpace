@@ -540,7 +540,14 @@
     <qualifier>project</qualifier>
     <scope_note>References project for related item.</scope_note>
   </dc-type>
-  
+
+  <dc-type>
+    <schema>dc</schema>
+    <element>relation</element>
+    <qualifier>conference</qualifier>
+    <scope_note>References conference for related item.</scope_note>
+  </dc-type>
+
   <dc-type>
 	<schema>dc</schema>
     <element>rights</element>
