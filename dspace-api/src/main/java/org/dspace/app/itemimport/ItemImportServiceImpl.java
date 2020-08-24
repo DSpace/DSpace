@@ -712,7 +712,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
         if (inlineSchema==null || "".equals(inlineSchema)) {
             inlineSchema = getAttributeValue(n, "schema");
             if (inlineSchema==null || "".equals(inlineSchema)) {
-                inlineSchema = MetadataSchema.DC_SCHEMA;
+                inlineSchema = MetadataSchemaEnum.DC.getName();
             }
         }
         // //getElementData(n, "element");
