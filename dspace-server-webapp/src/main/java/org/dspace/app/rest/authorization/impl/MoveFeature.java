@@ -64,7 +64,7 @@ public class MoveFeature implements AuthorizationFeature {
             }
 
             return authorizeService.authorizeActionBoolean(context, context.getCurrentUser(), owningObject,
-                Constants.WRITE, true);
+                Constants.REMOVE, true);
         }
         return false;
     }

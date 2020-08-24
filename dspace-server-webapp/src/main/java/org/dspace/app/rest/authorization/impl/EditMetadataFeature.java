@@ -18,6 +18,7 @@ import org.dspace.app.rest.model.BundleRest;
 import org.dspace.app.rest.model.CollectionRest;
 import org.dspace.app.rest.model.CommunityRest;
 import org.dspace.app.rest.model.ItemRest;
+import org.dspace.app.rest.model.SiteRest;
 import org.dspace.app.rest.security.DSpaceRestPermission;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,6 +44,7 @@ public class EditMetadataFeature implements AuthorizationFeature {
                 || object instanceof ItemRest
                 || object instanceof BundleRest
                 || object instanceof BitstreamRest
+                || object instanceof SiteRest
         ) {
             return authorizeServiceRestUtil.authorizeActionBoolean(context, object, DSpaceRestPermission.WRITE);
         }
@@ -56,7 +58,8 @@ public class EditMetadataFeature implements AuthorizationFeature {
             CollectionRest.CATEGORY + "." + CollectionRest.NAME,
             ItemRest.CATEGORY + "." + ItemRest.NAME,
             BundleRest.CATEGORY + "." + BundleRest.NAME,
-            BitstreamRest.CATEGORY + "." + BitstreamRest.NAME
+            BitstreamRest.CATEGORY + "." + BitstreamRest.NAME,
+            SiteRest.CATEGORY + "." + SiteRest.NAME
         };
     }
 }

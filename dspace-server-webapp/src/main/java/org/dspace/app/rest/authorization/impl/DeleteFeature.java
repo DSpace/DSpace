@@ -28,7 +28,6 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.content.factory.ContentServiceFactory;
-import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,8 +51,6 @@ public class DeleteFeature implements AuthorizationFeature {
     private AuthorizeService authorizeService;
     @Autowired
     private ContentServiceFactory contentServiceFactory;
-    @Autowired
-    private WorkspaceItemService workspaceItemService;
 
     @Override
     public boolean isAuthorized(Context context, BaseObjectRest object) throws SQLException {
