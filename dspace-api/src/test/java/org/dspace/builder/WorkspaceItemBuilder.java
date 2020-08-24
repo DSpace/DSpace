@@ -166,6 +166,11 @@ public class WorkspaceItemBuilder extends AbstractBuilder<WorkspaceItem, Workspa
     public WorkspaceItemBuilder withAbstract(final String subject) {
         return addMetadataValue(MetadataSchemaEnum.DC.getName(),"description", "abstract", subject);
     }
+
+    public WorkspaceItemBuilder withRelationshipType(final String relationshipType) {
+        return addMetadataValue("relationship", "type", null, relationshipType);
+    }
+
     public WorkspaceItemBuilder grantLicense() {
         Item item = workspaceItem.getItem();
         String license;
