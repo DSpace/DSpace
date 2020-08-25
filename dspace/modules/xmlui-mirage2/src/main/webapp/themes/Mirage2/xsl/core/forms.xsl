@@ -1174,6 +1174,9 @@
         <p>
             <xsl:apply-templates select="*[not(name()='field')]"/>
         </p>
+        <!-- Customization for LIBDRUM-617 -->
+        <xsl:call-template name="pick-label"/>
+        <!-- End customization for LIBDRUM-617 -->
         <div class="row">
             <div>
                 <xsl:call-template name="standardAttributes">

@@ -56,7 +56,8 @@
                         </xsl:attribute>
                         <fieldset>
                             <div class="input-group">
-                                <input class="ds-text-field form-control" type="text" placeholder="xmlui.general.search"
+                                <!-- Added aria-label="search" for LIBDRUM-614  -->
+                                <input class="ds-text-field form-control" aria-label="search" type="text" placeholder="xmlui.general.search"
                                        i18n:attr="placeholder">
                                     <xsl:attribute name="name">
                                         <xsl:value-of
