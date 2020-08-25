@@ -65,7 +65,7 @@
                                     </xsl:attribute>
                                 </input>
                                 <span class="input-group-btn">
-                                    <button class="ds-button-field btn btn-primary" title="xmlui.general.go" i18n:attr="title">
+                                    <button class="ds-button-field btn btn-primary" title="xmlui.general.go" i18n:attr="title" aria-label="Go" >
                                         <span class="glyphicon glyphicon-search" aria-hidden="true"/>
                                         <xsl:attribute name="onclick">
                                                     <xsl:text>
