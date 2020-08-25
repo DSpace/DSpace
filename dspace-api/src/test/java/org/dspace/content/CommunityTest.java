@@ -1013,7 +1013,8 @@ public class CommunityTest extends AbstractDSpaceObjectTest {
                    equalTo(c));
         assertThat("testGetAdminObject 1", (Community) communityService.getAdminObject(context, c, Constants.ADD),
                    equalTo(c));
-        assertThat("testGetAdminObject 2", communityService.getAdminObject(context, c, Constants.DELETE), nullValue());
+        assertThat("testGetAdminObject 2", (Community) communityService.getAdminObject(context, c, Constants.DELETE),
+                   equalTo(c));
         assertThat("testGetAdminObject 3", (Community) communityService.getAdminObject(context, c, Constants.ADMIN),
                    equalTo(c));
     }

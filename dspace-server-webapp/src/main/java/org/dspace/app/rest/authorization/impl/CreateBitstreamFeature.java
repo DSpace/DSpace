@@ -19,8 +19,8 @@ import org.dspace.app.rest.security.DSpaceRestPermission;
 import org.dspace.app.rest.utils.Utils;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Bundle;
-import org.dspace.content.Collection;
 import org.dspace.content.DSpaceObject;
+import org.dspace.content.Item;
 import org.dspace.content.service.BundleService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -61,12 +61,12 @@ public class CreateBitstreamFeature implements AuthorizationFeature {
             DSpaceObject owningObject = bundleService.getParentObject(context,
                 (Bundle)utils.getDSpaceAPIObjectFromRest(context, object));
 
-            if (!(owningObject instanceof Collection)) {
+            if (!(owningObject instanceof Item)) {
                 log.error("The partent object of bundle " + object.getType() + " is not an item");
                 return false;
             }
 
-            if (authorizeService.authorizeActionBoolean(context, context.getCurrentUser(), owningObject,
+            if (!authorizeService.authorizeActionBoolean(context, context.getCurrentUser(), owningObject,
                 Constants.WRITE, true)) {
                 return false;
             }
