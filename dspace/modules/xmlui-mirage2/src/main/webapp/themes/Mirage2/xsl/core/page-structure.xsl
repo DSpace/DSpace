@@ -117,16 +117,16 @@
 
                                 <div class="row row-offcanvas row-offcanvas-right">
                                     <div class="horizontal-slider clearfix">
-                                        <div class="col-xs-12 col-sm-12 col-md-9 main-content">
+                                        <main class="col-xs-12 col-sm-12 col-md-9 main-content">
                                             <xsl:apply-templates select="*[not(self::dri:options)]"/>
 
                                             <div class="visible-xs visible-sm">
                                                 <xsl:call-template name="buildFooter"/>
                                             </div>
-                                        </div>
-                                        <div class="col-xs-6 col-sm-3 sidebar-offcanvas" id="sidebar" role="navigation">
+                                        </main>
+                                        <nav class="col-xs-6 col-sm-3 sidebar-offcanvas" id="sidebar" role="navigation">
                                             <xsl:apply-templates select="dri:options"/>
-                                        </div>
+                                        </nav>
 
                                     </div>
                                 </div>
@@ -346,7 +346,7 @@
         <!-- Begin UMD Customization -->
         <!-- Changed add bootstrap CSS classes to change page layout -->
         <header>
-            <div class="navbar navbar-default navbar-static-top" role="navigation">
+            <nav class="navbar navbar-default navbar-static-top" role="navigation">
                 <div class="container">
                     <div class="navbar-header clear-float-xs-sm">
 
@@ -498,7 +498,7 @@
                         </button>
                     </div>
                 </div>
-            </div>
+            </nav>
 
         </header>
         <!-- End UMD Customization -->
