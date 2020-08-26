@@ -478,7 +478,43 @@ public abstract class Field extends AbstractWingElement implements
         this.label = new Label(context,null,null);
         this.label.addContent(message);
     }
+
+
+    // Customization for LIBDRUM-614
+    /**
+     * The help element provides help instructions to assist the user in using
+     * this field.
+     *
+     * @param characters
+     *            (May be null) Direct content or a dictionary tag to be
+     *            inserted into the element.
+     * @param rend
+     *            Render css class.
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
+     */
+    public void setLabel(String characters, String rend) throws WingException
+    {
+        this.label = new Label(context,null,rend);
+        this.label.addContent(characters);
+    }
     
+    /**
+     * The help element provides help instructions to assist the user in using
+     * this field.
+     *
+     * @param message
+     *            (Required) A key into the i18n catalogue for translation into
+     *            the user's preferred language.
+     * @param rend
+     *            Render css class.
+     * @throws org.dspace.app.xmlui.wing.WingException passed through.
+     */
+    public void setLabel(Message message, String rend) throws WingException
+    {
+        this.label = new Label(context,null,rend);
+        this.label.addContent(message);
+    }
+    // End Customization for LIBDRUM-614
     
     /**
      * Private function to remove all values of a particular type.

@@ -550,6 +550,11 @@
     </xsl:template>
 
     <xsl:template match="dri:field" mode="normalField">
+        <!-- Customization for LIBDRUM-614 -->
+        <xsl:if test="dri:label[@rend='hidden']">
+            <xsl:call-template name="hidden-label" />
+        </xsl:if>
+        <!-- End Customization for LIBDRUM-614 -->
         <xsl:variable name="confidenceIndicatorID" select="concat(translate(@id,'.','_'),'_confidence_indicator')"/>
         <xsl:choose>
             <!-- TODO: this has changed dramatically (see form3.xml) -->
@@ -1248,6 +1253,12 @@
                         <xsl:if test="dri:field/@required = 'yes'">
                             <xsl:text> required</xsl:text>
                         </xsl:if>
+                        <!-- Begin Customization for LIBDRUM-614 -->
+                        <xsl:if test="dri:field/dri:label/@rend">
+                            <xsl:text> </xsl:text>
+                            <xsl:value-of select="dri:field/dri:label/@rend"/>
+                        </xsl:if>
+                        <!-- End Customization for LIBDRUM-614 -->
                     </xsl:attribute>
                     <xsl:choose>
                         <xsl:when test="./dri:field/@id">
@@ -1297,6 +1308,22 @@
         </xsl:choose>
     </xsl:template>
 
+    <!-- Begin Customization for LIBDRUM-614 -->
+    <xsl:template name="hidden-label">
+        <label class="hidden">
+            <xsl:choose>
+                <xsl:when test="@id">
+                    <xsl:attribute name="for">
+                        <xsl:value-of select="translate(@id,'.','_')"/>
+                    </xsl:attribute>
+                </xsl:when>
+                <xsl:otherwise></xsl:otherwise>
+            </xsl:choose>
+            <xsl:apply-templates select="dri:label" mode="formComposite"/>
+        </label>
+    </xsl:template>
+    <!-- End Customization for LIBDRUM-614 -->
+
     <xsl:template match="dri:field/dri:label" mode="compositeLabel">
         <div class="col-sm-12">
             <label>
@@ -1343,6 +1370,13 @@
                     <xsl:value-of select="@placeholder"/>
                 </xsl:if>
             </xsl:with-param>
+            <!-- Begin Customization for LIBDRUM-614 -->
+            <xsl:with-param name="aria-label">
+                <xsl:if test="@aria-label">
+                    <xsl:value-of select="@aria-label"/>
+                </xsl:if>
+            </xsl:with-param>
+            <!-- End Customization for LIBDRUM-614 -->
         </xsl:call-template>
         <xsl:if test="@disabled='yes' or ../@rend = 'disabled'">
             <xsl:attribute name="disabled">disabled</xsl:attribute>

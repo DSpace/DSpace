@@ -423,6 +423,7 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
             // Create a select list to choose a month
             jumpForm.addContent(T_jump_select);
             Select month = jumpForm.addSelect(BrowseParams.MONTH);
+            month.setLabel(T_choose_month, "hidden"); // Customization for LIBDRUM-614
             month.addOption(false, "-1", T_choose_month);
             for (int i = 1; i <= 12; i++)
             {
@@ -432,6 +433,7 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
 
             // Create a select list to choose a year
             Select year = jumpForm.addSelect(BrowseParams.YEAR);
+            year.setLabel(T_choose_year, "hidden"); // Customization for LIBDRUM-614
             year.addOption(false, "-1", T_choose_year);
             int currentYear = DCDate.getCurrent().getYear();
             int i = currentYear;
@@ -462,8 +464,11 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
             // Create a free text entry box for the year
             jumpForm = jump.addPara();
             jumpForm.addContent(T_jump_year);
-            jumpForm.addText(BrowseParams.STARTS_WITH).setHelp(T_jump_year_help);
-            
+            // Customization for LIBDRUM-614
+            Text textInput = jumpForm.addText(BrowseParams.STARTS_WITH);
+            textInput.setHelp(T_jump_year_help);
+            textInput.setLabel(T_jump_year, "hidden");
+            // End customization for LIBDRUM-614
             jumpForm.addButton("submit").setValue(T_go);
         }
         else
@@ -491,7 +496,9 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
             // Create a free text field for the initial characters
             Para jumpForm = jump.addPara();
             jumpForm.addContent(T_starts_with);
-            jumpForm.addText(BrowseParams.STARTS_WITH).setHelp(T_starts_with_help);
+            Text inputText = jumpForm.addText(BrowseParams.STARTS_WITH);
+            inputText.setHelp(T_starts_with_help);
+            inputText.setLabel(T_starts_with, "hidden");
             
             jumpForm.addButton("submit").setValue(T_go);
         }
