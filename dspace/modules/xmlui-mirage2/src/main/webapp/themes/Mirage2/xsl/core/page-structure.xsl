@@ -117,6 +117,7 @@
 
                                 <div class="row row-offcanvas row-offcanvas-right">
                                     <div class="horizontal-slider clearfix">
+                                        <!-- Begin UMD Customization for LIBDRUM-620 -->
                                         <main class="col-xs-12 col-sm-12 col-md-9 main-content">
                                             <xsl:apply-templates select="*[not(self::dri:options)]"/>
 
@@ -127,6 +128,7 @@
                                         <nav class="col-xs-6 col-sm-3 sidebar-offcanvas" id="sidebar" aria-label="main">
                                             <xsl:apply-templates select="dri:options"/>
                                         </nav>
+                                        <!-- End UMD Customization for LIBDRUM-620 -->
 
                                     </div>
                                 </div>
