@@ -325,7 +325,7 @@
             <artifactId>apache-jena-libs</artifactId>
             <type>pom</type>
         </dependency>
-        <!-- This was added to support the pubmed api call -->
+        <!-- Required to support PubMed API call in "PubmedImportMetadataSourceServiceImpl.GetRecord" -->
         <!-- Makes runtime operations in Jersey Dependency Injection -->
         <dependency>
             <groupId>org.glassfish.jersey.inject</groupId>
