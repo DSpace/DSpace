@@ -26,6 +26,7 @@ import org.dspace.app.xmlui.wing.element.Body;
 import org.dspace.app.xmlui.wing.element.Division;
 import org.dspace.app.xmlui.wing.element.PageMeta;
 import org.dspace.app.xmlui.wing.element.Para;
+import org.dspace.app.xmlui.wing.element.Text;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
@@ -191,9 +192,9 @@ public class CommunitySearch extends AbstractDSpaceTransformer implements Cachea
                     Division.METHOD_POST, "secondary search");
 
             Para para = query.addPara("search-query", null);
-            para.addContent(T_full_text_search);
             para.addContent(" ");
-            para.addText("query");
+            Text queryInput = para.addText("query");
+            queryInput.setLabel(T_full_text_search);
             para.addContent(" ");
             para.addButton("submit").setValue(T_go);
            //query.addPara().addXref(contextPath + "/handle/" + community.getHandle() + "/advanced-search", T_advanced_search_link);

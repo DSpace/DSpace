@@ -56,7 +56,8 @@
                         </xsl:attribute>
                         <fieldset>
                             <div class="input-group">
-                                <input class="ds-text-field form-control" type="text" placeholder="xmlui.general.search"
+                                <!-- Added aria-label="search" for LIBDRUM-614  -->
+                                <input class="ds-text-field form-control" aria-label="search" type="text" placeholder="xmlui.general.search"
                                        i18n:attr="placeholder">
                                     <xsl:attribute name="name">
                                         <xsl:value-of
@@ -64,7 +65,7 @@
                                     </xsl:attribute>
                                 </input>
                                 <span class="input-group-btn">
-                                    <button class="ds-button-field btn btn-primary" title="xmlui.general.go" i18n:attr="title">
+                                    <button class="ds-button-field btn btn-primary" title="xmlui.general.go" i18n:attr="title" aria-label="Go" >
                                         <span class="glyphicon glyphicon-search" aria-hidden="true"/>
                                         <xsl:attribute name="onclick">
                                                     <xsl:text>
