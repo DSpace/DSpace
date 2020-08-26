@@ -75,7 +75,7 @@
             <xsl:text>?</xsl:text>
             <xsl:value-of select="$page-meta/dri:metadata[@element='request'][@qualifier='queryString']"/>
         </xsl:variable>
-        <field type="select" rend="alphabet-select visible-xs">
+        <field type="select" rend="alphabet-select visible-xs" aria-label="select alphabet"> <!-- Customization for LIBDRUM-614 -->
         <xsl:for-each select="dri:item/dri:xref">
                 <option returnValue="{@target}">
                     <xsl:value-of select="."/>

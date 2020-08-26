@@ -85,6 +85,11 @@
     or @id='aspect.discovery.SearchFacetFilter.field.starts_with'
     or @id='aspect.administrative.WithdrawnItems.field.starts_with'
     or @id='aspect.administrative.PrivateItems.field.starts_with']">
+        <!-- Begin Customization for LIBDRUM-614 -->
+        <xsl:if test="dri:label[@rend='hidden']">
+            <xsl:call-template name="hidden-label" />
+        </xsl:if>
+        <!-- End Customization for LIBDRUM-614 -->
         <input>
             <xsl:call-template name="fieldAttributes"/>
             <xsl:attribute name="value">

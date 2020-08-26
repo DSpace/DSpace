@@ -470,9 +470,15 @@
     </xsl:template>
 
     <xsl:template match="dri:field[starts-with(@id, 'aspect.discovery.SimpleSearch.field.add-filter')]">
+        <!-- Begin Customization for LIBDRUM-614 -->
+        <xsl:if test="dri:label[@rend='hidden']">
+            <xsl:call-template name="hidden-label" />
+        </xsl:if>
+        <!-- End Customization for LIBDRUM-614 -->
         <button>
             <xsl:call-template name="fieldAttributes"/>
             <xsl:attribute name="type">submit</xsl:attribute>
+            <xsl:attribute name="aria-label">plus sign</xsl:attribute> <!-- Customization for LIBDRUM-614 -->
             <xsl:choose>
                 <xsl:when test="dri:value/i18n:text">
                     <xsl:attribute name="title">
@@ -493,9 +499,15 @@
     </xsl:template>
 
     <xsl:template match="dri:field[starts-with(@id, 'aspect.discovery.SimpleSearch.field.remove-filter')]">
+        <!-- Begin Customization for LIBDRUM-614 -->
+        <xsl:if test="dri:label[@rend='hidden']">
+            <xsl:call-template name="hidden-label" />
+        </xsl:if>
+        <!-- End Customization for LIBDRUM-614 -->
         <button>
             <xsl:call-template name="fieldAttributes"/>
             <xsl:attribute name="type">submit</xsl:attribute>
+            <xsl:attribute name="aria-label">minus sign</xsl:attribute> <!--  Customization for LIBDRUM-614 -->
             <xsl:choose>
                 <xsl:when test="dri:value/i18n:text">
                     <xsl:attribute name="title">

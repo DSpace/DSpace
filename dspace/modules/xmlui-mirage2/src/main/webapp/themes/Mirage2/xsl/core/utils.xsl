@@ -125,6 +125,7 @@
     <xsl:template name="standardAttributes">
         <xsl:param name="class"/>
         <xsl:param name="placeholder"/>
+        <xsl:param name="aria-label"/> <!-- Customization for LIBDRUM-614 -->
         <xsl:if test="@id">
             <xsl:attribute name="id"><xsl:value-of select="translate(@id,'.','_')"/></xsl:attribute>
         </xsl:if>
@@ -139,6 +140,11 @@
             <xsl:attribute name="placeholder"><xsl:value-of select="$placeholder"/></xsl:attribute>
             <xsl:attribute name="i18n:attr">placeholder</xsl:attribute>
         </xsl:if>
+        <!-- Begin Customization for LIBDRUM-614 -->
+        <xsl:if test="string-length($aria-label)>0">
+            <xsl:attribute name="aria-label"><xsl:value-of select="$aria-label"/></xsl:attribute>
+        </xsl:if>
+        <!-- End Customization for LIBDRUM-614 -->
     </xsl:template>
 
     <!-- Replacing has content in original bundle lables (true,false) in Discover section with i18n elements -->

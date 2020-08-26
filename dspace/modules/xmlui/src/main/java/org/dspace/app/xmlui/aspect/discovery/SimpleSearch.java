@@ -60,8 +60,9 @@ public class SimpleSearch extends AbstractSearch implements CacheableProcessingC
     private static final Message T_head =
             message("xmlui.ArtifactBrowser.SimpleSearch.head");
 
-//    private static final Message T_search_label =
-//            message("xmlui.discovery.SimpleSearch.search_label");
+    // Customization for LIBDRUM-614
+    private static final Message T_search_label =
+           message("xmlui.discovery.SimpleSearch.search_label");
 
     private static final Message T_go = message("xmlui.general.go");
     private static final Message T_filter_label = message("xmlui.Discovery.SimpleSearch.filter_head");
@@ -71,6 +72,9 @@ public class SimpleSearch extends AbstractSearch implements CacheableProcessingC
     private static final Message T_filter_controls_apply = message("xmlui.Discovery.AbstractSearch.filters.controls.apply-filters");
     private static final Message T_filter_controls_add = message("xmlui.Discovery.AbstractSearch.filters.controls.add-filter");
     private static final Message T_filter_controls_remove = message("xmlui.Discovery.AbstractSearch.filters.controls.remove-filter");
+    private static final Message T_filter_controls_filter_type = message("xmlui.Discovery.AbstractSearch.filters.controls.filter-type");
+    private static final Message T_filter_controls_filter_operator = message("xmlui.Discovery.AbstractSearch.filters.controls.filter-operator");
+    private static final Message T_filter_controls_filter_text = message("xmlui.Discovery.AbstractSearch.filters.controls.filter-text");
     private static final Message T_filters_show = message("xmlui.Discovery.AbstractSearch.filters.display");
     private static final Message T_filter_contain = message("xmlui.Discovery.SimpleSearch.filter.contains");
     private static final Message T_filter_equals = message("xmlui.Discovery.SimpleSearch.filter.equals");
@@ -140,17 +144,18 @@ public class SimpleSearch extends AbstractSearch implements CacheableProcessingC
 
         List searchList = mainSearchDiv.addList("primary-search", List.TYPE_FORM);
 
-//        searchList.setHead(T_search_label);
+        // searchList.setHead(T_search_label);
         if (variableScope())
         {
             Select scope = searchList.addItem().addSelect("scope");
-            scope.setLabel(T_search_scope);
+            scope.setLabel(T_search_scope, "hidden"); // Customization for LIBDRUM-614
             buildScopeList(scope);
         }
 
         Item searchBoxItem = searchList.addItem();
         Text text = searchBoxItem.addText("query");
         text.setValue(queryString);
+        text.setLabel(T_search_label, "hidden"); // Customization for LIBDRUM-614
         searchBoxItem.addButton("submit", "search-icon").setValue(T_go);
         if(queryResults != null && StringUtils.isNotBlank(queryResults.getSpellCheckQuery()))
         {
@@ -240,6 +245,7 @@ public class SimpleSearch extends AbstractSearch implements CacheableProcessingC
 
     protected void addFilterRow(java.util.List<DiscoverySearchFilter> filterFields, int index, Row row, String selectedFilterType, String relationalOperator, String value) throws WingException {
         Select select = row.addCell("", Cell.ROLE_DATA, "selection").addSelect("filtertype_" + index);
+        select.setLabel(T_filter_controls_filter_type, "hidden"); // Customization for LIBDRUM-614
 
         //For each field found (at least one) add options
         for (DiscoverySearchFilter searchFilter : filterFields)
@@ -247,6 +253,7 @@ public class SimpleSearch extends AbstractSearch implements CacheableProcessingC
             select.addOption(StringUtils.equals(searchFilter.getIndexFieldName(), selectedFilterType), searchFilter.getIndexFieldName(), message("xmlui.ArtifactBrowser.SimpleSearch.filter." + searchFilter.getIndexFieldName()));
         }
         Select typeSelect = row.addCell("", Cell.ROLE_DATA, "selection").addSelect("filter_relational_operator_" + index);
+        typeSelect.setLabel(T_filter_controls_filter_operator, "hidden"); // Customization for LIBDRUM-614
         typeSelect.addOption(StringUtils.equals(relationalOperator, "contains"), "contains", T_filter_contain);
         typeSelect.addOption(StringUtils.equals(relationalOperator, "equals"), "equals", T_filter_equals);
         typeSelect.addOption(StringUtils.equals(relationalOperator, "authority"), "authority", T_filter_authority);
@@ -256,15 +263,21 @@ public class SimpleSearch extends AbstractSearch implements CacheableProcessingC
          
 
 
-
+        // BEGIN Customization for LIBDRUM-614
         //Add a box so we can search for our value
-        row.addCell("", Cell.ROLE_DATA, "discovery-filter-input-cell").addText("filter_" + index, "discovery-filter-input").setValue(value == null ? "" : value);
+        Text filterText = row.addCell("", Cell.ROLE_DATA, "discovery-filter-input-cell").addText("filter_" + index, "discovery-filter-input");
+        filterText.setValue(value == null ? "" : value);
+        filterText.setLabel(T_filter_controls_filter_text, "hidden");
 
         //And last add an add button
         Cell buttonsCell = row.addCell("filter-controls_" + index, Cell.ROLE_DATA, "filter-controls");
-        buttonsCell.addButton("add-filter_" + index, "filter-control filter-add").setValue(T_filter_controls_add);
-        buttonsCell.addButton("remove-filter_" + index, "filter-control filter-remove").setValue(T_filter_controls_remove);
-
+        Button addFilterButton = buttonsCell.addButton("add-filter_" + index, "filter-control filter-add");
+        addFilterButton.setValue(T_filter_controls_add);
+        addFilterButton.setLabel(T_filter_controls_add, "hidden");
+        Button removeFilterButton = buttonsCell.addButton("remove-filter_" + index, "filter-control filter-remove");
+        removeFilterButton.setValue(T_filter_controls_remove);
+        removeFilterButton.setLabel(T_filter_controls_remove, "hidden");
+        // END Customization for LIBDRUM-614
     }
 
     @Override

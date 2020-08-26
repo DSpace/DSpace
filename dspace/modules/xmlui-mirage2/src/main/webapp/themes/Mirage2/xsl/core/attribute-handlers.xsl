@@ -183,7 +183,7 @@
                                     </xsl:if>
                                 </xsl:attribute>
 
-                                <a class="previous-page-link">
+                                <a class="previous-page-link" aria-label="left arrow"> <!-- Customization for LIBDRUM-614 -->
                                     <xsl:attribute name="href">
                                         <xsl:value-of select="$prev-page"/>
                                     </xsl:attribute>
@@ -198,7 +198,7 @@
                                     </xsl:if>
                                 </xsl:attribute>
 
-                                <a class="next-page-link">
+                                <a class="next-page-link"  aria-label="right arrow"> <!-- Customization for LIBDRUM-614 -->
                                     <xsl:attribute name="href">
                                         <xsl:value-of select="$next-page"/>
                                     </xsl:attribute>
@@ -283,7 +283,7 @@
                                     <xsl:if test="$is-first-page">
                                         <xsl:attribute name="class">disabled</xsl:attribute>
                                     </xsl:if>
-                                    <a class="previous-page-link">
+                                    <a class="previous-page-link"  aria-label="left arrow"> <!-- Customization for LIBDRUM-614 -->
                                         <xsl:attribute name="href">
                                             <xsl:value-of
                                                     select="substring-before(parent::node()/@pageURLMask,'{pageNum}')"/>
@@ -357,7 +357,7 @@
                                 </xsl:if>
                                 <xsl:if test="$has-next-page">
                                     <li>
-                                        <a class="next-page-link">
+                                        <a class="next-page-link" aria-label="right arrow"> <!-- Customization for LIBDRUM-614 -->
                                             <xsl:attribute name="href">
                                                 <xsl:value-of
                                                         select="substring-before(parent::node()/@pageURLMask,'{pageNum}')"/>
@@ -457,7 +457,7 @@
     </xsl:template>
 
     <xsl:template name="renderGearButton">
-        <button class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+        <button class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-label="gear-icon" > <!-- Customization for LIBDRUM-614 -->
             <span class="glyphicon glyphicon-cog" aria-hidden="true"/>
         </button>
     </xsl:template>
