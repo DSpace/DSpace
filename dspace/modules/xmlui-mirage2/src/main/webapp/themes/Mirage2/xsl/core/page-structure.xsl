@@ -124,7 +124,7 @@
                                                 <xsl:call-template name="buildFooter"/>
                                             </div>
                                         </main>
-                                        <nav class="col-xs-6 col-sm-3 sidebar-offcanvas" id="sidebar" role="navigation">
+                                        <nav class="col-xs-6 col-sm-3 sidebar-offcanvas" id="sidebar">
                                             <xsl:apply-templates select="dri:options"/>
                                         </nav>
 
@@ -346,7 +346,7 @@
         <!-- Begin UMD Customization -->
         <!-- Changed add bootstrap CSS classes to change page layout -->
         <header>
-            <nav class="navbar navbar-default navbar-static-top" role="navigation">
+            <nav class="navbar navbar-default navbar-static-top">
                 <div class="container">
                     <div class="navbar-header clear-float-xs-sm">
 
@@ -513,7 +513,7 @@
             <div class="container">
                 <div class="row">
                     <!--TODO-->
-                    <div class="col-xs-12">
+                    <nav aria-label="breadcrumbs" class="col-xs-12">
                         <xsl:choose>
                             <xsl:when test="count(/dri:document/dri:meta/dri:pageMeta/dri:trail) > 1">
                                 <div class="breadcrumb dropdown visible-xs">
@@ -547,7 +547,7 @@
                                 </ul>
                             </xsl:otherwise>
                         </xsl:choose>
-                    </div>
+                    </nav>
                 </div>
             </div>
         </div>
