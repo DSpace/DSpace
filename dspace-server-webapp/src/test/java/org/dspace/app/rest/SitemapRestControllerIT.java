@@ -112,7 +112,7 @@ public class SitemapRestControllerIT extends AbstractControllerIntegrationTest {
 
         String response = result.getResponse().getContentAsString();
         // contains a link to /sitemaps/sitemap0.html
-        assertTrue(response.contains("/" + SITEMAPS_ENDPOINT + "/sitemap0.html"));
+        assertTrue(response.contains("/sitemap0.html"));
     }
 
     @Test
@@ -145,7 +145,7 @@ public class SitemapRestControllerIT extends AbstractControllerIntegrationTest {
 
         String response = result.getResponse().getContentAsString();
         // contains a link to /sitemaps/sitemap0.html
-        assertTrue(response.contains("/" + SITEMAPS_ENDPOINT + "/sitemap0.xml"));
+        assertTrue(response.contains("/sitemap0.xml"));
     }
 
     @Test
