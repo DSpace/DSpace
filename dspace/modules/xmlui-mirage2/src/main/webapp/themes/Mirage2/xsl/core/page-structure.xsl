@@ -117,6 +117,7 @@
 
                                 <div class="row row-offcanvas row-offcanvas-right">
                                     <div class="horizontal-slider clearfix">
+                                        <!-- Begin UMD Customization for LIBDRUM-620 -->
                                         <main class="col-xs-12 col-sm-12 col-md-9 main-content">
                                             <xsl:apply-templates select="*[not(self::dri:options)]"/>
 
@@ -124,9 +125,10 @@
                                                 <xsl:call-template name="buildFooter"/>
                                             </div>
                                         </main>
-                                        <nav class="col-xs-6 col-sm-3 sidebar-offcanvas" id="sidebar">
+                                        <nav class="col-xs-6 col-sm-3 sidebar-offcanvas" id="sidebar" aria-label="main">
                                             <xsl:apply-templates select="dri:options"/>
                                         </nav>
+                                        <!-- End UMD Customization for LIBDRUM-620 -->
 
                                     </div>
                                 </div>
@@ -346,7 +348,7 @@
         <!-- Begin UMD Customization -->
         <!-- Changed add bootstrap CSS classes to change page layout -->
         <header>
-            <nav class="navbar navbar-default navbar-static-top">
+            <div class="navbar navbar-default navbar-static-top" role="navigation">
                 <div class="container">
                     <div class="navbar-header clear-float-xs-sm">
 
@@ -498,7 +500,7 @@
                         </button>
                     </div>
                 </div>
-            </nav>
+            </div>
 
         </header>
         <!-- End UMD Customization -->
