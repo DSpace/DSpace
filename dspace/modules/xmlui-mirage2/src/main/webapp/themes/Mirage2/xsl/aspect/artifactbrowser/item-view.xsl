@@ -803,7 +803,7 @@
 
     <xsl:template name="getFileIcon">
         <xsl:param name="mimetype"/>
-            <i aria-hidden="true">
+            <span aria-hidden="true">
                 <xsl:attribute name="class">
                 <xsl:text>glyphicon </xsl:text>
                 <xsl:choose>
@@ -815,7 +815,7 @@
                     </xsl:otherwise>
                 </xsl:choose>
                 </xsl:attribute>
-            </i>
+            </span>
         <xsl:text> </xsl:text>
     </xsl:template>
 
