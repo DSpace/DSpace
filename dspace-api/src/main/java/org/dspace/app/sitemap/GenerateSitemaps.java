@@ -181,9 +181,8 @@ public class GenerateSitemaps {
      *                      if IO error occurs.
      */
     public static void generateSitemaps(boolean makeHTMLMap, boolean makeSitemapOrg) throws SQLException, IOException {
-        String sitemapsEndpoint = configurationService.getProperty("sitemap.path", "sitemaps");
         String uiURLStem = configurationService.getProperty("dspace.ui.url");
-        String sitemapStem = uiURLStem + "/" + sitemapsEndpoint + "/sitemap";
+        String sitemapStem = uiURLStem + "/sitemap";
 
         File outputDir = new File(configurationService.getProperty("sitemap.dir"));
         if (!outputDir.exists() && !outputDir.mkdir()) {
