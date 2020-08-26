@@ -124,7 +124,7 @@
                                                 <xsl:call-template name="buildFooter"/>
                                             </div>
                                         </main>
-                                        <nav class="col-xs-6 col-sm-3 sidebar-offcanvas" id="sidebar">
+                                        <nav class="col-xs-6 col-sm-3 sidebar-offcanvas" id="sidebar" aria-label="main">
                                             <xsl:apply-templates select="dri:options"/>
                                         </nav>
 
@@ -346,7 +346,7 @@
         <!-- Begin UMD Customization -->
         <!-- Changed add bootstrap CSS classes to change page layout -->
         <header>
-            <nav class="navbar navbar-default navbar-static-top">
+            <div class="navbar navbar-default navbar-static-top" role="navigation">
                 <div class="container">
                     <div class="navbar-header clear-float-xs-sm">
 
@@ -498,7 +498,7 @@
                         </button>
                     </div>
                 </div>
-            </nav>
+            </div>
 
         </header>
         <!-- End UMD Customization -->
