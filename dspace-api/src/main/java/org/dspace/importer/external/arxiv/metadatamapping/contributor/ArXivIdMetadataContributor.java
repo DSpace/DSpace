@@ -39,7 +39,8 @@ public class ArXivIdMetadataContributor extends SimpleXpathMetadatumContributor 
     }
 
     /**
-     * ArXiv doesn't return the item id. We have to get this from the path parameter
+     * ArXiv returns a full URL as in the <id> value, e.g. http://arxiv.org/abs/1911.11405v1.
+     * This method parses out the identifier from the end of the URL, e.g. 1911.11405v1.
      * 
      * @param dtos Metadata which contains the items uri
      * @return the items ids
