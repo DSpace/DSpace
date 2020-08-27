@@ -1227,7 +1227,12 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         tsv.close();
     }
 
-
+    @Test
+    /**
+     * Test the creation of workspaceitems POSTing to the resource collection endpoint a ris file
+     *
+     * @throws Exception
+     */
     public void createSingleWorkspaceItemFromRISWithOneEntryTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
@@ -1300,6 +1305,12 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         ris.close();
     }
 
+    @Test
+    /**
+     * Test the creation of workspaceitems POSTing to the resource collection endpoint an endnote file
+     *
+     * @throws Exception
+     */
     public void createSingleWorkspaceItemFromEndnoteWithOneEntryTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
