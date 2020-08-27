@@ -42,6 +42,10 @@ import org.dspace.eperson.service.EPersonService;
 import org.dspace.eperson.service.GroupService;
 import org.dspace.event.Event;
 import org.dspace.util.UUIDUtils;
+import org.dspace.xmlworkflow.Role;
+import org.dspace.xmlworkflow.factory.XmlWorkflowFactory;
+import org.dspace.xmlworkflow.state.Step;
+import org.dspace.xmlworkflow.storedcomponents.ClaimedTask;
 import org.dspace.xmlworkflow.storedcomponents.CollectionRole;
 import org.dspace.xmlworkflow.storedcomponents.PoolTask;
 import org.dspace.xmlworkflow.storedcomponents.service.ClaimedTaskService;
@@ -88,6 +92,8 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
     protected PoolTaskService poolTaskService;
     @Autowired(required = true)
     protected ClaimedTaskService claimedTaskService;
+    @Autowired(required = true)
+    protected XmlWorkflowFactory workflowFactory;
 
     protected GroupServiceImpl() {
         super();
@@ -151,18 +157,45 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
                                    groupChild.getName(), getIdentifiers(context, groupParent)));
     }
 
+    /**
+     * Removes a member of a group.
+     * The removal will be refused if the group is linked to a workflow step which has claimed tasks or pool tasks
+     * and no other member is present in the group to handle these.
+     * @param context DSpace context object
+     * @param group   DSpace group
+     * @param ePerson eperson
+     * @throws SQLException
+     */
     @Override
     public void removeMember(Context context, Group group, EPerson ePerson) throws SQLException {
         List<CollectionRole> collectionRoles = collectionRoleService.findByGroup(context, group);
         if (!collectionRoles.isEmpty()) {
             List<PoolTask> poolTasks = poolTaskService.findByGroup(context, group);
+            List<ClaimedTask> claimedTasks = claimedTaskService.findByEperson(context, ePerson);
+            for (ClaimedTask claimedTask : claimedTasks) {
+                Step stepByName = workflowFactory.getStepByName(claimedTask.getStepID());
+                Role role = stepByName.getRole();
+                for (CollectionRole collectionRole : collectionRoles) {
+                    if (StringUtils.equals(collectionRole.getRoleId(), role.getId())
+                            && claimedTask.getWorkflowItem().getCollection() == collectionRole.getCollection()) {
+                        List<EPerson> ePeople = allMembers(context, group);
+                        if (ePeople.size() == 1 && ePeople.contains(ePerson)) {
+                            throw new IllegalStateException(
+                                    "Refused to remove user " + ePerson
+                                            .getID() + " from workflow group because the group " + group
+                                            .getID() + " has tasks assigned and no other members");
+                        }
+
+                    }
+                }
+            }
             if (!poolTasks.isEmpty()) {
                 List<EPerson> ePeople = allMembers(context, group);
                 if (ePeople.size() == 1 && ePeople.contains(ePerson)) {
                     throw new IllegalStateException(
                             "Refused to remove user " + ePerson
                                     .getID() + " from workflow group because the group " + group
-                                    .getID() + " has no other members");
+                                    .getID() + " has tasks assigned and no other members");
                 }
             }
         }

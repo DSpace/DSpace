@@ -249,7 +249,7 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
             log.error("This IOException: " + ex + " occured while deleting Eperson with the ID: " + ePerson.getID());
             throw new AuthorizeException(new EPersonDeletionException());
         } catch (EPersonDeletionException e) {
-            throw new IllegalStateException(e.getMessage());
+            throw new IllegalStateException(e);
         }
     }
 
@@ -284,7 +284,7 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
             List<EPerson> ePeople = groupService.allMembers(context, group);
             if (ePeople.size() == 1 && ePeople.contains(ePerson)) {
                 throw new IllegalStateException(
-                        "Refused to delete user " + ePerson.getID() + " because it’s part of the group " + group
+                        "Refused to delete user " + ePerson.getID() + " because it is part of the group " + group
                                 .getID());
             }
         }
