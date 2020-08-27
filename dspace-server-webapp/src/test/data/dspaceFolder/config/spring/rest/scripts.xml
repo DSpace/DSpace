@@ -12,4 +12,9 @@
         <property name="description" value="Import metadata after batch editing" />
         <property name="dspaceRunnableClass" value="org.dspace.app.bulkedit.MetadataImport"/>
     </bean>
+
+    <bean id="metadata-export" class="org.dspace.app.bulkedit.MetadataExportScriptConfiguration" primary="true">
+        <property name="description" value="Export metadata for batch editing"/>
+        <property name="dspaceRunnableClass" value="org.dspace.app.bulkedit.MetadataExport"/>
+    </bean>
 </beans>
