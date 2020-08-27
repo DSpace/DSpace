@@ -164,7 +164,6 @@ public abstract class AbstractDSpaceObjectBuilder<T extends DSpaceObject>
                                                                       eperson, startDate, Constants.ADMIN,
                                                                       "Integration Test", dso);
             if (rp != null) {
-                log.info("Updating resource policy with REMOVE for eperson: " + eperson.getEmail());
                 resourcePolicyService.update(context, rp);
             }
         } catch (Exception e) {
