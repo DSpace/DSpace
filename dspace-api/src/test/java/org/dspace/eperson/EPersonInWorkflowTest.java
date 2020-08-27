@@ -49,7 +49,6 @@ import org.dspace.xmlworkflow.storedcomponents.service.CollectionRoleService;
 import org.dspace.xmlworkflow.storedcomponents.service.PoolTaskService;
 import org.dspace.xmlworkflow.storedcomponents.service.XmlWorkflowItemService;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.mock.web.MockHttpServletRequest;
 
@@ -127,23 +126,21 @@ public class EPersonInWorkflowTest extends AbstractIntegrationTestWithDatabase {
      *
      * This test will perform the following checks:
      * - create a workspace item, and let it move to step 1
-     * - approve it by user B
-     * - verify that the item moved to step 2
-     * - Claim it by user C
-     * - delete user B
-     * - verify the delete is refused
-     * - remove user B from step 3
-     * - approve it by user C
-     * - verify that the item is archived without any actions apart from removing user B
+     * - claim it by user B
      * - delete user B
      * - verify the delete is refused
      * - remove user B from step 1
+     * - verify that the removal is refused due to B being the last member in the workflow group and the group having
+     * a claimed item
+     * - approve it by user B and let it move to step 2
+     * - remove user B from step 3
+     * - approve it by user C
+     * - verify that the item is archived without any actions apart from removing user B
      * - delete user B
      * - verify the delete succeeds
      *
      * @throws Exception
      */
-    @Ignore
     @Test
     public void testDeleteUserWhenOnlyUserInGroup1() throws Exception {
         context.turnOffAuthorisationSystem();
@@ -169,6 +166,8 @@ public class EPersonInWorkflowTest extends AbstractIntegrationTestWithDatabase {
         httpServletRequest.setParameter("submit_approve", "submit_approve");
 
         executeWorkflowAction(httpServletRequest, workflowUserB, workflow, workflowItem, REVIEW_STEP, CLAIM_ACTION);
+        assertRemovalOfEpersonFromWorkflowGroup(workflowUserB, collection, REVIEW_ROLE, false);
+
         executeWorkflowAction(httpServletRequest, workflowUserB, workflow, workflowItem, REVIEW_STEP, REVIEW_ACTION);
 
         executeWorkflowAction(httpServletRequest, workflowUserC, workflow, workflowItem, EDIT_STEP, CLAIM_ACTION);
@@ -198,7 +197,8 @@ public class EPersonInWorkflowTest extends AbstractIntegrationTestWithDatabase {
      * - delete user B
      * - verify the delete is refused
      * - remove user B from step 1
-     * - verify that the removal is denied
+     * - verify that the removal is refused due to B being the last member in the workflow group and the group having a
+     * pool task
      * - approve it by user B and let it move to step 2
      * - remove user B from step 3
      * - delete user B
@@ -321,20 +321,21 @@ public class EPersonInWorkflowTest extends AbstractIntegrationTestWithDatabase {
      *
      * This test will perform the following checks:
      * - create a workspace item, and let it move to step 1
-     * - claim it by user B, but don’t approve it
+     * - approve it by user B, and let it move to step 2
+     * - approve it by user C, and let it move to step 3
+     * - claim it by user B
+     * - remove user B from step 1
      * - delete user B
      * - verify the delete is refused
-     * - remove user B from step 1
-     * - remove user B from step 3
+     * - remove user B from step 3, verify that the removal is refused due to user B having a claimed task and there
+     * being no other members in step 3
+     * - approve it by user B
      * - delete user B
-     * - verify the delete succeeds
-     * - verify that the item moved to step 2 without any actions apart from deleting user B
-     * - Approve it by user C
-     * - verify that the item is archived without any actions apart from the approving in step 2
+     * - verify the delete suceeds
+     * - verify that the item is archived
      *
      * @throws Exception
      */
-    @Ignore
     @Test
     public void testDeleteUserWhenOnlyUserInGroup4() throws Exception {
         context.turnOffAuthorisationSystem();
@@ -360,15 +361,20 @@ public class EPersonInWorkflowTest extends AbstractIntegrationTestWithDatabase {
         httpServletRequest.setParameter("submit_approve", "submit_approve");
 
         executeWorkflowAction(httpServletRequest, workflowUserB, workflow, workflowItem, REVIEW_STEP, CLAIM_ACTION);
-
-        assertDeletionOfEperson(workflowUserB, false);
-        assertRemovalOfEpersonFromWorkflowGroup(workflowUserB, collection, REVIEW_ROLE, false);
-        assertRemovalOfEpersonFromWorkflowGroup(workflowUserB, collection, FINAL_EDIT_ROLE, false);
-        assertDeletionOfEperson(workflowUserB, true);
-
-
+        executeWorkflowAction(httpServletRequest, workflowUserB, workflow, workflowItem, REVIEW_STEP, REVIEW_ACTION);
         executeWorkflowAction(httpServletRequest, workflowUserC, workflow, workflowItem, EDIT_STEP, CLAIM_ACTION);
         executeWorkflowAction(httpServletRequest, workflowUserC, workflow, workflowItem, EDIT_STEP, EDIT_ACTION);
+        executeWorkflowAction(httpServletRequest, workflowUserB, workflow, workflowItem, FINAL_EDIT_STEP, CLAIM_ACTION);
+
+        assertDeletionOfEperson(workflowUserB, false);
+        assertRemovalOfEpersonFromWorkflowGroup(workflowUserB, collection, REVIEW_ROLE, true);
+        assertRemovalOfEpersonFromWorkflowGroup(workflowUserB, collection, FINAL_EDIT_ROLE, false);
+
+        executeWorkflowAction(httpServletRequest, workflowUserB, workflow, workflowItem, FINAL_EDIT_STEP,
+                              FINAL_EDIT_ACTION);
+
+        assertRemovalOfEpersonFromWorkflowGroup(workflowUserB, collection, FINAL_EDIT_ROLE, true);
+        assertDeletionOfEperson(workflowUserB, true);
 
         assertTrue(workflowItem.getItem().isArchived());
 
@@ -376,124 +382,75 @@ public class EPersonInWorkflowTest extends AbstractIntegrationTestWithDatabase {
 
     /**
      * This test has the following setup:
-     * - Step 1: user B
-     * - Step 2: user C
-     * - Step 3: user B
+     * - Collection A - Step 1: user B
+     * - Collection A - Step 2: user C
+     * - Collection A - Step 3: user B
      *
-     * - create a workspace item, and let it move to step 1
-     * - Approve it by user B
-     * - verify that the item moved to step 2
-     * - claim it by user C, but don’t approve it
-     * - delete user C
+     * - Collection B - Step 1: user B
+     *
+     * This test will perform the following checks:
+     * - create a workspace item in Collection A, and let it move to step 1
+     * - claim it by user B
+     * - delete user B
      * - verify the delete is refused
-     * - remove user C from step 2
-     * - delete user C
-     * - verify the delete succeeds
-     * - verify that the item moved to step 3 without any actions apart from deleting user C
-     * - Approve it by user B
+     * - remove user B from Col A - step 3
+     * - remove user B from Col B - step 1
+     * - remove user B from Col A - step 1
+     * - Verify that the removal from Col A - step 1 is refused because user B has a claimed task in that collection and
+     * no other user is present
+     * - approve it by user B, and let it move to step 2
+     * - remove user B from Col A - step 1
+     * - verify it succeeds
+     * - delete user B
+     * - verify it succeeds
+     * - approve it by user C
      * - verify that the item is archived
      *
      * @throws Exception
      */
-    @Ignore
     @Test
     public void testDeleteUserWhenOnlyUserInGroup5() throws Exception {
         context.turnOffAuthorisationSystem();
 
         Community parent = CommunityBuilder.createCommunity(context).build();
-        Collection collection = CollectionBuilder.createCollection(context, parent)
-                                                 .withWorkflowGroup(1, workflowUserB)
-                                                 .withWorkflowGroup(2, workflowUserC)
-                                                 .withWorkflowGroup(3, workflowUserB)
-                                                 .build();
+        Collection collectionA = CollectionBuilder.createCollection(context, parent)
+                                                  .withWorkflowGroup(1, workflowUserB)
+                                                  .withWorkflowGroup(2, workflowUserC)
+                                                  .withWorkflowGroup(3, workflowUserB)
+                                                  .build();
 
-        WorkspaceItem wsi = WorkspaceItemBuilder.createWorkspaceItem(context, collection)
+        Collection collectionB = CollectionBuilder.createCollection(context, parent)
+                                                  .withWorkflowGroup(1, workflowUserB)
+                                                  .build();
+
+        WorkspaceItem wsi = WorkspaceItemBuilder.createWorkspaceItem(context, collectionA)
                                                 .withSubmitter(workflowUserA)
                                                 .withTitle("Test item full workflow")
                                                 .withIssueDate("2019-03-06")
                                                 .withSubject("ExtraEntry")
                                                 .build();
 
-        Workflow workflow = XmlWorkflowServiceFactory.getInstance().getWorkflowFactory().getWorkflow(collection);
+        Workflow workflow = XmlWorkflowServiceFactory.getInstance().getWorkflowFactory().getWorkflow(collectionA);
 
         XmlWorkflowItem workflowItem = xmlWorkflowService.startWithoutNotify(context, wsi);
         MockHttpServletRequest httpServletRequest = new MockHttpServletRequest();
         httpServletRequest.setParameter("submit_approve", "submit_approve");
 
         executeWorkflowAction(httpServletRequest, workflowUserB, workflow, workflowItem, REVIEW_STEP, CLAIM_ACTION);
+
+        assertRemovalOfEpersonFromWorkflowGroup(workflowUserB, collectionA, FINAL_EDIT_ROLE, true);
+        assertRemovalOfEpersonFromWorkflowGroup(workflowUserB, collectionB, REVIEW_ROLE, true);
+        assertRemovalOfEpersonFromWorkflowGroup(workflowUserB, collectionA, REVIEW_ROLE, false);
+
         executeWorkflowAction(httpServletRequest, workflowUserB, workflow, workflowItem, REVIEW_STEP, REVIEW_ACTION);
 
-        executeWorkflowAction(httpServletRequest, workflowUserC, workflow, workflowItem, EDIT_STEP, CLAIM_ACTION);
-        assertDeletionOfEperson(workflowUserC, false);
-        assertRemovalOfEpersonFromWorkflowGroup(workflowUserC, collection, EDIT_ROLE, false);
-        assertDeletionOfEperson(workflowUserC, true);
+        assertRemovalOfEpersonFromWorkflowGroup(workflowUserB, collectionA, REVIEW_ROLE, true);
+        assertDeletionOfEperson(workflowUserB, true);
 
-        executeWorkflowAction(httpServletRequest, workflowUserB, workflow, workflowItem, FINAL_EDIT_STEP, CLAIM_ACTION);
-        executeWorkflowAction(httpServletRequest, workflowUserB, workflow, workflowItem, FINAL_EDIT_STEP,
-                              FINAL_EDIT_ACTION);
-
-        assertTrue(workflowItem.getItem().isArchived());
-
-    }
-
-    /**
-     * This test has the following setup:
-     * - Step 1: user B
-     * - Step 2: user C
-     * - Step 3: user B
-     *
-     * - create a workspace item, and let it move to step 1
-     * - Approve it by user B
-     * - verify that the item moved to step 2
-     * - claim it by user C, but don’t approve it
-     * - delete user C
-     * - verify the delete is refused
-     * - remove user C from step 2
-     * - delete user C
-     * - verify the delete succeeds
-     * - verify that the item moved to step 3 without any actions apart from deleting user C
-     * - Approve it by user B
-     * - verify that the item is archived
-     *
-     * @throws Exception
-     */
-    @Ignore
-    @Test
-    public void testDeleteUserWhenOnlyUserInGroup6() throws Exception {
-        context.turnOffAuthorisationSystem();
-
-        Community parent = CommunityBuilder.createCommunity(context).build();
-        Collection collection = CollectionBuilder.createCollection(context, parent)
-                                                 .withWorkflowGroup(1, workflowUserB)
-                                                 .withWorkflowGroup(2, workflowUserC)
-                                                 .withWorkflowGroup(3, workflowUserB)
-                                                 .build();
-
-        WorkspaceItem wsi = WorkspaceItemBuilder.createWorkspaceItem(context, collection)
-                                                .withSubmitter(workflowUserA)
-                                                .withTitle("Test item full workflow")
-                                                .withIssueDate("2019-03-06")
-                                                .withSubject("ExtraEntry")
-                                                .build();
-
-        Workflow workflow = XmlWorkflowServiceFactory.getInstance().getWorkflowFactory().getWorkflow(collection);
-
-        XmlWorkflowItem workflowItem = xmlWorkflowService.startWithoutNotify(context, wsi);
-        MockHttpServletRequest httpServletRequest = new MockHttpServletRequest();
-        httpServletRequest.setParameter("submit_approve", "submit_approve");
-
-        executeWorkflowAction(httpServletRequest, workflowUserB, workflow, workflowItem, REVIEW_STEP, CLAIM_ACTION);
-        executeWorkflowAction(httpServletRequest, workflowUserB, workflow, workflowItem, REVIEW_STEP, REVIEW_ACTION);
 
         executeWorkflowAction(httpServletRequest, workflowUserC, workflow, workflowItem, EDIT_STEP, CLAIM_ACTION);
         executeWorkflowAction(httpServletRequest, workflowUserC, workflow, workflowItem, EDIT_STEP, EDIT_ACTION);
 
-        executeWorkflowAction(httpServletRequest, workflowUserB, workflow, workflowItem, FINAL_EDIT_STEP, CLAIM_ACTION);
-        assertDeletionOfEperson(workflowUserB, false);
-        assertRemovalOfEpersonFromWorkflowGroup(workflowUserB, collection, REVIEW_ROLE, false);
-        assertRemovalOfEpersonFromWorkflowGroup(workflowUserB, collection, FINAL_EDIT_ROLE, false);
-        assertDeletionOfEperson(workflowUserB, true);
-
         assertTrue(workflowItem.getItem().isArchived());
 
     }
@@ -520,7 +477,7 @@ public class EPersonInWorkflowTest extends AbstractIntegrationTestWithDatabase {
      * @throws Exception
      */
     @Test
-    public void testDeleteUserWhenOnlyUserInGroup7() throws Exception {
+    public void testDeleteUserWhenOnlyUserInGroup6() throws Exception {
         context.turnOffAuthorisationSystem();
 
         Community parent = CommunityBuilder.createCommunity(context).build();
@@ -584,7 +541,7 @@ public class EPersonInWorkflowTest extends AbstractIntegrationTestWithDatabase {
      * @throws Exception
      */
     @Test
-    public void testDeleteUserWhenOnlyUserInGroup8() throws Exception {
+    public void testDeleteUserWhenOnlyUserInGroup7() throws Exception {
         context.turnOffAuthorisationSystem();
 
         Community parent = CommunityBuilder.createCommunity(context).build();
