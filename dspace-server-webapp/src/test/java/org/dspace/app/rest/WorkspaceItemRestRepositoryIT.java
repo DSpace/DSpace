@@ -990,12 +990,12 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         context.restoreAuthSystemState();
 
         String authToken = getAuthToken(eperson.getEmail(), password);
-        // bulk create workspaceitems in the default collection (col1)
+        // create workspaceitems in the default collection (col1)
         AtomicReference<List<Integer>> idRef = new AtomicReference<>();
         try {
             getClient(authToken).perform(fileUpload("/api/submission/workspaceitems")
                     .file(csvFile))
-                // bulk create should return 200, 201 (created) is better for single resource
+                // create should return 200, 201 (created) is better for single resource
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$._embedded.workspaceitems[0].sections.traditionalpageone['dc.title'][0].value",
                         is("My Article")))
@@ -1030,7 +1030,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
             }
         }
 
-        // bulk create workspaceitems explicitly in the col2
+        // create workspaceitems explicitly in the col2
         try {
             getClient(authToken).perform(fileUpload("/api/submission/workspaceitems")
                     .file(csvFile)
@@ -1107,12 +1107,12 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
 
         String authToken = getAuthToken(eperson.getEmail(), password);
         AtomicReference<List<Integer>> idRef = new AtomicReference<>();
-        // bulk create workspaceitems in the default collection (col1)
+        // create workspaceitems in the default collection (col1)
 
         try {
             getClient(authToken).perform(fileUpload("/api/submission/workspaceitems")
                 .file(csvFile))
-            // bulk create should return 200, 201 (created) is better for single resource
+            // create should return 200, 201 (created) is better for single resource
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.workspaceitems[0].sections.traditionalpageone['dc.title'][0].value",
                     is("My Article")))
@@ -1186,11 +1186,11 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         String authToken = getAuthToken(eperson.getEmail(), password);
         AtomicReference<List<Integer>> idRef = new AtomicReference<>();
 
-        // bulk create workspaceitems in the default collection (col1)
+        // create workspaceitems in the default collection (col1)
         try {
             getClient(authToken).perform(fileUpload("/api/submission/workspaceitems")
                     .file(tsvFile))
-                // bulk create should return 200, 201 (created) is better for single resource
+                // create should return 200, 201 (created) is better for single resource
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$._embedded.workspaceitems[0].sections.traditionalpageone['dc.title'][0].value",
                         is("My Article")))
@@ -1257,14 +1257,16 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         String authToken = getAuthToken(eperson.getEmail(), password);
         AtomicReference<List<Integer>> idRef = new AtomicReference<>();
 
-        // bulk create workspaceitems in the default collection (col1)
+        // create workspaceitems in the default collection (col1)
         try {
             getClient(authToken).perform(fileUpload("/api/submission/workspaceitems")
                     .file(tsvFile))
-                // bulk create should return 200, 201 (created) is better for single resource
+                // create should return 200, 201 (created) is better for single resource
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$._embedded.workspaceitems[0].sections.traditionalpageone['dc.title'][0].value",
                         is("Challenge–Response Identification")))
+                .andExpect(jsonPath("$._embedded.workspaceitems[0].sections.traditionalpageone['dc.title'][1].value",
+                        is("Challenge–Response Identification second title")))
                 .andExpect(jsonPath("$._embedded.workspaceitems[0].sections.traditionalpageone"
                         + "['dc.contributor.author'][0].value",
                         is("Just, Mike")))
@@ -1326,11 +1328,11 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
 
         String authToken = getAuthToken(eperson.getEmail(), password);
         AtomicReference<List<Integer>> idRef = new AtomicReference<>();
-        // bulk create workspaceitems in the default collection (col1)
+        // create workspaceitems in the default collection (col1)
         try {
             getClient(authToken).perform(fileUpload("/api/submission/workspaceitems")
                     .file(endnoteFile))
-                // bulk create should return 200, 201 (created) is better for single resource
+                // create should return 200, 201 (created) is better for single resource
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$._embedded.workspaceitems[0].sections.traditionalpageone['dc.title'][0].value",
                         is("My Title")))
@@ -1405,11 +1407,11 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         String authToken = getAuthToken(eperson.getEmail(), password);
         AtomicReference<List<Integer>> idRef = new AtomicReference<>();
 
-        // bulk create workspaceitems in the default collection (col1)
+        // create workspaceitems in the default collection (col1)
         try {
             getClient(authToken).perform(fileUpload("/api/submission/workspaceitems")
                 .file(csvFile))
-            // bulk create should return 200, 201 (created) is better for single resource
+            // create should return 200, 201 (created) is better for single resource
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.workspaceitems[0].sections.traditionalpageone['dc.title'][0].value",
                     is("My Article")))
@@ -1729,10 +1731,10 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
 
         context.restoreAuthSystemState();
 
-        // bulk create a workspaceitem
+        // create a workspaceitem
         getClient(authToken).perform(fileUpload("/api/submission/workspaceitems")
                     .file(pdfFile))
-                // bulk create should return 200, 201 (created) is better for single resource
+                // create should return 200, 201 (created) is better for single resource
                 .andExpect(status().isOk())
                 //FIXME it will be nice to setup a mock grobid server for end to end testing
                 // no metadata for now
