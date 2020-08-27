@@ -26,10 +26,22 @@
 		<entry key-ref="dcAbstract" value-ref="risAbstractContrib" />    
     </util:map>
 
-    <bean id="risTitleContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleMetadataContributor">
+
+    <bean id="risTitleContrib" class="org.dspace.importer.external.metadatamapping.contributor.MultipleMetadataContributor">
         <property name="field" ref="dcTitle"/>
-        <property name="key" value="T1" />
+        <property name="metadatumContributors" ref="risTitleContribList" />
     </bean>
+
+	<util:list id="risTitleContribList">
+	    <bean id="risTitleContribTI" class="org.dspace.importer.external.metadatamapping.contributor.SimpleMetadataContributor">
+	        <property name="field" ref="dcTitle"/>
+	        <property name="key" value="TI" />
+	    </bean>
+	    <bean id="risTitleContribT1" class="org.dspace.importer.external.metadatamapping.contributor.SimpleMetadataContributor">
+	        <property name="field" ref="dcTitle"/>
+	        <property name="key" value="T1" />
+	    </bean>	
+	</util:list>
     
     <bean id="risAuthorContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleMetadataContributor">
         <property name="field" ref="dcAuthors"/>
