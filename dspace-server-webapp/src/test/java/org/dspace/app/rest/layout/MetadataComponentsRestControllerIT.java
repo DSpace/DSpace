@@ -78,37 +78,49 @@ public class MetadataComponentsRestControllerIT extends AbstractControllerIntegr
         CrisLayoutFieldBuilder.createMetadataField(context, isbn, 0, 0)
                 .withLabel("LABEL ISBN")
                 .withRendering("RENDERIGN ISBN")
-                .withStyle("STYLE")
+                .withStyle("row")
+                .withLabelStyle("col-6")
+                .withValueStyle("col-6")
                 .withBox(box)
                 .build();
         CrisLayoutFieldBuilder.createMetadataField(context, uri, 0, 1)
                 .withLabel("LABEL URI")
                 .withRendering("RENDERIGN URI")
-                .withStyle("STYLE")
+                .withStyle("row")
+                .withLabelStyle("col-6")
+                .withValueStyle("col-6")
                 .withBox(box)
                 .build();
         CrisLayoutFieldBuilder.createMetadataField(context, abs, 1, 0)
                 .withLabel("LABEL ABS")
                 .withRendering("RENDERIGN ABS")
-                .withStyle("STYLE")
+                .withStyle("row")
+                .withLabelStyle("col-6")
+                .withValueStyle("col-6")
                 .withBox(box)
                 .build();
         CrisLayoutFieldBuilder.createMetadataField(context, provenance, 1, 1)
                 .withLabel("LABEL PROVENANCE")
                 .withRendering("RENDERIGN PROVENANCE")
-                .withStyle("STYLE")
+                .withStyle("row")
+                .withLabelStyle("col-6")
+                .withValueStyle("col-6")
                 .withBox(box)
                 .build();
         CrisLayoutFieldBuilder.createMetadataField(context, sponsorship, 1, 2)
                 .withLabel("LABEL SPRONSORSHIP")
                 .withRendering("RENDERIGN SPRONSORSHIP")
-                .withStyle("STYLE")
+                .withStyle("row")
+                .withLabelStyle("col-6")
+                .withValueStyle("col-6")
                 .withBox(box)
                 .build();
         CrisLayoutFieldBuilder.createMetadataField(context, extent, 2, 0)
                 .withLabel("LABEL EXTENT")
                 .withRendering("RENDERIGN EXTENT")
-                .withStyle("STYLE")
+                .withStyle("row")
+                .withLabelStyle("col-6")
+                .withValueStyle("col-6")
                 .withBox(box)
                 .build();
         CrisLayoutBoxBuilder.createBuilder(context, eType, true, true)
@@ -145,6 +157,9 @@ public class MetadataComponentsRestControllerIT extends AbstractControllerIntegr
         values.put("label", "Department Name");
         values.put("rendering", "browselink");
         values.put("fieldType", "metadata");
+        values.put("style", "row");
+        values.put("styleLabel", "col-3");
+        values.put("styleValue", "col-9");
         metadataValues.add(values);
         operations.add(new AddOperation("/rows/0/fields/0", metadataValues));
 
@@ -160,7 +175,10 @@ public class MetadataComponentsRestControllerIT extends AbstractControllerIntegr
                         hasJsonPath("$.rows[0].fields[0].metadata", is("orgunit.identifier.name")),
                         hasJsonPath("$.rows[0].fields[0].label", is("Department Name")),
                         hasJsonPath("$.rows[0].fields[0].fieldType", is("METADATA")),
-                        hasJsonPath("$.rows[0].fields[0].rendering", is("browselink"))
+                        hasJsonPath("$.rows[0].fields[0].rendering", is("browselink")),
+                        hasJsonPath("$.rows[0].fields[0].style", is("row")),
+                        hasJsonPath("$.rows[0].fields[0].styleLabel", is("col-3")),
+                        hasJsonPath("$.rows[0].fields[0].styleValue", is("col-9"))
                        )));
 
     }

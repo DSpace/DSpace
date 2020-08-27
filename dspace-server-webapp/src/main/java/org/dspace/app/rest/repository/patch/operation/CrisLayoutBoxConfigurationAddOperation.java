@@ -193,6 +193,16 @@ public class CrisLayoutBoxConfigurationAddOperation<D> extends PatchOperation<D>
             field.setStyle(styleNode.asText());
         }
 
+        JsonNode styleLabelNode = node.get("styleLabel");
+        if (styleLabelNode != null && styleLabelNode.asText() != null ) {
+            field.setStyle(styleLabelNode.asText());
+        }
+
+        JsonNode styleValueNode = node.get("styleValue");
+        if (styleValueNode != null && styleValueNode.asText() != null ) {
+            field.setStyle(styleValueNode.asText());
+        }
+
         Integer priority = null;
         List<CrisLayoutField> fields = fieldService.findFieldByBoxId(context, box.getID(), row);
         if (fields != null && !fields.isEmpty()) {

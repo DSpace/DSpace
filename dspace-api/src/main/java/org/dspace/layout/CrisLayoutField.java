@@ -58,6 +58,10 @@ public class CrisLayoutField implements ReloadableEntity<Integer> {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "box_id")
     private CrisLayoutBox box;
+    @Column(name = "style_label")
+    private String styleLabel;
+    @Column(name = "style_value")
+    private String styleValue;
 
     @Override
     public Integer getID() {
@@ -122,6 +126,22 @@ public class CrisLayoutField implements ReloadableEntity<Integer> {
 
     public void setBox(CrisLayoutBox box) {
         this.box = box;
+    }
+
+    public String getStyleLabel() {
+        return styleLabel;
+    }
+
+    public void setStyleLabel(String styleLabel) {
+        this.styleLabel = styleLabel;
+    }
+
+    public String getStyleValue() {
+        return styleValue;
+    }
+
+    public void setStyleValue(String styleValue) {
+        this.styleValue = styleValue;
     }
 
 }

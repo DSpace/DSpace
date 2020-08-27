@@ -60,6 +60,8 @@ public class CrisLayoutMetadataBoxConfigurator implements CrisLayoutBoxConfigura
                 field.setLabel(layoutField.getLabel());
                 field.setRendering(layoutField.getRendering());
                 field.setStyle(layoutField.getStyle());
+                field.setStyleLabel(layoutField.getStyleLabel());
+                field.setStyleValue(layoutField.getStyleValue());
                 if (layoutField instanceof CrisLayoutFieldMetadata) {
                     field.setMetadata(composeMetadataFieldIdentifier(layoutField.getMetadataField()));
                     field.setFieldType("METADATA");
