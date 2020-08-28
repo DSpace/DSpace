@@ -259,8 +259,7 @@ public class RestDSpaceRunnableHandler implements DSpaceRunnableHandler {
      */
     public void schedule(DSpaceRunnable script) {
         TaskExecutor taskExecutor = new DSpace().getServiceManager()
-                                                          .getServiceByName("dspaceRunnableThreadExecutor",
-                                                                            TaskExecutor.class);
+                                                .getServiceByName("dspaceRunnableThreadExecutor", TaskExecutor.class);
         Context context = new Context();
         try {
             Process process = processService.find(context, processId);
