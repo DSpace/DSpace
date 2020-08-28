@@ -81,18 +81,27 @@ public class EPersonTest extends AbstractUnitTest {
     @Test
     public void testPreferences() throws Exception {
 
-        ePersonService.addMetadata(context, eperson, "dspace", "agreements", "end-user", null, "test");
-        ePersonService.addMetadata(context, eperson, "dspace", "agreements", "cookies", null,
-                                   "Dspace cookies agreement metadata");
+        String cookies =
+            "{" +
+                "\"token_item\":true," +
+                "\"impersonation\":true," +
+                "\"redirect\":true," +
+                "\"language\":true," +
+                "\"klaro\":true," +
+                "\"google-analytics\":false" +
+                "}";
+
+        ePersonService.addMetadata(context, eperson, "dspace", "agreements", "cookies", null, cookies);
+        ePersonService.addMetadata(context, eperson, "dspace", "agreements", "end-user", null, "true");
         context.commit();
 
         assertEquals(
-                "test",
-                ePersonService.getMetadataFirstValue(eperson, "dspace", "agreements", "end-user", null)
+            cookies,
+            ePersonService.getMetadataFirstValue(eperson, "dspace", "agreements", "cookies", null)
         );
         assertEquals(
-                "Dspace cookies agreement metadata",
-                ePersonService.getMetadataFirstValue(eperson, "dspace", "agreements", "cookies", null)
+            "true",
+                ePersonService.getMetadataFirstValue(eperson, "dspace", "agreements", "end-user", null)
         );
     }
 
