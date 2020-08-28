@@ -156,9 +156,13 @@ public class MultipartFileSender {
         // Initialize response.
         response.reset();
         response.setBufferSize(bufferSize);
-        response.setHeader(CONTENT_TYPE, contentType);
+        if (contentType != null) {
+            response.setHeader(CONTENT_TYPE, contentType);
+        }
         response.setHeader(ACCEPT_RANGES, BYTES);
-        response.setHeader(ETAG, checksum);
+        if (checksum != null) {
+            response.setHeader(ETAG, checksum);
+        }
         response.setDateHeader(LAST_MODIFIED, lastModified);
         response.setDateHeader(EXPIRES, System.currentTimeMillis() + DEFAULT_EXPIRE_TIME);
 
