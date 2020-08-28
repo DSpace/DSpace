@@ -78,7 +78,3 @@ DROP TABLE cris_layout_box2field, cris_layout_fieldbitstream2metadata;
 ALTER TABLE cris_layout_field ADD CONSTRAINT cris_layout_field_box_fkey FOREIGN KEY (box_id) REFERENCES cris_layout_box (id);
 
 ALTER TABLE cris_layout_field ADD COLUMN metadata_value VARCHAR(255);
-
-ALTER TABLE cris_layout_field ADD COLUMN style_label VARCHAR(255);
-
-ALTER TABLE cris_layout_field ADD COLUMN style_value VARCHAR(255);
