@@ -32,6 +32,7 @@ import org.dspace.discovery.SearchService;
 import org.dspace.discovery.SearchServiceException;
 import org.dspace.discovery.configuration.DiscoveryConfigurationParameters;
 import org.dspace.discovery.indexobject.IndexableItem;
+import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
@@ -161,6 +162,8 @@ public class SolrBrowseDAO implements BrowseDAO {
 
     protected AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
 
+    protected ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
+
     // administrative attributes for this class
 
 
@@ -176,6 +179,7 @@ public class SolrBrowseDAO implements BrowseDAO {
             DiscoverQuery query = new DiscoverQuery();
             addLocationScopeFilter(query);
             addStatusFilter(query);
+            addExtraFilter(query);
             if (distinct) {
                 DiscoverFacetField dff;
                 if (StringUtils.isNotBlank(startsWith)) {
@@ -220,6 +224,13 @@ public class SolrBrowseDAO implements BrowseDAO {
             }
         }
         return sResponse;
+    }
+
+    private void addExtraFilter(DiscoverQuery query) {
+        String filter = configurationService.getProperty("browse.solr." + facetField + ".filter");
+        if (StringUtils.isNotBlank(filter)) {
+            query.addFilterQueries(filter);
+        }
     }
 
     private void addStatusFilter(DiscoverQuery query) {
@@ -333,6 +344,7 @@ public class SolrBrowseDAO implements BrowseDAO {
         DiscoverQuery query = new DiscoverQuery();
         addLocationScopeFilter(query);
         addStatusFilter(query);
+        addExtraFilter(query);
         query.setMaxResults(0);
         query.addFilterQueries("search.resourcetype:" + IndexableItem.TYPE);
 
