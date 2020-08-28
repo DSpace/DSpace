@@ -182,24 +182,7 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
         c.turnOffAuthorisationSystem();
 
         // Find the EPerson, assign to context
-        try {
-            if (commandLine.hasOption('e')) {
-                EPerson eperson;
-                String e = commandLine.getOptionValue('e');
-                if (e.indexOf('@') != -1) {
-                    eperson = EPersonServiceFactory.getInstance().getEPersonService().findByEmail(c, e);
-                } else {
-                    eperson = EPersonServiceFactory.getInstance().getEPersonService().find(c, UUID.fromString(e));
-                }
-
-                if (eperson == null) {
-                    throw new ParseException("Error, eperson cannot be found: " + e);
-                }
-                c.setCurrentUser(eperson);
-            }
-        } catch (Exception e) {
-            throw new ParseException("Unable to find DSpace user: " + e.getMessage());
-        }
+        assignCurrentUserInContext(c);
 
         if (authorityControlled == null) {
             setAuthorizedMetadataFields();
@@ -277,6 +260,18 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
 
     }
 
+    protected void assignCurrentUserInContext(Context context) throws ParseException {
+        UUID uuid = getEpersonIdentifier();
+        if (uuid != null) {
+            try {
+                EPerson ePerson = EPersonServiceFactory.getInstance().getEPersonService().find(context, uuid);
+                context.setCurrentUser(ePerson);
+            } catch (SQLException e) {
+                log.error("Something went wrong trying to fetch the eperson for uuid: " + uuid, e);
+            }
+        }
+    }
+
     /**
      * This method determines whether the changes should be applied or not. This is default set to true for the REST
      * script as we don't want to interact with the caller. This will be overwritten in the CLI script to ask for
@@ -312,9 +307,6 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
             throw new ParseException("Required parameter -f missing!");
         }
         filename = commandLine.getOptionValue('f');
-        if (!commandLine.hasOption('e')) {
-            throw new ParseException("Required parameter -e missing!");
-        }
 
         // Option to apply template to new items
         if (commandLine.hasOption('t')) {
