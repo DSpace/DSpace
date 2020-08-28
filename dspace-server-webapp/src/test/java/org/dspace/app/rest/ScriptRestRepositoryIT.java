@@ -345,14 +345,20 @@ public class ScriptRestRepositoryIT extends AbstractControllerIntegrationTest {
             MvcResult mvcResult = getClient(token)
                     .perform(get("/api/core/bitstreams/" + bitstream.getID() + "/content")).andReturn();
             String content = mvcResult.getResponse().getContentAsString();
-            assertThat(content, CoreMatchers.containsString("INFO mock-script - 1 @ The script has started"));
+
+            assertThat(content, CoreMatchers
+                    .containsString("INFO mock-script - " + process.getID() + " @ The script has started"));
             assertThat(content,
-                       CoreMatchers.containsString("INFO mock-script - 1 @ Logging INFO for Mock DSpace Script"));
+                       CoreMatchers.containsString(
+                               "INFO mock-script - " + process.getID() + " @ Logging INFO for Mock DSpace Script"));
             assertThat(content,
-                       CoreMatchers.containsString("ERROR mock-script - 1 @ Logging ERROR for Mock DSpace Script"));
+                       CoreMatchers.containsString(
+                               "ERROR mock-script - " + process.getID() + " @ Logging ERROR for Mock DSpace Script"));
             assertThat(content,
-                       CoreMatchers.containsString("WARNING mock-script - 1 @ Logging WARNING for Mock DSpace Script"));
-            assertThat(content, CoreMatchers.containsString("INFO mock-script - 1 @ The script has completed"));
+                       CoreMatchers.containsString("WARNING mock-script - " + process
+                               .getID() + " @ Logging WARNING for Mock DSpace Script"));
+            assertThat(content, CoreMatchers
+                    .containsString("INFO mock-script - " + process.getID() + " @ The script has completed"));
 
 
 
