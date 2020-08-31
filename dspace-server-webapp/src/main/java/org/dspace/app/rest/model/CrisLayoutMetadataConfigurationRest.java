@@ -93,6 +93,9 @@ public class CrisLayoutMetadataConfigurationRest extends BaseObjectRest<Integer>
         private String rendering;
         private String fieldType;
         private String style;
+        private String styleLabel;
+        private String styleValue;
+
         public String getMetadata() {
             return metadata;
         }
@@ -174,6 +177,18 @@ public class CrisLayoutMetadataConfigurationRest extends BaseObjectRest<Integer>
         }
         public void setBitstream(Bitstream bitstream) {
             this.bitstream = bitstream;
+        }
+        public String getStyleLabel() {
+            return styleLabel;
+        }
+        public void setStyleLabel(String styleLabel) {
+            this.styleLabel = styleLabel;
+        }
+        public String getStyleValue() {
+            return styleValue;
+        }
+        public void setStyleValue(String styleValue) {
+            this.styleValue = styleValue;
         }
     }
 

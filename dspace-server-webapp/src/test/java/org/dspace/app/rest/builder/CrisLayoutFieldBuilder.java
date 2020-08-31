@@ -133,4 +133,14 @@ public class CrisLayoutFieldBuilder extends AbstractBuilder<CrisLayoutField, Cri
         this.field.setBox(box);
         return this;
     }
+
+    public CrisLayoutFieldBuilder withLabelStyle(String styleLabel) {
+        this.field.setStyleLabel(styleLabel);
+        return this;
+    }
+
+    public CrisLayoutFieldBuilder withValueStyle(String styleValue) {
+        this.field.setStyleValue(styleValue);
+        return this;
+    }
 }
