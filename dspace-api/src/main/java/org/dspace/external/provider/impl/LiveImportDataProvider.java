@@ -56,8 +56,8 @@ public class LiveImportDataProvider implements ExternalDataProvider {
     }
 
     /**
-     * This method set the QuerySource for the ExternalDataProvider
-     * @param querySource {@link org.dspace.importer.external.service.components.QuerySource} implementation used to process the input data
+     * This method set the MetadataSource for the ExternalDataProvider
+     * @param metadataSource {@link org.dspace.importer.external.service.components.MetadataSource} implementation used to process the input data
      */
     public void setMetadataSource(QuerySource querySource) {
         this.querySource = querySource;
@@ -110,7 +110,7 @@ public class LiveImportDataProvider implements ExternalDataProvider {
     @Override
     public int getNumberOfResults(String query) {
         try {
-            return querySource.getNbRecords(query);
+            return querySource.getRecordsCount(query);
         } catch (MetadataSourceException e) {
             throw new RuntimeException(
                     "The live import provider " + querySource.getImportSource() + " throws an exception", e);
@@ -127,22 +127,24 @@ public class LiveImportDataProvider implements ExternalDataProvider {
      * @return
      */
     private ExternalDataObject getExternalDataObject(ImportRecord record) {
+        //return 400 if no record were found
+        if (record == null) {
+            throw new IllegalArgumentException("No record found for query or id");
+        }
         ExternalDataObject externalDataObject = new ExternalDataObject(sourceIdentifier);
-        if (record != null) {
-            String id = getFirstValue(record, recordIdMetadata);
-            String display = getFirstValue(record, displayMetadata);
-            externalDataObject.setId(id);
-            externalDataObject.setDisplayValue(display);
-            externalDataObject.setValue(display);
-            for (MetadatumDTO dto : record.getValueList()) {
-                // FIXME it would be useful to remove MetadatumDTO in favor of MetadataValueDTO
-                MetadataValueDTO mvDTO = new MetadataValueDTO();
-                mvDTO.setSchema(dto.getSchema());
-                mvDTO.setElement(dto.getElement());
-                mvDTO.setQualifier(dto.getQualifier());
-                mvDTO.setValue(dto.getValue());
-                externalDataObject.addMetadata(mvDTO);
-            }
+        String id = getFirstValue(record, recordIdMetadata);
+        String display = getFirstValue(record, displayMetadata);
+        externalDataObject.setId(id);
+        externalDataObject.setDisplayValue(display);
+        externalDataObject.setValue(display);
+        for (MetadatumDTO dto : record.getValueList()) {
+            // FIXME it would be useful to remove MetadatumDTO in favor of MetadataValueDTO
+            MetadataValueDTO mvDTO = new MetadataValueDTO();
+            mvDTO.setSchema(dto.getSchema());
+            mvDTO.setElement(dto.getElement());
+            mvDTO.setQualifier(dto.getQualifier());
+            mvDTO.setValue(dto.getValue());
+            externalDataObject.addMetadata(mvDTO);
         }
         return externalDataObject;
     }

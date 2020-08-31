@@ -46,7 +46,7 @@ public class ArXivImportMetadataSourceServiceImpl extends AbstractImportMetadata
     private String baseAddress;
 
     /**
-     * Find the number of records matching a string query. Supports pagination
+     * Find the number of records matching the query string in ArXiv. Supports pagination.
      *
      * @param query a query string to base the search on.
      * @param start offset to start at
@@ -60,8 +60,11 @@ public class ArXivImportMetadataSourceServiceImpl extends AbstractImportMetadata
     }
 
     /**
-     * Find records based on a object query.
-     *
+     * Find records based on a object query and convert them to a list metadata mapped in ImportRecord.
+     * The entry with the key "query" of the Query's map will be used as query string value.
+     * 
+     * @see org.dspace.importer.external.datamodel.Query
+     * @see org.dspace.importer.external.datamodel.ImportRecord
      * @param query a query object to base the search on.
      * @return a set of records. Fully transformed.
      * @throws MetadataSourceException if the underlying methods throw any exception.
@@ -72,32 +75,34 @@ public class ArXivImportMetadataSourceServiceImpl extends AbstractImportMetadata
     }
 
     /**
-     * Find the number of records matching a query;
+     * Find the number of records matching the query string in ArXiv;
      *
      * @param query a query object to base the search on.
      * @return the sum of the matching records over this import source
      * @throws MetadataSourceException if the underlying methods throw any exception.
      */
     @Override
-    public int getNbRecords(String query) throws MetadataSourceException {
+    public int getRecordsCount(String query) throws MetadataSourceException {
         return retry(new CountByQueryCallable(query));
     }
 
 
     /**
      * Find the number of records matching a query;
-     *
+     * The entry with the key "query" of the Query's map will be used to get the query string.
+     * 
+     * @see org.dspace.importer.external.datamodel.Query
      * @param query a query string to base the search on.
      * @return the sum of the matching records over this import source
      * @throws MetadataSourceException if the underlying methods throw any exception.
      */
     @Override
-    public int getNbRecords(Query query) throws MetadataSourceException {
+    public int getRecordsCount(Query query) throws MetadataSourceException {
         return retry(new CountByQueryCallable(query));
     }
 
     /**
-     * Get a single record from the source by id
+     * Get a single record of metadata from the arxiv by ArXiv ID.
      *
      * @param id id of the record in ArXiv
      * @return the first matching record
@@ -111,8 +116,10 @@ public class ArXivImportMetadataSourceServiceImpl extends AbstractImportMetadata
     }
 
     /**
-     * Get a single record from the source.
-     *
+     * Get a single record from the ArXiv matching the query.
+     * Field "query" will be used to get data from.
+     * 
+     * @see org.dspace.importer.external.datamodel.Query
      * @param query a query matching a single record
      * @return the first matching record
      * @throws MetadataSourceException if the underlying methods throw any exception.
@@ -166,6 +173,16 @@ public class ArXivImportMetadataSourceServiceImpl extends AbstractImportMetadata
         return retry(new FindMatchingRecordCallable(query));
     }
 
+    /**
+     * This class is a Callable implementation to count the number of entries for an ArXiv
+     * query.
+     * This Callable use as query value to ArXiv the string queryString passed to constructor.
+     * If the object will be construct through Query.class instance, the value of the Query's
+     * map with the key "query" will be used.
+     * 
+     * @author Pasquale Cavallo (pasquale.cavallo at 4science dot it)
+     *
+     */
     private class CountByQueryCallable implements Callable<Integer> {
         private Query query;
 
@@ -194,22 +211,36 @@ public class ArXivImportMetadataSourceServiceImpl extends AbstractImportMetadata
             }
             Invocation.Builder invocationBuilder = local.request(MediaType.TEXT_PLAIN_TYPE);
             Response response = invocationBuilder.get();
-            String responseString = response.readEntity(String.class);
-            OMXMLParserWrapper records = OMXMLBuilderFactory.createOMBuilder(new StringReader(responseString));
-            OMElement element = records.getDocumentElement();
-            AXIOMXPath xpath = null;
-            try {
-                xpath = new AXIOMXPath("opensearch:totalResults");
-                xpath.addNamespace("opensearch", "http://a9.com/-/spec/opensearch/1.1/");
-                OMElement count = (OMElement) xpath.selectSingleNode(element);
-                return Integer.parseInt(count.getText());
-            } catch (JaxenException e) {
+            if (response.getStatus() == 200) {
+                String responseString = response.readEntity(String.class);
+                OMXMLParserWrapper records = OMXMLBuilderFactory.createOMBuilder(new StringReader(responseString));
+                OMElement element = records.getDocumentElement();
+                AXIOMXPath xpath = null;
+                try {
+                    xpath = new AXIOMXPath("opensearch:totalResults");
+                    xpath.addNamespace("opensearch", "http://a9.com/-/spec/opensearch/1.1/");
+                    OMElement count = (OMElement) xpath.selectSingleNode(element);
+                    return Integer.parseInt(count.getText());
+                } catch (JaxenException e) {
+                    return null;
+                }
+            } else {
                 return null;
             }
         }
     }
 
-
+    /**
+     * This class is a Callable implementation to get ArXiv entries based on
+     * query object.
+     * This Callable use as query value the string queryString passed to constructor.
+     * If the object will be construct through Query.class instance, a Query's map entry with key "query" will be used.
+     * Pagination is supported too, using the value of the Query's map with keys "start" and "count".
+     * 
+     * @see org.dspace.importer.external.datamodel.Query
+     * @author Pasquale Cavallo (pasquale.cavallo at 4science dot it)
+     *
+     */
     private class SearchByQueryCallable implements Callable<List<ImportRecord>> {
         private Query query;
 
@@ -241,15 +272,26 @@ public class ArXivImportMetadataSourceServiceImpl extends AbstractImportMetadata
             }
             Invocation.Builder invocationBuilder = local.request(MediaType.TEXT_PLAIN_TYPE);
             Response response = invocationBuilder.get();
-            String responseString = response.readEntity(String.class);
-            List<OMElement> omElements = splitToRecords(responseString);
-            for (OMElement record : omElements) {
-                results.add(transformSourceRecords(record));
+            if (response.getStatus() == 200) {
+                String responseString = response.readEntity(String.class);
+                List<OMElement> omElements = splitToRecords(responseString);
+                for (OMElement record : omElements) {
+                    results.add(transformSourceRecords(record));
+                }
+                return results;
+            } else {
+                return null;
             }
-            return results;
         }
     }
 
+    /**
+     * This class is a Callable implementation to get an ArXiv entry using ArXiv ID
+     * The ID to use can be passed through the constructor as a String or as Query's map entry, with the key "id".
+     *
+     * @author Pasquale Cavallo (pasquale.cavallo at 4science dot it)
+     *
+     */
     private class SearchByIdCallable implements Callable<List<ImportRecord>> {
         private Query query;
 
@@ -277,15 +319,29 @@ public class ArXivImportMetadataSourceServiceImpl extends AbstractImportMetadata
             WebTarget local = webTarget.queryParam("id_list", arxivid);
             Invocation.Builder invocationBuilder = local.request(MediaType.TEXT_PLAIN_TYPE);
             Response response = invocationBuilder.get();
-            String responseString = response.readEntity(String.class);
-            List<OMElement> omElements = splitToRecords(responseString);
-            for (OMElement record : omElements) {
-                results.add(transformSourceRecords(record));
+            if (response.getStatus() == 200) {
+                String responseString = response.readEntity(String.class);
+                List<OMElement> omElements = splitToRecords(responseString);
+                for (OMElement record : omElements) {
+                    results.add(transformSourceRecords(record));
+                }
+                return results;
+            } else {
+                return null;
             }
-            return results;
         }
     }
 
+    /**
+     * This class is a Callable implementation to search ArXiv entries
+     * using author and title.
+     * There are two field in the Query map to pass, with keys "title" and "author"
+     * (at least one must be used).
+     * 
+     * @see org.dspace.importer.external.datamodel.Query
+     * @author Pasquale Cavallo (pasquale.cavallo at 4science dot it)
+     *
+     */
     private class FindMatchingRecordCallable implements Callable<List<ImportRecord>> {
 
         private Query query;
@@ -301,12 +357,16 @@ public class ArXivImportMetadataSourceServiceImpl extends AbstractImportMetadata
             WebTarget local = webTarget.queryParam("search_query", queryString);
             Invocation.Builder invocationBuilder = local.request(MediaType.TEXT_PLAIN_TYPE);
             Response response = invocationBuilder.get();
-            String responseString = response.readEntity(String.class);
-            List<OMElement> omElements = splitToRecords(responseString);
-            for (OMElement record : omElements) {
-                results.add(transformSourceRecords(record));
+            if (response.getStatus() == 200) {
+                String responseString = response.readEntity(String.class);
+                List<OMElement> omElements = splitToRecords(responseString);
+                for (OMElement record : omElements) {
+                    results.add(transformSourceRecords(record));
+                }
+                return results;
+            } else {
+                return null;
             }
-            return results;
         }
 
         private String getQuery(Query query) {
@@ -358,5 +418,4 @@ public class ArXivImportMetadataSourceServiceImpl extends AbstractImportMetadata
     public void setBaseAddress(String baseAddress) {
         this.baseAddress = baseAddress;
     }
-
 }
