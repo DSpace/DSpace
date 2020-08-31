@@ -92,10 +92,13 @@ public class ItemConverter
     public MetadataValueList getPermissionFilteredMetadata(Context context, Item obj) {
         List<MetadataValue> fullList = itemService.getMetadata(obj, Item.ANY, Item.ANY, Item.ANY, Item.ANY, true);
         List<MetadataValue> returnList = new LinkedList<>();
+        String entityType = itemService.getMetadataFirstValue(obj, MetadataSchemaEnum.RELATIONSHIP.getName(),
+                "type", null, Item.ANY);
         try {
+            List<CrisLayoutBox> boxes = crisLayoutBoxService.findEntityBoxes(context, entityType, 1000, 0);
             for (MetadataValue metadataValue : fullList) {
                 MetadataField metadataField = metadataValue.getMetadataField();
-                if (checkMetadataFieldVisibility(context, obj, metadataField)) {
+                if (checkMetadataFieldVisibility(context, boxes, obj, metadataField)) {
                     returnList.add(metadataValue);
                 }
             }
@@ -105,21 +108,39 @@ public class ItemConverter
         return new MetadataValueList(returnList);
     }
 
-    public boolean checkMetadataFieldVisibility(Context context, Item item, MetadataField metadataField)
-            throws SQLException {
-        String entityType = itemService.getMetadataFirstValue(item, MetadataSchemaEnum.RELATIONSHIP.getName(),
-                                                              "type", null, Item.ANY);
+    public boolean checkMetadataFieldVisibility(Context context, Item item,
+            MetadataField metadataField) throws SQLException {
+        String entityType = itemService.getMetadataFirstValue(item, MetadataSchemaEnum.RELATIONSHIP.getName(), "type",
+                null, Item.ANY);
         List<CrisLayoutBox> boxes = crisLayoutBoxService.findEntityBoxes(context, entityType, 1000, 0);
-        List<MetadataField> allPublicMetadata = getPublicMetadata(boxes);
-        EPerson currentUser = context.getCurrentUser();
-        if (isPublicMetadataField(metadataField, allPublicMetadata)) {
-            return true;
-        } else if (currentUser != null) {
-            List<CrisLayoutBox> boxesWithMetadataFieldExcludedPublic = getBoxesWithMetadataFieldExcludedPublic(
-                    metadataField, boxes);
-            for (CrisLayoutBox box : boxesWithMetadataFieldExcludedPublic) {
-                if (grantAccess(context, currentUser, box, item)) {
+        return checkMetadataFieldVisibility(context, boxes, item, metadataField);
+    }
+
+    private boolean checkMetadataFieldVisibility(Context context, List<CrisLayoutBox> boxes, Item item,
+            MetadataField metadataField) throws SQLException {
+        if (boxes.size() == 0) {
+            if (context != null && authorizeService.isAdmin(context)) {
+                return true;
+            } else {
+                if (!metadataExposureService
+                        .isHidden(context, metadataField.getMetadataSchema().getName(),
+                                  metadataField.getElement(),
+                                  metadataField.getQualifier())) {
                     return true;
+                }
+            }
+        } else {
+            List<MetadataField> allPublicMetadata = getPublicMetadata(boxes);
+            EPerson currentUser = context.getCurrentUser();
+            if (isPublicMetadataField(metadataField, allPublicMetadata)) {
+                return true;
+            } else if (currentUser != null) {
+                List<CrisLayoutBox> boxesWithMetadataFieldExcludedPublic = getBoxesWithMetadataFieldExcludedPublic(
+                        metadataField, boxes);
+                for (CrisLayoutBox box : boxesWithMetadataFieldExcludedPublic) {
+                    if (grantAccess(context, currentUser, box, item)) {
+                        return true;
+                    }
                 }
             }
         }
