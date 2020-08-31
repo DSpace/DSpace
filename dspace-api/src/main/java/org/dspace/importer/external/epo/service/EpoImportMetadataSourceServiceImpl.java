@@ -161,7 +161,7 @@ public class EpoImportMetadataSourceServiceImpl extends AbstractImportMetadataSo
 
 
     @Override
-    public int getNbRecords(String query) throws MetadataSourceException {
+    public int getRecordsCount(String query) throws MetadataSourceException {
         fillKey();
         if (StringUtils.isNotBlank(consumerKey) && StringUtils.isNotBlank(consumerSecret)) {
             try {
@@ -176,7 +176,7 @@ public class EpoImportMetadataSourceServiceImpl extends AbstractImportMetadataSo
     }
 
     @Override
-    public int getNbRecords(Query query) throws MetadataSourceException {
+    public int getRecordsCount(Query query) throws MetadataSourceException {
         fillKey();
         if (StringUtils.isNotBlank(consumerKey) && StringUtils.isNotBlank(consumerSecret)) {
             try {

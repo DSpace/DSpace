@@ -35,7 +35,7 @@
             </list>
          </property>
     </bean>
-  
+
     <bean id="ArXivImportService"
           class="org.dspace.importer.external.arxiv.service.ArXivImportMetadataSourceServiceImpl" scope="singleton">
         <property name="metadataFieldMapping" ref="ArXivMetadataFieldMapping"/>

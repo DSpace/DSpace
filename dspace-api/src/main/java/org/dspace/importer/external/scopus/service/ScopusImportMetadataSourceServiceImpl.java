@@ -41,7 +41,6 @@ import org.dspace.importer.external.exception.MetadataSourceException;
 import org.dspace.importer.external.service.AbstractImportMetadataSourceService;
 import org.dspace.importer.external.service.components.QuerySource;
 import org.dspace.services.ConfigurationService;
-import org.dspace.submit.lookup.SubmissionLookupService;
 import org.jaxen.JaxenException;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -84,14 +83,13 @@ public class ScopusImportMetadataSourceServiceImpl extends AbstractImportMetadat
         return "scopus";
     }
 
-
     @Override
-    public int getNbRecords(String query) throws MetadataSourceException {
+    public int getRecordsCount(String query) throws MetadataSourceException {
         return retry(new SearchNBByQueryCallable(query));
     }
 
     @Override
-    public int getNbRecords(Query query) throws MetadataSourceException {
+    public int getRecordsCount(Query query) throws MetadataSourceException {
         return retry(new SearchNBByQueryCallable(query));
     }
 
@@ -158,52 +156,49 @@ public class ScopusImportMetadataSourceServiceImpl extends AbstractImportMetadat
             String proxyPort = configurationService.getProperty("http.proxy.port");
             String apiKey = configurationService.getProperty("submission.lookup.scopus.apikey");
             if (apiKey != null && !apiKey.equals("")) {
-                if (!configurationService.getBooleanProperty(SubmissionLookupService.CFG_MODULE +
-                        ".remoteservice.demo")) {
-                    HttpGet method = null;
+                HttpGet method = null;
+                try {
+                    HttpClientBuilder hcBuilder = HttpClients.custom();
+                    Builder requestConfigBuilder = RequestConfig.custom();
+                    requestConfigBuilder.setConnectionRequestTimeout(timeout);
+
+                    if (StringUtils.isNotBlank(proxyHost)
+                        && StringUtils.isNotBlank(proxyPort)) {
+                        HttpHost proxy = new HttpHost(proxyHost, Integer.parseInt(proxyPort), "http");
+                        DefaultProxyRoutePlanner routePlanner = new DefaultProxyRoutePlanner(proxy);
+                        hcBuilder.setRoutePlanner(routePlanner);
+                    }
+
+                    HttpClient client = hcBuilder.build();
+                    // open session
+                    method = new HttpGet(
+                        ENDPOINT_SEARCH_SCOPUS + "?httpAccept=application/xml&apiKey=" + apiKey + query);
+                    method.setConfig(requestConfigBuilder.build());
+                        // Execute the method.
+                    HttpResponse httpResponse = client.execute(method);
+                    int statusCode = httpResponse.getStatusLine().getStatusCode();
+                    if (statusCode != HttpStatus.SC_OK) {
+                        throw new RuntimeException("WS call failed: "
+                                                           + statusCode);
+                    }
+                    InputStream is = httpResponse.getEntity().getContent();
+                    String response = IOUtils.toString(is, Charsets.UTF_8);
+                    OMXMLParserWrapper records = OMXMLBuilderFactory.createOMBuilder(new StringReader(response));
+                    OMElement element = records.getDocumentElement();
+                    AXIOMXPath xpath = null;
                     try {
-                        HttpClientBuilder hcBuilder = HttpClients.custom();
-                        Builder requestConfigBuilder = RequestConfig.custom();
-                        requestConfigBuilder.setConnectionRequestTimeout(timeout);
-
-                        if (StringUtils.isNotBlank(proxyHost)
-                            && StringUtils.isNotBlank(proxyPort)) {
-                            HttpHost proxy = new HttpHost(proxyHost, Integer.parseInt(proxyPort), "http");
-                            DefaultProxyRoutePlanner routePlanner = new DefaultProxyRoutePlanner(proxy);
-                            hcBuilder.setRoutePlanner(routePlanner);
-                        }
-
-                        HttpClient client = hcBuilder.build();
-                        // open session
-                        method = new HttpGet(
-                            ENDPOINT_SEARCH_SCOPUS + "?httpAccept=application/xml&apiKey=" + apiKey + query);
-                        method.setConfig(requestConfigBuilder.build());
-                            // Execute the method.
-                        HttpResponse httpResponse = client.execute(method);
-                        int statusCode = httpResponse.getStatusLine().getStatusCode();
-                        if (statusCode != HttpStatus.SC_OK) {
-                            throw new RuntimeException("WS call failed: "
-                                                               + statusCode);
-                        }
-                        InputStream is = httpResponse.getEntity().getContent();
-                        String response = IOUtils.toString(is, Charsets.UTF_8);
-                        OMXMLParserWrapper records = OMXMLBuilderFactory.createOMBuilder(new StringReader(response));
-                        OMElement element = records.getDocumentElement();
-                        AXIOMXPath xpath = null;
-                        try {
-                            xpath = new AXIOMXPath("opensearch:totalResults");
-                            xpath.addNamespace("opensearch", "http://a9.com/-/spec/opensearch/1.1/");
-                            OMElement count = (OMElement) xpath.selectSingleNode(element);
-                            return Integer.parseInt(count.getText());
-                        } catch (JaxenException e) {
-                            return null;
-                        }
-                    } catch (Exception e1) {
-                        log.error(e1.getMessage(), e1);
-                    } finally {
-                        if (method != null) {
-                            method.releaseConnection();
-                        }
+                        xpath = new AXIOMXPath("opensearch:totalResults");
+                        xpath.addNamespace("opensearch", "http://a9.com/-/spec/opensearch/1.1/");
+                        OMElement count = (OMElement) xpath.selectSingleNode(element);
+                        return Integer.parseInt(count.getText());
+                    } catch (JaxenException e) {
+                        return null;
+                    }
+                } catch (Exception e1) {
+                    log.error(e1.getMessage(), e1);
+                } finally {
+                    if (method != null) {
+                        method.releaseConnection();
                     }
                 }
             }
@@ -229,47 +224,44 @@ public class ScopusImportMetadataSourceServiceImpl extends AbstractImportMetadat
             String proxyPort = configurationService.getProperty("http.proxy.port");
             String apiKey = configurationService.getProperty("submission.lookup.scopus.apikey");
             if (apiKey != null && !apiKey.equals("")) {
-                if (!configurationService.getBooleanProperty(SubmissionLookupService.CFG_MODULE +
-                        ".remoteservice.demo")) {
-                    HttpGet method = null;
-                    try {
-                        HttpClientBuilder hcBuilder = HttpClients.custom();
-                        Builder requestConfigBuilder = RequestConfig.custom();
-                        requestConfigBuilder.setConnectionRequestTimeout(timeout);
+                HttpGet method = null;
+                try {
+                    HttpClientBuilder hcBuilder = HttpClients.custom();
+                    Builder requestConfigBuilder = RequestConfig.custom();
+                    requestConfigBuilder.setConnectionRequestTimeout(timeout);
 
-                        if (StringUtils.isNotBlank(proxyHost)
-                            && StringUtils.isNotBlank(proxyPort)) {
-                            HttpHost proxy = new HttpHost(proxyHost, Integer.parseInt(proxyPort), "http");
-                            DefaultProxyRoutePlanner routePlanner = new DefaultProxyRoutePlanner(proxy);
-                            hcBuilder.setRoutePlanner(routePlanner);
-                        }
+                    if (StringUtils.isNotBlank(proxyHost)
+                        && StringUtils.isNotBlank(proxyPort)) {
+                        HttpHost proxy = new HttpHost(proxyHost, Integer.parseInt(proxyPort), "http");
+                        DefaultProxyRoutePlanner routePlanner = new DefaultProxyRoutePlanner(proxy);
+                        hcBuilder.setRoutePlanner(routePlanner);
+                    }
 
-                        HttpClient client = hcBuilder.build();
-                        // open session
-                        method = new HttpGet(
-                            ENDPOINT_SEARCH_SCOPUS + "?httpAccept=application/xml&apiKey=" + apiKey +
-                                "&view=COMPLETE&query=" + URLEncoder
-                                .encode(queryString));
-                        method.setConfig(requestConfigBuilder.build());
-                            // Execute the method.
-                        HttpResponse httpResponse = client.execute(method);
-                        int statusCode = httpResponse.getStatusLine().getStatusCode();
-                        if (statusCode != HttpStatus.SC_OK) {
-                            throw new RuntimeException("WS call failed: "
-                                                               + statusCode);
-                        }
-                        InputStream is = httpResponse.getEntity().getContent();
-                        String response = IOUtils.toString(is, Charsets.UTF_8);
-                        List<OMElement> omElements = splitToRecords(response);
-                        for (OMElement record : omElements) {
-                            results.add(transformSourceRecords(record));
-                        }
-                    } catch (Exception e1) {
-                        log.error(e1.getMessage(), e1);
-                    } finally {
-                        if (method != null) {
-                            method.releaseConnection();
-                        }
+                    HttpClient client = hcBuilder.build();
+                    // open session
+                    method = new HttpGet(
+                        ENDPOINT_SEARCH_SCOPUS + "?httpAccept=application/xml&apiKey=" + apiKey +
+                            "&view=COMPLETE&query=" + URLEncoder
+                            .encode(queryString));
+                    method.setConfig(requestConfigBuilder.build());
+                        // Execute the method.
+                    HttpResponse httpResponse = client.execute(method);
+                    int statusCode = httpResponse.getStatusLine().getStatusCode();
+                    if (statusCode != HttpStatus.SC_OK) {
+                        throw new RuntimeException("WS call failed: "
+                                                           + statusCode);
+                    }
+                    InputStream is = httpResponse.getEntity().getContent();
+                    String response = IOUtils.toString(is, Charsets.UTF_8);
+                    List<OMElement> omElements = splitToRecords(response);
+                    for (OMElement record : omElements) {
+                        results.add(transformSourceRecords(record));
+                    }
+                } catch (Exception e1) {
+                    log.error(e1.getMessage(), e1);
+                } finally {
+                    if (method != null) {
+                        method.releaseConnection();
                     }
                 }
             }
@@ -332,47 +324,44 @@ public class ScopusImportMetadataSourceServiceImpl extends AbstractImportMetadat
             String apiKey = configurationService.getProperty("submission.lookup.scopus.apikey");
 
             if (apiKey != null && !apiKey.equals("")) {
-                if (!configurationService.getBooleanProperty(SubmissionLookupService.CFG_MODULE +
-                        ".remoteservice.demo")) {
-                    HttpGet method = null;
-                    try {
-                        HttpClientBuilder hcBuilder = HttpClients.custom();
-                        Builder requestConfigBuilder = RequestConfig.custom();
-                        requestConfigBuilder.setConnectionRequestTimeout(timeout);
+                HttpGet method = null;
+                try {
+                    HttpClientBuilder hcBuilder = HttpClients.custom();
+                    Builder requestConfigBuilder = RequestConfig.custom();
+                    requestConfigBuilder.setConnectionRequestTimeout(timeout);
 
-                        if (StringUtils.isNotBlank(proxyHost)
-                            && StringUtils.isNotBlank(proxyPort)) {
-                            HttpHost proxy = new HttpHost(proxyHost, Integer.parseInt(proxyPort), "http");
-                            DefaultProxyRoutePlanner routePlanner = new DefaultProxyRoutePlanner(proxy);
-                            hcBuilder.setRoutePlanner(routePlanner);
-                        }
+                    if (StringUtils.isNotBlank(proxyHost)
+                        && StringUtils.isNotBlank(proxyPort)) {
+                        HttpHost proxy = new HttpHost(proxyHost, Integer.parseInt(proxyPort), "http");
+                        DefaultProxyRoutePlanner routePlanner = new DefaultProxyRoutePlanner(proxy);
+                        hcBuilder.setRoutePlanner(routePlanner);
+                    }
 
-                        HttpClient client = hcBuilder.build();
-                        // open session
-                        method = new HttpGet(
-                            ENDPOINT_SEARCH_SCOPUS + "?httpAccept=application/xml&apiKey=" + apiKey +
-                                "&view=COMPLETE&start=" + start + "&count=" + count + "&query=" + URLEncoder
-                                .encode(queryString));
-                        method.setConfig(requestConfigBuilder.build());
-                            // Execute the method.
-                        HttpResponse httpResponse = client.execute(method);
-                        int statusCode = httpResponse.getStatusLine().getStatusCode();
-                        if (statusCode != HttpStatus.SC_OK) {
-                            throw new RuntimeException("WS call failed: "
-                                                               + statusCode);
-                        }
-                        InputStream is = httpResponse.getEntity().getContent();
-                        String response = IOUtils.toString(is, Charsets.UTF_8);
-                        List<OMElement> omElements = splitToRecords(response);
-                        for (OMElement record : omElements) {
-                            results.add(transformSourceRecords(record));
-                        }
-                    } catch (Exception e1) {
-                        log.error(e1.getMessage(), e1);
-                    } finally {
-                        if (method != null) {
-                            method.releaseConnection();
-                        }
+                    HttpClient client = hcBuilder.build();
+                    // open session
+                    method = new HttpGet(
+                        ENDPOINT_SEARCH_SCOPUS + "?httpAccept=application/xml&apiKey=" + apiKey +
+                            "&view=COMPLETE&start=" + start + "&count=" + count + "&query=" + URLEncoder
+                            .encode(queryString));
+                    method.setConfig(requestConfigBuilder.build());
+                        // Execute the method.
+                    HttpResponse httpResponse = client.execute(method);
+                    int statusCode = httpResponse.getStatusLine().getStatusCode();
+                    if (statusCode != HttpStatus.SC_OK) {
+                        throw new RuntimeException("WS call failed: "
+                                                           + statusCode);
+                    }
+                    InputStream is = httpResponse.getEntity().getContent();
+                    String response = IOUtils.toString(is, Charsets.UTF_8);
+                    List<OMElement> omElements = splitToRecords(response);
+                    for (OMElement record : omElements) {
+                        results.add(transformSourceRecords(record));
+                    }
+                } catch (Exception e1) {
+                    log.error(e1.getMessage(), e1);
+                } finally {
+                    if (method != null) {
+                        method.releaseConnection();
                     }
                 }
             }
@@ -412,47 +401,44 @@ public class ScopusImportMetadataSourceServiceImpl extends AbstractImportMetadat
             String apiKey = configurationService.getProperty("submission.lookup.scopus.apikey");
 
             if (apiKey != null && !apiKey.equals("")) {
-                if (!configurationService.getBooleanProperty(SubmissionLookupService.CFG_MODULE +
-                        ".remoteservice.demo")) {
-                    HttpGet method = null;
-                    try {
-                        HttpClientBuilder hcBuilder = HttpClients.custom();
-                        Builder requestConfigBuilder = RequestConfig.custom();
-                        requestConfigBuilder.setConnectionRequestTimeout(timeout);
+                HttpGet method = null;
+                try {
+                    HttpClientBuilder hcBuilder = HttpClients.custom();
+                    Builder requestConfigBuilder = RequestConfig.custom();
+                    requestConfigBuilder.setConnectionRequestTimeout(timeout);
 
-                        if (StringUtils.isNotBlank(proxyHost)
-                            && StringUtils.isNotBlank(proxyPort)) {
-                            HttpHost proxy = new HttpHost(proxyHost, Integer.parseInt(proxyPort), "http");
-                            DefaultProxyRoutePlanner routePlanner = new DefaultProxyRoutePlanner(proxy);
-                            hcBuilder.setRoutePlanner(routePlanner);
-                        }
+                    if (StringUtils.isNotBlank(proxyHost)
+                        && StringUtils.isNotBlank(proxyPort)) {
+                        HttpHost proxy = new HttpHost(proxyHost, Integer.parseInt(proxyPort), "http");
+                        DefaultProxyRoutePlanner routePlanner = new DefaultProxyRoutePlanner(proxy);
+                        hcBuilder.setRoutePlanner(routePlanner);
+                    }
 
-                        HttpClient client = hcBuilder.build();
-                        // open session
-                        method = new HttpGet(
-                            ENDPOINT_SEARCH_SCOPUS + "?httpAccept=application/xml&apiKey=" + apiKey +
-                                "&start=" + (start != null ? start : 0) + "&count=" + (count != null ? count : 20) +
-                                "&query=" + URLEncoder.encode(queryString));
-                        method.setConfig(requestConfigBuilder.build());
-                            // Execute the method.
-                        HttpResponse httpResponse = client.execute(method);
-                        int statusCode = httpResponse.getStatusLine().getStatusCode();
-                        if (statusCode != HttpStatus.SC_OK) {
-                            throw new RuntimeException("WS call failed: "
-                                                               + statusCode);
-                        }
-                        InputStream is = httpResponse.getEntity().getContent();
-                        String response = IOUtils.toString(is, Charsets.UTF_8);
-                        List<OMElement> omElements = splitToRecords(response);
-                        for (OMElement record : omElements) {
-                            results.add(transformSourceRecords(record));
-                        }
-                    } catch (Exception e1) {
-                        log.error(e1.getMessage(), e1);
-                    } finally {
-                        if (method != null) {
-                            method.releaseConnection();
-                        }
+                    HttpClient client = hcBuilder.build();
+                    // open session
+                    method = new HttpGet(
+                        ENDPOINT_SEARCH_SCOPUS + "?httpAccept=application/xml&apiKey=" + apiKey +
+                            "&start=" + (start != null ? start : 0) + "&count=" + (count != null ? count : 20) +
+                            "&query=" + URLEncoder.encode(queryString));
+                    method.setConfig(requestConfigBuilder.build());
+                        // Execute the method.
+                    HttpResponse httpResponse = client.execute(method);
+                    int statusCode = httpResponse.getStatusLine().getStatusCode();
+                    if (statusCode != HttpStatus.SC_OK) {
+                        throw new RuntimeException("WS call failed: "
+                                                           + statusCode);
+                    }
+                    InputStream is = httpResponse.getEntity().getContent();
+                    String response = IOUtils.toString(is, Charsets.UTF_8);
+                    List<OMElement> omElements = splitToRecords(response);
+                    for (OMElement record : omElements) {
+                        results.add(transformSourceRecords(record));
+                    }
+                } catch (Exception e1) {
+                    log.error(e1.getMessage(), e1);
+                } finally {
+                    if (method != null) {
+                        method.releaseConnection();
                     }
                 }
             }

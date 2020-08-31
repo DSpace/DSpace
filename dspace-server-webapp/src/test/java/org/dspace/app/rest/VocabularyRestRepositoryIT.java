@@ -15,12 +15,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.util.Date;
 import java.util.UUID;
 
-import org.dspace.app.rest.builder.CollectionBuilder;
-import org.dspace.app.rest.builder.CommunityBuilder;
 import org.dspace.app.rest.matcher.VocabularyMatcher;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.authority.PersonAuthorityValue;
 import org.dspace.authority.factory.AuthorityServiceFactory;
+import org.dspace.builder.CollectionBuilder;
+import org.dspace.builder.CommunityBuilder;
 import org.dspace.content.Collection;
 import org.dspace.content.authority.service.ChoiceAuthorityService;
 import org.dspace.core.service.PluginService;

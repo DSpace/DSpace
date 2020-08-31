@@ -20,12 +20,12 @@ import java.util.Map;
 import javax.ws.rs.core.MediaType;
 
 import gr.ekt.bte.core.DataLoader;
-import org.dspace.app.rest.builder.CollectionBuilder;
-import org.dspace.app.rest.builder.CommunityBuilder;
-import org.dspace.app.rest.builder.WorkspaceItemBuilder;
 import org.dspace.app.rest.model.patch.AddOperation;
 import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
+import org.dspace.builder.CollectionBuilder;
+import org.dspace.builder.CommunityBuilder;
+import org.dspace.builder.WorkspaceItemBuilder;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.WorkspaceItem;

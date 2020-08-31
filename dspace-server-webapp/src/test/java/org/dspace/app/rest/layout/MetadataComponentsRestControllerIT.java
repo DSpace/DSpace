@@ -22,13 +22,13 @@ import java.util.List;
 import java.util.Map;
 import javax.ws.rs.core.MediaType;
 
-import org.dspace.app.rest.builder.CrisLayoutBoxBuilder;
-import org.dspace.app.rest.builder.CrisLayoutFieldBuilder;
-import org.dspace.app.rest.builder.EntityTypeBuilder;
 import org.dspace.app.rest.model.patch.AddOperation;
 import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.rest.model.patch.RemoveOperation;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
+import org.dspace.builder.CrisLayoutBoxBuilder;
+import org.dspace.builder.CrisLayoutFieldBuilder;
+import org.dspace.builder.EntityTypeBuilder;
 import org.dspace.content.EntityType;
 import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataSchema;
