@@ -195,12 +195,12 @@ public class CrisLayoutBoxConfigurationAddOperation<D> extends PatchOperation<D>
 
         JsonNode styleLabelNode = node.get("styleLabel");
         if (styleLabelNode != null && styleLabelNode.asText() != null ) {
-            field.setStyle(styleLabelNode.asText());
+            field.setStyleLabel(styleLabelNode.asText());
         }
 
         JsonNode styleValueNode = node.get("styleValue");
         if (styleValueNode != null && styleValueNode.asText() != null ) {
-            field.setStyle(styleValueNode.asText());
+            field.setStyleValue(styleValueNode.asText());
         }
 
         Integer priority = null;
