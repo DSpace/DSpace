@@ -54,6 +54,7 @@ import org.dspace.content.Item;
 import org.dspace.content.Site;
 import org.dspace.core.Constants;
 import org.dspace.eperson.EPerson;
+import org.dspace.services.ConfigurationService;
 import org.dspace.statistics.factory.StatisticsServiceFactory;
 import org.hamcrest.Matchers;
 import org.junit.Before;
@@ -69,6 +70,9 @@ import org.springframework.http.HttpStatus;
  * @author Maria Verdonck (Atmire) on 10/06/2020
  */
 public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTest {
+
+    @Autowired
+    ConfigurationService configurationService;
     @Autowired
     protected AuthorizeService authorizeService;
 
@@ -95,6 +99,9 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
     @Override
     public void setUp() throws Exception {
         super.setUp();
+
+        // Explicitly use solr commit in SolrLoggerServiceImpl#postView
+        configurationService.setProperty("solr-statistics.autoCommit", false);
 
         context.turnOffAuthorisationSystem();
 

@@ -252,8 +252,11 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
 
 
             solr.add(doc1);
-            //commits are executed automatically using the solr autocommit
-            solr.commit(false, false);
+            // commits are executed automatically using the solr autocommit
+            boolean useAutoCommit = configurationService.getBooleanProperty("solr-statistics.autoCommit", true);
+            if (!useAutoCommit) {
+                solr.commit(false, false);
+            }
 
         } catch (RuntimeException re) {
             throw re;
@@ -289,7 +292,10 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
 
             solr.add(doc1);
             // commits are executed automatically using the solr autocommit
-            solr.commit(false, false);
+            boolean useAutoCommit = configurationService.getBooleanProperty("solr-statistics.autoCommit", true);
+            if (!useAutoCommit) {
+                solr.commit(false, false);
+            }
 
         } catch (RuntimeException re) {
             throw re;
