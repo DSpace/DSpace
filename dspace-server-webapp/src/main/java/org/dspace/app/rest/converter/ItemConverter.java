@@ -92,31 +92,38 @@ public class ItemConverter
     public MetadataValueList getPermissionFilteredMetadata(Context context, Item obj) {
         List<MetadataValue> fullList = itemService.getMetadata(obj, Item.ANY, Item.ANY, Item.ANY, Item.ANY, true);
         List<MetadataValue> returnList = new LinkedList<>();
-        List<CrisLayoutBox> boxes = null;
-        String entityType = getEntityType(fullList);
         try {
-            boxes = crisLayoutBoxService.findEntityBoxes(context, entityType, 100, 0);
-            List<MetadataField> allPublicMetadata = getPublicMetadata(boxes);
-            EPerson currentUser = context.getCurrentUser();
             for (MetadataValue metadataValue : fullList) {
                 MetadataField metadataField = metadataValue.getMetadataField();
-                if (isPublicMetadataField(metadataField, allPublicMetadata)) {
+                if (checkMetadataFieldVisibility(context, obj, metadataField)) {
                     returnList.add(metadataValue);
-                } else if (currentUser != null) {
-                    List<CrisLayoutBox> boxesWithMetadataFieldExcludedPublic =
-                                        getBoxesWithMetadataFieldExcludedPublic(metadataField, boxes);
-                    for (CrisLayoutBox box : boxesWithMetadataFieldExcludedPublic) {
-                        if (grantAccess(context, currentUser, box, obj)) {
-                            returnList.add(metadataValue);
-                            break;
-                        }
-                    }
                 }
             }
         } catch (SQLException e) {
             log.error("Error filtering item metadata based on permissions", e);
         }
         return new MetadataValueList(returnList);
+    }
+
+    public boolean checkMetadataFieldVisibility(Context context, Item item, MetadataField metadataField)
+            throws SQLException {
+        String entityType = itemService.getMetadataFirstValue(item, MetadataSchemaEnum.RELATIONSHIP.getName(),
+                                                              "type", null, Item.ANY);
+        List<CrisLayoutBox> boxes = crisLayoutBoxService.findEntityBoxes(context, entityType, 1000, 0);
+        List<MetadataField> allPublicMetadata = getPublicMetadata(boxes);
+        EPerson currentUser = context.getCurrentUser();
+        if (isPublicMetadataField(metadataField, allPublicMetadata)) {
+            return true;
+        } else if (currentUser != null) {
+            List<CrisLayoutBox> boxesWithMetadataFieldExcludedPublic = getBoxesWithMetadataFieldExcludedPublic(
+                    metadataField, boxes);
+            for (CrisLayoutBox box : boxesWithMetadataFieldExcludedPublic) {
+                if (grantAccess(context, currentUser, box, item)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     private boolean grantAccess(Context context, EPerson currentUser, CrisLayoutBox box, Item item)
@@ -216,17 +223,6 @@ public class ItemConverter
             }
         }
         return false;
-    }
-
-    private String getEntityType(List<MetadataValue> fullList) {
-        String entityType = null;
-        for (MetadataValue mv : fullList) {
-            MetadataField metadataField = mv.getMetadataField();
-            if (metadataField.getMetadataSchema().getName().equals(MetadataSchemaEnum.RELATIONSHIP.getName())) {
-                entityType = mv.getValue();
-            }
-        }
-        return entityType;
     }
 
     private List<MetadataField> getPublicMetadata(List<CrisLayoutBox> boxes) {
