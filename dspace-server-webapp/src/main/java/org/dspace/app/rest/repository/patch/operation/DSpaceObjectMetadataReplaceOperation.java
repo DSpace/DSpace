@@ -10,6 +10,8 @@ package org.dspace.app.rest.repository.patch.operation;
 import java.sql.SQLException;
 import java.util.List;
 
+import org.apache.logging.log4j.Logger;
+import org.dspace.app.rest.converter.ItemConverter;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.MetadataValueRest;
@@ -39,8 +41,14 @@ import org.springframework.stereotype.Component;
 @Component
 public class DSpaceObjectMetadataReplaceOperation<R extends DSpaceObject> extends PatchOperation<R> {
 
+    private static final Logger log = org.apache.logging.log4j.LogManager
+                                         .getLogger(DSpaceObjectMetadataReplaceOperation.class);
+
     @Autowired
     DSpaceObjectMetadataPatchUtils metadataPatchUtils;
+
+    @Autowired
+    private ItemConverter itemConverter;
 
     @Override
     public R perform(Context context, R resource, Operation operation) throws SQLException {
@@ -78,6 +86,16 @@ public class DSpaceObjectMetadataReplaceOperation<R extends DSpaceObject> extend
      */
     private void replace(Context context, DSpaceObject dso, DSpaceObjectService dsoService, MetadataField metadataField,
                          MetadataValueRest metadataValue, String index, String propertyOfMd, String valueMdProperty) {
+        try {
+            if (dso instanceof Item) {
+                if (!itemConverter.checkMetadataFieldVisibility(context, (Item) dso, metadataField)) {
+                    throw new UnprocessableEntityException(
+                            "Current user has not permession to esecute patch peration on " + metadataField);
+                }
+            }
+        } catch (SQLException e) {
+            log.error("Error filtering item metadata based on permissions", e);
+        }
         // replace entire set of metadata
         if (metadataField == null) {
             this.replaceAllMetadata(context, dso, dsoService);
