@@ -242,8 +242,8 @@
 					<xsl:variable name="awardtitle" select="doc:metadata/doc:element[@name='dc']/doc:element[@name='relation']/doc:element/doc:field[@name='value']"/>
 					
 					<xsl:variable name="check_fundingreference"> 
-						<xsl:for-each select="$awardtitle">
-							<xsl:if test="$awardtitle!=''">
+						<xsl:for-each select="$funder">
+							<xsl:if test="$funder!=''">
 								<xsl:value-of select="."/>
 							</xsl:if>
 						</xsl:for-each>
@@ -251,12 +251,12 @@
 					
 					<xsl:if test="$check_fundingreference!=''">
 						<oaire:fundingReferences>
-							<xsl:for-each select="$awardtitle">
+							<xsl:for-each select="$funder">
 								<xsl:if test=".!='' ">
 									<oaire:fundingReference>
 										<xsl:variable name="counter" select="position()"/>
 										<oaire:funderName>
-											<xsl:value-of select="$funder[$counter]"/>
+											<xsl:value-of select="."/>
 										</oaire:funderName>
 										<xsl:if test="$funderid[$counter]!='' ">
 											<oaire:funderIdentifier funderIdentifierType="Crossref Funder ID">
@@ -267,15 +267,15 @@
 											<oaire:awardNumber>
 												<xsl:if test="$awarduri[$counter]!='' ">
 													<xsl:attribute name="awardURI">
-														<xsl:value-of select="$awarduri"/>
+														<xsl:value-of select="$awarduri[$counter]"/>
 													</xsl:attribute>
 												</xsl:if>
 												<xsl:value-of select="$awardnumber[$counter]"/>
 											</oaire:awardNumber>
 										</xsl:if>
-										<xsl:if test=".!='' ">
+										<xsl:if test="$awardtitle[$counter]!='' ">
 											<oaire:awardTitle>
-												<xsl:value-of select="."/>
+												<xsl:value-of select="$awardtitle[$counter]"/>
 											</oaire:awardTitle>
 										</xsl:if>
 									</oaire:fundingReference>
