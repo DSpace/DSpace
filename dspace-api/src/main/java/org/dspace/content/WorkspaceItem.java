@@ -156,11 +156,11 @@ public class WorkspaceItem
             return true;
         }
         Class<?> objClass = HibernateProxyHelper.getClassWithoutInitializingProxy(o);
-        if (getClass() != objClass) {
+        if (!getClass().equals(objClass)) {
             return false;
         }
         final WorkspaceItem that = (WorkspaceItem) o;
-        if (this.getID() != that.getID()) {
+        if (!this.getID().equals(that.getID())) {
             return false;
         }
 

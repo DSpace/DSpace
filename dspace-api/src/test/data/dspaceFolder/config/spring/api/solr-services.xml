@@ -19,20 +19,30 @@
 
     <context:annotation-config/> <!-- allows us to use spring annotations in beans -->
 
-    <bean class="org.dspace.discovery.SolrServiceImpl" id="org.dspace.discovery.SearchService"/>
+    <bean class="org.dspace.discovery.SolrServiceImpl"
+          id="org.dspace.discovery.SearchService"/>
 
-    <alias name="org.dspace.discovery.SearchService" alias="org.dspace.discovery.IndexingService"/>
+    <alias name="org.dspace.discovery.SearchService"
+           alias="org.dspace.discovery.IndexingService"/>
 
     <!-- These beans have been added so that we can mock our AuthoritySearchService in the tests-->
-    <bean class="org.dspace.authority.MockAuthoritySolrServiceImpl" id="org.dspace.authority.AuthoritySearchService"/>
-    <alias name="org.dspace.authority.AuthoritySearchService" alias="org.dspace.authority.indexer.AuthorityIndexingService"/>
+    <bean class="org.dspace.authority.MockAuthoritySolrServiceImpl"
+          id="org.dspace.authority.AuthoritySearchService"/>
+    <alias name="org.dspace.authority.AuthoritySearchService"
+           alias="org.dspace.authority.indexer.AuthorityIndexingService"/>
 
-    <bean id="org.dspace.discovery.SolrSearchCore" class="org.dspace.discovery.MockSolrSearchCore" autowire-candidate="true"/>
+    <bean id="org.dspace.discovery.MockSolrSearchCore"
+          class="org.dspace.discovery.MockSolrSearchCore"
+          autowire-candidate="true"/>
 
-    <!--<bean class="org.dspace.discovery.SolrServiceIndexOutputPlugin" id="solrServiceIndexOutputPlugin"/>-->
+    <!--<bean class="org.dspace.discovery.SolrServiceIndexOutputPlugin"
+          id="solrServiceIndexOutputPlugin"/>-->
 
-    <!-- Statistics services are both lazy loaded (by name), as you are likely just using ONE of them and not both -->
-    <bean id="solrLoggerService" class="org.dspace.statistics.MockSolrLoggerServiceImpl" lazy-init="true"/>
+    <!-- Statistics services are both lazy loaded (by name), as you are likely
+          just using ONE of them and not both -->
+    <bean id="solrLoggerService"
+          class="org.dspace.statistics.MockSolrLoggerServiceImpl"
+          lazy-init="true"/>
 
     <!-- deduplication -->
     <bean class="org.dspace.deduplication.MockSolrDedupCore" id="org.dspace.app.deduplication.service.DedupService"/>

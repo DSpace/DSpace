@@ -432,7 +432,7 @@ it, please enter the types and the actual numbers or codes.</hint>
    <form name="journalVolumeStep">
      <row>
        <relation-field>
-         <relationship-type>isVolumeOfJournal</relationship-type>
+         <relationship-type>isJournalOfVolume</relationship-type>
          <search-configuration>periodical</search-configuration>
          <filter>creativework.publisher:somepublishername</filter>
          <label>Journal</label>

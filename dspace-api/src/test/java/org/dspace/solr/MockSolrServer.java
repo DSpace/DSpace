@@ -19,7 +19,7 @@ import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.embedded.EmbeddedSolrServer;
 import org.apache.solr.core.CoreContainer;
-import org.dspace.AbstractDSpaceTest;
+import org.dspace.AbstractDSpaceIntegrationTest;
 
 /**
  * Factory of connections to an in-process embedded Solr service.
@@ -110,7 +110,7 @@ public class MockSolrServer {
                 server.deleteByQuery("*:*");
                 server.commit();
             } catch (SolrServerException | IOException e) {
-                e.printStackTrace(System.err);
+                log.error("Failed to empty Solr index:  {}", e.getMessage(), e);
             }
 
             loadedCores.put(coreName, server);
@@ -159,7 +159,7 @@ public class MockSolrServer {
      */
     private static synchronized void initSolrContainer() {
         if (container == null) {
-            String solrDir = AbstractDSpaceTest.getDspaceDir() + File.separator + "solr";
+            String solrDir = AbstractDSpaceIntegrationTest.getDspaceDir() + File.separator + "solr";
             log.info("Initializing SOLR CoreContainer with directory " + solrDir);
             container = new CoreContainer(solrDir);
             container.load();

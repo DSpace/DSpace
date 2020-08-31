@@ -18,11 +18,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.util.Locale;
 
-import org.dspace.app.rest.builder.EPersonBuilder;
 import org.dspace.app.rest.matcher.SubmissionFormFieldMatcher;
 import org.dspace.app.rest.repository.SubmissionFormRestRepository;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.app.util.DCInputsReaderException;
+import org.dspace.builder.EPersonBuilder;
 import org.dspace.eperson.EPerson;
 import org.dspace.services.ConfigurationService;
 import org.hamcrest.Matchers;
@@ -219,7 +219,7 @@ public class SubmissionFormsControllerIT extends AbstractControllerIntegrationTe
                         // check the first two rows
                         .andExpect(jsonPath("$.rows[0].fields", contains(
                             SubmissionFormFieldMatcher.matchFormClosedRelationshipFieldDefinition("Journal", null,
-                    false,"Select the journal related to this volume.", "isVolumeOfJournal",
+                    false,"Select the journal related to this volume.", "isJournalOfVolume",
                         "creativework.publisher:somepublishername", "periodical", false))))
         ;
     }
@@ -284,7 +284,7 @@ public class SubmissionFormsControllerIT extends AbstractControllerIntegrationTe
                          + " Як що вмiст вайлу не є текстовим, наприклад є фотографiєю, тодi вибрати (N/A)", null,
                            "dc.language.iso", "common_iso_languages"))));
 
-                 resetLocalesConfiguration();
+        resetLocalesConfiguration();
     }
 
     @Test
@@ -358,7 +358,7 @@ public class SubmissionFormsControllerIT extends AbstractControllerIntegrationTe
                          + " Як що вмiст вайлу не є текстовим, наприклад є фотографiєю, тодi вибрати (N/A)", null,
                            "dc.language.iso", "common_iso_languages"))));
 
-                 resetLocalesConfiguration();
+        resetLocalesConfiguration();
     }
 
     @Test
@@ -405,7 +405,7 @@ public class SubmissionFormsControllerIT extends AbstractControllerIntegrationTe
                          + " (ad esempio, se è un set di dati o un'immagine) selezionare (N/A)", null,
                            "dc.language.iso", "common_iso_languages"))));
 
-                 resetLocalesConfiguration();
+        resetLocalesConfiguration();
     }
 
     @Test
@@ -441,7 +441,38 @@ public class SubmissionFormsControllerIT extends AbstractControllerIntegrationTe
                             "\u00C8 necessario inserire un titolo principale per questo item", false,
                             "Inserisci titolo principale di questo item", "dc.title"))));
 
-                  resetLocalesConfiguration();
+        resetLocalesConfiguration();
+    }
+
+    @Test
+    public void supportLanguageUsingMultipleLocaleTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        String[] supportedLanguage = {"it","uk","en"};
+        configurationService.setProperty("default.locale","en");
+        configurationService.setProperty("webui.supported.locales",supportedLanguage);
+        submissionFormRestRepository.reload();
+
+        context.restoreAuthSystemState();
+
+        String tokenEperson = getAuthToken(eperson.getEmail(), password);
+        getClient(tokenEperson).perform(get("/api/config/submissionforms/languagetest")
+                 .header("Accept-Language", "fr;q=1, it;q=0.9"))
+                 .andExpect(status().isOk())
+                 .andExpect(content().contentType(contentType))
+                 .andExpect(jsonPath("$.id", is("languagetest")))
+                 .andExpect(jsonPath("$.name", is("languagetest")))
+                 .andExpect(jsonPath("$.type", is("submissionform")))
+                 .andExpect(jsonPath("$._links.self.href", Matchers
+                            .startsWith(REST_SERVER_URL + "config/submissionforms/languagetest")))
+                 .andExpect(jsonPath("$.rows[0].fields", contains(SubmissionFormFieldMatcher
+                            .matchFormFieldDefinition("name", "Autore", "\u00C8 richiesto almeno un autore", true,
+                                                      "Aggiungi un autore", "dc.contributor.author"))))
+                 .andExpect(jsonPath("$.rows[1].fields", contains(SubmissionFormFieldMatcher
+                            .matchFormFieldDefinition("onebox", "Titolo",
+                            "\u00C8 necessario inserire un titolo principale per questo item", false,
+                            "Inserisci titolo principale di questo item", "dc.title"))));
+
+        resetLocalesConfiguration();
     }
 
     @Test

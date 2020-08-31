@@ -7,9 +7,8 @@
  */
 package org.dspace.app.rest.repository;
 
-import java.util.List;
+import java.util.Enumeration;
 import java.util.Locale;
-import java.util.Locale.LanguageRange;
 
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.converter.ConverterService;
@@ -42,7 +41,7 @@ public abstract class AbstractDSpaceRestRepository {
         Context context = null;
         Request currentRequest = requestService.getCurrentRequest();
         context = ContextUtil.obtainContext(currentRequest.getServletRequest());
-        Locale currentLocale = getLocal(context, currentRequest);
+        Locale currentLocale = getLocale(context, currentRequest);
         context.setCurrentLocale(currentLocale);
         return context;
     }
@@ -51,28 +50,28 @@ public abstract class AbstractDSpaceRestRepository {
         return requestService;
     }
 
-    private Locale getLocal(Context context, Request request) {
+    private Locale getLocale(Context context, Request request) {
         Locale userLocale = null;
         Locale supportedLocale = null;
-        if (context.getCurrentUser() != null) {
-            String userLanguage = context.getCurrentUser().getLanguage();
-            if (userLanguage != null) {
-                userLocale = new Locale(userLanguage);
-            }
-        }
-        // Locale requested from client
+
+        // Locales requested from client
         String locale = request.getHttpServletRequest().getHeader("Accept-Language");
         if (StringUtils.isNotBlank(locale)) {
-            final List<LanguageRange> ranges = Locale.LanguageRange.parse(locale);
-            if (ranges != null && !ranges.isEmpty()) {
-                for (LanguageRange range: ranges) {
-                    final String localeString = range.getRange();
-                    final Locale l = Locale.forLanguageTag(localeString);
-                    if (I18nUtil.isSupportedLocale(l)) {
-                        userLocale = l;
+            Enumeration<Locale> locales = request.getHttpServletRequest().getLocales();
+            if (locales != null) {
+                while (locales.hasMoreElements()) {
+                    Locale current = locales.nextElement();
+                    if (I18nUtil.isSupportedLocale(current)) {
+                        userLocale = current;
                         break;
                     }
                 }
+            }
+        }
+        if (userLocale == null && context.getCurrentUser() != null) {
+            String userLanguage = context.getCurrentUser().getLanguage();
+            if (userLanguage != null) {
+                userLocale = new Locale(userLanguage);
             }
         }
         if (userLocale == null) {

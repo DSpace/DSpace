@@ -554,7 +554,7 @@ public class Utils {
      * {@link CompositeProjection} and applied in order as described there.
      * </p><p>
      * In addition, any number of embeds may be specified by rel name via the {@code embed} parameter.
-     * When provided, these act as a whitelist of embeds that may be included in the response, as described
+     * When provided, these act as an "allow list" of embeds that may be included in the response, as described
      * and implemented by {@link EmbedRelsProjection}.
      * </p>
      *

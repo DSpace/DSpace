@@ -17,7 +17,7 @@
    <parent>
       <groupId>org.dspace</groupId>
       <artifactId>modules</artifactId>
-      <version>7.0-beta3-SNAPSHOT</version>
+      <version>7.0-beta4-SNAPSHOT</version>
       <relativePath>..</relativePath>
    </parent>
 
@@ -49,7 +49,7 @@
          <activation>
             <activeByDefault>false</activeByDefault>
             <property>
-               <name>maven.test.skip</name>
+               <name>skipTests</name>
                <value>false</value>
             </property>
          </activation>
@@ -158,7 +158,6 @@
             <dependency>
                <groupId>org.dspace</groupId>
                <artifactId>dspace-api</artifactId>
-               <version>7.0-beta3-SNAPSHOT</version>
                <type>test-jar</type>
                <scope>test</scope>
             </dependency>
@@ -192,8 +191,18 @@
          <artifactId>dspace-api</artifactId>
       </dependency>
       <dependency>
+          <groupId>org.dspace</groupId>
+          <artifactId>dspace-api</artifactId>
+          <type>test-jar</type>
+          <scope>test</scope>
+      </dependency>
+      <dependency>
          <groupId>org.dspace</groupId>
          <artifactId>dspace-api-lang</artifactId>
+      </dependency>
+      <dependency>
+          <groupId>org.dspace</groupId>
+          <artifactId>dspace-services</artifactId>
       </dependency>
       <dependency>
          <groupId>javax.servlet</groupId>
@@ -211,6 +220,32 @@
             </exclusion>
          </exclusions>
       </dependency>
+        <dependency>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-core</artifactId>
+        </dependency>
+        <!-- Reminder: Keep icu4j (in Parent POM) synced with version used by lucene-analyzers-icu below,
+             otherwise ICUFoldingFilterFactory may throw errors in tests.  -->
+        <dependency>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-analyzers-icu</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-analyzers-smartcn</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-analyzers-stempel</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.xmlbeans</groupId>
+            <artifactId>xmlbeans</artifactId>
+            <version>2.6.0</version>
+        </dependency>
 
       <dependency>
          <groupId>junit</groupId>

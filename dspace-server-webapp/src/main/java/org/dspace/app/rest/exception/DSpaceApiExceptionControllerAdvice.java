@@ -14,14 +14,14 @@ import java.sql.SQLException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.exception.ResourceConflictException;
 import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.model.RestModel;
 import org.dspace.app.rest.security.RestAuthenticationService;
 import org.dspace.app.rest.utils.Utils;
 import org.dspace.authorize.AuthorizeException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.TypeMismatchException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.AnnotationUtils;
@@ -49,8 +49,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
  */
 @ControllerAdvice
 public class DSpaceApiExceptionControllerAdvice extends ResponseEntityExceptionHandler {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(DSpaceApiExceptionControllerAdvice.class);
+    private static final Logger log = LogManager.getLogger(DSpaceApiExceptionControllerAdvice.class);
 
     @Autowired
     private RestAuthenticationService restAuthenticationService;
@@ -65,16 +64,16 @@ public class DSpaceApiExceptionControllerAdvice extends ResponseEntityExceptionH
     protected void handleAuthorizeException(HttpServletRequest request, HttpServletResponse response, Exception ex)
         throws IOException {
         if (restAuthenticationService.hasAuthenticationData(request)) {
-            sendErrorResponse(request, response, ex, ex.getMessage(), HttpServletResponse.SC_FORBIDDEN);
+            sendErrorResponse(request, response, ex, "Access is denied", HttpServletResponse.SC_FORBIDDEN);
         } else {
-            sendErrorResponse(request, response, ex, ex.getMessage(), HttpServletResponse.SC_UNAUTHORIZED);
+            sendErrorResponse(request, response, ex, "Authentication is required", HttpServletResponse.SC_UNAUTHORIZED);
         }
     }
 
     @ExceptionHandler({IllegalArgumentException.class, MultipartException.class})
     protected void handleWrongRequestException(HttpServletRequest request, HttpServletResponse response,
                                                   Exception ex) throws IOException {
-        sendErrorResponse(request, response, ex, ex.getMessage(), HttpServletResponse.SC_BAD_REQUEST);
+        sendErrorResponse(request, response, ex, "Request is invalid or incorrect", HttpServletResponse.SC_BAD_REQUEST);
     }
 
     @ExceptionHandler(SQLException.class)
@@ -88,24 +87,24 @@ public class DSpaceApiExceptionControllerAdvice extends ResponseEntityExceptionH
     protected void handleIOException(HttpServletRequest request, HttpServletResponse response, Exception ex)
         throws IOException {
         sendErrorResponse(request, response, ex,
-                          "An internal read or write operation failed (IO Exception)",
+                          "An internal read or write operation failed",
                           HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
     }
 
     @ExceptionHandler(MethodNotAllowedException.class)
     protected void methodNotAllowedException(HttpServletRequest request, HttpServletResponse response,
                                                   Exception ex) throws IOException {
-        sendErrorResponse(request, response, ex, ex.getMessage(), HttpServletResponse.SC_METHOD_NOT_ALLOWED);
+        sendErrorResponse(request, response, ex, "Method is not allowed or supported",
+                          HttpServletResponse.SC_METHOD_NOT_ALLOWED);
     }
 
     @ExceptionHandler( {UnprocessableEntityException.class})
     protected void handleUnprocessableEntityException(HttpServletRequest request, HttpServletResponse response,
                                                       Exception ex) throws IOException {
-
         //422 is not defined in HttpServletResponse.  Its meaning is "Unprocessable Entity".
         //Using the value from HttpStatus.
         sendErrorResponse(request, response, null,
-                ex.getMessage(),
+                "Unprocessable or invalid entity",
                 HttpStatus.UNPROCESSABLE_ENTITY.value());
     }
 
@@ -114,7 +113,7 @@ public class DSpaceApiExceptionControllerAdvice extends ResponseEntityExceptionH
         throws IOException {
         // we want the 400 status for missing parameters, see https://jira.lyrasis.org/browse/DS-4428
         sendErrorResponse(request, response, null,
-                          ex.getMessage(),
+                          "A required parameter is invalid",
                           HttpStatus.BAD_REQUEST.value());
     }
 
@@ -123,7 +122,7 @@ public class DSpaceApiExceptionControllerAdvice extends ResponseEntityExceptionH
         throws IOException {
         // we want the 400 status for missing parameters, see https://jira.lyrasis.org/browse/DS-4428
         sendErrorResponse(request, response, null,
-                          ex.getMessage(),
+                          "A required parameter is missing",
                           HttpStatus.BAD_REQUEST.value());
     }
 
@@ -151,17 +150,15 @@ public class DSpaceApiExceptionControllerAdvice extends ResponseEntityExceptionH
     @ExceptionHandler(Exception.class)
     protected void handleGenericException(HttpServletRequest request, HttpServletResponse response, Exception ex)
         throws IOException {
-
-        LOGGER.error("A Generic exception has occured:", ex);
-
         ResponseStatus responseStatusAnnotation = AnnotationUtils.findAnnotation(ex.getClass(), ResponseStatus.class);
+
         int returnCode = 0;
         if (responseStatusAnnotation != null) {
             returnCode = responseStatusAnnotation.code().value();
         } else {
             returnCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
         }
-        sendErrorResponse(request, response, ex, "An Exception has occured", returnCode);
+        sendErrorResponse(request, response, ex, "An exception has occurred", returnCode);
 
     }
 
@@ -170,6 +167,13 @@ public class DSpaceApiExceptionControllerAdvice extends ResponseEntityExceptionH
                                    final Exception ex, final String message, final int statusCode) throws IOException {
         //Make sure Spring picks up this exception
         request.setAttribute(EXCEPTION_ATTRIBUTE, ex);
+
+        // For now, just logging server errors.
+        // We don't want to fill logs with bad/invalid REST API requests.
+        if (statusCode == HttpServletResponse.SC_INTERNAL_SERVER_ERROR) {
+            // Log the full error and status code
+            log.error("{} (status:{})", message, statusCode, ex);
+        }
 
         //Exception properties will be set by org.springframework.boot.web.support.ErrorPageFilter
         response.sendError(statusCode, message);

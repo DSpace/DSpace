@@ -15,12 +15,12 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import org.dspace.app.rest.builder.CollectionBuilder;
-import org.dspace.app.rest.builder.CommunityBuilder;
-import org.dspace.app.rest.builder.ItemBuilder;
 import org.dspace.app.rest.matcher.CollectionMatcher;
 import org.dspace.app.rest.matcher.ItemMatcher;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
+import org.dspace.builder.CollectionBuilder;
+import org.dspace.builder.CommunityBuilder;
+import org.dspace.builder.ItemBuilder;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
@@ -406,13 +406,13 @@ public class MappedCollectionRestRepositoryIT extends AbstractControllerIntegrat
                 .andExpect(jsonPath("$._embedded.mappedItems", Matchers.not(Matchers.contains(
                         ItemMatcher.matchItemProperties(publicItem1))
                 )))
-                .andExpect(jsonPath("$._embedded.mappedItems", Matchers.hasSize(0)));;
+                .andExpect(jsonPath("$._embedded.mappedItems", Matchers.hasSize(0)));
         getClient().perform(get("/api/core/collections/" + col3.getID() + "/mappedItems"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$._embedded.mappedItems", Matchers.contains(
                         ItemMatcher.matchItemProperties(publicItem1))
                 ))
-                .andExpect(jsonPath("$._embedded.mappedItems", Matchers.hasSize(1)));;
+                .andExpect(jsonPath("$._embedded.mappedItems", Matchers.hasSize(1)));
     }
 
     @Test

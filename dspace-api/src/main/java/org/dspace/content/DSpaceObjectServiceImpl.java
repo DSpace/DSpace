@@ -207,8 +207,8 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
     }
 
     @Override
-    public void addMetadata(Context context, T dso, String schema, String element, String qualifier, String lang,
-                            List<String> values) throws SQLException {
+    public List<MetadataValue> addMetadata(Context context, T dso, String schema, String element, String qualifier,
+                            String lang, List<String> values) throws SQLException {
         MetadataField metadataField = metadataFieldService.findByElement(context, schema, element, qualifier);
         if (metadataField == null) {
             throw new SQLException(
@@ -216,12 +216,12 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
                     "exist!");
         }
 
-        addMetadata(context, dso, metadataField, lang, values);
+        return addMetadata(context, dso, metadataField, lang, values);
     }
 
     @Override
-    public void addMetadata(Context context, T dso, String schema, String element, String qualifier, String lang,
-                            List<String> values, List<String> authorities, List<Integer> confidences)
+    public List<MetadataValue> addMetadata(Context context, T dso, String schema, String element, String qualifier,
+                               String lang, List<String> values, List<String> authorities, List<Integer> confidences)
         throws SQLException {
         // We will not verify that they are valid entries in the registry
         // until update() is called.
@@ -231,15 +231,16 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
                 "bad_dublin_core schema=" + schema + "." + element + "." + qualifier + ". Metadata field does not " +
                     "exist!");
         }
-        addMetadata(context, dso, metadataField, lang, values, authorities, confidences);
+        return addMetadata(context, dso, metadataField, lang, values, authorities, confidences);
     }
 
     @Override
-    public void addMetadata(Context context, T dso, MetadataField metadataField, String lang, List<String> values,
-                            List<String> authorities, List<Integer> confidences)
+    public List<MetadataValue> addMetadata(Context context, T dso, MetadataField metadataField, String lang,
+                                           List<String> values, List<String> authorities, List<Integer> confidences)
         throws SQLException {
         boolean authorityControlled = metadataAuthorityService.isAuthorityControlled(metadataField);
         boolean authorityRequired = metadataAuthorityService.isAuthorityRequired(metadataField);
+        List<MetadataValue> newMetadata = new ArrayList<>(values.size());
         // We will not verify that they are valid entries in the registry
         // until update() is called.
         for (int i = 0; i < values.size(); i++) {
@@ -250,6 +251,7 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
                 }
             }
             MetadataValue metadataValue = metadataValueService.create(context, dso, metadataField);
+            newMetadata.add(metadataValue);
             //Set place to list length of all metadatavalues for the given schema.element.qualifier combination.
             // Subtract one to adhere to the 0 as first element rule
             metadataValue.setPlace(
@@ -304,29 +306,31 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
 //            metadataValueService.update(context, metadataValue);
             dso.addDetails(metadataField.toString());
         }
+        return newMetadata;
     }
 
     @Override
-    public void addMetadata(Context context, T dso, MetadataField metadataField, String language, String value,
-                            String authority, int confidence) throws SQLException {
-        addMetadata(context, dso, metadataField, language, Arrays.asList(value), Arrays.asList(authority),
-                    Arrays.asList(confidence));
+    public MetadataValue addMetadata(Context context, T dso, MetadataField metadataField, String language,
+                            String value, String authority, int confidence) throws SQLException {
+        return addMetadata(context, dso, metadataField, language, Arrays.asList(value), Arrays.asList(authority),
+                    Arrays.asList(confidence)).get(0);
     }
 
     @Override
-    public void addMetadata(Context context, T dso, String schema, String element, String qualifier, String lang,
-                            String value) throws SQLException {
-        addMetadata(context, dso, schema, element, qualifier, lang, Arrays.asList(value));
+    public MetadataValue addMetadata(Context context, T dso, String schema, String element, String qualifier,
+                             String lang, String value) throws SQLException {
+        return addMetadata(context, dso, schema, element, qualifier, lang, Arrays.asList(value)).get(0);
     }
 
     @Override
-    public void addMetadata(Context context, T dso, MetadataField metadataField, String language, String value)
+    public MetadataValue addMetadata(Context context, T dso, MetadataField metadataField, String language, String value)
         throws SQLException {
-        addMetadata(context, dso, metadataField, language, Arrays.asList(value));
+        return addMetadata(context, dso, metadataField, language, Arrays.asList(value)).get(0);
     }
 
     @Override
-    public void addMetadata(Context context, T dso, MetadataField metadataField, String language, List<String> values)
+    public List<MetadataValue> addMetadata(Context context, T dso, MetadataField metadataField, String language,
+                                           List<String> values)
         throws SQLException {
         if (metadataField != null) {
             String fieldKey = metadataAuthorityService
@@ -343,18 +347,19 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
                         getAuthoritiesAndConfidences(fieldKey, null, values, authorities, confidences, i);
                     }
                 }
-                addMetadata(context, dso, metadataField, language, values, authorities, confidences);
+                return addMetadata(context, dso, metadataField, language, values, authorities, confidences);
             } else {
-                addMetadata(context, dso, metadataField, language, values, null, null);
+                return addMetadata(context, dso, metadataField, language, values, null, null);
             }
         }
+        return new ArrayList<>(0);
     }
 
     @Override
-    public void addMetadata(Context context, T dso, String schema, String element, String qualifier, String lang,
-                            String value, String authority, int confidence) throws SQLException {
-        addMetadata(context, dso, schema, element, qualifier, lang, Arrays.asList(value), Arrays.asList(authority),
-                    Arrays.asList(confidence));
+    public MetadataValue addMetadata(Context context, T dso, String schema, String element, String qualifier,
+                            String lang, String value, String authority, int confidence) throws SQLException {
+        return addMetadata(context, dso, schema, element, qualifier, lang, Arrays.asList(value),
+                Arrays.asList(authority), Arrays.asList(confidence)).get(0);
     }
 
     @Override
@@ -666,33 +671,35 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
     @Override
     public void addAndShiftRightMetadata(Context context, T dso, String schema, String element, String qualifier,
                                          String lang, String value, String authority, int confidence, int index)
-        throws SQLException {
+            throws SQLException {
 
         List<MetadataValue> list = getMetadata(dso, schema, element, qualifier);
 
-        clearMetadata(context, dso, schema, element, qualifier, Item.ANY);
-
         int idx = 0;
+        int place = 0;
         boolean last = true;
         for (MetadataValue rr : list) {
             if (idx == index) {
-                addMetadata(context, dso, schema, element, qualifier,
-                            lang, value, authority, confidence);
+                MetadataValue newMetadata = addMetadata(context, dso, schema, element, qualifier,
+                        lang, value, authority, confidence);
+
+                moveSingleMetadataValue(context, dso, place, newMetadata);
+                place++;
                 last = false;
             }
-            addMetadata(context, dso, schema, element, qualifier,
-                        rr.getLanguage(), rr.getValue(), rr.getAuthority(), rr.getConfidence());
+            moveSingleMetadataValue(context, dso, place, rr);
+            place++;
             idx++;
         }
         if (last) {
             addMetadata(context, dso, schema, element, qualifier,
-                        lang, value, authority, confidence);
+                    lang, value, authority, confidence);
         }
     }
 
     @Override
     public void moveMetadata(Context context, T dso, String schema, String element, String qualifier, int from, int to)
-        throws SQLException, IllegalArgumentException {
+            throws SQLException, IllegalArgumentException {
 
         if (from == to) {
             throw new IllegalArgumentException("The \"from\" location MUST be different from \"to\" location");
@@ -707,8 +714,6 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
                         "\n Idx from:" + from + " Idx to: " + to);
         }
 
-        clearMetadata(context, dso, schema, element, qualifier, Item.ANY);
-
         int idx = 0;
         MetadataValue moved = null;
         for (MetadataValue md : list) {
@@ -720,28 +725,36 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
         }
 
         idx = 0;
+        int place = 0;
         boolean last = true;
         for (MetadataValue rr : list) {
             if (idx == to && to < from) {
-                addMetadata(context, dso, schema, element, qualifier, moved.getLanguage(), moved.getValue(),
-                            moved.getAuthority(), moved.getConfidence());
+                moveSingleMetadataValue(context, dso, place, moved);
+                place++;
                 last = false;
             }
             if (idx != from) {
-                addMetadata(context, dso, schema, element, qualifier, rr.getLanguage(), rr.getValue(),
-                            rr.getAuthority(), rr.getConfidence());
+                moveSingleMetadataValue(context, dso, place, rr);
+                place++;
             }
             if (idx == to && to > from) {
-                addMetadata(context, dso, schema, element, qualifier, moved.getLanguage(), moved.getValue(),
-                            moved.getAuthority(), moved.getConfidence());
+                moveSingleMetadataValue(context, dso, place, moved);
+                place++;
                 last = false;
             }
             idx++;
         }
         if (last) {
-            addMetadata(context, dso, schema, element, qualifier, moved.getLanguage(), moved.getValue(),
-                        moved.getAuthority(), moved.getConfidence());
+            moveSingleMetadataValue(context, dso, place, moved);
         }
+    }
+
+    /**
+     * Supports moving metadata by updating the place of the metadata value
+     */
+    protected void moveSingleMetadataValue(Context context, T dso, int place, MetadataValue rr) {
+        //just move the metadata
+        rr.setPlace(place);
     }
 
     @Override
@@ -750,19 +763,8 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
 
         List<MetadataValue> list = getMetadata(dso, schema, element, qualifier);
 
-        clearMetadata(context, dso, schema, element, qualifier, Item.ANY);
-
-        int idx = 0;
-        for (MetadataValue rr : list) {
-            if (idx == index) {
-                addMetadata(context, dso, schema, element, qualifier,
-                            lang, value, authority, confidence);
-            } else {
-                addMetadata(context, dso, schema, element, qualifier,
-                            rr.getLanguage(), rr.getValue(), rr.getAuthority(), rr.getConfidence());
-            }
-            idx++;
-        }
+        removeMetadataValues(context, dso, Arrays.asList(list.get(index)));
+        addAndShiftRightMetadata(context, dso, schema, element, qualifier, lang, value, authority, confidence, index);
     }
 
     @Override

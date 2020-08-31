@@ -66,13 +66,13 @@
                 <entry key="administrativeView" value-ref="administrativeView" />
                 <entry key="publication" value-ref="publication"/>
                 <entry key="person" value-ref="person"/>
-                <entry key="organization" value-ref="organization"/>
-                <entry key="publicationIssue" value-ref="publicationIssue"/>
-                <entry key="publicationVolume" value-ref="publicationVolume"/>
-                <entry key="periodical" value-ref="periodical"/>
+                <entry key="orgunit" value-ref="orgUnit"/>
+                <entry key="journalissue" value-ref="journalIssue"/>
+                <entry key="journalvolume" value-ref="journalVolume"/>
+                <entry key="journal" value-ref="journal"/>
                 <entry key="project" value-ref="project"/>
                 <!-- search for an entity that can be a Person or an OrgUnit -->
-                <entry key="personOrOrganization" value-ref="personOrOrganization"/>
+                <entry key="personOrOrgunit" value-ref="personOrOrgunit"/>
                 <!-- OpenAIRE4 guidelines - search for an OrgUnit that have a specific dc.type=FundingOrganization -->
                 <entry key="openAIREFundingAgency" value-ref="openAIREFundingAgency"/>
                 <!-- Related items -->
@@ -1208,9 +1208,9 @@
         <property name="spellCheckEnabled" value="true"/>
     </bean>
 
-    <bean id="organization" class="org.dspace.discovery.configuration.DiscoveryConfiguration"
+    <bean id="orgUnit" class="org.dspace.discovery.configuration.DiscoveryConfiguration"
           scope="prototype">
-        <property name="id" value="organization"/>
+        <property name="id" value="orgUnit"/>
         <property name="indexAlways" value="true"/>
         <!--Which sidebar facets are to be displayed-->
         <property name="sidebarFacets">
@@ -1273,9 +1273,9 @@
         <property name="spellCheckEnabled" value="true"/>
     </bean>
 
-    <bean id="publicationIssue" class="org.dspace.discovery.configuration.DiscoveryConfiguration"
+    <bean id="journalIssue" class="org.dspace.discovery.configuration.DiscoveryConfiguration"
           scope="prototype">
-        <property name="id" value="publicationIssue"/>
+        <property name="id" value="journalIssue"/>
         <property name="indexAlways" value="true"/>
         <!--Which sidebar facets are to be displayed-->
         <property name="sidebarFacets">
@@ -1334,9 +1334,9 @@
         <property name="spellCheckEnabled" value="true"/>
     </bean>
 
-    <bean id="publicationVolume" class="org.dspace.discovery.configuration.DiscoveryConfiguration"
+    <bean id="journalVolume" class="org.dspace.discovery.configuration.DiscoveryConfiguration"
           scope="prototype">
-        <property name="id" value="publicationVolume"/>
+        <property name="id" value="journalVolume"/>
         <property name="indexAlways" value="true"/>
         <!--Which sidebar facets are to be displayed-->
         <property name="sidebarFacets">
@@ -1394,9 +1394,9 @@
         <property name="spellCheckEnabled" value="true"/>
     </bean>
 
-    <bean id="periodical" class="org.dspace.discovery.configuration.DiscoveryConfiguration"
+    <bean id="journal" class="org.dspace.discovery.configuration.DiscoveryConfiguration"
           scope="prototype">
-        <property name="id" value="periodical"/>
+        <property name="id" value="journal"/>
         <property name="indexAlways" value="true"/>
         <!--Which sidebar facets are to be displayed-->
         <property name="sidebarFacets">
@@ -1454,9 +1454,9 @@
         <property name="spellCheckEnabled" value="true"/>
     </bean>
 
-    <bean id="personOrOrganization" class="org.dspace.discovery.configuration.DiscoveryConfiguration"
+    <bean id="personOrOrgunit" class="org.dspace.discovery.configuration.DiscoveryConfiguration"
           scope="prototype">
-        <property name="id" value="personOrOrganization"/>
+        <property name="id" value="personOrOrgunit"/>
         <property name="indexAlways" value="true"/>
         <!--Which sidebar facets are to be displayed-->
         <property name="sidebarFacets">

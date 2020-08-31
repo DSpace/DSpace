@@ -14,11 +14,17 @@
         <property name="dspaceRunnableClass" value="org.dspace.app.bulkedit.MetadataImportCLI"/>
     </bean>
 
-    <bean id="metadata-export" class="org.dspace.app.bulkedit.MetadataExportScriptConfiguration">
+    <bean id="metadata-export" class="org.dspace.app.bulkedit.MetadataExportCliScriptConfiguration">
         <property name="description" value="Export metadata for batch editing"/>
-        <property name="dspaceRunnableClass" value="org.dspace.app.bulkedit.MetadataExport"/>
+        <property name="dspaceRunnableClass" value="org.dspace.app.bulkedit.MetadataExportCli"/>
     </bean>
 
+    <bean id="curate" class="org.dspace.curate.CurationScriptConfiguration">
+        <property name="description" value="Curation tasks"/>
+        <property name="dspaceRunnableClass" value="org.dspace.curate.CurationCli"/>
+    </bean>
+
+    <!-- Keep as last script; for test ScriptRestRepository#findOneScriptByNameTest -->
     <bean id="mock-script" class="org.dspace.scripts.MockDSpaceRunnableScriptConfiguration" scope="prototype">
         <property name="description" value="Mocking a script for testing purposes" />
         <property name="dspaceRunnableClass" value="org.dspace.scripts.impl.MockDSpaceRunnableScript"/>

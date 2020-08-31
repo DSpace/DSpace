@@ -159,7 +159,7 @@ public class ImportService implements Destroyable {
             int total = 0;
             for (MetadataSource metadataSource : matchingImports(uri)) {
                 if (metadataSource instanceof QuerySource) {
-                    total += ((QuerySource)metadataSource).getNbRecords(query);
+                    total += ((QuerySource)metadataSource).getRecordsCount(query);
                 }
             }
             return total;
@@ -181,7 +181,7 @@ public class ImportService implements Destroyable {
             int total = 0;
             for (MetadataSource metadataSource : matchingImports(uri)) {
                 if (metadataSource instanceof QuerySource) {
-                    total += ((QuerySource)metadataSource).getNbRecords(query);
+                    total += ((QuerySource)metadataSource).getRecordsCount(query);
                 }
             }
             return total;
@@ -297,23 +297,28 @@ public class ImportService implements Destroyable {
     }
 
     /*
-     * Get a collection of record from InputStream,
+     * Get a collection of record from File,
      * The first match will be return.
-     * This method doesn't close the InputStream.
      * 
-     * @param fileInputStream the input stream to the resource
+     * @param file  The file from which will read records
+     * @param originalName The original file name or full path
      * @return a single record contains the metadatum
      * @throws FileMultipleOccurencesException if more than one entry is found
      */
-    public ImportRecord getRecord(File file) throws FileMultipleOccurencesException, FileSourceException {
+    public ImportRecord getRecord(File file, String originalName)
+        throws FileMultipleOccurencesException, FileSourceException {
         ImportRecord importRecords = null;
         for (MetadataSource metadataSource : importSources.values()) {
             try (InputStream fileInputStream = new FileInputStream(file)) {
                 if (metadataSource instanceof FileSource) {
                     FileSource fileSource = (FileSource)metadataSource;
-                    importRecords = fileSource.getRecord(fileInputStream);
-                    break;
+                    if (fileSource.isValidSourceForFile(originalName)) {
+                        importRecords = fileSource.getRecord(fileInputStream);
+                        break;
+                    }
                 }
+            //catch statements is required because we could have supported format (i.e. XML)
+            //which fail on schema validation
             } catch (FileSourceException e) {
                 log.debug(metadataSource.getImportSource() + " isn't a valid parser for file");
             } catch (FileMultipleOccurencesException e) {
