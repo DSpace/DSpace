@@ -12,7 +12,6 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-import java.util.UUID;
 
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.model.ItemRest;
@@ -23,9 +22,6 @@ import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataSchemaEnum;
 import org.dspace.content.MetadataValue;
-import org.dspace.content.authority.ChoiceAuthority;
-import org.dspace.content.authority.EPersonAuthority;
-import org.dspace.content.authority.GroupAuthority;
 import org.dspace.content.authority.service.ChoiceAuthorityService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
@@ -145,52 +141,31 @@ public class ItemConverter
     }
 
     private boolean customDataGrantAccess(Context context, EPerson currentUser, CrisLayoutBox box, Item item) {
-        List<MetadataField> metadataEpersons = new LinkedList<MetadataField>();
-        List<MetadataField> metadataGroups = new LinkedList<MetadataField>();
         Set<MetadataField> metadataSecurityFields = box.getMetadataSecurityFields();
-        for (MetadataField metadataField : metadataSecurityFields) {
-            String authorityName = cas.getChoiceAuthorityName(metadataField.getMetadataSchema().getName(),
-                                   metadataField.getElement(),metadataField.getQualifier(), null);
-            ChoiceAuthority source = cas.getChoiceAuthorityByAuthorityName(authorityName);
-            if (source instanceof EPersonAuthority) {
-                metadataEpersons.add(metadataField);
-            }
-            if (source instanceof GroupAuthority) {
-                metadataGroups.add(metadataField);
-            }
-        }
-        return (grantAccesToEperson(currentUser, metadataEpersons, item) ||
-                grantAccesToGroup(context, currentUser, metadataGroups, item));
-    }
-
-    private boolean grantAccesToGroup(Context context, EPerson currentUser, List<MetadataField> metadataGroups,
-            Item item) {
-        for (MetadataField field : metadataGroups) {
+        for (MetadataField field : metadataSecurityFields) {
             List<MetadataValue> values = itemService.getMetadata(item, field.getMetadataSchema().getName(),
-                    field.getElement(), field.getQualifier(), Item.ANY, true);
-            for (MetadataValue value : values) {
-                UUID uuidGroup = UUID.fromString(value.getAuthority());
-                try {
-                    Group group = groupService.find(context, uuidGroup);
-                    if (groupService.isMember(context, currentUser, group)) {
-                        return true;
-                    }
-                } catch (SQLException e) {
-                    throw new RuntimeException(e.getMessage(), e);
-                }
+                                                     field.getElement(), field.getQualifier(), Item.ANY, true);
+            if (checkUser(currentUser, values)) {
+                return true;
             }
         }
         return false;
     }
 
-    private boolean grantAccesToEperson(EPerson currentUser, List<MetadataField> metadataEpersons, Item item) {
-        for (MetadataField field : metadataEpersons) {
-            List<MetadataValue> values = itemService.getMetadata(item, field.getMetadataSchema().getName(),
-                                                     field.getElement(), field.getQualifier(), Item.ANY, true);
-            for (MetadataValue value : values) {
-                if (value.getAuthority().equals(currentUser.getID().toString())) {
-                    return true;
-                }
+    private boolean checkUser(EPerson currentUser, List<MetadataValue> values) {
+        List<Group> groups = currentUser.getGroups();
+        for (MetadataValue value : values) {
+            if (value.getAuthority().equals(currentUser.getID().toString()) || checkGroup(value, groups)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean checkGroup(MetadataValue value, List<Group> groups) {
+        for (Group group : groups) {
+            if (group.getID().toString().equals(value.getAuthority())) {
+                return true;
             }
         }
         return false;
