@@ -29,9 +29,11 @@
         <entry key-ref="scopus.identifier" value-ref="scopusIdentifierContrib"/>
     </util:map>
 
-    <bean id="scopusIdentifierContrib" class="org.dspace.importer.external.metadatamapping.contributor.UrlencodeXPathMetadataContributor">
+    <bean id="scopusIdentifierContrib" class="org.dspace.importer.external.metadatamapping.contributor.ReplaceCharacterXPathMetadataContributor">
         <property name="field" ref="scopus.identifier"/>
         <property name="query" value="prism:doi"/>
+        <property name="characterToBeReplaced" value="47" />
+        <property name="characterToReplaceWith" value="1" />
         <property name="prefixToNamespaceMapping" ref="scopusPrism"/>
     </bean>
     <bean id="scopus.identifier" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">

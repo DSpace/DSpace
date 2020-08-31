@@ -80,7 +80,7 @@
         <property name="metadataFieldMapping" ref="epoMetadataFieldMapping"/>
     </bean>
     <bean id="epoMetadataFieldMapping"
-          class="org.dspace.importer.external.scopus.service.ScopusFieldMapping">
+          class="org.dspace.importer.external.epo.service.EpoFieldMapping">
     </bean>
 
 

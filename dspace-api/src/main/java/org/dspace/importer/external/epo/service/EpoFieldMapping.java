@@ -5,7 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.importer.external.scopus.service;
+package org.dspace.importer.external.epo.service;
 
 import java.util.Map;
 import javax.annotation.Resource;
@@ -15,12 +15,11 @@ import org.dspace.importer.external.metadatamapping.AbstractMetadataFieldMapping
 
 /**
  * An implementation of {@link AbstractMetadataFieldMapping}
- * Responsible for defining the mapping of the Scopus metadatum fields on the DSpace metadatum fields
+ * Responsible for defining the mapping of the Epo metadatum fields on the DSpace metadatum fields
  *
  * @author Pasquale Cavallo (pasquale.cavallo at 4science dot it)
  */
-public class ScopusFieldMapping extends AbstractMetadataFieldMapping {
-
+public class EpoFieldMapping extends AbstractMetadataFieldMapping {
     /**
      * Defines which metadatum is mapped on which metadatum. Note that while the key must be unique it
      * only matters here for postprocessing of the value. The mapped MetadatumContributor has full control over
@@ -30,9 +29,8 @@ public class ScopusFieldMapping extends AbstractMetadataFieldMapping {
      *                         the item.
      */
     @Override
-    @Resource(name = "scopusMetadataFieldMap")
+    @Resource(name = "epoMetadataFieldMap")
     public void setMetadataFieldMap(Map metadataFieldMap) {
         super.setMetadataFieldMap(metadataFieldMap);
     }
-
 }

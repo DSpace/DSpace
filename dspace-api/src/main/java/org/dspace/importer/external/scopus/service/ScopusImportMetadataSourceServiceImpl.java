@@ -176,9 +176,7 @@ public class ScopusImportMetadataSourceServiceImpl extends AbstractImportMetadat
                         HttpClient client = hcBuilder.build();
                         // open session
                         method = new HttpGet(
-                            ENDPOINT_SEARCH_SCOPUS + "?httpAccept=application/xml&apiKey=" + apiKey +
-                                "&start=0&query=" + URLEncoder
-                                .encode(query));
+                            ENDPOINT_SEARCH_SCOPUS + "?httpAccept=application/xml&apiKey=" + apiKey + query);
                         method.setConfig(requestConfigBuilder.build());
                             // Execute the method.
                         HttpResponse httpResponse = client.execute(method);
@@ -226,7 +224,7 @@ public class ScopusImportMetadataSourceServiceImpl extends AbstractImportMetadat
         @Override
         public List<ImportRecord> call() throws Exception {
             List<ImportRecord> results = new ArrayList<>();
-            String queryString = "DOI(" + doi + ")";
+            String queryString = "DOI(" + doi.replace("!", "/") + ")";
             String proxyHost = configurationService.getProperty("http.proxy.host");
             String proxyPort = configurationService.getProperty("http.proxy.port");
             String apiKey = configurationService.getProperty("submission.lookup.scopus.apikey");
@@ -250,7 +248,7 @@ public class ScopusImportMetadataSourceServiceImpl extends AbstractImportMetadat
                         // open session
                         method = new HttpGet(
                             ENDPOINT_SEARCH_SCOPUS + "?httpAccept=application/xml&apiKey=" + apiKey +
-                                "&view=COMPLETE&&query=" + URLEncoder
+                                "&view=COMPLETE&query=" + URLEncoder
                                 .encode(queryString));
                         method.setConfig(requestConfigBuilder.build());
                             // Execute the method.
@@ -292,12 +290,16 @@ public class ScopusImportMetadataSourceServiceImpl extends AbstractImportMetadat
         private String author;
         private Integer year;
         private Integer start;
+        private Integer count;
 
         private FindByQueryCallable(Query query) {
             this.title = query.getParameterAsClass("title", String.class);
             this.year = query.getParameterAsClass("year", Integer.class);
             this.author = query.getParameterAsClass("author", String.class);
-            this.start = query.getParameterAsClass("start", Integer.class);
+            this.start = query.getParameterAsClass("start", Integer.class) != null ?
+                query.getParameterAsClass("start", Integer.class) : 0;
+            this.count = query.getParameterAsClass("count", Integer.class) != null ?
+                query.getParameterAsClass("count", Integer.class) : 20;
         }
 
 
@@ -349,7 +351,7 @@ public class ScopusImportMetadataSourceServiceImpl extends AbstractImportMetadat
                         // open session
                         method = new HttpGet(
                             ENDPOINT_SEARCH_SCOPUS + "?httpAccept=application/xml&apiKey=" + apiKey +
-                                "&view=COMPLETE&start=" + start + "&query=" + URLEncoder
+                                "&view=COMPLETE&start=" + start + "&count=" + count + "&query=" + URLEncoder
                                 .encode(queryString));
                         method.setConfig(requestConfigBuilder.build());
                             // Execute the method.
@@ -404,6 +406,7 @@ public class ScopusImportMetadataSourceServiceImpl extends AbstractImportMetadat
             List<ImportRecord> results = new ArrayList<>();
             String queryString = query.getParameterAsClass("query", String.class);
             Integer start = query.getParameterAsClass("start", Integer.class);
+            Integer count = query.getParameterAsClass("count", Integer.class);
             String proxyHost = configurationService.getProperty("http.proxy.host");
             String proxyPort = configurationService.getProperty("http.proxy.port");
             String apiKey = configurationService.getProperty("submission.lookup.scopus.apikey");
@@ -428,8 +431,8 @@ public class ScopusImportMetadataSourceServiceImpl extends AbstractImportMetadat
                         // open session
                         method = new HttpGet(
                             ENDPOINT_SEARCH_SCOPUS + "?httpAccept=application/xml&apiKey=" + apiKey +
-                                "&start=" + start + "&query=" + URLEncoder
-                                .encode(queryString));
+                                "&start=" + (start != null ? start : 0) + "&count=" + (count != null ? count : 20) +
+                                "&query=" + URLEncoder.encode(queryString));
                         method.setConfig(requestConfigBuilder.build());
                             // Execute the method.
                         HttpResponse httpResponse = client.execute(method);
