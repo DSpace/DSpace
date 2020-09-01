@@ -739,7 +739,7 @@
         <dependency>
             <groupId>org.flywaydb</groupId>
             <artifactId>flyway-core</artifactId>
-            <version>4.0.3</version>
+            <version>6.5.5</version>
         </dependency>
 
         <!-- Google Analytics -->
