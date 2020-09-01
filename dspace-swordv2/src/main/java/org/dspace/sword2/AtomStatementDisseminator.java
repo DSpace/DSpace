@@ -13,8 +13,9 @@ import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.swordapp.server.AtomStatement;
 import org.swordapp.server.Statement;
 import org.swordapp.server.SwordError;
@@ -24,19 +25,22 @@ public class AtomStatementDisseminator extends GenericStatementDisseminator
     implements SwordStatementDisseminator {
     protected ItemService itemService = ContentServiceFactory.getInstance()
                                                              .getItemService();
+    protected ConfigurationService configurationService
+            = DSpaceServicesFactory.getInstance().getConfigurationService();
 
+    @Override
     public Statement disseminate(Context context, Item item)
         throws DSpaceSwordException, SwordError, SwordServerException {
         SwordUrlManager urlManager = new SwordUrlManager(
             new SwordConfigurationDSpace(), context);
         String feedUri = urlManager.getAtomStatementUri(item);
 
-        String authorField = ConfigurationManager
-            .getProperty("swordv2-server", "author.field");
-        String titleField = ConfigurationManager
-            .getProperty("swordv2-server", "title.field");
-        String updatedField = ConfigurationManager
-            .getProperty("swordv2-server", "updated.field");
+        String authorField = configurationService
+            .getProperty("swordv2-server.author.field");
+        String titleField = configurationService
+            .getProperty("swordv2-server.title.field");
+        String updatedField = configurationService
+            .getProperty("swordv2-server.updated.field");
 
         String author = this.stringMetadata(item, authorField);
         String title = this.stringMetadata(item, titleField);

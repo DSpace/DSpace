@@ -15,8 +15,9 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import org.apache.commons.io.FileUtils;
-import org.dspace.core.ConfigurationManager;
+import org.dspace.services.ConfigurationService;
 import org.dspace.xoai.services.api.cache.XOAILastCompilationCacheService;
+import org.springframework.beans.factory.annotation.Autowired;
 
 
 public class DSpaceXOAILastCompilationCacheService implements XOAILastCompilationCacheService {
@@ -31,9 +32,12 @@ public class DSpaceXOAILastCompilationCacheService implements XOAILastCompilatio
 
     private static File file = null;
 
-    private static File getFile() {
+    @Autowired(required = true)
+    ConfigurationService configurationService;
+
+    private File getFile() {
         if (file == null) {
-            String dir = ConfigurationManager.getProperty("oai", "cache.dir") + DATEFILE;
+            String dir = configurationService.getProperty("oai.cache.dir") + DATEFILE;
             file = new File(dir);
         }
         return file;

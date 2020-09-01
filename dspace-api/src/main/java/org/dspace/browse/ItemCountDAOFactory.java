@@ -7,8 +7,9 @@
  */
 package org.dspace.browse;
 
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
  * Factory class to allow us to load the correct DAO for registering
@@ -38,7 +39,9 @@ public class ItemCountDAOFactory {
         /** Log4j logger */
         ItemCountDAO dao = null;
 
-        String className = ConfigurationManager.getProperty("ItemCountDAO.class");
+        ConfigurationService configurationService
+                = DSpaceServicesFactory.getInstance().getConfigurationService();
+        String className = configurationService.getProperty("ItemCountDAO.class");
 
         // SOLR implementation is the default since DSpace 4.0
         if (className == null) {
@@ -47,7 +50,8 @@ public class ItemCountDAOFactory {
             try {
                 dao = (ItemCountDAO) Class
                     .forName(className.trim()).newInstance();
-            } catch (Exception e) {
+            } catch (ClassNotFoundException | IllegalAccessException
+                    | InstantiationException e) {
                 throw new ItemCountException("The configuration for ItemCountDAO is invalid: " + className, e);
             }
         }

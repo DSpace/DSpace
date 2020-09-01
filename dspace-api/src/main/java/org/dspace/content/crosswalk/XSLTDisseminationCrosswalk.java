@@ -15,7 +15,6 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,11 +35,12 @@ import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
 import org.dspace.content.service.ItemService;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.factory.CoreServiceFactory;
 import org.dspace.handle.factory.HandleServiceFactory;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.Namespace;
@@ -95,11 +95,14 @@ public class XSLTDisseminationCrosswalk
 
     private static final String DIRECTION = "dissemination";
 
-    protected static final CommunityService communityService = ContentServiceFactory.getInstance()
-                                                                                    .getCommunityService();
-    protected static final CollectionService collectionService = ContentServiceFactory.getInstance()
-                                                                                      .getCollectionService();
-    protected static final ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+    protected static final CommunityService communityService
+            = ContentServiceFactory.getInstance().getCommunityService();
+    protected static final CollectionService collectionService
+            = ContentServiceFactory.getInstance().getCollectionService();
+    protected static final ItemService itemService
+            = ContentServiceFactory.getInstance().getItemService();
+    protected static final ConfigurationService configurationService
+            = DSpaceServicesFactory.getInstance().getConfigurationService();
 
     private static final String aliases[] = makeAliases(DIRECTION);
 
@@ -133,7 +136,7 @@ public class XSLTDisseminationCrosswalk
 
         // get the schema location string, should already be in the
         // right format for value of "schemaLocation" attribute.
-        schemaLocation = ConfigurationManager.getProperty(prefix + "schemaLocation");
+        schemaLocation = configurationService.getProperty(prefix + "schemaLocation");
         if (schemaLocation == null) {
             LOG.warn("No schemaLocation for crosswalk=" + myAlias + ", key=" + prefix + "schemaLocation");
         } else if (schemaLocation.length() > 0 && schemaLocation.indexOf(' ') < 0) {
@@ -146,18 +149,17 @@ public class XSLTDisseminationCrosswalk
         // grovel for namespaces of the form:
         //  crosswalk.diss.{PLUGIN_NAME}.namespace.{PREFIX} = {URI}
         String nsPrefix = prefix + "namespace.";
-        Enumeration<String> pe = (Enumeration<String>) ConfigurationManager.propertyNames();
+        List<String> configKeys = configurationService.getPropertyKeys();
         List<Namespace> nsList = new ArrayList<>();
-        while (pe.hasMoreElements()) {
-            String key = pe.nextElement();
+        for (String key : configKeys) {
             if (key.startsWith(nsPrefix)) {
                 nsList.add(Namespace.getNamespace(key.substring(nsPrefix.length()),
-                                                  ConfigurationManager.getProperty(key)));
+                                                  configurationService.getProperty(key)));
             }
         }
         namespaces = nsList.toArray(new Namespace[nsList.size()]);
 
-        preferList = ConfigurationManager.getBooleanProperty(prefix + "preferList", false);
+        preferList = configurationService.getBooleanProperty(prefix + "preferList", false);
     }
 
     /**
@@ -463,7 +465,7 @@ public class XSLTDisseminationCrosswalk
             if (LOG.isDebugEnabled()) {
                 LOG.debug("Filtering out non-XML characters in string, reason=" + reason);
             }
-            StringBuffer result = new StringBuffer(value.length());
+            StringBuilder result = new StringBuilder(value.length());
             for (int i = 0; i < value.length(); ++i) {
                 char c = value.charAt(i);
                 if (Verifier.isXMLCharacter((int) c)) {
@@ -558,7 +560,7 @@ public class XSLTDisseminationCrosswalk
         try {
             XMLOutputter xmlout = new XMLOutputter(Format.getPrettyFormat());
             xmlout.output(new Document(root), out);
-        } catch (Exception e) {
+        } catch (IOException e) {
             // as this script is for testing dissemination crosswalks, we want
             // verbose information in case of an exception.
             System.err.println("An error occurred after processing the dissemination crosswalk.");

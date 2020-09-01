@@ -71,10 +71,10 @@ import org.dspace.content.BitstreamFormat;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.service.BitstreamFormatService;
 import org.dspace.content.service.DSpaceObjectService;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.RequestService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.util.UUIDUtils;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -134,7 +134,7 @@ public class Utils {
     private ConfigurationService configurationService;
 
     /** Cache to support fast lookups of LinkRest method annotation information. */
-    private Map<Method, Optional<LinkRest>> linkAnnotationForMethod = new HashMap<>();
+    private final Map<Method, Optional<LinkRest>> linkAnnotationForMethod = new HashMap<>();
 
     public <T> Page<T> getPage(List<T> fullContents, @Nullable Pageable optionalPageable) {
         Pageable pageable = getPageable(optionalPageable);
@@ -149,7 +149,7 @@ public class Utils {
                 pageContent = fullContents.subList(Math.toIntExact(pageable.getOffset()),
                         Math.toIntExact(pageable.getOffset()) + pageable.getPageSize());
             }
-            return new PageImpl<T>(pageContent, pageable, total);
+            return new PageImpl<>(pageContent, pageable, total);
         }
     }
 
@@ -304,11 +304,12 @@ public class Utils {
     }
 
     /**
-     * Build the canonical representation of a metadata key in DSpace. ie
+     * Build the canonical representation of a metadata key in DSpace. I.e.
      * <schema>.<element>[.<qualifier>]
      *
      * @param schema
      * @param element
+     * @param qualifier
      * @return
      */
     public String getMetadataKey(String schema, String element, String qualifier) {
@@ -320,11 +321,11 @@ public class Utils {
      *
      * @param multipartFile
      *            the multipartFile representing the uploaded file. Please note that it is a complex object including
-     *            additional information other than the binary like the orginal file name and the mimetype
+     *            additional information other than the binary like the original file name and the MIME type
      * @param prefixTempName
      *            the prefix to use to generate the filename of the temporary file
      * @param suffixTempName
-     *            the suffic to use to generate the filename of the temporary file
+     *            the suffix to use to generate the filename of the temporary file
      * @return the temporary file on the server
      * @throws IOException
      * @throws FileNotFoundException
@@ -332,8 +333,10 @@ public class Utils {
     public static File getFile(MultipartFile multipartFile, String prefixTempName, String suffixTempName)
             throws IOException, FileNotFoundException {
         // TODO after change item-submission into
-        String tempDir = (ConfigurationManager.getProperty("upload.temp.dir") != null)
-                ? ConfigurationManager.getProperty("upload.temp.dir")
+        ConfigurationService configurationService
+                = DSpaceServicesFactory.getInstance().getConfigurationService();
+        String tempDir = (configurationService.hasProperty("upload.temp.dir"))
+                ? configurationService.getProperty("upload.temp.dir")
                 : System.getProperty("java.io.tmpdir");
         File uploadDir = new File(tempDir);
         if (!uploadDir.exists()) {
@@ -349,7 +352,7 @@ public class Utils {
     }
 
     /**
-     * Return the filename part from a multipartFile upload that could eventually contains the fullpath on the client
+     * Return the filename part from a multipartFile upload that could eventually contains the full path on the client
 
      *
      * @param multipartFile
