@@ -10,11 +10,13 @@ package org.dspace.sword;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
-import org.dspace.core.ConfigurationManager;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.purl.sword.base.Collection;
 
 /**
@@ -25,11 +27,14 @@ public class CollectionCollectionGenerator extends ATOMCollectionGenerator {
     /**
      * logger
      */
-    private static Logger log =
-        org.apache.logging.log4j.LogManager.getLogger(CollectionCollectionGenerator.class);
+    private static final Logger log =
+        LogManager.getLogger(CollectionCollectionGenerator.class);
 
     protected CollectionService collectionService =
         ContentServiceFactory.getInstance().getCollectionService();
+
+    private final ConfigurationService configurationService
+            = DSpaceServicesFactory.getInstance().getConfigurationService();
 
     /**
      * Construct an object taking the SWORD service instance an argument
@@ -48,6 +53,7 @@ public class CollectionCollectionGenerator extends ATOMCollectionGenerator {
      * @param dso target DSpace object
      * @throws DSpaceSWORDException can be thrown by the internals of the DSpace SWORD implementation
      */
+    @Override
     public Collection buildCollection(DSpaceObject dso)
         throws DSpaceSWORDException {
         if (!(dso instanceof org.dspace.content.Collection)) {
@@ -122,8 +128,8 @@ public class CollectionCollectionGenerator extends ATOMCollectionGenerator {
 
         // should we offer the items in the collection up as deposit
         // targets?
-        boolean itemService = ConfigurationManager
-            .getBooleanProperty("sword-server", "expose-items");
+        boolean itemService = configurationService
+            .getBooleanProperty("sword-server.expose-items");
         if (itemService) {
             String subService = urlManager.constructSubServiceUrl(col);
             scol.setService(subService);

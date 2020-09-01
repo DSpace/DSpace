@@ -17,6 +17,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
+import javax.mail.MessagingException;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -26,11 +27,11 @@ import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.Email;
@@ -42,6 +43,8 @@ import org.dspace.identifier.DOIIdentifierProvider;
 import org.dspace.identifier.IdentifierException;
 import org.dspace.identifier.factory.IdentifierServiceFactory;
 import org.dspace.identifier.service.DOIService;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.utils.DSpace;
 
 
@@ -51,14 +54,15 @@ import org.dspace.utils.DSpace;
  */
 public class DOIOrganiser {
 
-    private static final Logger LOG = org.apache.logging.log4j.LogManager.getLogger(DOIOrganiser.class);
+    private static final Logger LOG = LogManager.getLogger(DOIOrganiser.class);
 
-    private DOIIdentifierProvider provider;
-    private Context context;
+    private final DOIIdentifierProvider provider;
+    private final Context context;
     private boolean quiet;
     protected HandleService handleService;
     protected ItemService itemService;
     protected DOIService doiService;
+    protected ConfigurationService configurationService;
 
     public DOIOrganiser(Context context, DOIIdentifierProvider provider) {
         this.context = context;
@@ -67,6 +71,7 @@ public class DOIOrganiser {
         this.handleService = HandleServiceFactory.getInstance().getHandleService();
         this.itemService = ContentServiceFactory.getInstance().getItemService();
         this.doiService = IdentifierServiceFactory.getInstance().getDOIService();
+        this.configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
     }
 
     public static void main(String[] args) {
@@ -191,7 +196,7 @@ public class DOIOrganiser {
             try {
                 List<DOI> dois = doiService
                     .getDOIsByStatus(context, Arrays.asList(DOIIdentifierProvider.TO_BE_RESERVED));
-                if (0 == dois.size()) {
+                if (dois.isEmpty()) {
                     System.err.println("There are no objects in the database "
                                            + "that could be reserved.");
                 }
@@ -211,7 +216,7 @@ public class DOIOrganiser {
             try {
                 List<DOI> dois = doiService
                     .getDOIsByStatus(context, Arrays.asList(DOIIdentifierProvider.TO_BE_REGISTERED));
-                if (0 == dois.size()) {
+                if (dois.isEmpty()) {
                     System.err.println("There are no objects in the database "
                                            + "that could be registered.");
                 }
@@ -232,7 +237,7 @@ public class DOIOrganiser {
                     DOIIdentifierProvider.UPDATE_BEFORE_REGISTRATION,
                     DOIIdentifierProvider.UPDATE_RESERVED,
                     DOIIdentifierProvider.UPDATE_REGISTERED));
-                if (0 == dois.size()) {
+                if (dois.isEmpty()) {
                     System.err.println("There are no objects in the database "
                                            + "whose metadata needs an update.");
                 }
@@ -252,7 +257,7 @@ public class DOIOrganiser {
             try {
                 List<DOI> dois = doiService
                     .getDOIsByStatus(context, Arrays.asList(DOIIdentifierProvider.TO_BE_DELETED));
-                if (0 == dois.size()) {
+                if (dois.isEmpty()) {
                     System.err.println("There are no objects in the database "
                                            + "that could be deleted.");
                 }
@@ -280,13 +285,7 @@ public class DOIOrganiser {
                 try {
                     DOI doiRow = organiser.resolveToDOI(identifier);
                     organiser.reserve(doiRow);
-                } catch (SQLException ex) {
-                    LOG.error(ex);
-                } catch (IllegalArgumentException ex) {
-                    LOG.error(ex);
-                } catch (IllegalStateException ex) {
-                    LOG.error(ex);
-                } catch (IdentifierException ex) {
+                } catch (SQLException | IllegalArgumentException | IllegalStateException | IdentifierException ex) {
                     LOG.error(ex);
                 }
             }
@@ -301,13 +300,7 @@ public class DOIOrganiser {
                 try {
                     DOI doiRow = organiser.resolveToDOI(identifier);
                     organiser.register(doiRow);
-                } catch (SQLException ex) {
-                    LOG.error(ex);
-                } catch (IllegalArgumentException ex) {
-                    LOG.error(ex);
-                } catch (IllegalStateException ex) {
-                    LOG.error(ex);
-                } catch (IdentifierException ex) {
+                } catch (SQLException | IllegalArgumentException | IllegalStateException | IdentifierException ex) {
                     LOG.error(ex);
                 }
             }
@@ -322,13 +315,7 @@ public class DOIOrganiser {
                 try {
                     DOI doiRow = organiser.resolveToDOI(identifier);
                     organiser.update(doiRow);
-                } catch (SQLException ex) {
-                    LOG.error(ex);
-                } catch (IllegalArgumentException ex) {
-                    LOG.error(ex);
-                } catch (IllegalStateException ex) {
-                    LOG.error(ex);
-                } catch (IdentifierException ex) {
+                } catch (SQLException | IllegalArgumentException | IllegalStateException | IdentifierException ex) {
                     LOG.error(ex);
                 }
             }
@@ -342,9 +329,7 @@ public class DOIOrganiser {
             } else {
                 try {
                     organiser.delete(identifier);
-                } catch (SQLException ex) {
-                    LOG.error(ex);
-                } catch (IllegalArgumentException ex) {
+                } catch (SQLException | IllegalArgumentException ex) {
                     LOG.error(ex);
                 }
             }
@@ -714,7 +699,7 @@ public class DOIOrganiser {
 
     private void sendAlertMail(String action, DSpaceObject dso, String doi, String reason)
         throws IOException {
-        String recipient = ConfigurationManager.getProperty("alert.recipient");
+        String recipient = configurationService.getProperty("alert.recipient");
 
         try {
             if (recipient != null) {
@@ -733,7 +718,7 @@ public class DOIOrganiser {
                     System.err.println("Email alert is sent.");
                 }
             }
-        } catch (Exception e) {
+        } catch (IOException | MessagingException e) {
             LOG.warn("Unable to send email alert", e);
             if (!quiet) {
                 System.err.println("Unable to send email alert.");

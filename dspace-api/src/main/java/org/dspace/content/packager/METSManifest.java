@@ -13,11 +13,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.codec.binary.Base64;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
@@ -29,10 +29,11 @@ import org.dspace.content.crosswalk.CrosswalkObjectNotSupported;
 import org.dspace.content.crosswalk.IngestionCrosswalk;
 import org.dspace.content.crosswalk.MetadataValidationException;
 import org.dspace.content.crosswalk.StreamIngestionCrosswalk;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.factory.CoreServiceFactory;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.jdom.Content;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -117,8 +118,10 @@ public class METSManifest {
     /**
      * log4j category
      */
-    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(METSManifest.class);
+    private static final Logger log = LogManager.getLogger(METSManifest.class);
 
+    private static final ConfigurationService configurationService
+            = DSpaceServicesFactory.getInstance().getConfigurationService();
     /**
      * Canonical filename of METS manifest within a package or as a bitstream.
      */
@@ -131,7 +134,7 @@ public class METSManifest {
     public static final String CONFIG_METS_PREFIX = "mets.";
 
     /**
-     * prefix of config lines identifying local XML Schema (XSD) files
+     * prefix of configuration lines identifying local XML Schema (XSD) files
      */
     protected static final String CONFIG_XSD_PREFIX = CONFIG_METS_PREFIX + "xsd.";
 
@@ -190,21 +193,20 @@ public class METSManifest {
     protected static String localSchemas;
 
     static {
-        String dspace_dir = ConfigurationManager.getProperty("dspace.dir");
+        String dspace_dir = configurationService.getProperty("dspace.dir");
         File xsdPath1 = new File(dspace_dir + "/config/schemas/");
         File xsdPath2 = new File(dspace_dir + "/config/");
 
-        Enumeration<String> pe = (Enumeration<String>) ConfigurationManager.propertyNames();
-        StringBuffer result = new StringBuffer();
-        while (pe.hasMoreElements()) {
+        List<String> configKeys = configurationService.getPropertyKeys();
+        StringBuilder result = new StringBuilder();
+        for (String key : configKeys) {
             // config lines have the format:
             //  mets.xsd.{identifier} = {namespace} {xsd-URL}
             // e.g.
             //  mets.xsd.dc =  http://purl.org/dc/elements/1.1/ dc.xsd
             // (filename is relative to {dspace_dir}/config/schemas/)
-            String key = pe.nextElement();
             if (key.startsWith(CONFIG_XSD_PREFIX)) {
-                String spec = ConfigurationManager.getProperty(key);
+                String spec = configurationService.getProperty(key);
                 String val[] = spec.trim().split("\\s+");
                 if (val.length == 2) {
                     File xsd = new File(xsdPath1, val[1]);
@@ -240,7 +242,7 @@ public class METSManifest {
      *
      * @param builder    XML parser (for parsing mdRef'd files and binData)
      * @param mets       parsed METS document
-     * @param configName config name
+     * @param configName configuration name
      */
     protected METSManifest(SAXBuilder builder, Element mets, String configName) {
         super();
@@ -337,7 +339,7 @@ public class METSManifest {
             return bundleFiles;
         }
 
-        bundleFiles = new ArrayList<Element>();
+        bundleFiles = new ArrayList<>();
         Element fileSec = mets.getChild("fileSec", metsNS);
 
         if (fileSec != null) {
@@ -356,7 +358,7 @@ public class METSManifest {
             return contentFiles;
         }
 
-        contentFiles = new ArrayList<Element>();
+        contentFiles = new ArrayList<>();
         Element fileSec = mets.getChild("fileSec", metsNS);
 
         if (fileSec != null) {
@@ -637,7 +639,7 @@ public class METSManifest {
                 //  XML parser stupidly includes newlines in prettyprinting
                 //  as text content objects..
                 String id = mdSec.getAttributeValue("ID");
-                StringBuffer sb = new StringBuffer();
+                StringBuilder sb = new StringBuilder();
                 for (Iterator mi = mdc.iterator(); mi.hasNext(); ) {
                     sb.append(", ").append(((Content) mi.next()).toString());
                 }
@@ -661,12 +663,12 @@ public class METSManifest {
                         if (mimeType != null && mimeType.equalsIgnoreCase("text/xml")) {
                             byte value[] = Base64.decodeBase64(bin.getText().getBytes());
                             Document mdd = parser.build(new ByteArrayInputStream(value));
-                            List<Element> result = new ArrayList<Element>(1);
+                            List<Element> result = new ArrayList<>(1);
                             result.add(mdd.getRootElement());
                             return result;
                         } else {
                             log.warn("Ignoring binData section because MIMETYPE is not XML, but: " + mimeType);
-                            return new ArrayList<Element>(0);
+                            return new ArrayList<>(0);
                         }
                     }
                 } else {
@@ -680,12 +682,12 @@ public class METSManifest {
                         // This next line triggers a false-positive XXE warning from LGTM, even though we disallow DTD
                         // parsing during initialization of parser in create()
                         Document mdd = parser.build(callback.getInputStream(mdRef)); // lgtm [java/xxe]
-                        List<Element> result = new ArrayList<Element>(1);
+                        List<Element> result = new ArrayList<>(1);
                         result.add(mdd.getRootElement());
                         return result;
                     } else {
                         log.warn("Ignoring mdRef section because MIMETYPE is not XML, but: " + mimeType);
-                        return new ArrayList<Element>(0);
+                        return new ArrayList<>(0);
                     }
 
                 } else {
@@ -805,7 +807,7 @@ public class METSManifest {
         //get our child object <div>s
         List childObjDivs = getChildObjDivs();
 
-        List<String> childPathList = new ArrayList<String>();
+        List<String> childPathList = new ArrayList<>();
 
         if (childObjDivs != null && !childObjDivs.isEmpty()) {
             Iterator childIterator = childObjDivs.iterator();
@@ -917,10 +919,10 @@ public class METSManifest {
          * then try
          *   mets.default.ingest.crosswalk.MDNAME = XWALKNAME
          */
-        String xwalkName = ConfigurationManager.getProperty(
+        String xwalkName = configurationService.getProperty(
             CONFIG_METS_PREFIX + configName + ".ingest.crosswalk." + type);
         if (xwalkName == null) {
-            xwalkName = ConfigurationManager.getProperty(
+            xwalkName = configurationService.getProperty(
                 CONFIG_METS_PREFIX + "default.ingest.crosswalk." + type);
             if (xwalkName == null) {
                 xwalkName = type;
@@ -993,7 +995,7 @@ public class METSManifest {
             return new Element[0];
         }
         String amdID[] = amds.split("\\s+");
-        List<Element> resultList = new ArrayList<Element>();
+        List<Element> resultList = new ArrayList<>();
         for (int i = 0; i < amdID.length; ++i) {
             List rmds = getElementByXPath("mets:amdSec[@ID=\"" + amdID[i] + "\"]", false).
                                                                                              getChildren("rightsMD",

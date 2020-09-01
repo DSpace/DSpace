@@ -21,6 +21,7 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
@@ -34,12 +35,13 @@ import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
 import org.dspace.content.service.ItemService;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.SelfNamedPlugin;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.jdom.Attribute;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -84,14 +86,13 @@ import org.jdom.xpath.XPath;
  *
  * @author Larry Stone
  * @author Scott Phillips
- * @version $Revision$
  */
 public class MODSDisseminationCrosswalk extends SelfNamedPlugin
     implements DisseminationCrosswalk {
     /**
      * log4j category
      */
-    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(MODSDisseminationCrosswalk.class);
+    private static final Logger log = LogManager.getLogger(MODSDisseminationCrosswalk.class);
 
     private static final String CONFIG_PREFIX = "crosswalk.mods.properties.";
 
@@ -99,6 +100,8 @@ public class MODSDisseminationCrosswalk extends SelfNamedPlugin
     protected final CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
     protected final ItemService itemService = ContentServiceFactory.getInstance().getItemService();
     protected final HandleService handleService = HandleServiceFactory.getInstance().getHandleService();
+    protected static final ConfigurationService configurationService
+            = DSpaceServicesFactory.getInstance().getConfigurationService();
 
     /**
      * Fill in the plugin alias table from DSpace configuration entries
@@ -107,10 +110,9 @@ public class MODSDisseminationCrosswalk extends SelfNamedPlugin
     private static String aliases[] = null;
 
     static {
-        List<String> aliasList = new ArrayList<String>();
-        Enumeration<String> pe = (Enumeration<String>) ConfigurationManager.propertyNames();
-        while (pe.hasMoreElements()) {
-            String key = pe.nextElement();
+        List<String> aliasList = new ArrayList<>();
+        List<String> pe = configurationService.getPropertyKeys();
+        for (String key : pe) {
             if (key.startsWith(CONFIG_PREFIX)) {
                 aliasList.add(key.substring(CONFIG_PREFIX.length()));
             }
@@ -142,8 +144,8 @@ public class MODSDisseminationCrosswalk extends SelfNamedPlugin
     private static final String schemaLocation =
         MODS_NS.getURI() + " " + MODS_XSD;
 
-    private static XMLOutputter outputUgly = new XMLOutputter();
-    private static SAXBuilder builder = new SAXBuilder();
+    private static final XMLOutputter outputUgly = new XMLOutputter();
+    private static final SAXBuilder builder = new SAXBuilder();
 
     private Map<String, modsTriple> modsMap = null;
 
@@ -176,11 +178,7 @@ public class MODSDisseminationCrosswalk extends SelfNamedPlugin
                 result.xpath.addNamespace(XLINK_NS);
                 Document d = builder.build(new StringReader(prolog + xml + postlog));
                 result.xml = (Element) d.getRootElement().getContent(0);
-            } catch (JDOMException je) {
-                log.error("Error initializing modsTriple(\"" + qdc + "\",\"" + xml + "\",\"" + xpath + "\"): got " + je
-                    .toString());
-                return null;
-            } catch (IOException je) {
+            } catch (JDOMException | IOException je) {
                 log.error("Error initializing modsTriple(\"" + qdc + "\",\"" + xml + "\",\"" + xpath + "\"): got " + je
                     .toString());
                 return null;
@@ -226,14 +224,14 @@ public class MODSDisseminationCrosswalk extends SelfNamedPlugin
             return;
         }
         String cmPropName = CONFIG_PREFIX + myAlias;
-        String propsFilename = ConfigurationManager.getProperty(cmPropName);
+        String propsFilename = configurationService.getProperty(cmPropName);
         if (propsFilename == null) {
             String msg = "MODS crosswalk missing " +
                 "configuration file for crosswalk named \"" + myAlias + "\"";
             log.error(msg);
             throw new CrosswalkInternalException(msg);
         } else {
-            String parent = ConfigurationManager.getProperty("dspace.dir") +
+            String parent = configurationService.getProperty("dspace.dir") +
                 File.separator + "config" + File.separator;
             File propsFile = new File(parent, propsFilename);
             Properties modsConfig = new Properties();
@@ -256,7 +254,7 @@ public class MODSDisseminationCrosswalk extends SelfNamedPlugin
                 }
             }
 
-            modsMap = new HashMap<String, modsTriple>();
+            modsMap = new HashMap<>();
             Enumeration<String> pe = (Enumeration<String>) modsConfig.propertyNames();
             while (pe.hasMoreElements()) {
                 String qdc = pe.nextElement();
@@ -343,7 +341,7 @@ public class MODSDisseminationCrosswalk extends SelfNamedPlugin
         }
         initMap();
 
-        List<Element> result = new ArrayList<Element>(dcvs.size());
+        List<Element> result = new ArrayList<>(dcvs.size());
 
         for (MetadataValueDTO dcv : dcvs) {
             String qdc = dcv.getSchema() + "." + dcv.getElement();
@@ -579,7 +577,7 @@ public class MODSDisseminationCrosswalk extends SelfNamedPlugin
             if (log.isDebugEnabled()) {
                 log.debug("Filtering out non-XML characters in string, reason=" + reason);
             }
-            StringBuffer result = new StringBuffer(value.length());
+            StringBuilder result = new StringBuilder(value.length());
             for (int i = 0; i < value.length(); ++i) {
                 char c = value.charAt(i);
                 if (Verifier.isXMLCharacter((int) c)) {

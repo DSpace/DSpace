@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.abdera.i18n.iri.IRI;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
@@ -23,9 +24,10 @@ import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.swordapp.server.DepositReceipt;
 import org.swordapp.server.SwordError;
 import org.swordapp.server.SwordServerException;
@@ -40,10 +42,13 @@ public class ReceiptGenerator {
     /**
      * logger
      */
-    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(ReceiptGenerator.class);
+    private static final Logger log = LogManager.getLogger(ReceiptGenerator.class);
 
     protected ItemService itemService =
         ContentServiceFactory.getInstance().getItemService();
+
+    protected ConfigurationService configurationService
+            = DSpaceServicesFactory.getInstance().getConfigurationService();
 
     protected DepositReceipt createFileReceipt(Context context,
                                                DepositResult result, SwordConfigurationDSpace config)
@@ -122,7 +127,7 @@ public class ReceiptGenerator {
                     od.getFormat(context).getMIMEType());
             }
 
-            Map<String, String> derived = new HashMap<String, String>();
+            Map<String, String> derived = new HashMap<>();
             List<Bitstream> drs = result.getDerivedResources();
             if (drs != null) {
                 for (Bitstream bs : result.getDerivedResources()) {
@@ -319,8 +324,8 @@ public class ReceiptGenerator {
      */
     protected void addLastUpdatedDate(DepositResult result,
                                       DepositReceipt receipt) {
-        String config = ConfigurationManager.getProperty(
-            "swordv2-server", "updated.field");
+        String config = configurationService.getProperty(
+            "swordv2-server.updated.field");
         List<MetadataValue> dcv = itemService.getMetadataByMetadataString(
             result.getItem(), config);
         if (dcv != null && dcv.size() == 1) {
@@ -342,8 +347,8 @@ public class ReceiptGenerator {
      * @param receipt deposit receipt
      */
     protected void addLastUpdatedDate(Item item, DepositReceipt receipt) {
-        String config = ConfigurationManager.getProperty(
-            "swordv2-server", "updated.field");
+        String config = configurationService.getProperty(
+            "swordv2-server.updated.field");
         List<MetadataValue> dcv = itemService.getMetadataByMetadataString(
             item, config);
         if (dcv != null && dcv.size() == 1) {

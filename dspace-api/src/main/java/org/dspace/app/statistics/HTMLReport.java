@@ -20,7 +20,8 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.dspace.core.ConfigurationManager;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
  * This class provides HTML reports for the ReportGenerator class
@@ -34,7 +35,7 @@ public class HTMLReport implements Report {
     /**
      * a list of the statistic blocks being managed by this class
      */
-    private List<Statistics> blocks = new ArrayList<Statistics>();
+    private final List<Statistics> blocks = new ArrayList<>();
 
     /**
      * the title for the page
@@ -59,7 +60,9 @@ public class HTMLReport implements Report {
     /**
      * the output file to which to write aggregation data
      */
-    private String output = ConfigurationManager.getProperty("dspace.dir") +
+    ConfigurationService configurationService
+            = DSpaceServicesFactory.getInstance().getConfigurationService();
+    private String output = configurationService.getProperty("dspace.dir") +
         File.separator + "log" + File.separator + "report";
 
     /**
@@ -82,7 +85,7 @@ public class HTMLReport implements Report {
      */
     @Override
     public String render() {
-        StringBuffer frag = new StringBuffer();
+        StringBuilder frag = new StringBuilder();
 
         // get the page headings
         frag.append(header(pageTitle));
@@ -140,7 +143,7 @@ public class HTMLReport implements Report {
      * @return an HTML string providing internal page navigation
      */
     public String navigation() {
-        StringBuffer frag = new StringBuffer();
+        StringBuilder frag = new StringBuilder();
 
         frag.append("<div class=\"reportNavigation\">");
         frag.append("<a href=\"#general_overview\">General Overview</a>");
@@ -173,7 +176,6 @@ public class HTMLReport implements Report {
     @Override
     public void addBlock(Statistics stat) {
         blocks.add(stat);
-        return;
     }
 
 
@@ -207,7 +209,7 @@ public class HTMLReport implements Report {
      */
     @Override
     public String dateRange() {
-        StringBuffer frag = new StringBuffer();
+        StringBuilder frag = new StringBuilder();
         DateFormat df = DateFormat.getDateInstance();
 
         frag.append("<div class=\"reportDate\">");
@@ -255,7 +257,6 @@ public class HTMLReport implements Report {
         if (pageTitle == null) {
             pageTitle = mainTitle;
         }
-        return;
     }
 
 
@@ -280,7 +281,7 @@ public class HTMLReport implements Report {
         // FIXME: this need to be figured out to integrate nicely into the
         // whole JSTL thing, but for the moment it's just going to deliver
         // some styles
-        StringBuffer frag = new StringBuffer();
+        StringBuilder frag = new StringBuilder();
 
         frag.append("<style type=\"text/css\">\n");
         frag.append("body { font-family: Arial, Helvetica, sans-serif }");
@@ -334,7 +335,7 @@ public class HTMLReport implements Report {
      */
     @Override
     public String statBlock(Statistics content) {
-        StringBuffer frag = new StringBuffer();
+        StringBuilder frag = new StringBuilder();
         Stat[] stats = content.getStats();
 
         // start the table
@@ -405,7 +406,7 @@ public class HTMLReport implements Report {
     @Override
     public String floorInfo(int floor) {
         if (floor > 0) {
-            StringBuffer frag = new StringBuffer();
+            StringBuilder frag = new StringBuilder();
             frag.append("<div class=\"reportFloor\">");
             frag.append("(more than " + ReportTools.numberFormat(floor) + " times)");
             frag.append("</div>\n");
@@ -419,12 +420,12 @@ public class HTMLReport implements Report {
      * output the explanation of the report block in HTML format
      *
      * @param explanation some text explaining the coming report block
-     * @return a string containing an explanaton HTML formatted
+     * @return a string containing an explanation HTML formatted
      */
     @Override
     public String blockExplanation(String explanation) {
         if (explanation != null) {
-            StringBuffer frag = new StringBuffer();
+            StringBuilder frag = new StringBuilder();
             frag.append("<div class=\"reportExplanation\">");
             frag.append(explanation);
             frag.append("</div>\n\n");

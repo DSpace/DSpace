@@ -17,7 +17,8 @@ import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
-import org.dspace.core.ConfigurationManager;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 public class AbstractSimpleDC {
     protected HashMap<String, String> dcMap = null;
@@ -27,16 +28,18 @@ public class AbstractSimpleDC {
     protected ItemService itemService = ContentServiceFactory.getInstance()
                                                              .getItemService();
 
+    protected ConfigurationService configurationService
+            = DSpaceServicesFactory.getInstance().getConfigurationService();
+
     protected void loadMetadataMaps() {
         if (this.dcMap == null) {
             // we should load our DC map from configuration
             this.dcMap = new HashMap<>();
-            Properties props = ConfigurationManager
-                .getProperties("swordv2-server");
+            Properties props = configurationService.getProperties();
             for (Object key : props.keySet()) {
                 String keyString = (String) key;
-                if (keyString.startsWith("simpledc.")) {
-                    String k = keyString.substring("simpledc.".length());
+                if (keyString.startsWith("swordv2-server.simpledc.")) {
+                    String k = keyString.substring("swordv2-server.simpledc.".length());
                     String v = (String) props.get(key);
                     this.dcMap.put(k, v);
                 }
@@ -45,12 +48,11 @@ public class AbstractSimpleDC {
 
         if (this.atomMap == null) {
             this.atomMap = new HashMap<>();
-            Properties props = ConfigurationManager
-                .getProperties("swordv2-server");
+            Properties props = configurationService.getProperties();
             for (Object key : props.keySet()) {
                 String keyString = (String) key;
-                if (keyString.startsWith("atom.")) {
-                    String k = keyString.substring("atom.".length());
+                if (keyString.startsWith("swordv2-server.atom.")) {
+                    String k = keyString.substring("swordv2-server.atom.".length());
                     String v = (String) props.get(key);
                     this.atomMap.put(k, v);
                 }

@@ -9,23 +9,23 @@ package org.dspace.content.authority;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.content.MetadataField;
 import org.dspace.content.authority.service.MetadataAuthorityService;
 import org.dspace.content.service.MetadataFieldService;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
+import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Broker for metadata authority settings configured for each metadata field.
  *
- * Configuration keys, per metadata field (e.g. "dc.contributer.author")
+ * Configuration keys, per metadata field (e.g. "dc.contributor.author")
  *
  * {@code
  * # is field authority controlled (i.e. store authority, confidence values)?
@@ -52,13 +52,16 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @see Choices
  */
 public class MetadataAuthorityServiceImpl implements MetadataAuthorityService {
-    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(MetadataAuthorityServiceImpl.class);
+    private static final Logger log = LogManager.getLogger(MetadataAuthorityServiceImpl.class);
 
     @Autowired(required = true)
     protected MetadataFieldService metadataFieldService;
 
+    @Autowired(required = true)
+    protected ConfigurationService configurationService;
+
     // map of field key to authority plugin
-    protected Map<String, Boolean> controlled = new HashMap<String, Boolean>();
+    protected Map<String, Boolean> controlled = new HashMap<>();
 
     // map of field key to answer of whether field is required to be controlled
     protected Map<String, Boolean> isAuthorityRequired = null;
@@ -67,7 +70,7 @@ public class MetadataAuthorityServiceImpl implements MetadataAuthorityService {
      * map of field key to answer of which is the min acceptable confidence
      * value for a field with authority
      */
-    protected Map<String, Integer> minConfidence = new HashMap<String, Integer>();
+    protected Map<String, Integer> minConfidence = new HashMap<>();
 
     /**
      * fallback default value unless authority.minconfidence = X is configured.
@@ -81,13 +84,12 @@ public class MetadataAuthorityServiceImpl implements MetadataAuthorityService {
     public void init() {
 
         if (isAuthorityRequired == null) {
-            isAuthorityRequired = new HashMap<String, Boolean>();
-            Enumeration pn = ConfigurationManager.propertyNames();
+            isAuthorityRequired = new HashMap<>();
+            List<String> pn = configurationService.getPropertyKeys();
             final String authPrefix = "authority.controlled.";
             Context context = new Context();
             try {
-                while (pn.hasMoreElements()) {
-                    String key = (String) pn.nextElement();
+                for (String key : pn) {
                     if (key.startsWith(authPrefix)) {
                         // field is expected to be "schema.element.qualifier"
                         String field = key.substring(authPrefix.length());
@@ -115,8 +117,8 @@ public class MetadataAuthorityServiceImpl implements MetadataAuthorityService {
                                 "Error while configuring authority control, metadata field: " + field + " could not " +
                                     "be found");
                         }
-                        boolean ctl = ConfigurationManager.getBooleanProperty(key, true);
-                        boolean req = ConfigurationManager.getBooleanProperty("authority.required." + field, false);
+                        boolean ctl = configurationService.getBooleanProperty(key, true);
+                        boolean req = configurationService.getBooleanProperty("authority.required." + field, false);
                         controlled.put(metadataField.toString(), ctl);
                         isAuthorityRequired.put(metadataField.toString(), req);
 
@@ -143,7 +145,7 @@ public class MetadataAuthorityServiceImpl implements MetadataAuthorityService {
     }
 
     private int readConfidence(String key) {
-        String mc = ConfigurationManager.getProperty(key);
+        String mc = configurationService.getProperty(key);
         if (mc != null) {
             int mci = Choices.getConfidenceValue(mc.trim(), Choices.CF_UNSET - 1);
             if (mci == Choices.CF_UNSET - 1) {
