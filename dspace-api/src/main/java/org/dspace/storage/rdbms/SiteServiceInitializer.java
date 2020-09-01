@@ -7,8 +7,6 @@
  */
 package org.dspace.storage.rdbms;
 
-import java.sql.Connection;
-
 import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Site;
@@ -17,8 +15,8 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.service.GroupService;
-import org.flywaydb.core.api.MigrationInfo;
-import org.flywaydb.core.api.callback.FlywayCallback;
+import org.flywaydb.core.api.callback.Callback;
+import org.flywaydb.core.api.callback.Event;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -27,7 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  *
  * @author kevinvandevelde at atmire.com
  */
-public class SiteServiceInitializer implements FlywayCallback {
+public class SiteServiceInitializer implements Callback {
 
     private Logger log = org.apache.logging.log4j.LogManager.getLogger(SiteServiceInitializer.class);
 
@@ -46,13 +44,13 @@ public class SiteServiceInitializer implements FlywayCallback {
         try {
             context = new Context();
             context.turnOffAuthorisationSystem();
-            // While it's not really a formal "registry", we need to ensure the
-            // default, required Groups exist in the DSpace database
+            // Create Site object if it doesn't exist in database
             Site site = null;
             if (siteService.findSite(context) == null) {
                 site = siteService.createSite(context);
             }
             context.restoreAuthSystemState();
+            // Give Anonymous users READ permissions on the Site Object (if doesn't exist)
             if (!authorizeService.authorizeActionBoolean(context, site, Constants.READ)) {
                 context.turnOffAuthorisationSystem();
                 Group anonGroup = groupService.findByName(context, Group.ANONYMOUS);
@@ -64,7 +62,7 @@ public class SiteServiceInitializer implements FlywayCallback {
             // Commit changes and close context
             context.complete();
         } catch (Exception e) {
-            log.error("Error attempting to add/update default DSpace Groups", e);
+            log.error("Error attempting to add/update default Site object", e);
         } finally {
             // Clean up our context, if it still exists & it was never completed
             if (context != null && context.isValid()) {
@@ -75,73 +73,36 @@ public class SiteServiceInitializer implements FlywayCallback {
 
     }
 
+    /**
+     * Events supported by this callback.
+     * @param event Flyway event
+     * @param context Flyway context
+     * @return true if AFTER_MIGRATE event
+     */
     @Override
-    public void beforeClean(Connection connection) {
-
+    public boolean supports(Event event, org.flywaydb.core.api.callback.Context context) {
+        // Must run AFTER all migrations complete, since it is dependent on Hibernate
+        return event.equals(Event.AFTER_MIGRATE);
     }
 
+    /**
+     * Whether event can be handled in a transaction or whether it must be handle outside of transaction.
+     * @param event Flyway event
+     * @param context Flyway context
+     * @return true
+     */
     @Override
-    public void afterClean(Connection connection) {
-
+    public boolean canHandleInTransaction(Event event, org.flywaydb.core.api.callback.Context context) {
+        return true;
     }
 
+    /**
+     * What to run when the callback is triggered.
+     * @param event Flyway event
+     * @param context Flyway context
+     */
     @Override
-    public void beforeMigrate(Connection connection) {
-
-    }
-
-    @Override
-    public void afterMigrate(Connection connection) {
+    public void handle(Event event, org.flywaydb.core.api.callback.Context context) {
         initializeSiteObject();
-    }
-
-    @Override
-    public void beforeEachMigrate(Connection connection, MigrationInfo migrationInfo) {
-
-    }
-
-    @Override
-    public void afterEachMigrate(Connection connection, MigrationInfo migrationInfo) {
-
-    }
-
-    @Override
-    public void beforeValidate(Connection connection) {
-
-    }
-
-    @Override
-    public void afterValidate(Connection connection) {
-
-    }
-
-    @Override
-    public void beforeBaseline(Connection connection) {
-
-    }
-
-    @Override
-    public void afterBaseline(Connection connection) {
-
-    }
-
-    @Override
-    public void beforeRepair(Connection connection) {
-
-    }
-
-    @Override
-    public void afterRepair(Connection connection) {
-
-    }
-
-    @Override
-    public void beforeInfo(Connection connection) {
-
-    }
-
-    @Override
-    public void afterInfo(Connection connection) {
-
     }
 }

@@ -7,12 +7,19 @@
  */
 package org.dspace.storage.rdbms.migration;
 
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.io.UncheckedIOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import org.apache.commons.lang3.StringUtils;
+import org.dspace.core.Constants;
+import org.springframework.core.io.Resource;
+import org.springframework.util.FileCopyUtils;
 
 /**
  * This Utility class offers utility methods which may be of use to perform
@@ -269,5 +276,20 @@ public class MigrationUtils {
         }
 
         return checksum;
+    }
+
+    /**
+     * Read a given Resource, converting to a String. This is used by several Java-based
+     * migrations to read a SQL migration into a string, so that it can be executed under
+     * specific scenarios.
+     * @param resource Resource to read
+     * @return String contents of Resource
+     */
+    public static String resourceToString(Resource resource) {
+        try (Reader reader = new InputStreamReader(resource.getInputStream(), Constants.DEFAULT_ENCODING)) {
+            return FileCopyUtils.copyToString(reader);
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
     }
 }
