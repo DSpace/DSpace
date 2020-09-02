@@ -9,7 +9,7 @@ package org.dspace.discovery.configuration;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Required;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @author Kevin Van de Velde (kevin at atmire dot com)
@@ -28,7 +28,7 @@ public class DiscoverySearchFilter {
         return indexFieldName;
     }
 
-    @Required
+    @Autowired(required = true)
     public void setIndexFieldName(String indexFieldName) {
         this.indexFieldName = indexFieldName;
     }
@@ -37,7 +37,7 @@ public class DiscoverySearchFilter {
         return metadataFields;
     }
 
-    @Required
+    @Autowired(required = true)
     public void setMetadataFields(List<String> metadataFields) {
         this.metadataFields = metadataFields;
     }

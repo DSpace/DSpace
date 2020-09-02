@@ -34,7 +34,7 @@ import org.dspace.content.Bitstream;
 import org.dspace.core.Utils;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
-import org.springframework.beans.factory.annotation.Required;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Asset store using Amazon's Simple Storage Service (S3).
@@ -178,7 +178,7 @@ public class S3BitStoreService implements BitStoreService {
         File scratchFile = File.createTempFile(bitstream.getInternalId(), "s3bs");
         try {
             FileUtils.copyInputStreamToFile(in, scratchFile);
-            Long contentLength = Long.valueOf(scratchFile.length());
+            Long contentLength = scratchFile.length();
 
             PutObjectRequest putObjectRequest = new PutObjectRequest(bucketName, key, scratchFile);
             PutObjectResult putObjectResult = s3Service.putObject(putObjectRequest);
@@ -277,7 +277,7 @@ public class S3BitStoreService implements BitStoreService {
         return awsAccessKey;
     }
 
-    @Required
+    @Autowired(required = true)
     public void setAwsAccessKey(String awsAccessKey) {
         this.awsAccessKey = awsAccessKey;
     }
@@ -286,7 +286,7 @@ public class S3BitStoreService implements BitStoreService {
         return awsSecretKey;
     }
 
-    @Required
+    @Autowired(required = true)
     public void setAwsSecretKey(String awsSecretKey) {
         this.awsSecretKey = awsSecretKey;
     }
@@ -299,7 +299,7 @@ public class S3BitStoreService implements BitStoreService {
         this.awsRegionName = awsRegionName;
     }
 
-    @Required
+    @Autowired(required = true)
     public String getBucketName() {
         return bucketName;
     }

@@ -51,7 +51,6 @@ import org.jdom.output.XMLOutputter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Required;
 
 /**
  * @author Pascal-Nicolas Becker
@@ -128,7 +127,7 @@ public class DataCiteConnector
      *
      * @param DATACITE_SCHEME Probably https or http.
      */
-    @Required
+    @Autowired(required = true)
     public void setDATACITE_SCHEME(String DATACITE_SCHEME) {
         this.SCHEME = DATACITE_SCHEME;
     }
@@ -139,7 +138,7 @@ public class DataCiteConnector
      *
      * @param DATACITE_HOST Hostname to connect to register DOIs (f.e. test.datacite.org).
      */
-    @Required
+    @Autowired(required = true)
     public void setDATACITE_HOST(String DATACITE_HOST) {
         this.HOST = DATACITE_HOST;
     }
@@ -150,7 +149,7 @@ public class DataCiteConnector
      *
      * @param DATACITE_DOI_PATH Path to register DOIs, f.e. /doi.
      */
-    @Required
+    @Autowired(required = true)
     public void setDATACITE_DOI_PATH(String DATACITE_DOI_PATH) {
         if (!DATACITE_DOI_PATH.startsWith("/")) {
             DATACITE_DOI_PATH = "/" + DATACITE_DOI_PATH;
@@ -168,7 +167,7 @@ public class DataCiteConnector
      *
      * @param DATACITE_METADATA_PATH Path to register metadata, f.e. /mds.
      */
-    @Required
+    @Autowired(required = true)
     public void setDATACITE_METADATA_PATH(String DATACITE_METADATA_PATH) {
         if (!DATACITE_METADATA_PATH.startsWith("/")) {
             DATACITE_METADATA_PATH = "/" + DATACITE_METADATA_PATH;
@@ -181,8 +180,7 @@ public class DataCiteConnector
     }
 
 
-    @Autowired
-    @Required
+    @Autowired(required = true)
     public void setConfigurationService(ConfigurationService configurationService) {
         this.configurationService = configurationService;
     }
@@ -194,7 +192,7 @@ public class DataCiteConnector
      * @param CROSSWALK_NAME The name of the dissemination crosswalk to use. This
      *                       crosswalk must be configured in dspace.cfg.
      */
-    @Required
+    @Autowired(required = true)
     public void setDisseminationCrosswalkName(String CROSSWALK_NAME) {
         this.CROSSWALK_NAME = CROSSWALK_NAME;
     }
