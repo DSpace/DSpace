@@ -97,7 +97,7 @@ public class XmlWorkflowFactoryImpl implements XmlWorkflowFactory {
     }
 
     @Override
-    public List<Collection> getCollectionHandlesMappedToWorklow(Context context, String workflowName) {
+    public List<Collection> getCollectionHandlesMappedToWorkflow(Context context, String workflowName) {
         List<Collection> collectionsMapped = new ArrayList<>();
         for (String handle : this.workflowMapping.keySet()) {
             if (this.workflowMapping.get(handle).getID().equals(workflowName)) {
@@ -107,7 +107,7 @@ public class XmlWorkflowFactoryImpl implements XmlWorkflowFactory {
                         collectionsMapped.add(collection);
                     }
                 } catch (SQLException e) {
-                    log.error("SQLException in XmlWorkflowFactoryImpl.getCollectionHandlesMappedToWorklow trying to " +
+                    log.error("SQLException in XmlWorkflowFactoryImpl.getCollectionHandlesMappedToWorkflow trying to " +
                             "retrieve collection with handle: " + handle, e);
                 }
             }
