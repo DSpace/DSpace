@@ -28,7 +28,6 @@ import org.dspace.identifier.service.DOIService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Required;
 
 /**
  * Provide service for DOIs using DataCite.
@@ -127,7 +126,7 @@ public class DOIIdentifierProvider
         return this.NAMESPACE_SEPARATOR;
     }
 
-    @Required
+    @Autowired(required = true)
     public void setDOIConnector(DOIConnector connector) {
         this.connector = connector;
     }

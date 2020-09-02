@@ -34,7 +34,7 @@ import org.json.JSONObject;
 import org.orcid.jaxb.model.common_v2.OrcidId;
 import org.orcid.jaxb.model.record_v2.Person;
 import org.orcid.jaxb.model.search_v2.Result;
-import org.springframework.beans.factory.annotation.Required;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * This class is the implementation of the ExternalDataProvider interface that will deal with the OrcidV2 External
@@ -42,9 +42,9 @@ import org.springframework.beans.factory.annotation.Required;
  */
 public class OrcidV2AuthorDataProvider implements ExternalDataProvider {
 
-    private static Logger log = LogManager.getLogger(OrcidV2AuthorDataProvider.class);
+    private static final Logger log = LogManager.getLogger(OrcidV2AuthorDataProvider.class);
 
-    private OrcidRestConnector orcidRestConnector;
+    private final OrcidRestConnector orcidRestConnector;
     private String OAUTHUrl;
     private String clientId;
 
@@ -232,7 +232,7 @@ public class OrcidV2AuthorDataProvider implements ExternalDataProvider {
      * Generic setter for the sourceIdentifier
      * @param sourceIdentifier   The sourceIdentifier to be set on this OrcidV2AuthorDataProvider
      */
-    @Required
+    @Autowired(required = true)
     public void setSourceIdentifier(String sourceIdentifier) {
         this.sourceIdentifier = sourceIdentifier;
     }
@@ -249,7 +249,7 @@ public class OrcidV2AuthorDataProvider implements ExternalDataProvider {
      * Generic setter for the orcidUrl
      * @param orcidUrl   The orcidUrl to be set on this OrcidV2AuthorDataProvider
      */
-    @Required
+    @Autowired(required = true)
     public void setOrcidUrl(String orcidUrl) {
         this.orcidUrl = orcidUrl;
     }
