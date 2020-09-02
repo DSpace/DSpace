@@ -21,12 +21,11 @@ import javax.mail.MessagingException;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
-import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.apache.commons.cli.PosixParser;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.content.DSpaceObject;
@@ -46,7 +45,6 @@ import org.dspace.identifier.service.DOIService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.utils.DSpace;
-
 
 /**
  * @author Marsa Haoua
@@ -117,47 +115,51 @@ public class DOIOrganiser {
         options.addOption("q", "quiet", false,
                           "Turn the command line output off.");
 
-        Option registerDoi = OptionBuilder.withArgName("DOI|ItemID|handle")
-                                          .withLongOpt("register-doi")
-                                          .hasArgs(1)
-                                          .withDescription("Register a specified identifier. "
-                                                               + "You can specify the identifier by ItemID, Handle or" +
-                                                               " DOI.")
-                                          .create();
+        Option registerDoi = Option.builder()
+                .longOpt("register-doi")
+                .hasArg()
+                .argName("DOI|ItemID|handle")
+                .desc("Register a specified identifier. "
+                        + "You can specify the identifier by ItemID, Handle or"
+                        + " DOI.")
+                .build();
 
         options.addOption(registerDoi);
 
-        Option reserveDoi = OptionBuilder.withArgName("DOI|ItemID|handle")
-                                         .withLongOpt("reserve-doi")
-                                         .hasArgs(1)
-                                         .withDescription("Reserve a specified identifier online. "
-                                                              + "You can specify the identifier by ItemID, Handle or " +
-                                                              "DOI.")
-                                         .create();
+        Option reserveDoi = Option.builder()
+                .longOpt("reserve-doi")
+                .hasArg()
+                .argName("DOI|ItemID|handle")
+                .desc("Reserve a specified identifier online. "
+                        + "You can specify the identifier by ItemID, Handle or "
+                        + "DOI.")
+                .build();
 
         options.addOption(reserveDoi);
 
-        Option update = OptionBuilder.withArgName("DOI|ItemID|handle")
-                                     .hasArgs(1)
-                                     .withDescription("Update online an object for a given DOI identifier"
-                                                          + " or ItemID or Handle. A DOI identifier or an ItemID or a" +
-                                                          " Handle is needed.\n")
-                                     .withLongOpt("update-doi")
-                                     .create();
+        Option update = Option.builder()
+                .longOpt("update-doi")
+                .hasArg()
+                .argName("DOI|ItemID|handle")
+                .desc("Update online an object for a given DOI identifier"
+                        + " or ItemID or Handle. A DOI identifier or an ItemID or a"
+                        + " Handle is needed.")
+                .build();
 
         options.addOption(update);
 
-        Option delete = OptionBuilder.withArgName("DOI identifier")
-                                     .withLongOpt("delete-doi")
-                                     .hasArgs(1)
-                                     .withDescription("Delete a specified identifier.")
-                                     .create();
+        Option delete = Option.builder()
+                .argName("DOI identifier")
+                .longOpt("delete-doi")
+                .hasArg()
+                .desc("Delete a specified identifier.")
+                .build();
 
         options.addOption(delete);
 
 
         // initialize parser
-        CommandLineParser parser = new PosixParser();
+        CommandLineParser parser = new DefaultParser();
         CommandLine line = null;
         HelpFormatter helpformater = new HelpFormatter();
 

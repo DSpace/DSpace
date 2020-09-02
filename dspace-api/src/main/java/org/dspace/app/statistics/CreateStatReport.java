@@ -16,8 +16,8 @@ import java.util.Properties;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Options;
-import org.apache.commons.cli.PosixParser;
 import org.dspace.core.Context;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
@@ -114,7 +114,7 @@ public class CreateStatReport {
         outputReportDirectory = configurationService.getProperty("report.dir") + File.separator;
 
         //read in command line variable to determine which statistic to run
-        CommandLineParser parser = new PosixParser();
+        CommandLineParser parser = new DefaultParser();
         Options options = new Options();
         options.addOption("r", "report", true, "report");
         CommandLine line = parser.parse(options, argv);
@@ -407,6 +407,5 @@ public class CreateStatReport {
         System.out.println(
             "Available: <stat-initial> <stat-general> <stat-monthly> <stat-report-initial> <stat-report-general> " +
                 "<stat-report-monthly>");
-        return;
     }
 }

@@ -13,8 +13,8 @@ import java.util.Locale;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Options;
-import org.apache.commons.cli.PosixParser;
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.core.Context;
 import org.dspace.core.I18nUtil;
@@ -62,7 +62,7 @@ public final class CreateAdministrator {
      */
     public static void main(String[] argv)
         throws Exception {
-        CommandLineParser parser = new PosixParser();
+        CommandLineParser parser = new DefaultParser();
         Options options = new Options();
 
         CreateAdministrator ca = new CreateAdministrator();

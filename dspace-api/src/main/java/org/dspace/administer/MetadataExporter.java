@@ -17,9 +17,9 @@ import java.util.Map;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.apache.commons.cli.PosixParser;
 import org.apache.xml.serialize.Method;
 import org.apache.xml.serialize.OutputFormat;
 import org.apache.xml.serialize.XMLSerializer;
@@ -61,7 +61,7 @@ public class MetadataExporter {
     private MetadataExporter() { }
 
     /**
-     * @param args commandline arguments
+     * @param args command line arguments
      * @throws ParseException          if parser error
      * @throws SAXException            if XML parse error
      * @throws IOException             if IO error
@@ -71,7 +71,7 @@ public class MetadataExporter {
     public static void main(String[] args)
         throws ParseException, SQLException, IOException, SAXException, RegistryExportException {
         // create an options object and populate it
-        CommandLineParser parser = new PosixParser();
+        CommandLineParser parser = new DefaultParser();
         Options options = new Options();
         options.addOption("f", "file", true, "output xml file for registry");
         options.addOption("s", "schema", true, "the name of the schema to export");
