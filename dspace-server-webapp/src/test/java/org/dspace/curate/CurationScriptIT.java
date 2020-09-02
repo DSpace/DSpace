@@ -40,7 +40,7 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * IT for {@link CurationCli}
+ * IT for {@link Curation}
  *
  * @author Maria Verdonck (Atmire) on 24/06/2020
  */
@@ -75,7 +75,6 @@ public class CurationScriptIT extends AbstractControllerIntegrationTest {
 
         LinkedList<DSpaceCommandLineParameter> parameters = new LinkedList<>();
 
-        parameters.add(new DSpaceCommandLineParameter("-e", admin.getEmail()));
         parameters.add(new DSpaceCommandLineParameter("-i", publicItem1.getHandle()));
         parameters.add(new DSpaceCommandLineParameter("-t", "invalidTaskOption"));
 
@@ -96,97 +95,11 @@ public class CurationScriptIT extends AbstractControllerIntegrationTest {
     }
 
     @Test
-    public void curateScript_MissingEperson() throws Exception {
-        context.turnOffAuthorisationSystem();
-
-        String token = getAuthToken(admin.getEmail(), password);
-
-        parentCommunity = CommunityBuilder.createCommunity(context)
-                                          .withName("Parent Community")
-                                          .build();
-        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
-                                           .withName("Sub Community")
-                                           .build();
-        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
-
-        Item publicItem1 = ItemBuilder.createItem(context, col1)
-                                      .withTitle("Public item 1")
-                                      .withIssueDate("2017-10-17")
-                                      .withAuthor("Smith, Donald").withAuthor("Doe, John")
-                                      .withSubject("ExtraEntry")
-                                      .build();
-
-        LinkedList<DSpaceCommandLineParameter> parameters = new LinkedList<>();
-
-        parameters.add(new DSpaceCommandLineParameter("-i", publicItem1.getHandle()));
-        parameters.add(new DSpaceCommandLineParameter("-t", CurationClientOptions.getTaskOptions().get(0)));
-
-        List<ParameterValueRest> list = parameters.stream()
-                                                  .map(dSpaceCommandLineParameter -> dSpaceRunnableParameterConverter
-                                                      .convert(dSpaceCommandLineParameter, Projection.DEFAULT))
-                                                  .collect(Collectors.toList());
-
-        context.restoreAuthSystemState();
-
-        // Request with missing required -e <email>
-        getClient(token)
-            .perform(post(CURATE_SCRIPT_ENDPOINT).contentType("multipart/form-data")
-                                                 .param("properties",
-                                                     new Gson().toJson(list)))
-            // Illegal Argument Exception
-            .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    public void curateScript_NonExistentEPerson() throws Exception {
-        context.turnOffAuthorisationSystem();
-
-        String token = getAuthToken(admin.getEmail(), password);
-
-        parentCommunity = CommunityBuilder.createCommunity(context)
-                                          .withName("Parent Community")
-                                          .build();
-        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
-                                           .withName("Sub Community")
-                                           .build();
-        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
-
-        Item publicItem1 = ItemBuilder.createItem(context, col1)
-                                      .withTitle("Public item 1")
-                                      .withIssueDate("2017-10-17")
-                                      .withAuthor("Smith, Donald").withAuthor("Doe, John")
-                                      .withSubject("ExtraEntry")
-                                      .build();
-
-        LinkedList<DSpaceCommandLineParameter> parameters = new LinkedList<>();
-
-        parameters.add(new DSpaceCommandLineParameter("-e", "nonExistentEmail@test.com"));
-        parameters.add(new DSpaceCommandLineParameter("-i", publicItem1.getHandle()));
-        parameters.add(new DSpaceCommandLineParameter("-t", CurationClientOptions.getTaskOptions().get(0)));
-
-        List<ParameterValueRest> list = parameters.stream()
-                                                  .map(dSpaceCommandLineParameter -> dSpaceRunnableParameterConverter
-                                                      .convert(dSpaceCommandLineParameter, Projection.DEFAULT))
-                                                  .collect(Collectors.toList());
-
-        context.restoreAuthSystemState();
-
-        // Request with -e <nonExistingEPersonEmail>
-        getClient(token)
-            .perform(post(CURATE_SCRIPT_ENDPOINT).contentType("multipart/form-data")
-                                                 .param("properties",
-                                                     new Gson().toJson(list)))
-            // Illegal Argument Exception
-            .andExpect(status().isBadRequest());
-    }
-
-    @Test
     public void curateScript_MissingHandle() throws Exception {
         String token = getAuthToken(admin.getEmail(), password);
 
         LinkedList<DSpaceCommandLineParameter> parameters = new LinkedList<>();
 
-        parameters.add(new DSpaceCommandLineParameter("-e", admin.getEmail()));
         parameters.add(new DSpaceCommandLineParameter("-t", CurationClientOptions.getTaskOptions().get(0)));
 
         List<ParameterValueRest> list = parameters.stream()
@@ -210,7 +123,6 @@ public class CurationScriptIT extends AbstractControllerIntegrationTest {
         LinkedList<DSpaceCommandLineParameter> parameters = new LinkedList<>();
 
         parameters.add(new DSpaceCommandLineParameter("-i", "invalidhandle"));
-        parameters.add(new DSpaceCommandLineParameter("-e", admin.getEmail()));
         parameters.add(new DSpaceCommandLineParameter("-t", CurationClientOptions.getTaskOptions().get(0)));
 
         List<ParameterValueRest> list = parameters.stream()
@@ -250,7 +162,6 @@ public class CurationScriptIT extends AbstractControllerIntegrationTest {
 
         LinkedList<DSpaceCommandLineParameter> parameters = new LinkedList<>();
 
-        parameters.add(new DSpaceCommandLineParameter("-e", admin.getEmail()));
         parameters.add(new DSpaceCommandLineParameter("-i", publicItem1.getHandle()));
 
         List<ParameterValueRest> list = parameters.stream()
@@ -275,7 +186,6 @@ public class CurationScriptIT extends AbstractControllerIntegrationTest {
 
         LinkedList<DSpaceCommandLineParameter> parameters = new LinkedList<>();
 
-        parameters.add(new DSpaceCommandLineParameter("-e", admin.getEmail()));
         parameters.add(new DSpaceCommandLineParameter("-i", "all"));
         parameters.add(new DSpaceCommandLineParameter("-s", "invalidScope"));
 
@@ -299,7 +209,6 @@ public class CurationScriptIT extends AbstractControllerIntegrationTest {
 
         LinkedList<DSpaceCommandLineParameter> parameters = new LinkedList<>();
 
-        parameters.add(new DSpaceCommandLineParameter("-e", admin.getEmail()));
         parameters.add(new DSpaceCommandLineParameter("-i", "all"));
         parameters.add(new DSpaceCommandLineParameter("-T", "invalidTaskFile"));
 
@@ -341,7 +250,6 @@ public class CurationScriptIT extends AbstractControllerIntegrationTest {
 
         LinkedList<DSpaceCommandLineParameter> parameters = new LinkedList<>();
 
-        parameters.add(new DSpaceCommandLineParameter("-e", admin.getEmail()));
         parameters.add(new DSpaceCommandLineParameter("-i", publicItem1.getHandle()));
         parameters.add(new DSpaceCommandLineParameter("-t", CurationClientOptions.getTaskOptions().get(0)));
 
@@ -394,7 +302,6 @@ public class CurationScriptIT extends AbstractControllerIntegrationTest {
         File taskFile = new File(testProps.get("test.curateTaskFile").toString());
 
         LinkedList<DSpaceCommandLineParameter> parameters = new LinkedList<>();
-        parameters.add(new DSpaceCommandLineParameter("-e", admin.getEmail()));
         parameters.add(new DSpaceCommandLineParameter("-i", publicItem1.getHandle()));
         parameters.add(new DSpaceCommandLineParameter("-T", taskFile.getAbsolutePath()));
 
@@ -421,5 +328,58 @@ public class CurationScriptIT extends AbstractControllerIntegrationTest {
             ProcessBuilder.deleteProcess(idRef.get());
         }
     }
+
+    @Test
+    public void curateScript_EPersonInParametersFails() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        String token = getAuthToken(admin.getEmail(), password);
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
+                                      .withTitle("Public item 1")
+                                      .withIssueDate("2017-10-17")
+                                      .withAuthor("Smith, Donald").withAuthor("Doe, John")
+                                      .withSubject("ExtraEntry")
+                                      .build();
+
+        LinkedList<DSpaceCommandLineParameter> parameters = new LinkedList<>();
+
+        parameters.add(new DSpaceCommandLineParameter("-e", eperson.getEmail()));
+        parameters.add(new DSpaceCommandLineParameter("-i", publicItem1.getHandle()));
+        parameters.add(new DSpaceCommandLineParameter("-t", CurationClientOptions.getTaskOptions().get(0)));
+
+        List<ParameterValueRest> list = parameters.stream()
+                                                  .map(dSpaceCommandLineParameter -> dSpaceRunnableParameterConverter
+                                                      .convert(dSpaceCommandLineParameter, Projection.DEFAULT))
+                                                  .collect(Collectors.toList());
+        AtomicReference<Integer> idRef = new AtomicReference<>();
+
+        context.restoreAuthSystemState();
+        try {
+
+            getClient(token)
+                .perform(post(CURATE_SCRIPT_ENDPOINT).contentType("multipart/form-data")
+                                                     .param("properties",
+                                                            new Gson().toJson(list)))
+                .andExpect(jsonPath("$", is(
+                    ProcessMatcher.matchProcess("curate",
+                                                String.valueOf(admin.getID()), parameters,
+                                                ProcessStatus.FAILED))))
+                .andDo(result -> idRef
+                    .set(read(result.getResponse().getContentAsString(), "$.processId")));
+        } finally {
+            ProcessBuilder.deleteProcess(idRef.get());
+        }
+    }
+
+
 
 }
