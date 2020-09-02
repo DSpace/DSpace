@@ -152,3 +152,61 @@ header .navbar-default .navbar-nav {
 .prod.environment-banner {
   display: none !important;
 }
+
+/* 
+  Customization for LIBDRUM-613
+  - Skip to content
+*/
+#skip-link>a {
+  position: absolute;
+  left: -999px!important;
+  top: auto;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  z-index: -999
+}
+#skip-link>a:active, #skip-link>a:focus {
+  color: #951022;
+  background-color: #fff;
+  left: auto!important;
+  top: 45px;
+  width: auto;
+  height: auto;
+  padding: 10px;
+  overflow: auto;
+  z-index: 999;
+  text-decoration: underline
+}
+
+/* Start of Accessibility color updates. https://issues.umd.edu/browse/LIBDRUM-615 */
+a {
+	color: #0052cc;
+  font-weight: 500;
+}
+h1 small, h1 .small, h2 small, h2 .small, h3 small, h3 .small, h4 small, h4 .small, h5 small, h5 .small, h6 small, h6 .small, .h1 small, .h1 .small, .h2 small, .h2 .small, .h3 small, .h3 .small, .h4 small, .h4 .small, .h5 small, .h5 .small, .h6 small, .h6 .small {
+  font-weight: 500;
+  line-height: 1;
+  color: #111;
+  font-style: italic;
+	font-size: 85%;
+}
+body {
+	color: #000;
+}
+.ds-artifact-list .artifact-title {
+	margin-top: 20px
+}
+#ds-options .ds-option-set-head {
+  color: #000;
+}
+.list-group-item.active, .list-group-item.active:hover, .list-group-item.active:focus {
+	background-color: #555;
+}
+.pagination-info {
+	color: #000;
+}
+#aspect_browseArtifacts_CommunityBrowse_div_community-browse h3, #aspect_browseArtifacts_CollectionBrowse_div_collection-browse h3{
+	color: #000;
+}
+/* End of Accessibility color updates. */

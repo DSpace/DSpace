@@ -643,7 +643,13 @@
         <xsl:param name="class"/>
         <xsl:variable name="head_count" select="count(ancestor::dri:*[dri:head])"/>
         <xsl:variable name="is_first_head_on_page" select="(//dri:head)[1] = ."/>
-            <xsl:element name="h{$head_count+1}">
+        <xsl:variable name="headerTag">
+            <xsl:choose>
+                <xsl:when test="$is_first_head_on_page">h1</xsl:when>
+                <xsl:otherwise>h<xsl:value-of select="$head_count + 1"/></xsl:otherwise>
+            </xsl:choose>
+        </xsl:variable>
+        <xsl:element name="{$headerTag}">
             <xsl:call-template name="standardAttributes">
                 <xsl:with-param name="class">
                     <xsl:value-of select="$class"/>

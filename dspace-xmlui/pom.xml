@@ -11,7 +11,7 @@
    <parent>
       <groupId>org.dspace</groupId>
       <artifactId>dspace-parent</artifactId>
-      <version>6.3-drum-2.4</version>
+      <version>6.3-drum-3</version>
       <relativePath>..</relativePath>
    </parent>
 
