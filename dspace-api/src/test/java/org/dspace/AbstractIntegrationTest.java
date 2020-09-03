@@ -16,7 +16,6 @@ import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 
 import org.dspace.discovery.MockSolrSearchCore;
-import org.dspace.discovery.SolrSearchCore;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.utils.DSpace;
 import org.junit.After;
