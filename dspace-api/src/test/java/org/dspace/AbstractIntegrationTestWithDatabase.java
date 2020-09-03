@@ -36,7 +36,6 @@ import org.jdom.Document;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Abstract Test class that will initialize the in-memory database
@@ -47,9 +46,6 @@ public class AbstractIntegrationTestWithDatabase extends AbstractDSpaceIntegrati
      */
     private static final Logger log = LogManager
         .getLogger(AbstractIntegrationTestWithDatabase.class);
-
-    @Autowired
-    protected MockSolrDedupCore dedupService;
 
     /**
      * Context mock object to use in the tests.
@@ -199,6 +195,8 @@ public class AbstractIntegrationTestWithDatabase extends AbstractDSpaceIntegrati
                     .getServiceByName(null, MockAuthoritySolrServiceImpl.class);
             authorityService.reset();
 
+            MockSolrDedupCore dedupService = serviceManager
+                    .getServiceByName(null, MockSolrDedupCore.class);
             dedupService.reset();
             // Reload our ConfigurationService (to reset configs to defaults again)
             DSpaceServicesFactory.getInstance().getConfigurationService().reloadConfig();

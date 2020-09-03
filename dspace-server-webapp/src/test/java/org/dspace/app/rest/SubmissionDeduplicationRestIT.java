@@ -36,7 +36,10 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
 import org.dspace.content.WorkspaceItem;
+import org.dspace.deduplication.MockSolrDedupCore;
 import org.dspace.eperson.EPerson;
+import org.dspace.kernel.ServiceManager;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.xmlworkflow.storedcomponents.ClaimedTask;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 import org.hamcrest.Matchers;
@@ -49,6 +52,16 @@ import org.junit.Test;
  *
  */
 public class SubmissionDeduplicationRestIT extends AbstractControllerIntegrationTest {
+    private MockSolrDedupCore dedupService;
+
+    @Override
+    public void setUp() throws Exception {
+        super.setUp();
+        ServiceManager serviceManager = DSpaceServicesFactory.getInstance().getServiceManager();
+        dedupService = serviceManager
+                .getServiceByName(null, MockSolrDedupCore.class);
+    }
+
     @Test
     /**
      * Test reject deduplication during workspace submission. Both verify and reject
