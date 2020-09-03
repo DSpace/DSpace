@@ -138,6 +138,15 @@ public class ItemConverter
                         return true;
                     }
                 }
+                // the metadata is not included in any box so use the default dspace security
+                if (boxesWithMetadataFieldExcludedPublic.size() == 0) {
+                    if (!metadataExposureService
+                            .isHidden(context, metadataField.getMetadataSchema().getName(),
+                                      metadataField.getElement(),
+                                      metadataField.getQualifier())) {
+                        return true;
+                    }
+                }
             }
         }
         return false;
