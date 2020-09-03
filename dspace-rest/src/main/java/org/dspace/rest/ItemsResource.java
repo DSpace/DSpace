@@ -950,8 +950,6 @@ public class ItemsResource extends Resource {
             processException("Context error:" + e.getMessage(), context);
         } catch (AuthorizeException e) {
             processException("Authorize error:" + e.getMessage(), context);
-        } catch (IOException e) {
-            processException("IO error:" + e.getMessage(), context);
         } finally {
             processFinally(context);
         }
