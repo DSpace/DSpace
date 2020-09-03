@@ -81,13 +81,13 @@
                                 <property name="style" value="col-md-4"/>
 							</bean>
                             <bean class="org.dspace.layout.CrisLayoutSearchComponent">
-                                <property name="discoveryConfigurationName" value="organization" />
+                                <property name="discoveryConfigurationName" value="orgunit" />
                                 <property name="style" value="col-md-8"/>
                             </bean>
 						</list>
                         <list>
                             <bean class="org.dspace.layout.CrisLayoutFacetComponent">
-                                <property name="discoveryConfigurationName" value="organization" />
+                                <property name="discoveryConfigurationName" value="orgunit" />
                                 <property name="style" value="col-md-12"/>
                             </bean>
                         </list>

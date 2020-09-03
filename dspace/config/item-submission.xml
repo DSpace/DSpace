@@ -97,6 +97,11 @@
       <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
       <type>submission-form</type>
     </step>
+    <step id="funding" mandatory="true">
+      <heading>submit.progressbar.describe.funding</heading>
+      <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
+      <type>submission-form</type>
+    </step>
     <step id="person" mandatory="true">
       <heading>submit.progressbar.describe.person</heading>
       <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
@@ -182,6 +187,13 @@
       <step id="patent" />
       <step id="patent_indexing" />
       <step id="patent_references" />
+      <step id="detect-duplicate" />
+      <step id="upload" />
+      <step id="license" />
+    </submission-process>
+    <submission-process name="funding">
+      <step id="collection" />
+      <step id="funding" />
       <step id="detect-duplicate" />
       <step id="upload" />
       <step id="license" />
