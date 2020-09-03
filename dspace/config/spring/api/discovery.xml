@@ -75,10 +75,19 @@
                 <entry key="personOrOrgunit" value-ref="personOrOrgunit"/>
                 <!-- OpenAIRE4 guidelines - search for an OrgUnit that have a specific dc.type=FundingOrganization -->
                 <entry key="openAIREFundingAgency" value-ref="openAIREFundingAgency"/>
-                <!-- Related items -->
-                <entry key="RELATION.Person.researchoutputs" value-ref="relationAuthorPublicationsConfiguration"/>
-                <entry key="RELATION.OrgUnit.people" value-ref="relationOrgunitPersonsConfiguration"/>
+                <!-- Person Related items -->
                 <entry key="RELATION.Person.projects" value-ref="relationInvestigatorProjectsConfiguration"/>
+                <entry key="RELATION.Person.researchoutputs" value-ref="relationAuthorPublicationsConfiguration"/>
+                <!-- OrgUnit Related items -->
+                <entry key="RELATION.OrgUnit.rpprojects" value-ref="relationOrgunitRPProjectConfiguration"/>
+                <entry key="RELATION.OrgUnit.publications" value-ref="relationOrgunitPublicationsConfiguration"/>
+                <entry key="RELATION.OrgUnit.rppublications" value-ref="relationOrgunitRPPublicationsConfiguration"/>
+                <entry key="RELATION.OrgUnit.people" value-ref="relationOrgunitPersonsConfiguration"/>
+                <entry key="RELATION.OrgUnit.projects" value-ref="relationOrgunitProjectsConfiguration"/>
+                <entry key="RELATION.OrgUnit.organizations" value-ref="relationOrgunitOrgunitsConfiguration"/>
+                <!-- Project Related items -->
+                <entry key="RELATION.Project.projects" value-ref="relationProjectProjectsConfiguration"/>
+                <entry key="RELATION.Project.grants" value-ref="relatioProjectFundingsConfiguration"/>
             </map>
         </property>
         <property name="toIgnoreMetadataFields">
@@ -897,6 +906,59 @@
     </bean>
 
     <!-- Inverse Relations -->
+        <!-- project of an researcher -->
+    <bean id="relationInvestigatorProjectsConfiguration" class="org.dspace.discovery.configuration.DiscoveryRelatedItemConfiguration">
+        <!--Which sidebar facets are to be displayed-->
+        <property name="sidebarFacets">
+            <list>
+                <ref bean="searchFilterEntityType" />
+            </list>
+        </property>
+        <!--The search filters which can be used on the discovery search page-->
+        <property name="searchFilters">
+            <list>
+                <ref bean="searchFilterEntityType" />
+                <ref bean="searchFilterProjectInvestigator"/>
+            </list>
+        </property>
+        <!--The sort filters for the discovery search-->
+        <property name="searchSortConfiguration">
+            <bean class="org.dspace.discovery.configuration.DiscoverySortConfiguration">
+                <!--<property name="defaultSort" ref="sortDateIssued"/>-->
+                <!--DefaultSortOrder can either be desc or asc (desc is default)-->
+                <property name="defaultSortOrder" value="desc"/>
+                <property name="sortFields">
+                    <list>
+                        <ref bean="sortTitle" />
+                    </list>
+                </property>
+            </bean>
+        </property>
+        <!--Any default filter queries, these filter queries will be used for all
+                queries done by discovery for this configuration -->
+        <property name="defaultFilterQueries">
+            <list>
+                <!--Only find related items. The placeholder {0} will be replaced with scope (UUID of item)-->
+                <value>projectinvestigators_authority:{0}</value>
+            </list>
+        </property>
+        <!--Default result per page  -->
+        <property name="defaultRpp" value="10" />
+        <property name="hitHighlightingConfiguration">
+            <bean class="org.dspace.discovery.configuration.DiscoveryHitHighlightingConfiguration">
+                <property name="metadataFields">
+                    <list>
+                        <bean class="org.dspace.discovery.configuration.DiscoveryHitHighlightFieldConfiguration">
+                            <property name="field" value="relationship.type"/>
+                            <property name="snippets" value="5"/>
+                        </bean>
+                    </list>
+                </property>
+            </bean>
+        </property>
+    </bean>
+    
+    
     <!-- publications of an author -->
     <bean id="relationAuthorPublicationsConfiguration" class="org.dspace.discovery.configuration.DiscoveryRelatedItemConfiguration">
         <!--Which sidebar facets are to be displayed-->
@@ -954,70 +1016,102 @@
         </property>
     </bean>
 
-    <!--  -->
+    <!-- project investigated by people affiliated to an orgunit -->
+    <bean id="relationOrgunitRPProjectConfiguration" class="org.dspace.discovery.configuration.DiscoveryRelatedItemConfiguration">
+        <!--Any default filter queries, these filter queries will be used for all
+                queries done by discovery for this configuration -->
+        <property name="defaultFilterQueries">
+            <list>
+                <!--Only find related items. The placeholder {0} will be replaced with scope (UUID of item)-->
+                <value>'{'!join from=search.resourceid to=projectinvestigators_authority fromIndex=search'}'person.affiliation.name_authority:{0}</value>
+            </list>
+        </property>
+    </bean>
+
+    <!-- publication sponsored by an orgunit -->
+    <bean id="relationOrgunitPublicationsConfiguration" class="org.dspace.discovery.configuration.DiscoveryRelatedItemConfiguration">
+        <!--Any default filter queries, these filter queries will be used for all
+                queries done by discovery for this configuration -->
+        <property name="defaultFilterQueries">
+            <list>
+                <!--Only find related items. The placeholder {0} will be replaced with scope (UUID of item)-->
+                <value>dc.description.sponsorship_authority:{0}</value>
+            </list>
+        </property>
+    </bean>
+
+    <!-- publication authored by people affiliated to an orgunit -->
+    <bean id="relationOrgunitRPPublicationsConfiguration" class="org.dspace.discovery.configuration.DiscoveryRelatedItemConfiguration">
+        <!--Any default filter queries, these filter queries will be used for all
+                queries done by discovery for this configuration -->
+        <property name="defaultFilterQueries">
+            <list>
+                <!--Only find related items. The placeholder {0} will be replaced with scope (UUID of item)-->
+                <value>'{'!join from=search.resourceid to=author_authority fromIndex=search'}'person.affiliation.name_authority:{0}</value>
+            </list>
+        </property>
+    </bean>
+
+    <!-- people affiliated to an orgunit -->
     <bean id="relationOrgunitPersonsConfiguration" class="org.dspace.discovery.configuration.DiscoveryRelatedItemConfiguration">
         <!--Any default filter queries, these filter queries will be used for all
                 queries done by discovery for this configuration -->
         <property name="defaultFilterQueries">
             <list>
                 <!--Only find related items. The placeholder {0} will be replaced with scope (UUID of item)-->
-                <value>crisrp.dept_authority:{0}</value>
+                <value>person.affiliation.name_authority:{0}</value>
             </list>
         </property>
     </bean>
 
-    <!-- project of an researcher -->
-    <bean id="relationInvestigatorProjectsConfiguration" class="org.dspace.discovery.configuration.DiscoveryRelatedItemConfiguration">
-        <!--Which sidebar facets are to be displayed-->
-        <property name="sidebarFacets">
-            <list>
-                <ref bean="searchFilterEntityType" />
-            </list>
-        </property>
-        <!--The search filters which can be used on the discovery search page-->
-        <property name="searchFilters">
-            <list>
-                <ref bean="searchFilterEntityType" />
-                <ref bean="searchFilterProjectInvestigator"/>
-            </list>
-        </property>
-        <!--The sort filters for the discovery search-->
-        <property name="searchSortConfiguration">
-            <bean class="org.dspace.discovery.configuration.DiscoverySortConfiguration">
-                <!--<property name="defaultSort" ref="sortDateIssued"/>-->
-                <!--DefaultSortOrder can either be desc or asc (desc is default)-->
-                <property name="defaultSortOrder" value="desc"/>
-                <property name="sortFields">
-                    <list>
-                        <ref bean="sortTitle" />
-                    </list>
-                </property>
-            </bean>
-        </property>
+    <!-- project participated by an orgunit -->
+    <bean id="relationOrgunitProjectsConfiguration" class="org.dspace.discovery.configuration.DiscoveryRelatedItemConfiguration">
         <!--Any default filter queries, these filter queries will be used for all
                 queries done by discovery for this configuration -->
         <property name="defaultFilterQueries">
             <list>
                 <!--Only find related items. The placeholder {0} will be replaced with scope (UUID of item)-->
-                <value>projectinvestigators_authority:{0}</value>
+                <value>involvedorganisation_authority:{0}</value>
             </list>
-        </property>
-        <!--Default result per page  -->
-        <property name="defaultRpp" value="10" />
-        <property name="hitHighlightingConfiguration">
-            <bean class="org.dspace.discovery.configuration.DiscoveryHitHighlightingConfiguration">
-                <property name="metadataFields">
-                    <list>
-                        <bean class="org.dspace.discovery.configuration.DiscoveryHitHighlightFieldConfiguration">
-                            <property name="field" value="relationship.type"/>
-                            <property name="snippets" value="5"/>
-                        </bean>
-                    </list>
-                </property>
-            </bean>
         </property>
     </bean>
 
+    <!-- suborganisation unit of an orgunit -->
+    <bean id="relationOrgunitOrgunitsConfiguration" class="org.dspace.discovery.configuration.DiscoveryRelatedItemConfiguration">
+        <!--Any default filter queries, these filter queries will be used for all
+                queries done by discovery for this configuration -->
+        <property name="defaultFilterQueries">
+            <list>
+                <!--Only find related items. The placeholder {0} will be replaced with scope (UUID of item)-->
+                <value>organization.parentOrganization_authority:{0}</value>
+            </list>
+        </property>
+    </bean>
+    
+    <!-- project related to a project -->
+    <bean id="relationProjectProjectsConfiguration" class="org.dspace.discovery.configuration.DiscoveryRelatedItemConfiguration">
+        <!--Any default filter queries, these filter queries will be used for all
+                queries done by discovery for this configuration -->
+        <property name="defaultFilterQueries">
+            <list>
+                <!--Only find related items. The placeholder {0} will be replaced with scope (UUID of item)-->
+                <value>dc.relation.project_authority:{0} AND entityType_keyword:Project</value>
+            </list>
+        </property>
+    </bean>
+
+    <!-- fundings related to a project -->
+    <bean id="relatioProjectFundingsConfiguration" class="org.dspace.discovery.configuration.DiscoveryRelatedItemConfiguration">
+        <!--Any default filter queries, these filter queries will be used for all
+                queries done by discovery for this configuration -->
+        <property name="defaultFilterQueries">
+            <list>
+                <!--Only find related items. The placeholder {0} will be replaced with scope (UUID of item)-->
+                <value>dc.relation.project_authority:{0} AND entityType_keyword:Fundings</value>
+            </list>
+        </property>
+    </bean>
+    
     <bean id="publication" class="org.dspace.discovery.configuration.DiscoveryConfiguration" scope="prototype">
         <property name="id" value="publication"/>
         <property name="indexAlways" value="true"/>
@@ -1170,6 +1264,7 @@
                 <ref bean="searchFilterIsPersonOfProjectRelation"/>
                 <ref bean="searchFilterIsPublicationOfProjectRelation"/>
                 <ref bean="searchFilterProjectInvestigator"/>
+                <ref bean="searchFilterProjectOrganisation"/>
             </list>
         </property>
         <!--The sort filters for the discovery search-->
@@ -1841,8 +1936,26 @@
         <property name="indexFieldName" value="projectinvestigators" />
         <property name="metadataFields">
             <list>
-                <value>crispj.coordinator</value>
                 <value>crispj.investigator</value>
+                <value>crispj.coinvestigators</value>
+            </list>
+        </property>
+        <property name="facetLimit" value="5"/>
+        <property name="sortOrderSidebar" value="COUNT"/>
+        <property name="sortOrderFilterPage" value="COUNT"/>
+        <property name="isOpenByDefault" value="false"/>
+        <property name="pageSize" value="10"/>
+        <property name="exposeMinAndMaxValue" value="false"/>
+    </bean>
+
+    <bean id="searchFilterProjectOrganisation"
+        class="org.dspace.discovery.configuration.DiscoverySearchFilterFacet">
+        <property name="indexFieldName" value="involvedorganisation" />
+        <property name="metadataFields">
+            <list>
+                <value>crispj.coordinator</value>
+                <value>crispj.partnerou</value>
+                <value>crispj.organization</value>
             </list>
         </property>
         <property name="facetLimit" value="5"/>
