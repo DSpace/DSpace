@@ -29,6 +29,17 @@
             <provenance />
         </collection>
         <collection>
+            <name>Funding</name>
+            <entity-type>Funding</entity-type>
+            <submission-type>funding</submission-type>
+            <description />
+            <intro />
+            <copyright />
+            <sidebar />
+            <license />
+            <provenance />
+        </collection>
+        <collection>
             <name>OrgUnit</name>
             <entity-type>OrgUnit</entity-type>
 			<submission-type>orgunit</submission-type>

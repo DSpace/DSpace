@@ -29,7 +29,7 @@
 								<entry key="oairecerif.author.affiliation">
 									<bean class="org.dspace.authority.filler.MetadataConfiguration.MappingDetails">
 										<property name="visibility" value="1" />
-										<property name="targetMetadata" value="crisrp.dept" />
+										<property name="targetMetadata" value="person.affiliation.name" />
 									</bean>
 								</entry>
 							</map>
@@ -44,7 +44,7 @@
 								<entry key="oairecerif.editor.affiliation">
 									<bean class="org.dspace.authority.filler.MetadataConfiguration.MappingDetails">
 										<property name="visibility" value="1" />
-										<property name="targetMetadata" value="crisrp.dept" />
+										<property name="targetMetadata" value="person.affiliation.name" />
 									</bean>
 								</entry>
 							</map>

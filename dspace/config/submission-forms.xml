@@ -161,8 +161,8 @@
       <row>
         <field>
           <dc-schema>oairecerif</dc-schema>
-          <dc-element>affiliation</dc-element>
-          <dc-qualifier>orgunit</dc-qualifier>
+          <dc-element>person</dc-element>
+          <dc-qualifier>affiliation</dc-qualifier>
           <label>Affiliation</label>
           <input-type>onebox</input-type>
           <repeatable>false</repeatable>
@@ -1566,7 +1566,7 @@ You can leave out the day and/or month if they aren't applicable.</hint>
           <dc-schema>crisou</dc-schema>
           <dc-element>boards</dc-element>
           <label>Scientifics Board</label>
-          <input-type>tag</input-type>
+          <input-type>onebox</input-type>
           <repeatable>true</repeatable>
           <required />
           <hint />
@@ -1710,31 +1710,9 @@ You can leave out the day and/or month if they aren't applicable.</hint>
       </row>
       <row>
         <field>
-          <dc-schema>oairecerif</dc-schema>
-          <dc-element>funder</dc-element>
-          <label>Funder</label>
-          <input-type>onebox</input-type>
-          <repeatable>false</repeatable>
-          <required />
-          <hint />
-        </field>
-      </row>
-      <row>
-        <field>
-          <dc-schema>crispj</dc-schema>
-          <dc-element>funding</dc-element>
-          <label>Funding Program</label>
-          <input-type>onebox</input-type>
-          <repeatable>true</repeatable>
-          <required />
-          <hint />
-        </field>
-      </row>
-      <row>
-        <field>
           <dc-schema>crispj</dc-schema>
           <dc-element>openaireid</dc-element>
-          <label>OpenAIRE</label>
+          <label>OpenAIRE ID</label>
           <input-type>onebox</input-type>
           <repeatable>true</repeatable>
           <required />
@@ -1902,7 +1880,7 @@ You can leave out the day and/or month if they aren't applicable.</hint>
         <field>
           <dc-schema>oairecerif</dc-schema>
           <dc-element>internalid</dc-element>
-          <label>Institution Unique Identifier</label>
+          <label>Funding code</label>
           <input-type>onebox</input-type>
           <repeatable>false</repeatable>
           <required />

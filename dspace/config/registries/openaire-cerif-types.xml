@@ -159,4 +159,33 @@
         <qualifier>duration</qualifier>
         <scope_note></scope_note>
     </dc-type>
+
+    <dc-type>
+        <schema>oairecerif</schema>
+        <element>event</element>
+        <qualifier>startDate</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>oairecerif</schema>
+        <element>event</element>
+        <qualifier>endDate</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>oairecerif</schema>
+        <element>event</element>
+        <qualifier>place</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>oairecerif</schema>
+        <element>event</element>
+        <qualifier>country</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
 </dspace-dc-types>
