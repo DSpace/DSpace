@@ -188,27 +188,30 @@ public class ItemMetadataImportFillerTest {
         Item itemToFill = buildItem(randomUUID());
 
         Map<String, MappingDetails> mappingDetails = new HashMap<>();
-        mappingDetails.put("dc.contributor.affiliation", buildMappingDetails(true));
+        mappingDetails.put("oairecerif.author.affiliation",
+                       buildMappingDetails(true, "oairecerif.author.affiliation"));
 
         Map<String, MetadataConfiguration> configurations = new HashMap<>();
         configurations.put("dc.contributor.author", buildMetadataConfig(true, mappingDetails));
         cut.setConfigurations(configurations);
 
-        MetadataValue firstMetadata = buildMetadataValue("dc", "contributor", "affiliation", "4Science");
-        MetadataValue secondMetadata = buildMetadataValue("dc", "contributor", "affiliation", "Affiliation");
+        MetadataValue firstMetadata = buildMetadataValue("oairecerif", "author", "affiliation", "4Science");
+        MetadataValue secondMetadata = buildMetadataValue("oairecerif", "author", "affiliation", "Affiliation");
         List<MetadataValue> expectedMetadata = asList(firstMetadata, secondMetadata);
-        when(itemService.getMetadataByMetadataString(sourceItem, "dc.contributor.affiliation"))
+        when(itemService.getMetadataByMetadataString(sourceItem, "oairecerif.author.affiliation"))
                 .thenReturn(expectedMetadata);
 
-        when(itemService.getMetadataByMetadataString(itemToFill, "dc.contributor.affiliation"))
+        when(itemService.getMetadataByMetadataString(itemToFill, "oairecerif.author.affiliation"))
                 .thenReturn(emptyList());
 
         cut.fillItem(context, metadataValue, itemToFill);
 
-        verify(itemService).getMetadataByMetadataString(itemToFill, "dc.contributor.affiliation");
-        verify(itemService).getMetadataByMetadataString(sourceItem, "dc.contributor.affiliation");
-        verify(itemService).addMetadata(context, itemToFill, firstMetadata.getMetadataField(), ANY, "4Science");
-        verify(itemService).addMetadata(context, itemToFill, secondMetadata.getMetadataField(), ANY, "Affiliation");
+        verify(itemService).getMetadataByMetadataString(sourceItem, "oairecerif.author.affiliation");
+        verify(itemService).clearMetadata(context, itemToFill, "oairecerif", "author", "affiliation", ANY);
+        verify(itemService).addMetadata(context, itemToFill, "oairecerif", "author", "affiliation",
+                                        null, "4Science", null, -1);
+        verify(itemService).addMetadata(context, itemToFill, "oairecerif", "author", "affiliation",
+                                        null, "Affiliation", null, -1);
         verifyNoMoreInteractions(context, itemService);
     }
 
@@ -225,28 +228,30 @@ public class ItemMetadataImportFillerTest {
         Item itemToFill = buildItem(randomUUID());
 
         Map<String, MappingDetails> mappingDetails = new HashMap<>();
-        mappingDetails.put("dc.contributor.affiliation", buildMappingDetails(false));
+        mappingDetails.put("oairecerif.author.affiliation",
+                       buildMappingDetails(false, "oairecerif.author.affiliation"));
 
         Map<String, MetadataConfiguration> configurations = new HashMap<>();
         configurations.put("dc.contributor.author", buildMetadataConfig(true, mappingDetails));
         cut.setConfigurations(configurations);
 
-        MetadataValue firstMetadata = buildMetadataValue("dc", "contributor", "affiliation", "4Science");
-        MetadataValue secondMetadata = buildMetadataValue("dc", "contributor", "affiliation", "Affiliation");
+        MetadataValue firstMetadata = buildMetadataValue("oairecerif", "author", "affiliation", "4Science");
+        MetadataValue secondMetadata = buildMetadataValue("oairecerif", "author", "affiliation", "Affiliation");
         List<MetadataValue> archivedItemAffiliationMetadata = asList(firstMetadata, secondMetadata);
-        when(itemService.getMetadataByMetadataString(sourceItem, "dc.contributor.affiliation"))
+        when(itemService.getMetadataByMetadataString(sourceItem, "oairecerif.author.affiliation"))
                 .thenReturn(archivedItemAffiliationMetadata);
 
-        List<MetadataValue> itemToFillMetadata = asList(buildMetadataValue("dc", "contributor", "affiliation", "old"));
-        when(itemService.getMetadataByMetadataString(itemToFill, "dc.contributor.affiliation"))
+        List<MetadataValue> itemToFillMetadata = asList(
+                                 buildMetadataValue("oairecerif", "author", "affiliation", "old"));
+        when(itemService.getMetadataByMetadataString(itemToFill, "oairecerif.author.affiliation"))
                 .thenReturn(itemToFillMetadata);
 
         cut.fillItem(context, metadataValue, itemToFill);
 
-        verify(itemService).getMetadataByMetadataString(itemToFill, "dc.contributor.affiliation");
-        verify(itemService).removeMetadataValues(context, itemToFill, itemToFillMetadata);
-        verify(itemService).getMetadataByMetadataString(sourceItem, "dc.contributor.affiliation");
-        verify(itemService).addMetadata(context, itemToFill, secondMetadata.getMetadataField(), ANY, "Affiliation");
+        verify(itemService).getMetadataByMetadataString(sourceItem, "oairecerif.author.affiliation");
+        verify(itemService).clearMetadata(context, itemToFill, "oairecerif", "author", "affiliation", ANY);
+        verify(itemService).addMetadata(context, itemToFill, "oairecerif", "author", "affiliation",
+                                        null, "Affiliation", null, -1);
         verifyNoMoreInteractions(context, itemService);
     }
 
@@ -264,27 +269,28 @@ public class ItemMetadataImportFillerTest {
         Item itemToFill = buildItem(randomUUID());
 
         Map<String, MappingDetails> mappingDetails = new HashMap<>();
-        mappingDetails.put("dc.contributor.affiliation", buildMappingDetails(false));
+        mappingDetails.put("oairecerif.author.affiliation", buildMappingDetails(false, "dc.contributor.affiliation"));
 
         Map<String, MetadataConfiguration> configurations = new HashMap<>();
         configurations.put("dc.contributor.author", buildMetadataConfig(true, mappingDetails));
         cut.setConfigurations(configurations);
 
-        MetadataValue firstMetadata = buildMetadataValue("dc", "contributor", "affiliation", "4Science");
-        MetadataValue secondMetadata = buildMetadataValue("dc", "contributor", "affiliation", "Affiliation");
+        MetadataValue firstMetadata = buildMetadataValue("oairecerif", "author", "affiliation", "4Science");
+        MetadataValue secondMetadata = buildMetadataValue("oairecerif", "author", "affiliation", "Affiliation");
         List<MetadataValue> expectedMetadata = asList(firstMetadata, secondMetadata);
-        when(itemService.getMetadataByMetadataString(sourceItem, "dc.contributor.affiliation"))
+        when(itemService.getMetadataByMetadataString(sourceItem, "oairecerif.author.affiliation"))
                 .thenReturn(expectedMetadata);
 
         cut.fillItem(context, metadataValue, itemToFill);
 
-        verify(itemService).getMetadataByMetadataString(sourceItem, "dc.contributor.affiliation");
+        verify(itemService).getMetadataByMetadataString(sourceItem, "oairecerif.author.affiliation");
         verifyNoMoreInteractions(context, itemService);
     }
 
-    private MappingDetails buildMappingDetails(boolean useAll) {
+    private MappingDetails buildMappingDetails(boolean useAll, String targetMetadata) {
         MappingDetails mappingDetails = new MappingDetails();
         mappingDetails.setUseAll(useAll);
+        mappingDetails.setTargetMetadata(targetMetadata);
         return mappingDetails;
     }
 
