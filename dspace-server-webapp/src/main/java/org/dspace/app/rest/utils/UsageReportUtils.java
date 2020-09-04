@@ -12,11 +12,9 @@ import java.sql.SQLException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.solr.client.solrj.SolrServerException;
-import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.model.UsageReportPointCityRest;
 import org.dspace.app.rest.model.UsageReportPointCountryRest;
 import org.dspace.app.rest.model.UsageReportPointDateRest;
@@ -49,8 +47,6 @@ import org.springframework.stereotype.Component;
 public class UsageReportUtils {
 
     @Autowired
-    private DSpaceObjectUtils dspaceObjectUtil;
-    @Autowired
     private HandleService handleService;
 
     public static final String TOTAL_VISITS_REPORT_ID = "TotalVisits";
@@ -62,26 +58,25 @@ public class UsageReportUtils {
     /**
      * Get list of usage reports that are applicable to the DSO (of given UUID)
      *
-     * @param context DSpace context
-     * @param uuid    UUID of DSO we want all available usage reports of
+     * @param context   DSpace context
+     * @param dso       DSpaceObject we want all available usage reports of
      * @return List of usage reports, applicable to the given DSO
      */
-    public List<UsageReportRest> getUsageReportsOfDSO(Context context, UUID uuid)
+    public List<UsageReportRest> getUsageReportsOfDSO(Context context, DSpaceObject dso)
         throws SQLException, ParseException, SolrServerException, IOException {
         List<UsageReportRest> usageReports = new ArrayList<>();
-        DSpaceObject dso = dspaceObjectUtil.findDSpaceObject(context, uuid);
         if (dso instanceof Site) {
             UsageReportRest globalUsageStats = this.resolveGlobalUsageReport(context);
-            globalUsageStats.setId(uuid.toString() + "_" + TOTAL_VISITS_REPORT_ID);
+            globalUsageStats.setId(dso.getID().toString() + "_" + TOTAL_VISITS_REPORT_ID);
             usageReports.add(globalUsageStats);
         } else {
-            usageReports.add(this.createUsageReport(context, uuid, TOTAL_VISITS_REPORT_ID));
-            usageReports.add(this.createUsageReport(context, uuid, TOTAL_VISITS_PER_MONTH_REPORT_ID));
-            usageReports.add(this.createUsageReport(context, uuid, TOP_COUNTRIES_REPORT_ID));
-            usageReports.add(this.createUsageReport(context, uuid, TOP_CITIES_REPORT_ID));
+            usageReports.add(this.createUsageReport(context, dso, TOTAL_VISITS_REPORT_ID));
+            usageReports.add(this.createUsageReport(context, dso, TOTAL_VISITS_PER_MONTH_REPORT_ID));
+            usageReports.add(this.createUsageReport(context, dso, TOP_COUNTRIES_REPORT_ID));
+            usageReports.add(this.createUsageReport(context, dso, TOP_CITIES_REPORT_ID));
         }
         if (dso instanceof Item || dso instanceof Bitstream) {
-            usageReports.add(this.createUsageReport(context, uuid, TOTAL_DOWNLOADS_REPORT_ID));
+            usageReports.add(this.createUsageReport(context, dso, TOTAL_DOWNLOADS_REPORT_ID));
         }
         return usageReports;
     }
@@ -91,14 +86,13 @@ public class UsageReportUtils {
      * If the report id or the object uuid is invalid, an exception is thrown.
      *
      * @param context  DSpace context
-     * @param uuid     DSpace object UUID we want a stat usage report on
+     * @param dso     DSpace object we want a stat usage report on
      * @param reportId Type of usage report requested
      * @return Rest object containing the stat usage report, see {@link UsageReportRest}
      */
-    public UsageReportRest createUsageReport(Context context, UUID uuid, String reportId)
+    public UsageReportRest createUsageReport(Context context, DSpaceObject dso, String reportId)
         throws ParseException, SolrServerException, IOException {
         try {
-            DSpaceObject dso = dspaceObjectUtil.findDSpaceObject(context, uuid);
             UsageReportRest usageReportRest;
             switch (reportId) {
                 case TOTAL_VISITS_REPORT_ID:
@@ -126,10 +120,10 @@ public class UsageReportUtils {
                                                         "available reports: TotalVisits, TotalVisitsPerMonth, " +
                                                         "TotalDownloads, TopCountries, TopCities");
             }
-            usageReportRest.setId(uuid + "_" + reportId);
+            usageReportRest.setId(dso.getID() + "_" + reportId);
             return usageReportRest;
         } catch (SQLException e) {
-            throw new DSpaceBadRequestException("The given object uuid can't be resolved to an object: " + uuid);
+            throw new SolrServerException("SQLException trying to receive statistics of: " + dso.getID());
         }
     }
 
