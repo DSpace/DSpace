@@ -38,7 +38,7 @@ public class ItemAuthorityMatcher {
                 hasJsonPath("$.display", is(display)),
                 hasJsonPath("$.value", is(value)),
                 hasJsonPath("$.type", is(type)),
-                hasJsonPath("$.otherInformation.data-dc_" + otherInfMetadata, is(metadataValue))
+                hasJsonPath("$.otherInformation['data-" + otherInfMetadata + "']", is(metadataValue))
         );
     }
 }

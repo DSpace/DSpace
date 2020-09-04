@@ -74,22 +74,22 @@ public class ItemAuthorityTest extends AbstractControllerIntegrationTest {
                                   .withRelationshipType("person")
                                   .build();
 
-       Item OrgUnit_1 = ItemBuilder.createItem(context, col1)
+       Item orgUnit_1 = ItemBuilder.createItem(context, col1)
                                    .withTitle("OrgUnit_1")
                                    .withRelationshipType("orgunit")
                                    .build();
 
-       Item OrgUnit_2 = ItemBuilder.createItem(context, col1)
+       Item orgUnit_2 = ItemBuilder.createItem(context, col1)
                                    .withTitle("OrgUnit_2")
                                    .withRelationshipType("orgunit")
                                    .build();
 
-       itemService.addMetadata(context, author_1, "crisrp", "dept", null, null, "OrgUnit_1",
-                                                   OrgUnit_1.getID().toString(), Choices.CF_ACCEPTED);
-       itemService.addMetadata(context, author_2, "crisrp", "dept", null, null, "OrgUnit_1",
-                                                   OrgUnit_1.getID().toString(), Choices.CF_ACCEPTED);
-       itemService.addMetadata(context, author_3, "crisrp", "dept", null, null, "OrgUnit_2",
-                                                   OrgUnit_2.getID().toString(), Choices.CF_ACCEPTED);
+       itemService.addMetadata(context, author_1, "person", "affiliation", "name", null, "OrgUnit_1",
+                                                   orgUnit_1.getID().toString(), Choices.CF_ACCEPTED);
+       itemService.addMetadata(context, author_2, "person", "affiliation", "name", null, "OrgUnit_1",
+                                                   orgUnit_1.getID().toString(), Choices.CF_ACCEPTED);
+       itemService.addMetadata(context, author_3, "person", "affiliation", "name", null, "OrgUnit_2",
+                                                   orgUnit_2.getID().toString(), Choices.CF_ACCEPTED);
         context.restoreAuthSystemState();
 
         String token = getAuthToken(eperson.getEmail(), password);
@@ -100,11 +100,14 @@ public class ItemAuthorityTest extends AbstractControllerIntegrationTest {
                         .andExpect(status().isOk())
                         .andExpect(jsonPath("$._embedded.entries", Matchers.containsInAnyOrder(
                              ItemAuthorityMatcher.matchItemAuthorityWithOtherInformations(author_1.getID().toString(),
-                                       "Author 1", "Author 1","vocabularyEntry","contributor_department","OrgUnit_1"),
+                    "Author 1", "Author 1", "vocabularyEntry", "oairecerif.author.affiliation", "OrgUnit_1::"
+                        + orgUnit_1.getID()),
                              ItemAuthorityMatcher.matchItemAuthorityWithOtherInformations(author_2.getID().toString(),
-                                       "Author 2", "Author 2","vocabularyEntry","contributor_department","OrgUnit_1"),
+                    "Author 2", "Author 2", "vocabularyEntry", "oairecerif.author.affiliation", "OrgUnit_1::"
+                        + orgUnit_1.getID()),
                              ItemAuthorityMatcher.matchItemAuthorityWithOtherInformations(author_3.getID().toString(),
-                                       "Author 3", "Author 3","vocabularyEntry","contributor_department","OrgUnit_2")
+                    "Author 3", "Author 3", "vocabularyEntry", "oairecerif.author.affiliation", "OrgUnit_2::"
+                        + orgUnit_2.getID())
                              )))
                         .andExpect(jsonPath("$.page.totalElements", Matchers.is(3)));
     }
@@ -139,22 +142,22 @@ public class ItemAuthorityTest extends AbstractControllerIntegrationTest {
                                   .withRelationshipType("person")
                                   .build();
 
-       Item OrgUnit_1 = ItemBuilder.createItem(context, col1)
+       Item orgUnit_1 = ItemBuilder.createItem(context, col1)
                                    .withTitle("OrgUnit_1")
                                    .withRelationshipType("orgunit")
                                    .build();
 
-       Item OrgUnit_2 = ItemBuilder.createItem(context, col1)
+       Item orgUnit_2 = ItemBuilder.createItem(context, col1)
                                    .withTitle("OrgUnit_2")
                                    .withRelationshipType("orgunit")
                                    .build();
 
-       itemService.addMetadata(context, author_1, "crisrp", "dept", null, null, "OrgUnit_1",
-                                                   OrgUnit_1.getID().toString(), Choices.CF_ACCEPTED);
-       itemService.addMetadata(context, author_1, "crisrp", "dept", null, null, "OrgUnit_2",
-                                                   OrgUnit_2.getID().toString(), Choices.CF_ACCEPTED);
-       itemService.addMetadata(context, author_2, "crisrp", "dept", null, null, "OrgUnit_2",
-                                                   OrgUnit_2.getID().toString(), Choices.CF_ACCEPTED);
+       itemService.addMetadata(context, author_1, "person", "affiliation", "name", null, "OrgUnit_1",
+                                                   orgUnit_1.getID().toString(), Choices.CF_ACCEPTED);
+       itemService.addMetadata(context, author_1, "person", "affiliation", "name", null, "OrgUnit_2",
+                                                   orgUnit_2.getID().toString(), Choices.CF_ACCEPTED);
+       itemService.addMetadata(context, author_2, "person", "affiliation", "name", null, "OrgUnit_2",
+                                                   orgUnit_2.getID().toString(), Choices.CF_ACCEPTED);
        context.restoreAuthSystemState();
 
        String token = getAuthToken(eperson.getEmail(), password);
@@ -165,11 +168,14 @@ public class ItemAuthorityTest extends AbstractControllerIntegrationTest {
                        .andExpect(status().isOk())
                        .andExpect(jsonPath("$._embedded.entries", Matchers.containsInAnyOrder(
                                ItemAuthorityMatcher.matchItemAuthorityWithOtherInformations(author_1.getID().toString(),
-                              "Author 1(OrgUnit_1)", "Author 1","vocabularyEntry","contributor_department","OrgUnit_1"),
+                    "Author 1(OrgUnit_1)", "Author 1", "vocabularyEntry", "oairecerif.author.affiliation", "OrgUnit_1::"
+                        + orgUnit_1.getID()),
                                ItemAuthorityMatcher.matchItemAuthorityWithOtherInformations(author_1.getID().toString(),
-                              "Author 1(OrgUnit_2)", "Author 1","vocabularyEntry","contributor_department","OrgUnit_2"),
+                    "Author 1(OrgUnit_2)", "Author 1", "vocabularyEntry", "oairecerif.author.affiliation", "OrgUnit_2::"
+                        + orgUnit_2.getID()),
                                ItemAuthorityMatcher.matchItemAuthorityWithOtherInformations(author_2.getID().toString(),
-                              "Author 2(OrgUnit_2)", "Author 2","vocabularyEntry","contributor_department","OrgUnit_2")
+                    "Author 2(OrgUnit_2)", "Author 2", "vocabularyEntry", "oairecerif.author.affiliation", "OrgUnit_2::"
+                               + orgUnit_2.getID())
                                )))
                        .andExpect(jsonPath("$.page.totalElements", Matchers.is(3)));
     }
@@ -198,7 +204,7 @@ public class ItemAuthorityTest extends AbstractControllerIntegrationTest {
                        .andExpect(status().isOk())
                        .andExpect(jsonPath("$._embedded.entries", Matchers.contains(
                               ItemAuthorityMatcher.matchItemAuthorityWithOtherInformations(author_1.getID().toString(),
-                             "Author 1", "Author 1","vocabularyEntry","contributor_department","")
+                    "Author 1", "Author 1", "vocabularyEntry", "oairecerif.author.affiliation", "")
                               )))
                        .andExpect(jsonPath("$.page.totalElements", Matchers.is(1)));
     }
@@ -251,15 +257,15 @@ public class ItemAuthorityTest extends AbstractControllerIntegrationTest {
     public void ePersonAuthorityNoComparisonTest() throws Exception {
        context.turnOffAuthorisationSystem();
 
-       EPerson ePerson1 = EPersonBuilder.createEPerson(context)
-                                        .withNameInMetadata("Andrea", "Bollini")
-                                        .withEmail("Andrea.Bollini@example.com")
-                                        .build();
+       EPersonBuilder.createEPerson(context)
+            .withNameInMetadata("Andrea", "Bollini")
+            .withEmail("Andrea.Bollini@example.com")
+            .build();
 
-       EPerson ePerson2 = EPersonBuilder.createEPerson(context)
-                                        .withNameInMetadata("Mykhaylo", "Boychuk")
-                                        .withEmail("Mykhaylo.Boychuk@example.com")
-                                        .build();
+       EPersonBuilder.createEPerson(context)
+            .withNameInMetadata("Mykhaylo", "Boychuk")
+            .withEmail("Mykhaylo.Boychuk@example.com")
+            .build();
 
        context.restoreAuthSystemState();
 
@@ -274,15 +280,15 @@ public class ItemAuthorityTest extends AbstractControllerIntegrationTest {
     public void ePersonAuthorityEmptyQueryTest() throws Exception {
        context.turnOffAuthorisationSystem();
 
-       EPerson ePerson1 = EPersonBuilder.createEPerson(context)
-                                        .withNameInMetadata("Andrea", "Bollini")
-                                        .withEmail("Andrea.Bollini@example.com")
-                                        .build();
+       EPersonBuilder.createEPerson(context)
+           .withNameInMetadata("Andrea", "Bollini")
+           .withEmail("Andrea.Bollini@example.com")
+           .build();
 
-       EPerson ePerson2 = EPersonBuilder.createEPerson(context)
-                                        .withNameInMetadata("Mykhaylo", "Boychuk")
-                                        .withEmail("Mykhaylo.Boychuk@example.com")
-                                        .build();
+       EPersonBuilder.createEPerson(context)
+           .withNameInMetadata("Mykhaylo", "Boychuk")
+           .withEmail("Mykhaylo.Boychuk@example.com")
+           .build();
 
        context.restoreAuthSystemState();
 
@@ -337,13 +343,13 @@ public class ItemAuthorityTest extends AbstractControllerIntegrationTest {
     public void groupAuthorityEmptyQueryTest() throws Exception {
        context.turnOffAuthorisationSystem();
 
-       Group simpleGroup = GroupBuilder.createGroup(context)
-                                       .withName("Simple Group")
-                                       .build();
+       GroupBuilder.createGroup(context)
+           .withName("Simple Group")
+           .build();
 
-       Group groupA = GroupBuilder.createGroup(context)
-                                  .withName("Group A")
-                                  .build();
+       GroupBuilder.createGroup(context)
+           .withName("Group A")
+           .build();
 
        context.restoreAuthSystemState();
 
