@@ -22,7 +22,6 @@ import org.dspace.app.rest.model.UsageReportPointCountryRest;
 import org.dspace.app.rest.model.UsageReportPointDateRest;
 import org.dspace.app.rest.model.UsageReportPointDsoTotalVisitsRest;
 import org.dspace.app.rest.model.UsageReportRest;
-import org.dspace.app.rest.repository.AbstractDSpaceRestRepository;
 import org.dspace.content.Bitstream;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
@@ -47,7 +46,7 @@ import org.springframework.stereotype.Component;
  * @author Maria Verdonck (Atmire) on 08/06/2020
  */
 @Component
-public class UsageReportUtils extends AbstractDSpaceRestRepository {
+public class UsageReportUtils {
 
     @Autowired
     private DSpaceObjectUtils dspaceObjectUtil;
