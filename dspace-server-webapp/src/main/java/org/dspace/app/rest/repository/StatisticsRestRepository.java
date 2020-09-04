@@ -20,7 +20,9 @@ import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.model.StatisticsSupportRest;
 import org.dspace.app.rest.model.UsageReportRest;
+import org.dspace.app.rest.utils.DSpaceObjectUtils;
 import org.dspace.app.rest.utils.UsageReportUtils;
+import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -30,6 +32,9 @@ import org.springframework.stereotype.Component;
 
 @Component(StatisticsSupportRest.CATEGORY + "." + UsageReportRest.NAME)
 public class StatisticsRestRepository extends DSpaceRestRepository<UsageReportRest, String> {
+
+    @Autowired
+    private DSpaceObjectUtils dspaceObjectUtil;
 
     @Autowired
     private UsageReportUtils usageReportUtils;
@@ -46,8 +51,13 @@ public class StatisticsRestRepository extends DSpaceRestRepository<UsageReportRe
 
         UsageReportRest usageReportRest = null;
         try {
-            usageReportRest = usageReportUtils.createUsageReport(context, uuidObject, reportId);
-        } catch (ParseException | SolrServerException | IOException e) {
+            DSpaceObject dso = dspaceObjectUtil.findDSpaceObject(context, uuidObject);
+            if (dso == null) {
+                throw new IllegalArgumentException("No DSO found with uuid: " + uuidObject);
+            }
+            usageReportRest = usageReportUtils.createUsageReport(context, dso, reportId);
+
+        } catch (ParseException | SolrServerException | IOException | SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
         return converter.toRest(usageReportRest, utils.obtainProjection());
@@ -60,7 +70,12 @@ public class StatisticsRestRepository extends DSpaceRestRepository<UsageReportRe
         UUID uuid = UUID.fromString(StringUtils.substringAfterLast(uri, "/"));
         List<UsageReportRest> usageReportsOfItem = null;
         try {
-            usageReportsOfItem = usageReportUtils.getUsageReportsOfDSO(obtainContext(), uuid);
+            Context context = obtainContext();
+            DSpaceObject dso = dspaceObjectUtil.findDSpaceObject(context, uuid);
+            if (dso == null) {
+                throw new IllegalArgumentException("No DSO found with uuid: " + uuid);
+            }
+            usageReportsOfItem = usageReportUtils.getUsageReportsOfDSO(context, dso);
         } catch (SQLException | ParseException | SolrServerException | IOException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
