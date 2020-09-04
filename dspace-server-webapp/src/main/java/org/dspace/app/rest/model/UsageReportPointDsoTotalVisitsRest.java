@@ -15,6 +15,9 @@ package org.dspace.app.rest.model;
  */
 public class UsageReportPointDsoTotalVisitsRest extends UsageReportPointRest {
 
+    /**
+     * Type of dso a UsageReport is being requested of (e.g. item, bitstream, ...)
+     */
     private String type;
 
     @Override
@@ -22,6 +25,11 @@ public class UsageReportPointDsoTotalVisitsRest extends UsageReportPointRest {
         return this.type;
     }
 
+    /**
+     * Sets the type of this {@link UsageReportPointRest} object, should be type of dso concerned (e.g. item, bitstream, ...)
+     *
+     * @param type Type of dso a {@link UsageReportRest} object is being requested of (e.g. item, bitstream, ...)
+     */
     public void setType(String type) {
         this.type = type;
     }

@@ -5,7 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.app.rest.repository;
+package org.dspace.app.rest.utils;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -22,7 +22,7 @@ import org.dspace.app.rest.model.UsageReportPointCountryRest;
 import org.dspace.app.rest.model.UsageReportPointDateRest;
 import org.dspace.app.rest.model.UsageReportPointDsoTotalVisitsRest;
 import org.dspace.app.rest.model.UsageReportRest;
-import org.dspace.app.rest.utils.DSpaceObjectUtils;
+import org.dspace.app.rest.repository.AbstractDSpaceRestRepository;
 import org.dspace.content.Bitstream;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
@@ -47,7 +47,7 @@ import org.springframework.stereotype.Component;
  * @author Maria Verdonck (Atmire) on 08/06/2020
  */
 @Component
-public class UsageReportService extends AbstractDSpaceRestRepository {
+public class UsageReportUtils extends AbstractDSpaceRestRepository {
 
     @Autowired
     private DSpaceObjectUtils dspaceObjectUtil;

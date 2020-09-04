@@ -9,11 +9,11 @@ package org.dspace.app.rest;
 
 import static org.apache.commons.codec.CharEncoding.UTF_8;
 import static org.apache.commons.io.IOUtils.toInputStream;
-import static org.dspace.app.rest.repository.UsageReportService.TOP_CITIES_REPORT_ID;
-import static org.dspace.app.rest.repository.UsageReportService.TOP_COUNTRIES_REPORT_ID;
-import static org.dspace.app.rest.repository.UsageReportService.TOTAL_DOWNLOADS_REPORT_ID;
-import static org.dspace.app.rest.repository.UsageReportService.TOTAL_VISITS_PER_MONTH_REPORT_ID;
-import static org.dspace.app.rest.repository.UsageReportService.TOTAL_VISITS_REPORT_ID;
+import static org.dspace.app.rest.utils.UsageReportUtils.TOP_CITIES_REPORT_ID;
+import static org.dspace.app.rest.utils.UsageReportUtils.TOP_COUNTRIES_REPORT_ID;
+import static org.dspace.app.rest.utils.UsageReportUtils.TOTAL_DOWNLOADS_REPORT_ID;
+import static org.dspace.app.rest.utils.UsageReportUtils.TOTAL_VISITS_PER_MONTH_REPORT_ID;
+import static org.dspace.app.rest.utils.UsageReportUtils.TOTAL_VISITS_REPORT_ID;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.not;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -37,8 +37,8 @@ import org.dspace.app.rest.model.UsageReportPointDsoTotalVisitsRest;
 import org.dspace.app.rest.model.UsageReportPointRest;
 import org.dspace.app.rest.model.ViewEventRest;
 import org.dspace.app.rest.repository.StatisticsRestRepository;
-import org.dspace.app.rest.repository.UsageReportService;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
+import org.dspace.app.rest.utils.UsageReportUtils;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.builder.BitstreamBuilder;
 import org.dspace.builder.CollectionBuilder;
@@ -64,7 +64,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 
 /**
- * Integration test to test the /api/statistics/usagereports/ endpoints, see {@link UsageReportService} and
+ * Integration test to test the /api/statistics/usagereports/ endpoints, see {@link UsageReportUtils} and
  * {@link StatisticsRestRepository}
  *
  * @author Maria Verdonck (Atmire) on 10/06/2020
