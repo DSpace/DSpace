@@ -26,26 +26,69 @@ public class UsageReportRest extends BaseObjectRest<String> {
     private String reportType;
     private List<UsageReportPointRest> points;
 
+    /**
+     * Returns the category of this Rest object, {@link #CATEGORY}
+     *
+     * @return The category of this Rest object, {@link #CATEGORY}
+     */
+    @Override
     public String getCategory() {
         return CATEGORY;
     }
 
+    /**
+     * Return controller class responsible for this Rest object
+     *
+     * @return Controller class responsible for this Rest object
+     */
+    @Override
     public Class getController() {
         return StatisticsRestController.class;
     }
 
+    /**
+     * Returns the type of this {@link UsageReportRest} object
+     *
+     * @return Type of this {@link UsageReportRest} object
+     */
+    @Override
     public String getType() {
         return NAME;
     }
 
+    /**
+     * Returns the report type of this UsageReport, options listed in
+     * {@link org.dspace.app.rest.utils.UsageReportUtils}, e.g.
+     * {@link org.dspace.app.rest.utils.UsageReportUtils#TOTAL_VISITS_REPORT_ID}
+     *
+     * @return The report type of this UsageReport, options listed in
+     * {@link org.dspace.app.rest.utils.UsageReportUtils}, e.g.
+     * {@link org.dspace.app.rest.utils.UsageReportUtils#TOTAL_VISITS_REPORT_ID}
+     */
     public String getReportType() {
         return reportType;
     }
 
+    /**
+     * Sets the report type of this UsageReport, options listed in
+     * {@link org.dspace.app.rest.utils.UsageReportUtils}, e.g.
+     * {@link org.dspace.app.rest.utils.UsageReportUtils#TOTAL_VISITS_REPORT_ID}
+     *
+     * @param reportType The report type of this UsageReport, options listed in
+     *                   {@link org.dspace.app.rest.utils.UsageReportUtils}, e.g.
+     *                   {@link org.dspace.app.rest.utils.UsageReportUtils#TOTAL_VISITS_REPORT_ID}
+     */
     public void setReportType(String reportType) {
         this.reportType = reportType;
     }
 
+    /**
+     * Returns the list of {@link UsageReportPointRest} objects attached to this {@link UsageReportRest} object, or
+     * empty list if none
+     *
+     * @return The list of {@link UsageReportPointRest} objects attached to this {@link UsageReportRest} object, or
+     * empty list if none
+     */
     public List<UsageReportPointRest> getPoints() {
         if (points == null) {
             points = new ArrayList<>();
@@ -53,6 +96,11 @@ public class UsageReportRest extends BaseObjectRest<String> {
         return points;
     }
 
+    /**
+     * Adds a {@link UsageReportPointRest} object to this {@link UsageReportRest} object
+     *
+     * @param point {@link UsageReportPointRest} to add to this {@link UsageReportRest} object
+     */
     public void addPoint(UsageReportPointRest point) {
         if (points == null) {
             points = new ArrayList<>();
@@ -60,6 +108,11 @@ public class UsageReportRest extends BaseObjectRest<String> {
         points.add(point);
     }
 
+    /**
+     * Set all {@link UsageReportPointRest} objects on this {@link UsageReportRest} object
+     *
+     * @param points All {@link UsageReportPointRest} objects on this {@link UsageReportRest} object
+     */
     public void setPoints(List<UsageReportPointRest> points) {
         this.points = points;
     }

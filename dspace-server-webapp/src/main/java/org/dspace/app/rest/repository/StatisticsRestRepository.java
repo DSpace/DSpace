@@ -20,6 +20,7 @@ import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.model.StatisticsSupportRest;
 import org.dspace.app.rest.model.UsageReportRest;
+import org.dspace.app.rest.utils.UsageReportUtils;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -31,7 +32,7 @@ import org.springframework.stereotype.Component;
 public class StatisticsRestRepository extends DSpaceRestRepository<UsageReportRest, String> {
 
     @Autowired
-    private UsageReportService usageReportService;
+    private UsageReportUtils usageReportUtils;
 
     public StatisticsSupportRest getStatisticsSupport() {
         return new StatisticsSupportRest();
@@ -45,7 +46,7 @@ public class StatisticsRestRepository extends DSpaceRestRepository<UsageReportRe
 
         UsageReportRest usageReportRest = null;
         try {
-            usageReportRest = usageReportService.createUsageReport(context, uuidObject, reportId);
+            usageReportRest = usageReportUtils.createUsageReport(context, uuidObject, reportId);
         } catch (ParseException | SolrServerException | IOException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -59,7 +60,7 @@ public class StatisticsRestRepository extends DSpaceRestRepository<UsageReportRe
         UUID uuid = UUID.fromString(StringUtils.substringAfterLast(uri, "/"));
         List<UsageReportRest> usageReportsOfItem = null;
         try {
-            usageReportsOfItem = usageReportService.getUsageReportsOfDSO(obtainContext(), uuid);
+            usageReportsOfItem = usageReportUtils.getUsageReportsOfDSO(obtainContext(), uuid);
         } catch (SQLException | ParseException | SolrServerException | IOException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
