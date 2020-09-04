@@ -23,7 +23,7 @@
 
 	<bean id="org.dspace.content.authority.ItemSimpleAuthorityMetadataGenerator" 
     	class="org.dspace.content.authority.ItemSimpleAuthorityMetadataGenerator">
-    	<property name="relatedInputformMetadata" value="oaire.author.affiliation"/>
+    	<property name="relatedInputformMetadata" value="oairecerif.author.affiliation"/>
     	<property name="schema" value="person"/>
     	<property name="element" value="affiliation"/>
     	<property name="qualifier" value="name"/>

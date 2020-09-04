@@ -27,7 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class ItemSimpleAuthorityMetadataGenerator implements ItemAuthorityExtraMetadataGenerator {
 
-    private String relatedInputformMetadata = "dc_contributor_department";
+    private String relatedInputformMetadata;
 
     private String schema;
 

@@ -84,11 +84,11 @@ public class ItemAuthorityTest extends AbstractControllerIntegrationTest {
                                    .withRelationshipType("orgunit")
                                    .build();
 
-       itemService.addMetadata(context, author_1, "crisrp", "dept", null, null, "OrgUnit_1",
+       itemService.addMetadata(context, author_1, "person", "affiliation", "name", null, "OrgUnit_1",
                                                    OrgUnit_1.getID().toString(), Choices.CF_ACCEPTED);
-       itemService.addMetadata(context, author_2, "crisrp", "dept", null, null, "OrgUnit_1",
+       itemService.addMetadata(context, author_2, "person", "affiliation", "name", null, "OrgUnit_1",
                                                    OrgUnit_1.getID().toString(), Choices.CF_ACCEPTED);
-       itemService.addMetadata(context, author_3, "crisrp", "dept", null, null, "OrgUnit_2",
+       itemService.addMetadata(context, author_3, "person", "affiliation", "name", null, "OrgUnit_2",
                                                    OrgUnit_2.getID().toString(), Choices.CF_ACCEPTED);
         context.restoreAuthSystemState();
 
@@ -100,11 +100,14 @@ public class ItemAuthorityTest extends AbstractControllerIntegrationTest {
                         .andExpect(status().isOk())
                         .andExpect(jsonPath("$._embedded.entries", Matchers.containsInAnyOrder(
                              ItemAuthorityMatcher.matchItemAuthorityWithOtherInformations(author_1.getID().toString(),
-                                       "Author 1", "Author 1","vocabularyEntry","contributor_department","OrgUnit_1"),
+                            "Author 1", "Author 1","vocabularyEntry","['data-oairecerif.author.affiliation']",
+                            "OrgUnit_1::" + OrgUnit_1.getID()),
                              ItemAuthorityMatcher.matchItemAuthorityWithOtherInformations(author_2.getID().toString(),
-                                       "Author 2", "Author 2","vocabularyEntry","contributor_department","OrgUnit_1"),
+                            "Author 2", "Author 2","vocabularyEntry","['data-oairecerif.author.affiliation']",
+                            "OrgUnit_1::" + OrgUnit_1.getID()),
                              ItemAuthorityMatcher.matchItemAuthorityWithOtherInformations(author_3.getID().toString(),
-                                       "Author 3", "Author 3","vocabularyEntry","contributor_department","OrgUnit_2")
+                            "Author 3", "Author 3","vocabularyEntry","['data-oairecerif.author.affiliation']",
+                            "OrgUnit_2::" + OrgUnit_2.getID())
                              )))
                         .andExpect(jsonPath("$.page.totalElements", Matchers.is(3)));
     }
@@ -149,11 +152,11 @@ public class ItemAuthorityTest extends AbstractControllerIntegrationTest {
                                    .withRelationshipType("orgunit")
                                    .build();
 
-       itemService.addMetadata(context, author_1, "crisrp", "dept", null, null, "OrgUnit_1",
+       itemService.addMetadata(context, author_1, "person", "affiliation", "name", null, "OrgUnit_1",
                                                    OrgUnit_1.getID().toString(), Choices.CF_ACCEPTED);
-       itemService.addMetadata(context, author_1, "crisrp", "dept", null, null, "OrgUnit_2",
+       itemService.addMetadata(context, author_1, "person", "affiliation", "name", null, "OrgUnit_2",
                                                    OrgUnit_2.getID().toString(), Choices.CF_ACCEPTED);
-       itemService.addMetadata(context, author_2, "crisrp", "dept", null, null, "OrgUnit_2",
+       itemService.addMetadata(context, author_2, "person", "affiliation", "name", null, "OrgUnit_2",
                                                    OrgUnit_2.getID().toString(), Choices.CF_ACCEPTED);
        context.restoreAuthSystemState();
 
@@ -165,11 +168,14 @@ public class ItemAuthorityTest extends AbstractControllerIntegrationTest {
                        .andExpect(status().isOk())
                        .andExpect(jsonPath("$._embedded.entries", Matchers.containsInAnyOrder(
                                ItemAuthorityMatcher.matchItemAuthorityWithOtherInformations(author_1.getID().toString(),
-                              "Author 1(OrgUnit_1)", "Author 1","vocabularyEntry","contributor_department","OrgUnit_1"),
+                               "Author 1(OrgUnit_1)", "Author 1", "vocabularyEntry",
+                               "['data-oairecerif.author.affiliation']", "OrgUnit_1::" + OrgUnit_1.getID()),
                                ItemAuthorityMatcher.matchItemAuthorityWithOtherInformations(author_1.getID().toString(),
-                              "Author 1(OrgUnit_2)", "Author 1","vocabularyEntry","contributor_department","OrgUnit_2"),
+                               "Author 1(OrgUnit_2)", "Author 1", "vocabularyEntry",
+                               "['data-oairecerif.author.affiliation']", "OrgUnit_2::" + OrgUnit_2.getID()),
                                ItemAuthorityMatcher.matchItemAuthorityWithOtherInformations(author_2.getID().toString(),
-                              "Author 2(OrgUnit_2)", "Author 2","vocabularyEntry","contributor_department","OrgUnit_2")
+                               "Author 2(OrgUnit_2)", "Author 2", "vocabularyEntry",
+                               "['data-oairecerif.author.affiliation']", "OrgUnit_2::" + OrgUnit_2.getID())
                                )))
                        .andExpect(jsonPath("$.page.totalElements", Matchers.is(3)));
     }
@@ -198,7 +204,7 @@ public class ItemAuthorityTest extends AbstractControllerIntegrationTest {
                        .andExpect(status().isOk())
                        .andExpect(jsonPath("$._embedded.entries", Matchers.contains(
                               ItemAuthorityMatcher.matchItemAuthorityWithOtherInformations(author_1.getID().toString(),
-                             "Author 1", "Author 1","vocabularyEntry","contributor_department","")
+                              "Author 1", "Author 1", "vocabularyEntry", "['data-oairecerif.author.affiliation']", "")
                               )))
                        .andExpect(jsonPath("$.page.totalElements", Matchers.is(1)));
     }
