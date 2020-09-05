@@ -822,6 +822,30 @@
         <decimal/>
         <group/>
       </field>
+      <field>
+        <name>STYLE_LABEL</name>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+        <repeat>N</repeat>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+      </field>
+      <field>
+        <name>STYLE_VALUE</name>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+        <repeat>N</repeat>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+      </field>
     </fields>
     <sheets>
       <sheet>
@@ -1494,10 +1518,16 @@ if (LABEL != null) {
 	op.value.label = LABEL;
 }
 if (STYLE != null) {
-op.value.style = STYLE;
+	op.value.style = STYLE;
 }
 if (RENDERING != null) {
-op.value.rendering = RENDERING;
+	op.value.rendering = RENDERING;
+}
+if (STYLE_LABEL != null) {
+	op.value.styleLabel = STYLE_LABEL;
+}
+if (STYLE_VALUE != null) {
+	op.value.styleValue = STYLE_VALUE;
 }
 op.value.bitstream = new Object();
 op.value.bitstream.bundle = BUNDLE;
@@ -1559,10 +1589,16 @@ if (LABEL != null) {
 	op.value.label = LABEL;
 }
 if (STYLE != null) {
-op.value.style = STYLE;
+	op.value.style = STYLE;
 }
 if (RENDERING != null) {
-op.value.rendering = RENDERING;
+	op.value.rendering = RENDERING;
+}
+if (STYLE_LABEL != null) {
+	op.value.styleLabel = STYLE_LABEL;
+}
+if (STYLE_VALUE != null) {
+	op.value.styleValue = STYLE_VALUE;
 }
 op.op = "add";
 op.path = "/rows/" + ROW + "/fields/-";
