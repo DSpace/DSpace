@@ -188,4 +188,26 @@
         <scope_note></scope_note>
     </dc-type>
 
+<!-- These below should be moved in the oairecerif schema -->
+    <dc-type>
+        <schema>dc</schema>
+        <element>relation</element>
+        <qualifier>project</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>dc</schema>
+        <element>relation</element>
+        <qualifier>funding</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>dc</schema>
+        <element>relation</element>
+        <qualifier>grantno</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
 </dspace-dc-types>
