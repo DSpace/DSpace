@@ -38,36 +38,46 @@ public class ItemSimpleAuthorityMetadataGenerator implements ItemAuthorityExtraM
     // use with aggregate mode
     private boolean singleResultOnAggregate = true;
 
+    // limit the generator to a specific authority
+    private String authorityName;
+
     @Autowired
     ItemService itemService;
 
     @Override
-    public Map<String, String> build(Item item) {
+    public Map<String, String> build(String checkAuthorityName, Item item) {
         Map<String, String> extras = new HashMap<String, String>();
-        buildSingleExtraByRP(item, extras);
+        if (StringUtils.isBlank(authorityName) || StringUtils.equals(authorityName, checkAuthorityName)) {
+            buildSingleExtraByRP(item, extras);
+        }
         return extras;
     }
 
     @Override
-    public List<Choice> buildAggregate(Item item) {
+    public List<Choice> buildAggregate(String checkAuthorityName, Item item) {
         List<Choice> choiceList = new LinkedList<Choice>();
-        if (isSingleResultOnAggregate()) {
-            Map<String, String> extras = new HashMap<String, String>();
-            buildSingleExtraByRP(item, extras);
-            choiceList.add(new Choice(item.getID().toString(), item.getName(), item.getName(), extras));
+        if (StringUtils.isNotBlank(authorityName) && !StringUtils.equals(authorityName, checkAuthorityName)) {
+            choiceList.add(
+                    new Choice(item.getID().toString(), item.getName(), item.getName(), new HashMap<String, String>()));
         } else {
-            List<MetadataValue> metadataValues =  itemService.getMetadata(item,
-                                                              getSchema(), getElement(), getQualifier(), Item.ANY);
-            for (MetadataValue metadataValue : metadataValues) {
+            if (isSingleResultOnAggregate()) {
                 Map<String, String> extras = new HashMap<String, String>();
-                buildSingleExtraByMetadata(metadataValue, extras);
-                choiceList.add(new Choice(item.getID().toString(), item.getName() + "(" + metadataValue.getValue()
-                                          + ")", item.getName(), extras));
-            }
-            if (metadataValues == null || metadataValues.size() == 0) {
-                Map<String, String> extras = new HashMap<String, String>();
-                extras.put("data-" + getRelatedInputformMetadata(), "");
+                buildSingleExtraByRP(item, extras);
                 choiceList.add(new Choice(item.getID().toString(), item.getName(), item.getName(), extras));
+            } else {
+                List<MetadataValue> metadataValues =  itemService.getMetadata(item,
+                                                                  getSchema(), getElement(), getQualifier(), Item.ANY);
+                for (MetadataValue metadataValue : metadataValues) {
+                    Map<String, String> extras = new HashMap<String, String>();
+                    buildSingleExtraByMetadata(metadataValue, extras);
+                    choiceList.add(new Choice(item.getID().toString(), item.getName() + "(" + metadataValue.getValue()
+                                              + ")", item.getName(), extras));
+                }
+                if (metadataValues == null || metadataValues.size() == 0) {
+                    Map<String, String> extras = new HashMap<String, String>();
+                    extras.put("data-" + getRelatedInputformMetadata(), "");
+                    choiceList.add(new Choice(item.getID().toString(), item.getName(), item.getName(), extras));
+                }
             }
         }
         return choiceList;
@@ -136,4 +146,11 @@ public class ItemSimpleAuthorityMetadataGenerator implements ItemAuthorityExtraM
         this.singleResultOnAggregate = singleResultOnAggregate;
     }
 
+    public void setAuthorityName(String authorityName) {
+        this.authorityName = authorityName;
+    }
+
+    public String getAuthorityName() {
+        return authorityName;
+    }
 }

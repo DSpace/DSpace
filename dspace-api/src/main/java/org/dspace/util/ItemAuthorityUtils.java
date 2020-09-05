@@ -25,26 +25,26 @@ public class ItemAuthorityUtils {
     private static DSpace dspace = new DSpace();
     private ItemAuthorityUtils() {}
 
-    public static Map<String, String> buildExtra(Item item) {
+    public static Map<String, String> buildExtra(String authorityName, Item item) {
         Map<String, String> extras = new HashMap<String, String>();
         List<ItemAuthorityExtraMetadataGenerator> generators = dspace.getServiceManager()
                 .getServicesByType(ItemAuthorityExtraMetadataGenerator.class);
         if (generators != null) {
             for (ItemAuthorityExtraMetadataGenerator gg : generators) {
-                Map<String, String> extrasTmp = gg.build(item);
+                Map<String, String> extrasTmp = gg.build(authorityName, item);
                 extras.putAll(extrasTmp);
             }
         }
         return extras;
     }
 
-    public static List<Choice> buildAggregateByExtra(Item item) {
+    public static List<Choice> buildAggregateByExtra(String authorityName, Item item) {
         List<Choice> choiceList = new LinkedList<Choice>();
         List<ItemAuthorityExtraMetadataGenerator> generators = dspace.getServiceManager()
                 .getServicesByType(ItemAuthorityExtraMetadataGenerator.class);
         if (generators != null) {
             for (ItemAuthorityExtraMetadataGenerator gg : generators) {
-                choiceList.addAll(gg.buildAggregate(item));
+                choiceList.addAll(gg.buildAggregate(authorityName, item));
             }
         }
         return choiceList;

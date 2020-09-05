@@ -101,7 +101,7 @@ public class ItemMultiAuthority implements ChoiceAuthority {
             while (dsoIterator.hasNext()) {
                 DSpaceObject dso = (DSpaceObject) dsoIterator.next().getIndexedObject();
                 Item item = (Item) dso;
-                choiceList.addAll(ItemAuthorityUtils.buildAggregateByExtra(item));
+                choiceList.addAll(ItemAuthorityUtils.buildAggregateByExtra(getPluginInstanceName(), item));
             }
             Choice[] results = new Choice[choiceList.size()];
             results = choiceList.toArray(results);
