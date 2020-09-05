@@ -39,6 +39,7 @@ import org.dspace.content.service.InstallItemService;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.Context;
+import org.dspace.core.CrisConstants;
 import org.dspace.event.Consumer;
 import org.dspace.event.Event;
 import org.dspace.services.ConfigurationService;
@@ -126,6 +127,10 @@ public class CrisConsumer implements Consumer {
         for (MetadataValue metadata : metadataValues) {
 
             String authority = metadata.getAuthority();
+            // ignore nested metadata with placeholder
+            if (StringUtils.equals(metadata.getValue(), CrisConstants.PLACEHOLDER_PARENT_METADATA_VALUE)) {
+                continue;
+            }
             if (StringUtils.isNotBlank(authority) && !authority.startsWith(AuthorityValueService.GENERATE)) {
                 continue;
             }
