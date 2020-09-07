@@ -1349,7 +1349,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                         is("10.1021/ac0354342")))
                     .andExpect(jsonPath("$.sections.traditionalpageone['dc.title'][0].value",
                         is("Multistep microreactions with proteins using electrocapture technology.")))
-                    .andExpect(jsonPath("$.sections.traditionalpageone['dc.type'][0].value",
+                    .andExpect(jsonPath("$.sections.traditionalpageone['dc.type'][1].value",
                         is("Journal Article")))
                     .andExpect(jsonPath("$.sections.traditionalpageone['dc.date.issued'][0].value",
                         is("2004-05-01")))
@@ -1381,7 +1381,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                     is("10.1021/ac0354342")))
                 .andExpect(jsonPath("$.sections.traditionalpageone['dc.title'][0].value",
                     is("Multistep microreactions with proteins using electrocapture technology.")))
-                .andExpect(jsonPath("$.sections.traditionalpageone['dc.type'][0].value",
+                .andExpect(jsonPath("$.sections.traditionalpageone['dc.type'][1].value",
                     is("Journal Article")))
                 .andExpect(jsonPath("$.sections.traditionalpageone['dc.date.issued'][0].value",
                     is("2004-05-01")))
