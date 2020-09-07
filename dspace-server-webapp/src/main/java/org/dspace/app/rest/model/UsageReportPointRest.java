@@ -10,7 +10,7 @@ package org.dspace.app.rest.model;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.dspace.app.rest.StatisticsRestController;
+import org.dspace.app.rest.RestResourceController;
 
 /**
  * This class serves as a REST representation of a Point of a {@link UsageReportRest} from the DSpace statistics
@@ -41,7 +41,7 @@ public class UsageReportPointRest extends BaseObjectRest<String> {
      */
     @Override
     public Class getController() {
-        return StatisticsRestController.class;
+        return RestResourceController.class;
     }
 
     /**
