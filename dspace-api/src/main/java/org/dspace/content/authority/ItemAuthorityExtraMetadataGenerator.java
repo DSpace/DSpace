@@ -21,8 +21,8 @@ import org.dspace.content.Item;
  */
 public interface ItemAuthorityExtraMetadataGenerator {
 
-    public Map<String, String> build(Item item);
+    public Map<String, String> build(String authorityName, Item item);
 
-    public List<Choice> buildAggregate(Item item);
+    public List<Choice> buildAggregate(String authorityName, Item item);
 
 }

@@ -4,114 +4,114 @@
     xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd"
     default-lazy-init="true">
 
-	<bean class="org.dspace.layout.service.impl.CrisLayoutSectionServiceImpl" >
-		<property name="componentMap">
-			<map>
-				<entry key="publications">
-					<list>
-						<list>
-							<bean class="org.dspace.layout.CrisLayoutBrowseComponent">
-								<property name="browseNames">
-									<list>
-										<value>rodept</value>
-										<value>author</value>
-										<value>title</value>
+    <bean class="org.dspace.layout.service.impl.CrisLayoutSectionServiceImpl" >
+        <property name="componentMap">
+            <map>
+                <entry key="publications">
+                    <list>
+                        <list>
+                            <bean class="org.dspace.layout.CrisLayoutBrowseComponent">
+                                <property name="browseNames">
+                                    <list>
+                                        <value>rodept</value>
+                                        <value>author</value>
+                                        <value>title</value>
                                         <value>type</value>
-										<value>dateissued</value>
-										<value>subject</value>
-									</list>
-								</property>
-								<property name="style" value="col-md-4"/>
-							</bean>
-							<bean class="org.dspace.layout.CrisLayoutSearchComponent">
+                                        <value>dateissued</value>
+                                        <value>subject</value>
+                                    </list>
+                                </property>
+                                <property name="style" value="col-md-4"/>
+                            </bean>
+                            <bean class="org.dspace.layout.CrisLayoutSearchComponent">
                                 <property name="discoveryConfigurationName" value="publication" />
                                 <property name="style" value="col-md-8"/>
                             </bean>
-						</list>
-						<list>
-							<bean class="org.dspace.layout.CrisLayoutTopComponent">
-								<property name="discoveryConfigurationName" value="publication" />
-								<property name="sortField" value="dc.date.accessioned" />
-								<property name="order" value="desc" />
+                        </list>
+                        <list>
+                            <bean class="org.dspace.layout.CrisLayoutTopComponent">
+                                <property name="discoveryConfigurationName" value="publication" />
+                                <property name="sortField" value="dc.date.accessioned" />
+                                <property name="order" value="desc" />
                                 <property name="style" value="col-md-6"/>
-							</bean>
-							<bean class="org.dspace.layout.CrisLayoutTopComponent">
-								<property name="discoveryConfigurationName" value="publication" />
-								<property name="sortField" value="dc.title" />
-								<property name="order" value="asc" />
+                            </bean>
+                            <bean class="org.dspace.layout.CrisLayoutTopComponent">
+                                <property name="discoveryConfigurationName" value="publication" />
+                                <property name="sortField" value="dc.title" />
+                                <property name="order" value="asc" />
                                 <property name="style" value="col-md-6"/>
-							</bean>
-						</list>
+                            </bean>
+                        </list>
                         <list>
                             <bean class="org.dspace.layout.CrisLayoutFacetComponent">
                                 <property name="discoveryConfigurationName" value="publication" />
                                 <property name="style" value="col-md-12"/>
                             </bean>
                         </list>
-					</list>
-				</entry>
-				<entry key="researcherprofiles">
-					<list>
-						<list>
-							<bean class="org.dspace.layout.CrisLayoutBrowseComponent">
-								<property name="browseNames">
-									<list>
-										<value>rpname</value>
-										<value>rpdept</value>
-									</list>
-								</property>
-                                <property name="style" value="col-md-4"/>
-							</bean>
-                            <bean class="org.dspace.layout.CrisLayoutSearchComponent">
-                                <property name="discoveryConfigurationName" value="person" />
-                                <property name="style" value="col-md-8"/>
-                            </bean>
-						</list>
-					</list>
-				</entry>
-				<entry key="orgunits">
-					<list>
-						<list>
-							<bean class="org.dspace.layout.CrisLayoutBrowseComponent">
-								<property name="browseNames">
-									<list>
-										<value>ouname</value>
-									</list>
-								</property>
-                                <property name="style" value="col-md-4"/>
-							</bean>
-                            <bean class="org.dspace.layout.CrisLayoutSearchComponent">
-                                <property name="discoveryConfigurationName" value="orgunit" />
-                                <property name="style" value="col-md-8"/>
-                            </bean>
-						</list>
+                    </list>
+                </entry>
+                <entry key="fundings">
+                    <list>
                         <list>
-                            <bean class="org.dspace.layout.CrisLayoutFacetComponent">
-                                <property name="discoveryConfigurationName" value="orgunit" />
-                                <property name="style" value="col-md-12"/>
-                            </bean>
-                        </list>
-					</list>
-				</entry>
-				<entry key="fundings">
-					<list>
-						<list>
-							<bean class="org.dspace.layout.CrisLayoutBrowseComponent">
-								<property name="browseNames">
-									<list>
-										<value>pjtitle</value>
-									</list>
-								</property>
+                            <bean class="org.dspace.layout.CrisLayoutBrowseComponent">
+                                <property name="browseNames">
+                                    <list>
+                                        <value>pjtitle</value>
+                                    </list>
+                                </property>
                                 <property name="style" value="col-md-4"/>
-							</bean>
+                            </bean>
                             <bean class="org.dspace.layout.CrisLayoutSearchComponent">
                                 <property name="discoveryConfigurationName" value="project" />
                                 <property name="style" value="col-md-8"/>
                             </bean>
-						</list>
-					</list>
-				</entry>
-			</map>
-		</property>
-	</bean>
+                        </list>
+                    </list>
+                </entry>
+				<entry key="researcherprofiles">
+                    <list>
+                        <list>
+                            <bean class="org.dspace.layout.CrisLayoutBrowseComponent">
+                                <property name="browseNames">
+                                    <list>
+                                        <value>rpname</value>
+                                        <value>rpdept</value>
+                                    </list>
+                                </property>
+                                <property name="style" value="col-md-4"/>
+                            </bean>
+                            <bean class="org.dspace.layout.CrisLayoutSearchComponent">
+                                <property name="discoveryConfigurationName" value="person" />
+                                <property name="style" value="col-md-8"/>
+                            </bean>
+                        </list>
+                    </list>
+                </entry>
+                <entry key="orgunits">
+                    <list>
+                        <list>
+                            <bean class="org.dspace.layout.CrisLayoutBrowseComponent">
+                                <property name="browseNames">
+                                    <list>
+                                        <value>ouname</value>
+                                    </list>
+                                </property>
+                                <property name="style" value="col-md-4"/>
+                            </bean>
+                            <bean class="org.dspace.layout.CrisLayoutSearchComponent">
+                                <property name="discoveryConfigurationName" value="orgunit" />
+                                <property name="style" value="col-md-8"/>
+                            </bean>
+                        </list>
+                        <list>
+                            <bean class="org.dspace.layout.CrisLayoutFacetComponent">
+                                <property name="discoveryConfigurationName" value="orgunit" />
+                                <property name="style" value="col-md-12"/>
+                            </bean>
+                        </list>
+                    </list>
+                </entry>
+            </map>
+        </property>
+    </bean>
 </beans>

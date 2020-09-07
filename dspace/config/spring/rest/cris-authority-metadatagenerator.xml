@@ -21,12 +21,22 @@
 
     <context:annotation-config /> <!-- allows us to use spring annotations in beans -->
 
-	<bean id="org.dspace.content.authority.ItemSimpleAuthorityMetadataGenerator" 
-    	class="org.dspace.content.authority.ItemSimpleAuthorityMetadataGenerator">
-    	<property name="relatedInputformMetadata" value="oairecerif.author.affiliation"/>
-    	<property name="schema" value="person"/>
-    	<property name="element" value="affiliation"/>
-    	<property name="qualifier" value="name"/>
-		<property name="singleResultOnAggregate" value="false"/>
+    <bean class="org.dspace.content.authority.ItemSimpleAuthorityMetadataGenerator">
+        <property name="authorityName" value="AuthorAuthority"/>
+        <property name="relatedInputformMetadata" value="oairecerif_author_affiliation"/>
+        <property name="schema" value="person"/>
+        <property name="element" value="affiliation"/>
+        <property name="qualifier" value="name"/>
+        <property name="singleResultOnAggregate" value="false"/>
      </bean>
+
+    <bean class="org.dspace.content.authority.ItemSimpleAuthorityMetadataGenerator">
+        <property name="authorityName" value="EditorAuthority"/>
+        <property name="relatedInputformMetadata" value="oairecerif_editor_affiliation"/>
+        <property name="schema" value="person"/>
+        <property name="element" value="affiliation"/>
+        <property name="qualifier" value="name"/>
+        <property name="singleResultOnAggregate" value="false"/>
+     </bean>
+
 </beans>
