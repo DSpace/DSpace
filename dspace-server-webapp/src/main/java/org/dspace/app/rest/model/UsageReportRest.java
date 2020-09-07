@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.dspace.app.rest.StatisticsRestController;
+import org.dspace.app.rest.RestResourceController;
 
 /**
  * This class serves as a REST representation of a Usage Report from the DSpace statistics
@@ -43,7 +43,7 @@ public class UsageReportRest extends BaseObjectRest<String> {
      */
     @Override
     public Class getController() {
-        return StatisticsRestController.class;
+        return RestResourceController.class;
     }
 
     /**
