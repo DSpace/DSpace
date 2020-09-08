@@ -172,18 +172,16 @@ public class ProcessRestRepository extends DSpaceRestRepository<ProcessRest, Int
         }
 
         Context context = obtainContext();
-        EPerson ePerson = epersonService.find(context, ePersonUuid);
-        if (ePersonUuid != null && ePerson == null) {
-            throw new DSpaceBadRequestException("No EPerson with the given UUID is found");
+        EPerson ePerson = null;
+        if (ePersonUuid != null) {
+            ePerson = epersonService.find(context, ePersonUuid);
+            if (ePerson == null) {
+                throw new DSpaceBadRequestException("No EPerson with the given UUID is found");
+            }
         }
 
         ProcessStatus processStatus = StringUtils.isBlank(processStatusString) ? null :
             ProcessStatus.valueOf(processStatusString);
-        if (processStatus != null && processStatus != ProcessStatus.RUNNING && processStatus != ProcessStatus.COMPLETED
-            && processStatus != ProcessStatus.FAILED) {
-            throw new DSpaceBadRequestException("The given ProcessStatus isn't within the accepted boundaries: "
-                                                    + processStatusString);
-        }
         ProcessQueryParameterContainer processQueryParameterContainer = createProcessQueryParameterContainer(scriptName,
                                                                             ePerson, processStatus);
         handleSearchSort(pageable, processQueryParameterContainer);
@@ -215,6 +213,8 @@ public class ProcessRestRepository extends DSpaceRestRepository<ProcessRest, Int
                 } else if (StringUtils.equalsIgnoreCase(order.getProperty(), "endTime")) {
                     processQueryParameterContainer.setSortProperty(Process_.FINISHED_TIME);
                     processQueryParameterContainer.setSortOrder(order.getDirection().name());
+                } else {
+                    throw new DSpaceBadRequestException("The given sort option was invalid: " + order.getProperty());
                 }
                 if (iterator.hasNext()) {
                     throw new DSpaceBadRequestException("Only one sort method is supported, can't give multiples");
