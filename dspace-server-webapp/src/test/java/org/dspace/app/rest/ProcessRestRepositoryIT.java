@@ -373,6 +373,36 @@ public class ProcessRestRepositoryIT extends AbstractControllerIntegrationTest {
                         )))
                         .andExpect(jsonPath("$.page", is(
                             PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 4))));
+
+        getClient(token).perform(get("/api/system/processes/search/byProperty")
+                                     .param("userId", eperson.getID().toString()))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$._embedded.processes", containsInAnyOrder(
+                            ProcessMatcher.matchProcess(newProcess.getName(),
+                                                        String.valueOf(eperson.getID().toString()),
+                                                        newProcess.getID(), parameters, ProcessStatus.SCHEDULED),
+                            ProcessMatcher.matchProcess(newProcess1.getName(),
+                                                        String.valueOf(eperson.getID().toString()),
+                                                        newProcess1.getID(), parameters, ProcessStatus.SCHEDULED),
+                            ProcessMatcher.matchProcess(newProcess2.getName(),
+                                                        String.valueOf(eperson.getID().toString()),
+                                                        newProcess2.getID(), parameters, ProcessStatus.SCHEDULED),
+                            ProcessMatcher.matchProcess(newProcess3.getName(),
+                                                        String.valueOf(eperson.getID().toString()),
+                                                        newProcess3.getID(), parameters, ProcessStatus.SCHEDULED),
+                            ProcessMatcher.matchProcess(newProcess4.getName(),
+                                                        String.valueOf(eperson.getID().toString()),
+                                                        newProcess4.getID(), parameters, ProcessStatus.SCHEDULED),
+                            ProcessMatcher.matchProcess(newProcess5.getName(),
+                                                        String.valueOf(eperson.getID().toString()),
+                                                        newProcess5.getID(), parameters, ProcessStatus.SCHEDULED),
+                            ProcessMatcher.matchProcess(newProcess6.getName(),
+                                                        String.valueOf(eperson.getID().toString()),
+                                                        newProcess6.getID(), parameters, ProcessStatus.SCHEDULED)
+
+                        )))
+                        .andExpect(jsonPath("$.page", is(
+                            PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 7))));
     }
 
     @Test
@@ -547,13 +577,14 @@ public class ProcessRestRepositoryIT extends AbstractControllerIntegrationTest {
                         .andExpect(status().isBadRequest());
     }
 
+
     @Test
-    public void searchProcessTestInvalidProcessStatusParamBadRequest() throws Exception {
+    public void searchProcessTestUnparseableProcessStatusParamBadRequest() throws Exception {
 
         String token = getAuthToken(admin.getEmail(), password);
 
         getClient(token).perform(get("/api/system/processes/search/byProperty")
-                                     .param("processStatus", "SCHEDULED"))
+                                     .param("processStatus", "not-a-valid-status"))
                         .andExpect(status().isBadRequest());
     }
 
@@ -717,8 +748,7 @@ public class ProcessRestRepositoryIT extends AbstractControllerIntegrationTest {
         String token = getAuthToken(admin.getEmail(), password);
 
         getClient(token).perform(get("/api/system/processes/search/byProperty")
-                                     .param("userId", eperson.getID().toString())
-                                     .param("sort", "startTime,desc"))
+                                     .param("userId", eperson.getID().toString()))
                         .andExpect(status().isOk())
                         .andExpect(jsonPath("$._embedded.processes", contains(
                             ProcessMatcher.matchProcess(newProcess3.getName(),
@@ -749,20 +779,7 @@ public class ProcessRestRepositoryIT extends AbstractControllerIntegrationTest {
         getClient(token).perform(get("/api/system/processes/search/byProperty")
                                      .param("userId", eperson.getID().toString())
                                      .param("sort", "eaz,desc"))
-                        .andExpect(status().isOk())
-                        .andExpect(jsonPath("$._embedded.processes", contains(
-                            ProcessMatcher.matchProcess(newProcess3.getName(),
-                                                        String.valueOf(eperson.getID().toString()),
-                                                        newProcess3.getID(), parameters, ProcessStatus.SCHEDULED),
-                            ProcessMatcher.matchProcess(newProcess2.getName(),
-                                                        String.valueOf(eperson.getID().toString()),
-                                                        newProcess2.getID(), parameters, ProcessStatus.SCHEDULED),
-                            ProcessMatcher.matchProcess(newProcess1.getName(),
-                                                        String.valueOf(eperson.getID().toString()),
-                                                        newProcess1.getID(), parameters, ProcessStatus.SCHEDULED)
-                        )))
-                        .andExpect(jsonPath("$.page", is(
-                            PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 3))));
+                        .andExpect(status().isBadRequest());
     }
 
     @After
