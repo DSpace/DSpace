@@ -34,6 +34,7 @@ import org.dspace.app.rest.security.DSpacePermissionEvaluator;
 import org.dspace.app.rest.security.WebSecurityExpressionEvaluator;
 import org.dspace.app.rest.utils.Utils;
 import org.dspace.services.RequestService;
+import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider;
@@ -51,6 +52,8 @@ import org.springframework.stereotype.Service;
 /**
  * Converts domain objects from the DSpace service layer to rest objects, and from rest objects to resource
  * objects, applying {@link Projection}s where applicable.
+ * 
+ * @author Luca Giamminonni (luca.giamminonni at 4science dot it)
  */
 @Service
 public class ConverterService {
@@ -149,12 +152,28 @@ public class ConverterService {
         DSpaceRestRepository repositoryToUse = utils
             .getResourceRepositoryByCategoryAndModel(baseObjectRest.getCategory(), baseObjectRest.getType());
         Annotation preAuthorize = null;
-        for (Method m : repositoryToUse.getClass().getMethods()) {
+        int maxDepth = 0;
+        // DS-4530 exclude the AOP Proxy from determining the annotations
+        for (Method m : AopUtils.getTargetClass(repositoryToUse).getMethods()) {
             if (StringUtils.equalsIgnoreCase(m.getName(), "findOne")) {
-                preAuthorize = AnnotationUtils.findAnnotation(m, PreAuthorize.class);
+                int depth = howManySuperclass(m.getDeclaringClass());
+                if (depth > maxDepth) {
+                    preAuthorize = AnnotationUtils.findAnnotation(m, PreAuthorize.class);
+                    maxDepth = depth;
+                }
             }
         }
         return preAuthorize;
+    }
+
+    private int howManySuperclass(Class<?> declaringClass) {
+        Class curr = declaringClass;
+        int count = 0;
+        while (curr != Object.class) {
+            curr = curr.getSuperclass();
+            count++;
+        }
+        return count;
     }
 
     private Annotation getDefaultFindOnePreAuthorize() {
