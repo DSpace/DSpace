@@ -190,7 +190,24 @@ public interface ProcessService {
      */
     public List<String> getFileTypesForProcessBitstreams(Context context, Process process);
 
+    /**
+     * This method will append the given output to the {@link Process} its logs
+     * @param processId     The ID of the {@link Process} to append the log for
+     * @param scriptName    The name of the Script that Process runs
+     * @param output        The output to append
+     * @param processLogLevel   The loglevel of the output
+     * @throws IOException  If something goes wrong
+     */
     void appendLog(int processId, String scriptName, String output, ProcessLogLevel processLogLevel) throws IOException;
+
+    /**
+     * This method will create a {@link Bitstream} containing the logs for the given {@link Process}
+     * @param context       The relevant DSpace context
+     * @param process       The {@link Process} for which we're making the {@link Bitstream}
+     * @throws IOException  If something goes wrong
+     * @throws SQLException If something goes wrong
+     * @throws AuthorizeException   If something goes wrong
+     */
     void createLogBitstream(Context context, Process process)
              throws IOException, SQLException, AuthorizeException;
 }

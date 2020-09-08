@@ -115,6 +115,10 @@ public class RestDSpaceRunnableHandler implements DSpaceRunnableHandler {
                               "error with the logging bitstream", e);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
+        } finally {
+            if (context.isValid()) {
+                context.abort();
+            }
         }
     }
 

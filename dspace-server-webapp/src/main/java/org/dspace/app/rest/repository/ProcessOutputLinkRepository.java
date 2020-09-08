@@ -25,6 +25,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
+/**
+ * This linkRepository will deal with calls to the /output endpoint of a given Process.
+ * It'll retrieve the output for the given Process and return this as a {@link BitstreamRest} object
+ */
 @Component(ProcessRest.CATEGORY + "." + ProcessRest.NAME + "." + ProcessRest.OUTPUT)
 public class ProcessOutputLinkRepository extends AbstractDSpaceRestRepository implements LinkRestRepository {
 
@@ -34,19 +38,18 @@ public class ProcessOutputLinkRepository extends AbstractDSpaceRestRepository im
     @Autowired
     private AuthorizeService authorizeService;
 
-    //    /**
-//     * This method will retrieve the list of {@link ProcessLog} objects from the {@link Process} as defined through
-//     the
-//     * given ID in the rest call and it'll wrap this in a {@link ProcessOutputRest} object to return these
-//     * @param request           The current request
-//     * @param processId         The given processId for the {@link Process}
-//     * @param optionalPageable  Pageable if applicable
-//     * @param projection        The current projection
-//     * @return                  The {@link ProcessOutputRest} containing the list of all {@link ProcessLog} for the
-//     *                          given {@link Process}
-//     * @throws SQLException         If something goes wrong
-//     * @throws AuthorizeException   If something goes wrong
-//     */
+    /**
+     * This method will retrieve the output for the {@link Process} as defined through the
+     * given ID in the rest call. This output is a {@link Bitstream} object that will be turned into a
+     * {@link BitstreamRest} object to be returned
+     * @param request           The current request
+     * @param processId         The given processId for the {@link Process}
+     * @param optionalPageable  Pageable if applicable
+     * @param projection        The current projection
+     * @return                  The {@link BitstreamRest} representing the output for the {@link Process}
+     * @throws SQLException         If something goes wrong
+     * @throws AuthorizeException   If something goes wrong
+     */
     @PreAuthorize("hasAuthority('ADMIN')")
     public BitstreamRest getOutputFromProcess(@Nullable HttpServletRequest request,
                                               Integer processId,
@@ -60,6 +63,9 @@ public class ProcessOutputLinkRepository extends AbstractDSpaceRestRepository im
             throw new AuthorizeException("The current user is not eligible to view the process with id: " + processId);
         }
         Bitstream bitstream = processService.getBitstream(context, process, Process.OUTPUT_TYPE);
+        if (bitstream == null) {
+            return null;
+        }
         return converter.toRest(bitstream, projection);
     }
 }

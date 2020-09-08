@@ -271,6 +271,7 @@ public class ProcessServiceImpl implements ProcessService {
         }
     }
 
+    @Override
     public void createLogBitstream(Context context, Process process)
             throws IOException, SQLException, AuthorizeException {
         File tmpDir = FileUtils.getTempDirectory();
