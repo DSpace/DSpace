@@ -17,4 +17,9 @@
         <property name="description" value="Export metadata for batch editing"/>
         <property name="dspaceRunnableClass" value="org.dspace.app.bulkedit.MetadataExport"/>
     </bean>
+
+    <bean id="curate" class="org.dspace.curate.CurationScriptConfiguration">
+        <property name="description" value="Curation tasks"/>
+        <property name="dspaceRunnableClass" value="org.dspace.curate.Curation"/>
+    </bean>
 </beans>

@@ -71,7 +71,7 @@ public class Query {
             return null;
         } else {
             Object o = c.iterator().next();
-            if (clazz.isAssignableFrom(o.getClass())) {
+            if (o != null && clazz.isAssignableFrom(o.getClass())) {
                 return (T) o;
             } else {
                 return null;
