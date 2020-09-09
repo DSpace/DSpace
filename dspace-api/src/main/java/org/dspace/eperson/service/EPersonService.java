@@ -7,12 +7,15 @@
  */
 package org.dspace.eperson.service;
 
+import static org.dspace.content.MetadataSchemaEnum.DC;
+
 import java.sql.SQLException;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.content.MetadataFieldName;
 import org.dspace.content.service.DSpaceObjectLegacySupportService;
 import org.dspace.content.service.DSpaceObjectService;
 import org.dspace.core.Context;
@@ -22,9 +25,10 @@ import org.dspace.eperson.PasswordHash;
 
 /**
  * Service interface class for the EPerson object.
- * The implementation of this class is responsible for all business logic calls for the EPerson object and is
- * autowired by spring
+ * The implementation of this class is responsible for all business logic calls
+ * for the EPerson object and is autowired by Spring.
  *
+ * <p>
  * Methods for handling registration by email and forgotten passwords. When
  * someone registers as a user, or forgets their password, the
  * sendRegistrationInfo or sendForgotPasswordInfo methods can be used to send an
@@ -33,13 +37,24 @@ import org.dspace.eperson.PasswordHash;
  * back to the system, the AccountManager can use the token to determine the
  * identity of the eperson.
  *
- * *NEW* now ignores expiration dates so that tokens never expire
+ * <p>
+ * *NEW* now ignores expiration dates so that tokens never expire.
  *
  * @author Peter Breton
  * @author kevinvandevelde at atmire.com
- * @version $Revision$
  */
 public interface EPersonService extends DSpaceObjectService<EPerson>, DSpaceObjectLegacySupportService<EPerson> {
+
+    // Common metadata fields which must be defined.
+
+    public static final MetadataFieldName MD_FIRSTNAME
+            = new MetadataFieldName(DC, "firstname");
+    public static final MetadataFieldName MD_LASTNAME
+            = new MetadataFieldName(DC, "lastname");
+    public static final MetadataFieldName MD_PHONE
+            = new MetadataFieldName(DC, "phone");
+    public static final MetadataFieldName MD_LANGUAGE
+            = new MetadataFieldName(DC, "language");
 
     /**
      * Find the eperson by their email address.
@@ -119,7 +134,8 @@ public interface EPersonService extends DSpaceObjectService<EPerson>, DSpaceObje
         throws SQLException;
 
     /**
-     * Find all the epeople in a specific order
+     * Find all the {@code EPerson}s in a specific order by field.
+     * The sortable fields are:
      * <ul>
      * <li><code>ID</code></li>
      * <li><code>LASTNAME</code></li>

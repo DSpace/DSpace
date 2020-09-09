@@ -650,30 +650,41 @@ public class StructBuilder {
             element.setAttribute("identifier", community.getHandle());
 
             Element nameElement = new Element("name");
-            nameElement.setText(communityService.getMetadata(community, "name"));
+            nameElement.setText(communityService.getMetadataFirstValue(
+                    community, CommunityService.MD_NAME, Item.ANY));
             element.addContent(nameElement);
 
-            if (communityService.getMetadata(community, "short_description") != null) {
+            String fieldValue;
+
+            fieldValue = communityService.getMetadataFirstValue(community,
+                    CommunityService.MD_SHORT_DESCRIPTION, Item.ANY);
+            if (fieldValue != null) {
                 Element descriptionElement = new Element("description");
-                descriptionElement.setText(communityService.getMetadata(community, "short_description"));
+                descriptionElement.setText(fieldValue);
                 element.addContent(descriptionElement);
             }
 
-            if (communityService.getMetadata(community, "introductory_text") != null) {
+            fieldValue = communityService.getMetadataFirstValue(community,
+                    CommunityService.MD_INTRODUCTORY_TEXT, Item.ANY);
+            if (fieldValue != null) {
                 Element introElement = new Element("intro");
-                introElement.setText(communityService.getMetadata(community, "introductory_text"));
+                introElement.setText(fieldValue);
                 element.addContent(introElement);
             }
 
-            if (communityService.getMetadata(community, "copyright_text") != null) {
+            fieldValue = communityService.getMetadataFirstValue(community,
+                    CommunityService.MD_COPYRIGHT_TEXT, Item.ANY);
+            if (fieldValue != null) {
                 Element copyrightElement = new Element("copyright");
-                copyrightElement.setText(communityService.getMetadata(community, "copyright_text"));
+                copyrightElement.setText(fieldValue);
                 element.addContent(copyrightElement);
             }
 
-            if (communityService.getMetadata(community, "side_bar_text") != null) {
+            fieldValue = communityService.getMetadataFirstValue(community,
+                    CommunityService.MD_SIDEBAR_TEXT, Item.ANY);
+            if (fieldValue != null) {
                 Element sidebarElement = new Element("sidebar");
-                sidebarElement.setText(communityService.getMetadata(community, "side_bar_text"));
+                sidebarElement.setText(fieldValue);
                 element.addContent(sidebarElement);
             }
 
@@ -733,42 +744,57 @@ public class StructBuilder {
             element.setAttribute("identifier", collection.getHandle());
 
             Element nameElement = new Element("name");
-            nameElement.setText(collectionService.getMetadata(collection, "name"));
+            nameElement.setText(collectionService.getMetadataFirstValue(collection,
+                    CollectionService.MD_NAME, Item.ANY));
             element.addContent(nameElement);
 
-            if (collectionService.getMetadata(collection, "short_description") != null) {
+            String fieldValue;
+
+            fieldValue = collectionService.getMetadataFirstValue(collection,
+                    CollectionService.MD_SHORT_DESCRIPTION, Item.ANY);
+            if (fieldValue != null) {
                 Element descriptionElement = new Element("description");
-                descriptionElement.setText(collectionService.getMetadata(collection, "short_description"));
+                descriptionElement.setText(fieldValue);
                 element.addContent(descriptionElement);
             }
 
-            if (collectionService.getMetadata(collection, "introductory_text") != null) {
+            fieldValue = collectionService.getMetadataFirstValue(collection,
+                    CollectionService.MD_INTRODUCTORY_TEXT, Item.ANY);
+            if (fieldValue != null) {
                 Element introElement = new Element("intro");
-                introElement.setText(collectionService.getMetadata(collection, "introductory_text"));
+                introElement.setText(fieldValue);
                 element.addContent(introElement);
             }
 
-            if (collectionService.getMetadata(collection, "copyright_text") != null) {
+            fieldValue = collectionService.getMetadataFirstValue(collection,
+                    CollectionService.MD_COPYRIGHT_TEXT, Item.ANY);
+            if (fieldValue != null) {
                 Element copyrightElement = new Element("copyright");
-                copyrightElement.setText(collectionService.getMetadata(collection, "copyright_text"));
+                copyrightElement.setText(fieldValue);
                 element.addContent(copyrightElement);
             }
 
-            if (collectionService.getMetadata(collection, "side_bar_text") != null) {
+            fieldValue = collectionService.getMetadataFirstValue(collection,
+                    CollectionService.MD_SIDEBAR_TEXT, Item.ANY);
+            if (fieldValue != null) {
                 Element sidebarElement = new Element("sidebar");
-                sidebarElement.setText(collectionService.getMetadata(collection, "side_bar_text"));
+                sidebarElement.setText(fieldValue);
                 element.addContent(sidebarElement);
             }
 
-            if (collectionService.getMetadata(collection, "license") != null) {
+            fieldValue = collectionService.getMetadataFirstValue(collection,
+                    CollectionService.MD_LICENSE, Item.ANY);
+            if (fieldValue != null) {
                 Element sidebarElement = new Element("license");
-                sidebarElement.setText(collectionService.getMetadata(collection, "license"));
+                sidebarElement.setText(fieldValue);
                 element.addContent(sidebarElement);
             }
 
-            if (collectionService.getMetadata(collection, "provenance_description") != null) {
+            fieldValue = collectionService.getMetadataFirstValue(collection,
+                    CollectionService.MD_PROVENANCE_DESCRIPTION, Item.ANY);
+            if (fieldValue != null) {
                 Element sidebarElement = new Element("provenance");
-                sidebarElement.setText(collectionService.getMetadata(collection, "provenance_description"));
+                sidebarElement.setText(fieldValue);
                 element.addContent(sidebarElement);
             }
 

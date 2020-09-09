@@ -13,6 +13,7 @@ import java.util.Map;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.content.DSpaceObject;
+import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
 import org.dspace.services.ConfigurationService;
@@ -75,7 +76,8 @@ public class CollectionCollectionGenerator extends ATOMCollectionGenerator {
         String location = urlManager.getDepositLocation(col);
 
         // collection title is just its name
-        String title = collectionService.getMetadata(col, "name");
+        String title = collectionService.getMetadataFirstValue(col,
+                CollectionService.MD_NAME, Item.ANY);
 
         // the collection policy is the licence to which the collection adheres
         String collectionPolicy = collectionService.getLicense(col);
@@ -84,8 +86,8 @@ public class CollectionCollectionGenerator extends ATOMCollectionGenerator {
         // String treatment = " ";
 
         // abstract is the short description of the collection
-        String dcAbstract = collectionService
-            .getMetadata(col, "short_description");
+        String dcAbstract = collectionService.getMetadataFirstValue(col,
+                CollectionService.MD_SHORT_DESCRIPTION, Item.ANY);
 
         // we just do support mediation
         boolean mediation = swordConfig.isMediated();
