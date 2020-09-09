@@ -194,6 +194,7 @@ public class ResearcherProfileServiceImpl implements ResearcherProfileService {
 
         WorkspaceItem workspaceItem = workspaceItemService.create(context, collection, false);
         Item item = workspaceItem.getItem();
+        itemService.addMetadata(context, item, "dc", "title", null, null, ePerson.getFullName());
         itemService.addMetadata(context, item, "cris", "sourceId", null, null, id);
         itemService.addMetadata(context, item, "cris", "owner", null, null, ePerson.getFullName(), id, CF_ACCEPTED);
 

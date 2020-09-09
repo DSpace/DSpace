@@ -32,7 +32,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
 /**
- * Rest controller that handles redirect after ORCID authentication succeded
+ * Rest controller that store ORCID infos and handles redirect.
  *
  * @author Luca Giamminonni (luca.giamminonni at 4science.it)
  */

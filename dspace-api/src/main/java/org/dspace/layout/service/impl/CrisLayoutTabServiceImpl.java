@@ -30,7 +30,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Implementation of service to manage Tabs component of layout
- * 
+ *
  * @author Danilo Di Nuzzo (danilo.dinuzzo at 4science.it)
  *
  */
@@ -183,7 +183,7 @@ public class CrisLayoutTabServiceImpl implements CrisLayoutTabService {
                     List<CrisLayoutTab2Box> tab2box = tab.getTab2Box();
                     if (tab2box != null && !tab2box.isEmpty()) {
                         for (CrisLayoutTab2Box t2b: tab2box) {
-                            if (boxService.hasContent(t2b.getBox(), itemMetadata)) {
+                            if (boxService.hasContent(context, t2b.getBox(), itemMetadata)) {
                                 resTabs.add(tab);
                                 break;
                             }

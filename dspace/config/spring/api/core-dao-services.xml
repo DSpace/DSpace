@@ -76,5 +76,8 @@
     <bean class="org.dspace.layout.dao.impl.CrisLayoutTabDAOImpl" />
     <bean class="org.dspace.layout.dao.impl.CrisLayoutBoxDAOImpl" />
     <bean class="org.dspace.layout.dao.impl.CrisLayoutFieldDAOImpl" />
+    
+    <!-- Orcid DAO -->
+    <bean class="org.dspace.app.orcid.dao.OrcidQueueDAOImpl" />
 
 </beans>

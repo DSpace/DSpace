@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.EntityType;
@@ -32,7 +33,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Implementation of service to manage Boxes component of layout
- * 
+ *
  * @author Danilo Di Nuzzo (danilo.dinuzzo at 4science.it)
  *
  */
@@ -177,9 +178,9 @@ public class CrisLayoutBoxServiceImpl implements CrisLayoutBoxService {
         List<CrisLayoutBox> resBoxes = new ArrayList<>();
         if (boxes != null && !boxes.isEmpty()) {
             List<MetadataValue> itemMetadata = item.getMetadata();
-            if ( itemMetadata != null && !itemMetadata.isEmpty() ) {
+            if (itemMetadata != null && !itemMetadata.isEmpty()) {
                 for (CrisLayoutBox box: boxes) {
-                    if (hasContent(box, itemMetadata) ) {
+                    if (hasContent(context, box, itemMetadata)) {
                         resBoxes.add(box);
                     }
                 }
@@ -201,33 +202,74 @@ public class CrisLayoutBoxServiceImpl implements CrisLayoutBoxService {
      * @see org.dspace.layout.service.CrisLayoutBoxService#hasContent()
      */
     @Override
-    public boolean hasContent(CrisLayoutBox box, List<MetadataValue> values) {
-        boolean found = false;
-        List<CrisLayoutField> boxFields = box.getLayoutFields();
-        // Check if the box type is relation
-        boolean isRelationBox = box.getType() != null ?
-                box.getType().equalsIgnoreCase("relation") : false;
-        if (isRelationBox) {
-            // The relation box has no associated content
-            found = true;
-        } else if ( boxFields != null && !boxFields.isEmpty() ) {
-            for (MetadataValue value: values) {
-                for (CrisLayoutField field: boxFields) {
-                    if (value.getMetadataField().equals(field.getMetadataField())) {
-                        found = true;
-                        break;
-                    }
-                }
-                if (found) {
-                    break;
-                }
-            }
+    public boolean hasContent(Context context, CrisLayoutBox box, List<MetadataValue> values) {
+        String boxType = box.getType();
+        if (StringUtils.isEmpty(boxType)) {
+            return hasMetadataBoxContent(box, values);
         }
-        return found;
+
+        switch (boxType.toUpperCase()) {
+            case "RELATION":
+                return hasRelationBoxContent(box, values);
+            case "ORCID_SYNC_SETTINGS":
+            case "ORCID_SYNC_QUEUE":
+                return hasOrcidSyncBoxContent(context, box, values);
+            case "ORCID_AUTHORIZATIONS":
+                return hasOrcidAuthorizationsBoxContent(context, box, values);
+            case "METADATA":
+            default:
+                return hasMetadataBoxContent(box, values);
+        }
+
     }
 
     @Override
     public CrisLayoutBoxConfiguration getConfiguration(Context context, CrisLayoutBox box) {
         return new CrisLayoutBoxConfiguration(box);
+    }
+
+    private boolean hasMetadataBoxContent(CrisLayoutBox box, List<MetadataValue> values) {
+        List<CrisLayoutField> boxFields = box.getLayoutFields();
+        if (boxFields == null || boxFields.isEmpty()) {
+            return false;
+        }
+
+        for (MetadataValue value : values) {
+            for (CrisLayoutField field : boxFields) {
+                if (value.getMetadataField().equals(field.getMetadataField())) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    private boolean hasRelationBoxContent(CrisLayoutBox box, List<MetadataValue> values) {
+        // The relation box has no associated content
+        return true;
+    }
+
+    private boolean hasOrcidSyncBoxContent(Context context, CrisLayoutBox box, List<MetadataValue> values) {
+        return isOwnProfile(context, values) && values.stream()
+            .map(metadata -> metadata.getMetadataField().toString('.'))
+            .anyMatch(metadata -> metadata.equals("person.identifier.orcid"));
+    }
+
+    private boolean hasOrcidAuthorizationsBoxContent(Context context, CrisLayoutBox box, List<MetadataValue> values) {
+        return isOwnProfile(context, values);
+    }
+
+    private boolean isOwnProfile(Context context, List<MetadataValue> values) {
+        MetadataValue crisOwner = values.stream()
+            .filter(metadata -> metadata.getMetadataField().toString('.').equals("cris.owner"))
+            .findFirst()
+            .orElse(null);
+
+        if (crisOwner == null || crisOwner.getAuthority() == null || context.getCurrentUser() == null) {
+            return false;
+        }
+
+        return crisOwner.getAuthority().equals(context.getCurrentUser().getID().toString());
     }
 }

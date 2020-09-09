@@ -98,6 +98,8 @@
         <mapping class="org.dspace.layout.CrisLayoutFieldMetadata" />
         <mapping class="org.dspace.layout.CrisLayoutFieldBitstream" />
         <mapping class="org.dspace.layout.CrisLayoutTab2Box" />
+        
+        <mapping class="org.dspace.app.orcid.OrcidQueue" />
 
     </session-factory>
 </hibernate-configuration>

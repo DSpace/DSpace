@@ -153,11 +153,13 @@ public interface CrisLayoutBoxService extends DSpaceCRUDService<CrisLayoutBox> {
 
     /**
      * Check if the box has content to show
-     * @param box CrisLayoutBox instance
-     * @param values metadataValue of item
+     * 
+     * @param context The relevant DSpace Context
+     * @param box     CrisLayoutBox instance
+     * @param values  metadataValue of item
      * @return true if the box has content to show, false otherwise
      */
-    public boolean hasContent(CrisLayoutBox box, List<MetadataValue> values);
+    public boolean hasContent(Context context, CrisLayoutBox box, List<MetadataValue> values);
 
     /**
      * Retrieve the configuration details of a specific box. By default the
