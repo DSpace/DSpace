@@ -12,6 +12,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import javax.annotation.Nonnull;
 import javax.persistence.Cacheable;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -207,10 +208,17 @@ public class Collection extends DSpaceObject implements DSpaceObjectLegacySuppor
      * Get the license that users must grant before submitting to this
      * collection.
      *
-     * @return the license for this collection
+     * @return the license for this collection. Never null.
      */
+    @Nonnull
     public String getLicenseCollection() {
-        return getCollectionService().getMetadata(this, "license");
+        String license = getCollectionService()
+                .getMetadataFirstValue(this, CollectionService.MD_LICENSE, Item.ANY);
+        if (null == license) {
+            return "";
+        } else {
+            return license;
+        }
     }
 
     /**

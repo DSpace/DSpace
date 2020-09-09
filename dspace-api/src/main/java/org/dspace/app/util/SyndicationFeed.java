@@ -205,7 +205,8 @@ public class SyndicationFeed {
             if (dso instanceof IndexableCollection) {
                 Collection col = ((IndexableCollection) dso).getIndexedObject();
                 defaultTitle = col.getName();
-                feed.setDescription(collectionService.getMetadata(col, "short_description"));
+                feed.setDescription(collectionService.getMetadataFirstValue(col,
+                        CollectionService.MD_SHORT_DESCRIPTION, Item.ANY));
                 logo = col.getLogo();
                 String cols = configurationService.getProperty("webui.feed.podcast.collections");
                 if (cols != null && cols.length() > 1 && cols.contains(col.getHandle())) {
@@ -215,7 +216,8 @@ public class SyndicationFeed {
             } else if (dso instanceof IndexableCommunity) {
                 Community comm = ((IndexableCommunity) dso).getIndexedObject();
                 defaultTitle = comm.getName();
-                feed.setDescription(communityService.getMetadata(comm, "short_description"));
+                feed.setDescription(communityService.getMetadataFirstValue(comm,
+                        CommunityService.MD_SHORT_DESCRIPTION, Item.ANY));
                 logo = comm.getLogo();
                 String comms = configurationService.getProperty("webui.feed.podcast.communities");
                 if (comms != null && comms.length() > 1 && comms.contains(comm.getHandle())) {

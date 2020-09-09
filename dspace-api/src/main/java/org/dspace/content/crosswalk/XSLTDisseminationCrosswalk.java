@@ -343,14 +343,21 @@ public class XSLTDisseminationCrosswalk
             if (dso.getType() == Constants.COLLECTION) {
                 Collection collection = (Collection) dso;
 
-                String description = collectionService.getMetadata(collection, "introductory_text");
-                String description_abstract = collectionService.getMetadata(collection, "short_description");
-                String description_table = collectionService.getMetadata(collection, "side_bar_text");
+                String description = collectionService.getMetadataFirstValue(collection,
+                        CollectionService.MD_INTRODUCTORY_TEXT, Item.ANY);
+                String description_abstract = collectionService.getMetadataFirstValue(collection,
+                        CollectionService.MD_SHORT_DESCRIPTION, Item.ANY);
+                String description_table = collectionService.getMetadataFirstValue(collection,
+                        CollectionService.MD_SIDEBAR_TEXT, Item.ANY);
                 String identifier_uri = "hdl:" + collection.getHandle();
-                String provenance = collectionService.getMetadata(collection, "provenance_description");
-                String rights = collectionService.getMetadata(collection, "copyright_text");
-                String rights_license = collectionService.getMetadata(collection, "license");
-                String title = collectionService.getMetadata(collection, "name");
+                String provenance = collectionService.getMetadataFirstValue(collection,
+                        CollectionService.MD_PROVENANCE_DESCRIPTION, Item.ANY);
+                String rights = collectionService.getMetadataFirstValue(collection,
+                        CollectionService.MD_COPYRIGHT_TEXT, Item.ANY);
+                String rights_license = collectionService.getMetadataFirstValue(collection,
+                        CollectionService.MD_LICENSE, Item.ANY);
+                String title = collectionService.getMetadataFirstValue(collection,
+                        CollectionService.MD_NAME, Item.ANY);
 
                 dim.addContent(createField("dc", "description", null, null, description));
                 dim.addContent(createField("dc", "description", "abstract", null, description_abstract));
@@ -363,12 +370,17 @@ public class XSLTDisseminationCrosswalk
             } else if (dso.getType() == Constants.COMMUNITY) {
                 Community community = (Community) dso;
 
-                String description = communityService.getMetadata(community, "introductory_text");
-                String description_abstract = communityService.getMetadata(community, "short_description");
-                String description_table = communityService.getMetadata(community, "side_bar_text");
+                String description = communityService.getMetadataFirstValue(community,
+                        CommunityService.MD_INTRODUCTORY_TEXT, Item.ANY);
+                String description_abstract = communityService.getMetadataFirstValue(community,
+                        CommunityService.MD_SHORT_DESCRIPTION, Item.ANY);
+                String description_table = communityService.getMetadataFirstValue(community,
+                        CommunityService.MD_SIDEBAR_TEXT, Item.ANY);
                 String identifier_uri = "hdl:" + community.getHandle();
-                String rights = communityService.getMetadata(community, "copyright_text");
-                String title = communityService.getMetadata(community, "name");
+                String rights = communityService.getMetadataFirstValue(community,
+                        CommunityService.MD_COPYRIGHT_TEXT, Item.ANY);
+                String title = communityService.getMetadataFirstValue(community,
+                        CommunityService.MD_NAME, Item.ANY);
 
                 dim.addContent(createField("dc", "description", null, null, description));
                 dim.addContent(createField("dc", "description", "abstract", null, description_abstract));

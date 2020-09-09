@@ -18,6 +18,7 @@ import java.util.UUID;
 
 import org.apache.solr.common.SolrInputDocument;
 import org.dspace.content.Community;
+import org.dspace.content.Item;
 import org.dspace.content.service.CommunityService;
 import org.dspace.core.Context;
 import org.dspace.discovery.SearchUtils;
@@ -71,7 +72,7 @@ public class CommunityIndexFactoryImpl extends DSpaceObjectIndexFactoryImpl<Inde
         DiscoveryConfiguration discoveryConfiguration = SearchUtils.getDiscoveryConfiguration(community);
         DiscoveryHitHighlightingConfiguration highlightingConfiguration = discoveryConfiguration
             .getHitHighlightingConfiguration();
-        List<String> highlightedMetadataFields = new ArrayList<String>();
+        List<String> highlightedMetadataFields = new ArrayList<>();
         if (highlightingConfiguration != null) {
             for (DiscoveryHitHighlightFieldConfiguration configuration : highlightingConfiguration
                 .getMetadataFields()) {
@@ -80,11 +81,16 @@ public class CommunityIndexFactoryImpl extends DSpaceObjectIndexFactoryImpl<Inde
         }
 
         // Add community metadata
-        String description = communityService.getMetadata(community, "introductory_text");
-        String description_abstract = communityService.getMetadata(community, "short_description");
-        String description_table = communityService.getMetadata(community, "side_bar_text");
-        String rights = communityService.getMetadata(community, "copyright_text");
-        String title = communityService.getMetadata(community, "name");
+        String description = communityService.getMetadataFirstValue(community,
+                CommunityService.MD_INTRODUCTORY_TEXT, Item.ANY);
+        String description_abstract = communityService.getMetadataFirstValue(community,
+                CommunityService.MD_SHORT_DESCRIPTION, Item.ANY);
+        String description_table = communityService.getMetadataFirstValue(community,
+                CommunityService.MD_SIDEBAR_TEXT, Item.ANY);
+        String rights = communityService.getMetadataFirstValue(community,
+                CommunityService.MD_COPYRIGHT_TEXT, Item.ANY);
+        String title = communityService.getMetadataFirstValue(community,
+                CommunityService.MD_NAME, Item.ANY);
 
         List<String> toIgnoreMetadataFields = SearchUtils.getIgnoredMetadataFields(community.getType());
         addContainerMetadataField(doc, highlightedMetadataFields, toIgnoreMetadataFields, "dc.description",

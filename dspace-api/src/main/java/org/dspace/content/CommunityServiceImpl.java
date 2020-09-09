@@ -51,7 +51,7 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
     /**
      * log4j category
      */
-    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(CommunityServiceImpl.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(CommunityServiceImpl.class);
 
     @Autowired(required = true)
     protected CommunityDAO communityDAO;
@@ -172,13 +172,6 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
         }
 
         return communityDAO.findAllNoParent(context, sortField);
-    }
-
-    @Override
-    public String getMetadata(Community community, String field) {
-        String[] MDValue = getMDValueByLegacyField(field);
-        String value = getMetadataFirstValue(community, MDValue[0], MDValue[1], MDValue[2], Item.ANY);
-        return value == null ? "" : value;
     }
 
     @Override
@@ -310,7 +303,7 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
 
     @Override
     public List<Community> getAllParents(Context context, Community community) throws SQLException {
-        List<Community> parentList = new ArrayList<Community>();
+        List<Community> parentList = new ArrayList<>();
         Community parent = (Community) getParentObject(context, community);
         while (parent != null) {
             parentList.add(parent);
@@ -332,7 +325,7 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
 
     @Override
     public List<Collection> getAllCollections(Context context, Community community) throws SQLException {
-        List<Collection> collectionList = new ArrayList<Collection>();
+        List<Collection> collectionList = new ArrayList<>();
         List<Community> subCommunities = community.getSubcommunities();
         for (Community subCommunity : subCommunities) {
             addCollectionList(subCommunity, collectionList);
