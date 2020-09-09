@@ -40,4 +40,20 @@ public abstract class IndexableDSpaceObject<T extends DSpaceObject> implements I
     public UUID getID() {
         return dso.getID();
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        //Two IndexableObjects of the same DSpaceObject are considered equal
+        if (!(obj instanceof IndexableDSpaceObject)) {
+            return false;
+        }
+        IndexableDSpaceObject other = (IndexableDSpaceObject) obj;
+        return other.getIndexedObject().equals(getIndexedObject());
+    }
+
+    @Override
+    public int hashCode() {
+        //Two IndexableObjects of the same DSpaceObject are considered equal
+        return getIndexedObject().hashCode();
+    }
 }
