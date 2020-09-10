@@ -18,10 +18,10 @@ import java.util.StringTokenizer;
 import javax.mail.MessagingException;
 
 import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.apache.commons.cli.PosixParser;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -149,7 +149,7 @@ public class Report {
 
         CommandLine cmdline = null;
         try {
-            cmdline = new PosixParser().parse(options, args);
+            cmdline = new DefaultParser().parse(options, args);
         } catch (ParseException e) {
             log.fatal("Invalid command line " + e.toString(), e);
             System.exit(1);
