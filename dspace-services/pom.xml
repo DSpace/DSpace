@@ -9,7 +9,7 @@
     <parent>
         <groupId>org.dspace</groupId>
         <artifactId>dspace-parent</artifactId>
-        <version>7.0-beta3-SNAPSHOT</version>
+        <version>7.0-beta4-SNAPSHOT</version>
     </parent>
 
     <properties>
@@ -25,7 +25,7 @@
             <activation>
                 <activeByDefault>false</activeByDefault>
                 <property>
-                    <name>maven.test.skip</name>
+                    <name>skipTests</name>
                     <value>false</value>
                 </property>
             </activation>
