@@ -7,6 +7,9 @@
  */
 package org.dspace.discovery;
 
+import static java.util.Collections.singletonList;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -31,7 +34,7 @@ public class DiscoverQuery {
      **/
     private String query;
     private List<String> filterQueries;
-    private String DSpaceObjectFilter = null;
+    private List<String> dspaceObjectFilters = new ArrayList<>();
     private List<String> fieldPresentQueries;
     private boolean spellCheck;
 
@@ -118,20 +121,33 @@ public class DiscoverQuery {
      * Sets the DSpace object filter, must be an DSpace Object type integer
      * can be used to only return objects from a certain DSpace Object type
      *
-     * @param DSpaceObjectFilter the DSpace object filer
+     * @param dspaceObjectFilter the DSpace object filter
      */
-    public void setDSpaceObjectFilter(String DSpaceObjectFilter) {
-        this.DSpaceObjectFilter = DSpaceObjectFilter;
+    public void setDSpaceObjectFilter(String dspaceObjectFilter) {
+        this.dspaceObjectFilters = singletonList(dspaceObjectFilter);
     }
 
     /**
-     * Gets the DSpace object filter
-     * can be used to only return objects from a certain DSpace Object type
+     * Adds a DSpace object filter, must be an DSpace Object type integer.
+     * Can be used to also return objects from a certain DSpace Object type.
      *
-     * @return the DSpace object filer
+     * @param dspaceObjectFilter the DSpace object filer
      */
-    public String getDSpaceObjectFilter() {
-        return DSpaceObjectFilter;
+    public void addDSpaceObjectFilter(String dspaceObjectFilter) {
+
+        if (isNotBlank(dspaceObjectFilter)) {
+            this.dspaceObjectFilters.add(dspaceObjectFilter);
+        }
+    }
+
+    /**
+     * Gets the DSpace object filters
+     * can be used to only return objects from certain DSpace Object types
+     *
+     * @return the DSpace object filters
+     */
+    public List<String> getDSpaceObjectFilters() {
+        return dspaceObjectFilters;
     }
 
     /**

@@ -18,6 +18,7 @@
     <!-- for handle "default". -->
     <submission-map>
         <name-map collection-handle="default" submission-name="traditional"/>
+        <name-map collection-handle="123456789/language-test-1" submission-name="languagetestprocess"/>
     </submission-map>
 
 
@@ -82,9 +83,9 @@
         <!--Step will be to select a Creative Commons License -->
         <!-- Uncomment this step to allow the user to select a Creative Commons
             license -->
-        <!-- <step id="creative-commons"> <heading>submit.progressbar.CClicense</heading>
-            <processing-class>org.dspace.submit.step.CCLicenseStep</processing-class>
-            <type>cclicense</type> </step> -->
+         <step id="cclicense"> <heading>submit.progressbar.CClicense</heading>
+            <processing-class>org.dspace.app.rest.submit.step.CCLicenseStep</processing-class>
+            <type>cclicense</type> </step>
 
         <!--Step will be to Check for potential duplicate -->
         <!-- <step id="detect-duplicate"> <heading>submit.progressbar.detect.duplicate</heading>
@@ -107,6 +108,12 @@
             <heading>Sample</heading>
             <processing-class>org.dspace.submit.step.SampleStep</processing-class>
             <type>sample</type>
+        </step>
+
+        <step id="languagetest" mandatory="true">
+            <heading>submit.progressbar.describe.stepone</heading>
+            <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
+            <type>submission-form</type>
         </step>
     </step-definitions>
 
@@ -145,10 +152,14 @@
 
             <!--Step will be to Sign off on the License -->
             <step id="license"/>
-            <!-- <step id="creative-commons"/> -->
+            <step id="cclicense"/>
             <!-- <step id="verify"/> -->
         </submission-process>
 
+        <submission-process name="languagetestprocess">
+            <step id="collection"/>
+            <step id="languagetest"/>
+        </submission-process>
     </submission-definitions>
 
 </item-submission>
