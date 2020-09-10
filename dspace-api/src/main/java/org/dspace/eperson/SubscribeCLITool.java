@@ -21,10 +21,10 @@ import java.util.TimeZone;
 import javax.mail.MessagingException;
 
 import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
-import org.apache.commons.cli.PosixParser;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.content.Collection;
@@ -305,7 +305,7 @@ public class SubscribeCLITool {
         }
 
         try {
-            line = new PosixParser().parse(options, argv);
+            line = new DefaultParser().parse(options, argv);
         } catch (org.apache.commons.cli.ParseException e) {
             // automatically generate the help statement
             formatter.printHelp(usage, e.getMessage(), options, "");
