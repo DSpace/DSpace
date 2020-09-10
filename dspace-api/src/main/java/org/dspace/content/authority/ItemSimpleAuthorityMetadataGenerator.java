@@ -84,10 +84,12 @@ public class ItemSimpleAuthorityMetadataGenerator implements ItemAuthorityExtraM
     }
 
     protected void buildSingleExtraByMetadata(MetadataValue metadataValue, Map<String, String> extras) {
-        if (metadataValue != null) {
+        if (metadataValue == null) {
+            extras.put("data-" + getRelatedInputformMetadata(), "");
+        } else {
             if (StringUtils.isNotBlank(metadataValue.getAuthority())) {
                 extras.put("data-" + getRelatedInputformMetadata(),
-                                          metadataValue.getValue() + "::" + metadataValue.getAuthority());
+                        metadataValue.getValue() + "::" + metadataValue.getAuthority());
             } else {
                 extras.put("data-" + getRelatedInputformMetadata(), metadataValue.getValue());
             }
