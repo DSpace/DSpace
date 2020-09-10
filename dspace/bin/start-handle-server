@@ -37,7 +37,7 @@ if [ "$JAVA_OPTS" = "" ]; then
 fi
 
 # Remove lock file, in case the old Handle server did not shut down properly
-rm -f $handledir/txns/lock
+rm -f $HANDLEDIR/txns/lock
 
 # Start the Handle server, with a special log4j properties file.
 # We cannot simply write to the same logs, since log4j
