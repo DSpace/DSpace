@@ -91,7 +91,13 @@ public class ItemConverter
         String entityType = itemService.getMetadataFirstValue(obj, MetadataSchemaEnum.RELATIONSHIP.getName(),
                 "type", null, Item.ANY);
         try {
-            List<CrisLayoutBox> boxes = crisLayoutBoxService.findEntityBoxes(context, entityType, 1000, 0);
+            List<CrisLayoutBox> boxes;
+            if (context != null) {
+                boxes = crisLayoutBoxService.findEntityBoxes(context, entityType, 1000, 0);
+            } else {
+                // the context could be null if the converter is used to prepare test data or in a batch script
+                boxes = new ArrayList<CrisLayoutBox>();
+            }
             for (MetadataValue metadataValue : fullList) {
                 MetadataField metadataField = metadataValue.getMetadataField();
                 if (checkMetadataFieldVisibility(context, boxes, obj, metadataField)) {

@@ -225,8 +225,8 @@ public class CrisConsumerIT extends AbstractControllerIntegrationTest {
         MetadataValueRest relationshipType = findSingleMetadata(relatedItem, "relationship.type");
         assertThat("The relationship.type should be Person", relationshipType.getValue(), equalTo("Person"));
 
-        MetadataValueRest affiliation = findSingleMetadata(relatedItem, "crisrp.dept");
-        assertThat("The crisrp.dept should be 4Science", affiliation.getValue(), equalTo("4Science"));
+        MetadataValueRest affiliation = findSingleMetadata(relatedItem, "person.affiliation.name");
+        assertThat("The person.affiliation.name should be 4Science", affiliation.getValue(), equalTo("4Science"));
 
         // verify that the authors collections is the Person collection
         CollectionRest collection = getOwnCollectionViaRestByItemId(authToken, UUID.fromString(relatedItem.getId()));
@@ -349,8 +349,8 @@ public class CrisConsumerIT extends AbstractControllerIntegrationTest {
         // search the related author item
         ItemRest authorItem = getItemViaRestByID(authToken, UUID.fromString(firstAuthorAuthority));
 
-        String affiliation = findSingleMetadata(authorItem, "crisrp.dept").getValue();
-        assertThat("The crisrp.dept should be 4Science", affiliation, equalTo("4Science"));
+        String affiliation = findSingleMetadata(authorItem, "person.affiliation.name").getValue();
+        assertThat("The person.affiliation.name should be 4Science", affiliation, equalTo("4Science"));
 
         // verify that the project collections is the Project collection
         CollectionRest firstCol = getOwnCollectionViaRestByItemId(authToken, fromString(firstProjectAuthority));
@@ -658,8 +658,8 @@ public class CrisConsumerIT extends AbstractControllerIntegrationTest {
             assertThat("The relationship.type should be Person", relationshipType.getValue(), equalTo("Person"));
 
             String expectedAffiliation = author.getPlace() == 0 ? "4Science" : "My org";
-            MetadataValueRest affiliation = findSingleMetadata(relatedItem, "crisrp.dept");
-            assertThat("The crisrp.dept should be " + expectedAffiliation, affiliation.getValue(),
+            MetadataValueRest affiliation = findSingleMetadata(relatedItem, "person.affiliation.name");
+            assertThat("The person.affiliation.name should be " + expectedAffiliation, affiliation.getValue(),
                     equalTo(expectedAffiliation));
 
         }
@@ -702,6 +702,7 @@ public class CrisConsumerIT extends AbstractControllerIntegrationTest {
         return CollectionBuilder.createCollection(context, community)
                 .withName(name)
                 .withRelationshipType(relationshipType)
+                .withSubmissionDefinition("traditional")
                 .withSubmitterGroup(submitter)
                 .build();
     }
