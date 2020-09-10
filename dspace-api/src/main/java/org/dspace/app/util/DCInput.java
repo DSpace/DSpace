@@ -12,14 +12,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
+import javax.annotation.Nullable;
 
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.content.MetadataSchemaEnum;
 import org.dspace.core.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.annotation.Nullable;
 
 /**
  * Class representing a line in an input form.
