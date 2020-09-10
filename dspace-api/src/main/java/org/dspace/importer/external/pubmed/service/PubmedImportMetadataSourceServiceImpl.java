@@ -44,6 +44,7 @@ import org.jaxen.JaxenException;
  * Implements a data source for querying PubMed Central
  *
  * @author Roeland Dillen (roeland at atmire dot com)
+ * @author Pasquale Cavallo (pasquale.cavallo at 4science dot it)
  */
 public class PubmedImportMetadataSourceServiceImpl extends AbstractImportMetadataSourceService<OMElement>
     implements QuerySource, FileSource {
