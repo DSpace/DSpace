@@ -97,7 +97,8 @@ public class EPersonPasswordReplaceOperation<R> extends PatchOperation<R> {
      * @param ePerson   Object on which patch is being performed
      */
     private void checkModelForExistingValue(EPerson ePerson) {
-//FIXME restore once the add operation is implemented otherwise it will be impossible to set the password for user created by administrators
+//FIXME restore once the add operation is implemented otherwise it will be impossible
+//to set the password for user created by administrators
 //        if (ePersonService.getPasswordHash(ePerson) == null
 //                || ePersonService.getPasswordHash(ePerson).getHash() == null) {
 //            throw new DSpaceBadRequestException("Attempting to replace a non-existent value (password).");
