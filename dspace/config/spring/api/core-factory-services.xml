@@ -55,4 +55,6 @@
 	<!-- Imp factory -->
 	<bean id="impServiceFactory" class="org.dspace.batch.factory.ImpServiceFactoryImpl"/>
 
+	<bean id="orcidQueueServiceFactory" class="org.dspace.app.orcid.factory.OrcidQueueServiceFactoryImpl"/>
+
 </beans>

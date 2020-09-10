@@ -14,6 +14,7 @@ import java.util.UUID;
 import org.dspace.app.orcid.OrcidQueue;
 import org.dspace.app.orcid.dao.OrcidQueueDAO;
 import org.dspace.app.orcid.service.OrcidQueueService;
+import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -41,6 +42,43 @@ public class OrcidQueueServiceImpl implements OrcidQueueService {
     @Override
     public long countByOwnerId(Context context, UUID ownerId) throws SQLException {
         return dao.countByOwnerId(context, ownerId);
+    }
+
+    @Override
+    public OrcidQueue create(Context context, Item owner, Item entity) throws SQLException {
+        OrcidQueue orcidQueue = new OrcidQueue();
+        orcidQueue.setEntity(entity);
+        orcidQueue.setOwner(owner);
+        return dao.create(context, orcidQueue);
+    }
+
+    @Override
+    public void deleteById(Context context, Integer id) throws SQLException {
+        OrcidQueue orcidQueue = dao.findByID(context, OrcidQueue.class, id);
+        if (orcidQueue != null) {
+            dao.delete(context, orcidQueue);
+        }
+    }
+
+    @Override
+    public void sendToOrcid(Context context, Integer id) throws SQLException {
+        System.out.println(id);
+        OrcidQueue orcidQueue = dao.findByID(context, OrcidQueue.class, id);
+        if (orcidQueue == null) {
+            throw new IllegalArgumentException("No ORCID Queue record found with id " + id);
+        }
+
+        Item owner = orcidQueue.getOwner();
+        String orcid = getMetadataValue(owner, "person.identifier.orcid");
+        Item entity = orcidQueue.getEntity();
+    }
+
+    private String getMetadataValue(Item item, String metadataField) {
+        return item.getMetadata().stream()
+            .filter(metadata -> metadata.getMetadataField().toString('.').equals(metadataField))
+            .map(metadata -> metadata.getValue())
+            .findFirst()
+            .orElse(null);
     }
 
 }

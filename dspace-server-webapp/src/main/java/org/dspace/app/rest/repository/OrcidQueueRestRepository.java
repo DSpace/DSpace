@@ -12,6 +12,7 @@ import static java.lang.Math.toIntExact;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
+import javax.servlet.http.HttpServletRequest;
 
 import org.dspace.app.orcid.OrcidQueue;
 import org.dspace.app.orcid.service.OrcidQueueService;
@@ -20,6 +21,7 @@ import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.model.CrisLayoutBoxRest;
 import org.dspace.app.rest.model.OrcidQueueRest;
+import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -51,13 +53,27 @@ public class OrcidQueueRestRepository extends DSpaceRestRepository<OrcidQueueRes
     }
 
     @Override
-    public Class<OrcidQueueRest> getDomainClass() {
-        return OrcidQueueRest.class;
+    @PreAuthorize("permitAll()")
+    protected void delete(Context context, Integer id) {
+        try {
+            orcidQueueService.deleteById(context, id);
+        } catch (SQLException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+    }
+
+    protected OrcidQueueRest createAndReturn(Context context)
+        throws AuthorizeException, SQLException, RepositoryMethodNotImplementedException {
+        HttpServletRequest request = getRequestService().getCurrentRequest().getHttpServletRequest();
+
+        String orcidQueueId = request.getParameter("orcidQueueId");
+        orcidQueueService.sendToOrcid(context, Integer.valueOf(orcidQueueId));
+        return new OrcidQueueRest();
     }
 
     @SearchRestMethod(name = "findByOwner")
     @PreAuthorize("permitAll()")
-    public Page<CrisLayoutBoxRest> findByEnityType(@Parameter(value = "ownerId", required = true) String ownerId,
+    public Page<CrisLayoutBoxRest> findByOwnerId(@Parameter(value = "ownerId", required = true) String ownerId,
         Pageable pageable) {
 
         Context context = obtainContext();
@@ -71,6 +87,11 @@ public class OrcidQueueRestRepository extends DSpaceRestRepository<OrcidQueueRes
             throw new RuntimeException(e.getMessage(), e);
         }
 
+    }
+
+    @Override
+    public Class<OrcidQueueRest> getDomainClass() {
+        return OrcidQueueRest.class;
     }
 
 }

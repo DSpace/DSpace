@@ -145,5 +145,6 @@
     <bean class="org.dspace.layout.service.impl.CrisLayoutFieldServiceImpl"/>
     
     <bean class="org.dspace.app.orcid.service.impl.OrcidQueueServiceImpl" />
+    <bean class="org.dspace.app.orcid.service.impl.OrcidHistoryServiceImpl" />
 </beans>
 

@@ -23,6 +23,8 @@ public class OrcidQueueRest extends BaseObjectRest<Integer> {
 
     private String entityName;
 
+    private String entityType;
+
     @Override
     public String getType() {
         return NAME;
@@ -60,6 +62,14 @@ public class OrcidQueueRest extends BaseObjectRest<Integer> {
 
     public void setEntityName(String entityName) {
         this.entityName = entityName;
+    }
+
+    public String getEntityType() {
+        return entityType;
+    }
+
+    public void setEntityType(String entityType) {
+        this.entityType = entityType;
     }
 
 }

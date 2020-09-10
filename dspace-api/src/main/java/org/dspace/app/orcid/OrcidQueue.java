@@ -24,8 +24,8 @@ import org.dspace.core.ReloadableEntity;
 public class OrcidQueue implements ReloadableEntity<Integer> {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "requestitem_seq")
-    @SequenceGenerator(name = "requestitem_seq", sequenceName = "requestitem_seq", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "orcid_queue_id_seq")
+    @SequenceGenerator(name = "orcid_queue_id_seq", sequenceName = "orcid_queue_id_seq", allocationSize = 1)
     private Integer id;
 
     @ManyToOne

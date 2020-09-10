@@ -26,16 +26,17 @@ public class OrcidQueueRestConverter implements DSpaceConverter<OrcidQueue, Orci
     public OrcidQueueRest convert(OrcidQueue modelObject, Projection projection) {
         OrcidQueueRest rest = new OrcidQueueRest();
         rest.setEntityId(modelObject.getEntity().getID());
-        rest.setEntityName(getEntityNameFromItem(modelObject.getEntity()));
+        rest.setEntityName(getMetadataValueFromItem(modelObject.getEntity(), "dc.title"));
+        rest.setEntityType(getMetadataValueFromItem(modelObject.getEntity(), "relationship.type"));
         rest.setId(modelObject.getId());
         rest.setOwnerId(modelObject.getOwner().getID());
         rest.setProjection(projection);
         return rest;
     }
 
-    private String getEntityNameFromItem(Item entity) {
+    private String getMetadataValueFromItem(Item entity, String metadataField) {
         return entity.getMetadata().stream()
-            .filter(metadata -> metadata.getMetadataField().toString('.').equals("dc.title"))
+            .filter(metadata -> metadata.getMetadataField().toString('.').equals(metadataField))
             .map(metadata -> metadata.getValue())
             .findFirst()
             .orElse(null);

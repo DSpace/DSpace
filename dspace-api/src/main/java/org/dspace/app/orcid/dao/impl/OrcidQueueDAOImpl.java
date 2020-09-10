@@ -5,7 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.app.orcid.dao;
+package org.dspace.app.orcid.dao.impl;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -13,6 +13,7 @@ import java.util.UUID;
 import javax.persistence.Query;
 
 import org.dspace.app.orcid.OrcidQueue;
+import org.dspace.app.orcid.dao.OrcidQueueDAO;
 import org.dspace.core.AbstractHibernateDAO;
 import org.dspace.core.Context;
 
