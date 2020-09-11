@@ -14,6 +14,8 @@ import java.util.UUID;
 import org.dspace.app.orcid.OrcidQueue;
 import org.dspace.app.orcid.dao.OrcidQueueDAO;
 import org.dspace.app.orcid.service.OrcidQueueService;
+import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +29,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class OrcidQueueServiceImpl implements OrcidQueueService {
 
     private OrcidQueueDAO dao;
+
+    @Autowired(required = true)
+    protected AuthorizeService authorizeService;
 
     @Autowired
     public OrcidQueueServiceImpl(OrcidQueueDAO dao) {
@@ -81,4 +86,34 @@ public class OrcidQueueServiceImpl implements OrcidQueueService {
             .orElse(null);
     }
 
+    @Override
+    public void delete(Context context, OrcidQueue orcidQueue) throws SQLException, AuthorizeException {
+        if (!authorizeService.isAdmin(context)) {
+            throw new AuthorizeException(
+                "You must be an admin to delete a Tab");
+        }
+        dao.delete(context, orcidQueue);
+    }
+
+    @Override
+    public OrcidQueue create(Context context) throws SQLException, AuthorizeException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public OrcidQueue find(Context context, int id) throws SQLException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public void update(Context context, OrcidQueue t) throws SQLException, AuthorizeException {
+        // TODO Auto-generated method stub
+    }
+
+    @Override
+    public void update(Context context, List<OrcidQueue> t) throws SQLException, AuthorizeException {
+        // TODO Auto-generated method stub
+    }
 }

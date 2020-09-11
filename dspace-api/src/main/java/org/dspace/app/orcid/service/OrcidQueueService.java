@@ -14,8 +14,9 @@ import java.util.UUID;
 import org.dspace.app.orcid.OrcidQueue;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
+import org.dspace.service.DSpaceCRUDService;
 
-public interface OrcidQueueService {
+public interface OrcidQueueService extends DSpaceCRUDService<OrcidQueue> {
 
     /**
      * Create an OrcidQueue record with the given owner and entity.
