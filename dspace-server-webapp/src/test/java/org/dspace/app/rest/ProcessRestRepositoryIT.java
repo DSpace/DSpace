@@ -31,6 +31,7 @@ import org.dspace.content.Bitstream;
 import org.dspace.content.ProcessStatus;
 import org.dspace.scripts.DSpaceCommandLineParameter;
 import org.dspace.scripts.Process;
+import org.dspace.scripts.ProcessLogLevel;
 import org.dspace.scripts.service.ProcessService;
 import org.hamcrest.Matchers;
 import org.junit.After;
@@ -318,6 +319,30 @@ public class ProcessRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         getClient(token).perform(get("/api/system/processes/" + new Random() + "/filetypes"))
                         .andExpect(status().isNotFound());
+
+
+    }
+
+    @Test
+    public void getProcessOutput() throws Exception {
+        try (InputStream is = IOUtils.toInputStream("Test File For Process", CharEncoding.UTF_8)) {
+            processService.appendLog(process.getID(), process.getName(), "testlog", ProcessLogLevel.INFO);
+        }
+        processService.createLogBitstream(context, process);
+        List<String> fileTypesToCheck = new LinkedList<>();
+        fileTypesToCheck.add("inputfile");
+
+        String token = getAuthToken(admin.getEmail(), password);
+
+        getClient(token).perform(get("/api/system/processes/" + process.getID() + "/output"))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.name",
+                                            is(process.getName() + process.getID() + ".log")))
+                        .andExpect(jsonPath("$.type", is("bitstream")))
+                        .andExpect(jsonPath("$.metadata['dc.title'][0].value",
+                                            is(process.getName() + process.getID() + ".log")))
+                        .andExpect(jsonPath("$.metadata['dspace.process.filetype'][0].value",
+                                            is("script_output")));
 
 
     }
