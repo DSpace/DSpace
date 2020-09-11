@@ -19,7 +19,6 @@ import org.dspace.app.orcid.service.OrcidQueueService;
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
-import org.dspace.app.rest.model.CrisLayoutBoxRest;
 import org.dspace.app.rest.model.OrcidQueueRest;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
@@ -73,7 +72,7 @@ public class OrcidQueueRestRepository extends DSpaceRestRepository<OrcidQueueRes
 
     @SearchRestMethod(name = "findByOwner")
     @PreAuthorize("permitAll()")
-    public Page<CrisLayoutBoxRest> findByOwnerId(@Parameter(value = "ownerId", required = true) String ownerId,
+    public Page<OrcidQueue> findByOwnerId(@Parameter(value = "ownerId", required = true) String ownerId,
         Pageable pageable) {
 
         Context context = obtainContext();
