@@ -40,4 +40,6 @@ public interface OrcidQueueDAO extends GenericDAO<OrcidQueue> {
         throws SQLException;
 
     long countByOwnerId(Context context, UUID ownerId) throws SQLException;
+
+    public List<OrcidQueue> findByOwnerAndEntityId(Context context, UUID ownerId, UUID entityId) throws SQLException;
 }

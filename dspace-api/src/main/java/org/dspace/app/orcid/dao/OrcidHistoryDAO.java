@@ -7,7 +7,12 @@
  */
 package org.dspace.app.orcid.dao;
 
+import java.sql.SQLException;
+import java.util.List;
+import java.util.UUID;
+
 import org.dspace.app.orcid.OrcidHistory;
+import org.dspace.core.Context;
 import org.dspace.core.GenericDAO;
 
 /**
@@ -21,4 +26,14 @@ import org.dspace.core.GenericDAO;
  */
 public interface OrcidHistoryDAO extends GenericDAO<OrcidHistory> {
 
+    /**
+     * Find all the ORCID history records by the given owner and entity uuids.
+     *
+     * @param context  the DSpace context
+     * @param ownerId  the owner item uuid
+     * @param entityId the entity item uuid
+     * @return the records list
+     * @throws SQLException if an SQL error occurs
+     */
+    List<OrcidHistory> findByOwnerAndEntity(Context context, UUID ownerId, UUID entityId) throws SQLException;
 }

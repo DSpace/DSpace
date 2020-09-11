@@ -126,6 +126,10 @@ public class OrcidQueueConsumer implements Consumer {
                 continue;
             }
 
+            if (!orcidQueueService.findByOwnerAndEntityId(context, relatedItemUuid, item.getID()).isEmpty()) {
+                continue;
+            }
+
             if (shouldBeSend(ownerItem, relationshipType)) {
                 OrcidQueue orcidQueue = orcidQueueService.create(context, ownerItem, item);
                 log.debug("Created ORCID queue record with id " + orcidQueue.getID());
@@ -137,7 +141,8 @@ public class OrcidQueueConsumer implements Consumer {
 
     private void consumePerson(Context context, Item item) throws SQLException {
         String orcidId = getMetadataValue(item, "person.identifier.orcid");
-        if (StringUtils.isNotEmpty(orcidId)) {
+        List<OrcidQueue> queueRecords = orcidQueueService.findByOwnerAndEntityId(context, item.getID(), item.getID());
+        if (StringUtils.isNotEmpty(orcidId) && queueRecords.isEmpty()) {
             OrcidQueue orcidQueue = orcidQueueService.create(context, item, item);
             log.debug("Created ORCID queue record with id " + orcidQueue.getID());
         }

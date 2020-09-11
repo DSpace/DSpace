@@ -41,6 +41,8 @@ public interface OrcidQueueService {
     public List<OrcidQueue> findByOwnerId(Context context, UUID ownerId, Integer limit, Integer offset)
         throws SQLException;
 
+    public List<OrcidQueue> findByOwnerAndEntityId(Context context, UUID ownerId, UUID entityId) throws SQLException;
+
     /**
      * Returns the number of records on the OrcidQueue associated with the given
      * ownerId.
