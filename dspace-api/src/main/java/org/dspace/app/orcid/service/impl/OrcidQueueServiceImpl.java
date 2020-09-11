@@ -8,12 +8,12 @@
 package org.dspace.app.orcid.service.impl;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static org.orcid.jaxb.model.common_v2.Iso3166Country.IT;
+import static org.orcid.jaxb.model.common_v2.Iso3166Country.fromValue;
 
 import java.io.StringWriter;
 import java.math.BigInteger;
 import java.sql.SQLException;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -37,10 +37,13 @@ import org.dspace.app.orcid.dao.OrcidHistoryDAO;
 import org.dspace.app.orcid.dao.OrcidQueueDAO;
 import org.dspace.app.orcid.service.OrcidQueueService;
 import org.dspace.content.Item;
+import org.dspace.content.MetadataValue;
+import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.services.ConfigurationService;
 import org.orcid.jaxb.model.common_v2.ExternalId;
 import org.orcid.jaxb.model.common_v2.ExternalIds;
+import org.orcid.jaxb.model.common_v2.Iso3166Country;
 import org.orcid.jaxb.model.common_v2.Organization;
 import org.orcid.jaxb.model.common_v2.OrganizationAddress;
 import org.orcid.jaxb.model.common_v2.RelationshipType;
@@ -72,6 +75,9 @@ public class OrcidQueueServiceImpl implements OrcidQueueService {
 
     @Autowired
     private ConfigurationService configurationService;
+
+    @Autowired
+    private ItemService itemService;
 
     @Override
     public List<OrcidQueue> findByOwnerId(Context context, UUID ownerId, Integer limit, Integer offset)
@@ -159,12 +165,7 @@ public class OrcidQueueServiceImpl implements OrcidQueueService {
         work.setType(WorkType.JOURNAL_ARTICLE);
         work.setPutCode(putCode);
 
-        ExternalId externalId = new ExternalId();
-        externalId.setExternalIdType("doi");
-        externalId.setExternalIdValue(entity.getID().toString());
-        externalId.setExternalIdRelationship(RelationshipType.SELF);
-        ExternalIds externalIds = new ExternalIds(Arrays.asList(externalId));
-        work.setExternalIds(externalIds);
+        work.setExternalIds(getExternalIds(entity));
 
         sendObjectToOrcid(context, orcidQueue, orcid, token, putCode, work, WORK_ENDPOINT);
 
@@ -185,14 +186,17 @@ public class OrcidQueueServiceImpl implements OrcidQueueService {
         String title = getMetadataValue(entity, "dc.title");
         funding.setTitle(new FundingTitle(title, null));
 
-        ExternalId externalId = new ExternalId();
-        externalId.setExternalIdType("doi");
-        externalId.setExternalIdValue(entity.getID().toString());
-        externalId.setExternalIdRelationship(RelationshipType.SELF);
-        ExternalIds externalIds = new ExternalIds(Arrays.asList(externalId));
-        funding.setExternalIds(externalIds);
+        funding.setExternalIds(getExternalIds(entity));
 
-        funding.setOrganization(new Organization("test", new OrganizationAddress("test", "test", IT), null));
+        MetadataValue coordinator = getMetadata(entity, "crispj.coordinator");
+        if (coordinator != null && coordinator.getAuthority() != null) {
+            Item organization = itemService.findByIdOrLegacyId(context, coordinator.getAuthority());
+            String name = getMetadataValue(organization, "dc.title");
+            String city = getMetadataValue(organization, "organization.address.addressLocality");
+            Iso3166Country country = fromValue(getMetadataValue(organization, "organization.address.addressCountry"));
+            funding.setOrganization(new Organization(name, new OrganizationAddress(city, null, country), null));
+        }
+
 
         sendObjectToOrcid(context, orcidQueue, orcid, token, putCode, funding, FUNDING_ENDPOINT);
 
@@ -218,11 +222,11 @@ public class OrcidQueueServiceImpl implements OrcidQueueService {
 
         try {
             JAXBContext jaxbContext = JAXBContext.newInstance(Work.class);
-            String workAsString = marshall(jaxbContext, objToSend);
+            String objToSendAsString = marshall(jaxbContext, objToSend);
 
             request.addHeader("Content-Type", "application/vnd.orcid+xml");
             request.addHeader("Authorization", "Bearer " + token);
-            request.setEntity(new StringEntity(workAsString));
+            request.setEntity(new StringEntity(objToSendAsString));
 
             HttpResponse response = httpClient.execute(request);
 
@@ -264,6 +268,28 @@ public class OrcidQueueServiceImpl implements OrcidQueueService {
             .orElse(null);
     }
 
+    private ExternalIds getExternalIds(Item entity) {
+        List<ExternalId> externalIds = new ArrayList<ExternalId>();
+        String indentifierUri = getMetadataValue(entity, "dc.identifier.uri");
+
+        ExternalId handle = new ExternalId();
+        handle.setExternalIdValue(indentifierUri);
+        handle.setExternalIdType("handle");
+        handle.setExternalIdRelationship(RelationshipType.SELF);
+        externalIds.add(handle);
+
+        String indentifierDoi = getMetadataValue(entity, "dc.identifier.doi");
+        if (StringUtils.isNotBlank(indentifierDoi)) {
+            ExternalId doi = new ExternalId();
+            doi.setExternalIdType("doi");
+            doi.setExternalIdValue(indentifierDoi);
+            doi.setExternalIdRelationship(RelationshipType.SELF);
+            externalIds.add(doi);
+        }
+
+        return new ExternalIds(externalIds);
+    }
+
     private String getPutCodeFromResponse(HttpResponse response) {
         Header[] headers = response.getHeaders("Location");
         if (headers.length == 0) {
@@ -286,6 +312,13 @@ public class OrcidQueueServiceImpl implements OrcidQueueService {
         return item.getMetadata().stream()
             .filter(metadata -> metadata.getMetadataField().toString('.').equals(metadataField))
             .map(metadata -> metadata.getValue())
+            .findFirst()
+            .orElse(null);
+    }
+
+    private MetadataValue getMetadata(Item item, String metadataField) {
+        return item.getMetadata().stream()
+            .filter(metadata -> metadata.getMetadataField().toString('.').equals(metadataField))
             .findFirst()
             .orElse(null);
     }
