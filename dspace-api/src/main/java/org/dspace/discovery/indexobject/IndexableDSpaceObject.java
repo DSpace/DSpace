@@ -10,7 +10,6 @@ package org.dspace.discovery.indexobject;
 import java.util.UUID;
 
 import org.dspace.content.DSpaceObject;
-import org.dspace.discovery.IndexableObject;
 
 /**
  * DSpaceObject implementation for the IndexableObject, contains methods used by all DSpaceObject methods
@@ -18,7 +17,7 @@ import org.dspace.discovery.IndexableObject;
  *
  * @author Kevin Van de Velde (kevin at atmire dot com)
  */
-public abstract class IndexableDSpaceObject<T extends DSpaceObject> implements IndexableObject<T, UUID> {
+public abstract class IndexableDSpaceObject<T extends DSpaceObject> extends AbstractIndexableObject<T, UUID> {
 
     private T dso;
 
@@ -41,19 +40,5 @@ public abstract class IndexableDSpaceObject<T extends DSpaceObject> implements I
         return dso.getID();
     }
 
-    @Override
-    public boolean equals(Object obj) {
-        //Two IndexableObjects of the same DSpaceObject are considered equal
-        if (!(obj instanceof IndexableDSpaceObject)) {
-            return false;
-        }
-        IndexableDSpaceObject other = (IndexableDSpaceObject) obj;
-        return other.getIndexedObject().equals(getIndexedObject());
-    }
 
-    @Override
-    public int hashCode() {
-        //Two IndexableObjects of the same DSpaceObject are considered equal
-        return getIndexedObject().hashCode();
-    }
 }
