@@ -14,7 +14,7 @@ pipelines:
              - sed -i 's/^submission\.lookup\.epo\.consumerKey.*/submission.lookup.epo.consumerKey='$EPO_API_KEY'/g' dspace-api/src/test/data/dspaceFolder/config/local.cfg
              - sed -i 's/^submission\.lookup\.epo\.consumerSecretKey.*/submission.lookup.epo.consumerSecretKey='$EPO_API_KEY_SECRET'/g' dspace-api/src/test/data/dspaceFolder/config/local.cfg
              - ./dspace-api/src/test/data/dspaceFolder/bin/install_grobid.sh
-             - mvn clean install license:check -Dmaven.test.skip=false -DskipITs=false -Pdspace-rest -P !assembly -B -V -Dsurefire.rerunFailingTestsCount=2
+             - mvn clean install license:check -DskipTests=false -DskipITs=false -Pdspace-rest -P !assembly -B -V -Dsurefire.rerunFailingTestsCount=2
 
 definitions:
   caches:

@@ -658,7 +658,7 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
         String firstItemId = getItemIdByProfileId(adminToken, id);
 
         MetadataValueRest valueToAdd = new MetadataValueRest(user.getEmail());
-        List<Operation> operations = asList(new AddOperation("/metadata/crisrp.email", valueToAdd));
+        List<Operation> operations = asList(new AddOperation("/metadata/person.email", valueToAdd));
 
         getClient(adminToken).perform(patch(BASE_REST_SERVER_URL + "/api/core/items/{id}", firstItemId)
             .contentType(MediaType.APPLICATION_JSON)
