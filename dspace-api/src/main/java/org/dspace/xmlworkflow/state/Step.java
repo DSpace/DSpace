@@ -81,7 +81,7 @@ public class Step implements BeanNameAware {
     /**
      * Get the next step based on out the outcome
      * @param outcome the outcome of the previous step
-     * @return the next stepp or NULL if there is no step configured for this outcome
+     * @return the next step or NULL if there is no step configured for this outcome
      */
     public Step getNextStep(int outcome) {
         return outcomes.get(outcome);

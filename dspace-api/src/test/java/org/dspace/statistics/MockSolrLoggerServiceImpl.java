@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.maxmind.geoip2.DatabaseReader;
 import com.maxmind.geoip2.model.CityResponse;
@@ -66,8 +67,10 @@ public class MockSolrLoggerServiceImpl
      * @return faked CityResponse
      */
     private CityResponse mockCityResponse() {
-        List<String> cityNames = new ArrayList<>(Collections.singleton("New York"));
-        City city = new City(cityNames, 1, 1, new HashMap());
+        List<String> cityLocales = new ArrayList<String>(Collections.singleton("en"));
+        Map<String, String> cityNames = new HashMap<>();
+        cityNames.put("en", "New York");
+        City city = new City(cityLocales, 1, 1, cityNames);
 
         List<String> countryNames = new ArrayList<>(Collections.singleton("United States"));
         Country country = new Country(countryNames, 1, 1, "US", new HashMap());

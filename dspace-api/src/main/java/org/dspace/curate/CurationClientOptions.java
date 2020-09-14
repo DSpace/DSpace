@@ -45,6 +45,11 @@ public enum CurationClientOptions {
         return null;
     }
 
+    /**
+     * This method will create all the possible Options for the {@link Curation} script.
+     * This will be used by {@link CurationScriptConfiguration}
+     * @return  The options for the {@link Curation} script
+     */
     protected static Options constructOptions() {
         Options options = new Options();
 
@@ -54,7 +59,6 @@ public enum CurationClientOptions {
             "Id (handle) of object to perform task on, or 'all' to perform on whole repository");
         options.addOption("p", "parameter", true, "a task parameter 'NAME=VALUE'");
         options.addOption("q", "queue", true, "name of task queue to process");
-        options.addOption("e", "eperson", true, "email address of curating eperson");
         options.addOption("r", "reporter", true,
             "relative or absolute path to the desired report file. Use '-' to report to console. If absent, no " +
             "reporting");
