@@ -12,6 +12,8 @@ import java.util.List;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.logging.log4j.Logger;
+import org.dspace.app.orcid.factory.OrcidQueueServiceFactory;
+import org.dspace.app.orcid.service.OrcidQueueService;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
@@ -96,6 +98,7 @@ public abstract class AbstractBuilder<T, S> {
     static CrisLayoutTabService crisLayoutTabService;
     static CrisLayoutBoxService crisLayoutBoxService;
     static CrisLayoutFieldService crisLayoutFieldService;
+    static OrcidQueueService orcidQueueService;
 
     protected Context context;
 
@@ -153,6 +156,7 @@ public abstract class AbstractBuilder<T, S> {
         crisLayoutTabService = CrisLayoutServiceFactory.getInstance().getTabService();
         crisLayoutBoxService = CrisLayoutServiceFactory.getInstance().getBoxService();
         crisLayoutFieldService = CrisLayoutServiceFactory.getInstance().getFieldService();
+        orcidQueueService = OrcidQueueServiceFactory.getInstance().getOrcidQueueService();
     }
 
 
@@ -186,6 +190,7 @@ public abstract class AbstractBuilder<T, S> {
         crisLayoutTabService = null;
         crisLayoutBoxService = null;
         crisLayoutFieldService = null;
+        orcidQueueService = null;
 
     }
 
