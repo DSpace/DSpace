@@ -368,7 +368,6 @@ public class ItemAuthorityTest extends AbstractControllerIntegrationTest {
 
     @Test
     public void groupAuthorityUnauthorizedTest() throws Exception {
-
        getClient().perform(get("/api/submission/vocabularies/GroupAuthority/entries")
                   .param("filter", "wrong text"))
                   .andExpect(status().isUnauthorized());
@@ -376,14 +375,8 @@ public class ItemAuthorityTest extends AbstractControllerIntegrationTest {
 
     @Test
     public void zdbAuthorityTest() throws Exception {
-        context.turnOffAuthorisationSystem();
-        parentCommunity = CommunityBuilder.createCommunity(context).build();
-        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).build();
-        context.restoreAuthSystemState();
         String token = getAuthToken(eperson.getEmail(), password);
         getClient(token).perform(get("/api/submission/vocabularies/ZDBAuthority/entries")
-                        .param("metadata", "dc.identifier.issn")
-                        .param("collection", col1.getID().toString())
                         .param("filter", "Acta AND Mathematica AND informatica"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$._embedded.entries",
@@ -412,43 +405,17 @@ public class ItemAuthorityTest extends AbstractControllerIntegrationTest {
 
     @Test
     public void zdbAuthorityEmptyQueryTest() throws Exception {
-        context.turnOffAuthorisationSystem();
-        parentCommunity = CommunityBuilder.createCommunity(context).build();
-        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).build();
-        context.restoreAuthSystemState();
         String token = getAuthToken(eperson.getEmail(), password);
         getClient(token).perform(get("/api/submission/vocabularies/ZDBAuthority/entries")
-                        .param("metadata", "dc.identifier.issn")
-                        .param("collection", col1.getID().toString())
                         .param("filter", ""))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.page.totalElements", Matchers.is(0)));
-    }
-
-    @Test
-    public void zdbAuthorityMissingMetadataTest() throws Exception {
-        context.turnOffAuthorisationSystem();
-        parentCommunity = CommunityBuilder.createCommunity(context).build();
-        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).build();
-        context.restoreAuthSystemState();
-        String token = getAuthToken(eperson.getEmail(), password);
-        getClient(token).perform(get("/api/submission/vocabularies/ZDBAuthority/entries")
-                        .param("collection", col1.getID().toString())
-                        .param("filter", ""))
-                .andExpect(status().isBadRequest());
+                        .andExpect(status().isUnprocessableEntity());
     }
 
     @Test
     public void zdbAuthorityUnauthorizedTest() throws Exception {
-        context.turnOffAuthorisationSystem();
-        parentCommunity = CommunityBuilder.createCommunity(context).build();
-        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).build();
-        context.restoreAuthSystemState();
         getClient().perform(get("/api/submission/vocabularies/ZDBAuthority/entries")
-                        .param("metadata", "dc.identifier.issn")
-                        .param("collection", col1.getID().toString())
-                        .param("filter", "Mathematica AND informatica"))
-                .andExpect(status().isUnauthorized());
+                   .param("filter", "Mathematica AND informatica"))
+                   .andExpect(status().isUnauthorized());
     }
 
     @Override
