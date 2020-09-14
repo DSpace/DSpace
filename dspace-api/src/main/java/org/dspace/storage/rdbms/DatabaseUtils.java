@@ -39,6 +39,7 @@ import org.flywaydb.core.api.MigrationInfo;
 import org.flywaydb.core.api.callback.Callback;
 import org.flywaydb.core.api.configuration.FluentConfiguration;
 import org.flywaydb.core.internal.info.MigrationInfoDumper;
+import org.flywaydb.core.internal.license.VersionPrinter;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.SingleConnectionDataSource;
@@ -73,6 +74,9 @@ public class DatabaseUtils {
     public static final String DBMS_POSTGRES = "postgres";
     public static final String DBMS_ORACLE = "oracle";
     public static final String DBMS_H2 = "h2";
+
+    // Name of the table that Flyway uses for its migration history
+    public static final String FLYWAY_TABLE = "schema_version";
 
     /**
      * Default constructor
@@ -412,6 +416,8 @@ public class DatabaseUtils {
                 "PostgreSQL '" + PostgresUtils.PGCRYPTO + "' extension installed/up-to-date? " + pgcryptoUpToDate + "" +
                     " " + ((pgcryptoVersion != null) ? "(version=" + pgcryptoVersion + ")" : "(not installed)"));
         }
+        // Finally, print out our version of Flyway
+        System.out.println("FlywayDB Version: " + VersionPrinter.getVersion());
     }
 
     /**
@@ -530,20 +536,21 @@ public class DatabaseUtils {
             // Determine location(s) where Flyway will load all DB migrations
             ArrayList<String> scriptLocations = new ArrayList<>();
 
-            // First, add location for custom SQL migrations, if any (based on DB Type)
+            // First, add location for custom SQL migrations, if exists (based on DB Type)
             // e.g. [dspace.dir]/etc/[dbtype]/
             // (We skip this for H2 as it's only used for unit testing)
-            if (!dbType.equals(DBMS_H2)) {
-                scriptLocations.add("filesystem:" + config.getProperty("dspace.dir") +
-                                        "/etc/" + dbType);
+            String etcDirPath = config.getProperty("dspace.dir") + "/etc/" + dbType;
+            File etcDir = new File(etcDirPath);
+            if (etcDir.exists() && !dbType.equals(DBMS_H2)) {
+                scriptLocations.add("filesystem:" + etcDirPath);
             }
 
             // Also add the Java package where Flyway will load SQL migrations from (based on DB Type)
-            scriptLocations.add("classpath:org.dspace.storage.rdbms.sqlmigration." + dbType);
+            scriptLocations.add("classpath:org/dspace/storage/rdbms/sqlmigration/" + dbType);
 
             // Also add the Java package where Flyway will load Java migrations from
             // NOTE: this also loads migrations from any sub-package
-            scriptLocations.add("classpath:org.dspace.storage.rdbms.migration");
+            scriptLocations.add("classpath:org/dspace/storage/rdbms/migration");
 
             //Add all potential workflow migration paths
             List<String> workflowFlywayMigrationLocations = WorkflowServiceFactory.getInstance()
@@ -567,7 +574,7 @@ public class DatabaseUtils {
             // Tell Flyway to use the "schema_version" table in the database to manage its migration history
             // As of Flyway v5, the default table is named "flyway_schema_history"
             // We are using the older name ("schema_version") for backwards compatibility.
-            flywayConfiguration.table("schema_version");
+            flywayConfiguration.table(FLYWAY_TABLE);
         } catch (SQLException e) {
             log.error("Unable to setup Flyway against DSpace database", e);
         }
@@ -1347,7 +1354,7 @@ public class DatabaseUtils {
      */
     public static String getCurrentFlywayState(Connection connection) throws SQLException {
         PreparedStatement statement = connection
-            .prepareStatement("SELECT \"version\" FROM \"schema_version\" ORDER BY \"version\" desc");
+            .prepareStatement("SELECT \"version\" FROM \"" + FLYWAY_TABLE + "\" ORDER BY \"version\" desc");
         ResultSet resultSet = statement.executeQuery();
         resultSet.next();
         return resultSet.getString("version");
