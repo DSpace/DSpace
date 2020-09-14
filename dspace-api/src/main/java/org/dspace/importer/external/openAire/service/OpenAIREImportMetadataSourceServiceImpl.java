@@ -93,13 +93,13 @@ public class OpenAIREImportMetadataSourceServiceImpl extends AbstractImportMetad
     }
 
     @Override
-    public int getNbRecords(String query) throws MetadataSourceException {
+    public int getRecordsCount(String query) throws MetadataSourceException {
         // TODO Auto-generated method stub
         return 0;
     }
 
     @Override
-    public int getNbRecords(Query query) throws MetadataSourceException {
+    public int getRecordsCount(Query query) throws MetadataSourceException {
         // TODO Auto-generated method stub
         return 0;
     }
