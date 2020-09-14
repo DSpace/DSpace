@@ -47,4 +47,8 @@
     	class="org.dspace.content.authority.ZDBExtraTitleMetadataGenerator">
     	<property name="relatedInputformMetadata" value="dc_relation_ispartof"/>
      </bean>
+
+     <bean id="org.dspace.content.authority.OpenAIRECodeExtraMetadataGenerator" 
+    	class="org.dspace.content.authority.OpenAIRECodeExtraMetadataGenerator">
+     </bean>
 </beans>

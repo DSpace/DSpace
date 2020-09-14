@@ -87,6 +87,15 @@
           class="org.dspace.importer.external.scopus.service.ScopusImportMetadataSourceServiceImpl" scope="singleton">
         <property name="metadataFieldMapping" ref="scopusMetadataFieldMapping"/>
     </bean>
+
+    <bean id="OpenAIREService"
+          class="org.dspace.importer.external.openAire.service.OpenAIREImportMetadataSourceServiceImpl" scope="singleton">
+          <property name="metadataFieldMapping" ref="openaireMetadataFieldMapping"/>
+    </bean>
+    <bean id="openaireMetadataFieldMapping"
+          class="org.dspace.importer.external.openaire.metadatamapping.OpenAIREFieldMapping">
+    </bean>
+
     <bean id="scopusMetadataFieldMapping"
           class="org.dspace.importer.external.scopus.service.ScopusFieldMapping">
     </bean>
