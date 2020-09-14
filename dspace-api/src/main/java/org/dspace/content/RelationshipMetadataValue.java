@@ -7,6 +7,8 @@
  */
 package org.dspace.content;
 
+import org.dspace.core.Constants;
+
 /**
  * This class is used as a representation of MetadataValues for the MetadataValues that are derived from the
  * Relationships that the item has. This includes the useForPlace property which we'll have to use to determine
@@ -56,5 +58,14 @@ public class RelationshipMetadataValue extends MetadataValue {
             return false;
         }
         return super.equals(obj);
+    }
+
+    /**
+     * Retrieves the Relationship ID from which the current RelationshipMetadataValue is derived
+     *
+     * @return the relationship ID
+     */
+    public int getRelationshipId() {
+        return Integer.parseInt(getAuthority().substring(Constants.VIRTUAL_AUTHORITY_PREFIX.length()));
     }
 }

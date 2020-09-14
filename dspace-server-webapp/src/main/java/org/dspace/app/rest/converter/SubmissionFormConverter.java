@@ -115,14 +115,16 @@ public class SubmissionFormConverter implements DSpaceConverter<DCInputSet, Subm
                 String inputType = dcinput.getInputType();
 
                 SelectableMetadata selMd = new SelectableMetadata();
-                if (authorityUtils.isChoice(dcinput.getSchema(), dcinput.getElement(), dcinput.getQualifier())) {
+                if (isChoice(dcinput.getSchema(), dcinput.getElement(), dcinput.getQualifier(),
+                        dcinput.getPairsType(), dcinput.getVocabulary())) {
                     inputRest.setType(getPresentation(dcinput.getSchema(), dcinput.getElement(),
                                                       dcinput.getQualifier(), inputType));
-                    selMd.setAuthority(getAuthorityName(dcinput.getSchema(), dcinput.getElement(),
+                    selMd.setControlledVocabulary(getAuthorityName(dcinput.getSchema(), dcinput.getElement(),
                                                         dcinput.getQualifier(), dcinput.getPairsType(),
                                                         dcinput.getVocabulary()));
                     selMd.setClosed(
-                            authorityUtils.isClosed(dcinput.getSchema(), dcinput.getElement(), dcinput.getQualifier()));
+                            isClosed(dcinput.getSchema(), dcinput.getElement(), dcinput.getQualifier(),
+                                    dcinput.getPairsType(), dcinput.getVocabulary()));
                 } else {
                     inputRest.setType(inputType);
                 }
@@ -139,10 +141,10 @@ public class SubmissionFormConverter implements DSpaceConverter<DCInputSet, Subm
                     selMd.setMetadata(org.dspace.core.Utils
                             .standardize(dcinput.getSchema(), dcinput.getElement(), pairs.get(idx + 1), "."));
                     if (authorityUtils.isChoice(dcinput.getSchema(), dcinput.getElement(), dcinput.getQualifier())) {
-                        selMd.setAuthority(getAuthorityName(dcinput.getSchema(), dcinput.getElement(),
+                        selMd.setControlledVocabulary(getAuthorityName(dcinput.getSchema(), dcinput.getElement(),
                                 pairs.get(idx + 1), dcinput.getPairsType(), dcinput.getVocabulary()));
-                        selMd.setClosed(authorityUtils.isClosed(dcinput.getSchema(), dcinput.getElement(),
-                                dcinput.getQualifier()));
+                        selMd.setClosed(isClosed(dcinput.getSchema(), dcinput.getElement(),
+                                dcinput.getQualifier(), null, dcinput.getVocabulary()));
                     }
                     selectableMetadata.add(selMd);
                 }
@@ -185,7 +187,8 @@ public class SubmissionFormConverter implements DSpaceConverter<DCInputSet, Subm
                     return INPUT_TYPE_LOOKUP;
                 }
             } else if (INPUT_TYPE_NAME.equals(inputType)) {
-                if (AuthorityUtils.PRESENTATION_TYPE_LOOKUP.equals(presentation)) {
+                if (AuthorityUtils.PRESENTATION_TYPE_LOOKUP.equals(presentation) ||
+                        AuthorityUtils.PRESENTATION_TYPE_AUTHORLOOKUP.equals(presentation)) {
                     return INPUT_TYPE_LOOKUP_NAME;
                 }
             }
@@ -201,6 +204,22 @@ public class SubmissionFormConverter implements DSpaceConverter<DCInputSet, Subm
             return vocabularyName;
         }
         return authorityUtils.getAuthorityName(schema, element, qualifier);
+    }
+
+    private boolean isClosed(String schema, String element, String qualifier, String valuePairsName,
+            String vocabularyName) {
+        if (StringUtils.isNotBlank(valuePairsName) || StringUtils.isNotBlank(vocabularyName)) {
+            return true;
+        }
+        return authorityUtils.isClosed(schema, element, qualifier);
+    }
+
+    private boolean isChoice(String schema, String element, String qualifier, String valuePairsName,
+            String vocabularyName) {
+        if (StringUtils.isNotBlank(valuePairsName) || StringUtils.isNotBlank(vocabularyName)) {
+            return true;
+        }
+        return authorityUtils.isChoice(schema, element, qualifier);
     }
 
     @Override
