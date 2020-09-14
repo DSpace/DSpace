@@ -23,6 +23,7 @@ import org.dspace.content.service.RelationshipTypeService;
 import org.dspace.content.virtual.VirtualMetadataPopulator;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.services.ConfigurationService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -66,6 +67,9 @@ public class RelationshipServiceImplTest {
 
     @Mock
     private EntityTypeService entityTypeService;
+
+    @Mock
+    private ConfigurationService configurationService;
 
     @Before
     public void init() {
