@@ -15,7 +15,6 @@ import java.util.Map;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.log4j.Logger;
 import org.dspace.authority.AuthorityValue;
-import org.dspace.content.Collection;
 import org.dspace.content.authority.zdb.ZDBAuthorityValue;
 import org.dspace.content.authority.zdb.ZDBService;
 import org.dspace.utils.DSpace;
@@ -34,13 +33,13 @@ public class ZDBAuthority extends ItemAuthority {
     private static DSpace dspace = new DSpace();
 
     @Override
-    public Choices getMatches(String field, String query, Collection collection, int start, int limit, String locale) {
-        Choices choices = super.getMatches(field, query, collection, start, limit, locale);
-        return new Choices(addExternalResults(field, query, choices, start, limit <= 0 ? DEFAULT_MAX_ROWS : limit),
+    public Choices getMatches(String query, int start, int limit, String locale) {
+        Choices choices = super.getMatches(query, start, limit, locale);
+        return new Choices(addExternalResults(query, choices, start, limit <= 0 ? DEFAULT_MAX_ROWS : limit),
                 choices.start, choices.total, choices.confidence, choices.more);
     }
 
-    protected Choice[] addExternalResults(String field, String text, Choices choices, int start, int max) {
+    protected Choice[] addExternalResults(String text, Choices choices, int start, int max) {
         if (source != null) {
             try {
                 List<Choice> results = new ArrayList<Choice>();
