@@ -332,9 +332,9 @@ public class OrcidQueueServiceImpl implements OrcidQueueService {
     public void delete(Context context, OrcidQueue orcidQueue) throws SQLException, AuthorizeException {
         if (!authorizeService.isAdmin(context)) {
             throw new AuthorizeException(
-                "You must be an admin to delete a Tab");
+                "You must be an admin to delete a OrcidQueue");
         }
-        dao.delete(context, orcidQueue);
+        orcidQueueDAO.delete(context, orcidQueue);
     }
 
     @Override
@@ -343,10 +343,17 @@ public class OrcidQueueServiceImpl implements OrcidQueueService {
         return null;
     }
 
+    /**
+     * Get an OrcidQueue from the database.
+     *
+     * @param context DSpace context object
+     * @param id      ID of the OrcidQueue
+     * @return the OrcidQueue format, or null if the ID is invalid.
+     * @throws SQLException if database error
+     */
     @Override
     public OrcidQueue find(Context context, int id) throws SQLException {
-        // TODO Auto-generated method stub
-        return null;
+        return orcidQueueDAO.findByID(context, OrcidQueue.class, id);
     }
 
     @Override
