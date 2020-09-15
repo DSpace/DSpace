@@ -27,7 +27,7 @@ import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.PosixParser;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.ResourcePolicy;
@@ -61,6 +61,7 @@ import org.dspace.content.service.BitstreamFormatService;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.BundleService;
 import org.dspace.content.service.CollectionService;
+import org.dspace.content.service.InstallItemService;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.MetadataFieldService;
 import org.dspace.content.service.MetadataSchemaService;
@@ -169,6 +170,8 @@ public class ItemImportOA {
     private ImpRecordToItemService impRecordToItemService = ImpServiceFactory.getInstance().getImpRecordToItemService();
     private ImpWorkflowNStateService impWorkflowNStateService = ImpServiceFactory.getInstance()
             .getImpWorkflowNStateService();
+    private InstallItemService installItemService = ContentServiceFactory.getInstance().getInstallItemService();
+
 
     public static void main(String[] argv) {
         Context context = null;
@@ -544,11 +547,11 @@ public class ItemImportOA {
 
         // create workspace item
         Item myitem = null;
-        WorkspaceItem wi = null;
+        WorkspaceItem wsi = null;
         c.setCurrentUser(myEPerson);
 
-        wi = workspaceItemService.create(c, mycollections[0], false);
-        myitem = wi.getItem();
+        wsi = workspaceItemService.create(c, mycollections[0], false);
+        myitem = wsi.getItem();
 
         if (StringUtils.isNotEmpty(handle)) {
             identifierService.register(c, myitem, handle);
@@ -565,15 +568,17 @@ public class ItemImportOA {
             plugin.process(c, myitem, getSourceRef());
         }
 
-        wi.setMultipleFiles(true);
-        wi.setMultipleTitles(true);
-        wi.setPublishedBefore(true);
-        wi.setStageReached(1);
-        workspaceItemService.update(c, wi);
+        wsi.setMultipleFiles(true);
+        wsi.setMultipleTitles(true);
+        wsi.setPublishedBefore(true);
+        wsi.setStageReached(1);
+        workspaceItemService.update(c, wsi);
 
         if (workflow) {
-            XmlWorkflowItem wfi = workflowService.startWithoutNotify(c, wi);
+            XmlWorkflowItem wfi = workflowService.startWithoutNotify(c, wsi);
             processWorkflow(c, wfi, imp_id);
+        } else if (reinstate) {
+            myitem = installItemService.installItem(c, wsi);
         }
 
         // now add to multiple collections if requested
