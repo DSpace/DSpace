@@ -21,6 +21,8 @@ import org.springframework.stereotype.Component;
 
 /**
  * The create bundle feature. It can be used to verify if bundles can be created in a specific item.
+ *
+ * Authorization is granted if the current user has ADD & WRITE permissions on the given item
  */
 @Component
 @AuthorizationFeatureDocumentation(name = CreateBundleFeature.NAME,

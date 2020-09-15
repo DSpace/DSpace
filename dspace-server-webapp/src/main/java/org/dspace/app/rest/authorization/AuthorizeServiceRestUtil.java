@@ -57,17 +57,16 @@ public class AuthorizeServiceRestUtil {
 
         EPerson ePerson = context.getCurrentUser();
 
-        if (dSpaceObjectService != null) {
-            if (dSpaceObject instanceof Item) {
-                if (!DSpaceRestPermission.READ.equals(dSpaceRestPermission)
-                    && !((Item) dSpaceObject).isArchived() && !((Item) dSpaceObject).isWithdrawn()) {
-                    return false;
-                }
+        // If the item is still inprogress we can process here only the READ permission.
+        // Other actions need to be evaluated against the wrapper object (workspace or workflow item)
+        if (dSpaceObject instanceof Item) {
+            if (!DSpaceRestPermission.READ.equals(dSpaceRestPermission)
+                && !((Item) dSpaceObject).isArchived() && !((Item) dSpaceObject).isWithdrawn()) {
+                return false;
             }
-
-            return authorizeService.authorizeActionBoolean(context, ePerson, dSpaceObject,
-                dSpaceRestPermission.getDspaceApiActionId(), true);
         }
-        return false;
+
+        return authorizeService.authorizeActionBoolean(context, ePerson, dSpaceObject,
+            dSpaceRestPermission.getDspaceApiActionId(), true);
     }
 }

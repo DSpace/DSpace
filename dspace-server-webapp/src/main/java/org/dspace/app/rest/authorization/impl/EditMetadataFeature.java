@@ -26,6 +26,8 @@ import org.springframework.stereotype.Component;
 
 /**
  * The edit metadata feature. It can be used to verify if the metadata of the specified objects can be edited.
+ *
+ * Authorization is granted if the current user has WRITE permissions on the given DSO
  */
 @Component
 @AuthorizationFeatureDocumentation(name = EditMetadataFeature.NAME,

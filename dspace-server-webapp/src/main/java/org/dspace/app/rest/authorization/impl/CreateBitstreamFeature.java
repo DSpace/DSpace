@@ -29,6 +29,8 @@ import org.springframework.stereotype.Component;
 
 /**
  * The create bitstream feature. It can be used to verify if bitstreams can be created in a specific bundle.
+ *
+ * Authorization is granted if the current user has ADD & WRITE permissions on the given bundle AND the item
  */
 @Component
 @AuthorizationFeatureDocumentation(name = CreateBitstreamFeature.NAME,
@@ -61,8 +63,9 @@ public class CreateBitstreamFeature implements AuthorizationFeature {
             DSpaceObject owningObject = bundleService.getParentObject(context,
                 (Bundle)utils.getDSpaceAPIObjectFromRest(context, object));
 
+            // Safety check. In case this is ever not true, this method should be revised.
             if (!(owningObject instanceof Item)) {
-                log.error("The partent object of bundle " + object.getType() + " is not an item");
+                log.error("The parent object of bundle " + object.getType() + " is not an item");
                 return false;
             }
 

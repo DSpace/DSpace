@@ -35,7 +35,6 @@ import org.dspace.core.Constants;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.services.ConfigurationService;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -78,8 +77,6 @@ public class GenericAuthorizationFeatureIT extends AbstractControllerIntegration
     private EPerson communityAWriter;
     private EPerson collectionXWriter;
     private EPerson item1Writer;
-
-    boolean originalAlwaysThrowException;
 
     @Override
     @Before
@@ -200,18 +197,8 @@ public class GenericAuthorizationFeatureIT extends AbstractControllerIntegration
 
         context.restoreAuthSystemState();
 
-        originalAlwaysThrowException = configurationService.getBooleanProperty(
-            "org.dspace.app.rest.authorization.AlwaysThrowExceptionFeature.turnoff", false);
         configurationService.setProperty(
             "org.dspace.app.rest.authorization.AlwaysThrowExceptionFeature.turnoff", "true");
-    }
-
-    @Override
-    @After
-    public void destroy() throws Exception {
-        configurationService.setProperty(
-            "org.dspace.app.rest.authorization.AlwaysThrowExceptionFeature.turnoff", originalAlwaysThrowException);
-        super.destroy();
     }
 
     private void testAdminsHavePermissionsAllDso(String feature) throws Exception {
@@ -825,10 +812,6 @@ public class GenericAuthorizationFeatureIT extends AbstractControllerIntegration
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='canMove')]")
                 .exists());
-
-        context.turnOffAuthorisationSystem();
-        ResourcePolicyBuilder.delete(removePermission.getID());
-        context.restoreAuthSystemState();
     }
 
     @Test
@@ -852,10 +835,6 @@ public class GenericAuthorizationFeatureIT extends AbstractControllerIntegration
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='canMove')]")
                 .exists());
-
-        context.turnOffAuthorisationSystem();
-        ResourcePolicyBuilder.delete(removePermission.getID());
-        context.restoreAuthSystemState();
     }
 
     @Test
