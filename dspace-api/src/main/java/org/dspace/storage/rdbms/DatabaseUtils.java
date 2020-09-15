@@ -562,6 +562,12 @@ public class DatabaseUtils {
             log.info("Loading Flyway DB migrations from: " + StringUtils.join(scriptLocations, ", "));
             flywayConfiguration.locations(scriptLocations.toArray(new String[scriptLocations.size()]));
 
+            // Tell Flyway NOT to throw a validation error if it finds older "Ignored" migrations.
+            // For DSpace, we sometimes have to insert "old" migrations in after a major release
+            // if further development/bug fixes are needed in older versions. So, "Ignored" migrations are
+            // nothing to worry about...you can always trigger them to run using "database migrate ignored" from CLI
+            flywayConfiguration.ignoreIgnoredMigrations(true);
+
             // Set flyway callbacks (i.e. classes which are called post-DB migration and similar)
             // In this situation, we have a Registry Updater that runs PRE-migration
             // NOTE: DatabaseLegacyReindexer only indexes in Legacy Lucene & RDBMS indexes. It can be removed
@@ -691,8 +697,13 @@ public class DatabaseUtils {
                 flyway = flywayConfiguration.load();
                 flyway.baseline();
             } else {
-                // Otherwise, database already initialized with Flyway. Just load our configuration.
+                // Otherwise, this database already ran Flyway before
+                // So, just load our Flyway configuration, initializing latest Flyway.
                 flyway = flywayConfiguration.load();
+
+                // Now, check our Flyway database table to see if it needs upgrading
+                // *before* any other Flyway commands can be run.
+                FlywayUpgradeUtils.upgradeFlywayTable(flyway, connection);
             }
 
             // Determine pending Database migrations
