@@ -157,6 +157,19 @@
                 </executions>
             </plugin>
 
+            <plugin>
+                <groupId>com.mycila</groupId>
+                <artifactId>license-maven-plugin</artifactId>
+                <configuration>
+                    <excludes>
+                        <exclude>src/test/resources/**</exclude>
+                        <exclude>src/test/data/**</exclude>
+                        <!-- Ignore license header requirements on Flyway upgrade scripts -->
+                        <exclude>src/main/resources/org/dspace/storage/rdbms/flywayupgrade/**</exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+
         </plugins>
     </build>
 
