@@ -18,11 +18,13 @@ import org.dspace.app.rest.matcher.OrcidQueueMatcher;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
+import org.dspace.builder.EPersonBuilder;
 import org.dspace.builder.ItemBuilder;
 import org.dspace.builder.OrcidQueueBuilder;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.content.service.ItemService;
+import org.dspace.eperson.EPerson;
 import org.hamcrest.Matchers;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,8 +40,25 @@ public class OrcidQueueRestRepositoryIT extends AbstractControllerIntegrationTes
     private ItemService itemService;
 
     @Test
+    public void findAllTest() throws Exception {
+        String authToken = getAuthToken(admin.getEmail(), password);
+        getClient(authToken).perform(get("/api/cris/orcidQueues/"))
+                            .andExpect(status().isMethodNotAllowed());
+    }
+
+    @Test
     public void findByOwnerTest() throws Exception {
         context.turnOffAuthorisationSystem();
+
+        EPerson researcher = EPersonBuilder.createEPerson(context)
+                                           .withNameInMetadata("Josiah", "Carberry")
+                                           .withEmail("josiah.Carberry@example.com")
+                                           .withPassword(password).build();
+
+        EPerson researcher2 = EPersonBuilder.createEPerson(context)
+                                           .withNameInMetadata("Laura", "Shulz")
+                                           .withEmail("laura.shulz@example.com")
+                                           .withPassword(password).build();
 
         parentCommunity = CommunityBuilder.createCommunity(context)
                                           .withName("Parent Community")
@@ -60,9 +79,17 @@ public class OrcidQueueRestRepositoryIT extends AbstractControllerIntegrationTes
         Item itemPerson = ItemBuilder.createItem(context, col1)
                                      .withPersonIdentifierFirstName("Josiah")
                                      .withPersonIdentifierLastName("Carberry")
+                                     .withCrisOwner(researcher.getFullName(), researcher.getID().toString())
                                      .build();
 
+        Item itemPerson2 = ItemBuilder.createItem(context, col1)
+                                      .withPersonIdentifierFirstName("Laura")
+                                      .withPersonIdentifierLastName("Shulz")
+                                      .withCrisOwner(researcher2.getFullName(), researcher2.getID().toString())
+                                      .build();
+
         itemService.addMetadata(context, itemPerson, "person", "identifier", "orcid", "en", "0000-0002-1825-0097");
+        itemService.addMetadata(context, itemPerson2, "person", "identifier", "orcid", "en", "0000-0002-1826-4497");
 
 
         Item itemPublication = ItemBuilder.createItem(context, col2)
@@ -72,7 +99,7 @@ public class OrcidQueueRestRepositoryIT extends AbstractControllerIntegrationTes
                                           .build();
 
         Item itemPublication2 = ItemBuilder.createItem(context, col2)
-                                           .withAuthor("Josiah, Carberry")
+                                           .withAuthor("Laura, Shulz")
                                            .withTitle("The Impact of Interactive Epistemologies on Cryptography")
                                            .withIssueDate("2013-02-17")
                                            .build();
@@ -84,31 +111,55 @@ public class OrcidQueueRestRepositoryIT extends AbstractControllerIntegrationTes
         itemService.addMetadata(context, itemPerson, "crisevent", "description", "keywords", null, "psychoceramics");
         itemService.addMetadata(context, itemPerson, "dc", "identifier", "scopus", null, "7004769520");
 
-        itemService.addMetadata(context, itemPublication, "cris", "owner", null, null, itemPerson.getID().toString());
-        itemService.addMetadata(context, itemPublication2, "cris", "owner", null, null, itemPerson.getID().toString());
-        itemService.addMetadata(context, itemProject, "cris", "owner", null, null, itemPerson.getID().toString());
-
         OrcidQueue orcidQueue = OrcidQueueBuilder.createOrcidQueue(context, itemPerson, itemPublication).build();
-        OrcidQueue orcidQueue2 = OrcidQueueBuilder.createOrcidQueue(context, itemPerson, itemPublication2).build();
+        OrcidQueue orcidQueue2 = OrcidQueueBuilder.createOrcidQueue(context, itemPerson2, itemPublication2).build();
         OrcidQueue orcidQueue3 = OrcidQueueBuilder.createOrcidQueue(context, itemPerson, itemProject).build();
 
         context.restoreAuthSystemState();
         String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        String tokenResearcher = getAuthToken(researcher.getEmail(), password);
+        String tokenResearcher2 = getAuthToken(researcher2.getEmail(), password);
+
+        getClient(tokenResearcher).perform(get("/api/cris/orcidQueue/search/findByOwner")
+                                  .param("ownerId", itemPerson.getID().toString()))
+                                  .andExpect(status().isOk())
+                                  .andExpect(jsonPath("$._embedded.orcidQueues", Matchers.containsInAnyOrder(
+                                             OrcidQueueMatcher.matchOrcidQueue(orcidQueue, "Publication"),
+                                             OrcidQueueMatcher.matchOrcidQueue(orcidQueue3, "Project")
+                                             )))
+                                  .andExpect(jsonPath("$.page.totalElements", is(2)));
+
+        getClient(tokenResearcher2).perform(get("/api/cris/orcidQueue/search/findByOwner")
+                                   .param("ownerId", itemPerson2.getID().toString()))
+                                   .andExpect(status().isOk())
+                                   .andExpect(jsonPath("$._embedded.orcidQueues", Matchers.contains(
+                                              OrcidQueueMatcher.matchOrcidQueue(orcidQueue2, "Publication")
+                                              )))
+                                   .andExpect(jsonPath("$.page.totalElements", is(1)));
 
         getClient(tokenAdmin).perform(get("/api/cris/orcidQueue/search/findByOwner")
                              .param("ownerId", itemPerson.getID().toString()))
                              .andExpect(status().isOk())
                              .andExpect(jsonPath("$._embedded.orcidQueues", Matchers.containsInAnyOrder(
-                                     OrcidQueueMatcher.matchOrcidQueue(orcidQueue, "Publication"),
-                                     OrcidQueueMatcher.matchOrcidQueue(orcidQueue2, "Publication"),
-                                     OrcidQueueMatcher.matchOrcidQueue(orcidQueue3, "Project")
-                                     )))
-                             .andExpect(jsonPath("$.page.totalElements", is(3)));
+                                        OrcidQueueMatcher.matchOrcidQueue(orcidQueue, "Publication"),
+                                        OrcidQueueMatcher.matchOrcidQueue(orcidQueue3, "Project")
+                                        )))
+                             .andExpect(jsonPath("$.page.totalElements", is(2)));
     }
 
     @Test
-    public void findByOwnerTwoResercherTest() throws Exception {
+    public void findByOwnerForbiddenTest() throws Exception {
         context.turnOffAuthorisationSystem();
+
+        EPerson researcher = EPersonBuilder.createEPerson(context)
+                                           .withNameInMetadata("Josiah", "Carberry")
+                                           .withEmail("josiah.Carberry@example.com")
+                                           .withPassword(password).build();
+
+        EPerson researcher2 = EPersonBuilder.createEPerson(context)
+                                           .withNameInMetadata("Laura", "Shulz")
+                                           .withEmail("laura.shulz@example.com")
+                                           .withPassword(password).build();
 
         parentCommunity = CommunityBuilder.createCommunity(context)
                                           .withName("Parent Community")
@@ -122,80 +173,109 @@ public class OrcidQueueRestRepositoryIT extends AbstractControllerIntegrationTes
                                            .withRelationshipType("Publication")
                                            .withName("Collection 2").build();
 
-        Item itemPerson1 = ItemBuilder.createItem(context, col1)
-                                      .withPersonIdentifierFirstName("Josiah")
-                                      .withPersonIdentifierLastName("Carberry")
-                                      .build();
+        Item itemPerson = ItemBuilder.createItem(context, col1)
+                                     .withPersonIdentifierFirstName("Josiah")
+                                     .withPersonIdentifierLastName("Carberry")
+                                     .withCrisOwner(researcher.getFullName(), researcher.getID().toString())
+                                     .build();
 
         Item itemPerson2 = ItemBuilder.createItem(context, col1)
                                       .withPersonIdentifierFirstName("Laura")
                                       .withPersonIdentifierLastName("Shulz")
+                                      .withCrisOwner(researcher2.getFullName(), researcher2.getID().toString())
                                       .build();
 
-        itemService.addMetadata(context, itemPerson1, "person", "identifier", "orcid", "en", "0000-0002-1825-0097");
-        itemService.addMetadata(context, itemPerson2, "person", "identifier", "orcid", "en", "0000-0002-1825-0033");
+        itemService.addMetadata(context, itemPerson, "person", "identifier", "orcid", "en", "0000-0002-1825-0097");
+        itemService.addMetadata(context, itemPerson2, "person", "identifier", "orcid", "en", "0000-0002-1826-4497");
 
 
         Item itemPublication = ItemBuilder.createItem(context, col2)
                                           .withAuthor("Josiah, Carberry")
                                           .withTitle("A Methodology for the Emulation of Architecture")
-                                          .withIssueDate("2013-08-03").build();
+                                          .withIssueDate("2013-08-03")
+                                          .build();
 
         Item itemPublication2 = ItemBuilder.createItem(context, col2)
                                            .withAuthor("Laura, Shulz")
-                                           .withTitle("Bulk and surface plasmons in artificially structured materials")
-                                           .withIssueDate("2015-05-21").build();
+                                           .withTitle("The Impact of Interactive Epistemologies on Cryptography")
+                                           .withIssueDate("2013-02-17")
+                                           .build();
 
-        Item itemPublication3 = ItemBuilder.createItem(context, col2)
-                                           .withAuthor("Laura, Shulz")
-                                           .withAuthor("Josiah, Carberry")
-                                           .withTitle("Developing Thin Clients Using Amphibious Epistemologies")
-                                           .withIssueDate("2012-11-21").build();
+        itemService.addMetadata(context, itemPerson, "crisevent", "description", "keywords", null, "psychoceramics");
+        itemService.addMetadata(context, itemPerson, "dc", "identifier", "scopus", null, "7004769520");
 
-        itemService.addMetadata(context, itemPublication, "cris", "owner", null, null, itemPerson1.getID().toString());
-        itemService.addMetadata(context, itemPublication2, "cris", "owner", null, null, itemPerson2.getID().toString());
-        itemService.addMetadata(context, itemPublication3, "cris", "owner", null, null, itemPerson1.getID().toString());
-        itemService.addMetadata(context, itemPublication3, "cris", "owner", null, null, itemPerson2.getID().toString());
-
-        OrcidQueue orcidQueue = OrcidQueueBuilder.createOrcidQueue(context, itemPerson1, itemPublication).build();
+        OrcidQueue orcidQueue = OrcidQueueBuilder.createOrcidQueue(context, itemPerson, itemPublication).build();
         OrcidQueue orcidQueue2 = OrcidQueueBuilder.createOrcidQueue(context, itemPerson2, itemPublication2).build();
-        OrcidQueue orcidQueue3 = OrcidQueueBuilder.createOrcidQueue(context, itemPerson1, itemPublication3).build();
-        OrcidQueue orcidQueue4 = OrcidQueueBuilder.createOrcidQueue(context, itemPerson2, itemPublication3).build();
 
         context.restoreAuthSystemState();
-        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        String tokenResearcher2 = getAuthToken(researcher2.getEmail(), password);
 
-        getClient(tokenAdmin).perform(get("/api/cris/orcidQueue/search/findByOwner")
-                             .param("ownerId", itemPerson1.getID().toString()))
-                             .andExpect(status().isOk())
-                             .andExpect(jsonPath("$._embedded.orcidQueues", Matchers.containsInAnyOrder(
-                                        OrcidQueueMatcher.matchOrcidQueue(orcidQueue, "Publication"),
-                                        OrcidQueueMatcher.matchOrcidQueue(orcidQueue3, "Publication")
-                                        )))
-                             .andExpect(jsonPath("$._embedded.orcidQueues", Matchers.not(Matchers.containsInAnyOrder(
-                                        OrcidQueueMatcher.matchOrcidQueue(orcidQueue2, "Publication"),
-                                        OrcidQueueMatcher.matchOrcidQueue(orcidQueue4, "Publication")
-                                        ))))
-                             .andExpect(jsonPath("$.page.totalElements", is(2)));
+        getClient(tokenResearcher2).perform(get("/api/cris/orcidQueue/search/findByOwner")
+                                   .param("ownerId", itemPerson.getID().toString()))
+                                   .andExpect(status().isForbidden());
+    }
 
-        getClient(tokenAdmin).perform(get("/api/cris/orcidQueue/search/findByOwner")
-                             .param("ownerId", itemPerson2.getID().toString()))
-                             .andExpect(status().isOk())
-                             .andExpect(jsonPath("$._embedded.orcidQueues", Matchers.containsInAnyOrder(
-                                     OrcidQueueMatcher.matchOrcidQueue(orcidQueue2, "Publication"),
-                                     OrcidQueueMatcher.matchOrcidQueue(orcidQueue4, "Publication")
-                                     )))
-                             .andExpect(jsonPath("$._embedded.orcidQueues", Matchers.not(Matchers.containsInAnyOrder(
-                                     OrcidQueueMatcher.matchOrcidQueue(orcidQueue, "Publication"),
-                                     OrcidQueueMatcher.matchOrcidQueue(orcidQueue3, "Publication")
-                                     ))))
-                             .andExpect(jsonPath("$.page.totalElements", is(2)));
+    @Test
+    public void findByOwnerUnauthorizedTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        EPerson researcher = EPersonBuilder.createEPerson(context)
+                                           .withNameInMetadata("Josiah", "Carberry")
+                                           .withEmail("josiah.Carberry@example.com")
+                                           .withPassword(password).build();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withRelationshipType("Person")
+                                           .withName("Collection 1").build();
+
+        Collection col2 = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withRelationshipType("Publication")
+                                           .withName("Collection 2").build();
+
+        Item itemPerson = ItemBuilder.createItem(context, col1)
+                                     .withPersonIdentifierFirstName("Josiah")
+                                     .withPersonIdentifierLastName("Carberry")
+                                     .withCrisOwner(researcher.getFullName(), researcher.getID().toString())
+                                     .build();
+
+        itemService.addMetadata(context, itemPerson, "person", "identifier", "orcid", "en", "0000-0002-1825-0097");
+
+        Item itemPublication = ItemBuilder.createItem(context, col2)
+                                          .withAuthor("Josiah, Carberry")
+                                          .withTitle("A Methodology for the Emulation of Architecture")
+                                          .withIssueDate("2013-08-03")
+                                          .build();
+
+        itemService.addMetadata(context, itemPerson, "crisevent", "description", "keywords", null, "psychoceramics");
+        itemService.addMetadata(context, itemPerson, "dc", "identifier", "scopus", null, "7004769520");
+
+        OrcidQueue orcidQueue = OrcidQueueBuilder.createOrcidQueue(context, itemPerson, itemPublication).build();
+
+        context.restoreAuthSystemState();
+
+        getClient().perform(get("/api/cris/orcidQueue/search/findByOwner")
+                   .param("ownerId", itemPerson.getID().toString()))
+                   .andExpect(status().isUnauthorized());
     }
 
     @Test
     public void findOneTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
+        EPerson researcher = EPersonBuilder.createEPerson(context)
+                                           .withNameInMetadata("Josiah", "Carberry")
+                                           .withEmail("josiah.Carberry@example.com")
+                                           .withPassword(password).build();
+
+        EPerson researcher2 = EPersonBuilder.createEPerson(context)
+                                            .withNameInMetadata("Laura", "Shulz")
+                                            .withEmail("Laura.Shulz@example.com")
+                                            .withPassword(password).build();
+
         parentCommunity = CommunityBuilder.createCommunity(context)
                                           .withName("Parent Community")
                                           .build();
@@ -211,11 +291,13 @@ public class OrcidQueueRestRepositoryIT extends AbstractControllerIntegrationTes
         Item itemPerson1 = ItemBuilder.createItem(context, col1)
                                       .withPersonIdentifierFirstName("Josiah")
                                       .withPersonIdentifierLastName("Carberry")
+                                      .withCrisOwner(researcher.getFullName(), researcher.getID().toString())
                                       .build();
 
         Item itemPerson2 = ItemBuilder.createItem(context, col1)
                                       .withPersonIdentifierFirstName("Laura")
                                       .withPersonIdentifierLastName("Shulz")
+                                      .withCrisOwner(researcher2.getFullName(), researcher2.getID().toString())
                                       .build();
 
         itemService.addMetadata(context, itemPerson1, "person", "identifier", "orcid", "en", "0000-0002-1825-0097");
@@ -232,33 +314,36 @@ public class OrcidQueueRestRepositoryIT extends AbstractControllerIntegrationTes
                                            .withTitle("Bulk and surface plasmons in artificially structured materials")
                                            .withIssueDate("2015-05-21").build();
 
-        itemService.addMetadata(context, itemPublication, "cris", "owner", null, null, itemPerson1.getID().toString());
-        itemService.addMetadata(context, itemPublication2, "cris", "owner", null, null, itemPerson2.getID().toString());
-
         OrcidQueue orcidQueue = OrcidQueueBuilder.createOrcidQueue(context, itemPerson1, itemPublication).build();
         OrcidQueue orcidQueue2 = OrcidQueueBuilder.createOrcidQueue(context, itemPerson2, itemPublication2).build();
 
         context.restoreAuthSystemState();
-        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        String tokenResearcher = getAuthToken(researcher.getEmail(), password);
+        String tokenResearcher2 = getAuthToken(researcher2.getEmail(), password);
 
-        getClient(tokenAdmin).perform(get("/api/cris/orcidQueue/" + orcidQueue.getID().toString()))
+        getClient(tokenResearcher).perform(get("/api/cris/orcidQueues/" + orcidQueue.getID().toString()))
                              .andExpect(status().isOk())
                              .andExpect(jsonPath("$", is(
-                                        OrcidQueueMatcher.matchOrcidQueue(orcidQueue, "Publication"))))
-                             .andExpect(jsonPath("$._links.self.href", Matchers
-                                       .containsString("/api/cris/orcidQueue/" + orcidQueue.getID())));
+                                        OrcidQueueMatcher.matchOrcidQueue(orcidQueue, "Publication"))));
+//                             .andExpect(jsonPath("$._links.self.href", Matchers
+//                                       .containsString("/api/cris/orcidQueue/" + orcidQueue.getID())));
 
-        getClient(tokenAdmin).perform(get("/api/cris/orcidQueue/" + orcidQueue2.getID().toString()))
+        getClient(tokenResearcher2).perform(get("/api/cris/orcidQueues/" + orcidQueue2.getID().toString()))
                              .andExpect(status().isOk())
                              .andExpect(jsonPath("$", is(
-                                        OrcidQueueMatcher.matchOrcidQueue(orcidQueue2, "Publication"))))
-                             .andExpect(jsonPath("$._links.self.href", Matchers
-                                       .containsString("/api/cris/orcidQueue/" + orcidQueue2.getID())));
+                                        OrcidQueueMatcher.matchOrcidQueue(orcidQueue2, "Publication"))));
+//                             .andExpect(jsonPath("$._links.self.href", Matchers
+//                                       .containsString("/api/cris/orcidQueue/" + orcidQueue2.getID())));
     }
 
     @Test
-    public void deleteOneTest() throws Exception {
+    public void findOneForbiddenTest() throws Exception {
         context.turnOffAuthorisationSystem();
+
+        EPerson researcher = EPersonBuilder.createEPerson(context)
+                                           .withNameInMetadata("Josiah", "Carberry")
+                                           .withEmail("josiah.Carberry@example.com")
+                                           .withPassword(password).build();
 
         parentCommunity = CommunityBuilder.createCommunity(context)
                                           .withName("Parent Community")
@@ -275,6 +360,7 @@ public class OrcidQueueRestRepositoryIT extends AbstractControllerIntegrationTes
         Item itemPerson1 = ItemBuilder.createItem(context, col1)
                                       .withPersonIdentifierFirstName("Josiah")
                                       .withPersonIdentifierLastName("Carberry")
+                                      .withCrisOwner(researcher.getFullName(), researcher.getID().toString())
                                       .build();
 
         itemService.addMetadata(context, itemPerson1, "person", "identifier", "orcid", "en", "0000-0002-1825-0097");
@@ -284,17 +370,212 @@ public class OrcidQueueRestRepositoryIT extends AbstractControllerIntegrationTes
                                           .withTitle("A Methodology for the Emulation of Architecture")
                                           .withIssueDate("2013-08-03").build();
 
-        itemService.addMetadata(context, itemPublication, "cris", "owner", null, null, itemPerson1.getID().toString());
+        OrcidQueue orcidQueue = OrcidQueueBuilder.createOrcidQueue(context, itemPerson1, itemPublication).build();
+
+        context.restoreAuthSystemState();
+        String tokenEperson = getAuthToken(eperson.getEmail(), password);
+
+        getClient(tokenEperson).perform(get("/api/cris/orcidQueues/" + orcidQueue.getID().toString()))
+                               .andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void findOneUnauthorizedTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        EPerson researcher = EPersonBuilder.createEPerson(context)
+                                           .withNameInMetadata("Josiah", "Carberry")
+                                           .withEmail("josiah.Carberry@example.com")
+                                           .withPassword(password).build();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withRelationshipType("Person")
+                                           .withName("Collection 1").build();
+
+        Collection col2 = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withRelationshipType("Publication")
+                                           .withName("Collection 2").build();
+
+        Item itemPerson1 = ItemBuilder.createItem(context, col1)
+                                      .withPersonIdentifierFirstName("Josiah")
+                                      .withPersonIdentifierLastName("Carberry")
+                                      .withCrisOwner(researcher.getFullName(), researcher.getID().toString())
+                                      .build();
+
+        itemService.addMetadata(context, itemPerson1, "person", "identifier", "orcid", "en", "0000-0002-1825-0097");
+
+        Item itemPublication = ItemBuilder.createItem(context, col2)
+                                          .withAuthor("Josiah, Carberry")
+                                          .withTitle("A Methodology for the Emulation of Architecture")
+                                          .withIssueDate("2013-08-03").build();
 
         OrcidQueue orcidQueue = OrcidQueueBuilder.createOrcidQueue(context, itemPerson1, itemPublication).build();
 
         context.restoreAuthSystemState();
+
+        getClient().perform(get("/api/cris/orcidQueue/" + orcidQueue.getID().toString()))
+                   .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    public void findOneNotFoundTest() throws Exception {
         String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        getClient(tokenAdmin).perform(get("/api/cris/orcidQueues/" + Integer.MAX_VALUE))
+                             .andExpect(status().isNotFound());
+    }
 
-        getClient(tokenAdmin).perform(delete("/api/cris/orcidQueue/" + orcidQueue.getID().toString()))
-                             .andExpect(status().isNoContent());
+    @Test
+    public void deleteOneTest() throws Exception {
+        context.turnOffAuthorisationSystem();
 
-        getClient(tokenAdmin).perform(get("/api/cris/orcidQueue/" + orcidQueue.getID().toString()))
+        EPerson researcher = EPersonBuilder.createEPerson(context)
+                                           .withNameInMetadata("Josiah", "Carberry")
+                                           .withEmail("josiah.Carberry@example.com")
+                                           .withPassword(password).build();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withRelationshipType("Person")
+                                           .withName("Collection 1").build();
+
+        Collection col2 = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withRelationshipType("Publication")
+                                           .withName("Collection 2").build();
+
+        Item itemPerson1 = ItemBuilder.createItem(context, col1)
+                                      .withPersonIdentifierFirstName("Josiah")
+                                      .withPersonIdentifierLastName("Carberry")
+                                      .withCrisOwner(researcher.getFullName(), researcher.getID().toString())
+                                      .build();
+
+        itemService.addMetadata(context, itemPerson1, "person", "identifier", "orcid", "en", "0000-0002-1825-0097");
+
+        Item itemPublication = ItemBuilder.createItem(context, col2)
+                                          .withAuthor("Josiah, Carberry")
+                                          .withTitle("A Methodology for the Emulation of Architecture")
+                                          .withIssueDate("2013-08-03").build();
+
+        OrcidQueue orcidQueue = OrcidQueueBuilder.createOrcidQueue(context, itemPerson1, itemPublication).build();
+
+        context.restoreAuthSystemState();
+        String tokenResearcher = getAuthToken(researcher.getEmail(), password);
+
+        getClient(tokenResearcher).perform(delete("/api/cris/orcidQueues/" + orcidQueue.getID()))
+                                  .andExpect(status().isNoContent());
+
+        getClient(tokenResearcher).perform(get("/api/cris/orcidQueues/" + orcidQueue.getID()))
+                                  .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void deleteOneForbiddenTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        EPerson researcher = EPersonBuilder.createEPerson(context)
+                                           .withNameInMetadata("Josiah", "Carberry")
+                                           .withEmail("josiah.Carberry@example.com")
+                                           .withPassword(password).build();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withRelationshipType("Person")
+                                           .withName("Collection 1").build();
+
+        Collection col2 = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withRelationshipType("Publication")
+                                           .withName("Collection 2").build();
+
+        Item itemPerson1 = ItemBuilder.createItem(context, col1)
+                                      .withPersonIdentifierFirstName("Josiah")
+                                      .withPersonIdentifierLastName("Carberry")
+                                      .withCrisOwner(researcher.getFullName(), researcher.getID().toString())
+                                      .build();
+
+        itemService.addMetadata(context, itemPerson1, "person", "identifier", "orcid", "en", "0000-0002-1825-0097");
+
+        Item itemPublication = ItemBuilder.createItem(context, col2)
+                                          .withAuthor("Josiah, Carberry")
+                                          .withTitle("A Methodology for the Emulation of Architecture")
+                                          .withIssueDate("2013-08-03").build();
+
+        OrcidQueue orcidQueue = OrcidQueueBuilder.createOrcidQueue(context, itemPerson1, itemPublication).build();
+
+        context.restoreAuthSystemState();
+
+        String tokenEPerson = getAuthToken(eperson.getEmail(), password);
+        String tokenResearcher = getAuthToken(researcher.getEmail(), password);
+
+        getClient(tokenEPerson).perform(delete("/api/cris/orcidQueues/" + orcidQueue.getID()))
+                               .andExpect(status().isForbidden());
+
+        getClient(tokenResearcher).perform(get("/api/cris/orcidQueues/" + orcidQueue.getID()))
+                                  .andExpect(status().isOk())
+                                  .andExpect(jsonPath("$", is(
+                                          OrcidQueueMatcher.matchOrcidQueue(orcidQueue, "Publication"))));
+    }
+
+    @Test
+    public void deleteOneUnauthorizedTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        EPerson researcher = EPersonBuilder.createEPerson(context)
+                                           .withNameInMetadata("Josiah", "Carberry")
+                                           .withEmail("josiah.Carberry@example.com")
+                                           .withPassword(password).build();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withRelationshipType("Person")
+                                           .withName("Collection 1").build();
+
+        Collection col2 = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withRelationshipType("Publication")
+                                           .withName("Collection 2").build();
+
+        Item itemPerson1 = ItemBuilder.createItem(context, col1)
+                                      .withPersonIdentifierFirstName("Josiah")
+                                      .withPersonIdentifierLastName("Carberry")
+                                      .withCrisOwner(researcher.getFullName(), researcher.getID().toString())
+                                      .build();
+
+        itemService.addMetadata(context, itemPerson1, "person", "identifier", "orcid", "en", "0000-0002-1825-0097");
+
+        Item itemPublication = ItemBuilder.createItem(context, col2)
+                                          .withAuthor("Josiah, Carberry")
+                                          .withTitle("A Methodology for the Emulation of Architecture")
+                                          .withIssueDate("2013-08-03").build();
+
+        OrcidQueue orcidQueue = OrcidQueueBuilder.createOrcidQueue(context, itemPerson1, itemPublication).build();
+
+        context.restoreAuthSystemState();
+        String tokenResearcher = getAuthToken(researcher.getEmail(), password);
+
+        getClient().perform(delete("/api/cris/orcidQueues/" + orcidQueue.getID()))
+                   .andExpect(status().isUnauthorized());
+
+        getClient(tokenResearcher).perform(get("/api/cris/orcidQueues/" + orcidQueue.getID()))
+                                  .andExpect(status().isOk())
+                                  .andExpect(jsonPath("$", is(
+                                          OrcidQueueMatcher.matchOrcidQueue(orcidQueue, "Publication"))));
+    }
+
+    @Test
+    public void deleteOneNotFoundTest() throws Exception {
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        getClient(tokenAdmin).perform(delete("/api/cris/orcidQueues/" + Integer.MAX_VALUE))
                              .andExpect(status().isNotFound());
     }
 }
