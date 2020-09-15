@@ -53,7 +53,7 @@ public class CreateCollectionFeature implements AuthorizationFeature {
     @Override
     public String[] getSupportedTypes() {
         return new String[]{
-                CommunityRest.CATEGORY + "." + CommunityRest.NAME
+            CommunityRest.CATEGORY + "." + CommunityRest.NAME
         };
     }
 }

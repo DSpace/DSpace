@@ -59,8 +59,8 @@ public class CreateCommunityFeature implements AuthorizationFeature {
     @Override
     public String[] getSupportedTypes() {
         return new String[]{
-                SiteRest.CATEGORY + "." + SiteRest.NAME,
-                CommunityRest.CATEGORY + "." + CommunityRest.NAME
+            SiteRest.CATEGORY + "." + SiteRest.NAME,
+            CommunityRest.CATEGORY + "." + CommunityRest.NAME
         };
     }
 }
