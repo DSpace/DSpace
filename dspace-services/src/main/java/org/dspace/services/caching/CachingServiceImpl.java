@@ -170,7 +170,7 @@ public final class CachingServiceImpl
      */
     @Override
     public String[] notifyForConfigNames() {
-        return knownConfigNames == null ? null : knownConfigNames.clone();
+        return knownConfigNames.clone();
     }
 
     /* (non-Javadoc)
@@ -260,9 +260,7 @@ public final class CachingServiceImpl
         // for some reason this causes lots of errors so not using it for now -AZ
         //ehCacheManagementService.dispose();
         try {
-            if (cacheRecord != null) {
-                cacheRecord.clear();
-            }
+            cacheRecord.clear();
         } catch (RuntimeException e) {
             // whatever
         }
