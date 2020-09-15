@@ -52,6 +52,7 @@ import org.dspace.app.rest.model.CommunityRest;
 import org.dspace.app.rest.model.CrisLayoutBoxRest;
 import org.dspace.app.rest.model.LinkRest;
 import org.dspace.app.rest.model.LinksRest;
+import org.dspace.app.rest.model.OrcidQueueRest;
 import org.dspace.app.rest.model.ProcessRest;
 import org.dspace.app.rest.model.PropertyRest;
 import org.dspace.app.rest.model.ResourcePolicyRest;
@@ -298,6 +299,9 @@ public class Utils {
         }
         if (StringUtils.equals(modelPlural, "boxes")) {
             return CrisLayoutBoxRest.NAME;
+        }
+        if (StringUtils.equals(modelPlural, "orcidQueues")) {
+            return OrcidQueueRest.NAME;
         }
         return modelPlural.replaceAll("s$", "");
     }
