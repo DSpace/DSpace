@@ -29,6 +29,9 @@ import org.springframework.stereotype.Component;
 
 /**
  * The move feature. It can be used to verify if item can be moved to a different collection.
+ *
+ * Authorization is granted if the current user has WRITE permissions on the given item and REMOVE permissions on the
+ * item’s owning collection
  */
 @Component
 @AuthorizationFeatureDocumentation(name = MoveFeature.NAME,

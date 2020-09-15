@@ -21,6 +21,8 @@ import org.springframework.stereotype.Component;
 
 /**
  * The reorder bitstream feature. It can be used to verify if bitstreams can be reordered in a specific bundle.
+ *
+ * Authorization is granted if the current user has WRITE permissions on the given bundle
  */
 @Component
 @AuthorizationFeatureDocumentation(name = ReorderBitstreamFeature.NAME,

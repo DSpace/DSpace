@@ -33,6 +33,10 @@ import org.springframework.stereotype.Component;
 
 /**
  * The policy feature. It can be used by administrators (or community/collection delegate) to manage resource policies
+ *
+ * Authorization is granted
+ * - for the site if the current user is administrator
+ * - for other objects if the current user has ADMIN permissions on the object
  */
 @Component
 @AuthorizationFeatureDocumentation(name = PolicyFeature.NAME,

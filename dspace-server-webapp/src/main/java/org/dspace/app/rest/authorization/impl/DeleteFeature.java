@@ -35,6 +35,16 @@ import org.springframework.stereotype.Component;
 
 /**
  * The delete feature. It can be used to verify if specific content can be deleted/expunged.
+ *
+ * Authorization is granted
+ * - for a bitstream if the current used has REMOVE permissions on both the Item and the Bundle
+ * - for a bundle if the current user has REMOVE permissions on the Item
+ * - for an item if the current user has REMOVE permissions on the collection AND and DELETE permissions on the item
+ * - for a collection if the current user has REMOVE permissions on the community
+ * - for a community with a parent community if the current user has REMOVE permissions on the parent community
+ * - for a community without a parent community if the current user has DELETE permissions on the current community
+ * - for other objects if the current user has REMOVE permissions on the parent object if there is one. Otherwise if the
+ *      current user has DELETE permissions on the current object
  */
 @Component
 @AuthorizationFeatureDocumentation(name = DeleteFeature.NAME,

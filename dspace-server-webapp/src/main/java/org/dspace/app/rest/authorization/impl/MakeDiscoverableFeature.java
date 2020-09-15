@@ -21,6 +21,8 @@ import org.springframework.stereotype.Component;
 
 /**
  * The make discoverable feature. It can be used to verify if an item can be made discoverable.
+ *
+ * Authorization is granted if the current user has WRITE permissions on the given item
  */
 @Component
 @AuthorizationFeatureDocumentation(name = MakeDiscoverableFeature.NAME,
