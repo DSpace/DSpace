@@ -249,14 +249,21 @@
                     </dependencies>
                 </plugin>
                 <plugin>
-                    <groupId>org.codehaus.mojo</groupId>
-                    <artifactId>findbugs-maven-plugin</artifactId>
-                    <version>3.0.5</version>
+                    <groupId>com.github.spotbugs</groupId>
+                    <artifactId>spotbugs-maven-plugin</artifactId>
+                    <version>4.0.4</version>
                     <configuration>
                         <effort>Max</effort>
                         <threshold>Low</threshold>
                         <xmlOutput>true</xmlOutput>
                     </configuration>
+                    <dependencies>
+                        <dependency>
+                            <groupId>com.github.spotbugs</groupId>
+                            <artifactId>spotbugs</artifactId>
+                            <version>4.1.2</version>
+                        </dependency>
+                    </dependencies>
                     <executions>
                         <execution>
                             <phase>compile</phase>
@@ -1666,6 +1673,7 @@
                 <artifactId>google-oauth-client</artifactId>
                 <version>1.23.0</version>
             </dependency>
+
             <!-- Findbugs annotations -->
             <dependency>
                 <groupId>com.google.code.findbugs</groupId>
@@ -1679,6 +1687,7 @@
                 <version>3.0.1u2</version>
                 <scope>provided</scope>
             </dependency>
+
             <!-- Converge miscellaneous transitive dependencies. -->
             <dependency>
                 <groupId>com.fasterxml</groupId>
