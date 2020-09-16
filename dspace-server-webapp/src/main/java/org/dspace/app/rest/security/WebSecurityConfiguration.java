@@ -57,6 +57,9 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Autowired
     private AuthenticationService authenticationService;
 
+    @Autowired
+    private UserAgreementFilter userAgreementFilter;
+
     @Override
     public void configure(WebSecurity webSecurity) throws Exception {
         webSecurity
@@ -124,7 +127,9 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
             // before each URL
             .addFilterBefore(new StatelessAuthenticationFilter(authenticationManager(), restAuthenticationService,
                                                                ePersonRestAuthenticationProvider, requestService),
-                             StatelessLoginFilter.class);
+                             StatelessLoginFilter.class)
+            // Add a filter to verify that the user accepted terms and conditions
+            .addFilterBefore(userAgreementFilter, LogoutFilter.class);
     }
 
     @Override
