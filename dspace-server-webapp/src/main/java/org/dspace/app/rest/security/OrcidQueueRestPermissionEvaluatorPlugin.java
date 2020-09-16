@@ -12,7 +12,9 @@ import java.sql.SQLException;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+import org.dspace.app.orcid.OrcidHistory;
 import org.dspace.app.orcid.OrcidQueue;
+import org.dspace.app.orcid.service.OrcidHistoryService;
 import org.dspace.app.orcid.service.OrcidQueueService;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.content.MetadataValue;
@@ -46,6 +48,9 @@ public class OrcidQueueRestPermissionEvaluatorPlugin extends RestObjectPermissio
     private OrcidQueueService orcidQueueService;
 
     @Autowired
+    private OrcidHistoryService orcidHistoryService;
+
+    @Autowired
     private ItemService itemService;
 
     @Override
@@ -64,30 +69,40 @@ public class OrcidQueueRestPermissionEvaluatorPlugin extends RestObjectPermissio
         Request request = requestService.getCurrentRequest();
         Context context = ContextUtil.obtainContext(request.getServletRequest());
 
-        EPerson ePerson = null;
-        try {
-            ePerson = context.getCurrentUser();
-            Integer orcidQueueId = Integer.parseInt(targetId.toString());
-            OrcidQueue orcidQueue = orcidQueueService.find(context, orcidQueueId);
+        EPerson currentUser = context.getCurrentUser();
+        Integer orcidObjectId = Integer.parseInt(targetId.toString());
 
-            // anonymous user
-            if (ePerson == null) {
-                return false;
-            } else if (orcidQueueId == null || StringUtils.isBlank(targetId.toString()) || orcidQueue == null) {
-                return true;
-            } else if (hasAccess(ePerson, orcidQueue)) {
-                return true;
-            }
-        } catch (SQLException e) {
-            log.error(e.getMessage(), e);
+        // anonymous user
+        if (currentUser == null) {
+            return false;
+        } else if (StringUtils.isBlank(targetId.toString())) {
+            return true;
+        } else if (hasAccess(context, currentUser, orcidObjectId)) {
+            return true;
         }
         return false;
     }
 
-    private boolean hasAccess(EPerson ePerson, OrcidQueue orcidQueue) {
-        List<MetadataValue> values = itemService.getMetadata(orcidQueue.getOwner(), "cris", "owner", null, null);
-        if (values.get(0).getAuthority().equals(ePerson.getID().toString())) {
-            return true;
+    private boolean hasAccess(Context context, EPerson currentUser, Integer orcidObjectId) {
+        try {
+            OrcidQueue orcidQueue = orcidQueueService.find(context, orcidObjectId);
+            OrcidHistory orcidHistory = orcidHistoryService.find(context, orcidObjectId);
+            if ((orcidQueue == null && orcidHistory == null)) {
+                return true;
+            }
+            if (orcidQueue != null) {
+                List<MetadataValue> value = itemService.getMetadata(orcidQueue.getOwner(), "cris", "owner", null, null);
+                if (value.get(0).getAuthority().equals(currentUser.getID().toString())) {
+                    return true;
+                }
+            } else {
+                List<MetadataValue> value = itemService.getMetadata(orcidHistory.getOwner(),"cris","owner", null, null);
+                if (value.get(0).getAuthority().equals(currentUser.getID().toString())) {
+                    return true;
+                }
+            }
+        } catch (SQLException e) {
+            log.error(e.getMessage(), e);
         }
         return false;
     }
