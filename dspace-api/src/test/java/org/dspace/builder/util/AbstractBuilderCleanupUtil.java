@@ -26,6 +26,7 @@ import org.dspace.builder.GroupBuilder;
 import org.dspace.builder.ItemBuilder;
 import org.dspace.builder.MetadataFieldBuilder;
 import org.dspace.builder.MetadataSchemaBuilder;
+import org.dspace.builder.OrcidHistoryBuilder;
 import org.dspace.builder.OrcidQueueBuilder;
 import org.dspace.builder.PoolTaskBuilder;
 import org.dspace.builder.ProcessBuilder;
@@ -51,6 +52,7 @@ public class AbstractBuilderCleanupUtil {
     public AbstractBuilderCleanupUtil() {
         //map.put(CrisLayoutBitstreamBuilder.class.getName(), new LinkedList<>());
         //map.put(CrisLayoutFieldBuilder.class.getName(), new LinkedList<>());
+        map.put(OrcidHistoryBuilder.class.getName(), new LinkedList<>());
         map.put(OrcidQueueBuilder.class.getName(), new LinkedList<>());
         map.put(CrisLayoutBoxBuilder.class.getName(), new LinkedList<>());
         map.put(CrisLayoutTabBuilder.class.getName(), new LinkedList<>());

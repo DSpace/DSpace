@@ -12,7 +12,9 @@ import java.util.List;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.logging.log4j.Logger;
+import org.dspace.app.orcid.factory.OrcidHistoryServiceFactory;
 import org.dspace.app.orcid.factory.OrcidQueueServiceFactory;
+import org.dspace.app.orcid.service.OrcidHistoryService;
 import org.dspace.app.orcid.service.OrcidQueueService;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
@@ -99,6 +101,7 @@ public abstract class AbstractBuilder<T, S> {
     static CrisLayoutBoxService crisLayoutBoxService;
     static CrisLayoutFieldService crisLayoutFieldService;
     static OrcidQueueService orcidQueueService;
+    static OrcidHistoryService orcidHistoryService;
 
     protected Context context;
 
@@ -157,6 +160,7 @@ public abstract class AbstractBuilder<T, S> {
         crisLayoutBoxService = CrisLayoutServiceFactory.getInstance().getBoxService();
         crisLayoutFieldService = CrisLayoutServiceFactory.getInstance().getFieldService();
         orcidQueueService = OrcidQueueServiceFactory.getInstance().getOrcidQueueService();
+        orcidHistoryService = OrcidHistoryServiceFactory.getInstance().getOrcidHistoryService();
     }
 
 
@@ -191,6 +195,7 @@ public abstract class AbstractBuilder<T, S> {
         crisLayoutBoxService = null;
         crisLayoutFieldService = null;
         orcidQueueService = null;
+        orcidHistoryService = null;
 
     }
 
