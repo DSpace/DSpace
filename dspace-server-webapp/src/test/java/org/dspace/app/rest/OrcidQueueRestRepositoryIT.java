@@ -42,7 +42,7 @@ public class OrcidQueueRestRepositoryIT extends AbstractControllerIntegrationTes
     @Test
     public void findAllTest() throws Exception {
         String authToken = getAuthToken(admin.getEmail(), password);
-        getClient(authToken).perform(get("/api/cris/orcidQueues/"))
+        getClient(authToken).perform(get("/api/cris/orcidQueues"))
                             .andExpect(status().isMethodNotAllowed());
     }
 
