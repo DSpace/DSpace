@@ -12,7 +12,6 @@ import static java.lang.Math.toIntExact;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
-import javax.servlet.http.HttpServletRequest;
 
 import org.dspace.app.orcid.OrcidQueue;
 import org.dspace.app.orcid.service.OrcidQueueService;
@@ -75,15 +74,6 @@ public class OrcidQueueRestRepository extends DSpaceRestRepository<OrcidQueueRes
         } catch (SQLException e) {
             throw new RuntimeException("Unable to delete OrcidQueue with id = " + id, e);
         }
-    }
-
-    protected OrcidQueueRest createAndReturn(Context context)
-        throws AuthorizeException, SQLException, RepositoryMethodNotImplementedException {
-        HttpServletRequest request = getRequestService().getCurrentRequest().getHttpServletRequest();
-
-        String orcidQueueId = request.getParameter("orcidQueueId");
-        orcidQueueService.sendToOrcid(context, Integer.valueOf(orcidQueueId));
-        return new OrcidQueueRest();
     }
 
     @SearchRestMethod(name = "findByOwner")
