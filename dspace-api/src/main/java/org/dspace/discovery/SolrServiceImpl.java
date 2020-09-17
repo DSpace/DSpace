@@ -421,8 +421,8 @@ public class SolrServiceImpl implements SearchService, IndexingService {
             long finish = System.currentTimeMillis();
             System.out.println("SOLR Search Optimize -- Process Finished:" + finish);
             System.out.println("SOLR Search Optimize -- Total time taken:" + (finish - start) + " (ms).");
-        } catch (SolrServerException | IOException sse) {
-            System.err.println(sse.getMessage());
+        } catch (SolrServerException | IOException e) {
+            System.err.println(e.getMessage());
         }
     }
 
@@ -721,7 +721,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
             QueryResponse queryResponse = solrSearchCore.getSolr().query(solrQuery, SolrRequest.METHOD.POST);
             return retrieveResult(context, discoveryQuery, queryResponse);
 
-        } catch (IOException | SQLException | SolrServerException | SearchServiceException e) {
+        } catch (Exception e) {
             throw new org.dspace.discovery.SearchServiceException(e.getMessage(), e);
         }
     }
