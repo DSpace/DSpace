@@ -156,6 +156,12 @@
 			<xsl:when test="$subtype='Conjunto de datos'">
 				conjunto de datos
 			</xsl:when>
+			<xsl:when test="$subtype='Placa espectrografica'">
+				conjunto de datos
+			</xsl:when>
+			<xsl:when test="$subtype='Placa fotografica'">
+				conjunto de datos
+			</xsl:when>
             <xsl:when test="$subtype='Proyecto de extension'">
                 proyecto de investigación
             </xsl:when>

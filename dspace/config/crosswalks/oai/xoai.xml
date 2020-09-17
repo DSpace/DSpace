@@ -603,6 +603,8 @@
 		    		<string>Objeto de conferencia</string>
 			    	<string>Resumen</string>
     				<string>Conjunto de datos</string>
+			        <string>Placa espectrografica</string>
+			        <string>Placa fotografica</string>
     				<string>Proyecto de extension</string>
     				<string>Proyecto de investigacion</string>
     			</list>

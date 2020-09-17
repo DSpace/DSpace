@@ -221,7 +221,12 @@
  			<xsl:for-each select="doc:metadata/doc:element[@name='bundles']/doc:element[@name='bundle' and doc:field[@name='name' and text()='ORIGINAL']]/doc:element[@name='bitstreams']/doc:element[@name='bitstream' and position()=1]/doc:field[@name='format']">
 				<dc:format><xsl:value-of select="." /></dc:format>
 			</xsl:for-each>
-			
+
+			<!--  dc.coverage.* -->
+			<xsl:for-each select="doc:metadata/doc:element[@name='dc']/doc:element[@name='coverage']/doc:element/doc:element/doc:field[@name='value']">
+				<dc:coverage><xsl:value-of select="." /></dc:coverage>
+			</xsl:for-each>
+
 			<!--  dc.format.extent -->
  			<xsl:for-each select="doc:metadata/doc:element[@name='dc']/doc:element[@name='format']/doc:element[@name='extent']/doc:element/doc:field[@name='value']">
 				<dc:format><xsl:value-of select="." /></dc:format>
