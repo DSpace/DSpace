@@ -10,6 +10,7 @@ package org.dspace.app.rest;
 import static com.jayway.jsonpath.JsonPath.read;
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
@@ -1816,5 +1817,45 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
                                 hasJsonPath("$.pooltask-search.href",
                                          is("http://localhost/api/workflow/pooltask/search"))
                         )));
+    }
+
+    @Test
+    public void findOneFullProjectionTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and two collections.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1")
+                                           .withWorkflowGroup(1, admin).build();
+
+        //2. a workflow item
+        XmlWorkflowItem witem = WorkflowItemBuilder.createWorkflowItem(context, col1)
+                                                   .withTitle("Workflow Item 1")
+                                                   .withIssueDate("2017-10-17")
+                                                   .withAuthor("Smith, Donald").withAuthor("Doe, John")
+                                                   .withSubject("ExtraEntry")
+                                                   .build();
+
+        context.restoreAuthSystemState();
+
+        String adminToken = getAuthToken(admin.getEmail(), password);
+        String epersonToken = getAuthToken(eperson.getEmail(), password);
+
+        getClient(epersonToken).perform(get("/api/workflow/workflowitems/" + witem.getID())
+                                    .param("projection", "full"))
+                            .andExpect(status().isOk())
+                            .andExpect(jsonPath("$._embedded.collection._embedded.adminGroup").doesNotExist());
+
+        getClient(adminToken).perform(get("/api/workflow/workflowitems/" + witem.getID())
+                                         .param("projection", "full"))
+                            .andExpect(status().isOk())
+                            .andExpect(jsonPath("$._embedded.collection._embedded.adminGroup", nullValue()));
+
     }
 }

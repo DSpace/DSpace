@@ -23,6 +23,11 @@ import org.dspace.importer.external.exception.FileSourceException;
 public interface FileSource extends MetadataSource {
 
     /**
+     * Get the file extensions (xml, csv, txt, ...) supported by the FileSource
+     */
+    public List<String> getSupportedExtensions();
+
+    /**
      * Return a list of ImportRecord constructed from input file.
      *
      * @param InputStream The inputStream of the file
@@ -61,10 +66,5 @@ public interface FileSource extends MetadataSource {
         }
         return false;
     }
-
-    /**
-     * Get the file extensions (xml, csv, txt, ...) supported by the FileSource implementation
-     */
-    public List<String> getSupportedExtensions();
 
 }

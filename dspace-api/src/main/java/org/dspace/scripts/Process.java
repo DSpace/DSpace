@@ -82,6 +82,7 @@ public class Process implements ReloadableEntity<Integer> {
     private Date creationTime;
 
     public static final String BITSTREAM_TYPE_METADATAFIELD = "dspace.process.filetype";
+    public static final String OUTPUT_TYPE = "script_output";
 
     protected Process() {
     }

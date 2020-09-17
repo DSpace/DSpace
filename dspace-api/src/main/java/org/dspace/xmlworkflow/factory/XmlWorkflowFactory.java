@@ -86,7 +86,7 @@ public interface XmlWorkflowFactory {
      * @param workflowName Name of workflow we want the collections of that are mapped to is
      * @return List of collections mapped to the requested workflow
      */
-    public List<Collection> getCollectionHandlesMappedToWorklow(Context context, String workflowName);
+    public List<Collection> getCollectionHandlesMappedToWorkflow(Context context, String workflowName);
 
     /**
      * Returns list of collections that are not mapped to any configured workflow, and thus use the default workflow
