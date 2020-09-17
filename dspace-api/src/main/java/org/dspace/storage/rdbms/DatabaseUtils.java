@@ -106,6 +106,10 @@ public class DatabaseUtils {
             FluentConfiguration flywayConfiguration = setupFlyway(dataSource);
             Flyway flyway = flywayConfiguration.load();
 
+            // Now, check our Flyway database table to see if it needs upgrading
+            // *before* any other Flyway commands can be run. This is a safety check.
+            FlywayUpgradeUtils.upgradeFlywayTable(flyway, dataSource.getConnection());
+
             // "test" = Test Database Connection
             if (argv[0].equalsIgnoreCase("test")) {
                 // Try to connect to the database
@@ -568,10 +572,7 @@ public class DatabaseUtils {
             // nothing to worry about...you can always trigger them to run using "database migrate ignored" from CLI
             flywayConfiguration.ignoreIgnoredMigrations(true);
 
-            // Set flyway callbacks (i.e. classes which are called post-DB migration and similar)
-            // In this situation, we have a Registry Updater that runs PRE-migration
-            // NOTE: DatabaseLegacyReindexer only indexes in Legacy Lucene & RDBMS indexes. It can be removed
-            // once those are obsolete.
+            // Set Flyway callbacks (i.e. classes which are called post-DB migration and similar)
             List<Callback> flywayCallbacks = DSpaceServicesFactory.getInstance().getServiceManager()
                                                                         .getServicesByType(Callback.class);
 
