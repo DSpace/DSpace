@@ -120,3 +120,19 @@ GermCrawler
 Jaunt\/[0-9]+\.[0-9]+
 admantx-euaspb\/[0-9]+\.[0-9]+
 GetLinkInfo
+Turnitin
+Buck\/[0-9]+\.[0-9]+
+IssueCrawler
+Scribbr-Citation-Bot
+scalaj-http\/[0-9]+\.[0-9]+
+AccompanyBot
+Dispatch\/[0-9]+\.[0-9]+
+ZoteroTranslationServer\/WMF
+Twingly Recon-Wally
+GigablastOpenSource\/[0-9]+\.[0-9]+
+PostmanRuntime\/[0-9]+\.[0-9]+
+Iframely\/[0-9]+\.[0-9]+
+Hexometer
+Auto Spider [0-9]+\.[0-9]+
+SirdataBot
+MoodleBot\/[0-9]+\.[0-9]+
