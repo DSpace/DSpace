@@ -169,7 +169,7 @@ public class EPersonTest extends AbstractUnitTest {
 
         ePersonService.addMetadata(context, eperson, "dspace", "agreements", "cookies", null, cookies);
         ePersonService.addMetadata(context, eperson, "dspace", "agreements", "end-user", null, "true");
-        context.commit();
+        ePersonService.update(context, eperson);
 
         assertEquals(
             cookies,
