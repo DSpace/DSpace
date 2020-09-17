@@ -17,4 +17,9 @@
         <property name="description" value="Export metadata for batch editing"/>
         <property name="dspaceRunnableClass" value="org.dspace.app.bulkedit.MetadataExport"/>
     </bean>
+
+    <bean id="metadata-deletion" class="org.dspace.app.bulkedit.MetadataDeletionScriptConfiguration" primary="true">
+        <property name="description" value="Delete all the values of the specified metadata field"/>
+        <property name="dspaceRunnableClass" value="org.dspace.app.bulkedit.MetadataDeletion"/>
+    </bean>
 </beans>
