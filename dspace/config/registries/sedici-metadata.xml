@@ -142,6 +142,12 @@
 	</dc-type>
 	<dc-type>
 		<schema>sedici</schema>
+		<element>subject</element>
+		<qualifier>ford</qualifier>
+		<scope_note>Clasificación FORD por áreas de investigación y desarrollo del documento</scope_note>
+	</dc-type>
+	<dc-type>
+		<schema>sedici</schema>
 		<element>description</element>
 		<qualifier>fulltext</qualifier>
 		<!-- sin calificar -->
@@ -353,6 +359,5 @@
 		<qualifier>sherpa</qualifier>
 		<scope_note>Contiene la descripción de la licencia del journal según Sherpa</scope_note>
 	</dc-type>
-
 
 </dspace-dc-types>

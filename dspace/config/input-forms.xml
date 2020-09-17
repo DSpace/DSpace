@@ -363,6 +363,29 @@
 					<type-bind>Conjunto de datos</type-bind>
 				</field>
 
+				<!-- Alcances temporal y geográfico del conjunto de datos -->
+				<field>
+					<dc-schema>dc</dc-schema>
+					<dc-element>coverage</dc-element>
+					<dc-qualifier>spatial</dc-qualifier>
+					<repeatable>true</repeatable>
+					<label>Alcance geografico</label>
+					<input-type>onebox</input-type>
+					<hint>Si el conjunto de datos es sobre una región geográfica específica se debe indicar en este campo. Si se trata de un país, se debe indicar el código correspondiente (por ejemplo, 'ARG', 'BRA' o 'USA'); si se trata de un área se debe indicar simplemente su nombre (por ejemplo 'Sureste del Chaco', 'Parque Nacional El Leoncito')</hint>
+					<type-bind>Conjunto de datos</type-bind>
+				</field>
+
+				<field>
+					<dc-schema>dc</dc-schema>
+					<dc-element>coverage</dc-element>
+					<dc-qualifier>temporal</dc-qualifier>
+					<repeatable>true</repeatable>
+					<label>Alcance temporal	</label>
+					<input-type>onebox</input-type>
+					<hint>Si el conjunto de datos es sobre un período de tiempo específico se debe indicar en este campo. Si es posible, se debe indicar el comienzo y el fin del intervalo de tiempo, de la siguiente manera: "AñoComienzo-AñoFin" (por ejemplo, 1900-1978)</hint>
+					<type-bind>Conjunto de datos</type-bind>
+				</field>
+
 				<!-- Localización fisica -->
 				<field>
 					<dc-schema>mods</dc-schema>
@@ -522,6 +545,20 @@
 					<required-on-group>Bibliotecarios</required-on-group>
 					<vocabulary>srsc</vocabulary>
 					<visibility-on-group>Bibliotecarios</visibility-on-group>
+				</field>
+
+				<!-- Clasificación FORD por áreas de investigación y desarrollo -->
+				<field>
+					<dc-schema>sedici</dc-schema>
+					<dc-element>subject</dc-element>
+					<dc-qualifier>ford</dc-qualifier>
+					<repeatable>true</repeatable>
+					<label>Clasificación FORD (*)</label>
+					<input-type>onebox</input-type>
+					<hint>Clasificación del documento por áreas de investigación y desarrollo (FORD por su sigla en inglés)</hint>
+					<required-on-group>Bibliotecarios</required-on-group>
+					<visibility-on-group>Bibliotecarios</visibility-on-group>
+					<type-bind>Conjunto de datos</type-bind>
 				</field>
 
 				<!-- Materia (de la lista de encabezamiento de LoC) -->

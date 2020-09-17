@@ -587,6 +587,18 @@
 			<xsl:with-param name="elements" select="dim:field[@element='audience']"/>
 		</xsl:call-template>
 
+		<!-- dc.coverage.spatial row -->
+		<xsl:call-template name="render-normal-field">
+			<xsl:with-param name="name" select="'coverage-spatial'"/>
+			<xsl:with-param name="elements" select="dim:field[@element='coverage' and @qualifier='spatial'] "/>
+		</xsl:call-template>
+
+		<!-- dc.coverage.temporal row -->
+		<xsl:call-template name="render-normal-field">
+			<xsl:with-param name="name" select="'coverage-temporal'"/>
+			<xsl:with-param name="elements" select="dim:field[@element='coverage' and @qualifier='temporal'] "/>
+		</xsl:call-template>
+
 		<!-- format row -->
 		<xsl:call-template name="render-normal-field">
 			<xsl:with-param name="name" select="'format'"/>
@@ -621,6 +633,12 @@
 					<xsl:with-param name="name" select="'subject-materias'"/>
 					<xsl:with-param name="elements" select="dim:field[@element='subject' and @qualifier='materias'] "/>
 					<xsl:with-param name="filter">subject</xsl:with-param>
+				</xsl:call-template>
+
+				<!-- subject.ford row -->
+				<xsl:call-template name="render-normal-field">
+					<xsl:with-param name="name" select="'subject-ford'"/>
+					<xsl:with-param name="elements" select="dim:field[@element='subject' and @qualifier='ford'] "/>
 				</xsl:call-template>
 
 			</div>

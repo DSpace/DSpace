@@ -2665,7 +2665,10 @@
 <message key="xmlui.dri2xhtml.METS-1.0.item-format">Physical description</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-format-extent">Pages</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-format-medium">Materials/Techniques</message>
+<message key="xmlui.dri2xhtml.METS-1.0.item-coverage-spatial">Geografic reach</message>
+<message key="xmlui.dri2xhtml.METS-1.0.item-coverage-temporal">Temporal reach</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-subject-materias">Subjects</message>
+<message key="xmlui.dri2xhtml.METS-1.0.item-subject-ford">FORD classification</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-subject">Keywords</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-relation-journal">Journal</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-relation-event">Event</message>

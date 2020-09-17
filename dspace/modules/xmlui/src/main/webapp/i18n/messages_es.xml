@@ -2328,8 +2328,11 @@ Puede reemplazar la plantilla que gestiona el caso general dri2xhtml para mejora
 <message key="xmlui.dri2xhtml.METS-1.0.item-format">Descripción física</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-format-extent">Páginas</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-format-medium">Materiales/Técnicas</message>
+<message key="xmlui.dri2xhtml.METS-1.0.item-coverage-spatial">Alcance geográfico</message>
+<message key="xmlui.dri2xhtml.METS-1.0.item-coverage-temporal">Alcance temporal</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-dc-subject">Palabras claves</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-subject-materias">Materias</message>
+<message key="xmlui.dri2xhtml.METS-1.0.item-subject-ford">Clasificación FORD</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-relation-journal">Revista</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-relation-event">Evento</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-contributor-inscriber">Firmantes</message>
