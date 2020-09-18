@@ -862,18 +862,18 @@ Common usage:
 
     <!-- installs and/or updates Project Counter Robot List resolution database -->
     <target name="update_spiders">
-        <echo>Downloading: ${stats.spider.agentregex.url}</echo>
-        <get src="${stats.spider.agentregex.url}" dest="${stats.spider.agentregex.regexfile}" verbose="true" />
+        <echo>Downloading: ${irus.statistics.spider.agentregex.url}</echo>
+        <get src="${irus.statistics.spider.agentregex.url}" dest="${irus.statistics.spider.agentregex.regexfile}" verbose="true" />
     </target>
 
     <target name="check_spiders">
         <condition property="need.spiders">
             <and>
                 <not>
-                    <available file="${stats.spider.agentregex.regexfile}" />
+                    <available file="${irus.statistics.spider.agentregex.regexfile}" />
                 </not>
                 <not>
-                    <contains string="${stats.spider.agentregex.url}" substring="stats.spider.agentregex.url"/>
+                    <contains string="${irus.statistics.spider.agentregex.url}" substring="irus.statistics.spider.agentregex.url"/>
                 </not>
             </and>
         </condition>

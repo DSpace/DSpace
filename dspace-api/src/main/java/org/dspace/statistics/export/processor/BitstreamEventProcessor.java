@@ -44,7 +44,7 @@ public class BitstreamEventProcessor extends ExportEventProcessor {
             throws SQLException {
         super(context, request);
         this.bitstream = bitstream;
-        this.item = getItem();
+        this.item = getItem(request);
     }
 
     /**
@@ -53,7 +53,7 @@ public class BitstreamEventProcessor extends ExportEventProcessor {
      * @return parent item of the bitstream
      * @throws SQLException
      */
-    private Item getItem() throws SQLException {
+    private Item getItem(HttpServletRequest request) throws SQLException {
         if (0 < bitstream.getBundles().size()) {
             if (!SpiderDetector.isSpider(request)) {
                 Bundle bundle = bitstream.getBundles().get(0);
