@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.InvocationTargetException;
 import java.net.URLEncoder;
 import java.sql.SQLException;
 import java.util.HashMap;
@@ -53,6 +54,7 @@ import edu.harvard.hul.ois.mets.helper.MetsException;
 import edu.harvard.hul.ois.mets.helper.MetsValidator;
 import edu.harvard.hul.ois.mets.helper.MetsWriter;
 import edu.harvard.hul.ois.mets.helper.PreformedXML;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.util.Util;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
@@ -116,14 +118,13 @@ import org.jdom.output.XMLOutputter;
  * @author Larry Stone
  * @author Robert Tansley
  * @author Tim Donohue
- * @version $Revision$
  */
 public abstract class AbstractMETSDisseminator
     extends AbstractPackageDisseminator {
     /**
      * log4j category
      */
-    private static org.apache.logging.log4j.Logger log =
+    private static final Logger log =
             org.apache.logging.log4j.LogManager.getLogger(AbstractMETSDisseminator.class);
 
     // JDOM xml output writer - indented format for readability.
@@ -163,7 +164,7 @@ public abstract class AbstractMETSDisseminator
      * element to e.g. a rightsMD segment.
      */
     protected static class MdStreamCache {
-        protected Map<MdRef, InputStream> extraFiles = new HashMap<MdRef, InputStream>();
+        protected Map<MdRef, InputStream> extraFiles = new HashMap<>();
 
         public void addStream(MdRef key, InputStream md) {
             extraFiles.put(key, md);
@@ -270,7 +271,9 @@ public abstract class AbstractMETSDisseminator
                                               + Constants.typeText[dso.getType()] + ", handle="
                                               + dso.getHandle() + ", dbID="
                                               + String.valueOf(dso.getID())));
-        } catch (MetsException e) {
+        } catch (MetsException
+                | NoSuchMethodException | InstantiationException
+                | IllegalAccessException | InvocationTargetException e) {
             String errorMsg = "Error exporting METS for DSpace Object, type="
                 + Constants.typeText[dso.getType()] + ", handle="
                 + dso.getHandle() + ", dbID="
@@ -302,11 +305,17 @@ public abstract class AbstractMETSDisseminator
      * @throws MetsException              if METS error
      * @throws SQLException               if database error
      * @throws IOException                if IO error
+     * @throws NoSuchMethodException      passed through.
+     * @throws InstantiationException     passed through.
+     * @throws IllegalAccessException     passed through.
+     * @throws InvocationTargetException  passed through.
      */
     protected void writeZipPackage(Context context, DSpaceObject dso,
                                    PackageParameters params, OutputStream pkg)
         throws PackageValidationException, CrosswalkException, MetsException,
-        AuthorizeException, SQLException, IOException {
+            AuthorizeException, SQLException, IOException, NoSuchMethodException,
+            InstantiationException, IllegalAccessException,
+            IllegalArgumentException, InvocationTargetException {
         long lmTime = 0;
         if (dso.getType() == Constants.ITEM) {
             lmTime = ((Item) dso).getLastModified().getTime();
@@ -523,7 +532,7 @@ public abstract class AbstractMETSDisseminator
 
     /**
      * Create an element wrapped around a metadata reference (either mdWrap
-     * or mdRef); i.e. dmdSec, techMd, sourceMd, etc.  Checks for
+     * or mdRef); i.e.dmdSec, techMd, sourceMd, etc.  Checks for
      * XML-DOM oriented crosswalk first, then if not found looks for
      * stream crosswalk of the same name.
      *
@@ -533,21 +542,27 @@ public abstract class AbstractMETSDisseminator
      * @param typeSpec     Type of metadata going into this mdSec (e.g. MODS, DC, PREMIS, etc)
      * @param params       the PackageParameters
      * @param extraStreams list of extra files which need to be added to final dissemination package
-     * @return mdSec element or null if xwalk returns empty results.
+     * @return mdSec element or null if crosswalk returns empty results.
      * @throws SQLException               if database error
      * @throws PackageValidationException if package validation error
      * @throws CrosswalkException         if crosswalk error
      * @throws IOException                if IO error
      * @throws AuthorizeException         if authorization error
+     * @throws NoSuchMethodException      if mdSecClass cannot be instantiated.
+     * @throws InstantiationException     if mdSecClass cannot be instantiated.
+     * @throws IllegalAccessException     if mdSecClass cannot be instantiated.
+     * @throws InvocationTargetException  if mdSecClass cannot be instantiated.
      */
     protected MdSec makeMdSec(Context context, DSpaceObject dso, Class mdSecClass,
                               String typeSpec, PackageParameters params,
                               MdStreamCache extraStreams)
         throws SQLException, PackageValidationException, CrosswalkException,
-        IOException, AuthorizeException {
+            IOException, AuthorizeException, NoSuchMethodException,
+            InstantiationException, IllegalAccessException, IllegalArgumentException,
+            InvocationTargetException {
         try {
             //create our metadata element (dmdSec, techMd, sourceMd, rightsMD etc.)
-            MdSec mdSec = (MdSec) mdSecClass.newInstance();
+            MdSec mdSec = (MdSec) mdSecClass.getDeclaredConstructor().newInstance();
             mdSec.setID(gensym(mdSec.getLocalName()));
             String parts[] = typeSpec.split(":", 2);
             String xwalkName;
@@ -665,9 +680,7 @@ public abstract class AbstractMETSDisseminator
                             "StreamDisseminationCrosswalk");
                 }
             }
-        } catch (InstantiationException e) {
-            throw new PackageValidationException("Error instantiating Mdsec object: " + e.toString(), e);
-        } catch (IllegalAccessException e) {
+        } catch (InstantiationException | IllegalAccessException e) {
             throw new PackageValidationException("Error instantiating Mdsec object: " + e.toString(), e);
         }
     }
@@ -680,7 +693,9 @@ public abstract class AbstractMETSDisseminator
                                PackageParameters params,
                                MdStreamCache extraStreams)
         throws SQLException, PackageValidationException, CrosswalkException,
-        IOException, AuthorizeException {
+            IOException, AuthorizeException,
+            NoSuchMethodException, InstantiationException, IllegalAccessException,
+            IllegalArgumentException, InvocationTargetException {
         for (int i = 0; i < mdTypes.length; ++i) {
             MdSec md = makeMdSec(context, dso, mdSecClass, mdTypes[i], params, extraStreams);
             if (md != null) {
@@ -693,7 +708,9 @@ public abstract class AbstractMETSDisseminator
     protected String addAmdSec(Context context, DSpaceObject dso, PackageParameters params,
                                Mets mets, MdStreamCache extraStreams)
         throws SQLException, PackageValidationException, CrosswalkException,
-        IOException, AuthorizeException {
+            IOException, AuthorizeException, NoSuchMethodException,
+            InstantiationException, IllegalAccessException, IllegalArgumentException,
+            IllegalArgumentException, InvocationTargetException {
         String techMdTypes[] = getTechMdTypes(context, dso, params);
         String rightsMdTypes[] = getRightsMdTypes(context, dso, params);
         String sourceMdTypes[] = getSourceMdTypes(context, dso, params);
@@ -731,12 +748,11 @@ public abstract class AbstractMETSDisseminator
     }
 
     /**
-     * Write out a METS manifest.
-     * Mostly lifted from Rob Tansley's METS exporter.
+     * Write out a METS manifest.  Mostly lifted from Rob Tansley's METS exporter.
      *
      * @param context      context
      * @param dso          DSpaceObject
-     * @param params       packaging params
+     * @param params       packaging parameters
      * @param extraStreams streams
      * @return METS manifest
      * @throws MetsException              if mets error
@@ -745,12 +761,17 @@ public abstract class AbstractMETSDisseminator
      * @throws AuthorizeException         if authorization error
      * @throws SQLException               if database error
      * @throws IOException                if IO error
+     * @throws NoSuchMethodException      if DmdSec cannot be instantiated.
+     * @throws InstantiationException     if DmdSec cannot be instantiated.
+     * @throws IllegalAccessException     if DmdSec cannot be instantiated.
+     * @throws InvocationTargetException  if DmdSec cannot be instantiated.
      */
     protected Mets makeManifest(Context context, DSpaceObject dso,
                                 PackageParameters params,
                                 MdStreamCache extraStreams)
         throws MetsException, PackageValidationException, CrosswalkException, AuthorizeException, SQLException,
-        IOException {
+            IOException, NoSuchMethodException, InstantiationException,
+            IllegalAccessException, IllegalArgumentException, InvocationTargetException {
 
         // Create the METS manifest in memory
         Mets mets = new Mets();
