@@ -490,8 +490,8 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         // Set the item to have two pieces of metadata for dc.type and dc2.type
         String dcType = "DC-TYPE";
         String testType = "TEST-TYPE";
-        itemService.addMetadata(context, it, "dc", "type", null, null, dcType, "accepted", 0);
-        itemService.addMetadata(context, it, "test", "type", null, null, testType, "accepted", 0);
+        itemService.addMetadata(context, it, "dc", "type", null, null, dcType);
+        itemService.addMetadata(context, it, "test", "type", null, null, testType);
 
         // Check that only one is returned when we ask for all dc.type values
         List<MetadataValue> values = itemService.getMetadata(it, "dc", "type", null, null);

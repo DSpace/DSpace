@@ -10,7 +10,12 @@ package org.dspace.app.bulkedit;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.UUID;
 
+import org.apache.commons.cli.ParseException;
+import org.dspace.core.Context;
+import org.dspace.eperson.EPerson;
+import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.scripts.handler.DSpaceRunnableHandler;
 
 /**
@@ -28,6 +33,36 @@ public class MetadataImportCLI extends MetadataImport {
                 return true;
             }
             return false;
+        }
+    }
+
+    @Override
+    protected void assignCurrentUserInContext(Context context) throws ParseException {
+        try {
+            if (commandLine.hasOption('e')) {
+                EPerson eperson;
+                String e = commandLine.getOptionValue('e');
+                if (e.indexOf('@') != -1) {
+                    eperson = EPersonServiceFactory.getInstance().getEPersonService().findByEmail(context, e);
+                } else {
+                    eperson = EPersonServiceFactory.getInstance().getEPersonService().find(context, UUID.fromString(e));
+                }
+
+                if (eperson == null) {
+                    throw new ParseException("Error, eperson cannot be found: " + e);
+                }
+                context.setCurrentUser(eperson);
+            }
+        } catch (Exception e) {
+            throw new ParseException("Unable to find DSpace user: " + e.getMessage());
+        }
+    }
+
+    @Override
+    public void setup() throws ParseException {
+        super.setup();
+        if (!commandLine.hasOption('e')) {
+            throw new ParseException("Required parameter -e missing!");
         }
     }
 }
