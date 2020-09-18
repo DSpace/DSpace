@@ -8,21 +8,17 @@
 package org.dspace.app.rest.security;
 
 import static java.util.Arrays.asList;
+import static org.dspace.app.rest.security.jwt.UserAgreementClaimProvider.USER_AGREEMENT_ACCEPTED;
 
 import java.io.IOException;
-import java.sql.SQLException;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.dspace.app.rest.utils.ContextUtil;
-import org.dspace.authorize.service.AuthorizeService;
-import org.dspace.content.Item;
-import org.dspace.content.MetadataValue;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
-import org.dspace.eperson.service.EPersonService;
 import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -42,12 +38,6 @@ public class UserAgreementFilter extends OncePerRequestFilter {
     @Autowired
     private ConfigurationService configurationService;
 
-    @Autowired
-    private EPersonService ePersonService;
-
-    @Autowired
-    private AuthorizeService authorizeService;
-
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
         throws ServletException, IOException {
@@ -55,15 +45,14 @@ public class UserAgreementFilter extends OncePerRequestFilter {
         Context context = ContextUtil.obtainContext(request);
 
         boolean filterEnabled = configurationService.getBooleanProperty("user-agreement.filter-enabled", false);
-
-        if (isAdmin(context) || !filterEnabled) {
+        if (!filterEnabled) {
             filterChain.doFilter(request, response);
         }
 
         EPerson currentUser = context.getCurrentUser();
-        if (isNotAllowedPath(request) && currentUser != null) {
-            String value = getUserAgreementMetadataValue(context, currentUser);
-            if (value == null || !value.equals("true")) {
+        if (isNotOpenPath(request) && currentUser != null) {
+            boolean isUserAgreementAccepted = (boolean) request.getAttribute(USER_AGREEMENT_ACCEPTED);
+            if (!isUserAgreementAccepted) {
                 response.setStatus(HttpStatus.FORBIDDEN.value());
                 response.getWriter().write("No user agreement accepted");
                 return;
@@ -74,25 +63,10 @@ public class UserAgreementFilter extends OncePerRequestFilter {
 
     }
 
-    private boolean isAdmin(Context context) {
-        try {
-            return authorizeService.isAdmin(context);
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private boolean isNotAllowedPath(HttpServletRequest request) {
-        return asList(this.configurationService.getArrayProperty("user-agreement.allowed-path-patterns")).stream()
+    private boolean isNotOpenPath(HttpServletRequest request) {
+        return asList(this.configurationService.getArrayProperty("user-agreement.open-path-patterns")).stream()
             .map(path -> new AntPathRequestMatcher(path))
-            .noneMatch(allowedPath -> allowedPath.matches(request));
-    }
-
-    private String getUserAgreementMetadataValue(Context context, EPerson eperson) {
-        return ePersonService.getMetadata(eperson, "dspace", "agreements", "end-user", Item.ANY).stream()
-            .map(MetadataValue::getValue)
-            .findFirst()
-            .orElse(null);
+            .noneMatch(openPath -> openPath.matches(request));
     }
 
 }
