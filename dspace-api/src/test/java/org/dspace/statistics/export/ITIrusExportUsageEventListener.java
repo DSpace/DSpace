@@ -111,9 +111,9 @@ public class ITIrusExportUsageEventListener extends AbstractIntegrationTestWithD
     public void setUp() throws Exception {
         super.setUp();
 
-        configurationService.setProperty("stats.tracker.enabled", true);
-        configurationService.setProperty("stats.tracker.type-field", "dc.type");
-        configurationService.setProperty("stats.tracker.type-value", "Excluded type");
+        configurationService.setProperty("irus.statistics.tracker.enabled", true);
+        configurationService.setProperty("irus.statistics.tracker.type-field", "dc.type");
+        configurationService.setProperty("irus.statistics.tracker.type-value", "Excluded type");
 
 
         context.turnOffAuthorisationSystem();

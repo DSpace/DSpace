@@ -38,7 +38,7 @@ public class IrusExportUsageEventListener extends AbstractUsageEventListener {
      * @param event includes all the information related to the event that occurred
      */
     public void receiveEvent(Event event) {
-        if (configurationService.getBooleanProperty("stats.tracker.enabled", false)) {
+        if (configurationService.getBooleanProperty("irus.statistics.tracker.enabled", false)) {
             if (event instanceof UsageEvent) {
                 UsageEvent ue = (UsageEvent) event;
                 Context context = ue.getContext();

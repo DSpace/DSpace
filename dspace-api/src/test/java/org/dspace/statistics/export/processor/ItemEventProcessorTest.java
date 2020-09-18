@@ -39,7 +39,7 @@ public class ItemEventProcessorTest extends AbstractIntegrationTestWithDatabase 
     @Before
     public void setUp() throws Exception {
         super.setUp();
-        configurationService.setProperty("stats.tracker.enabled", true);
+        configurationService.setProperty("irus.statistics.tracker.enabled", true);
 
         String dspaceUrl = configurationService.getProperty("dspace.ui.url");
         try {

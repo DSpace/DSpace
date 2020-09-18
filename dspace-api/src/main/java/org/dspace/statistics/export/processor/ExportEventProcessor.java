@@ -56,8 +56,8 @@ public abstract class ExportEventProcessor {
     private OpenUrlService openUrlService = OpenURLTrackerLoggerServiceFactory.getInstance().getOpenUrlService();
 
 
-    protected Context context;
-    protected HttpServletRequest request;
+    private Context context;
+    private HttpServletRequest request;
 
     /**
      * Creates a new ExportEventProcessor based on the params and initializes the services
@@ -87,10 +87,10 @@ public abstract class ExportEventProcessor {
      */
     protected void processObject(String urlParameters) throws IOException, SQLException {
         String baseUrl;
-        if (StringUtils.equals(configurationService.getProperty("stats.tracker.environment"), "production")) {
-            baseUrl = configurationService.getProperty("stats.tracker.produrl");
+        if (StringUtils.equals(configurationService.getProperty("irus.statistics.tracker.environment"), "production")) {
+            baseUrl = configurationService.getProperty("irus.statistics.tracker.produrl");
         } else {
-            baseUrl = configurationService.getProperty("stats.tracker.testurl");
+            baseUrl = configurationService.getProperty("irus.statistics.tracker.testurl");
         }
 
         openUrlService.processUrl(context, baseUrl + "?" + urlParameters);
@@ -127,7 +127,7 @@ public abstract class ExportEventProcessor {
         //Start adding our data
         StringBuilder data = new StringBuilder();
         data.append(URLEncoder.encode("url_ver", UTF_8) + "=" +
-                            URLEncoder.encode(configurationService.getProperty("stats.tracker.urlversion"), UTF_8));
+                    URLEncoder.encode(configurationService.getProperty("irus.statistics.tracker.urlversion"), UTF_8));
         data.append("&").append(URLEncoder.encode("req_id", UTF_8)).append("=")
             .append(URLEncoder.encode(clientIP, UTF_8));
         data.append("&").append(URLEncoder.encode("req_dat", UTF_8)).append("=")
@@ -194,7 +194,7 @@ public abstract class ExportEventProcessor {
         Entity entity = entityService.findByItemId(context, item.getID());
         EntityType type = entityService.getType(context, entity);
 
-        String[] entityTypeStrings = configurationService.getArrayProperty("stats.tracker.entity-types");
+        String[] entityTypeStrings = configurationService.getArrayProperty("irus.statistics.tracker.entity-types");
         List<String> entityTypes = new ArrayList<>();
 
         if (entityTypeStrings.length != 0) {
@@ -216,8 +216,8 @@ public abstract class ExportEventProcessor {
      * @return whether the item should be processed
      */
     protected boolean shouldProcessItemType(Item item) {
-        String trackerTypeMetadataField = configurationService.getProperty("stats.tracker.type-field");
-        String[] metadataValues = configurationService.getArrayProperty("stats.tracker.type-value");
+        String trackerTypeMetadataField = configurationService.getProperty("irus.statistics.tracker.type-field");
+        String[] metadataValues = configurationService.getArrayProperty("irus.statistics.tracker.type-value");
         List<String> trackerTypeMetadataValues;
         if (metadataValues.length > 0) {
             trackerTypeMetadataValues = new ArrayList<>();
