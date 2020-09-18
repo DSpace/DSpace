@@ -344,14 +344,16 @@ public class CitationDocumentServiceImpl implements CitationDocumentService, Ini
             drawTable(coverPage, contentStream, ypos, xpos, content2, fontHelveticaBold, 11, false);
             ypos -= ygap;
 
-            contentStream.fillRect(xpos, ypos, xwidth, 1);
+            contentStream.addRect(xpos, ypos, xwidth, 1);
+            contentStream.fill();
             contentStream.closeAndStroke();
 
             String[][] content3 = {{getOwningCommunity(context, item), getOwningCollection(item)}};
             drawTable(coverPage, contentStream, ypos, xpos, content3, fontHelvetica, 9, false);
             ypos -= ygap;
 
-            contentStream.fillRect(xpos, ypos, xwidth, 1);
+            contentStream.addRect(xpos, ypos, xwidth, 1);
+            contentStream.fill();
             contentStream.closeAndStroke();
             ypos -= (ygap * 2);
 
@@ -367,7 +369,8 @@ public class CitationDocumentServiceImpl implements CitationDocumentService, Ini
                 }
 
                 if (field.equals("_line_")) {
-                    contentStream.fillRect(xpos, ypos, xwidth, 1);
+                    contentStream.addRect(xpos, ypos, xwidth, 1);
+                    contentStream.fill();
                     contentStream.closeAndStroke();
                     ypos -= (ygap);
 
@@ -383,8 +386,8 @@ public class CitationDocumentServiceImpl implements CitationDocumentService, Ini
 
             contentStream.beginText();
             contentStream.setFont(fontHelveticaOblique, 11);
-            contentStream.moveTextPositionByAmount(xpos, ypos);
-            contentStream.drawString(footer);
+            contentStream.newLineAtOffset(xpos, ypos);
+            contentStream.showText(footer);
             contentStream.endText();
         } finally {
             contentStream.close();
@@ -445,12 +448,12 @@ public class CitationDocumentServiceImpl implements CitationDocumentService, Ini
 
         contentStream.beginText();
         contentStream.setFont(pdfFont, fontSize);
-        contentStream.moveTextPositionByAmount(startX, startY);
+        contentStream.newLineAtOffset(startX, startY);
         int currentY = startY;
         for (String line : lines) {
-            contentStream.drawString(line);
+            contentStream.showText(line);
             currentY -= leading;
-            contentStream.moveTextPositionByAmount(0, -leading);
+            contentStream.newLineAtOffset(0, -leading);
         }
         contentStream.endText();
         return currentY;
@@ -508,14 +511,18 @@ public class CitationDocumentServiceImpl implements CitationDocumentService, Ini
             //draw the rows
             float nexty = y;
             for (int i = 0; i <= rows; i++) {
-                contentStream.drawLine(margin, nexty, margin + tableWidth, nexty);
+                contentStream.moveTo(margin, nexty);
+                contentStream.lineTo(margin + tableWidth, nexty);
+                contentStream.stroke();
                 nexty -= rowHeight;
             }
 
             //draw the columns
             float nextx = margin;
             for (int i = 0; i <= cols; i++) {
-                contentStream.drawLine(nextx, y, nextx, y - tableHeight);
+                contentStream.moveTo(nextx, y);
+                contentStream.lineTo(nextx, y - tableHeight);
+                contentStream.stroke();
                 nextx += colWidth;
             }
         }
@@ -529,8 +536,8 @@ public class CitationDocumentServiceImpl implements CitationDocumentService, Ini
             for (int j = 0; j < content[i].length; j++) {
                 String text = content[i][j];
                 contentStream.beginText();
-                contentStream.moveTextPositionByAmount(textx, texty);
-                contentStream.drawString(text);
+                contentStream.newLineAtOffset(textx, texty);
+                contentStream.showText(text);
                 contentStream.endText();
                 textx += colWidth;
             }
