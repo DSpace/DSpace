@@ -127,6 +127,7 @@ public interface CreativeCommonsService {
      * @deprecated to make uniform JSPUI and XMLUI approach the bitstream with the license in the textual format it
      * is no longer stored (see https://jira.duraspace.org/browse/DS-2604)
      */
+    @Deprecated
     public Bitstream getLicenseTextBitstream(Item item)
             throws SQLException, IOException, AuthorizeException;
 
