@@ -56,7 +56,7 @@ public interface ChoiceAuthority extends NameAwarePlugin {
      * @param locale     explicit localization key if available, or null
      * @return a Choices object (never null) with 1 or 0 values.
      */
-    public Choices getBestMatch(String field, String locale);
+    public Choices getBestMatch(String text, String locale);
 
     /**
      * Get the canonical user-visible "label" (i.e. short descriptive text)

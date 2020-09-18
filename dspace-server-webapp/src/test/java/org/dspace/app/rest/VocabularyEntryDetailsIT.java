@@ -7,6 +7,7 @@
  */
 package org.dspace.app.rest;
 
+import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static org.hamcrest.Matchers.endsWith;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -17,6 +18,7 @@ import java.util.UUID;
 
 import org.dspace.app.rest.matcher.VocabularyEntryDetailsMatcher;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
+import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
 import org.junit.Test;
 
@@ -26,6 +28,18 @@ import org.junit.Test;
  * @author Mykhaylo Boychuk (4science.it)
  */
 public class VocabularyEntryDetailsIT extends AbstractControllerIntegrationTest {
+    @Test
+    public void discoverableNestedLinkTest() throws Exception {
+        String token = getAuthToken(eperson.getEmail(), password);
+        getClient(token).perform(get("/api"))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$._links",Matchers.allOf(
+                                hasJsonPath("$.vocabularyEntryDetails.href",
+                                         is("http://localhost/api/submission/vocabularyEntryDetails")),
+                                hasJsonPath("$.vocabularyEntryDetails-search.href",
+                                         is("http://localhost/api/submission/vocabularyEntryDetails/search"))
+                        )));
+    }
 
     @Test
     public void findAllTest() throws Exception {
@@ -60,6 +74,23 @@ public class VocabularyEntryDetailsIT extends AbstractControllerIntegrationTest 
         String idAuthority = "srsc:SCB110";
         getClient().perform(get("/api/submission/vocabularyEntryDetails/" + idAuthority))
                    .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    public void findOneNotFoundTest() throws Exception {
+        String idAuthority = "srsc:not-existing";
+        String token = getAuthToken(eperson.getEmail(), password);
+        getClient(token).perform(get("/api/submission/vocabularyEntryDetails/" + idAuthority))
+                   .andExpect(status().isNotFound());
+
+        // try with a special id missing only the entry-id part
+        getClient(token).perform(get("/api/submission/vocabularyEntryDetails/srsc:"))
+                   .andExpect(status().isNotFound());
+
+        // try to retrieve the xml root that is not a entry itself
+        getClient(token).perform(get("/api/submission/vocabularyEntryDetails/srsc:ResearchSubjectCategories"))
+                   .andExpect(status().isNotFound());
+
     }
 
     @Test
@@ -306,16 +337,6 @@ public class VocabularyEntryDetailsIT extends AbstractControllerIntegrationTest 
     @Test
     public void findParentByChildTest() throws Exception {
         String tokenEperson = getAuthToken(eperson.getEmail(), password);
-        getClient(tokenEperson).perform(get("/api/submission/vocabularyEntryDetails/srsc:SCB11/parent"))
-                 .andExpect(status().isOk())
-                 .andExpect(jsonPath("$", is(VocabularyEntryDetailsMatcher.matchAuthorityEntry(
-                         "srsc:ResearchSubjectCategories", "Research Subject Categories", "Research Subject Categories")
-                  )));
-    }
-
-    @Test
-    public void findParentByChildSecondLevelTest() throws Exception {
-        String tokenEperson = getAuthToken(eperson.getEmail(), password);
         getClient(tokenEperson).perform(get("/api/submission/vocabularyEntryDetails/srsc:SCB180/parent"))
                  .andExpect(status().isOk())
                  .andExpect(jsonPath("$", is(
@@ -338,10 +359,84 @@ public class VocabularyEntryDetailsIT extends AbstractControllerIntegrationTest 
     }
 
     @Test
-    public void findParentRootChildTest() throws Exception {
+    public void findParentTopTest() throws Exception {
         String tokenEperson = getAuthToken(eperson.getEmail(), password);
         getClient(tokenEperson)
-            .perform(get("/api/submission/vocabularyEntryDetails/srsc:ResearchSubjectCategory/parent"))
+            .perform(get("/api/submission/vocabularyEntryDetails/srsc:SCB11/parent"))
             .andExpect(status().isNoContent());
     }
+
+    @Test
+    public void srscProjectionTest() throws Exception {
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        getClient(tokenAdmin).perform(
+                get("/api/submission/vocabularyEntryDetails/srsc:SCB110").param("projection", "full"))
+                 .andExpect(status().isOk())
+                 .andExpect(jsonPath("$._embedded.parent",
+                         VocabularyEntryDetailsMatcher.matchAuthorityEntry(
+                                 "srsc:SCB11", "HUMANITIES and RELIGION",
+                                 "Research Subject Categories::HUMANITIES and RELIGION")))
+                 .andExpect(jsonPath("$._embedded.children._embedded.children", matchAllSrscSC110Children()))
+                 .andExpect(jsonPath("$._embedded.children._embedded.children[*].otherInformation.parent",
+                         Matchers.everyItem(
+                                 is("Research Subject Categories::HUMANITIES and RELIGION::Religion/Theology"))));
+
+        getClient(tokenAdmin).perform(
+                get("/api/submission/vocabularyEntryDetails/srsc:SCB110").param("embed", "children"))
+                 .andExpect(status().isOk())
+                 .andExpect(jsonPath("$._embedded.children._embedded.children", matchAllSrscSC110Children()))
+                 .andExpect(jsonPath("$._embedded.children._embedded.children[*].otherInformation.parent",
+                         Matchers.everyItem(
+                                 is("Research Subject Categories::HUMANITIES and RELIGION::Religion/Theology"))));
+
+        getClient(tokenAdmin).perform(
+                get("/api/submission/vocabularyEntryDetails/srsc:SCB110").param("embed", "parent"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$._embedded.parent",
+                        VocabularyEntryDetailsMatcher.matchAuthorityEntry(
+                                "srsc:SCB11", "HUMANITIES and RELIGION",
+                                "Research Subject Categories::HUMANITIES and RELIGION")));
+    }
+
+    private Matcher<Iterable<? extends Object>> matchAllSrscSC110Children() {
+        return Matchers.containsInAnyOrder(
+           VocabularyEntryDetailsMatcher.matchAuthorityEntry("srsc:VR110102",
+                   "History of religion",
+                   "Research Subject Categories::HUMANITIES and RELIGION::Religion/Theology::History of religion"),
+           VocabularyEntryDetailsMatcher.matchAuthorityEntry("srsc:VR110103",
+                   "Church studies",
+                   "Research Subject Categories::HUMANITIES and RELIGION::Religion/Theology::Church studies"),
+           VocabularyEntryDetailsMatcher.matchAuthorityEntry("srsc:VR110104",
+                   "Missionary studies",
+                   "Research Subject Categories::HUMANITIES and RELIGION::Religion/Theology::Missionary studies"),
+           VocabularyEntryDetailsMatcher.matchAuthorityEntry("srsc:VR110105",
+                   "Systematic theology",
+                   "Research Subject Categories::HUMANITIES and RELIGION::Religion/Theology::Systematic theology"),
+           VocabularyEntryDetailsMatcher.matchAuthorityEntry("srsc:VR110106",
+                   "Islamology",
+                   "Research Subject Categories::HUMANITIES and RELIGION::Religion/Theology::Islamology"),
+           VocabularyEntryDetailsMatcher.matchAuthorityEntry("srsc:VR110107",
+                   "Faith and reason",
+                   "Research Subject Categories::HUMANITIES and RELIGION::Religion/Theology::Faith and reason"),
+           VocabularyEntryDetailsMatcher.matchAuthorityEntry("srsc:VR110108",
+                   "Sociology of religion",
+                   "Research Subject Categories::HUMANITIES and RELIGION::Religion/Theology::Sociology of religion"),
+           VocabularyEntryDetailsMatcher.matchAuthorityEntry("srsc:VR110109",
+                   "Psychology of religion",
+                   "Research Subject Categories::HUMANITIES and RELIGION::Religion/Theology::Psychology of religion"),
+           VocabularyEntryDetailsMatcher.matchAuthorityEntry("srsc:VR110110",
+                   "Philosophy of religion",
+                   "Research Subject Categories::HUMANITIES and RELIGION::Religion/Theology::Philosophy of religion"),
+           VocabularyEntryDetailsMatcher.matchAuthorityEntry("srsc:VR110111",
+                   "New Testament exegesis",
+                   "Research Subject Categories::HUMANITIES and RELIGION::Religion/Theology::New Testament exegesis"),
+           VocabularyEntryDetailsMatcher.matchAuthorityEntry("srsc:VR110112",
+                   "Old Testament exegesis",
+                   "Research Subject Categories::HUMANITIES and RELIGION::Religion/Theology::Old Testament exegesis"),
+           VocabularyEntryDetailsMatcher.matchAuthorityEntry("srsc:VR110113",
+                   "Dogmatics with symbolics",
+                   "Research Subject Categories::HUMANITIES and RELIGION::Religion/Theology::Dogmatics with symbolics")
+          );
+    }
+
 }

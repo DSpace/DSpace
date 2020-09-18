@@ -48,7 +48,7 @@
        </row>
    </form>      
    
-	<form name="traditionalpageone">
+   <form name="traditionalpageone">
             <row>
                 <relation-field>
                     <relationship-type>isAuthorOfPublication</relationship-type>
@@ -386,7 +386,7 @@ it, please enter the types and the actual numbers or codes.</hint>
          <!-- An input-type of twobox MUST be marked as repeatable -->
          <repeatable>true</repeatable>
          <label>Subject Keywords</label>
-         <input-type>tag</input-type>
+         <input-type>twobox</input-type>
          <hint>Enter appropriate subject keywords or phrases. </hint>
          <required></required>
          <vocabulary>srsc</vocabulary>
@@ -1138,7 +1138,7 @@ You can leave out the day and/or month if they aren't applicable.</hint>
    </form>
    <!-- Form patent [END] -->
 
-    <form name="languagetest">
+   <form name="languagetest">
       <row>
         <field>
           <dc-schema>dc</dc-schema>
@@ -1163,7 +1163,45 @@ You can leave out the day and/or month if they aren't applicable.</hint>
           <hint>Enter the affiliation of the author as stated on the publication.</hint>
         </field>
       </row>
-    </form>
+   </form>
+    
+   <form name="sampleauthority">
+     <row>
+        <field>
+            <dc-schema>dc</dc-schema>
+            <dc-element>contributor</dc-element>
+            <dc-qualifier>author</dc-qualifier>
+            <repeatable>true</repeatable>
+            <label>Author</label>
+            <input-type>onebox</input-type>
+            <hint>Author field that can be associated with an authority providing suggestion</hint>
+            <required></required>
+        </field>
+     </row>
+     <row>
+        <field>
+            <dc-schema>dc</dc-schema>
+            <dc-element>contributor</dc-element>
+            <dc-qualifier>editor</dc-qualifier>
+            <repeatable>false</repeatable>
+            <label>Editor</label>
+            <input-type>name</input-type>
+            <hint>Editor field that can be associated with an authority providing the special name lookup</hint>
+            <required></required>
+        </field>
+     </row>
+     <row>
+        <field>
+            <dc-schema>dc</dc-schema>
+            <dc-element>subject</dc-element>
+            <repeatable>true</repeatable>
+            <label>Subject</label>
+            <input-type>onebox</input-type>
+            <hint>Subject field that can be associated with an authority providing lookup</hint>
+            <required></required>
+        </field>
+     </row>
+  </form>   
  </form-definitions>
 
 

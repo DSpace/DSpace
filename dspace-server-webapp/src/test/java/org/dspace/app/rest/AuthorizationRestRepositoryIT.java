@@ -1637,6 +1637,65 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
             .andExpect(status().isOk());
     }
 
+    @Test
+    public void findByObjectAndFeatureFullProjectionTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        Community com = CommunityBuilder.createCommunity(context).withName("A test community").build();
+        CommunityRest comRest = communityConverter.convert(com, DefaultProjection.DEFAULT);
+        String comUri = utils.linkToSingleResource(comRest, "self").getHref();
+        context.restoreAuthSystemState();
+
+        String adminToken = getAuthToken(admin.getEmail(), password);
+
+        // verify that it works for administrators - with eperson parameter
+        getClient(adminToken).perform(get("/api/authz/authorizations/search/object")
+                                          .param("uri", comUri)
+                                          .param("projection", "full")
+                                          .param("feature", alwaysTrue.getName())
+                                          .param("eperson", admin.getID().toString()))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$.page.totalElements", is(1)))
+                             .andExpect(jsonPath("$._embedded.authorizations", contains(
+                                 allOf(
+                                     hasJsonPath("$.id", is(admin.getID().toString() + "_" + alwaysTrue.getName() + "_"
+                                                                + comRest.getUniqueType() + "_" + comRest.getId())),
+                                     hasJsonPath("$.type", is("authorization")),
+                                     hasJsonPath("$._embedded.feature.id", is(alwaysTrue.getName())),
+                                     hasJsonPath("$._embedded.eperson.id", is(admin.getID().toString())),
+                                     hasJsonPath("$._embedded.object.id", is(com.getID().toString()))
+                                 )
+                             )))
+                             // This is the Full Projection data not visible to eperson's full projection
+                             .andExpect(jsonPath("$._embedded.authorizations[0]._embedded.object._embedded.adminGroup",
+                                                 nullValue()));
+
+        String epersonToken = getAuthToken(eperson.getEmail(), password);
+
+        // verify that it works for administrators - with eperson parameter
+        getClient(epersonToken).perform(get("/api/authz/authorizations/search/object")
+                                            .param("uri", comUri)
+                                            .param("projection", "full")
+                                            .param("feature", alwaysTrue.getName())
+                                            .param("eperson", eperson.getID().toString()))
+                               .andExpect(status().isOk())
+                               .andExpect(jsonPath("$.page.totalElements", is(1)))
+                               .andExpect(jsonPath("$._embedded.authorizations", contains(
+                                   allOf(
+                                       hasJsonPath("$.id",
+                                                   is(eperson.getID().toString() + "_" + alwaysTrue.getName() + "_"
+                                                          + comRest.getUniqueType() + "_" + comRest.getId())),
+                                       hasJsonPath("$.type", is("authorization")),
+                                       hasJsonPath("$._embedded.feature.id", is(alwaysTrue.getName())),
+                                       hasJsonPath("$._embedded.eperson.id", is(eperson.getID().toString())),
+                                       hasJsonPath("$._embedded.object.id", is(com.getID().toString()))
+                                   )
+                               )))
+                               // This is the Full Projection data not visible to eperson's full projection
+                               .andExpect(
+                                   jsonPath("$._embedded.authorizations[0]._embedded.object._embedded.adminGroup")
+                                       .doesNotExist());
+    }
+
     // utility methods to build authorization ID without having an authorization object
     private String getAuthorizationID(EPerson eperson, AuthorizationFeature feature, BaseObjectRest obj) {
         return getAuthorizationID(eperson != null ? eperson.getID().toString() : null, feature.getName(),
@@ -1663,4 +1722,6 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
         return (epersonUuid != null ? epersonUuid + "_" : "") + featureName + "_" + type + "_"
                 + id.toString();
     }
+
+
 }
