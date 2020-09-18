@@ -40,6 +40,8 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
  * @author Tom Desair (tom dot desair at atmire dot com)
  * @author Frederic Van Reet (frederic dot vanreet at atmire dot com)
  * @author Andrea Bollini (andrea.bollini at 4science.it)
+ * @author Pasquale Cavallo (pasquale.cavallo at 4science dot it)
+ * 
  */
 @ControllerAdvice
 public class DSpaceApiExceptionControllerAdvice extends ResponseEntityExceptionHandler {

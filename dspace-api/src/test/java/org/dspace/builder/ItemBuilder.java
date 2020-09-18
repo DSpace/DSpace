@@ -19,6 +19,7 @@ import org.dspace.content.MetadataSchemaEnum;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.content.service.DSpaceObjectService;
 import org.dspace.core.Context;
+import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 
 /**
@@ -129,6 +130,19 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
         readerGroup = group;
         return this;
     }
+
+    /**
+     * Create an admin group for the collection with the specified members
+     *
+     * @param members epersons to add to the admin group
+     * @return this builder
+     * @throws SQLException
+     * @throws AuthorizeException
+     */
+    public ItemBuilder withAdminUser(EPerson ePerson) throws SQLException, AuthorizeException {
+        return setAdminPermission(item, ePerson, null);
+    }
+
 
     @Override
     public Item build() {

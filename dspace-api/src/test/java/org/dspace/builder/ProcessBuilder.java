@@ -9,6 +9,8 @@ package org.dspace.builder;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.List;
 
 import org.dspace.authorize.AuthorizeException;
@@ -40,6 +42,18 @@ public class ProcessBuilder extends AbstractBuilder<Process, ProcessService> {
         this.context = context;
         this.process = processService.create(context, ePerson, scriptName, parameters);
         this.process.setProcessStatus(ProcessStatus.SCHEDULED);
+        return this;
+    }
+
+    public ProcessBuilder withProcessStatus(ProcessStatus processStatus) {
+        process.setProcessStatus(processStatus);
+        return this;
+    }
+
+    public ProcessBuilder withStartAndEndTime(String startTime, String endTime) throws ParseException {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy");
+        process.setStartTime(simpleDateFormat.parse(startTime));
+        process.setFinishedTime(simpleDateFormat.parse(endTime));
         return this;
     }
 

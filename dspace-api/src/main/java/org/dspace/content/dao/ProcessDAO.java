@@ -13,6 +13,7 @@ import java.util.List;
 import org.dspace.core.Context;
 import org.dspace.core.GenericDAO;
 import org.dspace.scripts.Process;
+import org.dspace.scripts.ProcessQueryParameterContainer;
 
 /**
  * This is the Data Access Object for the {@link Process} object
@@ -54,4 +55,30 @@ public interface ProcessDAO extends GenericDAO<Process> {
      */
     int countRows(Context context) throws SQLException;
 
+    /**
+     * Returns a list of all Processes in the database which match the given field requirements. If the
+     * requirements are not null, they will be combined with an AND operation.
+     * @param context          The relevant DSpace context
+     * @param processQueryParameterContainer       The {@link ProcessQueryParameterContainer} containing all the values
+     *                                             that the returned {@link Process} objects must adhere to
+     * @param limit            The limit for the amount of Processes returned
+     * @param offset           The offset for the Processes to be returned
+     * @return The list of all Processes which match the metadata requirements
+     * @throws SQLException If something goes wrong
+     */
+    List<Process> search(Context context, ProcessQueryParameterContainer processQueryParameterContainer, int limit,
+                         int offset) throws SQLException;
+
+    /**
+     * Count all the processes which match the requirements. The requirements are evaluated like the search
+     * method.
+     * @param context       The relevant DSpace context
+     * @param processQueryParameterContainer       The {@link ProcessQueryParameterContainer} containing all the values
+     *                                             that the returned {@link Process} objects must adhere to
+     * @return The number of results matching the query
+     * @throws SQLException If something goes wrong
+     */
+
+    int countTotalWithParameters(Context context, ProcessQueryParameterContainer processQueryParameterContainer)
+        throws SQLException;
 }

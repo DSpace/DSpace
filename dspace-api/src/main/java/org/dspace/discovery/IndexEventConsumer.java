@@ -8,6 +8,7 @@
 package org.dspace.discovery;
 
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 import org.apache.logging.log4j.Logger;
@@ -15,6 +16,7 @@ import org.dspace.content.Bundle;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.discovery.indexobject.factory.IndexFactory;
 import org.dspace.discovery.indexobject.factory.IndexObjectFactoryFactory;
 import org.dspace.event.Consumer;
 import org.dspace.event.Event;
@@ -67,7 +69,7 @@ public class IndexEventConsumer implements Consumer {
 
         int st = event.getSubjectType();
         if (!(st == Constants.ITEM || st == Constants.BUNDLE
-            || st == Constants.COLLECTION || st == Constants.COMMUNITY)) {
+            || st == Constants.COLLECTION || st == Constants.COMMUNITY || st == Constants.SITE)) {
             log
                 .warn("IndexConsumer should not have been given this kind of Subject in an event, skipping: "
                           + event.toString());
@@ -104,10 +106,28 @@ public class IndexEventConsumer implements Consumer {
             case Event.MODIFY:
             case Event.MODIFY_METADATA:
                 if (subject == null) {
-                    log.warn(event.getEventTypeAsString() + " event, could not get object for "
+                    if (st == Constants.SITE) {
+                        // Update the indexable objects of type in event.detail of objects with ids in event.identifiers
+                        for (String id : event.getIdentifiers()) {
+                            IndexFactory indexableObjectService = IndexObjectFactoryFactory.getInstance().
+                                getIndexFactoryByType(event.getDetail());
+                            Optional<IndexableObject> indexableObject = Optional.empty();
+                            indexableObject = indexableObjectService.findIndexableObject(ctx, id);
+                            if (indexableObject.isPresent()) {
+                                log.debug("consume() adding event to update queue: " + event.toString());
+                                objectsToUpdate
+                                    .addAll(indexObjectServiceFactory
+                                        .getIndexableObjects(ctx, indexableObject.get().getIndexedObject()));
+                            } else {
+                                log.warn("Cannot resolve " + id);
+                            }
+                        }
+                    } else {
+                        log.warn(event.getEventTypeAsString() + " event, could not get object for "
                                  + event.getSubjectTypeAsString() + " id="
                                  + event.getSubjectID()
                                  + ", perhaps it has been deleted.");
+                    }
                 } else {
                     log.debug("consume() adding event to update queue: " + event.toString());
                     objectsToUpdate.addAll(indexObjectServiceFactory.getIndexableObjects(ctx, subject));
