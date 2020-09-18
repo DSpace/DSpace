@@ -7,6 +7,7 @@
  */
 package org.dspace.event;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -58,13 +59,16 @@ public class ConsumerProfile {
      * @param name configuration name of the consumer profile
      * @return a new ConsumerProfile; never null.
      * @throws IllegalArgumentException if no class or no filters configured for the specified consumer
-     * @throws ClassNotFoundException   passed through.
-     * @throws InstantiationException   passed through.
-     * @throws IllegalAccessException   passed through.
+     * @throws ClassNotFoundException    passed through.
+     * @throws InstantiationException    passed through.
+     * @throws IllegalAccessException    passed through.
+     * @throws NoSuchMethodException     passed through.
+     * @throws InvocationTargetException passed through.
      */
     public static ConsumerProfile makeConsumerProfile(String name)
         throws IllegalArgumentException, ClassNotFoundException,
-        InstantiationException, IllegalAccessException {
+            InstantiationException, IllegalAccessException, NoSuchMethodException,
+            InvocationTargetException {
         ConsumerProfile result = new ConsumerProfile(name);
         result.readConfiguration();
         return result;
@@ -74,14 +78,16 @@ public class ConsumerProfile {
      * Get class and filters from DSpace Configuration.
      *
      * @throws IllegalArgumentException if no class or no filters configured for the specified consumer
-     * @throws ClassNotFoundException   passed through.
-     * @throws InstantiationException   passed through.
-     * @throws IllegalAccessException   passed through.
+     * @throws ClassNotFoundException    passed through.
+     * @throws InstantiationException    passed through.
+     * @throws IllegalAccessException    passed through.
+     * @throws NoSuchMethodException     passed through.
+     * @throws InvocationTargetException passed through.
      */
-
     private void readConfiguration()
         throws IllegalArgumentException, ClassNotFoundException,
-        InstantiationException, IllegalAccessException {
+            InstantiationException, IllegalAccessException, NoSuchMethodException,
+            InvocationTargetException {
         ConfigurationService configurationService
                 = DSpaceServicesFactory.getInstance().getConfigurationService();
         String className = configurationService.getProperty(CONSUMER_PREFIX
@@ -98,7 +104,7 @@ public class ConsumerProfile {
                 "No filters configured for consumer named: " + name);
         }
 
-        consumer = (Consumer) Class.forName(className.trim()).newInstance();
+        consumer = (Consumer) Class.forName(className.trim()).getDeclaredConstructor().newInstance();
 
         // Each "filter" is <objectTypes> + <eventTypes> : ...
         filters = new ArrayList<>();
