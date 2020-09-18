@@ -1007,8 +1007,14 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
         Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
                                            .withName("Sub Community")
                                            .build();
-        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
-        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1)
+                .withName("Collection 1")
+                .withRelationshipType("Publication")
+                .build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1)
+                .withName("Collection 2")
+                .withRelationshipType("Publication")
+                .build();
 
         //2. Two public items that are readable by Anonymous
         Item publicItem1 = ItemBuilder.createItem(context, col1)
@@ -1057,7 +1063,10 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
         parentCommunity = CommunityBuilder.createCommunity(context)
                                           .withName("Parent Community")
                                           .build();
-        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1").build();
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                .withName("Collection 1")
+                .withRelationshipType("Publication")
+                .build();
 
         //2. Twenty-one public items that are readable by Anonymous
         for (int i = 0; i <= 20; i++) {
@@ -1132,8 +1141,14 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
         Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
                                            .withName("Sub Community")
                                            .build();
-        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
-        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1)
+                .withName("Collection 1")
+                .withRelationshipType("Publication")
+                .build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1)
+                .withName("Collection 2")
+                .withRelationshipType("Publication")
+                .build();
 
         Item item1 = ItemBuilder.createItem(context, col1)
                                 .withTitle("Item 1")
