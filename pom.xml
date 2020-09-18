@@ -357,21 +357,6 @@
                     <artifactId>jacoco-maven-plugin</artifactId>
                     <version>0.8.5</version>
                 </plugin>
-                <!-- Used to send jacoco coverage reports to coveralls.io (see 'measure-test-coverage' profile) -->
-                <plugin>
-                    <groupId>org.eluder.coveralls</groupId>
-                    <artifactId>coveralls-maven-plugin</artifactId>
-                    <version>4.3.0</version>
-                    <!-- Include JAXB API directly to workaround coveralls-maven-plugin bug in Java 9+
-                         https://github.com/trautonen/coveralls-maven-plugin/issues/112 -->
-                    <dependencies>
-                        <dependency>
-                            <groupId>javax.xml.bind</groupId>
-                            <artifactId>jaxb-api</artifactId>
-                            <version>${jaxb-api.version}</version>
-                        </dependency>
-                    </dependencies>
-                </plugin>
             </plugins>
         </pluginManagement>
 
