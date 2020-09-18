@@ -129,7 +129,6 @@
 				<dc:language><xsl:value-of select="." /></dc:language>
 			</xsl:for-each>
 			
-			<!--dc.subject = subject -->
 			<!--sedici.subject.materias = subject -->
 			<!-- Imprimo primero en espanol y luego en el resto de los idiomas -->
 			<xsl:for-each select="doc:metadata/doc:element[@name='sedici']/doc:element[@name='subject']/doc:element[@name='materias']/doc:element[not(@name) or @name='es' ]/doc:field[@name='value']">
@@ -140,6 +139,10 @@
 			</xsl:for-each>
 			<!--sedici.subject.ford imprimo solo la uri de autoridad -->
 			<xsl:for-each select="doc:metadata/doc:element[@name='sedici']/doc:element[@name='subject']/doc:element[@name='ford']/doc:element/doc:field[@name='authority']">
+				<dc:subject><xsl:value-of select="." /></dc:subject>
+			</xsl:for-each>
+			<!--dc.subject = subject -->
+			<xsl:for-each select="doc:metadata/doc:element[@name='dc']/doc:element[@name='subject']/doc:element/doc:field[@name='value']">
 				<dc:subject><xsl:value-of select="." /></dc:subject>
 			</xsl:for-each>
 
