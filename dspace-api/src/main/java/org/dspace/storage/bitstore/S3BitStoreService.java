@@ -178,7 +178,7 @@ public class S3BitStoreService implements BitStoreService {
         File scratchFile = File.createTempFile(bitstream.getInternalId(), "s3bs");
         try {
             FileUtils.copyInputStreamToFile(in, scratchFile);
-            Long contentLength = scratchFile.length();
+            long contentLength = scratchFile.length();
 
             PutObjectRequest putObjectRequest = new PutObjectRequest(bucketName, key, scratchFile);
             PutObjectResult putObjectResult = s3Service.putObject(putObjectRequest);
