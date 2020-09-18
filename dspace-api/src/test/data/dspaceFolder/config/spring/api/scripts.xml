@@ -4,6 +4,9 @@
     xsi:schemaLocation="http://www.springframework.org/schema/beans
            http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
 
+    <bean id="dspaceRunnableThreadExecutor" class="org.springframework.core.task.SyncTaskExecutor"/>
+
+
     <bean id="index-discovery" class="org.dspace.discovery.IndexDiscoveryScriptConfiguration">
         <property name="description" value="Update Discovery Solr Search Index"/>
         <property name="dspaceRunnableClass" value="org.dspace.discovery.IndexClient"/>
@@ -19,11 +22,15 @@
         <property name="dspaceRunnableClass" value="org.dspace.app.bulkedit.MetadataExportCli"/>
     </bean>
 
-    <bean id="curate" class="org.dspace.curate.CurationScriptConfiguration">
+    <bean id="curate" class="org.dspace.curate.CurationCliScriptConfiguration">
         <property name="description" value="Curation tasks"/>
         <property name="dspaceRunnableClass" value="org.dspace.curate.CurationCli"/>
     </bean>
 
+    <bean id="another-mock-script" class="org.dspace.scripts.MockDSpaceRunnableScriptConfiguration" scope="prototype">
+        <property name="description" value="Mocking a script for testing purposes" />
+        <property name="dspaceRunnableClass" value="org.dspace.scripts.impl.MockDSpaceRunnableScript"/>
+    </bean>
     <!-- Keep as last script; for test ScriptRestRepository#findOneScriptByNameTest -->
     <bean id="mock-script" class="org.dspace.scripts.MockDSpaceRunnableScriptConfiguration" scope="prototype">
         <property name="description" value="Mocking a script for testing purposes" />

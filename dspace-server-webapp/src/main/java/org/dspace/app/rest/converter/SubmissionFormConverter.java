@@ -222,7 +222,8 @@ public class SubmissionFormConverter implements DSpaceConverter<DCInputSet, Subm
                     return INPUT_TYPE_DROPDOWN;
                 }
             } else if (INPUT_TYPE_NAME.equals(inputType)) {
-                if (AuthorityUtils.PRESENTATION_TYPE_LOOKUP.equals(presentation)) {
+                if (AuthorityUtils.PRESENTATION_TYPE_LOOKUP.equals(presentation) ||
+                        AuthorityUtils.PRESENTATION_TYPE_AUTHORLOOKUP.equals(presentation)) {
                     return INPUT_TYPE_LOOKUP_NAME;
                 }
             }

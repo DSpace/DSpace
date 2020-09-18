@@ -8,9 +8,12 @@
 package org.dspace.app.rest.repository;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+import org.atteo.evo.inflector.English;
+import org.dspace.app.rest.DiscoverableEndpointsService;
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.exception.LinkNotFoundException;
@@ -24,10 +27,12 @@ import org.dspace.content.authority.ChoiceAuthority;
 import org.dspace.content.authority.Choices;
 import org.dspace.content.authority.service.ChoiceAuthorityService;
 import org.dspace.core.Context;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.hateoas.Link;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
@@ -37,13 +42,25 @@ import org.springframework.stereotype.Component;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 @Component(VocabularyRest.CATEGORY + "." + VocabularyEntryDetailsRest.NAME)
-public class VocabularyEntryDetailsRestRepository extends DSpaceRestRepository<VocabularyEntryDetailsRest, String> {
+public class VocabularyEntryDetailsRestRepository extends DSpaceRestRepository<VocabularyEntryDetailsRest, String>
+        implements InitializingBean {
 
     @Autowired
     private ChoiceAuthorityService cas;
 
     @Autowired
     private AuthorityUtils authorityUtils;
+
+    @Autowired
+    private DiscoverableEndpointsService discoverableEndpointsService;
+
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        String models = English.plural(VocabularyEntryDetailsRest.NAME);
+        discoverableEndpointsService.register(this, Arrays.asList(
+                new Link("/api/" + VocabularyRest.CATEGORY + "/" + models + "/search",
+                        models + "-search")));
+    }
 
     @PreAuthorize("hasAuthority('AUTHENTICATED')")
     @Override

@@ -351,6 +351,44 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
     }
 
     @Test
+    public void findOneCollectionFullProjectionTest() throws Exception {
+
+        //We turn off the authorization system in order to create the structure as defined below
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and one collection.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Community child2 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community Two")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+
+        context.restoreAuthSystemState();
+
+
+        String adminToken = getAuthToken(admin.getEmail(), password);
+        getClient(adminToken).perform(get("/api/core/collections/" + col1.getID())
+                                .param("projection", "full"))
+                   .andExpect(status().isOk())
+                   .andExpect(content().contentType(contentType))
+                   .andExpect(jsonPath("$", CollectionMatcher.matchCollectionEntryFullProjection(
+                       col1.getName(), col1.getID(), col1.getHandle())));
+
+        getClient().perform(get("/api/core/collections/" + col1.getID())
+                                .param("projection", "full"))
+                   .andExpect(status().isOk())
+                   .andExpect(content().contentType(contentType))
+                   .andExpect(jsonPath("$", Matchers.not(CollectionMatcher.matchCollectionEntryFullProjection(
+                       col1.getName(), col1.getID(), col1.getHandle()))));
+    }
+
+    @Test
     public void findOneCollectionUnAuthenticatedTest() throws Exception {
 
         context.turnOffAuthorisationSystem();

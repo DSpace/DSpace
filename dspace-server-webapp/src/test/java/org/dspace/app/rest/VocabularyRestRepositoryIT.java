@@ -13,15 +13,18 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.Date;
+import java.util.Locale;
 import java.util.UUID;
 
 import org.dspace.app.rest.matcher.VocabularyMatcher;
+import org.dspace.app.rest.repository.SubmissionFormRestRepository;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.authority.PersonAuthorityValue;
 import org.dspace.authority.factory.AuthorityServiceFactory;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
 import org.dspace.content.Collection;
+import org.dspace.content.authority.DCInputAuthority;
 import org.dspace.content.authority.service.ChoiceAuthorityService;
 import org.dspace.core.service.PluginService;
 import org.dspace.services.ConfigurationService;
@@ -39,6 +42,9 @@ public class VocabularyRestRepositoryIT extends AbstractControllerIntegrationTes
 
     @Autowired
     ConfigurationService configurationService;
+
+    @Autowired
+    private SubmissionFormRestRepository submissionFormRestRepository;
 
     @Autowired
     private PluginService pluginService;
@@ -64,9 +70,9 @@ public class VocabularyRestRepositoryIT extends AbstractControllerIntegrationTes
         configurationService.setProperty("authority.author.indexer.field.1",
                 "dc.contributor.author");
 
-
         // These clears have to happen so that the config is actually reloaded in those classes. This is needed for
         // the properties that we're altering above and this is only used within the tests
+        DCInputAuthority.reset();
         pluginService.clearNamedPluginClasses();
         cas.clearCache();
 
@@ -102,6 +108,7 @@ public class VocabularyRestRepositoryIT extends AbstractControllerIntegrationTes
     // We need to cleanup the authorities cache once than the configuration has been restored
     public void destroy() throws Exception {
         super.destroy();
+        DCInputAuthority.reset();
         pluginService.clearNamedPluginClasses();
         cas.clearCache();
     }
@@ -227,6 +234,59 @@ public class VocabularyRestRepositoryIT extends AbstractControllerIntegrationTes
                 .andExpect(jsonPath("$.page.totalPages", Matchers.is(1)))
                 .andExpect(jsonPath("$.page.size", Matchers.is(2)));
     }
+
+    @Test
+    public void vocabularyEntriesDCInputAuthorityLocalesTest() throws Exception {
+        String[] supportedLanguage = {"it","uk"};
+        configurationService.setProperty("default.locale","it");
+        configurationService.setProperty("webui.supported.locales",supportedLanguage);
+        // These clears have to happen so that the config is actually reloaded in those classes. This is needed for
+        // the properties that we're altering above and this is only used within the tests
+        submissionFormRestRepository.reload();
+        DCInputAuthority.reset();
+        pluginService.clearNamedPluginClasses();
+        cas.clearCache();
+
+        Locale uk = new Locale("uk");
+        Locale it = new Locale("it");
+
+        String token = getAuthToken(admin.getEmail(), password);
+        getClient(token)
+                .perform(get("/api/submission/vocabularies/common_iso_languages/entries")
+                        .param("size", "2")
+                        .locale(it))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$._embedded.entries", Matchers.containsInAnyOrder(
+                        VocabularyMatcher.matchVocabularyEntry("N/A", "", "vocabularyEntry"),
+                        VocabularyMatcher.matchVocabularyEntry("Inglese (USA)", "en_US", "vocabularyEntry")
+                        )))
+                .andExpect(jsonPath("$._embedded.entries[*].authority").doesNotExist())
+                .andExpect(jsonPath("$.page.totalElements", Matchers.is(12)))
+                .andExpect(jsonPath("$.page.totalPages", Matchers.is(6)))
+                .andExpect(jsonPath("$.page.size", Matchers.is(2)));
+
+        getClient(token)
+                .perform(get("/api/submission/vocabularies/common_iso_languages/entries")
+                        .param("size", "2")
+                        .locale(uk))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$._embedded.entries", Matchers.containsInAnyOrder(
+                        VocabularyMatcher.matchVocabularyEntry("N/A", "", "vocabularyEntry"),
+                        VocabularyMatcher.matchVocabularyEntry("Американська (USA)", "en_US", "vocabularyEntry")
+                        )))
+                .andExpect(jsonPath("$._embedded.entries[*].authority").doesNotExist())
+                .andExpect(jsonPath("$.page.totalElements", Matchers.is(12)))
+                .andExpect(jsonPath("$.page.totalPages", Matchers.is(6)))
+                .andExpect(jsonPath("$.page.size", Matchers.is(2)));
+
+        configurationService.setProperty("default.locale","en");
+        configurationService.setProperty("webui.supported.locales",null);
+        submissionFormRestRepository.reload();
+        DCInputAuthority.reset();
+        pluginService.clearNamedPluginClasses();
+        cas.clearCache();
+    }
+
 
     @Test
     public void correctSolrQueryTest() throws Exception {

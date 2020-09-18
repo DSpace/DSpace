@@ -43,7 +43,6 @@ public class ArXivIdMetadataContributor extends SimpleXpathMetadatumContributor 
      * This method parses out the identifier from the end of the URL, e.g. 1911.11405v1.
      * 
      * @param dtos Metadata which contains the items uri
-     * @return the items ids
      */
     private void parseValue(Collection<MetadatumDTO> dtos) {
         if (dtos != null) {

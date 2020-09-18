@@ -47,7 +47,7 @@ public class VocabularyEntryDetailsChildrenLinkRepository extends AbstractDSpace
 
     @PreAuthorize("hasAuthority('AUTHENTICATED')")
     public Page<VocabularyEntryDetailsRest> getChildren(@Nullable HttpServletRequest request, String name,
-                                                        @Nullable Pageable pageable, Projection projection) {
+                                                        @Nullable Pageable optionalPageable, Projection projection) {
 
         Context context = obtainContext();
         String[] parts = StringUtils.split(name, ":", 2);
@@ -56,7 +56,7 @@ public class VocabularyEntryDetailsChildrenLinkRepository extends AbstractDSpace
         }
         String vocabularyName = parts[0];
         String id = parts[1];
-
+        Pageable pageable = utils.getPageable(optionalPageable);
         List<VocabularyEntryDetailsRest> results = new ArrayList<VocabularyEntryDetailsRest>();
         ChoiceAuthority authority = choiceAuthorityService.getChoiceAuthorityByAuthorityName(vocabularyName);
         if (StringUtils.isNotBlank(id) && authority.isHierarchical()) {

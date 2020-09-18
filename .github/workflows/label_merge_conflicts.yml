@@ -21,3 +21,5 @@ jobs:
         with:
           CONFLICT_LABEL_NAME: 'merge conflict'
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        # Ignore errors
+        continue-on-error: true

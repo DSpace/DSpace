@@ -14,6 +14,7 @@ import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.nullValue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -993,5 +994,184 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
                                                                                         "Moon", "2018-01-02")
                                        )));
     }
+
+    @Test
+    public void findBrowseByTitleItemsFullProjectionTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and two collections.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1)
+                .withName("Collection 1")
+                .withRelationshipType("Publication")
+                .build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1)
+                .withName("Collection 2")
+                .withRelationshipType("Publication")
+                .build();
+
+        //2. Two public items that are readable by Anonymous
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
+                                      .withTitle("Public item 1")
+                                      .withIssueDate("2017-10-17")
+                                      .withAuthor("Smith, Donald").withAuthor("Doe, John")
+                                      .withSubject("Java").withSubject("Unit Testing")
+                                      .build();
+
+
+        context.restoreAuthSystemState();
+
+        getClient().perform(get("/api/discover/browses/title/items")
+                                .param("projection", "full"))
+
+                   //** THEN **
+                   //The status has to be 200 OK
+                   .andExpect(status().isOk())
+                   //We expect the content type to be "application/hal+json;charset=UTF-8"
+                   .andExpect(content().contentType(contentType))
+                   // The full projection for anon shouldn't show the adminGroup in the response
+                   .andExpect(
+                       jsonPath("$._embedded.items[0]._embedded.owningCollection._embedded.adminGroup").doesNotExist());
+
+
+        String adminToken = getAuthToken(admin.getEmail(), password);
+        getClient(adminToken).perform(get("/api/discover/browses/title/items")
+                                          .param("projection", "full"))
+
+                             //** THEN **
+                             //The status has to be 200 OK
+                             .andExpect(status().isOk())
+                             //We expect the content type to be "application/hal+json;charset=UTF-8"
+                             .andExpect(content().contentType(contentType))
+                             // The full projection for admin should show the adminGroup in the response
+                             .andExpect(jsonPath("$._embedded.items[0]._embedded.owningCollection._embedded.adminGroup",
+                                                 nullValue()));
+    }
+
+    @Test
+    public void browseByAuthorFullProjectionTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community and one collection.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                .withName("Collection 1")
+                .withRelationshipType("Publication")
+                .build();
+
+        //2. Twenty-one public items that are readable by Anonymous
+        for (int i = 0; i <= 20; i++) {
+            ItemBuilder.createItem(context, col1)
+                       .withTitle("Public item " + String.format("%02d", i))
+                       .withIssueDate("2017-10-17")
+                       .withAuthor("Test, Author" + String.format("%02d", i))
+                       .withSubject("Java").withSubject("Unit Testing")
+                       .build();
+        }
+
+        context.restoreAuthSystemState();
+
+
+        getClient().perform(get("/api/discover/browses/author/entries")
+                                .param("projection", "full"))
+                   .andExpect(status().isOk())
+                   .andExpect(content().contentType(contentType))
+                   .andExpect(jsonPath("$.page.size", is(20)))
+                   .andExpect(jsonPath("$.page.totalElements", is(21)))
+                   .andExpect(jsonPath("$.page.totalPages", is(2)))
+                   .andExpect(jsonPath("$.page.number", is(0)))
+                   .andExpect(
+                       jsonPath("$._links.next.href", Matchers.containsString("/api/discover/browses/author/entries")))
+                   .andExpect(
+                       jsonPath("$._links.last.href", Matchers.containsString("/api/discover/browses/author/entries")))
+                   .andExpect(
+                       jsonPath("$._links.self.href", Matchers.endsWith("/api/discover/browses/author/entries")));
+
+        String adminToken = getAuthToken(admin.getEmail(), password);
+        getClient(adminToken).perform(get("/api/discover/browses/author/entries")
+                                          .param("projection", "full"))
+                             .andExpect(status().isOk())
+                             .andExpect(content().contentType(contentType))
+                             .andExpect(jsonPath("$.page.size", is(20)))
+                             .andExpect(jsonPath("$.page.totalElements", is(21)))
+                             .andExpect(jsonPath("$.page.totalPages", is(2)))
+                             .andExpect(jsonPath("$.page.number", is(0)))
+                             .andExpect(jsonPath("$._links.next.href",
+                                                 Matchers.containsString("/api/discover/browses/author/entries")))
+                             .andExpect(jsonPath("$._links.last.href",
+                                                 Matchers.containsString("/api/discover/browses/author/entries")))
+                             .andExpect(
+                                 jsonPath("$._links.self.href",
+                                          Matchers.endsWith("/api/discover/browses/author/entries")));
+
+        getClient().perform(get("/api/discover/browses/author/entries"))
+                   .andExpect(status().isOk())
+                   .andExpect(content().contentType(contentType))
+                   .andExpect(jsonPath("$.page.size", is(20)))
+                   .andExpect(jsonPath("$.page.totalElements", is(21)))
+                   .andExpect(jsonPath("$.page.totalPages", is(2)))
+                   .andExpect(jsonPath("$.page.number", is(0)))
+                   .andExpect(
+                       jsonPath("$._links.next.href", Matchers.containsString("/api/discover/browses/author/entries")))
+                   .andExpect(
+                       jsonPath("$._links.last.href", Matchers.containsString("/api/discover/browses/author/entries")))
+                   .andExpect(
+                       jsonPath("$._links.self.href", Matchers.endsWith("/api/discover/browses/author/entries")));
+
+    }
+
+    @Test
+    public void testBrowseByDateIssuedItemsFullProjectionTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and two collections.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1)
+                .withName("Collection 1")
+                .withRelationshipType("Publication")
+                .build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1)
+                .withName("Collection 2")
+                .withRelationshipType("Publication")
+                .build();
+
+        Item item1 = ItemBuilder.createItem(context, col1)
+                                .withTitle("Item 1")
+                                .withIssueDate("2017-10-17")
+                                .build();
+
+        context.restoreAuthSystemState();
+
+        getClient().perform(get("/api/discover/browses/dateissued/items")
+                                .param("projection", "full"))
+
+                   .andExpect(status().isOk())
+                   .andExpect(content().contentType(contentType))
+                   .andExpect(
+                       jsonPath("$._embedded.items[0]._embedded.owningCollection._embedded.adminGroup").doesNotExist());
+
+        String adminToken = getAuthToken(admin.getEmail(), password);
+        getClient(adminToken).perform(get("/api/discover/browses/dateissued/items")
+                                          .param("projection", "full"))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$._embedded.items[0]._embedded.owningCollection._embedded.adminGroup",
+                                                 nullValue()));
+    }
+
 
 }

@@ -78,6 +78,32 @@ public class EPersonTest extends AbstractUnitTest {
         super.destroy();
     }
 
+    @Test
+    public void testPreferences() throws Exception {
+
+        String cookies =
+            "{" +
+                "\"token_item\":true," +
+                "\"impersonation\":true," +
+                "\"redirect\":true," +
+                "\"language\":true," +
+                "\"klaro\":true," +
+                "\"google-analytics\":false" +
+                "}";
+
+        ePersonService.addMetadata(context, eperson, "dspace", "agreements", "cookies", null, cookies);
+        ePersonService.addMetadata(context, eperson, "dspace", "agreements", "end-user", null, "true");
+        context.commit();
+
+        assertEquals(
+            cookies,
+            ePersonService.getMetadataFirstValue(eperson, "dspace", "agreements", "cookies", null)
+        );
+        assertEquals(
+            "true",
+                ePersonService.getMetadataFirstValue(eperson, "dspace", "agreements", "end-user", null)
+        );
+    }
 
     /**
      * Test of equals method, of class EPerson.

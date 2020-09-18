@@ -349,7 +349,7 @@ public class WorkflowDefinitionRestRepositoryIT extends AbstractControllerIntegr
 
         if (StringUtils.isNotBlank(firstNonDefaultWorkflowName)) {
             List<Collection> mappedCollections
-                = xmlWorkflowFactory.getCollectionHandlesMappedToWorklow(context, firstNonDefaultWorkflowName);
+                = xmlWorkflowFactory.getCollectionHandlesMappedToWorkflow(context, firstNonDefaultWorkflowName);
             //When we call this facets endpoint
             if (mappedCollections.size() > 0) {
                 //returns array of collection jsons that are mapped to given workflow

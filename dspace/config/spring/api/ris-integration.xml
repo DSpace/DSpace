@@ -1,0 +1,77 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context-2.5.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd"
+       default-autowire-candidates="*Service,*DAO,javax.sql.DataSource">
+
+    <context:annotation-config/>
+    <!-- allows us to use spring annotations in beans -->
+
+    <util:map id="risMetadataFieldMap" key-type="org.dspace.importer.external.metadatamapping.MetadataFieldConfig"
+              value-type="org.dspace.importer.external.metadatamapping.contributor.MetadataContributor">
+        <description>Defines which metadatum is mapped on which metadatum. Note that while the key must be unique it
+            only matters here for postprocessing of the value. The mapped MetadatumContributor has full control over
+            what metadatafield is generated.
+        </description>
+        <entry key-ref="dcTitle" value-ref="risTitleContrib" />
+        <entry key-ref="dcAuthors" value-ref="risAuthorContrib" />
+        <entry key-ref="dcJournal" value-ref="risSourceContrib" />
+		<entry key-ref="dcIssued" value-ref="risDateContrib" />
+		<entry key-ref="dcJissn" value-ref="risISSNContrib" />    
+		<entry key-ref="dcSubtype" value-ref="risTypeContrib" />    
+		<entry key-ref="dcAbstract" value-ref="risAbstractContrib" />    
+    </util:map>
+
+
+    <bean id="risTitleContrib" class="org.dspace.importer.external.metadatamapping.contributor.MultipleMetadataContributor">
+        <property name="field" ref="dcTitle"/>
+        <property name="metadatumContributors" ref="risTitleContribList" />
+    </bean>
+
+	<util:list id="risTitleContribList">
+	    <bean id="risTitleContribTI" class="org.dspace.importer.external.metadatamapping.contributor.SimpleMetadataContributor">
+	        <property name="field" ref="dcTitle"/>
+	        <property name="key" value="TI" />
+	    </bean>
+	    <bean id="risTitleContribT1" class="org.dspace.importer.external.metadatamapping.contributor.SimpleMetadataContributor">
+	        <property name="field" ref="dcTitle"/>
+	        <property name="key" value="T1" />
+	    </bean>	
+	</util:list>
+    
+    <bean id="risAuthorContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleMetadataContributor">
+        <property name="field" ref="dcAuthors"/>
+        <property name="key" value="AU" />
+    </bean>    
+    
+    <bean id="risSourceContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleMetadataContributor">
+        <property name="field" ref="dcJournal"/>
+        <property name="key" value="SO" />
+    </bean>    
+    
+    
+    <bean id="risDateContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleMetadataContributor">
+        <property name="field" ref="dcIssued"/>
+        <property name="key" value="PY" />
+    </bean>    
+
+    <bean id="risISSNContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleMetadataContributor">
+        <property name="field" ref="dcJissn"/>
+        <property name="key" value="SN" />
+    </bean>    
+    
+   <bean id="risTypeContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleMetadataContributor">
+        <property name="field" ref="dcSubtype"/>
+        <property name="key" value="PT" />
+    </bean>    
+    
+   <bean id="risAbstractContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleMetadataContributor">
+        <property name="field" ref="dcAbstract"/>
+        <property name="key" value="AB" />
+    </bean>    
+
+</beans>
