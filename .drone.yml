@@ -1,0 +1,18 @@
+---
+kind: pipeline
+type: docker
+name: default
+
+steps:
+- name: dspace-cris-ci
+  image: maven:3.6.3-jdk-11
+  environment:
+    submission___P___lookup___P___ads___P___apikey:
+      from_secret: ADS_APIKEY
+    submission___P___lookup___P___epo___P___consumerKey:
+      from_secret: EPO_APIKEY
+    submission___P___lookup___P___epo___P___consumerSecretKey:
+      from_secret: EPO_APISECRET
+  commands:         
+  - ./dspace-api/src/test/data/dspaceFolder/bin/install_grobid.sh
+  - mvn clean install license:check -DskipTests=false -DskipITs=false -Pdspace-rest -P !assembly -B -V -Dsurefire.rerunFailingTestsCount=2
