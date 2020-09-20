@@ -7,11 +7,11 @@ steps:
 - name: dspace-cris-ci
   image: maven:3.6.3-jdk-11
   environment:
-    submission___P___lookup___P___ads___P___apikey:
+    submission__P__lookup__P__ads__P__apikey:
       from_secret: ADS_APIKEY
-    submission___P___lookup___P___epo___P___consumerKey:
+    submission__P__lookup__P__epo__P__consumerKey:
       from_secret: EPO_APIKEY
-    submission___P___lookup___P___epo___P___consumerSecretKey:
+    submission__P__lookup__P__epo__P__consumerSecretKey:
       from_secret: EPO_APISECRET
   commands:         
   - ./dspace-api/src/test/data/dspaceFolder/bin/install_grobid.sh
