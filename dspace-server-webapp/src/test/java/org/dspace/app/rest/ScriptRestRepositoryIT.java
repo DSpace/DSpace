@@ -47,7 +47,6 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
 import org.dspace.content.ProcessStatus;
-import org.dspace.content.service.BitstreamService;
 import org.dspace.scripts.DSpaceCommandLineParameter;
 import org.dspace.scripts.Process;
 import org.dspace.scripts.configuration.ScriptConfiguration;
@@ -67,10 +66,7 @@ public class ScriptRestRepositoryIT extends AbstractControllerIntegrationTest {
     private ProcessService processService;
 
     @Autowired
-    private BitstreamService bitstreamService;
-
-    @Autowired
-    private List<ScriptConfiguration> scriptConfigurations;
+    private List<ScriptConfiguration<?>> scriptConfigurations;
 
     @Autowired
     private DSpaceRunnableParameterConverter dSpaceRunnableParameterConverter;
@@ -91,9 +87,11 @@ public class ScriptRestRepositoryIT extends AbstractControllerIntegrationTest {
                                 ScriptMatcher.matchScript(scriptConfigurations.get(3).getName(),
                                                           scriptConfigurations.get(3).getDescription()),
                                 ScriptMatcher.matchScript(scriptConfigurations.get(4).getName(),
-                                scriptConfigurations.get(4).getDescription()),
-                            ScriptMatcher.matchScript(scriptConfigurations.get(5).getName(),
-                                                      scriptConfigurations.get(5).getDescription())
+                                                          scriptConfigurations.get(4).getDescription()),
+                                ScriptMatcher.matchScript(scriptConfigurations.get(5).getName(),
+                                                          scriptConfigurations.get(5).getDescription()),
+                                ScriptMatcher.matchScript(scriptConfigurations.get(6).getName(),
+                                                          scriptConfigurations.get(6).getDescription())
                         )));
 
     }
@@ -122,8 +120,8 @@ public class ScriptRestRepositoryIT extends AbstractControllerIntegrationTest {
                                                           scriptConfigurations.get(0).getDescription())
                         ))))
                         .andExpect(jsonPath("$._embedded.scripts", hasItem(
-                                ScriptMatcher.matchScript(scriptConfigurations.get(2).getName(),
-                                                          scriptConfigurations.get(2).getDescription())
+                                ScriptMatcher.matchScript(scriptConfigurations.get(6).getName(),
+                                                          scriptConfigurations.get(6).getDescription())
                         )))
                         .andExpect(jsonPath("$.page",
                                             is(PageMatcher.pageEntry(0, 1))));
@@ -132,8 +130,8 @@ public class ScriptRestRepositoryIT extends AbstractControllerIntegrationTest {
         getClient(token).perform(get("/api/system/scripts").param("size", "1").param("page", "1"))
                         .andExpect(status().isOk())
                         .andExpect(jsonPath("$._embedded.scripts", hasItem(
-                                ScriptMatcher.matchScript(scriptConfigurations.get(1).getName(),
-                                                          scriptConfigurations.get(1).getDescription())
+                                ScriptMatcher.matchScript(scriptConfigurations.get(2).getName(),
+                                                          scriptConfigurations.get(2).getDescription())
                         )))
                         .andExpect(jsonPath("$._embedded.scripts", Matchers.not(hasItem(
                                 ScriptMatcher.matchScript(scriptConfigurations.get(0).getName(),
@@ -151,7 +149,7 @@ public class ScriptRestRepositoryIT extends AbstractControllerIntegrationTest {
                         .andExpect(status().isOk())
                         .andExpect(jsonPath("$", ScriptMatcher
                                 .matchMockScript(
-                                        scriptConfigurations.get(scriptConfigurations.size() - 1).getOptions())));
+                                        scriptConfigurations.get(scriptConfigurations.size() - 2).getOptions())));
     }
 
     @Test
