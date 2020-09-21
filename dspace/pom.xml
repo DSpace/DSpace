@@ -213,9 +213,6 @@
                                         <sourceDirectory>${project.parent.basedir}/dspace-swordv2/src/main/java</sourceDirectory>
                                     </sourceDirectories>
                                     <sourceEncoding>UTF-8</sourceEncoding>
-                                    <!-- Specify that we are using Travis CI. TRAVIS_JOB_ID is passed in from [src]/.travis.yml -->
-                                    <serviceName>travis-ci</serviceName>
-                                    <serviceJobId>${env.TRAVIS_JOB_ID}</serviceJobId>
                                 </configuration>
                             </execution>
                         </executions>

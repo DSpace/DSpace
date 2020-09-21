@@ -56,14 +56,15 @@ install: skip
 #  -B            => Maven batch/non-interactive mode (recommended for CI)
 #  -V            => Display Maven version info before build
 #  -P-assembly   => Disable build of dspace-installer in [src]/dspace/, as it can be memory intensive
-script: "mvn install -B -V -P-assembly $TEST_FLAGS"
+script: mvn install -B -V -P-assembly $TEST_FLAGS
 
 # After a successful build and test (see 'script'), aggregate code coverage reports & send to coveralls.io
 # (using the 'coveralls' profile). Skips 'assembly' step to save time.
 # NOTE: also skips any code checks or compilation, as both are unnecessary. Coverage reports were already generated
 # by jacoco-maven-plugin during the unit or integration testing. So, this command is aggregating existing reports.
 # NOTE#2: TRAVIS_JOB_ID is passed into coveralls-maven-plugin to help Coveralls merge reports
-after_success: "mvn verify -B -P coveralls -P-assembly -DTRAVIS_JOB_ID=$TRAVIS_JOB_ID $SKIP_CODE_CHECKS $SKIP_CODE_COMPILATION"
+after_success:
+  - mvn verify -B -P coveralls -P-assembly -DserviceName="travis-ci" -DserviceBuildNumber=$TRAVIS_BUILD_NUMBER $SKIP_CODE_CHECKS $SKIP_CODE_COMPILATION
 
 # Send final notification to coveralls after all (parallel) jobs have been completed. This tells Coveralls
 # that all job coverage reports can now be merged. See https://docs.coveralls.io/parallel-build-webhook
