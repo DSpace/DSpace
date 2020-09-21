@@ -7,15 +7,19 @@
  */
 package org.dspace.app.rest.model;
 
+import java.util.UUID;
+
 import org.dspace.app.rest.RestResourceController;
 
 /**
- * The WorkspaceItem REST Resource
- *
- * @author Andrea Bollini (andrea.bollini at 4science.it)
+ * The EditItem REST Resource
+ * 
+ * @author Danilo Di Nuzzo (danilo.dinuzzo at 4science.it)
  */
-public class WorkspaceItemRest extends AInprogressSubmissionRest<Integer> {
-    public static final String NAME = "workspaceitem";
+public class EditItemRest extends AInprogressSubmissionRest<UUID> {
+
+    private static final long serialVersionUID = 964876735342568998L;
+    public static final String NAME = "edititem";
     public static final String CATEGORY = RestAddressableModel.SUBMISSION;
 
     @Override
@@ -29,7 +33,8 @@ public class WorkspaceItemRest extends AInprogressSubmissionRest<Integer> {
     }
 
     @Override
-    public Class getController() {
+    public Class<RestResourceController> getController() {
         return RestResourceController.class;
     }
+
 }
