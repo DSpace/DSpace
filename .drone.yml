@@ -7,6 +7,7 @@ steps:
 - name: dspace-cris-ci
   image: maven:3.6.3-jdk-11
   environment:
+    MAVEN_OPTS: -Xmx1024M
     submission__P__lookup__P__ads__P__apikey:
       from_secret: ADS_APIKEY
     submission__P__lookup__P__epo__P__consumerKey:
