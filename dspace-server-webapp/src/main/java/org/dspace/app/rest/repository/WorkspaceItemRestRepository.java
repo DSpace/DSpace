@@ -419,6 +419,9 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
                         records.add(record);
                         break;
                     }
+                } catch (Exception e) {
+                    log.error("Error processing data", e);
+                    throw e;
                 } finally {
                     file.delete();
                 }

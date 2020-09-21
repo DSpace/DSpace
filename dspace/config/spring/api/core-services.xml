@@ -130,6 +130,7 @@
     <bean class="org.dspace.discovery.indexobject.PoolTaskIndexFactoryImpl" autowire-candidate="true"/>
     <bean class="org.dspace.discovery.indexobject.WorkflowItemIndexFactoryImpl" autowire-candidate="true"/>
     <bean class="org.dspace.discovery.indexobject.WorkspaceItemIndexFactoryImpl" autowire-candidate="true"/>
+    <bean class="org.dspace.discovery.indexobject.MetadataFieldIndexFactoryImpl" autowire-candidate="true"/>
 
 	<!-- Imp beans -->
     <bean class="org.dspace.batch.ImpBitstreamServiceImpl"/>

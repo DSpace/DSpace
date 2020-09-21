@@ -22,7 +22,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.util.DCInputsReader;
 import org.dspace.app.util.DCInputsReaderException;
-import org.dspace.core.Context;
 import org.dspace.core.I18nUtil;
 import org.dspace.core.SelfNamedPlugin;
 
@@ -51,9 +50,21 @@ import org.dspace.core.SelfNamedPlugin;
 public class DCInputAuthority extends SelfNamedPlugin implements ChoiceAuthority {
     private static Logger log = org.apache.logging.log4j.LogManager.getLogger(DCInputAuthority.class);
 
+    /**
+     * The map of the values available for a specific language. Examples of keys are
+     * "en", "it", "uk"
+     */
     private Map<String, String[]> values = null;
+
+    /**
+     * The map of the labels available for a specific language. Examples of keys are
+     * "en", "it", "uk"
+     */
     private Map<String, String[]> labels = null;
 
+    /**
+     * The map of the input form reader associated to use for a specific java locale
+     */
     private static Map<Locale, DCInputsReader> dcis = null;
     private static String pluginNames[] = null;
 
@@ -181,7 +192,7 @@ public class DCInputAuthority extends SelfNamedPlugin implements ChoiceAuthority
 
         // Get default if locale is empty
         if (StringUtils.isBlank(locale)) {
-            locale = getDefaultLocale();
+            locale = I18nUtil.getDefaultLocale().getLanguage();
         }
 
         String[] labelsLocale = labels.get(locale);
@@ -197,11 +208,6 @@ public class DCInputAuthority extends SelfNamedPlugin implements ChoiceAuthority
         } else {
             return "UNKNOWN KEY " + key;
         }
-    }
-
-    protected String getDefaultLocale() {
-        Context context = new Context();
-        return context.getCurrentLocale().getLanguage();
     }
 
     @Override

@@ -282,7 +282,12 @@ public class WorkspaceItemServiceImpl implements WorkspaceItemService {
 
         // Need to delete the workspaceitem row first since it refers
         // to item ID
-        workspaceItem.getSupervisorGroups().clear();
+        try {
+            workspaceItem.getSupervisorGroups().clear();
+        } catch (Exception e) {
+            log.error("failed to clear supervisor group", e);
+        }
+
         workspaceItemDAO.delete(context, workspaceItem);
 
     }

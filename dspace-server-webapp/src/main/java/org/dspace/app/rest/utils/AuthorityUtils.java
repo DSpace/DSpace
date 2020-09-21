@@ -29,6 +29,8 @@ public class AuthorityUtils {
 
     public static final String PRESENTATION_TYPE_LOOKUP = "lookup";
 
+    public static final String PRESENTATION_TYPE_AUTHORLOOKUP = "authorLookup";
+
     public static final String PRESENTATION_TYPE_SUGGEST = "suggest";
 
     public static final String PRESENTATION_TYPE_SELECT = "select";

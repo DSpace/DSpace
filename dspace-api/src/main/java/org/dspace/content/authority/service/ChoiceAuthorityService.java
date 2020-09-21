@@ -179,6 +179,12 @@ public interface ChoiceAuthorityService {
      */
     public List<String> getVariants(MetadataValue metadataValue, Collection collection);
 
+    /**
+     * Return the ChoiceAuthority instance identified by the specified name
+     * 
+     * @param authorityName the ChoiceAuthority instance name
+     * @return the ChoiceAuthority identified by the specified name
+     */
     public ChoiceAuthority getChoiceAuthorityByAuthorityName(String authorityName);
 
     /**

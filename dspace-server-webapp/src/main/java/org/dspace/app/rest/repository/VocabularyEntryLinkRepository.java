@@ -56,7 +56,7 @@ public class VocabularyEntryLinkRepository extends AbstractDSpaceRestRepository
         String entryID = request == null ? null : request.getParameter("entryID");
 
         if (StringUtils.isNotBlank(filter) && StringUtils.isNotBlank(entryID)) {
-            throw new IllegalArgumentException("required only one of the parameters: filter or entryID");
+            throw new IllegalArgumentException("the filter and entryID parameters are mutually exclusive");
         }
 
         Pageable pageable = utils.getPageable(optionalPageable);

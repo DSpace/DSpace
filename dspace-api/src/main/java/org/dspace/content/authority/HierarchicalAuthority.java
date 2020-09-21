@@ -62,7 +62,8 @@ public interface HierarchicalAuthority extends ChoiceAuthority {
     public Choices getChoicesByParent(String authorityName, String parentId, int start, int limit, String locale);
 
     /**
-     *
+     * It returns the parent choice in the hierarchy if any
+     * 
      * @param authorityName  authority name
      * @param vocabularyId   user's value to match
      * @param locale         explicit localization key if available, or null

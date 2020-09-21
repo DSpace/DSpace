@@ -26,12 +26,15 @@
         Will result in using the PubmedImportService for the lookup step
         Omitting this property will default to searching over all configured ImportService implementations
     -->
-    <bean id="importService" class="org.dspace.importer.external.service.ImportService" scope="singleton"
-          lazy-init="false" autowire="byType" destroy-method="destroy">
+    <bean id="importService" class="org.dspace.importer.external.service.ImportService" lazy-init="false" autowire="byType" destroy-method="destroy">
         <property name="importSources">
             <list>
-                <ref bean="PubmedImportService"></ref>
-                <ref bean="BibtexImportService"></ref>
+                <ref bean="pubmedImportService" />
+                <ref bean="bibtexImportService" />
+                <ref bean="risImportService" />
+                <ref bean="csvImportService" />
+                <ref bean="tsvImportService" />
+                <ref bean="endnoteImportService" />
             </list>
          </property>
     </bean>
@@ -46,9 +49,9 @@
     </bean>
 
 
-    <bean id="PubmedImportService"
-          class="org.dspace.importer.external.pubmed.service.PubmedImportMetadataSourceServiceImpl" scope="singleton">
-        <property name="metadataFieldMapping" ref="PubmedMetadataFieldMapping"/>
+    <bean id="pubmedImportService"
+          class="org.dspace.importer.external.pubmed.service.PubmedImportMetadataSourceServiceImpl">
+        <property name="metadataFieldMapping" ref="pubmedMetadataFieldMapping"/>
         <property name="baseAddress" value="https://eutils.ncbi.nlm.nih.gov/entrez/eutils/"/>
         <property name="generateQueryForItem" ref="pubmedService"></property>
         <property name="supportedExtensions">
@@ -59,12 +62,21 @@
     </bean>
 
 
-    <bean id="PubmedMetadataFieldMapping"
+    <bean id="pubmedMetadataFieldMapping"
           class="org.dspace.importer.external.pubmed.metadatamapping.PubmedFieldMapping">
     </bean>
 
-    <bean id="BibtexImportService"
-          class="org.dspace.importer.external.bibtex.service.BibtexImportMetadataSourceServiceImpl" scope="singleton">
+    <bean id="risImportService"
+          class="org.dspace.importer.external.ris.service.RisImportMetadataSourceServiceImpl">
+          <property name="supportedExtensions">
+               <list>
+                     <value>ris</value>
+               </list>
+          </property>
+    </bean>
+
+    <bean id="bibtexImportService"
+          class="org.dspace.importer.external.bibtex.service.BibtexImportMetadataSourceServiceImpl">
           <property name="supportedExtensions">
                <list>
                      <value>bib</value>
@@ -73,6 +85,46 @@
           </property>
     </bean>
 
+    <bean id="csvImportService"
+          class="org.dspace.importer.external.csv.service.CharacterSeparatedImportMetadataSourceServiceImpl">
+          <property name="metadataFieldMap" ref="csvMetadataFieldMap"></property>
+          <property name="skipLines" value="1" />
+          <property name="supportedExtensions">
+               <list>
+                     <value>csv</value>
+               </list>
+          </property>
+    </bean>
+
+    <bean id="tsvImportService"
+          class="org.dspace.importer.external.csv.service.CharacterSeparatedImportMetadataSourceServiceImpl">
+          <property name="importSource" value="TsvMetadataSource" />
+          <property name="separator" value="\u0009" />
+          <property name="skipLines" value="1" />
+          <property name="metadataFieldMap" ref="tsvMetadataFieldMap" />
+          <property name="supportedExtensions">
+               <list>
+                     <value>tsv</value>
+               </list>
+          </property>
+    </bean>
+
+    <bean id="endnoteImportService"
+          class="org.dspace.importer.external.endnote.service.EndnoteImportMetadataSourceServiceImpl">
+          <property name="metadataFieldMap" ref="endnoteMetadataFieldMap"></property>
+          <property name="supportedExtensions">
+               <list>
+                     <value>enl</value>
+                     <value>enw</value>
+               </list>
+          </property>
+    </bean>
+
+
+    <!-- Metadatafield used to check against if it's already imported or not during the JSONLookupSearcher-->
+    <bean id="lookupID" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="dc.identifier.other"/>
+    </bean>
 
     <bean id="EpoImportService"
           class="org.dspace.importer.external.epo.service.EpoImportMetadataSourceServiceImpl" scope="singleton">
@@ -90,9 +142,6 @@
     <bean id="scopusMetadataFieldMapping"
           class="org.dspace.importer.external.scopus.service.ScopusFieldMapping">
     </bean>
-    <!-- Metadatafield used to check against if it's already imported or not during the JSONLookupSearcher-->
-    <bean id="lookupID" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
-        <constructor-arg value="dc.identifier.other"/>
-    </bean>
+
 
 </beans>
