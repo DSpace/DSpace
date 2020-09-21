@@ -7,6 +7,7 @@
  */
 package org.dspace.builder;
 
+import java.io.IOException;
 import java.sql.SQLException;
 
 import org.apache.log4j.Logger;
@@ -73,6 +74,28 @@ public class OrcidHistoryBuilder extends  AbstractBuilder<OrcidHistory, OrcidHis
     public void delete(Context c, OrcidHistory orcidHistory) throws Exception {
         if (orcidHistory != null) {
             getService().delete(c, orcidHistory);
+        }
+    }
+
+    /**
+     * Delete the Test OrcidHistory referred to by the given ID
+     * 
+     * @param id                Integer of Test OrcidHistory to delete
+     * @throws SQLException
+     * @throws IOException
+     */
+    public static void deleteOrcidHistory(Integer id) throws SQLException, IOException {
+        try (Context c = new Context()) {
+            c.turnOffAuthorisationSystem();
+            OrcidHistory orcidHistory = orcidHistoryService.find(c, id);
+            if (orcidHistory != null) {
+                try {
+                    orcidHistoryService.delete(c, orcidHistory);
+                } catch (AuthorizeException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+            c.complete();
         }
     }
 
