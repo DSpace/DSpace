@@ -35,6 +35,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+/**
+ * This test deals with testing the feature {@link CreateCollectionFeature}
+ */
 public class CanCreateCollectionsIT extends AbstractControllerIntegrationTest {
 
     @Autowired
