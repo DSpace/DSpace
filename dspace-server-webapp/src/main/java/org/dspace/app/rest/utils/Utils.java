@@ -301,10 +301,10 @@ public class Utils {
         if (StringUtils.equals(modelPlural, "boxes")) {
             return CrisLayoutBoxRest.NAME;
         }
-        if (StringUtils.equals(modelPlural, "orcidQueues")) {
+        if (StringUtils.equals(modelPlural, "orcidqueues")) {
             return OrcidQueueRest.NAME;
         }
-        if (StringUtils.equals(modelPlural, "orcidHistories")) {
+        if (StringUtils.equals(modelPlural, "orcidhistories")) {
             return OrcidHistoryRest.NAME;
         }
         return modelPlural.replaceAll("s$", "");

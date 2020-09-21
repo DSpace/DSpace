@@ -15,7 +15,7 @@ public class OrcidQueueRest extends BaseObjectRest<Integer> {
     private static final long serialVersionUID = 1L;
 
     public static final String CATEGORY = RestModel.CRIS;
-    public static final String NAME = "orcidQueue";
+    public static final String NAME = "orcidqueue";
 
     private UUID ownerId;
 
