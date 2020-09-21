@@ -1,0 +1,8 @@
+- hosts: all
+  gather_facts: false
+  tasks:
+    - name: Deploy maintenance scripts
+      copy:
+        src: ../customizations/maintenance-scripts/
+        dest: /brage/{{ item }}/app/bibsys-scripts
+      loop: "{{ kunder }}"
