@@ -10,6 +10,7 @@ package org.dspace.app.orcid.service;
 import java.sql.SQLException;
 
 import org.dspace.app.orcid.OrcidHistory;
+import org.dspace.app.orcid.OrcidQueue;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
@@ -53,5 +54,5 @@ public interface OrcidHistoryService {
      */
     public void update(Context context, OrcidHistory orcidHistory) throws SQLException, AuthorizeException;
 
-    void sendToOrcid(Context context, Integer id) throws SQLException;
+    public OrcidHistory sendToOrcid(Context context, OrcidQueue orcidQueue, boolean forceAddition) throws SQLException;
 }

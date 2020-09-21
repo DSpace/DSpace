@@ -8,12 +8,15 @@
 package org.dspace.app.rest.repository;
 
 import java.sql.SQLException;
+import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import org.dspace.app.orcid.OrcidHistory;
+import org.dspace.app.orcid.OrcidQueue;
 import org.dspace.app.orcid.service.OrcidHistoryService;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.model.OrcidHistoryRest;
+import org.dspace.app.rest.repository.handler.service.UriListHandlerService;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +36,9 @@ public class OrcidHistoryRestRepository extends DSpaceRestRepository<OrcidHistor
 
     @Autowired
     private OrcidHistoryService orcidHistoryService;
+
+    @Autowired
+    private UriListHandlerService uriListHandlerService;
 
     @Override
     public Page<OrcidHistoryRest> findAll(Context context, Pageable pageable) {
@@ -55,14 +61,18 @@ public class OrcidHistoryRestRepository extends DSpaceRestRepository<OrcidHistor
     }
 
     @Override
-    protected OrcidHistoryRest createAndReturn(Context context)
+    @PreAuthorize("hasPermission(#list, 'ORCID', 'ADD')")
+    protected OrcidHistoryRest createAndReturn(Context context, List<String> list)
            throws AuthorizeException, SQLException, RepositoryMethodNotImplementedException {
-        OrcidHistoryRest  orcidHistoryRest = null;
+        OrcidHistory orcidHistory = null;
         HttpServletRequest request = getRequestService().getCurrentRequest().getHttpServletRequest();
-
-        String orcidQueueId = request.getParameter("orcidQueueId");
-        orcidHistoryService.sendToOrcid(context, Integer.valueOf(orcidQueueId));
-        return orcidHistoryRest;
+        OrcidQueue orcidQueue = uriListHandlerService.handle(context, request, list, OrcidQueue.class);
+        if (orcidQueue == null) {
+            throw new IllegalArgumentException("No ORCID Queue record found, the uri-list does not contait a resource");
+        }
+        boolean forceAddition =  Boolean.parseBoolean(request.getParameter("forceAddition"));
+        orcidHistory = orcidHistoryService.sendToOrcid(context, orcidQueue, forceAddition);
+        return converter.toRest(orcidHistory, utils.obtainProjection());
     }
 
     @Override

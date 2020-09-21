@@ -117,12 +117,7 @@ public class OrcidHistoryServiceImpl implements OrcidHistoryService {
     }
 
     @Override
-    public void sendToOrcid(Context context, Integer id) throws SQLException {
-        OrcidQueue orcidQueue = orcidQueueDAO.findByID(context, OrcidQueue.class, id);
-        if (orcidQueue == null) {
-            throw new IllegalArgumentException("No ORCID Queue record found with id " + id);
-        }
-
+    public OrcidHistory sendToOrcid(Context context, OrcidQueue orcidQueue, boolean forceAddition) throws SQLException {
         Item owner = orcidQueue.getOwner();
         String orcid = getMetadataValue(owner, "person.identifier.orcid");
         if (orcid == null) {
@@ -142,37 +137,40 @@ public class OrcidHistoryServiceImpl implements OrcidHistoryService {
 
         switch (entityType) {
             case "Person":
+                //TODO
                 sendPersonToOrcid(context, orcidQueue, orcid, token);
                 break;
             case "Publication":
-                sendPublicationToOrcid(context, orcidQueue, orcid, token);
-                break;
+                return sendPublicationToOrcid(context, orcidQueue, orcid, token, forceAddition);
             case "Project":
-                sendProjectToOrcid(context, orcidQueue, orcid, token);
-                break;
+                return sendProjectToOrcid(context, orcidQueue, orcid, token, forceAddition);
             default:
                 break;
 
         }
+        return null;
     }
 
-    private void sendPublicationToOrcid(Context context, OrcidQueue orcidQueue, String orcid, String token)
-            throws SQLException {
+    private OrcidHistory sendPublicationToOrcid(Context context, OrcidQueue orcidQueue, String orcid, String token,
+            boolean forceAddition) throws SQLException {
 
         Item entity = orcidQueue.getEntity();
         Item owner = orcidQueue.getOwner();
-        BigInteger putCode = findPutCode(context, entity, owner);
+        BigInteger putCode = null;
         Work work = new Work();
         String title = getMetadataValue(entity, "dc.title");
         work.setTitle(new WorkTitle(title, null, null));
         work.setType(WorkType.JOURNAL_ARTICLE);
-        work.setPutCode(putCode);
         work.setExternalIds(getExternalIds(entity));
-        sendObjectToOrcid(context, orcidQueue, orcid, token, putCode, work, WORK_ENDPOINT);
+        if (!forceAddition) {
+            putCode = findPutCode(context, entity, owner);
+            work.setPutCode(putCode);
+        }
+        return sendObjectToOrcid(context, orcidQueue, orcid, token, putCode, work, WORK_ENDPOINT);
     }
 
-    private void sendProjectToOrcid(Context context, OrcidQueue orcidQueue, String orcid, String token)
-            throws SQLException {
+    private OrcidHistory sendProjectToOrcid(Context context, OrcidQueue orcidQueue, String orcid, String token,
+            boolean forceAddition) throws SQLException {
 
         Item entity = orcidQueue.getEntity();
         Item owner = orcidQueue.getOwner();
@@ -180,8 +178,12 @@ public class OrcidHistoryServiceImpl implements OrcidHistoryService {
         Funding funding = new Funding();
         funding.setType(FundingType.GRANT);
 
-        BigInteger putCode = findPutCode(context, entity, owner);
-        funding.setPutCode(putCode);
+        BigInteger putCode = null;
+
+        if (!forceAddition) {
+            putCode = findPutCode(context, entity, owner);
+            funding.setPutCode(putCode);
+        }
 
         String title = getMetadataValue(entity, "dc.title");
         funding.setTitle(new FundingTitle(title, null));
@@ -196,7 +198,7 @@ public class OrcidHistoryServiceImpl implements OrcidHistoryService {
             Iso3166Country country = fromValue(getMetadataValue(organization, "organization.address.addressCountry"));
             funding.setOrganization(new Organization(name, new OrganizationAddress(city, null, country), null));
         }
-        sendObjectToOrcid(context, orcidQueue, orcid, token, putCode, funding, FUNDING_ENDPOINT);
+        return sendObjectToOrcid(context, orcidQueue, orcid, token, putCode, funding, FUNDING_ENDPOINT);
     }
 
     private void sendPersonToOrcid(Context context, OrcidQueue orcidQueue, String orcid, String token)
@@ -205,7 +207,7 @@ public class OrcidHistoryServiceImpl implements OrcidHistoryService {
         orcidQueueDAO.delete(context, orcidQueue);
     }
 
-    private void sendObjectToOrcid(Context context, OrcidQueue orcidQueue, String orcid, String token,
+    private OrcidHistory sendObjectToOrcid(Context context, OrcidQueue orcidQueue, String orcid, String token,
             BigInteger putCode, Object objToSend, String endpoint) {
 
         Item entity = orcidQueue.getEntity();
@@ -230,6 +232,7 @@ public class OrcidHistoryServiceImpl implements OrcidHistoryService {
             history.setOwner(owner);
             history.setLastAttempt(new Date());
             history.setResponseMessage(IOUtils.toString(response.getEntity().getContent(), UTF_8.name()));
+            history.setStatus(response.getStatusLine().getStatusCode());
             if (putCode != null) {
                 history.setPutCode(putCode.toString());
             }
@@ -246,8 +249,8 @@ public class OrcidHistoryServiceImpl implements OrcidHistoryService {
             } else {
                 orcidHistoryDAO.create(context, history);
                 context.commit();
-                throw new IllegalArgumentException("Request to ORCID not valid");
             }
+            return history;
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
