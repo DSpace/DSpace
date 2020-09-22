@@ -11,6 +11,7 @@ import java.util.Date;
 import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.dspace.app.rest.RestResourceController;
 
 /**
  * The OrcidHistory REST Resource
@@ -53,8 +54,8 @@ public class OrcidHistoryRest extends BaseObjectRest<Integer> {
     }
 
     @Override
-    public Class<?> getController() {
-        return OrcidHistoryRest.class;
+    public Class<RestResourceController> getController() {
+        return RestResourceController.class;
     }
 
     public UUID getOwnerId() {
