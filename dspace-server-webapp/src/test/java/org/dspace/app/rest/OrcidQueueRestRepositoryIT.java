@@ -135,7 +135,9 @@ public class OrcidQueueRestRepositoryIT extends AbstractControllerIntegrationTes
                                    .andExpect(jsonPath("$._embedded.orcidqueues", Matchers.contains(
                                               OrcidQueueMatcher.matchOrcidQueue(orcidQueue2, "Publication")
                                               )))
-                                   .andExpect(jsonPath("$.page.totalElements", is(1)));
+                                   .andExpect(jsonPath("$.page.totalElements", is(1)))
+                                   .andExpect(jsonPath("$._links.self.href", Matchers
+                                           .containsString("/api/cris/orcidqueues/" + orcidQueue.getID())));
 
         getClient(tokenAdmin).perform(get("/api/cris/orcidqueue/search/findByOwner")
                              .param("ownerId", itemPerson.getID().toString()))
@@ -303,7 +305,6 @@ public class OrcidQueueRestRepositoryIT extends AbstractControllerIntegrationTes
         itemService.addMetadata(context, itemPerson1, "person", "identifier", "orcid", "en", "0000-0002-1825-0097");
         itemService.addMetadata(context, itemPerson2, "person", "identifier", "orcid", "en", "0000-0002-1825-0033");
 
-
         Item itemPublication = ItemBuilder.createItem(context, col2)
                                           .withAuthor("Josiah, Carberry")
                                           .withTitle("A Methodology for the Emulation of Architecture")
@@ -324,16 +325,16 @@ public class OrcidQueueRestRepositoryIT extends AbstractControllerIntegrationTes
         getClient(tokenResearcher).perform(get("/api/cris/orcidqueues/" + orcidQueue.getID().toString()))
                              .andExpect(status().isOk())
                              .andExpect(jsonPath("$", is(
-                                        OrcidQueueMatcher.matchOrcidQueue(orcidQueue, "Publication"))));
-//                             .andExpect(jsonPath("$._links.self.href", Matchers
-//                                       .containsString("/api/cris/orcidQueue/" + orcidQueue.getID())));
+                                        OrcidQueueMatcher.matchOrcidQueue(orcidQueue, "Publication"))))
+                             .andExpect(jsonPath("$._links.self.href", Matchers
+                                       .containsString("/api/cris/orcidqueues/" + orcidQueue.getID())));
 
         getClient(tokenResearcher2).perform(get("/api/cris/orcidqueues/" + orcidQueue2.getID().toString()))
                              .andExpect(status().isOk())
                              .andExpect(jsonPath("$", is(
-                                        OrcidQueueMatcher.matchOrcidQueue(orcidQueue2, "Publication"))));
-//                             .andExpect(jsonPath("$._links.self.href", Matchers
-//                                       .containsString("/api/cris/orcidQueue/" + orcidQueue2.getID())));
+                                        OrcidQueueMatcher.matchOrcidQueue(orcidQueue2, "Publication"))))
+                             .andExpect(jsonPath("$._links.self.href", Matchers
+                                       .containsString("/api/cris/orcidqueues/" + orcidQueue2.getID())));
     }
 
     @Test

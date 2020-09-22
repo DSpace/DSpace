@@ -8,14 +8,17 @@
 package org.dspace.app.rest;
 
 import static com.jayway.jsonpath.JsonPath.read;
+import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.dspace.app.orcid.OrcidHistory;
 import org.dspace.app.orcid.OrcidQueue;
+import org.dspace.app.rest.matcher.OrcidHistoryMatcher;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
@@ -27,6 +30,7 @@ import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.content.service.ItemService;
 import org.dspace.eperson.EPerson;
+import org.hamcrest.Matchers;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.webmvc.RestMediaTypes;
@@ -92,10 +96,18 @@ public class OrcidHistoryRestRepositoryIT extends AbstractControllerIntegrationT
         String tokenAdmin = getAuthToken(admin.getEmail(), password);
 
         getClient(tokenResearcher).perform(get("/api/cris/orcidhistories/" + orcidHistory.getID().toString()))
-                                  .andExpect(status().isOk());
+                                  .andExpect(status().isOk())
+                                  .andExpect(jsonPath("$", is(OrcidHistoryMatcher.matchOrcidHistory(
+                                             orcidHistory, 201, "123456", "<xml><work>...</work>"))))
+                                  .andExpect(jsonPath("$._links.self.href", Matchers
+                                             .containsString("/api/cris/orcidhistories/" + orcidHistory.getID())));
 
         getClient(tokenAdmin).perform(get("/api/cris/orcidhistories/" + orcidHistory.getID().toString()))
-                             .andExpect(status().isOk());
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$", is(OrcidHistoryMatcher.matchOrcidHistory(
+                                        orcidHistory, 201, "123456", "<xml><work>...</work>"))))
+                             .andExpect(jsonPath("$._links.self.href", Matchers
+                                        .containsString("/api/cris/orcidhistories/" + orcidHistory.getID())));
     }
 
     @Test
