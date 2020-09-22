@@ -165,6 +165,8 @@ public class OrcidHistoryServiceImpl implements OrcidHistoryService {
         if (!forceAddition) {
             putCode = findPutCode(context, entity, owner);
             work.setPutCode(putCode);
+        } else {
+            setNullPutCode(context, entity, owner);
         }
         return sendObjectToOrcid(context, orcidQueue, orcid, token, putCode, work, WORK_ENDPOINT);
     }
@@ -183,6 +185,8 @@ public class OrcidHistoryServiceImpl implements OrcidHistoryService {
         if (!forceAddition) {
             putCode = findPutCode(context, entity, owner);
             funding.setPutCode(putCode);
+        } else {
+            setNullPutCode(context, entity, owner);
         }
 
         String title = getMetadataValue(entity, "dc.title");
@@ -311,5 +315,17 @@ public class OrcidHistoryServiceImpl implements OrcidHistoryService {
         return item.getMetadata().stream()
                    .filter(metadata -> metadata.getMetadataField().toString('.').equals(metadataField)).findFirst()
                    .orElse(null);
+    }
+
+    private void setNullPutCode(Context context, Item entity, Item owner) throws SQLException {
+        List<OrcidHistory> orcidHistories = orcidHistoryDAO.findByOwnerAndEntity(context, owner.getID(),entity.getID());
+        if (orcidHistories != null) {
+            OrcidHistory orcidHistory = orcidHistories.get(0);
+            String putCode = orcidHistory.getPutCode();
+            if (putCode != null) {
+                orcidHistory.setPutCode(null);
+                orcidHistoryDAO.save(context, orcidHistory);
+            }
+        }
     }
 }
