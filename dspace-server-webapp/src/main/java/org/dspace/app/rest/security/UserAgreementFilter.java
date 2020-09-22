@@ -16,6 +16,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.dspace.app.rest.security.jwt.UserAgreementClaimProvider;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
@@ -38,6 +39,13 @@ public class UserAgreementFilter extends OncePerRequestFilter {
     @Autowired
     private ConfigurationService configurationService;
 
+    /**
+     * Set the response status as 401 Forbidden if the current user has not accepted
+     * the user agreement. This check is performed only if the filter is enabled and
+     * only if the current request path is not open. To verify if the user already
+     * accepted the terms and conditions the request attribute set by the
+     * {@link UserAgreementClaimProvider} is read.
+     */
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
         throws ServletException, IOException {

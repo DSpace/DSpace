@@ -38,12 +38,18 @@ public class UserAgreementClaimProvider implements JWTClaimProvider {
         return USER_AGREEMENT_ACCEPTED;
     }
 
+    /**
+     * Returns the current userAgreementAccepted value by searching for the
+     * dspace.agreements.end-user metadata.
+     */
     @Override
     public Object getValue(Context context, HttpServletRequest request) {
         EPerson user = context.getCurrentUser();
         try {
             // FIXME: necessary because some times the current user is obtained from the
-            // hibernate cache and could have differents metadata
+            // hibernate cache and could have differents metadata. The whole try/catch with
+            // its content should be removed after the problems with the hibernate cache
+            // will be solved.
             context.uncacheEntity(user);
             user = ePersonService.find(context, user.getID());
         } catch (SQLException e) {
@@ -53,6 +59,10 @@ public class UserAgreementClaimProvider implements JWTClaimProvider {
         return metadata != null ? metadata : "false";
     }
 
+    /**
+     * Read the userAgreementAccepted attribute from the jwt token and add its value
+     * to the request attributes.
+     */
     @Override
     public void parseClaim(Context context, HttpServletRequest request, JWTClaimsSet jwtClaimsSet) throws SQLException {
         String userAgreementAccepted = jwtClaimsSet.getClaim(USER_AGREEMENT_ACCEPTED).toString();
