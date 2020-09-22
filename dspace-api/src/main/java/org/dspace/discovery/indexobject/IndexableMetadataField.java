@@ -15,7 +15,7 @@ import org.dspace.discovery.IndexableObject;
  *
  * @author Maria Verdonck (Atmire) on 14/07/2020
  */
-public class IndexableMetadataField implements IndexableObject<MetadataField, Integer> {
+public class IndexableMetadataField extends AbstractIndexableObject<MetadataField, Integer> {
 
     private MetadataField metadataField;
     public static final String TYPE = MetadataField.class.getSimpleName();
