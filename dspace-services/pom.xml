@@ -18,21 +18,20 @@
     </properties>
 
     <profiles>
-        <!-- If Unit Testing is enabled, then setup the Unit Test Environment.
-             See also the 'skiptests' profile in Parent POM. -->
+        <!-- Setup the Unit Test Environment (when -DskipUnitTests=false) -->
         <profile>
-            <id>test-environment</id>
+            <id>unit-test-environment</id>
             <activation>
                 <activeByDefault>false</activeByDefault>
                 <property>
-                    <name>skipTests</name>
+                    <name>skipUnitTests</name>
                     <value>false</value>
                 </property>
             </activation>
             <build>
                 <plugins>
                     <!-- This plugin allows us to run a Groovy script in our Maven POM
-                         (see: http://gmaven.codehaus.org/Executing+Groovy+Code )
+                         (see: https://groovy.github.io/gmaven/groovy-maven-plugin/execute.html )
                          We are generating a OS-agnostic version (agnostic.build.dir) of
                          the ${project.build.directory} property (full path of target dir).
                          This is needed by the Surefire plugin (see below) to
@@ -59,21 +58,9 @@
                                 </configuration>
                             </execution>
                         </executions>
-                        <!-- TODO: When Groovy 3.0.0 is released, we should upgrade to fix this warning
-                             (which appears in Maven builds) https://issues.apache.org/jira/browse/GROOVY-8339
-                             The below (commented out) dependency should let us upgrade to v3.0.0 once released. -->
-                        <!--<dependencies>
-                            <dependency>
-                                <groupId>org.codehaus.groovy</groupId>
-                                <artifactId>groovy-all</artifactId>
-                                <version>3.0.0</version>
-                                <scope>runtime</scope>
-                                <type>pom</type>
-                            </dependency>
-                        </dependencies>-->
                     </plugin>
 
-                    <!-- Run Unit Testing! This plugin just kicks off the tests (when enabled). -->
+                    <!-- Run Unit Testing! This plugin just kicks off the tests. -->
                     <plugin>
                         <artifactId>maven-surefire-plugin</artifactId>
                         <configuration>
