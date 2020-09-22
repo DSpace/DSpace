@@ -34,27 +34,29 @@ public class MetadataDeletion extends DSpaceRunnable<MetadataDeletionScriptConfi
         Context context = new Context();
         context.turnOffAuthorisationSystem();
 
-        MetadataValueService metadataValueService = ContentServiceFactory.getInstance()
-            .getMetadataValueService();
-
-        MetadataFieldService metadataFieldService = ContentServiceFactory.getInstance()
-            .getMetadataFieldService();
-
         try {
-
-            MetadataField field = metadataFieldService.findByString(context, metadataField, '.');
-            if (field == null) {
-                throw new IllegalArgumentException("No metadata field found with name " + metadataField);
-            }
-
-            metadataValueService.deleteByMetadataField(context, field);
-
+            performMetadataValuesDeletion(context);
         } catch (SQLException e) {
             handler.handleException(e);
         }
 
         context.restoreAuthSystemState();
         context.complete();
+    }
+
+    private void performMetadataValuesDeletion(Context context) throws SQLException {
+        MetadataValueService metadataValueService = ContentServiceFactory.getInstance()
+            .getMetadataValueService();
+
+        MetadataFieldService metadataFieldService = ContentServiceFactory.getInstance()
+            .getMetadataFieldService();
+
+        MetadataField field = metadataFieldService.findByString(context, metadataField, '.');
+        if (field == null) {
+            throw new IllegalArgumentException("No metadata field found with name " + metadataField);
+        }
+
+        metadataValueService.deleteByMetadataField(context, field);
     }
 
     @Override
