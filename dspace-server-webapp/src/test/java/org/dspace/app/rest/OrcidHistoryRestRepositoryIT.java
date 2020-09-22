@@ -8,16 +8,27 @@
 package org.dspace.app.rest;
 
 import static com.jayway.jsonpath.JsonPath.read;
+import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.Matchers.is;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.io.InputStream;
 import java.util.concurrent.atomic.AtomicReference;
 
+import com.amazonaws.util.StringInputStream;
+import org.apache.http.ProtocolVersion;
+import org.apache.http.client.HttpClient;
+import org.apache.http.entity.BasicHttpEntity;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.message.BasicHttpResponse;
 import org.dspace.app.orcid.OrcidHistory;
 import org.dspace.app.orcid.OrcidQueue;
+import org.dspace.app.orcid.service.impl.OrcidHistoryServiceImpl;
 import org.dspace.app.rest.matcher.OrcidHistoryMatcher;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.builder.CollectionBuilder;
@@ -32,6 +43,8 @@ import org.dspace.content.service.ItemService;
 import org.dspace.eperson.EPerson;
 import org.hamcrest.Matchers;
 import org.junit.Test;
+import org.mockito.ArgumentMatchers;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.webmvc.RestMediaTypes;
 import org.springframework.http.MediaType;
@@ -45,6 +58,9 @@ public class OrcidHistoryRestRepositoryIT extends AbstractControllerIntegrationT
 
     @Autowired
     private ItemService itemService;
+
+    @Autowired
+    private OrcidHistoryServiceImpl orcidHistoryService;
 
     @Test
     public void findAllTest() throws Exception {
@@ -254,9 +270,105 @@ public class OrcidHistoryRestRepositoryIT extends AbstractControllerIntegrationT
                                 .andDo(result -> idRef.set(read(result.getResponse().getContentAsString(), "$.id")));
 
             getClient(authToken).perform(get("/api/cris/orcidhistories/" + idRef.get()))
-                                .andExpect(status().isOk());
+                                .andExpect(status().isOk())
+                                .andExpect(jsonPath("$", Matchers.allOf(
+                                        hasJsonPath("$.id", is(idRef.get())),
+                                        hasJsonPath("$.ownerId", is(itemPerson.getID().toString())),
+                                        hasJsonPath("$.entityId", is(itemPublication.getID().toString())),
+                                        hasJsonPath("$.status", is(401)),
+                                        hasJsonPath("$.putCode", nullValue()),
+                                        hasJsonPath("$.type", is("orcidhistory")))));
         } finally {
             OrcidHistoryBuilder.deleteOrcidHistory(idRef.get());
+        }
+    }
+
+    @Test
+    public void createUsingMockitoTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        HttpClient httpClient = Mockito.mock(HttpClient.class);
+
+        orcidHistoryService.setHttpClient(httpClient);
+        BasicHttpResponse basicHttpResponse = new BasicHttpResponse(new ProtocolVersion("http", 1, 1), 200, "OK");
+        basicHttpResponse.setHeader("Location", "ABCDE");
+        basicHttpResponse.setEntity(new BasicHttpEntity());
+        InputStream is = new StringInputStream("<xml><work>...</work>");
+        BasicHttpEntity bhe = new BasicHttpEntity();
+        basicHttpResponse.setEntity(bhe);
+        bhe.setChunked(true);
+        bhe.setContent(is);
+
+        when(httpClient.execute(ArgumentMatchers.any())).thenReturn(basicHttpResponse);
+        when(httpClient.execute(ArgumentMatchers.any())).thenReturn(basicHttpResponse);
+
+        AtomicReference<Integer> idRef = new AtomicReference<Integer>();
+        try {
+            EPerson researcher = EPersonBuilder.createEPerson(context)
+                                               .withNameInMetadata("Josiah", "Carberry")
+                                               .withEmail("josiah.Carberry@example.com")
+                                               .withPassword(password).build();
+
+            parentCommunity = CommunityBuilder.createCommunity(context)
+                                              .withName("Parent Community").build();
+
+            Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                               .withRelationshipType("Person")
+                                               .withName("Collection 1").build();
+
+            Collection col2 = CollectionBuilder.createCollection(context, parentCommunity)
+                                               .withRelationshipType("Publication")
+                                               .withName("Collection 2").build();
+
+            Item itemPerson = ItemBuilder.createItem(context, col1)
+                                         .withPersonIdentifierFirstName("Josiah")
+                                         .withPersonIdentifierLastName("Carberry")
+                                         .withCrisOwner(researcher.getFullName(),
+                                                        researcher.getID().toString()).build();
+
+            itemService.addMetadata(context, itemPerson, "person", "identifier", "orcid", "en", "0000-0002-1825-0097");
+            itemService.addMetadata(context, itemPerson, "cris", "orcid", "access-token", "en",
+                                    "f5af9f51-07e6-4332-8f1a-c0c11c1e3728");
+
+            Item itemPublication = ItemBuilder.createItem(context, col2)
+                                              .withAuthor("Josiah, Carberry")
+                                              .withTitle("A Methodology for the Emulation of Architecture")
+                                              .withIssueDate("2013-08-03").build();
+
+            OrcidQueue orcidQueue = OrcidQueueBuilder.createOrcidQueue(context, itemPerson, itemPublication).build();
+
+            OrcidHistory orcidHistory = OrcidHistoryBuilder.createOrcidHistory(context, itemPerson, itemPublication)
+                                                           .withResponseMessage("<xml><work>...</work>")
+                                                           .withPutCode("123456")
+                                                           .withStatus(201).build();
+
+            context.restoreAuthSystemState();
+
+            String authToken = getAuthToken(researcher.getEmail(), password);
+            getClient(authToken).perform(post("/api/cris/orcidhistories")
+                                .contentType(MediaType.parseMediaType(RestMediaTypes.TEXT_URI_LIST_VALUE))
+                                .param("forceAddition", "true")
+                                .content("/api/cris/orcidqueues/" + orcidQueue.getID()))
+                                .andExpect(status().isCreated())
+                                .andDo(result -> idRef.set(read(result.getResponse().getContentAsString(), "$.id")));
+
+            getClient(authToken).perform(get("/api/cris/orcidhistories/" + idRef.get()))
+                                .andExpect(status().isOk())
+                                .andExpect(jsonPath("$", Matchers.allOf(
+                                           hasJsonPath("$.id", is(idRef.get())),
+                                           hasJsonPath("$.ownerId", is(itemPerson.getID().toString())),
+                                           hasJsonPath("$.entityId", is(itemPublication.getID().toString())),
+                                           hasJsonPath("$.status", is(200)),
+                                           hasJsonPath("$.putCode", is("ABCDE")),
+                                           hasJsonPath("$.responseMessage", is("<xml><work>...</work>")),
+                                           hasJsonPath("$.type", is("orcidhistory")))))
+                                .andDo(result -> idRef.set(read(result.getResponse().getContentAsString(), "$.id")));
+
+            getClient(authToken).perform(get("/api/cris/orcidhistories/" + orcidHistory.getId()))
+                                .andExpect(status().isNotFound());
+        } finally {
+            OrcidHistoryBuilder.deleteOrcidHistory(idRef.get());
+            orcidHistoryService.setHttpClient(HttpClientBuilder.create().build());
         }
     }
 
