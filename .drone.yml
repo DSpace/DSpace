@@ -1,13 +1,13 @@
 ---
 kind: pipeline
 type: docker
-name: default
+name: unit-test-code-checks
 
 steps:
 - name: dspace-cris-ci
   image: maven:3.6.3-jdk-11
   environment:
-    MAVEN_OPTS: -Xmx1024M
+    MAVEN_OPTS: -Xmx1024M -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
     submission__P__lookup__P__ads__P__apikey:
       from_secret: ADS_APIKEY
     submission__P__lookup__P__epo__P__consumerKey:
@@ -15,5 +15,25 @@ steps:
     submission__P__lookup__P__epo__P__consumerSecretKey:
       from_secret: EPO_APISECRET
   commands:         
+  - mvn install -B -V -P-assembly -Pcoverage-report -DskipUnitTests=false -Pdspace-rest 
+
+---
+kind: pipeline
+type: docker
+name: integration-test
+
+steps:
+- name: dspace-cris-ci
+  image: maven:3.6.3-jdk-11
+  environment:
+    MAVEN_OPTS: -Xmx1024M -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
+    submission__P__lookup__P__ads__P__apikey:
+      from_secret: ADS_APIKEY
+    submission__P__lookup__P__epo__P__consumerKey:
+      from_secret: EPO_APIKEY
+    submission__P__lookup__P__epo__P__consumerSecretKey:
+      from_secret: EPO_APISECRET
+  commands:
   - ./dspace-api/src/test/data/dspaceFolder/bin/install_grobid.sh
-  - mvn clean install license:check -DskipTests=false -DskipITs=false -Pdspace-rest -P !assembly -B -V -Dsurefire.rerunFailingTestsCount=2
+  - mvn install -B -V -P-assembly -Pcoverage-report -DskipIntegrationTests=false -Denforcer.skip=true -Dcheckstyle.skip=true -Dlicense.skip=true -Dxml.skip=true
+  
