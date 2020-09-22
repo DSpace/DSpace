@@ -16,6 +16,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import javax.annotation.PostConstruct;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
@@ -82,6 +83,13 @@ public class OrcidHistoryServiceImpl implements OrcidHistoryService {
 
     @Autowired
     private ItemService itemService;
+
+    private HttpClient httpClient;
+
+    @PostConstruct
+    private void setup() {
+        this.httpClient =  HttpClientBuilder.create().build();
+    }
 
     @Override
     public OrcidHistory find(Context context, int id) throws SQLException {
@@ -166,7 +174,7 @@ public class OrcidHistoryServiceImpl implements OrcidHistoryService {
             putCode = findPutCode(context, entity, owner);
             work.setPutCode(putCode);
         } else {
-            setNullPutCode(context, entity, owner);
+            deleteOldRecords(context, entity, owner);
         }
         return sendObjectToOrcid(context, orcidQueue, orcid, token, putCode, work, WORK_ENDPOINT);
     }
@@ -186,7 +194,7 @@ public class OrcidHistoryServiceImpl implements OrcidHistoryService {
             putCode = findPutCode(context, entity, owner);
             funding.setPutCode(putCode);
         } else {
-            setNullPutCode(context, entity, owner);
+            deleteOldRecords(context, entity, owner);
         }
 
         String title = getMetadataValue(entity, "dc.title");
@@ -217,7 +225,6 @@ public class OrcidHistoryServiceImpl implements OrcidHistoryService {
         Item entity = orcidQueue.getEntity();
         Item owner = orcidQueue.getOwner();
         String orcidUrl = configurationService.getProperty("orcid-api.api-url");
-        HttpClient httpClient = HttpClientBuilder.create().build();
         String path = orcidUrl + "/" + orcid + endpoint;
         HttpEntityEnclosingRequestBase request = putCode != null ? new HttpPut(path + "/" + putCode)
                 : new HttpPost(path);
@@ -317,15 +324,19 @@ public class OrcidHistoryServiceImpl implements OrcidHistoryService {
                    .orElse(null);
     }
 
-    private void setNullPutCode(Context context, Item entity, Item owner) throws SQLException {
+    private void deleteOldRecords(Context context, Item entity, Item owner) throws SQLException {
         List<OrcidHistory> orcidHistories = orcidHistoryDAO.findByOwnerAndEntity(context, owner.getID(),entity.getID());
-        if (orcidHistories != null) {
-            OrcidHistory orcidHistory = orcidHistories.get(0);
-            String putCode = orcidHistory.getPutCode();
-            if (putCode != null) {
-                orcidHistory.setPutCode(null);
-                orcidHistoryDAO.save(context, orcidHistory);
-            }
+        for (OrcidHistory orcidHistory : orcidHistories) {
+            orcidHistoryDAO.delete(context, orcidHistory);
         }
     }
+
+    public HttpClient getHttpClient() {
+        return httpClient;
+    }
+
+    public void setHttpClient(HttpClient httpClient) {
+        this.httpClient = httpClient;
+    }
+
 }
