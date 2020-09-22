@@ -64,7 +64,7 @@ script: mvn install -B -V -P-assembly $TEST_FLAGS
 # by jacoco-maven-plugin during the unit or integration testing. So, this command is aggregating existing reports.
 # NOTE#2: TRAVIS_JOB_ID is passed into coveralls-maven-plugin to help Coveralls merge reports
 after_success:
-  - mvn verify -B -P coveralls -P-assembly -DserviceName="travis-ci" -DserviceBuildNumber=$TRAVIS_BUILD_NUMBER $SKIP_CODE_CHECKS $SKIP_CODE_COMPILATION
+  - mvn verify --debug -B -P coveralls -P-assembly -DserviceName="travis-ci" -DserviceBuildNumber=$TRAVIS_BUILD_NUMBER $SKIP_CODE_CHECKS $SKIP_CODE_COMPILATION
 
 # Send final notification to coveralls after all (parallel) jobs have been completed. This tells Coveralls
 # that all job coverage reports can now be merged. See https://docs.coveralls.io/parallel-build-webhook
