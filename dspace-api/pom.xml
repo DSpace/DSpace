@@ -838,7 +838,7 @@
         <dependency>
 			<groupId>org.dspace</groupId>
 			<artifactId>orcid-jaxb-api</artifactId>
-			<version>3.0.0-SNAPSHOT</version>
+			<version>3.0.0</version>
 		</dependency>
         
         <dependency>
