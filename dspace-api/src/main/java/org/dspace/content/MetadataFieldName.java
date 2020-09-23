@@ -147,8 +147,8 @@ public class MetadataFieldName {
                 .append('.')
                 .append(ELEMENT);
         if (null != QUALIFIER) {
-        buffer.append('.')
-                .append(QUALIFIER);
+            buffer.append('.')
+                    .append(QUALIFIER);
         }
         return buffer.toString();
     }

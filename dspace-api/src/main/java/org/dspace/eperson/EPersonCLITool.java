@@ -15,7 +15,8 @@ import java.util.List;
 import java.util.Locale;
 
 import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.GnuParser;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.OptionGroup;
@@ -83,7 +84,7 @@ public class EPersonCLITool {
         globalOptions.addOptionGroup(VERBS);
         globalOptions.addOption("h", "help", false, "explain options");
 
-        GnuParser parser = new GnuParser();
+        CommandLineParser parser = new DefaultParser();
         CommandLine command = parser.parse(globalOptions, argv, true);
 
         Context context = new Context();
@@ -145,7 +146,7 @@ public class EPersonCLITool {
         options.addOption("h", "help", false, "explain --add options");
 
         // Rescan the command for more details.
-        GnuParser parser = new GnuParser();
+        CommandLineParser parser = new DefaultParser();
         CommandLine command;
         try {
             command = parser.parse(options, argv);
@@ -225,7 +226,7 @@ public class EPersonCLITool {
 
         options.addOption("h", "help", false, "explain --delete options");
 
-        GnuParser parser = new GnuParser();
+        CommandLineParser parser = new DefaultParser();
         CommandLine command;
         try {
             command = parser.parse(options, argv);
@@ -314,7 +315,7 @@ public class EPersonCLITool {
 
         options.addOption("h", "help", false, "explain --modify options");
 
-        GnuParser parser = new GnuParser();
+        CommandLineParser parser = new DefaultParser();
         CommandLine command;
         try {
             command = parser.parse(options, argv);

@@ -24,10 +24,10 @@ import java.util.UUID;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
-import org.apache.commons.cli.PosixParser;
 import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
@@ -109,7 +109,7 @@ public class ItemUpdate {
 
     // instance variables
     protected ActionManager actionMgr = new ActionManager();
-    protected List<String> undoActionList = new ArrayList<String>();
+    protected List<String> undoActionList = new ArrayList<>();
     protected String eperson;
 
     /**
@@ -117,7 +117,7 @@ public class ItemUpdate {
      */
     public static void main(String[] argv) {
         // create an options object and populate it
-        CommandLineParser parser = new PosixParser();
+        CommandLineParser parser = new DefaultParser();
 
         Options options = new Options();
 
