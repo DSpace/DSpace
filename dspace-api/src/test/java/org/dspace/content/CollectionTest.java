@@ -269,6 +269,7 @@ public class CollectionTest extends AbstractDSpaceObjectTest {
 
     /**
      * Test of setMetadata method, of class Collection.
+     * @throws java.sql.SQLException if metadata cannot be set.
      */
     @Test
     public void testSetMetadata() throws SQLException {
@@ -280,13 +281,20 @@ public class CollectionTest extends AbstractDSpaceObjectTest {
         String provDesc = "provenance description";
         String license = "license text";
 
-        collectionService.setMetadata(context, collection, "name", name);
-        collectionService.setMetadata(context, collection, "short_description", sdesc);
-        collectionService.setMetadata(context, collection, "introductory_text", itext);
-        collectionService.setMetadata(context, collection, "copyright_text", copy);
-        collectionService.setMetadata(context, collection, "side_bar_text", sidebar);
-        collectionService.setMetadata(context, collection, "provenance_description", provDesc);
-        collectionService.setMetadata(context, collection, "license", license);
+        collectionService.setMetadataSingleValue(context, collection,
+                CollectionService.MD_NAME, null, name);
+        collectionService.setMetadataSingleValue(context, collection,
+                CollectionService.MD_SHORT_DESCRIPTION, null, sdesc);
+        collectionService.setMetadataSingleValue(context, collection,
+                CollectionService.MD_INTRODUCTORY_TEXT, null, itext);
+        collectionService.setMetadataSingleValue(context, collection,
+                CollectionService.MD_COPYRIGHT_TEXT, null, copy);
+        collectionService.setMetadataSingleValue(context, collection,
+                CollectionService.MD_SIDEBAR_TEXT, null, sidebar);
+        collectionService.setMetadataSingleValue(context, collection,
+                CollectionService.MD_PROVENANCE_DESCRIPTION, null, provDesc);
+        collectionService.setMetadataSingleValue(context, collection,
+                CollectionService.MD_LICENSE, null, license);
 
         assertEquals("Name was not set properly.", name,
                 collectionService.getMetadataFirstValue(collection,

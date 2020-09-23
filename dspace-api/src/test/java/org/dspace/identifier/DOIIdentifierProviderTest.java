@@ -101,10 +101,12 @@ public class DOIIdentifierProviderTest
             context.turnOffAuthorisationSystem();
             // Create an environment for our test objects to live in.
             community = communityService.create(null, context);
-            communityService.setMetadata(context, community, "name", "A Test Community");
+            communityService.setMetadataSingleValue(context, community,
+                    CommunityService.MD_NAME, null, "A Test Community");
             communityService.update(context, community);
             collection = collectionService.create(context, community);
-            collectionService.setMetadata(context, collection, "name", "A Test Collection");
+            collectionService.setMetadataSingleValue(context, collection,
+                    CollectionService.MD_NAME, null, "A Test Collection");
             collectionService.update(context, collection);
             //we need to commit the changes so we don't block the table for testing
             context.restoreAuthSystemState();

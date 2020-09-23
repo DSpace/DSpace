@@ -293,9 +293,10 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
     }
 
     @Override
-    public void setMetadata(Context context, Collection collection, String field, String value)
-        throws MissingResourceException, SQLException {
-        if ((field.trim()).equals("name") && (value == null || value.trim().equals(""))) {
+    public void setMetadataSingleValue(Context context, Collection collection,
+            MetadataFieldName field, String language, String value)
+            throws MissingResourceException, SQLException {
+        if (field.equals(MD_NAME) && (value == null || value.trim().equals(""))) {
             try {
                 value = I18nUtil.getMessage("org.dspace.workflow.WorkflowManager.untitled");
             } catch (MissingResourceException e) {
@@ -303,21 +304,19 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
             }
         }
 
-        String[] MDValue = getMDValueByLegacyField(field);
-
         /*
          * Set metadata field to null if null
          * and trim strings to eliminate excess
          * whitespace.
          */
         if (value == null) {
-            clearMetadata(context, collection, MDValue[0], MDValue[1], MDValue[2], Item.ANY);
+            clearMetadata(context, collection, field.SCHEMA, field.ELEMENT, field.QUALIFIER, Item.ANY);
             collection.setMetadataModified();
         } else {
-            setMetadataSingleValue(context, collection, MDValue[0], MDValue[1], MDValue[2], null, value);
+            super.setMetadataSingleValue(context, collection, field, null, value);
         }
 
-        collection.addDetails(field);
+        collection.addDetails(field.toString());
     }
 
     @Override

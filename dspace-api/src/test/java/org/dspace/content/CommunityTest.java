@@ -301,6 +301,7 @@ public class CommunityTest extends AbstractDSpaceObjectTest {
 
     /**
      * Test of setMetadata method, of class Community.
+     * @throws java.sql.SQLException if metadata cannot be set.
      */
     @Test
     public void testSetMetadata() throws SQLException {
@@ -310,11 +311,16 @@ public class CommunityTest extends AbstractDSpaceObjectTest {
         String copy = "copyright declaration";
         String sidebar = "side bar text";
 
-        communityService.setMetadata(context, c, "name", name);
-        communityService.setMetadata(context, c, "short_description", sdesc);
-        communityService.setMetadata(context, c, "introductory_text", itext);
-        communityService.setMetadata(context, c, "copyright_text", copy);
-        communityService.setMetadata(context, c, "side_bar_text", sidebar);
+        communityService.setMetadataSingleValue(context, c,
+                CommunityService.MD_NAME, null, name);
+        communityService.setMetadataSingleValue(context, c,
+                CommunityService.MD_SHORT_DESCRIPTION, null, sdesc);
+        communityService.setMetadataSingleValue(context, c,
+                CommunityService.MD_INTRODUCTORY_TEXT, null, itext);
+        communityService.setMetadataSingleValue(context, c,
+                CommunityService.MD_COPYRIGHT_TEXT, null, copy);
+        communityService.setMetadataSingleValue(context, c,
+                CommunityService.MD_SIDEBAR_TEXT, null, sidebar);
 
         assertEquals("Name not set properly.", name,
                 communityService.getMetadataFirstValue(c, CommunityService.MD_NAME, Item.ANY));
