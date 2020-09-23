@@ -137,7 +137,7 @@ public class OrcidQueueRestRepositoryIT extends AbstractControllerIntegrationTes
                                               )))
                                    .andExpect(jsonPath("$.page.totalElements", is(1)))
                                    .andExpect(jsonPath("$._links.self.href", Matchers
-                                           .containsString("/api/cris/orcidqueues/" + orcidQueue.getID())));
+                                             .containsString("/api/cris/orcidqueue/search/findByOwner")));
 
         getClient(tokenAdmin).perform(get("/api/cris/orcidqueue/search/findByOwner")
                              .param("ownerId", itemPerson.getID().toString()))
@@ -327,14 +327,22 @@ public class OrcidQueueRestRepositoryIT extends AbstractControllerIntegrationTes
                              .andExpect(jsonPath("$", is(
                                         OrcidQueueMatcher.matchOrcidQueue(orcidQueue, "Publication"))))
                              .andExpect(jsonPath("$._links.self.href", Matchers
-                                       .containsString("/api/cris/orcidqueues/" + orcidQueue.getID())));
+                                       .containsString("/api/cris/orcidqueues/" + orcidQueue.getID())))
+                             .andExpect(jsonPath("$._links.owner.href", Matchers
+                                       .containsString("/api/core/items/" + itemPerson1.getID())))
+                             .andExpect(jsonPath("$._links.entity.href", Matchers
+                                       .containsString("/api/core/items/" + itemPublication.getID())));
 
         getClient(tokenResearcher2).perform(get("/api/cris/orcidqueues/" + orcidQueue2.getID().toString()))
                              .andExpect(status().isOk())
                              .andExpect(jsonPath("$", is(
                                         OrcidQueueMatcher.matchOrcidQueue(orcidQueue2, "Publication"))))
                              .andExpect(jsonPath("$._links.self.href", Matchers
-                                       .containsString("/api/cris/orcidqueues/" + orcidQueue2.getID())));
+                                       .containsString("/api/cris/orcidqueues/" + orcidQueue2.getID())))
+                             .andExpect(jsonPath("$._links.owner.href", Matchers
+                                       .containsString("/api/core/items/" + itemPerson2.getID())))
+                             .andExpect(jsonPath("$._links.entity.href", Matchers
+                                       .containsString("/api/core/items/" + itemPublication2.getID())));
     }
 
     @Test
