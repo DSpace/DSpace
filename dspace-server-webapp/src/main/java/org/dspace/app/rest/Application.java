@@ -7,6 +7,8 @@
  */
 package org.dspace.app.rest;
 
+import java.io.IOException;
+import java.sql.SQLException;
 import java.util.List;
 import javax.servlet.Filter;
 
@@ -16,6 +18,7 @@ import org.dspace.app.rest.parameter.resolver.SearchFilterResolver;
 import org.dspace.app.rest.utils.ApplicationConfig;
 import org.dspace.app.rest.utils.DSpaceConfigurationInitializer;
 import org.dspace.app.rest.utils.DSpaceKernelInitializer;
+import org.dspace.app.sitemap.GenerateSitemaps;
 import org.dspace.app.util.DSpaceContextListener;
 import org.dspace.utils.servlet.DSpaceWebappServletFilter;
 import org.slf4j.Logger;
@@ -28,6 +31,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.core.annotation.Order;
 import org.springframework.hateoas.server.LinkRelationProvider;
 import org.springframework.lang.NonNull;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.context.request.RequestContextListener;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
@@ -49,12 +54,18 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
  * @author Tim Donohue
  */
 @SpringBootApplication
+@EnableScheduling
 public class Application extends SpringBootServletInitializer {
 
     private static final Logger log = LoggerFactory.getLogger(Application.class);
 
     @Autowired
     private ApplicationConfig configuration;
+
+    @Scheduled(cron = "${sitemap.cron:-}")
+    public void generateSitemap() throws IOException, SQLException {
+        GenerateSitemaps.generateSitemapsScheduled();
+    }
 
     /**
      * Override the default SpringBootServletInitializer.configure() method,
@@ -140,11 +151,11 @@ public class Application extends SpringBootServletInitializer {
                             // Set Access-Control-Allow-Credentials to "true" and specify which origins are valid
                             // for our Access-Control-Allow-Origin header
                             .allowCredentials(corsAllowCredentials).allowedOrigins(corsAllowedOrigins)
-                            // Whitelist of request preflight headers allowed to be sent to us from the client
+                            // Allow list of request preflight headers allowed to be sent to us from the client
                             .allowedHeaders("Authorization", "Content-Type", "X-Requested-With", "accept", "Origin",
                                             "Access-Control-Request-Method", "Access-Control-Request-Headers",
                                             "X-On-Behalf-Of")
-                            // Whitelist of response headers allowed to be sent by us (the server)
+                            // Allow list of response headers allowed to be sent by us (the server)
                             .exposedHeaders("Access-Control-Allow-Origin", "Access-Control-Allow-Credentials",
                                             "Authorization");
                 }

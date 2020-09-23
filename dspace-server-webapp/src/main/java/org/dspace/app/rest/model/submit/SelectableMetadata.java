@@ -7,6 +7,9 @@
  */
 package org.dspace.app.rest.model.submit;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+
 /**
  * The SelectableMetadata REST Resource. It is not addressable directly, only
  * used as inline object in the InputForm resource.
@@ -24,7 +27,9 @@ package org.dspace.app.rest.model.submit;
 public class SelectableMetadata {
     private String metadata;
     private String label;
-    private String authority;
+    @JsonInclude(Include.NON_NULL)
+    private String controlledVocabulary;
+    @JsonInclude(Include.NON_NULL)
     private Boolean closed = false;
 
     public String getMetadata() {
@@ -43,12 +48,12 @@ public class SelectableMetadata {
         this.label = label;
     }
 
-    public void setAuthority(String authority) {
-        this.authority = authority;
+    public void setControlledVocabulary(String vocabularyName) {
+        this.controlledVocabulary = vocabularyName;
     }
 
-    public String getAuthority() {
-        return authority;
+    public String getControlledVocabulary() {
+        return controlledVocabulary;
     }
 
     public Boolean isClosed() {

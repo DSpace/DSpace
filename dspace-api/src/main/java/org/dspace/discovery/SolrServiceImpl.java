@@ -7,6 +7,8 @@
  */
 package org.dspace.discovery;
 
+import static java.util.stream.Collectors.joining;
+
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -751,8 +753,13 @@ public class SolrServiceImpl implements SearchService, IndexingService {
             String filterQuery = discoveryQuery.getFilterQueries().get(i);
             solrQuery.addFilterQuery(filterQuery);
         }
-        if (discoveryQuery.getDSpaceObjectFilter() != null) {
-            solrQuery.addFilterQuery(SearchUtils.RESOURCE_TYPE_FIELD + ":" + discoveryQuery.getDSpaceObjectFilter());
+        if (discoveryQuery.getDSpaceObjectFilters() != null) {
+            solrQuery.addFilterQuery(
+                    discoveryQuery.getDSpaceObjectFilters()
+                            .stream()
+                            .map(filter -> SearchUtils.RESOURCE_TYPE_FIELD + ":" + filter)
+                            .collect(joining(" OR "))
+            );
         }
 
         for (int i = 0; i < discoveryQuery.getFieldPresentQueries().size(); i++) {

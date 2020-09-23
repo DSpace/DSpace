@@ -31,7 +31,7 @@ public class DatasetTimeGenerator extends DatasetGenerator {
     /**
      * Default constructor
      */
-    private DatasetTimeGenerator() { }
+    public DatasetTimeGenerator() { }
 
     /**
      * Sets the date interval.

@@ -7,6 +7,8 @@
  */
 package org.dspace.app.rest;
 
+import java.util.List;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.converter.ConverterService;
@@ -27,7 +29,9 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * This controller adds additional subresource methods to allow connecting scripts with processes
@@ -56,13 +60,14 @@ public class ScriptProcessesController {
      */
     @RequestMapping(method = RequestMethod.POST)
     @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<RepresentationModel<?>> startProcess(@PathVariable(name = "name") String scriptName)
+    public ResponseEntity<RepresentationModel<?>> startProcess(@PathVariable(name = "name") String scriptName,
+                                                        @RequestParam(name = "file") List<MultipartFile> files)
         throws Exception {
         if (log.isTraceEnabled()) {
             log.trace("Starting Process for Script with name: " + scriptName);
         }
         Context context = ContextUtil.obtainContext(requestService.getCurrentRequest().getServletRequest());
-        ProcessRest processRest = scriptRestRepository.startProcess(context, scriptName);
+        ProcessRest processRest = scriptRestRepository.startProcess(context, scriptName, files);
         ProcessResource processResource = converter.toResource(processRest);
         context.complete();
         return ControllerUtils.toResponseEntity(HttpStatus.ACCEPTED, new HttpHeaders(), processResource);
