@@ -36,4 +36,9 @@
         <property name="description" value="Mocking a script for testing purposes" />
         <property name="dspaceRunnableClass" value="org.dspace.scripts.impl.MockDSpaceRunnableScript"/>
     </bean>
+
+    <bean id="metadata-deletion" class="org.dspace.app.bulkedit.MetadataDeletionCliScriptConfiguration">
+        <property name="description" value="Delete all the values of the specified metadata field"/>
+        <property name="dspaceRunnableClass" value="org.dspace.app.bulkedit.MetadataDeletionCli"/>
+    </bean>
 </beans>
