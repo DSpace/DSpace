@@ -8,14 +8,13 @@
 package org.dspace.discovery.indexobject;
 
 import org.dspace.content.InProgressSubmission;
-import org.dspace.discovery.IndexableObject;
 
 /**
  * InProgressSubmission implementation for the IndexableObject
  * @author Kevin Van de Velde (kevin at atmire dot com)
  */
 public abstract class IndexableInProgressSubmission<T extends InProgressSubmission>
-        implements IndexableObject<T, Integer> {
+        extends AbstractIndexableObject<T, Integer> {
 
     protected T inProgressSubmission;
 

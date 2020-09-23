@@ -61,6 +61,17 @@
         <!--=== MAVEN SETTINGS ===-->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>${project.build.sourceEncoding}</project.reporting.outputEncoding>
+
+        <!--=== TEST SETTINGS (CUSTOM) ===-->
+        <!-- By default skip running all tests.
+             NOTE: Tests are always built, because we have modules that depend on common test infrastructure.
+             * Run all tests : 'mvn install -DskipUnitTests=false -DskipIntegrationTests=false'
+             * Run unit tests ONLY: 'mvn install -DskipUnitTests=false'
+             * Run integration tests ONLY: `mvn install -DskipIntegrationTests=false'
+        -->
+        <skipUnitTests>true</skipUnitTests>
+        <skipIntegrationTests>true</skipIntegrationTests>
+
         <!-- 'root.basedir' is the path to the root [dspace-src] dir. It must be redefined by each child POM,
                      as it is used to reference the LICENSE_HEADER and *.properties file(s) in that directory. -->
         <root.basedir>${basedir}</root.basedir>
@@ -160,7 +171,7 @@
                         </archive>
                     </configuration>
                 </plugin>
-                <!-- Used to run Unit tests (when -Dskiptests=false) -->
+                <!-- Used to run Unit tests (when enabled by -DskipUnitTests=false) -->
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
@@ -177,13 +188,15 @@
                         <redirectTestOutputToFile>true</redirectTestOutputToFile>
                         <!-- Ensure full stacktrace is logged (when errors occur) -->
                         <trimStackTrace>false</trimStackTrace>
+                        <!-- Whether to skip unit tests or not -->
+                        <skipTests>${skipUnitTests}</skipTests>
                         <!--
                         Enable to debug Maven Surefire tests in remote proces
                         <debugForkedProcess>true</debugForkedProcess>
                         -->
                     </configuration>
                 </plugin>
-                <!-- Used to run Integration tests (when -Dskipits=false) -->
+                <!-- Used to run Integration tests (when enabled by -DskipIntegrationTests=false) -->
                 <plugin>
                     <artifactId>maven-failsafe-plugin</artifactId>
                     <version>2.22.2</version>
@@ -198,10 +211,11 @@
                         <redirectTestOutputToFile>true</redirectTestOutputToFile>
                         <!-- Ensure full stacktrace is logged (when errors occur) -->
                         <trimStackTrace>false</trimStackTrace>
+                        <!-- Whether to skip integration tests or not -->
+                        <skipTests>${skipIntegrationTests}</skipTests>
                     </configuration>
                     <executions>
                         <execution>
-                            <id>integration-test</id>
                             <goals>
                                 <goal>integration-test</goal>
                                 <goal>verify</goal>
@@ -249,14 +263,21 @@
                     </dependencies>
                 </plugin>
                 <plugin>
-                    <groupId>org.codehaus.mojo</groupId>
-                    <artifactId>findbugs-maven-plugin</artifactId>
-                    <version>3.0.5</version>
+                    <groupId>com.github.spotbugs</groupId>
+                    <artifactId>spotbugs-maven-plugin</artifactId>
+                    <version>4.0.4</version>
                     <configuration>
                         <effort>Max</effort>
                         <threshold>Low</threshold>
                         <xmlOutput>true</xmlOutput>
                     </configuration>
+                    <dependencies>
+                        <dependency>
+                            <groupId>com.github.spotbugs</groupId>
+                            <artifactId>spotbugs</artifactId>
+                            <version>4.1.2</version>
+                        </dependency>
+                    </dependencies>
                     <executions>
                         <execution>
                             <phase>compile</phase>
@@ -342,21 +363,6 @@
                     <groupId>org.jacoco</groupId>
                     <artifactId>jacoco-maven-plugin</artifactId>
                     <version>0.8.5</version>
-                </plugin>
-                <!-- Used to send jacoco coverage reports to coveralls.io (see 'measure-test-coverage' profile) -->
-                <plugin>
-                    <groupId>org.eluder.coveralls</groupId>
-                    <artifactId>coveralls-maven-plugin</artifactId>
-                    <version>4.3.0</version>
-                    <!-- Include JAXB API directly to workaround coveralls-maven-plugin bug in Java 9+
-                         https://github.com/trautonen/coveralls-maven-plugin/issues/112 -->
-                    <dependencies>
-                        <dependency>
-                            <groupId>javax.xml.bind</groupId>
-                            <artifactId>jaxb-api</artifactId>
-                            <version>${jaxb-api.version}</version>
-                        </dependency>
-                    </dependencies>
                 </plugin>
             </plugins>
         </pluginManagement>
@@ -475,42 +481,6 @@
     </build>
 
     <profiles>
-        <!-- Skip running Unit Tests by default, but allow override on
-             command line by setting property "-DskipTests=false".
-             Tests are always built, because we have modules that depend
-             on common test infrastructure. -->
-        <profile>
-            <id>skiptests</id>
-            <activation>
-                <!-- This profile should be active at all times, unless the
-                     user specifies a different value for "skipTests" -->
-                <property>
-                    <name>!skipTests</name>
-                </property>
-            </activation>
-            <properties>
-                <skipTests>true</skipTests>
-            </properties>
-        </profile>
-
-        <!-- Skip running Integration Tests by default, but allow override on
-             command line by setting property "-DskipITs=false".
-             ITs are always built, because we have modules that depend
-             on common test infrastructure. -->
-        <profile>
-            <id>skipits</id>
-            <activation>
-                <!-- This profile should be active at all times, unless the
-                     user specifies a different value for "skipITs" -->
-                <property>
-                    <name>!skipITs</name>
-                </property>
-            </activation>
-            <properties>
-                <skipITs>true</skipITs>
-            </properties>
-        </profile>
-
         <!-- Allow for passing extra memory to Unit/Integration tests.
              By default this gives unit tests 1GB of memory max (when tests are enabled),
              unless tweaked on commandline (e.g. "-Dtest.argLine=-Xmx512m"). Since
@@ -527,18 +497,11 @@
             </properties>
         </profile>
 
-        <!-- This profile ensures that we ONLY generate the Unit Test Environment,
-             if the testEnvironment.xml file is found AND we are not skipping Unit
-             Tests (see also skiptests profile). That way the Test Environment is
-             also NOT built when running a 'mvn package' on a "binary" release. -->
+        <!-- This profile ensures that we generate the Unit Test Environment, whenever the testEnvironment.xml
+             file is found. This allows us to run Unit & Integration tests separately for CI, etc. -->
         <profile>
-            <id>generate-test-env</id>
+            <id>test-environment</id>
             <activation>
-                <activeByDefault>false</activeByDefault>
-                <property>
-                    <name>skipTests</name>
-                    <value>false</value>
-                </property>
                 <file>
                     <exists>src/main/assembly/testEnvironment.xml</exists>
                 </file>
@@ -571,12 +534,13 @@
             </build>
         </profile>
 
+        <!-- Measure test coverage of Unit Tests using JaCoCo (when -DskipUnitTests=false) -->
         <profile>
-            <id>measure-test-coverage</id>
+            <id>measure-unit-test-coverage</id>
             <activation>
                 <activeByDefault>false</activeByDefault>
                 <property>
-                    <name>skipTests</name>
+                    <name>skipUnitTests</name>
                     <value>false</value>
                 </property>
             </activation>
@@ -606,7 +570,29 @@
                                     <propertyName>surefireJacoco</propertyName>
                                 </configuration>
                             </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
 
+        <!-- Measure test coverage of Integration Tests using JaCoCo (when -DskipIntegrationTests=false) -->
+        <profile>
+            <id>measure-integration-test-coverage</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <property>
+                    <name>skipIntegrationTests</name>
+                    <value>false</value>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <!-- Report integration test code coverage -->
+                    <plugin>
+                        <groupId>org.jacoco</groupId>
+                        <artifactId>jacoco-maven-plugin</artifactId>
+                        <executions>
                             <!--
                                 Prepares the property pointing to the JaCoCo runtime agent which
                                 is passed as VM argument when Maven the Failsafe plugin is executed.
@@ -1666,6 +1652,7 @@
                 <artifactId>google-oauth-client</artifactId>
                 <version>1.23.0</version>
             </dependency>
+
             <!-- Findbugs annotations -->
             <dependency>
                 <groupId>com.google.code.findbugs</groupId>
@@ -1679,6 +1666,7 @@
                 <version>3.0.1u2</version>
                 <scope>provided</scope>
             </dependency>
+
             <!-- Converge miscellaneous transitive dependencies. -->
             <dependency>
                 <groupId>com.fasterxml</groupId>

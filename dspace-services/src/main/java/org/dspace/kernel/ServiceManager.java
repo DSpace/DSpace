@@ -21,7 +21,8 @@ import org.springframework.context.ConfigurableApplicationContext;
 public interface ServiceManager {
 
     /**
-     * Get the application context
+     * Get the application context.
+     * @return the Spring application context.
      */
     public ConfigurableApplicationContext getApplicationContext();
 
@@ -46,18 +47,14 @@ public interface ServiceManager {
      * service manager objects.  If using Spring this allows access to the
      * underlying ApplicationContext object like so:<br>
      * {@code getServiceByName(ApplicationContext.class.getName(), ApplicationContext.class);}
-     * If using Guice then the same applies like so:<br>
-     * {@code getServiceByName(Injector.class.getName(), Injector.class);}
-     * It is also possible to register a module and cause Guice to fill
-     * in any injected core services (see register method).
      * </p>
      *
-     * @param <T>  Class type
+     * @param <T>  Class type.
      * @param name (optional) the unique name for this service.
      *             If null then the bean will be returned if there is only one
      *             service of this type.
-     * @param type the type for the requested service (this will typically be the interface class but can be concrete
-     *            as well)
+     * @param type the type for the requested service (this will typically be
+     *             the interface class but can be concrete as well).
      * @return the service singleton OR null if none is found
      */
     public <T> T getServiceByName(String name, Class<T> type);
@@ -90,12 +87,6 @@ public interface ServiceManager {
      * down the context (webapp, etc.) that registered the service so
      * that the full lifecycle completes correctly.
      * </p>
-     * <p>
-     * <em>NOTE:</em> if using Guice it is possible to register a Guice
-     * Module as a service, which will not actually register it but will
-     * cause anything in the Module to have existing core services injected
-     * into it.  You can use anything as the name in this case.
-     * </p>
      *
      * @param name    the name of the service (must be unique)
      * @param service the object to register as a singleton service
@@ -103,6 +94,14 @@ public interface ServiceManager {
      */
     public void registerService(String name, Object service);
 
+    /**
+     * Add a singleton service at runtime, but do not inject dependencies.
+     * Typically used with a service instance that has already had all
+     * dependencies injected explicitly, for example in test code.
+     *
+     * @param name    the name of the service (must be unique).
+     * @param service the instance to register as a singleton service.
+     */
     public void registerServiceNoAutowire(String name, Object service);
 
     /**
@@ -112,7 +111,7 @@ public interface ServiceManager {
      * except that it allows the core service manager to startup your
      * service for you instead of you providing a service to the core.
      * In general, it is better if you use your own service manager
-     * (like Spring or Guice) to manage your services  and simply
+     * (like Spring) to manage your services  and simply
      * inherit the core service beans from the DSpace core service
      * manager using the special capabilities of
      * {@link #getServiceByName(String, Class)}.
