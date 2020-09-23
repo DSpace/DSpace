@@ -61,11 +61,6 @@ public class WorkspaceItemServiceImpl implements WorkspaceItemService {
     }
 
     @Override
-    public int getSupportsIndexableObjectTypeConstant() {
-        return Constants.WORKSPACEITEM;
-    }
-
-    @Override
     public WorkspaceItem find(Context context, int id) throws SQLException {
         WorkspaceItem workspaceItem = workspaceItemDAO.findByID(context, WorkspaceItem.class, id);
 
@@ -81,14 +76,6 @@ public class WorkspaceItemServiceImpl implements WorkspaceItemService {
             }
         }
         return workspaceItem;
-    }
-
-    @Override
-    public WorkspaceItem findIndexableObject(Context context, Integer id) throws SQLException {
-        if (id != null) {
-            return find(context, id);
-        }
-        return null;
     }
 
     @Override
@@ -278,7 +265,12 @@ public class WorkspaceItemServiceImpl implements WorkspaceItemService {
 
         // Need to delete the workspaceitem row first since it refers
         // to item ID
-        workspaceItem.getSupervisorGroups().clear();
+        try {
+            workspaceItem.getSupervisorGroups().clear();
+        } catch (Exception e) {
+            log.error("failed to clear supervisor group", e);
+        }
+
         workspaceItemDAO.delete(context, workspaceItem);
 
     }

@@ -10,8 +10,13 @@ package org.dspace.storage.rdbms;
 import java.sql.Connection;
 
 import org.apache.logging.log4j.Logger;
+import org.dspace.authorize.service.AuthorizeService;
+import org.dspace.content.Site;
 import org.dspace.content.service.SiteService;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.eperson.Group;
+import org.dspace.eperson.service.GroupService;
 import org.flywaydb.core.api.MigrationInfo;
 import org.flywaydb.core.api.callback.FlywayCallback;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +34,12 @@ public class SiteServiceInitializer implements FlywayCallback {
     @Autowired(required = true)
     protected SiteService siteService;
 
+    @Autowired
+    private AuthorizeService authorizeService;
+
+    @Autowired
+    private GroupService groupService;
+
     public void initializeSiteObject() {
         // After every migrate, ensure default Site is setup correctly.
         Context context = null;
@@ -37,10 +48,19 @@ public class SiteServiceInitializer implements FlywayCallback {
             context.turnOffAuthorisationSystem();
             // While it's not really a formal "registry", we need to ensure the
             // default, required Groups exist in the DSpace database
+            Site site = null;
             if (siteService.findSite(context) == null) {
-                siteService.createSite(context);
+                site = siteService.createSite(context);
             }
             context.restoreAuthSystemState();
+            if (!authorizeService.authorizeActionBoolean(context, site, Constants.READ)) {
+                context.turnOffAuthorisationSystem();
+                Group anonGroup = groupService.findByName(context, Group.ANONYMOUS);
+                if (anonGroup != null) {
+                    authorizeService.addPolicy(context, site, Constants.READ, anonGroup);
+                }
+                context.restoreAuthSystemState();
+            }
             // Commit changes and close context
             context.complete();
         } catch (Exception e) {

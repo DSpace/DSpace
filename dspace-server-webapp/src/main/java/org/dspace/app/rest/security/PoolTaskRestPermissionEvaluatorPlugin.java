@@ -11,9 +11,10 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.sql.SQLException;
 
+import org.apache.commons.lang3.StringUtils;
+import org.dspace.app.rest.model.PoolTaskRest;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.service.EPersonService;
@@ -30,7 +31,7 @@ import org.springframework.stereotype.Component;
 
 /**
  * An authenticated user is allowed to interact with a pool task only if it is in his list.
- * 
+ *
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 @Component
@@ -51,7 +52,7 @@ public class PoolTaskRestPermissionEvaluatorPlugin extends RestObjectPermissionE
     public boolean hasDSpacePermission(Authentication authentication, Serializable targetId,
                                  String targetType, DSpaceRestPermission permission) {
 
-        if (Constants.getTypeID(targetType) != Constants.POOLTASK) {
+        if (!StringUtils.equalsIgnoreCase(PoolTaskRest.NAME, targetType)) {
             return false;
         }
 
@@ -74,7 +75,7 @@ public class PoolTaskRestPermissionEvaluatorPlugin extends RestObjectPermissionE
             XmlWorkflowItem workflowItem = poolTask.getWorkflowItem();
 
             PoolTask poolTask2 = poolTaskService.findByWorkflowIdAndEPerson(context, workflowItem, ePerson);
-            if (poolTask2 != null && poolTask2.getID() == poolTask.getID()) {
+            if (poolTask2 != null && poolTask2.getID().equals(poolTask.getID())) {
                 return true;
             }
         } catch (SQLException | AuthorizeException | IOException e) {

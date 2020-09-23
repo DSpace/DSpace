@@ -12,9 +12,9 @@ import java.sql.SQLException;
 import java.util.List;
 
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.service.IndexableObjectService;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
+import org.dspace.eperson.Group;
 import org.dspace.service.DSpaceCRUDService;
 import org.dspace.xmlworkflow.storedcomponents.PoolTask;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
@@ -26,7 +26,10 @@ import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
  *
  * @author kevinvandevelde at atmire.com
  */
-public interface PoolTaskService extends DSpaceCRUDService<PoolTask>, IndexableObjectService<PoolTask, Integer> {
+public interface PoolTaskService extends DSpaceCRUDService<PoolTask> {
+
+    public List<PoolTask> findAll(Context context) throws SQLException;
+
     public List<PoolTask> findByEperson(Context context, EPerson ePerson)
         throws SQLException, AuthorizeException, IOException;
 
@@ -39,4 +42,13 @@ public interface PoolTaskService extends DSpaceCRUDService<PoolTask>, IndexableO
         throws SQLException, AuthorizeException;
 
     public List<PoolTask> findByEPerson(Context context, EPerson ePerson) throws SQLException;
+
+    /**
+     * This method will return a list of PoolTask for the given group
+     * @param context   The relevant DSpace context
+     * @param group     The Group to be searched on
+     * @return          The list of PoolTask objects
+     * @throws SQLException If something goes wrong
+     */
+    public List<PoolTask> findByGroup(Context context, Group group) throws SQLException;
 }

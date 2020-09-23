@@ -7,6 +7,7 @@
  */
 package org.dspace.app.rest.utils;
 
+import static java.util.Collections.emptyList;
 import static org.dspace.discovery.configuration.DiscoveryConfigurationParameters.SORT.COUNT;
 import static org.dspace.discovery.configuration.DiscoveryConfigurationParameters.SORT.VALUE;
 import static org.dspace.discovery.configuration.DiscoveryConfigurationParameters.TYPE_HIERARCHICAL;
@@ -14,10 +15,11 @@ import static org.dspace.discovery.configuration.DiscoveryConfigurationParameter
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.emptyOrNullString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.isEmptyOrNullString;
 import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -27,13 +29,13 @@ import static org.mockito.Mockito.when;
 
 import java.sql.SQLException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Function;
 
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.parameter.SearchFilter;
-import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.discovery.DiscoverFacetField;
 import org.dspace.discovery.DiscoverFilterQuery;
@@ -50,6 +52,8 @@ import org.dspace.discovery.configuration.DiscoverySearchFilterFacet;
 import org.dspace.discovery.configuration.DiscoverySortConfiguration;
 import org.dspace.discovery.configuration.DiscoverySortFieldConfiguration;
 import org.dspace.discovery.configuration.HierarchicalSidebarFacetConfiguration;
+import org.dspace.discovery.indexobject.IndexableItem;
+import org.dspace.discovery.indexobject.factory.IndexFactory;
 import org.dspace.services.ConfigurationService;
 import org.hamcrest.FeatureMatcher;
 import org.hamcrest.Matcher;
@@ -83,6 +87,9 @@ public class DiscoverQueryBuilderTest {
     @Mock
     private IndexableObject scope;
 
+    @Mock
+    private IndexFactory indexFactory;
+
     private DiscoveryConfiguration discoveryConfiguration;
     private String query;
     private SearchFilter searchFilter;
@@ -90,6 +97,10 @@ public class DiscoverQueryBuilderTest {
 
     @Before
     public void setUp() throws Exception {
+        queryBuilder.setIndexableFactories(Collections.singletonList(indexFactory));
+
+        when(indexFactory.getType()).thenReturn(IndexableItem.TYPE);
+
         when(configurationService.getIntProperty(eq("rest.search.max.results"), anyInt())).thenReturn(100);
 
         when(searchService.toSortFieldIndex(any(String.class), any(String.class)))
@@ -159,7 +170,7 @@ public class DiscoverQueryBuilderTest {
 
         query = "my test case";
         searchFilter = new SearchFilter("subject", "equals", "Java");
-        page = new PageRequest(1, 10, Sort.Direction.ASC, "dc.title");
+        page = PageRequest.of(1, 10, Sort.Direction.ASC, "dc.title");
 
         queryBuilder.afterPropertiesSet();
     }
@@ -172,7 +183,7 @@ public class DiscoverQueryBuilderTest {
 
         assertThat(discoverQuery.getFilterQueries(), containsInAnyOrder("archived:true", "subject:\"Java\""));
         assertThat(discoverQuery.getQuery(), is(query));
-        assertThat(discoverQuery.getDSpaceObjectFilter(), is(Constants.ITEM));
+        assertThat(discoverQuery.getDSpaceObjectFilters(), contains(IndexableItem.TYPE));
         assertThat(discoverQuery.getSortField(), is("dc.title_sort"));
         assertThat(discoverQuery.getSortOrder(), is(DiscoverQuery.SORT_ORDER.asc));
         assertThat(discoverQuery.getMaxResults(), is(10));
@@ -194,11 +205,11 @@ public class DiscoverQueryBuilderTest {
     @Test
     public void testBuildQueryDefaults() throws Exception {
         DiscoverQuery discoverQuery =
-            queryBuilder.buildQuery(context, null, discoveryConfiguration, null, null, null, null);
+            queryBuilder.buildQuery(context, null, discoveryConfiguration, null, null, emptyList(), null);
 
         assertThat(discoverQuery.getFilterQueries(), containsInAnyOrder("archived:true"));
-        assertThat(discoverQuery.getQuery(), isEmptyOrNullString());
-        assertThat(discoverQuery.getDSpaceObjectFilter(), is(-1));
+        assertThat(discoverQuery.getQuery(), is(emptyOrNullString()));
+        assertThat(discoverQuery.getDSpaceObjectFilters(), is(empty()));
         //Note this should actually be "dc.date.accessioned_dt"  but remember that our searchService is just a stupid
         // mock
         assertThat(discoverQuery.getSortField(), is("dc.date.accessioned_sort"));
@@ -221,14 +232,14 @@ public class DiscoverQueryBuilderTest {
 
     @Test
     public void testSortByScore() throws Exception {
-        page = new PageRequest(2, 10, Sort.Direction.ASC, "SCORE");
+        page = PageRequest.of(2, 10, Sort.Direction.ASC, "SCORE");
 
         DiscoverQuery discoverQuery =
-            queryBuilder.buildQuery(context, null, discoveryConfiguration, null, null, null, page);
+            queryBuilder.buildQuery(context, null, discoveryConfiguration, null, null, emptyList(), page);
 
         assertThat(discoverQuery.getFilterQueries(), containsInAnyOrder("archived:true"));
-        assertThat(discoverQuery.getQuery(), isEmptyOrNullString());
-        assertThat(discoverQuery.getDSpaceObjectFilter(), is(-1));
+        assertThat(discoverQuery.getQuery(), is(emptyOrNullString()));
+        assertThat(discoverQuery.getDSpaceObjectFilters(), is(empty()));
         //Note this should actually be "dc.date.accessioned_dt"  but remember that our searchService is just a stupid
         // mock
         assertThat(discoverQuery.getSortField(), is("score_sort"));
@@ -288,8 +299,8 @@ public class DiscoverQueryBuilderTest {
 
         assertThat(discoverQuery.getFilterQueries(), containsInAnyOrder("archived:true", "subject:\"Java\""));
         assertThat(discoverQuery.getQuery(), is(query));
-        assertThat(discoverQuery.getDSpaceObjectFilter(), is(Constants.ITEM));
-        assertThat(discoverQuery.getSortField(), isEmptyOrNullString());
+        assertThat(discoverQuery.getDSpaceObjectFilters(), contains(IndexableItem.TYPE));
+        assertThat(discoverQuery.getSortField(), is(emptyOrNullString()));
         assertThat(discoverQuery.getMaxResults(), is(0));
         assertThat(discoverQuery.getStart(), is(0));
         assertThat(discoverQuery.getFacetMinCount(), is(1));

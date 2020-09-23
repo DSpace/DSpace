@@ -15,6 +15,7 @@ import java.util.Iterator;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.validator.routines.UrlValidator;
 import org.apache.logging.log4j.Logger;
 import org.dspace.rdf.RDFUtil;
 import org.dspace.services.factory.DSpaceServicesFactory;
@@ -197,6 +198,7 @@ public class Negotiator {
         if (extraPathInfo == null) {
             extraPathInfo = "";
         }
+        UrlValidator urlValidator = new UrlValidator(UrlValidator.ALLOW_LOCAL_URLS);
 
         StringBuilder urlBuilder = new StringBuilder();
         String lang = null;
@@ -249,19 +251,22 @@ public class Negotiator {
         // if html is requested we have to forward to the repositories webui.
         if ("html".equals(lang)) {
             urlBuilder.append(DSpaceServicesFactory.getInstance()
-                                                   .getConfigurationService().getProperty("dspace.url"));
+                                                   .getConfigurationService().getProperty("dspace.ui.url"));
             if (!handle.equals(DSpaceServicesFactory.getInstance()
                                                     .getConfigurationService().getProperty("handle.prefix") + "/0")) {
                 urlBuilder.append("/handle/");
                 urlBuilder.append(handle).append("/").append(extraPathInfo);
             }
             String url = urlBuilder.toString();
-
-            log.debug("Will forward to '" + url + "'.");
-            response.setStatus(HttpServletResponse.SC_SEE_OTHER);
-            response.setHeader("Location", url);
-            response.flushBuffer();
-            return true;
+            if (urlValidator.isValid(url)) {
+                log.debug("Will forward to '" + url + "'.");
+                response.setStatus(HttpServletResponse.SC_SEE_OTHER);
+                response.setHeader("Location", url);
+                response.flushBuffer();
+                return true;
+            } else {
+                throw new IOException("Invalid URL '" + url + "', cannot redirect.");
+            }
         }
 
         // currently we cannot serve statistics as rdf
@@ -287,10 +292,14 @@ public class Negotiator {
         urlBuilder.append("/handle/").append(handle);
         urlBuilder.append("/").append(lang);
         String url = urlBuilder.toString();
-        log.debug("Will forward to '" + url + "'.");
-        response.setStatus(HttpServletResponse.SC_SEE_OTHER);
-        response.setHeader("Location", url);
-        response.flushBuffer();
-        return true;
+        if (urlValidator.isValid(url)) {
+            log.debug("Will forward to '" + url + "'.");
+            response.setStatus(HttpServletResponse.SC_SEE_OTHER);
+            response.setHeader("Location", url);
+            response.flushBuffer();
+            return true;
+        } else {
+            throw new IOException("Invalid URL '" + url + "', cannot redirect.");
+        }
     }
 }

@@ -13,8 +13,8 @@ import java.io.StringWriter;
 import java.sql.SQLException;
 import java.util.Date;
 import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
@@ -161,7 +161,7 @@ public class WorkflowUtils extends Util {
 
                 email.addRecipient(recipient);
                 email.addArgument(ConfigurationManager
-                                      .getProperty("dspace.url"));
+                                      .getProperty("dspace.ui.url"));
                 email.addArgument(new Date());
                 email.addArgument(request.getSession().getId());
                 email.addArgument(logInfo);
@@ -236,13 +236,13 @@ public class WorkflowUtils extends Util {
     }
 
 
-    public static HashMap<String, Role> getCollectionRoles(Collection thisCollection)
+    public static Map<String, Role> getCollectionRoles(Collection thisCollection)
         throws IOException, WorkflowConfigurationException, SQLException {
         Workflow workflow = xmlWorkflowFactory.getWorkflow(thisCollection);
         LinkedHashMap<String, Role> result = new LinkedHashMap<String, Role>();
         if (workflow != null) {
             //Make sure we find one
-            HashMap<String, Role> allRoles = workflow.getRoles();
+            Map<String, Role> allRoles = workflow.getRoles();
             //We have retrieved all our roles, not get the ones which can be configured by the collection
             for (String roleId : allRoles.keySet()) {
                 Role role = allRoles.get(roleId);
@@ -257,13 +257,13 @@ public class WorkflowUtils extends Util {
     }
 
 
-    public static HashMap<String, Role> getCollectionAndRepositoryRoles(Collection thisCollection)
+    public static Map<String, Role> getCollectionAndRepositoryRoles(Collection thisCollection)
         throws IOException, WorkflowConfigurationException, SQLException {
         Workflow workflow = xmlWorkflowFactory.getWorkflow(thisCollection);
         LinkedHashMap<String, Role> result = new LinkedHashMap<String, Role>();
         if (workflow != null) {
             //Make sure we find one
-            HashMap<String, Role> allRoles = workflow.getRoles();
+            Map<String, Role> allRoles = workflow.getRoles();
             //We have retrieved all our roles, not get the ones which can be configured by the collection
             for (String roleId : allRoles.keySet()) {
                 Role role = allRoles.get(roleId);
@@ -279,13 +279,13 @@ public class WorkflowUtils extends Util {
     }
 
 
-    public static HashMap<String, Role> getAllExternalRoles(Collection thisCollection)
+    public static Map<String, Role> getAllExternalRoles(Collection thisCollection)
         throws IOException, WorkflowConfigurationException, SQLException {
         Workflow workflow = xmlWorkflowFactory.getWorkflow(thisCollection);
         LinkedHashMap<String, Role> result = new LinkedHashMap<String, Role>();
         if (workflow != null) {
             //Make sure we find one
-            HashMap<String, Role> allRoles = workflow.getRoles();
+            Map<String, Role> allRoles = workflow.getRoles();
             //We have retrieved all our roles, not get the ones which can be configured by the collection
             for (String roleId : allRoles.keySet()) {
                 Role role = allRoles.get(roleId);

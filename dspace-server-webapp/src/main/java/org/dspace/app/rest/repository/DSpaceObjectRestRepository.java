@@ -14,8 +14,7 @@ import org.dspace.app.rest.converter.MetadataConverter;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.DSpaceObjectRest;
 import org.dspace.app.rest.model.patch.Patch;
-import org.dspace.app.rest.projection.Projection;
-import org.dspace.app.rest.repository.patch.DSpaceObjectPatch;
+import org.dspace.app.rest.repository.patch.ResourcePatch;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.service.DSpaceObjectService;
@@ -30,18 +29,17 @@ import org.springframework.data.rest.webmvc.ResourceNotFoundException;
  * @param <R> the corresponding DSpaceObjectRest.
  */
 public abstract class DSpaceObjectRestRepository<M extends DSpaceObject, R extends DSpaceObjectRest>
-        extends DSpaceRestRepository<R, UUID> {
+        extends DSpaceRestRepository<R, UUID> implements ReloadableEntityObjectRepository<M, UUID> {
 
     final DSpaceObjectService<M> dsoService;
-    final DSpaceObjectPatch<R> dsoPatch;
 
+    @Autowired
+    ResourcePatch<M> resourcePatch;
     @Autowired
     MetadataConverter metadataConverter;
 
-    DSpaceObjectRestRepository(DSpaceObjectService<M> dsoService,
-                               DSpaceObjectPatch<R> dsoPatch) {
+    DSpaceObjectRestRepository(DSpaceObjectService<M> dsoService) {
         this.dsoService = dsoService;
-        this.dsoPatch = dsoPatch;
     }
 
     /**
@@ -63,23 +61,17 @@ public abstract class DSpaceObjectRestRepository<M extends DSpaceObject, R exten
         if (dso == null) {
             throw new ResourceNotFoundException(apiCategory + "." + model + " with id: " + id + " not found");
         }
-        R dsoRest = dsoPatch.patch(findOne(context, id), patch.getOperations());
-        updateDSpaceObject(dso, dsoRest);
+        resourcePatch.patch(obtainContext(), dso, patch.getOperations());
+        dsoService.update(obtainContext(), dso);
     }
 
-    /**
-     * Applies the changes in the given rest DSpace object to the model DSpace object.
-     * The default implementation updates metadata if needed. Subclasses should extend
-     * to support updates of additional properties.
-     *
-     * @param dso the dso to apply changes to.
-     * @param dsoRest the rest representation of the new desired state.
-     */
-    protected void updateDSpaceObject(M dso, R dsoRest)
-            throws AuthorizeException, SQLException {
-        R origDsoRest = converter.toRest(dso, Projection.DEFAULT);
-        if (!origDsoRest.getMetadata().equals(dsoRest.getMetadata())) {
-            metadataConverter.setMetadata(obtainContext(), dso, dsoRest.getMetadata());
-        }
+    @Override
+    public M findDomainObjectByPk(Context context, UUID uuid) throws SQLException {
+        return dsoService.find(context, uuid);
+    }
+
+    @Override
+    public Class<UUID> getPKClass() {
+        return UUID.class;
     }
 }

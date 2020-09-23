@@ -9,8 +9,11 @@ package org.dspace.xmlworkflow.state.actions.processingaction;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
+import org.dspace.app.util.Util;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DCDate;
 import org.dspace.content.MetadataSchemaEnum;
@@ -31,40 +34,51 @@ import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
  */
 public class AcceptEditRejectAction extends ProcessingAction {
 
-    public static final int MAIN_PAGE = 0;
-    public static final int REJECT_PAGE = 1;
+    private static final String SUBMIT_APPROVE = "submit_approve";
+    private static final String SUBMIT_REJECT = "submit_reject";
 
     //TODO: rename to AcceptAndEditMetadataAction
 
     @Override
-    public void activate(Context c, XmlWorkflowItem wf) throws SQLException {
+    public void activate(Context c, XmlWorkflowItem wf) {
 
     }
 
     @Override
     public ActionResult execute(Context c, XmlWorkflowItem wfi, Step step, HttpServletRequest request)
-        throws SQLException, AuthorizeException, IOException {
-
-        if (request.getParameter("submit_approve") != null) {
-            return processAccept(c, wfi, step, request);
-        } else {
-            if (request.getParameter("submit_reject") != null) {
-                return processRejectPage(c, wfi, step, request);
+            throws SQLException, AuthorizeException, IOException {
+        if (super.isOptionInParam(request)) {
+            switch (Util.getSubmitButton(request, SUBMIT_CANCEL)) {
+                case SUBMIT_APPROVE:
+                    return processAccept(c, wfi);
+                case SUBMIT_REJECT:
+                    return processRejectPage(c, wfi, request);
+                default:
+                    return new ActionResult(ActionResult.TYPE.TYPE_CANCEL);
             }
         }
         return new ActionResult(ActionResult.TYPE.TYPE_CANCEL);
     }
 
-    public ActionResult processAccept(Context c, XmlWorkflowItem wfi, Step step, HttpServletRequest request)
-        throws SQLException, AuthorizeException {
+    @Override
+    public List<String> getOptions() {
+        List<String> options = new ArrayList<>();
+        options.add(SUBMIT_APPROVE);
+        options.add(SUBMIT_REJECT);
+        options.add(ProcessingAction.SUBMIT_EDIT_METADATA);
+        return options;
+    }
+
+    public ActionResult processAccept(Context c, XmlWorkflowItem wfi)
+            throws SQLException, AuthorizeException {
         //Delete the tasks
         addApprovedProvenance(c, wfi);
 
         return new ActionResult(ActionResult.TYPE.TYPE_OUTCOME, ActionResult.OUTCOME_COMPLETE);
     }
 
-    public ActionResult processRejectPage(Context c, XmlWorkflowItem wfi, Step step, HttpServletRequest request)
-        throws SQLException, AuthorizeException, IOException {
+    public ActionResult processRejectPage(Context c, XmlWorkflowItem wfi, HttpServletRequest request)
+            throws SQLException, AuthorizeException, IOException {
         String reason = request.getParameter("reason");
         if (reason == null || 0 == reason.trim().length()) {
             addErrorField(request, "reason");
@@ -85,14 +99,14 @@ public class AcceptEditRejectAction extends ProcessingAction {
 
         // Get user's name + email address
         String usersName = XmlWorkflowServiceFactory.getInstance().getXmlWorkflowService()
-                                                    .getEPersonName(c.getCurrentUser());
+                .getEPersonName(c.getCurrentUser());
 
         String provDescription = getProvenanceStartId() + " Approved for entry into archive by "
-            + usersName + " on " + now + " (GMT) ";
+                + usersName + " on " + now + " (GMT) ";
 
         // Add to item as a DC field
         itemService.addMetadata(c, wfi.getItem(), MetadataSchemaEnum.DC.getName(), "description", "provenance", "en",
-                                provDescription);
+                provDescription);
         itemService.update(c, wfi.getItem());
     }
 }

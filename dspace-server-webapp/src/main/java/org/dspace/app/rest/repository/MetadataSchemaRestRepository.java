@@ -21,7 +21,6 @@ import com.google.gson.Gson;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.MetadataSchemaRest;
-import org.dspace.app.rest.projection.Projection;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.MetadataSchema;
 import org.dspace.content.NonUniqueMetadataException;
@@ -46,6 +45,7 @@ public class MetadataSchemaRestRepository extends DSpaceRestRepository<MetadataS
     MetadataSchemaService metadataSchemaService;
 
     @Override
+    @PreAuthorize("permitAll()")
     public MetadataSchemaRest findOne(Context context, Integer id) {
         MetadataSchema metadataSchema = null;
         try {
@@ -63,7 +63,7 @@ public class MetadataSchemaRestRepository extends DSpaceRestRepository<MetadataS
     public Page<MetadataSchemaRest> findAll(Context context, Pageable pageable) {
         try {
             List<MetadataSchema> metadataSchemas = metadataSchemaService.findAll(context);
-            return converter.toRestPage(utils.getPage(metadataSchemas, pageable), utils.obtainProjection(true));
+            return converter.toRestPage(metadataSchemas, pageable, utils.obtainProjection());
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -111,7 +111,7 @@ public class MetadataSchemaRestRepository extends DSpaceRestRepository<MetadataS
         }
 
         // return
-        return converter.toRest(metadataSchema, Projection.DEFAULT);
+        return converter.toRest(metadataSchema, utils.obtainProjection());
     }
 
     @Override
@@ -167,6 +167,6 @@ public class MetadataSchemaRestRepository extends DSpaceRestRepository<MetadataS
                     + metadataSchemaRest.getPrefix() + "." + metadataSchemaRest.getNamespace() + " already exists");
         }
 
-        return converter.toRest(metadataSchema, Projection.DEFAULT);
+        return converter.toRest(metadataSchema, utils.obtainProjection());
     }
 }

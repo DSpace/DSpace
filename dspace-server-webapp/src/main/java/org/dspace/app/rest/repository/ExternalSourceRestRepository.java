@@ -13,7 +13,6 @@ import java.util.Optional;
 import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.model.ExternalSourceEntryRest;
 import org.dspace.app.rest.model.ExternalSourceRest;
-import org.dspace.app.rest.projection.Projection;
 import org.dspace.core.Context;
 import org.dspace.external.model.ExternalDataObject;
 import org.dspace.external.provider.ExternalDataProvider;
@@ -22,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
 /**
@@ -52,7 +52,7 @@ public class ExternalSourceRestRepository extends DSpaceRestRepository<ExternalS
                                                                                                     entryId);
         ExternalDataObject dataObject = externalDataObject.orElseThrow(() -> new ResourceNotFoundException(
             "Couldn't find an ExternalSource for source: " + externalSourceName + " and ID: " + entryId));
-        return converter.toRest(dataObject, Projection.DEFAULT);
+        return converter.toRest(dataObject, utils.obtainProjection());
     }
 
     /**
@@ -74,24 +74,25 @@ public class ExternalSourceRestRepository extends DSpaceRestRepository<ExternalS
                     pageable.getPageSize());
         int numberOfResults = externalDataService.getNumberOfResults(externalSourceName, query);
         return converter.toRestPage(externalDataObjects, pageable, numberOfResults,
-                                    utils.obtainProjection(true));
+                                    utils.obtainProjection());
     }
 
     @Override
+    @PreAuthorize("permitAll()")
     public ExternalSourceRest findOne(Context context, String externalSourceName) {
         ExternalDataProvider externalDataProvider = externalDataService.getExternalDataProvider(externalSourceName);
         if (externalDataProvider == null) {
             throw new ResourceNotFoundException("ExternalDataProvider for: " +
                                                     externalSourceName + " couldn't be found");
         }
-        return converter.toRest(externalDataProvider, Projection.DEFAULT);
+        return converter.toRest(externalDataProvider, utils.obtainProjection());
     }
 
     @Override
+    @PreAuthorize("permitAll()")
     public Page<ExternalSourceRest> findAll(Context context, Pageable pageable) {
         List<ExternalDataProvider> externalSources = externalDataService.getExternalDataProviders();
-        return converter.toRestPage(externalSources, pageable, externalSources.size(),
-                                    utils.obtainProjection(true));
+        return converter.toRestPage(externalSources, pageable, utils.obtainProjection());
     }
 
     public Class<ExternalSourceRest> getDomainClass() {

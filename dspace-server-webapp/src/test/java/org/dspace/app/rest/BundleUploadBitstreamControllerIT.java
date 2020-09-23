@@ -18,10 +18,6 @@ import java.util.Map;
 import java.util.UUID;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.dspace.app.rest.builder.BundleBuilder;
-import org.dspace.app.rest.builder.CollectionBuilder;
-import org.dspace.app.rest.builder.CommunityBuilder;
-import org.dspace.app.rest.builder.ItemBuilder;
 import org.dspace.app.rest.matcher.BitstreamMatcher;
 import org.dspace.app.rest.matcher.MetadataMatcher;
 import org.dspace.app.rest.model.BitstreamRest;
@@ -29,6 +25,10 @@ import org.dspace.app.rest.model.MetadataRest;
 import org.dspace.app.rest.model.MetadataValueRest;
 import org.dspace.app.rest.test.AbstractEntityIntegrationTest;
 import org.dspace.authorize.service.AuthorizeService;
+import org.dspace.builder.BundleBuilder;
+import org.dspace.builder.CollectionBuilder;
+import org.dspace.builder.CommunityBuilder;
+import org.dspace.builder.ItemBuilder;
 import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
@@ -128,7 +128,8 @@ public class BundleUploadBitstreamControllerIT extends AbstractEntityIntegration
         String bitstreamId = String.valueOf(map.get("id"));
 
 
-        getClient(token).perform(get("/api/core/bundles/" + bundle.getID() + "/bitstreams"))
+        getClient(token).perform(get("/api/core/bundles/" + bundle.getID() + "/bitstreams")
+                        .param("projection", "full"))
                         .andExpect(status().isOk())
                         .andExpect(jsonPath("_embedded.bitstreams", Matchers.hasItem(
                                 BitstreamMatcher.matchBitstreamEntry(UUID.fromString(bitstreamId), file.getSize(),
@@ -180,7 +181,8 @@ public class BundleUploadBitstreamControllerIT extends AbstractEntityIntegration
         Map<String, Object> map = mapper.readValue(content, Map.class);
         String bitstreamId = String.valueOf(map.get("id"));
 
-        getClient(token).perform(get("/api/core/bundles/" + bundle.getID() + "/bitstreams"))
+        getClient(token).perform(get("/api/core/bundles/" + bundle.getID() + "/bitstreams")
+                        .param("projection", "full"))
                         .andExpect(status().isOk())
                         .andExpect(jsonPath("_embedded.bitstreams", Matchers.hasItem(
                                 BitstreamMatcher.matchBitstreamEntry(UUID.fromString(bitstreamId), file.getSize()))));
@@ -232,7 +234,8 @@ public class BundleUploadBitstreamControllerIT extends AbstractEntityIntegration
         Map<String, Object> map = mapper.readValue(content, Map.class);
         String bitstreamId = String.valueOf(map.get("id"));
 
-        getClient(token).perform(get("/api/core/bundles/" + bundle.getID() + "/bitstreams"))
+        getClient(token).perform(get("/api/core/bundles/" + bundle.getID() + "/bitstreams")
+                        .param("projection", "full"))
                         .andExpect(status().isOk())
                         .andExpect(jsonPath("_embedded.bitstreams", Matchers.hasItem(
                                 BitstreamMatcher.matchBitstreamEntry(UUID.fromString(bitstreamId), file.getSize()))));
@@ -274,9 +277,10 @@ public class BundleUploadBitstreamControllerIT extends AbstractEntityIntegration
                                          .file(file))
                         .andExpect(status().isForbidden());
 
-        getClient(token).perform(get("/api/core/bundles/" + bundle.getID() + "/bitstreams"))
+        getClient(token).perform(get("/api/core/bundles/" + bundle.getID() + "/bitstreams")
+                        .param("projection", "full"))
                         .andExpect(status().isOk())
-                        .andExpect(jsonPath("_embedded.bitstreams").doesNotExist());
+                        .andExpect(jsonPath("_embedded.bitstreams").isEmpty());
     }
 
     @Test
@@ -315,9 +319,10 @@ public class BundleUploadBitstreamControllerIT extends AbstractEntityIntegration
                                                   .file(file))
                    .andExpect(status().isUnauthorized());
 
-        getClient(token).perform(get("/api/core/bundles/" + bundle.getID() + "/bitstreams"))
+        getClient(token).perform(get("/api/core/bundles/" + bundle.getID() + "/bitstreams")
+                        .param("projection", "full"))
                         .andExpect(status().isOk())
-                        .andExpect(jsonPath("_embedded.bitstreams").doesNotExist());
+                        .andExpect(jsonPath("_embedded.bitstreams").isEmpty());
     }
 
     @Test
@@ -375,7 +380,8 @@ public class BundleUploadBitstreamControllerIT extends AbstractEntityIntegration
         Map<String, Object> map = mapper.readValue(content, Map.class);
         String bitstreamId = String.valueOf(map.get("id"));
 
-        getClient(token).perform(get("/api/core/bundles/" + bundle.getID() + "/bitstreams"))
+        getClient(token).perform(get("/api/core/bundles/" + bundle.getID() + "/bitstreams")
+                        .param("projection", "full"))
                         .andExpect(status().isOk())
                         .andExpect(jsonPath("_embedded.bitstreams", Matchers.hasItem(
                                 BitstreamMatcher.matchBitstreamEntry(UUID.fromString(bitstreamId), file.getSize()))));

@@ -17,6 +17,8 @@ import org.dspace.app.rest.projection.Projection;
  */
 public abstract class RestAddressableModel implements RestModel {
 
+    private int embedLevel = 0;
+
     private Projection projection = Projection.DEFAULT;
 
     @JsonIgnore
@@ -26,11 +28,32 @@ public abstract class RestAddressableModel implements RestModel {
     public abstract Class getController();
 
     @JsonIgnore
+    public int getEmbedLevel() {
+        return embedLevel;
+    }
+
+    public void setEmbedLevel(int embedLevel) {
+        this.embedLevel = embedLevel;
+    }
+
+    @JsonIgnore
     public Projection getProjection() {
         return projection;
     }
 
     public void setProjection(Projection projection) {
         this.projection = projection;
+    }
+
+    @JsonIgnore
+    /**
+     * 
+     * @return an unique string useful to unambiguously identify the type of rest
+     *         object. It is in the form of category.model where model is in its
+     *         singular form. Examples include core.item, core.community,
+     *         submission.workspaceitem, etc.
+     */
+    public String getUniqueType() {
+        return getCategory() + "." + getType();
     }
 }

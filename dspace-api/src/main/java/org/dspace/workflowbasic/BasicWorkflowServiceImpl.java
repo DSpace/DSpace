@@ -1041,7 +1041,7 @@ public class BasicWorkflowServiceImpl implements BasicWorkflowService {
 
     @Override
     public String getMyDSpaceLink() {
-        return configurationService.getProperty("dspace.url") + "/mydspace";
+        return configurationService.getProperty("dspace.ui.url") + "/mydspace";
     }
 
     protected void notifyOfReject(Context context, BasicWorkflowItem workflowItem, EPerson e,
@@ -1214,6 +1214,12 @@ public class BasicWorkflowServiceImpl implements BasicWorkflowService {
 
         }
         return roleGroup;
+    }
+
+    @Override
+    public Group createWorkflowRoleGroup(Context context, Collection collection, String roleName)
+        throws AuthorizeException, SQLException {
+        return getWorkflowRoleGroup(context, collection, roleName, null);
     }
 
     @Override

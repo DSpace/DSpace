@@ -17,13 +17,13 @@ import java.util.UUID;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.codec.CharEncoding;
 import org.apache.commons.io.IOUtils;
-import org.dspace.app.rest.builder.BitstreamBuilder;
-import org.dspace.app.rest.builder.CollectionBuilder;
-import org.dspace.app.rest.builder.CommunityBuilder;
-import org.dspace.app.rest.builder.ItemBuilder;
-import org.dspace.app.rest.builder.SiteBuilder;
 import org.dspace.app.rest.model.ViewEventRest;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
+import org.dspace.builder.BitstreamBuilder;
+import org.dspace.builder.CollectionBuilder;
+import org.dspace.builder.CommunityBuilder;
+import org.dspace.builder.ItemBuilder;
+import org.dspace.builder.SiteBuilder;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
@@ -453,7 +453,7 @@ public class ViewEventRestRepositoryIT extends AbstractControllerIntegrationTest
 
 
     @Test
-    public void postTestAuthenticatedUserSucces() throws Exception {
+    public void postTestAuthenticatedUserSuccess() throws Exception {
 
         context.turnOffAuthorisationSystem();
 
@@ -485,7 +485,7 @@ public class ViewEventRestRepositoryIT extends AbstractControllerIntegrationTest
 
         ObjectMapper mapper = new ObjectMapper();
 
-        String token = getAuthToken(admin.getEmail(), password);
+        String token = getAuthToken(eperson.getEmail(), password);
 
         getClient(token).perform(post("/api/statistics/viewevents")
                                 .content(mapper.writeValueAsBytes(viewEventRest))

@@ -35,6 +35,5 @@
         <constructor-arg value="${openaire.api.url}"/>
         <property name="sourceIdentifier" value="openaireAPI"/>
     </bean>
-    
-</beans>
 
+</beans>

@@ -19,19 +19,30 @@ import java.util.List;
 import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.rest.model.patch.Patch;
 import org.dspace.app.rest.model.patch.ReplaceOperation;
+import org.dspace.services.RequestService;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.security.core.Authentication;
+import org.springframework.test.util.ReflectionTestUtils;
 
 /**
  * This class verifies that {@link EPersonRestPermissionEvaluatorPlugin} properly
  * evaluates Patch requests.
  */
+@RunWith(MockitoJUnitRunner.class)
 public class EPersonRestPermissionEvaluatorPluginTest {
 
+    @InjectMocks
     private EPersonRestPermissionEvaluatorPlugin ePersonRestPermissionEvaluatorPlugin;
 
     private Authentication authentication;
+
+    @Mock
+    private RequestService requestService;
 
     @Before
     public void setUp() throws Exception {
@@ -39,7 +50,9 @@ public class EPersonRestPermissionEvaluatorPluginTest {
         authentication = mock(Authentication.class);
         DSpaceRestPermission restPermission = DSpaceRestPermission.convert("WRITE");
         when(ePersonRestPermissionEvaluatorPlugin
-                .hasDSpacePermission(authentication, null, null, restPermission)).thenReturn(true);
+                 .hasDSpacePermission(authentication, null, null, restPermission)).thenReturn(true);
+        ReflectionTestUtils.setField(ePersonRestPermissionEvaluatorPlugin, "requestService", requestService);
+        when(requestService.getCurrentRequest()).thenReturn(null);
     }
 
     @Test
@@ -52,7 +65,7 @@ public class EPersonRestPermissionEvaluatorPluginTest {
         ops.add(canLoginOperation);
         Patch patch = new Patch(ops);
         assertFalse(ePersonRestPermissionEvaluatorPlugin
-                .hasPatchPermission(authentication, null, null, patch));
+                        .hasPatchPermission(authentication, null, null, patch));
 
     }
 
@@ -64,7 +77,7 @@ public class EPersonRestPermissionEvaluatorPluginTest {
         ops.add(passwordOperation);
         Patch patch = new Patch(ops);
         assertTrue(ePersonRestPermissionEvaluatorPlugin
-                .hasPatchPermission(authentication, null, null, patch));
+                       .hasPatchPermission(authentication, null, null, patch));
 
     }
 

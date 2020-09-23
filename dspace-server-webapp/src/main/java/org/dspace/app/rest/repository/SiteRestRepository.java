@@ -15,7 +15,6 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.dspace.app.rest.model.SiteRest;
 import org.dspace.app.rest.model.patch.Patch;
-import org.dspace.app.rest.repository.patch.DSpaceObjectPatch;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Site;
 import org.dspace.content.service.SiteService;
@@ -39,11 +38,12 @@ public class SiteRestRepository extends DSpaceObjectRestRepository<Site, SiteRes
 
     @Autowired
     public SiteRestRepository(SiteService dsoService) {
-        super(dsoService, new DSpaceObjectPatch<SiteRest>() {});
+        super(dsoService);
         this.sitesv = dsoService;
     }
 
     @Override
+    @PreAuthorize("permitAll()")
     public SiteRest findOne(Context context, UUID id) {
         Site site = null;
         try {
@@ -61,7 +61,7 @@ public class SiteRestRepository extends DSpaceObjectRestRepository<Site, SiteRes
     public Page<SiteRest> findAll(Context context, Pageable pageable) {
         try {
             List<Site> sites = Arrays.asList(sitesv.findSite(context));
-            return converter.toRestPage(sites, pageable, 1L, utils.obtainProjection(true));
+            return converter.toRestPage(sites, pageable, utils.obtainProjection());
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }

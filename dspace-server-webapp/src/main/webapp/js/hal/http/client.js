@@ -1,10 +1,12 @@
-/*
- * The contents of this file are subject to the license and copyright
- * detailed in the LICENSE and NOTICE files at the root of the source
- * tree and available online at
- *
- * http://www.dspace.org/license/
- */
+ /***********************************
+  * Customized version of the HAL Browser client.js provided from https://github.com/mikekelly/hal-browser
+  * Copyright (c) 2012 Mike Kelly, http://stateless.co/
+  * MIT LICENSE: https://github.com/mikekelly/hal-browser/blob/master/MIT-LICENSE.txt)
+  *
+  * This DSpace version of client.js has be customized to include:
+  *     * Download file functionality (see new downloadFile() method)
+  *     * Improved AuthorizationHeader parsing (see new getAuthorizationHeader() method)
+  ***********************************/
 HAL.Http.Client = function(opts) {
     this.vent = opts.vent;
     this.defaultHeaders = {'Accept': 'application/hal+json, application/json, */*; q=0.01'};
@@ -72,14 +74,15 @@ HAL.Http.Client.prototype.get = function(url) {
                 jqxhr: jqXHR,
                 headers: jqXHR.getAllResponseHeaders()
             });
-        }
-    }).error(function (response) {
-        self.vent.trigger('fail-response', {jqxhr: jqxhr});
-        var contentTypeResponseHeader = jqxhr.getResponseHeader("content-type");
-        if (contentTypeResponseHeader != undefined
-                && !contentTypeResponseHeader.startsWith("application/hal")
-                && !contentTypeResponseHeader.startsWith("application/json")) {
-            downloadFile(url);
+        },
+        error: function() {
+            self.vent.trigger('fail-response', { jqxhr: jqxhr });
+            var contentTypeResponseHeader = jqxhr.getResponseHeader("content-type");
+            if (contentTypeResponseHeader != undefined
+                    && !contentTypeResponseHeader.startsWith("application/hal")
+                    && !contentTypeResponseHeader.startsWith("application/json")) {
+                downloadFile(url);
+            }
         }});
 };
 

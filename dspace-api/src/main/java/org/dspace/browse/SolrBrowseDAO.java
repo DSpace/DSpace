@@ -20,7 +20,6 @@ import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Item;
-import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.discovery.DiscoverFacetField;
 import org.dspace.discovery.DiscoverQuery;
@@ -32,6 +31,7 @@ import org.dspace.discovery.IndexableObject;
 import org.dspace.discovery.SearchService;
 import org.dspace.discovery.SearchServiceException;
 import org.dspace.discovery.configuration.DiscoveryConfigurationParameters;
+import org.dspace.discovery.indexobject.IndexableItem;
 import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
@@ -207,7 +207,7 @@ public class SolrBrowseDAO implements BrowseDAO {
                 }
                 // filter on item to be sure to don't include any other object
                 // indexed in the Discovery Search core
-                query.addFilterQueries("search.resourcetype:" + Constants.ITEM);
+                query.addFilterQueries("search.resourcetype:" + IndexableItem.TYPE);
                 if (orderField != null) {
                     query.setSortField("bi_" + orderField + "_sort",
                                        ascending ? SORT_ORDER.asc : SORT_ORDER.desc);
@@ -297,10 +297,10 @@ public class SolrBrowseDAO implements BrowseDAO {
         DiscoverResult resp = getSolrResponse();
 
         List<Item> bitems = new ArrayList<>();
-        for (IndexableObject<UUID> solrDoc : resp.getIndexableObjects()) {
+        for (IndexableObject solrDoc : resp.getIndexableObjects()) {
             // FIXME introduce project, don't retrieve Item immediately when
             // processing the query...
-            Item item = (Item) solrDoc;
+            Item item = ((IndexableItem) solrDoc).getIndexedObject();
             bitems.add(item);
         }
         return bitems;
@@ -311,7 +311,7 @@ public class SolrBrowseDAO implements BrowseDAO {
         throws BrowseException {
         DiscoverQuery query = new DiscoverQuery();
         query.setQuery("search.resourceid:" + itemID
-                           + " AND search.resourcetype:" + Constants.ITEM);
+                           + " AND search.resourcetype:" + IndexableItem.TYPE);
         query.setMaxResults(1);
         DiscoverResult resp = null;
         try {
@@ -334,7 +334,7 @@ public class SolrBrowseDAO implements BrowseDAO {
         addLocationScopeFilter(query);
         addStatusFilter(query);
         query.setMaxResults(0);
-        query.addFilterQueries("search.resourcetype:" + Constants.ITEM);
+        query.addFilterQueries("search.resourcetype:" + IndexableItem.TYPE);
 
         // We need to take into account the fact that we may be in a subset of the items
         if (authority != null) {

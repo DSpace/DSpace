@@ -219,7 +219,7 @@ public class PREMISCrosswalk
         //  b. name of bitstream, if any
         //  c. made-up name based on sequence ID and extension.
         String sid = String.valueOf(bitstream.getSequenceID());
-        String baseUrl = ConfigurationManager.getProperty("dspace.url");
+        String baseUrl = ConfigurationManager.getProperty("dspace.ui.url");
         String handle = null;
         // get handle of parent Item of this bitstream, if there is one:
         List<Bundle> bn = bitstream.getBundles();

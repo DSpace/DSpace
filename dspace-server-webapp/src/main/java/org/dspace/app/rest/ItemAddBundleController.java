@@ -22,7 +22,6 @@ import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.BundleRest;
 import org.dspace.app.rest.model.ItemRest;
 import org.dspace.app.rest.model.hateoas.BundleResource;
-import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.repository.ItemRestRepository;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.app.rest.utils.Utils;
@@ -34,7 +33,7 @@ import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.webmvc.ControllerUtils;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
-import org.springframework.hateoas.ResourceSupport;
+import org.springframework.hateoas.RepresentationModel;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -88,9 +87,9 @@ public class ItemAddBundleController {
      */
     @RequestMapping(method = RequestMethod.POST)
     @PreAuthorize("hasPermission(#uuid, 'ITEM', 'ADD')")
-    public ResponseEntity<ResourceSupport> addBundleToItem(@PathVariable UUID uuid,
-                                                           HttpServletRequest request,
-                                                           HttpServletResponse response)
+    public ResponseEntity<RepresentationModel<?>> addBundleToItem(@PathVariable UUID uuid,
+                                                                  HttpServletRequest request,
+                                                                  HttpServletResponse response)
             throws SQLException, AuthorizeException {
         Context context = ContextUtil.obtainContext(request);
 
@@ -108,7 +107,7 @@ public class ItemAddBundleController {
         }
 
         Bundle bundle = itemRestRepository.addBundleToItem(context, item, bundleRest);
-        BundleResource bundleResource = converter.toResource(converter.toRest(bundle, Projection.DEFAULT));
+        BundleResource bundleResource = converter.toResource(converter.toRest(bundle, utils.obtainProjection()));
         return ControllerUtils.toResponseEntity(HttpStatus.CREATED, new HttpHeaders(), bundleResource);
     }
 

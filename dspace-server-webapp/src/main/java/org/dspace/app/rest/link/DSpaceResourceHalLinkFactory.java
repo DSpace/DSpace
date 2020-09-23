@@ -22,6 +22,7 @@ import org.dspace.app.rest.model.hateoas.DSpaceResource;
 import org.dspace.app.rest.utils.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
+import org.springframework.hateoas.IanaLinkRelations;
 import org.springframework.hateoas.Link;
 import org.springframework.stereotype.Component;
 
@@ -57,23 +58,17 @@ public class DSpaceResourceHalLinkFactory extends HalLinkFactory<DSpaceResource,
                         if (StringUtils.isBlank(linkRest.method())) {
                             Object linkedObject = readMethod.invoke(data);
 
-                            if (linkedObject instanceof RestAddressableModel
-                                    && linkRest.linkClass().isAssignableFrom(linkedObject.getClass())) {
+                            if (linkedObject instanceof RestAddressableModel) {
 
                                 linkToSubResource = utils
                                     .linkToSingleResource((RestAddressableModel) linkedObject, name);
                             }
 
-                            if (linkedObject != null || !linkRest.linkOptional() || !linkRest.embedOptional()) {
-
-                                if (linkRest.linkOptional() && linkRest.embedOptional()
-                                        && !halResource.getContent().getProjection()
-                                        .allowOptionalLink(halResource, linkRest)) {
-                                    continue; // projection disallows this optional method-level link
-                                }
-
-                                halResource.add(linkToSubResource);
+                            if (!halResource.getContent().getProjection().allowLinking(halResource, linkRest)) {
+                                continue; // projection disallows this optional method-level link
                             }
+
+                            halResource.add(linkToSubResource);
                         }
 
                     } else if (RestModel.class.isAssignableFrom(readMethod.getReturnType())) {
@@ -86,7 +81,7 @@ public class DSpaceResourceHalLinkFactory extends HalLinkFactory<DSpaceResource,
             e.printStackTrace();
         }
 
-        halResource.add(utils.linkToSingleResource(data, Link.REL_SELF));
+        halResource.add(utils.linkToSingleResource(data, IanaLinkRelations.SELF.value()));
     }
 
     protected Class<RestResourceController> getControllerClass() {

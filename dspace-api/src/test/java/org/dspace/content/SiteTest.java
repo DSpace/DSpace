@@ -14,13 +14,16 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.sql.SQLException;
+import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.AbstractUnitTest;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.SiteService;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
+import org.dspace.eperson.Group;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -58,7 +61,7 @@ public class SiteTest extends AbstractUnitTest {
         try {
             //we have to create a new community in the database
             context.turnOffAuthorisationSystem();
-            this.s = (Site) siteService.findSite(context);
+            this.s = siteService.findSite(context);
             //we need to commit the changes so we don't block the table for testing
             context.restoreAuthSystemState();
         } catch (SQLException ex) {
@@ -120,8 +123,7 @@ public class SiteTest extends AbstractUnitTest {
      */
     @Test
     public void testSiteFind() throws Exception {
-        int id = 0;
-        Site found = (Site) siteService.findSite(context);
+        Site found = siteService.findSite(context);
         assertThat("testSiteFind 0", found, notNullValue());
         assertThat("testSiteFind 1", found, equalTo(s));
     }
@@ -141,7 +143,20 @@ public class SiteTest extends AbstractUnitTest {
      */
     @Test
     public void testGetURL() {
-        assertThat("testGetURL 0", s.getURL(), equalTo(ConfigurationManager.getProperty("dspace.url")));
+        assertThat("testGetURL 0", s.getURL(), equalTo(ConfigurationManager.getProperty("dspace.ui.url")));
+    }
+
+    @Test
+    public void testAnonymousReadRights() throws Exception {
+        List<Group> groupList = authorizeService.getAuthorizedGroups(context, s, Constants.READ);
+        boolean foundAnonInList = false;
+        for (Group group : groupList) {
+            if (StringUtils.equalsIgnoreCase(group.getName(), "Anonymous")) {
+                foundAnonInList = true;
+            }
+        }
+        assertTrue(foundAnonInList);
+
     }
 
 }

@@ -13,15 +13,15 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import org.dspace.app.rest.builder.CollectionBuilder;
-import org.dspace.app.rest.builder.CommunityBuilder;
-import org.dspace.app.rest.builder.ItemBuilder;
-import org.dspace.app.rest.builder.RelationshipBuilder;
 import org.dspace.app.rest.matcher.EntityTypeMatcher;
 import org.dspace.app.rest.matcher.PageMatcher;
 import org.dspace.app.rest.matcher.RelationshipMatcher;
 import org.dspace.app.rest.matcher.RelationshipTypeMatcher;
 import org.dspace.app.rest.test.AbstractEntityIntegrationTest;
+import org.dspace.builder.CollectionBuilder;
+import org.dspace.builder.CommunityBuilder;
+import org.dspace.builder.ItemBuilder;
+import org.dspace.builder.RelationshipBuilder;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.EntityType;
@@ -86,7 +86,8 @@ public class RelationshipTypeRestControllerIT extends AbstractEntityIntegrationT
         RelationshipType relationshipType5 = relationshipTypeService
             .findbyTypesAndTypeName(context, publicationEntityType, orgunitEntityType, "isAuthorOfPublication",
                                   "isPublicationOfAuthor");
-        getClient().perform(get("/api/core/entitytypes/" + publicationEntityType.getID() + "/relationshiptypes"))
+        getClient().perform(get("/api/core/entitytypes/" + publicationEntityType.getID() + "/relationshiptypes")
+                   .param("projection", "full"))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$._embedded.relationshiptypes", containsInAnyOrder(
                        RelationshipTypeMatcher.matchRelationshipTypeEntry(relationshipType1),
@@ -185,7 +186,8 @@ public class RelationshipTypeRestControllerIT extends AbstractEntityIntegrationT
 
         context.restoreAuthSystemState();
         //verify results
-        getClient().perform(get("/api/core/relationships/search/byLabel?label=isAuthorOfPublication"))
+        getClient().perform(get("/api/core/relationships/search/byLabel?label=isAuthorOfPublication")
+                   .param("projection", "full"))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$._embedded.relationships", containsInAnyOrder(
                        RelationshipMatcher.matchRelationship(relationship1),
@@ -201,7 +203,8 @@ public class RelationshipTypeRestControllerIT extends AbstractEntityIntegrationT
 
         //verify results
         getClient().perform(get("/api/core/relationships/search/byLabel?label=isAuthorOfPublication&dso="
-                                    + publication.getID()))
+                                    + publication.getID())
+                   .param("projection", "full"))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$._embedded.relationships", containsInAnyOrder(
                        RelationshipMatcher.matchRelationship(relationship1),
@@ -216,7 +219,8 @@ public class RelationshipTypeRestControllerIT extends AbstractEntityIntegrationT
 
         //verify results
         getClient().perform(get("/api/core/relationships/search/byLabel?label=isAuthorOfPublication&dso="
-                                    + publication2.getID()))
+                                    + publication2.getID())
+                   .param("projection", "full"))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$._embedded.relationships", containsInAnyOrder(
                        RelationshipMatcher.matchRelationship(relationship3),

@@ -23,8 +23,10 @@ import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.BitstreamRest;
 import org.dspace.app.rest.model.CheckSumRest;
 import org.dspace.app.rest.model.MetadataValueRest;
-import org.dspace.app.rest.model.ResourcePolicyRest;
+import org.dspace.app.rest.model.UploadBitstreamAccessConditionDTO;
 import org.dspace.app.rest.model.WorkspaceItemRest;
+import org.dspace.app.rest.model.step.DataCCLicense;
+import org.dspace.app.rest.model.step.DataUpload;
 import org.dspace.app.rest.model.step.UploadBitstreamRest;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.utils.ContextUtil;
@@ -32,6 +34,8 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Collection;
+import org.dspace.content.InProgressSubmission;
+import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.content.service.CollectionService;
@@ -40,6 +44,7 @@ import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.Utils;
+import org.dspace.license.service.CreativeCommonsService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.RequestService;
 import org.dspace.services.model.Request;
@@ -74,13 +79,17 @@ public class SubmissionService {
     @Autowired
     protected WorkflowService<XmlWorkflowItem> workflowService;
     @Autowired
+    protected CreativeCommonsService creativeCommonsService;
+    @Autowired
     private RequestService requestService;
     @Autowired
     private ConverterService converter;
+    @Autowired
+    private org.dspace.app.rest.utils.Utils utils;
 
     /**
-     * Create a workspaceitem using the information in the reqest
-     * 
+     * Create a workspaceitem using the information in the request
+     *
      * @param context
      *            the dspace context
      * @param request
@@ -133,9 +142,19 @@ public class SubmissionService {
         }
     }
 
-
+    /**
+     * Build the rest representation of a bitstream as used in the upload section
+     * ({@link DataUpload}. It contains all its metadata and the list of applied
+     * access conditions (@link {@link UploadBitstreamAccessConditionDTO}
+     *
+     * @param configurationService the DSpace ConfigurationService
+     * @param source               the bitstream to translate in its rest submission
+     *                             representation
+     * @return
+     * @throws SQLException
+     */
     public UploadBitstreamRest buildUploadBitstream(ConfigurationService configurationService, Bitstream source)
-        throws SQLException {
+            throws SQLException {
         UploadBitstreamRest data = new UploadBitstreamRest();
 
         for (MetadataValue md : source.getMetadata()) {
@@ -162,14 +181,14 @@ public class SubmissionService {
             }
 
         }
-
+        Projection projection = utils.obtainProjection();
         HttpServletRequest request = requestService.getCurrentRequest().getHttpServletRequest();
-        data.setFormat(converter.toRest(source.getFormat(ContextUtil.obtainContext(request)), Projection.DEFAULT));
+        data.setFormat(converter.toRest(source.getFormat(ContextUtil.obtainContext(request)), projection));
 
         for (ResourcePolicy rp : source.getResourcePolicies()) {
             if (ResourcePolicy.TYPE_CUSTOM.equals(rp.getRpType())) {
-                ResourcePolicyRest resourcePolicyRest = converter.toRest(rp, Projection.DEFAULT);
-                data.getAccessConditions().add(resourcePolicyRest);
+                UploadBitstreamAccessConditionDTO uploadAccessCondition = createAccessConditionFromResourcePolicy(rp);
+                data.getAccessConditions().add(uploadAccessCondition);
             }
         }
 
@@ -179,14 +198,14 @@ public class SubmissionService {
         checksum.setValue(source.getChecksum());
         data.setCheckSum(checksum);
         data.setSizeBytes(source.getSizeBytes());
-        data.setUrl(configurationService.getProperty("dspace.url") + "/api/" + BitstreamRest.CATEGORY + "/" + English
-            .plural(BitstreamRest.NAME) + "/" + source.getID() + "/content");
+        data.setUrl(configurationService.getProperty("dspace.server.url") + "/api/" + BitstreamRest.CATEGORY + "/" +
+                        English.plural(BitstreamRest.NAME) + "/" + source.getID() + "/content");
         return data;
     }
 
     /**
-     * Create a workflowitem using the information in the reqest
-     * 
+     * Create a workflowitem using the information in the request
+     *
      * @param context
      *            the dspace context
      * @param requestUriListString
@@ -219,7 +238,7 @@ public class SubmissionService {
         if (wsi == null) {
             throw new UnprocessableEntityException("Workspace item is not found");
         }
-        WorkspaceItemRest wsiRest = converter.toRest(wsi, Projection.DEFAULT);
+        WorkspaceItemRest wsiRest = converter.toRest(wsi, utils.obtainProjection());
         if (!wsiRest.getErrors().isEmpty()) {
             throw new UnprocessableEntityException(
                     "Start workflow failed due to validation error on workspaceitem");
@@ -229,13 +248,53 @@ public class SubmissionService {
             wi = workflowService.start(context, wsi);
         } catch (IOException e) {
             throw new RuntimeException("The workflow could not be started for workspaceItem with" +
-                                           "id:  " + id);
+                                               "id:  " + id);
         }
 
         return wi;
     }
 
+    private UploadBitstreamAccessConditionDTO createAccessConditionFromResourcePolicy(ResourcePolicy rp) {
+        UploadBitstreamAccessConditionDTO accessCondition = new UploadBitstreamAccessConditionDTO();
+
+        accessCondition.setId(rp.getID());
+        accessCondition.setName(rp.getRpName());
+        accessCondition.setDescription(rp.getRpDescription());
+        accessCondition.setStartDate(rp.getStartDate());
+        accessCondition.setEndDate(rp.getEndDate());
+        if (rp.getGroup() != null) {
+            accessCondition.setGroupUUID(rp.getGroup().getID());
+        }
+        if (rp.getEPerson() != null) {
+            accessCondition.setEpersonUUID(rp.getEPerson().getID());
+        }
+        return accessCondition;
+    }
+
     public void saveWorkflowItem(Context context, XmlWorkflowItem source) throws SQLException, AuthorizeException {
         workflowItemService.update(context, source);
+    }
+
+    /**
+     * Builds the CC License data of an inprogress submission based on the cc license info present in the metadata
+     *
+     * @param obj   - the in progress submission
+     * @return an object representing the CC License data
+     * @throws SQLException
+     * @throws IOException
+     * @throws AuthorizeException
+     */
+    public DataCCLicense getDataCCLicense(InProgressSubmission obj)
+            throws SQLException, IOException, AuthorizeException {
+        DataCCLicense result = new DataCCLicense();
+        Item item = obj.getItem();
+
+        result.setUri(creativeCommonsService.getLicenseURI(item));
+        result.setRights(creativeCommonsService.getLicenseName(item));
+
+        Bitstream licenseRdfBitstream = creativeCommonsService.getLicenseRdfBitstream(item);
+        result.setFile(converter.toRest(licenseRdfBitstream, Projection.DEFAULT));
+
+        return result;
     }
 }

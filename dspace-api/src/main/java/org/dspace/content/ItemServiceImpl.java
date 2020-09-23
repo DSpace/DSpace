@@ -173,15 +173,6 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
     }
 
     @Override
-    /**
-     * This method is an alias of the find method needed to avoid ambiguity between the IndexableObjectService interface
-     * and the DSpaceObjectService interface
-     */
-    public Item findIndexableObject(Context context, UUID id) throws SQLException {
-        return find(context, id);
-    }
-
-    @Override
     public Item create(Context context, WorkspaceItem workspaceItem) throws SQLException, AuthorizeException {
         if (workspaceItem.getItem() != null) {
             throw new IllegalArgumentException(
@@ -675,15 +666,6 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
     @Override
     public int getSupportsTypeConstant() {
         return Constants.ITEM;
-    }
-
-    @Override
-    /**
-     * This method is an alias of the getSupportsTypeConstant method needed to avoid ambiguity between the
-     * IndexableObjectService interface and the DSpaceObjectService interface
-     */
-    public int getSupportsIndexableObjectTypeConstant() {
-        return getSupportsTypeConstant();
     }
 
     protected void rawDelete(Context context, Item item) throws AuthorizeException, SQLException, IOException {
@@ -1388,6 +1370,32 @@ prevent the generation of resource policy entry values with null dspace_object a
             return finalList;
         }
 
+    }
+
+    /**
+     * Supports moving metadata by adding the metadata value or updating the place of the relationship
+     */
+    @Override
+    protected void moveSingleMetadataValue(Context context, Item dso, int place, MetadataValue rr) {
+        if (rr instanceof RelationshipMetadataValue) {
+            try {
+                //Retrieve the applicable relationship
+                Relationship rs = relationshipService.find(context,
+                        ((RelationshipMetadataValue) rr).getRelationshipId());
+                if (rs.getLeftItem() == dso) {
+                    rs.setLeftPlace(place);
+                } else {
+                    rs.setRightPlace(place);
+                }
+                relationshipService.update(context, rs);
+            } catch (Exception e) {
+                //should not occur, otherwise metadata can't be updated either
+                log.error("An error occurred while moving " + rr.getAuthority() + " for item " + dso.getID(), e);
+            }
+        } else {
+            //just move the metadata
+            rr.setPlace(place);
+        }
     }
 
     /**

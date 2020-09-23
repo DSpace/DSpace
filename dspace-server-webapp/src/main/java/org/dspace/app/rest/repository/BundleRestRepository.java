@@ -23,8 +23,6 @@ import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.BitstreamRest;
 import org.dspace.app.rest.model.BundleRest;
 import org.dspace.app.rest.model.patch.Patch;
-import org.dspace.app.rest.projection.Projection;
-import org.dspace.app.rest.repository.patch.BundlePatch;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Bitstream;
@@ -71,16 +69,16 @@ public class BundleRestRepository extends DSpaceObjectRestRepository<Bundle, Bun
     @Autowired
     private BitstreamFormatService bitstreamFormatService;
 
-    public BundleRestRepository(BundleService dsoService, BundlePatch dsoPatch) {
-        super(dsoService, dsoPatch);
+    public BundleRestRepository(BundleService dsoService) {
+        super(dsoService);
         this.bundleService = dsoService;
     }
 
-    @PreAuthorize("hasPermission(#uuid, 'BUNDLE', 'READ')")
-    public BundleRest findOne(Context context, UUID uuid) {
+    @PreAuthorize("hasPermission(#id, 'BUNDLE', 'READ')")
+    public BundleRest findOne(Context context, UUID id) {
         Bundle bundle = null;
         try {
-            bundle = bundleService.find(context, uuid);
+            bundle = bundleService.find(context, id);
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -151,7 +149,7 @@ public class BundleRestRepository extends DSpaceObjectRestRepository<Bundle, Bun
             throw new RuntimeException(message, e);
         }
 
-        return converter.toRest(bitstream, Projection.DEFAULT);
+        return converter.toRest(bitstream, utils.obtainProjection());
     }
 
     /**
