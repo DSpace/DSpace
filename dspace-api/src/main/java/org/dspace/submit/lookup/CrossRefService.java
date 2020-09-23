@@ -99,6 +99,9 @@ public class CrossRefService {
                             factory.setValidating(false);
                             factory.setIgnoringComments(true);
                             factory.setIgnoringElementContentWhitespace(true);
+                            // disallow DTD parsing to ensure no XXE attacks can occur.
+                            // See https://cheatsheetseries.owasp.org/cheatsheets/XML_External_Entity_Prevention_Cheat_Sheet.html
+                            factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
 
                             DocumentBuilder db = factory
                                 .newDocumentBuilder();

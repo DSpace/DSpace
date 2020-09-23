@@ -48,10 +48,10 @@ public interface ChoiceAuthorityService {
      * @param element   element of metadata field
      * @param qualifier qualifier of metadata field
      * @return the name of the choice authority associated with the specified
-     * metadata. Throw IllegalArgumentException if the supplied metadat
+     * metadata. Throw IllegalArgumentException if the supplied metadata
      * is not associated with an authority choice
      */
-    public String getChoiceAuthorityName(String schema, String element, String qualifier);
+    public String getChoiceAuthorityName(String schema, String element, String qualifier, Collection collection);
 
     /**
      * Wrapper that calls getMatches method of the plugin corresponding to
@@ -112,30 +112,33 @@ public interface ChoiceAuthorityService {
      * the metadata field defined by schema,element,qualifier.
      *
      * @param metadataValue metadata value
+     * @param collection Collection owner of Item
      * @param locale        explicit localization key if available
      * @return label
      */
-    public String getLabel(MetadataValue metadataValue, String locale);
+    public String getLabel(MetadataValue metadataValue, Collection collection, String locale);
 
     /**
      * Wrapper that calls getLabel method of the plugin corresponding to
      * the metadata field defined by single field key.
      *
      * @param fieldKey single string identifying metadata field
+     * @param collection Collection owner of Item
      * @param locale   explicit localization key if available
      * @param authKey  authority key
      * @return label
      */
-    public String getLabel(String fieldKey, String authKey, String locale);
+    public String getLabel(String fieldKey, Collection collection, String authKey, String locale);
 
     /**
      * Predicate, is there a Choices configuration of any kind for the
      * given metadata field?
      *
      * @param fieldKey single string identifying metadata field
+     * @param collection Collection owner of Item
      * @return true if choices are configured for this field.
      */
-    public boolean isChoicesConfigured(String fieldKey);
+    public boolean isChoicesConfigured(String fieldKey, Collection collection);
 
     /**
      * Get the presentation keyword (should be "lookup", "select" or "suggest", but this
@@ -160,12 +163,14 @@ public interface ChoiceAuthorityService {
      * @param metadataValue metadata value
      * @return List of variants
      */
-    public List<String> getVariants(MetadataValue metadataValue);
+    public List<String> getVariants(MetadataValue metadataValue, Collection collection);
 
-    public String getChoiceMetadatabyAuthorityName(String name);
-
-    public Choice getChoice(String fieldKey, String authKey, String locale);
-
+    /**
+     * Return the ChoiceAuthority instance identified by the specified name
+     * 
+     * @param authorityName the ChoiceAuthority instance name
+     * @return the ChoiceAuthority identified by the specified name
+     */
     public ChoiceAuthority getChoiceAuthorityByAuthorityName(String authorityName);
 
     /**
@@ -173,4 +178,49 @@ public interface ChoiceAuthorityService {
      */
     public void clearCache();
 
+    /**
+     * Should we store the authority key (if any) for such field key and collection?
+     * 
+     * @param fieldKey   single string identifying metadata field
+     * @param collection Collection owner of Item or where the item is submitted to
+     * @return true if the configuration allows to store the authority value
+     */
+    public boolean storeAuthority(String fieldKey, Collection collection);
+
+    /**
+     * Wrapper that calls getChoicesByParent method of the plugin.
+     *
+     * @param authorityName authority name
+     * @param parentId      parent Id
+     * @param start         choice at which to start, 0 is first.
+     * @param limit         maximum number of choices to return, 0 for no limit.
+     * @param locale        explicit localization key if available, or null
+     * @return a Choices object (never null).
+     * @see org.dspace.content.authority.ChoiceAuthority#getChoicesByParent(java.lang.String, java.lang.String,
+     *  int, int, java.lang.String)
+     */
+    public Choices getChoicesByParent(String authorityName, String parentId, int start, int limit, String locale);
+
+    /**
+     * Wrapper that calls getTopChoices method of the plugin.
+     *
+     * @param authorityName authority name
+     * @param start         choice at which to start, 0 is first.
+     * @param limit         maximum number of choices to return, 0 for no limit.
+     * @param locale        explicit localization key if available, or null
+     * @return a Choices object (never null).
+     * @see org.dspace.content.authority.ChoiceAuthority#getTopChoices(java.lang.String, int, int, java.lang.String)
+     */
+    public Choices getTopChoices(String authorityName, int start, int limit, String locale);
+
+    /**
+     * Return the direct parent of an entry identified by its id in an hierarchical
+     * authority.
+     * 
+     * @param authorityName authority name
+     * @param vocabularyId  child id
+     * @param locale        explicit localization key if available, or null
+     * @return the parent Choice object if any
+     */
+    public Choice getParentChoice(String authorityName, String vocabularyId, String locale);
 }

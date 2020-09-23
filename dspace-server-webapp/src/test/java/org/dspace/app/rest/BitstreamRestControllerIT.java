@@ -11,13 +11,9 @@ import static java.util.UUID.randomUUID;
 import static org.apache.commons.codec.CharEncoding.UTF_8;
 import static org.apache.commons.collections.CollectionUtils.isEmpty;
 import static org.apache.commons.io.IOUtils.toInputStream;
-import static org.dspace.app.rest.builder.BitstreamBuilder.createBitstream;
-import static org.dspace.app.rest.builder.BitstreamFormatBuilder.createBitstreamFormat;
-import static org.dspace.app.rest.builder.CollectionBuilder.createCollection;
-import static org.dspace.app.rest.builder.CommunityBuilder.createCommunity;
-import static org.dspace.app.rest.builder.ItemBuilder.createItem;
-import static org.dspace.app.rest.builder.ResourcePolicyBuilder.createResourcePolicy;
 import static org.dspace.app.rest.matcher.BitstreamFormatMatcher.matchBitstreamFormat;
+import static org.dspace.builder.BitstreamFormatBuilder.createBitstreamFormat;
+import static org.dspace.builder.ResourcePolicyBuilder.createResourcePolicy;
 import static org.dspace.content.BitstreamFormat.KNOWN;
 import static org.dspace.content.BitstreamFormat.SUPPORTED;
 import static org.dspace.core.Constants.READ;
@@ -53,14 +49,14 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
 import org.apache.solr.client.solrj.SolrServerException;
-import org.dspace.app.rest.builder.BitstreamBuilder;
-import org.dspace.app.rest.builder.CollectionBuilder;
-import org.dspace.app.rest.builder.CommunityBuilder;
-import org.dspace.app.rest.builder.EPersonBuilder;
-import org.dspace.app.rest.builder.GroupBuilder;
-import org.dspace.app.rest.builder.ItemBuilder;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.authorize.service.ResourcePolicyService;
+import org.dspace.builder.BitstreamBuilder;
+import org.dspace.builder.CollectionBuilder;
+import org.dspace.builder.CommunityBuilder;
+import org.dspace.builder.EPersonBuilder;
+import org.dspace.builder.GroupBuilder;
+import org.dspace.builder.ItemBuilder;
 import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
 import org.dspace.content.Collection;
@@ -129,22 +125,22 @@ public class BitstreamRestControllerIT extends AbstractControllerIntegrationTest
 
         context.turnOffAuthorisationSystem();
 
-        Community community = createCommunity(context).build();
-        Collection collection = createCollection(context, community).build();
-        Item item = createItem(context, collection).build();
+        Community community = CommunityBuilder.createCommunity(context).build();
+        Collection collection = CollectionBuilder.createCollection(context, community).build();
+        Item item = ItemBuilder.createItem(context, collection).build();
 
-        bitstream = createBitstream(context, item, toInputStream("test", UTF_8))
+        bitstream = BitstreamBuilder.createBitstream(context, item, toInputStream("test", UTF_8))
                 .withFormat("test format")
                 .build();
 
         unknownFormat = bitstreamFormatService.findUnknown(context);
 
         knownFormat = createBitstreamFormat(context)
-                .withMimeType("known test mime type")
-                .withDescription("known test description")
-                .withShortDescription("known test short description")
-                .withSupportLevel(KNOWN)
-                .build();
+                                            .withMimeType("known test mime type")
+                                            .withDescription("known test description")
+                                            .withShortDescription("known test short description")
+                                            .withSupportLevel(KNOWN)
+                                            .build();
 
         supportedFormat = createBitstreamFormat(context)
                 .withMimeType("supported mime type")
@@ -729,7 +725,7 @@ public class BitstreamRestControllerIT extends AbstractControllerIntegrationTest
 
         // Find all hits/views of bitstream
         ObjectCount objectCount = solrLoggerService.queryTotal("type:" + Constants.BITSTREAM +
-                                                               " AND id:" + bitstream.getID(), null);
+                                                               " AND id:" + bitstream.getID(), null, 1);
         assertEquals(expectedNumberOfStatsRecords, objectCount.getCount());
     }
 

@@ -48,7 +48,7 @@ public class AuthorizationFeatureRestRepository extends DSpaceRestRepository<Aut
         return converter.toRestPage(authorizationFeatureService.findAll(), pageable, utils.obtainProjection());
     }
 
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("permitAll()")
     @Override
     public AuthorizationFeatureRest findOne(Context context, String id) {
         AuthorizationFeature authzFeature = authorizationFeatureService.find(id);
