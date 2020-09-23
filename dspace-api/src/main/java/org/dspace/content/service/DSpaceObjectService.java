@@ -460,6 +460,24 @@ public interface DSpaceObjectService<T extends DSpaceObject> {
     public void setMetadataSingleValue(Context context, T dso, String schema, String element, String qualifier,
                                        String language, String value) throws SQLException;
 
+    /**
+     * Set first metadata field value
+     *
+     * @param context   DSpace context
+     * @param dso       DSpaceObject
+     * @param field     {schema, element, qualifier} for the desired field.
+     * @param language  the ISO639 language code, optionally followed by an underscore
+     *                  and the ISO3166 country code. <code>null</code> means only
+     *                  values with no language are removed, and <code>Item.ANY</code>
+     *                  means values with any country code or no country code are
+     *                  removed.
+     * @param value     metadata value
+     * @throws SQLException if database error
+     */
+    public void setMetadataSingleValue(Context context, T dso,
+            MetadataFieldName field, String language, String value)
+            throws SQLException;
+
     public void updateLastModified(Context context, T dso) throws SQLException, AuthorizeException;
 
     public void update(Context context, T dso) throws SQLException, AuthorizeException;

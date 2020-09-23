@@ -7,6 +7,8 @@
  */
 package org.dspace.content;
 
+import static org.dspace.content.service.DSpaceObjectService.MD_LICENSE;
+
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -47,7 +49,6 @@ import org.hibernate.proxy.HibernateProxyHelper;
  * effect.
  *
  * @author Robert Tansley
- * @version $Revision$
  */
 @Entity
 @Table(name = "collection")
@@ -88,7 +89,7 @@ public class Collection extends DSpaceObject implements DSpaceObjectLegacySuppor
         joinColumns = {@JoinColumn(name = "collection_id")},
         inverseJoinColumns = {@JoinColumn(name = "community_id")}
     )
-    private Set<Community> communities = new HashSet<>();
+    private final Set<Community> communities = new HashSet<>();
 
     @Transient
     private transient CollectionService collectionService;
@@ -230,7 +231,7 @@ public class Collection extends DSpaceObject implements DSpaceObjectLegacySuppor
      * @throws SQLException if database error
      */
     public void setLicense(Context context, String license) throws SQLException {
-        getCollectionService().setMetadata(context, this, "license", license);
+        getCollectionService().setMetadataSingleValue(context, this, MD_LICENSE, Item.ANY, license);
     }
 
     /**
