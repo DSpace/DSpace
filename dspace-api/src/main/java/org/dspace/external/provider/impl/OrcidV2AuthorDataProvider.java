@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -184,7 +185,9 @@ public class OrcidV2AuthorDataProvider implements ExternalDataProvider {
             throw new IllegalArgumentException("The maximum number of results to retrieve cannot exceed 100.");
         }
 
-        String searchPath = "search?q=" + URLEncoder.encode(query) + "&start=" + start + "&rows=" + limit;
+        String searchPath = "search?q=" + URLEncoder.encode(query, StandardCharsets.UTF_8)
+                + "&start=" + start
+                + "&rows=" + limit;
         log.debug("queryBio searchPath=" + searchPath + " accessToken=" + accessToken);
         InputStream bioDocument = orcidRestConnector.get(searchPath, accessToken);
         XMLtoBio converter = new XMLtoBio();
@@ -220,7 +223,9 @@ public class OrcidV2AuthorDataProvider implements ExternalDataProvider {
 
     @Override
     public int getNumberOfResults(String query) {
-        String searchPath = "search?q=" + URLEncoder.encode(query) + "&start=" + 0 + "&rows=" + 0;
+        String searchPath = "search?q=" + URLEncoder.encode(query, StandardCharsets.UTF_8)
+                + "&start=" + 0
+                + "&rows=" + 0;
         log.debug("queryBio searchPath=" + searchPath + " accessToken=" + accessToken);
         InputStream bioDocument = orcidRestConnector.get(searchPath, accessToken);
         XMLtoBio converter = new XMLtoBio();

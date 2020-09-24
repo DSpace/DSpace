@@ -18,6 +18,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
 import java.net.URI;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.SQLException;
@@ -1538,8 +1539,7 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
             String out = time + "," + "view_" + contentServiceFactory.getDSpaceObjectService(dso).getTypeText(dso)
                                                                      .toLowerCase() + "," + id + "," + outputDateFormat
                 .format(solrDate) + ",anonymous," + ip + "\n";
-            FileUtils.writeStringToFile(exportOutput, out, true);
-
+            FileUtils.writeStringToFile(exportOutput, out, StandardCharsets.UTF_8, true);
         }
     }
 

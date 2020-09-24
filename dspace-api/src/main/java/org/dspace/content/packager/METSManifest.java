@@ -64,7 +64,7 @@ import org.jdom.xpath.XPath;
  * <LI>Local XML schema (XSD) declarations, in the general format:
  * <br><code>mets.xsd.<em>identifier</em> = <em>namespace</em> <em>xsd-URL</em></code>
  * <br> eg. <code>mets.xsd.dc =  http://purl.org/dc/elements/1.1/ dc.xsd</code>
- * <br>Add a separate config entry for each schema.
+ * <br>Add a separate configuration entry for each schema.
  * </LI>
  * <LI>Crosswalk plugin mappings:
  * These tell it the name of the crosswalk plugin to invoke for metadata sections
@@ -217,7 +217,7 @@ public class METSManifest {
                         log.warn("Schema file not found for config entry=\"" + spec + "\"");
                     } else {
                         try {
-                            String u = xsd.toURL().toString();
+                            String u = xsd.toURI().toURL().toString();
                             if (result.length() > 0) {
                                 result.append(" ");
                             }
@@ -231,10 +231,7 @@ public class METSManifest {
                 }
             }
         }
-        localSchemas = result.toString();
-        if (log.isDebugEnabled()) {
-            log.debug("Got local schemas = \"" + localSchemas + "\"");
-        }
+        log.debug("Got local schemas = \"{}\"", () -> result.toString());
     }
 
     /**
