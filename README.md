@@ -113,10 +113,10 @@ run automatically by [Travis CI](https://travis-ci.com/DSpace/DSpace/) for all P
   ```
   # Run all integration tests in a specific test class
   # NOTE: failIfNoTests=false is required to skip tests in other modules
-  mvn install -DskipIntegrationTests=false -Dtest=[full.package.testClassName] -DfailIfNoTests=false
+  mvn install -DskipIntegrationTests=false -Dit.test=[full.package.testClassName] -DfailIfNoTests=false
 
   # Run one test method in a specific test class
-  mvn install -DskipIntegrationTests=false -Dtest=[full.package.testClassName]#[testMethodName] -DfailIfNoTests=false
+  mvn install -DskipIntegrationTests=false -Dit.test=[full.package.testClassName]#[testMethodName] -DfailIfNoTests=false
   ```
 * How to run only tests of a specific DSpace module
   ```
