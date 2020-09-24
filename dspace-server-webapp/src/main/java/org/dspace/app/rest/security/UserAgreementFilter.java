@@ -55,6 +55,7 @@ public class UserAgreementFilter extends OncePerRequestFilter {
         boolean filterEnabled = configurationService.getBooleanProperty("user-agreement.filter-enabled", false);
         if (!filterEnabled) {
             filterChain.doFilter(request, response);
+            return;
         }
 
         EPerson currentUser = context.getCurrentUser();
