@@ -21,10 +21,10 @@ import javax.xml.parsers.SAXParserFactory;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.utils.URIBuilder;
-import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.content.DCPersonName;
@@ -72,10 +72,12 @@ public class LCNameDataProvider implements ExternalDataProvider {
     protected static final String NS_MX = "http://www.loc.gov/MARC21/slim";
 
 
+    @Override
     public String getSourceIdentifier() {
         return sourceIdentifier;
     }
 
+    @Override
     public Optional<ExternalDataObject> getExternalDataObject(String id) {
 
         StringBuilder query = new StringBuilder();
@@ -138,8 +140,7 @@ public class LCNameDataProvider implements ExternalDataProvider {
 
         HttpGet get = constructHttpGet(query, start, limit);
         // 2. web request
-        try {
-            HttpClient hc = new DefaultHttpClient();
+        try (CloseableHttpClient hc = HttpClientBuilder.create().build()) {
             HttpResponse response = hc.execute(get);
             if (response.getStatusLine().getStatusCode() == 200) {
                 SRUHandler handler = parseResponseToSRUHandler(response);
@@ -147,7 +148,7 @@ public class LCNameDataProvider implements ExternalDataProvider {
                 // this probably just means more results available..
                 if (handler.hits != handler.result.size()) {
                     log.warn("Discrepency in results, result.length=" + handler.result.size() +
-                                 ", yet expected results=" + handler.hits);
+                            ", yet expected results=" + handler.hits);
                 }
                 return handler.result;
             }
@@ -166,6 +167,7 @@ public class LCNameDataProvider implements ExternalDataProvider {
         return Collections.EMPTY_LIST;
     }
 
+    @Override
     public boolean supports(String source) {
         return StringUtils.equalsIgnoreCase(sourceIdentifier, source);
     }
@@ -208,8 +210,7 @@ public class LCNameDataProvider implements ExternalDataProvider {
         HttpGet get = constructHttpGet(queryStringBuilder, 0, 1);
 
         // 2. web request
-        try {
-            HttpClient hc = new DefaultHttpClient();
+        try ( CloseableHttpClient hc = HttpClientBuilder.create().build(); ) {
             HttpResponse response = hc.execute(get);
             if (response.getStatusLine().getStatusCode() == 200) {
                 SRUHandler handler = parseResponseToSRUHandler(response);
@@ -253,8 +254,8 @@ public class LCNameDataProvider implements ExternalDataProvider {
      */
     private static class SRUHandler
         extends DefaultHandler {
-        private String sourceIdentifier;
-        private List<ExternalDataObject> result = new ArrayList<ExternalDataObject>();
+        private final String sourceIdentifier;
+        private List<ExternalDataObject> result = new ArrayList<>();
         private int hits = -1;
         private String textValue = null;
         private String name = null;
