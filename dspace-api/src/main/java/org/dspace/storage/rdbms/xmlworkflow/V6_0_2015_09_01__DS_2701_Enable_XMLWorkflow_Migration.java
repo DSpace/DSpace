@@ -14,7 +14,6 @@ import org.dspace.workflow.factory.WorkflowServiceFactory;
 import org.dspace.xmlworkflow.service.XmlWorkflowService;
 import org.flywaydb.core.api.migration.BaseJavaMigration;
 import org.flywaydb.core.api.migration.Context;
-import org.springframework.core.io.ClassPathResource;
 
 /**
  * This class automatically migrates your DSpace Database to use the
@@ -66,10 +65,8 @@ public class V6_0_2015_09_01__DS_2701_Enable_XMLWorkflow_Migration extends BaseJ
 
                 // Get the contents of our DB Schema migration script, based on path & DB type
                 // (e.g. /src/main/resources/[path-to-this-class]/postgres/xml_workflow_migration.sql)
-                String dbMigrateSQL = MigrationUtils.resourceToString(
-                    new ClassPathResource(packagePath + "/" + dbFileLocation +
-                                              "/v6.0__DS-2701_xml_workflow_migration.sql",
-                                          getClass().getClassLoader()));
+                String dbMigrateSQL = MigrationUtils.getResourceAsString(packagePath + "/" + dbFileLocation +
+                                              "/v6.0__DS-2701_xml_workflow_migration.sql");
 
                 // Actually execute the Database schema migration SQL
                 // This will create the necessary tables for the XMLWorkflow feature
@@ -77,10 +74,8 @@ public class V6_0_2015_09_01__DS_2701_Enable_XMLWorkflow_Migration extends BaseJ
 
                 // Get the contents of our data migration script, based on path & DB type
                 // (e.g. /src/main/resources/[path-to-this-class]/postgres/data_workflow_migration.sql)
-                String dataMigrateSQL = MigrationUtils.resourceToString(
-                    new ClassPathResource(packagePath + "/" + dbFileLocation +
-                                              "/v6.0__DS-2701_data_workflow_migration.sql",
-                                          getClass().getClassLoader()));
+                String dataMigrateSQL = MigrationUtils.getResourceAsString(packagePath + "/" + dbFileLocation +
+                                              "/v6.0__DS-2701_data_workflow_migration.sql");
 
                 // Actually execute the Data migration SQL
                 // This will migrate all existing traditional workflows to the new XMLWorkflow system & tables

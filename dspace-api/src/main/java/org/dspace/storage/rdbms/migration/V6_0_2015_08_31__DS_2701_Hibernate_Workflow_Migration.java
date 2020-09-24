@@ -10,7 +10,6 @@ package org.dspace.storage.rdbms.migration;
 import org.dspace.storage.rdbms.DatabaseUtils;
 import org.flywaydb.core.api.migration.BaseJavaMigration;
 import org.flywaydb.core.api.migration.Context;
-import org.springframework.core.io.ClassPathResource;
 
 /**
  * User: kevin (kevin at atmire.com)
@@ -36,15 +35,13 @@ public class V6_0_2015_08_31__DS_2701_Hibernate_Workflow_Migration extends BaseJ
         // scripts
         if (DatabaseUtils.tableExists(context.getConnection(), "cwf_workflowitem")) {
             // Get the contents of our data migration script, based on path & DB type
-            dataMigrateSQL = MigrationUtils.resourceToString(new ClassPathResource(sqlMigrationPath + "xmlworkflow" +
-                                                       "/V6.0_2015.08.11__DS-2701_Xml_Workflow_Migration.sql",
-                                                   getClass().getClassLoader()));
+            dataMigrateSQL = MigrationUtils.getResourceAsString(sqlMigrationPath + "xmlworkflow" +
+                                                       "/V6.0_2015.08.11__DS-2701_Xml_Workflow_Migration.sql");
         } else {
             //Migrate the basic workflow
             // Get the contents of our data migration script, based on path & DB type
-            dataMigrateSQL = MigrationUtils.resourceToString(new ClassPathResource(sqlMigrationPath + "basicWorkflow" +
-                                                       "/V6.0_2015.08.11__DS-2701_Basic_Workflow_Migration.sql",
-                                                   getClass().getClassLoader()));
+            dataMigrateSQL = MigrationUtils.getResourceAsString(sqlMigrationPath + "basicWorkflow" +
+                                                       "/V6.0_2015.08.11__DS-2701_Basic_Workflow_Migration.sql");
         }
 
         // Actually execute the Data migration SQL
