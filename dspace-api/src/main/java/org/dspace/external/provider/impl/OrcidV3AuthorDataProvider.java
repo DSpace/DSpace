@@ -17,6 +17,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import javax.annotation.PostConstruct;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpResponse;
@@ -56,7 +57,14 @@ public class OrcidV3AuthorDataProvider implements ExternalDataProvider {
 
     private String orcidUrl;
 
+    private XMLtoBio converter;
+
     public static final String ORCID_ID_SYNTAX = "\\d{4}-\\d{4}-\\d{4}-(\\d{3}X|\\d{4})";
+
+    @PostConstruct
+    private void setup() {
+        this.converter =  new XMLtoBio();
+    }
 
     @Override
     public String getSourceIdentifier() {
@@ -100,14 +108,6 @@ public class OrcidV3AuthorDataProvider implements ExternalDataProvider {
                 accessToken = (String) responseObject.get("access_token");
             }
         }
-    }
-
-    /**
-     * Makes an instance of the Orcidv3 class based on the provided parameters.
-     * This constructor is called through the spring bean initialization
-     */
-    private OrcidV3AuthorDataProvider(String url) {
-        this.orcidRestConnector = new OrcidRestConnector(url);
     }
 
     @Override
@@ -161,7 +161,6 @@ public class OrcidV3AuthorDataProvider implements ExternalDataProvider {
             return null;
         }
         InputStream bioDocument = orcidRestConnector.get(id + ((id.endsWith("/person")) ? "" : "/person"), accessToken);
-        XMLtoBio converter = new XMLtoBio();
         Person person = converter.convertSinglePerson(bioDocument);
         try {
             bioDocument.close();
@@ -189,7 +188,6 @@ public class OrcidV3AuthorDataProvider implements ExternalDataProvider {
         String searchPath = "search?q=" + URLEncoder.encode(query) + "&start=" + start + "&rows=" + limit;
         log.debug("queryBio searchPath=" + searchPath + " accessToken=" + accessToken);
         InputStream bioDocument = orcidRestConnector.get(searchPath, accessToken);
-        XMLtoBio converter = new XMLtoBio();
         List<Result> results = converter.convert(bioDocument);
         List<Person> bios = new LinkedList<>();
         for (Result result : results) {
@@ -225,7 +223,6 @@ public class OrcidV3AuthorDataProvider implements ExternalDataProvider {
         String searchPath = "search?q=" + URLEncoder.encode(query) + "&start=" + 0 + "&rows=" + 0;
         log.debug("queryBio searchPath=" + searchPath + " accessToken=" + accessToken);
         InputStream bioDocument = orcidRestConnector.get(searchPath, accessToken);
-        XMLtoBio converter = new XMLtoBio();
         return converter.getNumberOfResultsFromXml(bioDocument);
     }
 
@@ -278,5 +275,21 @@ public class OrcidV3AuthorDataProvider implements ExternalDataProvider {
      */
     public void setClientSecret(String clientSecret) {
         this.clientSecret = clientSecret;
+    }
+
+    public OrcidRestConnector getOrcidRestConnector() {
+        return orcidRestConnector;
+    }
+
+    public void setOrcidRestConnector(OrcidRestConnector orcidRestConnector) {
+        this.orcidRestConnector = orcidRestConnector;
+    }
+
+    public XMLtoBio getConverter() {
+        return converter;
+    }
+
+    public void setConverter(XMLtoBio converter) {
+        this.converter = converter;
     }
 }
