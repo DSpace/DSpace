@@ -22,7 +22,6 @@ import org.apache.commons.text.StringSubstitutor;
 import org.apache.logging.log4j.Logger;
 import org.dspace.storage.rdbms.migration.MigrationUtils;
 import org.flywaydb.core.Flyway;
-import org.springframework.core.io.ClassPathResource;
 
 /**
  * Utility class used to detect issues with the Flyway migration history table and attempt to correct/fix them.
@@ -93,8 +92,7 @@ public class FlywayUpgradeUtils {
                 log.info("Attempting to upgrade Flyway table '{}' using script at '{}'",
                          FLYWAY_TABLE, scriptPath);
                 // Load the Flyway v4.2.0 upgrade SQL script as a String
-                String flywayUpgradeSQL = MigrationUtils.resourceToString(
-                    new ClassPathResource(scriptPath, FlywayUpgradeUtils.class.getClassLoader()));
+                String flywayUpgradeSQL = MigrationUtils.getResourceAsString(scriptPath);
 
                 // As this Flyway upgrade SQL was borrowed from Flyway v4.2.0 directly, it contains some inline
                 // variables which need replacing, namely ${schema} and ${table} variables.

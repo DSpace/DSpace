@@ -10,7 +10,6 @@ package org.dspace.storage.rdbms.migration;
 import org.dspace.storage.rdbms.DatabaseUtils;
 import org.flywaydb.core.api.migration.BaseJavaMigration;
 import org.flywaydb.core.api.migration.Context;
-import org.springframework.core.io.ClassPathResource;
 
 public class V6_1_2017_01_03__DS_3431_Add_Policies_for_BasicWorkflow
     extends BaseJavaMigration {
@@ -35,9 +34,8 @@ public class V6_1_2017_01_03__DS_3431_Add_Policies_for_BasicWorkflow
         } else {
             //Migrate the basic workflow
             // Get the contents of our data migration script, based on path & DB type
-            dataMigrateSQL = MigrationUtils.resourceToString(
-                new ClassPathResource(sqlMigrationPath + "basicWorkflow" + "/V6.1_2017.01.03__DS-3431.sql",
-                                      getClass().getClassLoader()));
+            dataMigrateSQL = MigrationUtils.getResourceAsString(sqlMigrationPath + "basicWorkflow" +
+                                                                    "/V6.1_2017.01.03__DS-3431.sql");
         }
 
         // Actually execute the Data migration SQL

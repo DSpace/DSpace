@@ -12,7 +12,6 @@ import org.dspace.workflow.factory.WorkflowServiceFactory;
 import org.dspace.xmlworkflow.service.XmlWorkflowService;
 import org.flywaydb.core.api.migration.BaseJavaMigration;
 import org.flywaydb.core.api.migration.Context;
-import org.springframework.core.io.ClassPathResource;
 
 /**
  * This class automatically adding rptype to the resource policy created with a migration into XML-based Configurable
@@ -35,10 +34,8 @@ public class V7_0_2018_04_03__Upgrade_Workflow_Policy extends BaseJavaMigration 
                 String dbtype = DatabaseUtils.getDbType(context.getConnection());
 
                 String sqlMigrationPath = "org/dspace/storage/rdbms/sqlmigration/workflow/" + dbtype + "/";
-                String dataMigrateSQL = MigrationUtils.resourceToString(
-                    new ClassPathResource(sqlMigrationPath + "xmlworkflow" +
-                                              "/V7.0_2018.04.03__upgrade_workflow_policy.sql",
-                                          getClass().getClassLoader()));
+                String dataMigrateSQL = MigrationUtils.getResourceAsString(
+                    sqlMigrationPath + "xmlworkflow/V7.0_2018.04.03__upgrade_workflow_policy.sql");
 
                 // Actually execute the Data migration SQL
                 // This will migrate all existing traditional workflows to the new XMLWorkflow system & tables
