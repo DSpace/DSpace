@@ -7,8 +7,6 @@
  */
 package org.dspace.app.rest.model;
 
-import java.util.UUID;
-
 import org.dspace.app.rest.RestResourceController;
 
 /**
@@ -16,11 +14,18 @@ import org.dspace.app.rest.RestResourceController;
  * 
  * @author Danilo Di Nuzzo (danilo.dinuzzo at 4science.it)
  */
-public class EditItemRest extends AInprogressSubmissionRest<UUID> {
+@LinksRest(links = {
+        @LinkRest(
+                name = EditItemRest.MODE,
+                method = "getModes"
+        )
+})
+public class EditItemRest extends AInprogressSubmissionRest<String> {
 
     private static final long serialVersionUID = 964876735342568998L;
     public static final String NAME = "edititem";
-    public static final String CATEGORY = RestAddressableModel.SUBMISSION;
+    public static final String MODE = "modes";
+    public static final String CATEGORY = RestAddressableModel.CORE;
 
     @Override
     public String getCategory() {

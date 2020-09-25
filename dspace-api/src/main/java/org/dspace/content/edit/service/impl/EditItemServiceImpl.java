@@ -22,6 +22,8 @@ import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.content.dao.ItemDAO;
 import org.dspace.content.edit.EditItem;
+import org.dspace.content.edit.EditItemMode;
+import org.dspace.content.edit.service.EditItemModeService;
 import org.dspace.content.edit.service.EditItemService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
@@ -43,6 +45,9 @@ public class EditItemServiceImpl implements EditItemService {
 
     @Autowired(required = true)
     private ItemDAO itemDAO;
+
+    @Autowired(required = true)
+    private EditItemModeService modeService;
 
     /* (non-Javadoc)
      * @see org.dspace.content.service.InProgressSubmissionService#
@@ -131,6 +136,18 @@ public class EditItemServiceImpl implements EditItemService {
     @Override
     public EditItem find(Context context, UUID id) throws SQLException {
         return new EditItem(context, getItemService().find(context, id));
+    }
+
+    /* (non-Javadoc)
+     * @see org.dspace.content.edit.service.EditItemService#
+     * find(org.dspace.core.Context, java.util.UUID, java.lang.String)
+     */
+    @Override
+    public EditItem find(Context context, UUID id, String mode) throws SQLException {
+        EditItemMode editMode = modeService.findMode(context, id, mode);
+        return new EditItem(context,
+                getItemService().find(context, id),
+                editMode);
     }
 
 }

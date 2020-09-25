@@ -41,4 +41,6 @@ public interface EditItemService extends InProgressSubmissionService<EditItem> {
 
     public EditItem find(Context context, UUID id) throws SQLException;
 
+    public EditItem find(Context context, UUID id, String mode) throws SQLException;
+
 }

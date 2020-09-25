@@ -8,7 +8,6 @@
 package org.dspace.content.edit;
 
 import java.sql.SQLException;
-import java.util.UUID;
 
 import org.dspace.content.Collection;
 import org.dspace.content.InProgressSubmission;
@@ -22,10 +21,10 @@ import org.dspace.eperson.EPerson;
  * @author Danilo Di Nuzzo (danilo.dinuzzo at 4science.it)
  *
  */
-public class EditItem implements InProgressSubmission<UUID> {
+public class EditItem implements InProgressSubmission<String> {
 
     private Item item;
-
+    private EditItemMode mode;
     private Context context;
 
     public EditItem(Context context, Item item) {
@@ -33,12 +32,18 @@ public class EditItem implements InProgressSubmission<UUID> {
         this.item = item;
     }
 
+    public EditItem(Context context, Item item, EditItemMode mode) {
+        this.context = context;
+        this.item = item;
+        this.mode = mode;
+    }
+
     /* (non-Javadoc)
      * @see org.dspace.content.InProgressSubmission#getID()
      */
     @Override
-    public UUID getID() {
-        return item.getID();
+    public String getID() {
+        return item.getID().toString();
     }
 
     /* (non-Javadoc)
@@ -116,6 +121,14 @@ public class EditItem implements InProgressSubmission<UUID> {
      */
     @Override
     public void setPublishedBefore(boolean b) {
+    }
+
+    public EditItemMode getMode() {
+        return mode;
+    }
+
+    public void setMode(EditItemMode mode) {
+        this.mode = mode;
     }
 
 }

@@ -33,6 +33,7 @@ import org.dspace.app.util.SubmissionStepConfig;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.edit.EditItem;
+import org.dspace.content.edit.EditItemMode;
 import org.dspace.content.edit.service.EditItemService;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
@@ -40,6 +41,7 @@ import org.dspace.eperson.EPersonServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
@@ -50,7 +52,7 @@ import org.springframework.web.multipart.MultipartFile;
  * @author Danilo Di Nuzzo (danilo.dinuzzo at 4science.it)
  */
 @Component(EditItemRest.CATEGORY + "." + EditItemRest.NAME)
-public class EditItemRestRepository extends DSpaceRestRepository<EditItemRest, UUID> {
+public class EditItemRestRepository extends DSpaceRestRepository<EditItemRest, String> {
 
     private static final Logger log = Logger.getLogger(EditItemRestRepository.class);
 
@@ -78,10 +80,30 @@ public class EditItemRestRepository extends DSpaceRestRepository<EditItemRest, U
      * @see org.dspace.app.rest.repository.DSpaceRestRepository#findOne(org.dspace.core.Context, java.io.Serializable)
      */
     @Override
-    public EditItemRest findOne(Context context, UUID id) {
+    public EditItemRest findOne(Context context, String data) {
         EditItem editItem = null;
         try {
-            editItem = eis.find(context, id);
+            String uuid = null;
+            String modeName = null;
+            String[] values = data.split(":");
+            if (values != null && values.length == 2) {
+                uuid = values[0];
+                modeName = values[1];
+            } else {
+                throw new DSpaceBadRequestException(
+                        "Given parameters are incomplete. Expected <UUID-ITEM>:<MODE>, Received: " + data);
+            }
+            editItem = eis.find(
+                    context,
+                    UUID.fromString(uuid),
+                    modeName);
+            if (editItem != null
+                    && !modeName.equalsIgnoreCase(EditItemMode.NONE)
+                    && editItem.getMode() == null) {
+                // The user is not allowed to give edit mode, return 403
+                throw new AccessDeniedException(
+                        "The current user does not have rights to edit mode <" + modeName + ">");
+            }
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -122,10 +144,18 @@ public class EditItemRestRepository extends DSpaceRestRepository<EditItemRest, U
     }
 
     @Override
-    protected void delete(Context context, UUID id) {
+    protected void delete(Context context, String data) {
         EditItem source = null;
         try {
-            source = eis.find(context, id);
+            String uuid = null;
+            String[] values = data.split(":");
+            if (values != null && values.length > 0) {
+                uuid = values[0];
+            } else {
+                throw new DSpaceBadRequestException(
+                        "Data: " + data);
+            }
+            source = eis.find(context, UUID.fromString(uuid));
             if (!authorizeService.isAdmin(context) && !eis.getItemService().canEdit(context, source.getItem())) {
                 throw new AuthorizeException("Unauthorized attempt to edit ItemID " + source.getItem().getID());
             }
@@ -138,15 +168,33 @@ public class EditItemRestRepository extends DSpaceRestRepository<EditItemRest, U
 
     @PreAuthorize("hasPermission(#id, 'WORKSPACEITEM', 'WRITE')")
     @Override
-    public EditItemRest upload(HttpServletRequest request, String apiCategory, String model, UUID id,
+    public EditItemRest upload(HttpServletRequest request, String apiCategory, String model, String data,
                                     MultipartFile file) throws SQLException {
 
+        String uuid = null;
+        String modeName = null;
+        String[] values = data.split(":");
+        if (values != null && values.length == 2) {
+            uuid = values[0];
+            modeName = values[1];
+        } else {
+            throw new DSpaceBadRequestException(
+                    "Given parameters are incomplete. Expected <UUID-ITEM>:<MODE>, Received: " + data);
+        }
         Context context = obtainContext();
-        EditItemRest eir = findOne(context, id);
-        EditItem source = eis.find(context, id);
+        EditItemRest eir = findOne(context, data);
+        EditItem source = eis.find(context, UUID.fromString(uuid), modeName);
+
+        if (source != null && source.getMode() == null) {
+            // The user is not allowed to give edit mode, return 403
+            throw new AccessDeniedException(
+                    "The current user does not have rights to edit mode <" + modeName + ">");
+        }
+
         List<ErrorRest> errors = new ArrayList<ErrorRest>();
         SubmissionConfig submissionConfig =
-            submissionConfigReader.getSubmissionConfigByName(eir.getSubmissionDefinition().getName());
+            submissionConfigReader.getSubmissionConfigByName(source.getMode().getSubmissionDefinition());
+        context.turnOffAuthorisationSystem();
         for (int i = 0; i < submissionConfig.getNumberOfSteps(); i++) {
             SubmissionStepConfig stepConfig = submissionConfig.getStep(i);
 
@@ -185,21 +233,34 @@ public class EditItemRestRepository extends DSpaceRestRepository<EditItemRest, U
         }
 
         context.commit();
+        context.restoreAuthSystemState();
         return eir;
     }
 
     @Override
-    public void patch(Context context, HttpServletRequest request, String apiCategory, String model, UUID id,
+    public void patch(Context context, HttpServletRequest request, String apiCategory, String model, String data,
                       Patch patch) throws SQLException, AuthorizeException {
         List<Operation> operations = patch.getOperations();
 
-        EditItem source = eis.find(context, id);
-        if (!authorizeService.isAdmin(context) && !eis.getItemService().canEdit(context, source.getItem())) {
-            throw new AuthorizeException("Unauthorized attempt to edit ItemID " + source.getItem().getID());
+        String uuid = null;
+        String modeName = null;
+        String[] values = data.split(":");
+        if (values != null && values.length > 0) {
+            uuid = values[0];
+            modeName = values[1];
+        } else {
+            throw new DSpaceBadRequestException(
+                    "Data: " + data);
+        }
+        EditItem source = eis.find(context, UUID.fromString(uuid));
+        if (source != null && source.getMode() == null) {
+            // The user is not allowed to give edit mode, return 403
+            throw new AccessDeniedException(
+                    "The current user does not have rights to edit mode <" + modeName + ">");
         }
         context.turnOffAuthorisationSystem();
 
-        EditItemRest eir = findOne(context, id);
+        EditItemRest eir = findOne(context, data);
         for (Operation op : operations) {
             // the value in the position 0 is a null value
             String[] path = op.getPath().substring(1).split("/", 3);
@@ -212,6 +273,7 @@ public class EditItemRestRepository extends DSpaceRestRepository<EditItemRest, U
             }
         }
         eis.update(context, source);
+        context.restoreAuthSystemState();
     }
 
     private void evaluatePatch(Context context, HttpServletRequest request, EditItem source, EditItemRest eir,

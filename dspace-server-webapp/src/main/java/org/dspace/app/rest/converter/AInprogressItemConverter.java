@@ -116,7 +116,7 @@ public abstract class AInprogressItemConverter<T extends InProgressSubmission,
         }
     }
 
-    private void addError(List<ErrorRest> errors, ErrorRest toAdd) {
+    protected void addError(List<ErrorRest> errors, ErrorRest toAdd) {
 
         boolean found = false;
         String i18nKey = toAdd.getMessage();

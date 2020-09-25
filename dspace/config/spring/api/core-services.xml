@@ -147,7 +147,5 @@
     
     <bean class="org.dspace.app.orcid.service.impl.OrcidQueueServiceImpl" />
     <bean class="org.dspace.app.orcid.service.impl.OrcidHistoryServiceImpl" />
-
-    <bean class="org.dspace.content.edit.service.impl.EditItemServiceImpl"/>
 </beans>
 
