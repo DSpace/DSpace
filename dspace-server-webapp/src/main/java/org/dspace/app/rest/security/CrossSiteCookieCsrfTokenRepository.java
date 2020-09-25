@@ -94,12 +94,17 @@ public class CrossSiteCookieCsrfTokenRepository implements CsrfTokenRepository {
             cookie.setDomain(this.cookieDomain);
         }
 
-        // Custom: Turn the above Cookie into a ResponseCookie so that we can set "SameSite"
-        // & hardcode "SameSite=None" to allow this cookie to be used cross site.
+        // Custom: Turn the above Cookie into a ResponseCookie so that we can set "SameSite" attribute
+        // NOTE: ONLY set "SameSite=None" if cookie is also secure. Most modern browsers will block it otherwise.
+        // This means that DSpace MUST USE HTTPS if the UI is on a different domain then backend.
+        String sameSite = "";
+        if (cookie.getSecure()) {
+            sameSite = "None";
+        }
         ResponseCookie responseCookie = ResponseCookie.from(cookie.getName(), cookie.getValue())
                                               .path(cookie.getPath()).maxAge(cookie.getMaxAge())
                                               .domain(cookie.getDomain()).httpOnly(cookie.isHttpOnly())
-                                              .secure(cookie.getSecure()).sameSite("None").build();
+                                              .secure(cookie.getSecure()).sameSite(sameSite).build();
         // Write the ResponseCookie to the Set-Cookie header
         response.addHeader(HttpHeaders.SET_COOKIE, responseCookie.toString());
     }

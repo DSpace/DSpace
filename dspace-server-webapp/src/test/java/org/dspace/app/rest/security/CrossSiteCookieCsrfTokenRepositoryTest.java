@@ -27,7 +27,7 @@ import org.springframework.security.web.csrf.CsrfToken;
  *
  * The only modifications are:
  *   - Updating these tests to use our custom CrossSiteCookieCsrfTokenRepository
- *   - Updating the saveToken() test, where we check for our custom SameSite attribute.
+ *   - Updating the saveTokenSecure() test, where we check for our custom SameSite attribute.
  */
 @RunWith(MockitoJUnitRunner.class)
 public class CrossSiteCookieCsrfTokenRepositoryTest {
@@ -85,12 +85,6 @@ public class CrossSiteCookieCsrfTokenRepositoryTest {
         assertThat(tokenCookie.getSecure()).isEqualTo(this.request.isSecure());
         assertThat(tokenCookie.getValue()).isEqualTo(token.getToken());
         assertThat(tokenCookie.isHttpOnly()).isEqualTo(true);
-        // DSpace Custom assert to verify SameSite attribute is set
-        // The Cookie class doesn't yet support SameSite, so we have to re-read
-        // the cookie from our headers, and check it.
-        List<String> headers = this.response.getHeaders(HttpHeaders.SET_COOKIE);
-        assertThat(headers.size()).isEqualTo(1);
-        assertThat(headers.get(0)).containsIgnoringCase("SameSite=None");
     }
 
     @Test
@@ -103,6 +97,12 @@ public class CrossSiteCookieCsrfTokenRepositoryTest {
             .getCookie(CrossSiteCookieCsrfTokenRepository.DEFAULT_CSRF_COOKIE_NAME);
 
         assertThat(tokenCookie.getSecure()).isTrue();
+        // DSpace Custom assert to verify SameSite attribute is set
+        // The Cookie class doesn't yet support SameSite, so we have to re-read
+        // the cookie from our headers, and check it.
+        List<String> headers = this.response.getHeaders(HttpHeaders.SET_COOKIE);
+        assertThat(headers.size()).isEqualTo(1);
+        assertThat(headers.get(0)).containsIgnoringCase("SameSite=None");
     }
 
     @Test
