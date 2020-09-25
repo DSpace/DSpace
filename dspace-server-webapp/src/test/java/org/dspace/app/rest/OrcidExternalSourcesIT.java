@@ -19,6 +19,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.http.ProtocolVersion;
 import org.apache.http.client.HttpClient;
 import org.apache.http.entity.BasicHttpEntity;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicHttpResponse;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.external.OrcidRestConnector;
@@ -180,5 +181,8 @@ public class OrcidExternalSourcesIT extends AbstractControllerIntegrationTest {
                            hasJsonPath("$.externalSource", is("orcid")),
                            hasJsonPath("$.type", is("externalSourceEntry"))
                            )));
+
+        orcidV3AuthorDataProvider.setConverter(new XMLtoBio());
+        orcidRestConnector.setHttpClient(HttpClientBuilder.create().build());
     }
 }
