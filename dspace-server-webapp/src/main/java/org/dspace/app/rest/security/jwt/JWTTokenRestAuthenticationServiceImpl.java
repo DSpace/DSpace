@@ -15,6 +15,7 @@ import java.util.List;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.core.HttpHeaders;
 
 import com.nimbusds.jose.JOSEException;
 import org.apache.commons.lang3.StringUtils;
@@ -32,6 +33,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Component;
 
 /**
@@ -151,11 +153,12 @@ public class JWTTokenRestAuthenticationServiceImpl implements RestAuthentication
 
     @Override
     public void invalidateAuthenticationCookie(HttpServletResponse response) {
-        Cookie cookie = new Cookie(AUTHORIZATION_COOKIE, "");
-        cookie.setHttpOnly(true);
-        cookie.setMaxAge(0);
-        cookie.setSecure(true);
-        response.addCookie(cookie);
+        // Re-send the same cookie (as addTokenToResponse()) with no value and a Max-Age of 0 seconds
+        ResponseCookie cookie = ResponseCookie.from(AUTHORIZATION_COOKIE, "")
+                                              .maxAge(0).httpOnly(true).secure(true).sameSite("None").build();
+
+        // Write the cookie to the Set-Cookie header in order to send it
+        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
     }
 
     @Override
@@ -190,14 +193,28 @@ public class JWTTokenRestAuthenticationServiceImpl implements RestAuthentication
         return wwwAuthenticate.toString();
     }
 
-    private void addTokenToResponse(final HttpServletResponse response, final String token, final Boolean addCookie)
-            throws IOException {
+    /**
+     * Adds the Authentication token (JWT) to the response either in a header (default) or in a cookie.
+     * <P>
+     * If 'addCookie' is true, then the JWT is also added to a response cookie. This is primarily for support of auth
+     * plugins which _require_ cookie-based auth (e.g. Shibboleth). Note that this cookie can be used cross-site
+     * (i.e. SameSite=None), but cannot be used by Javascript (HttpOnly) including the Angular UI. It also will only be
+     * sent via HTTPS (Secure).
+     * <P>
+     * If 'addCookie' is false, then the JWT is only added in the Authorization header. This is recommended behavior
+     * as it is the most secure. For the UI (or any JS clients) the JWT must be sent in the Authorization header.
+     * @param response current response
+     * @param token the authentication token
+     * @param addCookie whether to send token in a cookie (true) or header (false)
+     */
+    private void addTokenToResponse(final HttpServletResponse response, final String token, final Boolean addCookie) {
         // we need authentication cookies because Shibboleth can't use the authentication headers due to the redirects
         if (addCookie) {
-            Cookie cookie = new Cookie(AUTHORIZATION_COOKIE, token);
-            cookie.setHttpOnly(true);
-            cookie.setSecure(true);
-            response.addCookie(cookie);
+            ResponseCookie cookie = ResponseCookie.from(AUTHORIZATION_COOKIE, token)
+                                                  .httpOnly(true).secure(true).sameSite("None").build();
+
+            // Write the cookie to the Set-Cookie header in order to send it
+            response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
         }
         response.setHeader(AUTHORIZATION_HEADER, String.format("%s %s", AUTHORIZATION_TYPE, token));
     }
