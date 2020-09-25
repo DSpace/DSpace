@@ -14,15 +14,15 @@ import java.util.UUID;
 import org.apache.log4j.Logger;
 import org.dspace.app.rest.authorization.AuthorizationFeature;
 import org.dspace.app.rest.authorization.AuthorizationFeatureDocumentation;
-import org.dspace.app.rest.authorization.AuthorizeServiceRestUtil;
 import org.dspace.app.rest.model.BaseObjectRest;
 import org.dspace.app.rest.model.BitstreamRest;
 import org.dspace.app.rest.model.ItemRest;
-import org.dspace.app.rest.security.DSpaceRestPermission;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
+import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
+import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -30,9 +30,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
- * The create bitstream feature. It can be used to verify if bitstreams can be created in a specific bundle.
+ * The can request a copy feature. It can be used to verify if a copy can be requested of a bitstream or of a bitstream
+ * in an item.
  *
- * Authorization is granted if the current user has ADD & WRITE permissions on the given bundle AND the item
+ * Authorization is granted for a bitstream if the user has no access to the bitstream
+ * and the bistream is part of an archived item.
+ * Authorization is granted for an item if the user has no access to a bitstream in the item, and the item is archived.
  */
 @Component
 @AuthorizationFeatureDocumentation(name = RequestCopyFeature.NAME,
@@ -44,12 +47,13 @@ public class RequestCopyFeature implements AuthorizationFeature {
     public final static String NAME = "canRequestACopy";
 
     @Autowired
-    private AuthorizeServiceRestUtil authorizeServiceRestUtil;
-    @Autowired
     private AuthorizeService authorizeService;
 
     @Autowired
     private ItemService itemService;
+
+    @Autowired
+    private BitstreamService bitstreamService;
 
     @Override
     public boolean isAuthorized(Context context, BaseObjectRest object) throws SQLException {
@@ -57,6 +61,9 @@ public class RequestCopyFeature implements AuthorizationFeature {
             ItemRest itemRest = (ItemRest) object;
             String id = itemRest.getId();
             Item item = itemService.find(context, UUID.fromString(id));
+            if (!item.isArchived()) {
+                return false;
+            }
             List<Bundle> bunds = item.getBundles();
 
             for (Bundle bund : bunds) {
@@ -69,7 +76,15 @@ public class RequestCopyFeature implements AuthorizationFeature {
                 }
             }
         } else if (object instanceof BitstreamRest) {
-            return !authorizeServiceRestUtil.authorizeActionBoolean(context, object, DSpaceRestPermission.READ);
+            BitstreamRest bitstreamRest = (BitstreamRest) object;
+            Bitstream bitstream = bitstreamService.find(context, UUID.fromString(bitstreamRest.getId()));
+
+            DSpaceObject parentObject = bitstreamService.getParentObject(context, bitstream);
+            if (parentObject instanceof Item) {
+                if (((Item) parentObject).isArchived()) {
+                    return !authorizeService.authorizeActionBoolean(context, bitstream, Constants.READ);
+                }
+            }
         }
         return false;
     }
