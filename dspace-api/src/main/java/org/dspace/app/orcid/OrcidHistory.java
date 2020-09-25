@@ -56,6 +56,17 @@ public class OrcidHistory implements ReloadableEntity<Integer> {
     @Column(name = "timestamp_success_attempt")
     private Date successAttempt;
 
+    @Column(name = "status")
+    private Integer status;
+
+    public Integer getStatus() {
+        return status;
+    }
+
+    public void setStatus(Integer status) {
+        this.status = status;
+    }
+
     public Integer getId() {
         return id;
     }
