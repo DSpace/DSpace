@@ -8,7 +8,7 @@
 package org.dspace.app.orcid.service.impl;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static org.orcid.jaxb.model.common_v2.Iso3166Country.fromValue;
+import static org.orcid.jaxb.model.utils.Iso3166Country.fromValue;
 
 import java.io.StringWriter;
 import java.math.BigInteger;
@@ -41,18 +41,18 @@ import org.dspace.content.MetadataValue;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.services.ConfigurationService;
-import org.orcid.jaxb.model.common_v2.ExternalId;
-import org.orcid.jaxb.model.common_v2.ExternalIds;
-import org.orcid.jaxb.model.common_v2.Iso3166Country;
-import org.orcid.jaxb.model.common_v2.Organization;
-import org.orcid.jaxb.model.common_v2.OrganizationAddress;
-import org.orcid.jaxb.model.common_v2.RelationshipType;
-import org.orcid.jaxb.model.record_v2.Funding;
-import org.orcid.jaxb.model.record_v2.FundingTitle;
-import org.orcid.jaxb.model.record_v2.FundingType;
-import org.orcid.jaxb.model.record_v2.Work;
-import org.orcid.jaxb.model.record_v2.WorkTitle;
-import org.orcid.jaxb.model.record_v2.WorkType;
+import org.orcid.jaxb.model.common_v3.ExternalId;
+import org.orcid.jaxb.model.common_v3.ExternalIds;
+import org.orcid.jaxb.model.common_v3.Organization;
+import org.orcid.jaxb.model.common_v3.OrganizationAddress;
+import org.orcid.jaxb.model.record_v3.Funding;
+import org.orcid.jaxb.model.record_v3.FundingTitle;
+import org.orcid.jaxb.model.record_v3.Work;
+import org.orcid.jaxb.model.record_v3.WorkTitle;
+import org.orcid.jaxb.model.utils.FundingType;
+import org.orcid.jaxb.model.utils.Iso3166Country;
+import org.orcid.jaxb.model.utils.Relationship;
+import org.orcid.jaxb.model.utils.WorkType;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -162,7 +162,7 @@ public class OrcidQueueServiceImpl implements OrcidQueueService {
         Work work = new Work();
         String title = getMetadataValue(entity, "dc.title");
         work.setTitle(new WorkTitle(title, null, null));
-        work.setType(WorkType.JOURNAL_ARTICLE);
+        work.setType(WorkType.JOURNAL_ARTICLE.value());
         work.setPutCode(putCode);
 
         work.setExternalIds(getExternalIds(entity));
@@ -178,7 +178,7 @@ public class OrcidQueueServiceImpl implements OrcidQueueService {
         Item owner = orcidQueue.getOwner();
 
         Funding funding = new Funding();
-        funding.setType(FundingType.GRANT);
+        funding.setType(FundingType.GRANT.value());
 
         BigInteger putCode = findPutCode(context, entity, owner);
         funding.setPutCode(putCode);
@@ -194,7 +194,7 @@ public class OrcidQueueServiceImpl implements OrcidQueueService {
             String name = getMetadataValue(organization, "dc.title");
             String city = getMetadataValue(organization, "organization.address.addressLocality");
             Iso3166Country country = fromValue(getMetadataValue(organization, "organization.address.addressCountry"));
-            funding.setOrganization(new Organization(name, new OrganizationAddress(city, null, country), null));
+            funding.setOrganization(new Organization(name, new OrganizationAddress(city, null, country.name()), null));
         }
 
 
@@ -275,7 +275,7 @@ public class OrcidQueueServiceImpl implements OrcidQueueService {
         ExternalId handle = new ExternalId();
         handle.setExternalIdValue(indentifierUri);
         handle.setExternalIdType("handle");
-        handle.setExternalIdRelationship(RelationshipType.SELF);
+        handle.setExternalIdRelationship(Relationship.SELF.value());
         externalIds.add(handle);
 
         String indentifierDoi = getMetadataValue(entity, "dc.identifier.doi");
@@ -283,7 +283,7 @@ public class OrcidQueueServiceImpl implements OrcidQueueService {
             ExternalId doi = new ExternalId();
             doi.setExternalIdType("doi");
             doi.setExternalIdValue(indentifierDoi);
-            doi.setExternalIdRelationship(RelationshipType.SELF);
+            doi.setExternalIdRelationship(Relationship.SELF.value());
             externalIds.add(doi);
         }
 
