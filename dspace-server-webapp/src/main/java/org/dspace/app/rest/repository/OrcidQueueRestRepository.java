@@ -12,7 +12,6 @@ import static java.lang.Math.toIntExact;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
-import javax.servlet.http.HttpServletRequest;
 
 import org.dspace.app.orcid.OrcidQueue;
 import org.dspace.app.orcid.service.OrcidQueueService;
@@ -25,6 +24,7 @@ import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
@@ -41,9 +41,18 @@ public class OrcidQueueRestRepository extends DSpaceRestRepository<OrcidQueueRes
     private OrcidQueueService orcidQueueService;
 
     @Override
-    @PreAuthorize("permitAll()")
+    @PreAuthorize("hasPermission(#id, 'ORCID', 'READ')")
     public OrcidQueueRest findOne(Context context, Integer id) {
-        throw new RepositoryMethodNotImplementedException("No implementation found; Method not allowed!", "");
+        OrcidQueue orcidQueue = null;
+        try {
+            orcidQueue = orcidQueueService.find(context, id);
+        } catch (SQLException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+        if (orcidQueue == null) {
+            return null;
+        }
+        return converter.toRest(orcidQueue, utils.obtainProjection());
     }
 
     @Override
@@ -52,26 +61,23 @@ public class OrcidQueueRestRepository extends DSpaceRestRepository<OrcidQueueRes
     }
 
     @Override
-    @PreAuthorize("permitAll()")
-    protected void delete(Context context, Integer id) {
+    @PreAuthorize("hasPermission(#id, 'ORCID', 'DELETE')")
+    protected void delete(Context context, Integer id) throws AuthorizeException {
+        OrcidQueue orcidQueue = null;
         try {
+            orcidQueue = orcidQueueService.find(context, id);
+            if (orcidQueue == null) {
+                throw new ResourceNotFoundException(
+                    OrcidQueueRest.CATEGORY + "." + OrcidQueueRest.NAME + " with id: " + id + " not found");
+            }
             orcidQueueService.deleteById(context, id);
         } catch (SQLException e) {
-            throw new RuntimeException(e.getMessage(), e);
+            throw new RuntimeException("Unable to delete OrcidQueue with id = " + id, e);
         }
     }
 
-    protected OrcidQueueRest createAndReturn(Context context)
-        throws AuthorizeException, SQLException, RepositoryMethodNotImplementedException {
-        HttpServletRequest request = getRequestService().getCurrentRequest().getHttpServletRequest();
-
-        String orcidQueueId = request.getParameter("orcidQueueId");
-        orcidQueueService.sendToOrcid(context, Integer.valueOf(orcidQueueId));
-        return new OrcidQueueRest();
-    }
-
     @SearchRestMethod(name = "findByOwner")
-    @PreAuthorize("permitAll()")
+    @PreAuthorize("hasPermission(#ownerId, 'ORCID_SEARCH', 'READ')")
     public Page<OrcidQueueRest> findByOwnerId(@Parameter(value = "ownerId", required = true) String ownerId,
         Pageable pageable) {
 

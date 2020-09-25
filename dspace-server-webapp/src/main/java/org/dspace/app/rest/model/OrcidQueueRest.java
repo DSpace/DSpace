@@ -9,13 +9,15 @@ package org.dspace.app.rest.model;
 
 import java.util.UUID;
 
+import org.dspace.app.rest.RestResourceController;
+
 @LinkRest
 public class OrcidQueueRest extends BaseObjectRest<Integer> {
 
     private static final long serialVersionUID = 1L;
 
     public static final String CATEGORY = RestModel.CRIS;
-    public static final String NAME = "orcidQueue";
+    public static final String NAME = "orcidqueue";
 
     private UUID ownerId;
 
@@ -36,8 +38,8 @@ public class OrcidQueueRest extends BaseObjectRest<Integer> {
     }
 
     @Override
-    public Class<?> getController() {
-        return OrcidQueueRest.class;
+    public Class<RestResourceController> getController() {
+        return RestResourceController.class;
     }
 
     public UUID getOwnerId() {
