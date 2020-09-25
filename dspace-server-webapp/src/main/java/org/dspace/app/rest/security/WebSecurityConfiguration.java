@@ -24,7 +24,6 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
-import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.csrf.CsrfTokenRepository;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
@@ -152,7 +151,11 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
      * @return CookieCsrfTokenRepository with cookie path="/"
      */
     private CsrfTokenRepository getCsrfTokenRepository() {
-        CookieCsrfTokenRepository tokenRepository = CookieCsrfTokenRepository.withHttpOnlyFalse();
+        // We are using a *custom* CrossSiteCookieCsrfTokenRepository in which sets
+        // "SameSite=None" to allow this XSRF-TOKEN cookie to be used in cross site requests.
+        // This custom class should be REMOVED when this Spring Security ticket is resolved:
+        // https://github.com/spring-projects/spring-security/issues/7537
+        CrossSiteCookieCsrfTokenRepository tokenRepository = CrossSiteCookieCsrfTokenRepository.withHttpOnlyFalse();
         tokenRepository.setCookiePath("/");
         return tokenRepository;
     }
