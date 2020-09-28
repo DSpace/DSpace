@@ -48,7 +48,7 @@ public class DownloadFeature implements AuthorizationFeature {
     @Override
     public String[] getSupportedTypes() {
         return new String[]{
-                BitstreamRest.CATEGORY + "." + BitstreamRest.NAME,
+            BitstreamRest.CATEGORY + "." + BitstreamRest.NAME,
         };
     }
 }
