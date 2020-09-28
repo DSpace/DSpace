@@ -32,6 +32,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Component;
 
 /**
@@ -151,11 +153,12 @@ public class JWTTokenRestAuthenticationServiceImpl implements RestAuthentication
 
     @Override
     public void invalidateAuthenticationCookie(HttpServletResponse response) {
-        Cookie cookie = new Cookie(AUTHORIZATION_COOKIE, "");
-        cookie.setHttpOnly(true);
-        cookie.setMaxAge(0);
-        cookie.setSecure(true);
-        response.addCookie(cookie);
+        // Re-send the same cookie (as addTokenToResponse()) with no value and a Max-Age of 0 seconds
+        ResponseCookie cookie = ResponseCookie.from(AUTHORIZATION_COOKIE, "")
+                                              .maxAge(0).httpOnly(true).secure(true).sameSite("None").build();
+
+        // Write the cookie to the Set-Cookie header in order to send it
+        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
     }
 
     @Override
@@ -190,14 +193,29 @@ public class JWTTokenRestAuthenticationServiceImpl implements RestAuthentication
         return wwwAuthenticate.toString();
     }
 
+    /**
+     * Add login token to the current response in the Authorization header.
+     * <P>
+     * If requested, the JWT is also returned in a cookie. This is primarily for support of auth
+     * plugins which _require_ cookie-based auth (e.g. Shibboleth). Note that this cookie can be used cross-site
+     * (i.e. SameSite=None), but cannot be used by Javascript (HttpOnly) including the Angular UI. It also will only be
+     * sent via HTTPS (Secure).
+     *
+     * @param response current response
+     * @param token auth token to add
+     * @throws IOException
+     */
     private void addTokenToResponse(final HttpServletResponse response, final String token, final Boolean addCookie)
             throws IOException {
-        // we need authentication cookies because Shibboleth can't use the authentication headers due to the redirects
+        // Add an authentication cookie to the response *if* requested
+        // NOTE: authentication cookies are only needed by specific auth plugins (e.g. Shibboleth, which cannot use
+        // authentication headers due to redirects).
         if (addCookie) {
-            Cookie cookie = new Cookie(AUTHORIZATION_COOKIE, token);
-            cookie.setHttpOnly(true);
-            cookie.setSecure(true);
-            response.addCookie(cookie);
+            ResponseCookie cookie = ResponseCookie.from(AUTHORIZATION_COOKIE, token)
+                                                  .httpOnly(true).secure(true).sameSite("None").build();
+
+            // Write the cookie to the Set-Cookie header in order to send it
+            response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
         }
         response.setHeader(AUTHORIZATION_HEADER, String.format("%s %s", AUTHORIZATION_TYPE, token));
     }
