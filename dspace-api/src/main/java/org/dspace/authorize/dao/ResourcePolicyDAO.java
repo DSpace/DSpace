@@ -68,7 +68,14 @@ public interface ResourcePolicyDAO extends GenericDAO<ResourcePolicy> {
 
     public void deleteByDsoEPersonPolicies(Context context, DSpaceObject dso, EPerson ePerson) throws SQLException;
 
-    public void deleteAllEPersonPolicies(Context context, EPerson ePerson) throws SQLException;
+    /**
+     * Deletes all policies that belong to an EPerson
+     *
+     * @param context       DSpace context object
+     * @param ePerson       ePerson whose policies to delete
+     * @throws SQLException if database error
+     */
+    public void deleteByEPerson(Context context, EPerson ePerson) throws SQLException;
 
     public void deleteByDsoAndTypeNotEqualsTo(Context c, DSpaceObject o, String type) throws SQLException;
 
@@ -105,7 +112,7 @@ public interface ResourcePolicyDAO extends GenericDAO<ResourcePolicy> {
      * @return               total resource policies of the ePerson
      * @throws SQLException  if database error
      */
-    public int countByEPerson(Context context, EPerson eperson) throws SQLException;
+    public int countByEPerson(Context context, EPerson ePerson) throws SQLException;
 
     /**
      * Return a paginated list of policies related to a resourceUuid belong to an ePerson

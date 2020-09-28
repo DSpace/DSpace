@@ -253,7 +253,7 @@ public class ResourcePolicyServiceImpl implements ResourcePolicyService {
 
     @Override
     public void removeAllEPersonPolicies(Context context, EPerson ePerson) throws SQLException, AuthorizeException {
-        resourcePolicyDAO.deleteAllEPersonPolicies(context, ePerson);
+        resourcePolicyDAO.deleteByEPerson(context, ePerson);
     }
 
     @Override

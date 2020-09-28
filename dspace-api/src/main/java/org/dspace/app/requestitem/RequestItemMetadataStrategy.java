@@ -70,13 +70,14 @@ public class RequestItemMetadataStrategy extends RequestItemSubmitterStrategy {
                 //First get help desk name and email
                 email = DSpaceServicesFactory.getInstance()
                         .getConfigurationService().getProperty("mail.helpdesk");
-                name = I18nUtil.getMessage("org.dspace.app.requestitem.helpdeskname", context);
+                name = DSpaceServicesFactory.getInstance()
+                                            .getConfigurationService().getProperty("mail.helpdesk.name");
                 // If help desk mail is null get the mail and name of admin
                 if (email == null) {
                     email = DSpaceServicesFactory.getInstance()
                             .getConfigurationService().getProperty("mail.admin");
                     name = DSpaceServicesFactory.getInstance()
-                            .getConfigurationService().getProperty("admin.name");
+                            .getConfigurationService().getProperty("mail.admin.name");
                 }
                 author = new RequestItemAuthor(name, email);
             }
