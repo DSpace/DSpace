@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
+
+	<bean id="bulkImportService" class="org.dspace.app.bulkimport.service.impl.BulkImportServiceImpl">
+		<property name="itemService" ref="org.dspace.content.ItemServiceImpl" />
+		<property name="workspaceItemService" ref="org.dspace.content.WorkspaceItemServiceImpl" />
+	</bean>
+ 
+ </beans>

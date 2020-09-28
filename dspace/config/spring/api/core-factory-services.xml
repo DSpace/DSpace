@@ -57,5 +57,7 @@
 
 	<bean id="orcidQueueServiceFactory" class="org.dspace.app.orcid.factory.OrcidQueueServiceFactoryImpl"/>
 	<bean id="orcidHistoryServiceFactory" class="org.dspace.app.orcid.factory.OrcidHistoryServiceFactoryImpl"/>
+	
+	<bean id="bulkImportServiceFactory" class="org.dspace.app.bulkimport.service.impl.BulkImportServiceFactoryImpl"/>
 
 </beans>
