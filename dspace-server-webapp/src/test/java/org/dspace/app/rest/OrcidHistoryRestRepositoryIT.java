@@ -24,7 +24,6 @@ import com.amazonaws.util.StringInputStream;
 import org.apache.http.ProtocolVersion;
 import org.apache.http.client.HttpClient;
 import org.apache.http.entity.BasicHttpEntity;
-import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicHttpResponse;
 import org.dspace.app.orcid.OrcidHistory;
 import org.dspace.app.orcid.OrcidQueue;
@@ -287,6 +286,7 @@ public class OrcidHistoryRestRepositoryIT extends AbstractControllerIntegrationT
     public void createUsingMockitoTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
+        HttpClient originalHttpClient = orcidHistoryService.getHttpClient();
         HttpClient httpClient = Mockito.mock(HttpClient.class);
 
         orcidHistoryService.setHttpClient(httpClient);
@@ -368,7 +368,7 @@ public class OrcidHistoryRestRepositoryIT extends AbstractControllerIntegrationT
                                 .andExpect(status().isNotFound());
         } finally {
             OrcidHistoryBuilder.deleteOrcidHistory(idRef.get());
-            orcidHistoryService.setHttpClient(HttpClientBuilder.create().build());
+            orcidHistoryService.setHttpClient(originalHttpClient);
         }
     }
 

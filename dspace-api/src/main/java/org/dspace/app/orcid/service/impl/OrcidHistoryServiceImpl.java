@@ -10,6 +10,7 @@ package org.dspace.app.orcid.service.impl;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.orcid.jaxb.model.utils.Iso3166Country.fromValue;
 
+import java.io.IOException;
 import java.io.StringWriter;
 import java.math.BigInteger;
 import java.sql.SQLException;
@@ -31,6 +32,8 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
+import org.apache.http.util.EntityUtils;
 import org.dspace.app.orcid.OrcidHistory;
 import org.dspace.app.orcid.OrcidQueue;
 import org.dspace.app.orcid.dao.OrcidHistoryDAO;
@@ -88,7 +91,9 @@ public class OrcidHistoryServiceImpl implements OrcidHistoryService {
 
     @PostConstruct
     private void setup() {
-        this.httpClient =  HttpClientBuilder.create().build();
+        this.httpClient = HttpClientBuilder.create()
+            .setConnectionManager(new PoolingHttpClientConnectionManager())
+            .build();
     }
 
     @Override
@@ -228,7 +233,11 @@ public class OrcidHistoryServiceImpl implements OrcidHistoryService {
         String path = orcidUrl + "/" + orcid + endpoint;
         HttpEntityEnclosingRequestBase request = putCode != null ? new HttpPut(path + "/" + putCode)
                 : new HttpPost(path);
+
+        HttpResponse response = null;
+
         try {
+
             JAXBContext jaxbContext = JAXBContext.newInstance(Work.class);
             String objToSendAsString = marshall(jaxbContext, objToSend);
 
@@ -236,7 +245,7 @@ public class OrcidHistoryServiceImpl implements OrcidHistoryService {
             request.addHeader("Authorization", "Bearer " + token);
             request.setEntity(new StringEntity(objToSendAsString));
 
-            HttpResponse response = httpClient.execute(request);
+            response = httpClient.execute(request);
 
             OrcidHistory history = new OrcidHistory();
             history.setEntity(entity);
@@ -264,6 +273,14 @@ public class OrcidHistoryServiceImpl implements OrcidHistoryService {
             return history;
         } catch (Exception e) {
             throw new RuntimeException(e);
+        } finally {
+            if (response != null) {
+                try {
+                    EntityUtils.consume(response.getEntity());
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
         }
     }
 
