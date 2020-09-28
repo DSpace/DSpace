@@ -19,7 +19,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.http.ProtocolVersion;
 import org.apache.http.client.HttpClient;
 import org.apache.http.entity.BasicHttpEntity;
-import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicHttpResponse;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.external.OrcidRestConnector;
@@ -143,6 +142,7 @@ public class OrcidExternalSourcesIT extends AbstractControllerIntegrationTest {
     @Test
     public void findOneExternalSourcesMockitoTest() throws Exception {
 
+        HttpClient originalHttpClient = orcidRestConnector.getHttpClient();
         HttpClient httpClient = Mockito.mock(HttpClient.class);
         XMLtoBio converter = Mockito.mock(XMLtoBio.class);
         orcidV3AuthorDataProvider.setConverter(converter);
@@ -183,6 +183,6 @@ public class OrcidExternalSourcesIT extends AbstractControllerIntegrationTest {
                            )));
 
         orcidV3AuthorDataProvider.setConverter(new XMLtoBio());
-        orcidRestConnector.setHttpClient(HttpClientBuilder.create().build());
+        orcidRestConnector.setHttpClient(originalHttpClient);
     }
 }
