@@ -199,7 +199,6 @@ public class EPersonCLITool {
 
         try {
             ePersonService.update(context, eperson);
-            context.complete();
             System.out.printf("Created EPerson %s\n", eperson.getID().toString());
         } catch (SQLException ex) {
             context.abort();
@@ -264,7 +263,7 @@ public class EPersonCLITool {
         try {
             List<String> tableList = ePersonService.getDeleteConstraints(context, eperson);
             if (!tableList.isEmpty()) {
-                System.out.printf("This EPerson with ID: %s is referring to this tables:%n ",
+                System.out.printf("The EPerson with ID: %s is referenced by the following database tables:%n",
                         eperson.getID().toString());
                 tableList.forEach((s) -> {
                     System.out.println(s);
@@ -277,10 +276,9 @@ public class EPersonCLITool {
             String s = input.readLine();
             if (s != null && s.trim().toLowerCase().startsWith("y")) {
                 ePersonService.delete(context, eperson);
-                context.complete();
                 System.out.printf("%nDeleted EPerson with ID: %s", eperson.getID().toString());
             } else {
-                System.out.printf("%nAbort Deletetion of EPerson with ID: %s %n", eperson.getID().toString());
+                System.out.printf("%nAbort Deletion of EPerson with ID: %s %n", eperson.getID().toString());
             }
         } catch (SQLException | AuthorizeException | IOException ex) {
             System.err.println(ex.getMessage());
@@ -387,7 +385,6 @@ public class EPersonCLITool {
             if (modified) {
                 try {
                     ePersonService.update(context, eperson);
-                    context.complete();
                     System.out.printf("Modified EPerson %s\n", eperson.getID().toString());
                 } catch (SQLException ex) {
                     context.abort();

@@ -247,7 +247,7 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
             throw new AuthorizeException(ex.getMessage());
         } catch (IOException ex) {
             log.error("This IOException: " + ex + " occured while deleting Eperson with the ID: " + ePerson.getID());
-            throw new AuthorizeException(new EPersonDeletionException());
+            throw new AuthorizeException(ex);
         } catch (EPersonDeletionException e) {
             throw new IllegalStateException(e);
         }

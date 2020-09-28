@@ -205,7 +205,7 @@ public class ResourcePolicyDAOImpl extends AbstractHibernateDAO<ResourcePolicy> 
     }
 
     @Override
-    public void deleteAllEPersonPolicies(Context context, EPerson ePerson) throws SQLException {
+    public void deleteByEPerson(Context context, EPerson ePerson) throws SQLException {
         String queryString = "delete from ResourcePolicy where eperson= :eperson";
         Query query = createQuery(context, queryString);
         query.setParameter("eperson", ePerson);
@@ -266,10 +266,10 @@ public class ResourcePolicyDAOImpl extends AbstractHibernateDAO<ResourcePolicy> 
     }
 
     @Override
-    public int countByEPerson(Context context, EPerson eperson) throws SQLException {
+    public int countByEPerson(Context context, EPerson ePerson) throws SQLException {
         Query query = createQuery(context,
                 "SELECT count(*) FROM " + ResourcePolicy.class.getSimpleName() + " WHERE eperson_id = (:epersonUuid) ");
-        query.setParameter("epersonUuid", eperson.getID());
+        query.setParameter("epersonUuid", ePerson.getID());
         return count(query);
     }
 

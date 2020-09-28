@@ -217,7 +217,7 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
                     throw new IllegalStateException(
                             "Refused to remove sub group " + childGroup
                                     .getID() + " from workflow group because the group " + groupParent
-                                    .getID() + " has no other members");
+                                    .getID() + " has tasks assigned and no other members");
                 }
             }
         }
