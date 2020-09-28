@@ -7,6 +7,7 @@
  */
 package org.dspace.external;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Scanner;
 import javax.annotation.PostConstruct;
@@ -16,6 +17,8 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
+import org.apache.http.util.EntityUtils;
 import org.apache.logging.log4j.Logger;
 
 /**
@@ -37,7 +40,9 @@ public class OrcidRestConnector {
 
     @PostConstruct
     private void setup() {
-        this.httpClient =  HttpClientBuilder.create().build();
+        this.httpClient = HttpClientBuilder.create()
+            .setConnectionManager(new PoolingHttpClientConnectionManager())
+            .build();
     }
 
     public OrcidRestConnector(String url) {
@@ -45,6 +50,7 @@ public class OrcidRestConnector {
     }
 
     public InputStream get(String path, String accessToken) {
+        HttpResponse getResponse = null;
         InputStream result = null;
         path = trimSlashes(path);
 
@@ -55,11 +61,19 @@ public class OrcidRestConnector {
             httpGet.addHeader("Authorization","Bearer " + accessToken);
         }
         try {
-            HttpResponse getResponse = httpClient.execute(httpGet);
+            getResponse = httpClient.execute(httpGet);
             //do not close this httpClient
             result = getResponse.getEntity().getContent();
         } catch (Exception e) {
             getGotError(e, fullPath);
+        } finally {
+            if (getResponse != null) {
+                try {
+                    EntityUtils.consume(getResponse.getEntity());
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
         }
 
         return result;
