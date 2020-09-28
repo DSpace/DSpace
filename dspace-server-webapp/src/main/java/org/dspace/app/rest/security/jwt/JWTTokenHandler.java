@@ -99,10 +99,10 @@ public abstract class JWTTokenHandler {
     protected abstract String getTokenExpirationConfigurationKey();
 
     /**
-     * Get the configuration property key for the include ip.
+     * Get the configuration property key deciding whether to include the origin
      * @return the configuration property key
      */
-    protected abstract String getTokenIncludeIPConfigurationKey();
+    protected abstract String getTokenIncludeOriginConfigurationKey();
 
     /**
      * Get the configuration property key for the encryption enable setting.
@@ -227,8 +227,8 @@ public abstract class JWTTokenHandler {
         return secret;
     }
 
-    public boolean getIncludeIP() {
-        return configurationService.getBooleanProperty(getTokenIncludeIPConfigurationKey(), true);
+    public boolean getIncludeOrigin() {
+        return configurationService.getBooleanProperty(getTokenIncludeOriginConfigurationKey(), true);
     }
 
     public long getExpirationPeriod() {
@@ -397,7 +397,7 @@ public abstract class JWTTokenHandler {
     protected String buildSigningKey(HttpServletRequest request, EPerson ePerson) {
         String origin = "";
         // When enabled, include the origin of the request in the signing key
-        if (getIncludeIP()) {
+        if (getIncludeOrigin()) {
             origin = getRequestOrigin(request);
         }
         return getJwtKey() + ePerson.getSessionSalt() + origin;

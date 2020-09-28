@@ -31,8 +31,8 @@ public class LoginJWTTokenHandler extends JWTTokenHandler {
     }
 
     @Override
-    protected String getTokenIncludeIPConfigurationKey() {
-        return "jwt.login.token.include.ip";
+    protected String getTokenIncludeOriginConfigurationKey() {
+        return "jwt.login.token.include.origin";
     }
 
     @Override

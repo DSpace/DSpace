@@ -83,8 +83,8 @@ public class ShortLivedJWTTokenHandler extends JWTTokenHandler {
     }
 
     @Override
-    protected String getTokenIncludeIPConfigurationKey() {
-        return "jwt.shortLived.token.include.ip";
+    protected String getTokenIncludeOriginConfigurationKey() {
+        return "jwt.shortLived.token.include.origin";
     }
 
     @Override
