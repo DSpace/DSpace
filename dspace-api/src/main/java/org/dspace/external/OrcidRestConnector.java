@@ -10,14 +10,12 @@ package org.dspace.external;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Scanner;
-import javax.annotation.PostConstruct;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.util.EntityUtils;
 import org.apache.logging.log4j.Logger;
 
@@ -36,15 +34,6 @@ public class OrcidRestConnector {
 
     private String url;
 
-    private HttpClient httpClient;
-
-    @PostConstruct
-    private void setup() {
-        this.httpClient = HttpClientBuilder.create()
-            .setConnectionManager(new PoolingHttpClientConnectionManager())
-            .build();
-    }
-
     public OrcidRestConnector(String url) {
         this.url = url;
     }
@@ -61,6 +50,7 @@ public class OrcidRestConnector {
             httpGet.addHeader("Authorization","Bearer " + accessToken);
         }
         try {
+            HttpClient httpClient = HttpClientBuilder.create().build();
             getResponse = httpClient.execute(httpGet);
             //do not close this httpClient
             result = getResponse.getEntity().getContent();
@@ -96,13 +86,5 @@ public class OrcidRestConnector {
     public static String convertStreamToString(InputStream is) {
         Scanner s = new Scanner(is).useDelimiter("\\A");
         return s.hasNext() ? s.next() : "";
-    }
-
-    public HttpClient getHttpClient() {
-        return httpClient;
-    }
-
-    public void setHttpClient(HttpClient httpClient) {
-        this.httpClient = httpClient;
     }
 }

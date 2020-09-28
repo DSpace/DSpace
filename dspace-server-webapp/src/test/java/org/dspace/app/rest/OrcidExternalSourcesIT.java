@@ -14,14 +14,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.amazonaws.util.StringInputStream;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.ProtocolVersion;
-import org.apache.http.client.HttpClient;
-import org.apache.http.entity.BasicHttpEntity;
-import org.apache.http.message.BasicHttpResponse;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
-import org.dspace.external.OrcidRestConnector;
 import org.dspace.external.provider.impl.OrcidV3AuthorDataProvider;
 import org.dspace.external.provider.orcid.xml.XMLtoBio;
 import org.dspace.services.ConfigurationService;
@@ -46,9 +40,6 @@ public class OrcidExternalSourcesIT extends AbstractControllerIntegrationTest {
 
     @Autowired
     ConfigurationService configurationService;
-
-    @Autowired
-    private OrcidRestConnector orcidRestConnector;
 
     @Autowired
     private OrcidV3AuthorDataProvider orcidV3AuthorDataProvider;
@@ -142,23 +133,8 @@ public class OrcidExternalSourcesIT extends AbstractControllerIntegrationTest {
     @Test
     public void findOneExternalSourcesMockitoTest() throws Exception {
 
-        HttpClient originalHttpClient = orcidRestConnector.getHttpClient();
-        HttpClient httpClient = Mockito.mock(HttpClient.class);
         XMLtoBio converter = Mockito.mock(XMLtoBio.class);
         orcidV3AuthorDataProvider.setConverter(converter);
-        orcidRestConnector.setHttpClient(httpClient);
-
-        BasicHttpResponse basicHttpResponse = new BasicHttpResponse(new ProtocolVersion("http", 1, 1), 200, "OK");
-        basicHttpResponse.setEntity(new BasicHttpEntity());
-        StringInputStream is = new StringInputStream("HttpResponseProxy{HTTP/1.1 200 OK "
-                + "[Server: nginx/1.16.1, Cache-Control: no-cache, no-store, max-age=0, must-revalidate,"
-                + " Content-Type: application/vnd.orcid+xml; qs=5;charset=UTF-8,"
-                + " Expires: 0, Pragma: no-cache, X-XSS-Protection: 1; mode=block, Transfer-Encoding: chunked,"
-                + " Connection: keep-alive, path=/, X-Frame-Options: DENY]}");
-        BasicHttpEntity bhe = new BasicHttpEntity();
-        basicHttpResponse.setEntity(bhe);
-        bhe.setChunked(true);
-        bhe.setContent(is);
 
         String entry = "0000-0002-9029-1854";
 
@@ -169,8 +145,7 @@ public class OrcidExternalSourcesIT extends AbstractControllerIntegrationTest {
         person.setName(name);
         name.setPath(entry);
 
-        when(httpClient.execute(ArgumentMatchers.any())).thenReturn(basicHttpResponse);
-        when(converter.convertSinglePerson(is)).thenReturn(person);
+        when(converter.convertSinglePerson(ArgumentMatchers.any())).thenReturn(person);
 
         getClient().perform(get("/api/integration/externalsources/orcid/entryValues/" + entry))
                    .andExpect(status().isOk())
@@ -183,6 +158,5 @@ public class OrcidExternalSourcesIT extends AbstractControllerIntegrationTest {
                            )));
 
         orcidV3AuthorDataProvider.setConverter(new XMLtoBio());
-        orcidRestConnector.setHttpClient(originalHttpClient);
     }
 }
