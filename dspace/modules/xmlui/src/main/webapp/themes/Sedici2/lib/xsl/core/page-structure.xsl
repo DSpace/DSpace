@@ -1038,6 +1038,22 @@ placeholders for header images -->
                 </span>
             </div>
         </xsl:if>
+
+        <!-- If we are showing a opendatacommons.org license (instead a CC license) for datasets... -->
+        <xsl:if test="$ccLicenseName and $ccLicenseUri and contains($ccLicenseUri, 'opendatacommons')">
+            <div about="{$handleUri}">
+                    <xsl:attribute name="style">
+                        <xsl:text>margin:0em 2em 0em 2em; padding-bottom:0em;</xsl:text>
+                    </xsl:attribute>
+                    <span>
+                        <xsl:attribute name="style">
+                            <xsl:text>vertical-align:middle; text-indent:0 !important;</xsl:text>
+                        </xsl:attribute>
+                        <i18n:text>xmlui.dri2xhtml.METS-1.0.cc-license-text</i18n:text>
+                        <a rel="license" href="{$ccLicenseUri}" alt="{$ccLicenseName}" title="{$ccLicenseName}"><xsl:value-of select="$ccLicenseName"/></a>
+                    </span>
+                </div>
+        </xsl:if>
     </xsl:template>
 
 	<xsl:template match="dri:div[@id='aspect.eperson.PasswordLogin.div.register']">
