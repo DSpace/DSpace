@@ -14,14 +14,17 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.math.BigInteger;
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 import javax.annotation.PostConstruct;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 
+import com.ibm.icu.text.DecimalFormat;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.Header;
@@ -42,18 +45,30 @@ import org.dspace.app.orcid.service.OrcidHistoryService;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Item;
+import org.dspace.content.MetadataSchemaEnum;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.services.ConfigurationService;
+import org.orcid.jaxb.model.common_v3.CreditName;
 import org.orcid.jaxb.model.common_v3.ExternalId;
 import org.orcid.jaxb.model.common_v3.ExternalIds;
+import org.orcid.jaxb.model.common_v3.FuzzyDate;
+import org.orcid.jaxb.model.common_v3.FuzzyDate.Day;
+import org.orcid.jaxb.model.common_v3.FuzzyDate.Month;
+import org.orcid.jaxb.model.common_v3.FuzzyDate.Year;
+import org.orcid.jaxb.model.common_v3.OrcidId;
 import org.orcid.jaxb.model.common_v3.Organization;
 import org.orcid.jaxb.model.common_v3.OrganizationAddress;
+import org.orcid.jaxb.model.record_v3.Contributor;
+import org.orcid.jaxb.model.record_v3.ContributorAttributes;
+import org.orcid.jaxb.model.record_v3.ContributorEmail;
 import org.orcid.jaxb.model.record_v3.Funding;
 import org.orcid.jaxb.model.record_v3.FundingTitle;
 import org.orcid.jaxb.model.record_v3.Work;
+import org.orcid.jaxb.model.record_v3.WorkContributors;
 import org.orcid.jaxb.model.record_v3.WorkTitle;
+import org.orcid.jaxb.model.utils.ContributorRole;
 import org.orcid.jaxb.model.utils.FundingType;
 import org.orcid.jaxb.model.utils.Iso3166Country;
 import org.orcid.jaxb.model.utils.Relationship;
@@ -171,6 +186,8 @@ public class OrcidHistoryServiceImpl implements OrcidHistoryService {
         Item owner = orcidQueue.getOwner();
         BigInteger putCode = null;
         Work work = new Work();
+        addAuthors(context, work, entity);
+        addPubblicationDate(work, entity);
         String title = getMetadataValue(entity, "dc.title");
         work.setTitle(new WorkTitle(title, null, null));
         work.setType(WorkType.JOURNAL_ARTICLE.value());
@@ -354,6 +371,84 @@ public class OrcidHistoryServiceImpl implements OrcidHistoryService {
 
     public void setHttpClient(HttpClient httpClient) {
         this.httpClient = httpClient;
+    }
+
+    private void addAuthors(Context context, Work work, Item itemEntity) {
+        WorkContributors workContributors = new WorkContributors();
+        boolean haveContributor = false;
+
+        List<MetadataValue> authors = itemService.getMetadata(itemEntity,
+             MetadataSchemaEnum.DC.getName(), "contributor", "author", Item.ANY);
+        for (MetadataValue valContributor : authors) {
+            Contributor contributor = new Contributor();
+            String name = valContributor.getValue();
+            String uuidContributor = valContributor.getAuthority();
+            if (uuidContributor != null) {
+                Item itemContributor = null;
+                UUID uuid = UUID.fromString(uuidContributor);
+                try {
+                    itemContributor = itemService.find(context, uuid);
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+
+                String email = itemService.getMetadataFirstValue(itemContributor, "person", "email", null, null);
+                String orcid = itemService.getMetadataFirstValue(itemContributor, "person", "identifier", "orcid",null);
+
+                if (StringUtils.isNotBlank(email)) {
+                    ContributorEmail contributorEmail = new ContributorEmail();
+                    contributorEmail.setValue(email);
+                    contributor.setContributorEmail(contributorEmail);
+                }
+                if (StringUtils.isNotBlank(orcid)) {
+                    String domainOrcid = configurationService.getProperty("cris",
+                            "external.domainname.authority.service.orcid");
+                    OrcidId orcidID = new OrcidId();
+
+                    orcidID.setHost(domainOrcid);
+                    orcidID.setPath(orcid);
+                    orcidID.setUri(domainOrcid + orcid);
+                    contributor.setContributorOrcid(orcidID);
+                }
+            }
+            CreditName creditName = new CreditName();
+            creditName.setValue(name);
+            contributor.setCreditName(creditName);
+
+            ContributorAttributes attributes = new ContributorAttributes();
+            attributes.setContributorRole(ContributorRole.AUTHOR.value());
+            contributor.setContributorAttributes(attributes);
+            workContributors.getContributor().add(contributor);
+            haveContributor = true;
+
+            if (haveContributor) {
+                work.setContributors(workContributors);
+            }
+        }
+    }
+
+    private void addPubblicationDate(Work work, Item entity) {
+        DecimalFormat df = new DecimalFormat("00");
+        String pubblicationDate = itemService.getMetadataFirstValue(entity,
+               MetadataSchemaEnum.DC.getName(), "date", "issued", Item.ANY);
+        if (pubblicationDate != null) {
+            LocalDate date = LocalDate.parse(pubblicationDate);
+            FuzzyDate publicationDate = new FuzzyDate();
+            if (date != null) {
+                Year year = new Year();
+                year.setValue(Integer.valueOf(date.getYear()).toString());
+                publicationDate.setYear(year);
+
+                Month month = new Month();
+                month.setValue(df.format(date.getMonthValue()));
+                publicationDate.setMonth(month);
+
+                Day day = new Day();
+                day.setValue(df.format(date.getDayOfMonth()));
+                publicationDate.setDay(day);
+            }
+            work.setPublicationDate(publicationDate);
+        }
     }
 
 }
