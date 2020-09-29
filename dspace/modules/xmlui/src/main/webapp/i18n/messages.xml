@@ -2755,6 +2755,10 @@
 <message key="xmlui.Submission.submit.SediciCCLicenseStep.administrador.by-nc-sa">Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0)</message>
 <message key="xmlui.Submission.submit.SediciCCLicenseStep.administrador.by-nd">Creative Commons Attribution-NoDerivatives 4.0 International (CC BY-ND 4.0)</message>
 <message key="xmlui.Submission.submit.SediciCCLicenseStep.administrador.by-sa">Creative Commons Attribution-ShareAlike 4.0 International (CC BY-SA 4.0)</message>
+    <!-- opendatacommons.org licenses -->
+<message key="xmlui.Submission.submit.SediciCCLicenseStep.administrador.odbl">Open Data Commons Open Database License (ODbL) v1.0</message>
+<message key="xmlui.Submission.submit.SediciCCLicenseStep.administrador.odc-by">Open Data Commons Attribution License (ODC-By)</message>
+<message key="xmlui.Submission.submit.SediciCCLicenseStep.administrador.pddl">Open Data Commons Public Domain Dedication and License (PDDL)</message>
 <!-- Otras traducciones -->
 
 <message key="sedici.aspect.collectionViewer.addItem">Add document</message>

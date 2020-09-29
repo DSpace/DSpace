@@ -145,9 +145,14 @@ public class SediciCCLicenseStep extends AbstractSubmissionStep
 		    select.addOption("by-sa", message("xmlui.Submission.submit.SediciCCLicenseStep.administrador.by-sa"));
 		    select.addOption("by-nc-nd", message("xmlui.Submission.submit.SediciCCLicenseStep.administrador.by-nc-nd"));
 		    select.addOption("by-nc-sa", message("xmlui.Submission.submit.SediciCCLicenseStep.administrador.by-nc-sa"));
+		    //Open Data opendatacommons.org licenses
+		    select.addOption("opendatacommons-odbl", message("xmlui.Submission.submit.SediciCCLicenseStep.administrador.odbl"));
+		    select.addOption("opendatacommons-by", message("xmlui.Submission.submit.SediciCCLicenseStep.administrador.odc-by"));
+		    select.addOption("opendatacommons-pddl", message("xmlui.Submission.submit.SediciCCLicenseStep.administrador.pddl"));
 		   
 	        if (carga.length>0){
 		    	dato=carga[0].value;
+		       if(dato.matches("https?://creativecommons.org/licenses/.*")) {
 		    	int inicio=dato.indexOf("/by")+1;
 		        if (inicio!=0){
 			    	String substring=dato.substring(inicio);
@@ -155,6 +160,12 @@ public class SediciCCLicenseStep extends AbstractSubmissionStep
 			    	substring=substring.substring(0,fin);
 			    	select.setOptionSelected(substring);
 		        }
+		       } else if(dato.matches("https?://opendatacommons.org/licenses/.*")) {
+		           String suffix_odc_license = dato.replaceAll("^https?://opendatacommons.org/licenses/", "").replaceAll("/1-0/?","");
+		           if(suffix_odc_license != null && !suffix_odc_license.isEmpty() ) {
+		               select.setOptionSelected("opendatacommons-" + suffix_odc_license);
+		           }
+		       }
 	        } else {
 	        	select.setOptionSelected("by-" + commercial + "-" + derivatives);
 	        }

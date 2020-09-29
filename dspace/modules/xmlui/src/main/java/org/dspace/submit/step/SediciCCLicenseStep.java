@@ -163,7 +163,7 @@ public class SediciCCLicenseStep extends AbstractProcessingStep
     	   //limpio los metadatos
     	   item.clearMetadata(uriNameSchema, uriNameElement, uriNameQualifier, null);
 	       item.clearMetadata(uriFieldSchema, uriFieldElement, uriFieldQualifier, null);
-	       if (cc_license!=""){
+	       if (cc_license!="" && !cc_license.startsWith("opendatacommons-")){
 		    	//cargo los nuevos valores para el metadata 
 		    	licenseUri="http://creativecommons.org/licenses/"+cc_license;
 		    	HashMap<String, Integer> arreglo=new HashMap<String, Integer>();
@@ -210,6 +210,24 @@ public class SediciCCLicenseStep extends AbstractProcessingStep
 		    	//agrego los metadatos
 		    	item.addMetadata(uriFieldSchema, uriFieldElement, uriFieldQualifier, null, licenseUri);
 		    	item.addMetadata(uriNameSchema, uriNameElement, uriNameQualifier, null, licenseDescription);
+		    } else if (cc_license!="" && cc_license.startsWith("opendatacommons-")) {
+		      //Procesamos las licencias OpenDataCommons
+		        String opendatacommons_license = cc_license.replace("opendatacommons-", "");
+                licenseUri="https://opendatacommons.org/licenses/"+opendatacommons_license+"/1-0/";
+                switch(opendatacommons_license) {
+                case "odbl":
+                    licenseDescription="Open Data Commons Open Database License (ODbL) v1.0";
+                    break;
+                case "pddl":
+                    licenseDescription="Open Data Commons Public Domain Dedication and License (PDDL)";
+                    break;
+                default:    //odc-by
+                    licenseDescription="Open Data Commons Attribution License (ODC-By) v1.0";
+                    break;
+                }
+              //agrego los metadatos
+                item.addMetadata(uriFieldSchema, uriFieldElement, uriFieldQualifier, null, licenseUri);
+                item.addMetadata(uriNameSchema, uriNameElement, uriNameQualifier, null, licenseDescription);
 		    }
 	        //actualizo y comiteo
 			item.update();
