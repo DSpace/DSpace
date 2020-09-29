@@ -109,6 +109,14 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
         return addMetadataValue(item, CRIS.getName(), "owner", null, null, value, authority, CF_ACCEPTED);
     }
 
+    public ItemBuilder withDoiIdentifier(String doi) {
+        return addMetadataValue(item, "dc", "identifier", "doi", doi);
+    }
+
+    public ItemBuilder withOrcidIdentifier(String doi) {
+        return addMetadataValue(item, "person", "identifier", "orcid", doi);
+    }
+
     public ItemBuilder makeUnDiscoverable() {
         item.setDiscoverable(false);
         return this;

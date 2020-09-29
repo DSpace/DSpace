@@ -15,14 +15,14 @@ import org.apache.commons.collections4.MultiValuedMap;
 
 public class NestedEntity {
 
+    private final String parentId;
+
     private final MultiValuedMap<String, String> metadata;
 
-    private final String parentSourceId;
-
-    public NestedEntity(MultiValuedMap<String, String> metadata, String parentSourceId) {
+    public NestedEntity(String parentId, MultiValuedMap<String, String> metadata) {
         super();
         this.metadata = metadata;
-        this.parentSourceId = parentSourceId;
+        this.parentId = parentId;
     }
 
     public Collection<String> getMetadataValues(String metadataField) {
@@ -33,8 +33,8 @@ public class NestedEntity {
         return unmodifiableCollection(metadata.keySet());
     }
 
-    public String getParentSourceId() {
-        return parentSourceId;
+    public String getParentId() {
+        return parentId;
     }
 
 }

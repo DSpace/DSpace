@@ -41,4 +41,10 @@
         <property name="description" value="Delete all the values of the specified metadata field"/>
         <property name="dspaceRunnableClass" value="org.dspace.app.bulkedit.MetadataDeletionCli"/>
     </bean>
+    
+    <bean id="bulk-import" class="org.dspace.app.bulkedit.BulkImportCliScriptConfiguration">
+        <property name="description" value="Perform the bulk import of an excel file with a list of item to add, update or remove"/>
+        <property name="dspaceRunnableClass" value="org.dspace.app.bulkedit.BulkImportCli"/>
+    </bean>
+    
 </beans>

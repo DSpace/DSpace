@@ -7,12 +7,11 @@
  */
 package org.dspace.app.bulkimport.service;
 
-import java.io.InputStream;
 
-import org.dspace.app.bulkimport.model.ImportParams;
+import org.dspace.content.Item;
 import org.dspace.core.Context;
 
-public interface BulkImportService {
+public interface ItemSearcher {
 
-    public void performImport(Context context, InputStream is, ImportParams params);
+    public Item searchBy(Context context, String searchParam) throws Exception;
 }
