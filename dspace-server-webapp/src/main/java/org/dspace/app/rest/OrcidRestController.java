@@ -11,7 +11,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
-import org.dspace.app.orcid.service.OrcidQueueService;
 import org.dspace.app.rest.model.OrcidTokenRest;
 import org.dspace.app.rest.model.RestModel;
 import org.dspace.app.rest.utils.ContextUtil;
@@ -43,9 +42,6 @@ public class OrcidRestController {
 
     @Autowired
     private ConfigurationService configurationService;
-
-    @Autowired
-    private OrcidQueueService orcidQueueService;
 
     @Autowired
     private RestTemplate restTemplate;
