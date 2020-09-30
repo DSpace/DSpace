@@ -7,34 +7,35 @@
  */
 package org.dspace.app.bulkimport.model;
 
-import static java.util.Collections.unmodifiableCollection;
-
-import java.util.Collection;
+import static org.apache.commons.collections4.multimap.UnmodifiableMultiValuedMap.unmodifiableMultiValuedMap;
 
 import org.apache.commons.collections4.MultiValuedMap;
 
-public class NestedEntity {
+public class MetadataGroup {
 
     private final String parentId;
 
+    private final String name;
+
     private final MultiValuedMap<String, String> metadata;
 
-    public NestedEntity(String parentId, MultiValuedMap<String, String> metadata) {
+    public MetadataGroup(String parentId, String name, MultiValuedMap<String, String> metadata) {
         super();
         this.metadata = metadata;
         this.parentId = parentId;
+        this.name = name;
     }
 
-    public Collection<String> getMetadataValues(String metadataField) {
-        return unmodifiableCollection(metadata.get(metadataField));
-    }
-
-    public Collection<String> getMetadataFields() {
-        return unmodifiableCollection(metadata.keySet());
+    public MultiValuedMap<String, String> getMetadata() {
+        return unmodifiableMultiValuedMap(metadata);
     }
 
     public String getParentId() {
         return parentId;
+    }
+
+    public String getName() {
+        return name;
     }
 
 }

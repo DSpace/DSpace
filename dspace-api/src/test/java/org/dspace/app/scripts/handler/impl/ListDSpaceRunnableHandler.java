@@ -10,6 +10,7 @@ package org.dspace.app.scripts.handler.impl;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -27,6 +28,11 @@ public class ListDSpaceRunnableHandler extends TestDSpaceRunnableHandler {
     public void handleException(String message, Exception e) {
         super.handleException(message, e);
         if (message != null) {
+            System.err.println(message);
+            errorMessages.add(message);
+        }
+        if (e != null) {
+            message = ExceptionUtils.getRootCauseMessage(e);
             System.err.println(message);
             errorMessages.add(message);
         }

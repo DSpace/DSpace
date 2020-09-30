@@ -26,7 +26,7 @@ public class BulkImportScriptConfiguration<T extends BulkImport> extends ScriptC
     @Override
     public boolean isAllowedToExecute(Context context) {
         try {
-            return authorizeService.isCollectionAdmin(context);
+            return authorizeService.isCollectionAdmin(context) || authorizeService.isAdmin(context);
         } catch (SQLException e) {
             throw new RuntimeException("SQLException occurred when checking if the current user is an admin", e);
         }

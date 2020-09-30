@@ -11,6 +11,7 @@ import java.util.Spliterators;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.ss.usermodel.Row;
@@ -22,8 +23,12 @@ public final class WorkbookUtils {
 
     }
 
+    public static boolean isSheetEmpty(Sheet sheet) {
+        return getRows(sheet).allMatch(WorkbookUtils::isRowEmpty);
+    }
+
     public static boolean isRowEmpty(Row row) {
-        return row.getPhysicalNumberOfCells() == 0;
+        return getCells(row).allMatch(cell -> StringUtils.isBlank(getCellValue(cell)));
     }
 
     public static boolean isNotEmptyRow(Row row) {
@@ -32,6 +37,14 @@ public final class WorkbookUtils {
 
     public static boolean isNotFirstRow(Row row) {
         return row.getRowNum() != 0;
+    }
+
+    public static boolean isCellEmpty(Cell cell) {
+        return StringUtils.isBlank(getCellValue(cell));
+    }
+
+    public static boolean isCellNotEmpty(Cell cell) {
+        return !isCellEmpty(cell);
     }
 
     public static Stream<Cell> getCells(Row row) {
@@ -44,10 +57,14 @@ public final class WorkbookUtils {
 
     public static String getCellValue(Row row, int index) {
         Cell cell = row.getCell(index);
+        return getCellValue(cell);
+    }
+
+    public static String getCellValue(Cell cell) {
         if (cell == null) {
-            return null;
+            return "";
         }
         DataFormatter formatter = new DataFormatter();
-        return formatter.formatCellValue(cell);
+        return formatter.formatCellValue(cell).trim();
     }
 }
