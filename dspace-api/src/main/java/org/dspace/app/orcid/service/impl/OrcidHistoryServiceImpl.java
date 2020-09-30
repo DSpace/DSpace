@@ -14,11 +14,11 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.math.BigInteger;
 import java.sql.SQLException;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -42,10 +42,10 @@ import org.dspace.app.orcid.OrcidQueue;
 import org.dspace.app.orcid.dao.OrcidHistoryDAO;
 import org.dspace.app.orcid.dao.OrcidQueueDAO;
 import org.dspace.app.orcid.service.OrcidHistoryService;
+import org.dspace.app.util.OrcidWorkMetadata;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Item;
-import org.dspace.content.MetadataSchemaEnum;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
@@ -181,15 +181,14 @@ public class OrcidHistoryServiceImpl implements OrcidHistoryService {
 
     private OrcidHistory sendPublicationToOrcid(Context context, OrcidQueue orcidQueue, String orcid, String token,
             boolean forceAddition) throws SQLException {
-
         Item entity = orcidQueue.getEntity();
         Item owner = orcidQueue.getOwner();
+        OrcidWorkMetadata itemMetadata = new OrcidWorkMetadata(context, entity);
         BigInteger putCode = null;
         Work work = new Work();
-        addAuthors(context, work, entity);
-        addPubblicationDate(work, entity);
-        String title = getMetadataValue(entity, "dc.title");
-        work.setTitle(new WorkTitle(title, null, null));
+        addAuthors(context, work, itemMetadata);
+        addPubblicationDate(work, itemMetadata);
+        work.setTitle(new WorkTitle(itemMetadata.getTitle(), null, null));
         work.setType(WorkType.JOURNAL_ARTICLE.value());
         work.setExternalIds(getExternalIds(entity));
         if (!forceAddition) {
@@ -358,6 +357,12 @@ public class OrcidHistoryServiceImpl implements OrcidHistoryService {
                    .orElse(null);
     }
 
+    private List<MetadataValue> getMetadataValues(Item item, String metadataField) {
+        return item.getMetadata().stream()
+                .filter(metadata -> metadata.getMetadataField().toString('.').equals(metadataField))
+                .collect(Collectors.toList());
+    }
+
     private void deleteOldRecords(Context context, Item entity, Item owner) throws SQLException {
         List<OrcidHistory> orcidHistories = orcidHistoryDAO.findByOwnerAndEntity(context, owner.getID(),entity.getID());
         for (OrcidHistory orcidHistory : orcidHistories) {
@@ -373,12 +378,11 @@ public class OrcidHistoryServiceImpl implements OrcidHistoryService {
         this.httpClient = httpClient;
     }
 
-    private void addAuthors(Context context, Work work, Item itemEntity) {
+    private void addAuthors(Context context, Work work, OrcidWorkMetadata itemMetadata) {
         WorkContributors workContributors = new WorkContributors();
         boolean haveContributor = false;
 
-        List<MetadataValue> authors = itemService.getMetadata(itemEntity,
-             MetadataSchemaEnum.DC.getName(), "contributor", "author", Item.ANY);
+        List<MetadataValue> authors = itemMetadata.getAuthors();
         for (MetadataValue valContributor : authors) {
             Contributor contributor = new Contributor();
             String name = valContributor.getValue();
@@ -427,24 +431,29 @@ public class OrcidHistoryServiceImpl implements OrcidHistoryService {
         }
     }
 
-    private void addPubblicationDate(Work work, Item entity) {
-        DecimalFormat df = new DecimalFormat("00");
-        String pubblicationDate = itemService.getMetadataFirstValue(entity,
-               MetadataSchemaEnum.DC.getName(), "date", "issued", Item.ANY);
-        if (pubblicationDate != null) {
-            LocalDate date = LocalDate.parse(pubblicationDate);
-            FuzzyDate publicationDate = new FuzzyDate();
-            if (date != null) {
+    private void addPubblicationDate(Work work, OrcidWorkMetadata itemMetadata) {
+        DecimalFormat decimalFormat = new DecimalFormat("00");
+        FuzzyDate publicationDate = new FuzzyDate();
+
+        if (StringUtils.isNotBlank(itemMetadata.getYear())
+            || StringUtils.isNotBlank(itemMetadata.getMonth())
+            || StringUtils.isNotBlank(itemMetadata.getDay())) {
+
+            if (StringUtils.isNotBlank(itemMetadata.getYear())) {
                 Year year = new Year();
-                year.setValue(Integer.valueOf(date.getYear()).toString());
+                year.setValue(itemMetadata.getYear());
                 publicationDate.setYear(year);
+            }
 
+            if (StringUtils.isNotBlank(itemMetadata.getMonth())) {
                 Month month = new Month();
-                month.setValue(df.format(date.getMonthValue()));
+                month.setValue(decimalFormat.format(Long.parseLong(itemMetadata.getMonth())));
                 publicationDate.setMonth(month);
+            }
 
+            if (StringUtils.isNotBlank(itemMetadata.getDay())) {
                 Day day = new Day();
-                day.setValue(df.format(date.getDayOfMonth()));
+                day.setValue(decimalFormat.format(Long.parseLong(itemMetadata.getDay())));
                 publicationDate.setDay(day);
             }
             work.setPublicationDate(publicationDate);
