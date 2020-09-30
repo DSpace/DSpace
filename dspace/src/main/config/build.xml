@@ -114,6 +114,7 @@ Common usage:
         <echo message="update          --> Update ${dspace.dir} config, etc, lib and web applications without " />
         <echo message="                    touching your data" />
     	<echo message="update_configs  --> Update your configs directory with new configuration files"/>
+        <echo message="update_spiders  --> Dowload and install Spider Robots database into ${dspace.dir}/config" />
         <echo message="update_code     --> Update compiled code (bin, lib, and etc directories)" />
         <echo message="update_webapps  --> Update web applications" />
         <echo message="" />
@@ -177,6 +178,7 @@ Common usage:
     <target name="update_configs"
             depends="overwrite_configs,overwrite_solr_configs"
             description="Updates the Configuration Directory">
+        <antcall target="init_spiders" />
     </target>
 
     <target name="overwrite_configs" description="Overwrites a configuration directory." if="${overwrite}" depends="copy_configs_keep">
@@ -827,6 +829,8 @@ Common usage:
 
         <antcall target="copy_webapps" />
 
+        <antcall target="init_spiders" />
+
         <echo>
 ====================================================================
  The DSpace code has been installed.
@@ -854,6 +858,29 @@ Common usage:
 ====================================================================
         </echo>
 
+    </target>
+
+    <!-- installs and/or updates Project Counter Robot List resolution database -->
+    <target name="update_spiders">
+        <echo>Downloading: ${irus.statistics.spider.agentregex.url}</echo>
+        <get src="${irus.statistics.spider.agentregex.url}" dest="${irus.statistics.spider.agentregex.regexfile}" verbose="true" />
+    </target>
+
+    <target name="check_spiders">
+        <condition property="need.spiders">
+            <and>
+                <not>
+                    <available file="${irus.statistics.spider.agentregex.regexfile}" />
+                </not>
+                <not>
+                    <contains string="${irus.statistics.spider.agentregex.url}" substring="irus.statistics.spider.agentregex.url"/>
+                </not>
+            </and>
+        </condition>
+    </target>
+
+    <target name="init_spiders" depends="check_spiders" if="need.spiders">
+        <antcall target="update_spiders" />
     </target>
 
 </project>
