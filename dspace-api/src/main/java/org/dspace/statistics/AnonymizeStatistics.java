@@ -46,6 +46,16 @@ import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.statistics.factory.StatisticsServiceFactory;
 import org.dspace.statistics.service.SolrLoggerService;
 
+/**
+ * Script to anonymize solr statistics according to GDPR specifications.
+ * This script will anonymize records older than a certain threshold, configurable with the
+ * 'anonymize_statistics.time_threshold' config, with a default value of 90 days.
+ * The records will be anonymized by replacing the last part of the ip address with a mask, this mask is configurable:
+ * For IPv4 addresses, the config is 'anonymize_statistics.ip_v4_mask', with a default value of '255'
+ * For IPv6 addresses, the config is 'anonymize_statistics.ip_v6_mask', with a default value of 'FFFF:FFFF'
+ * The DNS value of the records will also be replaced by a mask, configurable with 'anonymize_statistics.dns_mask',
+ * and with a default value of 'anonymized'.
+ */
 public class AnonymizeStatistics {
 
     private static Logger log = getLogger(AnonymizeStatistics.class);
@@ -169,19 +179,25 @@ public class AnonymizeStatistics {
     }
 
 
+    /**
+     * Anonymize the relevant solr documents, returned by the getDocuments method.
+     */
     private static void anonymizeStatistics() {
         try {
             long updated = 0;
             long total = getDocuments().getResults().getNumFound();
             printInfo(total + " documents to update");
 
+            // The documents will be processed in seperate threads.
             ExecutorService executorService = Executors.newFixedThreadPool(threads);
 
             QueryResponse documents;
             do {
                 documents = getDocuments();
 
-                Collection<Callable<Boolean>> callables = new ArrayList<>();
+                // list of the processing callables to execute
+                Collection<DoProcessing> callables = new ArrayList<>();
+                // list of the shards to commit
                 Set<String> shards = new HashSet<>();
 
                 for (SolrDocument document : documents.getResults()) {
@@ -195,10 +211,13 @@ public class AnonymizeStatistics {
                     }
                 }
 
+                // execute the processing callables
                 executorService.invokeAll(callables);
 
+                // Commit the main core
                 solrLoggerService.commit();
 
+                // Commit all relevant solr shards
                 for (String shard : shards) {
                     solrLoggerService.commitShard(shard);
                 }
@@ -218,6 +237,12 @@ public class AnonymizeStatistics {
         }
     }
 
+    /**
+     * Get the documents to anonymize.
+     * @return
+     *      Non-anonymized documents, which are older than the time period configured by the
+     *      'anonymize_statistics.time_threshold' config (or 90 days, if not configured)
+     */
     private static QueryResponse getDocuments() throws SolrServerException, IOException {
 
         if (sleep > 0) {
@@ -231,13 +256,19 @@ public class AnonymizeStatistics {
         }
 
         return solrLoggerService.query(
-                "ip:*",
-                "time:[* TO " + TIME_LIMIT + "] AND -dns:" + DNS_MASK,
-                null, batchSize, -1, null, null, null, null, null, false, false, true
+            "ip:*",
+            "time:[* TO " + TIME_LIMIT + "] AND -dns:" + DNS_MASK,
+            null, batchSize, -1, null, null, null, null,
+            null, false, -1, false, true
         );
     }
 
+    /**
+     * {@link Callable} implementation to process a solr document to be anonymized.
+     * It will return true if the anonymization succeeded.
+     */
     public static class DoProcessing implements Callable<Boolean> {
+
         private final SolrDocument document;
         private final long updated;
 

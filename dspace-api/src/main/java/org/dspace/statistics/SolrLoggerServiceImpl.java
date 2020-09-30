@@ -853,7 +853,11 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
         for (int i = 0; i < docsToUpdate.size(); i++) {
             SolrInputDocument solrDocument = docsToUpdate.get(i);
 
+            // Get the relevant shard client
+            // For a non-sharded core, the shard variable will reference the main core
             HttpSolrClient shard = getSolrServer(solrDocument.getFieldValue("[shard]").toString());
+
+            // Delete the document from the shard client
             shard.deleteByQuery("uid:" + solrDocument.getFieldValue("uid"));
 
             // Now loop over our fieldname actions
@@ -883,9 +887,12 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
                 }
             }
 
+            // see https://stackoverflow.com/questions/26941260/normalizing-solr-records-for-sharding-version-issues
             solrDocument.removeField("_version_");
+            // this field will not work with a non-sharded core
             solrDocument.removeField("[shard]");
 
+            // Add the updated document to the shard client
             shard.add(solrDocument);
 
             if (commit) {
@@ -1044,9 +1051,9 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
     }
 
     @Override
-    public QueryResponse query(String query, String filterQuery,
-                               String facetField, int rows, int max, String dateType, String dateStart,
-                               String dateEnd, List<String> facetQueries, String sort, boolean ascending, int facetMinCount)
+    public QueryResponse query(String query, String filterQuery, String facetField, int rows, int max, String dateType,
+                               String dateStart, String dateEnd, List<String> facetQueries, String sort,
+                               boolean ascending, int facetMinCount)
             throws SolrServerException, IOException {
 
         return query(query, filterQuery, facetField, rows, max, dateType, dateStart, dateEnd, facetQueries, sort,
@@ -1065,7 +1072,8 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
     @Override
     public QueryResponse query(String query, String filterQuery, String facetField, int rows, int max, String dateType,
                                String dateStart, String dateEnd, List<String> facetQueries, String sort,
-                               boolean ascending, int facetMinCount, boolean defaultFilterQueries, boolean includeShardField)
+                               boolean ascending, int facetMinCount, boolean defaultFilterQueries,
+                               boolean includeShardField)
             throws SolrServerException, IOException {
 
         if (solr == null) {
