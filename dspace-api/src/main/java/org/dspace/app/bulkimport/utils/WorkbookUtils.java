@@ -7,6 +7,11 @@
  */
 package org.dspace.app.bulkimport.utils;
 
+import static java.util.Spliterators.spliteratorUnknownSize;
+import static java.util.stream.StreamSupport.stream;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Spliterators;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -48,7 +53,17 @@ public final class WorkbookUtils {
     }
 
     public static Stream<Cell> getCells(Row row) {
-        return StreamSupport.stream(Spliterators.spliteratorUnknownSize(row.cellIterator(), 0), false);
+        int lastNotEmptyColumnIndex = stream(spliteratorUnknownSize(row.cellIterator(), 0), false)
+            .filter(WorkbookUtils::isCellNotEmpty)
+            .mapToInt(Cell::getColumnIndex)
+            .max().orElse(-1);
+
+        List<Cell> cells = new ArrayList<Cell>();
+        for (int i = 0; i <= lastNotEmptyColumnIndex; i++) {
+            cells.add(row.getCell(i));
+        }
+
+        return cells.stream();
     }
 
     public static Stream<Row> getRows(Sheet sheet) {

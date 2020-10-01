@@ -30,11 +30,11 @@ public final class MainEntity {
 
     private final ImportAction action;
 
-    private final MultiValuedMap<String, String> metadata;
+    private final MultiValuedMap<String, MetadataValueVO> metadata;
 
     private final List<MetadataGroup> metadataGroups;
 
-    public MainEntity(String id, String action, int row, MultiValuedMap<String, String> metadata,
+    public MainEntity(String id, String action, int row, MultiValuedMap<String, MetadataValueVO> metadata,
         List<MetadataGroup> metadataGroups) {
         super();
         this.id = id;
@@ -44,7 +44,7 @@ public final class MainEntity {
         this.metadataGroups = metadataGroups;
     }
 
-    public MultiValuedMap<String, String> getMetadata() {
+    public MultiValuedMap<String, MetadataValueVO> getMetadata() {
         return unmodifiableMultiValuedMap(metadata);
     }
 

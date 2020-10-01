@@ -52,12 +52,10 @@ public class BulkImportIT extends AbstractIntegrationTestWithDatabase {
 
     @Before
     public void beforeTests() throws SQLException, AuthorizeException {
-
         context.turnOffAuthorisationSystem();
         community = createCommunity(context).build();
         collection = createCollection(context, community).withAdminGroup(eperson).build();
         context.restoreAuthSystemState();
-
     }
 
     @Test
@@ -93,6 +91,22 @@ public class BulkImportIT extends AbstractIntegrationTestWithDatabase {
     }
 
     @Test
+    public void testWithOneHeaderEmptyImport() throws InstantiationException, IllegalAccessException {
+
+        String fileLocation = getXlsFile("with-one-header-empty.xls").getAbsolutePath();
+        String[] args = new String[] { "bulk-import", "-c", collection.getID().toString(), "-f", fileLocation };
+        ListDSpaceRunnableHandler handler = new ListDSpaceRunnableHandler();
+
+        handleScript(args, ScriptLauncher.getConfig(kernelImpl), handler, kernelImpl, eperson);
+        assertThat("Expected no infos", handler.getInfoMessages(), emptyCollectionOf(String.class));
+        assertThat("Expected no warnings", handler.getWarningMessages(), emptyCollectionOf(String.class));
+
+        List<String> errorMessages = handler.getErrorMessages();
+        assertThat("Expected 1 error message", handler.getErrorMessages(), hasSize(1));
+        assertThat(errorMessages.get(0), containsString("Found empty header in the sheet named Main Entity"));
+    }
+
+    @Test
     public void testWithoutHeadersImport() throws InstantiationException, IllegalAccessException {
 
         String fileLocation = getXlsFile("without-headers.xls").getAbsolutePath();
@@ -105,28 +119,103 @@ public class BulkImportIT extends AbstractIntegrationTestWithDatabase {
 
         List<String> errorMessages = handler.getErrorMessages();
         assertThat("Expected 1 error message", handler.getErrorMessages(), hasSize(1));
-        assertThat(errorMessages.get(0),
-            containsString("The following metadata fields of the sheet named Main Entity are invalid"));
+        assertThat(errorMessages.get(0), containsString("Wrong ID header on sheet Main Entity: RID::123456789"));
     }
 
     @Test
     @SuppressWarnings("unchecked")
-    public void testManyPersonsImport() throws Exception {
+    public void testCreatePatent() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+        Collection orgUnits = createCollection(context, community)
+            .withSubmissionDefinition("patent")
+            .withAdminGroup(eperson)
+            .build();
+        context.restoreAuthSystemState();
+
+        String fileLocation = getXlsFile("create-patent.xls").getAbsolutePath();
+        String[] args = new String[] { "bulk-import", "-c", orgUnits.getID().toString(), "-f", fileLocation };
+        ListDSpaceRunnableHandler handler = new ListDSpaceRunnableHandler();
+
+        handleScript(args, ScriptLauncher.getConfig(kernelImpl), handler, kernelImpl, eperson);
+        assertThat("Expected no errors", handler.getErrorMessages(), emptyCollectionOf(String.class));
+        assertThat("Expected no warnings", handler.getWarningMessages(), emptyCollectionOf(String.class));
+
+        List<String> infoMessages = handler.getInfoMessages();
+        assertThat("Expected 1 info messages", infoMessages, hasSize(1));
+        assertThat(infoMessages.get(0), containsString("Row 2 - Item created successfully"));
+
+        String id = getIdFromCreatedMessage(infoMessages.get(0), 2);
+        Item createdItem = itemService.findByIdOrLegacyId(context, id);
+        assertThat("Item expected to be created", createdItem, notNullValue());
+
+        List<MetadataValue> metadata = createdItem.getMetadata();
+        assertThat(metadata, hasItems(with("dc.title", "Patent", null, null, 0, -1)));
+        assertThat(metadata, hasItems(with("dc.contributor.author", "Tom Jones", null, null, 0, -1)));
+        assertThat(metadata, hasItems(with("dc.contributor.author", "Luca Stone", null, null, 1, -1)));
+        assertThat(metadata, hasItems(with("dc.contributor.author", "Edward Red", null, null, 2, -1)));
+        assertThat(metadata, hasItems(with("dc.publisher", "Publisher", null, null, 0, -1)));
+
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void testCreatePublicationWithAuthority() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+        Collection publications = createCollection(context, community)
+            .withSubmissionDefinition("publication")
+            .withAdminGroup(eperson)
+            .build();
+        context.restoreAuthSystemState();
+
+        String fileLocation = getXlsFile("create-publication-with-authority.xlsx").getAbsolutePath();
+        String[] args = new String[] { "bulk-import", "-c", publications.getID().toString(), "-f", fileLocation };
+        ListDSpaceRunnableHandler handler = new ListDSpaceRunnableHandler();
+
+        handleScript(args, ScriptLauncher.getConfig(kernelImpl), handler, kernelImpl, eperson);
+        assertThat("Expected no errors", handler.getErrorMessages(), emptyCollectionOf(String.class));
+        assertThat("Expected no warnings", handler.getWarningMessages(), emptyCollectionOf(String.class));
+
+        List<String> infoMessages = handler.getInfoMessages();
+        assertThat("Expected 1 info messages", infoMessages, hasSize(1));
+        assertThat(infoMessages.get(0), containsString("Row 2 - Item created successfully"));
+
+        String id = getIdFromCreatedMessage(infoMessages.get(0), 2);
+        Item createdItem = itemService.findByIdOrLegacyId(context, id);
+        assertThat("Item expected to be created", createdItem, notNullValue());
+
+        List<MetadataValue> metadata = createdItem.getMetadata();
+        assertThat(metadata, hasItems(with("dc.contributor.author", "Author1", null, "authority1", 0, 600)));
+        assertThat(metadata, hasItems(with("dc.contributor.author", "Author2", null, null, 1, -1)));
+        assertThat(metadata, hasItems(with("oairecerif.author.affiliation", "OrgUnit1", null, null, 0, -1)));
+        assertThat(metadata, hasItems(with("oairecerif.author.affiliation", "OrgUnit2", null, "authority2", 1, 400)));
+
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void testManyPublicationImport() throws Exception {
 
         context.turnOffAuthorisationSystem();
 
-        Item itemToUpdateByRid = createItem(context, collection)
-            .withTitle("Tom Hawks")
-            .withTitleForLanguage("Tom Hawks English", "en")
+        Collection publications = createCollection(context, community)
+            .withSubmissionDefinition("publication")
+            .withAdminGroup(eperson)
+            .build();
+
+        Item itemToUpdateByRid = createItem(context, publications)
+            .withTitle("My Publication")
+            .withTitleForLanguage("My Publication English", "en")
             .withRidIdentifier("123456789")
             .build();
 
-        Item itemToDelete = createItem(context, collection).withDoiIdentifier("10.1000/182").build();
+        Item itemToDelete = createItem(context, publications).withDoiIdentifier("10.1000/182").build();
 
         context.restoreAuthSystemState();
 
-        String fileLocation = getXlsFile("many-persons.xls").getAbsolutePath();
-        String[] args = new String[] { "bulk-import", "-c", collection.getID().toString(), "-f", fileLocation };
+        String fileLocation = getXlsFile("many-publications.xls").getAbsolutePath();
+        String[] args = new String[] { "bulk-import", "-c", publications.getID().toString(), "-f", fileLocation };
         ListDSpaceRunnableHandler handler = new ListDSpaceRunnableHandler();
 
         handleScript(args, ScriptLauncher.getConfig(kernelImpl), handler, kernelImpl, eperson);
@@ -141,41 +230,39 @@ public class BulkImportIT extends AbstractIntegrationTestWithDatabase {
         assertThat(infoMessages.get(2), containsString("Row 4 - Item deleted successfully"));
 
         // verify created item (ROW 2)
-        String createdItemId = infoMessages.get(0).substring("Row 2 - Item created successfully - ID: ".length());
+        String createdItemId = getIdFromCreatedMessage(infoMessages.get(0), 2);
         Item createdItem = itemService.findByIdOrLegacyId(context, createdItemId);
         assertThat("Item expected to be created", createdItem, notNullValue());
 
         List<MetadataValue> metadata = createdItem.getMetadata();
-        assertThat(metadata, hasItems(with("dc.title", "John Smith", null, null, 0, -1)));
-        assertThat(metadata, hasItems(with("dc.title", "John Smith English", "en", null, 1, -1)));
-        assertThat(metadata, hasItems(with("person.birthDate", "12/12/65", null, null, 0, -1)));
-        assertThat(metadata, hasItems(with("oairecerif.person.affiliation", "University", null, null, 0, -1)));
-        assertThat(metadata, hasItems(with("oairecerif.person.affiliation", "Another University", null, null, 1, -1)));
-        assertThat(metadata, hasItems(with("oairecerif.affiliation.startDate", "01/01/98", null, null, 0, -1)));
-        assertThat(metadata, hasItems(with("oairecerif.affiliation.startDate", "01/01/01", null, null, 1, -1)));
-        assertThat(metadata, hasItems(with("oairecerif.affiliation.endDate", PLACEHOLDER, null, null, 0, -1)));
-        assertThat(metadata, hasItems(with("oairecerif.affiliation.endDate", "12/12/05", null, null, 1, -1)));
-        assertThat(metadata, hasItems(with("oairecerif.affiliation.role", "Researcher", null, null, 0, -1)));
-        assertThat(metadata, hasItems(with("oairecerif.affiliation.role", "Researcher", null, null, 1, -1)));
-        assertThat(metadata, hasItems(with("oairecerif.identifier.url", "www.test.com", null, null, 0, -1)));
-        assertThat(metadata, hasItems(with("crisrp.site.title", "test.com", null, null, 0, -1)));
+        assertThat(metadata, hasItems(with("dc.title", "First publication", null, null, 0, -1)));
+        assertThat(metadata, hasItems(with("dc.title", "First publication English", "en", null, 1, -1)));
+        assertThat(metadata, hasItems(with("dc.date.issued", "12/12/65", null, null, 0, -1)));
+        assertThat(metadata, hasItems(with("dc.contributor.author", "Thomas Edison", null, null, 0, -1)));
+        assertThat(metadata, hasItems(with("dc.contributor.author", "Morgan Pitt", null, null, 1, -1)));
+        assertThat(metadata, hasItems(with("oairecerif.author.affiliation", "Company", null, null, 0, -1)));
+        assertThat(metadata, hasItems(with("oairecerif.author.affiliation", PLACEHOLDER, null, null, 1, -1)));
+        assertThat(metadata, hasItems(with("dc.contributor.editor", "Editor", null, null, 0, -1)));
+        assertThat(metadata, hasItems(with("oairecerif.editor.affiliation", "EditorAffiliation", null, null, 0, -1)));
 
         // verify updated item (ROW 3)
         Item itemUpdated = itemService.find(context, itemToUpdateByRid.getID());
         metadata = itemUpdated.getMetadata();
 
-        assertThat(metadata, hasItems(with("dc.title", "Carl Johnson", null, null, 0, -1)));
-        assertThat(metadata, hasItems(with("dc.title", "Carl Johnson English", "en", null, 1, -1)));
-        assertThat(metadata, hasItems(with("dc.title", "Johnson Carl English", "en", null, 2, -1)));
-        assertThat(metadata, hasItems(with("person.birthDate", "01/07/95", null, null, 0, -1)));
-        assertThat(metadata, hasItems(with("oairecerif.person.affiliation", "4Science", null, null, 0, -1)));
-        assertThat(metadata, hasItems(with("oairecerif.affiliation.startDate", "01/01/18", null, null, 0, -1)));
-        assertThat(metadata, hasItems(with("oairecerif.affiliation.endDate", PLACEHOLDER, null, null, 0, -1)));
-        assertThat(metadata, hasItems(with("oairecerif.affiliation.role", PLACEHOLDER, null, null, 0, -1)));
+        assertThat(metadata, hasItems(with("dc.title", "Publication", null, null, 0, -1)));
+        assertThat(metadata, hasItems(with("dc.title", "Publication English", "en", null, 1, -1)));
+        assertThat(metadata, hasItems(with("dc.title", "English Publication", "en", null, 2, -1)));
+        assertThat(metadata, hasItems(with("dc.date.issued", "01/07/95", null, null, 0, -1)));
+        assertThat(metadata, hasItems(with("dc.contributor.author", "John Smith", null, null, 0, -1)));
+        assertThat(metadata, hasItems(with("oairecerif.author.affiliation", PLACEHOLDER, null, null, 0, -1)));
 
         // verify deleted item (ROW 4)
         assertThat("Item expected to be deleted", itemService.find(context, itemToDelete.getID()), nullValue());
 
+    }
+
+    private String getIdFromCreatedMessage(String message, int row) {
+        return message.substring(("Row " + row + " - Item created successfully - ID: ").length());
     }
 
     private File getXlsFile(String name) {

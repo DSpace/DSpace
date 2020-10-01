@@ -17,16 +17,16 @@ public class MetadataGroup {
 
     private final String name;
 
-    private final MultiValuedMap<String, String> metadata;
+    private final MultiValuedMap<String, MetadataValueVO> metadata;
 
-    public MetadataGroup(String parentId, String name, MultiValuedMap<String, String> metadata) {
+    public MetadataGroup(String parentId, String name, MultiValuedMap<String, MetadataValueVO> metadata) {
         super();
         this.metadata = metadata;
         this.parentId = parentId;
         this.name = name;
     }
 
-    public MultiValuedMap<String, String> getMetadata() {
+    public MultiValuedMap<String, MetadataValueVO> getMetadata() {
         return unmodifiableMultiValuedMap(metadata);
     }
 

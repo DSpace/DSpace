@@ -485,7 +485,7 @@ it, please enter the types and the actual numbers or codes.</hint>
           <dc-element>contributor</dc-element>
           <dc-qualifier>author</dc-qualifier>
           <label>Author</label>
-          <input-type>name</input-type>
+          <input-type>onebox</input-type>
           <repeatable>false</repeatable>
           <required>You must enter at least the author.</required>
           <hint>Enter the names of the authors of this item in the form Lastname, Firstname [i.e. Smith, Josh or Smith, J].</hint>
@@ -493,8 +493,8 @@ it, please enter the types and the actual numbers or codes.</hint>
       </row>
       <row>
         <field>
-          <dc-schema>local</dc-schema>
-          <dc-element>contributor</dc-element>
+          <dc-schema>oairecerif</dc-schema>
+          <dc-element>author</dc-element>
           <dc-qualifier>affiliation</dc-qualifier>
           <label>Affiliation</label>
           <input-type>onebox</input-type>
@@ -511,7 +511,7 @@ it, please enter the types and the actual numbers or codes.</hint>
           <dc-element>contributor</dc-element>
           <dc-qualifier>editor</dc-qualifier>
           <label>Editor</label>
-          <input-type>name</input-type>
+          <input-type>onebox</input-type>
           <repeatable>false</repeatable>
           <required>You must enter at least the author.</required>
           <hint>The editors of this publication.</hint>
@@ -519,9 +519,9 @@ it, please enter the types and the actual numbers or codes.</hint>
       </row>
       <row>
         <field>
-          <dc-schema>dc</dc-schema>
-          <dc-element>contributor</dc-element>
-          <dc-qualifier>editoraffiliation</dc-qualifier>
+          <dc-schema>oairecerif</dc-schema>
+          <dc-element>editor</dc-element>
+          <dc-qualifier>affiliation</dc-qualifier>
           <label>Affiliation</label>
           <input-type>onebox</input-type>
           <repeatable>false</repeatable>
