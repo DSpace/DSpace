@@ -119,7 +119,9 @@ public interface ItemService
      *
      * @param context DSpace context object
      * @param eperson the submitter
-     * @param retrieveAllItems flag to determine if only archive should be returned
+     * @param retrieveAllItems flag to determine if all items should be returned or only archived items.
+     *                         If true, all items (regardless of status) are returned.
+     *                         If false, only archived items will be returned.
      * @return an iterator over the items submitted by eperson
      * @throws SQLException if database error
      */

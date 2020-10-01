@@ -244,7 +244,7 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
         } catch (AuthorizeException ex) {
             log.error("This AuthorizeException: " + ex + " occured while deleting Eperson with the ID: " +
                       ePerson.getID());
-            throw new AuthorizeException(ex.getMessage());
+            throw new AuthorizeException(ex);
         } catch (IOException ex) {
             log.error("This IOException: " + ex + " occured while deleting Eperson with the ID: " + ePerson.getID());
             throw new AuthorizeException(ex);
@@ -284,8 +284,8 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
             List<EPerson> ePeople = groupService.allMembers(context, group);
             if (ePeople.size() == 1 && ePeople.contains(ePerson)) {
                 throw new IllegalStateException(
-                        "Refused to delete user " + ePerson.getID() + " because it is part of the group " + group
-                                .getID());
+                    "Refused to delete user " + ePerson.getID() + " because it the only member of the workflow group"
+                    + group.getID() + ". Delete the tasks and group first if you want to remove this user.");
             }
         }
         // check for presence of eperson in tables that

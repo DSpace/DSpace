@@ -119,6 +119,10 @@ public class EPersonInWorkflowTest extends AbstractIntegrationTestWithDatabase {
 
 
     /**
+     * This test verifies that an EPerson cannot be removed if they are the only member of a Workflow Group that has
+     * tasks currently assigned to it. This test also verifies that after user has been removed from the workflow
+     * group and the task has been passed, the EPerson can be removed.
+     *
      * This test has the following setup:
      * - Step 1: user B
      * - Step 2: user C
@@ -187,6 +191,10 @@ public class EPersonInWorkflowTest extends AbstractIntegrationTestWithDatabase {
     }
 
     /**
+     * This test verifies that an EPerson cannot be removed if they are the only member of a Workflow Group that has
+     * tasks currently assigned to it. This test also verifies that after user has been removed from the workflow
+     * group and the task has been passed, the EPerson can be removed.
+     *
      * This test has the following setup:
      * - Step 1: user B
      * - Step 2: user C
@@ -252,6 +260,10 @@ public class EPersonInWorkflowTest extends AbstractIntegrationTestWithDatabase {
 
 
     /**
+     * This test verifies that an EPerson cannot be removed if they are the only member of a Workflow Group that has
+     * tasks currently assigned to it. This test also verifies that after user has been removed from the workflow
+     * group and the task has been passed, the EPerson can be removed.
+     *
      * This test has the following setup:
      * - Step 1: user B
      * - Step 2: user C
@@ -314,6 +326,10 @@ public class EPersonInWorkflowTest extends AbstractIntegrationTestWithDatabase {
     }
 
     /**
+     * This test verifies that an EPerson cannot be removed if they are the only member of a Workflow Group that has
+     * tasks currently assigned to it. This test also verifies that after user has been removed from the workflow
+     * group and the task has been passed, the EPerson can be removed.
+     *
      * This test has the following setup:
      * - Step 1: user B
      * - Step 2: user C
@@ -381,6 +397,10 @@ public class EPersonInWorkflowTest extends AbstractIntegrationTestWithDatabase {
     }
 
     /**
+     * This test verifies that an EPerson cannot be removed if they are the only member of a Workflow Group that has
+     * tasks currently assigned to it. This test also verifies that after user has been removed from the workflow
+     * group and the task has been passed, the EPerson can be removed.
+     *
      * This test has the following setup:
      * - Collection A - Step 1: user B
      * - Collection A - Step 2: user C
@@ -456,6 +476,10 @@ public class EPersonInWorkflowTest extends AbstractIntegrationTestWithDatabase {
     }
 
     /**
+     * This test verifies that an EPerson cannot be removed if they are the only member of a Workflow Group that has
+     * tasks currently assigned to it. This test also verifies that after user has been removed from the workflow
+     * group and the task has been passed, the EPerson can be removed.
+     *
      * This test has the following setup:
      * - Step 1: user B
      * - Step 2: user C
@@ -517,6 +541,10 @@ public class EPersonInWorkflowTest extends AbstractIntegrationTestWithDatabase {
     }
 
     /**
+     * This test verifies that an EPerson cannot be removed if they are the only member of a Workflow Group that has
+     * tasks currently assigned to it. This test also verifies that after user has been removed from the workflow
+     * group and the task has been passed, the EPerson can be removed.
+     *
      * This test has the following setup:
      * - Step 1: user B
      * - Step 2: user C
@@ -583,6 +611,10 @@ public class EPersonInWorkflowTest extends AbstractIntegrationTestWithDatabase {
 
 
     /**
+     * This test verifies that an EPerson cannot be removed if they are the only member of a Workflow Group that has
+     * tasks currently assigned to it. This test also verifies that after another user has been added to the workflow
+     * group, the EPerson can be removed.
+     *
      * This test has the following setup:
      * - Step 1: user B
      * - Step 2: user C
@@ -654,6 +686,10 @@ public class EPersonInWorkflowTest extends AbstractIntegrationTestWithDatabase {
     }
 
     /**
+     * This test verifies that an EPerson cannot be removed if they are the only member of a Workflow Group that has
+     * tasks currently assigned to it. This test also verifies that after another user has been added to the workflow
+     * group, the EPerson can be removed.
+     *
      * This test has the following setup:
      * - Step 1: user B
      * - Step 2: user C
@@ -720,6 +756,10 @@ public class EPersonInWorkflowTest extends AbstractIntegrationTestWithDatabase {
     }
 
     /**
+     * This test verifies that an EPerson cannot be removed if they are the only member of a Workflow Group that has
+     * tasks currently assigned to it. This test also verifies that after another user has been added to the workflow
+     * group, the EPerson can be removed.
+     *
      * This test has the following setup:
      * - Step 1: user B
      * - Step 2: user C
@@ -785,6 +825,10 @@ public class EPersonInWorkflowTest extends AbstractIntegrationTestWithDatabase {
     }
 
     /**
+     * This test verifies that an EPerson cannot be removed if they are the only member of a Workflow Group that has
+     * tasks currently assigned to it. This test also verifies that after another user has been added to the workflow
+     * group, the EPerson can be removed.
+     *
      * This test has the following setup:
      * - Step 1: user B
      * - Step 2: user C
@@ -851,6 +895,10 @@ public class EPersonInWorkflowTest extends AbstractIntegrationTestWithDatabase {
     }
 
     /**
+     * This test verifies that an EPerson cannot be removed if they are the only member of a Workflow Group that has
+     * tasks currently assigned to it. This test also verifies that after another user has been added to the workflow
+     * group, the EPerson can be removed.
+     *
      * This test has the following setup:
      * - Step 1: user B
      * - Step 2: user C
@@ -916,6 +964,10 @@ public class EPersonInWorkflowTest extends AbstractIntegrationTestWithDatabase {
     }
 
     /**
+     * This test verifies that an EPerson cannot be removed if they are the only member of a Workflow Group that has
+     * tasks currently assigned to it. This test also verifies that after another user has been added to the workflow
+     * group, the EPerson can be removed.
+     *
      * This test has the following setup:
      * - Step 1: user B
      * - Step 2: user C
@@ -984,6 +1036,8 @@ public class EPersonInWorkflowTest extends AbstractIntegrationTestWithDatabase {
     }
 
     /**
+     * This test verifies that an EPerson can be removed if there is another user is present in the Workflow Group.
+     *
      * This test has the following setup:
      * - Step 1: user B and D
      * - Step 2: user C and D
@@ -1042,6 +1096,8 @@ public class EPersonInWorkflowTest extends AbstractIntegrationTestWithDatabase {
     }
 
     /**
+     * This test verifies that an EPerson can be removed if there is another user is present in the Workflow Group.
+     * 
      * This test has the following setup:
      * - Step 1: user B and D
      * - Step 2: user C and D
@@ -1102,6 +1158,8 @@ public class EPersonInWorkflowTest extends AbstractIntegrationTestWithDatabase {
     }
 
     /**
+     * This test verifies that an EPerson can be removed if there is another user is present in the Workflow Group.
+     * 
      * This test has the following setup:
      * - Step 1: user B and D
      * - Step 2: user C and D
@@ -1162,6 +1220,8 @@ public class EPersonInWorkflowTest extends AbstractIntegrationTestWithDatabase {
     }
 
     /**
+     * This test verifies that an EPerson can be removed if there is another user is present in the Workflow Group.
+     * 
      * This test has the following setup:
      * - Step 1: user B and D
      * - Step 2: user C and D
@@ -1223,6 +1283,8 @@ public class EPersonInWorkflowTest extends AbstractIntegrationTestWithDatabase {
     }
 
     /**
+     * This test verifies that an EPerson can be removed if there is another user is present in the Workflow Group.
+     * 
      * This test has the following setup:
      * - Step 1: user B and D
      * - Step 2: user C and D
@@ -1285,6 +1347,8 @@ public class EPersonInWorkflowTest extends AbstractIntegrationTestWithDatabase {
     }
 
     /**
+     * This test verifies that an EPerson can be removed if there is another user is present in the Workflow Group.
+     *
      * This test has the following setup:
      * - Step 1: user B and D
      * - Step 2: user C and D
