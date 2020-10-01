@@ -16,9 +16,9 @@ import static org.junit.Assert.fail;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 
-import org.dspace.kernel.mixins.InitializedService;
-import org.dspace.kernel.mixins.ShutdownService;
 import org.dspace.servicemanager.config.DSpaceConfigurationService;
 import org.dspace.servicemanager.example.ConcreteExample;
 import org.dspace.servicemanager.fakeservices.FakeService1;
@@ -28,7 +28,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 /**
- * testing the main dspace service manager
+ * Testing the main DSpace service manager.
  *
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  */
@@ -41,10 +41,6 @@ public class DSpaceServiceManagerTest {
     @Before
     public void init() {
         configurationService = new DSpaceConfigurationService();
-
-        // Set some sample configurations relating to services/beans
-        configurationService.loadConfig(SampleAnnotationBean.class.getName() + ".sampleValue", "beckyz");
-        configurationService.loadConfig("fakeBean.fakeParam", "beckyz");
 
         dsm = new DSpaceServiceManager(configurationService, SPRING_TEST_CONFIG_FILE);
     }
@@ -175,16 +171,6 @@ public class DSpaceServiceManagerTest {
         ConcreteExample concrete = dsm.getServiceByName(ConcreteExample.class.getName(), ConcreteExample.class);
         assertNotNull(concrete);
         assertEquals("azeckoski", concrete.getName());
-        concrete = null;
-
-        // initialize a SampleAnnotationBean
-        SampleAnnotationBean sab = dsm
-            .getServiceByName(SampleAnnotationBean.class.getName(), SampleAnnotationBean.class);
-        assertNotNull(sab);
-        // Based on the configuration for "sampleValue" in the init() method above,
-        // a value should be pre-set!
-        assertEquals("beckyz", sab.getSampleValue());
-        sab = null;
 
         SpringAnnotationBean spr = dsm.getServiceByName(
             SpringAnnotationBean.class.getName(), SpringAnnotationBean.class);
@@ -192,7 +178,6 @@ public class DSpaceServiceManagerTest {
         assertEquals("azeckoski", spr.getConcreteName());
         assertEquals("aaronz", spr.getExampleName());
         assertEquals(null, spr.getSampleValue());
-        spr = null;
     }
 
     /**
@@ -272,25 +257,6 @@ public class DSpaceServiceManagerTest {
     }
 
     @Test
-    public void testInitAndShutdown() {
-        dsm.startup();
-
-        SampleAnnotationBean sab = dsm
-            .getServiceByName(SampleAnnotationBean.class.getName(), SampleAnnotationBean.class);
-        assertNotNull(sab);
-        assertEquals(1, sab.initCounter);
-        sab = null;
-
-        TestService ts = new TestService();
-        assertEquals(0, ts.value);
-        dsm.registerService(TestService.class.getName(), ts);
-        assertEquals(1, ts.value);
-        dsm.unregisterService(TestService.class.getName());
-        assertEquals(2, ts.value);
-        ts = null;
-    }
-
-    @Test
     public void testRegisterProviderLifecycle() {
         dsm.startup();
 
@@ -321,16 +287,16 @@ public class DSpaceServiceManagerTest {
         properties = null;
     }
 
-    public static class TestService implements InitializedService, ShutdownService {
+    public static class TestService {
 
         public int value = 0;
 
-        @Override
+        @PostConstruct
         public void init() {
             value++;
         }
 
-        @Override
+        @PreDestroy
         public void shutdown() {
             value++;
         }

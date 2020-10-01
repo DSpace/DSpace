@@ -256,6 +256,19 @@ public class ProcessServiceImpl implements ProcessService {
     }
 
     @Override
+    public List<Process> search(Context context, ProcessQueryParameterContainer processQueryParameterContainer,
+                                int limit, int offset) throws SQLException {
+        return processDAO.search(context, processQueryParameterContainer, limit, offset);
+    }
+
+    @Override
+    public int countSearch(Context context, ProcessQueryParameterContainer processQueryParameterContainer)
+        throws SQLException {
+        return processDAO.countTotalWithParameters(context, processQueryParameterContainer);
+    }
+
+
+    @Override
     public void appendLog(int processId, String scriptName, String output, ProcessLogLevel processLogLevel)
             throws IOException {
         File tmpDir = FileUtils.getTempDirectory();
