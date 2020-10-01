@@ -20,7 +20,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  *
  */
-public abstract class AInprogressSubmissionRest extends BaseObjectRest<Integer> {
+public abstract class AInprogressSubmissionRest<ID extends Serializable> extends BaseObjectRest<ID> {
 
     private Date lastModified = new Date();
     private Map<String, Serializable> sections;

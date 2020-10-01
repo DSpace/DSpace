@@ -572,6 +572,37 @@ public class RestResourceController implements InitializingBean {
     }
 
     /**
+     * Called in POST, multipart, upload to a specific rest resource the file passed as "file" request parameter
+     *
+     * Note that the regular expression in the request mapping accept a String as identifier;
+     *
+     * @param request
+     *            the http request
+     * @param apiCategory
+     *            the api category
+     * @param model
+     *            the rest model that identify the REST resource collection
+     * @param id
+     *            the id of the specific rest resource
+     * @param uploadfile
+     *            the file to upload
+     * @return the created resource
+     * @throws HttpRequestMethodNotSupportedException
+     */
+    @RequestMapping(method = RequestMethod.POST,
+            value = REGEX_REQUESTMAPPING_IDENTIFIER_AS_STRING_VERSION_STRONG,
+            headers = "content-type=multipart/form-data")
+    public <ID extends Serializable> ResponseEntity<RepresentationModel<?>> upload(HttpServletRequest request,
+                                                                                   @PathVariable String apiCategory,
+                                                                                   @PathVariable String model,
+                                                                                   @PathVariable String id,
+                                                                                   @RequestParam("file") MultipartFile
+                                                                                uploadfile)
+        throws HttpRequestMethodNotSupportedException {
+        return uploadInternal(request, apiCategory, model, id, uploadfile);
+    }
+
+    /**
      * Internal upload method.
      *
      * @param request
@@ -679,6 +710,28 @@ public class RestResourceController implements InitializingBean {
     public ResponseEntity<RepresentationModel<?>> patch(HttpServletRequest request, @PathVariable String apiCategory,
                                                         @PathVariable String model,
                                                         @PathVariable(name = "uuid") UUID id,
+                                                        @RequestBody(required = true) JsonNode jsonNode) {
+        return patchInternal(request, apiCategory, model, id, jsonNode);
+    }
+
+    /**
+     * PATCH method, using operation on the resources following (JSON) Patch notation (https://tools.ietf
+     * .org/html/rfc6902)
+     *
+     * Note that the regular expression in the request mapping accept a UUID as identifier;
+     *
+     * @param request
+     * @param apiCategory
+     * @param model
+     * @param id
+     * @param jsonNode
+     * @return
+     * @throws HttpRequestMethodNotSupportedException
+     */
+    @RequestMapping(method = RequestMethod.PATCH, value = REGEX_REQUESTMAPPING_IDENTIFIER_AS_STRING_VERSION_STRONG)
+    public ResponseEntity<RepresentationModel<?>> patch(HttpServletRequest request, @PathVariable String apiCategory,
+                                                        @PathVariable String model,
+                                                        @PathVariable String id,
                                                         @RequestBody(required = true) JsonNode jsonNode) {
         return patchInternal(request, apiCategory, model, id, jsonNode);
     }

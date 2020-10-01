@@ -7,76 +7,86 @@
  */
 package org.dspace.app.rest.converter;
 
-import java.util.List;
-
-import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
-import org.dspace.app.rest.model.AInprogressSubmissionRest;
+import org.dspace.app.rest.model.EditItemRest;
 import org.dspace.app.rest.model.ErrorRest;
 import org.dspace.app.rest.model.SubmissionDefinitionRest;
 import org.dspace.app.rest.model.SubmissionSectionRest;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.submit.AbstractRestProcessingStep;
-import org.dspace.app.rest.submit.SubmissionService;
-import org.dspace.app.util.SubmissionConfigReader;
 import org.dspace.app.util.SubmissionConfigReaderException;
 import org.dspace.app.util.SubmissionStepConfig;
 import org.dspace.content.Collection;
-import org.dspace.content.InProgressSubmission;
 import org.dspace.content.Item;
+import org.dspace.content.edit.EditItem;
+import org.dspace.content.edit.EditItemMode;
+import org.dspace.discovery.IndexableObject;
 import org.dspace.eperson.EPerson;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
- * Abstract implementation providing the common functionalities for all the inprogressSubmission Converter
- * 
- * @author Andrea Bollini (andrea.bollini at 4science.it)
+ * @author Danilo Di Nuzzo (danilo.dinuzzo at 4science.it)
  *
- * @param <T>
- *            the DSpace API inprogressSubmission object
- * @param <R>
- *            the DSpace REST inprogressSubmission representation
  */
-public abstract class AInprogressItemConverter<T extends InProgressSubmission,
-                            R extends AInprogressSubmissionRest>
-        implements IndexableObjectConverter<T, R> {
+@Component
+public class EditItemConverter
+    extends AInprogressItemConverter<EditItem, EditItemRest> {
 
-    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(AInprogressItemConverter.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(EditItemConverter.class);
 
     @Autowired
     private ConverterService converter;
-
     @Autowired
     private SubmissionSectionConverter submissionSectionConverter;
-
-    protected SubmissionConfigReader submissionConfigReader;
-
     @Autowired
-    SubmissionService submissionService;
+    private EditItemModeConverter modeConverter;
 
-    public AInprogressItemConverter() throws SubmissionConfigReaderException {
-        submissionConfigReader = new SubmissionConfigReader();
+    public EditItemConverter() throws SubmissionConfigReaderException {
+        super();
     }
 
-    protected void fillFromModel(T obj, R witem, Projection projection) {
+    /* (non-Javadoc)
+     * @see org.dspace.app.rest.converter.IndexableObjectConverter#supportsModel(org.dspace.discovery.IndexableObject)
+     */
+    @Override
+    public boolean supportsModel(IndexableObject idxo) {
+        return idxo.getIndexedObject() instanceof EditItem;
+    }
+
+    /* (non-Javadoc)
+     * @see org.dspace.app.rest.converter.DSpaceConverter#
+     * convert(java.lang.Object, org.dspace.app.rest.projection.Projection)
+     */
+    @Override
+    public EditItemRest convert(EditItem modelObject, Projection projection) {
+        EditItemRest rest = new EditItemRest();
+        rest.setProjection(projection);
+        fillFromModel(modelObject, rest, projection);
+        return rest;
+    }
+
+    protected void fillFromModel(EditItem obj, EditItemRest rest, Projection projection) {
         Collection collection = obj.getCollection();
         Item item = obj.getItem();
         EPerson submitter = null;
         submitter = obj.getSubmitter();
+        EditItemMode mode = obj.getMode();
 
-        witem.setId(obj.getID());
-        witem.setCollection(collection != null ? converter.toRest(collection, projection) : null);
-        witem.setItem(converter.toRest(item, projection));
-        witem.setSubmitter(converter.toRest(submitter, projection));
+        rest.setId(obj.getID() + ":none");
+        rest.setCollection(collection != null ? converter.toRest(collection, projection) : null);
+        rest.setItem(converter.toRest(item, projection));
+        rest.setSubmitter(converter.toRest(submitter, projection));
 
         // 1. retrieve the submission definition
         // 2. iterate over the submission section to allow to plugin additional
         // info
 
-        if (collection != null) {
+        if (mode != null) {
+            rest.setId(obj.getID() + ":" + mode.getName());
             SubmissionDefinitionRest def = converter.toRest(
-                    submissionConfigReader.getSubmissionConfigByCollection(collection), projection);
-            witem.setSubmissionDefinition(def);
+                    submissionConfigReader.getSubmissionConfigByName(mode.getSubmissionDefinition()), projection);
+            rest.setSubmissionDefinition(def);
             for (SubmissionSectionRest sections : def.getPanels()) {
                 SubmissionStepConfig stepConfig = submissionSectionConverter.toModel(sections);
 
@@ -96,9 +106,9 @@ public abstract class AInprogressItemConverter<T extends InProgressSubmission,
                         AbstractRestProcessingStep stepProcessing =
                             (AbstractRestProcessingStep) stepClass.newInstance();
                         for (ErrorRest error : stepProcessing.validate(submissionService, obj, stepConfig)) {
-                            addError(witem.getErrors(), error);
+                            addError(rest.getErrors(), error);
                         }
-                        witem.getSections()
+                        rest.getSections()
                             .put(sections.getId(), stepProcessing.getData(submissionService, obj, stepConfig));
                     } else {
                         log.warn("The submission step class specified by '" + stepConfig.getProcessingClassName() +
@@ -116,22 +126,11 @@ public abstract class AInprogressItemConverter<T extends InProgressSubmission,
         }
     }
 
-    protected void addError(List<ErrorRest> errors, ErrorRest toAdd) {
-
-        boolean found = false;
-        String i18nKey = toAdd.getMessage();
-        if (StringUtils.isNotBlank(i18nKey)) {
-            for (ErrorRest error : errors) {
-                if (i18nKey.equals(error.getMessage())) {
-                    error.getPaths().addAll(toAdd.getPaths());
-                    found = true;
-                    break;
-                }
-            }
-        }
-        if (!found) {
-            errors.add(toAdd);
-        }
+    /* (non-Javadoc)
+     * @see org.dspace.app.rest.converter.DSpaceConverter#getModelClass()
+     */
+    @Override
+    public Class<EditItem> getModelClass() {
+        return EditItem.class;
     }
-
 }

@@ -40,7 +40,7 @@ import org.hibernate.proxy.HibernateProxyHelper;
 @Entity
 @Table(name = "workspaceitem")
 public class WorkspaceItem
-    implements InProgressSubmission, Serializable {
+    implements InProgressSubmission<Integer>, Serializable {
 
     @Id
     @Column(name = "workspace_item_id", unique = true, nullable = false)
