@@ -11,6 +11,7 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.app.rest.authorization.AuthorizationFeature;
 import org.dspace.app.rest.authorization.AuthorizationFeatureDocumentation;
@@ -26,6 +27,8 @@ import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.eperson.EPerson;
+import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -55,8 +58,23 @@ public class RequestCopyFeature implements AuthorizationFeature {
     @Autowired
     private BitstreamService bitstreamService;
 
+    @Autowired
+    private ConfigurationService configurationService;
+
     @Override
     public boolean isAuthorized(Context context, BaseObjectRest object) throws SQLException {
+        String requestType = configurationService.getProperty("request.item.type");
+        if (StringUtils.isBlank(requestType)) {
+            return false;
+        } else if (StringUtils.equalsIgnoreCase(requestType, "logged")) {
+            EPerson currentUser = context.getCurrentUser();
+            if (currentUser == null) {
+                return false;
+            }
+        } else if (!StringUtils.equalsIgnoreCase(requestType, "all")) {
+            log.warn("The configuration parameter \"request.item.type\" contains an invalid value.");
+            return false;
+        }
         if (object instanceof ItemRest) {
             ItemRest itemRest = (ItemRest) object;
             String id = itemRest.getId();
@@ -64,7 +82,7 @@ public class RequestCopyFeature implements AuthorizationFeature {
             if (!item.isArchived()) {
                 return false;
             }
-            List<Bundle> bunds = item.getBundles();
+            List<Bundle> bunds = itemService.getBundles(item, Constants.DEFAULT_BUNDLE_NAME);
 
             for (Bundle bund : bunds) {
                 List<Bitstream> bitstreams = bund.getBitstreams();
