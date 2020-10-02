@@ -30,4 +30,11 @@
         <scope_note>Stores the cookie preferences of an EPerson, as selected in last session. Value will be an array of cookieName/boolean pairs, specifying which cookies are allowed or not allowed.</scope_note>
     </dc-type>
 
+    <dc-type>
+        <schema>dspace</schema>
+        <element>agreements</element>
+        <qualifier>ignore</qualifier>
+        <scope_note>Stores whether the EPerson is allowed to ignore the user agreement, useful for user account used by third party application. Valid values; true, false</scope_note>
+    </dc-type>
+
 </dspace-dc-types>

@@ -11,6 +11,7 @@ import java.sql.SQLException;
 import javax.servlet.http.HttpServletRequest;
 
 import com.nimbusds.jwt.JWTClaimsSet;
+import org.apache.commons.lang3.BooleanUtils;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
@@ -56,7 +57,9 @@ public class UserAgreementClaimProvider implements JWTClaimProvider {
             throw new RuntimeException(e);
         }
         String metadata = ePersonService.getMetadataFirstValue(user, "dspace", "agreements", "end-user", Item.ANY);
-        return metadata != null ? metadata : "false";
+        String metadataIgnore = ePersonService.getMetadataFirstValue(user, "dspace", "agreements", "ignore", Item.ANY);
+        // return true if the user can ignore the agreement or has accepted it
+        return BooleanUtils.toBoolean(metadataIgnore) ? "true" : String.valueOf(BooleanUtils.toBoolean(metadata));
     }
 
     /**

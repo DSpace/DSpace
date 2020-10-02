@@ -16,6 +16,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang3.BooleanUtils;
 import org.dspace.app.rest.security.jwt.UserAgreementClaimProvider;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.core.Context;
@@ -60,7 +61,8 @@ public class UserAgreementFilter extends OncePerRequestFilter {
 
         EPerson currentUser = context.getCurrentUser();
         if (isNotOpenPath(request) && currentUser != null) {
-            boolean isUserAgreementAccepted = (boolean) request.getAttribute(USER_AGREEMENT_ACCEPTED);
+            boolean isUserAgreementAccepted = BooleanUtils
+                    .isTrue((Boolean) request.getAttribute(USER_AGREEMENT_ACCEPTED));
             if (!isUserAgreementAccepted) {
                 response.setStatus(HttpStatus.FORBIDDEN.value());
                 response.getWriter().write("No user agreement accepted");
