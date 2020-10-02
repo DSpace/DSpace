@@ -26,8 +26,21 @@ import org.springframework.stereotype.Service;
 @Service
 public interface RestAuthenticationService {
 
+    /**
+     * Add authenticated user data found in the request and/or Authentication class into the response.
+     * <P>
+     * This method is called after authentication has succeeded, and it allows the REST API to provide
+     * user data in the response (in the form of a JWT or similar, depending on implementation)
+     * @param request current request
+     * @param response current response
+     * @param authentication Authentication information from successful login
+     * @param addSingleUseCookie true/false, whether to include authentication data in a single-use cookie
+     *                           When false, DSpace only will use headers to return authentication data.
+     * @throws IOException
+     */
     void addAuthenticationDataForUser(HttpServletRequest request, HttpServletResponse response,
-                                      DSpaceAuthentication authentication, boolean addCookie) throws IOException;
+                                      DSpaceAuthentication authentication, boolean addSingleUseCookie)
+        throws IOException;
 
     /**
      * Retrieve a short lived authentication token, this can be used (among other things) for file downloads
@@ -37,9 +50,9 @@ public interface RestAuthenticationService {
      */
     AuthenticationToken getShortLivedAuthenticationToken(Context context, HttpServletRequest request);
 
-    EPerson getAuthenticatedEPerson(HttpServletRequest request, Context context);
+    EPerson getAuthenticatedEPerson(HttpServletRequest request, HttpServletResponse response, Context context);
 
-    boolean hasAuthenticationData(HttpServletRequest request);
+    boolean hasAuthenticationData(HttpServletRequest request, HttpServletResponse response);
 
     void invalidateAuthenticationData(HttpServletRequest request, HttpServletResponse response, Context context)
             throws Exception;
@@ -57,6 +70,6 @@ public interface RestAuthenticationService {
      */
     String getWwwAuthenticateHeaderValue(HttpServletRequest request, HttpServletResponse response);
 
-    void invalidateAuthenticationCookie(HttpServletResponse res);
+    void invalidateSingleUseCookie(HttpServletResponse res);
 
 }

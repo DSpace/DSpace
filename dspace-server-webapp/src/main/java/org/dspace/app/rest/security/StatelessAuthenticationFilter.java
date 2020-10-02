@@ -96,7 +96,6 @@ public class StatelessAuthenticationFilter extends BasicAuthenticationFilter {
         }
         if (authentication != null) {
             SecurityContextHolder.getContext().setAuthentication(authentication);
-            restAuthenticationService.invalidateAuthenticationCookie(res);
         }
         chain.doFilter(req, res);
     }
@@ -118,12 +117,12 @@ public class StatelessAuthenticationFilter extends BasicAuthenticationFilter {
     private Authentication getAuthentication(HttpServletRequest request, HttpServletResponse res)
         throws AuthorizeException, SQLException {
 
-        if (restAuthenticationService.hasAuthenticationData(request)) {
+        if (restAuthenticationService.hasAuthenticationData(request, res)) {
             // parse the token.
 
             Context context = ContextUtil.obtainContext(request);
 
-            EPerson eperson = restAuthenticationService.getAuthenticatedEPerson(request, context);
+            EPerson eperson = restAuthenticationService.getAuthenticatedEPerson(request, res, context);
             if (eperson != null) {
                 //Pass the eperson ID to the request service
                 requestService.setCurrentUserId(eperson.getID());

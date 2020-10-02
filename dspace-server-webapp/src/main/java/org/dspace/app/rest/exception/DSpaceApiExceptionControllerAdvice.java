@@ -41,7 +41,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
  * @author Frederic Van Reet (frederic dot vanreet at atmire dot com)
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  * @author Pasquale Cavallo (pasquale.cavallo at 4science dot it)
- * 
+ *
  */
 @ControllerAdvice
 public class DSpaceApiExceptionControllerAdvice extends ResponseEntityExceptionHandler {
@@ -53,7 +53,7 @@ public class DSpaceApiExceptionControllerAdvice extends ResponseEntityExceptionH
     @ExceptionHandler({AuthorizeException.class, RESTAuthorizationException.class, AccessDeniedException.class})
     protected void handleAuthorizeException(HttpServletRequest request, HttpServletResponse response, Exception ex)
         throws IOException {
-        if (restAuthenticationService.hasAuthenticationData(request)) {
+        if (restAuthenticationService.hasAuthenticationData(request, response)) {
             sendErrorResponse(request, response, ex, "Access is denied", HttpServletResponse.SC_FORBIDDEN);
         } else {
             sendErrorResponse(request, response, ex, "Authentication is required", HttpServletResponse.SC_UNAUTHORIZED);

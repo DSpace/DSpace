@@ -69,9 +69,34 @@ public class JWTTokenRestAuthenticationServiceImpl implements RestAuthentication
 
     }
 
+    /**
+     * Add authenticated user data found in the request and/or Authentication class into the response
+     * within a JWT (JSON Web Token)
+     * <P>
+     * This method is called after authentication has already succeeded. It parses the information
+     * obtained from the successful login (from request and/or Authentication class) and creates a JWT
+     * which is sent in the response.
+     * <P>
+     * If requested, the JWT is also returned in a single-use cookie. This is primarily for support of auth
+     * plugins which require a lot of redirects, as headers cannot be sent via redirects. A good example of this
+     * behavior is Shibboleth authentication, which creates this single-use cookie prior to a redirect back to the
+     * client after a successful login. The client then sends this cookie back to validate the login, at which point
+     * it is destroyed & request headers are used thereafter.
+     * <P>
+     * WARNING: Single-use cookies should be avoided unless absolutely necessary, as there is a (very small)
+     * risk of CSRF (Cross Site Request Forgery) whenever authentication information is sent via a cookie.  That said,
+     * because the cookie is single-use & the JWT can be limited by origin/domain, the risk is low.
+     *
+     * @param request current request
+     * @param response current response
+     * @param authentication Authentication information from successful login
+     * @param addSingleUseCookie true/false, whether to include JWT in a single-use cookie
+     *                           When false, DSpace will only return JWT in headers.
+     * @throws IOException
+     */
     @Override
     public void addAuthenticationDataForUser(HttpServletRequest request, HttpServletResponse response,
-            DSpaceAuthentication authentication, boolean addCookie) throws IOException {
+            DSpaceAuthentication authentication, boolean addSingleUseCookie) throws IOException {
         try {
             Context context = ContextUtil.obtainContext(request);
             context.setCurrentUser(ePersonService.findByEmail(context, authentication.getName()));
@@ -81,7 +106,7 @@ public class JWTTokenRestAuthenticationServiceImpl implements RestAuthentication
             String token = loginJWTTokenHandler.createTokenForEPerson(context, request,
                                                                  authentication.getPreviousLoginDate(), groups);
 
-            addTokenToResponse(response, token, addCookie);
+            addTokenToResponse(response, token, addSingleUseCookie);
             context.commit();
 
         } catch (JOSEException e) {
@@ -115,9 +140,9 @@ public class JWTTokenRestAuthenticationServiceImpl implements RestAuthentication
     }
 
     @Override
-    public EPerson getAuthenticatedEPerson(HttpServletRequest request, Context context) {
+    public EPerson getAuthenticatedEPerson(HttpServletRequest request, HttpServletResponse response, Context context) {
         try {
-            String token = getLoginToken(request);
+            String token = getLoginToken(request, response);
             EPerson ePerson = null;
             if (token == null) {
                 token = getShortLivedToken(request);
@@ -137,22 +162,24 @@ public class JWTTokenRestAuthenticationServiceImpl implements RestAuthentication
     }
 
     @Override
-    public boolean hasAuthenticationData(HttpServletRequest request) {
+    public boolean hasAuthenticationData(HttpServletRequest request, HttpServletResponse response) {
         return StringUtils.isNotBlank(request.getHeader(AUTHORIZATION_HEADER))
-                || StringUtils.isNotBlank(getAuthorizationCookie(request))
+                || StringUtils.isNotBlank(getSingleUseCookie(request, response))
                 || StringUtils.isNotBlank(request.getParameter(AUTHORIZATION_TOKEN_PARAMETER));
     }
 
     @Override
     public void invalidateAuthenticationData(HttpServletRequest request, HttpServletResponse response,
                                              Context context) throws Exception {
-        String token = getLoginToken(request);
-        invalidateAuthenticationCookie(response);
+        // invalidate our current token
+        String token = getLoginToken(request, response);
         loginJWTTokenHandler.invalidateToken(token, request, context);
+        // Just in case, invalidate our single-use cookie too
+        invalidateSingleUseCookie(response);
     }
 
     @Override
-    public void invalidateAuthenticationCookie(HttpServletResponse response) {
+    public void invalidateSingleUseCookie(HttpServletResponse response) {
         // Re-send the same cookie (as addTokenToResponse()) with no value and a Max-Age of 0 seconds
         ResponseCookie cookie = ResponseCookie.from(AUTHORIZATION_COOKIE, "")
                                               .maxAge(0).httpOnly(true).secure(true).sameSite("None").build();
@@ -210,21 +237,27 @@ public class JWTTokenRestAuthenticationServiceImpl implements RestAuthentication
     /**
      * Add login token to the current response in the Authorization header.
      * <P>
-     * If requested, the JWT is also returned in a cookie. This is primarily for support of auth
-     * plugins which _require_ cookie-based auth (e.g. Shibboleth). Note that this cookie can be used cross-site
-     * (i.e. SameSite=None), but cannot be used by Javascript (HttpOnly) including the Angular UI. It also will only be
-     * sent via HTTPS (Secure).
+     * If requested, the JWT is also returned in a single-use cookie. This is primarily for support of auth
+     * plugins which require a lot of redirects, as headers cannot be sent via redirects. A good example of this
+     * behavior is Shibboleth authentication, which creates this single-use cookie prior to a redirect back to the
+     * client after a successful login. The client then sends this cookie back to validate the login, at which point
+     * it is destroyed & request headers are used thereafter.
+     * <P>
+     * Note that the single-use cookie can be used cross-site (i.e. SameSite=None), but cannot be read by Javascript
+     * (HttpOnly). It also will only be sent via HTTPS (Secure).
      *
      * @param response current response
      * @param token auth token to add
+     * @param addSingleUseCookie whether or not to generate a single-use cookie including the JWT.
      * @throws IOException
      */
-    private void addTokenToResponse(final HttpServletResponse response, final String token, final Boolean addCookie)
+    private void addTokenToResponse(final HttpServletResponse response, final String token,
+                                    final Boolean addSingleUseCookie)
             throws IOException {
         // Add an authentication cookie to the response *if* requested
         // NOTE: authentication cookies are only needed by specific auth plugins (e.g. Shibboleth, which cannot use
         // authentication headers as headers cannot be sent via redirects).
-        if (addCookie) {
+        if (addSingleUseCookie) {
             ResponseCookie cookie = ResponseCookie.from(AUTHORIZATION_COOKIE, token)
                                                   .httpOnly(true).secure(true).sameSite("None").build();
 
@@ -234,10 +267,18 @@ public class JWTTokenRestAuthenticationServiceImpl implements RestAuthentication
         response.setHeader(AUTHORIZATION_HEADER, String.format("%s %s", AUTHORIZATION_TYPE, token));
     }
 
-    private String getLoginToken(HttpServletRequest request) {
+    /**
+     * Get the Login token (JWT) in the current request. First we check the Authorization header.
+     * If not found there, we check for a single-use cookie (used to initialize Authorization header)
+     * and use that.
+     * @param request
+     * @param response
+     * @return
+     */
+    private String getLoginToken(HttpServletRequest request, HttpServletResponse response) {
         String tokenValue = null;
         String authHeader = request.getHeader(AUTHORIZATION_HEADER);
-        String authCookie = getAuthorizationCookie(request);
+        String authCookie = getSingleUseCookie(request, response);
         if (StringUtils.isNotBlank(authHeader)) {
             tokenValue = authHeader.replace(AUTHORIZATION_TYPE, "").trim();
         } else if (StringUtils.isNotBlank(authCookie)) {
@@ -256,13 +297,22 @@ public class JWTTokenRestAuthenticationServiceImpl implements RestAuthentication
         return tokenValue;
     }
 
-    private String getAuthorizationCookie(HttpServletRequest request) {
-        String authCookie = "";
+    /**
+     * Check for our single use cookie in the request. If found, read it and destroy it, returning
+     * its value.
+     * @param request current request
+     * @param response current response
+     * @return value of single-use cookie or null if not found
+     */
+    private String getSingleUseCookie(HttpServletRequest request, HttpServletResponse response) {
+        String authCookie = null;
         Cookie[] cookies = request.getCookies();
         if (cookies != null) {
             for (Cookie cookie : cookies) {
+                // We found a single-use cookie. Read it, and immediately delete it.
                 if (cookie.getName().equals(AUTHORIZATION_COOKIE) && StringUtils.isNotEmpty(cookie.getValue())) {
                     authCookie = cookie.getValue();
+                    invalidateSingleUseCookie(response);
                 }
             }
         }
