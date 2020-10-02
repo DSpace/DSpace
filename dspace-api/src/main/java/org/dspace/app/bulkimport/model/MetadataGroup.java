@@ -10,6 +10,8 @@ package org.dspace.app.bulkimport.model;
 import static org.apache.commons.collections4.multimap.UnmodifiableMultiValuedMap.unmodifiableMultiValuedMap;
 
 import org.apache.commons.collections4.MultiValuedMap;
+import org.apache.commons.collections4.multimap.HashSetValuedHashMap;
+import org.apache.commons.lang3.StringUtils;
 
 public class MetadataGroup {
 
@@ -19,11 +21,22 @@ public class MetadataGroup {
 
     private final MultiValuedMap<String, MetadataValueVO> metadata;
 
+    private final String validationError;
+
+    public MetadataGroup(String parentId, String name, String validationError) {
+        super();
+        this.metadata = new HashSetValuedHashMap<>();
+        this.parentId = parentId;
+        this.name = name;
+        this.validationError = validationError;
+    }
+
     public MetadataGroup(String parentId, String name, MultiValuedMap<String, MetadataValueVO> metadata) {
         super();
         this.metadata = metadata;
         this.parentId = parentId;
         this.name = name;
+        this.validationError = null;
     }
 
     public MultiValuedMap<String, MetadataValueVO> getMetadata() {
@@ -36,6 +49,14 @@ public class MetadataGroup {
 
     public String getName() {
         return name;
+    }
+
+    public boolean isNotValid() {
+        return StringUtils.isNotEmpty(validationError);
+    }
+
+    public String getValidationError() {
+        return validationError;
     }
 
 }

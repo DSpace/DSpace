@@ -16,13 +16,12 @@ import java.util.List;
 import org.apache.commons.collections4.MultiValuedMap;
 
 /**
- * Class that model a row of the first section of the Bulk import excel (main
- * entity).
+ * Class that model a row of the first sheet of the Bulk import excel.
  *
  * @author Luca Giamminonni (luca.giamminonni at 4science.it)
  *
  */
-public final class MainEntity {
+public final class EntityRow {
 
     private final String id;
 
@@ -34,7 +33,7 @@ public final class MainEntity {
 
     private final List<MetadataGroup> metadataGroups;
 
-    public MainEntity(String id, String action, int row, MultiValuedMap<String, MetadataValueVO> metadata,
+    public EntityRow(String id, String action, int row, MultiValuedMap<String, MetadataValueVO> metadata,
         List<MetadataGroup> metadataGroups) {
         super();
         this.id = id;

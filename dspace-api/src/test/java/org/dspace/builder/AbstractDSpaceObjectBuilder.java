@@ -14,7 +14,6 @@ import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.content.DSpaceObject;
-import org.dspace.content.Item;
 import org.dspace.content.service.DSpaceObjectService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -63,7 +62,7 @@ public abstract class AbstractDSpaceObjectBuilder<T extends DSpaceObject>
                                                                             final String qualifier,
                                                                             final String value) {
         try {
-            getService().addMetadata(context, dso, schema, element, qualifier, Item.ANY, value);
+            getService().addMetadata(context, dso, schema, element, qualifier, null, value);
         } catch (Exception e) {
             return handleException(e);
         }

@@ -70,8 +70,9 @@ public class BulkImportIT extends AbstractIntegrationTestWithDatabase {
         assertThat("Expected no warnings", handler.getWarningMessages(), emptyCollectionOf(String.class));
 
         List<String> errorMessages = handler.getErrorMessages();
-        assertThat("Expected 1 error message", handler.getErrorMessages(), hasSize(1));
+        assertThat("Expected 2 error messages", errorMessages, hasSize(2));
         assertThat(errorMessages.get(0), containsString("The sheet Main Entity of the Workbook is empty"));
+        assertThat(errorMessages.get(1), containsString("Import failed - All performed operations are rolled back"));
     }
 
     @Test
@@ -86,14 +87,14 @@ public class BulkImportIT extends AbstractIntegrationTestWithDatabase {
         assertThat("Expected no warnings", handler.getWarningMessages(), emptyCollectionOf(String.class));
 
         List<String> errorMessages = handler.getErrorMessages();
-        assertThat("Expected 1 error message", handler.getErrorMessages(), hasSize(1));
+        assertThat("Expected 2 error message", errorMessages, hasSize(2));
         assertThat(errorMessages.get(0), containsString("The header of sheet Main Entity of the Workbook is empty"));
     }
 
     @Test
-    public void testWithOneHeaderEmptyImport() throws InstantiationException, IllegalAccessException {
+    public void testOneHeaderEmptyImport() throws InstantiationException, IllegalAccessException {
 
-        String fileLocation = getXlsFile("with-one-header-empty.xls").getAbsolutePath();
+        String fileLocation = getXlsFile("one-header-empty.xls").getAbsolutePath();
         String[] args = new String[] { "bulk-import", "-c", collection.getID().toString(), "-f", fileLocation };
         ListDSpaceRunnableHandler handler = new ListDSpaceRunnableHandler();
 
@@ -102,8 +103,10 @@ public class BulkImportIT extends AbstractIntegrationTestWithDatabase {
         assertThat("Expected no warnings", handler.getWarningMessages(), emptyCollectionOf(String.class));
 
         List<String> errorMessages = handler.getErrorMessages();
-        assertThat("Expected 1 error message", handler.getErrorMessages(), hasSize(1));
-        assertThat(errorMessages.get(0), containsString("Found empty header in the sheet named Main Entity"));
+        assertThat("Expected 2 error messages", errorMessages, hasSize(2));
+        assertThat(errorMessages.get(0), containsString("The following metadata fields of the sheet named "
+            + "'Main Entity' are invalid:[Empty metadata]"));
+        assertThat(errorMessages.get(1), containsString("Import failed - All performed operations are rolled back"));
     }
 
     @Test
@@ -118,8 +121,104 @@ public class BulkImportIT extends AbstractIntegrationTestWithDatabase {
         assertThat("Expected no warnings", handler.getWarningMessages(), emptyCollectionOf(String.class));
 
         List<String> errorMessages = handler.getErrorMessages();
-        assertThat("Expected 1 error message", handler.getErrorMessages(), hasSize(1));
+        assertThat("Expected 2 error message", errorMessages, hasSize(2));
         assertThat(errorMessages.get(0), containsString("Wrong ID header on sheet Main Entity: RID::123456789"));
+        assertThat(errorMessages.get(1), containsString("Import failed - All performed operations are rolled back"));
+    }
+
+    @Test
+    public void testInvalidHeadersImport() throws InstantiationException, IllegalAccessException {
+
+        String fileLocation = getXlsFile("invalid-headers.xls").getAbsolutePath();
+        String[] args = new String[] { "bulk-import", "-c", collection.getID().toString(), "-f", fileLocation };
+        ListDSpaceRunnableHandler handler = new ListDSpaceRunnableHandler();
+
+        handleScript(args, ScriptLauncher.getConfig(kernelImpl), handler, kernelImpl, eperson);
+        assertThat("Expected no infos", handler.getInfoMessages(), emptyCollectionOf(String.class));
+        assertThat("Expected no warnings", handler.getWarningMessages(), emptyCollectionOf(String.class));
+
+        List<String> errorMessages = handler.getErrorMessages();
+        assertThat("Expected 2 error messages", errorMessages, hasSize(2));
+        assertThat(errorMessages.get(0), containsString("The following metadata fields of the sheet named "
+            + "'Main Entity' are invalid:[unknown is not valid for the given collection, "
+            + "person.identifier is not valid for the given collection]"));
+        assertThat(errorMessages.get(1), containsString("Import failed - All performed operations are rolled back"));
+    }
+
+    @Test
+    public void testInvalidSheetNameImport() throws InstantiationException, IllegalAccessException {
+
+        String fileLocation = getXlsFile("invalid-sheet-name.xlsx").getAbsolutePath();
+        String[] args = new String[] { "bulk-import", "-c", collection.getID().toString(), "-f", fileLocation };
+        ListDSpaceRunnableHandler handler = new ListDSpaceRunnableHandler();
+
+        handleScript(args, ScriptLauncher.getConfig(kernelImpl), handler, kernelImpl, eperson);
+        assertThat("Expected no infos", handler.getInfoMessages(), emptyCollectionOf(String.class));
+        assertThat("Expected no warnings", handler.getWarningMessages(), emptyCollectionOf(String.class));
+
+        List<String> errorMessages = handler.getErrorMessages();
+        assertThat("Expected 2 error messages", errorMessages, hasSize(2));
+        assertThat(errorMessages.get(0), containsString("The sheet name wrongdc.contributor.author "
+            + "is not a valid metadata group"));
+        assertThat(errorMessages.get(1), containsString("Import failed - All performed operations are rolled back"));
+    }
+
+    @Test
+    public void testMetadataGroupRowWithManyValuesImport() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+        Collection publications = createCollection(context, community)
+            .withSubmissionDefinition("publication")
+            .withAdminGroup(eperson)
+            .build();
+        context.commit();
+        context.restoreAuthSystemState();
+
+        String fileLocation = getXlsFile("metadata-group-row-with-many-values.xlsx").getAbsolutePath();
+        String[] args = new String[] { "bulk-import", "-c", publications.getID().toString(), "-f", fileLocation };
+        ListDSpaceRunnableHandler handler = new ListDSpaceRunnableHandler();
+
+        handleScript(args, ScriptLauncher.getConfig(kernelImpl), handler, kernelImpl, eperson);
+        assertThat("Expected no warnings", handler.getWarningMessages(), emptyCollectionOf(String.class));
+
+        List<String> errorMessages = handler.getErrorMessages();
+        assertThat("Expected 1 error message", errorMessages, hasSize(1));
+        assertThat(errorMessages.get(0), containsString("Multiple metadata value on the same cell not allowed in the "
+            + "metadata group sheets: Author1 || Author2"));
+
+        List<String> infoMessages = handler.getInfoMessages();
+        assertThat("Expected 5 info message", infoMessages, hasSize(5));
+        assertThat(infoMessages.get(0), containsString("Start reading all the metadata group rows"));
+        assertThat(infoMessages.get(1), containsString("Found 1 metadata groups to process"));
+        assertThat(infoMessages.get(2), containsString("Found 2 items to process"));
+        assertThat(infoMessages.get(3), containsString("Row 2 - Item created successfully"));
+        assertThat(infoMessages.get(4), containsString("Row 3 - Item created successfully"));
+    }
+
+    @Test
+    public void testHeadersDuplicatedImport() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+        Collection patents = createCollection(context, community)
+            .withSubmissionDefinition("patent")
+            .withAdminGroup(eperson)
+            .build();
+        context.commit();
+        context.restoreAuthSystemState();
+
+        String fileLocation = getXlsFile("headers-duplicated.xls").getAbsolutePath();
+        String[] args = new String[] { "bulk-import", "-c", patents.getID().toString(), "-f", fileLocation };
+        ListDSpaceRunnableHandler handler = new ListDSpaceRunnableHandler();
+
+        handleScript(args, ScriptLauncher.getConfig(kernelImpl), handler, kernelImpl, eperson);
+        assertThat("Expected no infos", handler.getInfoMessages(), emptyCollectionOf(String.class));
+        assertThat("Expected no warnings", handler.getWarningMessages(), emptyCollectionOf(String.class));
+
+        List<String> errorMessages = handler.getErrorMessages();
+        assertThat("Expected 2 error messages", errorMessages, hasSize(2));
+        assertThat(errorMessages.get(0), containsString("Sheet Main Entity - Duplicated headers found "
+            + "on cells 3 and 4"));
+        assertThat(errorMessages.get(1), containsString("Import failed - All performed operations are rolled back"));
     }
 
     @Test
@@ -127,14 +226,15 @@ public class BulkImportIT extends AbstractIntegrationTestWithDatabase {
     public void testCreatePatent() throws Exception {
 
         context.turnOffAuthorisationSystem();
-        Collection orgUnits = createCollection(context, community)
+        Collection patents = createCollection(context, community)
             .withSubmissionDefinition("patent")
             .withAdminGroup(eperson)
             .build();
+        context.commit();
         context.restoreAuthSystemState();
 
         String fileLocation = getXlsFile("create-patent.xls").getAbsolutePath();
-        String[] args = new String[] { "bulk-import", "-c", orgUnits.getID().toString(), "-f", fileLocation };
+        String[] args = new String[] { "bulk-import", "-c", patents.getID().toString(), "-f", fileLocation };
         ListDSpaceRunnableHandler handler = new ListDSpaceRunnableHandler();
 
         handleScript(args, ScriptLauncher.getConfig(kernelImpl), handler, kernelImpl, eperson);
@@ -142,10 +242,13 @@ public class BulkImportIT extends AbstractIntegrationTestWithDatabase {
         assertThat("Expected no warnings", handler.getWarningMessages(), emptyCollectionOf(String.class));
 
         List<String> infoMessages = handler.getInfoMessages();
-        assertThat("Expected 1 info messages", infoMessages, hasSize(1));
-        assertThat(infoMessages.get(0), containsString("Row 2 - Item created successfully"));
+        assertThat("Expected 4 info messages", infoMessages, hasSize(4));
+        assertThat(infoMessages.get(0), containsString("Start reading all the metadata group rows"));
+        assertThat(infoMessages.get(1), containsString("Found 0 metadata groups to process"));
+        assertThat(infoMessages.get(2), containsString("Found 1 items to process"));
+        assertThat(infoMessages.get(3), containsString("Row 2 - Item created successfully"));
 
-        String id = getIdFromCreatedMessage(infoMessages.get(0), 2);
+        String id = getIdFromCreatedMessage(infoMessages.get(3), 2);
         Item createdItem = itemService.findByIdOrLegacyId(context, id);
         assertThat("Item expected to be created", createdItem, notNullValue());
 
@@ -155,6 +258,53 @@ public class BulkImportIT extends AbstractIntegrationTestWithDatabase {
         assertThat(metadata, hasItems(with("dc.contributor.author", "Luca Stone", null, null, 1, -1)));
         assertThat(metadata, hasItems(with("dc.contributor.author", "Edward Red", null, null, 2, -1)));
         assertThat(metadata, hasItems(with("dc.publisher", "Publisher", null, null, 0, -1)));
+        assertThat(metadata, hasItems(with("dc.identifier.patentno", "", null, null, 0, -1)));
+
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void testUpdatePatent() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+        Collection patents = createCollection(context, community)
+            .withSubmissionDefinition("patent")
+            .withAdminGroup(eperson)
+            .build();
+
+        Item patentToUpdate = createItem(context, patents)
+            .withTitle("Patent to update")
+            .withAuthor("Luca G.")
+            .withIsniIdentifier("54321")
+            .withPatentNo("888-444-333")
+            .build();
+
+        context.commit();
+        context.restoreAuthSystemState();
+
+        String fileLocation = getXlsFile("update-patent.xls").getAbsolutePath();
+        String[] args = new String[] { "bulk-import", "-c", patents.getID().toString(), "-f", fileLocation };
+        ListDSpaceRunnableHandler handler = new ListDSpaceRunnableHandler();
+
+        handleScript(args, ScriptLauncher.getConfig(kernelImpl), handler, kernelImpl, eperson);
+        assertThat("Expected no errors", handler.getErrorMessages(), emptyCollectionOf(String.class));
+        assertThat("Expected no warnings", handler.getWarningMessages(), emptyCollectionOf(String.class));
+
+        List<String> infoMessages = handler.getInfoMessages();
+        assertThat("Expected 4 info messages", infoMessages, hasSize(4));
+        assertThat(infoMessages.get(0), containsString("Start reading all the metadata group rows"));
+        assertThat(infoMessages.get(1), containsString("Found 0 metadata groups to process"));
+        assertThat(infoMessages.get(2), containsString("Found 1 items to process"));
+        assertThat(infoMessages.get(3), containsString("Row 2 - Item updated successfully"));
+
+        Item updatedItem = itemService.find(context, patentToUpdate.getID());
+
+        List<MetadataValue> metadata = updatedItem.getMetadata();
+        assertThat(metadata, hasItems(with("dc.title", "Patent", null, null, 0, -1)));
+        assertThat(metadata, hasItems(with("dc.contributor.author", "Tom Jones", null, null, 0, -1)));
+        assertThat(metadata, hasItems(with("dc.contributor.author", "Edward Red", null, null, 1, -1)));
+        assertThat(metadata, hasItems(with("dc.publisher", "Publisher", null, null, 0, -1)));
+        assertThat(metadata, hasItems(with("dc.identifier.patentno", "", null, null, 0, -1)));
 
     }
 
@@ -167,6 +317,7 @@ public class BulkImportIT extends AbstractIntegrationTestWithDatabase {
             .withSubmissionDefinition("publication")
             .withAdminGroup(eperson)
             .build();
+        context.commit();
         context.restoreAuthSystemState();
 
         String fileLocation = getXlsFile("create-publication-with-authority.xlsx").getAbsolutePath();
@@ -178,10 +329,13 @@ public class BulkImportIT extends AbstractIntegrationTestWithDatabase {
         assertThat("Expected no warnings", handler.getWarningMessages(), emptyCollectionOf(String.class));
 
         List<String> infoMessages = handler.getInfoMessages();
-        assertThat("Expected 1 info messages", infoMessages, hasSize(1));
-        assertThat(infoMessages.get(0), containsString("Row 2 - Item created successfully"));
+        assertThat("Expected 4 info messages", infoMessages, hasSize(4));
+        assertThat(infoMessages.get(0), containsString("Start reading all the metadata group rows"));
+        assertThat(infoMessages.get(1), containsString("Found 2 metadata groups to process"));
+        assertThat(infoMessages.get(2), containsString("Found 1 items to process"));
+        assertThat(infoMessages.get(3), containsString("Row 2 - Item created successfully"));
 
-        String id = getIdFromCreatedMessage(infoMessages.get(0), 2);
+        String id = getIdFromCreatedMessage(infoMessages.get(3), 2);
         Item createdItem = itemService.findByIdOrLegacyId(context, id);
         assertThat("Item expected to be created", createdItem, notNullValue());
 
@@ -212,6 +366,7 @@ public class BulkImportIT extends AbstractIntegrationTestWithDatabase {
 
         Item itemToDelete = createItem(context, publications).withDoiIdentifier("10.1000/182").build();
 
+        context.commit();
         context.restoreAuthSystemState();
 
         String fileLocation = getXlsFile("many-publications.xls").getAbsolutePath();
@@ -223,14 +378,17 @@ public class BulkImportIT extends AbstractIntegrationTestWithDatabase {
         assertThat("Expected no warnings", handler.getWarningMessages(), emptyCollectionOf(String.class));
 
         List<String> infoMessages = handler.getInfoMessages();
-        assertThat("Expected 3 info messages", infoMessages, hasSize(3));
+        assertThat("Expected 6 info messages", infoMessages, hasSize(6));
 
-        assertThat(infoMessages.get(0), containsString("Row 2 - Item created successfully"));
-        assertThat(infoMessages.get(1), containsString("Row 3 - Item updated successfully"));
-        assertThat(infoMessages.get(2), containsString("Row 4 - Item deleted successfully"));
+        assertThat(infoMessages.get(0), containsString("Start reading all the metadata group rows"));
+        assertThat(infoMessages.get(1), containsString("Found 4 metadata groups to process"));
+        assertThat(infoMessages.get(2), containsString("Found 3 items to process"));
+        assertThat(infoMessages.get(3), containsString("Row 2 - Item created successfully"));
+        assertThat(infoMessages.get(4), containsString("Row 3 - Item updated successfully"));
+        assertThat(infoMessages.get(5), containsString("Row 4 - Item deleted successfully"));
 
         // verify created item (ROW 2)
-        String createdItemId = getIdFromCreatedMessage(infoMessages.get(0), 2);
+        String createdItemId = getIdFromCreatedMessage(infoMessages.get(3), 2);
         Item createdItem = itemService.findByIdOrLegacyId(context, createdItemId);
         assertThat("Item expected to be created", createdItem, notNullValue());
 
@@ -258,6 +416,185 @@ public class BulkImportIT extends AbstractIntegrationTestWithDatabase {
 
         // verify deleted item (ROW 4)
         assertThat("Item expected to be deleted", itemService.find(context, itemToDelete.getID()), nullValue());
+
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void testManyPublicationImportWithErrorAndNotAbortOnError() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        Collection publications = createCollection(context, community)
+            .withSubmissionDefinition("publication")
+            .withAdminGroup(eperson)
+            .build();
+
+        Item itemToDelete = createItem(context, publications).withDoiIdentifier("10.1000/182").build();
+
+        context.commit();
+        context.restoreAuthSystemState();
+
+        String fileLocation = getXlsFile("many-publications.xls").getAbsolutePath();
+        String[] args = new String[] { "bulk-import", "-c", publications.getID().toString(), "-f", fileLocation };
+        ListDSpaceRunnableHandler handler = new ListDSpaceRunnableHandler();
+
+        handleScript(args, ScriptLauncher.getConfig(kernelImpl), handler, kernelImpl, eperson);
+
+        List<String> errorMessages = handler.getErrorMessages();
+        assertThat("Expected 1 error message", errorMessages, hasSize(1));
+        assertThat(errorMessages.get(0), containsString("No item to update found for entity with id RID::123456789"));
+
+        assertThat("Expected no warnings", handler.getWarningMessages(), emptyCollectionOf(String.class));
+
+        List<String> infoMessages = handler.getInfoMessages();
+        assertThat("Expected 5 info messages", infoMessages, hasSize(5));
+
+        assertThat(infoMessages.get(0), containsString("Start reading all the metadata group rows"));
+        assertThat(infoMessages.get(1), containsString("Found 4 metadata groups to process"));
+        assertThat(infoMessages.get(2), containsString("Found 3 items to process"));
+        assertThat(infoMessages.get(3), containsString("Row 2 - Item created successfully"));
+        assertThat(infoMessages.get(4), containsString("Row 4 - Item deleted successfully"));
+
+        // verify created item (ROW 2)
+        String createdItemId = getIdFromCreatedMessage(infoMessages.get(3), 2);
+        Item createdItem = itemService.findByIdOrLegacyId(context, createdItemId);
+        assertThat("Item expected to be created", createdItem, notNullValue());
+
+        List<MetadataValue> metadata = createdItem.getMetadata();
+        assertThat(metadata, hasItems(with("dc.title", "First publication", null, null, 0, -1)));
+        assertThat(metadata, hasItems(with("dc.title", "First publication English", "en", null, 1, -1)));
+        assertThat(metadata, hasItems(with("dc.date.issued", "12/12/65", null, null, 0, -1)));
+        assertThat(metadata, hasItems(with("dc.contributor.author", "Thomas Edison", null, null, 0, -1)));
+        assertThat(metadata, hasItems(with("dc.contributor.author", "Morgan Pitt", null, null, 1, -1)));
+        assertThat(metadata, hasItems(with("oairecerif.author.affiliation", "Company", null, null, 0, -1)));
+        assertThat(metadata, hasItems(with("oairecerif.author.affiliation", PLACEHOLDER, null, null, 1, -1)));
+        assertThat(metadata, hasItems(with("dc.contributor.editor", "Editor", null, null, 0, -1)));
+        assertThat(metadata, hasItems(with("oairecerif.editor.affiliation", "EditorAffiliation", null, null, 0, -1)));
+
+        // verify deleted item (ROW 4)
+        assertThat("Item expected to be deleted", itemService.find(context, itemToDelete.getID()), nullValue());
+
+    }
+
+    @Test
+    public void testManyPublicationImportWithErrorAndAbortOnError() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        Collection publications = createCollection(context, community)
+            .withSubmissionDefinition("publication")
+            .withAdminGroup(eperson)
+            .build();
+
+        Item itemToDelete = createItem(context, publications).withDoiIdentifier("10.1000/182").build();
+
+        context.commit();
+        context.restoreAuthSystemState();
+
+        String fileLocation = getXlsFile("many-publications.xls").getAbsolutePath();
+        String[] args = new String[] { "bulk-import", "-c", publications.getID().toString(), "-f", fileLocation, "-e" };
+        ListDSpaceRunnableHandler handler = new ListDSpaceRunnableHandler();
+
+        handleScript(args, ScriptLauncher.getConfig(kernelImpl), handler, kernelImpl, eperson);
+
+        List<String> errorMessages = handler.getErrorMessages();
+        assertThat("Expected 2 error messages", errorMessages, hasSize(2));
+        assertThat(errorMessages.get(0), containsString("No item to update found for entity with id RID::123456789"));
+        assertThat(errorMessages.get(1), containsString("Import failed - All performed operations are rolled back"));
+
+        assertThat("Expected no warnings", handler.getWarningMessages(), emptyCollectionOf(String.class));
+
+        List<String> infoMessages = handler.getInfoMessages();
+        assertThat("Expected 5 info messages", infoMessages, hasSize(4));
+
+        assertThat(infoMessages.get(0), containsString("Start reading all the metadata group rows"));
+        assertThat(infoMessages.get(1), containsString("Found 4 metadata groups to process"));
+        assertThat(infoMessages.get(2), containsString("Found 3 items to process"));
+        assertThat(infoMessages.get(3), containsString("Row 2 - Item created successfully"));
+
+        // verify created item (ROW 2)
+        String createdItemId = getIdFromCreatedMessage(infoMessages.get(3), 2);
+        Item createdItem = itemService.findByIdOrLegacyId(context, createdItemId);
+        assertThat("Item expected not to be created", createdItem, nullValue());
+
+        // verify deleted item (ROW 4)
+        assertThat("Item expected not to be deleted", itemService.find(context, itemToDelete.getID()), notNullValue());
+
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void testCreatePublicationWithOneInvalidAuthorityAndNoAbortOnError() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+        Collection publications = createCollection(context, community)
+            .withSubmissionDefinition("publication")
+            .withAdminGroup(eperson)
+            .build();
+        context.commit();
+        context.restoreAuthSystemState();
+
+        String fileLocation = getXlsFile("create-publication-with-one-invalid-authority.xlsx").getAbsolutePath();
+        String[] args = new String[] { "bulk-import", "-c", publications.getID().toString(), "-f", fileLocation };
+        ListDSpaceRunnableHandler handler = new ListDSpaceRunnableHandler();
+
+        handleScript(args, ScriptLauncher.getConfig(kernelImpl), handler, kernelImpl, eperson);
+
+        List<String> errorMessages = handler.getErrorMessages();
+        assertThat("Expected 1 error message", errorMessages, hasSize(1));
+        assertThat(errorMessages.get(0), containsString("Sheet dc.contributor.author - Row 2 - Invalid metadata "
+            + "value Author1::authority1::xxx: invalid confidence value xxx"));
+
+        assertThat("Expected no warnings", handler.getWarningMessages(), emptyCollectionOf(String.class));
+
+        List<String> infoMessages = handler.getInfoMessages();
+        assertThat("Expected 6 info messages", infoMessages, hasSize(6));
+        assertThat(infoMessages.get(0), containsString("Start reading all the metadata group rows"));
+        assertThat(infoMessages.get(1), containsString("Found 1 metadata groups to process"));
+        assertThat(infoMessages.get(2), containsString("Found 3 items to process"));
+        assertThat(infoMessages.get(3), containsString("Row 2 - Item created successfully"));
+        assertThat(infoMessages.get(4), containsString("Row 3 - Item created successfully"));
+        assertThat(infoMessages.get(5), containsString("Row 4 - Item created successfully"));
+
+        String id = getIdFromCreatedMessage(infoMessages.get(4), 3);
+        Item createdItem = itemService.findByIdOrLegacyId(context, id);
+        assertThat("Item expected to be created", createdItem, notNullValue());
+
+        List<MetadataValue> metadata = createdItem.getMetadata();
+        assertThat(metadata, hasItems(with("dc.contributor.author", "Author2", null, null, 0, -1)));
+        assertThat(metadata, hasItems(with("oairecerif.author.affiliation", "OrgUnit2", null, "authority2", 0, 400)));
+
+    }
+
+    @Test
+    public void testCreatePublicationWithOneInvalidAuthorityAndAbortOnError() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+        Collection publications = createCollection(context, community)
+            .withSubmissionDefinition("publication")
+            .withAdminGroup(eperson)
+            .build();
+        context.commit();
+        context.restoreAuthSystemState();
+
+        String fileLocation = getXlsFile("create-publication-with-one-invalid-authority.xlsx").getAbsolutePath();
+        String[] args = new String[] { "bulk-import", "-c", publications.getID().toString(), "-f", fileLocation, "-e" };
+        ListDSpaceRunnableHandler handler = new ListDSpaceRunnableHandler();
+
+        handleScript(args, ScriptLauncher.getConfig(kernelImpl), handler, kernelImpl, eperson);
+
+        List<String> errorMessages = handler.getErrorMessages();
+        assertThat("Expected 2 error messages", errorMessages, hasSize(2));
+        assertThat(errorMessages.get(0), containsString("Sheet dc.contributor.author - Row 2 - Invalid metadata "
+            + "value Author1::authority1::xxx: invalid confidence value xxx"));
+        assertThat(errorMessages.get(1), containsString("Import failed - All performed operations are rolled back"));
+
+        assertThat("Expected no warnings", handler.getWarningMessages(), emptyCollectionOf(String.class));
+
+        List<String> infoMessages = handler.getInfoMessages();
+        assertThat("Expected 1 info messages", infoMessages, hasSize(1));
+        assertThat(infoMessages.get(0), containsString("Start reading all the metadata group rows"));
 
     }
 

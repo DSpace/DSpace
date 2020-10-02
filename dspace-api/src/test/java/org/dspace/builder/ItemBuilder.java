@@ -121,8 +121,16 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
         return addMetadataValue(item, "person", "identifier", "orcid", orcid);
     }
 
+    public ItemBuilder withIsniIdentifier(String isni) {
+        return addMetadataValue(item, "person", "identifier", "isni", isni);
+    }
+
     public ItemBuilder withRidIdentifier(String rid) {
         return addMetadataValue(item, "person", "identifier", "rid", rid);
+    }
+
+    public ItemBuilder withPatentNo(String patentNo) {
+        return addMetadataValue(item, "dc", "identifier", "patentno", patentNo);
     }
 
     public ItemBuilder makeUnDiscoverable() {

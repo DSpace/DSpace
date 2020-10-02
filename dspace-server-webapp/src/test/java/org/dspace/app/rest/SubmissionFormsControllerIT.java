@@ -616,26 +616,26 @@ public class SubmissionFormsControllerIT extends AbstractControllerIntegrationTe
                                                           "Enter the names of the authors of this item.", null,
                                                           "dc.contributor.author", "AuthorAuthority"))))
                         .andExpect(jsonPath("$.rows[4].fields[0].rows[0].fields", contains(SubmissionFormFieldMatcher
-                              .matchFormFieldDefinition("name", "Author", "You must enter at least the author.",
+                              .matchFormFieldDefinition("onebox", "Author", "You must enter at least the author.",
                                             false, "Enter the names of the authors of this item in the form Lastname,"
                                          + " Firstname [i.e. Smith, Josh or Smith, J].", null, "dc.contributor.author",
                                            "AuthorAuthority"))))
                         .andExpect(jsonPath("$.rows[4].fields[0].rows[1].fields", contains(SubmissionFormFieldMatcher
                                 .matchFormFieldDefinition("onebox", "Affiliation", null, false,
                                             "Enter the affiliation of the author as stated on the publication.",
-                                             null, "local.contributor.affiliation", null))))
+                                             null, "oairecerif.author.affiliation", "OrgUnitAuthority"))))
                         .andExpect(jsonPath("$.rows[5].fields", contains(SubmissionFormFieldMatcher
                                 .matchFormFieldDefinition("group", "Editors", null, true,
                                                           "The editors of this publication.", null,
                                                           "dc.contributor.editor", "EditorAuthority"))))
                         .andExpect(jsonPath("$.rows[5].fields[0].rows[0].fields", contains(SubmissionFormFieldMatcher
-                              .matchFormFieldDefinition("name", "Editor", "You must enter at least the author.",
+                              .matchFormFieldDefinition("onebox", "Editor", "You must enter at least the author.",
                                             false, "The editors of this publication.", null, "dc.contributor.editor",
                                            "EditorAuthority"))))
                         .andExpect(jsonPath("$.rows[5].fields[0].rows[1].fields", contains(SubmissionFormFieldMatcher
                                 .matchFormFieldDefinition("onebox", "Affiliation", null, false,
                                             "Enter the affiliation of the editor as stated on the publication.",
-                                             null, "dc.contributor.editoraffiliation", null))))
+                                             null, "oairecerif.editor.affiliation", "OrgUnitAuthority"))))
                         .andExpect(jsonPath("$.rows[6].fields", contains(SubmissionFormFieldMatcher
                                .matchFormFieldDefinition("onebox", "Type", "You must select a publication type", false,
                                                          "Select the type of content of the item.", null,
