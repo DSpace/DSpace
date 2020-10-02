@@ -9,7 +9,6 @@ package org.dspace.app.rest.authorization.impl;
 
 import java.sql.SQLException;
 
-import org.apache.log4j.Logger;
 import org.dspace.app.rest.authorization.AuthorizationFeature;
 import org.dspace.app.rest.authorization.AuthorizationFeatureDocumentation;
 import org.dspace.app.rest.authorization.AuthorizeServiceRestUtil;
@@ -29,8 +28,6 @@ import org.springframework.stereotype.Component;
 @AuthorizationFeatureDocumentation(name = DownloadFeature.NAME,
         description = "It can be used to verify if the user can download a bitstream")
 public class DownloadFeature implements AuthorizationFeature {
-
-    Logger log = Logger.getLogger(DownloadFeature.class);
 
     public final static String NAME = "canDownload";
 

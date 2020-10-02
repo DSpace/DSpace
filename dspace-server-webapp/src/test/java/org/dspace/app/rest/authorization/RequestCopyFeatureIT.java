@@ -41,6 +41,7 @@ import org.dspace.content.Community;
 import org.dspace.content.Item;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.core.Constants;
+import org.dspace.services.ConfigurationService;
 import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
@@ -63,9 +64,13 @@ public class RequestCopyFeatureIT extends AbstractControllerIntegrationTest {
     @Autowired
     private BitstreamConverter bitstreamConverter;
 
+    @Autowired
+    private ConfigurationService configurationService;
+
 
     @Autowired
     private Utils utils;
+
 
     private AuthorizationFeature requestCopyFeature;
 
@@ -84,6 +89,9 @@ public class RequestCopyFeatureIT extends AbstractControllerIntegrationTest {
     @Before
     public void setUp() throws Exception {
         super.setUp();
+
+        configurationService.setProperty("request.item.type", "all");
+
         context.turnOffAuthorisationSystem();
         requestCopyFeature = authorizationFeatureService.find(RequestCopyFeature.NAME);
 
@@ -449,5 +457,95 @@ public class RequestCopyFeatureIT extends AbstractControllerIntegrationTest {
                         .andExpect(jsonPath("$._embedded").doesNotExist());
     }
 
+    public void requestACopyItemTypeLoggedAsAnonymous() throws Exception {
+        configurationService.setProperty("request.item.type", "logged");
 
+        BitstreamRest bitstreamRest = bitstreamConverter.convert(bitstreamFromCollection, Projection.DEFAULT);
+        String bitstreamUri = utils.linkToSingleResource(bitstreamRest, "self").getHref();
+
+        getClient().perform(get("/api/authz/authorizations/search/object")
+                                    .param("uri", bitstreamUri)
+                                    .param("feature", requestCopyFeature.getName()))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$.page.totalElements", is(0)))
+                   .andExpect(jsonPath("$._embedded").doesNotExist());
+    }
+
+    @Test
+    public void requestACopyItemTypeLoggedAsEperson() throws Exception {
+        BitstreamRest bitstreamRest = bitstreamConverter.convert(bitstreamB, Projection.DEFAULT);
+        String bitstreamUri = utils.linkToSingleResource(bitstreamRest, "self").getHref();
+        Authorization authorizationFeature = new Authorization(eperson, requestCopyFeature, bitstreamRest);
+
+        String token = getAuthToken(eperson.getEmail(), password);
+
+        getClient(token).perform(get("/api/authz/authorizations/search/object")
+                                         .param("uri", bitstreamUri)
+                                         .param("feature", requestCopyFeature.getName()))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.page.totalElements", greaterThan(0)))
+                        .andExpect(jsonPath("$._embedded.authorizations", contains(
+                                Matchers.is(AuthorizationMatcher.matchAuthorization(authorizationFeature))))
+                        );
+    }
+
+    public void requestACopyItemTypeEmptyAsAnonymous() throws Exception {
+        configurationService.setProperty("request.item.type", "");
+
+        BitstreamRest bitstreamRest = bitstreamConverter.convert(bitstreamFromCollection, Projection.DEFAULT);
+        String bitstreamUri = utils.linkToSingleResource(bitstreamRest, "self").getHref();
+
+        getClient().perform(get("/api/authz/authorizations/search/object")
+                                    .param("uri", bitstreamUri)
+                                    .param("feature", requestCopyFeature.getName()))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$.page.totalElements", is(0)))
+                   .andExpect(jsonPath("$._embedded").doesNotExist());
+    }
+
+    public void requestACopyItemTypeEmptyAsEperson() throws Exception {
+        configurationService.setProperty("request.item.type", "");
+
+        BitstreamRest bitstreamRest = bitstreamConverter.convert(bitstreamFromCollection, Projection.DEFAULT);
+        String bitstreamUri = utils.linkToSingleResource(bitstreamRest, "self").getHref();
+
+        String token = getAuthToken(eperson.getEmail(), password);
+
+        getClient(token).perform(get("/api/authz/authorizations/search/object")
+                                         .param("uri", bitstreamUri)
+                                         .param("feature", requestCopyFeature.getName()))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.page.totalElements", is(0)))
+                        .andExpect(jsonPath("$._embedded").doesNotExist());
+    }
+
+    public void requestACopyItemTypeBogusValueAsAnonymous() throws Exception {
+        configurationService.setProperty("request.item.type", "invalid value");
+
+        BitstreamRest bitstreamRest = bitstreamConverter.convert(bitstreamFromCollection, Projection.DEFAULT);
+        String bitstreamUri = utils.linkToSingleResource(bitstreamRest, "self").getHref();
+
+        getClient().perform(get("/api/authz/authorizations/search/object")
+                                    .param("uri", bitstreamUri)
+                                    .param("feature", requestCopyFeature.getName()))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$.page.totalElements", is(0)))
+                   .andExpect(jsonPath("$._embedded").doesNotExist());
+    }
+
+    public void requestACopyItemTypeBogusValueAsEperson() throws Exception {
+        configurationService.setProperty("request.item.type", "invalid value");
+
+        BitstreamRest bitstreamRest = bitstreamConverter.convert(bitstreamFromCollection, Projection.DEFAULT);
+        String bitstreamUri = utils.linkToSingleResource(bitstreamRest, "self").getHref();
+
+        String token = getAuthToken(eperson.getEmail(), password);
+
+        getClient(token).perform(get("/api/authz/authorizations/search/object")
+                                         .param("uri", bitstreamUri)
+                                         .param("feature", requestCopyFeature.getName()))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.page.totalElements", is(0)))
+                        .andExpect(jsonPath("$._embedded").doesNotExist());
+    }
 }
