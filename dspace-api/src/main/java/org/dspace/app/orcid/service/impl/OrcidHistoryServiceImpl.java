@@ -60,6 +60,7 @@ import org.orcid.jaxb.model.common_v3.FuzzyDate.Year;
 import org.orcid.jaxb.model.common_v3.OrcidId;
 import org.orcid.jaxb.model.common_v3.Organization;
 import org.orcid.jaxb.model.common_v3.OrganizationAddress;
+import org.orcid.jaxb.model.record_v3.Citation;
 import org.orcid.jaxb.model.record_v3.Contributor;
 import org.orcid.jaxb.model.record_v3.ContributorAttributes;
 import org.orcid.jaxb.model.record_v3.ContributorEmail;
@@ -188,6 +189,7 @@ public class OrcidHistoryServiceImpl implements OrcidHistoryService {
         Work work = new Work();
         addAuthors(context, work, itemMetadata);
         addPubblicationDate(work, itemMetadata);
+        addCitation(work, itemMetadata);
         work.setTitle(new WorkTitle(itemMetadata.getTitle(), null, null));
         work.setType(WorkType.JOURNAL_ARTICLE.value());
         work.setExternalIds(getExternalIds(entity));
@@ -460,4 +462,13 @@ public class OrcidHistoryServiceImpl implements OrcidHistoryService {
         }
     }
 
+    private void addCitation(Work work, OrcidWorkMetadata itemMetadata) {
+        String citationVal = itemMetadata.getCitation();
+        if (StringUtils.isNotBlank(citationVal)) {
+            Citation citation = new Citation();
+            citation.setCitationType(itemMetadata.getCitationType());
+            citation.setCitationValue(citationVal);
+            work.setCitation(citation);
+        }
+    }
 }

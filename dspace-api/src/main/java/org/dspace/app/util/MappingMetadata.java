@@ -7,11 +7,14 @@
  */
 package org.dspace.app.util;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -27,11 +30,16 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
+import org.dspace.content.crosswalk.CrosswalkException;
+import org.dspace.content.crosswalk.StreamDisseminationCrosswalk;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.ConfigurationManager;
+import org.dspace.core.Context;
+import org.dspace.core.factory.CoreServiceFactory;
 import org.dspace.util.MultiFormatDateParser;
 import org.dspace.utils.DSpace;
 
@@ -142,6 +150,41 @@ public abstract class MappingMetadata {
 
         if (null != v && (null != v.getValue()) && !v.getValue().trim().equals("")) {
             metadataMappings.put(fieldName, v.getValue());
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    protected boolean addCitation(String fieldName) {
+        String config = configuredFields.get(fieldName);
+        if (null == config || config.equals("")) {
+            return false;
+        }
+
+        if (log.isDebugEnabled()) {
+            log.debug("Processing " + fieldName);
+        }
+        final StreamDisseminationCrosswalk streamCrosswalkDefault = (StreamDisseminationCrosswalk) CoreServiceFactory
+                .getInstance().getPluginService().getNamedPlugin(StreamDisseminationCrosswalk.class, config);
+
+        OutputStream outputStream = new ByteArrayOutputStream();
+        String citation = "";
+        Context context = null;
+        try {
+            context = new Context();
+            streamCrosswalkDefault.disseminate(context, item, outputStream);
+            citation = outputStream.toString();
+        } catch (CrosswalkException | IOException | AuthorizeException | SQLException e) {
+            log.error(e.getMessage(), e);
+        } finally {
+            if (context != null && context.isValid()) {
+                context.abort();
+            }
+        }
+
+        if (citation.length() > 0) {
+            metadataMappings.put(fieldName, citation);
             return true;
         } else {
             return false;
