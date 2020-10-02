@@ -19,9 +19,11 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 
 /**
- * This class will filter shibboleth requests to try and authenticate them
+ * This class will filter Shibboleth requests to see if the user has been authenticated via Shibboleth
  *
  * @author Giuseppe Digilio (giuseppe dot digilio at 4science dot it)
+ * @see org.dspace.app.rest.ShibbolethRestController
+ * @see org.dspace.authenticate.ShibAuthentication
  */
 public class ShibbolethAuthenticationFilter extends StatelessLoginFilter {
 
@@ -33,7 +35,10 @@ public class ShibbolethAuthenticationFilter extends StatelessLoginFilter {
     @Override
     public Authentication attemptAuthentication(HttpServletRequest req,
                                                 HttpServletResponse res) throws AuthenticationException {
-
+        // In the case of Shibboleth, this method does NOT actually authenticate us. The authentication
+        // has already happened in Shibboleth & we are just intercepting the return request in order to check
+        // for a valid Shibboleth login (using ShibAuthentication.authenticate()) & add user info into our JWT.
+        // See org.dspace.app.rest.ShibbolethRestController JavaDocs for an outline of the entire Shib login process.
         return authenticationManager.authenticate(
                 new DSpaceAuthentication(null, null, new ArrayList<>())
         );

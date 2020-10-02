@@ -166,6 +166,18 @@ public class JWTTokenRestAuthenticationServiceImpl implements RestAuthentication
         return authenticationService;
     }
 
+    /**
+     * Return a comma-separated list of all currently enabled authentication options (based on DSpace configuration).
+     * This list is sent to the client in the WWW-Authenticate header in order to inform it of all the enabled
+     * authentication plugins *and* (optionally) to provide it with the "location" of the login page, if
+     * the authentication plugin requires an external login page (e.g. Shibboleth).
+     * <P>
+     * Example output looks like:
+     *    shibboleth realm="DSpace REST API" location=[shibboleth-url], password realm="DSpace REST API"
+     * @param request The current client request
+     * @param response The response being build for the client
+     * @return comma separated list of authentication options
+     */
     @Override
     public String getWwwAuthenticateHeaderValue(final HttpServletRequest request, final HttpServletResponse response) {
         Iterator<AuthenticationMethod> authenticationMethodIterator
@@ -182,10 +194,12 @@ public class JWTTokenRestAuthenticationServiceImpl implements RestAuthentication
 
             wwwAuthenticate.append(authenticationMethod.getName()).append(" realm=\"DSpace REST API\"");
 
+            // If authentication method requires a custom login page, add that as the "location". The client is
+            // expected to read this "location" and send users to that URL when this authentication option is selected
+            // We cannot reply with a 303 code because many browsers handle 3xx response codes transparently. This
+            // means that the JavaScript client code is not aware of the 303 status and fails to react accordingly.
             String loginPageURL = authenticationMethod.loginPageURL(context, request, response);
             if (org.apache.commons.lang3.StringUtils.isNotBlank(loginPageURL)) {
-                // We cannot reply with a 303 code because may browsers handle 3xx response codes transparently. This
-                // means that the JavaScript client code is not aware of the 303 status and fails to react accordingly.
                 wwwAuthenticate.append(", location=\"").append(loginPageURL).append("\"");
             }
         }
@@ -209,7 +223,7 @@ public class JWTTokenRestAuthenticationServiceImpl implements RestAuthentication
             throws IOException {
         // Add an authentication cookie to the response *if* requested
         // NOTE: authentication cookies are only needed by specific auth plugins (e.g. Shibboleth, which cannot use
-        // authentication headers due to redirects).
+        // authentication headers as headers cannot be sent via redirects).
         if (addCookie) {
             ResponseCookie cookie = ResponseCookie.from(AUTHORIZATION_COOKIE, token)
                                                   .httpOnly(true).secure(true).sameSite("None").build();

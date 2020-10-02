@@ -478,6 +478,14 @@ public class ShibAuthentication implements AuthenticationMethod {
      * Get login page to which to redirect. Returns URL (as string) to which to
      * redirect to obtain credentials (either password prompt or e.g. HTTPS port
      * for client cert.); null means no redirect.
+     * <P>
+     * For Shibboleth, this URL looks like (note 'target' param is URL encoded, but shown as unencoded in this example)
+     * [shibURL]?target=[dspace.server.url]/api/authn/shibboleth?redirectUrl=[dspace.ui.url]
+     * <P>
+     * This URL is used by the client to redirect directly to Shibboleth for authentication. The "target" param
+     * is then the location (in REST API) where Shibboleth redirects back to. The "redirectUrl" is the path/URL in the
+     * client (e.g. Angular UI) which the REST API redirects the user to (after capturing/storing any auth info from
+     * Shibboleth).
      *
      * @param context  DSpace context, will be modified (ePerson set) upon success.
      * @param request  The HTTP request that started this operation, or null if not

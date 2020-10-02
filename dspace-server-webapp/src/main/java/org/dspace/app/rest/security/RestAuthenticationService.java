@@ -47,7 +47,10 @@ public interface RestAuthenticationService {
     AuthenticationService getAuthenticationService();
 
     /**
-     * Return the value that should be passed in the WWWW-Authenticate header for 4xx responses to the client
+     * Return the value that should be passed in the WWWW-Authenticate header for 4xx responses to the client.
+     * <P>
+     * In DSpace, we use this header to send the list of all valid authentication options to the client site, including
+     * the URL/path of each authentication option.
      * @param request The current client request
      * @param response The response being build for the client
      * @return A string value that should be set in the WWWW-Authenticate header
