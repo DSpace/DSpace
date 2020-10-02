@@ -150,7 +150,7 @@ public abstract class JWTTokenHandler {
 
             return ePerson;
         } else {
-            log.warn(getIpAddress(request) + " tried to use an expired or non-valid token");
+            log.warn("Origin: " + getRequestOrigin(request) + " tried to use an expired or non-valid token");
             return null;
         }
     }
@@ -384,23 +384,39 @@ public abstract class JWTTokenHandler {
      * minimum length of 1 byte and the eperson session salt is always 32 bytes),
      * this way the key is always long enough for the HMAC using SHA-256 algorithm.
      * More information: https://tools.ietf.org/html/rfc7518#section-3.2
+     * <P>
+     * Minimally, this signing key includes a salt from the authenticated EPerson.
+     * <P>
+     * However, for extra security (basic CSRF protection), you can also configure it to include the Origin of the
+     * request. This ensures that requests from a different Origin cannot reuse the same JWT.
      *
-     * @param request
-     * @param ePerson
-     * @return
+     * @param request current request
+     * @param ePerson authenticated EPerson.
+     * @return signing key
      */
     protected String buildSigningKey(HttpServletRequest request, EPerson ePerson) {
-        String ipAddress = "";
+        String origin = "";
+        // When enabled, include the origin of the request in the signing key
         if (getIncludeIP()) {
-            ipAddress = getIpAddress(request);
+            origin = getRequestOrigin(request);
         }
-        return getJwtKey() + ePerson.getSessionSalt() + ipAddress;
+        return getJwtKey() + ePerson.getSessionSalt() + origin;
     }
 
-    private String getIpAddress(HttpServletRequest request) {
-        return clientInfoService.getClientIp(request);
+    /**
+     * Retrieve the Origin information from the request. First checks for the "Origin" header,
+     * if not found falls back to the "Referer" header.
+     * @param request current request
+     * @return found origin (or null if not able to determine)
+     */
+    private String getRequestOrigin(HttpServletRequest request) {
+        String source = request.getHeader("Origin");
+        if (StringUtils.isBlank(source)) {
+            // If empty fallback to "Referer" header
+            source = request.getHeader("Referer");
+        }
+        return source;
     }
-
 
     /**
      * Update session salt information for the currently logged in user.
