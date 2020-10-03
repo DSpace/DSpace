@@ -137,13 +137,13 @@ public class BulkImport extends DSpaceRunnable<BulkImportScriptConfiguration<Bul
 
     private String collectionId;
 
-    private Collection collection;
-
     private String filename;
 
     private boolean useWorkflow;
 
     private boolean abortOnError;
+
+    private Context context;
 
 
     @Override
@@ -181,15 +181,15 @@ public class BulkImport extends DSpaceRunnable<BulkImportScriptConfiguration<Bul
 
     @Override
     public void internalRun() throws Exception {
-        Context context = new Context();
+        context = new Context();
         context.setMode(Context.Mode.BATCH_EDIT);
-        assignCurrentUserInContext(context);
+        assignCurrentUserInContext();
 
         InputStream inputStream = handler.getFileStream(context, filename)
             .orElseThrow(() -> new IllegalArgumentException("Error reading file, the file couldn't be "
                 + "found for filename: " + filename));
 
-        collection = collectionService.find(context, UUID.fromString(collectionId));
+        Collection collection = getCollection();
         if (collection == null) {
             throw new IllegalArgumentException("No collection found with id " + collectionId);
         }
@@ -199,20 +199,19 @@ public class BulkImport extends DSpaceRunnable<BulkImportScriptConfiguration<Bul
         }
 
         try {
-            performImport(context, inputStream);
+            performImport(inputStream);
             context.complete();
         } catch (Exception e) {
             handler.handleException(e);
-            handler.logError("Import failed - All performed operations are rolled back");
             context.abort();
         }
     }
 
-    public void performImport(Context context, InputStream is) {
+    public void performImport(InputStream is) {
         Workbook workbook = createWorkbook(is);
-        validateWorkbook(context, workbook);
+        validateWorkbook(workbook);
         List<EntityRow> entityRows = getValidEntityRows(workbook);
-        performImport(context, entityRows);
+        performImport(entityRows);
     }
 
     private Workbook createWorkbook(InputStream is) {
@@ -223,7 +222,7 @@ public class BulkImport extends DSpaceRunnable<BulkImportScriptConfiguration<Bul
         }
     }
 
-    private void validateWorkbook(Context context, Workbook workbook) {
+    private void validateWorkbook(Workbook workbook) {
         if (workbook.getNumberOfSheets() == 0) {
             throw new BulkImportException("The Workbook should have at least one sheet");
         }
@@ -245,14 +244,14 @@ public class BulkImport extends DSpaceRunnable<BulkImportScriptConfiguration<Bul
                 throw new BulkImportException("The sheet name " + name + " is not a valid metadata group");
             }
 
-            validateHeaders(context, sheet);
+            validateHeaders(sheet);
         }
     }
 
-    private void validateHeaders(Context context, Sheet sheet) {
+    private void validateHeaders(Sheet sheet) {
         List<String> headers = getAllHeaders(sheet);
         validateMainHeaders(sheet, headers);
-        validateMetadataFields(context, sheet, headers);
+        validateMetadataFields(sheet, headers);
     }
 
     private void validateMainHeaders(Sheet sheet, List<String> headers) {
@@ -280,7 +279,7 @@ public class BulkImport extends DSpaceRunnable<BulkImportScriptConfiguration<Bul
         }
     }
 
-    private void validateMetadataFields(Context context, Sheet sheet, List<String> headers) {
+    private void validateMetadataFields(Sheet sheet, List<String> headers) {
         String sheetName = sheet.getSheetName();
         boolean isEntityRowSheet = isEntityRowSheet(sheet);
 
@@ -323,7 +322,7 @@ public class BulkImport extends DSpaceRunnable<BulkImportScriptConfiguration<Bul
 
     private List<String> getSubmissionFormMetadataGroup(String groupName) {
         try {
-            String submissionName = this.submissionConfigReader.getSubmissionConfigByCollection(collection)
+            String submissionName = this.submissionConfigReader.getSubmissionConfigByCollection(getCollection())
                 .getSubmissionName();
             String formName = submissionName + "-" + groupName.replaceAll("\\.", "-");
             return Arrays.stream(this.reader.getInputsByFormName(formName).getFields())
@@ -339,7 +338,7 @@ public class BulkImport extends DSpaceRunnable<BulkImportScriptConfiguration<Bul
     private List<String> getSubmissionFormMetadata(boolean group) {
 
         try {
-            return this.reader.getInputsByCollection(collection).stream()
+            return this.reader.getInputsByCollection(getCollection()).stream()
                 .flatMap(dcInputSet -> Arrays.stream(dcInputSet.getFields()))
                 .flatMap(dcInputs -> Arrays.stream(dcInputs))
                 .filter(dcInput -> group ? isGroupType(dcInput) : !isGroupType(dcInput))
@@ -438,30 +437,38 @@ public class BulkImport extends DSpaceRunnable<BulkImportScriptConfiguration<Bul
         return new EntityRow(id, action, row.getRowNum(), metadata, ownMetadataGroup);
     }
 
-    private void performImport(Context context, List<EntityRow> entityRows) {
+    private void performImport(List<EntityRow> entityRows) {
         handler.logInfo("Found " + entityRows.size() + " items to process");
-        entityRows.forEach(entityRow -> performImport(context, entityRow));
+        entityRows.forEach(entityRow -> performImport(entityRow));
     }
 
-    private void performImport(Context context, EntityRow entityRow) {
+    private void performImport(EntityRow entityRow) {
 
         try {
 
+            Item item = null;
+
             switch (entityRow.getAction()) {
                 case ADD:
-                    addItem(context, entityRow);
+                    item = addItem(entityRow);
                     break;
                 case UPDATE:
-                    updateItem(context, entityRow);
+                    item = updateItem(entityRow);
                     break;
                 case DELETE:
-                    deleteItem(context, entityRow);
+                    deleteItem(entityRow);
                     break;
                 case NOT_SPECIFIED:
                 default:
-                    addOrUpdateItem(context, entityRow);
+                    item = addOrUpdateItem(entityRow);
                     break;
             }
+
+            if (item != null) {
+                context.uncacheEntity(item);
+            }
+
+            context.commit();
 
         } catch (BulkImportException bie) {
             handleException(entityRow, bie);
@@ -472,10 +479,10 @@ public class BulkImport extends DSpaceRunnable<BulkImportScriptConfiguration<Bul
 
     }
 
-    private void addItem(Context context, EntityRow entityRow)
+    private Item addItem(EntityRow entityRow)
         throws AuthorizeException, SQLException, IOException, WorkflowException {
 
-        WorkspaceItem workspaceItem = workspaceItemService.create(context, collection, false);
+        WorkspaceItem workspaceItem = workspaceItemService.create(context, getCollection(), false);
 
         if (useWorkflow) {
             workflowService.start(context, workspaceItem);
@@ -484,37 +491,39 @@ public class BulkImport extends DSpaceRunnable<BulkImportScriptConfiguration<Bul
         }
 
         Item item = workspaceItem.getItem();
-        addMetadata(context, item, entityRow, false);
+        addMetadata(item, entityRow, false);
 
         handler.logInfo("Row " + entityRow.getRow() + " - Item created successfully - ID: " + item.getID());
+        return item;
 
     }
 
-    private void updateItem(Context context, EntityRow entityRow) throws Exception {
-        Item item = findItem(context, entityRow);
+    private Item updateItem(EntityRow entityRow) throws Exception {
+        Item item = findItem(entityRow);
         if (item == null) {
             throw new BulkImportException("No item to update found for entity with id " + entityRow.getId());
         }
 
-        updateItem(context, entityRow, item);
+        return updateItem(entityRow, item);
     }
 
-    private void updateItem(Context context, EntityRow entityRow, Item item) throws SQLException {
+    private Item updateItem(EntityRow entityRow, Item item) throws SQLException {
 
-        if (!collection.equals(item.getOwningCollection())) {
+        if (!getCollection().equals(item.getOwningCollection())) {
             throw new BulkImportException("The item related to the entity with id " + entityRow.getId()
                 + " have a different own collection");
         }
 
-        addMetadata(context, item, entityRow, true);
+        addMetadata(item, entityRow, true);
 
         handler.logInfo("Row " + entityRow.getRow() + " - Item updated successfully - ID: " + item.getID());
+        return item;
 
     }
 
-    private void deleteItem(Context context, EntityRow entityRow) throws Exception {
+    private void deleteItem(EntityRow entityRow) throws Exception {
 
-        Item item = findItem(context, entityRow);
+        Item item = findItem(entityRow);
         if (item == null) {
             throw new BulkImportException("No item to delete found for entity with id " + entityRow.getId());
         }
@@ -523,18 +532,18 @@ public class BulkImport extends DSpaceRunnable<BulkImportScriptConfiguration<Bul
         handler.logInfo("Row " + entityRow.getRow() + " - Item deleted successfully");
     }
 
-    private void addOrUpdateItem(Context context, EntityRow entityRow) throws Exception {
+    private Item addOrUpdateItem(EntityRow entityRow) throws Exception {
 
-        Item item = findItem(context, entityRow);
+        Item item = findItem(entityRow);
         if (item == null) {
-            addItem(context, entityRow);
+            return addItem(entityRow);
         } else {
-            updateItem(context, entityRow, item);
+            return updateItem(entityRow, item);
         }
 
     }
 
-    private Item findItem(Context context, EntityRow entityRow) throws Exception {
+    private Item findItem(EntityRow entityRow) throws Exception {
 
         String id = entityRow.getId();
         if (id == null) {
@@ -549,22 +558,22 @@ public class BulkImport extends DSpaceRunnable<BulkImportScriptConfiguration<Bul
         return itemSearcherMapper.search(context, idSections[0].toUpperCase(), idSections[1]);
     }
 
-    private void addMetadata(Context context, Item item, EntityRow entityRow, boolean replace) throws SQLException {
+    private void addMetadata(Item item, EntityRow entityRow, boolean replace) throws SQLException {
 
         if (replace) {
-            removeMetadata(context, item, entityRow);
+            removeMetadata(item, entityRow);
         }
 
-        addMetadata(context, item, entityRow.getMetadata());
+        addMetadata(item, entityRow.getMetadata());
 
         List<MetadataGroup> metadataGroups = entityRow.getMetadataGroups();
         for (MetadataGroup metadataGroup : metadataGroups) {
-            addMetadata(context, item, metadataGroup.getMetadata());
+            addMetadata(item, metadataGroup.getMetadata());
         }
 
     }
 
-    private void addMetadata(Context context, Item item, MultiValuedMap<String, MetadataValueVO> metadata)
+    private void addMetadata(Item item, MultiValuedMap<String, MetadataValueVO> metadata)
         throws SQLException {
 
         Iterable<String> metadataFields = metadata.keySet();
@@ -581,29 +590,29 @@ public class BulkImport extends DSpaceRunnable<BulkImportScriptConfiguration<Bul
 
     }
 
-    private void removeMetadata(Context context, Item item, EntityRow entityRow) throws SQLException {
+    private void removeMetadata(Item item, EntityRow entityRow) throws SQLException {
 
-        removeMetadata(context, item, entityRow.getMetadata());
+        removeMetadata(item, entityRow.getMetadata());
 
         List<MetadataGroup> metadataGroups = entityRow.getMetadataGroups();
         for (MetadataGroup metadataGroup : metadataGroups) {
-            removeMetadata(context, item, metadataGroup.getMetadata());
+            removeMetadata(item, metadataGroup.getMetadata());
         }
     }
 
-    private void removeMetadata(Context context, Item item, MultiValuedMap<String, MetadataValueVO> metadata)
+    private void removeMetadata(Item item, MultiValuedMap<String, MetadataValueVO> metadata)
         throws SQLException {
 
         Iterable<String> fields = metadata.keySet();
         for (String field : fields) {
             String language = getMetadataLanguage(field);
             MetadataField metadataField = metadataFieldService.findByString(context, getMetadataField(field), '.');
-            removeSingleMetadata(context, item, metadataField, language);
+            removeSingleMetadata(item, metadataField, language);
         }
 
     }
 
-    private void removeSingleMetadata(Context context, Item item, MetadataField metadataField, String language)
+    private void removeSingleMetadata(Item item, MetadataField metadataField, String language)
         throws SQLException {
         List<MetadataValue> metadata = itemService.getMetadata(item, metadataField.getMetadataSchema().getName(),
             metadataField.getElement(), metadataField.getQualifier(), language);
@@ -812,11 +821,19 @@ public class BulkImport extends DSpaceRunnable<BulkImportScriptConfiguration<Bul
         }
     }
 
-    private void assignCurrentUserInContext(Context context) throws SQLException {
+    private void assignCurrentUserInContext() throws SQLException {
         UUID uuid = getEpersonIdentifier();
         if (uuid != null) {
             EPerson ePerson = EPersonServiceFactory.getInstance().getEPersonService().find(context, uuid);
             context.setCurrentUser(ePerson);
+        }
+    }
+
+    private Collection getCollection() {
+        try {
+            return collectionService.find(context, UUID.fromString(collectionId));
+        } catch (SQLException e) {
+            throw new BulkImportException(e);
         }
     }
 

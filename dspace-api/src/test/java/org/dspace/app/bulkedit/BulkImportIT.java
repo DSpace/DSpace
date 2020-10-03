@@ -70,9 +70,8 @@ public class BulkImportIT extends AbstractIntegrationTestWithDatabase {
         assertThat("Expected no warnings", handler.getWarningMessages(), emptyCollectionOf(String.class));
 
         List<String> errorMessages = handler.getErrorMessages();
-        assertThat("Expected 2 error messages", errorMessages, hasSize(2));
+        assertThat("Expected 1 error message", errorMessages, hasSize(1));
         assertThat(errorMessages.get(0), containsString("The sheet Main Entity of the Workbook is empty"));
-        assertThat(errorMessages.get(1), containsString("Import failed - All performed operations are rolled back"));
     }
 
     @Test
@@ -87,7 +86,7 @@ public class BulkImportIT extends AbstractIntegrationTestWithDatabase {
         assertThat("Expected no warnings", handler.getWarningMessages(), emptyCollectionOf(String.class));
 
         List<String> errorMessages = handler.getErrorMessages();
-        assertThat("Expected 2 error message", errorMessages, hasSize(2));
+        assertThat("Expected 1 error message", errorMessages, hasSize(1));
         assertThat(errorMessages.get(0), containsString("The header of sheet Main Entity of the Workbook is empty"));
     }
 
@@ -103,10 +102,9 @@ public class BulkImportIT extends AbstractIntegrationTestWithDatabase {
         assertThat("Expected no warnings", handler.getWarningMessages(), emptyCollectionOf(String.class));
 
         List<String> errorMessages = handler.getErrorMessages();
-        assertThat("Expected 2 error messages", errorMessages, hasSize(2));
+        assertThat("Expected 1 error message", errorMessages, hasSize(1));
         assertThat(errorMessages.get(0), containsString("The following metadata fields of the sheet named "
             + "'Main Entity' are invalid:[Empty metadata]"));
-        assertThat(errorMessages.get(1), containsString("Import failed - All performed operations are rolled back"));
     }
 
     @Test
@@ -121,9 +119,8 @@ public class BulkImportIT extends AbstractIntegrationTestWithDatabase {
         assertThat("Expected no warnings", handler.getWarningMessages(), emptyCollectionOf(String.class));
 
         List<String> errorMessages = handler.getErrorMessages();
-        assertThat("Expected 2 error message", errorMessages, hasSize(2));
+        assertThat("Expected 1 error message", errorMessages, hasSize(1));
         assertThat(errorMessages.get(0), containsString("Wrong ID header on sheet Main Entity: RID::123456789"));
-        assertThat(errorMessages.get(1), containsString("Import failed - All performed operations are rolled back"));
     }
 
     @Test
@@ -138,11 +135,10 @@ public class BulkImportIT extends AbstractIntegrationTestWithDatabase {
         assertThat("Expected no warnings", handler.getWarningMessages(), emptyCollectionOf(String.class));
 
         List<String> errorMessages = handler.getErrorMessages();
-        assertThat("Expected 2 error messages", errorMessages, hasSize(2));
+        assertThat("Expected 1 error message", errorMessages, hasSize(1));
         assertThat(errorMessages.get(0), containsString("The following metadata fields of the sheet named "
             + "'Main Entity' are invalid:[unknown is not valid for the given collection, "
             + "person.identifier is not valid for the given collection]"));
-        assertThat(errorMessages.get(1), containsString("Import failed - All performed operations are rolled back"));
     }
 
     @Test
@@ -157,10 +153,9 @@ public class BulkImportIT extends AbstractIntegrationTestWithDatabase {
         assertThat("Expected no warnings", handler.getWarningMessages(), emptyCollectionOf(String.class));
 
         List<String> errorMessages = handler.getErrorMessages();
-        assertThat("Expected 2 error messages", errorMessages, hasSize(2));
+        assertThat("Expected 1 error message", errorMessages, hasSize(1));
         assertThat(errorMessages.get(0), containsString("The sheet name wrongdc.contributor.author "
             + "is not a valid metadata group"));
-        assertThat(errorMessages.get(1), containsString("Import failed - All performed operations are rolled back"));
     }
 
     @Test
@@ -215,10 +210,9 @@ public class BulkImportIT extends AbstractIntegrationTestWithDatabase {
         assertThat("Expected no warnings", handler.getWarningMessages(), emptyCollectionOf(String.class));
 
         List<String> errorMessages = handler.getErrorMessages();
-        assertThat("Expected 2 error messages", errorMessages, hasSize(2));
+        assertThat("Expected 1 error message", errorMessages, hasSize(1));
         assertThat(errorMessages.get(0), containsString("Sheet Main Entity - Duplicated headers found "
             + "on cells 3 and 4"));
-        assertThat(errorMessages.get(1), containsString("Import failed - All performed operations are rolled back"));
     }
 
     @Test
@@ -478,6 +472,7 @@ public class BulkImportIT extends AbstractIntegrationTestWithDatabase {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     public void testManyPublicationImportWithErrorAndAbortOnError() throws Exception {
 
         context.turnOffAuthorisationSystem();
@@ -499,9 +494,8 @@ public class BulkImportIT extends AbstractIntegrationTestWithDatabase {
         handleScript(args, ScriptLauncher.getConfig(kernelImpl), handler, kernelImpl, eperson);
 
         List<String> errorMessages = handler.getErrorMessages();
-        assertThat("Expected 2 error messages", errorMessages, hasSize(2));
+        assertThat("Expected 1 error message", errorMessages, hasSize(1));
         assertThat(errorMessages.get(0), containsString("No item to update found for entity with id RID::123456789"));
-        assertThat(errorMessages.get(1), containsString("Import failed - All performed operations are rolled back"));
 
         assertThat("Expected no warnings", handler.getWarningMessages(), emptyCollectionOf(String.class));
 
@@ -516,7 +510,18 @@ public class BulkImportIT extends AbstractIntegrationTestWithDatabase {
         // verify created item (ROW 2)
         String createdItemId = getIdFromCreatedMessage(infoMessages.get(3), 2);
         Item createdItem = itemService.findByIdOrLegacyId(context, createdItemId);
-        assertThat("Item expected not to be created", createdItem, nullValue());
+        assertThat("Item expected to be created", createdItem, notNullValue());
+
+        List<MetadataValue> metadata = createdItem.getMetadata();
+        assertThat(metadata, hasItems(with("dc.title", "First publication", null, null, 0, -1)));
+        assertThat(metadata, hasItems(with("dc.title", "First publication English", "en", null, 1, -1)));
+        assertThat(metadata, hasItems(with("dc.date.issued", "12/12/65", null, null, 0, -1)));
+        assertThat(metadata, hasItems(with("dc.contributor.author", "Thomas Edison", null, null, 0, -1)));
+        assertThat(metadata, hasItems(with("dc.contributor.author", "Morgan Pitt", null, null, 1, -1)));
+        assertThat(metadata, hasItems(with("oairecerif.author.affiliation", "Company", null, null, 0, -1)));
+        assertThat(metadata, hasItems(with("oairecerif.author.affiliation", PLACEHOLDER, null, null, 1, -1)));
+        assertThat(metadata, hasItems(with("dc.contributor.editor", "Editor", null, null, 0, -1)));
+        assertThat(metadata, hasItems(with("oairecerif.editor.affiliation", "EditorAffiliation", null, null, 0, -1)));
 
         // verify deleted item (ROW 4)
         assertThat("Item expected not to be deleted", itemService.find(context, itemToDelete.getID()), notNullValue());
@@ -585,10 +590,9 @@ public class BulkImportIT extends AbstractIntegrationTestWithDatabase {
         handleScript(args, ScriptLauncher.getConfig(kernelImpl), handler, kernelImpl, eperson);
 
         List<String> errorMessages = handler.getErrorMessages();
-        assertThat("Expected 2 error messages", errorMessages, hasSize(2));
+        assertThat("Expected 1 error message", errorMessages, hasSize(1));
         assertThat(errorMessages.get(0), containsString("Sheet dc.contributor.author - Row 2 - Invalid metadata "
             + "value Author1::authority1::xxx: invalid confidence value xxx"));
-        assertThat(errorMessages.get(1), containsString("Import failed - All performed operations are rolled back"));
 
         assertThat("Expected no warnings", handler.getWarningMessages(), emptyCollectionOf(String.class));
 
