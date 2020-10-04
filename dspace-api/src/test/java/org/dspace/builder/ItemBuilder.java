@@ -64,6 +64,10 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
         return setMetadataSingleValue(item, MetadataSchemaEnum.DC.getName(), "title", null, title);
     }
 
+    public ItemBuilder withTitleForLanguage(final String title, final String language) {
+        return addMetadataValue(item, MetadataSchemaEnum.DC.getName(), "title", null, language, title);
+    }
+
     public ItemBuilder withIssueDate(final String issueDate) {
         return addMetadataValue(item, MetadataSchemaEnum.DC.getName(),
                                 "date", "issued", new DCDate(issueDate).toString());
@@ -107,6 +111,26 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
 
     public ItemBuilder withCrisOwner(String value, String authority) {
         return addMetadataValue(item, CRIS.getName(), "owner", null, null, value, authority, CF_ACCEPTED);
+    }
+
+    public ItemBuilder withDoiIdentifier(String doi) {
+        return addMetadataValue(item, "dc", "identifier", "doi", doi);
+    }
+
+    public ItemBuilder withOrcidIdentifier(String orcid) {
+        return addMetadataValue(item, "person", "identifier", "orcid", orcid);
+    }
+
+    public ItemBuilder withIsniIdentifier(String isni) {
+        return addMetadataValue(item, "person", "identifier", "isni", isni);
+    }
+
+    public ItemBuilder withRidIdentifier(String rid) {
+        return addMetadataValue(item, "person", "identifier", "rid", rid);
+    }
+
+    public ItemBuilder withPatentNo(String patentNo) {
+        return addMetadataValue(item, "dc", "identifier", "patentno", patentNo);
     }
 
     public ItemBuilder makeUnDiscoverable() {
