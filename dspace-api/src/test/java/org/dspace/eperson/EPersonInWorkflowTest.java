@@ -140,8 +140,8 @@ public class EPersonInWorkflowTest extends AbstractIntegrationTestWithDatabase {
          * - delete user B
          * - verify the delete is refused
          * - remove user B from step 1
-         * - verify that the removal is refused due to B being the last member in the workflow group and the group having
-         * a claimed item
+         * - verify that the removal is refused due to B being the last member in the workflow group and the group
+         * having a claimed item
          * - approve it by user B and let it move to step 2
          * - remove user B from step 3
          * - approve it by user C
@@ -213,8 +213,8 @@ public class EPersonInWorkflowTest extends AbstractIntegrationTestWithDatabase {
          * - delete user B
          * - verify the delete is refused
          * - remove user B from step 1
-         * - verify that the removal is refused due to B being the last member in the workflow group and the group having a
-         * pool task
+         * - verify that the removal is refused due to B being the last member in the workflow group and the group
+         * having a pool task
          * - approve it by user B and let it move to step 2
          * - remove user B from step 3
          * - delete user B
@@ -432,8 +432,8 @@ public class EPersonInWorkflowTest extends AbstractIntegrationTestWithDatabase {
          * - remove user B from Col A - step 3
          * - remove user B from Col B - step 1
          * - remove user B from Col A - step 1
-         * - Verify that the removal from Col A - step 1 is refused because user B has a claimed task in that collection and
-         * no other user is present
+         * - Verify that the removal from Col A - step 1 is refused because user B has a claimed task in that
+         * collection and no other user is present
          * - approve it by user B, and let it move to step 2
          * - remove user B from Col A - step 1
          * - verify it succeeds
