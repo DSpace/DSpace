@@ -1,0 +1,16 @@
+@virtual.reftype.bibtex@{
+	@virtual.uniqueidentifier@,
+	author = {@virtual.authors.bibtex@},
+	title = {@dc.title@},
+	year = {@virtual.date.year@},
+	publisher = {@dc.publisher.name@},
+	address = {@dc.publisher.place@},
+	journal = {@dc.relation.ispartof@},
+	volume = {@dc.relation.volume@},
+	booktitle = {@dc.relation.ispartofbook@},	
+	abstract = {@dc.description.abstract@},
+	keywords = {@virtual.keywords.all@},
+	url = {@dc.identifier.url@},
+	pages = {@virtual.fullpage.bibtex@},
+	organization ={@dc.description.sponsorship@}
+}
