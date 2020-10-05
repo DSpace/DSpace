@@ -7,6 +7,8 @@
  */
 package org.dspace.app.rest;
 
+import static org.dspace.app.rest.matcher.ProcessMatcher.matchProcess;
+import static org.dspace.content.ProcessStatus.SCHEDULED;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.is;
@@ -804,6 +806,30 @@ public class ProcessRestRepositoryIT extends AbstractControllerIntegrationTest {
                         .andExpect(jsonPath("$.metadata['dspace.process.filetype'][0].value",
                                             is("script_output")));
 
+
+    }
+
+    @Test
+    public void testFindByCurrentUser() throws Exception {
+
+        Process process1 = ProcessBuilder.createProcess(context, eperson, "mock-script", parameters)
+            .withStartAndEndTime("10/01/1990", "20/01/1990")
+            .build();
+        ProcessBuilder.createProcess(context, admin, "mock-script", parameters)
+            .withStartAndEndTime("11/01/1990", "19/01/1990")
+            .build();
+        Process process3 = ProcessBuilder.createProcess(context, eperson, "mock-script", parameters)
+            .withStartAndEndTime("12/01/1990", "18/01/1990")
+            .build();
+
+        String token = getAuthToken(eperson.getEmail(), password);
+
+        getClient(token).perform(get("/api/system/processes/search/own"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$._embedded.processes", contains(
+                matchProcess(process3.getName(), eperson.getID().toString(), process3.getID(), parameters, SCHEDULED),
+                matchProcess(process1.getName(), eperson.getID().toString(), process1.getID(), parameters, SCHEDULED))))
+            .andExpect(jsonPath("$.page", is(PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 2))));
 
     }
 

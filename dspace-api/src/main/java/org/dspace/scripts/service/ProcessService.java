@@ -215,6 +215,29 @@ public interface ProcessService {
      * @throws SQLException If something goes wrong
      */
     int countSearch(Context context, ProcessQueryParameterContainer processQueryParameterContainer) throws SQLException;
+
+    /**
+     * Returns a list of all Process objects in the database by the given user.
+     *
+     * @param context The relevant DSpace context
+     * @param user    The user to search for
+     * @param limit   The limit for the amount of Processes returned
+     * @param offset  The offset for the Processes to be returned
+     * @return The list of all Process objects in the Database
+     * @throws SQLException If something goes wrong
+     */
+    List<Process> findByUser(Context context, EPerson user, int limit, int offset) throws SQLException;
+
+    /**
+     * Count all the processes which is related to the given user.
+     *
+     * @param context The relevant DSpace context
+     * @param user    The user to search for
+     * @return The number of results matching the query
+     * @throws SQLException If something goes wrong
+     */
+    int countByUser(Context context, EPerson user) throws SQLException;
+
     /**
      * This method will append the given output to the {@link Process} its logs
      * @param processId     The ID of the {@link Process} to append the log for

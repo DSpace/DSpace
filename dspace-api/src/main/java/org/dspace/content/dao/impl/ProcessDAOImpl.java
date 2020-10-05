@@ -20,6 +20,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.dspace.content.dao.ProcessDAO;
 import org.dspace.core.AbstractHibernateDAO;
 import org.dspace.core.Context;
+import org.dspace.eperson.EPerson;
 import org.dspace.scripts.Process;
 import org.dspace.scripts.ProcessQueryParameterContainer;
 import org.dspace.scripts.Process_;
@@ -145,6 +146,29 @@ public class ProcessDAOImpl extends AbstractHibernateDAO<Process> implements Pro
         return count(context, criteriaQuery, criteriaBuilder, processRoot);
     }
 
+    @Override
+    public List<Process> findByUser(Context context, EPerson user, int limit, int offset) throws SQLException {
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaQuery<Process> criteriaQuery = getCriteriaQuery(criteriaBuilder, Process.class);
+
+        Root<Process> processRoot = criteriaQuery.from(Process.class);
+        criteriaQuery.select(processRoot);
+        criteriaQuery.where(criteriaBuilder.equal(processRoot.get(Process_.E_PERSON), user));
+
+        return list(context, criteriaQuery, false, Process.class, limit, offset);
+    }
+
+    @Override
+    public int countByUser(Context context, EPerson user) throws SQLException {
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaQuery<Process> criteriaQuery = getCriteriaQuery(criteriaBuilder, Process.class);
+
+        Root<Process> processRoot = criteriaQuery.from(Process.class);
+        criteriaQuery.select(processRoot);
+        criteriaQuery.where(criteriaBuilder.equal(processRoot.get(Process_.E_PERSON), user));
+        return count(context, criteriaQuery, criteriaBuilder, processRoot);
+
+    }
 
 }
 

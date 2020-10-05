@@ -47,7 +47,7 @@ public class ProcessFilesLinkRepository extends AbstractDSpaceRestRepository imp
      * @throws SQLException         If something goes wrong
      * @throws AuthorizeException   If something goes wrong
      */
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasPermission(#processId, 'PROCESS', 'READ')")
     public Page<BitstreamRest> getFilesFromProcess(@Nullable HttpServletRequest request,
                                                    Integer processId,
                                                    @Nullable Pageable optionalPageable,
