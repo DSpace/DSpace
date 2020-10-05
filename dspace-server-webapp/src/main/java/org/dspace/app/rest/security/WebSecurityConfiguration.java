@@ -111,16 +111,10 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
             // Everyone can call this endpoint
             .permitAll()
             .and()
-
             // Add a filter before any request to handle DSpace IP-based authorization/authentication
             // (e.g. anonymous users may be added to special DSpace groups if they are in a given IP range)
             .addFilterBefore(new AnonymousAdditionalAuthorizationFilter(authenticationManager(), authenticationService),
                              StatelessAuthenticationFilter.class)
-            // Add a custom Token based authentication filter before any request to check for a valid authentication
-            // token (JWT) passed from the client. This validates if the client has already authenticated.
-            .addFilterBefore(new StatelessAuthenticationFilter(authenticationManager(), restAuthenticationService,
-                                                               ePersonRestAuthenticationProvider, requestService),
-                             StatelessLoginFilter.class)
             // Add a filter before our login endpoints to do the authentication based on the data in the HTTP request
             .addFilterBefore(new StatelessLoginFilter("/api/authn/login", authenticationManager(),
                                                       restAuthenticationService),
@@ -129,7 +123,12 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
             // HTTP request
             .addFilterBefore(new ShibbolethAuthenticationFilter("/api/authn/shibboleth", authenticationManager(),
                                                                 restAuthenticationService),
-                             LogoutFilter.class);
+                             LogoutFilter.class)
+            // Add a custom Token based authentication filter before any request to check for a valid authentication
+            // token (JWT) passed from the client. This validates if the client has already authenticated.
+            .addFilterBefore(new StatelessAuthenticationFilter(authenticationManager(), restAuthenticationService,
+                                                               ePersonRestAuthenticationProvider, requestService),
+                             StatelessLoginFilter.class);
     }
 
     @Override
