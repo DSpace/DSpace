@@ -120,33 +120,35 @@ public class EPersonInWorkflowTest extends AbstractIntegrationTestWithDatabase {
 
     /**
      * This test verifies that an EPerson cannot be removed if they are the only member of a Workflow Group that has
-     * tasks currently assigned to it. This test also verifies that after user has been removed from the workflow
-     * group and the task has been passed, the EPerson can be removed.
-     *
-     * This test has the following setup:
-     * - Step 1: user B
-     * - Step 2: user C
-     * - Step 3: user B
-     *
-     * This test will perform the following checks:
-     * - create a workspace item, and let it move to step 1
-     * - claim it by user B
-     * - delete user B
-     * - verify the delete is refused
-     * - remove user B from step 1
-     * - verify that the removal is refused due to B being the last member in the workflow group and the group having
-     * a claimed item
-     * - approve it by user B and let it move to step 2
-     * - remove user B from step 3
-     * - approve it by user C
-     * - verify that the item is archived without any actions apart from removing user B
-     * - delete user B
-     * - verify the delete succeeds
+     * tasks currently assigned to it. This test verifies this with the task claimed by the user to be deleted.
+     * This test also verifies that after the task has been passed and the user has been removed from the workflow
+     * group, the EPerson can be removed.
      *
      * @throws Exception
      */
     @Test
     public void testDeleteUserWhenOnlyUserInGroup1() throws Exception {
+        /*
+         * This test has the following setup:
+         * - Step 1: user B
+         * - Step 2: user C
+         * - Step 3: user B
+         *
+         * This test will perform the following checks:
+         * - create a workspace item, and let it move to step 1
+         * - claim it by user B
+         * - delete user B
+         * - verify the delete is refused
+         * - remove user B from step 1
+         * - verify that the removal is refused due to B being the last member in the workflow group and the group having
+         * a claimed item
+         * - approve it by user B and let it move to step 2
+         * - remove user B from step 3
+         * - approve it by user C
+         * - verify that the item is archived without any actions apart from removing user B
+         * - delete user B
+         * - verify the delete succeeds
+         */
         context.turnOffAuthorisationSystem();
 
         Community parent = CommunityBuilder.createCommunity(context).build();
@@ -192,32 +194,34 @@ public class EPersonInWorkflowTest extends AbstractIntegrationTestWithDatabase {
 
     /**
      * This test verifies that an EPerson cannot be removed if they are the only member of a Workflow Group that has
-     * tasks currently assigned to it. This test also verifies that after user has been removed from the workflow
-     * group and the task has been passed, the EPerson can be removed.
-     *
-     * This test has the following setup:
-     * - Step 1: user B
-     * - Step 2: user C
-     * - Step 3: user B
-     *
-     * This test will perform the following checks:
-     * - create a workspace item, and let it move to step 1
-     * - delete user B
-     * - verify the delete is refused
-     * - remove user B from step 1
-     * - verify that the removal is refused due to B being the last member in the workflow group and the group having a
-     * pool task
-     * - approve it by user B and let it move to step 2
-     * - remove user B from step 3
-     * - delete user B
-     * - verify the delete succeeds
-     * - Approve it by user C
-     * - verify that the item is archived without any actions apart from the approving in step 2
+     * tasks currently assigned to it. This test verifies this with a pooled task.
+     * This test also verifies that after the task has been passed and the user has been removed from the workflow
+     * group, the EPerson can be removed.
      *
      * @throws Exception
      */
     @Test
     public void testDeleteUserWhenOnlyUserInGroup2() throws Exception {
+        /*
+         * This test has the following setup:
+         * - Step 1: user B
+         * - Step 2: user C
+         * - Step 3: user B
+         *
+         * This test will perform the following checks:
+         * - create a workspace item, and let it move to step 1
+         * - delete user B
+         * - verify the delete is refused
+         * - remove user B from step 1
+         * - verify that the removal is refused due to B being the last member in the workflow group and the group having a
+         * pool task
+         * - approve it by user B and let it move to step 2
+         * - remove user B from step 3
+         * - delete user B
+         * - verify the delete succeeds
+         * - Approve it by user C
+         * - verify that the item is archived without any actions apart from the approving in step 2
+         */
         context.turnOffAuthorisationSystem();
 
         Community parent = CommunityBuilder.createCommunity(context).build();
@@ -261,30 +265,32 @@ public class EPersonInWorkflowTest extends AbstractIntegrationTestWithDatabase {
 
     /**
      * This test verifies that an EPerson cannot be removed if they are the only member of a Workflow Group that has
-     * tasks currently assigned to it. This test also verifies that after user has been removed from the workflow
-     * group and the task has been passed, the EPerson can be removed.
-     *
-     * This test has the following setup:
-     * - Step 1: user B
-     * - Step 2: user C
-     * - Step 3: user B
-     *
-     * This test will perform the following checks:
-     * - create a workspace item, and let it move to step 1
-     * - delete user C
-     * - verify the delete is refused
-     * - remove user C from step 2
-     * - delete user C
-     * - verify the delete succeeds
-     * - Approve it by user B
-     * - verify that the item moved to step 3 without any actions apart from the approving in step 1
-     * - Approve it by user B
-     * - verify that the item is archived
+     * tasks currently assigned to it. This test verifies this with a group without a task.
+     * This test also verifies that after user has been removed from the workflow
+     * group, the EPerson can be removed.
      *
      * @throws Exception
      */
     @Test
     public void testDeleteUserWhenOnlyUserInGroup3() throws Exception {
+        /*
+         * This test has the following setup:
+         * - Step 1: user B
+         * - Step 2: user C
+         * - Step 3: user B
+         *
+         * This test will perform the following checks:
+         * - create a workspace item, and let it move to step 1
+         * - delete user C
+         * - verify the delete is refused
+         * - remove user C from step 2
+         * - delete user C
+         * - verify the delete succeeds
+         * - Approve it by user B
+         * - verify that the item moved to step 3 without any actions apart from the approving in step 1
+         * - Approve it by user B
+         * - verify that the item is archived
+         */
         context.turnOffAuthorisationSystem();
 
         Community parent = CommunityBuilder.createCommunity(context).build();
@@ -327,33 +333,36 @@ public class EPersonInWorkflowTest extends AbstractIntegrationTestWithDatabase {
 
     /**
      * This test verifies that an EPerson cannot be removed if they are the only member of a Workflow Group that has
-     * tasks currently assigned to it. This test also verifies that after user has been removed from the workflow
-     * group and the task has been passed, the EPerson can be removed.
-     *
-     * This test has the following setup:
-     * - Step 1: user B
-     * - Step 2: user C
-     * - Step 3: user B
-     *
-     * This test will perform the following checks:
-     * - create a workspace item, and let it move to step 1
-     * - approve it by user B, and let it move to step 2
-     * - approve it by user C, and let it move to step 3
-     * - claim it by user B
-     * - remove user B from step 1
-     * - delete user B
-     * - verify the delete is refused
-     * - remove user B from step 3, verify that the removal is refused due to user B having a claimed task and there
-     * being no other members in step 3
-     * - approve it by user B
-     * - delete user B
-     * - verify the delete suceeds
-     * - verify that the item is archived
+     * tasks currently assigned to it. This test verifies a user can't be removed from a workflow step they have claimed
+     * items for that task. This test also verifies that the user can be removed from another workflow group where
+     * they have no claimed items for that task. This test also verifies that after user has performed the task, and the
+     * user has been removed from the workflow group, the EPerson can be removed.
      *
      * @throws Exception
      */
     @Test
     public void testDeleteUserWhenOnlyUserInGroup4() throws Exception {
+        /*
+         * This test has the following setup:
+         * - Step 1: user B
+         * - Step 2: user C
+         * - Step 3: user B
+         *
+         * This test will perform the following checks:
+         * - create a workspace item, and let it move to step 1
+         * - approve it by user B, and let it move to step 2
+         * - approve it by user C, and let it move to step 3
+         * - claim it by user B
+         * - remove user B from step 1
+         * - delete user B
+         * - verify the delete is refused
+         * - remove user B from step 3, verify that the removal is refused due to user B having a claimed task and there
+         * being no other members in step 3
+         * - approve it by user B
+         * - delete user B
+         * - verify the delete suceeds
+         * - verify that the item is archived
+         */
         context.turnOffAuthorisationSystem();
 
         Community parent = CommunityBuilder.createCommunity(context).build();
@@ -398,38 +407,41 @@ public class EPersonInWorkflowTest extends AbstractIntegrationTestWithDatabase {
 
     /**
      * This test verifies that an EPerson cannot be removed if they are the only member of a Workflow Group that has
-     * tasks currently assigned to it. This test also verifies that after user has been removed from the workflow
-     * group and the task has been passed, the EPerson can be removed.
-     *
-     * This test has the following setup:
-     * - Collection A - Step 1: user B
-     * - Collection A - Step 2: user C
-     * - Collection A - Step 3: user B
-     *
-     * - Collection B - Step 1: user B
-     *
-     * This test will perform the following checks:
-     * - create a workspace item in Collection A, and let it move to step 1
-     * - claim it by user B
-     * - delete user B
-     * - verify the delete is refused
-     * - remove user B from Col A - step 3
-     * - remove user B from Col B - step 1
-     * - remove user B from Col A - step 1
-     * - Verify that the removal from Col A - step 1 is refused because user B has a claimed task in that collection and
-     * no other user is present
-     * - approve it by user B, and let it move to step 2
-     * - remove user B from Col A - step 1
-     * - verify it succeeds
-     * - delete user B
-     * - verify it succeeds
-     * - approve it by user C
-     * - verify that the item is archived
+     * tasks currently assigned to it. This test verifies a user can't be removed from a workflow step they have claimed
+     * items for that task. This test also verifies that this verification is using both the step and the collection
+     * to determine whether the user can be removed from a workflow group. This test also verifies that after user has
+     *  been removed from the workflow group and the task has been passed, the EPerson can be removed.
      *
      * @throws Exception
      */
     @Test
     public void testDeleteUserWhenOnlyUserInGroup5() throws Exception {
+        /*
+         * This test has the following setup:
+         * - Collection A - Step 1: user B
+         * - Collection A - Step 2: user C
+         * - Collection A - Step 3: user B
+         *
+         * - Collection B - Step 1: user B
+         *
+         * This test will perform the following checks:
+         * - create a workspace item in Collection A, and let it move to step 1
+         * - claim it by user B
+         * - delete user B
+         * - verify the delete is refused
+         * - remove user B from Col A - step 3
+         * - remove user B from Col B - step 1
+         * - remove user B from Col A - step 1
+         * - Verify that the removal from Col A - step 1 is refused because user B has a claimed task in that collection and
+         * no other user is present
+         * - approve it by user B, and let it move to step 2
+         * - remove user B from Col A - step 1
+         * - verify it succeeds
+         * - delete user B
+         * - verify it succeeds
+         * - approve it by user C
+         * - verify that the item is archived
+         */
         context.turnOffAuthorisationSystem();
 
         Community parent = CommunityBuilder.createCommunity(context).build();
@@ -476,32 +488,29 @@ public class EPersonInWorkflowTest extends AbstractIntegrationTestWithDatabase {
     }
 
     /**
-     * This test verifies that an EPerson cannot be removed if they are the only member of a Workflow Group that has
-     * tasks currently assigned to it. This test also verifies that after user has been removed from the workflow
-     * group and the task has been passed, the EPerson can be removed.
-     *
-     * This test has the following setup:
-     * - Step 1: user B
-     * - Step 2: user C
-     * - Step 3: user B
-     *
-     * - create a workspace item, and let it move to step 1
-     * - Approve it by user B
-     * - verify that the item moved to step 2
-     * - claim it by user C, but don’t approve it
-     * - delete user C
-     * - verify the delete is refused
-     * - remove user C from step 2
-     * - delete user C
-     * - verify the delete succeeds
-     * - verify that the item moved to step 3 without any actions apart from deleting user C
-     * - Approve it by user B
-     * - verify that the item is archived
+     * This test verifies that the submitter can be removed, and the workflow steps will still be supported
+     * if there's no submitter assigned to the item
      *
      * @throws Exception
      */
     @Test
     public void testDeleteUserWhenOnlyUserInGroup6() throws Exception {
+        /*
+         * This test has the following setup:
+         * - Submitter: user A
+         * - Step 1: user B
+         * - Step 2: user C
+         * - Step 3: user B
+         *
+         * - create a workspace item, and let it move to step 1
+         * - delete the submitter
+         * - Approve it by user B
+         * - verify that the item moved to step 2
+         * - Approve it by user C
+         * - verify that the item moved to step 3
+         * - Approve it by user B
+         * - verify that the item is archived
+         */
         context.turnOffAuthorisationSystem();
 
         Community parent = CommunityBuilder.createCommunity(context).build();
@@ -542,34 +551,38 @@ public class EPersonInWorkflowTest extends AbstractIntegrationTestWithDatabase {
 
     /**
      * This test verifies that an EPerson cannot be removed if they are the only member of a Workflow Group that has
-     * tasks currently assigned to it. This test also verifies that after user has been removed from the workflow
-     * group and the task has been passed, the EPerson can be removed.
-     *
-     * This test has the following setup:
-     * - Step 1: user B
-     * - Step 2: user C
-     * - Step 3: user B
-     *
-     * This test will perform the following checks:
-     * - create a workspace item, and let it move to step 1
-     * - delete user B
-     * - verify the delete is refused
-     * - remove user B from step 1
-     * - verify the removal is refused
-     * - remove user B from step 3
-     * - verify the removal succeeds
-     * - approve it by user B
-     * - verify that the item moved to step 2
-     * - remove user B from step 1
-     * - delete user B
-     * - verify the delete succeeds
-     * - approve it by user C
-     * - verify that the item is archived without any actions apart from removing user B
+     * tasks currently assigned to it. This test also verifies the user can't be removed from a step with a pooled
+     * task if they are the only member. This test also verifies the user can be removed from a step with no tasks
+     * even if they are the only member. This test also verifies that after the task has been passed and the user has
+     *  been removed from the workflow, the EPerson can be removed. This test also verifies that an item is correctly
+     *  arhived if the last step has no members left.
      *
      * @throws Exception
      */
     @Test
     public void testDeleteUserWhenOnlyUserInGroup7() throws Exception {
+        /*
+         * This test has the following setup:
+         * - Step 1: user B
+         * - Step 2: user C
+         * - Step 3: user B
+         *
+         * This test will perform the following checks:
+         * - create a workspace item, and let it move to step 1
+         * - delete user B
+         * - verify the delete is refused
+         * - remove user B from step 1
+         * - verify the removal is refused
+         * - remove user B from step 3
+         * - verify the removal succeeds
+         * - approve it by user B
+         * - verify that the item moved to step 2
+         * - remove user B from step 1
+         * - delete user B
+         * - verify the delete succeeds
+         * - approve it by user C
+         * - verify that the item is archived without any actions apart from removing user B
+         */
         context.turnOffAuthorisationSystem();
 
         Community parent = CommunityBuilder.createCommunity(context).build();
