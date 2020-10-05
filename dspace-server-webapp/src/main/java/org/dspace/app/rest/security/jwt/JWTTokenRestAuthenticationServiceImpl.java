@@ -178,8 +178,11 @@ public class JWTTokenRestAuthenticationServiceImpl implements RestAuthentication
         invalidateSingleUseCookie(response);
     }
 
-    @Override
-    public void invalidateSingleUseCookie(HttpServletResponse response) {
+    /**
+     * Invalidate our single use cookie, by overwriting it in the response.
+     * @param response
+     */
+    private void invalidateSingleUseCookie(HttpServletResponse response) {
         // Re-send the same cookie (as addTokenToResponse()) with no value and a Max-Age of 0 seconds
         ResponseCookie cookie = ResponseCookie.from(AUTHORIZATION_COOKIE, "")
                                               .maxAge(0).httpOnly(true).secure(true).sameSite("None").build();

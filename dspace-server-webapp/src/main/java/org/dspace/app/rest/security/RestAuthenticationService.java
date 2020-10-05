@@ -31,6 +31,11 @@ public interface RestAuthenticationService {
      * <P>
      * This method is called after authentication has succeeded, and it allows the REST API to provide
      * user data in the response (in the form of a JWT or similar, depending on implementation)
+     * <P>
+     * If addSingleUseCookie is set to true, then user data should be stored in a cookie temporarily for ONE request.
+     * Once this cookie is read again, it should be immediately replaced by storing user data in Headers. Storing any
+     * authentication info in a cookie long term is not secure, as it makes DSpace susceptible to CSRF
+     * (cross site request forgery) attacks.
      * @param request current request
      * @param response current response
      * @param authentication Authentication information from successful login
@@ -50,13 +55,42 @@ public interface RestAuthenticationService {
      */
     AuthenticationToken getShortLivedAuthenticationToken(Context context, HttpServletRequest request);
 
+    /**
+     * Retrieve the currently authenticated EPerson (i.e. user) based on the data in the current request
+     * and/or current DSpace context. Usually the EPerson is obtained via the current login token passed
+     * in a request header (or temporary cookie)
+     * @param request current request
+     * @param response current response
+     * @param context current DSpace Context
+     * @return current EPerson, or null if not found
+     */
     EPerson getAuthenticatedEPerson(HttpServletRequest request, HttpServletResponse response, Context context);
 
+    /**
+     * Returns whether the current request/response has EPerson authentication data. This method simply checks
+     * the headers and/or temporary cookies for a valid login token (if found). If its found in a single-use
+     * cookie then the cookie should be deleted & the login token moved to a header in the response.
+     * @param request current request
+     * @param response current response
+     * @return true if login token found, false otherwise
+     */
     boolean hasAuthenticationData(HttpServletRequest request, HttpServletResponse response);
 
+    /**
+     * Invalidates any existing login tokens (if found) in request/response. This is necessary to completely
+     * logout from the system. This removes/invalidates the token from the headers and/or temporary cookies.
+     * @param request current request
+     * @param response current response
+     * @param context current DSpace context
+     * @throws Exception if error occurs
+     */
     void invalidateAuthenticationData(HttpServletRequest request, HttpServletResponse response, Context context)
             throws Exception;
 
+    /**
+     * Get current AuthenticationService which stores Authentication methods/plugins
+     * @return
+     */
     AuthenticationService getAuthenticationService();
 
     /**
@@ -69,7 +103,4 @@ public interface RestAuthenticationService {
      * @return A string value that should be set in the WWWW-Authenticate header
      */
     String getWwwAuthenticateHeaderValue(HttpServletRequest request, HttpServletResponse response);
-
-    void invalidateSingleUseCookie(HttpServletResponse res);
-
 }
