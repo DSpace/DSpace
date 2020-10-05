@@ -460,7 +460,7 @@ public class RequestCopyFeatureIT extends AbstractControllerIntegrationTest {
     public void requestACopyItemTypeLoggedAsAnonymous() throws Exception {
         configurationService.setProperty("request.item.type", "logged");
 
-        BitstreamRest bitstreamRest = bitstreamConverter.convert(bitstreamFromCollection, Projection.DEFAULT);
+        BitstreamRest bitstreamRest = bitstreamConverter.convert(bitstreamB, Projection.DEFAULT);
         String bitstreamUri = utils.linkToSingleResource(bitstreamRest, "self").getHref();
 
         getClient().perform(get("/api/authz/authorizations/search/object")
@@ -473,6 +473,8 @@ public class RequestCopyFeatureIT extends AbstractControllerIntegrationTest {
 
     @Test
     public void requestACopyItemTypeLoggedAsEperson() throws Exception {
+        configurationService.setProperty("request.item.type", "logged");
+
         BitstreamRest bitstreamRest = bitstreamConverter.convert(bitstreamB, Projection.DEFAULT);
         String bitstreamUri = utils.linkToSingleResource(bitstreamRest, "self").getHref();
         Authorization authorizationFeature = new Authorization(eperson, requestCopyFeature, bitstreamRest);
@@ -492,7 +494,7 @@ public class RequestCopyFeatureIT extends AbstractControllerIntegrationTest {
     public void requestACopyItemTypeEmptyAsAnonymous() throws Exception {
         configurationService.setProperty("request.item.type", "");
 
-        BitstreamRest bitstreamRest = bitstreamConverter.convert(bitstreamFromCollection, Projection.DEFAULT);
+        BitstreamRest bitstreamRest = bitstreamConverter.convert(bitstreamB, Projection.DEFAULT);
         String bitstreamUri = utils.linkToSingleResource(bitstreamRest, "self").getHref();
 
         getClient().perform(get("/api/authz/authorizations/search/object")
@@ -506,7 +508,7 @@ public class RequestCopyFeatureIT extends AbstractControllerIntegrationTest {
     public void requestACopyItemTypeEmptyAsEperson() throws Exception {
         configurationService.setProperty("request.item.type", "");
 
-        BitstreamRest bitstreamRest = bitstreamConverter.convert(bitstreamFromCollection, Projection.DEFAULT);
+        BitstreamRest bitstreamRest = bitstreamConverter.convert(bitstreamB, Projection.DEFAULT);
         String bitstreamUri = utils.linkToSingleResource(bitstreamRest, "self").getHref();
 
         String token = getAuthToken(eperson.getEmail(), password);
@@ -522,7 +524,7 @@ public class RequestCopyFeatureIT extends AbstractControllerIntegrationTest {
     public void requestACopyItemTypeBogusValueAsAnonymous() throws Exception {
         configurationService.setProperty("request.item.type", "invalid value");
 
-        BitstreamRest bitstreamRest = bitstreamConverter.convert(bitstreamFromCollection, Projection.DEFAULT);
+        BitstreamRest bitstreamRest = bitstreamConverter.convert(bitstreamB, Projection.DEFAULT);
         String bitstreamUri = utils.linkToSingleResource(bitstreamRest, "self").getHref();
 
         getClient().perform(get("/api/authz/authorizations/search/object")
@@ -536,7 +538,7 @@ public class RequestCopyFeatureIT extends AbstractControllerIntegrationTest {
     public void requestACopyItemTypeBogusValueAsEperson() throws Exception {
         configurationService.setProperty("request.item.type", "invalid value");
 
-        BitstreamRest bitstreamRest = bitstreamConverter.convert(bitstreamFromCollection, Projection.DEFAULT);
+        BitstreamRest bitstreamRest = bitstreamConverter.convert(bitstreamB, Projection.DEFAULT);
         String bitstreamUri = utils.linkToSingleResource(bitstreamRest, "self").getHref();
 
         String token = getAuthToken(eperson.getEmail(), password);
