@@ -669,7 +669,7 @@ public class FlowItemUtils
 		if (bundles != null && bundles.size() > 0)
 		{
 			Bundle bundle = bundles.get(0);
-			if (bundle.getPrimaryBitstream() != null && bundle.getPrimaryBitstream().toString().equals(String.valueOf(bitstreamID)))
+			if (bundle.getPrimaryBitstream() != null && bundle.getPrimaryBitstream().equals(bitstream))
 			{
 				// currently the bitstream is primary
 				if ("no".equals(primary))
