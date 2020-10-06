@@ -12,21 +12,25 @@
 				</entry>
 				<entry key="ORCID">
 					<bean class="org.dspace.app.bulkimport.service.impl.ItemSearcherByMetadata">
+						<constructor-arg ref="org.dspace.discovery.SearchService"></constructor-arg>
 						<constructor-arg value="person.identifier.orcid"></constructor-arg>
 					</bean>
 				</entry>
 				<entry key="RID">
 					<bean class="org.dspace.app.bulkimport.service.impl.ItemSearcherByMetadata">
+						<constructor-arg ref="org.dspace.discovery.SearchService"></constructor-arg>
 						<constructor-arg value="person.identifier.rid"></constructor-arg>
 					</bean>
 				</entry>
 				<entry key="ISNI">
 					<bean class="org.dspace.app.bulkimport.service.impl.ItemSearcherByMetadata">
+						<constructor-arg ref="org.dspace.discovery.SearchService"></constructor-arg>
 						<constructor-arg value="person.identifier.isni"></constructor-arg>
 					</bean>
 				</entry>
 				<entry key="DOI">
 					<bean class="org.dspace.app.bulkimport.service.impl.ItemSearcherByMetadata">
+						<constructor-arg ref="org.dspace.discovery.SearchService"></constructor-arg>
 						<constructor-arg value="dc.identifier.doi"></constructor-arg>
 					</bean>
 				</entry>

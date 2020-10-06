@@ -8,12 +8,15 @@
 package org.dspace.app.rest;
 
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
+import org.junit.Ignore;
 
 /**
  * Test suite for the EditItem endpoint
  * 
  * @author Danilo Di Nuzzo (danilo.dinuzzo at 4science.it)
  */
+@Ignore
 public class EditItemRestRepositoryIT extends AbstractControllerIntegrationTest {
 
+    // TODO: provide some test cases
 }
