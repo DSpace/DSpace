@@ -18,6 +18,7 @@ import static org.junit.Assert.assertNotEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.cookie;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -130,7 +131,7 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
     }
 
     @Test
-    public void testStatusAuthenticatedWithCookie() throws Exception {
+    public void testShibAuthenticatedWithSingleUseCookie() throws Exception {
         //Enable Shibboleth login
         configurationService.setProperty("plugin.sequence.org.dspace.authenticate.AuthenticationMethod", SHIB_ONLY);
 
@@ -144,7 +145,10 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
         Cookie[] cookies = new Cookie[1];
         cookies[0] = new Cookie(AUTHORIZATION_COOKIE, token);
 
-        //Check if we are authenticated with a status request with authorization cookie
+        // Check if we are authenticated with a status request with a single use authorization cookie
+        // This simulates what happens after Shibboleth login occurs. Shibboleth redirects back to REST API
+        // to generate the token & then redirects to UI with token in a Cookie. UI sends token back in order
+        // to get access to the Authorization header
         getClient().perform(get("/api/authn/status")
                 .secure(true)
                 .cookie(cookies))
@@ -153,7 +157,19 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
                 .andExpect(content().contentType(contentType))
                 .andExpect(jsonPath("$.okay", is(true)))
                 .andExpect(jsonPath("$.authenticated", is(true)))
-                .andExpect(jsonPath("$.type", is("status")));
+                .andExpect(jsonPath("$.type", is("status")))
+                // Cookie is single use, so its value should now be cleared
+                .andExpect(cookie().value(AUTHORIZATION_COOKIE, ""));
+
+        //Test token passed as Header still works though (even after cookie is cleared)
+        getClient(token).perform(get("/api/authn/status")
+                                .secure(true)
+                                .cookie(cookies))
+                   .andExpect(status().isOk())
+                   .andExpect(content().contentType(contentType))
+                   .andExpect(jsonPath("$.okay", is(true)))
+                   .andExpect(jsonPath("$.authenticated", is(true)))
+                   .andExpect(jsonPath("$.type", is("status")));
 
         //Logout
         getClient(token).perform(get("/api/authn/logout"))
@@ -316,30 +332,87 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
     }
 
     @Test
-    public void testReuseTokenWithDifferentIP() throws Exception {
+    public void testReuseTokenFromUntrustedOrigin() throws Exception {
         String token = getAuthToken(eperson.getEmail(), password);
 
+        // Test token works
         getClient(token).perform(get("/api/authn/status"))
 
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.okay", is(true)))
+                        .andExpect(jsonPath("$.authenticated", is(true)))
+                        .andExpect(jsonPath("$.type", is("status")));
+
+        // Test token cannot be used from an *untrusted* Origin
+        // (NOTE: this Origin is NOT listed in 'rest.cors.allowed-origins')
+        getClient(token).perform(get("/api/authn/status")
+                                     .header("Origin", "https://example.org"))
+                        // should result in a 403 error as Spring Security returns that for untrusted origins
+                        .andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void testReuseTokenWithDifferentTrustedOrigin() throws Exception {
+        // NOTE: By default we do NOT allow token reuse from different origins (even if trusted)
+        String token = getAuthToken(eperson.getEmail(), password);
+
+        // Test token works
+        getClient(token).perform(get("/api/authn/status"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.okay", is(true)))
                 .andExpect(jsonPath("$.authenticated", is(true)))
                 .andExpect(jsonPath("$.type", is("status")));
 
+        // Test token still doesn't work from a different origin, even though it's trusted
+        // NOTE: "https://dspace.org" is added to "rest.cors.allowed-origins" setting for test environment
         getClient(token).perform(get("/api/authn/status")
-                                     .header("X-FORWARDED-FOR", "1.1.1.1"))
+                                     .header("Origin", "https://dspace.org"))
                         .andExpect(status().isOk())
                         .andExpect(jsonPath("$.okay", is(true)))
                         .andExpect(jsonPath("$.authenticated", is(false)))
                         .andExpect(jsonPath("$.type", is("status")));
 
 
+        // Test token also doesn't work from different (but trusted) Referer
         getClient(token).perform(get("/api/authn/status")
-                                    .with(ip("1.1.1.1")))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.okay", is(true)))
-                .andExpect(jsonPath("$.authenticated", is(false)))
-                .andExpect(jsonPath("$.type", is("status")));
+                                     .header("Referer", "https://dspace.org"))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.okay", is(true)))
+                        .andExpect(jsonPath("$.authenticated", is(false)))
+                        .andExpect(jsonPath("$.type", is("status")));
+
+    }
+
+    @Test
+    public void testReuseTokenWithDifferentTrustedOriginWhenAllowed() throws Exception {
+        // Disable signing of token with Origin. This allows token to be used cross-origin
+        configurationService.setProperty("jwt.login.token.include.origin", "false");
+
+        String token = getAuthToken(eperson.getEmail(), password);
+
+        // Test token works
+        getClient(token).perform(get("/api/authn/status"))
+
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.okay", is(true)))
+                        .andExpect(jsonPath("$.authenticated", is(true)))
+                        .andExpect(jsonPath("$.type", is("status")));
+
+        // Test token now works from different trusted Origin
+        getClient(token).perform(get("/api/authn/status")
+                                     .header("Origin", "https://dspace.org"))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.okay", is(true)))
+                        .andExpect(jsonPath("$.authenticated", is(true)))
+                        .andExpect(jsonPath("$.type", is("status")));
+
+        // Test token now works from different trusted Referer
+        getClient(token).perform(get("/api/authn/status")
+                                     .header("Referer", "https://dspace.org"))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.okay", is(true)))
+                        .andExpect(jsonPath("$.authenticated", is(true)))
+                        .andExpect(jsonPath("$.type", is("status")));
     }
 
     @Test
