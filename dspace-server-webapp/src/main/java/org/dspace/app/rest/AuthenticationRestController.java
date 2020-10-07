@@ -180,7 +180,7 @@ public class AuthenticationRestController implements InitializingBean {
      * Actual logout is performed by our {@link org.dspace.app.rest.security.CustomLogoutHandler}
      * @return ResponseEntity (204 No Content)
      */
-    @RequestMapping(value = "/logout", method = {RequestMethod.GET, RequestMethod.POST})
+    @RequestMapping(value = "/logout", method = {RequestMethod.POST})
     public ResponseEntity logout() {
         return ResponseEntity.noContent().build();
     }

@@ -172,7 +172,7 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
                    .andExpect(jsonPath("$.type", is("status")));
 
         //Logout
-        getClient(token).perform(get("/api/authn/logout"))
+        getClient(token).perform(post("/api/authn/logout"))
                         .andExpect(status().isNoContent());
     }
 
@@ -265,17 +265,15 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
 
         getClient(token).perform(get("/api/authn/status"))
                         .andExpect(status().isOk())
-
                         .andExpect(jsonPath("$.okay", is(true)))
                         .andExpect(jsonPath("$.authenticated", is(true)))
                         .andExpect(jsonPath("$.type", is("status")));
 
-        getClient(token).perform(get("/api/authn/logout"))
+        getClient(token).perform(post("/api/authn/logout"))
                         .andExpect(status().isNoContent());
 
         getClient(token).perform(get("/api/authn/status"))
                         .andExpect(status().isOk())
-
                         .andExpect(jsonPath("$.okay", is(true)))
                         .andExpect(jsonPath("$.authenticated", is(false)))
                         .andExpect(jsonPath("$.type", is("status")));
@@ -292,19 +290,16 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
 
         assertNotEquals(token1, token2);
 
-        getClient(token1).perform(get("/api/authn/logout"));
+        getClient(token1).perform(post("/api/authn/logout"));
 
         getClient(token1).perform(get("/api/authn/status"))
                          .andExpect(status().isOk())
-
                          .andExpect(jsonPath("$.okay", is(true)))
                          .andExpect(jsonPath("$.authenticated", is(false)))
                          .andExpect(jsonPath("$.type", is("status")));
 
-
         getClient(token2).perform(get("/api/authn/status"))
                          .andExpect(status().isOk())
-
                          .andExpect(jsonPath("$.okay", is(true)))
                          .andExpect(jsonPath("$.authenticated", is(false)))
                          .andExpect(jsonPath("$.type", is("status")));
@@ -449,7 +444,7 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
                         .andExpect(jsonPath("$.type", is("status")));
 
         //Logout
-        getClient(token).perform(get("/api/authn/logout"))
+        getClient(token).perform(post("/api/authn/logout"))
                         .andExpect(status().isNoContent());
 
         //Check if we are actually logged out
@@ -719,7 +714,7 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
                         .andExpect(jsonPath("$.type", is("status")));
 
         //Logout
-        getClient(token).perform(get("/api/authn/logout"))
+        getClient(token).perform(post("/api/authn/logout"))
                         .andExpect(status().isNoContent());
 
         //Check if we are actually logged out
@@ -744,7 +739,7 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
                         .andExpect(jsonPath("$.type", is("status")));
 
         //Logout
-        getClient(token).perform(get("/api/authn/logout"))
+        getClient(token).perform(post("/api/authn/logout"))
                         .andExpect(status().isNoContent());
 
         //Check if we are actually logged out (again)
@@ -778,7 +773,7 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
                         .andExpect(jsonPath("$.type", is("status")));
 
         //Logout
-        getClient(token).perform(get("/api/authn/logout"))
+        getClient(token).perform(post("/api/authn/logout"))
                         .andExpect(status().isNoContent());
 
         //Check if we are actually logged out
@@ -829,7 +824,7 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
             .andReturn().getResponse().getHeader(AUTHORIZATION_HEADER);
 
         //Logout
-        getClient(token).perform(get("/api/authn/logout"))
+        getClient(token).perform(post("/api/authn/logout"))
                         .andExpect(status().isNoContent());
 
         //Check if we are actually logged out

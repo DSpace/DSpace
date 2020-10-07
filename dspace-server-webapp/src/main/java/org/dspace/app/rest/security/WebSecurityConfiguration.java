@@ -104,8 +104,8 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
             .logout()
             // On logout, clear the "session" salt
             .addLogoutHandler(customLogoutHandler)
-            // Configure the logout entry point
-            .logoutRequestMatcher(new AntPathRequestMatcher("/api/authn/logout"))
+            // Configure the logout entry point & require POST
+            .logoutRequestMatcher(new AntPathRequestMatcher("/api/authn/logout", HttpMethod.POST.name()))
             // When logout is successful, return OK (204) status
             .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler(HttpStatus.NO_CONTENT))
             // Everyone can call this endpoint
