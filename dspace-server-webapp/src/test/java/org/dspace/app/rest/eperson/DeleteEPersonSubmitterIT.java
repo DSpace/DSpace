@@ -305,6 +305,9 @@ public class DeleteEPersonSubmitterIT extends AbstractControllerIntegrationTest 
 
     @Ignore
     @Test
+    /**
+     * TODO: This test currently fails with a status 500
+     */
     public void testWorkflowItemSubmitterDelete() throws Exception {
         context.turnOffAuthorisationSystem();
 
@@ -329,7 +332,7 @@ public class DeleteEPersonSubmitterIT extends AbstractControllerIntegrationTest 
         assertDeletionOfEperson(submitter);
 
         getClient(token).perform(get("/api/workflow/workflowitems/" + workflowItem.getID()))
-                        .andExpect(status().isNotFound());
+                        .andExpect(status().isOk());
 
     }
 
