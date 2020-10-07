@@ -10,6 +10,7 @@ package org.dspace.app.rest.security.jwt;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.text.ParseException;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import javax.servlet.http.Cookie;
@@ -17,6 +18,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.nimbusds.jose.JOSEException;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.model.wrapper.AuthenticationToken;
 import org.dspace.app.rest.security.DSpaceAuthentication;
@@ -164,7 +166,7 @@ public class JWTTokenRestAuthenticationServiceImpl implements RestAuthentication
     @Override
     public boolean hasAuthenticationData(HttpServletRequest request, HttpServletResponse response) {
         return StringUtils.isNotBlank(request.getHeader(AUTHORIZATION_HEADER))
-                || StringUtils.isNotBlank(getSingleUseCookie(request, response))
+                || hasSingleUseCookie(request)
                 || StringUtils.isNotBlank(request.getParameter(AUTHORIZATION_TOKEN_PARAMETER));
     }
 
@@ -316,10 +318,26 @@ public class JWTTokenRestAuthenticationServiceImpl implements RestAuthentication
                 if (cookie.getName().equals(AUTHORIZATION_COOKIE) && StringUtils.isNotEmpty(cookie.getValue())) {
                     authCookie = cookie.getValue();
                     invalidateSingleUseCookie(response);
+                    break;
                 }
             }
         }
         return authCookie;
     }
 
+    /**
+     * Check if the current request includes our single-use cookie. However, this does NOT read
+     * and destroy the cookie. It's simply a check whether the single-use auth cookie exists.
+     * @param request current request
+     * @return true if single-use cookie found in request. false otherwise.
+     */
+    private boolean hasSingleUseCookie(HttpServletRequest request) {
+        Cookie[] cookies = request.getCookies();
+        if (ArrayUtils.isNotEmpty(cookies)) {
+            // Check if any request cookies have a name matching our auth cookie
+            return Arrays.stream(cookies).anyMatch(cookie -> cookie.getName().equals(AUTHORIZATION_COOKIE));
+        } else {
+            return false;
+        }
+    }
 }

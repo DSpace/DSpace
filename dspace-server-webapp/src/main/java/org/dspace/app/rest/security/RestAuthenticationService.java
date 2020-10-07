@@ -58,7 +58,9 @@ public interface RestAuthenticationService {
     /**
      * Retrieve the currently authenticated EPerson (i.e. user) based on the data in the current request
      * and/or current DSpace context. Usually the EPerson is obtained via the current login token passed
-     * in a request header (or temporary cookie)
+     * in a request header (or temporary cookie). If a temporary cookie contains the login token, then
+     * that cookie should be deleted after reading it. Storing any authentication info in a cookie long term
+     * is not secure, as it makes DSpace susceptible to CSRF (cross site request forgery) attacks.
      * @param request current request
      * @param response current response
      * @param context current DSpace Context
@@ -68,8 +70,7 @@ public interface RestAuthenticationService {
 
     /**
      * Returns whether the current request/response has EPerson authentication data. This method simply checks
-     * the headers and/or temporary cookies for a valid login token (if found). If its found in a single-use
-     * cookie then the cookie should be deleted & the login token moved to a header in the response.
+     * the headers and/or temporary cookies for a valid login token.
      * @param request current request
      * @param response current response
      * @return true if login token found, false otherwise

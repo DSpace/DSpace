@@ -35,6 +35,7 @@ import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
+import org.dspace.core.Utils;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.service.EPersonService;
@@ -141,8 +142,7 @@ public abstract class JWTTokenHandler {
 
         // As long as the JWT is valid, parse all claims and return the EPerson
         if (isValidToken(request, signedJWT, jwtClaimsSet, ePerson)) {
-
-            log.debug("Received valid token for username: " + ePerson.getEmail());
+            log.debug("Received valid token for user: " + ePerson.getEmail());
 
             for (JWTClaimProvider jwtClaimProvider : jwtClaimProviders) {
                 jwtClaimProvider.parseClaim(context, request, jwtClaimsSet);
@@ -150,7 +150,8 @@ public abstract class JWTTokenHandler {
 
             return ePerson;
         } else {
-            log.warn("Origin: " + getRequestOrigin(request) + " tried to use an expired or non-valid token");
+            log.warn("Origin '" + getRequestOrigin(request) +
+                         "' tried to use a token which is either expired or not valid for this origin");
             return null;
         }
     }
@@ -167,7 +168,6 @@ public abstract class JWTTokenHandler {
      */
     public String createTokenForEPerson(Context context, HttpServletRequest request, Date previousLoginDate,
                                         List<Group> groups) throws JOSEException, SQLException {
-
         // Verify that the user isn't trying to use a short lived token to generate another token
         if (StringUtils.isNotBlank(request.getParameter(AUTHORIZATION_TOKEN_PARAMETER))) {
             throw new AccessDeniedException("Short lived tokens can't be used to generate other tokens");
@@ -175,6 +175,7 @@ public abstract class JWTTokenHandler {
 
         // Update the saved session salt for the currently logged in user, returning the user object
         EPerson ePerson = updateSessionSalt(context, previousLoginDate);
+        log.debug("Creating new token for user: " + (ePerson != null ? ePerson.getEmail() : "null"));
 
         // Create a claims set based on currently logged in user
         JWTClaimsSet claimsSet = buildJwtClaimsSet(context, request);
@@ -399,13 +400,19 @@ public abstract class JWTTokenHandler {
         // When enabled, include the origin of the request in the signing key
         if (getIncludeOrigin()) {
             origin = getRequestOrigin(request);
+            log.debug("Using Origin '" + origin + "' for token signing key...");
         }
-        return getJwtKey() + ePerson.getSessionSalt() + origin;
+        return getJwtKey() + ePerson.getSessionSalt() + (origin != null ? origin : "");
     }
 
     /**
      * Retrieve the Origin information from the request. First checks for the "Origin" header,
      * if not found falls back to the "Referer" header.
+     * <P>
+     * NOTE: If URL found includes a path, that path is removed. For instance, if the
+     * Origin=https://dspace.org/license/ then this method will return https://dspace.org
+     * This allows for JWTs to be used across an entire domain, instead of only for a single path
+     * within that domain.
      * @param request current request
      * @return found origin (or null if not able to determine)
      */
@@ -415,7 +422,9 @@ public abstract class JWTTokenHandler {
             // If empty fallback to "Referer" header
             source = request.getHeader("Referer");
         }
-        return source;
+
+        // Return base URL (this removes any path, etc)
+        return Utils.getBaseUrl(source);
     }
 
     /**
