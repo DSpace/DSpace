@@ -13,7 +13,6 @@ import java.util.List;
 
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
-import org.dspace.core.Context;
 
 /**
  * Based on GoogleMetadata crosswalk
@@ -52,9 +51,8 @@ public class OrcidWorkMetadata extends MappingMetadata {
      * 
      * @param item    The item being viewed to extract metadata from
      */
-    public OrcidWorkMetadata(Context context, Item item) throws SQLException {
+    public OrcidWorkMetadata(Item item) throws SQLException {
         init("orcid-work-metadata.config");
-        // Hold onto the item in case we need to refresh a stale parse
         this.item = item;
         parseItem();
     }

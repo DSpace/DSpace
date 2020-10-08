@@ -7,7 +7,7 @@
  */
 package org.dspace.util;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.dspace.submit.lookup.MapConverterModifier;
 
 /**

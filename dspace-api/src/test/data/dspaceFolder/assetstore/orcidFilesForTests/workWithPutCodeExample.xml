@@ -3,6 +3,16 @@
     <ns2:title>
         <title>A Methodology for the Emulation of Architecture</title>
     </ns2:title>
+    <ns2:citation>
+        <ns2:citation-type>bibtex</ns2:citation-type>
+        <ns2:citation-value>@OTHER{
+	123456789_xxx,
+	author = {Carberry Josiah},
+	title = {A Methodology for the Emulation of Architecture},
+}
+</ns2:citation-value>
+    </ns2:citation>
+    <ns2:type>other</ns2:type>
     <publication-date>
         <year>2013</year>
         <month>08</month>
@@ -11,7 +21,7 @@
     <external-ids>
         <external-id>
             <external-id-type>handle</external-id-type>
-            <external-id-value>http://localhost:4000/handle/123456789/5</external-id-value>
+            <external-id-value>123456789/xxx</external-id-value>
             <external-id-relationship>self</external-id-relationship>
         </external-id>
     </external-ids>

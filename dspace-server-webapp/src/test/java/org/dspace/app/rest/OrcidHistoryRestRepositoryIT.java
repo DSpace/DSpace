@@ -515,6 +515,8 @@ public class OrcidHistoryRestRepositoryIT extends AbstractControllerIntegrationT
             Item itemPublication = ItemBuilder.createItem(context, col2)
                                               .withAuthor("Josiah, Carberry")
                                               .withTitle("A Methodology for the Emulation of Architecture")
+                                              .withHandle("123456789/yyy")
+                                              .withDoiIdentifier("10.1000/182")
                                               .withIssueDate("2013-08-03").build();
 
             OrcidQueue orcidQueue = OrcidQueueBuilder.createOrcidQueue(context, itemPerson, itemPublication).build();
@@ -600,14 +602,15 @@ public class OrcidHistoryRestRepositoryIT extends AbstractControllerIntegrationT
             Item itemPublication = ItemBuilder.createItem(context, col2)
                                               .withAuthor("Josiah, Carberry")
                                               .withTitle("A Methodology for the Emulation of Architecture")
+                                              .withHandle("123456789/xxx")
                                               .withIssueDate("2013-08-03").build();
 
             OrcidQueue orcidQueue = OrcidQueueBuilder.createOrcidQueue(context, itemPerson, itemPublication).build();
 
-            OrcidHistory orcidHistory = OrcidHistoryBuilder.createOrcidHistory(context, itemPerson, itemPublication)
-                                                           .withResponseMessage("<xml><work>...</work>")
-                                                           .withPutCode("12345")
-                                                           .withStatus(201).build();
+            OrcidHistoryBuilder.createOrcidHistory(context, itemPerson, itemPublication)
+                               .withResponseMessage("<xml><work>...</work>")
+                               .withPutCode("12345")
+                               .withStatus(201).build();
 
             context.restoreAuthSystemState();
 

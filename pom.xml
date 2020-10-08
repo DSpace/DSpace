@@ -1883,17 +1883,6 @@
             <url>https://maven.restlet.com</url>
         </repository>
         -->
-        <repository>
-            <id>4science-nexus</id>
-            <url>https://nexus.4science.it/repository/maven-public</url>
-            <layout>default</layout>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </repository>
     </repositories>
 
     <dependencies>

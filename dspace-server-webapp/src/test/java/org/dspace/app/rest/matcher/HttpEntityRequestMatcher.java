@@ -15,30 +15,32 @@ import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
 import org.mockito.ArgumentMatcher;
 
 /**
- *
+ * Custom {@link ArgumentMatcher} to compare verify the
+ * {@link HttpEntityEnclosingRequestBase} attributes.
+ * 
  * @author Mykhaylo Boychuk (mykhaylo.boychuk at 4science.it)
  */
 public class HttpEntityRequestMatcher implements ArgumentMatcher<HttpEntityEnclosingRequestBase> {
 
-    private String xmlFile;
+    private String content;
     private String httpMethod;
 
-    public HttpEntityRequestMatcher(String xmlFiel, String httpMethod) {
-        this.xmlFile = xmlFiel;
+    public HttpEntityRequestMatcher(String content, String httpMethod) {
+        this.content = content;
         this.httpMethod = httpMethod;
     }
 
     @Override
-    public boolean matches(HttpEntityEnclosingRequestBase argument) {
-        String requestContent = null;
+    public boolean matches(HttpEntityEnclosingRequestBase request) {
+        String requestContent = getRequestContentAsString(request);
+        return requestContent.equals(content) && request.getMethod().equals(httpMethod);
+    }
+
+    private String getRequestContentAsString(HttpEntityEnclosingRequestBase request) {
         try {
-            requestContent = IOUtils.toString(argument.getEntity().getContent(), Charset.defaultCharset());
-        } catch (IOException e) {
-            e.printStackTrace();
+            return IOUtils.toString(request.getEntity().getContent(), Charset.defaultCharset());
+        } catch (UnsupportedOperationException | IOException e) {
+            throw new RuntimeException(e);
         }
-        if (requestContent.equals(xmlFile) && argument.getMethod().equals(httpMethod)) {
-           return true;
-        }
-        return false;
     }
 }

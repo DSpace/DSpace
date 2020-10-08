@@ -668,7 +668,7 @@ public abstract class MappingMetadata {
             for (MetadataValue v : fields) {
                 if (null != v && (null != v.getValue()) && !v.getValue().trim().equals("")) {
                     metadataMappings.put(fieldName, v.getValue());
-                    metadataMappings.put(v.getValue(), map.get(v.getMetadataField().toString()));
+                    metadataMappings.put(v.getValue(), map.get(v.getMetadataField().toString('.')));
                 }
             }
         } else {

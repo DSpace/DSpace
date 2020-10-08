@@ -18,13 +18,13 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 
 import com.ibm.icu.text.DecimalFormat;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.Header;
@@ -51,7 +51,7 @@ import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.services.ConfigurationService;
 import org.dspace.util.SimpleMapConverter;
-import org.dspace.utils.DSpace;
+import org.dspace.util.UUIDUtils;
 import org.orcid.jaxb.model.common_v3.CreditName;
 import org.orcid.jaxb.model.common_v3.ExternalId;
 import org.orcid.jaxb.model.common_v3.ExternalIds;
@@ -76,6 +76,7 @@ import org.orcid.jaxb.model.utils.FundingType;
 import org.orcid.jaxb.model.utils.Iso3166Country;
 import org.orcid.jaxb.model.utils.Relationship;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 
 /**
  * Implementation of {@link OrcidHistoryService}.
@@ -104,6 +105,10 @@ public class OrcidHistoryServiceImpl implements OrcidHistoryService {
     @Autowired
     private ItemService itemService;
 
+    @Autowired
+    @Qualifier("mapConverterOrcidWorkType")
+    private SimpleMapConverter mapConverterModifier;
+
     private HttpClient httpClient;
 
     @PostConstruct
@@ -129,8 +134,7 @@ public class OrcidHistoryServiceImpl implements OrcidHistoryService {
     @Override
     public void delete(Context context, OrcidHistory orcidHistory) throws SQLException, AuthorizeException {
         if (!authorizeService.isAdmin(context)) {
-            throw new AuthorizeException(
-                "You must be an admin to delete a OrcidHistory");
+            throw new AuthorizeException("You must be an admin to delete a OrcidHistory");
         }
         orcidHistoryDAO.delete(context, orcidHistory);
     }
@@ -138,8 +142,7 @@ public class OrcidHistoryServiceImpl implements OrcidHistoryService {
     @Override
     public void update(Context context, OrcidHistory orcidHistory) throws SQLException, AuthorizeException {
         if (!authorizeService.isAdmin(context)) {
-            throw new AuthorizeException(
-                "You must be an admin to update a OrcidHistory");
+            throw new AuthorizeException("You must be an admin to update a OrcidHistory");
         }
         if (orcidHistory != null) {
             orcidHistoryDAO.save(context, orcidHistory);
@@ -185,16 +188,15 @@ public class OrcidHistoryServiceImpl implements OrcidHistoryService {
             boolean forceAddition) throws SQLException {
         Item entity = orcidQueue.getEntity();
         Item owner = orcidQueue.getOwner();
-        OrcidWorkMetadata itemMetadata = new OrcidWorkMetadata(context, entity);
+        OrcidWorkMetadata itemMetadata = new OrcidWorkMetadata(entity);
         BigInteger putCode = null;
         Work work = new Work();
         addAuthors(context, work, itemMetadata);
         addPubblicationDate(work, itemMetadata);
-        addExternalIdentifire(work, itemMetadata);
+        addExternalIdentifiers(work, itemMetadata);
         addType(work, itemMetadata);
         addCitation(work, itemMetadata);
         work.setTitle(new WorkTitle(itemMetadata.getTitle(), null, null));
-        work.setExternalIds(getExternalIds(entity));
         if (!forceAddition) {
             putCode = findPutCode(context, entity, owner);
             work.setPutCode(putCode);
@@ -291,6 +293,7 @@ public class OrcidHistoryServiceImpl implements OrcidHistoryService {
                 context.commit();
             }
             return history;
+
         } catch (Exception e) {
             throw new RuntimeException(e);
         } finally {
@@ -361,12 +364,6 @@ public class OrcidHistoryServiceImpl implements OrcidHistoryService {
                    .orElse(null);
     }
 
-    private List<MetadataValue> getMetadataValues(Item item, String metadataField) {
-        return item.getMetadata().stream()
-                .filter(metadata -> metadata.getMetadataField().toString('.').equals(metadataField))
-                .collect(Collectors.toList());
-    }
-
     private void deleteOldRecords(Context context, Item entity, Item owner) throws SQLException {
         List<OrcidHistory> orcidHistories = orcidHistoryDAO.findByOwnerAndEntity(context, owner.getID(),entity.getID());
         for (OrcidHistory orcidHistory : orcidHistories) {
@@ -382,57 +379,50 @@ public class OrcidHistoryServiceImpl implements OrcidHistoryService {
         this.httpClient = httpClient;
     }
 
-    private void addAuthors(Context context, Work work, OrcidWorkMetadata itemMetadata) {
-        WorkContributors workContributors = new WorkContributors();
-        boolean haveContributor = false;
+    private void addAuthors(Context context, Work work, OrcidWorkMetadata itemMetadata) throws SQLException {
 
         List<MetadataValue> authors = itemMetadata.getAuthors();
+        if (CollectionUtils.isEmpty(authors)) {
+            return;
+        }
+
+        WorkContributors workContributors = new WorkContributors();
         for (MetadataValue valContributor : authors) {
             Contributor contributor = new Contributor();
             String name = valContributor.getValue();
-            String uuidContributor = valContributor.getAuthority();
-            if (uuidContributor != null) {
-                Item itemContributor = null;
-                UUID uuid = UUID.fromString(uuidContributor);
-                try {
-                    itemContributor = itemService.find(context, uuid);
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-
-                String email = itemService.getMetadataFirstValue(itemContributor, "person", "email", null, null);
-                String orcid = itemService.getMetadataFirstValue(itemContributor, "person", "identifier", "orcid",null);
+            UUID authorityUuid = UUIDUtils.fromString(valContributor.getAuthority());
+            if (authorityUuid != null) {
+                Item authorItem = itemService.find(context, authorityUuid);
+                String email = itemService.getMetadataFirstValue(authorItem, "person", "email", null, null);
+                String orcidId = itemService.getMetadataFirstValue(authorItem, "person", "identifier", "orcid", null);
 
                 if (StringUtils.isNotBlank(email)) {
                     ContributorEmail contributorEmail = new ContributorEmail();
                     contributorEmail.setValue(email);
                     contributor.setContributorEmail(contributorEmail);
                 }
-                if (StringUtils.isNotBlank(orcid)) {
-                    String domainOrcid = configurationService.getProperty("cris",
-                            "external.domainname.authority.service.orcid");
-                    OrcidId orcidID = new OrcidId();
 
-                    orcidID.setHost(domainOrcid);
-                    orcidID.setPath(orcid);
-                    orcidID.setUri(domainOrcid + orcid);
-                    contributor.setContributorOrcid(orcidID);
+                if (StringUtils.isNotBlank(orcidId)) {
+                    String orcidDomain = configurationService.getProperty("orcid.domain-url");
+                    if (StringUtils.isNotBlank(orcidId)) {
+                        OrcidId orcidID = new OrcidId();
+                        orcidID.setHost(orcidDomain);
+                        orcidID.setPath(orcidId);
+                        orcidID.setUri(orcidDomain + "/" + orcidId);
+                        contributor.setContributorOrcid(orcidID);
+                    }
                 }
             }
-            CreditName creditName = new CreditName();
-            creditName.setValue(name);
-            contributor.setCreditName(creditName);
+
+            contributor.setCreditName(new CreditName(name));
 
             ContributorAttributes attributes = new ContributorAttributes();
             attributes.setContributorRole(ContributorRole.AUTHOR.value());
             contributor.setContributorAttributes(attributes);
             workContributors.getContributor().add(contributor);
-            haveContributor = true;
-
-            if (haveContributor) {
-                work.setContributors(workContributors);
-            }
         }
+
+        work.setContributors(workContributors);
     }
 
     private void addPubblicationDate(Work work, OrcidWorkMetadata itemMetadata) {
@@ -464,7 +454,7 @@ public class OrcidHistoryServiceImpl implements OrcidHistoryService {
         }
     }
 
-    private void addExternalIdentifire(Work work, OrcidWorkMetadata itemMetadata) {
+    private void addExternalIdentifiers(Work work, OrcidWorkMetadata itemMetadata) {
         if (itemMetadata.getExternalIdentifier() != null) {
             ExternalIds workExternalIdentifiers = new ExternalIds();
             for (String valIdentifier : itemMetadata.getExternalIdentifier()) {
@@ -479,8 +469,6 @@ public class OrcidHistoryServiceImpl implements OrcidHistoryService {
     }
 
     private void addType(Work work, OrcidWorkMetadata itemMetadata) {
-        SimpleMapConverter mapConverterModifier = new DSpace().getServiceManager().getServiceByName(
-                          "mapConverterOrcidWorkType", SimpleMapConverter.class);
         if (mapConverterModifier == null) {
             work.setType(itemMetadata.getWorkType());
         } else {
