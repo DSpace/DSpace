@@ -39,7 +39,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
- * Implementation of service to manage Boxes component of layout
+ * Unit tests for CrisLayoutBoxServiceImpl, so far only findByItem method is tested.
  *
  * @author Corrado Lombardi (corrado.lombardi at 4science.it)
  */
