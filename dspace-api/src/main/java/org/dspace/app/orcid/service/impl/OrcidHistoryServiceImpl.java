@@ -50,6 +50,8 @@ import org.dspace.content.MetadataValue;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.services.ConfigurationService;
+import org.dspace.util.SimpleMapConverter;
+import org.dspace.utils.DSpace;
 import org.orcid.jaxb.model.common_v3.CreditName;
 import org.orcid.jaxb.model.common_v3.ExternalId;
 import org.orcid.jaxb.model.common_v3.ExternalIds;
@@ -72,6 +74,7 @@ import org.orcid.jaxb.model.utils.ContributorRole;
 import org.orcid.jaxb.model.utils.FundingType;
 import org.orcid.jaxb.model.utils.Iso3166Country;
 import org.orcid.jaxb.model.utils.Relationship;
+import org.orcid.jaxb.model.utils.WorkType;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -188,6 +191,7 @@ public class OrcidHistoryServiceImpl implements OrcidHistoryService {
         addAuthors(context, work, itemMetadata);
         addPubblicationDate(work, itemMetadata);
         addExternalIdentifire(work, itemMetadata);
+        addType(work, itemMetadata);
         work.setTitle(new WorkTitle(itemMetadata.getTitle(), null, null));
         work.setType(itemMetadata.getWorkType());
         work.setExternalIds(getExternalIds(entity));
@@ -474,4 +478,13 @@ public class OrcidHistoryServiceImpl implements OrcidHistoryService {
         }
     }
 
+    private void addType(Work work, OrcidWorkMetadata itemMetadata) {
+        SimpleMapConverter mapConverterModifier = new DSpace().getServiceManager().getServiceByName(
+                          "mapConverterOrcidWorkType", SimpleMapConverter.class);
+        if (mapConverterModifier == null) {
+            work.setType(WorkType.valueOf(itemMetadata.getWorkType()).name());
+        } else {
+            work.setType(WorkType.fromValue(mapConverterModifier.getValue(itemMetadata.getWorkType())).name());
+        }
+    }
 }
