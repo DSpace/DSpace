@@ -36,6 +36,8 @@ public class OrcidWorkMetadata extends MappingMetadata {
 
     public static final String ISSUE = "publication_date";
 
+    public static final String CITATION = "citation_crosswalk";
+
     public static final String ISSUE_YEAR = "publication_date.year";
     public static final String ISSUE_MONTH = "publication_date.month";
     public static final String ISSUE_DAY = "publication_date.day";
@@ -86,6 +88,8 @@ public class OrcidWorkMetadata extends MappingMetadata {
         //TYPE
         addSingleField(TYPE);
 
+        // CITATION
+        addCitation(CITATION);
     }
 
     @Override
@@ -173,6 +177,20 @@ public class OrcidWorkMetadata extends MappingMetadata {
     public String getWorkType() {
         if (!metadataMappings.get(TYPE).isEmpty()) {
             return metadataMappings.get(TYPE).get(0);
+        }
+        return null;
+    }
+
+    public String getCitation() {
+        if (!metadataMappings.get(CITATION).isEmpty()) {
+            return metadataMappings.get(CITATION).get(0);
+        }
+        return null;
+    }
+
+    public String getCitationType() {
+        if (!configuredFields.get(CITATION).isEmpty()) {
+            return configuredFields.get(CITATION);
         }
         return null;
     }

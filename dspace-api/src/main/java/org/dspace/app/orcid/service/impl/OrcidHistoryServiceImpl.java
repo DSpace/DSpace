@@ -62,6 +62,7 @@ import org.orcid.jaxb.model.common_v3.FuzzyDate.Year;
 import org.orcid.jaxb.model.common_v3.OrcidId;
 import org.orcid.jaxb.model.common_v3.Organization;
 import org.orcid.jaxb.model.common_v3.OrganizationAddress;
+import org.orcid.jaxb.model.record_v3.Citation;
 import org.orcid.jaxb.model.record_v3.Contributor;
 import org.orcid.jaxb.model.record_v3.ContributorAttributes;
 import org.orcid.jaxb.model.record_v3.ContributorEmail;
@@ -191,6 +192,7 @@ public class OrcidHistoryServiceImpl implements OrcidHistoryService {
         addPubblicationDate(work, itemMetadata);
         addExternalIdentifire(work, itemMetadata);
         addType(work, itemMetadata);
+        addCitation(work, itemMetadata);
         work.setTitle(new WorkTitle(itemMetadata.getTitle(), null, null));
         work.setExternalIds(getExternalIds(entity));
         if (!forceAddition) {
@@ -483,6 +485,16 @@ public class OrcidHistoryServiceImpl implements OrcidHistoryService {
             work.setType(itemMetadata.getWorkType());
         } else {
             work.setType(mapConverterModifier.getValue(itemMetadata.getWorkType()));
+        }
+    }
+
+    private void addCitation(Work work, OrcidWorkMetadata itemMetadata) {
+        String citationVal = itemMetadata.getCitation();
+        if (StringUtils.isNotBlank(citationVal)) {
+            Citation citation = new Citation();
+            citation.setCitationType(itemMetadata.getCitationType());
+            citation.setCitationValue(citationVal);
+            work.setCitation(citation);
         }
     }
 }
