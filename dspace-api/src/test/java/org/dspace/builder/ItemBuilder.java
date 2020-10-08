@@ -90,6 +90,10 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
         return addMetadataValue(item, "relationship", "type", null, relationshipType);
     }
 
+    public ItemBuilder withType(final String type) {
+        return addMetadataValue(item, "dc", "type", null, type);
+    }
+
     public ItemBuilder withPublicationIssueNumber(final String issueNumber) {
         return addMetadataValue(item, "publicationissue", "issueNumber", null, issueNumber);
     }
