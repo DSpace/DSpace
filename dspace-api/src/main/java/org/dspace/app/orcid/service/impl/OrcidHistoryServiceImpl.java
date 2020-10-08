@@ -8,7 +8,7 @@
 package org.dspace.app.orcid.service.impl;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static org.orcid.jaxb.model.common_v2.Iso3166Country.fromValue;
+import static org.orcid.jaxb.model.utils.Iso3166Country.fromValue;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -17,11 +17,14 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 
+import com.ibm.icu.text.DecimalFormat;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.Header;
@@ -39,6 +42,7 @@ import org.dspace.app.orcid.OrcidQueue;
 import org.dspace.app.orcid.dao.OrcidHistoryDAO;
 import org.dspace.app.orcid.dao.OrcidQueueDAO;
 import org.dspace.app.orcid.service.OrcidHistoryService;
+import org.dspace.app.util.OrcidWorkMetadata;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Item;
@@ -46,18 +50,30 @@ import org.dspace.content.MetadataValue;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.services.ConfigurationService;
-import org.orcid.jaxb.model.common_v2.ExternalId;
-import org.orcid.jaxb.model.common_v2.ExternalIds;
-import org.orcid.jaxb.model.common_v2.Iso3166Country;
-import org.orcid.jaxb.model.common_v2.Organization;
-import org.orcid.jaxb.model.common_v2.OrganizationAddress;
-import org.orcid.jaxb.model.common_v2.RelationshipType;
-import org.orcid.jaxb.model.record_v2.Funding;
-import org.orcid.jaxb.model.record_v2.FundingTitle;
-import org.orcid.jaxb.model.record_v2.FundingType;
-import org.orcid.jaxb.model.record_v2.Work;
-import org.orcid.jaxb.model.record_v2.WorkTitle;
-import org.orcid.jaxb.model.record_v2.WorkType;
+import org.dspace.util.SimpleMapConverter;
+import org.dspace.utils.DSpace;
+import org.orcid.jaxb.model.common_v3.CreditName;
+import org.orcid.jaxb.model.common_v3.ExternalId;
+import org.orcid.jaxb.model.common_v3.ExternalIds;
+import org.orcid.jaxb.model.common_v3.FuzzyDate;
+import org.orcid.jaxb.model.common_v3.FuzzyDate.Day;
+import org.orcid.jaxb.model.common_v3.FuzzyDate.Month;
+import org.orcid.jaxb.model.common_v3.FuzzyDate.Year;
+import org.orcid.jaxb.model.common_v3.OrcidId;
+import org.orcid.jaxb.model.common_v3.Organization;
+import org.orcid.jaxb.model.common_v3.OrganizationAddress;
+import org.orcid.jaxb.model.record_v3.Contributor;
+import org.orcid.jaxb.model.record_v3.ContributorAttributes;
+import org.orcid.jaxb.model.record_v3.ContributorEmail;
+import org.orcid.jaxb.model.record_v3.Funding;
+import org.orcid.jaxb.model.record_v3.FundingTitle;
+import org.orcid.jaxb.model.record_v3.Work;
+import org.orcid.jaxb.model.record_v3.WorkContributors;
+import org.orcid.jaxb.model.record_v3.WorkTitle;
+import org.orcid.jaxb.model.utils.ContributorRole;
+import org.orcid.jaxb.model.utils.FundingType;
+import org.orcid.jaxb.model.utils.Iso3166Country;
+import org.orcid.jaxb.model.utils.Relationship;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -166,14 +182,16 @@ public class OrcidHistoryServiceImpl implements OrcidHistoryService {
 
     private OrcidHistory sendPublicationToOrcid(Context context, OrcidQueue orcidQueue, String orcid, String token,
             boolean forceAddition) throws SQLException {
-
         Item entity = orcidQueue.getEntity();
         Item owner = orcidQueue.getOwner();
+        OrcidWorkMetadata itemMetadata = new OrcidWorkMetadata(context, entity);
         BigInteger putCode = null;
         Work work = new Work();
-        String title = getMetadataValue(entity, "dc.title");
-        work.setTitle(new WorkTitle(title, null, null));
-        work.setType(WorkType.JOURNAL_ARTICLE);
+        addAuthors(context, work, itemMetadata);
+        addPubblicationDate(work, itemMetadata);
+        addExternalIdentifire(work, itemMetadata);
+        addType(work, itemMetadata);
+        work.setTitle(new WorkTitle(itemMetadata.getTitle(), null, null));
         work.setExternalIds(getExternalIds(entity));
         if (!forceAddition) {
             putCode = findPutCode(context, entity, owner);
@@ -191,7 +209,7 @@ public class OrcidHistoryServiceImpl implements OrcidHistoryService {
         Item owner = orcidQueue.getOwner();
 
         Funding funding = new Funding();
-        funding.setType(FundingType.GRANT);
+        funding.setType(FundingType.GRANT.value());
 
         BigInteger putCode = null;
 
@@ -213,7 +231,7 @@ public class OrcidHistoryServiceImpl implements OrcidHistoryService {
             String name = getMetadataValue(organization, "dc.title");
             String city = getMetadataValue(organization, "organization.address.addressLocality");
             Iso3166Country country = fromValue(getMetadataValue(organization, "organization.address.addressCountry"));
-            funding.setOrganization(new Organization(name, new OrganizationAddress(city, null, country), null));
+            funding.setOrganization(new Organization(name, new OrganizationAddress(city, null, country.name()), null));
         }
         return sendObjectToOrcid(context, orcidQueue, orcid, token, putCode, funding, FUNDING_ENDPOINT);
     }
@@ -297,7 +315,7 @@ public class OrcidHistoryServiceImpl implements OrcidHistoryService {
         ExternalId handle = new ExternalId();
         handle.setExternalIdValue(indentifierUri);
         handle.setExternalIdType("handle");
-        handle.setExternalIdRelationship(RelationshipType.SELF);
+        handle.setExternalIdRelationship(Relationship.SELF.value());
         externalIds.add(handle);
 
         String indentifierDoi = getMetadataValue(entity, "dc.identifier.doi");
@@ -305,7 +323,7 @@ public class OrcidHistoryServiceImpl implements OrcidHistoryService {
             ExternalId doi = new ExternalId();
             doi.setExternalIdType("doi");
             doi.setExternalIdValue(indentifierDoi);
-            doi.setExternalIdRelationship(RelationshipType.SELF);
+            doi.setExternalIdRelationship(Relationship.SELF.value());
             externalIds.add(doi);
         }
         return new ExternalIds(externalIds);
@@ -341,6 +359,12 @@ public class OrcidHistoryServiceImpl implements OrcidHistoryService {
                    .orElse(null);
     }
 
+    private List<MetadataValue> getMetadataValues(Item item, String metadataField) {
+        return item.getMetadata().stream()
+                .filter(metadata -> metadata.getMetadataField().toString('.').equals(metadataField))
+                .collect(Collectors.toList());
+    }
+
     private void deleteOldRecords(Context context, Item entity, Item owner) throws SQLException {
         List<OrcidHistory> orcidHistories = orcidHistoryDAO.findByOwnerAndEntity(context, owner.getID(),entity.getID());
         for (OrcidHistory orcidHistory : orcidHistories) {
@@ -356,4 +380,109 @@ public class OrcidHistoryServiceImpl implements OrcidHistoryService {
         this.httpClient = httpClient;
     }
 
+    private void addAuthors(Context context, Work work, OrcidWorkMetadata itemMetadata) {
+        WorkContributors workContributors = new WorkContributors();
+        boolean haveContributor = false;
+
+        List<MetadataValue> authors = itemMetadata.getAuthors();
+        for (MetadataValue valContributor : authors) {
+            Contributor contributor = new Contributor();
+            String name = valContributor.getValue();
+            String uuidContributor = valContributor.getAuthority();
+            if (uuidContributor != null) {
+                Item itemContributor = null;
+                UUID uuid = UUID.fromString(uuidContributor);
+                try {
+                    itemContributor = itemService.find(context, uuid);
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+
+                String email = itemService.getMetadataFirstValue(itemContributor, "person", "email", null, null);
+                String orcid = itemService.getMetadataFirstValue(itemContributor, "person", "identifier", "orcid",null);
+
+                if (StringUtils.isNotBlank(email)) {
+                    ContributorEmail contributorEmail = new ContributorEmail();
+                    contributorEmail.setValue(email);
+                    contributor.setContributorEmail(contributorEmail);
+                }
+                if (StringUtils.isNotBlank(orcid)) {
+                    String domainOrcid = configurationService.getProperty("cris",
+                            "external.domainname.authority.service.orcid");
+                    OrcidId orcidID = new OrcidId();
+
+                    orcidID.setHost(domainOrcid);
+                    orcidID.setPath(orcid);
+                    orcidID.setUri(domainOrcid + orcid);
+                    contributor.setContributorOrcid(orcidID);
+                }
+            }
+            CreditName creditName = new CreditName();
+            creditName.setValue(name);
+            contributor.setCreditName(creditName);
+
+            ContributorAttributes attributes = new ContributorAttributes();
+            attributes.setContributorRole(ContributorRole.AUTHOR.value());
+            contributor.setContributorAttributes(attributes);
+            workContributors.getContributor().add(contributor);
+            haveContributor = true;
+
+            if (haveContributor) {
+                work.setContributors(workContributors);
+            }
+        }
+    }
+
+    private void addPubblicationDate(Work work, OrcidWorkMetadata itemMetadata) {
+        DecimalFormat decimalFormat = new DecimalFormat("00");
+        FuzzyDate publicationDate = new FuzzyDate();
+
+        if (StringUtils.isNotBlank(itemMetadata.getYear())
+            || StringUtils.isNotBlank(itemMetadata.getMonth())
+            || StringUtils.isNotBlank(itemMetadata.getDay())) {
+
+            if (StringUtils.isNotBlank(itemMetadata.getYear())) {
+                Year year = new Year();
+                year.setValue(itemMetadata.getYear());
+                publicationDate.setYear(year);
+            }
+
+            if (StringUtils.isNotBlank(itemMetadata.getMonth())) {
+                Month month = new Month();
+                month.setValue(decimalFormat.format(Long.parseLong(itemMetadata.getMonth())));
+                publicationDate.setMonth(month);
+            }
+
+            if (StringUtils.isNotBlank(itemMetadata.getDay())) {
+                Day day = new Day();
+                day.setValue(decimalFormat.format(Long.parseLong(itemMetadata.getDay())));
+                publicationDate.setDay(day);
+            }
+            work.setPublicationDate(publicationDate);
+        }
+    }
+
+    private void addExternalIdentifire(Work work, OrcidWorkMetadata itemMetadata) {
+        if (itemMetadata.getExternalIdentifier() != null) {
+            ExternalIds workExternalIdentifiers = new ExternalIds();
+            for (String valIdentifier : itemMetadata.getExternalIdentifier()) {
+                ExternalId workExternalIdentifier = new ExternalId();
+                workExternalIdentifier.setExternalIdType(itemMetadata.getExternalIdentifierType(valIdentifier));
+                workExternalIdentifier.setExternalIdValue(valIdentifier);
+                workExternalIdentifier.setExternalIdRelationship(Relationship.SELF.value());
+                workExternalIdentifiers.getExternalId().add(workExternalIdentifier);
+            }
+            work.setExternalIds(workExternalIdentifiers);
+        }
+    }
+
+    private void addType(Work work, OrcidWorkMetadata itemMetadata) {
+        SimpleMapConverter mapConverterModifier = new DSpace().getServiceManager().getServiceByName(
+                          "mapConverterOrcidWorkType", SimpleMapConverter.class);
+        if (mapConverterModifier == null) {
+            work.setType(itemMetadata.getWorkType());
+        } else {
+            work.setType(mapConverterModifier.getValue(itemMetadata.getWorkType()));
+        }
+    }
 }
