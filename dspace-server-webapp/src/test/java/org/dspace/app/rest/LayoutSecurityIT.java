@@ -41,6 +41,7 @@ import org.dspace.content.EntityType;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
 import org.dspace.content.WorkspaceItem;
+import org.dspace.content.edit.EditItem;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.MetadataFieldService;
 import org.dspace.core.Constants;
@@ -1992,4 +1993,66 @@ public class LayoutSecurityIT extends AbstractControllerIntegrationTest {
                                     hasJsonPath("$['dc.title'][0].value", is("Title Workspace 1"))
                                     )));
     }
+
+    @Test
+    public void findOneEditItemUsingLayoutSecurityCustomDataTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        EntityType eType = EntityTypeBuilder.createEntityTypeBuilder(context, "Publication").build();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withRelationshipType("Publication")
+                                           .withName("Collection 1")
+                                           .build();
+
+        Item itemA = ItemBuilder.createItem(context, col1)
+                                .withTitle("Title item A")
+                                .withIssueDate("2015-06-25")
+                                .withAuthor("Smith, Maria")
+                                .build();
+
+        EditItem editItem = new EditItem(context, itemA);
+
+        itemService.addMetadata(context, itemA, "dc", "description", "abstract", null, "A secured abstract");
+
+        MetadataField policyEperson = mfss.findByElement(context, "cris", "policy", "eperson");
+        MetadataField policyGroup = mfss.findByElement(context, "cris", "policy", "group");
+
+        MetadataField dateIssued = mfss.findByElement(context, "dc", "date", "issued");
+
+        CrisLayoutBox box1 = CrisLayoutBoxBuilder.createBuilder(context, eType, true, true)
+                                                 .withShortname("box-shortname-one")
+                                                 .withSecurity(LayoutSecurity.CUSTOM_DATA)
+                                                 .addMetadataSecurityField(policyEperson)
+                                                 .addMetadataSecurityField(policyGroup)
+                                                 .build();
+
+        CrisLayoutFieldBuilder.createMetadataField(context, dateIssued, 0, 0)
+                              .withLabel("LABEL DATE")
+                              .withRendering("RENDERIGN DATE")
+                              .withStyle("STYLE")
+                              .withBox(box1).build();
+
+        context.restoreAuthSystemState();
+
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+
+        getClient(tokenAdmin).perform(get("/api/core/edititem/" + itemA.getID() + ":MODE1"))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$.sections.traditionalpageone-cris", Matchers.allOf(
+                                     hasJsonPath("$['dc.contributor.author'][0].value", is("Smith, Maria")),
+                                     hasJsonPath("$['dc.date.issued'][0].value", is("2015-06-25")),
+                                     hasJsonPath("$['dc.title'][0].value", is("Title item A"))
+                                     )))
+                             .andExpect(jsonPath("$._embedded.item.metadata", Matchers.allOf(
+                                     hasJsonPath("$['dc.contributor.author'][0].value", is("Smith, Maria")),
+                                     hasJsonPath("$['dc.date.issued'][0].value", is("2015-06-25")),
+                                     hasJsonPath("$['dc.title'][0].value", is("Title item A"))
+                                     )));
+
+    }
+
 }
