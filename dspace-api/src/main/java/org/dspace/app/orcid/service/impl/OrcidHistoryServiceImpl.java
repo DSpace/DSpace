@@ -72,7 +72,6 @@ import org.orcid.jaxb.model.utils.ContributorRole;
 import org.orcid.jaxb.model.utils.FundingType;
 import org.orcid.jaxb.model.utils.Iso3166Country;
 import org.orcid.jaxb.model.utils.Relationship;
-import org.orcid.jaxb.model.utils.WorkType;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -188,8 +187,9 @@ public class OrcidHistoryServiceImpl implements OrcidHistoryService {
         Work work = new Work();
         addAuthors(context, work, itemMetadata);
         addPubblicationDate(work, itemMetadata);
+        addExternalIdentifire(work, itemMetadata);
         work.setTitle(new WorkTitle(itemMetadata.getTitle(), null, null));
-        work.setType(WorkType.JOURNAL_ARTICLE.value());
+        work.setType(itemMetadata.getWorkType());
         work.setExternalIds(getExternalIds(entity));
         if (!forceAddition) {
             putCode = findPutCode(context, entity, owner);
@@ -457,6 +457,20 @@ public class OrcidHistoryServiceImpl implements OrcidHistoryService {
                 publicationDate.setDay(day);
             }
             work.setPublicationDate(publicationDate);
+        }
+    }
+
+    private void addExternalIdentifire(Work work, OrcidWorkMetadata itemMetadata) {
+        if (itemMetadata.getExternalIdentifier() != null) {
+            ExternalIds workExternalIdentifiers = new ExternalIds();
+            for (String valIdentifier : itemMetadata.getExternalIdentifier()) {
+                ExternalId workExternalIdentifier = new ExternalId();
+                workExternalIdentifier.setExternalIdType(itemMetadata.getExternalIdentifierType(valIdentifier));
+                workExternalIdentifier.setExternalIdValue(valIdentifier);
+                workExternalIdentifier.setExternalIdRelationship(Relationship.SELF.value());
+                workExternalIdentifiers.getExternalId().add(workExternalIdentifier);
+            }
+            work.setExternalIds(workExternalIdentifiers);
         }
     }
 
