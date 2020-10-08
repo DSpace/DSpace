@@ -1854,8 +1854,13 @@
         </repository>
     </distributionManagement>
 
-    <!-- Enable access to artifacts in Sonatype's snapshot repo for Snapshots ONLY -->
     <repositories>
+        <!-- Check Maven Central first (before other repos below) -->
+        <repository>
+            <id>maven-central</id>
+            <url>https://repo1.maven.org/maven2</url>
+        </repository>
+        <!-- Enable access to artifacts in Sonatype's snapshot repo for Snapshots ONLY -->
         <repository>
             <id>maven-snapshots</id>
             <url>https://oss.sonatype.org/content/repositories/snapshots</url>
