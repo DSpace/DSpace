@@ -74,7 +74,6 @@ import org.orcid.jaxb.model.utils.ContributorRole;
 import org.orcid.jaxb.model.utils.FundingType;
 import org.orcid.jaxb.model.utils.Iso3166Country;
 import org.orcid.jaxb.model.utils.Relationship;
-import org.orcid.jaxb.model.utils.WorkType;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -193,7 +192,6 @@ public class OrcidHistoryServiceImpl implements OrcidHistoryService {
         addExternalIdentifire(work, itemMetadata);
         addType(work, itemMetadata);
         work.setTitle(new WorkTitle(itemMetadata.getTitle(), null, null));
-        work.setType(itemMetadata.getWorkType());
         work.setExternalIds(getExternalIds(entity));
         if (!forceAddition) {
             putCode = findPutCode(context, entity, owner);
@@ -482,9 +480,9 @@ public class OrcidHistoryServiceImpl implements OrcidHistoryService {
         SimpleMapConverter mapConverterModifier = new DSpace().getServiceManager().getServiceByName(
                           "mapConverterOrcidWorkType", SimpleMapConverter.class);
         if (mapConverterModifier == null) {
-            work.setType(WorkType.valueOf(itemMetadata.getWorkType()).name());
+            work.setType(itemMetadata.getWorkType());
         } else {
-            work.setType(WorkType.fromValue(mapConverterModifier.getValue(itemMetadata.getWorkType())).name());
+            work.setType(mapConverterModifier.getValue(itemMetadata.getWorkType()));
         }
     }
 }
