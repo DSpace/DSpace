@@ -30,6 +30,9 @@ handle.canonical.prefix = https://hdl.handle.net/
 # BIBSYS agora-handle configuration
 handleservice.configuration = ${dspace.dir}/config/handleserver.properties
 
+# Sherpa Romeo API-key
+sherpa.romeo.apikey = {{ lookup('hashi_vault', 'secret=secret/service/brage/' + fase + ':sherpa_romeo_apikey auth_method=approle role_id=brage-client-' + fase + ' secret_id=' + vault_secret + ' url=https://vault.bibsys.no:8200')}}
+
 # XMLUI
 xmlui.user.registration=false
 
