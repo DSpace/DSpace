@@ -8,9 +8,7 @@
 package org.dspace.app.suggestion;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 import org.dspace.core.Context;
@@ -19,16 +17,16 @@ import org.springframework.stereotype.Service;
 @Service
 public class SuggestionServiceImpl implements SuggestionService {
 
-    Map<UUID, SuggestionTarget> storage = new HashMap<UUID, SuggestionTarget>();
+    List<SuggestionTarget> storage = new ArrayList<>();
 
     @Override
     public void addSuggestionTarget(SuggestionTarget target) {
-        storage.put(target.getID(), target);
+        storage.add(target);
     }
 
     @Override
     public SuggestionTarget find(Context context, UUID id) {
-        return storage.get(id);
+        return storage.stream().filter(st -> st.getID().equals(id)).findFirst().orElse(null);
     }
 
     @Override
@@ -43,10 +41,10 @@ public class SuggestionServiceImpl implements SuggestionService {
             return null;
         }
         int idx = 0;
-        for (SuggestionTarget t : storage.values()) {
+        for (SuggestionTarget t : storage) {
             if (idx >= offset && idx < offset + pageSize) {
                 results.add(t);
-            } else {
+            } else if (idx >= offset + pageSize) {
                 break;
             }
             idx++;
@@ -56,7 +54,7 @@ public class SuggestionServiceImpl implements SuggestionService {
 
     @Override
     public void deleteTarget(SuggestionTarget target) {
-        storage.remove(target.getID());
+        storage.remove(target);
     }
 
 }
