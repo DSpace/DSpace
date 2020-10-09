@@ -16,6 +16,7 @@ import org.dspace.app.orcid.factory.OrcidHistoryServiceFactory;
 import org.dspace.app.orcid.factory.OrcidQueueServiceFactory;
 import org.dspace.app.orcid.service.OrcidHistoryService;
 import org.dspace.app.orcid.service.OrcidQueueService;
+import org.dspace.app.suggestion.SuggestionService;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
@@ -50,6 +51,7 @@ import org.dspace.layout.service.CrisLayoutTabService;
 import org.dspace.scripts.factory.ScriptServiceFactory;
 import org.dspace.scripts.service.ProcessService;
 import org.dspace.services.factory.DSpaceServicesFactory;
+import org.dspace.utils.DSpace;
 import org.dspace.versioning.factory.VersionServiceFactory;
 import org.dspace.versioning.service.VersionHistoryService;
 import org.dspace.xmlworkflow.factory.XmlWorkflowServiceFactory;
@@ -102,6 +104,7 @@ public abstract class AbstractBuilder<T, S> {
     static CrisLayoutFieldService crisLayoutFieldService;
     static OrcidQueueService orcidQueueService;
     static OrcidHistoryService orcidHistoryService;
+    static SuggestionService suggestionService;
 
     protected Context context;
 
@@ -161,6 +164,7 @@ public abstract class AbstractBuilder<T, S> {
         crisLayoutFieldService = CrisLayoutServiceFactory.getInstance().getFieldService();
         orcidQueueService = OrcidQueueServiceFactory.getInstance().getOrcidQueueService();
         orcidHistoryService = OrcidHistoryServiceFactory.getInstance().getOrcidHistoryService();
+        suggestionService = new DSpace().getSingletonService(SuggestionService.class);
     }
 
 
