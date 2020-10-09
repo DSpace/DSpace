@@ -21,46 +21,22 @@
                             <property name="submissionDefinition" value="traditional-cris" />
                         </bean>
                         <bean class="org.dspace.content.edit.EditItemMode">
-                            <property name="name" value="MODE2" />
+                            <property name="name" value="FIRST" />
                             <property name="security">
                               <value type="org.dspace.content.edit.EditItemModeSecurity">
-                                OWNER
+                                ADMIN
                               </value>
                             </property>
-                            <property name="submissionDefinition" value="edit_owner_publication" />
-                        </bean>
-                    </list>
-                </entry>
-                <entry key="person">
-                    <list>
-                        <bean class="org.dspace.content.edit.EditItemMode">
-                            <property name="name" value="full" />
-                            <property name="label" value="edititem.mode.test2" />
-                            <property name="security">
-                              <value type="org.dspace.content.edit.EditItemModeSecurity">
-                                OWNER
-                              </value>
-                            </property>
-                            <property name="submissionDefinition" value="person" />
+                            <property name="submissionDefinition" value="modeA" />
                         </bean>
                         <bean class="org.dspace.content.edit.EditItemMode">
-                            <property name="name" value="UPLOAD" />
+                            <property name="name" value="SECOND" />
                             <property name="security">
                               <value type="org.dspace.content.edit.EditItemModeSecurity">
-                                CUSTOM
+                                ADMIN
                               </value>
                             </property>
-                            <property name="submissionDefinition" value="person_upload" />
-                            <property name="groups">
-                                <list>
-                                    <value>cris.policy.group</value>
-                                </list>
-                            </property>
-                            <property name="users">
-                                <list>
-                                    <value>cris.policy.eperson</value>
-                                </list>
-                            </property>
+                            <property name="submissionDefinition" value="modeB" />
                         </bean>
                     </list>
                 </entry>
