@@ -25,6 +25,7 @@ import org.dspace.app.rest.RestResourceController;
         @LinkRest(name = SuggestionTargetRest.TARGET, method = "getTarget")
 })
 public class SuggestionTargetRest extends BaseObjectRest<UUID> {
+    private static final long serialVersionUID = 1L;
     public static final String NAME = "suggestiontarget";
     public static final String TARGET = "target";
     public static final String CATEGORY = RestAddressableModel.INTEGRATION;
