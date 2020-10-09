@@ -5,7 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.content.integration.crosswalks;
+package org.dspace.content.integration.crosswalks.virtualfields;
 
 import java.util.Map;
 
@@ -14,15 +14,12 @@ import org.dspace.content.Item;
 
 /**
  * Implements virtual field processing to build custom identifier
- * 
+ *
  * @author Mykhaylo Boychuk (mykhaylo.boychuk at 4science.it)
  */
-public class VirtualFieldHandleLocalNameIdentifier implements VirtualFieldDisseminator, VirtualFieldIngester {
+public class VirtualFieldHandleLocalNameIdentifier implements VirtualField {
 
-    public VirtualFieldHandleLocalNameIdentifier() {
-    }
-
-    public String[] getMetadata(Item item, Map fieldCache, String fieldName) {
+    public String[] getMetadata(Item item, Map<String, String> fieldCache, String fieldName) {
         if (fieldCache.containsKey(fieldName)) {
             return (new String[] { (String) fieldCache.get(fieldName) });
         }
@@ -31,24 +28,14 @@ public class VirtualFieldHandleLocalNameIdentifier implements VirtualFieldDissem
         int position = handle.indexOf("/");
 
         if (StringUtils.isNotBlank(handle)) {
-            fieldCache.put("virtual.handlelocalname", (new StringBuilder(handle.substring(position + 1))).toString());
+            fieldCache.put("virtual.handlelocalname", handle.substring(position + 1));
         } else {
-            fieldCache.put("virtual.handlelocalname", (new StringBuilder("ATT-")).append(item.getID()).toString());
+            fieldCache.put("virtual.handlelocalname", "ATT-" + item.getID());
         }
         if (fieldCache.containsKey(fieldName)) {
             return (new String[] { (String) fieldCache.get(fieldName) });
         } else {
             return null;
         }
-    }
-
-    public boolean addMetadata(Item item, Map fieldCache, String fieldName, String s) {
-        // NOOP - we won't add any metadata yet, we'll pick it up when we
-        // finalise the item
-        return true;
-    }
-
-    public boolean finalizeItem(Item item, Map fieldCache) {
-        return false;
     }
 }

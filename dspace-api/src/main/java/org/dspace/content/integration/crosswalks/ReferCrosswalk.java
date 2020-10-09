@@ -12,20 +12,16 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.annotation.PostConstruct;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
@@ -37,76 +33,108 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.crosswalk.CrosswalkException;
-import org.dspace.content.crosswalk.CrosswalkInternalException;
 import org.dspace.content.crosswalk.CrosswalkObjectNotSupported;
 import org.dspace.content.crosswalk.IConverter;
 import org.dspace.content.crosswalk.StreamDisseminationCrosswalk;
-import org.dspace.content.crosswalk.StreamIngestionCrosswalk;
-import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.integration.crosswalks.virtualfields.VirtualField;
+import org.dspace.content.integration.crosswalks.virtualfields.VirtualFieldMapper;
 import org.dspace.content.service.ItemService;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.I18nUtil;
 import org.dspace.core.LogManager;
-import org.dspace.core.SelfNamedPlugin;
 import org.dspace.core.factory.CoreServiceFactory;
+import org.dspace.services.ConfigurationService;
+import org.springframework.beans.factory.annotation.Autowired;
 
-/**
- * This class has been initially developed by Graham Triggs, we have moved to a
- * CILEA package to make more clear that it is not included in the org.dspace
- * sourcecode.
- * ADDED support to UTF-8 and FileNameDisseminator (CILEA improvements)
- * 
- * @author grahamt
- * 
- */
-public class ReferCrosswalk extends SelfNamedPlugin
-        implements StreamDisseminationCrosswalk, StreamIngestionCrosswalk, FileNameDisseminator {
-    protected static final String CONFIG_PREFIX = "crosswalk.refer";
+public class ReferCrosswalk implements StreamDisseminationCrosswalk, FileNameDisseminator {
 
     private static Logger log = Logger.getLogger(ReferCrosswalk.class);
-
-    private List<TemplateLine> template = new ArrayList<TemplateLine>();
-
-    private boolean initialized = false;
-
-    private ItemService itemService = ContentServiceFactory.getInstance().getItemService();
 
     // Patter to extract the converter name if any
     private static final Pattern converterPattern = Pattern.compile(".*\\((.*)\\)");
 
-    private static String aliases[] = null;
-    static {
-        List<String> aliasList = new ArrayList<String>();
-        Enumeration<?> pe = ConfigurationManager.propertyNames();
-        String propname = CONFIG_PREFIX + ".template.";
-        while (pe.hasMoreElements()) {
-            String key = (String) pe.nextElement();
-            if (key.startsWith(propname)) {
-                aliasList.add(key.substring(propname.length()));
+
+    @Autowired
+    private ConfigurationService configurationService;
+
+    @Autowired
+    private ItemService itemService;
+
+    @Autowired
+    private VirtualFieldMapper virtualFieldMapper;
+
+
+    private final String templateFileName;
+
+    private final String mimeType;
+
+    private final String fileName;
+
+    private List<TemplateLine> template = new ArrayList<TemplateLine>();
+
+
+    public ReferCrosswalk(String templateFileName, String mimeType, String fileName) {
+        super();
+        this.templateFileName = templateFileName;
+        this.mimeType = mimeType;
+        this.fileName = fileName;
+    }
+
+    @PostConstruct
+    private void postConstruct() throws IOException {
+
+        String parent = configurationService.getProperty("dspace.dir") + File.separator + "config" + File.separator;
+        File templateFile = new File(parent, templateFileName);
+
+        try (FileReader fileReader = new FileReader(templateFile);
+            BufferedReader templateReader = new BufferedReader(fileReader)) {
+
+            Pattern mdRepl = Pattern.compile("@[a-z0-9.*]+(\\(.*\\))?@");
+            String templateLine = templateReader.readLine();
+            while (templateLine != null) {
+                TemplateLine line = new TemplateLine();
+                Matcher matcher = mdRepl.matcher(templateLine);
+                if (matcher.find()) {
+                    line.beforeField = templateLine.substring(0, matcher.start());
+                    line.afterField = templateLine.substring(matcher.end());
+
+                    String mdString = templateLine.substring(matcher.start() + 1,
+                        matcher.end() - 1);
+                    String converterName = null;
+                    Matcher converterMatcher = converterPattern.matcher(mdString);
+                    if (converterMatcher.matches()) {
+                        converterName = converterMatcher.group(1);
+                        mdString = mdString.replaceAll("\\(" + converterName
+                            + "\\)", "");
+                    }
+
+                    line.mdField = mdString;
+                    line.converterName = converterName;
+                    line.mdBits = line.mdField.split("\\.");
+
+                    if (line.mdBits != null && line.mdBits[0].equalsIgnoreCase("virtual") && line.mdBits.length > 1) {
+                        line.vf = virtualFieldMapper.getVirtualField(line.mdBits[1]);
+                    }
+                } else {
+                    line.beforeField = templateLine;
+                }
+
+                template.add(line);
+                templateLine = templateReader.readLine();
             }
+
         }
-        aliases = (String[]) aliasList.toArray(new String[aliasList.size()]);
     }
 
-    public static String[] getPluginNames() {
-        return aliases;
-    }
-
-    public boolean canDisseminate(Context context, DSpaceObject dso) {
-        if (dso.getType() == Constants.ITEM) {
-            return true;
-        }
-        return false;
-    }
-
+    @Override
     public void disseminate(Context context, DSpaceObject dso, OutputStream out)
-            throws CrosswalkException, IOException, SQLException, AuthorizeException {
-        init();
+        throws CrosswalkException, IOException, SQLException, AuthorizeException {
+
         if (dso.getType() != Constants.ITEM) {
             throw new CrosswalkObjectNotSupported("ReferCrosswalk can only crosswalk an Item.");
         }
+
         Item item = (Item) dso;
         Map<String, String> fieldCache = new HashMap<String, String>();
 
@@ -114,16 +142,8 @@ public class ReferCrosswalk extends SelfNamedPlugin
         String aliasForm;
         try {
             String formFileName = I18nUtil.getInputFormsFileName(I18nUtil.getDefaultLocale());
-            String col_handle = "";
 
             Collection collection = item.getOwningCollection();
-
-            if (collection == null) {
-                // set an empty handle so to get the default input set
-                col_handle = "";
-            } else {
-                col_handle = collection.getHandle();
-            }
 
             // Read the input form file for the specific collection
             DCInputsReader inputsReader = new DCInputsReader(formFileName);
@@ -141,14 +161,14 @@ public class ReferCrosswalk extends SelfNamedPlugin
                 IConverter converter = null;
                 if (StringUtils.isNotBlank(line.converterName)) {
                     converter = (IConverter) CoreServiceFactory.getInstance().getPluginService()
-                                                   .getNamedPlugin(IConverter.class, line.converterName);
+                        .getNamedPlugin(IConverter.class, line.converterName);
                     if (converter == null) {
                         log.error(LogManager.getHeader(null, "disseminate", "no converter plugin found with name "
-                                + line.converterName + " for metadata " + line.mdField));
+                            + line.converterName + " for metadata " + line.mdField));
                     }
                 }
-                if (line.vfDissem != null) {
-                    String[] values = line.vfDissem.getMetadata(item, fieldCache, line.mdField);
+                if (line.vf != null) {
+                    String[] values = line.vf.getMetadata(item, fieldCache, line.mdField);
 
                     if (values != null) {
                         for (String value : values) {
@@ -201,146 +221,43 @@ public class ReferCrosswalk extends SelfNamedPlugin
         }
 
         writer.flush();
+
     }
 
-    public String getMIMEType() {
-        return ConfigurationManager.getProperty(CONFIG_PREFIX + ".mimetype." + getPluginInstanceName().split("-")[0]);
-    }
-
-    public void ingest(Context context, DSpaceObject dso, InputStream in, String MIMEType)
-            throws CrosswalkException, IOException, SQLException, AuthorizeException {
-        init();
-        if (dso.getType() != Constants.ITEM) {
-            throw new CrosswalkObjectNotSupported("ReferCrosswalk can only crosswalk an Item.");
-        }
-        Item item = (Item) dso;
-
-        Set<VirtualFieldIngester> ingesters = new HashSet<VirtualFieldIngester>();
-        Map<String, String> fields = new HashMap<String, String>();
-
-        BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-
-        String line = reader.readLine();
-        while (line != null) {
-            for (TemplateLine templateLine : template) {
-                if (line.startsWith(templateLine.beforeField) && line.endsWith(templateLine.afterField)) {
-                    String value = line.substring(templateLine.beforeField.length(),
-                            line.length() - templateLine.afterField.length());
-                    fields.put(templateLine.mdField, value);
-
-                    if (templateLine.vfIngest != null) {
-                        if (!ingesters.contains(templateLine.vfIngest)) {
-                            ingesters.add(templateLine.vfIngest);
-                        }
-                        if (templateLine.mdBits.length == 3) {
-                            templateLine.vfIngest.addMetadata(item, fields, templateLine.mdBits[3], value);
-                        } else {
-                            throw new CrosswalkInternalException(
-                                    "Incorrect virtual field specification in template"
-                                    + " - must be virtual.processor.fieldname");
-                        }
-                    }
-
-                    if (templateLine.mdBits.length == 2) {
-                        itemService.addMetadata(context, item, templateLine.mdBits[0], templateLine.mdBits[1],
-                                    null, null, value);
-                    } else if (templateLine.mdBits.length == 3) {
-                        itemService.addMetadata(context, item, templateLine.mdBits[0], templateLine.mdBits[1],
-                                    templateLine.mdBits[2], null, value);
-                    } else {
-                        throw new CrosswalkInternalException(
-                                "Incorrect field specification in template - must be schema.element[.qualifier]");
-                    }
-
-                    break;
-                }
-            }
-
-            line = reader.readLine();
-        }
-
-        reader.close();
-
-        if (ingesters.size() > 0) {
-            for (VirtualFieldIngester ingester : ingesters) {
-                ingester.finalizeItem(item, fields);
-            }
-        }
-    }
-
-    private synchronized void init() throws CrosswalkInternalException, IOException {
-        if (initialized) {
-            return;
-        }
-        initialized = true;
-
-        String myName = getPluginInstanceName();
-        if (myName == null) {
-            throw new CrosswalkInternalException("Cannot determine plugin name, "
-                    + "You must use PluginManager to instantiate ReferCrosswalk so the instance knows its name.");
-        }
-        String templatePropName = CONFIG_PREFIX + ".template." + myName;
-        String templateFileName = ConfigurationManager.getProperty(templatePropName);
-
-        if (templateFileName == null) {
-            throw new CrosswalkInternalException("Configuration error: "
-                    + "No template file configured for Refer crosswalk named \"" + myName + "\"");
-        }
-        String parent = ConfigurationManager.getProperty("dspace.dir") + File.separator + "config" + File.separator;
-        File templateFile = new File(parent, templateFileName);
-        BufferedReader templateReader = new BufferedReader(new FileReader(templateFile));
-
-        Pattern mdRepl = Pattern.compile("@[a-z0-9.*]+(\\(.*\\))?@");
-        String templateLine = templateReader.readLine();
-        while (templateLine != null) {
-            TemplateLine line = new TemplateLine();
-            Matcher matcher = mdRepl.matcher(templateLine);
-            if (matcher.find()) {
-                line.beforeField = templateLine.substring(0, matcher.start());
-                line.afterField = templateLine.substring(matcher.end());
-
-                String mdString = templateLine.substring(matcher.start() + 1, matcher.end() - 1);
-                String converterName = null;
-                Matcher converterMatcher = converterPattern.matcher(mdString);
-                if (converterMatcher.matches()) {
-                    converterName = converterMatcher.group(1);
-                    mdString = mdString.replaceAll("\\(" + converterName + "\\)", "");
-                }
-
-                line.mdField = mdString;
-                line.converterName = converterName;
-                line.mdBits = line.mdField.split("\\.");
-
-                if (line.mdBits != null && line.mdBits[0].equalsIgnoreCase("virtual") && line.mdBits.length > 1) {
-                    line.vfDissem = (VirtualFieldDisseminator) CoreServiceFactory.getInstance().getPluginService()
-                     .getNamedPlugin(VirtualFieldDisseminator.class, line.mdBits[1]);
-                    line.vfIngest = (VirtualFieldIngester) CoreServiceFactory.getInstance().getPluginService()
-                     .getNamedPlugin(VirtualFieldIngester.class, line.mdBits[1]);
-                }
-            } else {
-                line.beforeField = templateLine;
-            }
-
-            template.add(line);
-            templateLine = templateReader.readLine();
-        }
-        templateReader.close();
+    @Override
+    public boolean canDisseminate(Context context, DSpaceObject dso) {
+        return dso.getType() == Constants.ITEM;
     }
 
     @Override
     public String getFileName() {
-        String filename = ConfigurationManager.getProperty(CONFIG_PREFIX + "." + getPluginInstanceName() + ".filename");
-        return filename == null ? "references" : filename;
-
+        return fileName;
     }
-}
 
-class TemplateLine {
-    String converterName;
-    String beforeField;
-    String afterField;
-    String mdField;
-    String mdBits[];
-    VirtualFieldDisseminator vfDissem;
-    VirtualFieldIngester vfIngest;
+    @Override
+    public String getMIMEType() {
+        return mimeType;
+    }
+
+    public void setConfigurationService(ConfigurationService configurationService) {
+        this.configurationService = configurationService;
+    }
+
+    public void setItemService(ItemService itemService) {
+        this.itemService = itemService;
+    }
+
+    public void setVirtualFieldMapper(VirtualFieldMapper virtualFieldMapper) {
+        this.virtualFieldMapper = virtualFieldMapper;
+    }
+
+    class TemplateLine {
+        String converterName;
+        String beforeField;
+        String afterField;
+        String mdField;
+        String mdBits[];
+        VirtualField vf;
+    }
+
 }

@@ -5,24 +5,29 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.content.integration.crosswalks;
+package org.dspace.content.integration.crosswalks.virtualfields;
 
 import java.util.List;
 import java.util.Map;
 
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
-import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Implements virtual field processing for split pagenumber range information.
- * 
+ *
  * @author Mykhaylo Boychuk (mykhaylo.boychuk at 4science.it)
  */
-public class VirtualFieldDate implements VirtualFieldDisseminator, VirtualFieldIngester {
+public class VirtualFieldDate implements VirtualField {
 
-    private ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+    private final ItemService itemService;
+
+    @Autowired
+    public VirtualFieldDate(ItemService itemService) {
+        this.itemService = itemService;
+    }
 
     public String[] getMetadata(Item item, Map<String, String> fieldCache, String fieldName) {
         // Check to see if the virtual field is already in the cache
@@ -50,15 +55,5 @@ public class VirtualFieldDate implements VirtualFieldDisseminator, VirtualFieldI
             }
         }
         return null;
-    }
-
-    public boolean addMetadata(Item item, Map<String, String> fieldCache, String fieldName, String value) {
-        // NOOP - we won't add any metadata yet, we'll pick it up when we finalise the
-        // item
-        return true;
-    }
-
-    public boolean finalizeItem(Item item, Map<String, String> fieldCache) {
-        return false;
     }
 }

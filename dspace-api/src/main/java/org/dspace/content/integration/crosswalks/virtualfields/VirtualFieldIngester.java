@@ -5,7 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.content.integration.crosswalks;
+package org.dspace.content.integration.crosswalks.virtualfields;
 
 import java.util.Map;
 

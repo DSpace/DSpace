@@ -5,25 +5,32 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.content.integration.crosswalks;
+package org.dspace.content.integration.crosswalks.virtualfields;
 
+import java.text.MessageFormat;
 import java.util.List;
 import java.util.Map;
 
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
-import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Implements virtual field processing for generate an xml element to insert on
  * crosserf xml deposit file.
- * 
+ *
+ * @author pascarelli
  * @author Mykhaylo Boychuk (mykhaylo.boychuk at 4science.it)
  */
-public class VirtualFieldCrossrefISBN implements VirtualFieldDisseminator, VirtualFieldIngester {
+public class VirtualFieldCrossrefAuthor implements VirtualField {
 
-    private ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+    private final ItemService itemService;
+
+    @Autowired
+    public VirtualFieldCrossrefAuthor(ItemService itemService) {
+        this.itemService = itemService;
+    }
 
     public String[] getMetadata(Item item, Map<String, String> fieldCache, String fieldName) {
         // Check to see if the virtual field is already in the cache
@@ -32,14 +39,26 @@ public class VirtualFieldCrossrefISBN implements VirtualFieldDisseminator, Virtu
         if (fieldCache.containsKey(fieldName)) {
             return new String[] { fieldCache.get(fieldName) };
         }
-        List<MetadataValue> mds = itemService.getMetadata(item, "dc", "identifier", "other", Item.ANY);
-        String element = "";
-        if (mds != null && mds.size() > 0) {
-            element = "<isbn>" + mds.get(0).getValue() + "</isbn>";
+        List<MetadataValue> md = itemService.getMetadata(item, "dc", "contributor", "author", Item.ANY);
+
+        String element = "<given_name>{0}</given_name><surname>{1}</surname>";
+        String firstname = "";
+        String lastname = "";
+
+        String[] author = md.get(0).getValue().split(",");
+        if (author.length > 2) {
+            firstname = author[2];
+            lastname = author[0] + "," + author[1];
         } else {
-            element = "<noisbn reason=\"monograph\"></noisbn>";
+            if (author.length > 1) {
+                firstname = author[1];
+                lastname = author[0];
+            }
         }
-        fieldCache.put("virtual.crossrefisbn", element);
+
+        element = MessageFormat.format(element, firstname.trim(), lastname.trim());
+
+        fieldCache.put("virtual.crossrefauthor", element);
         // Return the value of the virtual field (if any)
         if (fieldCache.containsKey(fieldName)) {
             return new String[] { fieldCache.get(fieldName) };
@@ -47,13 +66,4 @@ public class VirtualFieldCrossrefISBN implements VirtualFieldDisseminator, Virtu
         return null;
     }
 
-    public boolean addMetadata(Item item, Map<String, String> fieldCache, String fieldName, String value) {
-        // NOOP - we won't add any metadata yet, we'll pick it up when we
-        // finalise the item
-        return true;
-    }
-
-    public boolean finalizeItem(Item item, Map<String, String> fieldCache) {
-        return false;
-    }
 }

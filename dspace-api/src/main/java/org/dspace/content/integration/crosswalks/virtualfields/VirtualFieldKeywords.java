@@ -5,33 +5,38 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.content.integration.crosswalks;
+package org.dspace.content.integration.crosswalks.virtualfields;
 
 import java.util.List;
 import java.util.Map;
 
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
-import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
-import org.dspace.core.ConfigurationManager;
+import org.dspace.services.ConfigurationService;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Implements virtual field processing for split keywords. At the moment only
  * fullname is available
- * 
+ *
  * @author Mykhaylo Boychuk (mykhaylo.boychuk at 4sciecnce.it)
  */
-public class VirtualFieldKeywords implements VirtualFieldDisseminator, VirtualFieldIngester {
+public class VirtualFieldKeywords implements VirtualField {
 
-    private ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+    private final ItemService itemService;
+
+    private final ConfigurationService configurationService;
+
+    @Autowired
+    public VirtualFieldKeywords(ItemService itemService, ConfigurationService configurationService) {
+        this.itemService = itemService;
+        this.configurationService = configurationService;
+    }
 
     public String[] getMetadata(Item item, Map<String, String> fieldCache, String fieldName) {
         // Get the citation from the item
-        String keywordsDC = "dc.subject.keywords";
-        if (ConfigurationManager.getProperty("crosswalk.virtualkeywords.value") != null) {
-            keywordsDC = ConfigurationManager.getProperty("crosswalk.virtualkeywords.value");
-        }
+        String keywordsDC = configurationService.getProperty("crosswalk.virtualkeywords.value", "dc.subject.keywords");
 
         List<MetadataValue> dcvs = itemService.getMetadataByMetadataString(item, keywordsDC);
         String[] virtualFieldName = fieldName.split("\\.");
@@ -67,15 +72,5 @@ public class VirtualFieldKeywords implements VirtualFieldDisseminator, VirtualFi
             }
         }
         return null;
-    }
-
-    public boolean addMetadata(Item item, Map<String, String> fieldCache, String fieldName, String value) {
-        // NOOP - we won't add any metadata yet, we'll pick it up when we finalise the
-        // item
-        return true;
-    }
-
-    public boolean finalizeItem(Item item, Map<String, String> fieldCache) {
-        return false;
     }
 }

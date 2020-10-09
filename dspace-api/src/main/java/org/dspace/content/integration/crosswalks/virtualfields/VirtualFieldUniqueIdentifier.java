@@ -5,7 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.content.integration.crosswalks;
+package org.dspace.content.integration.crosswalks.virtualfields;
 
 import java.util.Map;
 
@@ -15,10 +15,10 @@ import org.dspace.content.Item;
 /**
  * Implements virtual field processing for generate an unique identifier of the
  * citation.
- * 
+ *
  * @author Mykhaylo Boychuk (mykhaylo.boychuk at 4sciecnce.it)
  */
-public class VirtualFieldUniqueIdentifier implements VirtualFieldDisseminator, VirtualFieldIngester {
+public class VirtualFieldUniqueIdentifier implements VirtualField {
 
     public String[] getMetadata(Item item, Map<String, String> fieldCache, String fieldName) {
         // Check to see if the virtual field is already in the cache
@@ -38,15 +38,5 @@ public class VirtualFieldUniqueIdentifier implements VirtualFieldDisseminator, V
             return new String[] { fieldCache.get(fieldName) };
         }
         return null;
-    }
-
-    public boolean addMetadata(Item item, Map<String, String> fieldCache, String fieldName, String value) {
-        // NOOP - we won't add any metadata yet, we'll pick it up when we finalise the
-        // item
-        return true;
-    }
-
-    public boolean finalizeItem(Item item, Map<String, String> fieldCache) {
-        return false;
     }
 }

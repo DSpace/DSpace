@@ -5,7 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.content.integration.crosswalks;
+package org.dspace.content.integration.crosswalks.virtualfields;
 
 import java.util.List;
 import java.util.Map;
@@ -13,17 +13,22 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
-import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Implements virtual field processing for authors and editors information
- * 
+ *
  * @author Mykhaylo Boychuk (mykhaylo.boychuk at 4science.it)
  */
-public class VirtualFieldBibtexContributors implements VirtualFieldDisseminator, VirtualFieldIngester {
+public class VirtualFieldBibtexContributors implements VirtualField {
 
-    private ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+    private final ItemService itemService;
+
+    @Autowired
+    public VirtualFieldBibtexContributors(ItemService itemService) {
+        this.itemService = itemService;
+    }
 
     public String[] getMetadata(Item item, Map<String, String> fieldCache, String fieldName) {
 
@@ -40,7 +45,7 @@ public class VirtualFieldBibtexContributors implements VirtualFieldDisseminator,
                 int splitLength = split.length;
                 String str = (splitLength > 1) ? split[1] : "";
                 String str2 = split[0];
-                if (StringUtils.isNotBlank(str2)) {
+                if (StringUtils.isNotBlank(str)) {
                     sb.append(str).append(" ");
                 }
                 sb.append(str2).append(" and ");
@@ -50,13 +55,4 @@ public class VirtualFieldBibtexContributors implements VirtualFieldDisseminator,
         return null;
     }
 
-    public boolean addMetadata(Item item, Map<String, String> fieldCache, String fieldName, String value) {
-        // NOOP - we won't add any metadata yet, we'll pick it up when we
-        // finalise the item
-        return true;
-    }
-
-    public boolean finalizeItem(Item item, Map<String, String> fieldCache) {
-        return false;
-    }
 }
