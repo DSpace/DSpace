@@ -58,6 +58,7 @@ or refer to the Web site http://dspace-dev.dsi.uminho.pt.
 			</xs:all>
 			<xs:attribute name="id" type="xs:ID" use="optional"/>
 			<xs:attribute name="label" type="xs:string" use="required"/>
+			<xs:attribute name="selectable" type="xs:boolean" default="true"/>
 		</xs:complexType>
 	</xs:element>
 </xs:schema>

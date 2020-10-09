@@ -58,7 +58,7 @@ import org.dspace.statistics.util.LocationUtils;
  * <li>Add a {@link DatasetDSpaceObjectGenerator} for the appropriate object type.</li>
  * <li>Add other generators as required to get the statistic you want.</li>
  * <li>Add {@link org.dspace.statistics.content.filter filters} as required.</li>
- * <li>{@link #createDataset(Context)} will run the query and return a result matrix.
+ * <li>{@link #createDataset(Context, int)} will run the query and return a result matrix.
  * Subsequent calls skip the query and return the same matrix.</li>
  * </ol>
  *
@@ -117,7 +117,7 @@ public class StatisticsDataVisits extends StatisticsData {
     }
 
     @Override
-    public Dataset createDataset(Context context) throws SQLException,
+    public Dataset createDataset(Context context, int facetMinCount) throws SQLException,
         SolrServerException, ParseException, IOException {
         // Check if we already have one.
         // If we do then give it back.
@@ -214,7 +214,8 @@ public class StatisticsDataVisits extends StatisticsData {
                         // We are asking from our current query all the visits faceted by date
                         ObjectCount[] results = solrLoggerService
                             .queryFacetDate(query, filterQuery, dataSetQuery.getMax(), dateFacet.getDateType(),
-                                            dateFacet.getStartDate(), dateFacet.getEndDate(), showTotal, context);
+                                            dateFacet.getStartDate(), dateFacet.getEndDate(), showTotal, context,
+                                            facetMinCount);
                         dataset = new Dataset(1, results.length);
                         // Now that we have our results put em in a matrix
                         for (int j = 0; j < results.length; j++) {
@@ -230,15 +231,15 @@ public class StatisticsDataVisits extends StatisticsData {
                         // the datasettimequery
                         ObjectCount[] maxObjectCounts = solrLoggerService
                             .queryFacetField(query, filterQuery, dataSetQuery.getFacetField(), dataSetQuery.getMax(),
-                                             false, null);
+                                             false, null, facetMinCount);
                         for (int j = 0; j < maxObjectCounts.length; j++) {
                             ObjectCount firstCount = maxObjectCounts[j];
                             String newQuery = dataSetQuery.getFacetField() + ": " + ClientUtils
                                 .escapeQueryChars(firstCount.getValue()) + " AND " + query;
                             ObjectCount[] maxDateFacetCounts = solrLoggerService
                                 .queryFacetDate(newQuery, filterQuery, dataSetQuery.getMax(), dateFacet.getDateType(),
-                                                dateFacet.getStartDate(), dateFacet.getEndDate(), showTotal, context);
-
+                                                dateFacet.getStartDate(), dateFacet.getEndDate(), showTotal, context,
+                                                facetMinCount);
 
                             // Make sure we have a dataSet
                             if (dataset == null) {
@@ -283,7 +284,8 @@ public class StatisticsDataVisits extends StatisticsData {
 
             ObjectCount[] topCounts1 = null;
 //            if (firsDataset.getQueries().size() == 1) {
-            topCounts1 = queryFacetField(firsDataset, firsDataset.getQueries().get(0).getQuery(), filterQuery);
+            topCounts1 =
+                queryFacetField(firsDataset, firsDataset.getQueries().get(0).getQuery(), filterQuery, facetMinCount);
 //            } else {
 //                TODO: do this
 //            }
@@ -292,7 +294,7 @@ public class StatisticsDataVisits extends StatisticsData {
                 DatasetQuery secondDataSet = datasetQueries.get(1);
                 // Now do the second one
                 ObjectCount[] topCounts2 = queryFacetField(secondDataSet, secondDataSet.getQueries().get(0).getQuery(),
-                                                           filterQuery);
+                                                           filterQuery, facetMinCount);
                 // Now that have results for both of them lets do x.y queries
                 List<String> facetQueries = new ArrayList<String>();
                 for (ObjectCount count2 : topCounts2) {
@@ -325,7 +327,7 @@ public class StatisticsDataVisits extends StatisticsData {
                     }
 
                     Map<String, Integer> facetResult = solrLoggerService
-                        .queryFacetQuery(query, filterQuery, facetQueries);
+                        .queryFacetQuery(query, filterQuery, facetQueries, facetMinCount);
 
 
                     // TODO: the show total
@@ -671,7 +673,7 @@ public class StatisticsDataVisits extends StatisticsData {
 
                 case Constants.ITEM:
                     Item item = itemService.findByIdOrLegacyId(context, dsoId);
-                    if (item == null) {
+                    if (item == null || item.getHandle() == null) {
                         break;
                     }
 
@@ -680,7 +682,7 @@ public class StatisticsDataVisits extends StatisticsData {
 
                 case Constants.COLLECTION:
                     Collection coll = collectionService.findByIdOrLegacyId(context, dsoId);
-                    if (coll == null) {
+                    if (coll == null || coll.getHandle() == null) {
                         break;
                     }
 
@@ -689,7 +691,7 @@ public class StatisticsDataVisits extends StatisticsData {
 
                 case Constants.COMMUNITY:
                     Community comm = communityService.findByIdOrLegacyId(context, dsoId);
-                    if (comm == null) {
+                    if (comm == null || comm.getHandle() == null) {
                         break;
                     }
 
@@ -704,12 +706,12 @@ public class StatisticsDataVisits extends StatisticsData {
 
 
     protected ObjectCount[] queryFacetField(DatasetQuery dataset, String query,
-                                            String filterQuery)
+                                            String filterQuery, int facetMinCount)
             throws SolrServerException, IOException {
         String facetType = dataset.getFacetField() == null ? "id" : dataset
             .getFacetField();
         return solrLoggerService.queryFacetField(query, filterQuery, facetType,
-                                                 dataset.getMax(), false, null);
+                                                 dataset.getMax(), false, null, facetMinCount);
     }
 
     public static class DatasetQuery {

@@ -75,11 +75,6 @@ public class AbstractUnitTest extends AbstractDSpaceTest {
      */
     @BeforeClass
     public static void initDatabase() {
-        // Clear our old flyway object. Because this DB is in-memory, its
-        // data is lost when the last connection is closed. So, we need
-        // to (re)start Flyway from scratch for each Unit Test class.
-        DatabaseUtils.clearFlywayDBCache();
-
         try {
             // Update/Initialize the database to latest version (via Flyway)
             DatabaseUtils.updateDatabase();

@@ -8,7 +8,9 @@
 package org.dspace.statistics.util;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.Properties;
 import java.util.ResourceBundle;
@@ -34,7 +36,8 @@ public class LocationUtils {
     /**
      * Default constructor
      */
-    private LocationUtils() { }
+    private LocationUtils() {
+    }
 
     /**
      * Map DSpace continent codes onto ISO country codes.
@@ -53,7 +56,7 @@ public class LocationUtils {
         if (countryToContinent.isEmpty()) {
             try {
                 countryToContinent.load(LocationUtils.class
-                                            .getResourceAsStream("country-continent-codes.properties"));
+                    .getResourceAsStream("country-continent-codes.properties"));
             } catch (IOException e) {
                 logger.error("Could not load country/continent map file", e);
             }
@@ -105,7 +108,7 @@ public class LocationUtils {
             names = ResourceBundle.getBundle(CONTINENT_NAMES_BUNDLE, locale);
         } catch (MissingResourceException e) {
             logger.error("Could not load continent code/name resource bundle",
-                         e);
+                e);
             return I18nUtil
                 .getMessage("org.dspace.statistics.util.LocationUtils.unknown-continent");
         }
@@ -115,7 +118,7 @@ public class LocationUtils {
             name = names.getString(continentCode);
         } catch (MissingResourceException e) {
             logger.info("No continent code " + continentCode + " in bundle "
-                            + names.getLocale().getDisplayName());
+                        + names.getLocale().getDisplayName());
             return I18nUtil
                 .getMessage("org.dspace.statistics.util.LocationUtils.unknown-continent");
         }
@@ -132,6 +135,36 @@ public class LocationUtils {
     @Deprecated
     static public String getCountryName(String countryCode) {
         return getCountryName(countryCode, Locale.getDefault());
+    }
+
+    /**
+     * Revert a country name back into a country code (iso2)
+     * Source: https://stackoverflow.com/a/38588988
+     *
+     * @param countryName Name of country (according to Locale)
+     * @return Corresponding iso2 country code
+     */
+    static public String getCountryCode(String countryName) {
+        // Get all country codes in a string array.
+        String[] isoCountryCodes = Locale.getISOCountries();
+        Map<String, String> countryMap = new HashMap<>();
+        Locale locale;
+        String name;
+
+        // Iterate through all country codes:
+        for (String code : isoCountryCodes) {
+            // Create a locale using each country code
+            locale = new Locale("", code);
+            // Get country name for each code.
+            name = locale.getDisplayCountry();
+            // Map all country names and codes in key - value pairs.
+            countryMap.put(name, code);
+        }
+
+        // Return the country code for the given country name using the map.
+        // Here you will need some validation or better yet
+        // a list of countries to give to user to choose from.
+        return countryMap.get(countryName); // "NL" for Netherlands.
     }
 
     /**
