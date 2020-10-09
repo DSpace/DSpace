@@ -1005,6 +1005,7 @@
                 <artifactId>dspace-api</artifactId>
                 <type>test-jar</type>
                 <version>7.0-beta4-SNAPSHOT</version>
+                <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.dspace.modules</groupId>
@@ -1037,6 +1038,7 @@
                 <artifactId>dspace-server-webapp</artifactId>
                 <type>test-jar</type>
                 <version>7.0-beta4-SNAPSHOT</version>
+                <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
@@ -1228,11 +1230,13 @@
                 <groupId>org.apache.lucene</groupId>
                 <artifactId>lucene-analyzers-smartcn</artifactId>
                 <version>${solr.client.version}</version>
+                <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.apache.lucene</groupId>
                 <artifactId>lucene-analyzers-stempel</artifactId>
                 <version>${solr.client.version}</version>
+                <scope>test</scope>
             </dependency>
 
             <dependency>
@@ -1858,7 +1862,7 @@
         <!-- Check Maven Central first (before other repos below) -->
         <repository>
             <id>maven-central</id>
-            <url>https://repo1.maven.org/maven2</url>
+            <url>https://repo.maven.apache.org/maven2</url>
         </repository>
         <!-- Enable access to artifacts in Sonatype's snapshot repo for Snapshots ONLY -->
         <repository>
