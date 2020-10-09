@@ -333,7 +333,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-javadoc-plugin</artifactId>
-                    <version>3.1.1</version>
+                    <version>3.2.0</version>
                     <configuration>
                         <!-- Never fail a build based on Javadoc errors -->
                         <failOnError>false</failOnError>
@@ -376,8 +376,9 @@
                 <artifactId>maven-release-plugin</artifactId>
                 <version>2.5.3</version>
                 <configuration>
-                    <!-- During release:perform, enable the "release" profile (see below) -->
-                    <releaseProfiles>release</releaseProfiles>
+                    <!-- During release:prepare and release:perform, pass the "release" property to enable the
+                     "release" profile (and enable/disable other profiles based on whether they need releasing) -->
+                    <arguments>-Drelease</arguments>
                     <goals>deploy</goals>
                     <!-- Suggest tagging the release in SCM as "dspace-[version]" -->
                     <tagNameFormat>dspace-@{project.version}</tagNameFormat>
@@ -505,6 +506,10 @@
                 <file>
                     <exists>src/main/assembly/testEnvironment.xml</exists>
                 </file>
+                <!-- Disable if we are doing a release (-Drelease) -->
+                <property>
+                    <name>!release</name>
+                </property>
             </activation>
             <build>
                 <plugins>
@@ -757,6 +762,10 @@
                 <file>
                     <exists>dspace/pom.xml</exists>
                 </file>
+                <!-- Disable if we are doing a release (-Drelease), as this module has no source code -->
+                <property>
+                    <name>!release</name>
+                </property>
             </activation>
             <modules>
                 <module>dspace</module>
@@ -829,6 +838,10 @@
            <id>dspace-rest</id>
            <activation>
                <activeByDefault>false</activeByDefault>
+               <!-- Enable if we are doing a release (-Drelease), to tag/release this optional module -->
+               <property>
+                   <name>release</name>
+               </property>
            </activation>
            <modules>
                <module>dspace-rest</module>
@@ -903,25 +916,19 @@
          The 'release' profile is used by the 'maven-release-plugin' (see above)
          to actually perform a DSpace software release to Maven central.
          This profile contains settings which are ONLY enabled when performing
-         a DSpace release. See alse https://wiki.duraspace.org/display/DSPACE/Release+Procedure
+         a DSpace release. See also https://wiki.duraspace.org/display/DSPACE/Release+Procedure
+         NOTE: You MUST trigger this profile by running "-Drelease"
+         (as that flag also triggers other modules to be enabled/disabled as necessary for release)
         -->
         <profile>
             <id>release</id>
             <activation>
                 <activeByDefault>false</activeByDefault>
+                <!-- Enable this profile if we are doing a release (-Drelease) -->
+                <property>
+                    <name>release</name>
+                </property>
             </activation>
-            <!-- Activate all modules *except* for the 'dspace' module,
-                 as it does not include any Java source code to release. -->
-            <modules>
-                <module>dspace-api</module>
-                <module>dspace-oai</module>
-                <module>dspace-rdf</module>
-                <module>dspace-rest</module>
-                <module>dspace-services</module>
-                <module>dspace-sword</module>
-                <module>dspace-swordv2</module>
-                <module>dspace-server-webapp</module>
-            </modules>
             <build>
                 <plugins>
                     <!-- Configure Nexus plugin for new releases via Sonatype.
@@ -952,7 +959,7 @@
                             </execution>
                         </executions>
                     </plugin>
-                    <!-- For new releases, generate JavaDocs -->
+                    <!-- For new releases, generate JavaDocs for each module -->
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-javadoc-plugin</artifactId>
@@ -960,7 +967,7 @@
                             <execution>
                                 <id>attach-javadocs</id>
                                 <goals>
-                                    <goal>aggregate-jar</goal>
+                                    <goal>jar</goal>
                                 </goals>
                             </execution>
                         </executions>
