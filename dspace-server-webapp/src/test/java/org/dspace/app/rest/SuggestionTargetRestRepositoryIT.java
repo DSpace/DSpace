@@ -95,7 +95,7 @@ public class SuggestionTargetRestRepositoryIT extends AbstractControllerIntegrat
         getClient(adminToken).perform(get("/api/integration/suggestiontargets").param("size", "1"))
                 .andExpect(status().isOk()).andExpect(content().contentType(contentType))
                 .andExpect(jsonPath("$._embedded.suggestiontargets",
-                        Matchers.is(allOf(hasJsonPath("$.display", is("Bollini, Andrea")),
+                        Matchers.contains(allOf(hasJsonPath("$.display", is("Bollini, Andrea")),
                                 hasJsonPath("$.totals.reciter", is(31)), hasJsonPath("$.totals.scopus", is(3)),
                                 hasJsonPath("$.type", is("suggestiontarget"))))))
                 .andExpect(
@@ -106,13 +106,13 @@ public class SuggestionTargetRestRepositoryIT extends AbstractControllerIntegrat
                         Matchers.containsString("/api/integration/suggestiontargets?page=10")))
                 .andExpect(jsonPath("$._links.first.href",
                         Matchers.containsString("/api/integration/suggestiontargets?page=0")))
-                .andExpect(jsonPath("$._links.previous.href", Matchers.empty()))
-                .andExpect(jsonPath("$.page.size", is(20))).andExpect(jsonPath("$.page.totalElements", is(11)));
+                .andExpect(jsonPath("$._links.previous.href").doesNotExist())
+                .andExpect(jsonPath("$.page.size", is(1))).andExpect(jsonPath("$.page.totalElements", is(11)));
 
         getClient(adminToken).perform(get("/api/integration/suggestiontargets").param("size", "1").param("page", "1"))
                 .andExpect(status().isOk()).andExpect(content().contentType(contentType))
                 .andExpect(jsonPath("$._embedded.suggestiontargets",
-                        Matchers.is(allOf(hasJsonPath("$.display", is("Digilio, Giuseppe")),
+                        Matchers.contains(allOf(hasJsonPath("$.display", is("Digilio, Giuseppe")),
                                 hasJsonPath("$.totals.reciter", is(11)), hasJsonPath("$.totals.scopus", is(0)),
                                 hasJsonPath("$.type", is("suggestiontarget"))))))
                 .andExpect(jsonPath("$._links.self.href",
@@ -125,23 +125,23 @@ public class SuggestionTargetRestRepositoryIT extends AbstractControllerIntegrat
                         Matchers.containsString("/api/integration/suggestiontargets?page=0")))
                 .andExpect(jsonPath("$._links.previous.href",
                         Matchers.containsString("/api/integration/suggestiontargets?page=0")))
-                .andExpect(jsonPath("$.page.size", is(20))).andExpect(jsonPath("$.page.totalElements", is(11)));
+                .andExpect(jsonPath("$.page.size", is(1))).andExpect(jsonPath("$.page.totalElements", is(11)));
         getClient(adminToken).perform(get("/api/integration/suggestiontargets").param("size", "1").param("page", "10"))
                 .andExpect(status().isOk()).andExpect(content().contentType(contentType))
                 .andExpect(jsonPath("$._embedded.suggestiontargets",
-                        Matchers.is(allOf(hasJsonPath("$.display", is("Lombardi, Corrado")),
+                        Matchers.contains(allOf(hasJsonPath("$.display", is("Lombardi, Corrado")),
                                 hasJsonPath("$.totals.reciter", is(0)), hasJsonPath("$.totals.scopus", is(3)),
                                 hasJsonPath("$.type", is("suggestiontarget"))))))
                 .andExpect(jsonPath("$._links.self.href",
                         Matchers.containsString("/api/integration/suggestiontargets?page=10")))
-                .andExpect(jsonPath("$._links.next.href", Matchers.empty()))
+                .andExpect(jsonPath("$._links.next.href").doesNotExist())
                 .andExpect(jsonPath("$._links.last.href",
                         Matchers.containsString("/api/integration/suggestiontargets?page=10")))
                 .andExpect(jsonPath("$._links.first.href",
                         Matchers.containsString("/api/integration/suggestiontargets?page=0")))
                 .andExpect(jsonPath("$._links.previous.href",
                         Matchers.containsString("/api/integration/suggestiontargets?page=9")))
-                .andExpect(jsonPath("$.page.size", is(20))).andExpect(jsonPath("$.page.totalElements", is(11)));
+                .andExpect(jsonPath("$.page.size", is(1))).andExpect(jsonPath("$.page.totalElements", is(11)));
     }
 
     @Test
