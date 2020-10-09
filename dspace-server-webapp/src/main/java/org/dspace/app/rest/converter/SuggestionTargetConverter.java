@@ -25,6 +25,7 @@ public class SuggestionTargetConverter
     @Override
     public SuggestionTargetRest convert(SuggestionTarget target, Projection projection) {
         SuggestionTargetRest targetRest = new SuggestionTargetRest();
+        targetRest.setProjection(projection);
         targetRest.setId(target.getID());
         targetRest.setDisplay(target.getTarget().getName());
         targetRest.setTotals(target.getTotals());
