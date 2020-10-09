@@ -54,7 +54,7 @@ public class SuggestionTargetRestRepositoryIT extends AbstractControllerIntegrat
         String adminToken = getAuthToken(admin.getEmail(), password);
         getClient(adminToken).perform(get("/api/integration/suggestiontargets")).andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
-                .andExpect(jsonPath("$._embedded.suggestiontargets", Matchers.containsInAnyOrder(
+                .andExpect(jsonPath("$._embedded.suggestiontargets", Matchers.hasItems(
                         allOf(hasJsonPath("$.display", is("Bollini, Andrea")), hasJsonPath("$.totals.reciter", is(31)),
                                 hasJsonPath("$.totals.scopus", is(3)), hasJsonPath("$.type", is("suggestiontarget"))),
                         allOf(hasJsonPath("$.display", is("Digilio, Giuseppe")),
