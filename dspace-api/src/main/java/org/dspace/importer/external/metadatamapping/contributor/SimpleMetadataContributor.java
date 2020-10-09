@@ -77,18 +77,33 @@ public class SimpleMetadataContributor implements MetadataContributor<PlainMetad
         return values;
     }
 
-    /*
-     * Setter to inject field item
+    /**
+     * Method to inject field item
+     * 
+     * @param field the {@link MetadataFieldConfig} to use in this contributor
      */
     public void setField(MetadataFieldConfig field) {
         this.field = field;
     }
 
-    /*
-     * Setter to inject key value
+    /**
+     * Method to inject key value
      */
     public void setKey(String key) {
         this.key = key;
     }
 
+     /**
+     * Method to retrieve field item
+     */
+    public String getKey() {
+        return key;
+    }
+
+    /**
+     * Method to retrieve the {@link MetadataFieldConfig} used in this contributor
+     */
+    public MetadataFieldConfig getField() {
+        return field;
+    }
 }

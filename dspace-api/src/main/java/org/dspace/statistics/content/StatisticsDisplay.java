@@ -83,8 +83,9 @@ public abstract class StatisticsDisplay {
         return statisticsData.getDataset();
     }
 
-    public Dataset getDataset(Context context) throws SQLException, SolrServerException, IOException, ParseException {
-        return statisticsData.createDataset(context);
+    public Dataset getDataset(Context context, int facetMinCount) throws SQLException, SolrServerException, IOException,
+        ParseException {
+        return statisticsData.createDataset(context, facetMinCount);
     }
 
     public void addCss(String style) {

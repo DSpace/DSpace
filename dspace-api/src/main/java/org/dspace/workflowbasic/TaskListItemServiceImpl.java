@@ -47,6 +47,17 @@ public class TaskListItemServiceImpl implements TaskListItemService {
     }
 
     @Override
+    public void deleteByWorkflowItemAndEPerson(Context context, BasicWorkflowItem workflowItem, EPerson ePerson)
+        throws SQLException {
+        taskListItemDAO.deleteByWorkflowItemAndEPerson(context, workflowItem, ePerson);
+    }
+
+    @Override
+    public void deleteByEPerson(Context context, EPerson ePerson) throws SQLException {
+        taskListItemDAO.deleteByEPerson(context, ePerson);
+    }
+
+    @Override
     public void update(Context context, TaskListItem taskListItem) throws SQLException {
         taskListItemDAO.save(context, taskListItem);
     }

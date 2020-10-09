@@ -14,8 +14,8 @@ import org.apache.logging.log4j.Logger;
 import org.dspace.browse.BrowseException;
 import org.dspace.browse.BrowseIndex;
 import org.dspace.storage.rdbms.DatabaseUtils;
-import org.flywaydb.core.api.migration.MigrationChecksumProvider;
-import org.flywaydb.core.api.migration.jdbc.JdbcMigration;
+import org.flywaydb.core.api.migration.BaseJavaMigration;
+import org.flywaydb.core.api.migration.Context;
 
 /**
  * This Flyway Java migration deletes any legacy DBMS browse tables found in
@@ -23,7 +23,7 @@ import org.flywaydb.core.api.migration.jdbc.JdbcMigration;
  *
  * @author Tim Donohue
  */
-public class V6_0_2016_01_26__DS_2188_Remove_DBMS_Browse_Tables implements JdbcMigration, MigrationChecksumProvider {
+public class V6_0_2016_01_26__DS_2188_Remove_DBMS_Browse_Tables extends BaseJavaMigration {
     /**
      * log4j category
      */
@@ -34,8 +34,8 @@ public class V6_0_2016_01_26__DS_2188_Remove_DBMS_Browse_Tables implements JdbcM
     private int checksum = -1;
 
     @Override
-    public void migrate(Connection connection) throws Exception, SQLException {
-        removeDBMSBrowseTables(connection);
+    public void migrate(Context context) throws Exception, SQLException {
+        removeDBMSBrowseTables(context.getConnection());
     }
 
     /**

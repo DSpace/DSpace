@@ -12,7 +12,6 @@ import java.util.UUID;
 
 import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
-import org.dspace.app.rest.link.HalLinkService;
 import org.dspace.app.rest.model.RestAddressableModel;
 import org.dspace.app.rest.model.StatisticsSupportRest;
 import org.dspace.app.rest.model.hateoas.SearchEventResource;
@@ -45,9 +44,6 @@ public class StatisticsRestController implements InitializingBean {
 
     @Autowired
     private DiscoverableEndpointsService discoverableEndpointsService;
-
-    @Autowired
-    private HalLinkService halLinkService;
 
     @Autowired
     private ConverterService converter;
