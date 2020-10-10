@@ -44,6 +44,10 @@
             <id>dspace-rest</id>
             <activation>
                 <activeByDefault>false</activeByDefault>
+                <!-- Enable if we are doing a release (-Drelease), to tag/release this optional module -->
+                <property>
+                    <name>release</name>
+                </property>
             </activation>
             <modules>
                 <module>rest</module>
