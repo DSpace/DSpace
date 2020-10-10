@@ -19,8 +19,6 @@
         <!-- This is the path to the root [dspace-src] directory. -->
         <root.basedir>${basedir}/../..</root.basedir>
         <license.skip>true</license.skip>
-        <!-- Always skip Javadoc generation for this module -->
-        <maven.javadoc.skip>true</maven.javadoc.skip>
     </properties>
 
     <!-- The 'additions' module must *always* be built, as it is included
