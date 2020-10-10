@@ -24,8 +24,6 @@
    <properties>
        <!-- This is the path to the root [dspace-src] directory. -->
        <root.basedir>${basedir}/../../..</root.basedir>
-       <!-- Always skip Javadoc generation for this module -->
-       <maven.javadoc.skip>true</maven.javadoc.skip>
    </properties>
 
    <build>
