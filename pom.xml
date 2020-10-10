@@ -762,10 +762,6 @@
                 <file>
                     <exists>dspace/pom.xml</exists>
                 </file>
-                <!-- Disable if we are doing a release (-Drelease), as this module has no source code -->
-                <property>
-                    <name>!release</name>
-                </property>
             </activation>
             <modules>
                 <module>dspace</module>
@@ -1017,7 +1013,7 @@
             <dependency>
                 <groupId>org.dspace.modules</groupId>
                 <artifactId>additions</artifactId>
-                <version>7.0-beta4-SNAPSHOT</version>
+                <version>7.0-beta5-SNAPSHOT</version>
             </dependency>
 
             <dependency>
