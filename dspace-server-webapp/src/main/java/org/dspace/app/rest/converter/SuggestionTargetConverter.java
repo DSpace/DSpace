@@ -28,7 +28,8 @@ public class SuggestionTargetConverter
         targetRest.setProjection(projection);
         targetRest.setId(target.getID());
         targetRest.setDisplay(target.getTarget().getName());
-        targetRest.setTotals(target.getTotals());
+        targetRest.setTotal(target.getTotal());
+        targetRest.setSource(target.getSource());
         return targetRest;
     }
 

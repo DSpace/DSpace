@@ -7,9 +7,6 @@
  */
 package org.dspace.builder;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.dspace.app.suggestion.SuggestionService;
 import org.dspace.app.suggestion.SuggestionTarget;
 import org.dspace.content.Collection;
@@ -24,59 +21,71 @@ import org.dspace.eperson.EPerson;
  */
 public class SuggestionTargetBuilder extends AbstractBuilder<SuggestionTarget, SuggestionService> {
 
-    private ItemBuilder itemBuilder;
+    private Item item;
     private SuggestionTarget target;
-    private Map<String, Integer> totals = new HashMap<String, Integer>();
+    private String source;
+    private int total;
 
     protected SuggestionTargetBuilder(Context context) {
         super(context);
     }
 
-    public static SuggestionTargetBuilder createTarget(final Context context, final Collection col) {
-        SuggestionTargetBuilder builder = new SuggestionTargetBuilder(context);
-        return builder.create(context, col);
+    public static SuggestionTargetBuilder createTarget(final Context context, final Collection col, final String name) {
+        return createTarget(context, col, name, null);
     }
 
-    private SuggestionTargetBuilder create(final Context context, final Collection col) {
+    public static SuggestionTargetBuilder createTarget(final Context context, final Collection col, final String name,
+            final EPerson eperson) {
+        SuggestionTargetBuilder builder = new SuggestionTargetBuilder(context);
+        return builder.create(context, col, name, eperson);
+    }
+
+    public static SuggestionTargetBuilder createTarget(final Context context, final Item item) {
+        SuggestionTargetBuilder builder = new SuggestionTargetBuilder(context);
+        return builder.create(context, item);
+    }
+
+    private SuggestionTargetBuilder create(final Context context, final Collection col, final String name) {
+        return create(context, col, name, null);
+    }
+
+    private SuggestionTargetBuilder create(final Context context, final Collection col, final String name,
+            final EPerson eperson) {
         this.context = context;
 
         try {
-            itemBuilder = ItemBuilder.createItem(context, col);
+            ItemBuilder itemBuilder = ItemBuilder.createItem(context, col).withTitle(name);
+            if (eperson != null) {
+                itemBuilder = itemBuilder.withCrisOwner(eperson.getFullName(), eperson.getID().toString());
+            }
+            item = itemBuilder.build();
+            context.dispatchEvents();
+            indexingService.commit();
         } catch (Exception e) {
             return handleException(e);
         }
-
         return this;
     }
 
-    public SuggestionTargetBuilder withPreferredName(final String title) {
-        itemBuilder = itemBuilder.withTitle(title);
+    private SuggestionTargetBuilder create(final Context context, final Item item) {
+        this.context = context;
+        this.item = item;
         return this;
     }
 
-    public SuggestionTargetBuilder withSuggestionCount(final String source, final int count) {
-        totals.put(source, count);
-        return this;
-    }
-
-    public SuggestionTargetBuilder withOwner(EPerson eperson) {
-        itemBuilder = itemBuilder.withCrisOwner(eperson.getFullName(), eperson.getID().toString());
+    public SuggestionTargetBuilder withSuggestionCount(final String source, final int total) {
+        this.source = source;
+        this.total = total;
         return this;
     }
 
     @Override
     public SuggestionTarget build() {
-        try {
-            Item item = itemBuilder.build();
-            context.dispatchEvents();
-            indexingService.commit();
-            target = new SuggestionTarget(item);
-            target.setTotals(totals);
-            suggestionService.addSuggestionTarget(target);
-            return target;
-        } catch (Exception e) {
-            return handleException(e);
-        }
+        target = new SuggestionTarget(item);
+        target.setTotal(total);
+        target.setSource(source);
+        suggestionService.addSuggestionTarget(target);
+        return target;
     }
 
     @Override
@@ -91,6 +100,6 @@ public class SuggestionTargetBuilder extends AbstractBuilder<SuggestionTarget, S
 
     @Override
     public void delete(Context c, SuggestionTarget dso) throws Exception {
-        // TODO Auto-generated method stub
+        suggestionService.deleteTarget(dso);
     }
 }

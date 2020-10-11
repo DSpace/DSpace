@@ -21,11 +21,11 @@ public interface SuggestionService {
 
     public void addSuggestionTarget(SuggestionTarget target);
 
-    public SuggestionTarget find(Context context, UUID id);
+    public SuggestionTarget find(Context context, String source, UUID id);
 
-    public long countAll(Context context);
+    public long countAll(Context context, String source);
 
-    public List<SuggestionTarget> findAllTargets(Context context, int pageSize, long offset);
+    public List<SuggestionTarget> findAllTargets(Context context, String source, int pageSize, long offset);
 
 
     public void deleteTarget(SuggestionTarget target);

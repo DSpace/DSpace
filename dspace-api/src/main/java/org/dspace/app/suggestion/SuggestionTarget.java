@@ -7,9 +7,6 @@
  */
 package org.dspace.app.suggestion;
 
-import java.util.Map;
-import java.util.UUID;
-
 import org.dspace.content.Item;
 
 /**
@@ -21,7 +18,9 @@ public class SuggestionTarget {
 
     private Item target;
 
-    private Map<String, Integer> totals;
+    private String source;
+
+    private int total;
 
     public SuggestionTarget() {
     }
@@ -37,12 +36,12 @@ public class SuggestionTarget {
     }
 
     /**
-     * The suggestion target uses the same uuid than the person item that wrap
+     * The suggestion target uses the concatenation of the source and target uuid separated by colon as id
      * 
-     * @return the uuid of the wrapped item
+     * @return the source:uuid of the wrapped item
      */
-    public UUID getID() {
-        return target.getID();
+    public String getID() {
+        return source + ":" + target.getID();
     }
 
     public Item getTarget() {
@@ -53,12 +52,20 @@ public class SuggestionTarget {
         this.target = target;
     }
 
-    public Map<String, Integer> getTotals() {
-        return totals;
+    public String getSource() {
+        return source;
     }
 
-    public void setTotals(Map<String, Integer> totals) {
-        this.totals = totals;
+    public void setSource(String source) {
+        this.source = source;
+    }
+
+    public int getTotal() {
+        return total;
+    }
+
+    public void setTotal(int total) {
+        this.total = total;
     }
 
 }

@@ -12,6 +12,7 @@ import java.util.UUID;
 import javax.annotation.Nullable;
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.model.ItemRest;
 import org.dspace.app.rest.model.SuggestionTargetRest;
 import org.dspace.app.rest.projection.Projection;
@@ -37,7 +38,7 @@ public class SuggestionTargetTargetLinkRepository extends AbstractDSpaceRestRepo
     private ItemService itemService;
 
     /**
-     * Returns the item related to the suggestion target with the given UUID.
+     * Returns the item related to the suggestion target with the given id.
      *
      * @param request    the http servlet request
      * @param id         the suggestion target UUID
@@ -46,13 +47,16 @@ public class SuggestionTargetTargetLinkRepository extends AbstractDSpaceRestRepo
      * @return the target item rest representation
      */
     @PreAuthorize("permitAll()")
-    public ItemRest getTarget(@Nullable HttpServletRequest request, UUID id,
+    public ItemRest getTarget(@Nullable HttpServletRequest request, String id,
         @Nullable Pageable pageable, Projection projection) {
-
+        String source = id.split(":")[0];
+        UUID uuid = UUID.fromString(id.split(":")[1]);
+        if (StringUtils.isBlank(source) || uuid == null) {
+            throw new ResourceNotFoundException("No such item related to a suggestion target with UUID: " + id);
+        }
         try {
             Context context = obtainContext();
-
-            Item profile = itemService.find(context, id);
+            Item profile = itemService.find(context, uuid);
             if (profile == null) {
                 throw new ResourceNotFoundException("No such item related to a suggestion target with UUID: " + id);
             }

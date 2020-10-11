@@ -7,9 +7,6 @@
  */
 package org.dspace.app.rest.model;
 
-import java.util.Map;
-import java.util.UUID;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
 import org.dspace.app.rest.RestResourceController;
@@ -24,14 +21,15 @@ import org.dspace.app.rest.RestResourceController;
 @LinksRest(links = {
         @LinkRest(name = SuggestionTargetRest.TARGET, method = "getTarget")
 })
-public class SuggestionTargetRest extends BaseObjectRest<UUID> {
+public class SuggestionTargetRest extends BaseObjectRest<String> {
     private static final long serialVersionUID = 1L;
     public static final String NAME = "suggestiontarget";
     public static final String TARGET = "target";
     public static final String CATEGORY = RestAddressableModel.INTEGRATION;
 
     private String display;
-    private Map<String, Integer> totals;
+    private String source;
+    private int total;
 
     @Override
     @JsonProperty(access = Access.READ_ONLY)
@@ -57,11 +55,19 @@ public class SuggestionTargetRest extends BaseObjectRest<UUID> {
         this.display = display;
     }
 
-    public Map<String, Integer> getTotals() {
-        return totals;
+    public String getSource() {
+        return source;
     }
 
-    public void setTotals(Map<String, Integer> totals) {
-        this.totals = totals;
+    public void setSource(String source) {
+        this.source = source;
+    }
+
+    public int getTotal() {
+        return total;
+    }
+
+    public void setTotal(int total) {
+        this.total = total;
     }
 }
