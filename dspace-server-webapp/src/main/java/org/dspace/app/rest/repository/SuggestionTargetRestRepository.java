@@ -40,10 +40,16 @@ public class SuggestionTargetRestRepository extends DSpaceRestRepository<Suggest
     private SuggestionService suggestionService;
 
     @Override
-    @PreAuthorize("permitAll()")
+    @PreAuthorize("hasPermission(#id, 'SUGGESTIONTARGET', 'READ')")
     public SuggestionTargetRest findOne(Context context, String id) {
-        String source = id.split(":")[0];
-        UUID uuid = UUID.fromString(id.split(":")[1]);
+        String source = null;
+        UUID uuid = null;
+        try {
+            source = id.split(":")[0];
+            uuid = UUID.fromString(id.split(":")[1]);
+        } catch (Exception e) {
+            return null;
+        }
         SuggestionTarget suggestionTarget = suggestionService.find(context, source, uuid);
         if (suggestionTarget == null) {
             return null;

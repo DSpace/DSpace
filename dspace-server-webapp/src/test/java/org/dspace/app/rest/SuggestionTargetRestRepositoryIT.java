@@ -412,16 +412,16 @@ public class SuggestionTargetRestRepositoryIT extends AbstractControllerIntegrat
         getClient(epersonToken).perform(get("/api/integration/suggestiontargets/" + UUID.randomUUID()))
                 .andExpect(status().isForbidden());
         getClient(epersonToken).perform(get("/api/integration/suggestiontargets/scopus:" + UUID.randomUUID()))
-                .andExpect(status().isNotFound());
+                .andExpect(status().isForbidden());
         getClient(epersonToken).perform(get("/api/integration/suggestiontargets/invalid:" + UUID.randomUUID()))
-                .andExpect(status().isNotFound());
+                .andExpect(status().isForbidden());
 
         getClient().perform(get("/api/integration/suggestiontargets/not-an-uuid")).andExpect(status().isUnauthorized());
         getClient().perform(get("/api/integration/suggestiontargets/" + UUID.randomUUID()))
                 .andExpect(status().isUnauthorized());
         getClient().perform(get("/api/integration/suggestiontargets/scopus:" + UUID.randomUUID()))
-                .andExpect(status().isNotFound());
+                .andExpect(status().isUnauthorized());
         getClient().perform(get("/api/integration/suggestiontargets/invalid:" + UUID.randomUUID()))
-                .andExpect(status().isNotFound());
+                .andExpect(status().isUnauthorized());
     }
 }

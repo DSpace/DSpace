@@ -46,7 +46,7 @@ public class SuggestionTargetTargetLinkRepository extends AbstractDSpaceRestRepo
      * @param projection the projection object
      * @return the target item rest representation
      */
-    @PreAuthorize("permitAll()")
+    @PreAuthorize("hasPermission(#id, 'SUGGESTIONTARGET', 'READ')")
     public ItemRest getTarget(@Nullable HttpServletRequest request, String id,
         @Nullable Pageable pageable, Projection projection) {
         String source = id.split(":")[0];
