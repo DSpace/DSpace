@@ -27,12 +27,18 @@ import org.dspace.app.rest.model.patch.RemoveOperation;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
+import org.dspace.builder.EPersonBuilder;
+import org.dspace.builder.GroupBuilder;
 import org.dspace.builder.ItemBuilder;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.content.edit.EditItem;
+import org.dspace.content.service.ItemService;
+import org.dspace.eperson.EPerson;
+import org.dspace.eperson.Group;
 import org.hamcrest.Matchers;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Test suite for the EditItem endpoint
@@ -40,6 +46,9 @@ import org.junit.Test;
  * @author Mykhaylo Boychuk (mykhaylo.boychuk at 4science.it)
  */
 public class EditItemRestRepositoryIT extends AbstractControllerIntegrationTest {
+
+    @Autowired
+    private ItemService itemService;
 
     @Test
     public void findOneTest() throws Exception {
@@ -506,5 +515,461 @@ public class EditItemRestRepositoryIT extends AbstractControllerIntegrationTest 
                                      hasJsonPath("$['dc.date.issued'][0].value", is("2015-06-25"))
                                      )))
                              .andExpect(jsonPath("$.sections.onlyTitle['dc.contributor.author']").doesNotExist());
+    }
+
+    @Test
+    public void findOneForbiddenTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withRelationshipType("Publication")
+                                           .withName("Collection 1")
+                                           .build();
+
+        Item itemA = ItemBuilder.createItem(context, col1)
+                                .withTitle("Title item A")
+                                .withIssueDate("2015-06-25")
+                                .withAuthor("Smith, Maria")
+                                .build();
+
+        EditItem editItem = new EditItem(context, itemA);
+
+        context.restoreAuthSystemState();
+
+        String tokenEperson = getAuthToken(eperson.getEmail(), password);
+
+        getClient(tokenEperson).perform(get("/api/core/edititems/" + editItem.getID() + ":FIRST"))
+                               .andExpect(status().isForbidden());
+
+    }
+
+    @Test
+    public void findOneUnauthorizedTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withRelationshipType("Publication")
+                                           .withName("Collection 1")
+                                           .build();
+
+        Item itemA = ItemBuilder.createItem(context, col1)
+                                .withTitle("Title item A")
+                                .withIssueDate("2015-06-25")
+                                .withAuthor("Smith, Maria")
+                                .build();
+
+        EditItem editItem = new EditItem(context, itemA);
+
+        context.restoreAuthSystemState();
+
+        getClient().perform(get("/api/core/edititems/" + editItem.getID() + ":FIRST"))
+                   .andExpect(status().isUnauthorized());
+
+    }
+
+    @Test
+    public void findOneOwnerOnlyForbiddenTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        EPerson userA = EPersonBuilder.createEPerson(context)
+                                      .withNameInMetadata("Mykhaylo", "Boychuk")
+                                      .withEmail("user.a@example.com")
+                                      .withPassword(password).build();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withRelationshipType("Publication")
+                                           .withName("Collection 1")
+                                           .build();
+
+        Item itemA = ItemBuilder.createItem(context, col1)
+                                .withTitle("Title item A")
+                                .withIssueDate("2015-06-25")
+                                .withAuthor("Smith, Maria")
+                                .build();
+
+        itemService.addMetadata(context, itemA, "cris", "owner", null, null, userA.getID().toString());
+
+        EditItem editItem = new EditItem(context, itemA);
+
+        context.restoreAuthSystemState();
+
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        String tokenEperson = getAuthToken(eperson.getEmail(), password);
+
+        getClient(tokenAdmin).perform(get("/api/core/edititems/" + editItem.getID() + ":FIRST-OWNER"))
+                             .andExpect(status().isForbidden());
+
+        getClient(tokenEperson).perform(get("/api/core/edititems/" + editItem.getID() + ":FIRST-OWNER"))
+                               .andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void findOneOwnerOnlyUnauthorizedTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        EPerson userA = EPersonBuilder.createEPerson(context)
+                                      .withNameInMetadata("Mykhaylo", "Boychuk")
+                                      .withEmail("user.a@example.com")
+                                      .withPassword(password).build();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withRelationshipType("Publication")
+                                           .withName("Collection 1")
+                                           .build();
+
+        Item itemA = ItemBuilder.createItem(context, col1)
+                                .withTitle("Title item A")
+                                .withIssueDate("2015-06-25")
+                                .withAuthor("Smith, Maria")
+                                .build();
+
+        itemService.addMetadata(context, itemA, "cris", "owner", null, null, userA.getID().toString());
+
+        EditItem editItem = new EditItem(context, itemA);
+
+        context.restoreAuthSystemState();
+
+        getClient().perform(get("/api/core/edititems/" + editItem.getID() + ":FIRST-OWNER"))
+                   .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    public void findOneOwnerOnlyTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        EPerson userA = EPersonBuilder.createEPerson(context)
+                                      .withNameInMetadata("Mykhaylo", "Boychuk")
+                                      .withEmail("user.a@example.com")
+                                      .withPassword(password).build();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withRelationshipType("Publication")
+                                           .withName("Collection 1")
+                                           .build();
+
+        Item itemA = ItemBuilder.createItem(context, col1)
+                                .withTitle("Title item A")
+                                .withIssueDate("2015-06-25")
+                                .withAuthor("Smith, Maria")
+                                .build();
+
+        itemService.addMetadata(context, itemA, "cris", "owner", null, null, userA.getID().toString());
+
+        EditItem editItem = new EditItem(context, itemA);
+
+        context.restoreAuthSystemState();
+
+        String tokenUserA = getAuthToken(userA.getEmail(), password);
+
+        getClient(tokenUserA).perform(get("/api/core/edititems/" + editItem.getID() + ":FIRST-OWNER"))
+                 .andExpect(status().isOk())
+                 .andExpect(jsonPath("$.sections.titleAndIssuedDate", Matchers.allOf(
+                         hasJsonPath("$['dc.date.issued'][0].value", is("2015-06-25")),
+                         hasJsonPath("$['dc.title'][0].value", is("Title item A"))
+                         )))
+                 .andExpect(jsonPath("$.sections.titleAndIssuedDate['dc.contributor.author']").doesNotExist());
+    }
+
+    @Test
+    public void findOneCustomSecurityModeTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        EPerson userA = EPersonBuilder.createEPerson(context)
+                                      .withNameInMetadata("Mykhaylo", "Boychuk")
+                                      .withEmail("user.a@example.com")
+                                      .withPassword(password).build();
+
+        EPerson userB = EPersonBuilder.createEPerson(context)
+                                      .withNameInMetadata("Simone", "Proni")
+                                      .withEmail("user.b@example.com")
+                                      .withPassword(password).build();
+
+        Group groupA = GroupBuilder.createGroup(context)
+                                   .withName("Group A")
+                                   .addMember(userB).build();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withRelationshipType("Publication")
+                                           .withName("Collection 1")
+                                           .build();
+
+        Item itemA = ItemBuilder.createItem(context, col1)
+                                .withTitle("Title item A")
+                                .withIssueDate("2015-06-25")
+                                .withAuthor("Smith, Maria")
+                                .build();
+
+        itemService.addMetadata(context, itemA, "cris", "policy", "eperson", null, userA.getFullName(),
+                                userA.getID().toString(), 600);
+        itemService.addMetadata(context, itemA, "cris", "policy", "group", null, groupA.getName(),
+                                groupA.getID().toString(), 600);
+
+        EditItem editItem = new EditItem(context, itemA);
+
+        context.restoreAuthSystemState();
+
+        String tokenUserA = getAuthToken(userA.getEmail(), password);
+        String tokenUserB = getAuthToken(userB.getEmail(), password);
+
+        getClient(tokenUserA).perform(get("/api/core/edititems/" + editItem.getID() + ":FIRST-CUSTOM"))
+                 .andExpect(status().isOk())
+                 .andExpect(jsonPath("$.sections.titleAndIssuedDate", Matchers.allOf(
+                         hasJsonPath("$['dc.date.issued'][0].value", is("2015-06-25")),
+                         hasJsonPath("$['dc.title'][0].value", is("Title item A"))
+                         )))
+                 .andExpect(jsonPath("$.sections.titleAndIssuedDate['dc.contributor.author']").doesNotExist());
+
+        getClient(tokenUserB).perform(get("/api/core/edititems/" + editItem.getID() + ":FIRST-CUSTOM"))
+                 .andExpect(status().isOk())
+                 .andExpect(jsonPath("$.sections.titleAndIssuedDate", Matchers.allOf(
+                         hasJsonPath("$['dc.date.issued'][0].value", is("2015-06-25")),
+                         hasJsonPath("$['dc.title'][0].value", is("Title item A"))
+                         )))
+                 .andExpect(jsonPath("$.sections.titleAndIssuedDate['dc.contributor.author']").doesNotExist());
+    }
+
+    @Test
+    public void patchAddMetadataUsingSecurityConfigurationOwnerTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community").build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withRelationshipType("Publication")
+                                           .withName("Collection 1").build();
+
+        Item itemA = ItemBuilder.createItem(context, col1)
+                                .withIssueDate("2015-06-25")
+                                .withAuthor("Mykhaylo, Boychuk").build();
+
+        itemService.addMetadata(context, itemA, "cris", "owner", null, null, eperson.getID().toString());
+
+        EditItem editItem = new EditItem(context, itemA);
+
+        context.restoreAuthSystemState();
+
+        String tokenOwner = getAuthToken(eperson.getEmail(), password);
+
+        List<Operation> operations = new ArrayList<Operation>();
+        List<Map<String, String>> titelValues = new ArrayList<Map<String, String>>();
+        Map<String, String> value = new HashMap<String, String>();
+        value.put("value", "New Title");
+        titelValues.add(value);
+        operations.add(new AddOperation("/sections/titleAndIssuedDate/dc.title", titelValues));
+
+        String patchBody = getPatchContent(operations);
+        getClient(tokenOwner).perform(patch("/api/core/edititems/" + editItem.getID() + ":FIRST-OWNER")
+                            .content(patchBody)
+                            .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                            .andExpect(status().isOk())
+                            .andExpect(jsonPath("$.sections.titleAndIssuedDate", Matchers.allOf(
+                                    hasJsonPath("$['dc.title'][0].value", is("New Title")),
+                                    hasJsonPath("$['dc.date.issued'][0].value", is("2015-06-25"))
+                                    )));
+
+        // verify that the patch changes have been persisted
+        getClient(tokenOwner).perform(get("/api/core/edititems/" + editItem.getID() + ":FIRST-OWNER"))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$.sections.titleAndIssuedDate", Matchers.allOf(
+                                     hasJsonPath("$['dc.title'][0].value", is("New Title")),
+                                     hasJsonPath("$['dc.date.issued'][0].value", is("2015-06-25"))
+                                     )));
+    }
+
+    @Test
+    public void patchAddMetadataUsingSecurityConfigurationOwnerForbiddenTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community").build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withRelationshipType("Publication")
+                                           .withName("Collection 1").build();
+
+        Item itemA = ItemBuilder.createItem(context, col1)
+                                .withIssueDate("2015-06-25")
+                                .withAuthor("Mykhaylo, Boychuk").build();
+
+        itemService.addMetadata(context, itemA, "cris", "owner", null, null, eperson.getID().toString());
+
+        EditItem editItem = new EditItem(context, itemA);
+
+        context.restoreAuthSystemState();
+
+        String tokenOwner = getAuthToken(eperson.getEmail(), password);
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+
+        List<Operation> operations = new ArrayList<Operation>();
+        List<Map<String, String>> titelValues = new ArrayList<Map<String, String>>();
+        Map<String, String> value = new HashMap<String, String>();
+        value.put("value", "New Title");
+        titelValues.add(value);
+        operations.add(new AddOperation("/sections/titleAndIssuedDate/dc.title", titelValues));
+
+        String patchBody = getPatchContent(operations);
+        getClient(tokenAdmin).perform(patch("/api/core/edititems/" + editItem.getID() + ":FIRST-OWNER")
+                            .content(patchBody)
+                            .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                            .andExpect(status().isForbidden());
+
+        getClient(tokenOwner).perform(get("/api/core/edititems/" + editItem.getID() + ":FIRST-OWNER"))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$.sections.titleAndIssuedDate", Matchers.allOf(
+                                     hasJsonPath("$['dc.date.issued'][0].value", is("2015-06-25"))
+                                     )))
+                             .andExpect(jsonPath("$.sections.titleAndIssuedDate['dc.title']").doesNotExist());
+    }
+
+    @Test
+    public void patchAddMetadataUsingSecurityConfigurationCustomTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        EPerson userA = EPersonBuilder.createEPerson(context)
+                                      .withNameInMetadata("Mykhaylo", "Boychuk")
+                                      .withEmail("user.a@example.com")
+                                      .withPassword(password).build();
+
+        EPerson userB = EPersonBuilder.createEPerson(context)
+                                      .withNameInMetadata("Simone", "Proni")
+                                      .withEmail("user.b@example.com")
+                                      .withPassword(password).build();
+
+        Group groupA = GroupBuilder.createGroup(context)
+                                   .withName("Group A")
+                                   .addMember(userB).build();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community").build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withRelationshipType("Publication")
+                                           .withName("Collection 1").build();
+
+        Item itemA = ItemBuilder.createItem(context, col1)
+                                .withIssueDate("2015-06-25")
+                                .withAuthor("Mykhaylo, Boychuk").build();
+
+        itemService.addMetadata(context, itemA, "cris", "policy", "eperson", null, userA.getFullName(),
+                                userA.getID().toString(), 600);
+        itemService.addMetadata(context, itemA, "cris", "policy", "group", null, groupA.getName(),
+                                groupA.getID().toString(), 600);
+
+        EditItem editItem = new EditItem(context, itemA);
+
+        context.restoreAuthSystemState();
+
+        String tokenUserA = getAuthToken(userA.getEmail(), password);
+
+        List<Operation> operations = new ArrayList<Operation>();
+        List<Map<String, String>> titelValues = new ArrayList<Map<String, String>>();
+        Map<String, String> value = new HashMap<String, String>();
+        value.put("value", "New Title");
+        titelValues.add(value);
+        operations.add(new AddOperation("/sections/titleAndIssuedDate/dc.title", titelValues));
+
+        String patchBody = getPatchContent(operations);
+        getClient(tokenUserA).perform(patch("/api/core/edititems/" + editItem.getID() + ":FIRST-CUSTOM")
+                             .content(patchBody)
+                             .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$.sections.titleAndIssuedDate", Matchers.allOf(
+                                    hasJsonPath("$['dc.title'][0].value", is("New Title")),
+                                    hasJsonPath("$['dc.date.issued'][0].value", is("2015-06-25"))
+                                    )));
+
+        getClient(tokenUserA).perform(get("/api/core/edititems/" + editItem.getID() + ":FIRST-CUSTOM"))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$.sections.titleAndIssuedDate", Matchers.allOf(
+                                     hasJsonPath("$['dc.title'][0].value", is("New Title")),
+                                     hasJsonPath("$['dc.date.issued'][0].value", is("2015-06-25"))
+                                     )));
+    }
+
+    @Test
+    public void patchAddMetadataUsingSecurityConfigurationCustomForbiddenTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        EPerson userA = EPersonBuilder.createEPerson(context)
+                                      .withNameInMetadata("Mykhaylo", "Boychuk")
+                                      .withEmail("user.a@example.com")
+                                      .withPassword(password).build();
+
+        EPerson userB = EPersonBuilder.createEPerson(context)
+                                      .withNameInMetadata("Simone", "Proni")
+                                      .withEmail("user.b@example.com")
+                                      .withPassword(password).build();
+
+        Group groupA = GroupBuilder.createGroup(context)
+                                   .withName("Group A")
+                                   .addMember(userB).build();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community").build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withRelationshipType("Publication")
+                                           .withName("Collection 1").build();
+
+        Item itemA = ItemBuilder.createItem(context, col1)
+                                .withIssueDate("2015-06-25")
+                                .withAuthor("Mykhaylo, Boychuk").build();
+
+        itemService.addMetadata(context, itemA, "cris", "policy", "eperson", null, userA.getFullName(),
+                                userA.getID().toString(), 600);
+        itemService.addMetadata(context, itemA, "cris", "policy", "group", null, groupA.getName(),
+                                groupA.getID().toString(), 600);
+
+        EditItem editItem = new EditItem(context, itemA);
+
+        context.restoreAuthSystemState();
+
+        String tokenUserA = getAuthToken(userA.getEmail(), password);
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+
+        List<Operation> operations = new ArrayList<Operation>();
+        List<Map<String, String>> titelValues = new ArrayList<Map<String, String>>();
+        Map<String, String> value = new HashMap<String, String>();
+        value.put("value", "New Title");
+        titelValues.add(value);
+        operations.add(new AddOperation("/sections/titleAndIssuedDate/dc.title", titelValues));
+
+        String patchBody = getPatchContent(operations);
+        getClient(tokenAdmin).perform(patch("/api/core/edititems/" + editItem.getID() + ":FIRST-CUSTOM")
+                             .content(patchBody)
+                             .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                             .andExpect(status().isForbidden());
+
+        getClient(tokenUserA).perform(get("/api/core/edititems/" + editItem.getID() + ":FIRST-CUSTOM"))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$.sections.titleAndIssuedDate", Matchers.allOf(
+                                     hasJsonPath("$['dc.date.issued'][0].value", is("2015-06-25"))
+                                     )))
+                             .andExpect(jsonPath("$.sections.titleAndIssuedDate['dc.title']").doesNotExist());
     }
 }
