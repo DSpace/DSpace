@@ -20,14 +20,11 @@ import org.dspace.app.rest.model.CommunityRest;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.app.rest.utils.Utils;
-import org.dspace.authorize.ResourcePolicy;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
 import org.dspace.builder.ResourcePolicyBuilder;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
-import org.dspace.content.Site;
-import org.dspace.content.service.SiteService;
 import org.dspace.core.Constants;
 import org.junit.Before;
 import org.junit.Test;
@@ -39,9 +36,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class ManageTemplateItemFeatureIT extends AbstractControllerIntegrationTest {
 
     @Autowired
-    private SiteService siteService;
-
-    @Autowired
     private Utils utils;
 
     @Autowired
@@ -50,7 +44,6 @@ public class ManageTemplateItemFeatureIT extends AbstractControllerIntegrationTe
     @Autowired
     private CollectionConverter collectionConverter;
 
-    private Site site;
     private Community communityA;
     private CommunityRest communityARest;
     private Collection collectionA;
@@ -66,7 +59,6 @@ public class ManageTemplateItemFeatureIT extends AbstractControllerIntegrationTe
         super.setUp();
         context.turnOffAuthorisationSystem();
 
-        site = siteService.findSite(context);
         communityA = CommunityBuilder.createCommunity(context)
             .withName("communityA")
             .build();
@@ -134,7 +126,7 @@ public class ManageTemplateItemFeatureIT extends AbstractControllerIntegrationTe
     @Test
     public void collectionAdminCollectionTestSuccess() throws Exception {
         context.turnOffAuthorisationSystem();
-        ResourcePolicy adminPermissionForEPersonOnCollectionA = ResourcePolicyBuilder.createResourcePolicy(context)
+        ResourcePolicyBuilder.createResourcePolicy(context)
             .withDspaceObject(collectionA)
             .withAction(Constants.ADMIN)
             .withUser(eperson)
@@ -154,7 +146,7 @@ public class ManageTemplateItemFeatureIT extends AbstractControllerIntegrationTe
     @Test
     public void collectionAdminCommunityTestNotFound() throws Exception {
         context.turnOffAuthorisationSystem();
-        ResourcePolicy adminPermissionForEPersonOnCollectionA = ResourcePolicyBuilder.createResourcePolicy(context)
+        ResourcePolicyBuilder.createResourcePolicy(context)
             .withDspaceObject(collectionA)
             .withAction(Constants.ADMIN)
             .withUser(eperson)
