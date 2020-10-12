@@ -45,7 +45,7 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.CrisConstants;
 import org.dspace.services.ConfigurationService;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.convert.converter.Converter;
 
 public class ReferCrosswalk implements StreamDisseminationCrosswalk, FileNameDisseminator {
 
@@ -53,14 +53,15 @@ public class ReferCrosswalk implements StreamDisseminationCrosswalk, FileNameDis
 
     private static final Pattern FIELD_PATTERN = Pattern.compile("@[a-zA-Z0-9\\-.*]+(\\(.*\\))?@");
 
-    @Autowired
-    private ConfigurationService configurationService;
 
-    @Autowired
-    private ItemService itemService;
+    private final ConfigurationService configurationService;
 
-    @Autowired
-    private VirtualFieldMapper virtualFieldMapper;
+    private final ItemService itemService;
+
+    private final VirtualFieldMapper virtualFieldMapper;
+
+    private Converter<String, String> converter;
+
 
     private final String templateFileName;
 
@@ -70,8 +71,12 @@ public class ReferCrosswalk implements StreamDisseminationCrosswalk, FileNameDis
 
     private List<TemplateLine> templateLines;
 
-    public ReferCrosswalk(String templateFileName, String mimeType, String fileName) {
+    public ReferCrosswalk(ConfigurationService configurationService, ItemService itemService,
+        VirtualFieldMapper virtualFieldMapper, String templateFileName, String mimeType, String fileName) {
         super();
+        this.configurationService = configurationService;
+        this.itemService = itemService;
+        this.virtualFieldMapper = virtualFieldMapper;
         this.templateFileName = templateFileName;
         this.mimeType = mimeType;
         this.fileName = fileName;
@@ -123,18 +128,6 @@ public class ReferCrosswalk implements StreamDisseminationCrosswalk, FileNameDis
     @Override
     public String getMIMEType() {
         return mimeType;
-    }
-
-    public void setConfigurationService(ConfigurationService configurationService) {
-        this.configurationService = configurationService;
-    }
-
-    public void setItemService(ItemService itemService) {
-        this.itemService = itemService;
-    }
-
-    public void setVirtualFieldMapper(VirtualFieldMapper virtualFieldMapper) {
-        this.virtualFieldMapper = virtualFieldMapper;
     }
 
     private TemplateLine buildTemplateLine(String templateLine) {
@@ -259,9 +252,14 @@ public class ReferCrosswalk implements StreamDisseminationCrosswalk, FileNameDis
     private void writeLine(BufferedWriter writer, TemplateLine line, String value)
         throws IOException {
         writer.write(line.getBeforeField());
-        writer.write(value);
+        writer.write(converter != null ? converter.convert(value) : value);
         writer.write(line.getAfterField());
         writer.newLine();
+    }
+
+
+    public void setConverter(Converter<String, String> converter) {
+        this.converter = converter;
     }
 
 }

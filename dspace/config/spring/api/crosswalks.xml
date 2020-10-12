@@ -8,6 +8,7 @@
 		<constructor-arg>
 			<map>
 				<entry key="bibtex" value-ref="referCrosswalkBibtex"></entry>
+				<entry key="person-xml" value-ref="referCrosswalkPersonXml"></entry>
 			</map>
 		</constructor-arg>
 	</bean>
@@ -16,6 +17,13 @@
 		<constructor-arg name="templateFileName" value="crosswalks/template/bibtex.template"/>
 		<constructor-arg name="mimeType" value="application/x-bibtex; charset=UTF-8"/>
 		<constructor-arg name="fileName" value="references.bib"/>
+	</bean>
+	
+	<bean class="org.dspace.content.integration.crosswalks.ReferCrosswalk" id="referCrosswalkPersonXml">
+		<constructor-arg name="templateFileName" value="crosswalks/template/person-xml.template"/>
+		<constructor-arg name="mimeType" value="application/xml; charset=UTF-8"/>
+		<constructor-arg name="fileName" value="person.xml"/>
+		<property name="converter" ref="xmlValueConverter" />
 	</bean>
 	
 	<bean class="org.dspace.content.integration.crosswalks.virtualfields.VirtualFieldMapper">
@@ -45,5 +53,7 @@
 	<bean class="org.dspace.content.integration.crosswalks.virtualfields.VirtualFieldUniqueIdentifier" id="virtualFieldUniqueIdentifier"/>
 	<bean class="org.dspace.content.integration.crosswalks.virtualfields.VirtualFieldCruiIdentifier" id="virtualFieldCruiIdentifier"/>
 	<bean class="org.dspace.content.integration.crosswalks.virtualfields.VirtualFieldHandleLocalNameIdentifier" id="virtualFieldHandleLocalNameIdentifier"/>
+	
+	<bean class="org.dspace.content.integration.crosswalks.converter.XmlValueConverter" id="xmlValueConverter" />
 	
 </beans>

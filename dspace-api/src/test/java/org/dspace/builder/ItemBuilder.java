@@ -134,6 +134,50 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
         return addMetadataValue(item, "dc", "identifier", "patentno", patentNo);
     }
 
+    public ItemBuilder withFullName(String fullname) {
+        return setMetadataSingleValue(item, "crisrp", "name", null, fullname);
+    }
+
+    public ItemBuilder withVariantName(String variant) {
+        return addMetadataValue(item, "crisrp", "name", "variant", variant);
+    }
+
+    public ItemBuilder withGivenName(String givenName) {
+        return setMetadataSingleValue(item, "person", "givenName", null, givenName);
+    }
+
+    public ItemBuilder withFamilyName(String familyName) {
+        return setMetadataSingleValue(item, "person", "familyName", null, familyName);
+    }
+
+    public ItemBuilder withBirthDate(String birthDate) {
+        return setMetadataSingleValue(item, "person", "birthDate", null, birthDate);
+    }
+
+    public ItemBuilder withGender(String gender) {
+        return setMetadataSingleValue(item, "oairecerif", "person", "gender", gender);
+    }
+
+    public ItemBuilder withJobTitle(String jobTitle) {
+        return setMetadataSingleValue(item, "person", "jobTitle", null, jobTitle);
+    }
+
+    public ItemBuilder withMainAffiliation(String affiliation) {
+        return setMetadataSingleValue(item, "person", "affiliation", "name", affiliation);
+    }
+
+    public ItemBuilder withWorkingGroup(String workingGroup) {
+        return addMetadataValue(item, "crisrp", "workgroup", null, workingGroup);
+    }
+
+    public ItemBuilder withPersonalSiteUrl(String url) {
+        return addMetadataValue(item, "oairecerif", "identifier", "url", url);
+    }
+
+    public ItemBuilder withPersonalSiteTitle(String title) {
+        return addMetadataValue(item, "crisrp", "site", "title", title);
+    }
+
     public ItemBuilder makeUnDiscoverable() {
         item.setDiscoverable(false);
         return this;

@@ -10,6 +10,7 @@ package org.dspace.content.integration.crosswalks;
 import static org.dspace.builder.CollectionBuilder.createCollection;
 import static org.dspace.builder.CommunityBuilder.createCommunity;
 import static org.dspace.builder.ItemBuilder.createItem;
+import static org.dspace.core.CrisConstants.PLACEHOLDER_PARENT_METADATA_VALUE;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
@@ -84,6 +85,45 @@ public class ReferCrosswalkIT extends AbstractIntegrationTestWithDatabase {
         try (FileInputStream fis = getFileInputStream("publication.bib")) {
             String expectedBibtex = IOUtils.toString(fis, Charset.defaultCharset());
             assertThat(out.toString(), equalTo(expectedBibtex));
+        }
+    }
+
+    @Test
+    public void testPersonXmlDisseminate() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        Item item = createItem(context, collection)
+            .withTitle("John Smith")
+            .withFullName("John Smith")
+            .withVariantName("J.S.")
+            .withVariantName("Smith John")
+            .withGivenName("John")
+            .withFamilyName("Smith")
+            .withBirthDate("1992-06-26")
+            .withGender("M")
+            .withJobTitle("Researcher")
+            .withMainAffiliation("University")
+            .withWorkingGroup("First work group")
+            .withWorkingGroup("Second work group")
+            .withPersonalSiteUrl("www.test.com")
+            .withPersonalSiteTitle("Test")
+            .withPersonalSiteUrl("www.john-smith.com")
+            .withPersonalSiteTitle(PLACEHOLDER_PARENT_METADATA_VALUE)
+            .withPersonalSiteUrl("www.site.com")
+            .withPersonalSiteTitle("Site")
+            .build();
+
+        context.restoreAuthSystemState();
+
+        ReferCrosswalk referCrossWalk = referCrosswalkMapper.getReferCrosswalk("person-xml");
+        assertThat(referCrossWalk, notNullValue());
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        referCrossWalk.disseminate(context, item, out);
+
+        try (FileInputStream fis = getFileInputStream("person.xml")) {
+            String expectedXml = IOUtils.toString(fis, Charset.defaultCharset());
+            assertThat(out.toString(), equalTo(expectedXml));
         }
     }
 
