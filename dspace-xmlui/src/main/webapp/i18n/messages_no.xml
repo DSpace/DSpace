@@ -317,6 +317,8 @@
     <message key="xmlui.ArtifactBrowser.FeedbackForm.email_help">Denne adressen brukes til svar på din henvendelse.</message>
     <message key="xmlui.ArtifactBrowser.FeedbackForm.comments">Melding</message>
     <message key="xmlui.ArtifactBrowser.FeedbackForm.submit">Send</message>
+    <message key="xmlui.ArtifactBrowser.FeedbackForm.captcha_help">Legg inn resultatet av summen</message>
+    <message key="xmlui.ArtifactBrowser.FeedbackForm.captcha_error">Feil resultat, prøv igjen</message>
 
     <!-- org.dspace.app.xmlui.artifactbrowser.FeedbackSent.java -->
     <message key="xmlui.ArtifactBrowser.FeedbackSent.title">Gi tilbakemelding</message>

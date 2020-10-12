@@ -21,6 +21,7 @@ import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.Body;
 import org.dspace.app.xmlui.wing.element.Division;
+import org.dspace.app.xmlui.wing.element.Item;
 import org.dspace.app.xmlui.wing.element.List;
 import org.dspace.app.xmlui.wing.element.PageMeta;
 import org.dspace.app.xmlui.wing.element.Text;
@@ -62,7 +63,13 @@ public class FeedbackForm extends AbstractDSpaceTransformer implements Cacheable
     
     private static final Message T_submit =
         message("xmlui.ArtifactBrowser.FeedbackForm.submit");
-    
+
+    private static final Message T_captcha_help =
+            message("xmlui.ArtifactBrowser.FeedbackForm.captcha_help");
+
+    private static final Message T_captcha_error =
+            message("xmlui.ArtifactBrowser.FeedbackForm.captcha_error");
+
     /**
      * Generate the unique caching key.
      * This key must be unique inside the space of this component.
@@ -72,8 +79,9 @@ public class FeedbackForm extends AbstractDSpaceTransformer implements Cacheable
         String email = parameters.getParameter("email","");
         String comments = parameters.getParameter("comments","");
         String page = parameters.getParameter("page","unknown");
-        
-       return HashUtil.hash(email + "-" + comments + "-" + page);
+        String captchaError = parameters.getParameter("captchaError","");
+
+        return HashUtil.hash(email + "-" + comments + "-" + page + "-" + captchaError);
     }
 
     /**
@@ -113,12 +121,22 @@ public class FeedbackForm extends AbstractDSpaceTransformer implements Cacheable
         email.setAutofocus("autofocus");
         email.setLabel(T_email);
         email.setHelp(T_email_help);
+        email.setRequired(true);
         email.setValue(parameters.getParameter("email",""));
         
         TextArea comments = form.addItem().addTextArea("comments");
         comments.setLabel(T_comments);
+        comments.setRequired(true);
         comments.setValue(parameters.getParameter("comments",""));
-        
+
+        //Add simple math captcha
+        Item captcha=form.addItem("captcha", "captcha");
+        captcha.addContent(T_captcha_help);
+        Text captcha_input=captcha.addText("captcha_input");
+        if(parameters.getParameter("captchaError","").equals("true"))
+            captcha_input.addError(T_captcha_error);
+        captcha_input.setLabel("Captcha");
+
         form.addItem().addButton("submit").setValue(T_submit);
         
         feedback.addHidden("page").setValue(parameters.getParameter("page","unknown"));

@@ -2,11 +2,11 @@
 ServerName {{ kundedata[kunde]["virtualhost"] | default(bragevirtualhost) }}
 ServerAdmin webmaster@unit.no
 DocumentRoot /home/httpd/domains/brage.unit.no
-ErrorLog logs/{{ appserver }}_error_log
-CustomLog logs/{{ appserver }}_access_log combined
+ErrorLog logs/{{ appserver.split(".")[0] }}_error_log
+CustomLog logs/{{ appserver.split(".")[0] }}_access_log combined
 RedirectMatch ^/$ https://{{ kundedata[kunde]["virtualhost"] | default(bragevirtualhost) }}/{{ kunde }}-xmlui/
 RedirectMatch ^/{{ kunde }}-xmlui$ https://{{ kundedata[kunde]["virtualhost"] | default(bragevirtualhost) }}/{{ kunde }}-xmlui/
-JkMount /{{ kunde }}-oai/* {{ appserver }}
-JkMount /{{ kunde }}-rest/* {{ appserver }}
-JkMount /{{ kunde }}-xmlui/* {{ appserver }}
+ProxyPass /{{ kunde }}-oai ajp://{{ appserver }}:8009/{{ kunde }}-oai secret={{ ajpsecret }}
+ProxyPass /{{ kunde }}-rest ajp://{{ appserver }}:8009/{{ kunde }}-rest secret={{ ajpsecret }}
+ProxyPass /{{ kunde }}-xmlui ajp://{{ appserver }}:8009/{{ kunde }}-xmlui secret={{ ajpsecret }}
 </VirtualHost>

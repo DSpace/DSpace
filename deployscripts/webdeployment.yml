@@ -1,3 +1,7 @@
+- name: Hent AJP secret
+  set_fact:
+    ajpsecret: "{{ lookup('hashi_vault', 'secret=secret/service/brage/produksjon:ajpsecret auth_method=approle role_id=brage-client-produksjon secret_id=' ~ vault_secret ~ ' url=https://vault.bibsys.no:8200')}}"
+
 - name: Copy VirtualHost configuration file
   template:
     src: virtualhost.conf.j2

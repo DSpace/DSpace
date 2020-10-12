@@ -11,6 +11,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.ConnectException;
+import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -189,6 +190,8 @@ public class OREIngestionCrosswalk
                     log.error("The provided URI failed to return a resource: " + href);
                 } catch (ConnectException fe) {
                     log.error("The provided URI was invalid: " + href);
+                } catch (SocketTimeoutException e) {
+                    log.error("Got timeout while reading " + href, e);
                 }
             } else {
                 throw new CrosswalkException("Entry did not contain link to resource: " + entryId);

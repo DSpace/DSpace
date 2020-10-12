@@ -37,7 +37,7 @@ pipeline {
                     try {
                         timeout(activity: true, time: 120, unit: 'SECONDS') {
                             inputResult = input(id: 'phaseInput', message: 'Velg parametre', parameters: [
-                                    choice(choices: ["utvikle", "test", "produksjon"], name: 'devstep', description: 'Utviklingsfase:'),
+                                    choice(choices: ["produksjon", "utvikle", "test"], name: 'devstep', description: 'Utviklingsfase:'),
                                     choice(choices: kunder, name: 'kunde', description: "Kunde:")
                             ])
                         }

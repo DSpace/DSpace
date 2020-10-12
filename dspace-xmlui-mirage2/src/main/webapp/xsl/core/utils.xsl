@@ -155,4 +155,34 @@
         <xsl:value-of select="substring-after(.,' ')"/>
     </xsl:template>
 
+    <xsl:variable name="global-theme-path">
+        <xsl:value-of
+                select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='theme' and @qualifier='path']">
+        </xsl:value-of>
+    </xsl:variable>
+
+    <xsl:variable name="global-context-path">
+        <xsl:value-of
+                select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath']">
+        </xsl:value-of>
+    </xsl:variable>
+
+    <!-- Prints the absolute path to the resource indicated with the path parameter -->
+    <xsl:template name="print-theme-path">
+        <xsl:param name="path">/</xsl:param>
+        <xsl:variable name="theme-path" select="$global-theme-path" />
+        <xsl:variable name="context-path" select="$global-context-path" />
+
+        <xsl:if test="not(starts-with($path, '/'))">
+            <!-- Imprimo el context path si la URL no es absoluta -->
+            <xsl:value-of select="$context-path" />
+            <xsl:text>/themes/</xsl:text>
+            <xsl:value-of select="$theme-path" />
+            <xsl:if test="not(starts-with($path, '/'))">
+                <xsl:text>/</xsl:text>
+            </xsl:if>
+        </xsl:if>
+        <xsl:value-of select="$path" />
+    </xsl:template>
+
 </xsl:stylesheet>

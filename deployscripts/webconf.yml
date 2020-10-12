@@ -1,0 +1,13 @@
+- name: Definer *.brage.unit.no virtualhost
+  set_fact:
+    bragevirtualhost: "{{ item ~ '.brage.unit.no' }}"
+
+- name: Definer kunde
+  set_fact:
+    kunde: "{{ item }}"
+
+- name: Copy VirtualHost configuration file
+  template:
+    src: virtualhost.conf.j2
+    mode: 0644
+    dest: "{{ webconfpath | default('/etc/httpd/conf/vhosts/active/brage') }}/{{ item }}.conf"
