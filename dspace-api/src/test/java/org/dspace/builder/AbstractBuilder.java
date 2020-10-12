@@ -195,6 +195,10 @@ public abstract class AbstractBuilder<T, S> {
         }
     }
 
+    public static void cleanupBuilderCache() {
+        abstractBuilderCleanupUtil.cleanupMap();
+    }
+
     /**
      * This method will ensure that the DSpaceObject contained within the Builder will be cleaned up properly
      * @throws Exception    If something goes wrong
