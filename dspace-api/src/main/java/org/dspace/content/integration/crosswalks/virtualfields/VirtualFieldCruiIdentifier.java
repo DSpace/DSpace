@@ -8,7 +8,6 @@
 package org.dspace.content.integration.crosswalks.virtualfields;
 
 import java.util.List;
-import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.content.Item;
@@ -30,10 +29,7 @@ public class VirtualFieldCruiIdentifier implements VirtualField {
         this.itemService = itemService;
     }
 
-    public String[] getMetadata(Item item, Map<String, String> fieldCache, String fieldName) {
-        if (fieldCache.containsKey(fieldName)) {
-            return (new String[] { (String) fieldCache.get(fieldName) });
-        }
+    public String[] getMetadata(Item item, String fieldName) {
         List<MetadataValue> mds = itemService.getMetadataByMetadataString(item, "dc.identifier.issn");
         String element = "";
         if (mds != null && mds.size() > 0) {
@@ -53,14 +49,9 @@ public class VirtualFieldCruiIdentifier implements VirtualField {
         }
         String handle = item.getHandle();
         if (StringUtils.isNotBlank(handle)) {
-            fieldCache.put("virtual.cruiidentifier", element + "/" + handle.substring(6));
+            return new String[] { element + "/" + handle.substring(6) };
         } else {
-            fieldCache.put("virtual.cruiidentifier", "ATT-" + item.getID());
-        }
-        if (fieldCache.containsKey(fieldName)) {
-            return (new String[] { (String) fieldCache.get(fieldName) });
-        } else {
-            return null;
+            return new String[] { "ATT-" + item.getID() };
         }
     }
 }

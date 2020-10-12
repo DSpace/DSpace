@@ -7,18 +7,16 @@
  */
 package org.dspace.content.integration.crosswalks.virtualfields;
 
-import java.util.Map;
-
 import org.dspace.content.Item;
 
 public interface VirtualField extends VirtualFieldDisseminator, VirtualFieldIngester {
 
-    public default boolean addMetadata(Item item, Map<String, String> fieldCache, String fieldName, String value) {
+    public default boolean addMetadata(Item item, String fieldName, String value) {
         // NOOP - we won't add any metadata yet, we'll pick it up when we finalize the item
         return true;
     }
 
-    public default boolean finalizeItem(Item item, Map<String, String> fieldCache) {
+    public default boolean finalizeItem(Item item) {
         return false;
     }
 }

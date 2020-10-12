@@ -8,7 +8,6 @@
 package org.dspace.content.integration.crosswalks.virtualfields;
 
 import java.util.List;
-import java.util.Map;
 
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
@@ -30,14 +29,7 @@ public class VirtualFieldPageNumber implements VirtualField {
         this.itemService = itemService;
     }
 
-    public String[] getMetadata(Item item, Map<String, String> fieldCache, String fieldName) {
-        // Check to see if the virtual field is already in the cache
-        // - processing is quite intensive, so we generate all the values on
-        // first request
-        if (fieldCache.containsKey(fieldName)) {
-            return new String[] { fieldCache.get(fieldName) };
-        }
-
+    public String[] getMetadata(Item item, String fieldName) {
         String[] virtualFieldName = fieldName.split("\\.");
         String qualifier = virtualFieldName[2];
         String separator = " - ";
@@ -54,9 +46,9 @@ public class VirtualFieldPageNumber implements VirtualField {
 
         if ((dcvs != null && dcvs.size() > 0) && (dcvs2 != null && dcvs2.size() > 0)) {
             String value = dcvs.get(0).getValue() + separator + dcvs2.get(0).getValue();
-            fieldCache.put(fieldName, value);
             return new String[] { value };
         }
+
         return null;
     }
 }

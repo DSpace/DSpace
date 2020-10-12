@@ -7,20 +7,21 @@
  */
 package org.dspace.content.integration.crosswalks.virtualfields;
 
-import java.util.List;
-import java.util.Map;
-
+import org.apache.commons.lang3.StringUtils;
 import org.dspace.content.Item;
-import org.dspace.content.MetadataValue;
 import org.dspace.content.service.ItemService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * Implements virtual field processing for split pagenumber range information.
+ * Implements virtual field processing to retrieve issued date.
  *
  * @author Mykhaylo Boychuk (mykhaylo.boychuk at 4science.it)
  */
 public class VirtualFieldDate implements VirtualField {
+
+    private final static Logger LOGGER = LoggerFactory.getLogger(VirtualFieldDate.class);
 
     private final ItemService itemService;
 
@@ -29,31 +30,28 @@ public class VirtualFieldDate implements VirtualField {
         this.itemService = itemService;
     }
 
-    public String[] getMetadata(Item item, Map<String, String> fieldCache, String fieldName) {
-        // Check to see if the virtual field is already in the cache
-        // - processing is quite intensive, so we generate all the values on first
-        // request
-        if (fieldCache.containsKey(fieldName)) {
-            return new String[] { fieldCache.get(fieldName) };
+    public String[] getMetadata(Item item, String fieldName) {
+
+        String dateIssued = itemService.getMetadataFirstValue(item, "dc", "date", "issued", Item.ANY);
+        if (StringUtils.isBlank(dateIssued)) {
+            return new String[] {};
+        }
+
+        if (dateIssued.length() < 4) {
+            LOGGER.warn("Invalid dc.date.issued found for item " + item.getID() + ": " + dateIssued);
+            return new String[] {};
         }
 
         String[] virtualFieldName = fieldName.split("\\.");
-        String qualifier = virtualFieldName[1];
+        String qualifier = virtualFieldName.length == 3 ? virtualFieldName[2] : "year";
 
-        if (qualifier.equals("date")) {
-            // Get the citation from the item
-            List<MetadataValue> dcvs = itemService.getMetadataByMetadataString(item, fieldName);
-            if (dcvs != null && dcvs.size() > 0) {
-                fieldCache.put("virtual.date.year", dcvs.get(0).getValue().substring(0, 4));
-                if (dcvs.get(0).getValue().length() > 4) {
-                    fieldCache.put("virtual.date.month", dcvs.get(0).getValue().substring(5, 7));
-                }
-                // Return the value of the virtual field (if any)
-                if (fieldCache.containsKey(fieldName)) {
-                    return new String[] { fieldCache.get(fieldName) };
-                }
-            }
+        switch (qualifier) {
+            case "month":
+                return dateIssued.length() > 7 ? new String[] { dateIssued.substring(5, 7) } : new String[] {};
+            case "year":
+            default:
+                return new String[] { dateIssued.substring(0, 4) };
+
         }
-        return null;
     }
 }

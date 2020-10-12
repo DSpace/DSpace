@@ -8,7 +8,6 @@
 package org.dspace.content.integration.crosswalks.virtualfields;
 
 import java.util.List;
-import java.util.Map;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -32,7 +31,7 @@ public class VirtualFieldBibtexAuthors implements VirtualField {
         this.itemService = itemService;
     }
 
-    public String[] getMetadata(Item item, Map<String, String> fieldCache, String fieldName) {
+    public String[] getMetadata(Item item, String fieldName) {
 
         String metadata = "dc.contributor.author";
 

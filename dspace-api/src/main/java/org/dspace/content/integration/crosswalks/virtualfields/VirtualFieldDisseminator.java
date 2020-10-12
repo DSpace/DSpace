@@ -6,7 +6,6 @@
  * http://www.dspace.org/license/
  */
 package org.dspace.content.integration.crosswalks.virtualfields;
-import java.util.Map;
 
 import org.dspace.content.Item;
 
@@ -26,5 +25,5 @@ import org.dspace.content.Item;
  */
 public interface VirtualFieldDisseminator {
 
-    public String[] getMetadata(Item item, Map<String, String> fieldCache, String fieldName);
+    public String[] getMetadata(Item item, String fieldName);
 }

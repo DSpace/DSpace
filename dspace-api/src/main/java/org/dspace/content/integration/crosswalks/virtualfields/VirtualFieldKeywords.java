@@ -8,7 +8,6 @@
 package org.dspace.content.integration.crosswalks.virtualfields;
 
 import java.util.List;
-import java.util.Map;
 
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
@@ -34,7 +33,7 @@ public class VirtualFieldKeywords implements VirtualField {
         this.configurationService = configurationService;
     }
 
-    public String[] getMetadata(Item item, Map<String, String> fieldCache, String fieldName) {
+    public String[] getMetadata(Item item, String fieldName) {
         // Get the citation from the item
         String keywordsDC = configurationService.getProperty("crosswalk.virtualkeywords.value", "dc.subject.keywords");
 

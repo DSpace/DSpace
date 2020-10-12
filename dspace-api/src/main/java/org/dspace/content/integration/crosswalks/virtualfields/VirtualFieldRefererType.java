@@ -7,9 +7,12 @@
  */
 package org.dspace.content.integration.crosswalks.virtualfields;
 
-import java.util.Map;
+import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+import org.dspace.app.util.DCInputSet;
+import org.dspace.app.util.DCInputsReader;
+import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,13 +31,27 @@ public class VirtualFieldRefererType implements VirtualField {
         this.configurationService = configurationService;
     }
 
-    public String[] getMetadata(Item item, Map<String, String> fieldCache, String fieldName) {
+    public String[] getMetadata(Item item, String fieldName) {
         String[] virtualFieldName = fieldName.split("\\.");
         String qualifier = virtualFieldName[2];
-        String type = configurationService.getProperty(PROPERTY_PREFIX + qualifier + "." + fieldCache.get("formAlias"));
+        String type = configurationService.getProperty(PROPERTY_PREFIX + qualifier + "." + getAliasForm(item));
         if (StringUtils.isNotBlank(type)) {
             return new String[] { type };
         }
         return new String[] { configurationService.getProperty(PROPERTY_PREFIX + qualifier) };
+    }
+
+    private String getAliasForm(Item item) {
+        try {
+            Collection collection = item.getOwningCollection();
+            // Read the input form file for the specific collection
+            DCInputsReader inputsReader = new DCInputsReader();
+
+            List<DCInputSet> inputSet = inputsReader.getInputsByCollection(collection);
+            DCInputSet dci = inputSet.get(0);
+            return dci.getFormName();
+        } catch (Exception e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
     }
 }

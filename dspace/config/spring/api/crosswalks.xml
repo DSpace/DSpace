@@ -13,7 +13,7 @@
 	</bean>
 	
 	<bean class="org.dspace.content.integration.crosswalks.ReferCrosswalk" id="referCrosswalkBibtex">
-		<constructor-arg name="templateFileName" value="crosswalks/bibtex.template"/>
+		<constructor-arg name="templateFileName" value="crosswalks/template/bibtex.template"/>
 		<constructor-arg name="mimeType" value="application/x-bibtex; charset=UTF-8"/>
 		<constructor-arg name="fileName" value="references.bib"/>
 	</bean>
@@ -31,9 +31,6 @@
 				<entry key="uniqueidentifier" value-ref="virtualFieldUniqueIdentifier" />
 				<entry key="cruiidentifier" value-ref="virtualFieldCruiIdentifier" />
 				<entry key="handlelocalname" value-ref="virtualFieldHandleLocalNameIdentifier" />
-				<entry key="crossrefauthor" value-ref="virtualFieldCrossrefAuthor" />
-				<entry key="crossrefisbn" value-ref="virtualFieldCrossrefISBN" />
-				<entry key="crossrefissued" value-ref="virtualFieldCrossrefIssued" />
 			</map>
 		</constructor-arg>
 	</bean>
@@ -48,8 +45,5 @@
 	<bean class="org.dspace.content.integration.crosswalks.virtualfields.VirtualFieldUniqueIdentifier" id="virtualFieldUniqueIdentifier"/>
 	<bean class="org.dspace.content.integration.crosswalks.virtualfields.VirtualFieldCruiIdentifier" id="virtualFieldCruiIdentifier"/>
 	<bean class="org.dspace.content.integration.crosswalks.virtualfields.VirtualFieldHandleLocalNameIdentifier" id="virtualFieldHandleLocalNameIdentifier"/>
-	<bean class="org.dspace.content.integration.crosswalks.virtualfields.VirtualFieldCrossrefAuthor" id="virtualFieldCrossrefAuthor"/>
-	<bean class="org.dspace.content.integration.crosswalks.virtualfields.VirtualFieldCrossrefISBN" id="virtualFieldCrossrefISBN"/>
-	<bean class="org.dspace.content.integration.crosswalks.virtualfields.VirtualFieldCrossrefIssued" id="virtualFieldCrossrefIssued"/>
 	
 </beans>

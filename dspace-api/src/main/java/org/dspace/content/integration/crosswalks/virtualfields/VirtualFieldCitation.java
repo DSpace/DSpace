@@ -8,7 +8,6 @@
 package org.dspace.content.integration.crosswalks.virtualfields;
 
 import java.io.ByteArrayOutputStream;
-import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.dspace.content.Item;
@@ -26,7 +25,7 @@ public class VirtualFieldCitation implements VirtualField {
 
     private static Logger log = Logger.getLogger(VirtualFieldCitation.class);
 
-    public String[] getMetadata(Item item, Map<String, String> fieldCache, String fieldName) {
+    public String[] getMetadata(Item item, String fieldName) {
         StreamDisseminationCrosswalk crosswalk = getStreamDisseminationCrosswalk(fieldName);
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         String[] result = null;

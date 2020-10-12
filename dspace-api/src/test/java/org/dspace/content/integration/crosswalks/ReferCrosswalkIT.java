@@ -67,6 +67,7 @@ public class ReferCrosswalkIT extends AbstractIntegrationTestWithDatabase {
 
         Item item = createItem(context, collection)
             .withTitle("Publication title")
+            .withIssueDate("2018-05-17")
             .withAuthor("John Smith")
             .withAuthor("Edward Red")
             .withHandle("123456789/0001")
