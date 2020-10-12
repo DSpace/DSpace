@@ -11,9 +11,11 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
 
+import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Item;
 import org.dspace.content.edit.EditItemMode;
 import org.dspace.core.Context;
+import org.dspace.eperson.EPerson;
 
 /**
  * @author Danilo Di Nuzzo (danilo.dinuzzo at 4science.it)
@@ -48,5 +50,11 @@ public interface EditItemModeService {
      * @return
      * @throws SQLException
      */
-    EditItemMode findMode(Context context, UUID itemId, String name) throws SQLException;
+    EditItemMode findMode(Context context, Item item, String name) throws SQLException;
+
+    boolean hasAccess(Context context, Item item, EPerson currentUser, EditItemMode editMode)
+        throws SQLException, AuthorizeException;
+
+    public List<EditItemMode> findModes(Context context, Item item, boolean checkSecurity)
+        throws SQLException, AuthorizeException;
 }

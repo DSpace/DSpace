@@ -13,12 +13,15 @@ import java.util.UUID;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.model.EditItemModeRest;
+import org.dspace.content.Item;
 import org.dspace.content.edit.EditItemMode;
 import org.dspace.content.edit.service.EditItemModeService;
+import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
@@ -32,6 +35,9 @@ public class EditItemModeRestRepository
 
     @Autowired
     private EditItemModeService eimService;
+
+    @Autowired
+    ItemService itemService;
 
     /* (non-Javadoc)
      * @see org.dspace.app.rest.repository.DSpaceRestRepository#findOne(org.dspace.core.Context, java.io.Serializable)
@@ -51,7 +57,12 @@ public class EditItemModeRestRepository
                     "Given parameters are incomplete. Expected <UUID-ITEM>:<MODE>, Received: " + data);
         }
         try {
-            mode = eimService.findMode(context, UUID.fromString(uuid), modeName);
+            UUID itemUuid = UUID.fromString(uuid);
+            Item item = itemService.find(context, itemUuid);
+            if (item == null) {
+                throw new ResourceNotFoundException("No such item with uuid : " + itemUuid);
+            }
+            mode = eimService.findMode(context, item, modeName);
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }

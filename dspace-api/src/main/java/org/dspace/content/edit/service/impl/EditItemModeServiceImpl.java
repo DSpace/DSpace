@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
@@ -51,6 +52,10 @@ public class EditItemModeServiceImpl implements EditItemModeService {
      */
     @Override
     public List<EditItemMode> findModes(Context context, Item item) throws SQLException {
+        return findModes(context, item, true);
+    }
+
+    public List<EditItemMode> findModes(Context context, Item item, boolean checkSecurity) throws SQLException {
         List<EditItemMode> editModes = new ArrayList<>();
         String entityType = "";
         if ( item != null ) {
@@ -67,44 +72,9 @@ public class EditItemModeServiceImpl implements EditItemModeService {
                         // Check if the current user is an Administrator
                         boolean isAdmin = authorizeService.isAdmin(context);
                         // Filter for user permissions
-                        for (EditItemMode editMode: configuredModes) {
-                            if ( ( editMode.getSecurity().equals(EditItemModeSecurity.ADMIN) ||
-                                    editMode.getSecurity().equals(EditItemModeSecurity.ADMIN_OWNER) )
-                                    && isAdmin) {
+                        for (EditItemMode editMode : configuredModes) {
+                            if (!checkSecurity || hasAccess(context, item, currentUser, isOwner, isAdmin, editMode)) {
                                 editModes.add(editMode);
-                            } else if ( ( editMode.getSecurity().equals(EditItemModeSecurity.OWNER) ||
-                                    editMode.getSecurity().equals(EditItemModeSecurity.ADMIN_OWNER) )
-                                    && isOwner) {
-                                editModes.add(editMode);
-                            } else if (editMode.getSecurity().equals(EditItemModeSecurity.CUSTOM)) {
-                                boolean found = false;
-                                if (editMode.getGroups() != null) {
-                                    List<Group> userGroups = currentUser.getGroups();
-                                    if (userGroups != null && !userGroups.isEmpty()) {
-                                        for (Group group: userGroups) {
-                                            for (String metadataGroup: editMode.getGroups()) {
-                                                if (check(context, item, metadataGroup,
-                                                        group.getID().toString())) {
-                                                    editModes.add(editMode);
-                                                    found = true;
-                                                    break;
-                                                }
-                                            }
-                                            if (found) {
-                                                break;
-                                            }
-                                        }
-                                    }
-                                }
-                                if (!found && editMode.getUsers() != null) {
-                                    for (String metadataUser: editMode.getUsers()) {
-                                        if (check(context, item, metadataUser,
-                                                currentUser.getID().toString())) {
-                                            editModes.add(editMode);
-                                            break;
-                                        }
-                                    }
-                                }
                             }
                         }
                     }
@@ -112,6 +82,55 @@ public class EditItemModeServiceImpl implements EditItemModeService {
             }
         }
         return editModes;
+    }
+
+    public boolean hasAccess(Context context, Item item, EPerson currentUser, EditItemMode editMode)
+            throws SQLException, AuthorizeException {
+        // Check if the current user is the owner of the given item
+        boolean isOwner = isOwner(item, currentUser);
+        // Check if the current user is an Administrator
+        boolean isAdmin = authorizeService.isAdmin(context);
+        return hasAccess(context, item, currentUser, isOwner, isAdmin, editMode);
+    }
+
+    private boolean hasAccess(Context context, Item item, EPerson currentUser, boolean isOwner,
+            boolean isAdmin, EditItemMode editMode) throws SQLException {
+        if ( ( editMode.getSecurity().equals(EditItemModeSecurity.ADMIN) ||
+                editMode.getSecurity().equals(EditItemModeSecurity.ADMIN_OWNER) )
+                && isAdmin) {
+            return true;
+        } else if ( ( editMode.getSecurity().equals(EditItemModeSecurity.OWNER) ||
+                editMode.getSecurity().equals(EditItemModeSecurity.ADMIN_OWNER) )
+                && isOwner) {
+            return true;
+        } else if (editMode.getSecurity().equals(EditItemModeSecurity.CUSTOM)) {
+            boolean found = false;
+            if (editMode.getGroups() != null) {
+                List<Group> userGroups = currentUser.getGroups();
+                if (userGroups != null && !userGroups.isEmpty()) {
+                    for (Group group: userGroups) {
+                        for (String metadataGroup: editMode.getGroups()) {
+                            if (check(context, item, metadataGroup,
+                                    group.getID().toString())) {
+                                return true;
+                            }
+                        }
+                        if (found) {
+                            break;
+                        }
+                    }
+                }
+            }
+            if (!found && editMode.getUsers() != null) {
+                for (String metadataUser: editMode.getUsers()) {
+                    if (check(context, item, metadataUser,
+                            currentUser.getID().toString())) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
     }
 
     /* (non-Javadoc)
@@ -126,8 +145,8 @@ public class EditItemModeServiceImpl implements EditItemModeService {
      * @see org.dspace.content.edit.service.EditItemModeService#findMode(org.dspace.core.Context, java.lang.String)
      */
     @Override
-    public EditItemMode findMode(Context context, UUID itemId, String name) throws SQLException {
-        List<EditItemMode> modes = findModes(context, itemService.find(context, itemId));
+    public EditItemMode findMode(Context context, Item item, String name) throws SQLException {
+        List<EditItemMode> modes = findModes(context, item, false);
         return modes.stream()
                 .filter(mode -> mode.getName().equalsIgnoreCase(name))
                 .findFirst()
@@ -141,7 +160,13 @@ public class EditItemModeServiceImpl implements EditItemModeService {
      * @return
      */
     private boolean isOwner(Item item, EPerson eperson) {
-        return item.getSubmitter().getID().equals(eperson.getID());
+        List<MetadataValue> values = itemService.getMetadata(item, "cris", "owner", null, Item.ANY);
+        for (MetadataValue value : values) {
+            if (value.getAuthority().equals(eperson.getID().toString())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public Map<String, List<EditItemMode>> getEditModesMap() {

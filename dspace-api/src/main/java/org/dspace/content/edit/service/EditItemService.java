@@ -12,6 +12,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 
+import org.dspace.authorize.AuthorizeException;
+import org.dspace.content.Item;
 import org.dspace.content.edit.EditItem;
 import org.dspace.content.service.InProgressSubmissionService;
 import org.dspace.content.service.ItemService;
@@ -41,6 +43,6 @@ public interface EditItemService extends InProgressSubmissionService<EditItem> {
 
     public EditItem find(Context context, UUID id) throws SQLException;
 
-    public EditItem find(Context context, UUID id, String mode) throws SQLException;
+    public EditItem find(Context context, Item item, String mode) throws SQLException, AuthorizeException;
 
 }
