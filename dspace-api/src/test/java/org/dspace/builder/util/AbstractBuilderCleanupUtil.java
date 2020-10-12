@@ -95,6 +95,9 @@ public class AbstractBuilderCleanupUtil {
         }
     }
 
+    /**
+     * Clears and re-initialises the map of builders
+     */
     public void cleanupMap() {
         this.map.clear();
         initMap();

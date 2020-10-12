@@ -195,6 +195,9 @@ public abstract class AbstractBuilder<T, S> {
         }
     }
 
+    /**
+     * This method will cleanup the map of builders
+     */
     public static void cleanupBuilderCache() {
         abstractBuilderCleanupUtil.cleanupMap();
     }
