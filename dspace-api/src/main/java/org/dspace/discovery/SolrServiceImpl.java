@@ -461,32 +461,41 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                 // Query for all indexed Items, Collections and Communities,
                 // returning just their handle
                 query.setFields(HANDLE_FIELD);
+                query.addSort(HANDLE_FIELD, SolrQuery.ORDER.asc);
                 query.setQuery(RESOURCE_TYPE_FIELD + ":[2 TO 4]");
-                QueryResponse rsp = getSolr().query(query, SolrRequest.METHOD.POST);
-                SolrDocumentList docs = rsp.getResults();
 
-                Iterator iter = docs.iterator();
-                while (iter.hasNext())
-                {
+                // Get the total amount of results
+                QueryResponse totalResponse = getSolr().query(query);
+                long total = totalResponse.getResults().getNumFound();
 
-                 SolrDocument doc = (SolrDocument) iter.next();
+                int start = 0;
+                int batch = 100;
 
-                String handle = (String) doc.getFieldValue(HANDLE_FIELD);
+                query.setRows(batch);
+                while (start < total) {
+                    query.setStart(start);
+                    QueryResponse rsp = getSolr().query(query, SolrRequest.METHOD.POST);
+                    SolrDocumentList docs = rsp.getResults();
 
-                DSpaceObject o = handleService.resolveToObject(context, handle);
+                    for (SolrDocument doc : docs) {
+                        String handle = (String) doc.getFieldValue(HANDLE_FIELD);
 
-                if (o == null)
-                {
-                    log.info("Deleting: " + handle);
-                    /*
-                          * Use IndexWriter to delete, its easier to manage
-                          * write.lock
-                          */
-                    unIndexContent(context, handle);
-                } else {
-                    log.debug("Keeping: " + handle);
+                        DSpaceObject o = handleService.resolveToObject(context, handle);
+
+                        if (o == null) {
+                            log.info("Deleting: " + handle);
+                            /*
+                             * Use IndexWriter to delete, its easier to manage
+                             * write.lock
+                             */
+                            unIndexContent(context, handle);
+                        } else {
+                            log.debug("Keeping: " + handle);
+                        }
+                    }
+
+                    start += batch;
                 }
-            }
             }
         } catch(Exception e)
         {

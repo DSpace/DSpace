@@ -16,8 +16,11 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
+import java.net.Inet4Address;
+import java.net.Inet6Address;
 import java.net.InetAddress;
 import java.net.URLEncoder;
+import java.net.UnknownHostException;
 import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -110,7 +113,10 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
 
     private static List<String> statisticYearCores = new ArrayList<String>();
     private static boolean statisticYearCoresInit = false;
-    
+
+    private static final String IP_V4_REGEX = "^((?:\\d{1,3}\\.){3})\\d{1,3}$";
+    private static final String IP_V6_REGEX = "^(.*):.*:.*$";
+
     @Autowired(required = true)
     protected BitstreamService bitstreamService;
     @Autowired(required = true)
@@ -171,19 +177,22 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
             } catch (FileNotFoundException fe) {
                 log.error(
                     "The GeoLite Database file is missing (" + dbPath + ")! Solr Statistics cannot generate location " +
-                        "based reports! Please see the DSpace installation instructions for instructions to install " +
-                        "this file.",
+                        "based reports! GeoLite databases are now managed outside of DSpace. " +
+                        "Please see the DSpace installation instructions for more information.",
                     fe);
             } catch (IOException e) {
                 log.error(
-                    "Unable to load GeoLite Database file (" + dbPath + ")! You may need to reinstall it. See the " +
-                        "DSpace installation instructions for more details.",
+                    "Unable to load GeoLite Database file (" + dbPath + ")! You may need to reinstall it. " +
+                            "GeoLite databases are now managed outside of DSpace. " +
+                            "Please see the DSpace installation instructions for more information.",
                     e);
             }
         }
         else
         {
-            log.error("The required 'dbfile' configuration is missing in solr-statistics.cfg!");
+            log.error("The required 'dbfile' configuration is missing in usage-statistics.cfg! " +
+                    "GeoLite databases are now managed outside of DSpace. " +
+                    "Please see the DSpace installation instructions for more information.");
         }
         locationService = service;
 
@@ -311,7 +320,15 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
                 }
             }
 
-            doc1.addField("ip", ip);
+            if (configurationService.getBooleanProperty("anonymize_statistics.anonymize_on_log", false)) {
+                try {
+                    doc1.addField("ip", anonymizeIp(ip));
+                } catch (UnknownHostException e) {
+                    log.warn(e.getMessage(), e);
+                }
+            } else {
+                doc1.addField("ip", ip);
+            }
 
             //Also store the referrer
             if(request.getHeader("referer") != null){
@@ -320,7 +337,11 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
 
             try
             {
-                String dns = DnsLookup.reverseDns(ip);
+                String dns = configurationService.getProperty("anonymize_statistics.dns_mask", "anonymized");
+                if (!configurationService.getBooleanProperty("anonymize_statistics.anonymize_on_log", false)) {
+                    dns = DnsLookup.reverseDns(ip);
+                }
+
                 doc1.addField("dns", dns.toLowerCase());
             }
             catch (Exception e)
@@ -404,11 +425,23 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
                     }
                 }
 
-            doc1.addField("ip", ip);
+                if (configurationService.getBooleanProperty("anonymize_statistics.anonymize_on_log", false)) {
+                    try {
+                        doc1.addField("ip", anonymizeIp(ip));
+                    } catch (UnknownHostException e) {
+                        log.warn(e.getMessage(), e);
+                    }
+                } else {
+                    doc1.addField("ip", ip);
+                }
 
             try
             {
-                String dns = DnsLookup.reverseDns(ip);
+                String dns = configurationService.getProperty("anonymize_statistics.dns_mask", "anonymized");
+                if (!configurationService.getBooleanProperty("anonymize_statistics.anonymize_on_log", false)) {
+                    dns = DnsLookup.reverseDns(ip);
+                }
+
                 doc1.addField("dns", dns.toLowerCase());
             }
             catch (Exception e)
@@ -665,6 +698,7 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
             Map<String, String> params = new HashMap<String, String>();
             params.put("q", query);
             params.put("rows", "10");
+            params.put("fl","[shard],*");
             if(0 < statisticYearCores.size()){
                 params.put(ShardParams.SHARDS, StringUtils.join(statisticYearCores.iterator(), ','));
             }
@@ -802,6 +836,14 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
             List<String> fieldNames, List<List<Object>> fieldValuesList)
             throws SolrServerException, IOException
     {
+        update(query, action, fieldNames, fieldValuesList, true);
+    }
+
+    @Override
+    public void update(String query, String action,
+            List<String> fieldNames, List<List<Object>> fieldValuesList, boolean commit)
+            throws SolrServerException, IOException
+    {
         // Since there is NO update
         // We need to get our documents
         // QueryResponse queryResponse = solr.query()//query(query, null, -1,
@@ -818,13 +860,14 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
 
         processor.execute(query);
 
-        // We have all the docs delete the ones we don't need
-        solr.deleteByQuery(query);
-
         // Add the new (updated onces
         for (int i = 0; i < docsToUpdate.size(); i++)
         {
             SolrDocument solrDocument = docsToUpdate.get(i);
+
+            HttpSolrServer shard = new HttpSolrServer("http://" + solrDocument.getFieldValue("[shard]"));
+            shard.deleteByQuery("uid:" + solrDocument.getFieldValue("uid"));
+
             // Now loop over our fieldname actions
             for (int j = 0; j < fieldNames.size(); j++)
             {
@@ -859,11 +902,19 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
                     }
                 }
             }
+
+            solrDocument.removeFields("_version_");
+            solrDocument.removeFields("[shard]");
+
             SolrInputDocument newInput = ClientUtils
                     .toSolrInputDocument(solrDocument);
-            solr.add(newInput);
+
+            shard.add(newInput);
+
+            if (commit) {
+                shard.commit();
+            }
         }
-        solr.commit();
         // System.out.println("SolrLogger.update(\""+query+"\"):"+(new
         // Date().getTime() - start)+"ms,"+numbFound+"records");
     }
@@ -1035,11 +1086,19 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
     }
 
     @Override
-    public QueryResponse query(String query, String filterQuery,
-            String facetField, int rows, int max, String dateType, String dateStart,
-            String dateEnd, List<String> facetQueries, String sort, boolean ascending)
-            throws SolrServerException
-    {
+    public QueryResponse query(String query, String filterQuery, String facetField, int rows, int max, String dateType, String dateStart, String dateEnd, List<String> facetQueries, String sort, boolean ascending) throws SolrServerException {
+
+        return query(query, filterQuery, facetField, rows, max, dateType, dateStart, dateEnd, facetQueries, sort, ascending, true);
+    }
+
+    @Override
+    public QueryResponse query(String query, String filterQuery, String facetField, int rows, int max, String dateType, String dateStart, String dateEnd, List<String> facetQueries, String sort, boolean ascending, boolean defaultFilterQueries) throws SolrServerException {
+        return query(query, filterQuery, facetField, rows, max, dateType, dateStart, dateEnd, facetQueries, sort, ascending, defaultFilterQueries, false);
+    }
+
+    @Override
+    public QueryResponse query(String query, String filterQuery, String facetField, int rows, int max, String dateType, String dateStart, String dateEnd, List<String> facetQueries, String sort, boolean ascending, boolean defaultFilterQueries, boolean includeShardField) throws SolrServerException {
+
         if (solr == null)
         {
             return null;
@@ -1049,6 +1108,10 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
         SolrQuery solrQuery = new SolrQuery().setRows(rows).setQuery(query)
                 .setFacetMinCount(1);
         addAdditionalSolrYearCores(solrQuery);
+
+        if (includeShardField) {
+            solrQuery.setParam("fl", "[shard],*");
+        }
 
         // Set the date facet if present
         if (dateType != null)
@@ -1094,14 +1157,14 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
         // not be influenced
 
         // Choose to filter by the Legacy spider IP list (may get too long to properly filter all IP's
-        if(configurationService.getBooleanProperty("solr-statistics.query.filter.spiderIp",false))
+        if (defaultFilterQueries && configurationService.getBooleanProperty("solr-statistics.query.filter.spiderIp",false))
         {
             solrQuery.addFilterQuery(getIgnoreSpiderIPs());
         }
 
         // Choose to filter by isBot field, may be overriden in future
         // to allow views on stats based on bots.
-        if(configurationService.getBooleanProperty("solr-statistics.query.filter.isBot",true))
+        if (defaultFilterQueries && configurationService.getBooleanProperty("solr-statistics.query.filter.isBot",true))
         {
             solrQuery.addFilterQuery("-isBot:true");
         }
@@ -1111,7 +1174,7 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
         }
 
         String[] bundles = configurationService.getArrayProperty("solr-statistics.query.filter.bundles");
-        if(bundles != null && bundles.length > 0){
+        if (defaultFilterQueries && bundles != null && bundles.length > 0) {
 
             /**
              * The code below creates a query that will allow only records which do not have a bundlename
@@ -1535,6 +1598,17 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
         }
     }
 
+    @Override
+    public void commit() throws Exception {
+        solr.commit();
+    }
+
+    @Override
+    public void commitShard(String shard) throws Exception {
+        HttpSolrServer shardSolr = new HttpSolrServer("http://" + shard);
+        shardSolr.commit();
+    }
+
     protected void addDocumentsToFile(Context context, SolrDocumentList docs, File exportOutput) throws SQLException, ParseException, IOException {
         for(SolrDocument doc : docs) {
             String ip = doc.get("ip").toString();
@@ -1634,5 +1708,16 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
             log.error(e.getMessage(), e);
         }
         statisticYearCoresInit = true;
+    }
+
+    public Object anonymizeIp(String ip) throws UnknownHostException {
+        InetAddress address = InetAddress.getByName(ip);
+        if (address instanceof Inet4Address) {
+            return ip.replaceFirst(IP_V4_REGEX, "$1" + configurationService.getProperty("anonymize_statistics.ip_v4_mask", "255"));
+        } else if (address instanceof Inet6Address) {
+            return ip.replaceFirst(IP_V6_REGEX, "$1:" + configurationService.getProperty("anonymize_statistics.ip_v6_mask", "FFFF:FFFF"));
+        }
+
+        throw new UnknownHostException("unknown ip format");
     }
 }

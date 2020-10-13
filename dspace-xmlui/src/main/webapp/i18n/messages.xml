@@ -961,7 +961,7 @@
     <message key="xmlui.Submission.submit.CCLicenseStep.license">License Type</message>
     <message key="xmlui.Submission.submit.CCLicenseStep.select_change">Select or modify your license ...</message>
     <message key="xmlui.Submission.submit.CCLicenseStep.no_license">No Creative Commons License</message>
-    <message key="xmlui.Submission.submit.CCLicenseStep.save_changes">You must click Next to save your changes.</message>
+    <message key="xmlui.Submission.submit.CCLicenseStep.save_changes">You must click Next to save your changes.</message><message key="xmlui.Submission.submit.CCLicenseStep.error"><strong>ERROR</strong>: Creative Commons API not accessible.<br/>You may continue the submission but you will not be able to select a Creative Commons license.</message>
 
     <!-- org.dspace.app.xmlui.Submission.submit.LicenseStep -->
     <message key="xmlui.Submission.submit.LicenseStep.head">Distribution License</message>

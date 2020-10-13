@@ -1,7 +1,6 @@
-DSpace source code license:
+DSpace source code BSD License:
 
-
-Copyright (c) 2002-2018, DuraSpace.  All rights reserved.
+Copyright (c) 2002-2020, LYRASIS.  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are
@@ -34,7 +33,7 @@ DAMAGE.
 
 
 DSpace uses third-party libraries which may be distributed under
-different licenses to the above. Information about these licenses 
-is detailed in the LICENSES_THIRD_PARTY file at the root of the source 
-tree.  You must agree to the terms of these licenses, in addition to 
+different licenses to the above. Information about these licenses
+is detailed in the LICENSES_THIRD_PARTY file at the root of the source
+tree.  You must agree to the terms of these licenses, in addition to
 the above DSpace source code license, in order to use this software.

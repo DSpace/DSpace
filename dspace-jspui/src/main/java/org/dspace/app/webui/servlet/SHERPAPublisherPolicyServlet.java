@@ -9,7 +9,9 @@ package org.dspace.app.webui.servlet;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 
@@ -18,10 +20,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-import org.dspace.app.sherpa.SHERPAJournal;
-import org.dspace.app.sherpa.SHERPAPublisher;
-import org.dspace.app.sherpa.SHERPAResponse;
+import org.dspace.app.sherpa.v2.SHERPAJournal;
+import org.dspace.app.sherpa.v2.SHERPAPublisher;
+import org.dspace.app.sherpa.v2.SHERPAPublisherPolicy;
+import org.dspace.app.sherpa.v2.SHERPAResponse;
 import org.dspace.app.sherpa.submit.SHERPASubmitService;
+import org.dspace.app.sherpa.v2.SHERPASystemMetadata;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
@@ -63,38 +67,26 @@ public class SHERPAPublisherPolicyServlet extends DSpaceServlet
         {
             return;
         }
-        SHERPAResponse shresp = sherpaSubmitService.searchRelatedJournals(
-                context, item);
-        if (shresp.isError())
-        {
-            request.setAttribute("error", Boolean.TRUE);
-        }
-        else
-        {
-            List<SHERPAJournal> journals = shresp.getJournals();
-            if (journals != null)
-            {
-                Object[][] results = new Object[journals.size()][];
-                if (journals.size() > 0)
-                {
-                    Iterator<SHERPAJournal> ijourn = journals.iterator();
-                    int idx = 0;
-                    while (ijourn.hasNext())
-                    {
-                        SHERPAJournal journ = ijourn.next();
-                        List<SHERPAPublisher> publishers = shresp
-                                .getPublishers();
-                        results[idx] = new Object[] {
-                                journ,
-                                publishers != null && publishers.size() > 0 ? publishers
-                                        .get(0) : null };
-                        idx++;
-                    }
-                }
+        List<SHERPAResponse> responses = sherpaSubmitService.searchRelatedJournals(context, item);
+        List<SHERPAResponse> sherpaResponses = new LinkedList<>();
+        // The new structure means we should handle multiple *responses*, (the API 'item' object) not just
+        // multiple journals within a single response.
+        // Only return responses with valid results, unless there are only errors
 
-                request.setAttribute("result", results);
+        boolean all_errors = true;
+        boolean some_errors = false;
+        for (SHERPAResponse sherpaResponse : responses) {
+            if (sherpaResponse.isError()) {
+                some_errors = true;
+            } else {
+                all_errors = false;
             }
+            sherpaResponses.add(sherpaResponse);
         }
+        request.setAttribute("sherpaResponses", sherpaResponses);
+        request.setAttribute("error", all_errors);
+        request.setAttribute("some_errors", some_errors);
+
         // Simply forward to the plain form
         JSPManager.showJSP(request, response, "/sherpa/sherpa-policy.jsp");
     }

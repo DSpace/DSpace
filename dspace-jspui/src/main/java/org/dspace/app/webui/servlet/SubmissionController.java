@@ -1757,21 +1757,23 @@ public class SubmissionController extends DSpaceServlet
                     // throw IOException to handle it in the calling method
                     throw e;
                 }
+                finally {
+                    try
+                    {
+                        if (is != null)
+                        {
+                            is.close();
+                        }
+                    }
+                    catch (IOException ex)
+                    {
+                        // nothing to do here
+                    }
+                }
             }
         } 
         finally 
         {
-            try 
-            {
-                if (is != null) 
-                {
-                    is.close();
-                }
-            } 
-            catch (IOException ex) 
-            {
-                // nothing to do here
-            }
             try 
             {
                 if (os != null) 
