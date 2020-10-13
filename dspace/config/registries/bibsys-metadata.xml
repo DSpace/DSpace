@@ -3,7 +3,7 @@
 <dspace-dc-types>
 
     <dspace-header>
-        <title>Bibsys Metadata Registry</title>
+        <title>Unit Metadata Registry</title>
     </dspace-header>
 
     <!-- schemas used -->
@@ -12,13 +12,6 @@
         <name>dc</name>
         <namespace>http://dublincore.org/documents/dcmi-terms/</namespace>
     </dc-schema>
-
-    <dc-type>
-        <schema>dc</schema>
-        <element>contributor</element>
-        <qualifier>author</qualifier>
-        <scope_note>Use for author</scope_note>
-    </dc-type>
 
     <dc-type>
         <schema>dc</schema>
@@ -37,8 +30,22 @@
     <dc-type>
         <schema>dc</schema>
         <element>contributor</element>
+        <qualifier>author</qualifier>
+        <scope_note>Use for author</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>dc</schema>
+        <element>contributor</element>
         <qualifier>editor</qualifier>
         <scope_note>Use for editor</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>dc</schema>
+        <element>contributor</element>
+        <qualifier>orcid</qualifier>
+        <scope_note>Use for Orcid identifier of a contributor</scope_note>
     </dc-type>
 
     <dc-type>
@@ -50,6 +57,13 @@
 
     <dc-type>
         <schema>dc</schema>
+        <element>contributor</element>
+        <qualifier>department</qualifier>
+        <scope_note>The department where an item was created (used for import from DiVA).</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>dc</schema>
         <element>description</element>
         <qualifier>tableofcontents</qualifier>
         <scope_note>Used for News in metadata for archives, sub-archives and collections</scope_note>
@@ -57,23 +71,9 @@
 
     <dc-type>
         <schema>dc</schema>
-        <element>subject</element>
-        <qualifier>agrovoc</qualifier>
-        <scope_note>Agrovoc term</scope_note>
-    </dc-type>
-
-    <dc-type>
-        <schema>dc</schema>
         <element>source</element>
         <qualifier>articlenumber</qualifier>
         <scope_note>Journal article number</scope_note>
-    </dc-type>
-
-    <dc-type>
-        <schema>dc</schema>
-        <element>contributor</element>
-        <qualifier>department</qualifier>
-        <scope_note>The department where an item was created (used for import from DiVA).</scope_note>
     </dc-type>
 
     <dc-type>
@@ -116,6 +116,48 @@
         <element>subject</element>
         <qualifier>jel</qualifier>
         <scope_note>JEL classification system for scholarly literature in the field of economics.</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>dc</schema>
+        <element>subject</element>
+        <qualifier>agrovoc</qualifier>
+        <scope_note>AGROVOC is a multilingual controlled vocabulary covering all areas of interest to the FAO.</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>dc</schema>
+        <element>subject</element>
+        <qualifier>hrc</qualifier>
+        <scope_note>hrc term</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>dc</schema>
+        <element>subject</element>
+        <qualifier>humord</qualifier>
+        <scope_note>Humord er en norsk tesaurus for humaniora og samfunnsvitenskap med tilgrensende fagområder.</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>dc</schema>
+        <element>subject</element>
+        <qualifier>lcc</qualifier>
+        <scope_note>The set of conceptual resources specified by the Library of Congress Classification.</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>dc</schema>
+        <element>subject</element>
+        <qualifier>realfagstermer</qualifier>
+        <scope_note>Realfagstermer</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>dc</schema>
+        <element>subject</element>
+        <qualifier>nus</qualifier>
+        <scope_note>Norsk standard for utdanningsgruppering (NUS) ref SSB (https://www.ssb.no/klass/klassifikasjoner/36).</scope_note>
     </dc-type>
 
     <dc-type>
