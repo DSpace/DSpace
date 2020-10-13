@@ -117,7 +117,7 @@ public class ReferCrosswalkIT extends AbstractIntegrationTestWithDatabase {
             .withPersonAffiliation("Company")
             .withPersonAffiliationStartDate("2018-01-01")
             .withPersonAffiliationRole("Developer")
-            .withDescriptionAbstract("Biography \n\tThis is my biography")
+            .withDescriptionAbstract("Biography \n\t<This is my biography>")
             .withPersonCountry("England")
             .withPersonKnowsLanguages("English")
             .withPersonKnowsLanguages("Italian")
@@ -142,7 +142,9 @@ public class ReferCrosswalkIT extends AbstractIntegrationTestWithDatabase {
 
         try (FileInputStream fis = getFileInputStream("person.xml")) {
             String expectedXml = IOUtils.toString(fis, Charset.defaultCharset());
-            assertThat(out.toString(), equalTo(expectedXml));
+            String exportedXml = out.toString();
+            System.out.println(exportedXml);
+            assertThat(exportedXml, equalTo(expectedXml));
         }
     }
 
@@ -190,6 +192,67 @@ public class ReferCrosswalkIT extends AbstractIntegrationTestWithDatabase {
         try (FileInputStream fis = getFileInputStream("person-with-empty-groups.xml")) {
             String expectedXml = IOUtils.toString(fis, Charset.defaultCharset());
             assertThat(out.toString(), equalTo(expectedXml));
+        }
+    }
+
+    @Test
+    public void testPersonJsonDisseminate() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        Item item = createItem(context, collection)
+            .withTitle("John Smith")
+            .withFullName("John Smith")
+            .withVernacularName("JOHN SMITH")
+            .withVariantName("J.S.")
+            .withVariantName("Smith John")
+            .withGivenName("John")
+            .withFamilyName("Smith")
+            .withBirthDate("1992-06-26")
+            .withGender("M")
+            .withJobTitle("Researcher")
+            .withPersonMainAffiliation("University")
+            .withWorkingGroup("First work group")
+            .withWorkingGroup("Second work group")
+            .withPersonalSiteUrl("www.test.com")
+            .withPersonalSiteTitle("Test")
+            .withPersonalSiteUrl("www.john-smith.com")
+            .withPersonalSiteTitle(PLACEHOLDER_PARENT_METADATA_VALUE)
+            .withPersonalSiteUrl("www.site.com")
+            .withPersonalSiteTitle("Site")
+            .withPersonEmail("test@test.com")
+            .withSubject("Science")
+            .withOrcidIdentifier("0000-0002-9079-5932")
+            .withPersonAffiliation("Company")
+            .withPersonAffiliationStartDate("2018-01-01")
+            .withPersonAffiliationRole("Developer")
+            .withDescriptionAbstract("Biography: \n\t\"This is my biography\"")
+            .withPersonCountry("England")
+            .withPersonKnowsLanguages("English")
+            .withPersonKnowsLanguages("Italian")
+            .withPersonEducation("School")
+            .withPersonEducationStartDate("2000-01-01")
+            .withPersonEducationEndDate("2005-01-01")
+            .withPersonEducationRole("Student")
+            .withPersonQualification("First Qualification")
+            .withPersonQualificationStartDate("2015-01-01")
+            .withPersonQualificationEndDate("2016-01-01")
+            .withPersonQualification("Second Qualification")
+            .withPersonQualificationStartDate("2016-01-02")
+            .build();
+
+        context.restoreAuthSystemState();
+
+        ReferCrosswalk referCrossWalk = referCrosswalkMapper.getReferCrosswalk("person-json");
+        assertThat(referCrossWalk, notNullValue());
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        referCrossWalk.disseminate(context, item, out);
+
+        try (FileInputStream fis = getFileInputStream("person.json")) {
+            String expectedJson = IOUtils.toString(fis, Charset.defaultCharset());
+            String exportedJson = out.toString();
+            System.out.println(exportedJson);
+            assertThat(exportedJson, equalTo(expectedJson));
         }
     }
 

@@ -10,6 +10,12 @@ package org.dspace.content.integration.crosswalks;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * Class to map each {@link ReferCrosswalk} with its name.
+ *
+ * @author Luca Giamminonni (luca.giamminonni at 4science.it)
+ *
+ */
 public class ReferCrosswalkMapper {
 
     private final Map<String, ReferCrosswalk> map;

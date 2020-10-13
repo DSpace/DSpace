@@ -10,6 +10,12 @@ package org.dspace.content.integration.crosswalks.model;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Models a set of template line related to a single metadata group.
+ *
+ * @author Luca Giamminonni (luca.giamminonni at 4science.it)
+ *
+ */
 public class TemplateLineGroup {
 
     private final int groupSize;
@@ -18,6 +24,12 @@ public class TemplateLineGroup {
 
     private final List<TemplateLine> templateLines;
 
+    /**
+     * Constructor.
+     *
+     * @param groupName the metadata group name
+     * @param groupSize the metadata group size
+     */
     public TemplateLineGroup(String groupName, int groupSize) {
         super();
         this.groupSize = groupSize;

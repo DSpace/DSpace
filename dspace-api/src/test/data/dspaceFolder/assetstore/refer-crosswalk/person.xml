@@ -49,7 +49,7 @@
 		</affiliation>
 	</affiliations>
 	<biography>Biography 
-	This is my biography</biography>
+	&lt;This is my biography&gt;</biography>
 	<educations>
 		<education>
 			<name>School</name>

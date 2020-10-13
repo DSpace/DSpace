@@ -142,6 +142,10 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
         return setMetadataSingleValue(item, "crisrp", "name", null, fullname);
     }
 
+    public ItemBuilder withVernacularName(String vernacularName) {
+        return setMetadataSingleValue(item, "crisrp", "name", "translated", vernacularName);
+    }
+
     public ItemBuilder withVariantName(String variant) {
         return addMetadataValue(item, "crisrp", "name", "variant", variant);
     }

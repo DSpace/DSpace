@@ -17,11 +17,13 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -47,6 +49,13 @@ import org.dspace.core.CrisConstants;
 import org.dspace.services.ConfigurationService;
 import org.springframework.core.convert.converter.Converter;
 
+/**
+ * Implementation of {@StreamDisseminationCrosswalk} to produce an output from
+ * an Item starting from a template.
+ *
+ * @author Luca Giamminonni (luca.giamminonni at 4science.it)
+ *
+ */
 public class ReferCrosswalk implements StreamDisseminationCrosswalk, FileNameDisseminator {
 
     private static Logger log = Logger.getLogger(ReferCrosswalk.class);
@@ -62,6 +71,8 @@ public class ReferCrosswalk implements StreamDisseminationCrosswalk, FileNameDis
 
     private Converter<String, String> converter;
 
+    private Consumer<List<String>> linesPostProcessor;
+
 
     private final String templateFileName;
 
@@ -72,7 +83,8 @@ public class ReferCrosswalk implements StreamDisseminationCrosswalk, FileNameDis
     private List<TemplateLine> templateLines;
 
     public ReferCrosswalk(ConfigurationService configurationService, ItemService itemService,
-        VirtualFieldMapper virtualFieldMapper, String templateFileName, String mimeType, String fileName) {
+        VirtualFieldMapper virtualFieldMapper, String templateFileName, String mimeType, String fileName,
+        String valueDelimiter) {
         super();
         this.configurationService = configurationService;
         this.itemService = itemService;
@@ -108,9 +120,20 @@ public class ReferCrosswalk implements StreamDisseminationCrosswalk, FileNameDis
 
         Item item = (Item) dso;
 
+        List<String> lines = new ArrayList<String>();
+        appendLines(item, lines);
+
+        if (linesPostProcessor != null) {
+            linesPostProcessor.accept(lines);
+        }
+
         try (OutputStreamWriter osw = new OutputStreamWriter(out, UTF_8);
             BufferedWriter writer = new BufferedWriter(osw)) {
-            writeLines(item, writer);
+            for (String line : lines) {
+                writer.write(line);
+                writer.newLine();
+            }
+            writer.flush();
         }
 
     }
@@ -153,7 +176,7 @@ public class ReferCrosswalk implements StreamDisseminationCrosswalk, FileNameDis
         return templateLineObj;
     }
 
-    private void writeLines(Item item, BufferedWriter writer) throws IOException {
+    private void appendLines(Item item, List<String> lines) throws IOException {
         TemplateLineGroup currentGroup = null;
 
         for (TemplateLine line : templateLines) {
@@ -165,7 +188,7 @@ public class ReferCrosswalk implements StreamDisseminationCrosswalk, FileNameDis
             }
 
             if (line.isMetadataGroupEndField()) {
-                writeMetadataGroupLines(item, currentGroup, writer);
+                appendMetadataGroupLines(item, currentGroup, lines);
                 currentGroup = null;
                 continue;
             }
@@ -176,18 +199,15 @@ public class ReferCrosswalk implements StreamDisseminationCrosswalk, FileNameDis
             }
 
             if (StringUtils.isBlank(line.getField())) {
-                writer.write(line.getBeforeField());
-                writer.newLine();
+                lines.add(line.getBeforeField());
                 continue;
             }
 
             List<String> metadataValues = getMetadataValuesForLine(line, item);
             for (String metadataValue : metadataValues) {
-                writeLine(writer, line, metadataValue);
+                appendLine(lines, line, metadataValue);
             }
         }
-
-        writer.flush();
     }
 
     private int getMetadataGroupSize(Item item, String metadataGroupFieldName) {
@@ -206,22 +226,22 @@ public class ReferCrosswalk implements StreamDisseminationCrosswalk, FileNameDis
         }
     }
 
-    private void writeMetadataGroupLines(Item item, TemplateLineGroup lineGroup, BufferedWriter writer)
+    private void appendMetadataGroupLines(Item item, TemplateLineGroup lineGroup, List<String> lines)
         throws IOException {
 
-        List<TemplateLine> templateLines = lineGroup.getTemplateLines();
+        List<TemplateLine> groupLines = lineGroup.getTemplateLines();
         int groupSize = lineGroup.getGroupSize();
 
         Map<String, List<String>> metadataValues = new HashMap<>();
 
         for (int i = 0; i < groupSize; i++) {
-            for (TemplateLine line : templateLines) {
+
+            for (TemplateLine line : groupLines) {
 
                 String field = line.getField();
 
                 if (StringUtils.isBlank(line.getField())) {
-                    writer.write(line.getBeforeField());
-                    writer.newLine();
+                    lines.add(line.getBeforeField());
                     continue;
                 }
 
@@ -241,7 +261,7 @@ public class ReferCrosswalk implements StreamDisseminationCrosswalk, FileNameDis
 
                 String metadataValue = metadata.get(i);
                 if (!CrisConstants.PLACEHOLDER_PARENT_METADATA_VALUE.equals(metadataValue)) {
-                    writeLine(writer, line, metadataValue);
+                    appendLine(lines, line, metadataValue);
                 }
 
             }
@@ -249,17 +269,17 @@ public class ReferCrosswalk implements StreamDisseminationCrosswalk, FileNameDis
 
     }
 
-    private void writeLine(BufferedWriter writer, TemplateLine line, String value)
-        throws IOException {
-        writer.write(line.getBeforeField());
-        writer.write(converter != null ? converter.convert(value) : value);
-        writer.write(line.getAfterField());
-        writer.newLine();
+    private void appendLine(List<String> lines, TemplateLine line, String value) {
+        String valueToAdd = converter != null ? converter.convert(value) : value;
+        lines.add(line.getBeforeField() + valueToAdd + line.getAfterField());
     }
-
 
     public void setConverter(Converter<String, String> converter) {
         this.converter = converter;
+    }
+
+    public void setLinesPostProcessor(Consumer<List<String>> linesPostProcessor) {
+        this.linesPostProcessor = linesPostProcessor;
     }
 
 }

@@ -9,6 +9,7 @@
 			<map>
 				<entry key="bibtex" value-ref="referCrosswalkBibtex"></entry>
 				<entry key="person-xml" value-ref="referCrosswalkPersonXml"></entry>
+				<entry key="person-json" value-ref="referCrosswalkPersonJson"></entry>
 			</map>
 		</constructor-arg>
 	</bean>
@@ -24,6 +25,14 @@
 		<constructor-arg name="mimeType" value="application/xml; charset=UTF-8"/>
 		<constructor-arg name="fileName" value="person.xml"/>
 		<property name="converter" ref="xmlValueConverter" />
+	</bean>
+	
+	<bean class="org.dspace.content.integration.crosswalks.ReferCrosswalk" id="referCrosswalkPersonJson">
+		<constructor-arg name="templateFileName" value="crosswalks/template/person-json.template"/>
+		<constructor-arg name="mimeType" value="application/json; charset=UTF-8"/>
+		<constructor-arg name="fileName" value="person.json"/>
+		<property name="converter" ref="jsonValueConverter" />
+		<property name="linesPostProcessor" ref="jsonPostProcessor" />
 	</bean>
 	
 	<bean class="org.dspace.content.integration.crosswalks.virtualfields.VirtualFieldMapper">
@@ -55,5 +64,8 @@
 	<bean class="org.dspace.content.integration.crosswalks.virtualfields.VirtualFieldHandleLocalNameIdentifier" id="virtualFieldHandleLocalNameIdentifier"/>
 	
 	<bean class="org.dspace.content.integration.crosswalks.converter.XmlValueConverter" id="xmlValueConverter" />
+	<bean class="org.dspace.content.integration.crosswalks.converter.JsonValueConverter" id="jsonValueConverter" />
+	
+	<bean class="org.dspace.content.integration.crosswalks.postprocessors.JsonPostProcessor" id="jsonPostProcessor" />
 	
 </beans>
