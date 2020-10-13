@@ -130,6 +130,7 @@
     <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.dateIssued.year">Date Issued</message>
 
     <message key="xmlui.Discovery.AbstractSearch.type_doctype">Filter by: Dokument type</message>
+    <message key="xmlui.Discovery.AbstractSearch.type_advisor">Filter by: Advisor</message>
 
     <message key="xmlui.Discovery.AbstractSearch.startswith">Starts with</message>
     <message key="xmlui.Discovery.AbstractSearch.startswith.help">Or enter first few letters:</message>
