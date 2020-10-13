@@ -25,6 +25,7 @@ import org.dspace.app.rest.security.DSpaceAuthentication;
 import org.dspace.app.rest.security.RestAuthenticationService;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.authenticate.AuthenticationMethod;
+import org.dspace.authenticate.ShibAuthentication;
 import org.dspace.authenticate.service.AuthenticationService;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
@@ -92,7 +93,7 @@ public class JWTTokenRestAuthenticationServiceImpl implements RestAuthentication
      * @param request current request
      * @param response current response
      * @param authentication Authentication information from successful login
-     * @param addSingleUseCookie true/false, whether to include JWT in a single-use cookie
+     * @param addSingleUseCookie true/false, whether to include JWT in a single-use cookie (if allowed)
      *                           When false, DSpace will only return JWT in headers.
      * @throws IOException
      */
@@ -108,6 +109,11 @@ public class JWTTokenRestAuthenticationServiceImpl implements RestAuthentication
             String token = loginJWTTokenHandler.createTokenForEPerson(context, request,
                                                                  authentication.getPreviousLoginDate(), groups);
 
+            // If an auth cookie was requested, but they are NOT allowed
+            if (addSingleUseCookie && !allowSingleUseAuthCookie(request, response)) {
+                // do not allow single use cookie to be added to response
+                addSingleUseCookie = false;
+            }
             addTokenToResponse(response, token, addSingleUseCookie);
             context.commit();
 
@@ -240,6 +246,29 @@ public class JWTTokenRestAuthenticationServiceImpl implements RestAuthentication
     }
 
     /**
+     * For DSpace, we currently ONLY allow for single-use Authentication cookies when Shibboleth is enabled. Even then,
+     * they will ONLY be created from teh ShibbolethAuthenticationFilter (to ensure non-Shibboleth requests don't
+     * accidentally create these cookies.
+     * <P>
+     * For Shibboleth, authentication cookies are required to pass auth info back to the UI/client via a redirect (as
+     * headers cannot be passed on a redirect). See ShibbolethRestController comments for more details on Shib auth.
+     * @param request current request
+     * @param response current response
+     * @return true if Shibboleth is enabled, false otherwise.
+     */
+    @Override
+    public boolean allowSingleUseAuthCookie(HttpServletRequest request, HttpServletResponse response) {
+        String shibbolethPluginName = new ShibAuthentication().getName();
+
+        // Only return true if the Shibboleth Authentication Plugin is enabled. When enabled then
+        // its plugin name will be included in the WWW-Authenticate header value.
+        if (getWwwAuthenticateHeaderValue(request, response).contains(shibbolethPluginName)) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
      * Add login token to the current response in the Authorization header.
      * <P>
      * If requested, the JWT is also returned in a single-use cookie. This is primarily for support of auth
@@ -274,11 +303,10 @@ public class JWTTokenRestAuthenticationServiceImpl implements RestAuthentication
 
     /**
      * Get the Login token (JWT) in the current request. First we check the Authorization header.
-     * If not found there, we check for a single-use cookie (used to initialize Authorization header)
-     * and use that.
-     * @param request
-     * @param response
-     * @return
+     * If not found there, we check for a single-use cookie (if allowed) and use that.
+     * @param request current request
+     * @param response current response
+     * @return authentication token (if found), or null
      */
     private String getLoginToken(HttpServletRequest request, HttpServletResponse response) {
         String tokenValue = null;
@@ -286,7 +314,7 @@ public class JWTTokenRestAuthenticationServiceImpl implements RestAuthentication
         String authCookie = getSingleUseCookie(request, response);
         if (StringUtils.isNotBlank(authHeader)) {
             tokenValue = authHeader.replace(AUTHORIZATION_TYPE, "").trim();
-        } else if (StringUtils.isNotBlank(authCookie)) {
+        } else if (allowSingleUseAuthCookie(request, response) && StringUtils.isNotBlank(authCookie)) {
             tokenValue = authCookie;
         }
 

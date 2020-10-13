@@ -158,23 +158,59 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
                 .andExpect(jsonPath("$.okay", is(true)))
                 .andExpect(jsonPath("$.authenticated", is(true)))
                 .andExpect(jsonPath("$.type", is("status")))
-                // Cookie is single use, so its value should now be cleared
+                // Cookie is single use, so its value should now be cleared in response
                 .andExpect(cookie().value(AUTHORIZATION_COOKIE, ""));
 
-        //Test token passed as Header still works though (even after cookie is cleared)
-        getClient(token).perform(get("/api/authn/status")
-                                .secure(true)
-                                .cookie(cookies))
+        // Test token passed as Header still works though (even after cookie is cleared)
+        getClient(token).perform(get("/api/authn/status"))
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$.okay", is(true)))
                    .andExpect(jsonPath("$.authenticated", is(true)))
                    .andExpect(jsonPath("$.type", is("status")));
 
-        //Logout
+        // Logout
         getClient(token).perform(post("/api/authn/logout"))
                         .andExpect(status().isNoContent());
     }
+
+    @Test
+    public void testSingleUseCookieCannotBeUsedWithShibDisabled() throws Exception {
+        // Enable only password login
+        configurationService.setProperty("plugin.sequence.org.dspace.authenticate.AuthenticationMethod", PASS_ONLY);
+
+        // Simulate a password authentication
+        String token = getAuthToken(eperson.getEmail(), password);
+
+        // Create an authorization Cookie to see if we can use this even though Shibboleth is disabled
+        Cookie[] cookies = new Cookie[1];
+        cookies[0] = new Cookie(AUTHORIZATION_COOKIE, token);
+
+        // Check if cookie can be used to authenticate us via a /status request. This works when Shib is enabled,
+        // but this should NOT work (authenticated=false) when Shib is disabled.
+        getClient().perform(get("/api/authn/status")
+                                .secure(true)
+                                .cookie(cookies))
+                   .andExpect(status().isOk())
+                   .andExpect(content().contentType(contentType))
+                   .andExpect(jsonPath("$.okay", is(true)))
+                   .andExpect(jsonPath("$.authenticated", is(false)))
+                   .andExpect(jsonPath("$.type", is("status")));
+
+        // Test token passed as Header works though (i.e. it's only the cookie that doesn't work)
+        // This should return authenticated=true
+        getClient(token).perform(get("/api/authn/status"))
+                        .andExpect(status().isOk())
+                        .andExpect(content().contentType(contentType))
+                        .andExpect(jsonPath("$.okay", is(true)))
+                        .andExpect(jsonPath("$.authenticated", is(true)))
+                        .andExpect(jsonPath("$.type", is("status")));
+
+        // Logout
+        getClient(token).perform(post("/api/authn/logout"))
+                        .andExpect(status().isNoContent());
+    }
+
 
     @Test
     public void testTwoAuthenticationTokens() throws Exception {
@@ -507,7 +543,7 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
     }
 
     @Test
-    public void testShibbolethLoginURLWithServerlURLConteiningPort() throws Exception {
+    public void testShibbolethLoginURLWithServerlURLContainingPort() throws Exception {
         context.turnOffAuthorisationSystem();
         //Enable Shibboleth login
         configurationService.setProperty("plugin.sequence.org.dspace.authenticate.AuthenticationMethod", SHIB_ONLY);
@@ -869,7 +905,7 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
     }
 
     @Test
-    public void testShortLivedTokenToDowloadBitstream() throws Exception {
+    public void testShortLivedTokenToDownloadBitstream() throws Exception {
         Bitstream bitstream = createPrivateBitstream();
         String shortLivedToken = getShortLivedToken(eperson);
 
@@ -879,7 +915,7 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
     }
 
     @Test
-    public void testShortLivedTokenToDowloadBitstreamUnauthorized() throws Exception {
+    public void testShortLivedTokenToDownloadBitstreamUnauthorized() throws Exception {
         Bitstream bitstream = createPrivateBitstream();
 
         context.turnOffAuthorisationSystem();
@@ -897,7 +933,7 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
     }
 
     @Test
-    public void testLoginTokenToDowloadBitstream() throws Exception {
+    public void testLoginTokenToDownloadBitstream() throws Exception {
         Bitstream bitstream = createPrivateBitstream();
 
         String loginToken = getAuthToken(eperson.getEmail(), password);
@@ -907,7 +943,7 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
     }
 
     @Test
-    public void testExpiredShortLivedTokenToDowloadBitstream() throws Exception {
+    public void testExpiredShortLivedTokenToDownloadBitstream() throws Exception {
         Bitstream bitstream = createPrivateBitstream();
         configurationService.setProperty("jwt.shortLived.token.expiration", "1");
         String shortLivedToken = getShortLivedToken(eperson);

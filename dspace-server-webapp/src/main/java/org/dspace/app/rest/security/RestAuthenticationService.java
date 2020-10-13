@@ -32,10 +32,10 @@ public interface RestAuthenticationService {
      * This method is called after authentication has succeeded, and it allows the REST API to provide
      * user data in the response (in the form of a JWT or similar, depending on implementation)
      * <P>
-     * If addSingleUseCookie is set to true, then user data should be stored in a cookie temporarily for ONE request.
-     * Once this cookie is read again, it should be immediately replaced by storing user data in Headers. Storing any
-     * authentication info in a cookie long term is not secure, as it makes DSpace susceptible to CSRF
-     * (cross site request forgery) attacks.
+     * If addSingleUseCookie is set to true (and allowSingleUseAuthCookie() returns true), then user data should be
+     * stored in a cookie temporarily for ONE request. Once this cookie is read again, it should be immediately replaced
+     * by storing user data in Headers. Storing any authentication data in a cookie long term is not secure, as it makes
+     * DSpace susceptible to CSRF (cross site request forgery) attacks.
      * @param request current request
      * @param response current response
      * @param authentication Authentication information from successful login
@@ -57,10 +57,13 @@ public interface RestAuthenticationService {
 
     /**
      * Retrieve the currently authenticated EPerson (i.e. user) based on the data in the current request
-     * and/or current DSpace context. Usually the EPerson is obtained via the current login token passed
-     * in a request header (or temporary cookie). If a temporary cookie contains the login token, then
-     * that cookie should be deleted after reading it. Storing any authentication info in a cookie long term
-     * is not secure, as it makes DSpace susceptible to CSRF (cross site request forgery) attacks.
+     * and/or current DSpace context.
+     * <P>
+     * Usually the EPerson is obtained via the current login token passed in a request header (most secure).
+     * <P>
+     * However, if allowSingleUseAuthCookie() is true, then the login token may be passed via a temporary cookie.
+     * If such a cookie is found, then that cookie should be deleted after reading it. Storing any authentication data
+     * in a cookie long term is not secure, as it makes DSpace susceptible to CSRF (cross site request forgery) attacks.
      * @param request current request
      * @param response current response
      * @param context current DSpace Context
@@ -104,4 +107,24 @@ public interface RestAuthenticationService {
      * @return A string value that should be set in the WWWW-Authenticate header
      */
     String getWwwAuthenticateHeaderValue(HttpServletRequest request, HttpServletResponse response);
+
+    /**
+     * Whether (or not) this Authentication service allows for the creation (and reading) of single-use
+     * cookies to store authentication tokens/info.
+     * <P>
+     * This method should be used by addAuthenticationDataForUser() to determine whether single-use
+     * cookies can be created.
+     * <P>
+     * This method should also be used by getAuthenticatedEPerson() to determine whether single-use
+     * cookies can be read from to provide trusted authentication information.
+     * <P>
+     * WARNING: Ideally, a RestAuthenticationService will only support single-use cookies in _very specific_ scenarios.
+     * Keep in mind that storing any authentication data in a cookie makes DSpace potentially susceptible to CSRF
+     * (cross site request forgery) attacks. So, when in doubt, this method should return 'false'.
+     * @param request current request
+     * @param response current response
+     * @return true if single-use cookies can be trusted in current request and/or written to current response.
+     * false if they cannot be trusted or used in request and/or response.
+     */
+    boolean allowSingleUseAuthCookie(HttpServletRequest request, HttpServletResponse response);
 }
