@@ -178,11 +178,23 @@ public class AuthenticationRestController implements InitializingBean {
     /**
      * Returns a successful "204 No Content" response for a logout request.
      * Actual logout is performed by our {@link org.dspace.app.rest.security.CustomLogoutHandler}
+     * <P>
+     * For logout we *require* POST requests. HEAD is also supported for endpoint visibility in HAL Browser, etc.
      * @return ResponseEntity (204 No Content)
      */
-    @RequestMapping(value = "/logout", method = {RequestMethod.POST})
+    @RequestMapping(value = "/logout", method = { RequestMethod.HEAD, RequestMethod.POST })
     public ResponseEntity logout() {
         return ResponseEntity.noContent().build();
+    }
+
+    /**
+     * Disables GET/PUT/PATCH on the /logout endpoint. You must use POST (see above method)
+     * @return ResponseEntity
+     */
+    @RequestMapping(value = "/logout", method = { RequestMethod.GET, RequestMethod.PUT, RequestMethod.PATCH,
+        RequestMethod.DELETE })
+    public ResponseEntity logoutMethodNotAllowed() {
+        return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).body("Only POST is allowed for logout requests.");
     }
 
     /**
