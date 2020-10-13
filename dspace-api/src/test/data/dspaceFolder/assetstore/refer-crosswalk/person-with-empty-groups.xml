@@ -18,17 +18,6 @@
 		<working-group>Second work group</working-group>
 	</working-groups>
 	<personal-sites>
-		<personal-site>
-			<site-url>www.test.com</site-url>
-			<site-title>Test</site-title>
-		</personal-site>
-		<personal-site>
-			<site-url>www.john-smith.com</site-url>
-		</personal-site>
-		<personal-site>
-			<site-url>www.site.com</site-url>
-			<site-title>Site</site-title>
-		</personal-site>
 	</personal-sites>
 	<email>test@test.com</email>
 	<interests>
@@ -37,8 +26,11 @@
 	<identifiers>
 		<orcid>0000-0002-9079-5932</orcid>
 		<scopus-author-ids>
+			<scopus-author-id>111-222-333</scopus-author-id>
 		</scopus-author-ids>
 		<researcher-ids>
+			<researcher-id>0001</researcher-id>
+			<researcher-id>0002</researcher-id>
 		</researcher-ids>
 	</identifiers>
 	<affiliations>
@@ -48,8 +40,6 @@
 			<role>Developer</role>
 		</affiliation>
 	</affiliations>
-	<biography>Biography 
-	This is my biography</biography>
 	<educations>
 		<education>
 			<name>School</name>
@@ -60,18 +50,7 @@
 	</educations>
 	<country>England</country>
 	<qualifications>
-		<qualification>
-			<name>First Qualification</name>
-			<start-date>2015-01-01</start-date>
-			<end-date>2016-01-01</end-date>
-		</qualification>
-		<qualification>
-			<name>Second Qualification</name>
-			<start-date>2016-01-02</start-date>
-		</qualification>
 	</qualifications>
 	<knows-languages>
-		<language>English</language>
-		<language>Italian</language>
 	</knows-languages>
 </person>

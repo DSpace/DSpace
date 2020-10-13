@@ -355,7 +355,7 @@ public class BulkImportIT extends AbstractIntegrationTestWithDatabase {
         Item itemToUpdateByRid = createItem(context, publications)
             .withTitle("My Publication")
             .withTitleForLanguage("My Publication English", "en")
-            .withRidIdentifier("123456789")
+            .withResearcherIdentifier("123456789")
             .build();
 
         Item itemToDelete = createItem(context, publications).withDoiIdentifier("10.1000/182").build();

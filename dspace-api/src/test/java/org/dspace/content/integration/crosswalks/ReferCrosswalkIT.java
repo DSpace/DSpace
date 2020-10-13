@@ -102,7 +102,7 @@ public class ReferCrosswalkIT extends AbstractIntegrationTestWithDatabase {
             .withBirthDate("1992-06-26")
             .withGender("M")
             .withJobTitle("Researcher")
-            .withMainAffiliation("University")
+            .withPersonMainAffiliation("University")
             .withWorkingGroup("First work group")
             .withWorkingGroup("Second work group")
             .withPersonalSiteUrl("www.test.com")
@@ -111,6 +111,25 @@ public class ReferCrosswalkIT extends AbstractIntegrationTestWithDatabase {
             .withPersonalSiteTitle(PLACEHOLDER_PARENT_METADATA_VALUE)
             .withPersonalSiteUrl("www.site.com")
             .withPersonalSiteTitle("Site")
+            .withPersonEmail("test@test.com")
+            .withSubject("Science")
+            .withOrcidIdentifier("0000-0002-9079-5932")
+            .withPersonAffiliation("Company")
+            .withPersonAffiliationStartDate("2018-01-01")
+            .withPersonAffiliationRole("Developer")
+            .withDescriptionAbstract("Biography \n\tThis is my biography")
+            .withPersonCountry("England")
+            .withPersonKnowsLanguages("English")
+            .withPersonKnowsLanguages("Italian")
+            .withPersonEducation("School")
+            .withPersonEducationStartDate("2000-01-01")
+            .withPersonEducationEndDate("2005-01-01")
+            .withPersonEducationRole("Student")
+            .withPersonQualification("First Qualification")
+            .withPersonQualificationStartDate("2015-01-01")
+            .withPersonQualificationEndDate("2016-01-01")
+            .withPersonQualification("Second Qualification")
+            .withPersonQualificationStartDate("2016-01-02")
             .build();
 
         context.restoreAuthSystemState();
@@ -122,6 +141,53 @@ public class ReferCrosswalkIT extends AbstractIntegrationTestWithDatabase {
         referCrossWalk.disseminate(context, item, out);
 
         try (FileInputStream fis = getFileInputStream("person.xml")) {
+            String expectedXml = IOUtils.toString(fis, Charset.defaultCharset());
+            assertThat(out.toString(), equalTo(expectedXml));
+        }
+    }
+
+    @Test
+    public void testPersonWithEmptyGroupsXmlDisseminate() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        Item item = createItem(context, collection)
+            .withTitle("John Smith")
+            .withFullName("John Smith")
+            .withVariantName("J.S.")
+            .withVariantName("Smith John")
+            .withGivenName("John")
+            .withFamilyName("Smith")
+            .withBirthDate("1992-06-26")
+            .withGender("M")
+            .withJobTitle("Researcher")
+            .withPersonMainAffiliation("University")
+            .withWorkingGroup("First work group")
+            .withWorkingGroup("Second work group")
+            .withPersonEmail("test@test.com")
+            .withSubject("Science")
+            .withOrcidIdentifier("0000-0002-9079-5932")
+            .withScopusAuthorIdentifier("111-222-333")
+            .withResearcherIdentifier("0001")
+            .withResearcherIdentifier("0002")
+            .withPersonAffiliation("Company")
+            .withPersonAffiliationStartDate("2018-01-01")
+            .withPersonAffiliationRole("Developer")
+            .withPersonCountry("England")
+            .withPersonEducation("School")
+            .withPersonEducationStartDate("2000-01-01")
+            .withPersonEducationEndDate("2005-01-01")
+            .withPersonEducationRole("Student")
+            .build();
+
+        context.restoreAuthSystemState();
+
+        ReferCrosswalk referCrossWalk = referCrosswalkMapper.getReferCrosswalk("person-xml");
+        assertThat(referCrossWalk, notNullValue());
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        referCrossWalk.disseminate(context, item, out);
+
+        try (FileInputStream fis = getFileInputStream("person-with-empty-groups.xml")) {
             String expectedXml = IOUtils.toString(fis, Charset.defaultCharset());
             assertThat(out.toString(), equalTo(expectedXml));
         }

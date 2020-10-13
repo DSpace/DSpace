@@ -126,8 +126,12 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
         return addMetadataValue(item, "person", "identifier", "isni", isni);
     }
 
-    public ItemBuilder withRidIdentifier(String rid) {
+    public ItemBuilder withResearcherIdentifier(String rid) {
         return addMetadataValue(item, "person", "identifier", "rid", rid);
+    }
+
+    public ItemBuilder withScopusAuthorIdentifier(String id) {
+        return addMetadataValue(item, "person", "identifier", "scopus-author-id", id);
     }
 
     public ItemBuilder withPatentNo(String patentNo) {
@@ -162,7 +166,7 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
         return setMetadataSingleValue(item, "person", "jobTitle", null, jobTitle);
     }
 
-    public ItemBuilder withMainAffiliation(String affiliation) {
+    public ItemBuilder withPersonMainAffiliation(String affiliation) {
         return setMetadataSingleValue(item, "person", "affiliation", "name", affiliation);
     }
 
@@ -176,6 +180,66 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
 
     public ItemBuilder withPersonalSiteTitle(String title) {
         return addMetadataValue(item, "crisrp", "site", "title", title);
+    }
+
+    public ItemBuilder withPersonEmail(String email) {
+        return addMetadataValue(item, "person", "email", null, email);
+    }
+
+    public ItemBuilder withPersonAffiliation(String affiliation) {
+        return addMetadataValue(item, "oairecerif", "person", "affiliation", affiliation);
+    }
+
+    public ItemBuilder withPersonAffiliationStartDate(String startDate) {
+        return addMetadataValue(item, "oairecerif", "affiliation", "startDate", startDate);
+    }
+
+    public ItemBuilder withPersonAffiliationEndDate(String endDate) {
+        return addMetadataValue(item, "oairecerif", "affiliation", "endDate", endDate);
+    }
+
+    public ItemBuilder withPersonAffiliationRole(String role) {
+        return addMetadataValue(item, "oairecerif", "affiliation", "role", role);
+    }
+
+    public ItemBuilder withDescriptionAbstract(String description) {
+        return addMetadataValue(item, MetadataSchemaEnum.DC.getName(), "description", "abstract", description);
+    }
+
+    public ItemBuilder withPersonEducation(String education) {
+        return addMetadataValue(item, "crisrp", "education", null, education);
+    }
+
+    public ItemBuilder withPersonEducationStartDate(String startDate) {
+        return addMetadataValue(item, "crisrp", "education", "start", startDate);
+    }
+
+    public ItemBuilder withPersonEducationEndDate(String endDate) {
+        return addMetadataValue(item, "crisrp", "education", "end", endDate);
+    }
+
+    public ItemBuilder withPersonEducationRole(String role) {
+        return addMetadataValue(item, "crisrp", "education", "role", role);
+    }
+
+    public ItemBuilder withPersonCountry(String country) {
+        return addMetadataValue(item, "crisrp", "country", null, country);
+    }
+
+    public ItemBuilder withPersonQualification(String qualification) {
+        return addMetadataValue(item, "crisrp", "qualification", null, qualification);
+    }
+
+    public ItemBuilder withPersonQualificationStartDate(String startDate) {
+        return addMetadataValue(item, "crisrp", "qualification", "start", startDate);
+    }
+
+    public ItemBuilder withPersonQualificationEndDate(String endDate) {
+        return addMetadataValue(item, "crisrp", "qualification", "end", endDate);
+    }
+
+    public ItemBuilder withPersonKnowsLanguages(String lanugage) {
+        return addMetadataValue(item, "person", "knowsLanguage", null, lanugage);
     }
 
     public ItemBuilder makeUnDiscoverable() {

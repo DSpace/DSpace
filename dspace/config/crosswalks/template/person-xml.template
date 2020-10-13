@@ -41,9 +41,9 @@
 		@group.oairecerif-person-affiliation.start@
 		<affiliation>
 			<name>@oairecerif.person.affiliation@</name>
-			<start-date>@oairecerif.person.startDate@</start-date>
-			<end-date>@oairecerif.person.endDate@</end-date>
-			<role>@oairecerif.person.role@</role>
+			<start-date>@oairecerif.affiliation.startDate@</start-date>
+			<end-date>@oairecerif.affiliation.endDate@</end-date>
+			<role>@oairecerif.affiliation.role@</role>
 		</affiliation>
 		@group.oairecerif-person-affiliation.end@
 	</affiliations>
@@ -51,10 +51,10 @@
 	<educations>
 		@group.crisrp-education.start@
 		<education>
-			<name>@crisrp.edutation@</name>
-			<start-date>@crisrp.edutation.start@</start-date>
-			<end-date>@crisrp.edutation.end@</end-date>
-			<role>@crisrp.edutation.role@</role>
+			<name>@crisrp.education@</name>
+			<start-date>@crisrp.education.start@</start-date>
+			<end-date>@crisrp.education.end@</end-date>
+			<role>@crisrp.education.role@</role>
 		</education>
 		@group.crisrp-education.end@
 	</educations>
