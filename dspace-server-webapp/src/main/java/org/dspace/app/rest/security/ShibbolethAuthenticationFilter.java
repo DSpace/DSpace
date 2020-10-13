@@ -49,8 +49,12 @@ public class ShibbolethAuthenticationFilter extends StatelessLoginFilter {
                                             HttpServletResponse res,
                                             FilterChain chain,
                                             Authentication auth) throws IOException, ServletException {
-
         DSpaceAuthentication dSpaceAuthentication = (DSpaceAuthentication) auth;
+        // OVERRIDE DEFAULT behavior of StatelessLoginFilter to return a temporary, single use cookie containing
+        // the Auth Token (JWT). This Cookie is required because ShibbolethRestController *redirects* the user
+        // back to the client/UI after a successful Shibboleth login. Headers cannot be sent via a redirect, so a Cookie
+        // must be sent to provide the auth token to the client. On the next request from the client, the cookie is
+        // read and destroyed & the Auth token is only used in the Header from that point forward.
         restAuthenticationService.addAuthenticationDataForUser(req, res, dSpaceAuthentication, true);
         chain.doFilter(req, res);
     }
