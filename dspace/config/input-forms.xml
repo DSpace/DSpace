@@ -202,16 +202,12 @@
 
                 <field>
                     <dc-schema>dc</dc-schema>
-                    <dc-element>relation</dc-element>
-                    <dc-qualifier>project</dc-qualifier>
-                    <repeatable>true</repeatable>
-                    <label>Project</label>
+                    <dc-element>source</dc-element>
+                    <dc-qualifier>articlenumber</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Article number</label>
                     <input-type>onebox</input-type>
-                    <hint>For projects funded by the European Commission use: EC/[Funding programme]/[project reference]
-                        where H2020 must be used for Horizon 2020
-                        and FP7 for the 7th Framework Program. F.ex.: EC/H2020/641918 or EC/FP7/266213.
-                        For other projects use: [Funder]: [project reference]). F.ex. Norges forskningsråd: 227607.
-                    </hint>
+                    <hint>Enter the article number of the journal.</hint>
                     <required></required>
                 </field>
 
@@ -258,6 +254,21 @@
             </page>
 
             <page number="2">
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>relation</dc-element>
+                    <dc-qualifier>project</dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Project</label>
+                    <input-type>onebox</input-type>
+                    <hint>For projects funded by the European Commission use: EC/[Funding programme]/[project reference]
+                        where H2020 must be used for Horizon 2020
+                        and FP7 for the 7th Framework Program. F.ex.: EC/H2020/641918 or EC/FP7/266213.
+                        For other projects use: [Funder]: [project reference]). F.ex. Norges forskningsråd: 227607.
+                    </hint>
+                    <required></required>
+                </field>
+
                 <field>
                     <dc-schema>dc</dc-schema>
                     <dc-element>subject</dc-element>
