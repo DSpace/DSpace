@@ -69,7 +69,8 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.DELETE, "/api/authn/login");
     }
 
-
+    // Disable LGTM warning about CSRF protection (see comments inline below)
+    @SuppressWarnings("lgtm [java/spring-disabled-csrf-protection]")
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         // Configure authentication requirements for ${dspace.server.url}/api/ URL only
@@ -90,10 +91,11 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
             .servletApi().and()
             // Enable CORS for Spring Security (see CORS settings in Application and ApplicationConfig)
             .cors().and()
-            // DISABLE Spring Security CSRF protection, as it relies on sending a token via cookie and therefore does
-            // NOT work across domains (as cookies can only be shared across subdomains and not across primary ones).
-            // Instead, we protect ourselves from CSRF by only allowing JWT auth tokens to be sent in headers
-            // (by default). See also "jwt.login.cookies.enabled" configuration (which defaults to false)
+            // DISABLE Spring Security CSRF protection, as it doesn't play well with auth plugins which require HTTP
+            // redirects back to DSpace (like Shibboleth integration). Spring CSRF protection requires sending the CSRF
+            // token back via headers, and headers cannot be sent via redirects. Instead, we protect ourselves from CSRF
+            // by only allowing JWT auth tokens to be sent in headers *except* when redirects are required (in which
+            // case a secure, origin-specific, single-use cookie is used, see JWTTokenRestAuthenticationServiceImpl)
             .csrf().disable()
             // Return 401 on authorization failures with a correct WWWW-Authenticate header
             .exceptionHandling().authenticationEntryPoint(
