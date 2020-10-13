@@ -461,6 +461,10 @@
                 <stored-value>Map</stored-value>
             </pair>
             <pair>
+                <displayed-value>Hefte i tidsskrift</displayed-value>
+                <stored-value>Journal issue</stored-value>
+            </pair>
+            <pair>
                 <displayed-value>Konferansebidrag</displayed-value>
                 <stored-value>Conference object</stored-value>
             </pair>
