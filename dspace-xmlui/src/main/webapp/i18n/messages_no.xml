@@ -998,6 +998,7 @@
     <message key="xmlui.Submission.submit.CCLicenseStep.no_license">Ingen lisens</message>
     <message key="xmlui.Submission.submit.CCLicenseStep.save_changes">Du må klikke Neste for å lagre endringene.</message>
     <message key="xmlui.Submission.submit.CCLicenseStep.submit_remove">Fjern denne Creative Commons-lisensen</message>
+    <message key="xmlui.Submission.submit.CCLicenseStep.error"><strong>ERROR</strong>: Creative Commons API ikke tilgjengelig.<br/>Du kan fortsette registreringen, men du kan ikke velge en Creative Commons-lisens.</message>
 
     <!-- org.dspace.app.xmlui.Submission.submit.LicenseStep -->
     <message key="xmlui.Submission.submit.LicenseStep.head">Distribusjonslisens</message>
