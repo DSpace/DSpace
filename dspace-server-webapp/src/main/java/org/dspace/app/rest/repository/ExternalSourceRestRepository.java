@@ -89,10 +89,10 @@ public class ExternalSourceRestRepository extends DSpaceRestRepository<ExternalS
     }
 
     @Override
+    @PreAuthorize("permitAll()")
     public Page<ExternalSourceRest> findAll(Context context, Pageable pageable) {
         List<ExternalDataProvider> externalSources = externalDataService.getExternalDataProviders();
-        return converter.toRestPage(externalSources, pageable, externalSources.size(),
-                                    utils.obtainProjection());
+        return converter.toRestPage(externalSources, pageable, utils.obtainProjection());
     }
 
     public Class<ExternalSourceRest> getDomainClass() {
