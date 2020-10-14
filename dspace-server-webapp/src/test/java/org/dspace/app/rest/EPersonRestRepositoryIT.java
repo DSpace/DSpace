@@ -39,11 +39,6 @@ import javax.ws.rs.core.MediaType;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
-import org.dspace.app.rest.builder.CollectionBuilder;
-import org.dspace.app.rest.builder.CommunityBuilder;
-import org.dspace.app.rest.builder.EPersonBuilder;
-import org.dspace.app.rest.builder.GroupBuilder;
-import org.dspace.app.rest.builder.ItemBuilder;
 import org.dspace.app.rest.jackson.IgnoreJacksonWriteOnlyAccess;
 import org.dspace.app.rest.matcher.EPersonMatcher;
 import org.dspace.app.rest.matcher.GroupMatcher;
@@ -57,9 +52,13 @@ import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.rest.model.patch.ReplaceOperation;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.app.rest.test.MetadataPatchSuite;
+import org.dspace.builder.CollectionBuilder;
+import org.dspace.builder.CommunityBuilder;
+import org.dspace.builder.EPersonBuilder;
+import org.dspace.builder.GroupBuilder;
+import org.dspace.builder.WorkflowItemBuilder;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
-import org.dspace.content.Item;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.PasswordHash;
@@ -798,7 +797,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
     }
 
     @Test
-    public void deleteViolatingConstraints() throws Exception {
+    public void deleteViolatingWorkFlowConstraints() throws Exception {
         // We turn off the authorization system in order to create the structure as defined below
         context.turnOffAuthorisationSystem();
 
@@ -817,12 +816,13 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         // 2. A collection with a logo
         Collection col = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection")
-                                          .withLogo("logo_collection").build();
+                                          .withLogo("logo_collection")
+                                          .withWorkflowGroup(1, ePerson)
+                                          .build();
 
 
         // 3. Create an item that will prevent the deletion of the eperson account (it is the submitter)
-        Item item = ItemBuilder.createItem(context, col).build();
-
+        WorkflowItemBuilder.createWorkflowItem(context, col);
         context.restoreAuthSystemState();
 
         String token = getAuthToken(admin.getEmail(), password);

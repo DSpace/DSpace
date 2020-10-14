@@ -23,13 +23,22 @@ public class RequestItemSubmitterStrategy implements RequestItemAuthorExtractor 
     public RequestItemSubmitterStrategy() {
     }
 
+    /**
+     * Returns the submitter of an Item as RequestItemAuthor or null if the
+     * Submitter is deleted.
+     *
+     * @return The submitter of the item or null if the submitter is deleted
+     * @throws SQLException if database error
+     */
     @Override
     public RequestItemAuthor getRequestItemAuthor(Context context, Item item)
         throws SQLException {
         EPerson submitter = item.getSubmitter();
-        RequestItemAuthor author = new RequestItemAuthor(
-            submitter.getFullName(), submitter.getEmail());
+        RequestItemAuthor author = null;
+        if (null != submitter) {
+            author = new RequestItemAuthor(
+                    submitter.getFullName(), submitter.getEmail());
+        }
         return author;
     }
-
 }

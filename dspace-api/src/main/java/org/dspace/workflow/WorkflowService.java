@@ -80,6 +80,20 @@ public interface WorkflowService<T extends WorkflowItem> {
      */
     public WorkspaceItem abort(Context c, T wi, EPerson e) throws SQLException, AuthorizeException, IOException;
 
+    /**
+     * Deletes workflow task item in correct order.
+     *
+     * @param c  The relevant DSpace Context.
+     * @param wi The WorkflowItem that shall be deleted.
+     * @param e  Admin that deletes this workflow task and item (for logging
+     * @throws SQLException       An exception that provides information on a database access error or other errors.
+     * @throws AuthorizeException Exception indicating the current user of the context does not have permission
+     *                            to perform a particular action.
+     * @throws IOException        A general class of exceptions produced by failed or interrupted I/O operations.
+     */
+    public void deleteWorkflowByWorkflowItem(Context c, T wi, EPerson e)
+        throws SQLException, AuthorizeException, IOException;
+
     public WorkspaceItem sendWorkflowItemBackSubmission(Context c, T workflowItem, EPerson e, String provenance,
                                                         String rejection_message)
         throws SQLException, AuthorizeException, IOException;
