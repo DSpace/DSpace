@@ -21,6 +21,7 @@ import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.layout.CrisLayoutBox;
+import org.dspace.layout.LayoutSecurity;
 import org.dspace.layout.service.CrisLayoutBoxAccessService;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -42,17 +43,18 @@ public class CrisLayoutBoxAccessServiceImpl implements CrisLayoutBoxAccessServic
     @Override
     public boolean grantAccess(Context context, EPerson currentUser, CrisLayoutBox box, Item item)
         throws SQLException {
-        int layoutSecurity = box.getSecurity();
 
-        switch (layoutSecurity) {
-            case 1:
-                return authorizeService.isAdmin(context);
-            case 2:
+        switch (LayoutSecurity.valueOf(box.getSecurity())) {
+            case PUBLIC:
+                return true;
+            case OWNER_ONLY:
                 return isOwner(currentUser, item);
-            case 3:
-                return (isOwner(currentUser, item) || authorizeService.isAdmin(context));
-            case 4:
+            case CUSTOM_DATA:
                 return customDataGrantAccess(currentUser, box, item);
+            case ADMINISTRATOR:
+                return authorizeService.isAdmin(context);
+            case OWNER_AND_ADMINISTRATOR:
+                return authorizeService.isAdmin(context) || isOwner(currentUser, item);
             default:
                 return false;
         }
