@@ -2767,15 +2767,17 @@ function doSetupCollectionHarvesting(collectionID)
 	var oaiSetIdValue = null;
 	var metadataFormatValue = null;
 	var harvestLevelValue = null;
+	var harvestStartTimeValue = null;
 
 	do {
-		sendPageAndWait("admin/collection/setupHarvesting",{"collectionID":collectionID,"oaiProviderValue":oaiProviderValue,"oaiSetAll":oaiSetAll,"oaiSetIdValue":oaiSetIdValue,"metadataFormatValue":metadataFormatValue,"harvestLevelValue":harvestLevelValue},result);
+		sendPageAndWait("admin/collection/setupHarvesting",{"collectionID":collectionID,"oaiProviderValue":oaiProviderValue,"oaiSetAll":oaiSetAll,"oaiSetIdValue":oaiSetIdValue,"metadataFormatValue":metadataFormatValue,"harvestLevelValue":harvestLevelValue, "harvestStartTimeValue":harvestStartTimeValue},result);
 		result = null;
 		oaiProviderValue = cocoon.request.get("oai_provider");
 		oaiSetAll = cocoon.request.get("oai-set-setting");
 		oaiSetIdValue = cocoon.request.get("oai_setid");
 		metadataFormatValue = cocoon.request.get("metadata_format");
 		harvestLevelValue = cocoon.request.get("harvest_level");
+		harvestStartTimeValue = cocoon.request.get("harvest_starttime");
 
 		assertAdminCollection(collectionID);
 
