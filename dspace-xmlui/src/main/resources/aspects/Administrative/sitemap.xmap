@@ -739,6 +739,7 @@ to administer DSpace.
 		        				<map:parameter name="oaiSetIdValue" value="{flow-attribute:oaiSetIdValue}"/>
 		        				<map:parameter name="metadataFormatValue" value="{flow-attribute:metadataFormatValue}"/>
 		        				<map:parameter name="harvestLevelValue" value="{flow-attribute:harvestLevelValue}"/>
+		        				<map:parameter name="harvestStartTimeValue" value="{flow-attribute:harvestStartTimeValue}"/>
 		        			</map:transform>
 		        		</map:match> 
 		        		

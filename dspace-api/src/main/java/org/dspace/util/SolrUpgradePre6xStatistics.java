@@ -67,6 +67,7 @@ import org.dspace.services.factory.DSpaceServicesFactory;
  * 
  * @author Terry Brady, Georgetown University Library
  */
+
 public class SolrUpgradePre6xStatistics {
     //Command line parameter constants
     private static final String INDEX_NAME_OPTION = "i";
@@ -487,8 +488,8 @@ public class SolrUpgradePre6xStatistics {
         sQ.addSort("type", SolrQuery.ORDER.desc);
         sQ.addSort("scopeType", SolrQuery.ORDER.desc);
         sQ.addSort("ord(owningItem)", SolrQuery.ORDER.desc);
-        sQ.addSort("id", SolrQuery.ORDER.asc);
-        sQ.addSort("scopeId", SolrQuery.ORDER.asc);
+        sQ.addSort("ord(id)", SolrQuery.ORDER.asc);
+        sQ.addSort("ord(scopeId)", SolrQuery.ORDER.asc);
 
         QueryResponse sr = server.query(sQ);
         SolrDocumentList sdl = sr.getResults();

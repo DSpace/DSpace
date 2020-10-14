@@ -409,7 +409,7 @@ public class BrowseEngine
             // get the table name that we are going to be getting our data from
             // this is the distinct table constrained to either community or collection
             dao.setTable(browseIndex.getDistinctTableName());
-            dao.setStartsWith(StringUtils.lowerCase(scope.getStartsWith()));
+            dao.setStartsWith("0".equals(scope.getStartsWith()) && !scope.getOrder().equals("ASC") ? "9" : StringUtils.lowerCase(scope.getStartsWith()));
             // remind the DAO that this is a distinct value browse, so it knows what sort
             // of query to build
             dao.setDistinct(true);
@@ -461,48 +461,67 @@ public class BrowseEngine
             // = sort_1 > myvalue
             dao.setJumpToField("sort_value");
             int offset = scope.getOffset();
+            int limit = scope.getResultsPerPage();
+            List<String[]> results = null;
+
             String rawFocusValue = null;
-            if (offset < 1 && scope.hasJumpToValue() || scope.hasStartsWith())
-            {
+            if (offset < 1 && scope.hasJumpToValue() || scope.hasStartsWith()) {
                 // store the value to tell the Browse Info object which value we are browsing on
                 rawFocusValue = getJumpToValue();
             }
-
-
-            // assemble the offset and limit
-            dao.setOffset(offset);
-            dao.setLimit(scope.getResultsPerPage());
-
-            // Holder for the results
-            List<String[]> results = null;
-
-            // Does this browse have any contents?
-            if (total > 0)
-            {
-                // now run the query
-                results = dao.doValueQuery();
-
-                // now, if we don't have any results, we are at the end of the browse.  This will
-                // be because a starts_with value has been supplied for which we don't have
-                // any items.
-                if (results.size() == 0)
-                {
-                    // In this case, we will calculate a new offset for the last page of results
-                    offset = total - scope.getResultsPerPage();
-                    if (offset < 0)
-                    {
-                        offset = 0;
-                    }
-
-                    // And rerun the query
-                    dao.setOffset(offset);
-                    results = dao.doValueQuery();
-                }
-            }
-            else
-            {
-                // No records, so make an empty list
+            if ("0".equals(scope.getStartsWith())) {
+                int currentSW = scope.getOrder().equals("ASC") ? 0 : 9;
                 results = new ArrayList<String[]>();
+                // While we haven't reached results or the end
+                while (results.size() < scope.getResultsPerPage() && currentSW <= 9 && currentSW >= 0) {
+                    List<String[]> thisNumResults = dao.doValueQuery();
+                    // If set contains our results
+                    if (offset < thisNumResults.size()) {
+                        // If we have found the rest, add and exit loop
+                        if (offset + limit < thisNumResults.size()) {
+                            results.addAll(thisNumResults.subList(offset, offset + limit));
+                            break;
+                        } else { // Else add all we can and query again
+                            thisNumResults = thisNumResults.subList(offset, thisNumResults.size());
+                            results.addAll(thisNumResults);
+                            offset = 0;
+                            limit -= thisNumResults.size();
+                        }
+                    } else {
+                        offset -= thisNumResults.size();
+                    }
+                    dao.setStartsWith(String.valueOf(scope.getOrder().equals("ASC") ? ++currentSW : --currentSW));
+                }
+
+                offset = scope.getOffset();
+            } else {
+                // assemble the offset and limit
+                dao.setOffset(offset);
+                dao.setLimit(limit);
+
+                // Does this browse have any contents?
+                if (total > 0) {
+                    // now run the query
+                    results = dao.doValueQuery();
+
+                    // now, if we don't have any results, we are at the end of the browse.  This will
+                    // be because a starts_with value has been supplied for which we don't have
+                    // any items.
+                    if (results.size() == 0) {
+                        // In this case, we will calculate a new offset for the last page of results
+                        offset = total - scope.getResultsPerPage();
+                        if (offset < 0) {
+                            offset = 0;
+                        }
+
+                        // And rerun the query
+                        dao.setOffset(offset);
+                        results = dao.doValueQuery();
+                    }
+                } else {
+                    // No records, so make an empty list
+                    results = new ArrayList<String[]>();
+                }
             }
 
             // construct the BrowseInfo object to pass back
@@ -757,6 +776,19 @@ public class BrowseEngine
         
         // perform the query and get the result
         int count = dao.doCountQuery();
+        if ("0".equals(dao.getStartsWith())) {
+            for (int x = 1; x <= 9; x++) {
+                dao.setStartsWith(String.valueOf(x));
+                count += dao.doCountQuery();
+            }
+            dao.setStartsWith("0");
+        } else if ("9".equals(dao.getStartsWith())) {
+            for (int x = 8; x >= 0; x--) {
+                dao.setStartsWith(String.valueOf(x));
+                count += dao.doCountQuery();
+            }
+            dao.setStartsWith("9");
+        }
 
         // now put back the values we removed for this method
         dao.setJumpToField(focusField);

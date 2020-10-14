@@ -13,6 +13,7 @@ import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import javax.servlet.http.HttpSession;
 
 import org.apache.cocoon.environment.ObjectModelHelper;
@@ -70,16 +71,20 @@ public class CCLicenseStep extends AbstractSubmissionStep
             message("xmlui.Submission.submit.CCLicenseStep.submit_issue_creative_commons");
     protected static final Message T_license = 
         message("xmlui.Submission.submit.CCLicenseStep.license");
-        protected static final Message T_submit_remove = message("xmlui.Submission.submit.CCLicenseStep.submit_remove");
-        protected static final Message T_no_license    = message("xmlui.Submission.submit.CCLicenseStep.no_license");
-        protected static final Message T_select_change = message("xmlui.Submission.submit.CCLicenseStep.select_change");
-        protected static final Message T_save_changes  = message("xmlui.Submission.submit.CCLicenseStep.save_changes");
-        protected static final Message T_ccws_error  = message("xmlui.Submission.submit.CCLicenseStep.ccws_error");
+	protected static final Message T_submit_remove = message("xmlui.Submission.submit.CCLicenseStep.submit_remove");
+	protected static final Message T_no_license    = message("xmlui.Submission.submit.CCLicenseStep.no_license");
+	protected static final Message T_select_change = message("xmlui.Submission.submit.CCLicenseStep.select_change");
+	protected static final Message T_save_changes  = message("xmlui.Submission.submit.CCLicenseStep.save_changes");
+	protected static final Message T_ccws_error  = message("xmlui.Submission.submit.CCLicenseStep.ccws_error");
+	protected static final Message T_error = message("xmlui.Submission.submit.CCLicenseStep.error");
 
     /** CC specific variables */
     private String ccLocale;
 
 	protected CreativeCommonsService creativeCommonsService = LicenseServiceFactory.getInstance().getCreativeCommonsService();
+
+	/** log4j logger */
+	private static Logger log = Logger.getLogger(CCLicenseStep.class);
 
 
 	/**
@@ -127,21 +132,33 @@ public class CCLicenseStep extends AbstractSubmissionStep
 	    Select selectList = list.addItem().addSelect("licenseclass_chooser");
 	    selectList.setLabel(T_license);
 	    selectList.setEvtBehavior("submitOnChange");
-		ccLocale = context.getCurrentLocale().getLanguage();
-		Iterator<CCLicense> iterator = cclookup.getLicenses(ccLocale).iterator();
+			ccLocale = context.getCurrentLocale().getLanguage();
+
+			java.util.Collection<CCLicense> licenses = cclookup.getLicenses(ccLocale);
 	    // build select List - first choice always 'choose a license', last always 'No license'
 	    selectList.addOption(T_select_change.getKey(), T_select_change);
 	    if(T_select_change.getKey().equals(selectedLicense)) {
 	    	selectList.setOptionSelected(T_select_change.getKey());
 	    }
-	    while (iterator.hasNext()) {
-	        CCLicense cclicense = iterator.next();
-	        selectList.addOption(cclicense.getLicenseId(), cclicense.getLicenseName());
-            if (selectedLicense != null && selectedLicense.equals(cclicense.getLicenseId()))
-        	{
-            	selectList.setOptionSelected(cclicense.getLicenseId());
-        	}
-	    }
+
+	    if(licenses != null)	{
+			Iterator<CCLicense> iterator = licenses.iterator();
+
+			while (iterator.hasNext()) {
+				CCLicense cclicense = iterator.next();
+				selectList.addOption(cclicense.getLicenseId(), cclicense.getLicenseName());
+				if (selectedLicense != null && selectedLicense.equals(cclicense.getLicenseId()))
+				{
+					selectList.setOptionSelected(cclicense.getLicenseId());
+				}
+			}
+		}
+	    else {
+	    	div.addPara(T_error);
+	    	log.error("Could not retrieve CC licenses.");
+
+		}
+
 	    selectList.addOption(T_no_license.getKey(), T_no_license);
 	    if(T_no_license.getKey().equals(selectedLicense)) {
 	    	selectList.setOptionSelected(T_no_license.getKey());
