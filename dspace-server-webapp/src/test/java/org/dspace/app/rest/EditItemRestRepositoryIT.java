@@ -45,7 +45,6 @@ import org.springframework.beans.factory.annotation.Autowired;
  * 
  * @author Mykhaylo Boychuk (mykhaylo.boychuk at 4science.it)
  */
-@Ignore
 public class EditItemRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     @Autowired

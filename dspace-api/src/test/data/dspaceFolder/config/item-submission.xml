@@ -22,8 +22,6 @@
         <name-map collection-handle="123456789/language-test-1" submission-name="languagetestprocess"/>
         <name-map collection-handle="123456789/patent-test" submission-name="patent"/>
         <name-map collection-handle="123456789/traditional-cris" submission-name="traditional-cris"/>
-        <name-map collection-handle="123456789/modeA" submission-name="modeA"/>
-        <name-map collection-handle="123456789/mode2" submission-name="modeB"/>
     </submission-map>
 
 
