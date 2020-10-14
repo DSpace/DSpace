@@ -7,25 +7,21 @@
  */
 package org.dspace.storage.rdbms.migration;
 
-import java.sql.Connection;
-
-import org.dspace.core.Constants;
 import org.dspace.storage.rdbms.DatabaseUtils;
-import org.flywaydb.core.api.migration.MigrationChecksumProvider;
-import org.flywaydb.core.api.migration.jdbc.JdbcMigration;
-import org.flywaydb.core.internal.util.scanner.classpath.ClassPathResource;
+import org.flywaydb.core.api.migration.BaseJavaMigration;
+import org.flywaydb.core.api.migration.Context;
 
 public class V5_7_2017_05_05__DS_3431_Add_Policies_for_BasicWorkflow
-    implements JdbcMigration, MigrationChecksumProvider {
+    extends BaseJavaMigration {
 
     // Size of migration script run
     Integer migration_file_size = -1;
 
 
     @Override
-    public void migrate(Connection connection) throws Exception {
+    public void migrate(Context context) throws Exception {
         // Based on type of DB, get path to SQL migration script
-        String dbtype = DatabaseUtils.getDbType(connection);
+        String dbtype = DatabaseUtils.getDbType(context.getConnection());
 
         String dataMigrateSQL;
         String sqlMigrationPath = "org/dspace/storage/rdbms/sqlmigration/workflow/" + dbtype + "/";
@@ -33,19 +29,18 @@ public class V5_7_2017_05_05__DS_3431_Add_Policies_for_BasicWorkflow
         // If XMLWorkflow Table does NOT exist in this database, then lets do the migration!
         // If XMLWorkflow Table ALREADY exists, then this migration is a noop, we assume you manually ran the sql
         // scripts
-        if (DatabaseUtils.tableExists(connection, "cwf_workflowitem")) {
+        if (DatabaseUtils.tableExists(context.getConnection(), "cwf_workflowitem")) {
             return;
         } else {
             //Migrate the basic workflow
             // Get the contents of our data migration script, based on path & DB type
-            dataMigrateSQL = new ClassPathResource(sqlMigrationPath + "basicWorkflow" + "/V5.7_2017.05.05__DS-3431.sql",
-                                                   getClass().getClassLoader())
-                .loadAsString(Constants.DEFAULT_ENCODING);
+            dataMigrateSQL = MigrationUtils.getResourceAsString(
+                sqlMigrationPath + "basicWorkflow/V5.7_2017.05.05__DS-3431.sql");
         }
 
         // Actually execute the Data migration SQL
         // This will migrate all existing traditional workflows to the new XMLWorkflow system & tables
-        DatabaseUtils.executeSql(connection, dataMigrateSQL);
+        DatabaseUtils.executeSql(context.getConnection(), dataMigrateSQL);
         migration_file_size = dataMigrateSQL.length();
 
     }

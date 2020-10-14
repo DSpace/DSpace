@@ -13,8 +13,9 @@ import java.sql.Statement;
 
 import org.apache.logging.log4j.Logger;
 import org.flywaydb.core.api.FlywayException;
-import org.flywaydb.core.api.MigrationInfo;
-import org.flywaydb.core.api.callback.FlywayCallback;
+import org.flywaydb.core.api.callback.Callback;
+import org.flywaydb.core.api.callback.Context;
+import org.flywaydb.core.api.callback.Event;
 
 /**
  * This is a FlywayCallback class which automatically verifies that "pgcrypto"
@@ -28,7 +29,7 @@ import org.flywaydb.core.api.callback.FlywayCallback;
  *
  * @author Tim Donohue
  */
-public class PostgreSQLCryptoChecker implements FlywayCallback {
+public class PostgreSQLCryptoChecker implements Callback {
     private Logger log = org.apache.logging.log4j.LogManager.getLogger(PostgreSQLCryptoChecker.class);
 
     /**
@@ -96,76 +97,43 @@ public class PostgreSQLCryptoChecker implements FlywayCallback {
         }
     }
 
+    /**
+     * Events supported by this callback.
+     * @param event Flyway event
+     * @param context Flyway context
+     * @return true if BEFORE_BASELINE, BEFORE_MIGRATE or BEFORE_CLEAN
+     */
     @Override
-    public void beforeClean(Connection connection) {
-        // If pgcrypto is installed, remove it
-        removePgCrypto(connection);
+    public boolean supports(Event event, Context context) {
+        return event.equals(Event.BEFORE_BASELINE) || event.equals(Event.BEFORE_MIGRATE) ||
+            event.equals(Event.BEFORE_CLEAN);
     }
 
+    /**
+     * Whether event can be handled in a transaction or whether it must be handle outside of transaction.
+     * @param event Flyway event
+     * @param context Flyway context
+     * @return true
+     */
     @Override
-    public void afterClean(Connection connection) {
-
+    public boolean canHandleInTransaction(Event event, Context context) {
+        return true;
     }
 
+    /**
+     * What to run when the callback is triggered.
+     * @param event Flyway event
+     * @param context Flyway context
+     */
     @Override
-    public void beforeMigrate(Connection connection) {
-        // Before migrating database, check for pgcrypto
-        checkPgCrypto(connection);
-    }
-
-    @Override
-    public void afterMigrate(Connection connection) {
-
-    }
-
-    @Override
-    public void beforeEachMigrate(Connection connection, MigrationInfo migrationInfo) {
-
-    }
-
-    @Override
-    public void afterEachMigrate(Connection connection, MigrationInfo migrationInfo) {
-
-    }
-
-    @Override
-    public void beforeValidate(Connection connection) {
-
-    }
-
-    @Override
-    public void afterValidate(Connection connection) {
-
-    }
-
-    @Override
-    public void beforeBaseline(Connection connection) {
-        // Before initializing database, check for pgcrypto
-        checkPgCrypto(connection);
-    }
-
-    @Override
-    public void afterBaseline(Connection connection) {
-
-    }
-
-    @Override
-    public void beforeRepair(Connection connection) {
-
-    }
-
-    @Override
-    public void afterRepair(Connection connection) {
-
-    }
-
-    @Override
-    public void beforeInfo(Connection connection) {
-
-    }
-
-    @Override
-    public void afterInfo(Connection connection) {
+    public void handle(Event event, Context context) {
+        // If, before initializing or migrating database, check for pgcrypto
+        // Else, before Cleaning database, remove pgcrypto (if exists)
+        if (event.equals(Event.BEFORE_BASELINE) || event.equals(Event.BEFORE_MIGRATE)) {
+            checkPgCrypto(context.getConnection());
+        } else if (event.equals(Event.BEFORE_CLEAN)) {
+            removePgCrypto(context.getConnection());
+        }
 
     }
 }

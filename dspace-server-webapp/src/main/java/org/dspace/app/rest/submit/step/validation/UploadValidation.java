@@ -41,15 +41,11 @@ public class UploadValidation extends AbstractValidation {
                                     SubmissionStepConfig config) throws DCInputsReaderException, SQLException {
         //TODO MANAGE METADATA
 
-        for (String key : uploadConfigurationService.getMap().keySet()) {
-            if (getName().equals(key)) {
-                UploadConfiguration uploadConfig = uploadConfigurationService.getMap().get(key);
-                if (uploadConfig.isRequired() && !itemService.hasUploadedFiles(obj.getItem())) {
-                    addError(ERROR_VALIDATION_FILEREQUIRED,
-                             "/" + WorkspaceItemRestRepository.OPERATION_PATH_SECTIONS + "/"
-                                 + config.getId());
-                }
-            }
+        UploadConfiguration uploadConfig = uploadConfigurationService.getMap().get(config.getId());
+        if (uploadConfig.isRequired() && !itemService.hasUploadedFiles(obj.getItem())) {
+            addError(ERROR_VALIDATION_FILEREQUIRED,
+                     "/" + WorkspaceItemRestRepository.OPERATION_PATH_SECTIONS + "/"
+                         + config.getId());
         }
         return getErrors();
     }

@@ -59,7 +59,7 @@ public class SitemapsOrgGenerator extends AbstractGenerator {
 
     @Override
     public String getFilename(int number) {
-        return "sitemap" + number + ".xml.gz";
+        return "sitemap" + number + ".xml";
     }
 
     @Override
@@ -100,12 +100,12 @@ public class SitemapsOrgGenerator extends AbstractGenerator {
 
     @Override
     public boolean useCompression() {
-        return true;
+        return false;
     }
 
     @Override
     public String getIndexFilename() {
-        return "sitemap_index.xml.gz";
+        return "sitemap_index.xml";
     }
 
     @Override
