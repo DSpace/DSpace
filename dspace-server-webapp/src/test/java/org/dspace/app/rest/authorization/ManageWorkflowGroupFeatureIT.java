@@ -33,7 +33,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 /**
  * Test for the canManageWorkflowGroup authorization feature
  */
-public class ManageWorkflowGroupFeature extends AbstractControllerIntegrationTest {
+public class ManageWorkflowGroupFeatureIT extends AbstractControllerIntegrationTest {
 
     @Autowired
     private Utils utils;
@@ -48,8 +48,6 @@ public class ManageWorkflowGroupFeature extends AbstractControllerIntegrationTes
     private CommunityRest communityARest;
     private Collection collectionA;
     private CollectionRest collectionARest;
-    private String adminToken;
-    private String epersonToken;
 
     final String feature = "canManageWorkflowGroup";
 
@@ -70,13 +68,11 @@ public class ManageWorkflowGroupFeature extends AbstractControllerIntegrationTes
 
         communityARest = communityConverter.convert(communityA, Projection.DEFAULT);
         collectionARest = collectionConverter.convert(collectionA, Projection.DEFAULT);
-
-        adminToken = getAuthToken(admin.getEmail(), password);
-        epersonToken = getAuthToken(eperson.getEmail(), password);
     }
 
     @Test
     public void adminCollectionTestSuccess() throws Exception {
+        String adminToken = getAuthToken(admin.getEmail(), password);
         getClient(adminToken).perform(
             get("/api/authz/authorizations/search/object")
                 .param("embed", "feature")
@@ -89,6 +85,7 @@ public class ManageWorkflowGroupFeature extends AbstractControllerIntegrationTes
 
     @Test
     public void adminCommunityTestNotFound() throws Exception {
+        String adminToken = getAuthToken(admin.getEmail(), password);
         getClient(adminToken).perform(
             get("/api/authz/authorizations/search/object")
                 .param("embed", "feature")
@@ -133,6 +130,7 @@ public class ManageWorkflowGroupFeature extends AbstractControllerIntegrationTes
             .build();
         context.restoreAuthSystemState();
 
+        String epersonToken = getAuthToken(eperson.getEmail(), password);
         getClient(epersonToken).perform(
             get("/api/authz/authorizations/search/object")
                 .param("embed", "feature")
@@ -153,6 +151,7 @@ public class ManageWorkflowGroupFeature extends AbstractControllerIntegrationTes
             .build();
         context.restoreAuthSystemState();
 
+        String epersonToken = getAuthToken(eperson.getEmail(), password);
         getClient(epersonToken).perform(
             get("/api/authz/authorizations/search/object")
                 .param("embed", "feature")
