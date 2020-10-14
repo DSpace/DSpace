@@ -141,7 +141,7 @@ public class EPerson extends DSpaceObject implements DSpaceObjectLegacySupport {
             return false;
         }
         final EPerson other = (EPerson) obj;
-        if (this.getID() != other.getID()) {
+        if (!this.getID().equals(other.getID())) {
             return false;
         }
         if (!StringUtils.equals(this.getEmail(), other.getEmail())) {

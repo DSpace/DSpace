@@ -13,6 +13,7 @@ import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadata;
 import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadataDoesNotExist;
 import static org.dspace.core.Constants.WRITE;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
@@ -286,6 +287,47 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                         "owningCollection"
                 )))
                 .andExpect(jsonPath("$", publicItem1Matcher));
+    }
+
+    @Test
+    public void findOneFullProjectionTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and two collections.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
+
+        //2. Three public items that are readable by Anonymous with different subjects
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
+                                      .withTitle("Public item 1")
+                                      .withIssueDate("2017-10-17")
+                                      .withAuthor("Smith, Donald").withAuthor("Doe, John")
+                                      .withSubject("ExtraEntry")
+                                      .build();
+        context.restoreAuthSystemState();
+        Matcher<? super Object> publicItem1Matcher = ItemMatcher.matchItemWithTitleAndDateIssued(publicItem1,
+                                                                                                 "Public item 1",
+                                                                                                 "2017-10-17");
+
+        String token = getAuthToken(admin.getEmail(), password);
+        getClient(token).perform(get("/api/core/items/" + publicItem1.getID())
+                                     .param("projection", "full"))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$._embedded.owningCollection._embedded.adminGroup", nullValue()));
+
+
+        getClient().perform(get("/api/core/items/" + publicItem1.getID())
+                                .param("projection", "full"))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$._embedded.owningCollection._embedded.adminGroup").doesNotExist());
+
     }
 
     @Test
