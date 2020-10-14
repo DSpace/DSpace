@@ -9,6 +9,8 @@ package org.dspace.content;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.collections4.CollectionUtils;
@@ -20,8 +22,12 @@ import org.dspace.content.dao.MetadataFieldDAO;
 import org.dspace.content.service.MetadataFieldService;
 import org.dspace.content.service.MetadataSchemaService;
 import org.dspace.content.service.MetadataValueService;
+import org.dspace.content.service.SiteService;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
+import org.dspace.discovery.indexobject.IndexableMetadataField;
+import org.dspace.event.Event;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -46,6 +52,8 @@ public class MetadataFieldServiceImpl implements MetadataFieldService {
     protected MetadataValueService metadataValueService;
     @Autowired(required = true)
     protected MetadataSchemaService metadataSchemaService;
+    @Autowired
+    protected SiteService siteService;
 
     protected MetadataFieldServiceImpl() {
 
@@ -77,6 +85,8 @@ public class MetadataFieldServiceImpl implements MetadataFieldService {
 
         log.info(LogManager.getHeader(context, "create_metadata_field",
                                       "metadata_field_id=" + metadataField.getID()));
+        // Update the index of type metadatafield
+        this.triggerEventToUpdateIndex(context, metadataField.getID());
         return metadataField;
     }
 
@@ -149,6 +159,8 @@ public class MetadataFieldServiceImpl implements MetadataFieldService {
                                       "metadata_field_id=" + metadataField.getID() + "element=" + metadataField
                                           .getElement()
                                           + "qualifier=" + metadataField.getQualifier()));
+        // Update the index of type metadatafield
+        this.triggerEventToUpdateIndex(context, metadataField.getID());
     }
 
     @Override
@@ -177,6 +189,21 @@ public class MetadataFieldServiceImpl implements MetadataFieldService {
 
         log.info(LogManager.getHeader(context, "delete_metadata_field",
                                       "metadata_field_id=" + metadataField.getID()));
+        // Update the index of type metadatafield
+        this.triggerEventToUpdateIndex(context, metadataField.getID());
+    }
+
+    /**
+     * Calls a MODIFY SITE event with the identifier of the changed mdField, so it can be indexed in
+     * {@link org.dspace.discovery.IndexEventConsumer}, with type of {@link org.dspace.discovery.IndexableObject} in
+     * {@link Event}.detail and the identifiers of the changed mdFields in {@link Event}.identifiers
+     *
+     * @param context   DSpace context
+     * @param mdFieldId ID of the metadata field that needs to be (re)indexed
+     */
+    private void triggerEventToUpdateIndex(Context context, int mdFieldId) {
+        context.addEvent(new Event(Event.MODIFY, Constants.SITE, null, IndexableMetadataField.TYPE, new ArrayList<>(
+            Arrays.asList(Integer.toString(mdFieldId)))));
     }
 
     /**

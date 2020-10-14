@@ -798,33 +798,37 @@ public class BasicWorkflowServiceImpl implements BasicWorkflowService {
         try {
             // Get submitter
             EPerson ep = item.getSubmitter();
-            // Get the Locale
-            Locale supportedLocale = I18nUtil.getEPersonLocale(ep);
-            Email email = Email.getEmail(I18nUtil.getEmailFilename(supportedLocale, "submit_archive"));
 
-            // Get the item handle to email to user
-            String handle = handleService.findHandle(context, item);
+            // send the notification to the submitter unless the submitter eperson has been deleted
+            if (ep != null) {
+                // Get the Locale
+                Locale supportedLocale = I18nUtil.getEPersonLocale(ep);
+                Email email = Email.getEmail(I18nUtil.getEmailFilename(supportedLocale, "submit_archive"));
 
-            // Get title
-            String title = item.getName();
-            if (StringUtils.isBlank(title)) {
-                try {
-                    title = I18nUtil.getMessage("org.dspace.workflow.WorkflowManager.untitled");
-                } catch (MissingResourceException e) {
-                    title = "Untitled";
+                // Get the item handle to email to user
+                String handle = handleService.findHandle(context, item);
+
+                // Get title
+                String title = item.getName();
+                if (StringUtils.isBlank(title)) {
+                    try {
+                        title = I18nUtil.getMessage("org.dspace.workflow.WorkflowManager.untitled");
+                    } catch (MissingResourceException e) {
+                        title = "Untitled";
+                    }
                 }
+
+                email.addRecipient(ep.getEmail());
+                email.addArgument(title);
+                email.addArgument(coll.getName());
+                email.addArgument(handleService.getCanonicalForm(handle));
+
+                email.send();
             }
-
-            email.addRecipient(ep.getEmail());
-            email.addArgument(title);
-            email.addArgument(coll.getName());
-            email.addArgument(handleService.getCanonicalForm(handle));
-
-            email.send();
         } catch (MessagingException e) {
             log.warn(LogManager.getHeader(context, "notifyOfArchive",
-                                          "cannot email user; item_id=" + item.getID()
-                                              + ":  " + e.getMessage()));
+                    "cannot email user; item_id=" + item.getID()
+                    + ":  " + e.getMessage()));
         }
     }
 
@@ -866,6 +870,22 @@ public class BasicWorkflowServiceImpl implements BasicWorkflowService {
         return workspaceItem;
     }
 
+    @Override
+    public void deleteWorkflowByWorkflowItem(Context context, BasicWorkflowItem wi, EPerson e)
+        throws SQLException, AuthorizeException, IOException {
+        Item myitem = wi.getItem();
+        UUID itemID = myitem.getID();
+        Integer workflowID = wi.getID();
+        UUID collID = wi.getCollection().getID();
+        // stop workflow
+        taskListItemService.deleteByWorkflowItem(context, wi);
+        // Now remove the workflow object manually from the database
+        workflowItemService.deleteWrapper(context, wi);
+        // Now delete the item
+        itemService.delete(context, myitem);
+        log.info(LogManager.getHeader(context, "delete_workflow", String.format("workflow_item_id=%s " +
+                        "item_id=%s collection_id=%s eperson_id=%s", workflowID, itemID, collID, e.getID())));
+    }
 
     @Override
     public WorkspaceItem sendWorkflowItemBackSubmission(Context context, BasicWorkflowItem workflowItem,
@@ -1047,25 +1067,30 @@ public class BasicWorkflowServiceImpl implements BasicWorkflowService {
     protected void notifyOfReject(Context context, BasicWorkflowItem workflowItem, EPerson e,
                                   String reason) {
         try {
-            // Get the item title
-            String title = getItemTitle(workflowItem);
+            // Get submitter
+            EPerson ep = workflowItem.getSubmitter();
+            // send the notification only if the person was not deleted in the meantime
+            if (ep != null) {
+                // Get the item title
+                String title = getItemTitle(workflowItem);
 
-            // Get the collection
-            Collection coll = workflowItem.getCollection();
+                // Get the collection
+                Collection coll = workflowItem.getCollection();
 
-            // Get rejector's name
-            String rejector = getEPersonName(e);
-            Locale supportedLocale = I18nUtil.getEPersonLocale(e);
-            Email email = Email.getEmail(I18nUtil.getEmailFilename(supportedLocale, "submit_reject"));
+                // Get rejector's name
+                String rejector = getEPersonName(e);
+                Locale supportedLocale = I18nUtil.getEPersonLocale(e);
+                Email email = Email.getEmail(I18nUtil.getEmailFilename(supportedLocale, "submit_reject"));
 
-            email.addRecipient(workflowItem.getSubmitter().getEmail());
-            email.addArgument(title);
-            email.addArgument(coll.getName());
-            email.addArgument(rejector);
-            email.addArgument(reason);
-            email.addArgument(getMyDSpaceLink());
+                email.addRecipient(ep.getEmail());
+                email.addArgument(title);
+                email.addArgument(coll.getName());
+                email.addArgument(rejector);
+                email.addArgument(reason);
+                email.addArgument(getMyDSpaceLink());
 
-            email.send();
+                email.send();
+            }
         } catch (RuntimeException re) {
             // log this email error
             log.warn(LogManager.getHeader(context, "notify_of_reject",
@@ -1101,7 +1126,9 @@ public class BasicWorkflowServiceImpl implements BasicWorkflowService {
     @Override
     public String getSubmitterName(BasicWorkflowItem wi) throws SQLException {
         EPerson e = wi.getSubmitter();
-
+        if (e == null) {
+            return null;
+        }
         return getEPersonName(e);
     }
 

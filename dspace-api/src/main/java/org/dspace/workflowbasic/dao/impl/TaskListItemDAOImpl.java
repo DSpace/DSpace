@@ -43,6 +43,24 @@ public class TaskListItemDAOImpl extends AbstractHibernateDAO<TaskListItem> impl
     }
 
     @Override
+    public void deleteByWorkflowItemAndEPerson(Context context, BasicWorkflowItem workflowItem, EPerson ePerson)
+        throws SQLException {
+        String queryString = "delete from TaskListItem where workflowItem = :workflowItem AND ePerson = :ePerson";
+        Query query = createQuery(context, queryString);
+        query.setParameter("workflowItem", workflowItem);
+        query.setParameter("ePerson", ePerson);
+        query.executeUpdate();
+    }
+
+    @Override
+    public void deleteByEPerson(Context context, EPerson ePerson) throws SQLException {
+        String queryString = "delete from TaskListItem where ePerson = :ePerson";
+        Query query = createQuery(context, queryString);
+        query.setParameter("ePerson", ePerson);
+        query.executeUpdate();
+    }
+
+    @Override
     public List<TaskListItem> findByEPerson(Context context, EPerson ePerson) throws SQLException {
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, TaskListItem.class);
