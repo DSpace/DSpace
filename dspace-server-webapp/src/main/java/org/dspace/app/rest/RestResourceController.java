@@ -149,7 +149,7 @@ public class RestResourceController implements InitializingBean {
      * @return single DSpaceResource
      */
     @RequestMapping(method = RequestMethod.GET, value = REGEX_REQUESTMAPPING_IDENTIFIER_AS_DIGIT)
-    public DSpaceResource<RestAddressableModel> findOne(@PathVariable String apiCategory, @PathVariable String model,
+    public HALResource<RestAddressableModel> findOne(@PathVariable String apiCategory, @PathVariable String model,
                                                         @PathVariable Integer id) {
         return findOneInternal(apiCategory, model, id);
     }
@@ -180,7 +180,7 @@ public class RestResourceController implements InitializingBean {
      * @return single DSpaceResource
      */
     @RequestMapping(method = RequestMethod.GET, value = REGEX_REQUESTMAPPING_IDENTIFIER_AS_STRING_VERSION_STRONG)
-    public DSpaceResource<RestAddressableModel> findOne(@PathVariable String apiCategory, @PathVariable String model,
+    public HALResource<RestAddressableModel> findOne(@PathVariable String apiCategory, @PathVariable String model,
                                                         @PathVariable String id) {
         return findOneInternal(apiCategory, model, id);
     }
@@ -200,7 +200,7 @@ public class RestResourceController implements InitializingBean {
      * @return single DSpaceResource
      */
     @RequestMapping(method = RequestMethod.GET, value = REGEX_REQUESTMAPPING_IDENTIFIER_AS_UUID)
-    public DSpaceResource<RestAddressableModel> findOne(@PathVariable String apiCategory, @PathVariable String model,
+    public HALResource<RestAddressableModel> findOne(@PathVariable String apiCategory, @PathVariable String model,
                                                         @PathVariable UUID uuid) {
         return findOneInternal(apiCategory, model, uuid);
     }
@@ -213,7 +213,7 @@ public class RestResourceController implements InitializingBean {
      * @param id Identifier from request
      * @return single DSpaceResource
      */
-    private <ID extends Serializable> DSpaceResource<RestAddressableModel> findOneInternal(String apiCategory,
+    private <ID extends Serializable> HALResource<RestAddressableModel> findOneInternal(String apiCategory,
                                                                                            String model, ID id) {
         DSpaceRestRepository<RestAddressableModel, ID> repository = utils.getResourceRepository(apiCategory, model);
         Optional<RestAddressableModel> modelObject = Optional.empty();
@@ -624,7 +624,7 @@ public class RestResourceController implements InitializingBean {
             HttpServletRequest request,
             @PathVariable String apiCategory,
             @PathVariable String model,
-            @RequestParam("file") MultipartFile uploadfile)
+            @RequestParam("file") List<MultipartFile> uploadfile)
         throws SQLException, FileNotFoundException, IOException, AuthorizeException {
 
         checkModelPluralForm(apiCategory, model);
@@ -799,7 +799,7 @@ public class RestResourceController implements InitializingBean {
             Method linkMethod = utils.requireMethod(linkRepository.getClass(), linkRest.method());
             try {
                 if (Page.class.isAssignableFrom(linkMethod.getReturnType())) {
-                    Page<? extends RestModel> pageResult = (Page<? extends RestAddressableModel>) linkMethod
+                    Page<? extends RestModel> pageResult = (Page<? extends RestModel>) linkMethod
                             .invoke(linkRepository, request, uuid, page, utils.obtainProjection());
 
                     if (pageResult == null) {
@@ -823,8 +823,8 @@ public class RestResourceController implements InitializingBean {
                     return new EntityModel(new EmbeddedPage(link.getHref(),
                             pageResult.map(converter::toResource), null, subpath));
                 } else {
-                    RestModel object = (RestModel) linkMethod.invoke(linkRepository, request, uuid, page,
-                            utils.obtainProjection());
+                    RestModel object = (RestModel) linkMethod.invoke(linkRepository, request,
+                            uuid, page, utils.obtainProjection());
                     if (object == null) {
                         response.setStatus(HttpServletResponse.SC_NO_CONTENT);
                         return null;
@@ -846,7 +846,7 @@ public class RestResourceController implements InitializingBean {
                 throw new RuntimeException(e);
             }
         }
-        RestAddressableModel modelObject = repository.findById(uuid).orElse(null);
+        RestModel modelObject = repository.findById(uuid).orElse(null);
 
         if (modelObject == null) {
             throw new ResourceNotFoundException(apiCategory + "." + model + " with id: " + uuid + " not found");

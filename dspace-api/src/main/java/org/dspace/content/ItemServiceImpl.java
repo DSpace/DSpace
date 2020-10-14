@@ -231,6 +231,12 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
     }
 
     @Override
+    public Iterator<Item> findBySubmitter(Context context, EPerson eperson, boolean retrieveAllItems)
+        throws SQLException {
+        return itemDAO.findBySubmitter(context, eperson, retrieveAllItems);
+    }
+
+    @Override
     public Iterator<Item> findBySubmitterDateSorted(Context context, EPerson eperson, Integer limit)
         throws SQLException {
 
@@ -1100,19 +1106,7 @@ prevent the generation of resource policy entry values with null dspace_object a
                 }
                 break;
             case Constants.DELETE:
-                if (item.getOwningCollection() != null) {
-                    if (AuthorizeConfiguration.canCollectionAdminPerformItemDeletion()) {
-                        adminObject = collection;
-                    } else if (AuthorizeConfiguration.canCommunityAdminPerformItemDeletion()) {
-                        adminObject = community;
-                    }
-                } else {
-                    if (AuthorizeConfiguration.canCollectionAdminManageTemplateItem()) {
-                        adminObject = collection;
-                    } else if (AuthorizeConfiguration.canCommunityAdminManageCollectionTemplateItem()) {
-                        adminObject = community;
-                    }
-                }
+                adminObject = item;
                 break;
             case Constants.WRITE:
                 // if it is a template item we need to check the
@@ -1370,6 +1364,32 @@ prevent the generation of resource policy entry values with null dspace_object a
             return finalList;
         }
 
+    }
+
+    /**
+     * Supports moving metadata by adding the metadata value or updating the place of the relationship
+     */
+    @Override
+    protected void moveSingleMetadataValue(Context context, Item dso, int place, MetadataValue rr) {
+        if (rr instanceof RelationshipMetadataValue) {
+            try {
+                //Retrieve the applicable relationship
+                Relationship rs = relationshipService.find(context,
+                        ((RelationshipMetadataValue) rr).getRelationshipId());
+                if (rs.getLeftItem() == dso) {
+                    rs.setLeftPlace(place);
+                } else {
+                    rs.setRightPlace(place);
+                }
+                relationshipService.update(context, rs);
+            } catch (Exception e) {
+                //should not occur, otherwise metadata can't be updated either
+                log.error("An error occurred while moving " + rr.getAuthority() + " for item " + dso.getID(), e);
+            }
+        } else {
+            //just move the metadata
+            rr.setPlace(place);
+        }
     }
 
     /**
