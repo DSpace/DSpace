@@ -201,7 +201,7 @@
                     <repeatable>false</repeatable>
                     <label>Artikkelnummer</label>
                     <input-type>onebox</input-type>
-                    <hint>Artikkelnummerof  for tidsskrift.</hint>
+                    <hint>Artikkelnummer i tidsskrift.</hint>
                     <required></required>
                 </field>
 

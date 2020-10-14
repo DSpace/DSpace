@@ -207,7 +207,7 @@
                     <repeatable>false</repeatable>
                     <label>Article number</label>
                     <input-type>onebox</input-type>
-                    <hint>Enter the article number of the journal.</hint>
+                    <hint>The article number in the journal.</hint>
                     <required></required>
                 </field>
 
