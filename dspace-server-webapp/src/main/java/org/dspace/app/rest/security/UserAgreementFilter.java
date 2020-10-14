@@ -22,10 +22,8 @@ import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.services.ConfigurationService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
-import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 /**
@@ -34,11 +32,14 @@ import org.springframework.web.filter.OncePerRequestFilter;
  *
  * @author Luca Giamminonni (luca.giamminonni at 4science.it)
  */
-@Component
 public class UserAgreementFilter extends OncePerRequestFilter {
 
-    @Autowired
     private ConfigurationService configurationService;
+
+    public UserAgreementFilter(ConfigurationService configurationService) {
+        super();
+        this.configurationService = configurationService;
+    }
 
     /**
      * Set the response status as 401 Forbidden if the current user has not accepted
