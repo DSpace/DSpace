@@ -91,8 +91,6 @@ public class ViewUsageStatisticsFeatureIT extends AbstractControllerIntegrationT
     private Bitstream bitstreamA;
     private BitstreamRest bitstreamARest;
     private Bundle bundleA;
-    private String adminToken;
-    private String epersonToken;
 
     final String feature = "canViewUsageStatistics";
 
@@ -129,13 +127,11 @@ public class ViewUsageStatisticsFeatureIT extends AbstractControllerIntegrationT
         collectionARest = collectionConverter.convert(collectionA, Projection.DEFAULT);
         itemARest = itemConverter.convert(itemA, Projection.DEFAULT);
         bitstreamARest = bitstreamConverter.convert(bitstreamA, Projection.DEFAULT);
-
-        adminToken = getAuthToken(admin.getEmail(), password);
-        epersonToken = getAuthToken(eperson.getEmail(), password);
     }
 
     @Test
     public void adminBitstreamTestNotFound() throws Exception {
+        String adminToken = getAuthToken(admin.getEmail(), password);
         getClient(adminToken).perform(
             get("/api/authz/authorizations/search/object")
                 .param("embed", "feature")
@@ -148,6 +144,7 @@ public class ViewUsageStatisticsFeatureIT extends AbstractControllerIntegrationT
 
     @Test
     public void adminItemAdminRequiredSuccess() throws Exception {
+        String adminToken = getAuthToken(admin.getEmail(), password);
         getClient(adminToken).perform(
             get("/api/authz/authorizations/search/object")
                 .param("embed", "feature")
@@ -160,6 +157,7 @@ public class ViewUsageStatisticsFeatureIT extends AbstractControllerIntegrationT
 
     @Test
     public void adminCollectionAdminRequiredSuccess() throws Exception {
+        String adminToken = getAuthToken(admin.getEmail(), password);
         getClient(adminToken).perform(
             get("/api/authz/authorizations/search/object")
                 .param("embed", "feature")
@@ -172,6 +170,7 @@ public class ViewUsageStatisticsFeatureIT extends AbstractControllerIntegrationT
 
     @Test
     public void adminCommunityAdminRequiredSuccess() throws Exception {
+        String adminToken = getAuthToken(admin.getEmail(), password);
         getClient(adminToken).perform(
             get("/api/authz/authorizations/search/object")
                 .param("embed", "feature")
@@ -184,6 +183,7 @@ public class ViewUsageStatisticsFeatureIT extends AbstractControllerIntegrationT
 
     @Test
     public void adminSiteAdminRequiredSuccess() throws Exception {
+        String adminToken = getAuthToken(admin.getEmail(), password);
         getClient(adminToken).perform(
             get("/api/authz/authorizations/search/object")
                 .param("embed", "feature")
@@ -196,6 +196,7 @@ public class ViewUsageStatisticsFeatureIT extends AbstractControllerIntegrationT
 
     @Test
     public void ePersonItemAdminRequiredNotFound() throws Exception {
+        String epersonToken = getAuthToken(eperson.getEmail(), password);
         getClient(epersonToken).perform(
             get("/api/authz/authorizations/search/object")
                 .param("embed", "feature")
@@ -208,6 +209,7 @@ public class ViewUsageStatisticsFeatureIT extends AbstractControllerIntegrationT
 
     @Test
     public void ePersonCollectionAdminRequiredNotFound() throws Exception {
+        String epersonToken = getAuthToken(eperson.getEmail(), password);
         getClient(epersonToken).perform(
             get("/api/authz/authorizations/search/object")
                 .param("embed", "feature")
@@ -220,6 +222,7 @@ public class ViewUsageStatisticsFeatureIT extends AbstractControllerIntegrationT
 
     @Test
     public void ePersonCommunityAdminRequiredNotFound() throws Exception {
+        String epersonToken = getAuthToken(eperson.getEmail(), password);
         getClient(epersonToken).perform(
             get("/api/authz/authorizations/search/object")
                 .param("embed", "feature")
@@ -232,6 +235,7 @@ public class ViewUsageStatisticsFeatureIT extends AbstractControllerIntegrationT
 
     @Test
     public void ePersonSiteAdminRequiredNotFound() throws Exception {
+        String epersonToken = getAuthToken(eperson.getEmail(), password);
         getClient(epersonToken).perform(
             get("/api/authz/authorizations/search/object")
                 .param("embed", "feature")
@@ -246,6 +250,7 @@ public class ViewUsageStatisticsFeatureIT extends AbstractControllerIntegrationT
     public void ePersonItemAdminNotRequiredSuccess() throws Exception {
         configurationService.setProperty("usage-statistics.authorization.admin.usage", false);
 
+        String epersonToken = getAuthToken(eperson.getEmail(), password);
         getClient(epersonToken).perform(
             get("/api/authz/authorizations/search/object")
                 .param("embed", "feature")
@@ -260,6 +265,7 @@ public class ViewUsageStatisticsFeatureIT extends AbstractControllerIntegrationT
     public void ePersonCollectionAdminNotRequiredSuccess() throws Exception {
         configurationService.setProperty("usage-statistics.authorization.admin.usage", false);
 
+        String epersonToken = getAuthToken(eperson.getEmail(), password);
         getClient(epersonToken).perform(
             get("/api/authz/authorizations/search/object")
                 .param("embed", "feature")
@@ -274,6 +280,7 @@ public class ViewUsageStatisticsFeatureIT extends AbstractControllerIntegrationT
     public void ePersonCommunityAdminNotRequiredSuccess() throws Exception {
         configurationService.setProperty("usage-statistics.authorization.admin.usage", false);
 
+        String epersonToken = getAuthToken(eperson.getEmail(), password);
         getClient(epersonToken).perform(
             get("/api/authz/authorizations/search/object")
                 .param("embed", "feature")
@@ -288,6 +295,7 @@ public class ViewUsageStatisticsFeatureIT extends AbstractControllerIntegrationT
     public void ePersonSiteAdminNotRequiredSuccess() throws Exception {
         configurationService.setProperty("usage-statistics.authorization.admin.usage", false);
 
+        String epersonToken = getAuthToken(eperson.getEmail(), password);
         getClient(epersonToken).perform(
             get("/api/authz/authorizations/search/object")
                 .param("embed", "feature")
@@ -303,6 +311,7 @@ public class ViewUsageStatisticsFeatureIT extends AbstractControllerIntegrationT
         configurationService.setProperty("usage-statistics.authorization.admin.usage", false);
         authorizeService.removeAllPolicies(context, itemA);
 
+        String epersonToken = getAuthToken(eperson.getEmail(), password);
         getClient(epersonToken).perform(
             get("/api/authz/authorizations/search/object")
                 .param("embed", "feature")
