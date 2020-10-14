@@ -22,6 +22,7 @@ import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.layout.CrisLayoutBox;
 import org.dspace.layout.service.CrisLayoutBoxAccessService;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @author Corrado Lombardi (corrado.lombardi at 4science.it)
@@ -31,6 +32,7 @@ public class CrisLayoutBoxAccessServiceImpl implements CrisLayoutBoxAccessServic
     private final AuthorizeService authorizeService;
     private final ItemService itemService;
 
+    @Autowired
     public CrisLayoutBoxAccessServiceImpl(AuthorizeService authorizeService,
                                           ItemService itemService) {
         this.authorizeService = authorizeService;
