@@ -826,7 +826,7 @@ public class ProcessRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         getClient(token).perform(get("/api/system/processes/search/own"))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$._embedded.processes", contains(
+            .andExpect(jsonPath("$._embedded.processes", containsInAnyOrder(
                 matchProcess(process3.getName(), eperson.getID().toString(), process3.getID(), parameters, SCHEDULED),
                 matchProcess(process1.getName(), eperson.getID().toString(), process1.getID(), parameters, SCHEDULED))))
             .andExpect(jsonPath("$.page", is(PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 2))));

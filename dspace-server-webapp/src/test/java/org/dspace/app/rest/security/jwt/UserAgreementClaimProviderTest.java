@@ -68,6 +68,7 @@ public class UserAgreementClaimProviderTest {
 
         verify(ePersonService).find(context, ePersonUUID);
         verify(ePersonService).getMetadataFirstValue(ePerson, "dspace", "agreements", "end-user", ANY);
+        verify(ePersonService).getMetadataFirstValue(ePerson, "dspace", "agreements", "ignore", ANY);
         verifyNoMoreInteractions(ePersonService);
     }
 
@@ -79,6 +80,20 @@ public class UserAgreementClaimProviderTest {
 
         verify(ePersonService).find(context, ePersonUUID);
         verify(ePersonService).getMetadataFirstValue(ePerson, "dspace", "agreements", "end-user", ANY);
+        verify(ePersonService).getMetadataFirstValue(ePerson, "dspace", "agreements", "ignore", ANY);
+        verifyNoMoreInteractions(ePersonService);
+    }
+
+    @Test
+    public void testGetValueWithIgnoreSetToTrue() throws SQLException {
+        when(ePersonService.getMetadataFirstValue(ePerson, "dspace", "agreements", "end-user", ANY)).thenReturn(null);
+        when(ePersonService.getMetadataFirstValue(ePerson, "dspace", "agreements", "ignore", ANY)).thenReturn("true");
+        Object value = userAgreementClaimProvider.getValue(context, request);
+        assertEquals("true", value);
+
+        verify(ePersonService).find(context, ePersonUUID);
+        verify(ePersonService).getMetadataFirstValue(ePerson, "dspace", "agreements", "end-user", ANY);
+        verify(ePersonService).getMetadataFirstValue(ePerson, "dspace", "agreements", "ignore", ANY);
         verifyNoMoreInteractions(ePersonService);
     }
 

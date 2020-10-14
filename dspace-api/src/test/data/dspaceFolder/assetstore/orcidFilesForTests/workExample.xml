@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:work xmlns="http://www.orcid.org/ns/common" xmlns:ns6="http://www.orcid.org/ns/keyword" xmlns:ns5="http://www.orcid.org/ns/funding" xmlns:ns8="http://www.orcid.org/ns/email" xmlns:ns7="http://www.orcid.org/ns/address" xmlns:ns9="http://www.orcid.org/ns/researcher-url" xmlns:ns12="http://www.orcid.org/ns/external-identifier" xmlns:ns11="http://www.orcid.org/ns/personal-details" xmlns:ns10="http://www.orcid.org/ns/other-name" xmlns:ns2="http://www.orcid.org/ns/work" xmlns:ns4="http://www.orcid.org/ns/research-resource" xmlns:ns3="http://www.orcid.org/ns/peer-review">
+    <ns2:title>
+        <title>A Methodology for the Emulation of Architecture</title>
+    </ns2:title>
+    <ns2:citation>
+        <ns2:citation-type>bibtex</ns2:citation-type>
+        <ns2:citation-value>@OTHER{
+	123456789_yyy,
+	author = {Carberry Josiah},
+	title = {A Methodology for the Emulation of Architecture},
+}
+</ns2:citation-value>
+    </ns2:citation>
+    <ns2:type>other</ns2:type>
+    <publication-date>
+        <year>2013</year>
+        <month>08</month>
+        <day>03</day>
+    </publication-date>
+    <external-ids>
+        <external-id>
+            <external-id-type>handle</external-id-type>
+            <external-id-value>123456789/yyy</external-id-value>
+            <external-id-relationship>self</external-id-relationship>
+        </external-id>
+        <external-id>
+            <external-id-type>doi</external-id-type>
+            <external-id-value>10.1000/182</external-id-value>
+            <external-id-relationship>self</external-id-relationship>
+        </external-id>
+    </external-ids>
+    <ns2:contributors>
+        <ns2:contributor>
+            <ns2:credit-name>Josiah, Carberry</ns2:credit-name>
+            <ns2:contributor-attributes>
+                <ns2:contributor-role>author</ns2:contributor-role>
+            </ns2:contributor-attributes>
+        </ns2:contributor>
+    </ns2:contributors>
+</ns2:work>
